@@ -17,6 +17,12 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
 public class NullPeripheralCommAdapterDescription
     extends PeripheralCommAdapterDescription {
 
+  /**
+   * Creates a new instance.
+   */
+  public NullPeripheralCommAdapterDescription() {
+  }
+
   @Override
   public String getDescription() {
     return "-";

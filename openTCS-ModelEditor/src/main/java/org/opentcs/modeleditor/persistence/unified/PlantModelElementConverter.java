@@ -65,8 +65,10 @@ public class PlantModelElementConverter {
                                                       LengthProperty.Unit.MM);
     model.getPropertyModelPositionY().setValueAndUnit(pointTO.getPosition().getY(),
                                                       LengthProperty.Unit.MM);
-    model.getPropertyVehicleOrientationAngle().setValueAndUnit(pointTO.getVehicleOrientationAngle(),
-                                                               AngleProperty.Unit.DEG);
+    model.getPropertyVehicleOrientationAngle().setValueAndUnit(
+        pointTO.getVehicleOrientationAngle(),
+        AngleProperty.Unit.DEG
+    );
     model.getPropertyType().setValue(mapPointType(pointTO.getType()));
     for (Map.Entry<String, String> property : pointTO.getProperties().entrySet()) {
       model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
@@ -77,8 +79,12 @@ public class PlantModelElementConverter {
     // Gather information contained in the layout
     model.getPropertyLayoutPosX().setText(String.valueOf(pointTO.getLayout().getPosition().getX()));
     model.getPropertyLayoutPosY().setText(String.valueOf(pointTO.getLayout().getPosition().getY()));
-    model.getPropertyPointLabelOffsetX().setText(String.valueOf(pointTO.getLayout().getLabelOffset().getX()));
-    model.getPropertyPointLabelOffsetY().setText(String.valueOf(pointTO.getLayout().getLabelOffset().getY()));
+    model.getPropertyPointLabelOffsetX().setText(
+        String.valueOf(pointTO.getLayout().getLabelOffset().getX())
+    );
+    model.getPropertyPointLabelOffsetY().setText(
+        String.valueOf(pointTO.getLayout().getLabelOffset().getY())
+    );
     model.getPropertyPointLabelOrientationAngle().setText("");
     LayerWrapper layerWrapper = systemModel.getLayoutModel().getPropertyLayerWrappers()
         .getValue().get(pointTO.getLayout().getLayerId());
@@ -215,10 +221,18 @@ public class PlantModelElementConverter {
     }
 
     // Gather information contained in the layout
-    model.getPropertyLayoutPositionX().setText(String.valueOf(locationTO.getLayout().getPosition().getX()));
-    model.getPropertyLayoutPositionY().setText(String.valueOf(locationTO.getLayout().getPosition().getY()));
-    model.getPropertyLabelOffsetX().setText(String.valueOf(locationTO.getLayout().getLabelOffset().getX()));
-    model.getPropertyLabelOffsetY().setText(String.valueOf(locationTO.getLayout().getLabelOffset().getY()));
+    model.getPropertyLayoutPositionX().setText(
+        String.valueOf(locationTO.getLayout().getPosition().getX())
+    );
+    model.getPropertyLayoutPositionY().setText(
+        String.valueOf(locationTO.getLayout().getPosition().getY())
+    );
+    model.getPropertyLabelOffsetX().setText(
+        String.valueOf(locationTO.getLayout().getLabelOffset().getX())
+    );
+    model.getPropertyLabelOffsetY().setText(
+        String.valueOf(locationTO.getLayout().getLabelOffset().getY())
+    );
     model.getPropertyDefaultRepresentation().setLocationRepresentation(
         LocationRepresentation.valueOf(locationTO.getLayout().getLocationRepresentation().name())
     );

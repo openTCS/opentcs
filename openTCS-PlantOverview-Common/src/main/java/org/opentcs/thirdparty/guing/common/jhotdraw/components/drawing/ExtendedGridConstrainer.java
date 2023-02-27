@@ -33,7 +33,7 @@ import org.jhotdraw.draw.GridConstrainer;
 public class ExtendedGridConstrainer
     extends GridConstrainer {
 
-  private final static int MIN_GRID_SPACING = 4;
+  private static final int MIN_GRID_SPACING = 4;
   /**
    * The spacing factor for a medium grid cell.
    */
@@ -86,7 +86,7 @@ public class ExtendedGridConstrainer
       Point2D.Double point = new Point2D.Double();
       Point2D.Double viewPoint = new Point2D.Double();
 
-      // Vertical grid lines are only drawn, if they are at least [MIN_GRID_SPACING] 
+      // Vertical grid lines are only drawn, if they are at least [MIN_GRID_SPACING]
       // pixels apart on the view coordinate system.
       if (width * view.getScaleFactor() > MIN_GRID_SPACING) {
         for (int i = (int) (origin.x / width), m = (int) ((origin.x + bounds.width) / width) + 1;
@@ -107,7 +107,10 @@ public class ExtendedGridConstrainer
             g.setColor(MINOR_COLOR);
           }
 
-          g.drawLine((int) viewPoint.x, viewBounds.y, (int) viewPoint.x, viewBounds.y + viewBounds.height);
+          g.drawLine((int) viewPoint.x,
+                     viewBounds.y,
+                     (int) viewPoint.x,
+                     viewBounds.y + viewBounds.height);
         }
       }
       else if (width * majorGridSpacing * view.getScaleFactor() > 2) {
@@ -118,12 +121,15 @@ public class ExtendedGridConstrainer
           if (i % majorGridSpacing == 0) {
             point.x = width * i;
             t.transform(point, viewPoint);
-            g.drawLine((int) viewPoint.x, viewBounds.y, (int) viewPoint.x, viewBounds.y + viewBounds.height);
+            g.drawLine((int) viewPoint.x,
+                       viewBounds.y,
+                       (int) viewPoint.x,
+                       viewBounds.y + viewBounds.height);
           }
         }
       }
 
-      // Horizontal grid lines are only drawn, if they are at least [MIN_GRID_SPACING] 
+      // Horizontal grid lines are only drawn, if they are at least [MIN_GRID_SPACING]
       // pixels apart on the view coordinate system.
       if (height * view.getScaleFactor() > MIN_GRID_SPACING) {
         for (int i = (int) (origin.y / height), m = (int) ((origin.y + bounds.height) / height) + 1;
@@ -144,7 +150,10 @@ public class ExtendedGridConstrainer
             g.setColor(MINOR_COLOR);
           }
 
-          g.drawLine(viewBounds.x, (int) viewPoint.y, viewBounds.x + viewBounds.width, (int) viewPoint.y);
+          g.drawLine(viewBounds.x,
+                     (int) viewPoint.y,
+                     viewBounds.x + viewBounds.width,
+                     (int) viewPoint.y);
         }
       }
       else if (height * majorGridSpacing * view.getScaleFactor() > 2) {
@@ -155,7 +164,10 @@ public class ExtendedGridConstrainer
           if (i % majorGridSpacing == 0) {
             point.y = height * i;
             t.transform(point, viewPoint);
-            g.drawLine(viewBounds.x, (int) viewPoint.y, viewBounds.x + viewBounds.width, (int) viewPoint.y);
+            g.drawLine(viewBounds.x,
+                       (int) viewPoint.y,
+                       viewBounds.x + viewBounds.width,
+                       (int) viewPoint.y);
           }
         }
       }

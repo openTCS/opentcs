@@ -104,8 +104,14 @@ public class PeripheralOperation
   /**
    * Defines the various moments at which an operation may be executed.
    */
-  public static enum ExecutionTrigger {
+  public enum ExecutionTrigger {
+    /**
+     * The operation is to be triggered before the movement.
+     */
     BEFORE_MOVEMENT,
+    /**
+     * The operation is to be triggered after the movement.
+     */
     AFTER_MOVEMENT;
   }
 

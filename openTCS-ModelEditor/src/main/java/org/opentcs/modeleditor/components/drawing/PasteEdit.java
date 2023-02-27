@@ -46,17 +46,20 @@ public class PasteEdit
 
   @Override
   public String getPresentationName() {
-    return ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH).getString("pasteEdit.presentationName");
+    return ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH)
+        .getString("pasteEdit.presentationName");
   }
 
   @Override
-  public void undo() throws CannotUndoException {
+  public void undo()
+      throws CannotUndoException {
     super.undo();
     drawingView.getDrawing().removeAll(figures);
   }
 
   @Override
-  public void redo() throws CannotRedoException {
+  public void redo()
+      throws CannotRedoException {
     super.redo();
     drawingView.getDrawing().addAll(figures);
   }

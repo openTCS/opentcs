@@ -45,6 +45,12 @@ public class PathTO
   private Boolean locked = false;
   private PathLayout pathLayout = new PathLayout();
 
+  /**
+   * Creates a new instance.
+   */
+  public PathTO() {
+  }
+
   @XmlAttribute(required = true)
   public String getSourcePoint() {
     return sourcePoint;
@@ -141,6 +147,12 @@ public class PathTO
     private Integer layerId = 0;
     private List<ControlPoint> controlPoints = new ArrayList<>();
 
+    /**
+     * Creates a new instance.
+     */
+    public PathLayout() {
+    }
+
     @XmlAttribute(required = true)
     public String getConnectionType() {
       return connectionType;
@@ -178,6 +190,12 @@ public class PathTO
 
     private Long x = 0L;
     private Long y = 0L;
+
+    /**
+     * Creates a new instance.
+     */
+    public ControlPoint() {
+    }
 
     @XmlAttribute(required = true)
     public Long getX() {

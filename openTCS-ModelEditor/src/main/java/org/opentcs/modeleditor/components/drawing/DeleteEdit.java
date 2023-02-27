@@ -46,11 +46,13 @@ public class DeleteEdit
 
   @Override
   public String getPresentationName() {
-    return ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH).getString("deleteEdit.presentationName");
+    return ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH)
+        .getString("deleteEdit.presentationName");
   }
 
   @Override
-  public void undo() throws CannotUndoException {
+  public void undo()
+      throws CannotUndoException {
     super.undo();
     drawingView.clearSelection();
     for (Figure figure : figures) {
@@ -59,7 +61,8 @@ public class DeleteEdit
   }
 
   @Override
-  public void redo() throws CannotRedoException {
+  public void redo()
+      throws CannotRedoException {
     super.redo();
     for (Figure figure : figures) {
       drawingView.getDrawing().remove(figure);

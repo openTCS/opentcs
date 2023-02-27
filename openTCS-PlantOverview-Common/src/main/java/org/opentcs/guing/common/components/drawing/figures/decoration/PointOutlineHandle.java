@@ -21,7 +21,6 @@ import org.opentcs.guing.common.components.drawing.figures.PointFigure;
 
 /**
  *
- * 
  * @author Heinz Huber (Fraunhofer IML)
  */
 public class PointOutlineHandle
@@ -50,7 +49,8 @@ public class PointOutlineHandle
       float[] dist = {0.1f, 0.9f};
       Color[] colors = {Color.CYAN, Color.BLUE};
 
-      RadialGradientPaint radialGradientPaint = new RadialGradientPaint(center, radius, dist, colors);
+      RadialGradientPaint radialGradientPaint
+          = new RadialGradientPaint(center, radius, dist, colors);
       Paint oldPaint = g.getPaint();
       g.setPaint(radialGradientPaint);
 

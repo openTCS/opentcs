@@ -31,21 +31,45 @@ public class TransportOrderTableModel
     extends AbstractTableModel
     implements TransportOrderContainerListener {
 
+  /**
+   * The index of the 'name' column.
+   */
+  public static final int COLUMN_NAME = 0;
+  /**
+   * The index of the 'source' column.
+   */
+  public static final int COLUMN_SOURCE = 1;
+  /**
+   * The index of the 'destination' column.
+   */
+  public static final int COLUMN_DESTINATION = 2;
+  /**
+   * The index of the 'intended vehicle' column.
+   */
+  public static final int COLUMN_INTENDED_VEHICLE = 3;
+  /**
+   * The index of the 'executing vehicle' column.
+   */
+  public static final int COLUMN_EXECUTING_VEHICLE = 4;
+  /**
+   * The index of the 'status' column.
+   */
+  public static final int COLUMN_STATUS = 5;
+  /**
+   * The index of the 'order sequence' column.
+   */
+  public static final int COLUMN_ORDER_SEQUENCE = 6;
+  /**
+   * The index of the 'creation time' column.
+   */
+  public static final int COLUMN_CREATION_TIME = 7;
+
   private static final Logger LOG = LoggerFactory.getLogger(TransportOrderTableModel.class);
   /**
    * The resource bundle to use.
    */
   private static final ResourceBundle BUNDLE
       = ResourceBundle.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
-
-  public static final int COLUMN_NAME = 0;
-  public static final int COLUMN_SOURCE = 1;
-  public static final int COLUMN_DESTINATION = 2;
-  public static final int COLUMN_INTENDED_VEHICLE = 3;
-  public static final int COLUMN_EXECUTING_VEHICLE = 4;
-  public static final int COLUMN_STATUS = 5;
-  public static final int COLUMN_ORDER_SEQUENCE = 6;
-  public static final int COLUMN_CREATION_TIME = 7;
 
   private static final String[] COLUMN_NAMES = new String[]{
     "Name",
@@ -73,6 +97,12 @@ public class TransportOrderTableModel
   };
 
   private final List<TransportOrder> entries = new LinkedList<>();
+
+  /**
+   * Creates a new instance.
+   */
+  public TransportOrderTableModel() {
+  }
 
   @Override
   public int getRowCount() {
@@ -109,7 +139,9 @@ public class TransportOrderTableModel
           return entry.getIntendedVehicle().getName();
         }
         else {
-          return BUNDLE.getString("transportOrderTableModel.column_intendedVehicle.determinedAutomatic.text");
+          return BUNDLE.getString(
+              "transportOrderTableModel.column_intendedVehicle.determinedAutomatic.text"
+          );
         }
       case COLUMN_EXECUTING_VEHICLE:
         if (entry.getProcessingVehicle() != null) {
@@ -149,7 +181,7 @@ public class TransportOrderTableModel
     requireNonNull(orders, "orders");
 
     SwingUtilities.invokeLater(() -> {
-      // Notifiations of any change listeners must happen at the same time/in the same thread the 
+      // Notifiations of any change listeners must happen at the same time/in the same thread the
       // data behind the model is updated. Otherwise, there is a risk that listeners work with/
       // refer to outdated data, which can lead to runtime exceptions.
       entries.clear();

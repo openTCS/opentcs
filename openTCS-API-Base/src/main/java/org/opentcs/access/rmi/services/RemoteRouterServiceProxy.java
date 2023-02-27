@@ -24,6 +24,12 @@ class RemoteRouterServiceProxy
     extends AbstractRemoteServiceProxy<RemoteRouterService>
     implements RouterService {
 
+  /**
+   * Creates a new instance.
+   */
+  RemoteRouterServiceProxy() {
+  }
+
   @Override
   public void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
       throws ObjectUnknownException, KernelRuntimeException {

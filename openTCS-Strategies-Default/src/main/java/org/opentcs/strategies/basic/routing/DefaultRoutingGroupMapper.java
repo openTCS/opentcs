@@ -26,6 +26,12 @@ public class DefaultRoutingGroupMapper
    */
   private static final String DEFAULT_ROUTING_GROUP = "";
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultRoutingGroupMapper() {
+  }
+
   @Override
   public String apply(Vehicle vehicle) {
     String propVal = vehicle.getProperty(PROPKEY_ROUTING_GROUP);

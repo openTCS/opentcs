@@ -18,7 +18,7 @@ public interface DrawnModelComponent
     extends ModelComponent {
 
   /**
-   * The property key for the layer wrapper that contains the layer on which a model component 
+   * The property key for the layer wrapper that contains the layer on which a model component
    * (respectively its figure) is to be drawn.
    */
   String LAYER_WRAPPER = "LAYER_WRAPPER";

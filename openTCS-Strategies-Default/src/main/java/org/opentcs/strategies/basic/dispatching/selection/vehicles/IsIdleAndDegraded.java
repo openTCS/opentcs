@@ -21,6 +21,12 @@ import org.opentcs.strategies.basic.dispatching.selection.RechargeVehicleSelecti
 public class IsIdleAndDegraded
     implements RechargeVehicleSelectionFilter {
 
+  /**
+   * Creates a new instance.
+   */
+  public IsIdleAndDegraded() {
+  }
+
   @Override
   public Collection<String> apply(Vehicle vehicle) {
     return idleAndDegraded(vehicle) ? new ArrayList<>() : Arrays.asList(getClass().getName());

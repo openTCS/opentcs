@@ -350,7 +350,7 @@ public class TransportOrderUtil
       if (!order.getState().isFinalState()) {
         updateTransportOrderState(order.getReference(),
                                   TransportOrder.State.FAILED);
-        // The order was not processed by any vehicle but there still might be a reservation for 
+        // The order was not processed by any vehicle but there still might be a reservation for
         // that order.
         orderReservationPool.removeReservation(order.getReference());
       }
@@ -490,7 +490,8 @@ public class TransportOrderUtil
                                                              sequence.getFinishedIndex() + 1);
     }
     // The sequence may have changed. Get an up-to-date copy.
-    sequence = transportOrderService.fetchObject(OrderSequence.class, failedOrder.getWrappingSequence());
+    sequence = transportOrderService.fetchObject(OrderSequence.class,
+                                                 failedOrder.getWrappingSequence());
     // Mark the sequence as finished if there's nothing more to do in it.
     if (sequence.isComplete() && sequence.getNextUnfinishedOrder() == null) {
       transportOrderService.markOrderSequenceFinished(sequence.getReference());

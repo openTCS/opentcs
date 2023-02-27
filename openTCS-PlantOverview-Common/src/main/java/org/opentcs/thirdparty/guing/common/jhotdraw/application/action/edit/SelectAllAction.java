@@ -31,7 +31,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class SelectAllAction
     extends org.jhotdraw.app.action.edit.AbstractSelectionAction {
 
-  public final static String ID = "edit.selectAll";
+  /**
+   * This action's ID.
+   */
+  public static final String ID = "edit.selectAll";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
 
@@ -63,7 +66,8 @@ public class SelectAllAction
   @Override
   public void actionPerformed(ActionEvent evt) {
     JComponent cTarget = target;
-    Component cFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
+    Component cFocusOwner
+        = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
 
     if (cTarget == null && (cFocusOwner instanceof JComponent)) {
       cTarget = (JComponent) cFocusOwner;

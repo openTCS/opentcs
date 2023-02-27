@@ -73,7 +73,9 @@ public class ReleasePeripheralsPhase
   @Override
   public void run() {
     Collection<Location> peripheralsToBeRelease
-        = releaseStrategy.selectPeripheralsToRelease(peripheralService.fetchObjects(Location.class));
+        = releaseStrategy.selectPeripheralsToRelease(
+            peripheralService.fetchObjects(Location.class)
+        );
     for (Location location : peripheralsToBeRelease) {
       releasePeripheral(location);
     }

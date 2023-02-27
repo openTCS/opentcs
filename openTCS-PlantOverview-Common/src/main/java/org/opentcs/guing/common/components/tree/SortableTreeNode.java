@@ -47,7 +47,7 @@ public class SortableTreeNode
 
   /**
    * Returns true if the child elements of this node can be sorted.
-   * 
+   *
    * @return True if the child elements of this node can be sorted.
    */
   public boolean isSorting() {

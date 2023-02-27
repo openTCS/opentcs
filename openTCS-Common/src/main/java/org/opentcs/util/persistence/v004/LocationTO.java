@@ -35,6 +35,12 @@ public class LocationTO
   private Boolean locked = false;
   private LocationLayout locationLayout = new LocationLayout();
 
+  /**
+   * Creates a new instance.
+   */
+  public LocationTO() {
+  }
+
   @XmlAttribute
   public Long getxPosition() {
     return xPosition;
@@ -117,6 +123,12 @@ public class LocationTO
     private String point = "";
     private List<AllowedOperationTO> allowedOperations = new ArrayList<>();
 
+    /**
+     * Creates a new instance.
+     */
+    public Link() {
+    }
+
     @XmlAttribute(required = true)
     public String getPoint() {
       return point;
@@ -151,6 +163,12 @@ public class LocationTO
     private Long yLabelOffset = 0L;
     private String locationRepresentation = "";
     private Integer layerId = 0;
+
+    /**
+     * Creates a new instance.
+     */
+    public LocationLayout() {
+    }
 
     @XmlAttribute(required = true)
     public Long getxPosition() {
@@ -198,7 +216,8 @@ public class LocationTO
     }
 
     public LocationLayout setLocationRepresentation(String locationRepresentation) {
-      this.locationRepresentation = requireNonNull(locationRepresentation, "locationRepresentation");
+      this.locationRepresentation = requireNonNull(locationRepresentation,
+                                                   "locationRepresentation");
       return this;
     }
 

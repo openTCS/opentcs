@@ -19,6 +19,12 @@ import org.opentcs.guing.common.transport.OrderTypeSuggestionsPool;
 public class OrderTypeSuggestionsModule
     extends PlantOverviewInjectionModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public OrderTypeSuggestionsModule() {
+  }
+
   @Override
   protected void configure() {
     orderTypeSuggestionsBinder().addBinding()

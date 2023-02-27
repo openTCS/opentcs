@@ -85,7 +85,6 @@ public class EditableComboBoxEditor<E>
 
   @Override
   public Object getItem() {
-    //if the panel tries to capture the input, this method guarantees that 
     for (E p : content) {
       if (representer.apply(p).equals(editor.getText())) {
         return p;

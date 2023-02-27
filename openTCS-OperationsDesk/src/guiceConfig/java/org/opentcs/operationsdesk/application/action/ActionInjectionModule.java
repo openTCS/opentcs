@@ -19,10 +19,16 @@ import javax.inject.Singleton;
 public class ActionInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public ActionInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     install(new FactoryModuleBuilder().build(ActionFactory.class));
-    
+
     bind(ViewActionMap.class).in(Singleton.class);
   }
 

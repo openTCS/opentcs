@@ -38,24 +38,24 @@ public class DockingManagerOperating
     extends AbstractDockingManager {
 
   /**
-   * ID for the tab pane, that contains the course, transport orders and order sequences.
+   * ID for the tab pane that contains the course, transport orders and order sequences.
    */
   public static final String COURSE_TAB_PANE_ID = "course_tab_pane";
   /**
-   * ID for the tab pane, that contains the components, blocks and groups.
-   */
-  public static final String TREE_TAB_PANE_ID = "tree_tab_pane";
-  public static final String LAYER_TAB_PANE_ID = "layer_tab_pane";
-  /**
-   * ID for the dockable, that contains the VehiclePanel.
+   * ID for the dockable that contains the VehiclePanel.
    */
   public static final String VEHICLES_DOCKABLE_ID = "vehicles_dock";
-  public static final String COMPONENTS_ID = "comp_dock";
-  public static final String BLOCKS_ID = "block_dock";
-  public static final String PROPERTIES_ID = "properties_id";
-  public static final String STATUS_ID = "status_id";
-  public static final String LAYERS_ID = "layers_id";
-  public static final String LAYER_GROUPS_ID = "layer_groups_id";
+  /**
+   * ID for the tab pane that contains the components, blocks and groups.
+   */
+  private static final String TREE_TAB_PANE_ID = "tree_tab_pane";
+  private static final String LAYER_TAB_PANE_ID = "layer_tab_pane";
+  private static final String COMPONENTS_ID = "comp_dock";
+  private static final String BLOCKS_ID = "block_dock";
+  private static final String PROPERTIES_ID = "properties_id";
+  private static final String STATUS_ID = "status_id";
+  private static final String LAYERS_ID = "layers_id";
+  private static final String LAYER_GROUPS_ID = "layer_groups_id";
   /**
    * The panel showing every vehicle available in the system.
    */
@@ -155,7 +155,8 @@ public class DockingManagerOperating
     getCControl().putProperty(CControl.KEY_GOTO_MAXIMIZED, null);
     getCControl().putProperty(CControl.KEY_MAXIMIZE_CHANGE, null);
 
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.DOCKABLE_PATH);
+    ResourceBundleUtil bundle
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.DOCKABLE_PATH);
     CGrid grid = new CGrid(getCControl());
     courseTabPane = new CStack(COURSE_TAB_PANE_ID);
     addTabPane(COURSE_TAB_PANE_ID, courseTabPane);

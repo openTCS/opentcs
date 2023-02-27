@@ -37,10 +37,6 @@ public class PeripheralTableModel
     implements PropertyChangeListener {
 
   /**
-   * This class's resource bundle.
-   */
-  private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
-  /**
    * The index of the column showing the peripheral device's name.
    */
   public static final int COLUMN_LOCATION = 0;
@@ -56,6 +52,10 @@ public class PeripheralTableModel
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(PeripheralTableModel.class);
+  /**
+   * This class's resource bundle.
+   */
+  private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * The collumn names for the table header.
    */

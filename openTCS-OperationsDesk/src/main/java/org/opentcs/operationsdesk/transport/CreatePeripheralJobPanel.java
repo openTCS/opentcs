@@ -99,7 +99,8 @@ public class CreatePeripheralJobPanel
     }
 
     operationCombobox.removeAllItems();
-    for (String op : location.getLocationType().getPropertyAllowedPeripheralOperations().getItems()) {
+    for (String op
+             : location.getLocationType().getPropertyAllowedPeripheralOperations().getItems()) {
       operationCombobox.addItem(op);
     }
   }
@@ -186,6 +187,7 @@ public class CreatePeripheralJobPanel
         gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
         add(operationCombobox, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
   private void locationComboboxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_locationComboboxItemStateChanged
     if (evt.getStateChange() == ItemEvent.SELECTED) {
@@ -193,7 +195,7 @@ public class CreatePeripheralJobPanel
     }
   }//GEN-LAST:event_locationComboboxItemStateChanged
 
-
+  // CHECKSTYLE:OFF
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<LocationModel> locationCombobox;
     private javax.swing.JLabel locationLabel;

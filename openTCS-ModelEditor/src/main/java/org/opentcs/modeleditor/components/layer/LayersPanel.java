@@ -47,8 +47,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.guing.common.util.IconToolkit;
 import org.opentcs.modeleditor.util.I18nPlantOverviewModeling;
 import org.opentcs.util.gui.StringListCellRenderer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A panel to display and edit layers.
@@ -58,7 +56,6 @@ import org.slf4j.LoggerFactory;
 public class LayersPanel
     extends JPanel {
 
-  private static final Logger LOG = LoggerFactory.getLogger(LayersPanel.class);
   /**
    * The path containing the icons.
    */
@@ -120,7 +117,7 @@ public class LayersPanel
     layerGroupManager.addLayerGroupChangeListener(tableModel);
     table = new JTable(tableModel);
     initTable();
-    
+
     add(createToolBar(), BorderLayout.NORTH);
     add(new JScrollPane(table), BorderLayout.CENTER);
   }
@@ -217,7 +214,8 @@ public class LayersPanel
 
   private JButton createMoveLayerUpButton() {
     IconToolkit iconkit = IconToolkit.instance();
-    JButton button = new JButton(iconkit.getImageIconByFullPath(ICON_PATH + "move-layer-up.16.png"));
+    JButton button
+        = new JButton(iconkit.getImageIconByFullPath(ICON_PATH + "move-layer-up.16.png"));
     button.setEnabled(false);
     button.addActionListener(actionEvent -> {
       int selectedRow = table.getSelectedRow();
@@ -236,7 +234,8 @@ public class LayersPanel
 
   private JButton createMoveLayerDownButton() {
     IconToolkit iconkit = IconToolkit.instance();
-    JButton button = new JButton(iconkit.getImageIconByFullPath(ICON_PATH + "move-layer-down.16.png"));
+    JButton button
+        = new JButton(iconkit.getImageIconByFullPath(ICON_PATH + "move-layer-down.16.png"));
     button.setEnabled(false);
     button.addActionListener(actionEvent -> {
       int selectedRow = table.getSelectedRow();
@@ -255,6 +254,12 @@ public class LayersPanel
 
   private class RemoveLayerListener
       implements ActionListener {
+
+    /**
+     * Creates a new instance.
+     */
+    RemoveLayerListener() {
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -285,7 +290,7 @@ public class LayersPanel
     private final Border focusedCellBorder = UIManager.getBorder("Table.focusCellHighlightBorder");
     private final JRadioButton radioButton;
 
-    public RadioButtonCellRenderer() {
+    RadioButtonCellRenderer() {
       radioButton = new JRadioButton();
       radioButton.setHorizontalAlignment(JRadioButton.CENTER);
       radioButton.setBorderPainted(true);
@@ -294,8 +299,12 @@ public class LayersPanel
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                    boolean hasFocus, int row, int col) {
-      radioButton.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-      radioButton.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
+      radioButton.setBackground(
+          isSelected ? table.getSelectionBackground() : table.getBackground()
+      );
+      radioButton.setForeground(
+          isSelected ? table.getSelectionForeground() : table.getForeground()
+      );
       radioButton.setBorder(hasFocus ? focusedCellBorder : unfocusedCellBorder);
       radioButton.setSelected(Boolean.TRUE.equals(value));
 
@@ -309,7 +318,7 @@ public class LayersPanel
 
     private final JRadioButton radioButton;
 
-    public RadioButtonCellEditor() {
+    RadioButtonCellEditor() {
       radioButton = new JRadioButton();
       radioButton.setHorizontalAlignment(JRadioButton.CENTER);
       radioButton.addActionListener(actionEvent -> stopCellEditing());
@@ -333,7 +342,7 @@ public class LayersPanel
 
     private final DefaultComboBoxModel<LayerGroup> model;
 
-    public GroupCellEditor() {
+    GroupCellEditor() {
       super(new JComboBox<LayerGroup>());
       @SuppressWarnings("unchecked")
       JComboBox<LayerGroup> combobox = (JComboBox<LayerGroup>) getComponent();

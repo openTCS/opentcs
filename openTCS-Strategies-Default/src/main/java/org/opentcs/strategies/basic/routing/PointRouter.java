@@ -47,8 +47,8 @@ public interface PointRouter {
    * point.
    * If no route exists, {@link #INFINITE_COSTS INFINITE_COSTS} will be returned.
    */
-  public long getCosts(TCSObjectReference<Point> srcPointRef,
-                       TCSObjectReference<Point> destPointRef);
+  long getCosts(TCSObjectReference<Point> srcPointRef,
+                TCSObjectReference<Point> destPointRef);
 
   /**
    * Returns the costs for travelling the shortest route from one point to another.

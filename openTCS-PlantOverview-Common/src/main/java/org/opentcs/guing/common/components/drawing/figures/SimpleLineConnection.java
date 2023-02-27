@@ -45,8 +45,7 @@ public abstract class SimpleLineConnection
       = new ArrowTip(0.35, 12.0, 11.3, true, true, true);
   protected static final ArrowTip ARROW_BACKWARD
       = new ArrowTip(0.35, 12.0, 11.3, true, true, false);
-  private static final Logger logger
-      = LoggerFactory.getLogger(SimpleLineConnection.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SimpleLineConnection.class);
 
   /**
    * Creates a new instance.
@@ -86,7 +85,7 @@ public abstract class SimpleLineConnection
       return super.getCappedPath();
     }
     catch (NullPointerException ex) {
-      logger.warn("", ex);
+      LOG.warn("", ex);
       return path.clone();
     }
   }

@@ -17,6 +17,12 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 public class NullVehicleCommAdapterDescription
     extends VehicleCommAdapterDescription {
 
+  /**
+   * Creates a new instance.
+   */
+  public NullVehicleCommAdapterDescription() {
+  }
+
   @Override
   public String getDescription() {
     return "-";

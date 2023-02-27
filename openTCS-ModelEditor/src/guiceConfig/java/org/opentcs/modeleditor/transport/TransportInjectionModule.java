@@ -17,6 +17,12 @@ import com.google.inject.AbstractModule;
 public class TransportInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public TransportInjectionModule() {
+  }
+
   @Override
   protected void configure() {
   }

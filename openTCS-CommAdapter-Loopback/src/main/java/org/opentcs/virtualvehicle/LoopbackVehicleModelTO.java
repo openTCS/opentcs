@@ -54,6 +54,12 @@ public class LoopbackVehicleModelTO
    */
   private boolean vehiclePaused;
 
+  /**
+   * Creates a new instance.
+   */
+  public LoopbackVehicleModelTO() {
+  }
+
   public boolean isSingleStepModeEnabled() {
     return singleStepModeEnabled;
   }

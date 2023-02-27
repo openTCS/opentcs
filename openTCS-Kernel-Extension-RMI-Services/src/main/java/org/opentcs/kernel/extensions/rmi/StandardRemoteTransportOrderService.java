@@ -45,7 +45,8 @@ public class StandardRemoteTransportOrderService
   /**
    * This class's logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(StandardRemoteTransportOrderService.class);
+  private static final Logger LOG
+      = LoggerFactory.getLogger(StandardRemoteTransportOrderService.class);
   /**
    * The transport order service to invoke methods on.
    */

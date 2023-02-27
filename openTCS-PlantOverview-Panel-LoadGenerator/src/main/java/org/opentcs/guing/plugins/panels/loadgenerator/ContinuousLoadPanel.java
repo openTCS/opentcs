@@ -163,7 +163,7 @@ public class ContinuousLoadPanel
 
     doTable.getSelectionModel().addListSelectionListener(event -> updateElementStates());
     propertyTable.getSelectionModel().addListSelectionListener(event -> updateElementStates());
-    
+
     updateElementStates();
 
     initialized = true;
@@ -270,20 +270,24 @@ public class ContinuousLoadPanel
           = (TransportOrderTableModel) toTable.getModel();
       for (TransportOrderData curData : tableModel.getList()) {
         if (curData.getDriveOrders().isEmpty()) {
-          JOptionPane.showMessageDialog(this,
-                                        bundle.getString("continuousLoadPanel.optionPane_driveOrderEmpty.message"),
-                                        bundle.getString("continuousLoadPanel.optionPane_driveOrderEmpty.title"),
-                                        JOptionPane.ERROR_MESSAGE);
+          JOptionPane.showMessageDialog(
+              this,
+              bundle.getString("continuousLoadPanel.optionPane_driveOrderEmpty.message"),
+              bundle.getString("continuousLoadPanel.optionPane_driveOrderEmpty.title"),
+              JOptionPane.ERROR_MESSAGE
+          );
           return null;
         }
         else {
           for (DriveOrderStructure curDOS : curData.getDriveOrders()) {
             if (curDOS.getDriveOrderLocation() == null
                 || curDOS.getDriveOrderVehicleOperation() == null) {
-              JOptionPane.showMessageDialog(this,
-                                            bundle.getString("continuousLoadPanel.optionPane_driveOrderIncorrect.message"),
-                                            bundle.getString("continuousLoadPanel.optionPane_driveOrderIncorrect.title"),
-                                            JOptionPane.ERROR_MESSAGE);
+              JOptionPane.showMessageDialog(
+                  this,
+                  bundle.getString("continuousLoadPanel.optionPane_driveOrderIncorrect.message"),
+                  bundle.getString("continuousLoadPanel.optionPane_driveOrderIncorrect.title"),
+                  JOptionPane.ERROR_MESSAGE
+              );
               return null;
             }
           }
@@ -1181,7 +1185,7 @@ toTable.getSelectionModel().addListSelectionListener(listener);
      *
      * @param table The transport order table
      */
-    public TOTableSelectionListener(JTable table) {
+    TOTableSelectionListener(JTable table) {
       this.table = requireNonNull(table, "table");
     }
 

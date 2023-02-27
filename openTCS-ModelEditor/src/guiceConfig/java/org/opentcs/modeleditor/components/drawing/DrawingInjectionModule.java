@@ -25,15 +25,21 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.components.drawing.OpenTCSDra
 public class DrawingInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public DrawingInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     install(new FactoryModuleBuilder().build(FigureFactory.class));
 
     bind(OpenTCSDrawingEditor.class).in(Singleton.class);
     bind(DrawingEditor.class).to(OpenTCSDrawingEditor.class);
-    
+
     bind(OpenTCSDrawingView.class).to(OpenTCSDrawingViewModeling.class);
-    
+
     bind(DrawingOptions.class).in(Singleton.class);
   }
 }

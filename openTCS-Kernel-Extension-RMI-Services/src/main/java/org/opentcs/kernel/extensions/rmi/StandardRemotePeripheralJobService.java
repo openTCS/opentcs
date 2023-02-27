@@ -42,7 +42,8 @@ public class StandardRemotePeripheralJobService
   /**
    * This class's logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(StandardRemotePeripheralJobService.class);
+  private static final Logger LOG
+      = LoggerFactory.getLogger(StandardRemotePeripheralJobService.class);
   /**
    * The peripheral job service to invoke methods on.
    */

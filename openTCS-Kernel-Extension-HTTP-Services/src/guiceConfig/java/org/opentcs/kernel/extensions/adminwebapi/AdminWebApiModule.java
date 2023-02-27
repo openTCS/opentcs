@@ -25,6 +25,12 @@ public class AdminWebApiModule
    */
   private static final Logger LOG = LoggerFactory.getLogger(AdminWebApiModule.class);
 
+  /**
+   * Creates a new instance.
+   */
+  public AdminWebApiModule() {
+  }
+
   @Override
   protected void configure() {
     AdminWebApiConfiguration configuration

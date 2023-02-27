@@ -28,7 +28,6 @@ public class OrderSequenceTableModel
     implements OrderSequenceContainerListener {
 
   private static final Logger LOG = LoggerFactory.getLogger(OrderSequenceTableModel.class);
-
   /**
    * The resource bundle to use.
    */
@@ -68,6 +67,12 @@ public class OrderSequenceTableModel
 
   private final List<OrderSequence> entries = new LinkedList<>();
 
+  /**
+   * Creates a new instance.
+   */
+  public OrderSequenceTableModel() {
+  }
+
   @Override
   public int getRowCount() {
     return entries.size();
@@ -94,7 +99,9 @@ public class OrderSequenceTableModel
           return entry.getIntendedVehicle().getName();
         }
         else {
-          return BUNDLE.getString("orderSequenceTableModel.column_intendedVehicle.determinedAutomatic.text");
+          return BUNDLE.getString(
+              "orderSequenceTableModel.column_intendedVehicle.determinedAutomatic.text"
+          );
         }
       case COLUMN_EXECUTING_VEHICLE:
 
@@ -102,7 +109,9 @@ public class OrderSequenceTableModel
           return entry.getProcessingVehicle().getName();
         }
         else {
-          return BUNDLE.getString("orderSequenceTableModel.column_intendedVehicle.determinedAutomatic.text");
+          return BUNDLE.getString(
+              "orderSequenceTableModel.column_intendedVehicle.determinedAutomatic.text"
+          );
         }
       case COLUMN_INDEX:
         return entry.getFinishedIndex();
@@ -132,7 +141,7 @@ public class OrderSequenceTableModel
     requireNonNull(sequences, "sequences");
 
     SwingUtilities.invokeLater(() -> {
-      // Notifiations of any change listeners must happen at the same time/in the same thread the 
+      // Notifiations of any change listeners must happen at the same time/in the same thread the
       // data behind the model is updated. Otherwise, there is a risk that listeners work with/
       // refer to outdated data, which can lead to runtime exceptions.
       entries.clear();
@@ -172,7 +181,8 @@ public class OrderSequenceTableModel
     SwingUtilities.invokeLater(() -> {
       int sequenceIndex = entries.indexOf(sequence);
       if (sequenceIndex == -1) {
-        LOG.warn("Unknown order sequence: {}. Ignoring order sequence removal.", sequence.getName());
+        LOG.warn("Unknown order sequence: {}. Ignoring order sequence removal.",
+                 sequence.getName());
         return;
       }
       entries.remove(sequenceIndex);

@@ -84,6 +84,9 @@ public abstract class AbstractOpenTCSDrawingView
                EditableComponent,
                PropertyChangeListener {
 
+  /**
+   * A property name for 'focus gained'.
+   */
   public static final String FOCUS_GAINED = "focusGained";
   /**
    * This class's logger.
@@ -703,7 +706,7 @@ public abstract class AbstractOpenTCSDrawingView
             figuresToRemove.add((BitmapFigure) fig);
           }
           // Commented out on 2020-07-17 by Martin Grzenia:
-          // During the integration of layers this block caused some problems. When a layer is 
+          // During the integration of layers this block caused some problems. When a layer is
           // hidden, setVisible(false) is called for all figures contained in that particular layer.
           // This block caused all figures to be shown again once the drawing view gained focus.
           // The purpose of this block is not quite clear, but it seems a bit strange at least.

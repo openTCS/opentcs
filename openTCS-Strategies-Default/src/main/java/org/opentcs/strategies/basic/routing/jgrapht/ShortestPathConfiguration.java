@@ -46,14 +46,26 @@ public interface ShortestPathConfiguration {
       })
   List<String> edgeEvaluators();
 
+  /**
+   * The available algorithms.
+   */
   enum Algorithm {
+    /**
+     * The Dijkstra algorithm.
+     */
     DIJKSTRA(false),
+    /**
+     * The Bellman-Ford algorithm.
+     */
     BELLMAN_FORD(true),
+    /**
+     * The Floyd-Warshall algorithm.
+     */
     FLOYD_WARSHALL(false);
 
     private final boolean handlingNegativeCosts;
 
-    private Algorithm(boolean handlingNegativeCosts) {
+    Algorithm(boolean handlingNegativeCosts) {
       this.handlingNegativeCosts = handlingNegativeCosts;
     }
 

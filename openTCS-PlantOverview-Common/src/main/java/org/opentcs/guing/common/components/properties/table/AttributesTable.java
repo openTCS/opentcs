@@ -27,7 +27,7 @@ import org.opentcs.guing.common.components.properties.event.TableSelectionChange
 
 /**
  * A table in which properties are displayed and can be edited.
- * The table has two columns, the first with the name of the property and the second with the 
+ * The table has two columns, the first with the name of the property and the second with the
  * value of the property.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
@@ -48,7 +48,7 @@ public class AttributesTable
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param appState Stores the application's current state.
    */
   @Inject
@@ -141,7 +141,7 @@ public class AttributesTable
    * @param row The index of the row to be checked.
    * @return True if the row is editable.
    */
-  public boolean isEditable(int row) { 
+  public boolean isEditable(int row) {
     AttributesTableModel tableModel = (AttributesTableModel) getModel();
     ModelAttribute attribute = (ModelAttribute) tableModel.getValueAt(row, 1);
 

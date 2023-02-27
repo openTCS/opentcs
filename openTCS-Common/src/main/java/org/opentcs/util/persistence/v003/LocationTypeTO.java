@@ -29,6 +29,12 @@ public class LocationTypeTO
   private String locationNamePrefix;
   private List<AllowedOperationTO> allowedOperations = new ArrayList<>();
 
+  /**
+   * Creates a new instance.
+   */
+  public LocationTypeTO() {
+  }
+
   @XmlAttribute
   public String getLocationNamePrefix() {
     return locationNamePrefix;

@@ -12,7 +12,7 @@ import org.opentcs.configuration.ConfigurationEntry;
 import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
- * Provides methods to configure the {@link DefaultDispatcher}
+ * Provides methods to configure the {@link DefaultDispatcher}.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
@@ -152,9 +152,22 @@ public interface DefaultDispatcherConfiguration {
       orderKey = "9_misc")
   long idleVehicleRedispatchingInterval();
 
+  /**
+   * The available strategies for situations in which rerouting is not possible.
+   */
   enum ReroutingImpossibleStrategy {
+    /**
+     * Stick to the previous route, ignoring path locks.
+     */
     IGNORE_PATH_LOCKS,
+    /**
+     * Do not send further orders to the vehicle; wait for another rerouting opportunity.
+     */
     PAUSE_IMMEDIATELY,
+    /**
+     * Send further orders to the vehicle only until it reaches a locked path; then wait for another
+     * rerouting opportunity.
+     */
     PAUSE_AT_PATH_LOCK;
   }
 }

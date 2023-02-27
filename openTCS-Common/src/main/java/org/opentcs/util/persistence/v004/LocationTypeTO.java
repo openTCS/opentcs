@@ -36,6 +36,12 @@ public class LocationTypeTO
   private List<AllowedPeripheralOperationTO> allowedPeripheralOperations = new ArrayList<>();
   private LocationTypeLayout locationTypeLayout = new LocationTypeLayout();
 
+  /**
+   * Creates a new instance.
+   */
+  public LocationTypeTO() {
+  }
+
   @XmlAttribute
   public String getLocationNamePrefix() {
     return locationNamePrefix;
@@ -83,13 +89,20 @@ public class LocationTypeTO
 
     private String locationRepresentation = "";
 
+    /**
+     * Creates a new instance.
+     */
+    public LocationTypeLayout() {
+    }
+
     @XmlAttribute(required = true)
     public String getLocationRepresentation() {
       return locationRepresentation;
     }
 
     public LocationTypeLayout setLocationRepresentation(@Nonnull String locationRepresentation) {
-      this.locationRepresentation = requireNonNull(locationRepresentation, "locationRepresentation");
+      this.locationRepresentation = requireNonNull(locationRepresentation,
+                                                   "locationRepresentation");
       return this;
     }
   }

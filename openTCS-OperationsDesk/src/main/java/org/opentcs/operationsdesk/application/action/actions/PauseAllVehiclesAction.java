@@ -40,7 +40,7 @@ public class PauseAllVehiclesAction
   /**
    * This action's ID.
    */
-  public final static String ID = "openTCS.pauseAllVehicles";
+  public static final String ID = "openTCS.pauseAllVehicles";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
   /**

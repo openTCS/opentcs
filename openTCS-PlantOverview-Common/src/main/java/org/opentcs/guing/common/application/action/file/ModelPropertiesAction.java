@@ -33,7 +33,7 @@ public class ModelPropertiesAction
    * This action's ID.
    */
   public static final String ID = "file.modelProperties";
-  
+
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
   /**
    * The parent component for dialogs shown by this action.
@@ -49,26 +49,42 @@ public class ModelPropertiesAction
                                ModelManager modelManager) {
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
     this.modelManager = requireNonNull(modelManager, "modelManager");
-    
+
     putValue(NAME, BUNDLE.getString("modelPropertiesAction.name"));
     putValue(SHORT_DESCRIPTION, BUNDLE.getString("modelPropertiesAction.shortDescription"));
   }
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.MODELPROPERTIES_PATH);
+    ResourceBundleUtil bundle
+        = ResourceBundleUtil.getBundle(I18nPlantOverview.MODELPROPERTIES_PATH);
 
     JOptionPane.showMessageDialog(
         dialogParent,
         "<html><p><b>" + modelManager.getModel().getName() + "</b><br>"
-        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfPoints") + numberOfPoints() + "<br>"
-        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfPaths") + numberOfPaths() + "<br>"
-        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfLocations") + numberOfLocations() + "<br>"
-        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfLocationTypes") + numberOfLocationTypes() + "<br>"
-        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfBlocks") + numberOfBlocks() + "<br>"
-        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfVehicles") + numberOfVehicles() + "<br>"
+        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfPoints")
+        + numberOfPoints()
         + "<br>"
-        + bundle.getString("modelPropertiesAction.optionPane_properties.message.lastModified") + lastModified()
+        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfPaths")
+        + numberOfPaths()
+        + "<br>"
+        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfLocations")
+        + numberOfLocations()
+        + "<br>"
+        + bundle.getString(
+            "modelPropertiesAction.optionPane_properties.message.numberOfLocationTypes"
+        )
+        + numberOfLocationTypes()
+        + "<br>"
+        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfBlocks")
+        + numberOfBlocks()
+        + "<br>"
+        + bundle.getString("modelPropertiesAction.optionPane_properties.message.numberOfVehicles")
+        + numberOfVehicles()
+        + "<br>"
+        + "<br>"
+        + bundle.getString("modelPropertiesAction.optionPane_properties.message.lastModified")
+        + lastModified()
         + "</p></html>"
     );
 

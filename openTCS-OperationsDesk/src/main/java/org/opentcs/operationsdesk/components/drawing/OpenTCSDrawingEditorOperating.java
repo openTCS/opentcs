@@ -107,6 +107,8 @@ public class OpenTCSDrawingEditorOperating
     for (OpenTCSDrawingView view : getAllViews()) {
       view.displayDriveOrders(vehicleModel, true);
     }
-    vehicleFigure.propertiesChanged(new AttributesChangeEvent(new NullAttributesChangeListener(), vehicleModel));
+    vehicleFigure.propertiesChanged(
+        new AttributesChangeEvent(new NullAttributesChangeListener(), vehicleModel)
+    );
   }
 }

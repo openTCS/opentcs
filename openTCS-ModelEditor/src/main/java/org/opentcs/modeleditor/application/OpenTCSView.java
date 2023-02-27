@@ -158,7 +158,8 @@ public class OpenTCSView
    * The name/title of this application.
    */
   public static final String NAME
-      = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MISC_PATH).getString("openTcsView.applicationName.text");
+      = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MISC_PATH)
+          .getString("openTcsView.applicationName.text");
   /**
    * Property key for the currently loaded driving course model.
    * The corresponding value contains a "*" if the model has been modified.
@@ -318,7 +319,8 @@ public class OpenTCSView
    * @param dockingManager Manages docking frames.
    * @param drawingViewFocusHandler Handles focussing of dockables.
    * @param layerManager The layer manager.
-   * @param layerEditorEventHandler Handles drawing editor events that the layer editor needs to know about.
+   * @param layerEditorEventHandler Handles drawing editor events that the layer editor needs to
+   * know about.
    */
   @Inject
   public OpenTCSView(ApplicationState appState,
@@ -448,7 +450,7 @@ public class OpenTCSView
     String id = factory.getClass().getName();
     SingleCDockable dockable = dockingManager.getCControl().getSingleDockable(id);
     if (dockable != null) {
-      // dockable is not null at this point when the user hides the plugin 
+      // dockable is not null at this point when the user hides the plugin
       // panel by clicking on its menu entry
       PluggablePanel panel = (PluggablePanel) dockable.getFocusComponent();
       panel.terminate();
@@ -497,7 +499,8 @@ public class OpenTCSView
 
     int drawingViewIndex = viewManager.getNextDrawingViewIndex();
 
-    String title = bundle.getString("openTcsView.panel_operatingDrawingView.title") + " " + drawingViewIndex;
+    String title
+        = bundle.getString("openTcsView.panel_operatingDrawingView.title") + " " + drawingViewIndex;
     DefaultSingleCDockable newDockable
         = dockingManager.createDockable("drivingCourse" + drawingViewIndex,
                                         title,
@@ -511,7 +514,9 @@ public class OpenTCSView
     newDockable.addVetoClosingListener(new DrawingViewClosingListener(newDockable));
     newDockable.addFocusListener(drawingViewFocusHandler);
 
-    newScrollPane.getDrawingView().getComponent().dispatchEvent(new FocusEvent(this, FocusEvent.FOCUS_GAINED));
+    newScrollPane.getDrawingView().getComponent().dispatchEvent(
+        new FocusEvent(this, FocusEvent.FOCUS_GAINED)
+    );
     firePropertyChange(AbstractOpenTCSDrawingView.FOCUS_GAINED, null, newDockable);
 
     return newDockable;
@@ -767,7 +772,7 @@ public class OpenTCSView
   }
 
   /**
-   * Returns all drawing views (including the modelling view)
+   * Returns all drawing views (including the modelling view).
    *
    * @return List with all known <code>OpenTCSDrawingViews</code>.
    */
@@ -839,7 +844,8 @@ public class OpenTCSView
     // Link/Path: Remove corresponding Figure.
     else if ((model instanceof LinkModel || model instanceof PathModel)
         && !(model.getParent() instanceof BlockModel)) {
-      SimpleLineConnection figure = (SimpleLineConnection) fModelManager.getModel().getFigure(model);
+      SimpleLineConnection figure
+          = (SimpleLineConnection) fModelManager.getModel().getFigure(model);
       fDrawingEditor.getActiveView().getDrawing().remove(figure);
       componentRemoved = true;
     }
@@ -1457,7 +1463,7 @@ public class OpenTCSView
     /**
      * Creates a new instance.
      */
-    public AttributesEventHandler() {
+    AttributesEventHandler() {
     }
 
     @Override  // AttributesChangeListener
@@ -1533,7 +1539,7 @@ public class OpenTCSView
     /**
      * Creates a new instance.
      */
-    public BlockEventHandler() {
+    BlockEventHandler() {
     }
 
     @Override  // BlockChangeListener
@@ -1573,7 +1579,7 @@ public class OpenTCSView
      *
      * @param modelManager Provides access to the current system model.
      */
-    public DrawingEditorEventHandler(ModelManager modelManager) {
+    DrawingEditorEventHandler(ModelManager modelManager) {
       this.modelManager = requireNonNull(modelManager, "modelManager");
     }
 
@@ -1730,7 +1736,7 @@ public class OpenTCSView
 
     private final DefaultSingleCDockable newDockable;
 
-    public DrawingViewClosingListener(DefaultSingleCDockable newDockable) {
+    DrawingViewClosingListener(DefaultSingleCDockable newDockable) {
       this.newDockable = newDockable;
     }
 

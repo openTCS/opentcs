@@ -22,6 +22,12 @@ class RemoteSchedulerServiceProxy
     extends AbstractRemoteServiceProxy<RemoteSchedulerService>
     implements SchedulerService {
 
+  /**
+   * Creates a new instance.
+   */
+  RemoteSchedulerServiceProxy() {
+  }
+
   @Override
   public SchedulerAllocationState fetchSchedulerAllocations()
       throws KernelRuntimeException {

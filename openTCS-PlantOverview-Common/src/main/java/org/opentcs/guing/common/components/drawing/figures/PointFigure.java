@@ -87,7 +87,8 @@ public class PointFigure
 
   public Ellipse2D.Double getShape() {
     Rectangle2D r2 = fDisplayBox.getBounds2D();
-    Ellipse2D.Double shape = new Ellipse2D.Double(r2.getX(), r2.getY(), fDiameter - 1, fDiameter - 1);
+    Ellipse2D.Double shape
+        = new Ellipse2D.Double(r2.getX(), r2.getY(), fDiameter - 1, fDiameter - 1);
     return shape;
   }
 

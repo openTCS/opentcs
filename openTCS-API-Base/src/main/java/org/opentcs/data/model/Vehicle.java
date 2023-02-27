@@ -242,10 +242,11 @@ public class Vehicle
     this.currentPosition = currentPosition;
     this.nextPosition = nextPosition;
     this.precisePosition = precisePosition;
-    checkArgument(Double.isNaN(orientationAngle)
-        || (orientationAngle >= -360.0 && orientationAngle <= 360.0),
-                  "Illegal orientation angle: %s",
-                  orientationAngle);
+    checkArgument(
+        Double.isNaN(orientationAngle) || (orientationAngle >= -360.0 && orientationAngle <= 360.0),
+        "Illegal orientation angle: %s",
+        orientationAngle
+    );
     this.orientationAngle = orientationAngle;
     this.energyLevel = checkInRange(energyLevel, 0, 100, "energyLevel");
     this.loadHandlingDevices = listWithoutNullValues(requireNonNull(loadHandlingDevices,
@@ -1707,7 +1708,7 @@ public class Vehicle
   /**
    * A vehicle's state of integration into the system.
    */
-  public static enum IntegrationLevel {
+  public enum IntegrationLevel {
 
     /**
      * The vehicle's reported position is ignored.

@@ -30,7 +30,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class DuplicateAction
     extends org.jhotdraw.app.action.edit.AbstractSelectionAction {
 
-  public final static String ID = "edit.duplicate";
+  /**
+   * This action's ID.
+   */
+  public static final String ID = "edit.duplicate";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
 
@@ -61,7 +64,8 @@ public class DuplicateAction
 
   @Override
   public void actionPerformed(ActionEvent evt) {
-    Component cFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
+    Component cFocusOwner
+        = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
 
     if (cFocusOwner instanceof JComponent) {
       if (cFocusOwner.isEnabled()) {

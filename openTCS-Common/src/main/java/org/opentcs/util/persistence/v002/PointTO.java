@@ -26,13 +26,19 @@ import javax.xml.bind.annotation.XmlType;
                       "vehicleOrientationAngle", "type", "outgoingPaths", "properties"})
 public class PointTO
     extends PlantModelElementTO {
-  
+
   private Long xPosition = 0L;
   private Long yPosition = 0L;
   private Long zPosition = 0L;
   private Float vehicleOrientationAngle = 0.0F;
   private String type = "";
   private List<OutgoingPath> outgoingPaths = new ArrayList<>();
+
+  /**
+   * Creates a new instance.
+   */
+  public PointTO() {
+  }
 
   @XmlAttribute(required = true)
   public Long getxPosition() {
@@ -104,6 +110,12 @@ public class PointTO
   public static class OutgoingPath {
 
     private String name = "";
+
+    /**
+     * Creates a new instance.
+     */
+    public OutgoingPath() {
+    }
 
     @XmlAttribute(required = true)
     public String getName() {

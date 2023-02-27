@@ -23,6 +23,12 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar.OpenTCSS
 public class ToolBarInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public ToolBarInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     install(new FactoryModuleBuilder().build(SelectionToolFactory.class));

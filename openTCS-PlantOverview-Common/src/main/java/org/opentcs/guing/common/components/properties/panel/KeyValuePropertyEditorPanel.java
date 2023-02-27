@@ -80,7 +80,8 @@ public class KeyValuePropertyEditorPanel
 
   @Override
   public String getTitle() {
-    return ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH).getString("keyValuePropertyEditorPanel.title");
+    return ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH)
+        .getString("keyValuePropertyEditorPanel.title");
   }
 
   @Override
@@ -138,6 +139,7 @@ public class KeyValuePropertyEditorPanel
     gridBagConstraints.gridy = 1;
     add(valueComboBox, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
   private void keyValueChangedListener(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_keyValueChangedListener
 
@@ -154,6 +156,7 @@ public class KeyValuePropertyEditorPanel
     valueComboBox.getEditor().setItem(currentSuggestion);
   }//GEN-LAST:event_keyValueChangedListener
 
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox<String> keyComboBox;
   private javax.swing.JLabel keyLabel;

@@ -18,6 +18,12 @@ import javax.inject.Singleton;
 public class PeripheralJobInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public PeripheralJobInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     bind(PeripheralJobsContainer.class).in(Singleton.class);

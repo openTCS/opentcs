@@ -159,8 +159,12 @@ public class OrderSequencesContainerPanel
     fTable.setRowSelectionInterval(row, row);
 
     JPopupMenu menu = new JPopupMenu();
-    JMenuItem item = menu.add(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TO_SEQUENCE_PATH)
-        .getString("orderSequencesContainerPanel.table_sequences.popupMenuItem_showDetails.text"));
+    JMenuItem item = menu.add(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TO_SEQUENCE_PATH)
+            .getString(
+                "orderSequencesContainerPanel.table_sequences.popupMenuItem_showDetails.text"
+            )
+    );
     item.addActionListener((ActionEvent evt) -> showOrderSequence());
 
     menu.show(fTable, x, y);
@@ -196,7 +200,8 @@ public class OrderSequencesContainerPanel
     return new RowFilter<Object, Object>() {
       @Override
       public boolean include(Entry<? extends Object, ? extends Object> entry) {
-        OrderSequence os = ((OrderSequenceTableModel) entry.getModel()).getEntryAt((int) entry.getIdentifier());
+        OrderSequence os
+            = ((OrderSequenceTableModel) entry.getModel()).getEntryAt((int) entry.getIdentifier());
         return os.isComplete();
       }
     };

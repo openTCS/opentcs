@@ -53,9 +53,9 @@ public class TransportOrderEntry {
    * @param properties A map containing the properties of this transport order
    */
   public TransportOrderEntry(TransportOrderData.Deadline deadline,
-                                    List<DriveOrderStructure> driveOrders,
-                                    String intendedVehicle,
-                                    Map<String, String> properties) {
+                             List<DriveOrderStructure> driveOrders,
+                             String intendedVehicle,
+                             Map<String, String> properties) {
     switch (deadline) {
       case MINUS_FIVE_MINUTES:
         this.deadline = Deadline.MINUS_FIVE_MINUTES;
@@ -85,7 +85,7 @@ public class TransportOrderEntry {
     for (DriveOrderStructure curDOS : driveOrders) {
       this.driveOrders.add(
           new DriveOrderEntry(curDOS.getDriveOrderLocation().getName(),
-                                     curDOS.getDriveOrderVehicleOperation()));
+                              curDOS.getDriveOrderVehicleOperation()));
     }
   }
 
@@ -157,7 +157,7 @@ public class TransportOrderEntry {
   /**
    * The enumeration of possible default deadline values.
    */
-  public static enum Deadline {
+  public enum Deadline {
 
     /**
      * The deadline value is five minutes in the past.

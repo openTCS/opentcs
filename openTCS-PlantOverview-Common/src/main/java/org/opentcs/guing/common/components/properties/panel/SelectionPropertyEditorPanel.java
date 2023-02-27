@@ -41,7 +41,7 @@ public class SelectionPropertyEditorPanel
   @SuppressWarnings("unchecked")
   public SelectionPropertyEditorPanel(ListCellRenderer<?> listCellRenderer) {
     requireNonNull(listCellRenderer, "listCellRenderer");
-    
+
     this.listCellRenderer = (ListCellRenderer<Object>) listCellRenderer;
     initComponents();
   }
@@ -51,8 +51,9 @@ public class SelectionPropertyEditorPanel
     fProperty = (AbstractProperty) property;
 
     @SuppressWarnings("unchecked")
-    ComboBoxModel<Object> model
-        = new DefaultComboBoxModel<>(((Selectable<Object>) fProperty).getPossibleValues().toArray());
+    ComboBoxModel<Object> model = new DefaultComboBoxModel<>(
+        ((Selectable<Object>) fProperty).getPossibleValues().toArray()
+    );
     valueComboBox.setModel(model);
 
     Object value = fProperty.getValue();

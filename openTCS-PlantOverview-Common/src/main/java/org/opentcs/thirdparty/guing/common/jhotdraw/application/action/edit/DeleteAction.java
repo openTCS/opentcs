@@ -32,8 +32,11 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class DeleteAction
     extends TextAction {
 
-  public final static String ID = "edit.delete";
-  
+  /**
+   * This action's ID.
+   */
+  public static final String ID = "edit.delete";
+
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
 
   /**
@@ -53,7 +56,8 @@ public class DeleteAction
 
   @Override
   public void actionPerformed(ActionEvent evt) {
-    Component cFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
+    Component cFocusOwner
+        = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
 
     if (cFocusOwner instanceof JComponent) {
       if (cFocusOwner.isEnabled()) {

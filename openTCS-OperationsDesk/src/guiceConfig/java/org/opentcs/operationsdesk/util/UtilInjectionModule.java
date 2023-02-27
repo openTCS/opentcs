@@ -19,6 +19,12 @@ import org.opentcs.guing.common.util.PanelRegistry;
 public class UtilInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public UtilInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     bind(PanelRegistry.class).in(Singleton.class);

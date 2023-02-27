@@ -61,13 +61,19 @@ public class PercentProperty
     validRange.setMin(0).setMax(100);
   }
 
-  public static enum Unit {
+  /**
+   * The supported units.
+   */
+  public enum Unit {
 
+    /**
+     * Percent.
+     */
     PERCENT("%");
 
     private final String displayString;
 
-    private Unit(String displayString) {
+    Unit(String displayString) {
       this.displayString = displayString;
     }
 

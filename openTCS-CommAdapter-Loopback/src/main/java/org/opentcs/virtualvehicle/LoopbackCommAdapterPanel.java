@@ -244,7 +244,11 @@ public class LoopbackCommAdapterPanel
   private void updateOrientationAngle(double orientation) {
     SwingUtilities.invokeLater(() -> {
       if (Double.isNaN(orientation)) {
-        orientationAngleTxt.setText(BUNDLE.getString("loopbackCommAdapterPanel.textField_orientationAngle.angleNotSetPlaceholder"));
+        orientationAngleTxt.setText(
+            BUNDLE.getString(
+                "loopbackCommAdapterPanel.textField_orientationAngle.angleNotSetPlaceholder"
+            )
+        );
       }
       else {
         orientationAngleTxt.setText(Double.toString(orientation));

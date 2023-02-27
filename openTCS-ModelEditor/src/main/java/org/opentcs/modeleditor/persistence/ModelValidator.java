@@ -50,20 +50,18 @@ import org.slf4j.LoggerFactory;
 public class ModelValidator {
 
   /**
+   * This class' logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(ModelValidator.class);
+  /**
    * This class' resource bundle.
    */
   private final ResourceBundleUtil bundle
       = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.VALIDATOR_PATH);
-
   /**
    * The collection of errors which happened after the last reset.
    */
   private final List<String> errors = new LinkedList<>();
-
-  /**
-   * This class' logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(ModelValidator.class);
 
   /**
    * Creates a new instance.
@@ -106,11 +104,15 @@ public class ModelValidator {
     }
     //Validate the name of the component
     if (Strings.isNullOrEmpty(component.getName())) {
-      errorOccurred(component, "modelValidator.error_componentNameInvalid.text", component.getName());
+      errorOccurred(component,
+                    "modelValidator.error_componentNameInvalid.text",
+                    component.getName());
       return false;
     }
     if (nameExists(model, component)) {
-      errorOccurred(component, "modelValidator.error_componentNameExists.text", component.getName());
+      errorOccurred(component,
+                    "modelValidator.error_componentNameExists.text",
+                    component.getName());
       return false;
     }
     //Validate the miscellaneous property of the component
@@ -152,9 +154,11 @@ public class ModelValidator {
 
   public void showLoadingValidationWarning(Component parent, Collection<String> content) {
     TextAreaDialog panel
-        = new TextAreaDialog(parent,
-                             true,
-                             bundle.getString("modelValidator.dialog_validationWarning.message.loadingError"));
+        = new TextAreaDialog(
+            parent,
+            true,
+            bundle.getString("modelValidator.dialog_validationWarning.message.loadingError")
+        );
     panel.setContent(content);
     panel.setTitle(bundle.getString("modelValidator.dialog_validationWarning.title"));
     panel.setLocationRelativeTo(null);
@@ -163,9 +167,11 @@ public class ModelValidator {
 
   public void showSavingValidationWarning(Component parent, Collection<String> content) {
     TextAreaDialog panel
-        = new TextAreaDialog(parent,
-                             true,
-                             bundle.getString("modelValidator.dialog_validationWarning.message.savingError"));
+        = new TextAreaDialog(
+            parent,
+            true,
+            bundle.getString("modelValidator.dialog_validationWarning.message.savingError")
+        );
     panel.setContent(content);
     panel.setTitle(bundle.getString("modelValidator.dialog_validationWarning.title"));
     panel.setLocationRelativeTo(null);
@@ -394,7 +400,7 @@ public class ModelValidator {
         = (PercentProperty) vehicle.getProperty(VehicleModel.ENERGY_LEVEL_CRITICAL);
     if (((int) energyCriticalProperty.getValue()) < 0
         || ((int) energyCriticalProperty.getValue()) > 100) {
-      LOG.warn("{}: Energy level critical is {} but has to be in range of [0..100]. Setting it to 0.",
+      LOG.warn("{}: Energy level critical is {}, should be in [0..100]. Setting to 0.",
                vehicle.getName(),
                energyCriticalProperty.getValue());
       energyCriticalProperty.setValueAndUnit(0, PercentProperty.Unit.PERCENT);
@@ -405,7 +411,7 @@ public class ModelValidator {
     PercentProperty energyGoodProperty
         = (PercentProperty) vehicle.getProperty(VehicleModel.ENERGY_LEVEL_GOOD);
     if (((int) energyGoodProperty.getValue()) < 0 || ((int) energyGoodProperty.getValue()) > 100) {
-      LOG.warn("{}: Energy level good is {} but has to be in range of [0..100]. Setting it to 100.",
+      LOG.warn("{}: Energy level good is {}, should be in [0..100]. Setting to 100.",
                vehicle.getName(),
                energyGoodProperty.getValue());
       energyGoodProperty.setValueAndUnit(100, PercentProperty.Unit.PERCENT);
@@ -414,7 +420,7 @@ public class ModelValidator {
 
     //Validate that the good energy level is greater equals than the critical energy level
     if (((int) energyGoodProperty.getValue()) < ((int) energyCriticalProperty.getValue())) {
-      LOG.warn("{}: Energy level good('{}') has to be >= energy level critical('{}'). Setting it to {}.",
+      LOG.warn("{}: Energy level good ('{}') not >= energy level critical ('{}'). Setting to {}.",
                vehicle.getName(),
                energyGoodProperty.getValue(),
                energyCriticalProperty.getValue(),
@@ -428,7 +434,8 @@ public class ModelValidator {
     //Validate the current energy level
     PercentProperty energyLevelProperty
         = (PercentProperty) vehicle.getProperty(VehicleModel.ENERGY_LEVEL);
-    if (((int) energyLevelProperty.getValue()) < 0 || ((int) energyLevelProperty.getValue()) > 100) {
+    if (((int) energyLevelProperty.getValue()) < 0
+        || ((int) energyLevelProperty.getValue()) > 100) {
       LOG.warn("{}: Energy level is {} but has to be in range of [0..100]. Setting it to 50.");
       energyLevelProperty.setValueAndUnit(50, PercentProperty.Unit.PERCENT);
       vehicle.setProperty(VehicleModel.ENERGY_LEVEL, energyLevelProperty);
@@ -452,7 +459,8 @@ public class ModelValidator {
       valid = false;
     }
     //Validate whether the next point exists
-    StringProperty nextPointProperty = (StringProperty) vehicle.getProperty(VehicleModel.NEXT_POINT);
+    StringProperty nextPointProperty
+        = (StringProperty) vehicle.getProperty(VehicleModel.NEXT_POINT);
     String nextPoint = nextPointProperty.getText();
     if (!isNullOrEmptyPoint(nextPoint) && !nameExists(model, nextPoint)) {
       errorOccurred(vehicle, "modelValidator.error_vehicleNextPointNotExisting.text",

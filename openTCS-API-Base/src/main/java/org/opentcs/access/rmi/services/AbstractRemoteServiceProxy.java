@@ -106,7 +106,7 @@ abstract class AbstractRemoteServiceProxy<R extends Remote> {
    * associated to it.
    */
   boolean isLoggedIn() {
-    return (getClientId() != null && getRemoteService() != null);
+    return getClientId() != null && getRemoteService() != null;
   }
 
   /**

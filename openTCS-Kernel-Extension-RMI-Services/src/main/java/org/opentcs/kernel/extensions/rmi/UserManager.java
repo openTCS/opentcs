@@ -108,7 +108,7 @@ public class UserManager
       return;
     }
 
-    // Register the user manager as an event listener so that the user manager can collect events 
+    // Register the user manager as an event listener so that the user manager can collect events
     // and pass them to known clients polling events.
     eventSource.subscribe(this);
 

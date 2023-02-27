@@ -201,8 +201,8 @@ public class DefaultScheduler
       // Remember the allocate future in case we need to cancel it.
       addAllocateFuture(client, allocateFuture);
 
-      // Clean up the collection of allocate futures and remove futures that have already been 
-      // completed. This could also be done in other places, but doing it for every new allocation 
+      // Clean up the collection of allocate futures and remove futures that have already been
+      // completed. This could also be done in other places, but doing it for every new allocation
       // should be sufficient.
       removeCompletedAllocateFutures(client);
     }
@@ -420,6 +420,12 @@ public class DefaultScheduler
    */
   private static class DummyClient
       implements Scheduler.Client {
+
+    /**
+     * Creates a new instance.
+     */
+    DummyClient() {
+    }
 
     @Override
     public String getId() {

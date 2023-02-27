@@ -41,7 +41,7 @@ public class PointPanel
   private final List<InputValidationListener> validationListeners = new LinkedList<>();
 
   /**
-   * Creates new form PointPanel
+   * Creates new instance.
    *
    * @param items possible destination points
    */
@@ -141,6 +141,7 @@ public class PointPanel
     }
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -163,9 +164,12 @@ public class PointPanel
     itemsComboBox.setFont(itemsComboBox.getFont());
     add(itemsComboBox);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox<String> itemsComboBox;
   private javax.swing.JLabel itemsLabel;
   // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 }

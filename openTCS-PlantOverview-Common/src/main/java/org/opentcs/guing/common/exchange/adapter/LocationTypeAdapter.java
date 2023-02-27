@@ -33,6 +33,12 @@ import org.opentcs.guing.common.model.SystemModel;
 public class LocationTypeAdapter
     extends AbstractProcessAdapter {
 
+  /**
+   * Creates a new instance.
+   */
+  public LocationTypeAdapter() {
+  }
+
   @Override // OpenTCSProcessAdapter
   public void updateModelProperties(TCSObject<?> tcsObject,
                                     ModelComponent modelComponent,
@@ -69,7 +75,9 @@ public class LocationTypeAdapter
         .withLocationType(
             new LocationTypeCreationTO(modelComponent.getName())
                 .withAllowedOperations(getAllowedOperations((LocationTypeModel) modelComponent))
-                .withAllowedPeripheralOperations(getAllowedPeripheralOperations((LocationTypeModel) modelComponent))
+                .withAllowedPeripheralOperations(
+                    getAllowedPeripheralOperations((LocationTypeModel) modelComponent)
+                )
                 .withProperties(getKernelProperties(modelComponent))
                 .withLayout(getLayout((LocationTypeModel) modelComponent))
         );

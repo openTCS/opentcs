@@ -36,11 +36,16 @@ public class Cfg4jConfigurationBindingProvider
   /**
    * This class's logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(Cfg4jConfigurationBindingProvider.class);
+  private static final Logger LOG
+      = LoggerFactory.getLogger(Cfg4jConfigurationBindingProvider.class);
   /**
    * The key of the (system) property containing the reload interval.
    */
   private static final String PROPKEY_RELOAD_INTERVAL = "opentcs.cfg4j.reload.interval";
+  /**
+   * The default reload interval.
+   */
+  private static final long DEFAULT_RELOAD_INTERVAL = 10000;
   /**
    * Default configuration file name.
    */
@@ -83,7 +88,6 @@ public class Cfg4jConfigurationBindingProvider
   }
 
   private long reloadInterval() {
-    final long DEFAULT_RELOAD_INTERVAL = 10000;
     String valueString = System.getProperty(PROPKEY_RELOAD_INTERVAL);
 
     if (valueString == null) {

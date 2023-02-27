@@ -30,14 +30,18 @@ public class StatelessImageVehicleTheme
     implements VehicleTheme {
 
   /**
+   * The path containing the images.
+   */
+  private static final String PATH
+      = "/org/opentcs/guing/plugins/themes/symbols/vehicle/Vehicle24.png";
+  /**
    * The single image used for representing vehicles, regardless of their state.
    */
   private final Image image;
-  /**
-   * The path containing the images.
-   */
-  private static final String PATH = "/org/opentcs/guing/plugins/themes/symbols/vehicle/Vehicle24.png";
 
+  /**
+   * Creates a new instance.
+   */
   public StatelessImageVehicleTheme() {
     this.image = loadImage(PATH);
   }

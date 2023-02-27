@@ -24,5 +24,5 @@ public interface ModelBasedFigure
    *
    * @return The model component for this figure.
    */
-  public DrawnModelComponent getModel();
+  DrawnModelComponent getModel();
 }

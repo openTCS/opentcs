@@ -26,6 +26,9 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class DownloadModelFromKernelAction
     extends AbstractAction {
 
+  /**
+   * This action's ID.
+   */
   public static final String ID = "file.downloadModelFromKernel";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);

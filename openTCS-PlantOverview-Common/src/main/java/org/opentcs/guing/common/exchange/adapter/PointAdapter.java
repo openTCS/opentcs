@@ -33,6 +33,12 @@ import org.opentcs.guing.common.model.SystemModel;
 public class PointAdapter
     extends AbstractProcessAdapter {
 
+  /**
+   * Creates a new instance.
+   */
+  public PointAdapter() {
+  }
+
   @Override  // OpenTCSProcessAdapter
   public void updateModelProperties(TCSObject<?> tcsObject,
                                     ModelComponent modelComponent,

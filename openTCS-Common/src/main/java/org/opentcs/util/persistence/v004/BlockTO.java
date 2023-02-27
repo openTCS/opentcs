@@ -31,6 +31,12 @@ public class BlockTO
   private List<MemberTO> members = new ArrayList<>();
   private BlockLayout blockLayout = new BlockLayout();
 
+  /**
+   * Creates a new instance.
+   */
+  public BlockTO() {
+  }
+
   @XmlAttribute(required = true)
   public String getType() {
     return type;
@@ -67,6 +73,12 @@ public class BlockTO
   public static class BlockLayout {
 
     private String color = "";
+
+    /**
+     * Creates a new instance.
+     */
+    public BlockLayout() {
+    }
 
     @XmlAttribute(required = true)
     public String getColor() {

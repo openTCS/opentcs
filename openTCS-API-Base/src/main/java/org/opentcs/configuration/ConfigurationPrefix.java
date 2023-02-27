@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 
 /**
  * Marks an interface that provides some configuration for a specific class.
- * 
+ *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 @Target({TYPE})
@@ -25,7 +25,7 @@ public @interface ConfigurationPrefix {
   
   /**
    * Returns the name of the class the interface configures.
-   * 
+   *
    * @return The name of the class the interface configures.
    */
   String value();

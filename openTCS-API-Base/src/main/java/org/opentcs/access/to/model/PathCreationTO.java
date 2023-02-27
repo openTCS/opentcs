@@ -227,7 +227,8 @@ public class PathCreationTO
   }
 
   /**
-   * Creates a copy of this object with the maximum allowed forward velocity (in mm/s) for this path.
+   * Creates a copy of this object with the maximum allowed forward velocity (in mm/s) for this
+   * path.
    *
    * @param maxVelocity The new maximum allowed velocity (in mm/s). May not be a negative value.
    * @return A copy of this object, differing in the given maximum velocity.

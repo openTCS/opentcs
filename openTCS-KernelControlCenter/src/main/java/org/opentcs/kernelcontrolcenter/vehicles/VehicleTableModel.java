@@ -45,7 +45,7 @@ public class VehicleTableModel
   /**
    * The column names.
    */
-  private static final String[] COLUMN_NAMES = new String[] {
+  private static final String[] COLUMN_NAMES = new String[]{
     BUNDLE.getString("vehicleTableModel.column_vehicle.headerText"),
     BUNDLE.getString("vehicleTableModel.column_state.headerText"),
     BUNDLE.getString("vehicleTableModel.column_adapter.headerText"),
@@ -55,7 +55,7 @@ public class VehicleTableModel
   /**
    * The column classes.
    */
-  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[] {
+  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
     String.class,
     String.class,
     VehicleCommAdapterDescription.class,
@@ -83,17 +83,17 @@ public class VehicleTableModel
    */
   private static final int POSITION_COLUMN = 4;
   /**
-   * The vehicles we're controlling.
-   */
-  private final List<LocalVehicleEntry> entries = new ArrayList<>();
-  /**
    * The identifier for the adapter column.
    */
-  public static final String ADAPTER_COLUMN_IDENTIFIER = COLUMN_NAMES[ADAPTER_COLUMN];
+  private static final String ADAPTER_COLUMN_IDENTIFIER = COLUMN_NAMES[ADAPTER_COLUMN];
   /**
    * The identifier for the position column.
    */
-  public static final String POSITION_COLUMN_IDENTIFIER = COLUMN_NAMES[POSITION_COLUMN];
+  private static final String POSITION_COLUMN_IDENTIFIER = COLUMN_NAMES[POSITION_COLUMN];
+  /**
+   * The vehicles we're controlling.
+   */
+  private final List<LocalVehicleEntry> entries = new ArrayList<>();
   /**
    * The vehicle service used for interactions.
    */
@@ -113,6 +113,24 @@ public class VehicleTableModel
                            CallWrapper callWrapper) {
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");
+  }
+
+  /**
+   * Returns the identifier for the adapter column.
+   *
+   * @return The identifier for the adapter column.
+   */
+  public static String adapterColumnIdentifier() {
+    return ADAPTER_COLUMN_IDENTIFIER;
+  }
+
+  /**
+   * Returns the identifier for the position column.
+   *
+   * @return The identifier for the position column.
+   */
+  public static String positionColumnIdentifier() {
+    return POSITION_COLUMN_IDENTIFIER;
   }
 
   /**
@@ -157,20 +175,7 @@ public class VehicleTableModel
       case ADAPTER_COLUMN:
         break;
       case ENABLED_COLUMN:
-        try {
-          if ((boolean) aValue) {
-            callWrapper.call(() -> vehicleService.enableCommAdapter(
-                entry.getAttachmentInformation().getVehicleReference()));
-          }
-          else {
-            callWrapper.call(() -> vehicleService.disableCommAdapter(
-                entry.getAttachmentInformation().getVehicleReference()));
-          }
-        }
-        catch (Exception ex) {
-          LOG.warn("Error enabling/disabling comm adapter for {}", entry.getVehicleName(), ex);
-        }
-
+        setEnabledState((boolean) aValue, entry);
         break;
       case POSITION_COLUMN:
         break;
@@ -261,6 +266,22 @@ public class VehicleTableModel
         int myIndex = index;
         SwingUtilities.invokeLater(() -> fireTableRowsUpdated(myIndex, myIndex));
       }
+    }
+  }
+
+  private void setEnabledState(boolean enabled, LocalVehicleEntry entry) {
+    try {
+      if (enabled) {
+        callWrapper.call(() -> vehicleService.enableCommAdapter(
+            entry.getAttachmentInformation().getVehicleReference()));
+      }
+      else {
+        callWrapper.call(() -> vehicleService.disableCommAdapter(
+            entry.getAttachmentInformation().getVehicleReference()));
+      }
+    }
+    catch (Exception ex) {
+      LOG.warn("Error enabling/disabling comm adapter for {}", entry.getVehicleName(), ex);
     }
   }
 

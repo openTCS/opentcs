@@ -40,9 +40,10 @@ public final class DropdownListInputPanel<E>
 
   @Override
   protected void captureInput() {
-    //if the combobox is editable and the input was entered using the jTextField and 
-    //confirmed using the enter button, then the textField's input is not yet saved as the comboBox selection.
-    //Thats why it is safer to get the input from the textfield, if the combobox is editable.
+    // If the combobox is editable and the input was entered using the jTextField and confirmed
+    // using the enter button, then the textField's input is not yet saved as the comboBox
+    // selection.
+    // That's why it is safer to get the input from the textfield, if the combobox is editable.
     input = comboBox.isEditable() ? comboBox.getEditor().getItem() : comboBox.getSelectedItem();
   }
 

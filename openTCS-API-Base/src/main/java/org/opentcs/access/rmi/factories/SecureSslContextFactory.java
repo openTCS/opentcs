@@ -49,7 +49,7 @@ class SecureSslContextFactory
    *
    * @param sslParameterSet The ssl parameters to be used for creating the ssl context.
    */
-  public SecureSslContextFactory(SslParameterSet sslParameterSet) {
+  SecureSslContextFactory(SslParameterSet sslParameterSet) {
     this.sslParameterSet = requireNonNull(sslParameterSet, "sslParameterSet");
   }
 

@@ -58,6 +58,9 @@ public class StatefulImageVehicleTheme
   private final Map<Vehicle.State, Image> stateMapLoadedPaused
       = new EnumMap<>(Vehicle.State.class);
 
+  /**
+   * Creates a new instance.
+   */
   public StatefulImageVehicleTheme() {
     initMaps();
   }
@@ -135,11 +138,13 @@ public class StatefulImageVehicleTheme
     stateMapPaused.put(Vehicle.State.UNAVAILABLE, loadImage(PATH + "normal_paused.png"));
     stateMapPaused.put(Vehicle.State.UNKNOWN, loadImage(PATH + "normal_paused.png"));
 
-    stateMapLoadedPaused.put(Vehicle.State.CHARGING, loadImage(PATH + "charging_loaded_paused.png"));
+    stateMapLoadedPaused.put(Vehicle.State.CHARGING,
+                             loadImage(PATH + "charging_loaded_paused.png"));
     stateMapLoadedPaused.put(Vehicle.State.ERROR, loadImage(PATH + "error_loaded_paused.png"));
     stateMapLoadedPaused.put(Vehicle.State.EXECUTING, loadImage(PATH + "normal_loaded_paused.png"));
     stateMapLoadedPaused.put(Vehicle.State.IDLE, loadImage(PATH + "normal_loaded_paused.png"));
-    stateMapLoadedPaused.put(Vehicle.State.UNAVAILABLE, loadImage(PATH + "normal_loaded_paused.png"));
+    stateMapLoadedPaused.put(Vehicle.State.UNAVAILABLE,
+                             loadImage(PATH + "normal_loaded_paused.png"));
     stateMapLoadedPaused.put(Vehicle.State.UNKNOWN, loadImage(PATH + "normal_loaded_paused.png"));
   }
 

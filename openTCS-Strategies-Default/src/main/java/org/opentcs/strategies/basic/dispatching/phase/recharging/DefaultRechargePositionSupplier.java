@@ -208,8 +208,8 @@ public class DefaultRechargePositionSupplier
    * operation.
    */
   private boolean allowsOperation(Location.Link link, String operation) {
-    // This link is only interesting if it either does not define any allowed operations (does 
-    // not override the allowed operations of the corresponding location) at all or, if it does, 
+    // This link is only interesting if it either does not define any allowed operations (does
+    // not override the allowed operations of the corresponding location) at all or, if it does,
     // allows the required recharge operation.
     return link.getAllowedOperations().isEmpty() || link.hasAllowedOperation(operation);
   }
@@ -276,7 +276,7 @@ public class DefaultRechargePositionSupplier
     private final Location location;
     private final long costs;
 
-    public LocationCandidate(Location location, long costs) {
+    LocationCandidate(Location location, long costs) {
       this.location = location;
       this.costs = costs;
     }

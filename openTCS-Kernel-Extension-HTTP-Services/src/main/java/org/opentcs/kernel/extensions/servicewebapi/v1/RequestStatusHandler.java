@@ -76,7 +76,9 @@ public class RequestStatusHandler {
    * value is null.
    * @return A list of transport orders that match the filter.
    */
-  public List<GetTransportOrderResponseTO> getTransportOrdersState(@Nullable String intendedVehicle) {
+  public List<GetTransportOrderResponseTO> getTransportOrdersState(
+      @Nullable String intendedVehicle
+  ) {
     if (intendedVehicle != null) {
       Vehicle vehicle = orderService.fetchObject(Vehicle.class, intendedVehicle);
       if (vehicle == null) {
@@ -119,8 +121,10 @@ public class RequestStatusHandler {
    * if the value is null.
    * @return List of peripheral job states.
    */
-  public List<GetPeripheralJobResponseTO> getPeripheralJobs(@Nullable String relatedVehicle,
-                                                    @Nullable String relatedTransportOrder) {
+  public List<GetPeripheralJobResponseTO> getPeripheralJobs(
+      @Nullable String relatedVehicle,
+      @Nullable String relatedTransportOrder
+  ) {
     // If a related vehicle or transport order is set, make sure they exist.
     if (relatedVehicle != null && orderService.fetchObject(Vehicle.class, relatedVehicle) == null) {
       throw new ObjectUnknownException("Unknown vehicle: " + relatedVehicle);
@@ -163,7 +167,7 @@ public class RequestStatusHandler {
    */
   public List<GetVehicleResponseTO> getVehiclesState(@Nullable String procState) {
     List<GetVehicleResponseTO> vehicles = orderService.fetchObjects(Vehicle.class,
-                                                            new VehicleFilter(procState))
+                                                                    new VehicleFilter(procState))
         .stream()
         .map(vehicle -> GetVehicleResponseTO.fromVehicle(vehicle))
         .collect(Collectors.toList());

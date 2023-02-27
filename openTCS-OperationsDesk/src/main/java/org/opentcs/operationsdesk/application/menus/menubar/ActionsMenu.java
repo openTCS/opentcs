@@ -72,7 +72,8 @@ public class ActionsMenu
     requireNonNull(menuFactory, "menuFactory");
     requireNonNull(appConfig, "appConfig");
 
-    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MENU_PATH);
+    final ResourceBundleUtil labels
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MENU_PATH);
 
     this.setText(labels.getString("actionsMenu.text"));
     this.setToolTipText(labels.getString("actionsMenu.tooltipText"));
@@ -91,8 +92,9 @@ public class ActionsMenu
     add(menuItemFindVehicle);
 
     // Menu item Actions -> Ignore precise position
-    cbiIgnorePrecisePosition
-        = new JCheckBoxMenuItem(labels.getString("actionsMenu.menuItem_ignorePrecisePosition.text"));
+    cbiIgnorePrecisePosition = new JCheckBoxMenuItem(
+        labels.getString("actionsMenu.menuItem_ignorePrecisePosition.text")
+    );
 
     add(cbiIgnorePrecisePosition);
     cbiIgnorePrecisePosition.setSelected(appConfig.ignoreVehiclePrecisePosition());
@@ -105,15 +107,18 @@ public class ActionsMenu
     });
 
     // Menu item Actions -> Ignore orientation angle
-    cbiIgnoreOrientationAngle
-        = new JCheckBoxMenuItem(labels.getString("actionsMenu.menuItem_ignorePreciseOrientation.text"));
+    cbiIgnoreOrientationAngle = new JCheckBoxMenuItem(
+        labels.getString("actionsMenu.menuItem_ignorePreciseOrientation.text")
+    );
 
     add(cbiIgnoreOrientationAngle);
     cbiIgnoreOrientationAngle.setSelected(appConfig.ignoreVehicleOrientationAngle());
     cbiIgnoreOrientationAngle.addActionListener((ActionEvent e) -> {
       for (Figure figure : drawingEditor.getDrawing().getChildren()) {
         if (figure instanceof VehicleFigure) {
-          ((VehicleFigure) figure).setIgnoreOrientationAngle(cbiIgnoreOrientationAngle.isSelected());
+          ((VehicleFigure) figure).setIgnoreOrientationAngle(
+              cbiIgnoreOrientationAngle.isSelected()
+          );
         }
       }
     });

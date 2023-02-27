@@ -27,11 +27,6 @@ public abstract class AbstractLayerGroupsTableModel
     implements LayerGroupChangeListener {
 
   /**
-   * The resource bundle to use.
-   */
-  private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle(I18nPlantOverview.LAYERS_PATH);
-  /**
    * The number of the "ID" column.
    */
   public static final int COLUMN_ID = 0;
@@ -43,6 +38,11 @@ public abstract class AbstractLayerGroupsTableModel
    * The number of the "Visible" column.
    */
   public static final int COLUMN_VISIBLE = 2;
+  /**
+   * The resource bundle to use.
+   */
+  private static final ResourceBundle BUNDLE
+      = ResourceBundle.getBundle(I18nPlantOverview.LAYERS_PATH);
   /**
    * The column names.
    */

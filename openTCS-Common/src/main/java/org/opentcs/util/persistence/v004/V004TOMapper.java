@@ -51,6 +51,12 @@ public class V004TOMapper {
   public static final String VERSION_STRING = "0.0.4";
 
   /**
+   * Creates a new instance.
+   */
+  public V004TOMapper() {
+  }
+
+  /**
    * Maps the given model to a {@link PlantModelCreationTO} instance.
    *
    * @param model The model to map.
@@ -106,11 +112,15 @@ public class V004TOMapper {
               .withVehicleOrientationAngle(point.getVehicleOrientationAngle().doubleValue())
               .withType(Point.Type.valueOf(point.getType()))
               .withProperties(convertProperties(point.getProperties()))
-              .withLayout(new PointCreationTO.Layout(new Couple(point.getPointLayout().getxPosition(),
-                                                                point.getPointLayout().getyPosition()),
-                                                     new Couple(point.getPointLayout().getxLabelOffset(),
-                                                                point.getPointLayout().getyLabelOffset()),
-                                                     point.getPointLayout().getLayerId()))
+              .withLayout(
+                  new PointCreationTO.Layout(
+                      new Couple(point.getPointLayout().getxPosition(),
+                                 point.getPointLayout().getyPosition()),
+                      new Couple(point.getPointLayout().getxLabelOffset(),
+                                 point.getPointLayout().getyLabelOffset()),
+                      point.getPointLayout().getLayerId()
+                  )
+              )
       );
     }
 
@@ -127,7 +137,9 @@ public class V004TOMapper {
               .withEnergyLevelCritical(vehicle.getEnergyLevelCritical().intValue())
               .withEnergyLevelGood(vehicle.getEnergyLevelGood().intValue())
               .withEnergyLevelFullyRecharged(vehicle.getEnergyLevelFullyRecharged().intValue())
-              .withEnergyLevelSufficientlyRecharged(vehicle.getEnergyLevelSufficientlyRecharged().intValue())
+              .withEnergyLevelSufficientlyRecharged(
+                  vehicle.getEnergyLevelSufficientlyRecharged().intValue()
+              )
               .withMaxReverseVelocity(vehicle.getMaxReverseVelocity())
               .withMaxVelocity(vehicle.getMaxVelocity())
               .withProperties(convertProperties(vehicle.getProperties()))
@@ -194,9 +206,13 @@ public class V004TOMapper {
                   locationType.getAllowedPeripheralOperations())
               )
               .withProperties(convertProperties(locationType.getProperties()))
-              .withLayout(new LocationTypeCreationTO.Layout(
-                  LocationRepresentation.valueOf(locationType.getLocationTypeLayout().getLocationRepresentation())
-              ))
+              .withLayout(
+                  new LocationTypeCreationTO.Layout(
+                      LocationRepresentation.valueOf(
+                          locationType.getLocationTypeLayout().getLocationRepresentation()
+                      )
+                  )
+              )
       );
     }
 
@@ -216,12 +232,18 @@ public class V004TOMapper {
               .withLinks(getLinks(location))
               .withLocked(location.isLocked())
               .withProperties(convertProperties(location.getProperties()))
-              .withLayout(new LocationCreationTO.Layout(new Couple(location.getLocationLayout().getxPosition(),
-                                                                   location.getLocationLayout().getyPosition()),
-                                                        new Couple(location.getLocationLayout().getxLabelOffset(),
-                                                                   location.getLocationLayout().getyLabelOffset()),
-                                                        LocationRepresentation.valueOf(location.getLocationLayout().getLocationRepresentation()),
-                                                        location.getLocationLayout().getLayerId()))
+              .withLayout(
+                  new LocationCreationTO.Layout(
+                      new Couple(location.getLocationLayout().getxPosition(),
+                                 location.getLocationLayout().getyPosition()),
+                      new Couple(location.getLocationLayout().getxLabelOffset(),
+                                 location.getLocationLayout().getyLabelOffset()),
+                      LocationRepresentation.valueOf(
+                          location.getLocationLayout().getLocationRepresentation()
+                      ),
+                      location.getLocationLayout().getLayerId()
+                  )
+              )
       );
     }
 
@@ -392,7 +414,11 @@ public class V004TOMapper {
           .setPathLayout(new PathTO.PathLayout()
               .setConnectionType(path.getLayout().getConnectionType().name())
               .setControlPoints(path.getLayout().getControlPoints().stream()
-                  .map(controlPoint -> new PathTO.ControlPoint().setX(controlPoint.getX()).setY(controlPoint.getY()))
+                  .map(controlPoint -> {
+                    return new PathTO.ControlPoint()
+                        .setX(controlPoint.getX())
+                        .setY(controlPoint.getY());
+                  })
                   .collect(Collectors.toList()))
               .setLayerId(path.getLayout().getLayerId()))
           .setProperties(convertProperties(path.getProperties()));
@@ -425,10 +451,17 @@ public class V004TOMapper {
     for (LocationTypeCreationTO locationType : locationTypes) {
       LocationTypeTO locationTypeTO = new LocationTypeTO();
       locationTypeTO.setName(locationType.getName());
-      locationTypeTO.setAllowedOperations(toAllowedOperationTOs(locationType.getAllowedOperations()))
-          .setAllowedPeripheralOperations(toAllowedPeripheralOperationTOs(locationType.getAllowedPeripheralOperations()))
-          .setLocationTypeLayout(new LocationTypeTO.LocationTypeLayout()
-              .setLocationRepresentation(locationType.getLayout().getLocationRepresentation().name()))
+      locationTypeTO.setAllowedOperations(
+          toAllowedOperationTOs(locationType.getAllowedOperations())
+      )
+          .setAllowedPeripheralOperations(
+              toAllowedPeripheralOperationTOs(locationType.getAllowedPeripheralOperations())
+          )
+          .setLocationTypeLayout(
+              new LocationTypeTO.LocationTypeLayout()
+                  .setLocationRepresentation(
+                      locationType.getLayout().getLocationRepresentation().name())
+          )
           .setProperties(convertProperties(locationType.getProperties()));
 
       result.add(locationTypeTO);
@@ -546,7 +579,9 @@ public class V004TOMapper {
   private List<AllowedOperationTO> toAllowedOperationTOs(Collection<String> allowedOperations) {
     return allowedOperations.stream()
         .sorted()
-        .map(allowedOperation -> (AllowedOperationTO) new AllowedOperationTO().setName(allowedOperation))
+        .map(allowedOperation -> {
+          return (AllowedOperationTO) new AllowedOperationTO().setName(allowedOperation);
+        })
         .collect(Collectors.toList());
   }
 
@@ -554,7 +589,10 @@ public class V004TOMapper {
       Collection<String> allowedOperations) {
     return allowedOperations.stream()
         .sorted()
-        .map(allowedOperation -> (AllowedPeripheralOperationTO) new AllowedPeripheralOperationTO().setName(allowedOperation))
+        .map(allowedOperation -> {
+          return (AllowedPeripheralOperationTO) new AllowedPeripheralOperationTO()
+              .setName(allowedOperation);
+        })
         .collect(Collectors.toList());
   }
 

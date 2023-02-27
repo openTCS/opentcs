@@ -26,6 +26,12 @@ class RemoteDispatcherServiceProxy
     extends AbstractRemoteServiceProxy<RemoteDispatcherService>
     implements DispatcherService {
 
+  /**
+   * Creates a new instance.
+   */
+  RemoteDispatcherServiceProxy() {
+  }
+
   @Override
   public void dispatch()
       throws KernelRuntimeException {

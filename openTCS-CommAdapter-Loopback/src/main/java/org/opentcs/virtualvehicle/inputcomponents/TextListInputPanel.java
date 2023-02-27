@@ -13,13 +13,13 @@ import javax.swing.event.ListSelectionListener;
 
 /**
  * An input panel with a text field for user input as well as a list of predefined
- * inputs to select from. 
+ * inputs to select from.
  * @author Tobias Marquardt (Fraunhofer IML)
  */
 public final class TextListInputPanel
     extends TextInputPanel {
 
-  /** 
+  /**
    * Creates a new instance TextListInputPanel.
    * @param title the title of the panel
    */
@@ -46,7 +46,7 @@ public final class TextListInputPanel
   }
 
   /**
-   * Enable input validation against the given regular expression. 
+   * Enable input validation against the given regular expression.
    * @see InputPanel#addValidationListener
    * @param format A regular expression.
    */
@@ -191,9 +191,9 @@ public final class TextListInputPanel
     }
 
     /**
-     * Set the initial selected list entry. 
+     * Set the initial selected list entry.
      * @param element Element to select. Selection remains unchanged if
-     *                element ist not in the list or element is 
+     *                element ist not in the list or element is
      *                <code>null</code>.
      * @return the instance fo this <code>Builder</code>
      */

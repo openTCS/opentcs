@@ -36,13 +36,13 @@ public class CreatePeripheralJobAction
     extends AbstractAction {
 
   /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(CreatePeripheralJobAction.class);
-  /**
    * This action class's ID.
    */
   public static final String ID = "actions.createPeripheralJob";
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(CreatePeripheralJobAction.class);
   /**
    * Access to the resource bundle.
    */

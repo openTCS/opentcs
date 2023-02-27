@@ -35,13 +35,13 @@ public abstract class TreeViewManager
     implements EventHandler {
 
   /**
-   * The tree view.
-   */
-  private final TreeView fTreeView;
-  /**
    * A factory for UserObjects.
    */
   protected final UserObjectUtil userObjectUtil;
+  /**
+   * The tree view.
+   */
+  private final TreeView fTreeView;
   /**
    * This manager's component filter.
    */

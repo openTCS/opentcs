@@ -23,6 +23,12 @@ import org.opentcs.strategies.basic.scheduling.modules.SingleVehicleBlockModule;
 public class DefaultSchedulerModule
     extends KernelInjectionModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultSchedulerModule() {
+  }
+
   @Override
   protected void configure() {
     configureSchedulerDependencies();

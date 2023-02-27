@@ -25,6 +25,12 @@ class RemotePeripheralJobServiceProxy
     extends RemoteTCSObjectServiceProxy<RemotePeripheralJobService>
     implements PeripheralJobService {
 
+  /**
+   * Creates a new instance.
+   */
+  RemotePeripheralJobServiceProxy() {
+  }
+
   @Override
   public PeripheralJob createPeripheralJob(PeripheralJobCreationTO to)
       throws ObjectUnknownException, ObjectExistsException, KernelRuntimeException {

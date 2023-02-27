@@ -30,6 +30,12 @@ public class BlockTO
   private String type = Block.Type.SINGLE_VEHICLE_ONLY.name();
   private List<MemberTO> members = new ArrayList<>();
 
+  /**
+   * Creates a new instance.
+   */
+  public BlockTO() {
+  }
+
   @XmlAttribute(required = true)
   public String getType() {
     return type;

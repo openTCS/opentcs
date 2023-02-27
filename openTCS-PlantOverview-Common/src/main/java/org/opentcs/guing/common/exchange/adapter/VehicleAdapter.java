@@ -76,7 +76,9 @@ public class VehicleAdapter
       model.getPropertyEnergyLevel().setValueAndUnit(vehicle.getEnergyLevel(),
                                                      PercentProperty.Unit.PERCENT);
 
-      model.getPropertyLoaded().setValue(vehicle.getLoadHandlingDevices().stream().anyMatch(lhe -> lhe.isFull()));
+      model.getPropertyLoaded().setValue(
+          vehicle.getLoadHandlingDevices().stream().anyMatch(lhe -> lhe.isFull())
+      );
       model.getPropertyState().setValue(vehicle.getState());
       model.getPropertyProcState().setValue(vehicle.getProcState());
       model.getPropertyIntegrationLevel().setValue(vehicle.getIntegrationLevel());
@@ -104,7 +106,7 @@ public class VehicleAdapter
 
       model.getAllocatedResources().setItems(vehicle.getAllocatedResources());
       model.getClaimedResources().setItems(vehicle.getClaimedResources());
-      
+
       model.propertiesChanged(new NullAttributesChangeListener());
     }
     catch (CredentialsException e) {
@@ -124,7 +126,9 @@ public class VehicleAdapter
                 .withEnergyLevelCritical(getEnergyLevelCritical(vehicleModel))
                 .withEnergyLevelGood(getEnergyLevelGood(vehicleModel))
                 .withEnergyLevelFullyRecharged(getEnergyLevelFullyRecharged(vehicleModel))
-                .withEnergyLevelSufficientlyRecharged(getEnergyLevelSufficientlyRecharged(vehicleModel))
+                .withEnergyLevelSufficientlyRecharged(
+                    getEnergyLevelSufficientlyRecharged(vehicleModel)
+                )
                 .withMaxVelocity(getMaximumVelocity(vehicleModel))
                 .withMaxReverseVelocity(getMaximumReverseVelocity(vehicleModel))
                 .withProperties(getKernelProperties(vehicleModel))
@@ -203,7 +207,8 @@ public class VehicleAdapter
   }
 
   private int getMaximumReverseVelocity(VehicleModel model) {
-    return ((Double) model.getPropertyMaxReverseVelocity().getValueByUnit(SpeedProperty.Unit.MM_S)).intValue();
+    return ((Double) model.getPropertyMaxReverseVelocity().getValueByUnit(SpeedProperty.Unit.MM_S))
+        .intValue();
   }
 
   private int getMaximumVelocity(VehicleModel model) {

@@ -191,7 +191,7 @@ public class DefaultLayerManager
             .filter(wrapper -> wrapper.getLayer().getGroupId() == groupId)
             .collect(Collectors.partitioningBy(wrapper -> wrapper.getLayer().isVisible()));
 
-    // We only need to take care of "visible" layers. Non-visible layers are not affected by 
+    // We only need to take care of "visible" layers. Non-visible layers are not affected by
     // any changes to a group's visibility.
     for (LayerWrapper wrapper : wrappersByLayerVisibility.get(Boolean.TRUE)) {
       if (wrapper.getLayerGroup().isVisible() != visible) {

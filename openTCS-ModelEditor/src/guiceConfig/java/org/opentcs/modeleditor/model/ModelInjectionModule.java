@@ -20,6 +20,12 @@ import org.opentcs.guing.common.model.SystemModel;
 public class ModelInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public ModelInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     bind(SystemModel.class).to(StandardSystemModel.class);

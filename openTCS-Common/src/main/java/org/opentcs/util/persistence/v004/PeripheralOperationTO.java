@@ -24,6 +24,12 @@ public class PeripheralOperationTO
   private String executionTrigger = "";
   private boolean completionRequired;
 
+  /**
+   * Creates a new instance.
+   */
+  public PeripheralOperationTO() {
+  }
+
   @XmlAttribute(required = true)
   public String getLocationName() {
     return locationName;

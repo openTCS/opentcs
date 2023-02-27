@@ -39,6 +39,12 @@ public class VehicleTO
   private Long energyLevelSufficientlyRecharged = 0L;
   private VehicleLayout vehicleLayout = new VehicleLayout();
 
+  /**
+   * Creates a new instance.
+   */
+  public VehicleTO() {
+  }
+
   @XmlAttribute
   @XmlSchemaType(name = "unsignedInt")
   public Long getLength() {
@@ -136,6 +142,12 @@ public class VehicleTO
   public static class VehicleLayout {
 
     private String color = "";
+
+    /**
+     * Creates a new instance.
+     */
+    public VehicleLayout() {
+    }
 
     @XmlAttribute(required = true)
     public String getColor() {

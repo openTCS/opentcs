@@ -35,6 +35,12 @@ public class VisualLayoutTO
   private List<ModelLayoutElement> modelLayoutElements = new ArrayList<>();
   private List<ViewBookmark> viewBookmarks = new ArrayList<>();
 
+  /**
+   * Creates a new instance.
+   */
+  public VisualLayoutTO() {
+  }
+
   @XmlAttribute(required = true)
   public Float getScaleX() {
     return scaleX;
@@ -73,7 +79,9 @@ public class VisualLayoutTO
     return shapeLayoutElements;
   }
 
-  public VisualLayoutTO setShapeLayoutElements(@Nonnull List<ShapeLayoutElement> shapeLayoutElements) {
+  public VisualLayoutTO setShapeLayoutElements(
+      @Nonnull List<ShapeLayoutElement> shapeLayoutElements
+  ) {
     requireNonNull(shapeLayoutElements, "shapeLayoutElements");
     this.shapeLayoutElements = shapeLayoutElements;
     return this;
@@ -84,7 +92,9 @@ public class VisualLayoutTO
     return modelLayoutElements;
   }
 
-  public VisualLayoutTO setModelLayoutElements(@Nonnull List<ModelLayoutElement> modelLayoutElements) {
+  public VisualLayoutTO setModelLayoutElements(
+      @Nonnull List<ModelLayoutElement> modelLayoutElements
+  ) {
     requireNonNull(modelLayoutElements, "modelLayoutElements");
     this.modelLayoutElements = modelLayoutElements;
     return this;
@@ -109,6 +119,12 @@ public class VisualLayoutTO
     private Long redValue = 0L;
     private Long greenValue = 0L;
     private Long blueValue = 0L;
+
+    /**
+     * Creates a new instance.
+     */
+    public Color() {
+    }
 
     @XmlAttribute(required = true)
     public String getName() {
@@ -165,6 +181,12 @@ public class VisualLayoutTO
     private Long layer = 0L;
     private List<PropertyTO> properties = new ArrayList<>();
 
+    /**
+     * Creates a new instance.
+     */
+    public ShapeLayoutElement() {
+    }
+
     @XmlAttribute(required = true)
     @XmlSchemaType(name = "unsignedInt")
     public Long getLayer() {
@@ -196,6 +218,12 @@ public class VisualLayoutTO
     private String visualizedObjectName = "";
     private Long layer = 0L;
     private List<PropertyTO> properties = new ArrayList<>();
+
+    /**
+     * Creates a new instance.
+     */
+    public ModelLayoutElement() {
+    }
 
     @XmlAttribute(required = true)
     public String getVisualizedObjectName() {
@@ -242,6 +270,12 @@ public class VisualLayoutTO
     private Float viewScaleX = 0.0F;
     private Float viewScaleY = 0.0F;
     private Integer viewRotation = 0;
+
+    /**
+     * Creates a new instance.
+     */
+    public ViewBookmark() {
+    }
 
     @XmlAttribute(required = true)
     public String getLabel() {

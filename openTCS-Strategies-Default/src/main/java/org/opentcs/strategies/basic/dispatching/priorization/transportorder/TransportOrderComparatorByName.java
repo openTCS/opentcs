@@ -24,6 +24,12 @@ public class TransportOrderComparatorByName
    */
   public static final String CONFIGURATION_KEY = "BY_NAME";
 
+  /**
+   * Creates a new instance.
+   */
+  public TransportOrderComparatorByName() {
+  }
+
   @Override
   public int compare(TransportOrder order1, TransportOrder order2) {
     return order1.getName().compareTo(order2.getName());

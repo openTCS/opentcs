@@ -91,12 +91,16 @@ public class LocalVehicleEntryPool
 
     try {
 
-      Set<Vehicle> vehicles = callWrapper.call(() -> servicePortal.getVehicleService().fetchObjects(Vehicle.class));
+      Set<Vehicle> vehicles
+          = callWrapper.call(() -> servicePortal.getVehicleService().fetchObjects(Vehicle.class));
       for (Vehicle vehicle : vehicles) {
-        AttachmentInformation ai
-            = callWrapper.call(() -> servicePortal.getVehicleService().fetchAttachmentInformation(vehicle.getReference()));
-        VehicleProcessModelTO processModel
-            = callWrapper.call(() -> servicePortal.getVehicleService().fetchProcessModel(vehicle.getReference()));
+        AttachmentInformation ai = callWrapper.call(() -> {
+          return servicePortal.getVehicleService()
+              .fetchAttachmentInformation(vehicle.getReference());
+        });
+        VehicleProcessModelTO processModel = callWrapper.call(() -> {
+          return servicePortal.getVehicleService().fetchProcessModel(vehicle.getReference());
+        });
         LocalVehicleEntry entry = new LocalVehicleEntry(ai, processModel);
         entries.put(vehicle.getName(), entry);
       }

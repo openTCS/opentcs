@@ -42,7 +42,7 @@ public class ResourceAllocationPanel
     implements EventHandler {
 
   /**
-   * This class' logger:
+   * This class' logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(ResourceAllocationPanel.class);
   /**
@@ -145,7 +145,8 @@ public class ResourceAllocationPanel
       return;
     }
 
-    // Ignore events if we're not operating or connected. (Vehicle objects may change a lot in modelling mode.)
+    // Ignore events if we're not operating or connected.
+    // (Vehicle objects may change a lot in modelling mode.)
     if (sharedPortal.getPortal().getState() != Kernel.State.OPERATING) {
       LOG.debug("Kernel is not in operating mode - skipping.");
       return;
@@ -197,6 +198,7 @@ public class ResourceAllocationPanel
     return result;
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
    * initialize the form.
@@ -233,16 +235,18 @@ public class ResourceAllocationPanel
 
         add(allocationScrollPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
   private void enableUpdatesCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableUpdatesCheckboxActionPerformed
     enableUpdates = enableUpdatesCheckbox.isSelected();
   }//GEN-LAST:event_enableUpdatesCheckboxActionPerformed
 
-
+  // CHECKSTYLE:OFF
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane allocationScrollPane;
     protected javax.swing.JTree allocationTable;
     private javax.swing.JCheckBox enableUpdatesCheckbox;
     private javax.swing.JPanel optionsPanel;
     // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 }

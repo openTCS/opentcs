@@ -39,7 +39,7 @@ class CustomSslRMIClientSocketFactory
    * @param secureSslContextFactory Provides an instance of {@link SSLContext} used to get the
    * actual socket factory.
    */
-  public CustomSslRMIClientSocketFactory(SecureSslContextFactory secureSslContextFactory) {
+  CustomSslRMIClientSocketFactory(SecureSslContextFactory secureSslContextFactory) {
     this.secureSslContextFactory = requireNonNull(secureSslContextFactory,
                                                   "secureSslContextFactory");
   }

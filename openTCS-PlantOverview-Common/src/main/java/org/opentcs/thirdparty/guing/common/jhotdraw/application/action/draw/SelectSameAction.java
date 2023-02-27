@@ -33,7 +33,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class SelectSameAction
     extends AbstractSelectedAction {
 
-  public final static String ID = "edit.selectSame";
+  /**
+   * This action's ID.
+   */
+  public static final String ID = "edit.selectSame";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MODELVIEW_PATH);
 

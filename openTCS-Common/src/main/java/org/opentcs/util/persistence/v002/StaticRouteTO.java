@@ -28,6 +28,12 @@ public class StaticRouteTO
 
   private List<Hop> hops = new ArrayList<>();
 
+  /**
+   * Creates a new instance.
+   */
+  public StaticRouteTO() {
+  }
+
   @XmlElement(name = "hop")
   public List<Hop> getHops() {
     return hops;
@@ -43,6 +49,12 @@ public class StaticRouteTO
   public static class Hop {
 
     private String name = "";
+
+    /**
+     * Creates a new instance.
+     */
+    public Hop() {
+    }
 
     @XmlAttribute(required = true)
     public String getName() {

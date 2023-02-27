@@ -65,11 +65,29 @@ public class KernelStateChangeEvent
     }
   }
 
-  public static enum State {
+  /**
+   * The potential kernel states.
+   */
+  public enum State {
+    /**
+     * Modelling mode.
+     */
     MODELLING,
+    /**
+     * Operating.
+     */
     OPERATING,
+    /**
+     * Shutting down.
+     */
     SHUTDOWN,
+    /**
+     * Logged in.
+     */
     LOGGED_IN,
+    /**
+     * Disconnected.
+     */
     DISCONNECTED;
   }
 }

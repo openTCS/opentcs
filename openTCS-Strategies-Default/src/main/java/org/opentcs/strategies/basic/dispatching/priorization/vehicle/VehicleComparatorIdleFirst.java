@@ -26,6 +26,12 @@ public class VehicleComparatorIdleFirst
   public static final String CONFIGURATION_KEY = "IDLE_FIRST";
 
   /**
+   * Creates a new instance.
+   */
+  public VehicleComparatorIdleFirst() {
+  }
+
+  /**
    * Compares two vehicles by their state.
    * Note: this comparator imposes orderings that are inconsistent with equals.
    *

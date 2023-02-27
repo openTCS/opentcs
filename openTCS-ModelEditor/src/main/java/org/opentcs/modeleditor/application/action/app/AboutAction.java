@@ -38,7 +38,7 @@ public class AboutAction
   /**
    * This action's ID.
    */
-  public final static String ID = "application.about";
+  public static final String ID = "application.about";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
   /**
@@ -82,21 +82,57 @@ public class AboutAction
     JOptionPane.showMessageDialog(
         dialogParent,
         "<html><p><b>" + OpenTCSView.NAME + "</b><br> "
-        + BUNDLE.getFormatted("aboutAction.optionPane_applicationInformation.message.baselineVersion", Environment.getBaselineVersion()) + "<br>"
-        + BUNDLE.getFormatted("aboutAction.optionPane_applicationInformation.message.customization",
-                              Environment.getCustomizationName(),
-                              Environment.getCustomizationVersion()) + "<br>"
-        + BUNDLE.getString("aboutAction.optionPane_applicationInformation.message.copyright") + "<br>"
-        + BUNDLE.getString("aboutAction.optionPane_applicationInformation.message.runningOn") + "<br>"
-        + "Java: " + System.getProperty("java.version") + ", " + System.getProperty("java.vendor") + "<br>"
-        + "JVM: " + System.getProperty("java.vm.version") + ", " + System.getProperty("java.vm.vendor") + "<br>"
-        + "OS: " + System.getProperty("os.name") + " " + System.getProperty("os.version") + ", " + System.getProperty("os.arch") + "<br>"
+        + BUNDLE.getFormatted(
+            "aboutAction.optionPane_applicationInformation.message.baselineVersion",
+            Environment.getBaselineVersion()
+        )
+        + "<br>"
+        + BUNDLE.getFormatted(
+            "aboutAction.optionPane_applicationInformation.message.customization",
+            Environment.getCustomizationName(),
+            Environment.getCustomizationVersion()
+        )
+        + "<br>"
+        + BUNDLE.getString(
+            "aboutAction.optionPane_applicationInformation.message.copyright"
+        )
+        + "<br>"
+        + BUNDLE.getString(
+            "aboutAction.optionPane_applicationInformation.message.runningOn"
+        )
+        + "<br>"
+        + "Java: "
+        + System.getProperty("java.version")
+        + ", "
+        + System.getProperty("java.vendor")
+        + "<br>"
+        + "JVM: "
+        + System.getProperty("java.vm.version")
+        + ", "
+        + System.getProperty("java.vm.vendor")
+        + "<br>"
+        + "OS: "
+        + System.getProperty("os.name")
+        + " "
+        + System.getProperty("os.version")
+        + ", "
+        + System.getProperty("os.arch")
+        + "<br>"
         + "<b>Kernel</b><br>"
         + portalProvider.getPortalDescription()
-        + "<br>" + BUNDLE.getFormatted("aboutAction.optionPane_applicationInformation.message.mode", appState.getOperationMode())
+        + "<br>"
+        + BUNDLE.getFormatted(
+            "aboutAction.optionPane_applicationInformation.message.mode",
+            appState.getOperationMode()
+        )
         + "</p></html>",
-        BUNDLE.getString("aboutAction.optionPane_applicationInformation.title"),
+        BUNDLE.getString(
+            "aboutAction.optionPane_applicationInformation.title"
+        ),
         JOptionPane.PLAIN_MESSAGE,
-        new ImageIcon(getClass().getResource("/org/opentcs/guing/res/symbols/openTCS/openTCS.300x132.gif")));
+        new ImageIcon(
+            getClass().getResource("/org/opentcs/guing/res/symbols/openTCS/openTCS.300x132.gif")
+        )
+    );
   }
 }

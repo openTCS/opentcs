@@ -69,7 +69,8 @@ public class ViewMenu
     this.toolBarManager = requireNonNull(toolBarManager, "toolBarManager");
     requireNonNull(menuPluginPanels, "menuPluginPanels");
 
-    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
+    final ResourceBundleUtil labels
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
 
     this.setText(labels.getString("viewMenu.text"));
     this.setToolTipText(labels.getString("viewMenu.tooltipText"));
@@ -97,7 +98,9 @@ public class ViewMenu
 
     // Menu item View -> Restore docking layout
     menuItemRestoreDockingLayout = new JMenuItem(actionMap.get(RestoreDockingLayoutAction.ID));
-    menuItemRestoreDockingLayout.setText(labels.getString("viewMenu.menuItem_restoreWindowArrangement.text"));
+    menuItemRestoreDockingLayout.setText(
+        labels.getString("viewMenu.menuItem_restoreWindowArrangement.text")
+    );
     add(menuItemRestoreDockingLayout);
   }
 

@@ -29,8 +29,8 @@ import org.jhotdraw.util.Images;
 public class ColorIcon
     implements javax.swing.Icon {
 
-  private Color fillColor;
   private static BufferedImage noColorImage;
+  private Color fillColor;
   private int width;
   private int height;
   private String name;
@@ -84,8 +84,18 @@ public class ColorIcon
         g.setColor(Color.WHITE);
         g.fillRect(x + 1, y + 1, width - 2, height - 2);
         g.setColor(Color.red);
-        int[] xpoints = new int[] {x + 2, x + width - 5, x + width - 3, x + width - 3, x + 4, x + 2};
-        int[] ypoints = new int[] {y + height - 5, y + 2, y + 2, y + 4, y + height - 3, y + height - 3};
+        int[] xpoints = new int[]{x + 2,
+                                  x + width - 5,
+                                  x + width - 3,
+                                  x + width - 3,
+                                  x + 4,
+                                  x + 2};
+        int[] ypoints = new int[]{y + height - 5,
+                                  y + 2,
+                                  y + 2,
+                                  y + 4,
+                                  y + height - 3,
+                                  y + height - 3};
         g.fillPolygon(xpoints, ypoints, xpoints.length);
       }
     }

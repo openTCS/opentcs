@@ -24,6 +24,12 @@ import org.opentcs.modeleditor.persistence.unified.UnifiedModelReader;
 public class DefaultPersistenceInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultPersistenceInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     bind(OpenTCSModelManagerModeling.class).in(Singleton.class);

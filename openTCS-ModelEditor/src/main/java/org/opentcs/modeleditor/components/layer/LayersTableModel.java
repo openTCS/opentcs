@@ -33,11 +33,6 @@ class LayersTableModel
                LayerGroupChangeListener {
 
   /**
-   * The resource bundle to use.
-   */
-  private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle(I18nPlantOverviewModeling.LAYERS_PATH);
-  /**
    * The number of the "Active" column.
    */
   public static final int COLUMN_ACTIVE = 0;
@@ -61,6 +56,11 @@ class LayersTableModel
    * The number of the "Group visible" column.
    */
   public static final int COLUMN_GROUP_VISIBLE = 5;
+  /**
+   * The resource bundle to use.
+   */
+  private static final ResourceBundle BUNDLE
+      = ResourceBundle.getBundle(I18nPlantOverviewModeling.LAYERS_PATH);
   /**
    * The column names.
    */
@@ -103,9 +103,9 @@ class LayersTableModel
    * @param activeLayerProvider Provides the currently active layer.
    * @param layerEditor The layer editor.
    */
-  public LayersTableModel(ModelManager modelManager,
-                          ActiveLayerProvider activeLayerProvider,
-                          LayerEditorModeling layerEditor) {
+  LayersTableModel(ModelManager modelManager,
+                   ActiveLayerProvider activeLayerProvider,
+                   LayerEditorModeling layerEditor) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.activeLayerProvider = requireNonNull(activeLayerProvider, "activeLayerProvider");
     this.layerEditor = requireNonNull(layerEditor, "layerEditor");
@@ -213,14 +213,14 @@ class LayersTableModel
 
   @Override
   public void layersInitialized() {
-    // Once the layers are initialized we want to redraw the entire table to avoid any 
+    // Once the layers are initialized we want to redraw the entire table to avoid any
     // display errors.
     executeOnEventDispatcherThread(() -> fireTableDataChanged());
   }
 
   @Override
   public void layersChanged() {
-    // Update the entire table but don't use fireTableDataChanged() to preserve the current 
+    // Update the entire table but don't use fireTableDataChanged() to preserve the current
     // selection.
     executeOnEventDispatcherThread(() -> fireTableRowsUpdated(0, getRowCount() - 1));
   }
@@ -233,7 +233,7 @@ class LayersTableModel
 
   @Override
   public void layerRemoved() {
-    // At this point, there's no way for us to determine the row the removed layer was in. The 
+    // At this point, there's no way for us to determine the row the removed layer was in. The
     // entry has already been remove from this table model's data source which is provided by
     // layersByOrdinal().
     // Workaround: Since the table now contains one entry less, pretend that the last entry was
@@ -282,7 +282,7 @@ class LayersTableModel
    * If the runnable is already being called on the EDT, the runnable is executed immediately.
    * Otherwise it is scheduled for execution on the EDT.
    * <p>
-   * Note: Deferring a runnable by scheduling it for execution on the EDT even though it would 
+   * Note: Deferring a runnable by scheduling it for execution on the EDT even though it would
    * have already been executed on the EDT may lead to exceptions due to data inconsistency.
    * </p>
    *

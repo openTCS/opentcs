@@ -17,9 +17,15 @@ import org.opentcs.components.kernel.services.QueryService;
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-public class RemoteQueryServiceProxy
+class RemoteQueryServiceProxy
     extends AbstractRemoteServiceProxy<RemoteQueryService>
     implements QueryService {
+
+  /**
+   * Creates a new instance.
+   */
+  RemoteQueryServiceProxy() {
+  }
 
   @Override
   public <T> T query(Query<T> query) {

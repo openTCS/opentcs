@@ -35,7 +35,8 @@ public class PeripheralOperationPanel
   /**
    * The bundle to be used.
    */
-  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
+  private final ResourceBundleUtil bundle
+      = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
 
   /**
    * Creates new form StringPanel.
@@ -64,7 +65,8 @@ public class PeripheralOperationPanel
     }
 
     operationComboBox.removeAllItems();
-    for (String op : location.getLocationType().getPropertyAllowedPeripheralOperations().getItems()) {
+    for (String op
+             : location.getLocationType().getPropertyAllowedPeripheralOperations().getItems()) {
       operationComboBox.addItem(op);
     }
   }

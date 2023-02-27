@@ -31,13 +31,6 @@ public class IntegrationLevelChangeAction
     extends AbstractAction {
 
   /**
-   * Resource path to the correct lables.
-   */
-  public static final String IGNORE_ID = "course.vehicle.integrationLevelIgnore";
-  public static final String NOTICE_ID = "course.vehicle.integrationLevelNotice";
-  public static final String RESPECT_ID = "course.vehicle.integrationLevelRespect";
-  public static final String UTILIZE_ID = "course.vehicle.integrationLevelUtilize";
-  /**
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(IntegrationLevelChangeAction.class);

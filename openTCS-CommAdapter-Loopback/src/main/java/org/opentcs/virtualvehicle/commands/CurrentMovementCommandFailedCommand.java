@@ -19,6 +19,12 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 public class CurrentMovementCommandFailedCommand
     implements AdapterCommand {
 
+  /**
+   * Creates a new instance.
+   */
+  public CurrentMovementCommandFailedCommand() {
+  }
+
   @Override
   public void execute(VehicleCommAdapter adapter) {
     MovementCommand failedCommand = adapter.getSentQueue().peek();

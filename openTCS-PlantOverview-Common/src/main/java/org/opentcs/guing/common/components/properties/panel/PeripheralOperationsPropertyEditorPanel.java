@@ -245,6 +245,7 @@ public class PeripheralOperationsPropertyEditorPanel
 
     add(controlPanel, java.awt.BorderLayout.EAST);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
   private void moveDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownButtonActionPerformed
     int selectedRow = itemsTable.getSelectedRow();
@@ -298,6 +299,8 @@ public class PeripheralOperationsPropertyEditorPanel
   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
     add();
   }//GEN-LAST:event_addButtonActionPerformed
+
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
   private javax.swing.JPanel controlPanel;
@@ -311,47 +314,60 @@ public class PeripheralOperationsPropertyEditorPanel
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
 
-  protected class ItemsTableModel
+  private class ItemsTableModel
       extends AbstractTableModel {
 
     /**
      * Column classes.
      */
-    private final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
+    private final Class<?>[] columnClasses = new Class<?>[]{
       String.class,
       String.class,
       String.class,
       Boolean.class
     };
-
     /**
      * The column names.
      */
-    private final String[] COLUMN_NAMES = new String[]{
-      bundle.getString("peripheralOperationsPropertyEditorPanel.table_resources.column_location.headerText"),
-      bundle.getString("peripheralOperationsPropertyEditorPanel.table_resources.column_operation.headerText"),
-      bundle.getString("peripheralOperationsPropertyEditorPanel.table_resources.column_trigger.headerText"),
-      bundle.getString("peripheralOperationsPropertyEditorPanel.table_resources.column_completion.headerText")
+    private final String[] columnNames = new String[]{
+      bundle.getString(
+      "peripheralOperationsPropertyEditorPanel.table_resources.column_location.headerText"
+      ),
+      bundle.getString(
+      "peripheralOperationsPropertyEditorPanel.table_resources.column_operation.headerText"
+      ),
+      bundle.getString(
+      "peripheralOperationsPropertyEditorPanel.table_resources.column_trigger.headerText"
+      ),
+      bundle.getString(
+      "peripheralOperationsPropertyEditorPanel.table_resources.column_completion.headerText"
+      )
     };
 
-    private final int COLUMN_LOCATION = 0;
-    private final int COLUMN_OPERATION = 1;
-    private final int COLUMN_TRIGGER = 2;
-    private final int COLUMN_COMPLETION_REQUIRED = 3;
+    private final int columnLocation = 0;
+    private final int columnOperation = 1;
+    private final int columnTrigger = 2;
+    private final int columnCompletionRequired = 3;
 
     /**
      * Values in this model.
      */
     private List<PeripheralOperationModel> values = new ArrayList<>();
 
+    /**
+     * Creates a new instance.
+     */
+    ItemsTableModel() {
+    }
+
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-      return COLUMN_CLASSES[columnIndex];
+      return columnClasses[columnIndex];
     }
 
     @Override
     public String getColumnName(int columnIndex) {
-      return COLUMN_NAMES[columnIndex];
+      return columnNames[columnIndex];
     }
 
     @Override
@@ -366,7 +382,7 @@ public class PeripheralOperationsPropertyEditorPanel
 
     @Override
     public int getColumnCount() {
-      return COLUMN_NAMES.length;
+      return columnNames.length;
     }
 
     @Override
@@ -376,13 +392,13 @@ public class PeripheralOperationsPropertyEditorPanel
       }
       PeripheralOperationModel entry = values.get(rowIndex);
       switch (columnIndex) {
-        case COLUMN_LOCATION:
+        case columnLocation:
           return entry.getLocationName();
-        case COLUMN_OPERATION:
+        case columnOperation:
           return entry.getOperation();
-        case COLUMN_TRIGGER:
+        case columnTrigger:
           return entry.getExecutionTrigger().name();
-        case COLUMN_COMPLETION_REQUIRED:
+        case columnCompletionRequired:
           return entry.isCompletionRequired();
         default:
           throw new IllegalArgumentException("Invalid column index: " + columnIndex);

@@ -83,8 +83,7 @@ public class MergedPropertySuggestionsTest {
     private final Set<String> keySuggestions = new HashSet<>();
     private final Set<String> valueSuggestions = new HashSet<>();
 
-    public PropertySuggestionsImpl() {
-
+    PropertySuggestionsImpl() {
     }
 
     @Override

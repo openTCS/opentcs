@@ -27,6 +27,12 @@ public class CandidateComparatorByInitialRoutingCosts
   public static final String CONFIGURATION_KEY = "BY_INITIAL_ROUTING_COSTS";
 
   /**
+   * Creates a new instance.
+   */
+  public CandidateComparatorByInitialRoutingCosts() {
+  }
+
+  /**
    * Compares two candidates by their inital routing cost.
    * Note: this comparator imposes orderings that are inconsistent with equals.
    *

@@ -56,7 +56,9 @@ public class ResourcePropertyViewerEditorPanel
     itemsTable.setModel(new ItemsTableModel());
     itemsTable.setDefaultRenderer(
         TCSResourceReference.class,
-        new StringTableCellRenderer<TCSResourceReference<?>>(ref -> ref == null ? "" : ref.getName())
+        new StringTableCellRenderer<TCSResourceReference<?>>(
+            ref -> ref == null ? "" : ref.getName()
+        )
     );
 
     setPreferredSize(new Dimension(400, 200));
@@ -140,10 +142,10 @@ public class ResourcePropertyViewerEditorPanel
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
 
-  protected class ItemsTableModel
+  private class ItemsTableModel
       extends AbstractTableModel {
 
-    private final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
+    private final Class<?>[] columnClasses = new Class<?>[]{
       TCSResourceReference.class,
       TCSResourceReference.class,
       TCSResourceReference.class
@@ -152,29 +154,31 @@ public class ResourcePropertyViewerEditorPanel
     /**
      * The column names.
      */
-    private final String[] COLUMN_NAMES = new String[]{
+    private final String[] columnNames = new String[]{
       BUNDLE.getString("resourcePropertyViewerEditorPanel.table_resources.column_path.headerText"),
       BUNDLE.getString("resourcePropertyViewerEditorPanel.table_resources.column_point.headerText"),
-      BUNDLE.getString("resourcePropertyViewerEditorPanel.table_resources.column_location.headerText")
+      BUNDLE.getString(
+      "resourcePropertyViewerEditorPanel.table_resources.column_location.headerText"
+      )
     };
 
-    private final int COLUMN_PATH = 0;
-    private final int COLUMN_POINT = 1;
-    private final int COLUMN_LOCATION = 2;
+    private final int columnPath = 0;
+    private final int columnPoint = 1;
+    private final int columnLocation = 2;
 
     private List<List<TCSResourceReference<?>>> values = new LinkedList<>();
 
-    public ItemsTableModel() {
+    ItemsTableModel() {
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-      return COLUMN_CLASSES[columnIndex];
+      return columnClasses[columnIndex];
     }
 
     @Override
     public String getColumnName(int columnIndex) {
-      return COLUMN_NAMES[columnIndex];
+      return columnNames[columnIndex];
     }
 
     @Override
@@ -189,7 +193,7 @@ public class ResourcePropertyViewerEditorPanel
 
     @Override
     public int getColumnCount() {
-      return COLUMN_NAMES.length;
+      return columnNames.length;
     }
 
     @Override
@@ -199,12 +203,12 @@ public class ResourcePropertyViewerEditorPanel
       }
       List<TCSResourceReference<?>> entry = values.get(rowIndex);
       switch (columnIndex) {
-        case COLUMN_PATH:
-          return entry.get(COLUMN_PATH);
-        case COLUMN_POINT:
-          return entry.get(COLUMN_POINT);
-        case COLUMN_LOCATION:
-          return entry.get(COLUMN_LOCATION);
+        case columnPath:
+          return entry.get(columnPath);
+        case columnPoint:
+          return entry.get(columnPoint);
+        case columnLocation:
+          return entry.get(columnLocation);
         default:
           throw new IllegalArgumentException("Invalid column index: " + columnIndex);
       }

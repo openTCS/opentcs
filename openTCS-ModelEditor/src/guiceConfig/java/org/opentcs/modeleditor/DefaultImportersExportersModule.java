@@ -17,6 +17,12 @@ import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 public class DefaultImportersExportersModule
     extends PlantOverviewInjectionModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultImportersExportersModule() {
+  }
+
   @Override
   protected void configure() {
     plantModelImporterBinder();

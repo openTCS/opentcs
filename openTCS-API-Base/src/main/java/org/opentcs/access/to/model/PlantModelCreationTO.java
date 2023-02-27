@@ -212,7 +212,9 @@ public class PlantModelCreationTO
    * @param locationTypes The new location types.
    * @return A copy of this model, differing in the given location types.
    */
-  public PlantModelCreationTO withLocationTypes(@Nonnull List<LocationTypeCreationTO> locationTypes) {
+  public PlantModelCreationTO withLocationTypes(
+      @Nonnull List<LocationTypeCreationTO> locationTypes
+  ) {
     return new PlantModelCreationTO(getName(),
                                     getModifiableProperties(),
                                     points,
@@ -473,7 +475,9 @@ public class PlantModelCreationTO
    */
   @Deprecated
   @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  public PlantModelCreationTO withVisualLayouts(@Nonnull List<VisualLayoutCreationTO> visualLayouts) {
+  public PlantModelCreationTO withVisualLayouts(
+      @Nonnull List<VisualLayoutCreationTO> visualLayouts
+  ) {
     return new PlantModelCreationTO(getName(),
                                     getModifiableProperties(),
                                     points,

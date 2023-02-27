@@ -59,12 +59,14 @@ public class PeripheralAttachmentManagerTest {
     commAdapterRegistry = mock(PeripheralCommAdapterRegistry.class);
     commAdapterFactory = mock(PeripheralCommAdapterFactory.class);
     peripheralEntryPool = new PeripheralEntryPool(peripheralService);
-    attachmentManager = spy(new PeripheralAttachmentManager(peripheralService,
-                                                            mock(LocalPeripheralControllerPool.class),
-                                                            commAdapterRegistry,
-                                                            peripheralEntryPool,
-                                                            mock(EventHandler.class),
-                                                            mock(KernelApplicationConfiguration.class)));
+    attachmentManager = spy(
+        new PeripheralAttachmentManager(peripheralService,
+                                        mock(LocalPeripheralControllerPool.class),
+                                        commAdapterRegistry,
+                                        peripheralEntryPool,
+                                        mock(EventHandler.class),
+                                        mock(KernelApplicationConfiguration.class))
+    );
 
     location = createLocation(LOCATION_NAME);
   }
@@ -139,7 +141,7 @@ public class PeripheralAttachmentManagerTest {
 
     private final PeripheralProcessModel processModel;
 
-    public SimpleCommAdapter(Location location) {
+    SimpleCommAdapter(Location location) {
       this.processModel = new PeripheralProcessModel(location.getReference());
     }
 

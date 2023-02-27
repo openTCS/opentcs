@@ -18,12 +18,6 @@ import java.awt.Stroke;
 public class Strokes {
 
   /**
-   * Prevents instantiation of this utility class.
-   */
-  private Strokes() {
-  }
-
-  /**
    * Decoration of paths, points and locations that are part of a block.
    */
   public static final Stroke BLOCK_ELEMENT = new BasicStroke(4.0f);
@@ -35,7 +29,7 @@ public class Strokes {
                         BasicStroke.CAP_BUTT,
                         BasicStroke.JOIN_MITER,
                         10.0f,
-                        new float[] {10.0f, 5.0f},
+                        new float[]{10.0f, 5.0f},
                         0.0f);
   /**
    * Decoration of paths that are part of a withdrawn transport order.
@@ -45,6 +39,13 @@ public class Strokes {
                         BasicStroke.CAP_BUTT,
                         BasicStroke.JOIN_MITER,
                         10.0f,
-                        new float[] {8.0f, 4.0f, 2.0f, 4.0f},
+                        new float[]{8.0f, 4.0f, 2.0f, 4.0f},
                         0.0f);
+
+  /**
+   * Prevents instantiation of this utility class.
+   */
+  private Strokes() {
+  }
+
 }

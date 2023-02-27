@@ -45,10 +45,22 @@ public interface UserObjectContext {
    */
   ContextType getType();
 
-  public enum ContextType {
+  /**
+   * Supported context types.
+   */
+  enum ContextType {
 
+    /**
+     * Component.
+     */
     COMPONENT,
+    /**
+     * Block.
+     */
     BLOCK,
+    /**
+     * Null context.
+     */
     NULL;
   }
 }

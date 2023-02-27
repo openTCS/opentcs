@@ -28,6 +28,12 @@ public class V003ModelParser {
   public static final String VERSION_STRING = "0.0.3";
 
   /**
+   * Creates a new instance.
+   */
+  public V003ModelParser() {
+  }
+
+  /**
    * Reads a model with the given reader and parses it to a {@link V003PlantModelTO} instance.
    *
    * @param reader The reader to use.

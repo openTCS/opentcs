@@ -29,6 +29,12 @@ public class RmiServicesModule
    */
   private static final Logger LOG = LoggerFactory.getLogger(RmiServicesModule.class);
 
+  /**
+   * Creates a new instance.
+   */
+  public RmiServicesModule() {
+  }
+
   @Override
   protected void configure() {
     RmiKernelInterfaceConfiguration configuration

@@ -30,7 +30,7 @@ public interface ModelFileReader {
    * @throws java.io.IOException If an exception occured while reading
    * the file.
    */
-  public Optional<PlantModelCreationTO> deserialize(File file)
+  Optional<PlantModelCreationTO> deserialize(File file)
       throws IOException;
 
   /**
@@ -39,5 +39,5 @@ public interface ModelFileReader {
    * @return The filter that declares which files are supported with this reader
    */
   @Nonnull
-  public FileFilter getDialogFileFilter();
+  FileFilter getDialogFileFilter();
 }

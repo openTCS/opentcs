@@ -496,7 +496,7 @@ public class OpenTCSModelManager
 
       label.setOffset(labelPositionX, labelPositionY);
     }
-    figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
+    figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);
     locationFigure.setBounds(figurePosition, figurePosition);
 
     labelPosition = locationFigure.getStartPoint();
@@ -770,7 +770,7 @@ public class OpenTCSModelManager
 
       label.setOffset(labelPositionX, labelPositionY);
     }
-    figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);  // Vorzeichen!
+    figurePosition = new Point2D.Double(figurePositionX / scaleX, -figurePositionY / scaleY);
     pointFigure.setBounds(figurePosition, figurePosition);
 
     labelPosition = pointFigure.getStartPoint();

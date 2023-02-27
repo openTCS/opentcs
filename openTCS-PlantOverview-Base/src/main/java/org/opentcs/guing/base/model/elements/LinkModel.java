@@ -96,7 +96,9 @@ public class LinkModel
     setProperty(ALLOWED_OPERATIONS, pOperations);
 
     StringProperty startComponent = new StringProperty(this);
-    startComponent.setDescription(bundle.getString("linkModel.property_startComponent.description"));
+    startComponent.setDescription(
+        bundle.getString("linkModel.property_startComponent.description")
+    );
     startComponent.setModellingEditable(false);
     startComponent.setOperatingEditable(false);
     setProperty(START_COMPONENT, startComponent);
@@ -106,7 +108,7 @@ public class LinkModel
     endComponent.setModellingEditable(false);
     endComponent.setOperatingEditable(false);
     setProperty(END_COMPONENT, endComponent);
-    
+
     LayerWrapperProperty pLayerWrapper = new LayerWrapperProperty(this, new NullLayerWrapper());
     pLayerWrapper.setDescription(bundle.getString("linkModel.property_layerWrapper.description"));
     pLayerWrapper.setHelptext(bundle.getString("linkModel.property_layerWrapper.helptext"));

@@ -112,11 +112,10 @@ public class OrderSequenceView
 
     textType.setText(getOrderSequence().getType());
 
-//    TCSObjectReference<TransportOrder> nextUnfinishedOrder = getOrderSequence().getNextUnfinishedOrder();
     // TODO...
     // Transport orders
     DefaultTableModel tableModel = new UneditableTableModel();
-    tableModel.setColumnIdentifiers(new String[] {"Name"});  // , "Quelle", "Ziel"...
+    tableModel.setColumnIdentifiers(new String[]{"Name"});
 
     for (TCSObjectReference<TransportOrder> to : getOrderSequence().getOrders()) {
       String[] row = new String[1];
@@ -339,13 +338,17 @@ public class OrderSequenceView
     gridBagConstraints.weighty = 1.0;
     add(transportOrdersPanel, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
   private void checkBoxCompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxCompleteActionPerformed
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TO_SEQUENCE_PATH);
-    int n = JOptionPane.showConfirmDialog(this,
-                                          bundle.getString("orderSequenceView.optionPane_markSequenceCompleteConfirmation.message"),
-                                          bundle.getString("orderSequenceView.optionPane_markSequenceCompleteConfirmation.title"),
-                                          JOptionPane.YES_NO_OPTION);
+    ResourceBundleUtil bundle
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TO_SEQUENCE_PATH);
+    int n = JOptionPane.showConfirmDialog(
+        this,
+        bundle.getString("orderSequenceView.optionPane_markSequenceCompleteConfirmation.message"),
+        bundle.getString("orderSequenceView.optionPane_markSequenceCompleteConfirmation.title"),
+        JOptionPane.YES_NO_OPTION
+    );
 
     if (n == JOptionPane.OK_OPTION) {
       try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
@@ -361,6 +364,8 @@ public class OrderSequenceView
       checkBoxComplete.setSelected(false);
     }
   }//GEN-LAST:event_checkBoxCompleteActionPerformed
+
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkBoxComplete;
   private javax.swing.JCheckBox checkBoxFailureFatal;
@@ -383,5 +388,4 @@ public class OrderSequenceView
   private javax.swing.JTable transportOrdersTable;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
-
 }

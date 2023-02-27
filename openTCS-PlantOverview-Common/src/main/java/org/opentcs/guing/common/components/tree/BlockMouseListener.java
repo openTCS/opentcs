@@ -88,7 +88,9 @@ public class BlockMouseListener
     ModelComponent modelComponent = userObject.getModelComponent();
     if (modelComponent instanceof BlockModel) {
       final BlockModel blockModel = (BlockModel) modelComponent;
-      JMenuItem item = new JMenuItem(labels.getString("blockMouseListener.popupMenuItem_addToBlock.text"));
+      JMenuItem item = new JMenuItem(
+          labels.getString("blockMouseListener.popupMenuItem_addToBlock.text")
+      );
       item.addActionListener(new ActionListener() {
 
         @Override
@@ -101,7 +103,9 @@ public class BlockMouseListener
       item.setEnabled(appState.hasOperationMode(OperationMode.MODELLING));
       menu.add(item);
 
-      item = new JMenuItem(labels.getString("blockMouseListener.popupMenuItem_removeFromBlock.text"));
+      item = new JMenuItem(
+          labels.getString("blockMouseListener.popupMenuItem_removeFromBlock.text")
+      );
       item.addActionListener(new ActionListener() {
 
         @Override
@@ -116,7 +120,9 @@ public class BlockMouseListener
 
       menu.addSeparator();
 
-      item = new JMenuItem(labels.getString("blockMouseListener.popupMenuItem_selectAllElements.text"));
+      item = new JMenuItem(
+          labels.getString("blockMouseListener.popupMenuItem_selectAllElements.text")
+      );
       item.addActionListener(new ActionListener() {
 
         @Override

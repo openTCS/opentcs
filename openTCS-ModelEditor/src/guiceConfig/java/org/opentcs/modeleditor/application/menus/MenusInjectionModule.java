@@ -17,6 +17,12 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 public class MenusInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public MenusInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     install(new FactoryModuleBuilder().build(MenuFactory.class));

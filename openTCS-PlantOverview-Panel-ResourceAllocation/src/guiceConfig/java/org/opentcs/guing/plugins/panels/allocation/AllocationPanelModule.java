@@ -24,6 +24,12 @@ public class AllocationPanelModule
    */
   private static final Logger LOG = LoggerFactory.getLogger(AllocationPanelModule.class);
 
+  /**
+   * Creates a new instance.
+   */
+  public AllocationPanelModule() {
+  }
+
   @Override
   protected void configure() {
     ResourceAllocationPanelConfiguration configuration

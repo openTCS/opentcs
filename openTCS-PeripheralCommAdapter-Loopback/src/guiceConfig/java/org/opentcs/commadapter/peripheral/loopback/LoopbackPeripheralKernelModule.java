@@ -25,6 +25,12 @@ public class LoopbackPeripheralKernelModule
    */
   private static final Logger LOG = LoggerFactory.getLogger(LoopbackPeripheralKernelModule.class);
 
+  /**
+   * Creates a new instance.
+   */
+  public LoopbackPeripheralKernelModule() {
+  }
+
   @Override
   protected void configure() {
     VirtualPeripheralConfiguration configuration

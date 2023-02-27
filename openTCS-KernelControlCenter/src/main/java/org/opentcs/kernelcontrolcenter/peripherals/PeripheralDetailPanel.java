@@ -115,12 +115,13 @@ public class PeripheralDetailPanel
 
     LocalPeripheralEntry entry = (LocalPeripheralEntry) evt.getSource();
     if (!Objects.equals(entry, peripheralEntry)) {
-      // Since we're registered only to the currently selected/attached entry, this should never 
+      // Since we're registered only to the currently selected/attached entry, this should never
       // happen.
       return;
     }
 
-    if (Objects.equals(evt.getPropertyName(), LocalPeripheralEntry.Attribute.PROCESS_MODEL.name())) {
+    if (Objects.equals(evt.getPropertyName(),
+                       LocalPeripheralEntry.Attribute.PROCESS_MODEL.name())) {
       for (PeripheralCommAdapterPanel panel : customPanelList) {
         panel.processModelChanged(entry.getProcessModel());
       }

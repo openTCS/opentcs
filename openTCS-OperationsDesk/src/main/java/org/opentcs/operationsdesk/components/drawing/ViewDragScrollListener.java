@@ -167,9 +167,11 @@ public class ViewDragScrollListener
 
       if (isMovableFigure(pressedFigure)) {
         if (!isFigureCompletelyInView(pressedFigure, viewport, drawingView)) {
-          // If the figure exceeds the current view, start scrolling as soon as the mouse is 
+          // If the figure exceeds the current view, start scrolling as soon as the mouse is
           // hitting the view bounds.
-          drawingView.getComponent().scrollRectToVisible(new Rectangle(evt.getX(), evt.getY(), 1, 1));
+          drawingView.getComponent().scrollRectToVisible(
+              new Rectangle(evt.getX(), evt.getY(), 1, 1)
+          );
         }
 
         fMouseCurrentPoint.setLocation(drawingView.viewToDrawing(evt.getPoint()));
@@ -379,7 +381,8 @@ public class ViewDragScrollListener
       LOG.warn("Selected VehicleFigure does not have a model, skipping.");
       return;
     }
-    if ((Vehicle.ProcState) vehicleModel.getPropertyProcState().getValue() != Vehicle.ProcState.IDLE) {
+    if ((Vehicle.ProcState) vehicleModel.getPropertyProcState().getValue()
+        != Vehicle.ProcState.IDLE) {
       LOG.debug("Selected vehicle already has an order, skipping.");
       return;
     }

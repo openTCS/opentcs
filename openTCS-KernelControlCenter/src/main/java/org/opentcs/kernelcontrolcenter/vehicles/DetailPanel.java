@@ -205,7 +205,7 @@ public class DetailPanel
   void attachToVehicle(LocalVehicleEntry newVehicleEntry) {
     requireNonNull(newVehicleEntry, "newVehicleEntry");
 
-    // Clean up first - but only if we're not reattaching the vehicle model which is already 
+    // Clean up first - but only if we're not reattaching the vehicle model which is already
     // attached to this panel.
     if (vehicleEntry != newVehicleEntry) {
       detachFromVehicle();
@@ -265,13 +265,16 @@ public class DetailPanel
   }
 
   private void updateFromVehicleProcessModel(ProcessModelEvent evt) {
-    if (Objects.equals(evt.getAttributeChanged(), VehicleProcessModel.Attribute.COMM_ADAPTER_ENABLED.name())) {
+    if (Objects.equals(evt.getAttributeChanged(),
+                       VehicleProcessModel.Attribute.COMM_ADAPTER_ENABLED.name())) {
       updateCommAdapterEnabled(evt.getUpdatedProcessModel().isCommAdapterEnabled());
     }
-    else if (Objects.equals(evt.getAttributeChanged(), VehicleProcessModel.Attribute.POSITION.name())) {
+    else if (Objects.equals(evt.getAttributeChanged(),
+                            VehicleProcessModel.Attribute.POSITION.name())) {
       updateVehiclePosition(evt.getUpdatedProcessModel().getVehiclePosition());
     }
-    else if (Objects.equals(evt.getAttributeChanged(), VehicleProcessModel.Attribute.STATE.name())) {
+    else if (Objects.equals(evt.getAttributeChanged(),
+                            VehicleProcessModel.Attribute.STATE.name())) {
       updateVehicleState(evt.getUpdatedProcessModel().getVehicleState());
     }
     else if (Objects.equals(evt.getAttributeChanged(),
@@ -331,9 +334,11 @@ public class DetailPanel
     customPanelList.clear();
     if (attachmentInfo != null) {
       for (VehicleCommAdapterPanelFactory panelFactory : panelFactories) {
-        customPanelList.addAll(panelFactory.getPanelsFor(vehicleEntry.getAttachedCommAdapterDescription(),
-                                                         vehicleEntry.getAttachmentInformation().getVehicleReference(),
-                                                         vehicleEntry.getProcessModel()));
+        customPanelList.addAll(
+            panelFactory.getPanelsFor(vehicleEntry.getAttachedCommAdapterDescription(),
+                                      vehicleEntry.getAttachmentInformation().getVehicleReference(),
+                                      vehicleEntry.getProcessModel())
+        );
         for (VehicleCommAdapterPanel curPanel : customPanelList) {
           LOG.debug("Adding {} with title {} to tabbedPane.", curPanel, curPanel.getTitle());
           tabbedPane.addTab(curPanel.getTitle(), curPanel);

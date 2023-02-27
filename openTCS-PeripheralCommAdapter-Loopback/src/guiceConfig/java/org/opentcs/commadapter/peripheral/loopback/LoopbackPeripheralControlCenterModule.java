@@ -18,9 +18,17 @@ import org.opentcs.customizations.controlcenter.ControlCenterInjectionModule;
 public class LoopbackPeripheralControlCenterModule
     extends ControlCenterInjectionModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public LoopbackPeripheralControlCenterModule() {
+  }
+
   @Override
   protected void configure() {
-    install(new FactoryModuleBuilder().build(LoopbackPeripheralAdapterPanelComponentsFactory.class));
+    install(
+        new FactoryModuleBuilder().build(LoopbackPeripheralAdapterPanelComponentsFactory.class)
+    );
 
     peripheralCommAdapterPanelFactoryBinder()
         .addBinding().to(LoopbackPeripheralCommAdapterPanelFactory.class);

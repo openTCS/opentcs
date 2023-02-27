@@ -32,7 +32,8 @@ public interface LoopbackAdapterConstants {
    */
   String PROPVAL_LOAD_OPERATION_DEFAULT = "Load cargo";
   /**
-   * The key of the vehicle property that specifies which operation unloads the load handling device.
+   * The key of the vehicle property that specifies which operation unloads the load handling
+   * device.
    */
   String PROPKEY_UNLOAD_OPERATION = "loopback:unloadOperation";
   /**

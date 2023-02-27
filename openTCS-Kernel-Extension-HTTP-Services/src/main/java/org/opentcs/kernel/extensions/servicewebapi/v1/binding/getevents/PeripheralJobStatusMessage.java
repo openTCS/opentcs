@@ -41,6 +41,12 @@ public class PeripheralJobStatusMessage
 
   private List<Property> properties;
 
+  /**
+   * Creates a new instance.
+   */
+  public PeripheralJobStatusMessage() {
+  }
+
   @Override
   public PeripheralJobStatusMessage setSequenceNumber(long sequenceNumber) {
     return (PeripheralJobStatusMessage) super.setSequenceNumber(sequenceNumber);

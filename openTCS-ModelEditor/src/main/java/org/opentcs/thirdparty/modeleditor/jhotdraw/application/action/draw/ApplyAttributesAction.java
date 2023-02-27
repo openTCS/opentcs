@@ -48,7 +48,7 @@ public class ApplyAttributesAction
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
 
   private Set<AttributeKey<?>> excludedAttributes = new HashSet<>(
-      Arrays.asList(new AttributeKey<?>[] {TRANSFORM, TEXT}));
+      Arrays.asList(new AttributeKey<?>[]{TRANSFORM, TEXT}));
 
   /**
    * Creates a new instance.
@@ -85,8 +85,10 @@ public class ApplyAttributesAction
   public void applyAttributes() {
     DrawingEditor editor = getEditor();
 
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH);
-    CompositeEdit edit = new CompositeEdit(labels.getString("applyAttributesAction.undo.presentationName"));
+    ResourceBundleUtil labels
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH);
+    CompositeEdit edit
+        = new CompositeEdit(labels.getString("applyAttributesAction.undo.presentationName"));
     DrawingView view = getView();
     view.getDrawing().fireUndoableEditHappened(edit);
 

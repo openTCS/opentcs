@@ -27,6 +27,7 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByDeadline;
 
 /**
+ * Unit tests for {@link CandidateComparatorByDeadline}.
  *
  * @author Mustafa Yalciner (Fraunhofer IML)
  */
@@ -61,7 +62,8 @@ public class CandidateComparatorByDeadlineTest {
   private AssignmentCandidate candidateWithDeadline(Instant time) {
     TransportOrder deadlinedOrder = new TransportOrder("Some order", new ArrayList<>())
         .withDeadline(time);
-    Step dummyStep = new Route.Step(null, null, new Point("Point1"), Vehicle.Orientation.FORWARD, 1);
+    Step dummyStep
+        = new Route.Step(null, null, new Point("Point1"), Vehicle.Orientation.FORWARD, 1);
     Route route = new Route(Arrays.asList(dummyStep), 10);
     List<DriveOrder> driveOrders = List.of(
         new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))

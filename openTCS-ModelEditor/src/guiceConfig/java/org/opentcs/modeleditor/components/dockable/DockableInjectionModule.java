@@ -21,6 +21,12 @@ import org.opentcs.guing.common.components.dockable.DockingManager;
 public class DockableInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public DockableInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     install(new FactoryModuleBuilder().build(DockableHandlerFactory.class));

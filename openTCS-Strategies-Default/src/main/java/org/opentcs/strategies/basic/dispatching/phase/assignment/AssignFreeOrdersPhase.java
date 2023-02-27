@@ -63,7 +63,7 @@ public class AssignFreeOrdersPhase
    */
   private static final Logger LOG = LoggerFactory.getLogger(AssignFreeOrdersPhase.class);
   /**
-   * The object service
+   * The object service.
    */
   private final TCSObjectService objectService;
   /**
@@ -303,7 +303,12 @@ public class AssignFreeOrdersPhase
             .map(order -> computeCandidate(vehicle, vehiclePosition, order))
             .filter(optCandidate -> optCandidate.isPresent())
             .map(optCandidate -> optCandidate.get())
-            .map(candidate -> new CandidateFilterResult(candidate, assignmentCandidateSelectionFilter.apply(candidate)))
+            .map(
+                candidate -> new CandidateFilterResult(
+                    candidate,
+                    assignmentCandidateSelectionFilter.apply(candidate)
+                )
+            )
             .collect(Collectors.partitioningBy(filterResult -> !filterResult.isFiltered()));
 
     ordersSplitByFilter.get(Boolean.FALSE).stream()
@@ -326,13 +331,21 @@ public class AssignFreeOrdersPhase
         = availableVehicles.stream()
             .filter(vehicle -> (!assignmentState.wasAssignedToOrder(vehicle)
                                 && orderAssignableToVehicle(order, vehicle)))
-            .map(vehicle -> computeCandidate(vehicle,
-                                             objectService.fetchObject(Point.class,
-                                                                       vehicle.getCurrentPosition()),
-                                             order))
+            .map(
+                vehicle -> computeCandidate(
+                    vehicle,
+                    objectService.fetchObject(Point.class, vehicle.getCurrentPosition()),
+                    order
+                )
+            )
             .filter(optCandidate -> optCandidate.isPresent())
             .map(optCandidate -> optCandidate.get())
-            .map(candidate -> new CandidateFilterResult(candidate, assignmentCandidateSelectionFilter.apply(candidate)))
+            .map(
+                candidate -> new CandidateFilterResult(
+                    candidate,
+                    assignmentCandidateSelectionFilter.apply(candidate)
+                )
+            )
             .collect(Collectors.partitioningBy(filterResult -> !filterResult.isFiltered()));
 
     ordersSplitByFilter.get(Boolean.FALSE).stream()

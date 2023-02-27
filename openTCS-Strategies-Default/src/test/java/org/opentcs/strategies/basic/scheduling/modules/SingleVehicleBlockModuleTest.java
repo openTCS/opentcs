@@ -28,6 +28,7 @@ import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.strategies.basic.scheduling.ReservationPool;
 
 /**
+ * Unit tests for {@link SingleVehicleBlockModule}.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
@@ -90,7 +91,7 @@ public class SingleVehicleBlockModuleTest {
     private final Set<TCSResource<?>> resourcesToAllocate = new HashSet<>();
     private final Block block;
 
-    public ModelData() {
+    ModelData() {
       Point pointA = new Point("A");
       Point pointB = new Point("B");
       Point pointC = new Point("C");

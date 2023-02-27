@@ -25,7 +25,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class AddBitmapAction
     extends AbstractAction {
 
-  public final static String ID = "view.addBitmap";
+  /**
+   * This action's ID.
+   */
+  public static final String ID = "view.addBitmap";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
 

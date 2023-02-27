@@ -36,10 +36,12 @@ public class ComplexPropertyCellEditor
    * The button for showing the details dialog.
    */
   private final JButton fButton = new JButton();
+  // CHECKSTYLE:OFF (Getting this declaration shorter is difficult with automatic formatting.)
   /**
    * Provides the appropriate dialog content for a given property.
    */
   private final Map<Class<? extends AbstractComplexProperty>, Provider<DetailsDialogContent>> contentMap;
+  // CHECKSTYLE:ON
   /**
    * A parent for dialogs created by this instance.
    */

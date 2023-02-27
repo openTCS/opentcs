@@ -15,7 +15,6 @@ import static javax.swing.Action.LARGE_ICON_KEY;
 import static javax.swing.Action.SMALL_ICON;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
@@ -42,26 +41,16 @@ public class UndoRedoManager
     extends UndoManager
     implements EventHandler {
 
+  /**
+   * An undo action's ID.
+   */
   public static final String UNDO_ACTION_ID = "edit.undo";
+  /**
+   * A redo action's ID.
+   */
   public static final String REDO_ACTION_ID = "edit.redo";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
-
-  /**
-   * Sending this UndoableEdit event to the UndoRedoManager
-   * disables the Undo and Redo functions of the manager.
-   */
-  public final static UndoableEdit DISCARD_ALL_EDITS = new AbstractUndoableEdit() {
-    @Override
-    public boolean canUndo() {
-      return false;
-    }
-
-    @Override
-    public boolean canRedo() {
-      return false;
-    }
-  };
 
   /**
    * This class's logger.
@@ -69,20 +58,17 @@ public class UndoRedoManager
   private static final Logger LOG = LoggerFactory.getLogger(UndoRedoManager.class);
 
   protected PropertyChangeSupport propertySupport = new PropertyChangeSupport(this);
-
   /**
    * This flag is set to true when at least one significant UndoableEdit
    * has been added to the manager since the last call to discardAllEdits.
    */
-  private boolean hasSignificantEdits = false;
-
+  private boolean hasSignificantEdits;
   /**
    * This flag is set to true when an undo or redo operation is in progress.
    * The UndoRedoManager ignores all incoming UndoableEdit events while
    * this flag is true.
    */
   private boolean undoOrRedoInProgress;
-
   /**
    * The undo action instance.
    */
@@ -197,8 +183,7 @@ public class UndoRedoManager
   }
 
   /**
-   * Updates the properties of the UndoAction
-   * and of the RedoAction.
+   * Updates the properties of the UndoAction and of the RedoAction.
    */
   private void updateActions() {
     String label;
@@ -321,7 +306,7 @@ public class UndoRedoManager
   private class UndoAction
       extends AbstractAction {
 
-    public UndoAction() {
+    UndoAction() {
       putValue(NAME, BUNDLE.getString("undoRedoManager.undoAction.name"));
       putValue(SHORT_DESCRIPTION, BUNDLE.getString("undoRedoManager.undoAction.shortDescription"));
       putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl Z"));
@@ -350,7 +335,7 @@ public class UndoRedoManager
   private class RedoAction
       extends AbstractAction {
 
-    public RedoAction() {
+    RedoAction() {
       putValue(NAME, BUNDLE.getString("undoRedoManager.redoAction.name"));
       putValue(SHORT_DESCRIPTION, BUNDLE.getString("undoRedoManager.redoAction.shortDescription"));
       putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl Y"));

@@ -21,5 +21,5 @@ public interface PluginPanelManager {
    * @param factory The factory resp. panel that shall be shown / hidden.
    * @param visible True to set it visible, false otherwise.
    */
-  public void showPluginPanel(PluggablePanelFactory factory, boolean visible);
+  void showPluginPanel(PluggablePanelFactory factory, boolean visible);
 }

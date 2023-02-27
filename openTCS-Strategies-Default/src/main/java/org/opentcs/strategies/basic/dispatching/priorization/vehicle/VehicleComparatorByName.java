@@ -24,6 +24,12 @@ public class VehicleComparatorByName
    */
   public static final String CONFIGURATION_KEY = "BY_NAME";
 
+  /**
+   * Creates a new instance.
+   */
+  public VehicleComparatorByName() {
+  }
+
   @Override
   public int compare(Vehicle vehicle1, Vehicle vehicle2) {
     return vehicle1.getName().compareTo(vehicle2.getName());

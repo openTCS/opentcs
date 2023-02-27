@@ -40,7 +40,7 @@ public class ContinuousLoadPanelFactory
 
   /**
    * Creates a new instance.
-   * 
+   *
    * @param portalProvider The application's portal provider.
    * @param panelProvider A provider for the actual panels.
    */

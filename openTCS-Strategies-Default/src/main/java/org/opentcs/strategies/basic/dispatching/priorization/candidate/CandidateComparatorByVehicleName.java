@@ -28,6 +28,12 @@ public class CandidateComparatorByVehicleName
 
   private final Comparator<Vehicle> delegate = new VehicleComparatorByName();
 
+  /**
+   * Creates a new instance.
+   */
+  public CandidateComparatorByVehicleName() {
+  }
+
   @Override
   public int compare(AssignmentCandidate candidate1, AssignmentCandidate candidate2) {
     return delegate.compare(candidate1.getVehicle(), candidate2.getVehicle());

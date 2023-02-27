@@ -36,7 +36,8 @@ public class OrderTypesPropertyEditorPanel
   /**
    * The bundle to be used.
    */
-  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
+  private final ResourceBundleUtil bundle
+      = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
   /**
    * The pool of types to suggest.
    */
@@ -105,8 +106,12 @@ public class OrderTypesPropertyEditorPanel
     while (entries.hasMoreElements()) {
       String entry = entries.nextElement();
       if (entry.equals(category)) {
-        JOptionPane.showMessageDialog(this,
-                                      bundle.getString("orderTypesPropertyEditorPanel.optionPane_typeAlreadyPresentError.message"));
+        JOptionPane.showMessageDialog(
+            this,
+            bundle.getString(
+                "orderTypesPropertyEditorPanel.optionPane_typeAlreadyPresentError.message"
+            )
+        );
         return;
       }
     }
@@ -201,6 +206,7 @@ public class OrderTypesPropertyEditorPanel
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
     add(removeButton, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
       String value = itemsList.getSelectedValue();
@@ -217,6 +223,7 @@ public class OrderTypesPropertyEditorPanel
       add();
     }//GEN-LAST:event_addButtonActionPerformed
 
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
   private javax.swing.JList<String> itemsList;

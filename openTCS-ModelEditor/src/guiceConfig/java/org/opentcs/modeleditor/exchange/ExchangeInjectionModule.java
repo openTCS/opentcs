@@ -27,9 +27,14 @@ import org.opentcs.util.event.SimpleEventBus;
 public class ExchangeInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public ExchangeInjectionModule() {
+  }
+
   @Override
   protected void configure() {
-
     bind(PortalManager.class)
         .to(DefaultPortalManager.class)
         .in(Singleton.class);

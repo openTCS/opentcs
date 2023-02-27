@@ -28,6 +28,12 @@ public class PlantModelElementTO {
   private String name = "";
   private List<PropertyTO> properties = new ArrayList<>();
 
+  /**
+   * Creates a new instance.
+   */
+  public PlantModelElementTO() {
+  }
+
   @XmlAttribute(required = true)
   public String getName() {
     return name;

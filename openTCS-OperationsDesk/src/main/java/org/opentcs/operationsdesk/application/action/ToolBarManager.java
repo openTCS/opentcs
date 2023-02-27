@@ -55,8 +55,7 @@ public class ToolBarManager
   /**
    * A list of all toolbars.
    */
-  private final List<JToolBar> toolBarList
-      = Collections.synchronizedList(new LinkedList<JToolBar>());
+  private final List<JToolBar> toolBarList = Collections.synchronizedList(new LinkedList<>());
   /**
    * A tool bar for actions creating new items.
    */
@@ -113,11 +112,12 @@ public class ToolBarManager
     this.selectionToolFactory = requireNonNull(selectionToolFactory,
                                                "selectionToolFactory");
 
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TOOLBAR_PATH);
+    ResourceBundleUtil labels
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TOOLBAR_PATH);
 
     // --- 1. ToolBar: Creation ---
-    // Selection, Drag | Create Point, Location, Path, Link | 
-    // Create Location Type, Vehicle, Block, Static Route | 
+    // Selection, Drag | Create Point, Location, Path, Link |
+    // Create Location Type, Vehicle, Block, Static Route |
     // Create Transport Order | Find, Show Vehicles
     toolBarCreation.setActionMap(actionMap);
     // --- Selection Tool ---
@@ -224,8 +224,10 @@ public class ToolBarManager
 
     toggleButton.setIcon(ImageDirectory.getImageIcon("/toolbar/select-2.png"));
     toggleButton.setText(null);
-    toggleButton.setToolTipText(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TOOLBAR_PATH)
-        .getString("toolBarManager.button_selectionTool.tooltipText"));
+    toggleButton.setToolTipText(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TOOLBAR_PATH)
+            .getString("toolBarManager.button_selectionTool.tooltipText")
+    );
 
     toggleButton.setSelected(true);
     toggleButton.addItemListener(new ToolButtonListener(selectionTool, editor));

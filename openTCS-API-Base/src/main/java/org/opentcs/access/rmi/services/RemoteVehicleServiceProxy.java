@@ -29,6 +29,12 @@ class RemoteVehicleServiceProxy
     extends RemoteTCSObjectServiceProxy<RemoteVehicleService>
     implements VehicleService {
 
+  /**
+   * Creates a new instance.
+   */
+  RemoteVehicleServiceProxy() {
+  }
+
   @Override
   public void attachCommAdapter(TCSObjectReference<Vehicle> ref,
                                 VehicleCommAdapterDescription description)

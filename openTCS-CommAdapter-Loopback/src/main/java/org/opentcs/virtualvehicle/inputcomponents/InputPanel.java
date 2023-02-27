@@ -54,7 +54,7 @@ public abstract class InputPanel
   }
 
   /**
-   * Get the title of this panel. 
+   * Get the title of this panel.
    * @return The title
    */
   public String getTitle() {
@@ -62,9 +62,9 @@ public abstract class InputPanel
   }
 
   /**
-   * Add a {@link ValidationListener} that will receive 
+   * Add a {@link ValidationListener} that will receive
    * {@link ValidationEvent ValidationEvents}
-   * whenever the validity of the input in this panel changes. The 
+   * whenever the validity of the input in this panel changes. The
    * {@link ValidationListener} will receive a {@link ValidationEvent} with the
    * current validity state immediately after beeing added.
    * If the panel does not validate it's input the validity will never change.
@@ -77,7 +77,7 @@ public abstract class InputPanel
   }
 
   /**
-   * Mark the input of the panel as valid/invalid and send 
+   * Mark the input of the panel as valid/invalid and send
    * {@link ValidationEvent ValidationEvents}
    * to the attached {@link ValidationListener ValidationListeners}.
    * The Validity should only be changed via this method!
@@ -94,7 +94,7 @@ public abstract class InputPanel
     }
   }
 /**
- * 
+ *
  * @return The validation Listeners.
  */
   public List<ValidationListener> getValidationListeners() {
@@ -113,7 +113,7 @@ public abstract class InputPanel
 
   /**
    * Get the user input from the panel. If the input wasn't captured before
-   * (see {@link #captureInput()}) null is returned. Otherwise it depends on the 
+   * (see {@link #captureInput()}) null is returned. Otherwise it depends on the
    * concrete implementing panel what the input can look like.
    * @return The input
    */
@@ -125,7 +125,7 @@ public abstract class InputPanel
    * Tells the panel to get and store the user input which will be available
    * via {@link #getInput()} afterwards.
    * Usually this method should be called from the enclosing dialog when the
-   * ok button is pressed. It is not intended to be used by the user of the 
+   * ok button is pressed. It is not intended to be used by the user of the
    * panel!
    */
   protected abstract void captureInput();
@@ -144,7 +144,7 @@ public abstract class InputPanel
   /**
    * Inform the panel, that it should reset it's input values (probably because
    * the reset button in the enclosing dialog was pressed).
-   * It's up to the specific panel itself to decide what is resetted. 
+   * It's up to the specific panel itself to decide what is resetted.´
    * The default implementation does nothing.
    * It should be overwritten in subclasses if reset functionality is needed.
    */
@@ -170,24 +170,24 @@ public abstract class InputPanel
    * <b>Usage</b>:
    * </p>
    * <ol>
-   * <li>Instanciate the builder, passing required parameters to the 
+   * <li>Instanciate the builder, passing required parameters to the
    * constructor.</li>
    * <li>Set optional parameters via the other public methods.</li>
-   * <li>Actually build the panel according to the previously specified 
+   * <li>Actually build the panel according to the previously specified
    * parameters using the build() method.</li>
    * </ol>
    * <p>
-   * <b>Note</b>: 
-   * The parameter methods should always return the builder itself, so the 
-   * creation of a panel can be done in a single statement (see the 
+   * <b>Note</b>:
+   * The parameter methods should always return the builder itself, so the
+   * creation of a panel can be done in a single statement (see the
    * <i>Builder-Pattern</i> in Joshua Bloch's <i>Effective Java</i>).
    * </p>
    */
   public interface Builder {
 
     /**
-     * Finally build the {@link InputPanel} as described by this 
-     * <code>Builder</code>.
+     * Finally build the {@link InputPanel} as described by this <code>Builder</code>.
+     *
      * @return The created <code>InputPanel</code>.
      */
     InputPanel build();

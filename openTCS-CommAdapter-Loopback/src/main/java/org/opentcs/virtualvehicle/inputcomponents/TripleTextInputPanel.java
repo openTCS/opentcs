@@ -16,9 +16,9 @@ import javax.swing.text.Document;
  * <li>labels for the text fields</li>
  * <li>unit labels for the text fields</li>
  * </ul>
- * The input of the text fields can be validated 
+ * The input of the text fields can be validated
  * (see {@link Builder#enableValidation enableValidation}).
- * For instanciation the contained 
+ * For instanciation the contained
  * {@link TripleTextInputPanel.Builder Builder}-class must be used.
  * The <code>Object</code> that is returned by {@link InputPanel#getInput} is
  * an <code>Array</code> of three <code>Strings</code>.
@@ -46,7 +46,7 @@ public final class TripleTextInputPanel
    */
   private boolean inputField3Valid = true;
 
-  /** 
+  /**
    * Create a new <code>TripleTextInputPanel</code>.
    * @param title Title of the panel
    */
@@ -56,8 +56,8 @@ public final class TripleTextInputPanel
   }
 
   /**
-   * Enable input validation against the given regular expressions. 
-   * If a format string is <code>null</code> the related text field is not 
+   * Enable input validation against the given regular expressions.
+   * If a format string is <code>null</code> the related text field is not
    * validated.
    * @see InputPanel#addValidationListener
    * @param format1 A regular expression for the first text field.
@@ -97,7 +97,7 @@ public final class TripleTextInputPanel
    * two documents is checked, too. Only if all three text fields contain valid
    * input, the whole input of the panel is marked as valid.
    *
-   * @see TextInputPanel#setInputValid(boolean, javax.swing.text.Document)  
+   * @see TextInputPanel#setInputValid(boolean, javax.swing.text.Document)
    * @param valid true, if the content of the <code>Document</code> is valid
    * @param doc the <code>Document</code>
    */

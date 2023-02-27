@@ -34,6 +34,12 @@ public class LocationTO
   private List<Link> links = new ArrayList<>();
   private Boolean locked = false;
 
+  /**
+   * Creates a new instance.
+   */
+  public LocationTO() {
+  }
+
   @XmlAttribute
   public Long getxPosition() {
     return xPosition;
@@ -105,6 +111,12 @@ public class LocationTO
 
     private String point = "";
     private List<AllowedOperationTO> allowedOperations = new ArrayList<>();
+
+    /**
+     * Creates a new instance.
+     */
+    public Link() {
+    }
 
     @XmlAttribute(required = true)
     public String getPoint() {

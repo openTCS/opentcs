@@ -168,6 +168,7 @@ public class PeripheralsPanel
     return result;
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
    * initialize the form.
@@ -225,6 +226,7 @@ public class PeripheralsPanel
 
     getAccessibleContext().setAccessibleName(bundle.getString("peripheralsPanel.accessibleName")); // NOI18N
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
   private void peripheralTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_peripheralTableMouseClicked
     if (evt.getClickCount() == 2) {
@@ -242,6 +244,7 @@ public class PeripheralsPanel
     updateRowFilter();
   }//GEN-LAST:event_hideDetachedLocationsCheckBoxActionPerformed
 
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel filterPanel;
   private javax.swing.JCheckBox hideDetachedLocationsCheckBox;
@@ -250,4 +253,5 @@ public class PeripheralsPanel
   private javax.swing.JPanel peripheralDetailsPanel;
   private javax.swing.JTable peripheralTable;
   // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 }

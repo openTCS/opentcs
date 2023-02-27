@@ -18,6 +18,9 @@ import org.opentcs.configuration.ConfigurationPrefix;
 @ConfigurationPrefix(ServiceWebApiConfiguration.PREFIX)
 public interface ServiceWebApiConfiguration {
 
+  /**
+   * The prefix for all configuration entries here.
+   */
   String PREFIX = "servicewebapi";
 
   @ConfigurationEntry(

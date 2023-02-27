@@ -19,6 +19,9 @@ import org.opentcs.modeleditor.application.OpenTCSView;
 public class RestoreDockingLayoutAction
     extends AbstractAction {
 
+  /**
+   * This action's ID.
+   */
   public static final String ID = "openTCS.restoreDockingLayout";
   private final OpenTCSView view;
 

@@ -26,6 +26,12 @@ class RemotePeripheralDispatcherServiceProxy
     extends AbstractRemoteServiceProxy<RemotePeripheralDispatcherService>
     implements PeripheralDispatcherService {
 
+  /**
+   * Creates a new instance.
+   */
+  RemotePeripheralDispatcherServiceProxy() {
+  }
+
   @Override
   public void dispatch()
       throws KernelRuntimeException {

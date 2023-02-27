@@ -45,8 +45,9 @@ public class AssignmentState {
 
   public void addFilteredOrder(OrderFilterResult filterResult) {
     TransportOrder order = filterResult.getOrder();
-    OrderFilterResult result = filteredOrders.getOrDefault(order,
-                                                      new OrderFilterResult(order, new ArrayList<>()));
+    OrderFilterResult result
+        = filteredOrders.getOrDefault(order,
+                                      new OrderFilterResult(order, new ArrayList<>()));
     result.getFilterReasons().addAll(filterResult.getFilterReasons());
     filteredOrders.put(order, result);
   }
@@ -76,7 +77,7 @@ public class AssignmentState {
     return Stream.concat(assignedCandidates.stream(), reservedCandidates.stream())
         .anyMatch(candidate -> Objects.equals(candidate.getVehicle(), vehicle));
   }
-  
+
   public boolean wasFiltered(TransportOrder order) {
     return filteredOrders.containsKey(order);
   }

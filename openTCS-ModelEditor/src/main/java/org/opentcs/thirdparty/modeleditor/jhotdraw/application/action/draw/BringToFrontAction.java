@@ -38,7 +38,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class BringToFrontAction
     extends AbstractSelectedAction {
 
-  public final static String ID = "edit.bringToFront";
+  /**
+   * This action's ID.
+   */
+  public static final String ID = "edit.bringToFront";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
 
@@ -65,7 +68,8 @@ public class BringToFrontAction
     fireUndoableEditHappened(new AbstractUndoableEdit() {
       @Override
       public String getPresentationName() {
-        return ResourceBundleUtil.getBundle(TOOLBAR_PATH).getString("bringToFrontAction.undo.presentationName");
+        return ResourceBundleUtil.getBundle(TOOLBAR_PATH)
+            .getString("bringToFrontAction.undo.presentationName");
       }
 
       @Override

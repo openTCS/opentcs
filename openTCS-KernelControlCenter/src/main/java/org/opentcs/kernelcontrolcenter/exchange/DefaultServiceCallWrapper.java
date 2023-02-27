@@ -116,10 +116,12 @@ public class DefaultServiceCallWrapper
 
   private boolean showRetryDialog() {
     int dialogSelection
-        = JOptionPane.showConfirmDialog(null,
-                                        BUNDLE.getString("defaultServiceCallWrapper.optionPane_retryConfirmation.message"),
-                                        BUNDLE.getString("defaultServiceCallWrapper.optionPane_retryConfirmation.title"),
-                                        JOptionPane.YES_NO_CANCEL_OPTION);
+        = JOptionPane.showConfirmDialog(
+            null,
+            BUNDLE.getString("defaultServiceCallWrapper.optionPane_retryConfirmation.message"),
+            BUNDLE.getString("defaultServiceCallWrapper.optionPane_retryConfirmation.title"),
+            JOptionPane.YES_NO_CANCEL_OPTION
+        );
 
     switch (dialogSelection) {
       case JOptionPane.YES_OPTION:

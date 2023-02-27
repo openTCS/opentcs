@@ -137,9 +137,10 @@ public class LocalPeripheralEntryPool
     Set<Location> locations
         = callWrapper.call(() -> servicePortal.getPlantModelService().fetchObjects(Location.class));
     for (Location location : locations) {
-      PeripheralAttachmentInformation ai = callWrapper.call(
-          () -> servicePortal.getPeripheralService().fetchAttachmentInformation(location.getReference())
-      );
+      PeripheralAttachmentInformation ai = callWrapper.call(() -> {
+        return servicePortal.getPeripheralService()
+            .fetchAttachmentInformation(location.getReference());
+      });
       PeripheralProcessModel processModel = callWrapper.call(
           () -> servicePortal.getPeripheralService().fetchProcessModel(location.getReference()));
       entries.put(location.getReference(), new LocalPeripheralEntry(location.getReference(),

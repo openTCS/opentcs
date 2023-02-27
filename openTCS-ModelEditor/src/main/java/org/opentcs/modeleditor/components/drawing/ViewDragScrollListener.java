@@ -34,8 +34,6 @@ import org.opentcs.guing.common.components.drawing.figures.PathConnection;
 import org.opentcs.guing.common.components.drawing.figures.liner.TripleBezierLiner;
 import org.opentcs.guing.common.components.drawing.figures.liner.TupelBezierLiner;
 import org.opentcs.guing.common.persistence.ModelManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A listener for dragging of the drawing view and single objects inside the
@@ -48,10 +46,6 @@ import org.slf4j.LoggerFactory;
 public class ViewDragScrollListener
     extends MouseAdapter {
 
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(ViewDragScrollListener.class);
   /**
    * The scroll pane enclosing the drawing view.
    */
@@ -168,9 +162,11 @@ public class ViewDragScrollListener
 
       if (isMovableFigure(pressedFigure)) {
         if (!isFigureCompletelyInView(pressedFigure, viewport, drawingView)) {
-          // If the figure exceeds the current view, start scrolling as soon as the mouse is 
+          // If the figure exceeds the current view, start scrolling as soon as the mouse is
           // hitting the view bounds.
-          drawingView.getComponent().scrollRectToVisible(new Rectangle(evt.getX(), evt.getY(), 1, 1));
+          drawingView.getComponent().scrollRectToVisible(
+              new Rectangle(evt.getX(), evt.getY(), 1, 1)
+          );
         }
 
         fMouseCurrentPoint.setLocation(drawingView.viewToDrawing(evt.getPoint()));

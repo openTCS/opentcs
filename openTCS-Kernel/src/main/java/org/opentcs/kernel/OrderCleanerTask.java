@@ -166,7 +166,7 @@ public class OrderCleanerTask
      */
     private final Instant creationTimeThreshold;
 
-    public OrderApproval(Instant creationTimeThreshold) {
+    OrderApproval(Instant creationTimeThreshold) {
       this.creationTimeThreshold = creationTimeThreshold;
     }
 
@@ -212,7 +212,7 @@ public class OrderCleanerTask
      */
     private final Instant creationTimeThreshold;
 
-    public SequenceApproval(Instant creationTimeThreshold) {
+    SequenceApproval(Instant creationTimeThreshold) {
       this.creationTimeThreshold = creationTimeThreshold;
     }
 
@@ -250,7 +250,7 @@ public class OrderCleanerTask
      */
     private final Instant creationTimeThreshold;
 
-    public PeripheralJobApproval(Instant creationTimeThreshold) {
+    PeripheralJobApproval(Instant creationTimeThreshold) {
       this.creationTimeThreshold = creationTimeThreshold;
     }
 

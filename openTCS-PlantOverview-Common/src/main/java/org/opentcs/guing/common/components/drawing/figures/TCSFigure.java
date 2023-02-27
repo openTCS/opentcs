@@ -83,7 +83,7 @@ public abstract class TCSFigure
 
   @Override
   protected Rectangle2D.Double getFigureDrawingArea() {
-    // Add some margin to the drawing area of the figure, so the 
+    // Add some margin to the drawing area of the figure, so the
     // drawing area scrolls a little earlier
     Rectangle2D.Double drawingArea = super.getFigureDrawingArea();
     // if we add these two lines the Drawing becomes grey, if we start

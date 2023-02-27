@@ -79,7 +79,8 @@ public class FileMenu
     requireNonNull(menuImport, "menuImport");
     requireNonNull(menuExport, "menuExport");
 
-    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
+    final ResourceBundleUtil labels
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
 
     this.setText(labels.getString("fileMenu.text"));
     this.setToolTipText(labels.getString("fileMenu.tooltipText"));
@@ -109,7 +110,8 @@ public class FileMenu
     addSeparator();
 
     // Load model from kernel
-    menuItemDownloadModelFromKernel = new JMenuItem(actionMap.get(DownloadModelFromKernelAction.ID));
+    menuItemDownloadModelFromKernel
+        = new JMenuItem(actionMap.get(DownloadModelFromKernelAction.ID));
     add(menuItemDownloadModelFromKernel);
 
     // Persist model in kernel

@@ -66,7 +66,8 @@ public interface SystemModel
    * Return all object of a specified class in a folder.
    *
    * @param foldername Key of the folder in which to search.
-   * @param classType Tha class of the objects to find.
+   * @param classType The class of the objects to find.
+   * @param <T> The type of objects returned.
    * @return List of all object of specified type in the folder.
    */
   <T> List<T> getAll(FolderKey foldername, Class<T> classType);
@@ -249,18 +250,45 @@ public interface SystemModel
   List<OtherGraphicalElement> getOtherGraphicalElements();
 
   /**
-   * Keys for the folders in a SystemModel.
+   * Supported keys for the folders in a SystemModel.
    */
-  public static enum FolderKey {
+  enum FolderKey {
 
+    /**
+     * Vehicles.
+     */
     VEHICLES,
+    /**
+     * Layout.
+     */
     LAYOUT,
+    /**
+     * Points.
+     */
     POINTS,
+    /**
+     * Locations.
+     */
     LOCATIONS,
+    /**
+     * Paths.
+     */
     PATHS,
+    /**
+     * Links.
+     */
     LINKS,
+    /**
+     * Location types.
+     */
     LOCATION_TYPES,
+    /**
+     * Blocks.
+     */
     BLOCKS,
+    /**
+     * Other graphical elements.
+     */
     OTHER_GRAPHICAL_ELEMENTS
   }
 }

@@ -88,11 +88,15 @@ public class OpsDeskVehicleAdapter
         component.removeVehicleModel(vehicleModel);
       }
 
-      vehicleModel.setCurrentDriveOrderPath(getCurrentDriveOrderPath(transportOrder.getCurrentDriveOrder(),
-                                                                     vehicle.getRouteProgressIndex(),
-                                                                     systemModel));
-      vehicleModel.setDriveOrderDestination(getCurrentDriveOrderDestination(transportOrder.getCurrentDriveOrder(),
-                                                                            systemModel));
+      vehicleModel.setCurrentDriveOrderPath(
+          getCurrentDriveOrderPath(transportOrder.getCurrentDriveOrder(),
+                                   vehicle.getRouteProgressIndex(),
+                                   systemModel)
+      );
+      vehicleModel.setDriveOrderDestination(
+          getCurrentDriveOrderDestination(transportOrder.getCurrentDriveOrder(),
+                                          systemModel)
+      );
 
       vehicleModel.setDriveOrderState(transportOrder.getState());
     }

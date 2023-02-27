@@ -18,6 +18,9 @@ import org.opentcs.configuration.ConfigurationPrefix;
 @ConfigurationPrefix(AdminWebApiConfiguration.PREFIX)
 public interface AdminWebApiConfiguration {
 
+  /**
+   * The prefix for all configuration entries here.
+   */
   String PREFIX = "adminwebapi";
 
   @ConfigurationEntry(

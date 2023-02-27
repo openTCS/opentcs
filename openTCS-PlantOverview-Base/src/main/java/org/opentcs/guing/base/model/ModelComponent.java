@@ -92,7 +92,8 @@ public interface ModelComponent
   /**
    * Returns whether this model component is to be shown in the tree view.
    *
-   * @return {@code true}, if the model component is to be shown in the tree view, otherwise {@code false}.
+   * @return {@code true}, if the model component is to be shown in the tree view, otherwise
+   * {@code false}.
    */
   boolean isTreeViewVisible();
 
@@ -177,8 +178,8 @@ public interface ModelComponent
    * component.
    *
    * @param l The listener.
-   * @return {@code true}, if the given {@link AttributesChangeListener} is already registered with the model
-   * component, otherwise {@code false}.
+   * @return {@code true}, if the given {@link AttributesChangeListener} is already registered with
+   * the model component, otherwise {@code false}.
    */
   boolean containsAttributesChangeListener(AttributesChangeListener l);
 

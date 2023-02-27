@@ -21,7 +21,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class AddDrawingViewAction
     extends AbstractAction {
 
-  public final static String ID = "view.addDrawingView";
+  /**
+   * This action's ID.
+   */
+  public static final String ID = "view.addDrawingView";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
 

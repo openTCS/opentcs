@@ -19,6 +19,12 @@ import org.opentcs.virtualvehicle.LoopbackCommunicationAdapter;
 public class TriggerCommand
     implements AdapterCommand {
 
+  /**
+   * Creates a new instance.
+   */
+  public TriggerCommand() {
+  }
+
   @Override
   public void execute(VehicleCommAdapter adapter) {
     if (!(adapter instanceof LoopbackCommunicationAdapter)) {

@@ -11,10 +11,10 @@ import java.awt.BorderLayout;
 import javax.swing.border.EmptyBorder;
 
 /**
- * A generic dialog for user input. It has two or three buttons 
- * (<i>Ok</i>, <i>Cancel</i>, <i>reset</i>(optional)) and acts as a frame for an 
- * {@link InputPanel}, that must be provided when 
- * creating the dialog. <code>InputDialog</code> listens to 
+ * A generic dialog for user input. It has two or three buttons
+ * (<i>Ok</i>, <i>Cancel</i>, <i>reset</i>(optional)) and acts as a frame for an
+ * {@link InputPanel}, that must be provided when
+ * creating the dialog. <code>InputDialog</code> listens to
  * <code>InputPanel</code>'s {@link ValidationEvent} to dynamically
  * enable/disable the <i>ok</i>-button if the panel validates it's input.
  *
@@ -50,7 +50,7 @@ public class InputDialog
     ACCEPTED
   }
 
-  /** 
+  /**
    * Create a new instance of <code>InputDialog</code>.
    * @param panel the panel to be displayed in the dialog.
    */
@@ -62,7 +62,7 @@ public class InputDialog
     this.panel = panel;
     setTitle(panel.getTitle());
     panel.setBorder(new EmptyBorder(6, 6, 10, 6));
-    // Setup dialog 
+    // Setup dialog
     getContentPane().add(panel, BorderLayout.CENTER);
     getRootPane().setDefaultButton(okButton);
     if (!panel.isResetable()) {
@@ -81,20 +81,20 @@ public class InputDialog
   /**
    * Get the return status of the dialog that indicates if there is input
    * available via {@link #getInput()}.
-   * If the return status is {@link ReturnStatus#ACCEPTED ACCEPTED}, 
+   * If the return status is {@link ReturnStatus#ACCEPTED ACCEPTED},
    * the panels input was captured
    * or reset and is available through {@link #getInput()}.
-   * If the return status is {@link ReturnStatus#CANCELED CANCELLED}, 
+   * If the return status is {@link ReturnStatus#CANCELED CANCELLED},
    * {@link #getInput()} should <b>not</b>
    * be called as the dialog was canceled and there is no valid input available.
    * If the dialog wasn't closed yet, <code>null</code> will be returned.
-   * @return the return status  
+   * @return the return status
    */
   public ReturnStatus getReturnStatus() {
     return returnStatus;
   }
 
-  /** 
+  /**
    * Get the input from the embedded panel. This is the same as calling
    * {@link InputPanel#getInput()} directly.
    * Prior to calling this method you should check if there even is any input

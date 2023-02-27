@@ -197,7 +197,7 @@ public abstract class AbstractParkingPositionSupplier
     private final Point point;
     private final long costs;
 
-    public PointCandidate(Point point, long costs) {
+    PointCandidate(Point point, long costs) {
       this.point = point;
       this.costs = costs;
     }

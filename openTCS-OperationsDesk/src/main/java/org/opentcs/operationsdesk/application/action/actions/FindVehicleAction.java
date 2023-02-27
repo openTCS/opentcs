@@ -43,7 +43,7 @@ public class FindVehicleAction
   /**
    * This action's ID.
    */
-  public final static String ID = "actions.findVehicle";
+  public static final String ID = "actions.findVehicle";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
   /**

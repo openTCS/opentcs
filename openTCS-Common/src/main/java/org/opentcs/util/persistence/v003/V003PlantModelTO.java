@@ -53,6 +53,12 @@ public class V003PlantModelTO
   private List<VisualLayoutTO> visualLayouts = new ArrayList<>();
   private List<PropertyTO> properties = new ArrayList<>();
 
+  /**
+   * Creates a new instance.
+   */
+  public V003PlantModelTO() {
+  }
+
   @XmlAttribute(required = true)
   public String getName() {
     return name;
@@ -222,7 +228,8 @@ public class V003PlantModelTO
 
   private static Schema createSchema()
       throws SAXException {
-    URL schemaUrl = V003PlantModelTO.class.getResource("/org/opentcs/util/persistence/model-0.0.3.xsd");
+    URL schemaUrl
+        = V003PlantModelTO.class.getResource("/org/opentcs/util/persistence/model-0.0.3.xsd");
     SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     return schemaFactory.newSchema(schemaUrl);
   }

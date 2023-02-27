@@ -35,7 +35,7 @@ public interface I18nPlantOverviewOperating {
    */
   String MENU_PATH = "i18n.org.opentcs.plantoverview.operating.mainMenu";
   /**
-   * Path to miscellaneous resources
+   * Path to miscellaneous resources.
    */
   String MISC_PATH = "i18n.org.opentcs.plantoverview.operating.miscellaneous";
   /**
@@ -73,5 +73,6 @@ public interface I18nPlantOverviewOperating {
   /**
    * Path to the resources related to the create peripheral job panel.
    */
-  String CREATE_PERIPHERAL_JOB_PATH = "i18n.org.opentcs.plantoverview.operating.dialogs.createPeripheralJob";
+  String CREATE_PERIPHERAL_JOB_PATH
+      = "i18n.org.opentcs.plantoverview.operating.dialogs.createPeripheralJob";
 }

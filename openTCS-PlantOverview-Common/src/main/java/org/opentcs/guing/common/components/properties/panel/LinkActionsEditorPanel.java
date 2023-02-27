@@ -29,7 +29,8 @@ public class LinkActionsEditorPanel
   /**
    * The bundle to be used.
    */
-  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
+  private final ResourceBundleUtil bundle
+      = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
 
   /**
    * Creates a new instance.

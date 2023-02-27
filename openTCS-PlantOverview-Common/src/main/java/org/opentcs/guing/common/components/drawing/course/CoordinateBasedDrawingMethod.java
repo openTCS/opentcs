@@ -8,7 +8,7 @@
 package org.opentcs.guing.common.components.drawing.course;
 
 /**
- * A drawing method where the position of a figure and the real position are in relation 
+ * A drawing method where the position of a figure and the real position are in relation
  * to each other.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
@@ -23,7 +23,7 @@ public class CoordinateBasedDrawingMethod
   protected Origin fOrigin;
 
   /**
-   * Creates a new instance of CoordinateBasedDrawingMethod
+   * Creates a new instance.
    */
   public CoordinateBasedDrawingMethod() {
     fOrigin = new Origin();

@@ -22,6 +22,7 @@ import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Vehicle;
 
 /**
+ * Unit tests for {@link PausedVehicleModule}.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
@@ -65,7 +66,7 @@ public class PausedVehicleModuleTest {
 
     private final String id;
 
-    public SampleClient(String id) {
+    SampleClient(String id) {
       this.id = id;
     }
 

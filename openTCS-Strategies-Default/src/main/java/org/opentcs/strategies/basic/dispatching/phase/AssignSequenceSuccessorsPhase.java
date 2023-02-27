@@ -94,9 +94,11 @@ public class AssignSequenceSuccessorsPhase
     nextOrderInCurrentSequence(vehicle)
         .map(order -> computeCandidate(vehicle, order))
         .filter(candidate -> assignmentCandidateSelectionFilter.apply(candidate).isEmpty())
-        .ifPresent(candidate -> transportOrderUtil.assignTransportOrder(vehicle,
-                                                                        candidate.getTransportOrder(),
-                                                                        candidate.getDriveOrders()));
+        .ifPresent(
+            candidate -> transportOrderUtil.assignTransportOrder(vehicle,
+                                                                 candidate.getTransportOrder(),
+                                                                 candidate.getDriveOrders())
+        );
   }
 
   private AssignmentCandidate computeCandidate(Vehicle vehicle, TransportOrder order) {

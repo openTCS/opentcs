@@ -22,13 +22,19 @@ import org.xml.sax.SAXException;
 /**
  * Allows reading a model file to access basic information (such as the model version) for
  * validation purposes.
- * 
+ *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 @XmlRootElement(name = "model")
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class ProbePlantModelTO
     extends BasePlantModelTO {
+
+  /**
+   * Creates a new instance.
+   */
+  public ProbePlantModelTO() {
+  }
 
   /**
    * Unmarshals an instance of this class from the given XML representation.

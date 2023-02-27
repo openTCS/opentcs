@@ -148,12 +148,14 @@ public class OpenTCSDrawingViewOperating
   @Override
   public void setBlocks(ModelComponent blocks) {
   }
- 
+
   @Override
   protected void drawTool(Graphics2D g2d) {
     super.drawTool(g2d);
 
-    if (getEditor() == null || getEditor().getTool() == null || getEditor().getActiveView() != this) {
+    if (getEditor() == null
+        || getEditor().getTool() == null
+        || getEditor().getActiveView() != this) {
       return;
     }
 
@@ -300,6 +302,12 @@ public class OpenTCSDrawingViewOperating
 
   private class ExtendedEventHandler
       extends AbstractExtendedEventHandler {
+
+    /**
+     * Creates a new instance.
+     */
+    ExtendedEventHandler() {
+    }
 
     @Override
     protected boolean shouldShowFigure(Figure figure) {

@@ -514,7 +514,7 @@ public class Path
     /**
      * The connection type a path is represented as.
      */
-    public static enum ConnectionType {
+    public enum ConnectionType {
 
       /**
        * A direct connection.

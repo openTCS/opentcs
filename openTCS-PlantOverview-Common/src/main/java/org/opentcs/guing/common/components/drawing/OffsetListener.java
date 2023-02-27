@@ -26,10 +26,10 @@ public class OffsetListener
   /**
    * Initiales the offset figures once the view is resized (normally
    * done when the window becomes visible). But the listener shouldn't
-   * listen to further resizing events. 
+   * listen to further resizing events.
    * XXX get rid of this listener?
    */
-  private boolean initialized = false;
+  private boolean initialized;
 
   /**
    * Creates a new instance.

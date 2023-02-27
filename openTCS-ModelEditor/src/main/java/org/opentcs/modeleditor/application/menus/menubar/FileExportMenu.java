@@ -25,7 +25,7 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class FileExportMenu
     extends JMenu {
 
-  private static final ResourceBundleUtil LABELS 
+  private static final ResourceBundleUtil LABELS
       = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
 
   @Inject

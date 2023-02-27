@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 /**
+ * Unit tests for {@link Assertions}.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */

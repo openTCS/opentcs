@@ -18,8 +18,8 @@ import org.opentcs.guing.common.components.tree.elements.UserObject;
 
 /**
  * A TreeView manages a model which has a set of TreeNode objects.
- * Each TreeNode has a UserObject. Each UserObject wraps a real object 
- * (e.g. Article, Figure, ...). It knows which methods to call to when an object is selected 
+ * Each TreeNode has a UserObject. Each UserObject wraps a real object
+ * (e.g. Article, Figure, ...). It knows which methods to call to when an object is selected
  * in the tree or is deleted or is double-clicked.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
@@ -29,7 +29,7 @@ public interface TreeView {
 
   /**
    * Adds an item to the tree.
-   * 
+   *
    * @param parent A real object that is seached in the tree.
    * @param item Is a UserObject.
    */

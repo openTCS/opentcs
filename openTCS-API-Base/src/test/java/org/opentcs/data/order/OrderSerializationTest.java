@@ -23,7 +23,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 
 /**
- * Tests for proper serialization and deserialization for TransportOrder and OrderSequence
+ * Tests for proper serialization and deserialization for TransportOrder and OrderSequence.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
@@ -36,7 +36,8 @@ public class OrderSerializationTest {
   public void shouldSerializeAndDeserializeTransportOrder()
       throws Exception {
     TransportOrder originalObject = createTransportOrder();
-    TransportOrder deserializedObject = (TransportOrder) deserializeTCSObject(serializeTCSObject(originalObject));
+    TransportOrder deserializedObject
+        = (TransportOrder) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
     assertEquals(originalObject.getProperties(), deserializedObject.getProperties());
@@ -48,7 +49,8 @@ public class OrderSerializationTest {
   public void shouldSerializeAndDeserializeOrderSequence()
       throws Exception {
     OrderSequence originalObject = createOrderSequence();
-    OrderSequence deserializedObject = (OrderSequence) deserializeTCSObject(serializeTCSObject(originalObject));
+    OrderSequence deserializedObject
+        = (OrderSequence) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
     assertTrue(originalObject.getOrders().get(0)

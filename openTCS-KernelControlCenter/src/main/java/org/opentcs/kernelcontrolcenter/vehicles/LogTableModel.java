@@ -73,7 +73,7 @@ final class LogTableModel
   /**
    * Creates a new instance.
    */
-  public LogTableModel() {
+  LogTableModel() {
   }
 
   @Override

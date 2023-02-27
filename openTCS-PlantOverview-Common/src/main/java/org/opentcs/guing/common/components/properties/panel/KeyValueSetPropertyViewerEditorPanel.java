@@ -153,8 +153,12 @@ public class KeyValueSetPropertyViewerEditorPanel
       super(
           new Object[][]{},
           new String[]{
-            resBundle.getString("keyValueSetPropertyViewerEditorPanel.table_properties.column_key.headerText"),
-            resBundle.getString("keyValueSetPropertyViewerEditorPanel.table_properties.column_value.headerText")
+            resBundle.getString(
+                "keyValueSetPropertyViewerEditorPanel.table_properties.column_key.headerText"
+            ),
+            resBundle.getString(
+                "keyValueSetPropertyViewerEditorPanel.table_properties.column_value.headerText"
+            )
           }
       );
     }

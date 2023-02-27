@@ -185,7 +185,11 @@ public class PeripheralJobsContainerPanel
     boolean singleRowSelected = table.getSelectedRowCount() <= 1;
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(PERIPHERALJOB_PATH);
     JPopupMenu menu = new JPopupMenu();
-    JMenuItem item = menu.add(bundle.getString("peripheralJobsContainerPanel.table_peripheralJobs.popupMenuItem_showDetails.text"));
+    JMenuItem item = menu.add(
+        bundle.getString(
+            "peripheralJobsContainerPanel.table_peripheralJobs.popupMenuItem_showDetails.text"
+        )
+    );
     item.setEnabled(singleRowSelected);
     item.addActionListener(event -> showSelectedJob());
 
@@ -199,7 +203,7 @@ public class PeripheralJobsContainerPanel
       toBeWithdrawn.add(tableModel.getEntryAt(table.convertRowIndexToModel(i)));
     }
 
-    try ( SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
       for (PeripheralJob job : toBeWithdrawn) {
         sharedPortal.getPortal().getPeripheralDispatcherService()
             .withdrawByPeripheralJob(job.getReference());

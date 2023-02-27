@@ -27,6 +27,12 @@ import org.opentcs.thirdparty.operationsdesk.components.drawing.OpenTCSDrawingVi
 public class DrawingInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public DrawingInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     install(new FactoryModuleBuilder().build(VehicleFigureFactory.class));

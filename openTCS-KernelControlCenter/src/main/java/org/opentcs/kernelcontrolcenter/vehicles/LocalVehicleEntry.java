@@ -97,7 +97,7 @@ public class LocalVehicleEntry {
   /**
    * Enum elements used as notification arguments to specify which argument changed.
    */
-  public static enum Attribute {
+  public enum Attribute {
     /**
      * Indicates a change of the process model reference.
      */

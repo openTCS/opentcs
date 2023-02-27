@@ -14,10 +14,10 @@ package org.opentcs.virtualvehicle.inputcomponents;
  * <li>a label</li>
  * <li>a unit label for the input</li>
  * </ul>
- * The input of the text field can be validated 
+ * The input of the text field can be validated
  * (see {@link Builder#enableValidation enableValidation}).
  * <br>
- * For instanciation the contained 
+ * For instanciation the contained
  * {@link SingleTextInputPanel.Builder Builder}-class must be used.
  * <br>
  * The <code>Object</code> that is returned by {@link InputPanel#getInput} is
@@ -34,7 +34,7 @@ public final class SingleTextInputPanel
    */
   private Object resetValue;
 
-  /** 
+  /**
    * Creates new instance of SingleTextInputPanel.
    * The given title is not used in the panel itselft but can be used by
    * the enclosing component.
@@ -46,7 +46,7 @@ public final class SingleTextInputPanel
   }
 
   /**
-   * Enable input validation against the given regular expression. 
+   * Enable input validation against the given regular expression.
    * @see InputPanel#addValidationListener
    * @param format A regular expression.
    */
@@ -98,7 +98,7 @@ public final class SingleTextInputPanel
     private String format;
     /**
      * Show a reset button in the panel.
-     * Default is <code>false</code>. 
+     * Default is <code>false</code>.
      */
     private boolean resetButton;
     /**

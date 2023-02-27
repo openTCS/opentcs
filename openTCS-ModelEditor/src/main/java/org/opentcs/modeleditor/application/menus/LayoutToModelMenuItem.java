@@ -93,7 +93,9 @@ public class LayoutToModelMenuItem
     this.copyAll = copyAll;
 
     setIcon(new ImageIcon(
-        getClass().getClassLoader().getResource("org/opentcs/guing/res/symbols/menu/arrow-up-3.png")));
+        getClass().getClassLoader()
+            .getResource("org/opentcs/guing/res/symbols/menu/arrow-up-3.png")
+    ));
     setMargin(new Insets(0, 2, 0, 2));
     addActionListener();
   }

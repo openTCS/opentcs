@@ -21,9 +21,15 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(propOrder = {"name", "value"})
 public class PropertyTO {
-  
+
   private String name = "";
   private String value = "";
+
+  /**
+   * Creates a new instance.
+   */
+  public PropertyTO() {
+  }
 
   @XmlAttribute(required = true)
   public String getName() {

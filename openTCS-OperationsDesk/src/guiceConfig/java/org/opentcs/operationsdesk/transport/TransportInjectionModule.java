@@ -22,13 +22,19 @@ import org.opentcs.operationsdesk.transport.sequences.OrderSequencesContainer;
 public class TransportInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public TransportInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     install(new FactoryModuleBuilder().build(TransportViewFactory.class));
-    
+
     bind(TransportOrdersContainer.class)
         .in(Singleton.class);
-    
+
     bind(OrderSequencesContainer.class)
         .in(Singleton.class);
   }

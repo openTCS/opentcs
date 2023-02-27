@@ -291,7 +291,9 @@ public class ModelValidatorTest {
     addProperty(path, LengthProperty.class, PathModel.LENGTH, 0d);
     addProperty(path, SpeedProperty.class, PathModel.MAX_VELOCITY, 0d);
     addProperty(path, SpeedProperty.class, PathModel.MAX_REVERSE_VELOCITY, 0d);
-    addProperty(path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.Type.DIRECT);
+    addProperty(
+        path, SelectionProperty.class, ElementPropKeys.PATH_CONN_TYPE, PathModel.Type.DIRECT
+    );
     addProperty(path, StringProperty.class, ElementPropKeys.PATH_CONTROL_POINTS, "");
     addProperty(path, StringProperty.class, PathModel.START_COMPONENT, pointName1);
     addProperty(path, StringProperty.class, PathModel.END_COMPONENT, pointName2);
@@ -309,7 +311,9 @@ public class ModelValidatorTest {
    */
   private LocationTypeModel createLocationType(String name) {
     LocationTypeModel locationType = createComponentWithName(LocationTypeModel.class, name);
-    addProperty(locationType, StringSetProperty.class, LocationTypeModel.ALLOWED_OPERATIONS, new HashSet<>());
+    addProperty(
+        locationType, StringSetProperty.class, LocationTypeModel.ALLOWED_OPERATIONS, new HashSet<>()
+    );
     return locationType;
   }
 

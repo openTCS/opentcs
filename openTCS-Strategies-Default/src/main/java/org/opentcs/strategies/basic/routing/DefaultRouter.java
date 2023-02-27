@@ -143,7 +143,7 @@ public class DefaultRouter
       DriveOrder[] driveOrders
           = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
 
-      // Since point routers get reset on topology changes, make sure there are point routers for 
+      // Since point routers get reset on topology changes, make sure there are point routers for
       // all routing groups.
       createMissingPointRouters();
 
@@ -501,8 +501,8 @@ public class DefaultRouter
      * of the route to be computed.
      * @param pointRouter The point router for the vehicle type.
      */
-    public OrderRouteParameterStruct(DriveOrder[] driveOrders,
-                                     PointRouter pointRouter) {
+    OrderRouteParameterStruct(DriveOrder[] driveOrders,
+                              PointRouter pointRouter) {
       this.driveOrders = requireNonNull(driveOrders, "driveOrders");
       this.pointRouter = requireNonNull(pointRouter, "pointRouter");
     }
@@ -537,7 +537,7 @@ public class DefaultRouter
      * <code>TransportOrder</code> for which this struct is to store the
      * routing result.
      */
-    public OrderRouteResultStruct(int driveOrderCount) {
+    OrderRouteResultStruct(int driveOrderCount) {
       currentRoute = new DriveOrder[driveOrderCount];
       currentCosts = 0;
       bestRoute = new DriveOrder[driveOrderCount];

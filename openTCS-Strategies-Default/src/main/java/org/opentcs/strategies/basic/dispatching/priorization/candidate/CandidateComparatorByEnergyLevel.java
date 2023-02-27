@@ -30,6 +30,12 @@ public class CandidateComparatorByEnergyLevel
   private final Comparator<Vehicle> delegate = new VehicleComparatorByEnergyLevel();
 
   /**
+   * Creates a new instance.
+   */
+  public CandidateComparatorByEnergyLevel() {
+  }
+
+  /**
    * Compares two candidates by the energy level of their vehicles.
    * Note: this comparator imposes orderings that are inconsistent with equals.
    *

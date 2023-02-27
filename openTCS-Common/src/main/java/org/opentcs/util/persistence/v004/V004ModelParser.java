@@ -36,6 +36,12 @@ import org.opentcs.util.persistence.v003.VisualLayoutTO.ModelLayoutElement;
 public class V004ModelParser {
 
   /**
+   * Creates a new instance.
+   */
+  public V004ModelParser() {
+  }
+
+  /**
    * Reads a model with the given reader and parses it to a {@link PlantModelCreationTO} instance.
    *
    * @param reader The reader to use.
@@ -117,7 +123,9 @@ public class V004ModelParser {
     List<LocationTO> locationsAssignedToDefaultLayer = new ArrayList<>();
     for (LocationTO path : model.getLocations()) {
       locationsAssignedToDefaultLayer.add(
-          path.setLocationLayout(path.getLocationLayout().setLayerId(ModelConstants.DEFAULT_LAYER_ID))
+          path.setLocationLayout(
+              path.getLocationLayout().setLayerId(ModelConstants.DEFAULT_LAYER_ID)
+          )
       );
     }
 

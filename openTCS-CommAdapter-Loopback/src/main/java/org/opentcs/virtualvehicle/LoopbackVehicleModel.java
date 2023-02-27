@@ -308,7 +308,7 @@ public class LoopbackVehicleModel
   /**
    * Notification arguments to indicate some change.
    */
-  public static enum Attribute {
+  public enum Attribute {
     /**
      * Indicates a change of the virtual vehicle's single step mode setting.
      */

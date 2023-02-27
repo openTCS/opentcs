@@ -26,7 +26,7 @@ public class SelectionPropertyCellEditor
     extends AbstractPropertyCellEditor {
 
   /**
-   * Creates a new instance of ComboBoxCellEditor
+   * Creates a new instance.
    *
    * @param comboBox
    * @param umh
@@ -48,7 +48,9 @@ public class SelectionPropertyCellEditor
 
     setValue(value);
     JComboBox<Object> comboBox = getComponent();
-    comboBox.setModel(new DefaultComboBoxModel<>(((Selectable) property()).getPossibleValues().toArray()));
+    comboBox.setModel(
+        new DefaultComboBoxModel<>(((Selectable) property()).getPossibleValues().toArray())
+    );
     comboBox.setSelectedItem(property().getValue());
 
     return fComponent;

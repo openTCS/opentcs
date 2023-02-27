@@ -26,6 +26,12 @@ public class DriveOrderHistory {
   private final Map<String, Set<FigureDecorationDetails>> driveOrderComponents = new HashMap<>();
 
   /**
+   * Creates a new instance.
+   */
+  public DriveOrderHistory() {
+  }
+
+  /**
    * Remembers the given set of components as the new drive order components for the given
    * vehicle name and returns the set difference of the old and the new drive order components
    * (e.g. the components that are no longer part of the vehicle's drive order).

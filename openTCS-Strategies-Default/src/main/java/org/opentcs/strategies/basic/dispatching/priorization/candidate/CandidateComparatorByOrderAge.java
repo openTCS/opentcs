@@ -30,6 +30,12 @@ public class CandidateComparatorByOrderAge
   private final Comparator<TransportOrder> delegate = new TransportOrderComparatorByAge();
 
   /**
+   * Creates a new instance.
+   */
+  public CandidateComparatorByOrderAge() {
+  }
+
+  /**
    * Compares two candidate by the age of the order.
    * Note: this comparator imposes orderings that are inconsistent with equals.
    *

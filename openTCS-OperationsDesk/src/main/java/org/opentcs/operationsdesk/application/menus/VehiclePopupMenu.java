@@ -47,7 +47,8 @@ public class VehiclePopupMenu
     requireNonNull(actionFactory, "actionFactory");
     requireNonNull(vehicles, "vehicles");
 
-    final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.VEHICLEPOPUP_PATH);
+    final ResourceBundleUtil bundle
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.VEHICLEPOPUP_PATH);
     VehicleModel singleVehicle = vehicles.stream().findFirst().get();
     JCheckBoxMenuItem checkBoxMenuItem;
     Action action;
@@ -55,7 +56,9 @@ public class VehiclePopupMenu
     JMenuItem mi = new JMenuItem();
     mi.setEnabled(false);
     if (vehicles.size() == 1) {
-      mi.setText(bundle.getString("vehiclePopupMenu.menuItem_singleVehicle.text") + singleVehicle.getName());
+      mi.setText(
+          bundle.getString("vehiclePopupMenu.menuItem_singleVehicle.text") + singleVehicle.getName()
+      );
     }
     else {
       mi.setText(bundle.getString("vehiclePopupMenu.menuItem_multipleVehicles.text"));
@@ -110,40 +113,50 @@ public class VehiclePopupMenu
     JMenu integrateSubMenu
         = new JMenu(bundle.getString("vehiclePopupMenu.subMenu_integrate.text"));
 
-    action = actionFactory.createIntegrationLevelChangeAction(vehicles,
-                                                              Vehicle.IntegrationLevel.TO_BE_IGNORED);
+    action = actionFactory.createIntegrationLevelChangeAction(
+        vehicles,
+        Vehicle.IntegrationLevel.TO_BE_IGNORED
+    );
     action.setEnabled(!isAnyProcessingOrder(vehicles));
     checkBoxMenuItem = new JCheckBoxMenuItem(action);
     checkBoxMenuItem.setSelected(isAnyAtIntegrationLevel(vehicles,
                                                          Vehicle.IntegrationLevel.TO_BE_IGNORED));
     integrateSubMenu.add(checkBoxMenuItem);
 
-    action = actionFactory.createIntegrationLevelChangeAction(vehicles,
-                                                              Vehicle.IntegrationLevel.TO_BE_NOTICED);
+    action = actionFactory.createIntegrationLevelChangeAction(
+        vehicles,
+        Vehicle.IntegrationLevel.TO_BE_NOTICED
+    );
     action.setEnabled(!isAnyProcessingOrder(vehicles));
     checkBoxMenuItem = new JCheckBoxMenuItem(action);
     checkBoxMenuItem.setSelected(isAnyAtIntegrationLevel(vehicles,
                                                          Vehicle.IntegrationLevel.TO_BE_NOTICED));
     integrateSubMenu.add(checkBoxMenuItem);
 
-    action = actionFactory.createIntegrationLevelChangeAction(vehicles,
-                                                              Vehicle.IntegrationLevel.TO_BE_RESPECTED);
+    action = actionFactory.createIntegrationLevelChangeAction(
+        vehicles,
+        Vehicle.IntegrationLevel.TO_BE_RESPECTED
+    );
     checkBoxMenuItem = new JCheckBoxMenuItem(action);
-    checkBoxMenuItem.setSelected(isAnyAtIntegrationLevel(vehicles,
-                                                         Vehicle.IntegrationLevel.TO_BE_RESPECTED));
+    checkBoxMenuItem.setSelected(
+        isAnyAtIntegrationLevel(vehicles, Vehicle.IntegrationLevel.TO_BE_RESPECTED)
+    );
     integrateSubMenu.add(checkBoxMenuItem);
 
-    action = actionFactory.createIntegrationLevelChangeAction(vehicles,
-                                                              Vehicle.IntegrationLevel.TO_BE_UTILIZED);
+    action = actionFactory.createIntegrationLevelChangeAction(
+        vehicles,
+        Vehicle.IntegrationLevel.TO_BE_UTILIZED
+    );
     checkBoxMenuItem = new JCheckBoxMenuItem(action);
-    checkBoxMenuItem.setSelected(isAnyAtIntegrationLevel(vehicles,
-                                                         Vehicle.IntegrationLevel.TO_BE_UTILIZED));
+    checkBoxMenuItem.setSelected(
+        isAnyAtIntegrationLevel(vehicles, Vehicle.IntegrationLevel.TO_BE_UTILIZED)
+    );
     integrateSubMenu.add(checkBoxMenuItem);
 
     add(integrateSubMenu);
 
     addSeparator();
-    
+
     JMenu rerouteSubMenu
         = new JMenu(bundle.getString("vehiclePopupMenu.subMenu_reroute.text"));
 
@@ -156,7 +169,7 @@ public class VehiclePopupMenu
     rerouteSubMenu.add(action);
 
     add(rerouteSubMenu);
-    
+
     addSeparator();
 
     JMenu withdrawSubMenu

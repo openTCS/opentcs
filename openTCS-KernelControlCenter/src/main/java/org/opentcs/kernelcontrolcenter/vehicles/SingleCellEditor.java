@@ -49,7 +49,7 @@ final class SingleCellEditor
    *
    * @param table The JTable associated
    */
-  public SingleCellEditor(JTable table) {
+  SingleCellEditor(JTable table) {
     this.table = table;
     editors = new HashMap<>();
     defaultEditor = new DefaultCellEditor(new JTextField());

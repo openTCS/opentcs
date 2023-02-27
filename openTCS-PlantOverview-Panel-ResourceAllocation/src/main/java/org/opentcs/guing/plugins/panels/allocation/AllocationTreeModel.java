@@ -77,7 +77,8 @@ public class AllocationTreeModel
    * @param vehicleName The name of the vehicle
    * @param resources The allocated resources of the vehicle
    */
-  private void updateVehicleAllocation(String vehicleName, List<TCSResourceReference<?>> resources) {
+  private void updateVehicleAllocation(String vehicleName,
+                                       List<TCSResourceReference<?>> resources) {
     DefaultMutableTreeNode vehicleNode = null;
     for (int x = 0; x < root.getChildCount(); x++) {
       DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) root.getChildAt(x);
@@ -132,7 +133,8 @@ public class AllocationTreeModel
    * @param vehicleNode The parent node
    * @return The index of the node containing the resource or -1 if not found
    */
-  private int getChildIndexOf(TCSResourceReference<?> resource, DefaultMutableTreeNode vehicleNode) {
+  private int getChildIndexOf(TCSResourceReference<?> resource,
+                              DefaultMutableTreeNode vehicleNode) {
     int index = 0;
 
     List<DefaultMutableTreeNode> vehicleChildren = Collections.list(vehicleNode.children()).stream()

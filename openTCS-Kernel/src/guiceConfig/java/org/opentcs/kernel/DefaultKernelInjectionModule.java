@@ -91,6 +91,12 @@ import org.opentcs.util.logging.UncaughtExceptionLogger;
 public class DefaultKernelInjectionModule
     extends KernelInjectionModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultKernelInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     configureEventHub();

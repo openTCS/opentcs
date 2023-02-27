@@ -18,6 +18,12 @@ import javax.swing.JPopupMenu;
 public class NullContext
     implements UserObjectContext {
 
+  /**
+   * Creates a new instance.
+   */
+  public NullContext() {
+  }
+
   @Override
   public JPopupMenu getPopupMenu(Set<UserObject> selectedUserObjects) {
     return new JPopupMenu();

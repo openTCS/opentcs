@@ -36,19 +36,19 @@ public class DockingManagerModeling
     extends AbstractDockingManager {
 
   /**
-   * ID for the tab pane, that contains the course, transport orders and order sequences.
+   * ID of the tab pane that contains the course, transport orders and order sequences.
    */
   public static final String COURSE_TAB_PANE_ID = "course_tab_pane";
   /**
-   * ID for the tab pane, that contains the components, blocks and groups.
+   * ID of the tab pane that contains the components, blocks and groups.
    */
-  public static final String TREE_TAB_PANE_ID = "tree_tab_pane";
-  public static final String LAYER_TAB_PANE_ID = "layer_tab_pane";
-  public static final String COMPONENTS_ID = "comp_dock";
-  public static final String BLOCKS_ID = "block_dock";
-  public static final String PROPERTIES_ID = "properties_id";
-  public static final String LAYERS_ID = "layers_id";
-  public static final String LAYER_GROUPS_ID = "layer_groups_id";
+  private static final String TREE_TAB_PANE_ID = "tree_tab_pane";
+  private static final String LAYER_TAB_PANE_ID = "layer_tab_pane";
+  private static final String COMPONENTS_ID = "comp_dock";
+  private static final String BLOCKS_ID = "block_dock";
+  private static final String PROPERTIES_ID = "properties_id";
+  private static final String LAYERS_ID = "layers_id";
+  private static final String LAYER_GROUPS_ID = "layer_groups_id";
   /**
    * The tree view manager for components.
    */
@@ -132,7 +132,8 @@ public class DockingManagerModeling
     getCControl().putProperty(CControl.KEY_GOTO_MAXIMIZED, null);
     getCControl().putProperty(CControl.KEY_MAXIMIZE_CHANGE, null);
 
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.DOCKABLE_PATH);
+    ResourceBundleUtil bundle
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.DOCKABLE_PATH);
     CGrid grid = new CGrid(getCControl());
     courseTabPane = new CStack(COURSE_TAB_PANE_ID);
     addTabPane(COURSE_TAB_PANE_ID, courseTabPane);
@@ -157,16 +158,16 @@ public class DockingManagerModeling
                             bundle.getString("dockingManagerModeling.panel_properties.title"),
                             selectionPropertiesComponent,
                             false));
-    DefaultSingleCDockable layersDock = 
-             createDockable(LAYERS_ID,
-                            bundle.getString("dockingManagerModeling.panel_layers.title"),
-                            layersPanel,
-                            false);
-    DefaultSingleCDockable layerGroupsDock = 
-             createDockable(LAYER_GROUPS_ID,
-                            bundle.getString("dockingManagerModeling.panel_layerGroups.title"),
-                            layerGroupsPanel,
-                            false);
+    DefaultSingleCDockable layersDock
+        = createDockable(LAYERS_ID,
+                         bundle.getString("dockingManagerModeling.panel_layers.title"),
+                         layersPanel,
+                         false);
+    DefaultSingleCDockable layerGroupsDock
+        = createDockable(LAYER_GROUPS_ID,
+                         bundle.getString("dockingManagerModeling.panel_layerGroups.title"),
+                         layerGroupsPanel,
+                         false);
     grid.add(0, 700, 250, 300, layerTabPane);
     grid.add(400, 0, 1000, 500, courseTabPane);
 

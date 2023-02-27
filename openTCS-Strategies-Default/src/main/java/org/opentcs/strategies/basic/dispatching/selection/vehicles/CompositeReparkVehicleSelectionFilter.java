@@ -17,7 +17,7 @@ import org.opentcs.strategies.basic.dispatching.selection.ReparkVehicleSelection
 
 /**
  * A collection of {@link ReparkVehicleSelectionFilter}s.
- * 
+ *
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class CompositeReparkVehicleSelectionFilter

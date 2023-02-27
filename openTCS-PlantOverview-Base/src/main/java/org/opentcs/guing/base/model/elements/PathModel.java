@@ -176,25 +176,38 @@ public class PathModel
     setProperty(MAX_VELOCITY, pMaxVelocity);
 
     SpeedProperty pMaxReverseVelocity = new SpeedProperty(this, 0.0, SpeedProperty.Unit.M_S);
-    pMaxReverseVelocity.setDescription(bundle.getString("pathModel.property_maximumReverseVelocity.description"));
-    pMaxReverseVelocity.setHelptext(bundle.getString("pathModel.property_maximumReverseVelocity.helptext"));
+    pMaxReverseVelocity.setDescription(
+        bundle.getString("pathModel.property_maximumReverseVelocity.description")
+    );
+    pMaxReverseVelocity.setHelptext(
+        bundle.getString("pathModel.property_maximumReverseVelocity.helptext")
+    );
     setProperty(MAX_REVERSE_VELOCITY, pMaxReverseVelocity);
 
-    LinerTypeProperty pPathConnType = new LinerTypeProperty(this, Arrays.asList(Type.values()), Type.values()[0]);
-    pPathConnType.setDescription(bundle.getString("pathModel.property_pathConnectionType.description"));
+    LinerTypeProperty pPathConnType
+        = new LinerTypeProperty(this, Arrays.asList(Type.values()), Type.values()[0]);
+    pPathConnType.setDescription(
+        bundle.getString("pathModel.property_pathConnectionType.description")
+    );
     pPathConnType.setHelptext(bundle.getString("pathModel.property_pathConnectionType.helptext"));
     pPathConnType.setCollectiveEditable(true);
     setProperty(ElementPropKeys.PATH_CONN_TYPE, pPathConnType);
 
     StringProperty pPathControlPoints = new StringProperty(this);
-    pPathControlPoints.setDescription(bundle.getString("pathModel.property_pathControlPoints.description"));
-    pPathControlPoints.setHelptext(bundle.getString("pathModel.property_pathControlPoints.helptext"));
+    pPathControlPoints.setDescription(
+        bundle.getString("pathModel.property_pathControlPoints.description")
+    );
+    pPathControlPoints.setHelptext(
+        bundle.getString("pathModel.property_pathControlPoints.helptext")
+    );
     // Control points may only be moved in the drawing.
     pPathControlPoints.setModellingEditable(false);
     setProperty(ElementPropKeys.PATH_CONTROL_POINTS, pPathControlPoints);
 
     StringProperty startComponent = new StringProperty(this);
-    startComponent.setDescription(bundle.getString("pathModel.property_startComponent.description"));
+    startComponent.setDescription(
+        bundle.getString("pathModel.property_startComponent.description")
+    );
     startComponent.setModellingEditable(false);
     startComponent.setOperatingEditable(false);
     setProperty(START_COMPONENT, startComponent);
@@ -217,8 +230,11 @@ public class PathModel
     pLocked.setOperatingEditable(true);
     setProperty(LOCKED, pLocked);
 
-    PeripheralOperationsProperty pOperations = new PeripheralOperationsProperty(this, new LinkedList<>());
-    pOperations.setDescription(bundle.getString("pathModel.property_peripheralOperations.description"));
+    PeripheralOperationsProperty pOperations
+        = new PeripheralOperationsProperty(this, new LinkedList<>());
+    pOperations.setDescription(
+        bundle.getString("pathModel.property_peripheralOperations.description")
+    );
     pOperations.setHelptext(bundle.getString("pathModel.property_peripheralOperations.helptext"));
     setProperty(PERIPHERAL_OPERATIONS, pOperations);
 
@@ -278,7 +294,7 @@ public class PathModel
 
     private final String helptext;
 
-    private Type(String description, String helptext) {
+    Type(String description, String helptext) {
       this.description = requireNonNull(description, "description");
       this.helptext = requireNonNull(helptext, "helptext");
     }

@@ -41,7 +41,13 @@ public class LayoutAdapter
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(LayoutAdapter.class);
-  
+
+  /**
+   * Creates a new instance.
+   */
+  public LayoutAdapter() {
+  }
+
   @Override // OpenTCSProcessAdapter
   public void updateModelProperties(TCSObject<?> tcsObject,
                                     ModelComponent modelComponent,
@@ -49,27 +55,27 @@ public class LayoutAdapter
                                     TCSObjectService objectService) {
     VisualLayout layout = requireNonNull((VisualLayout) tcsObject, "tcsObject");
     LayoutModel model = (LayoutModel) modelComponent;
-    
+
     try {
       model.getPropertyName().setText(layout.getName());
       model.getPropertyName().markChanged();
-      
+
       model.getPropertyScaleX().setValueAndUnit(layout.getScaleX(), LengthProperty.Unit.MM);
       model.getPropertyScaleX().markChanged();
       model.getPropertyScaleY().setValueAndUnit(layout.getScaleY(), LengthProperty.Unit.MM);
       model.getPropertyScaleY().markChanged();
-      
+
       initLayerGroups(model, layout.getLayerGroups());
       initLayers(model, layout.getLayers());
       model.getPropertyLayerWrappers().markChanged();
-      
+
       updateMiscModelProperties(model, layout);
     }
     catch (IllegalArgumentException e) {
       LOG.warn("", e);
     }
   }
-  
+
   @Override
   public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
                                                 SystemModel systemModel,
@@ -83,7 +89,7 @@ public class LayoutAdapter
             .withLayerGroups(getLayerGroups((LayoutModel) modelComponent))
     );
   }
-  
+
   private void initLayerGroups(LayoutModel model, Collection<LayerGroup> groups) {
     Map<Integer, LayerGroup> layerGroups = model.getPropertyLayerGroups().getValue();
     layerGroups.clear();
@@ -91,33 +97,33 @@ public class LayoutAdapter
       layerGroups.put(group.getId(), group);
     }
   }
-  
+
   private void initLayers(LayoutModel model, Collection<Layer> layers) {
     Map<Integer, LayerWrapper> layerWrappers = model.getPropertyLayerWrappers().getValue();
     layerWrappers.clear();
-    
+
     Map<Integer, LayerGroup> layerGroups = model.getPropertyLayerGroups().getValue();
     for (Layer layer : layers) {
       layerWrappers.put(layer.getId(),
                         new LayerWrapper(layer, layerGroups.get(layer.getGroupId())));
     }
   }
-  
+
   private double getScaleX(LayoutModel model) {
     return model.getPropertyScaleX().getValueByUnit(LengthProperty.Unit.MM);
   }
-  
+
   private double getScaleY(LayoutModel model) {
     return model.getPropertyScaleY().getValueByUnit(LengthProperty.Unit.MM);
   }
-  
+
   private List<Layer> getLayers(LayoutModel model) {
     return model.getPropertyLayerWrappers().getValue().values().stream()
         .map(wrapper -> wrapper.getLayer())
         .sorted(Comparator.comparing(layer -> layer.getId()))
         .collect(Collectors.toList());
   }
-  
+
   private List<LayerGroup> getLayerGroups(LayoutModel model) {
     return model.getPropertyLayerGroups().getValue().values().stream()
         .sorted(Comparator.comparing(group -> group.getId()))

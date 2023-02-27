@@ -17,12 +17,14 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsMapWithSize.anEmptyMap;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
 
 /**
+ * Unit tests for {@link ReservationPool}.
  *
  * @author Stefan Walter (Fraunhofer IML)
  * @author Martin Grzenia (Fraunhofer IML)

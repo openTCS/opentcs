@@ -31,6 +31,35 @@ class PeripheralJobTableModel
     extends AbstractTableModel
     implements PeripheralJobsContainerListener {
 
+  /**
+   * The ID for the 'name' column.
+   */
+  public static final int COLUMN_NAME = 0;
+  /**
+   * The ID for the 'location' column.
+   */
+  public static final int COLUMN_LOCATION = 1;
+  /**
+   * The ID for the 'operation' column.
+   */
+  public static final int COLUMN_OPERATION = 2;
+  /**
+   * The ID for the 'related vehicle' column.
+   */
+  public static final int COLUMN_RELATED_VEHICLE = 3;
+  /**
+   * The ID for the 'related order' column.
+   */
+  public static final int COLUMN_RELATED_ORDER = 4;
+  /**
+   * The ID for the 'state' column.
+   */
+  public static final int COLUMN_STATE = 5;
+  /**
+   * The ID for the 'creation time' column.
+   */
+  public static final int COLUMN_CREATION_TIME = 6;
+
   private static final Logger LOG = LoggerFactory.getLogger(PeripheralJobTableModel.class);
   /**
    * The resource bundle to use.
@@ -38,13 +67,6 @@ class PeripheralJobTableModel
   private static final ResourceBundle BUNDLE
       = ResourceBundle.getBundle(I18nPlantOverviewOperating.PERIPHERALJOB_PATH);
 
-  public static final int COLUMN_NAME = 0;
-  public static final int COLUMN_LOCATION = 1;
-  public static final int COLUMN_OPERATION = 2;
-  public static final int COLUMN_RELATED_VEHICLE = 3;
-  public static final int COLUMN_RELATED_ORDER = 4;
-  public static final int COLUMN_STATE = 5;
-  public static final int COLUMN_CREATION_TIME = 6;
   /**
    * The column names.
    */
@@ -77,7 +99,7 @@ class PeripheralJobTableModel
   /**
    * Creates a new instance.
    */
-  public PeripheralJobTableModel() {
+  PeripheralJobTableModel() {
   }
 
   @Override
@@ -132,7 +154,7 @@ class PeripheralJobTableModel
     requireNonNull(jobs, "jobs");
 
     SwingUtilities.invokeLater(() -> {
-      // Notifiations of any change listeners must happen at the same time/in the same thread the 
+      // Notifiations of any change listeners must happen at the same time/in the same thread the
       // data behind the model is updated. Otherwise, there is a risk that listeners work with/
       // refer to outdated data, which can lead to runtime exceptions.
       entries.clear();

@@ -156,10 +156,12 @@ public class OpenTCSModelManagerModeling
       return true;
     }
     catch (IOException | IllegalArgumentException ex) {
-      getStatusPanel().setLogMessage(Level.SEVERE,
-                                     ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.STATUS_PATH)
-                                         .getFormatted("openTcsModelManagerModeling.message_notLoaded.text",
-                                                       file.getName()));
+      getStatusPanel().setLogMessage(
+          Level.SEVERE,
+          ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.STATUS_PATH)
+              .getFormatted("openTcsModelManagerModeling.message_notLoaded.text",
+                            file.getName())
+      );
       LOG.info("Error reading file", ex);
     }
     return false;
@@ -182,9 +184,11 @@ public class OpenTCSModelManagerModeling
       return true;
     }
     catch (IOException | IllegalArgumentException ex) {
-      getStatusPanel().setLogMessage(Level.SEVERE,
-                                     ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.STATUS_PATH)
-                                         .getFormatted("openTcsModelManagerModeling.message_notImported.text"));
+      getStatusPanel().setLogMessage(
+          Level.SEVERE,
+          ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.STATUS_PATH)
+              .getFormatted("openTcsModelManagerModeling.message_notImported.text")
+      );
       LOG.warn("Exception importing model", ex);
       return false;
     }
@@ -198,9 +202,11 @@ public class OpenTCSModelManagerModeling
       return persistModel(getModel(), portal, kernelPersistor, false);
     }
     catch (IllegalStateException | CredentialsException e) {
-      getStatusPanel().setLogMessage(Level.SEVERE,
-                                     ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.STATUS_PATH)
-                                         .getString("openTcsModelManagerModeling.message_notSaved.text"));
+      getStatusPanel().setLogMessage(
+          Level.SEVERE,
+          ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.STATUS_PATH)
+              .getString("openTcsModelManagerModeling.message_notSaved.text")
+      );
       LOG.warn("Exception persisting model", e);
       return false;
     }
@@ -221,9 +227,11 @@ public class OpenTCSModelManagerModeling
       return true;
     }
     catch (IOException | IllegalArgumentException ex) {
-      getStatusPanel().setLogMessage(Level.SEVERE,
-                                     ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.STATUS_PATH)
-                                         .getString("openTcsModelManagerModeling.message_notExported.text"));
+      getStatusPanel().setLogMessage(
+          Level.SEVERE,
+          ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.STATUS_PATH)
+              .getString("openTcsModelManagerModeling.message_notExported.text")
+      );
       LOG.warn("Exception exporting model", ex);
       return false;
     }

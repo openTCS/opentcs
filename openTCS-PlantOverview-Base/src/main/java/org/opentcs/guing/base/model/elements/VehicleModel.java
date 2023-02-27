@@ -42,27 +42,94 @@ public class VehicleModel
     extends AbstractModelComponent
     implements DrawnModelComponent {
 
+  /**
+   * The name/key of the 'length' property.
+   */
   public static final String LENGTH = "Length";
+  /**
+   * The name/key of the 'energy level critical' property.
+   */
   public static final String ENERGY_LEVEL_CRITICAL = "EnergyLevelCritical";
+  /**
+   * The name/key of the 'energy level good' property.
+   */
   public static final String ENERGY_LEVEL_GOOD = "EnergyLevelGood";
+  /**
+   * The name/key of the 'energy level fully recharged' property.
+   */
   public static final String ENERGY_LEVEL_FULLY_RECHARGED = "EnergyLevelFullyRecharged";
-  public static final String ENERGY_LEVEL_SUFFICIENTLY_RECHARGED = "EnergyLevelSufficientlyRecharged";
+  /**
+   * The name/key of the 'energy level sufficiently recharged' property.
+   */
+  public static final String ENERGY_LEVEL_SUFFICIENTLY_RECHARGED
+      = "EnergyLevelSufficientlyRecharged";
+  /**
+   * The name/key of the 'loaded' property.
+   */
   public static final String LOADED = "Loaded";
+  /**
+   * The name/key of the 'state' property.
+   */
   public static final String STATE = "State";
+  /**
+   * The name/key of the 'proc state' property.
+   */
   public static final String PROC_STATE = "ProcState";
+  /**
+   * The name/key of the 'integration level' property.
+   */
   public static final String INTEGRATION_LEVEL = "IntegrationLevel";
+  /**
+   * The name/key of the 'paused' property.
+   */
   public static final String PAUSED = "Paused";
+  /**
+   * The name/key of the 'point' property.
+   */
   public static final String POINT = "Point";
+  /**
+   * The name/key of the 'next point' property.
+   */
   public static final String NEXT_POINT = "NextPoint";
+  /**
+   * The name/key of the 'precise position' property.
+   */
   public static final String PRECISE_POSITION = "PrecisePosition";
+  /**
+   * The name/key of the 'orientation angle' property.
+   */
   public static final String ORIENTATION_ANGLE = "OrientationAngle";
+  /**
+   * The name/key of the 'energy level' property.
+   */
   public static final String ENERGY_LEVEL = "EnergyLevel";
+  /**
+   * The name/key of the 'current transport order name' property.
+   */
   public static final String CURRENT_TRANSPORT_ORDER_NAME = "currentTransportOrderName";
+  /**
+   * The name/key of the 'current order sequence name' property.
+   */
   public static final String CURRENT_SEQUENCE_NAME = "currentOrderSequenceName";
+  /**
+   * The name/key of the 'maximum velocity' property.
+   */
   public static final String MAXIMUM_VELOCITY = "MaximumVelocity";
+  /**
+   * The name/key of the 'maximum reverse velocity' property.
+   */
   public static final String MAXIMUM_REVERSE_VELOCITY = "MaximumReverseVelocity";
+  /**
+   * The name/key of the 'allowed order types' property.
+   */
   public static final String ALLOWED_ORDER_TYPES = "AllowedOrderTypes";
+  /**
+   * The name/key of the 'allocated resources' property.
+   */
   public static final String ALLOCATED_RESOURCES = "AllocatedResources";
+  /**
+   * The name/key of the 'claimed resources' property.
+   */
   public static final String CLAIMED_RESOURCES = "ClaimedResources";
   /**
    * This class's resource bundle.
@@ -163,7 +230,7 @@ public class VehicleModel
   }
 
   /**
-   * Sets the current position
+   * Sets the current position.
    *
    * @param position A triple containing the position.
    */

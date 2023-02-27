@@ -118,7 +118,7 @@ public class TCSObjectEvent
   /**
    * Indicates the type of an event, which can be helpful with filtering events.
    */
-  public static enum Type {
+  public enum Type {
 
     /**
      * Indicates that the referenced object has been newly created.

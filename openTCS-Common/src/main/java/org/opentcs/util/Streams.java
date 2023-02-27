@@ -139,7 +139,7 @@ public final class Streams {
     /**
      * Creates a new SearchableByteArrayOutputStream.
      */
-    public SearchableByteArrayOutputStream() {
+    SearchableByteArrayOutputStream() {
     }
 
     /**

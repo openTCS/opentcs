@@ -18,10 +18,21 @@ import org.opentcs.guing.base.model.ModelComponent;
 public interface ModelAttribute
     extends Serializable {
 
-  public static enum ChangeState {
-
+  /**
+   * Potential change states of the attribute.
+   */
+  enum ChangeState {
+    /**
+     * The attribute has not changed.
+     */
     NOT_CHANGED,
+    /**
+     * The attribute has changed.
+     */
     CHANGED,
+    /**
+     * (Only) A detail of the attribute has changed.
+     */
     DETAIL_CHANGED,
   };
 
@@ -30,14 +41,14 @@ public interface ModelAttribute
    *
    * @return The model component.
    */
-  public ModelComponent getModel();
+  ModelComponent getModel();
 
   /**
    * Sets the model component this attribute is attached to.
    *
    * @param model The model component.
    */
-  public void setModel(ModelComponent model);
+  void setModel(ModelComponent model);
 
   /**
    * Marks the attribute as changed.
@@ -113,30 +124,36 @@ public interface ModelAttribute
 
   /**
    * Sets whether or not the attribute can be changed in modelling mode.
+   *
    * @param editable True if the attribute can be changed in modelling mode.
    */
   void setModellingEditable(boolean editable);
 
   /**
    * Returns whether or not the attribute can be changed in modelling mode.
+   *
    * @return True if the attribute can be changed in modelling mode.
    */
   boolean isModellingEditable();
 
   /**
    * Sets whether or not the attribute can be changed in operating mode.
+   *
    * @param editable True if the attribute can be changed in operating mode.
    */
   void setOperatingEditable(boolean editable);
 
   /**
    * Returns whether or not the attribute can be changed in operating mode.
+   *
    * @return True if the attribute can be changed in operating mode.
    */
   boolean isOperatingEditable();
 
   /**
-   * @return true, if this attribute should be considered when persisting the model to a file or not.
+   * Whether this attribute should be included when persisting the model to a file.
+   *
+   * @return true, if this attribute should be included when persisting the model to a file.
    */
   default boolean isPersistent() {
     return true;

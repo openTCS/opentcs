@@ -40,7 +40,7 @@ public class ResumeAllVehiclesAction
   /**
    * This action's ID.
    */
-  public final static String ID = "openTCS.resumeAllVehicles";
+  public static final String ID = "openTCS.resumeAllVehicles";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
   /**

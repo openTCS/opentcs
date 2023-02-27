@@ -124,6 +124,7 @@ public class LocationActionPanel
   public void initFields() {
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -176,15 +177,18 @@ public class LocationActionPanel
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     add(actionsComboBox, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
   private void locationsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_locationsComboBoxItemStateChanged
     updateActions();
   }//GEN-LAST:event_locationsComboBoxItemStateChanged
 
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox<String> actionsComboBox;
   private javax.swing.JLabel actionsLabel;
   private javax.swing.JComboBox<String> locationsComboBox;
   private javax.swing.JLabel locationsLabel;
   // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 }

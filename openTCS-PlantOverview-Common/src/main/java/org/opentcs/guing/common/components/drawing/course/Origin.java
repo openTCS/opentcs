@@ -27,13 +27,13 @@ import org.slf4j.LoggerFactory;
 public final class Origin {
 
   /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(Origin.class);
-  /**
    * Scale (in mm per pixel) of the layout.
    */
   public static final double DEFAULT_SCALE = 50.0;
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(Origin.class);
   /**
    * Amount of mm to equal one pixel on screen in horizontal direction.
    */
@@ -60,7 +60,7 @@ public final class Origin {
   private final OriginFigure fFigure = new OriginFigure();
 
   /**
-   * Creates a new instance of Origin
+   * Creates a new instance.
    */
   public Origin() {
     setCoordinateSystem(new NormalCoordinateSystem());

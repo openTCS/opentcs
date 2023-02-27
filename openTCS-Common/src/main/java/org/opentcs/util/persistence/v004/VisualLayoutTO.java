@@ -31,6 +31,12 @@ public class VisualLayoutTO
   private List<Layer> layers = new ArrayList<>();
   private List<LayerGroup> layerGroups = new ArrayList<>();
 
+  /**
+   * Creates a new instance.
+   */
+  public VisualLayoutTO() {
+  }
+
   @XmlAttribute(required = true)
   public Float getScaleX() {
     return scaleX;
@@ -82,6 +88,12 @@ public class VisualLayoutTO
     private Boolean visible = true;
     private String name = "";
     private Integer groupId = 0;
+
+    /**
+     * Creates a new instance.
+     */
+    public Layer() {
+    }
 
     @XmlAttribute(required = true)
     public Integer getId() {
@@ -141,6 +153,12 @@ public class VisualLayoutTO
     private Integer id = 0;
     private String name = "";
     private Boolean visible = true;
+
+    /**
+     * Creates a new instance.
+     */
+    public LayerGroup() {
+    }
 
     @XmlAttribute(required = true)
     public Integer getId() {

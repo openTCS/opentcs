@@ -19,6 +19,12 @@ import static org.opentcs.virtualvehicle.I18nLoopbackCommAdapter.BUNDLE_PATH;
 public class LoopbackCommunicationAdapterDescription
     extends VehicleCommAdapterDescription {
 
+  /**
+   * Creates a new instance.
+   */
+  public LoopbackCommunicationAdapterDescription() {
+  }
+
   @Override
   public String getDescription() {
     return ResourceBundle.getBundle(BUNDLE_PATH)

@@ -43,7 +43,8 @@ public class StandardRemoteNotificationService
   /**
    * This class's logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(StandardRemoteNotificationService.class);
+  private static final Logger LOG
+      = LoggerFactory.getLogger(StandardRemoteNotificationService.class);
   /**
    * The notification service to invoke methods on.
    */

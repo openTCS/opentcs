@@ -17,7 +17,7 @@ import org.opentcs.strategies.basic.dispatching.selection.TransportOrderSelectio
 
 /**
  * A collection of {@link TransportOrderSelectionFilter}s.
- * 
+ *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public class CompositeTransportOrderSelectionFilter

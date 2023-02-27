@@ -72,7 +72,8 @@ public class SingleLineFormatter
 
   private String source(LogRecord record) {
     return record.getSourceClassName() != null
-        ? record.getSourceClassName().replaceAll("\\B\\w+(\\.[a-z])", "$1") + "." + record.getSourceMethodName() + "()"
+        ? record.getSourceClassName()
+            .replaceAll("\\B\\w+(\\.[a-z])", "$1") + "." + record.getSourceMethodName() + "()"
         : record.getLoggerName();
   }
 

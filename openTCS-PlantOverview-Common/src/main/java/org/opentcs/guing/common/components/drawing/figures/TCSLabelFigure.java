@@ -81,7 +81,7 @@ public class TCSLabelFigure
    * @param posY The Y-Offset of the label.
    */
   public void setOffset(int posX, int posY) {
-    fOffset =  new Point2D.Double(posX, posY);
+    fOffset = new Point2D.Double(posX, posY);
   }
 
   public Double getOffset() {
@@ -107,7 +107,8 @@ public class TCSLabelFigure
 
       if (newOffset.x != fOffset.x || newOffset.y != fOffset.y) {
         fOffset = newOffset;
-        StringProperty sp = (StringProperty) model.getProperty(ElementPropKeys.POINT_LABEL_OFFSET_X);
+        StringProperty sp
+            = (StringProperty) model.getProperty(ElementPropKeys.POINT_LABEL_OFFSET_X);
 
         if (sp != null) {
           sp.setText(String.format("%d", (long) newOffset.x));

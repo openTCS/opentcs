@@ -161,7 +161,8 @@ public class OpenTCSView
    * The name/title of this application.
    */
   public static final String NAME
-      = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MISC_PATH).getString("openTcsView.applicationName.text");
+      = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MISC_PATH)
+          .getString("openTcsView.applicationName.text");
   /**
    * Property key for the currently loaded driving course model.
    * The corresponding value contains a "*" if the model has been modified.
@@ -492,7 +493,7 @@ public class OpenTCSView
     String id = factory.getClass().getName();
     SingleCDockable dockable = dockingManager.getCControl().getSingleDockable(id);
     if (dockable != null) {
-      // dockable is not null at this point when the user hides the plugin 
+      // dockable is not null at this point when the user hides the plugin
       // panel by clicking on its menu entry
       PluggablePanel panel = (PluggablePanel) dockable.getFocusComponent();
       panel.terminate();
@@ -505,7 +506,8 @@ public class OpenTCSView
       return;
     }
     if (factory.providesPanel(OperationMode.equivalent(appState.getOperationMode()))) {
-      PluggablePanel panel = factory.createPanel(OperationMode.equivalent(appState.getOperationMode()));
+      PluggablePanel panel
+          = factory.createPanel(OperationMode.equivalent(appState.getOperationMode()));
       DefaultSingleCDockable factoryDockable = dockingManager.createFloatingDockable(
           factory.getClass().getName(),
           factory.getPanelDescription(),
@@ -539,7 +541,8 @@ public class OpenTCSView
 
     int drawingViewIndex = viewManager.getNextDrawingViewIndex();
 
-    String title = bundle.getString("openTcsView.panel_operatingDrawingView.title") + " " + drawingViewIndex;
+    String title
+        = bundle.getString("openTcsView.panel_operatingDrawingView.title") + " " + drawingViewIndex;
     DefaultSingleCDockable newDockable
         = dockingManager.createDockable("drivingCourse" + drawingViewIndex,
                                         title,
@@ -553,7 +556,8 @@ public class OpenTCSView
     newDockable.addVetoClosingListener(new DrawingViewClosingListener(newDockable));
     newDockable.addFocusListener(drawingViewFocusHandler);
 
-    newScrollPane.getDrawingView().getComponent().dispatchEvent(new FocusEvent(this, FocusEvent.FOCUS_GAINED));
+    newScrollPane.getDrawingView().getComponent()
+        .dispatchEvent(new FocusEvent(this, FocusEvent.FOCUS_GAINED));
     firePropertyChange(AbstractOpenTCSDrawingView.FOCUS_GAINED, null, newDockable);
 
     return newDockable;
@@ -671,13 +675,16 @@ public class OpenTCSView
     for (DefaultSingleCDockable dock : new ArrayList<>(viewManager.getDrawingViewMap().keySet())) {
       removeDrawingView(dock);
     }
-    for (DefaultSingleCDockable dock : new ArrayList<>(viewManager.getTransportOrderMap().keySet())) {
+    for (DefaultSingleCDockable dock
+             : new ArrayList<>(viewManager.getTransportOrderMap().keySet())) {
       dockingManager.removeDockable(dock);
     }
-    for (DefaultSingleCDockable dock : new ArrayList<>(viewManager.getOrderSequenceMap().keySet())) {
+    for (DefaultSingleCDockable dock
+             : new ArrayList<>(viewManager.getOrderSequenceMap().keySet())) {
       dockingManager.removeDockable(dock);
     }
-    for (DefaultSingleCDockable dock : new ArrayList<>(viewManager.getPeripheralJobMap().keySet())) {
+    for (DefaultSingleCDockable dock
+             : new ArrayList<>(viewManager.getPeripheralJobMap().keySet())) {
       dockingManager.removeDockable(dock);
     }
     dockingManager.reset();
@@ -961,7 +968,7 @@ public class OpenTCSView
   }
 
   /**
-   * Returns all drawing views (including the modelling view)
+   * Returns all drawing views (including the modelling view).
    *
    * @return List with all known <code>OpenTCSDrawingViews</code>.
    */
@@ -1400,7 +1407,7 @@ public class OpenTCSView
     /**
      * Creates a new instance.
      */
-    public AttributesEventHandler() {
+    AttributesEventHandler() {
     }
 
     @Override  // AttributesChangeListener
@@ -1476,7 +1483,7 @@ public class OpenTCSView
     /**
      * Creates a new instance.
      */
-    public BlockEventHandler() {
+    BlockEventHandler() {
     }
 
     @Override  // BlockChangeListener
@@ -1516,7 +1523,7 @@ public class OpenTCSView
      *
      * @param modelManager Provides access to the current system model.
      */
-    public DrawingEditorEventHandler(ModelManager modelManager) {
+    DrawingEditorEventHandler(ModelManager modelManager) {
       this.modelManager = requireNonNull(modelManager, "modelManager");
     }
 
@@ -1687,7 +1694,7 @@ public class OpenTCSView
      *
      * @param dragCursor The cursor to be used when a vehicle is dragged.
      */
-    public VehicleDragHandler(Cursor dragCursor) {
+    VehicleDragHandler(Cursor dragCursor) {
       this.dragCursor = requireNonNull(dragCursor, "dragCursor");
     }
 
@@ -1728,7 +1735,9 @@ public class OpenTCSView
       setCursor(Cursor.getDefaultCursor());
       vehicleModel = null;
 
-      if (vehicleModel != null && (Vehicle.ProcState) vehicleModel.getPropertyProcState().getValue() == Vehicle.ProcState.IDLE) {
+      if (vehicleModel != null
+          && (Vehicle.ProcState) vehicleModel.getPropertyProcState().getValue()
+          == Vehicle.ProcState.IDLE) {
         createOrderToPointOnScreen(event.getLocationOnScreen());
       }
     }
@@ -1768,7 +1777,7 @@ public class OpenTCSView
 
     private final DefaultSingleCDockable newDockable;
 
-    public DrawingViewClosingListener(DefaultSingleCDockable newDockable) {
+    DrawingViewClosingListener(DefaultSingleCDockable newDockable) {
       this.newDockable = newDockable;
     }
 

@@ -170,10 +170,12 @@ public class DefaultPortalManager
     catch (KernelRuntimeException e) {
       LOG.warn("Failed to connect to remote portal", e);
       eventHandler.onEvent(ConnectionState.DISCONNECTED);
-      JOptionPane.showMessageDialog(null,
-                                    BUNDLE.getString("connectToServerDialog.optionPane_noConnection.message"),
-                                    BUNDLE.getString("connectToServerDialog.optionPane_noConnection.message"),
-                                    JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(
+          null,
+          BUNDLE.getString("connectToServerDialog.optionPane_noConnection.message"),
+          BUNDLE.getString("connectToServerDialog.optionPane_noConnection.message"),
+          JOptionPane.ERROR_MESSAGE
+      );
 
       // Retry connection attempt
       return connectWithDialog();

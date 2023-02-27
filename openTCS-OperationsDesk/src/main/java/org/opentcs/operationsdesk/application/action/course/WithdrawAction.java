@@ -33,9 +33,12 @@ public class WithdrawAction
     extends AbstractAction {
 
   /**
-   * Withdraws the current transport order from a vehicle.
+   * The ID for the 'withdraw regularly' action.
    */
   public static final String ID = "course.vehicle.withdrawTransportOrder";
+  /**
+   * The ID for the 'withdraw forcibly' action.
+   */
   public static final String IMMEDIATELY_ID = "course.vehicle.withdrawTransportOrderImmediately";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(VEHICLEPOPUP_PATH);
@@ -91,11 +94,13 @@ public class WithdrawAction
   public void actionPerformed(ActionEvent evt) {
     if (immediateAbort) {
       int dialogResult
-          = JOptionPane.showConfirmDialog(dialogParent,
-                                          BUNDLE.getString("withdrawAction.optionPane_confirmWithdraw.message"),
-                                          BUNDLE.getString("withdrawAction.optionPane_confirmWithdraw.title"),
-                                          JOptionPane.OK_CANCEL_OPTION,
-                                          JOptionPane.WARNING_MESSAGE);
+          = JOptionPane.showConfirmDialog(
+              dialogParent,
+              BUNDLE.getString("withdrawAction.optionPane_confirmWithdraw.message"),
+              BUNDLE.getString("withdrawAction.optionPane_confirmWithdraw.title"),
+              JOptionPane.OK_CANCEL_OPTION,
+              JOptionPane.WARNING_MESSAGE
+          );
 
       if (dialogResult != JOptionPane.OK_OPTION) {
         return;

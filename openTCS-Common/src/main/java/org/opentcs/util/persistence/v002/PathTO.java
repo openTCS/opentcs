@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(propOrder = {"name", "id", "sourcePoint", "destinationPoint", "length", "routingCost",
-                      "maxVelocity", "maxReverseVelocity", "locked", "typeMaxVelocity", 
+                      "maxVelocity", "maxReverseVelocity", "locked", "typeMaxVelocity",
                       "typeMaxReverseVelocity", "typeLock", "typeActions", "properties"})
 public class PathTO
     extends PlantModelElementTO {
@@ -40,6 +40,12 @@ public class PathTO
   private List<MaxVelocityType> typeMaxReverseVelocity = new ArrayList<>();
   private List<LockType> typeLock = new ArrayList<>();
   private List<ActionsType> typeActions = new ArrayList<>();
+
+  /**
+   * Creates a new instance.
+   */
+  public PathTO() {
+  }
 
   @XmlAttribute(required = true)
   public String getSourcePoint() {
@@ -172,6 +178,12 @@ public class PathTO
     private String vehicleType = "";
     private Long velocity = 0L;
 
+    /**
+     * Creates a new instance.
+     */
+    public MaxVelocityType() {
+    }
+
     @XmlAttribute(required = true)
     public String getVehicleType() {
       return vehicleType;
@@ -203,6 +215,12 @@ public class PathTO
     private String vehicleType = "";
     private Boolean locked = false;
 
+    /**
+     * Creates a new instance.
+     */
+    public LockType() {
+    }
+
     @XmlAttribute(required = true)
     public String getVehicleType() {
       return vehicleType;
@@ -231,6 +249,12 @@ public class PathTO
 
     private String vehicleType = "";
     private List<Action> actions = new ArrayList<>();
+
+    /**
+     * Creates a new instance.
+     */
+    public ActionsType() {
+    }
 
     @XmlAttribute(required = true)
     public String getVehicleType() {
@@ -261,6 +285,12 @@ public class PathTO
       private Long distance = 0L;
       private String action = "";
       private List<Orientation> orientations = new ArrayList<>();
+
+      /**
+       * Creates a new instance.
+       */
+      public Action() {
+      }
 
       @XmlAttribute(required = true)
       @XmlSchemaType(name = "unsignedInt")
@@ -301,6 +331,12 @@ public class PathTO
     public static class Orientation {
 
       private String name = "";
+
+      /**
+       * Creates a new instance.
+       */
+      public Orientation() {
+      }
 
       @XmlAttribute(required = true)
       public String getName() {

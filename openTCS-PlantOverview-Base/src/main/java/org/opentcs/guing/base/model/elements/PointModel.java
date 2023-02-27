@@ -47,13 +47,13 @@ public class PointModel
    */
   public static final String TYPE = "Type";
   /**
-   * This class's resource bundle.
-   */
-  private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
-  /**
    * The point's default position for both axes.
    */
   private static final int DEFAULT_XY_POSITION = 0;
+  /**
+   * This class's resource bundle.
+   */
+  private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * The set of vehicle models for which this model component's figure is to be decorted to
    * indicate that it is part of the route of the respective vehicles.
@@ -195,7 +195,9 @@ public class PointModel
     setProperty(TYPE, pType);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
-    pMiscellaneous.setDescription(bundle.getString("pointModel.property_miscellaneous.description"));
+    pMiscellaneous.setDescription(
+        bundle.getString("pointModel.property_miscellaneous.description")
+    );
     pMiscellaneous.setHelptext(bundle.getString("pointModel.property_miscellaneous.helptext"));
     pMiscellaneous.setOperatingEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
@@ -215,13 +217,17 @@ public class PointModel
     setProperty(ElementPropKeys.POINT_POS_Y, pPointPosY);
 
     StringProperty pPointLabelOffsetX = new StringProperty(this);
-    pPointLabelOffsetX.setDescription(bundle.getString("pointModel.property_labelOffsetX.description"));
+    pPointLabelOffsetX.setDescription(
+        bundle.getString("pointModel.property_labelOffsetX.description")
+    );
     pPointLabelOffsetX.setHelptext(bundle.getString("pointModel.property_labelOffsetX.helptext"));
     pPointLabelOffsetX.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_LABEL_OFFSET_X, pPointLabelOffsetX);
 
     StringProperty pPointLabelOffsetY = new StringProperty(this);
-    pPointLabelOffsetY.setDescription(bundle.getString("pointModel.property_labelOffsetY.description"));
+    pPointLabelOffsetY.setDescription(
+        bundle.getString("pointModel.property_labelOffsetY.description")
+    );
     pPointLabelOffsetY.setHelptext(bundle.getString("pointModel.property_labelOffsetY.helptext"));
     pPointLabelOffsetY.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_LABEL_OFFSET_Y, pPointLabelOffsetY);
@@ -244,7 +250,7 @@ public class PointModel
   private void setVehicleModels(Set<VehicleModel> vehicles) {
     this.vehicles = vehicles;
   }
-  
+
   private void setBlockModels(Set<BlockModel> blocks) {
     this.blocks = blocks;
   }
@@ -273,7 +279,7 @@ public class PointModel
     private final String description;
     private final String helptext;
 
-    private Type(String description, String helptext) {
+    Type(String description, String helptext) {
       this.description = requireNonNull(description, "description");
       this.helptext = requireNonNull(helptext, "helptext");
     }

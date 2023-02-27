@@ -67,7 +67,8 @@ public class ViewMenu
     requireNonNull(actionMap, "actionMap");
     requireNonNull(menuPluginPanels, "menuPluginPanels");
 
-    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MENU_PATH);
+    final ResourceBundleUtil labels
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MENU_PATH);
 
     this.setText(labels.getString("viewMenu.text"));
     this.setToolTipText(labels.getString("viewMenu.tooltipText"));
@@ -84,7 +85,7 @@ public class ViewMenu
     // Menu item View -> Add transport order sequence view
     menuOrderSequenceView = new JMenuItem(actionMap.get(AddTransportOrderSequenceViewAction.ID));
     add(menuOrderSequenceView);
-    
+
     menuPeripheralJobView = new JMenuItem(actionMap.get(AddPeripheralJobViewAction.ID));
     add(menuPeripheralJobView);
 
@@ -97,7 +98,9 @@ public class ViewMenu
 
     // Menu item View -> Restore docking layout
     menuItemRestoreDockingLayout = new JMenuItem(actionMap.get(RestoreDockingLayoutAction.ID));
-    menuItemRestoreDockingLayout.setText(labels.getString("viewMenu.menuItem_restoreWindowArrangement.text"));
+    menuItemRestoreDockingLayout.setText(
+        labels.getString("viewMenu.menuItem_restoreWindowArrangement.text")
+    );
     add(menuItemRestoreDockingLayout);
   }
 }

@@ -204,7 +204,7 @@ public class StandardRemoteKernelClientPortal
   public void logout(ClientID clientID) {
     requireNonNull("clientID");
 
-    // Forget the client so it won't be able to call methods on this kernel and won't receive 
+    // Forget the client so it won't be able to call methods on this kernel and won't receive
     // events any more.
     synchronized (userManager.getKnownClients()) {
       userManager.getKnownClients().remove(clientID);

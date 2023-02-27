@@ -23,8 +23,7 @@ final class CommandListCellRenderer
   /**
    * Creates a new CommandListCellRenderer.
    */
-  public CommandListCellRenderer() {
-    // Do nada.
+  CommandListCellRenderer() {
   }
 
   @Override

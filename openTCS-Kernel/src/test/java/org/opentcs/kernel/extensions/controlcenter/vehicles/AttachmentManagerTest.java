@@ -173,8 +173,12 @@ public class AttachmentManagerTest {
   private class SimpleCommAdapter
       extends BasicVehicleCommAdapter {
 
-    public SimpleCommAdapter(Vehicle vehicle) {
-      super(new VehicleProcessModel(vehicle), 0, 0, "", Executors.newSingleThreadScheduledExecutor());
+    SimpleCommAdapter(Vehicle vehicle) {
+      super(new VehicleProcessModel(vehicle),
+            0,
+            0,
+            "",
+            Executors.newSingleThreadScheduledExecutor());
     }
 
     @Override

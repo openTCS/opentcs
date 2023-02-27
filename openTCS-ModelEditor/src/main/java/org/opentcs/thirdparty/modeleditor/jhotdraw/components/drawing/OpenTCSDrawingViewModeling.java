@@ -117,7 +117,7 @@ public class OpenTCSDrawingViewModeling
       pastedFigures.addAll(cutPasteBufferedItems());
     }
     else {
-      // The list of buffered figures contains a mix of figures contained in the drawing and 
+      // The list of buffered figures contains a mix of figures contained in the drawing and
       // figures not contained in the drawing. This should never happen.
       throw new IllegalStateException("Some figures to be pasted are already in the drawing, some "
           + "are not.");
@@ -160,7 +160,9 @@ public class OpenTCSDrawingViewModeling
   protected void drawTool(Graphics2D g2d) {
     super.drawTool(g2d);
 
-    if (getEditor() == null || getEditor().getTool() == null || getEditor().getActiveView() != this) {
+    if (getEditor() == null
+        || getEditor().getTool() == null
+        || getEditor().getActiveView() != this) {
       return;
     }
 
@@ -274,6 +276,12 @@ public class OpenTCSDrawingViewModeling
 
   private class ExtendedEventHandler
       extends AbstractExtendedEventHandler {
+
+    /**
+     * Creates a new instance.
+     */
+    ExtendedEventHandler() {
+    }
 
     @Override
     protected boolean shouldShowFigure(Figure figure) {

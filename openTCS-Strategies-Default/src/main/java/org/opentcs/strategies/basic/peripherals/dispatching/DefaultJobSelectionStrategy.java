@@ -28,6 +28,12 @@ import org.opentcs.util.Comparators;
 public class DefaultJobSelectionStrategy
     implements JobSelectionStrategy {
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultJobSelectionStrategy() {
+  }
+
   @Override
   public Optional<PeripheralJob> select(Collection<PeripheralJob> jobs, Location location) {
     checkArgument(jobs.stream().allMatch(job -> matchesLocation(job, location)),

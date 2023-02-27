@@ -32,6 +32,9 @@ public class ConfigDocGenerator {
    */
   private static final Logger LOG = LoggerFactory.getLogger(ConfigDocGenerator.class);
 
+  /**
+   * Prevents instantiation.
+   */
   private ConfigDocGenerator() {
   }
 
@@ -167,10 +170,10 @@ public class ConfigDocGenerator {
      */
     private final String orderKey;
 
-    public Entry(String name,
-                 String type,
-                 String[] description,
-                 String orderKey) {
+    Entry(String name,
+          String type,
+          String[] description,
+          String orderKey) {
       this.name = name;
       this.type = type;
       this.description = description;

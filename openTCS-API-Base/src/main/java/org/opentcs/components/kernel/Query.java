@@ -20,8 +20,13 @@ public interface Query<T> {
   /**
    * A convenience class to be used as the result type for queries that do not return any result.
    */
-  public static class Void
+  class Void
       implements Serializable {
 
+    /**
+     * Creates a new instance.
+     */
+    public Void() {
+    }
   }
 }

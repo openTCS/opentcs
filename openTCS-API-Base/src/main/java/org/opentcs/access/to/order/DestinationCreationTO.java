@@ -63,7 +63,10 @@ public class DestinationCreationTO
    */
   @Override
   public DestinationCreationTO withName(@Nonnull String name) {
-    return new DestinationCreationTO(destLocationName, destOperation, name, getModifiableProperties());
+    return new DestinationCreationTO(destLocationName,
+                                     destOperation,
+                                     name,
+                                     getModifiableProperties());
   }
 
   /**
@@ -112,7 +115,10 @@ public class DestinationCreationTO
    * @return A copy of this object, differing in the given destination.
    */
   public DestinationCreationTO withDestLocationName(@Nonnull String desLocationName) {
-    return new DestinationCreationTO(destLocationName, destOperation, getName(), getModifiableProperties());
+    return new DestinationCreationTO(destLocationName,
+                                     destOperation,
+                                     getName(),
+                                     getModifiableProperties());
   }
 
   /**
@@ -132,6 +138,9 @@ public class DestinationCreationTO
    * @return A copy of this object, differing in the given destination operation.
    */
   public DestinationCreationTO withDestOperation(@Nonnull String destOperation) {
-    return new DestinationCreationTO(destLocationName, destOperation, getName(), getModifiableProperties());
+    return new DestinationCreationTO(destLocationName,
+                                     destOperation,
+                                     getName(),
+                                     getModifiableProperties());
   }
 }

@@ -28,6 +28,12 @@ class RemotePlantModelServiceProxy
     extends RemoteTCSObjectServiceProxy<RemotePlantModelService>
     implements PlantModelService {
 
+  /**
+   * Creates a new instance.
+   */
+  RemotePlantModelServiceProxy() {
+  }
+
   @Override
   public PlantModel getPlantModel()
       throws KernelRuntimeException {

@@ -38,8 +38,7 @@ public class BitmapFigure
   /**
    * This class's logger.
    */
-  private static final Logger log
-      = LoggerFactory.getLogger(BitmapFigure.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BitmapFigure.class);
   /**
    * The image to be displayed.
    */
@@ -67,7 +66,7 @@ public class BitmapFigure
       image = ImageIO.read(file);
       imagePath = file.getPath();
       if (image == null) {
-        log.error("Couldn't open image file at" + file.getPath());
+        LOG.error("Couldn't open image file at" + file.getPath());
         fDisplayBox = new Rectangle(0, 0, 0, 0);
         fZoomPoint = new ZoomPoint(0, 0);
         requestRemove();
@@ -77,7 +76,7 @@ public class BitmapFigure
       fZoomPoint = new ZoomPoint(0.5 * image.getWidth(), 0.5 * image.getHeight());
     }
     catch (IOException ex) {
-      log.error("", ex);
+      LOG.error("", ex);
       requestRemove();
     }
   }

@@ -30,6 +30,12 @@ public class CandidateComparatorIdleFirst
   private final Comparator<Vehicle> delegate = new VehicleComparatorIdleFirst();
 
   /**
+   * Creates a new instance.
+   */
+  public CandidateComparatorIdleFirst() {
+  }
+
+  /**
    * Compares two candidates by the state of their vehicles.
    * Note: this comparator imposes orderings that are inconsistent with equals.
    *

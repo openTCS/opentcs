@@ -86,13 +86,21 @@ public class LocationTypeModel
     setProperty(NAME, pName);
 
     StringSetProperty pOperations = new LocationTypeActionsProperty(this);
-    pOperations.setDescription(bundle.getString("locationTypeModel.property_allowedOperations.description"));
-    pOperations.setHelptext(bundle.getString("locationTypeModel.property_allowedOperations.helptext"));
+    pOperations.setDescription(
+        bundle.getString("locationTypeModel.property_allowedOperations.description")
+    );
+    pOperations.setHelptext(
+        bundle.getString("locationTypeModel.property_allowedOperations.helptext")
+    );
     setProperty(ALLOWED_OPERATIONS, pOperations);
 
     StringSetProperty pPeripheralOperations = new LocationTypeActionsProperty(this);
-    pPeripheralOperations.setDescription(bundle.getString("locationTypeModel.property_allowedPeripheralOperations.description"));
-    pPeripheralOperations.setHelptext(bundle.getString("locationTypeModel.property_allowedPeripheralOperations.helptext"));
+    pPeripheralOperations.setDescription(
+        bundle.getString("locationTypeModel.property_allowedPeripheralOperations.description")
+    );
+    pPeripheralOperations.setHelptext(
+        bundle.getString("locationTypeModel.property_allowedPeripheralOperations.helptext")
+    );
     setProperty(ALLOWED_PERIPHERAL_OPERATIONS, pPeripheralOperations);
 
     SymbolProperty pSymbol = new SymbolProperty(this);
@@ -102,8 +110,12 @@ public class LocationTypeModel
     setProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION, pSymbol);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
-    pMiscellaneous.setDescription(bundle.getString("locationTypeModel.property_miscellaneous.description"));
-    pMiscellaneous.setHelptext(bundle.getString("locationTypeModel.property_miscellaneous.helptext"));
+    pMiscellaneous.setDescription(
+        bundle.getString("locationTypeModel.property_miscellaneous.description")
+    );
+    pMiscellaneous.setHelptext(
+        bundle.getString("locationTypeModel.property_miscellaneous.helptext")
+    );
     pMiscellaneous.setOperatingEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
   }

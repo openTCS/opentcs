@@ -68,6 +68,12 @@ import org.opentcs.strategies.basic.dispatching.selection.vehicles.IsReparkable;
 public class DefaultDispatcherModule
     extends KernelInjectionModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultDispatcherModule() {
+  }
+
   @Override
   protected void configure() {
     configureDispatcherDependencies();
@@ -188,7 +194,7 @@ public class DefaultDispatcherModule
 
     bind(TransportOrderUtil.class)
         .in(Singleton.class);
-    
+
     configureRerouteComponents();
   }
 

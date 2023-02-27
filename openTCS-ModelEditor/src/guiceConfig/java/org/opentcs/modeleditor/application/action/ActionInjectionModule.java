@@ -18,6 +18,12 @@ import javax.inject.Singleton;
 public class ActionInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public ActionInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     bind(ViewActionMap.class).in(Singleton.class);

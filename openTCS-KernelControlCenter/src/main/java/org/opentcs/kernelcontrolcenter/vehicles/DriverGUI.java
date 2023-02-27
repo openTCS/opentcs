@@ -185,9 +185,9 @@ public class DriverGUI
       index++;
     }
 
-    vehicleTable.getColumn(VehicleTableModel.ADAPTER_COLUMN_IDENTIFIER)
+    vehicleTable.getColumn(VehicleTableModel.adapterColumnIdentifier())
         .setCellEditor(adapterCellEditor);
-    vehicleTable.getColumn(VehicleTableModel.POSITION_COLUMN_IDENTIFIER)
+    vehicleTable.getColumn(VehicleTableModel.positionColumnIdentifier())
         .setCellEditor(pointsCellEditor);
   }
 
@@ -617,8 +617,11 @@ public class DriverGUI
     public void actionPerformed(ActionEvent evt) {
       for (String vehicleName : vehicleNames) {
         servicePortal.getVehicleService().attachCommAdapter(
-            vehicleEntryPool.getEntryFor(vehicleName).getAttachmentInformation().getVehicleReference(),
-            commAdapterDescription);
+            vehicleEntryPool.getEntryFor(vehicleName)
+                .getAttachmentInformation()
+                .getVehicleReference(),
+            commAdapterDescription
+        );
       }
     }
   }
@@ -627,5 +630,11 @@ public class DriverGUI
 
     private int enabledCount;
     private int disabledCount;
+
+    /**
+     * Creates a new instance.
+     */
+    StatesCounts() {
+    }
   }
 }

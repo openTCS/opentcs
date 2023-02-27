@@ -68,7 +68,7 @@ public interface PortalManager {
   /**
    * Defines the states in which a portal manager instance may be in.
    */
-  public enum ConnectionState {
+  enum ConnectionState {
 
     /**
      * Indicates the portal manager is trying to connect to the remote portal.
@@ -93,7 +93,7 @@ public interface PortalManager {
   /**
    * Defines the modes a portal manager uses to establish a connection to a portal.
    */
-  public enum ConnectionMode {
+  enum ConnectionMode {
 
     /**
      * Connect automatically by using a predefined set of connection parameters.

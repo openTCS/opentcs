@@ -49,14 +49,18 @@ public class BlocksTreeViewPanel
   public void pasteBufferedItems() {
     restoreItems(bufferedUserObjects, bufferedFigures);
     // Also make "Paste" undoable
-    fUndoRedoManager.addEdit(new AbstractTreeViewPanel.PasteEdit(bufferedUserObjects, bufferedFigures));
+    fUndoRedoManager.addEdit(
+        new AbstractTreeViewPanel.PasteEdit(bufferedUserObjects, bufferedFigures)
+    );
   }
 
   @Override // EditableComponent
   public void duplicate() {
     bufferSelectedItems(false);
     restoreItems(bufferedUserObjects, bufferedFigures);
-    fUndoRedoManager.addEdit(new AbstractTreeViewPanel.PasteEdit(bufferedUserObjects, bufferedFigures));
+    fUndoRedoManager.addEdit(
+        new AbstractTreeViewPanel.PasteEdit(bufferedUserObjects, bufferedFigures)
+    );
   }
 
   @Override // EditableComponent
@@ -67,12 +71,14 @@ public class BlocksTreeViewPanel
       return; // nothing to undo/redo
     }
 
-    fUndoRedoManager.addEdit(new AbstractTreeViewPanel.DeleteEdit(bufferedUserObjects, bufferedFigures));
+    fUndoRedoManager.addEdit(
+        new AbstractTreeViewPanel.DeleteEdit(bufferedUserObjects, bufferedFigures)
+    );
   }
 
   @Override // EditableComponent
   public void selectAll() {
-    // Sample implementation (HH 2014-04-08): 
+    // Sample implementation (HH 2014-04-08):
     // Select all components in the currently focused tree folder
     // TODO: select all components except folders
     UserObject selectedItem = getSelectedItem();

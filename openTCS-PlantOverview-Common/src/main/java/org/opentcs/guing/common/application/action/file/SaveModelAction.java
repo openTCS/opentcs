@@ -23,7 +23,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class SaveModelAction
     extends AbstractAction {
 
-  public final static String ID = "file.saveModel";
+  /**
+   * This action's ID.
+   */
+  public static final String ID = "file.saveModel";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
 

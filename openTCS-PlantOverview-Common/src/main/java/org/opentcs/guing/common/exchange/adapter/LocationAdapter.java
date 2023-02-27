@@ -45,6 +45,12 @@ public class LocationAdapter
    */
   private static final Logger LOG = LoggerFactory.getLogger(LocationAdapter.class);
 
+  /**
+   * Creates a new instance.
+   */
+  public LocationAdapter() {
+  }
+
   @Override  // OpenTCSProcessAdapter
   public void updateModelProperties(TCSObject<?> tcsObject,
                                     ModelComponent modelComponent,
@@ -54,7 +60,7 @@ public class LocationAdapter
     LocationModel model = (LocationModel) modelComponent;
 
     try {
-      // Name 
+      // Name
       model.getPropertyName().setText(location.getName());
 
       // Position in model
@@ -68,9 +74,15 @@ public class LocationAdapter
       model.getPropertyLocked().setValue(location.isLocked());
 
       // Peripheral information
-      model.getPropertyPeripheralReservationToken().setText(location.getPeripheralInformation().getReservationToken());
-      model.getPropertyPeripheralState().setText(location.getPeripheralInformation().getState().name());
-      model.getPropertyPeripheralProcState().setText(location.getPeripheralInformation().getProcState().name());
+      model.getPropertyPeripheralReservationToken().setText(
+          location.getPeripheralInformation().getReservationToken()
+      );
+      model.getPropertyPeripheralState().setText(
+          location.getPeripheralInformation().getState().name()
+      );
+      model.getPropertyPeripheralProcState().setText(
+          location.getPeripheralInformation().getProcState().name()
+      );
       model.getPropertyPeripheralJob().setText(extractPeripheralJobName(location));
 
       // Misc properties

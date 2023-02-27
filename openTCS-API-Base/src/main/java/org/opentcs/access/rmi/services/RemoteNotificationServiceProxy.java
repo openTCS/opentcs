@@ -24,6 +24,12 @@ class RemoteNotificationServiceProxy
     extends AbstractRemoteServiceProxy<RemoteNotificationService>
     implements NotificationService {
 
+  /**
+   * Creates a new instance.
+   */
+  RemoteNotificationServiceProxy() {
+  }
+
   @Override
   public List<UserNotification> fetchUserNotifications(Predicate<UserNotification> predicate)
       throws KernelRuntimeException {

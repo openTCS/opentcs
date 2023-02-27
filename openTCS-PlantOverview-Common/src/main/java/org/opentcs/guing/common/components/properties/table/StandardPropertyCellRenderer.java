@@ -25,10 +25,13 @@ import org.opentcs.guing.base.components.properties.type.Property;
 public class StandardPropertyCellRenderer
     extends javax.swing.table.DefaultTableCellRenderer {
 
-  public final static Color BG_UNEDITABLE = new Color(0xE0E0E0);
+  /**
+   * The background color for uneditable properties.
+   */
+  public static final Color BG_UNEDITABLE = new Color(0xE0E0E0);
 
   /**
-   * Creates a new instance of StringPropertyCellRenderer
+   * Creates a new instance.
    */
   public StandardPropertyCellRenderer() {
     super();

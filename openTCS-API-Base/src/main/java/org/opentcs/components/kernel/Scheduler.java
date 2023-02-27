@@ -298,8 +298,7 @@ public interface Scheduler
      *
      * @param client The client the resource sequence is claimed by.
      * @param claim The resource sequence, i.e. total claim.
-     * @deprecated Redundant - use
-     * {@link #setAllocationState(org.opentcs.components.kernel.Scheduler.Client, java.util.Set, java.util.List)}
+     * @deprecated Redundant - use {@link #setAllocationState(Client, Set, List)}
      * instead/exclusively.
      */
     @Deprecated
@@ -311,8 +310,7 @@ public interface Scheduler
      * Resets a client's <i>total claim</i>.
      *
      * @param client The client for which to reset the claim.
-     * @deprecated Redundant - use
-     * {@link #setAllocationState(org.opentcs.components.kernel.Scheduler.Client, java.util.Set, java.util.List)}
+     * @deprecated Redundant - use {@link #setAllocationState(Client, Set, List)}
      * instead/exclusively.
      */
     @Deprecated

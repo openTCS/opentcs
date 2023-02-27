@@ -23,13 +23,19 @@ import org.opentcs.guing.common.components.layer.LayerManager;
 public class LayersInjectionModule
     extends PlantOverviewInjectionModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public LayersInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     bind(DefaultLayerManager.class).in(Singleton.class);
     bind(LayerManager.class).to(DefaultLayerManager.class);
     bind(LayerEditor.class).to(DefaultLayerManager.class);
     bind(LayersPanel.class).in(Singleton.class);
-    
+
     bind(LayerGroupManager.class).to(DefaultLayerManager.class);
     bind(LayerGroupEditor.class).to(DefaultLayerManager.class);
     bind(LayerGroupsPanel.class).in(Singleton.class);

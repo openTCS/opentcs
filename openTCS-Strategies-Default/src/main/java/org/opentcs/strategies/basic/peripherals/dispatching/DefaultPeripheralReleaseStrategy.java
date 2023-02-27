@@ -26,6 +26,12 @@ import org.opentcs.data.model.PeripheralInformation;
 public class DefaultPeripheralReleaseStrategy
     implements PeripheralReleaseStrategy {
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultPeripheralReleaseStrategy() {
+  }
+
   @Override
   public Collection<Location> selectPeripheralsToRelease(Collection<Location> locations) {
     return locations.stream()

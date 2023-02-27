@@ -71,7 +71,10 @@ public class SystemModelTransitionEvent
         + '}';
   }
 
-  public static enum Stage {
+  /**
+   * The possible stages of a transition.
+   */
+  public enum Stage {
 
     /**
      * Indicates the current system model is currently being unloaded.

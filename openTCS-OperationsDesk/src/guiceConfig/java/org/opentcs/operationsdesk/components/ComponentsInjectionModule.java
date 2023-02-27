@@ -34,6 +34,12 @@ import org.opentcs.operationsdesk.components.tree.elements.TreeElementsInjection
 public class ComponentsInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public ComponentsInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     install(new DialogsInjectionModule());
@@ -51,7 +57,7 @@ public class ComponentsInjectionModule
   private static class ComponentsTreeViewModule
       extends PrivateModule {
 
-    public ComponentsTreeViewModule() {
+    ComponentsTreeViewModule() {
     }
 
     @Override
@@ -83,7 +89,7 @@ public class ComponentsInjectionModule
   private static class BlocksTreeViewModule
       extends PrivateModule {
 
-    public BlocksTreeViewModule() {
+    BlocksTreeViewModule() {
     }
 
     @Override

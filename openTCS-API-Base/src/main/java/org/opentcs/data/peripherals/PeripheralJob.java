@@ -388,7 +388,7 @@ public class PeripheralJob
   /**
    * Defines the various states a peripheral job may be in.
    */
-  public static enum State {
+  public enum State {
     /**
      * Indicates a peripheral job is still waiting to be processed.
      */

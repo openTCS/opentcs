@@ -55,7 +55,14 @@ public class DefaultKernelControlCenterInjectionModule
   /**
    * This class' logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(DefaultKernelControlCenterInjectionModule.class);
+  private static final Logger LOG
+      = LoggerFactory.getLogger(DefaultKernelControlCenterInjectionModule.class);
+
+  /**
+   * Creates a new instance.
+   */
+  public DefaultKernelControlCenterInjectionModule() {
+  }
 
   @Override
   protected void configure() {

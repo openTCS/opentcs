@@ -31,7 +31,7 @@ class PluginPanelPropertyHandler
    *
    * @param utilMenuItem The menu item corresponding to the plugin panel.
    */
-  public PluginPanelPropertyHandler(JCheckBoxMenuItem utilMenuItem) {
+  PluginPanelPropertyHandler(JCheckBoxMenuItem utilMenuItem) {
     this.utilMenuItem = Objects.requireNonNull(utilMenuItem, "utilMenuItem is null");
   }
 

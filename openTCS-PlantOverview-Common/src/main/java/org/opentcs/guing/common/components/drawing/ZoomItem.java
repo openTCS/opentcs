@@ -9,7 +9,7 @@ package org.opentcs.guing.common.components.drawing;
 
 /**
  * An item to show in a combo box.
- * 
+ *
  * @author Heinz Huber (Fraunhofer IML)
  * @author Philipp Seifert (Fraunhofer IML)
  */

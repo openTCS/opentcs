@@ -20,21 +20,20 @@ public interface KernelClientApplication
   /**
    * Tells the application to switch its state to online.
    *
-   * @param autoConnect Whether to connect automatically to the kernel or to show a connect dialog 
+   * @param autoConnect Whether to connect automatically to the kernel or to show a connect dialog
    * when going online.
    */
-  public void online(boolean autoConnect);
+  void online(boolean autoConnect);
 
   /**
    * Tells the application to switch its state to offline.
    */
-  public void offline();
+  void offline();
 
   /**
    * Checks whether the application's state is online.
    *
    * @return Whether the application's state is online.
    */
-  public boolean isOnline();
-
+  boolean isOnline();
 }

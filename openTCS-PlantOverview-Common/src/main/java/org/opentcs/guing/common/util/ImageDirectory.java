@@ -17,16 +17,19 @@ import javax.swing.ImageIcon;
  */
 public final class ImageDirectory {
 
-  private ImageDirectory() {
-  }
-
   /**
    * The directory where GUI images and icons are stored.
    */
   public static final String DIR = "/org/opentcs/guing/res/symbols";
 
   /**
-   * Returns an ImageIcon from a relative path inside the image directory
+   * Prevents instantiation.
+   */
+  private ImageDirectory() {
+  }
+
+  /**
+   * Returns an ImageIcon from a relative path inside the image directory.
    *
    * @param relPath path to file inside the image directory.
    * @return the new ImageIcon

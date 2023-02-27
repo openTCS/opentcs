@@ -17,6 +17,12 @@ import javax.swing.table.DefaultTableModel;
 public class UneditableTableModel
     extends DefaultTableModel {
 
+  /**
+   * Creates a new instance.
+   */
+  public UneditableTableModel() {
+  }
+
   @Override
   public boolean isCellEditable(int row, int column) {
     return false;

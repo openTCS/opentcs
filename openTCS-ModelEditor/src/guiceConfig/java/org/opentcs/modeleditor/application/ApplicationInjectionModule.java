@@ -40,6 +40,12 @@ public class ApplicationInjectionModule
    */
   private final JFrame applicationFrame = new JFrame();
 
+  /**
+   * Creates a new instance.
+   */
+  public ApplicationInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     install(new ActionInjectionModule());

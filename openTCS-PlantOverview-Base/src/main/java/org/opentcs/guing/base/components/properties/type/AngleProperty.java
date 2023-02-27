@@ -72,13 +72,22 @@ public class AngleProperty
     return relations;
   }
 
-  public static enum Unit {
+  /**
+   * The supported units.
+   */
+  public enum Unit {
+    /**
+     * Degrees.
+     */
     DEG("deg"),
+    /**
+     * Radians.
+     */
     RAD("rad");
 
     private final String displayString;
 
-    private Unit(String displayString) {
+    Unit(String displayString) {
       this.displayString = displayString;
     }
 

@@ -272,7 +272,7 @@ public class RerouteUtil {
      * @param strategy The current fallback strategy.
      * @param source The (earliest) point from which execution may not be allowed.
      */
-    public ExecutionTest(ReroutingImpossibleStrategy strategy, Point source) {
+    ExecutionTest(ReroutingImpossibleStrategy strategy, Point source) {
       this.strategy = requireNonNull(strategy, "strategy");
       this.source = requireNonNull(source, "source");
     }

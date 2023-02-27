@@ -27,7 +27,8 @@ public class PeriodicPeripheralRedispatchingTask
   /**
    * This class's Logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(PeriodicPeripheralRedispatchingTask.class);
+  private static final Logger LOG
+      = LoggerFactory.getLogger(PeriodicPeripheralRedispatchingTask.class);
 
   private final PeripheralDispatcherService dispatcherService;
 
@@ -59,9 +60,9 @@ public class PeriodicPeripheralRedispatchingTask
         });
   }
 
-  private boolean couldProcessJob(Location location) {
-    return location.getPeripheralInformation().getState() != PeripheralInformation.State.NO_PERIPHERAL
-        && (processesNoJob(location));
+  private boolean couldProcessJob(Location loc) {
+    return loc.getPeripheralInformation().getState() != PeripheralInformation.State.NO_PERIPHERAL
+        && processesNoJob(loc);
   }
 
   private boolean processesNoJob(Location location) {

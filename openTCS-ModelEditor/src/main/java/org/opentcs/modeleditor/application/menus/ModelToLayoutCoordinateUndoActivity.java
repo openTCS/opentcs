@@ -52,15 +52,18 @@ public class ModelToLayoutCoordinateUndoActivity
 
   @Override
   protected void saveTransformBeforeModification() {
-    AbstractConnectableModelComponent model = (AbstractConnectableModelComponent) property.getModel();
+    AbstractConnectableModelComponent model
+        = (AbstractConnectableModelComponent) property.getModel();
     StringProperty pxLayout = (StringProperty) model.getProperty(ElementPropKeys.POINT_POS_X);
     StringProperty pyLayout = (StringProperty) model.getProperty(ElementPropKeys.POINT_POS_Y);
 
     Origin origin = bufferedFigure.get(FigureConstants.ORIGIN);
     TCSFigure pf = bufferedFigure.getPresentationFigure();
     double zoomScale = pf.getZoomPoint().scale();
-    double xModel = pxModel.getValueByUnit(CoordinateProperty.Unit.MM) / (zoomScale * origin.getScaleX());
-    double yModel = pyModel.getValueByUnit(CoordinateProperty.Unit.MM) / (-zoomScale * origin.getScaleY());
+    double xModel
+        = pxModel.getValueByUnit(CoordinateProperty.Unit.MM) / (zoomScale * origin.getScaleX());
+    double yModel
+        = pyModel.getValueByUnit(CoordinateProperty.Unit.MM) / (-zoomScale * origin.getScaleY());
     String sx = (String) pxLayout.getComparableValue();
     double xLayout = Double.parseDouble(sx) / (zoomScale * origin.getScaleX());
     String sy = (String) pyLayout.getComparableValue();

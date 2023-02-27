@@ -169,9 +169,10 @@ public class RemoteKernelServicePortalProxy
 
     try {
       // Look up the remote portal with the RMI registry.
-      Registry registry = LocateRegistry.getRegistry(hostName,
-                                                     port,
-                                                     socketFactoryProvider.getClientSocketFactory());
+      Registry registry
+          = LocateRegistry.getRegistry(hostName,
+                                       port,
+                                       socketFactoryProvider.getClientSocketFactory());
 
       setRemoteService((RemoteKernelServicePortal) registry.lookup(REMOTE_KERNEL_CLIENT_PORTAL));
       // Login and save the client ID.
@@ -304,7 +305,7 @@ public class RemoteKernelServicePortalProxy
   public PeripheralJobService getPeripheralJobService() {
     return peripheralJobService;
   }
-  
+
   @Override
   @Nonnull
   public PeripheralDispatcherService getPeripheralDispatcherService() {
@@ -320,7 +321,9 @@ public class RemoteKernelServicePortalProxy
 
     transportOrderService
         .setClientId(getClientId())
-        .setRemoteService((RemoteTransportOrderService) registry.lookup(REMOTE_TRANSPORT_ORDER_SERVICE))
+        .setRemoteService(
+            (RemoteTransportOrderService) registry.lookup(REMOTE_TRANSPORT_ORDER_SERVICE)
+        )
         .setServiceListener(this);
 
     vehicleService
@@ -360,12 +363,18 @@ public class RemoteKernelServicePortalProxy
 
     peripheralJobService
         .setClientId(getClientId())
-        .setRemoteService((RemotePeripheralJobService) registry.lookup(REMOTE_PERIPHERAL_JOB_SERVICE))
+        .setRemoteService(
+            (RemotePeripheralJobService) registry.lookup(REMOTE_PERIPHERAL_JOB_SERVICE)
+        )
         .setServiceListener(this);
 
     peripheralDispatcherService
         .setClientId(getClientId())
-        .setRemoteService((RemotePeripheralDispatcherService) registry.lookup(REMOTE_PERIPHERAL_DISPATCHER_SERVICE))
+        .setRemoteService(
+            (RemotePeripheralDispatcherService) registry.lookup(
+                REMOTE_PERIPHERAL_DISPATCHER_SERVICE
+            )
+        )
         .setServiceListener(this);
   }
 

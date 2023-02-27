@@ -19,11 +19,17 @@ import javax.inject.Singleton;
 public class DialogsInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public DialogsInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     install(new FactoryModuleBuilder().build(SingleVehicleViewFactory.class));
     install(new FactoryModuleBuilder().build(FindVehiclePanelFactory.class));
-    
+
     bind(VehiclesPanel.class).in(Singleton.class);
   }
 }

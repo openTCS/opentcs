@@ -44,6 +44,7 @@ public class PostTransportOrderRequestTO {
 
   private List<String> dependencies;
 
+  // CHECKSTYLE:OFF (because of very long parameter declarations)
   @JsonCreator
   public PostTransportOrderRequestTO(
       @JsonProperty(required = false, value = "incompleteName") boolean incompleteName,
@@ -67,6 +68,7 @@ public class PostTransportOrderRequestTO {
     this.properties = properties;
     this.dependencies = dependencies;
   }
+  // CHECKSTYLE:ON
 
   public PostTransportOrderRequestTO() {
   }

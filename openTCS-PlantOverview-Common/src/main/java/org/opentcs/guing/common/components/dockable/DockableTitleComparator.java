@@ -19,6 +19,12 @@ import java.util.Comparator;
 public class DockableTitleComparator
     implements Comparator<DefaultSingleCDockable> {
 
+  /**
+   * Creates a new instance.
+   */
+  public DockableTitleComparator() {
+  }
+
   @Override
   public int compare(DefaultSingleCDockable o1, DefaultSingleCDockable o2) {
     return o1.getTitleText().compareTo(o2.getTitleText());

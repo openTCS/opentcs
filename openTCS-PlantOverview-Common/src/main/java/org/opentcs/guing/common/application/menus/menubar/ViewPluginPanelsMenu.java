@@ -31,7 +31,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class ViewPluginPanelsMenu
     extends JMenu {
 
-  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH);
+  private static final ResourceBundleUtil BUNDLE
+      = ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH);
 
   /**
    * The plugin panel manager.
@@ -94,7 +95,8 @@ public class ViewPluginPanelsMenu
     // If the menu is empty, add a single disabled menu item to it that explains
     // to the user that no plugin panels are available.
     if (getMenuComponentCount() == 0) {
-      JMenuItem dummyItem = new JMenuItem(BUNDLE.getString("viewPluginPanelsMenu.menuItem_none.text"));
+      JMenuItem dummyItem
+          = new JMenuItem(BUNDLE.getString("viewPluginPanelsMenu.menuItem_none.text"));
       dummyItem.setEnabled(false);
       add(dummyItem);
     }

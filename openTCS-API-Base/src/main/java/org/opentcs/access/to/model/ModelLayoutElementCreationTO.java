@@ -95,7 +95,8 @@ public class ModelLayoutElementCreationTO
   }
 
   /**
-   * Creates a copy of this object with the given layer on which this model layout element is to be displayed.
+   * Creates a copy of this object with the given layer on which this model layout element is to be
+   * displayed.
    *
    * @param layer The new layer
    * @return A copy of this object, differing in the given layer.

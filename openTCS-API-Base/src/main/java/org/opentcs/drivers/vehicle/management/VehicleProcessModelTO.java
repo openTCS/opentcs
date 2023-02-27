@@ -70,6 +70,12 @@ public class VehicleProcessModelTO
    */
   private Vehicle.State vehicleState = Vehicle.State.UNKNOWN;
 
+  /**
+   * Creates a new instance.
+   */
+  public VehicleProcessModelTO() {
+  }
+
   public String getVehicleName() {
     return vehicleName;
   }

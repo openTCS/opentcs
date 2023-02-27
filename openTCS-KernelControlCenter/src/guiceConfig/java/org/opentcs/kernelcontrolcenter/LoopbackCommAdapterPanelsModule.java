@@ -18,6 +18,12 @@ import org.opentcs.virtualvehicle.LoopbackCommAdapterPanelFactory;
 public class LoopbackCommAdapterPanelsModule
     extends ControlCenterInjectionModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public LoopbackCommAdapterPanelsModule() {
+  }
+
   // tag::documentation_createCommAdapterPanelsModule[]
   @Override
   protected void configure() {

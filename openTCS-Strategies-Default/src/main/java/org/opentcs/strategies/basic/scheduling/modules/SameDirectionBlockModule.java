@@ -137,10 +137,11 @@ public class SameDirectionBlockModule
       }
 
       LOG.debug("{}: Checking resource availability: {}", client.getId(), resources);
-      if (!checkBlockEntryPermissions(client,
-                                      blocks,
-                                      path.getProperties().getOrDefault(PROPKEY_BLOCK_ENTRY_DIRECTION,
-                                                                        path.getName()))) {
+      if (!checkBlockEntryPermissions(
+          client,
+          blocks,
+          path.getProperties().getOrDefault(PROPKEY_BLOCK_ENTRY_DIRECTION, path.getName())
+      )) {
         LOG.debug("{}: Resources unavailable.", client.getId());
         return false;
       }
@@ -264,7 +265,7 @@ public class SameDirectionBlockModule
      */
     private final Queue<PermissionRequest> pendingRequests = new LinkedList<>();
 
-    public BlockPermission(Block block) {
+    BlockPermission(Block block) {
       this.block = requireNonNull(block, "block");
     }
 
@@ -355,7 +356,7 @@ public class SameDirectionBlockModule
      * @param entryDirection The entry direction permission is requested for.
      * @param blocks The blocks the client requests permission for.
      */
-    public PermissionRequest(Scheduler.Client client, String entryDirection) {
+    PermissionRequest(Scheduler.Client client, String entryDirection) {
       this.client = requireNonNull(client, "client");
       this.entryDirection = requireNonNull(entryDirection, "entryDirection");
     }

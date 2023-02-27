@@ -63,9 +63,7 @@ public interface InternalPlantModelService
    * @param token The location's new reservation token.
    * @throws ObjectUnknownException If the referenced location does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
-   * @deprecated Use
-   * {@link InternalPeripheralService#updatePeripheralReservationToken(org.opentcs.data.model.TCSResourceReference, java.lang.String)}
-   * instead.
+   * @deprecated Use {@code InternalPeripheralService.updatePeripheralReservationToken()} instead.
    */
   @Deprecated
   @ScheduledApiChange(details = "Will be removed.", when = "6.0")

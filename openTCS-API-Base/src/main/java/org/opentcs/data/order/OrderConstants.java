@@ -16,7 +16,7 @@ public interface OrderConstants {
 
   /**
    * The string representing the <em>any</em> type.
-   * Primarily intended to be used for a vehicle to indicate there are no restrictions to its 
+   * Primarily intended to be used for a vehicle to indicate there are no restrictions to its
    * allowed oder types.
    */
   String TYPE_ANY = "*";

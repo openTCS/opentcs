@@ -86,7 +86,8 @@ public class ModelKernelPersistor {
     LOG.debug("Persisting model...");
     timeBefore = System.currentTimeMillis();
     portal.getPlantModelService().createPlantModel(modelExportAdapter.convert(systemModel));
-    LOG.debug("Persisting to kernel took {} milliseconds.", System.currentTimeMillis() - timeBefore);
+    LOG.debug("Persisting to kernel took {} milliseconds.",
+              System.currentTimeMillis() - timeBefore);
 
     return true;
   }

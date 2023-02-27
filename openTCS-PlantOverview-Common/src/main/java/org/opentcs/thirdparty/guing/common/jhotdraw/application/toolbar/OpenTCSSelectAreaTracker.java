@@ -58,7 +58,7 @@ public class OpenTCSSelectAreaTracker
   /**
    * The hover Figure is the figure, over which the mouse is currently hovering.
    */
-  private Figure hoverFigure = null;
+  private Figure hoverFigure;
 
   /**
    * Creates a new instance.
@@ -113,7 +113,7 @@ public class OpenTCSSelectAreaTracker
     }
     else {
       // Search first, if one of the selected figures contains
-      // the current mouse location, and is selectable. 
+      // the current mouse location, and is selectable.
       // Only then search for other
       // figures. This search sequence is consistent with the
       // search sequence of the SelectionTool.

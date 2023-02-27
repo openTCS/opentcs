@@ -32,7 +32,8 @@ import org.opentcs.guing.common.components.drawing.course.OriginChangeListener;
  */
 public abstract class LabeledFigure
     extends GraphicalCompositeFigure
-    implements AttributesChangeListener, OriginChangeListener {
+    implements AttributesChangeListener,
+               OriginChangeListener {
 
   /**
    * The figure of the label of this labeled figure.
@@ -146,9 +147,10 @@ public abstract class LabeledFigure
   }
 
   public abstract void updateModel();
+
   /**
    * Scales the model coodinates accodring to changes to the layout scale.
-   * 
+   *
    * @param event The event containing the layout scale change.
    */
   public abstract void scaleModel(EventObject event);

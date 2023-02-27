@@ -121,8 +121,12 @@ public class TreeMouseAdapter
     final JTree objectTree = treeView.getTree();
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverview.TREEVIEW_PATH);
 
-    JMenuItem item = new JMenuItem(labels.getString("treeMouseAdapter.popupMenuItem_expandAllFolders.text"));
-    item.setToolTipText(labels.getString("treeMouseAdapter.popupMenuItem_expandAllFolders.tooltipText"));
+    JMenuItem item = new JMenuItem(
+        labels.getString("treeMouseAdapter.popupMenuItem_expandAllFolders.text")
+    );
+    item.setToolTipText(
+        labels.getString("treeMouseAdapter.popupMenuItem_expandAllFolders.tooltipText")
+    );
 
     item.addActionListener(new ActionListener() {
       @Override
@@ -136,7 +140,9 @@ public class TreeMouseAdapter
     menu.add(item);
 
     item = new JMenuItem(labels.getString("treeMouseAdapter.popupMenuItem_closeAllFolders.text"));
-    item.setToolTipText(labels.getString("treeMouseAdapter.popupMenuItem_closeAllFolders.tooltipText"));
+    item.setToolTipText(
+        labels.getString("treeMouseAdapter.popupMenuItem_closeAllFolders.tooltipText")
+    );
 
     item.addActionListener(new ActionListener() {
       @Override
@@ -152,12 +158,15 @@ public class TreeMouseAdapter
     menu.addSeparator();
 
     item = new JMenuItem(labels.getString("treeMouseAdapter.popupMenuItem_sortAllItems.text"));
-    item.setToolTipText(labels.getString("treeMouseAdapter.popupMenuItem_sortAllItems.tooltipText"));
+    item.setToolTipText(
+        labels.getString("treeMouseAdapter.popupMenuItem_sortAllItems.tooltipText")
+    );
 
     item.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent event) {
-        Enumeration<? extends TreeNode> eTreeNodes = ((TreeNode) objectTree.getModel().getRoot()).children();
+        Enumeration<? extends TreeNode> eTreeNodes
+            = ((TreeNode) objectTree.getModel().getRoot()).children();
 
         while (eTreeNodes.hasMoreElements()) {
           TreeNode node = eTreeNodes.nextElement();

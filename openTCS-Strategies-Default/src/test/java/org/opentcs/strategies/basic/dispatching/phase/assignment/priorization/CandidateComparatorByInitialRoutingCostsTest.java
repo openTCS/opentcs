@@ -25,6 +25,7 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByInitialRoutingCosts;
 
 /**
+ * Unit tests for {@link CandidateComparatorByInitialRoutingCosts}.
  *
  * @author Mustafa Yalciner (Fraunhofer IML)
  */
@@ -58,7 +59,8 @@ public class CandidateComparatorByInitialRoutingCostsTest {
 
   private AssignmentCandidate candidateWithInitialRoutingCost(long initialRoutingCost) {
     TransportOrder trasportOrder = new TransportOrder("TOrder1", new ArrayList<>());
-    Route.Step dummyStep = new Route.Step(null, null, new Point("Point1"), Vehicle.Orientation.FORWARD, 1);
+    Route.Step dummyStep
+        = new Route.Step(null, null, new Point("Point1"), Vehicle.Orientation.FORWARD, 1);
     Route route = new Route(Arrays.asList(dummyStep), initialRoutingCost);
     List<DriveOrder> driveOrders = List.of(
         new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))

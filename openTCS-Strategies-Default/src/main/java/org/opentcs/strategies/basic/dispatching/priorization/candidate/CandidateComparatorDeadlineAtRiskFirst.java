@@ -31,7 +31,8 @@ public class CandidateComparatorDeadlineAtRiskFirst
   public static final String CONFIGURATION_KEY = "DEADLINE_AT_RISK_FIRST";
 
   /**
-   * The comparator that compares the deadlines of transport orders, taking the critical threshold into account.
+   * The comparator that compares the deadlines of transport orders, taking the critical threshold
+   * into account.
    */
   private final Comparator<TransportOrder> delegate;
 

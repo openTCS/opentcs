@@ -17,4 +17,10 @@ import javax.xml.bind.annotation.XmlAccessorType;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class AllowedOperationTO
     extends PlantModelElementTO {
+
+  /**
+   * Creates a new instance.
+   */
+  public AllowedOperationTO() {
+  }
 }

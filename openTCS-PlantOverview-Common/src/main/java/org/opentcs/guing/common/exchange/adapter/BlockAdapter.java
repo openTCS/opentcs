@@ -29,6 +29,12 @@ import org.opentcs.guing.common.model.SystemModel;
 public class BlockAdapter
     extends AbstractProcessAdapter {
 
+  /**
+   * Creates a new instance.
+   */
+  public BlockAdapter() {
+  }
+
   @Override  // OpenTCSProcessAdapter
   public void updateModelProperties(TCSObject<?> tcsObject,
                                     ModelComponent modelComponent,

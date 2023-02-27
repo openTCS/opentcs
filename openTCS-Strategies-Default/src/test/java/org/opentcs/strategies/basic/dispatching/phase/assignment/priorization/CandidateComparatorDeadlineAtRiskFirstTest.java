@@ -30,6 +30,7 @@ import org.opentcs.strategies.basic.dispatching.priorization.candidate.Candidate
 import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorDeadlineAtRiskFirst;
 
 /**
+ * Unit tests for {@link CandidateComparatorDeadlineAtRiskFirst}.
  *
  * @author Mustafa Yalciner (Fraunhofer IML)
  */
@@ -39,7 +40,8 @@ public class CandidateComparatorDeadlineAtRiskFirstTest {
 
   @BeforeEach
   public void setUp() {
-    DefaultDispatcherConfiguration configuration = Mockito.mock(DefaultDispatcherConfiguration.class);
+    DefaultDispatcherConfiguration configuration
+        = Mockito.mock(DefaultDispatcherConfiguration.class);
     Mockito.when(configuration.deadlineAtRiskPeriod()).thenReturn(Long.valueOf(60 * 60 * 1000));
 
     this.comparator = new CandidateComparatorDeadlineAtRiskFirst(
@@ -81,11 +83,5 @@ public class CandidateComparatorDeadlineAtRiskFirstTest {
     return new AssignmentCandidate(new Vehicle("Vehicle1"),
                                    deadlinedOrder,
                                    driveOrders);
-  }
-
-  private TransportOrderComparatorDeadlineAtRiskFirst createOrderComparator() {
-    DefaultDispatcherConfiguration configuration = Mockito.mock(DefaultDispatcherConfiguration.class);
-    Mockito.when(configuration.deadlineAtRiskPeriod()).thenReturn(Long.valueOf(10));
-    return new TransportOrderComparatorDeadlineAtRiskFirst(configuration);
   }
 }

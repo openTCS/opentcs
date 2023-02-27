@@ -28,7 +28,7 @@ public interface ModelFilePersistor {
    * @return {@code true} if, and only if, the model was successfully serialized
    * @throws java.io.IOException If an exception occurs
    */
-  public boolean serialize(PlantModelCreationTO model, File file)
+  boolean serialize(PlantModelCreationTO model, File file)
       throws IOException;
 
   /**
@@ -37,5 +37,5 @@ public interface ModelFilePersistor {
    * @return The filter that declares which files are supported with this persistor
    */
   @Nonnull
-  public FileFilter getDialogFileFilter();
+  FileFilter getDialogFileFilter();
 }

@@ -23,7 +23,7 @@ public class BooleanPropertyCellEditor
     extends AbstractPropertyCellEditor {
 
   /**
-   * Creates a new instance of BooleanCellEditor
+   * Creates a new instance.
    *
    * @param checkBox
    * @param umh
@@ -73,7 +73,7 @@ public class BooleanPropertyCellEditor
   /**
    * Creates the details dialog.
    * Always returns null, does not create a details dialog.
-   * 
+   *
    * @return always returns null, does not create a details dialog.
    */
   @Override

@@ -26,9 +26,21 @@ import org.opentcs.guing.base.model.CompositeModelComponent;
 public class LayoutModel
     extends CompositeModelComponent {
 
+  /**
+   * The key/name of the 'scale X' property.
+   */
   public static final String SCALE_X = "scaleX";
+  /**
+   * The key/name of the 'scale Y' property.
+   */
   public static final String SCALE_Y = "scaleY";
+  /**
+   * The key/name of the 'layer wrappers' property.
+   */
   public static final String LAYERS_WRAPPERS = "layerWrappers";
+  /**
+   * The key/name of the 'layer groups' property.
+   */
   public static final String LAYER_GROUPS = "layerGroups";
   /**
    * This class's resource bundle.
@@ -85,13 +97,17 @@ public class LayoutModel
     setProperty(SCALE_Y, pScaleY);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
-    pMiscellaneous.setDescription(bundle.getString("layoutModel.property_miscellaneous.description"));
+    pMiscellaneous.setDescription(
+        bundle.getString("layoutModel.property_miscellaneous.description")
+    );
     pMiscellaneous.setHelptext(bundle.getString("layoutModel.property_miscellaneous.helptext"));
     pMiscellaneous.setOperatingEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
 
     LayerWrappersProperty pLayerWrappers = new LayerWrappersProperty(this, new HashMap<>());
-    pLayerWrappers.setDescription(bundle.getString("layoutModel.property_layerWrappers.description"));
+    pLayerWrappers.setDescription(
+        bundle.getString("layoutModel.property_layerWrappers.description")
+    );
     pLayerWrappers.setHelptext(bundle.getString("layoutModel.property_layerWrappers.helptext"));
     pLayerWrappers.setModellingEditable(false);
     setProperty(LAYERS_WRAPPERS, pLayerWrappers);

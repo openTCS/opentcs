@@ -32,7 +32,7 @@ public class PointTypePropertyCellRenderer
     JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected,
                                                                 hasFocus, row, column);
 
-    if (value instanceof PointTypeProperty 
+    if (value instanceof PointTypeProperty
         && ((PointTypeProperty) value).getValue() instanceof Type) {
       PointTypeProperty property = (PointTypeProperty) value;
       Type type = (Type) property.getValue();

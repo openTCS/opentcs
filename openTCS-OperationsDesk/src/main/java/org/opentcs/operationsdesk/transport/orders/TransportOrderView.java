@@ -130,9 +130,18 @@ public class TransportOrderView
   private TableModel createPropertiesTableModel() {
     DefaultTableModel tableModel = new UneditableTableModel();
 
-    tableModel.setColumnIdentifiers(new String[]{
-      ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH).getString("transportOrderView.table_properties.column_propertiesKey.headerText"),
-      ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH).getString("transportOrderView.table_properties.column_propertiesValue.headerText")});
+    tableModel.setColumnIdentifiers(
+        new String[]{
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+              .getString(
+                  "transportOrderView.table_properties.column_propertiesKey.headerText"
+              ),
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+              .getString(
+                  "transportOrderView.table_properties.column_propertiesValue.headerText"
+              )
+        }
+    );
     for (Entry<String, String> entry : fTransportOrder.getProperties().entrySet()) {
       tableModel.addRow(new String[]{entry.getKey(), entry.getValue()});
     }
@@ -143,10 +152,14 @@ public class TransportOrderView
   private TableModel createDriveOrdersTableModel() {
     DefaultTableModel tableModel = new UneditableTableModel();
 
-    tableModel.setColumnIdentifiers(new String[]{
-      ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH).getString("transportOrderView.table_driveOrderProperties.column_target.headerText"),
-      "Operation",
-      "Status"});
+    tableModel.setColumnIdentifiers(
+        new String[]{
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+              .getString("transportOrderView.table_driveOrderProperties.column_target.headerText"),
+          "Operation",
+          "Status"
+        }
+    );
 
     for (DriveOrder o : fTransportOrder.getAllDriveOrders()) {
       String[] row = new String[3];
@@ -162,10 +175,24 @@ public class TransportOrderView
   private TableModel createDriveOrderPropertiesTableModel() {
     DefaultTableModel tableModel = new UneditableTableModel();
 
-    tableModel.setColumnIdentifiers(new String[]{
-      ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH).getString("transportOrderView.table_driveOrderProperties.column_driveOrderPropertiesKey.headerText"),
-      ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH).getString("transportOrderView.table_driveOrderProperties.column_driveOrderPropertiesValue.headerText")
-    });
+    // We could put these long resource bundle keys somewhere else with less indentation to make
+    // them fit into the maximum line length, but then we would deviate from the pattern used in
+    // all the other places in this file, so we make an exception and disable Checkstyle here.
+    // -- S. Walter, 2023-02-25
+    // CHECKSTYLE:OFF
+    tableModel.setColumnIdentifiers(
+        new String[]{
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+              .getString(
+                  "transportOrderView.table_driveOrderProperties.column_driveOrderPropertiesKey.headerText"
+              ),
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+              .getString(
+                  "transportOrderView.table_driveOrderProperties.column_driveOrderPropertiesValue.headerText"
+              )
+        }
+    );
+    // CHECKSTYLE:ON
 
     return tableModel;
   }
@@ -173,9 +200,14 @@ public class TransportOrderView
   private TableModel createRouteTableModel() {
     DefaultTableModel tableModel = new UneditableTableModel();
 
-    tableModel.setColumnIdentifiers(new String[]{
-      ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH).getString("transportOrderView.table_route.column_route.headerText"),
-      ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH).getString("transportOrderView.table_routeTable.column_destination.headerText")});
+    tableModel.setColumnIdentifiers(
+        new String[]{
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+              .getString("transportOrderView.table_route.column_route.headerText"),
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+              .getString("transportOrderView.table_routeTable.column_destination.headerText")
+        }
+    );
 
     return tableModel;
   }
@@ -183,11 +215,16 @@ public class TransportOrderView
   private TableModel createDependenciesTableModel() {
     DefaultTableModel tableModel = new UneditableTableModel();
 
-    tableModel.setColumnIdentifiers(new String[]{
-      ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH).getString("transportOrderView.table_dependencies.column_dependentTransportOrder.headerText")});
+    tableModel.setColumnIdentifiers(
+        new String[]{
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+              .getString(
+                  "transportOrderView.table_dependencies.column_dependentTransportOrder.headerText"
+              )
+        }
+    );
 
-    for (TCSObjectReference<TransportOrder> refTransportOrder
-             : fTransportOrder.getDependencies()) {
+    for (TCSObjectReference<TransportOrder> refTransportOrder : fTransportOrder.getDependencies()) {
       String[] row = new String[1];
       row[0] = refTransportOrder.getName();
       tableModel.addRow(row);
@@ -199,10 +236,14 @@ public class TransportOrderView
   private TableModel createHistoryTableModel() {
     DefaultTableModel tableModel = new UneditableTableModel();
 
-    tableModel.setColumnIdentifiers(new String[]{
-      ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH).getString("transportOrderView.table_history.column_timestamp.headerText"),
-      ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH).getString("transportOrderView.table_history.column_event.headerText")
-    });
+    tableModel.setColumnIdentifiers(
+        new String[]{
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+              .getString("transportOrderView.table_history.column_timestamp.headerText"),
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+              .getString("transportOrderView.table_history.column_event.headerText")
+        }
+    );
 
     for (ObjectHistory.Entry entry : fTransportOrder.getHistory().getEntries()) {
       tableModel.addRow(new String[]{
@@ -667,7 +708,7 @@ public class TransportOrderView
     /**
      * Creates a new instance.
      */
-    public ToolTipCellRenderer() {
+    ToolTipCellRenderer() {
     }
 
     @Override

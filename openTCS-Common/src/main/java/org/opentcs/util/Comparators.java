@@ -28,12 +28,6 @@ public final class Comparators {
   private static final Comparator<TCSObject<?>> OBJECTS_BY_NAME
       = (TCSObject<?> o1, TCSObject<?> o2) -> o1.getName().compareTo(o2.getName());
   /**
-   * A <code>Comparator</code> for ordering <code>TCSObjectReference</code>s ascendingly
-   * by their names.
-   */
-  private static final Comparator<TCSObjectReference<?>> REFERENCES_BY_NAME
-      = (TCSObjectReference<?> o1, TCSObjectReference<?> o2) -> o1.getName().compareTo(o2.getName());
-  /**
    * A comparator for sorting transport orders by their age, with the oldest ones coming first.
    */
   private static final Comparator<TransportOrder> ORDERS_BY_AGE
@@ -81,15 +75,6 @@ public final class Comparators {
           return OBJECTS_BY_NAME.compare(o1, o2);
         }
       };
-  /**
-   * Compares ModelLayoutElements by the names of their visualized objects.
-   */
-  @Deprecated
-  private static final Comparator<org.opentcs.data.model.visualization.ModelLayoutElement> LAYOUT_ELEMS_BY_NAME
-      = (org.opentcs.data.model.visualization.ModelLayoutElement o1,
-          org.opentcs.data.model.visualization.ModelLayoutElement o2)
-      -> o1.getVisualizedObject().getName().compareTo(
-          o2.getVisualizedObject().getName());
 
   /**
    * Prevents undesired instantiation.
@@ -116,7 +101,8 @@ public final class Comparators {
    * by their names.
    */
   public static Comparator<TCSObjectReference<?>> referencesByName() {
-    return REFERENCES_BY_NAME;
+    return (TCSObjectReference<?> o1, TCSObjectReference<?> o2)
+        -> o1.getName().compareTo(o2.getName());
   }
 
   /**
@@ -160,7 +146,11 @@ public final class Comparators {
    */
   @Deprecated
   @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  public static Comparator<org.opentcs.data.model.visualization.ModelLayoutElement> modelLayoutElementsByName() {
-    return LAYOUT_ELEMS_BY_NAME;
+  public static Comparator<org.opentcs.data.model.visualization.ModelLayoutElement>
+      modelLayoutElementsByName() {
+    return (org.opentcs.data.model.visualization.ModelLayoutElement o1,
+        org.opentcs.data.model.visualization.ModelLayoutElement o2)
+        -> o1.getVisualizedObject().getName().compareTo(
+            o2.getVisualizedObject().getName());
   }
 }

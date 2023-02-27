@@ -31,7 +31,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class CutAction
     extends AbstractSelectionAction {
 
-  public final static String ID = "edit.cut";
+  /**
+   * This action's ID.
+   */
+  public static final String ID = "edit.cut";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
 
@@ -62,7 +65,8 @@ public class CutAction
 
   @Override
   public void actionPerformed(ActionEvent evt) {
-    Component cFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
+    Component cFocusOwner
+        = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
 
     if (cFocusOwner instanceof JComponent) {
       if (cFocusOwner.isEnabled()) {
@@ -81,7 +85,9 @@ public class CutAction
 //    }
 //
 //    if (cTarget != null && cTarget.isEnabled() && cTarget.getTransferHandler() != null) {
-//      cTarget.getTransferHandler().exportToClipboard(cTarget, ClipboardUtil.getClipboard(), TransferHandler.MOVE);
+//      cTarget.getTransferHandler().exportToClipboard(cTarget,
+//                                                     ClipboardUtil.getClipboard(),
+//                                                     TransferHandler.MOVE);
 //    }
   }
 }

@@ -21,7 +21,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class AddTransportOrderSequenceViewAction
     extends AbstractAction {
 
-  public final static String ID = "view.addOrderSequenceView";
+  /**
+   * This action's ID.
+   */
+  public static final String ID = "view.addOrderSequenceView";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
 

@@ -62,7 +62,8 @@ public abstract class ControlCenterInjectionModule
    *
    * @return The multibinder.
    */
-  protected Multibinder<PeripheralCommAdapterPanelFactory> peripheralCommAdapterPanelFactoryBinder() {
+  protected Multibinder<PeripheralCommAdapterPanelFactory>
+      peripheralCommAdapterPanelFactoryBinder() {
     return Multibinder.newSetBinder(binder(), PeripheralCommAdapterPanelFactory.class);
   }
 }

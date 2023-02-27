@@ -34,11 +34,6 @@ class LayersTableModel
                LayerGroupChangeListener {
 
   /**
-   * The resource bundle to use.
-   */
-  private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle(I18nPlantOverviewOperating.LAYERS_PATH);
-  /**
    * The number of the "Ordinal" column.
    */
   public static final int COLUMN_ORDINAL = 0;
@@ -58,6 +53,11 @@ class LayersTableModel
    * The number of the "Group visible" column.
    */
   public static final int COLUMN_GROUP_VISIBLE = 4;
+  /**
+   * The resource bundle to use.
+   */
+  private static final ResourceBundle BUNDLE
+      = ResourceBundle.getBundle(I18nPlantOverviewOperating.LAYERS_PATH);
   /**
    * The column names.
    */
@@ -93,8 +93,8 @@ class LayersTableModel
    * @param modelManager The model manager.
    * @param layerEditor The layer editor.
    */
-  public LayersTableModel(ModelManager modelManager,
-                          LayerEditor layerEditor) {
+  LayersTableModel(ModelManager modelManager,
+                   LayerEditor layerEditor) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.layerEditor = requireNonNull(layerEditor, "layerEditor");
   }
@@ -194,14 +194,14 @@ class LayersTableModel
 
   @Override
   public void layersInitialized() {
-    // Once the layers are initialized we want to redraw the entire table to avoid any 
+    // Once the layers are initialized we want to redraw the entire table to avoid any
     // display errors.
     executeOnEventDispatcherThread(() -> fireTableDataChanged());
   }
 
   @Override
   public void layersChanged() {
-    // Update the entire table but don't use fireTableDataChanged() to preserve the current 
+    // Update the entire table but don't use fireTableDataChanged() to preserve the current
     // selection.
     executeOnEventDispatcherThread(() -> fireTableRowsUpdated(0, getRowCount() - 1));
   }
@@ -251,7 +251,7 @@ class LayersTableModel
    * If the runnable is already being called on the EDT, the runnable is executed immediately.
    * Otherwise it is scheduled for execution on the EDT.
    * <p>
-   * Note: Deferring a runnable by scheduling it for execution on the EDT even though it would 
+   * Note: Deferring a runnable by scheduling it for execution on the EDT even though it would
    * have already been executed on the EDT may lead to exceptions due to data inconsistency.
    * </p>
    *

@@ -81,7 +81,7 @@ public class RemoteServicesTest {
 
     Class<?>[] paramTypes = method.getParameterTypes();
     Class<?>[] extParamTypes = new Class<?>[paramTypes.length + 1];
-    // We're looking for a method with the same parameter types as the called one, but with an 
+    // We're looking for a method with the same parameter types as the called one, but with an
     // additional client ID as the first parameter.
     extParamTypes[0] = ClientID.class;
     System.arraycopy(paramTypes, 0, extParamTypes, 1, paramTypes.length);

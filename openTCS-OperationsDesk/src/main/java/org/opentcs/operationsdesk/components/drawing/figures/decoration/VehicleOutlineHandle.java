@@ -19,7 +19,6 @@ import org.opentcs.operationsdesk.components.drawing.figures.VehicleFigure;
 
 /**
  *
- * 
  * @author Heinz Huber (Fraunhofer IML)
  */
 public class VehicleOutlineHandle

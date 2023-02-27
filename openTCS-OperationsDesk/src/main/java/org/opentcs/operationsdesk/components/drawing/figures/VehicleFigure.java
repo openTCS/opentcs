@@ -108,7 +108,7 @@ public class VehicleFigure
   /**
    * The image.
    */
-  protected transient Image fImage;
+  private transient Image fImage;
   /**
    * Whether to ignore the vehicle's precise position or not.
    */
@@ -120,7 +120,7 @@ public class VehicleFigure
   /**
    * Indicates whether figure details changed.
    */
-  private boolean figureDetailsChanged = false;
+  private boolean figureDetailsChanged;
 
   /**
    * Creates a new instance.

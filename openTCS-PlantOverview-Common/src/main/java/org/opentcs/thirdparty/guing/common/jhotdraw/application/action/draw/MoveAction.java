@@ -98,7 +98,7 @@ public abstract class MoveAction
     /**
      * This action's ID.
      */
-    public final static String ID = "edit.moveEast";
+    public static final String ID = "edit.moveEast";
 
     /**
      * Creates a new instance.
@@ -122,7 +122,7 @@ public abstract class MoveAction
     /**
      * This action's ID.
      */
-    public final static String ID = "edit.moveWest";
+    public static final String ID = "edit.moveWest";
 
     /**
      * Creates a new instance.
@@ -146,7 +146,7 @@ public abstract class MoveAction
     /**
      * This action's ID.
      */
-    public final static String ID = "edit.moveNorth";
+    public static final String ID = "edit.moveNorth";
 
     /**
      * Creates a new instance.
@@ -170,7 +170,7 @@ public abstract class MoveAction
     /**
      * This action's ID.
      */
-    public final static String ID = "edit.moveSouth";
+    public static final String ID = "edit.moveSouth";
 
     /**
      * Creates a new instance.

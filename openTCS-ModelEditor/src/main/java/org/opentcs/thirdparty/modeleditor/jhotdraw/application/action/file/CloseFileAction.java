@@ -52,7 +52,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * <p>
  * You should
  * include this action in applications which use at least one of the following
- * actions, so that the user can close views that he/she created: {@link NewFileAction}, {@link NewWindowAction},
+ * actions, so that the user can close views that he/she created:
+ * {@link NewFileAction}, {@link NewWindowAction},
  * {@link OpenFileAction}, {@link OpenDirectoryAction}.
  * <p>
  *
@@ -61,12 +62,21 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class CloseFileAction
     extends AbstractAction {
 
-  public final static String ID = "file.close";
-  public final static String ID_WINDOW_CLOSING = "windowClosing";
-  public final static String ID_MODEL_CLOSING = "modelClosing";
+  /**
+   * This action's regular ID.
+   */
+  public static final String ID = "file.close";
+  /**
+   * This action's ID for the window being closed.
+   */
+  public static final String ID_WINDOW_CLOSING = "windowClosing";
+  /**
+   * This action's ID for the model being closed.
+   */
+  public static final String ID_MODEL_CLOSING = "modelClosing";
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
   /**
-   * 0: Save file 1: Dont't save file 2: Canceled
+   * 0: Save file; 1: Don't save file; 2: Canceled.
    */
   private int fileSaved;
   private final OpenTCSView view;
@@ -101,8 +111,10 @@ public class CloseFileAction
       URI unsavedURI = view.getURI();
       String message
           = "<html><b>"
-          + labels.getFormatted("file.saveBefore.doYouWantToSave.message",
-                                (unsavedURI == null) ? Kernel.DEFAULT_MODEL_NAME : URIUtil.getName(unsavedURI))
+          + labels.getFormatted(
+              "file.saveBefore.doYouWantToSave.message",
+              (unsavedURI == null) ? Kernel.DEFAULT_MODEL_NAME : URIUtil.getName(unsavedURI)
+          )
           + "</b><p>"
           + labels.getString("file.saveBefore.doYouWantToSave.details")
           + "</p></html>";
@@ -113,10 +125,14 @@ public class CloseFileAction
         labels.getString("file.saveBefore.cancelOption.text")
       };
 
-      int option = JOptionPane.showOptionDialog(view.getComponent(), message, "", // title
-                                                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
-                                                null, // icon
-                                                options, options[0]);
+      int option = JOptionPane.showOptionDialog(view.getComponent(),
+                                                message,
+                                                "",
+                                                JOptionPane.YES_NO_CANCEL_OPTION,
+                                                JOptionPane.WARNING_MESSAGE,
+                                                null,
+                                                options,
+                                                options[0]);
 
       fileSaved = JOptionPane.CANCEL_OPTION;
 

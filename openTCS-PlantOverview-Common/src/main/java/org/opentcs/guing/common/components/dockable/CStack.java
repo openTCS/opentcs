@@ -26,7 +26,7 @@ import bibliothek.util.Path;
 
 /**
  * A tab dockable copied from the dockingframes examples.
- * 
+ *
  * @author Philipp Seifert (Fraunhofer IML)
  */
 public class CStack
@@ -196,7 +196,7 @@ public class CStack
   }
 
   public DockActionSource[] getSources() {
-    return new DockActionSource[] {getClose()};
+    return new DockActionSource[]{getClose()};
   }
 
   @Override

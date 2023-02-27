@@ -124,7 +124,8 @@ public class TransportOrdersContainerPanel
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
     this.orderPanelProvider = requireNonNull(orderPanelProvider, "orderPanelProvider");
     this.transportViewFactory = requireNonNull(transportViewFactory, "transportViewFactory");
-    this.transportOrdersContainer = requireNonNull(transportOrderContainer, "transportOrderContainer");
+    this.transportOrdersContainer = requireNonNull(transportOrderContainer,
+                                                   "transportOrderContainer");
 
     initComponents();
   }
@@ -228,19 +229,28 @@ public class TransportOrdersContainerPanel
 
   private void showPopupMenuForSelectedTransportOrder(int x, int y) {
     boolean singleRowSelected = fTable.getSelectedRowCount() <= 1;
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
+    ResourceBundleUtil bundle
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
     JPopupMenu menu = new JPopupMenu();
-    JMenuItem item = menu.add(bundle.getString("transportOrdersContainerPanel.table_orders.popupMenuItem_showDetails.text"));
+    JMenuItem item = menu.add(
+        bundle.getString(
+            "transportOrdersContainerPanel.table_orders.popupMenuItem_showDetails.text"
+        )
+    );
     item.setEnabled(singleRowSelected);
     item.addActionListener((ActionEvent evt) -> showSelectedTransportOrder());
 
     menu.add(new JSeparator());
 
-    item = menu.add(bundle.getString("transportOrdersContainerPanel.table_orders.popupMenuItem_orderAsTemplate.text"));
+    item = menu.add(bundle.getString(
+        "transportOrdersContainerPanel.table_orders.popupMenuItem_orderAsTemplate.text")
+    );
     item.setEnabled(singleRowSelected);
     item.addActionListener((ActionEvent evt) -> createTransportOrderWithPattern());
 
-    item = menu.add(bundle.getString("transportOrdersContainerPanel.table_orders.popupMenuItem_copyOrder.text"));
+    item = menu.add(bundle.getString(
+        "transportOrdersContainerPanel.table_orders.popupMenuItem_copyOrder.text")
+    );
     item.setEnabled(singleRowSelected);
     item.addActionListener((ActionEvent evt) -> createCopyOfSelectedTransportOrder());
 
@@ -248,7 +258,8 @@ public class TransportOrdersContainerPanel
   }
 
   private void addControlButtons(JToolBar toolBar) {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
+    ResourceBundleUtil bundle
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
 
     toolBar.add(new JToolBar.Separator());
 
@@ -272,7 +283,8 @@ public class TransportOrdersContainerPanel
   }
 
   private List<JToggleButton> createFilterButtons() {
-    ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
+    ResourceBundleUtil bundle
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
     JToggleButton button;
     List<JToggleButton> buttons = new ArrayList<>();
     IconToolkit iconkit = IconToolkit.instance();
@@ -281,34 +293,46 @@ public class TransportOrdersContainerPanel
                               createFilterForState(RAW),
                               sorter);
 
-    button.setToolTipText(bundle.getString("transportOrdersContainerPanel.button_filterRawOrders.tooltipText"));
+    button.setToolTipText(
+        bundle.getString("transportOrdersContainerPanel.button_filterRawOrders.tooltipText")
+    );
     buttons.add(button);
 
     button
         = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterActivated.16x16.gif"),
                            createFilterForState(DISPATCHABLE),
                            sorter);
-    button.setToolTipText(bundle.getString("transportOrdersContainerPanel.button_filterDispatchableOrders.tooltipText"));
+    button.setToolTipText(
+        bundle.getString(
+            "transportOrdersContainerPanel.button_filterDispatchableOrders.tooltipText"
+        )
+    );
     buttons.add(button);
 
     button
         = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterProcessing.16x16.gif"),
                            createFilterForState(BEING_PROCESSED),
                            sorter);
-    button.setToolTipText(bundle.getString("transportOrdersContainerPanel.button_filterProcessedOrders.tooltipText"));
+    button.setToolTipText(
+        bundle.getString("transportOrdersContainerPanel.button_filterProcessedOrders.tooltipText")
+    );
     buttons.add(button);
 
     button
         = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterFinished.16x16.gif"),
                            createFilterForState(FINISHED),
                            sorter);
-    button.setToolTipText(bundle.getString("transportOrdersContainerPanel.button_filterFinishedOrders.tooltipText"));
+    button.setToolTipText(
+        bundle.getString("transportOrdersContainerPanel.button_filterFinishedOrders.tooltipText")
+    );
     buttons.add(button);
 
     button = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterFailed.16x16.gif"),
                               createFilterForState(FAILED),
                               sorter);
-    button.setToolTipText(bundle.getString("transportOrdersContainerPanel.button_filterFailedOrders.tooltipText"));
+    button.setToolTipText(
+        bundle.getString("transportOrdersContainerPanel.button_filterFailedOrders.tooltipText")
+    );
     buttons.add(button);
 
     return buttons;
@@ -318,7 +342,8 @@ public class TransportOrdersContainerPanel
     return new RowFilter<Object, Object>() {
       @Override
       public boolean include(Entry<? extends Object, ? extends Object> entry) {
-        TransportOrder order = ((TransportOrderTableModel) entry.getModel()).getEntryAt((int) entry.getIdentifier());
+        TransportOrder order
+            = ((TransportOrderTableModel) entry.getModel()).getEntryAt((int) entry.getIdentifier());
         return order.getState() != state;
       }
     };

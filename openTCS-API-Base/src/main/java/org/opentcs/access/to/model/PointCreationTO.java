@@ -124,7 +124,8 @@ public class PointCreationTO
   }
 
   /**
-   * Creates a copy of this object with the vehicle's (assumed) orientation angle when it's at this position.
+   * Creates a copy of this object with the vehicle's (assumed) orientation angle when it's at this
+   * position.
    * Allowed value range: [-360..360], or {@code Double.NaN} to indicate that there is no specific
    * orientation angle for this point.
    *
@@ -132,9 +133,12 @@ public class PointCreationTO
    * @return A copy of this object, differing in the given angle.
    */
   public PointCreationTO withVehicleOrientationAngle(double vehicleOrientationAngle) {
-    checkArgument(Double.isNaN(vehicleOrientationAngle)
-        || (vehicleOrientationAngle >= -360.0 || vehicleOrientationAngle <= 360.0),
-                  "vehicleOrientationAngle not in [-360..360]: " + vehicleOrientationAngle);
+    checkArgument(
+        Double.isNaN(vehicleOrientationAngle)
+        || vehicleOrientationAngle >= -360.0
+        || vehicleOrientationAngle <= 360.0,
+        "vehicleOrientationAngle not in [-360..360]: " + vehicleOrientationAngle
+    );
     return new PointCreationTO(getName(),
                                getModifiableProperties(),
                                position,

@@ -53,7 +53,8 @@ public class ActionsMenu
     requireNonNull(menuFactory, "menuFactory");
     requireNonNull(appConfig, "appConfig");
 
-    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
+    final ResourceBundleUtil labels
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
 
     this.setText(labels.getString("actionsMenu.text"));
     this.setToolTipText(labels.getString("actionsMenu.tooltipText"));

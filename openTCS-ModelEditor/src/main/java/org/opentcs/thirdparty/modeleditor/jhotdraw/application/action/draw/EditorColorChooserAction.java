@@ -62,8 +62,9 @@ public class EditorColorChooserAction
     super(editor, fixedAttributes, name, icon);
     this.key = key;
     putValue(AbstractAction.NAME, name);
-    putValue(Action.SHORT_DESCRIPTION, ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH)
-             .getString("editorColorChooserAction.shortDescription"));
+    putValue(Action.SHORT_DESCRIPTION,
+             ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH)
+                 .getString("editorColorChooserAction.shortDescription"));
     putValue(AbstractAction.SMALL_ICON, icon);
     updateEnabledState();
   }
@@ -71,10 +72,14 @@ public class EditorColorChooserAction
   @Override
   public void actionPerformed(java.awt.event.ActionEvent e) {
     Color initialColor = getInitialColor();
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH);
-    Color chosenColor = JColorChooser.showDialog((Component) e.getSource(),
-                                                 labels.getString("editorColorChooserAction.dialog_colorSelection.title"),
-                                                 initialColor);
+    ResourceBundleUtil labels
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH);
+    Color chosenColor
+        = JColorChooser.showDialog(
+            (Component) e.getSource(),
+            labels.getString("editorColorChooserAction.dialog_colorSelection.title"),
+            initialColor
+        );
 
     if (chosenColor != null) {
       HashMap<AttributeKey, Object> attr = new HashMap<>(attributes);

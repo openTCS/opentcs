@@ -22,10 +22,13 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class AddPeripheralJobViewAction
     extends AbstractAction {
 
+  /**
+   * This action's ID.
+   */
   public static final String ID = "view.addPeripheralJobView";
-  
+
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);
-  
+
   private final OpenTCSView view;
 
   /**
@@ -35,7 +38,7 @@ public class AddPeripheralJobViewAction
    */
   public AddPeripheralJobViewAction(OpenTCSView view) {
     this.view = requireNonNull(view, "view");
-    
+
     putValue(NAME, BUNDLE.getString("addPeripheralJobViewAction.name"));
   }
 

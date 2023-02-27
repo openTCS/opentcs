@@ -32,6 +32,12 @@ public class PathTO
   private Long maxReverseVelocity = 0L;
   private Boolean locked = false;
 
+  /**
+   * Creates a new instance.
+   */
+  public PathTO() {
+  }
+
   @XmlAttribute(required = true)
   public String getSourcePoint() {
     return sourcePoint;

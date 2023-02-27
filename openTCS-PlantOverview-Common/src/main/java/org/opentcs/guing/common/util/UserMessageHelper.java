@@ -18,6 +18,12 @@ import javax.swing.JOptionPane;
 public class UserMessageHelper {
 
   /**
+   * Creates a new instance.
+   */
+  public UserMessageHelper() {
+  }
+
+  /**
    * Shows a message dialog to the user centered in the screen.
    *
    * @param title The title of the dialog.
@@ -127,18 +133,45 @@ public class UserMessageHelper {
                                   jOptionType);
   }
 
+  /**
+   * Supported types of user messages.
+   */
   public enum Type {
 
+    /**
+     * A plain message.
+     */
     PLAIN,
+    /**
+     * An info message.
+     */
     INFO,
+    /**
+     * An error message.
+     */
     ERROR,
+    /**
+     * A question.
+     */
     QUESTION;
   }
 
+  /**
+   * Possible return types of the dialog.
+   */
   public enum ReturnType {
 
+    /**
+     * OK.
+     */
     OK,
+    /**
+     * No.
+     */
     NO,
+    /**
+     * Cancel.
+     */
     CANCEL;
   }
 }

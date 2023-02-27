@@ -7,7 +7,7 @@
  */
 package org.opentcs.guing.common.components.properties.event;
 
-/** 
+/**
  * A listener that listens for changes on a table.
  *
  * @author Sebastian Naumann (ifak e.V. Magdeburg)

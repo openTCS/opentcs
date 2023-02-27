@@ -17,6 +17,12 @@ import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 public class MultipleDifferentValues
     implements AcceptableInvalidValue {
 
+  /**
+   * Creates a new instance.
+   */
+  public MultipleDifferentValues() {
+  }
+
   @Override
   public String getDescription() {
     return ResourceBundle.getBundle(BUNDLE_PATH)

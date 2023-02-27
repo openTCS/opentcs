@@ -42,6 +42,12 @@ public class ModelParser {
   private static final Charset CHARSET = Charset.forName("UTF-8");
 
   /**
+   * Creates a new instance.
+   */
+  public ModelParser() {
+  }
+
+  /**
    * Reads a model from the given file and parses it to a {@link PlantModelCreationTO} instance.
    *
    * @param file The model file to read.

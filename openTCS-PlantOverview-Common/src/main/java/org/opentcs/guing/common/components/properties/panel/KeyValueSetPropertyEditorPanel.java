@@ -149,7 +149,10 @@ public class KeyValueSetPropertyEditorPanel
       if (itemsTable.getValueAt(i, 0).equals(key)) {
         JOptionPane.showMessageDialog(
             this,
-            resBundle.getString("keyValueSetPropertyEditorPanel.optionPane_keyAlreadyExists.message") + ": " + key);
+            resBundle.getString(
+                "keyValueSetPropertyEditorPanel.optionPane_keyAlreadyExists.message"
+            ) + ": " + key
+        );
         return;
       }
     }
@@ -178,7 +181,10 @@ public class KeyValueSetPropertyEditorPanel
               && Objects.equals(itemsTable.getValueAt(newKeyRow, 0), newKey)) {
             JOptionPane.showMessageDialog(
                 this,
-                resBundle.getString("keyValueSetPropertyEditorPanel.optionPane_keyAlreadyExists.message") + ": " + newKey);
+                resBundle.getString(
+                    "keyValueSetPropertyEditorPanel.optionPane_keyAlreadyExists.message"
+                ) + ": " + newKey
+            );
             return;
           }
         }
@@ -272,6 +278,7 @@ public class KeyValueSetPropertyEditorPanel
     removeButton.setEnabled(enableRemoval);
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -352,6 +359,7 @@ public class KeyValueSetPropertyEditorPanel
 
     add(controlPanel, java.awt.BorderLayout.EAST);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
       int selectedRowIndex = itemsTable.getSelectedRow();

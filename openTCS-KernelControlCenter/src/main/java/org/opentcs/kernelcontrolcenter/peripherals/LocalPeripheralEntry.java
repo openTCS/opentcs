@@ -84,7 +84,9 @@ public class LocalPeripheralEntry {
     return attachedCommAdapter;
   }
 
-  public void setAttachedCommAdapter(@Nonnull PeripheralCommAdapterDescription attachedCommAdapter) {
+  public void setAttachedCommAdapter(
+      @Nonnull PeripheralCommAdapterDescription attachedCommAdapter
+  ) {
     PeripheralCommAdapterDescription oldAttachedCommAdapter = this.attachedCommAdapter;
     this.attachedCommAdapter = requireNonNull(attachedCommAdapter, "attachedCommAdapter");
 
@@ -115,7 +117,7 @@ public class LocalPeripheralEntry {
   /**
    * Enum elements used as notification arguments to specify which argument changed.
    */
-  public static enum Attribute {
+  public enum Attribute {
     /**
      * Indicates a change of the process model.
      */

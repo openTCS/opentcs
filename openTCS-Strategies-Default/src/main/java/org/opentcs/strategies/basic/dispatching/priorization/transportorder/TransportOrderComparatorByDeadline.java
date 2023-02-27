@@ -26,6 +26,12 @@ public class TransportOrderComparatorByDeadline
   public static final String CONFIGURATION_KEY = "BY_DEADLINE";
 
   /**
+   * Creates a new instance.
+   */
+  public TransportOrderComparatorByDeadline() {
+  }
+
+  /**
    * Compares two orders by their deadline.
    * Note: this comparator imposes orderings that are inconsistent with equals.
    *

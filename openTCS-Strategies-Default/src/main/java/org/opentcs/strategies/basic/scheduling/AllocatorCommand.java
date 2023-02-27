@@ -91,7 +91,7 @@ abstract class AllocatorCommand
      * @param client The scheduler client this command is associated with.
      * @param resources The resources being released.
      */
-    public AllocationsReleased(Client client, Set<TCSResource<?>> resources) {
+    AllocationsReleased(Client client, Set<TCSResource<?>> resources) {
       super(2, client);
       this.resources = requireNonNull(resources, "resources");
     }
@@ -125,7 +125,7 @@ abstract class AllocatorCommand
      *
      * @param client The scheduler client this command is associated with.
      */
-    public RetryAllocates(Client client) {
+    RetryAllocates(Client client) {
       super(3, client);
     }
 
@@ -155,7 +155,7 @@ abstract class AllocatorCommand
      * @param client The scheduler client this command is associated with.
      * @param resources The resources to be checked.
      */
-    public CheckAllocationsPrepared(Client client, Set<TCSResource<?>> resources) {
+    CheckAllocationsPrepared(Client client, Set<TCSResource<?>> resources) {
       super(4, client);
       this.resources = requireNonNull(resources, "resources");
     }
@@ -195,7 +195,7 @@ abstract class AllocatorCommand
      * @param client The scheduler client this command is associated with.
      * @param resources The resources to be allocated.
      */
-    public Allocate(Client client, Set<TCSResource<?>> resources) {
+    Allocate(Client client, Set<TCSResource<?>> resources) {
       super(5, client);
       this.resources = requireNonNull(resources, "resources");
     }

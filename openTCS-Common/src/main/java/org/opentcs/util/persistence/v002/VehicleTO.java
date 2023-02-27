@@ -39,6 +39,12 @@ public class VehicleTO
   private Long energyLevelFullyRecharged = 0L;
   private Long energyLevelSufficientlyRecharged = 0L;
 
+  /**
+   * Creates a new instance.
+   */
+  public VehicleTO() {
+  }
+
   @XmlAttribute
   public String getType() {
     return type;

@@ -51,7 +51,7 @@ public class CreateTransportOrderPanel
   /**
    * This instance's resource bundle.
    */
-  private final ResourceBundle bundle 
+  private final ResourceBundle bundle
       = ResourceBundle.getBundle(I18nPlantOverviewOperating.CREATETO_PATH);
   /**
    * The selected deadline.
@@ -100,8 +100,12 @@ public class CreateTransportOrderPanel
 
     initComponents();
     Object[] columnNames = {
-      bundle.getString("createTransportOrderPanel.table_driveOrdersTable.column_location.headerText"),
-      bundle.getString("createTransportOrderPanel.table_driveOrdersTable.column_action.headerText")
+      bundle.getString(
+      "createTransportOrderPanel.table_driveOrdersTable.column_location.headerText"
+      ),
+      bundle.getString(
+      "createTransportOrderPanel.table_driveOrdersTable.column_action.headerText"
+      )
     };
     DefaultTableModel model = (DefaultTableModel) driveOrdersTable.getModel();
     model.setColumnIdentifiers(columnNames);
@@ -165,18 +169,22 @@ public class CreateTransportOrderPanel
       fSelectedDeadline = deadline.toInstant().toEpochMilli();
     }
     catch (ParseException e) {
-      JOptionPane.showMessageDialog(this,
-                                    bundle.getString("createTransportOrderPanel.optionPane_dateTimeParseError.message"),
-                                    bundle.getString("createTransportOrderPanel.optionPane_dateTimeParseError.title"),
-                                    JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(
+          this,
+          bundle.getString("createTransportOrderPanel.optionPane_dateTimeParseError.message"),
+          bundle.getString("createTransportOrderPanel.optionPane_dateTimeParseError.title"),
+          JOptionPane.ERROR_MESSAGE
+      );
       updateFailed = true;
     }
 
     if (fDestinationModels.isEmpty()) {
-      JOptionPane.showMessageDialog(this,
-                                    bundle.getString("createTransportOrderPanel.optionPane_noOrderError.message"),
-                                    bundle.getString("createTransportOrderPanel.optionPane_noOrderError.title"),
-                                    JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(
+          this,
+          bundle.getString("createTransportOrderPanel.optionPane_noOrderError.message"),
+          bundle.getString("createTransportOrderPanel.optionPane_noOrderError.title"),
+          JOptionPane.ERROR_MESSAGE
+      );
       updateFailed = true;
     }
   }
@@ -221,7 +229,8 @@ public class CreateTransportOrderPanel
         row[0] = destination;
         row[1] = action;
         model.addRow(row);
-        AbstractConnectableModelComponent destModel = fModelManager.getModel().getLocationModel(destination);
+        AbstractConnectableModelComponent destModel
+            = fModelManager.getModel().getLocationModel(destination);
         if (destModel == null) {
           destModel = fModelManager.getModel().getPointModel(destination);
         }
@@ -503,6 +512,7 @@ public class CreateTransportOrderPanel
 
     add(vehiclePanel);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
   private void moveDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownButtonActionPerformed
     int index = driveOrdersTable.getSelectedRow();
@@ -579,7 +589,8 @@ public class CreateTransportOrderPanel
 
     AbstractConnectableModelComponent location = fDestinationModels.get(index);
     String action = fActions.get(index);
-    EditDriveOrderPanel contentPanel = new EditDriveOrderPanel(fModelManager.getModel().getLocationModels(), location, action);
+    EditDriveOrderPanel contentPanel
+        = new EditDriveOrderPanel(fModelManager.getModel().getLocationModels(), location, action);
     StandardContentDialog dialog
         = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
                                     contentPanel);
@@ -601,10 +612,10 @@ public class CreateTransportOrderPanel
   }//GEN-LAST:event_editButtonActionPerformed
 
   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-    EditDriveOrderPanel contentPanel = new EditDriveOrderPanel(fModelManager.getModel().getLocationModels());
+    EditDriveOrderPanel contentPanel
+        = new EditDriveOrderPanel(fModelManager.getModel().getLocationModels());
     StandardContentDialog dialog
-        = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
-                                    contentPanel);
+        = new StandardContentDialog(JOptionPane.getFrameForComponent(this), contentPanel);
     dialog.setVisible(true);
 
     Optional<LocationModel> locModel = contentPanel.getSelectedLocation();
@@ -631,6 +642,8 @@ public class CreateTransportOrderPanel
       updateButtons();
     }
   }//GEN-LAST:event_addButtonActionPerformed
+
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
   private javax.swing.JLabel dateLabel;

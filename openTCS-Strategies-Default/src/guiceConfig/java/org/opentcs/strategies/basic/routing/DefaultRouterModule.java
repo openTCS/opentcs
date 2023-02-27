@@ -38,6 +38,12 @@ public class DefaultRouterModule
    */
   private static final Logger LOG = LoggerFactory.getLogger(DefaultRouterModule.class);
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultRouterModule() {
+  }
+
   @Override
   protected void configure() {
     configureRouterDependencies();

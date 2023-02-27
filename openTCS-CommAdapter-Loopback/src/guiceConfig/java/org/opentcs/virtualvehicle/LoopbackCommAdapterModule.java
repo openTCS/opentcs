@@ -25,6 +25,12 @@ public class LoopbackCommAdapterModule
    */
   private static final Logger LOG = LoggerFactory.getLogger(LoopbackCommAdapterModule.class);
 
+  /**
+   * Creates a new instance.
+   */
+  public LoopbackCommAdapterModule() {
+  }
+
   @Override
   protected void configure() {
     VirtualVehicleConfiguration configuration
@@ -40,7 +46,7 @@ public class LoopbackCommAdapterModule
         .toInstance(configuration);
 
     install(new FactoryModuleBuilder().build(LoopbackAdapterComponentsFactory.class));
-    
+
     // tag::documentation_createCommAdapterModule[]
     vehicleCommAdaptersBinder().addBinding().to(LoopbackCommunicationAdapterFactory.class);
     // end::documentation_createCommAdapterModule[]

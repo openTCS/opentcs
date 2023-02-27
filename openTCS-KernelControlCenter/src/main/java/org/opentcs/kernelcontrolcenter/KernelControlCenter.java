@@ -65,7 +65,7 @@ public class KernelControlCenter
    */
   private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
-   * The factory providing a ControlCenterInfoHandler
+   * The factory providing a ControlCenterInfoHandler.
    */
   private final ControlCenterInfoHandlerFactory controlCenterInfoHandlerFactoy;
   /**
@@ -135,10 +135,12 @@ public class KernelControlCenter
       @Nonnull KernelServicePortal servicePortal,
       @Nonnull @ServiceCallWrapper CallWrapper callWrapper,
       @Nonnull PortalManager portalManager,
-      @ApplicationEventBus EventSource eventSource,
+      @Nonnull @ApplicationEventBus EventSource eventSource,
       @Nonnull ControlCenterInfoHandlerFactory controlCenterInfoHandlerFactory,
-      @Nonnull @ActiveInModellingMode Collection<Provider<ControlCenterPanel>> panelProvidersModelling,
-      @Nonnull @ActiveInOperatingMode Collection<Provider<ControlCenterPanel>> panelProvidersOperating) {
+      @Nonnull
+      @ActiveInModellingMode Collection<Provider<ControlCenterPanel>> panelProvidersModelling,
+      @Nonnull
+      @ActiveInOperatingMode Collection<Provider<ControlCenterPanel>> panelProvidersOperating) {
     this.application = requireNonNull(application, "application");
     this.servicePortal = requireNonNull(servicePortal, "servicePortal");
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");

@@ -58,16 +58,31 @@ public class LengthProperty
     validRange.setMin(0);
   }
 
-  public static enum Unit {
+  /**
+   * Supported length units.
+   */
+  public enum Unit {
 
+    /**
+     * Millimeters.
+     */
     MM("mm"),
+    /**
+     * Centimeters.
+     */
     CM("cm"),
+    /**
+     * Meters.
+     */
     M("m"),
+    /**
+     * Kilometers.
+     */
     KM("km");
 
     private final String displayString;
 
-    private Unit(String displayString) {
+    Unit(String displayString) {
       this.displayString = displayString;
     }
 

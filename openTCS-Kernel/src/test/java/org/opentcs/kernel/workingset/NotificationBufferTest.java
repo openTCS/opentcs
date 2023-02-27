@@ -52,7 +52,9 @@ public class NotificationBufferTest {
       assertEquals(i, messages.size());
     }
     // Add one more message to exceed the capacity.
-    testBuffer.addNotification(new UserNotification("message text", UserNotification.Level.INFORMATIONAL));
+    testBuffer.addNotification(
+        new UserNotification("message text", UserNotification.Level.INFORMATIONAL)
+    );
     assertEquals(cutBackCount, testBuffer.getMessageCount());
     List<UserNotification> messages = testBuffer.getNotifications();
     assertEquals(cutBackCount, messages.size());

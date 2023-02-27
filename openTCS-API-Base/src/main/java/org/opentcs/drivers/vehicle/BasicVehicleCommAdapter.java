@@ -411,7 +411,7 @@ public abstract class BasicVehicleCommAdapter
   private class CommandDispatcherTask
       implements Runnable {
 
-    public CommandDispatcherTask() {
+    CommandDispatcherTask() {
     }
 
     @Override

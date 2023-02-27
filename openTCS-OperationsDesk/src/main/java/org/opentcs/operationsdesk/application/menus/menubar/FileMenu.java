@@ -53,9 +53,10 @@ public class FileMenu
   public FileMenu(ViewActionMap actionMap) {
     requireNonNull(actionMap, "actionMap");
 
-    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MENU_PATH);
-    
-    this.setText( labels.getString("fileMenu.text"));
+    final ResourceBundleUtil labels
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MENU_PATH);
+
+    this.setText(labels.getString("fileMenu.text"));
     this.setToolTipText(labels.getString("fileMenu.tooltipText"));
     this.setMnemonic('F');
 

@@ -26,6 +26,7 @@ import org.opentcs.strategies.basic.dispatching.priorization.CompositeOrderCompa
 import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorByDeadline;
 
 /**
+ * Unit tests for {@link CompositeOrderComparator}.
  *
  * @author Mustafa Yalciner (Fraunhofer IML)
  */
@@ -69,11 +70,14 @@ public class CompositeOrderComparatorTest {
     Mockito.when(configuration.orderPriorities())
         .thenReturn(List.of());
     comparator = new CompositeOrderComparator(configuration, availableComparators);
-    
+
     Instant creationTime = Instant.now();
-    TransportOrder candidate1 = candidateWithNameAndCreationtime("AA", creationTime.minusSeconds(1));
-    TransportOrder candidate2 = candidateWithNameAndCreationtime("CC", creationTime.minusSeconds(2));
-    TransportOrder candidate3 = candidateWithNameAndCreationtime("BB", creationTime.minusSeconds(2));
+    TransportOrder candidate1 = candidateWithNameAndCreationtime("AA",
+                                                                 creationTime.minusSeconds(1));
+    TransportOrder candidate2 = candidateWithNameAndCreationtime("CC",
+                                                                 creationTime.minusSeconds(2));
+    TransportOrder candidate3 = candidateWithNameAndCreationtime("BB",
+                                                                 creationTime.minusSeconds(2));
 
     List<TransportOrder> list = new ArrayList<>();
     list.add(candidate1);

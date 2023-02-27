@@ -25,6 +25,9 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class UploadModelToKernelAction
     extends AbstractAction {
 
+  /**
+   * This action's ID.
+   */
   public static final String ID = "file.uploadModelToKernel";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MENU_PATH);

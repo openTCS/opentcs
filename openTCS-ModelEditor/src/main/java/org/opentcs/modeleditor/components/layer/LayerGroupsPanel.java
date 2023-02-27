@@ -126,7 +126,8 @@ public class LayerGroupsPanel
 
   private JButton createAddGroupButton() {
     IconToolkit iconkit = IconToolkit.instance();
-    JButton button = new JButton(iconkit.getImageIconByFullPath(ICON_PATH + "create-layer-group.16.png"));
+    JButton button
+        = new JButton(iconkit.getImageIconByFullPath(ICON_PATH + "create-layer-group.16.png"));
     button.addActionListener(actionEvent -> {
       layerGroupEditor.createLayerGroup();
       table.getSelectionModel().setSelectionInterval(0, 0);
@@ -138,7 +139,8 @@ public class LayerGroupsPanel
 
   private JButton createRemoveGroupButton() {
     IconToolkit iconkit = IconToolkit.instance();
-    JButton button = new JButton(iconkit.getImageIconByFullPath(ICON_PATH + "delete-layer-group.16.png"));
+    JButton button
+        = new JButton(iconkit.getImageIconByFullPath(ICON_PATH + "delete-layer-group.16.png"));
     button.addActionListener(new RemoveGroupListener());
     button.setToolTipText(BUNDLE.getString("layerGroupsPanel.button_removeGroup.tooltipText"));
 
@@ -157,6 +159,12 @@ public class LayerGroupsPanel
   private class RemoveGroupListener
       implements ActionListener {
 
+    /**
+     * Creates a new instance.
+     */
+    RemoveGroupListener() {
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
       int selectedRow = table.getSelectedRow();
@@ -171,7 +179,7 @@ public class LayerGroupsPanel
 
       if (layersAssignedToOtherGroups.isEmpty()) {
         // All layers in the model are assigned to the group the user wants to remove.
-        // In this case, removing the group is not allowed as that would mean that all layers would 
+        // In this case, removing the group is not allowed as that would mean that all layers would
         // be removed as well and there wouldn't be any layers left.
         JOptionPane.showMessageDialog(
             LayerGroupsPanel.this,
@@ -187,8 +195,12 @@ public class LayerGroupsPanel
         // in the assigned layers and the model components they contain to be removed as well.
         int selectedOption = JOptionPane.showConfirmDialog(
             LayerGroupsPanel.this,
-            BUNDLE.getString("layerGroupsPanel.optionPane_confirmGroupAndAssignedLayersRemoval.message"),
-            BUNDLE.getString("layerGroupsPanel.optionPane_confirmGroupAndAssignedLayersRemoval.title"),
+            BUNDLE.getString(
+                "layerGroupsPanel.optionPane_confirmGroupAndAssignedLayersRemoval.message"
+            ),
+            BUNDLE.getString(
+                "layerGroupsPanel.optionPane_confirmGroupAndAssignedLayersRemoval.title"
+            ),
             JOptionPane.YES_NO_OPTION,
             JOptionPane.WARNING_MESSAGE
         );

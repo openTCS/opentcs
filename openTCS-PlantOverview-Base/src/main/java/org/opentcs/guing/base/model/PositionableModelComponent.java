@@ -18,9 +18,9 @@ public interface PositionableModelComponent
   /**
    * Key for the X (model) cordinate.
    */
-  public static final String MODEL_X_POSITION = "modelXPosition";
+  String MODEL_X_POSITION = "modelXPosition";
   /**
    * Key for the Y (model) cordinate.
    */
-  public static final String MODEL_Y_POSITION = "modelYPosition";
+  String MODEL_Y_POSITION = "modelYPosition";
 }

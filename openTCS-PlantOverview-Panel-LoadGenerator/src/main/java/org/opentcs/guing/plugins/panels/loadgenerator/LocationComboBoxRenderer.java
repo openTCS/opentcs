@@ -26,8 +26,7 @@ class LocationComboBoxRenderer
   /**
    * Creates a new instance.
    */
-  public LocationComboBoxRenderer() {
-    // Do nada.
+  LocationComboBoxRenderer() {
   }
 
   @Override

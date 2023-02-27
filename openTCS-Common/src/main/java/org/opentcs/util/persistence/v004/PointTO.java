@@ -35,6 +35,12 @@ public class PointTO
   private List<OutgoingPath> outgoingPaths = new ArrayList<>();
   private PointLayout pointLayout = new PointLayout();
 
+  /**
+   * Creates a new instance.
+   */
+  public PointTO() {
+  }
+
   @XmlAttribute(required = true)
   public Long getxPosition() {
     return xPosition;
@@ -116,6 +122,12 @@ public class PointTO
 
     private String name = "";
 
+    /**
+     * Creates a new instance.
+     */
+    public OutgoingPath() {
+    }
+
     @XmlAttribute(required = true)
     public String getName() {
       return name;
@@ -137,6 +149,12 @@ public class PointTO
     private Long xLabelOffset = 0L;
     private Long yLabelOffset = 0L;
     private Integer layerId = 0;
+
+    /**
+     * Creates a new instance.
+     */
+    public PointLayout() {
+    }
 
     @XmlAttribute(required = true)
     public Long getxPosition() {

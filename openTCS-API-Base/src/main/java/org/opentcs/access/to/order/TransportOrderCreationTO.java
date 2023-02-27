@@ -234,7 +234,9 @@ public class TransportOrderCreationTO
    * @param destinations The destinations.
    * @return A copy of this object, differing in the given derstinations.
    */
-  public TransportOrderCreationTO withDestinations(@Nonnull List<DestinationCreationTO> destinations) {
+  public TransportOrderCreationTO withDestinations(
+      @Nonnull List<DestinationCreationTO> destinations
+  ) {
     return new TransportOrderCreationTO(getName(),
                                         getModifiableProperties(),
                                         incompleteName,

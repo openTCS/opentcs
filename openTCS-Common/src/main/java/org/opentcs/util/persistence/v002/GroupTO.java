@@ -27,6 +27,12 @@ public class GroupTO
 
   private List<MemberTO> members = new ArrayList<>();
 
+  /**
+   * Creates a new instance.
+   */
+  public GroupTO() {
+  }
+
   @XmlElement(name = "member")
   public List<MemberTO> getMembers() {
     return members;

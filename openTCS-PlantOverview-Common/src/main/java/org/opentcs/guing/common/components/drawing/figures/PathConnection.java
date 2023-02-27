@@ -165,11 +165,11 @@ public class PathConnection
       path.clear();
       if (type == PathModel.Type.BEZIER_3) { //BEZIER curve with 3 control points);
         //Add the scaled vector between start and endpoint to the startpoint
-        cp1 = new Point2D.Double(sp.x + (ep.x - sp.x) * 1 / 6, sp.y + (ep.y - sp.y) * 1 / 6); //point at 1/6
-        cp2 = new Point2D.Double(sp.x + (ep.x - sp.x) * 2 / 6, sp.y + (ep.y - sp.y) * 2 / 6); //point at 2/6
-        cp3 = new Point2D.Double(sp.x + (ep.x - sp.x) * 3 / 6, sp.y + (ep.y - sp.y) * 3 / 6); //point at 3/6
-        cp4 = new Point2D.Double(sp.x + (ep.x - sp.x) * 4 / 6, sp.y + (ep.y - sp.y) * 4 / 6); //point at 4/6
-        cp5 = new Point2D.Double(sp.x + (ep.x - sp.x) * 5 / 6, sp.y + (ep.y - sp.y) * 5 / 6); //point at 5/6
+        cp1 = new Point2D.Double(sp.x + (ep.x - sp.x) * 1 / 6, sp.y + (ep.y - sp.y) * 1 / 6);
+        cp2 = new Point2D.Double(sp.x + (ep.x - sp.x) * 2 / 6, sp.y + (ep.y - sp.y) * 2 / 6);
+        cp3 = new Point2D.Double(sp.x + (ep.x - sp.x) * 3 / 6, sp.y + (ep.y - sp.y) * 3 / 6);
+        cp4 = new Point2D.Double(sp.x + (ep.x - sp.x) * 4 / 6, sp.y + (ep.y - sp.y) * 4 / 6);
+        cp5 = new Point2D.Double(sp.x + (ep.x - sp.x) * 5 / 6, sp.y + (ep.y - sp.y) * 5 / 6);
         path.add(new BezierPath.Node(BezierPath.C2_MASK,
                                      sp.x, sp.y, //Current point
                                      sp.x, sp.y, //Previous point - not in use because of C2_MASK
@@ -509,10 +509,14 @@ public class PathConnection
         if (length <= 0.0) {
           PointFigure start = ((LabeledPointFigure) getStartFigure()).getPresentationFigure();
           PointFigure end = ((LabeledPointFigure) getEndFigure()).getPresentationFigure();
-          double startPosX = start.getModel().getPropertyModelPositionX().getValueByUnit(LengthProperty.Unit.MM);
-          double startPosY = start.getModel().getPropertyModelPositionY().getValueByUnit(LengthProperty.Unit.MM);
-          double endPosX = end.getModel().getPropertyModelPositionX().getValueByUnit(LengthProperty.Unit.MM);
-          double endPosY = end.getModel().getPropertyModelPositionY().getValueByUnit(LengthProperty.Unit.MM);
+          double startPosX
+              = start.getModel().getPropertyModelPositionX().getValueByUnit(LengthProperty.Unit.MM);
+          double startPosY
+              = start.getModel().getPropertyModelPositionY().getValueByUnit(LengthProperty.Unit.MM);
+          double endPosX
+              = end.getModel().getPropertyModelPositionX().getValueByUnit(LengthProperty.Unit.MM);
+          double endPosY
+              = end.getModel().getPropertyModelPositionY().getValueByUnit(LengthProperty.Unit.MM);
           length = distance(startPosX, startPosY, endPosX, endPosY);
           property.setValueAndUnit(length, LengthProperty.Unit.MM);
           property.markChanged();

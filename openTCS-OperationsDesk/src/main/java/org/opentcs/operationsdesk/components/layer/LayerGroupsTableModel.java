@@ -26,7 +26,7 @@ class LayerGroupsTableModel
    * @param modelManager The model manager.
    * @param layerGroupEditor The layer group editor.
    */
-  public LayerGroupsTableModel(ModelManager modelManager, LayerGroupEditor layerGroupEditor) {
+  LayerGroupsTableModel(ModelManager modelManager, LayerGroupEditor layerGroupEditor) {
     super(modelManager, layerGroupEditor);
   }
 
@@ -42,14 +42,14 @@ class LayerGroupsTableModel
 
   @Override
   public void groupsInitialized() {
-    // Once the layers are initialized we want to redraw the entire table to avoid any 
+    // Once the layers are initialized we want to redraw the entire table to avoid any
     // display errors.
     executeOnEventDispatcherThread(() -> fireTableDataChanged());
   }
 
   @Override
   public void groupsChanged() {
-    // Update the entire table but don't use fireTableDataChanged() to preserve the current 
+    // Update the entire table but don't use fireTableDataChanged() to preserve the current
     // selection.
     executeOnEventDispatcherThread(() -> fireTableRowsUpdated(0, getRowCount() - 1));
   }
@@ -67,7 +67,7 @@ class LayerGroupsTableModel
    * If the runnable is already being called on the EDT, the runnable is executed immediately.
    * Otherwise it is scheduled for execution on the EDT.
    * <p>
-   * Note: Deferring a runnable by scheduling it for execution on the EDT even though it would 
+   * Note: Deferring a runnable by scheduling it for execution on the EDT even though it would
    * have already been executed on the EDT may lead to exceptions due to data inconsistency.
    * </p>
    *

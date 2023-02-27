@@ -33,6 +33,12 @@ public class VisualLayoutTO
   private List<ShapeLayoutElement> shapeLayoutElements = new ArrayList<>();
   private List<ModelLayoutElement> modelLayoutElements = new ArrayList<>();
 
+  /**
+   * Creates a new instance.
+   */
+  public VisualLayoutTO() {
+  }
+
   @XmlAttribute(required = true)
   public Float getScaleX() {
     return scaleX;
@@ -86,6 +92,12 @@ public class VisualLayoutTO
     private Long layer = 0L;
     private List<PropertyTO> properties = new ArrayList<>();
 
+    /**
+     * Creates a new instance.
+     */
+    public ShapeLayoutElement() {
+    }
+
     @XmlAttribute(required = true)
     @XmlSchemaType(name = "unsignedInt")
     public Long getLayer() {
@@ -117,6 +129,12 @@ public class VisualLayoutTO
     private String visualizedObjectName = "";
     private Long layer = 0L;
     private List<PropertyTO> properties = new ArrayList<>();
+
+    /**
+     * Creates a new instance.
+     */
+    public ModelLayoutElement() {
+    }
 
     @XmlAttribute(required = true)
     public String getVisualizedObjectName() {

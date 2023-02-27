@@ -69,9 +69,11 @@ public class ColorPropertyCellEditor
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(PROPERTIES_PATH);
 
     Frame parent = JOptionPane.getFrameForComponent(fTable);
-    Color newColor = JColorChooser.showDialog(parent,
-                                              bundle.getString("colorPropertyCellEditor.dialog_colorSelection.title"),
-                                              fColorProperty.getColor());
+    Color newColor = JColorChooser.showDialog(
+        parent,
+        bundle.getString("colorPropertyCellEditor.dialog_colorSelection.title"),
+        fColorProperty.getColor()
+    );
 
     if (newColor != null) {
       Color oldColor = fColorProperty.getColor();

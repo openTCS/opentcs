@@ -28,6 +28,12 @@ class RemotePeripheralServiceProxy
     extends RemoteTCSObjectServiceProxy<RemotePeripheralService>
     implements PeripheralService {
 
+  /**
+   * Creates a new instance.
+   */
+  RemotePeripheralServiceProxy() {
+  }
+
   @Override
   public void attachCommAdapter(TCSResourceReference<Location> ref,
                                 PeripheralCommAdapterDescription description)

@@ -26,6 +26,12 @@ public class TransportOrderComparatorByAge
   public static final String CONFIGURATION_KEY = "BY_AGE";
 
   /**
+   * Creates a new instance.
+   */
+  public TransportOrderComparatorByAge() {
+  }
+
+  /**
    * Compares two orders by their age.
    * Note: this comparator imposes orderings that are inconsistent with equals.
    *

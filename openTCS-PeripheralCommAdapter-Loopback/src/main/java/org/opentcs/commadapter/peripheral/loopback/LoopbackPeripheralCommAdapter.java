@@ -164,8 +164,8 @@ public class LoopbackPeripheralCommAdapter
       setProcessModel(getProcessModel().withManualModeEnabled(enabled));
 
       if (oldProcessModel.isManualModeEnabled() && !getProcessModel().isManualModeEnabled()) {
-        // Job processing mode changed to "automatic". If there's a task that has not yet been 
-        // processed while the processing mode was set to "manual", make sure the task is executed 
+        // Job processing mode changed to "automatic". If there's a task that has not yet been
+        // processed while the processing mode was set to "manual", make sure the task is executed
         // and schedule it for execution on the kernel executor.
         if (!jobTaskQueue.isEmpty()) {
           currentJobFuture = kernelExecutor.submit(jobTaskQueue.poll());

@@ -38,7 +38,8 @@ public class HelpMenu
   public HelpMenu(ViewActionMap actionMap) {
     requireNonNull(actionMap, "actionMap");
 
-    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MENU_PATH);
+    final ResourceBundleUtil labels
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MENU_PATH);
 
     this.setText(labels.getString("helpMenu.text"));
     this.setToolTipText(labels.getString("helpMenu.tooltipText"));

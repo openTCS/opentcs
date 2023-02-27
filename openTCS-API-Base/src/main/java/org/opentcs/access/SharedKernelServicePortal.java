@@ -17,7 +17,7 @@ public interface SharedKernelServicePortal
     extends AutoCloseable {
 
   @Override
-  public void close();
+  void close();
 
   /**
    * Indicates whether this instance is closed/unregistered from the shared portal pool.

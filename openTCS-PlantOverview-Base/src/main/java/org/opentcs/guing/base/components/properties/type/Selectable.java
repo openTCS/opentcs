@@ -13,6 +13,7 @@ import java.util.List;
  * Interface for a property indicating this property has different
  * possible values to choose from.
  *
+ * @param <E> The type of elements that can be selected from.
  * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public interface Selectable<E> {
@@ -22,12 +23,12 @@ public interface Selectable<E> {
    *
    * @param possibleValues An array with the possible values.
    */
-  public void setPossibleValues(List<E> possibleValues);
+  void setPossibleValues(List<E> possibleValues);
 
   /**
    * Returns the possible values.
    *
    * @return The possible values.
    */
-  public List<E> getPossibleValues();
+  List<E> getPossibleValues();
 }

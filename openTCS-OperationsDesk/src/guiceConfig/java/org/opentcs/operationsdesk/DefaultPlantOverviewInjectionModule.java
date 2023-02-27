@@ -57,6 +57,12 @@ public class DefaultPlantOverviewInjectionModule
   private static final Logger LOG
       = LoggerFactory.getLogger(DefaultPlantOverviewInjectionModule.class);
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultPlantOverviewInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     File applicationHome = new File(System.getProperty("opentcs.home", "."));
@@ -139,7 +145,9 @@ public class DefaultPlantOverviewInjectionModule
         .in(Singleton.class);
   }
 
-  private void configurePlantOverview(PlantOverviewOperatingApplicationConfiguration configuration) {
+  private void configurePlantOverview(
+      PlantOverviewOperatingApplicationConfiguration configuration
+  ) {
     Locale.setDefault(Locale.forLanguageTag(configuration.locale()));
 
     try {

@@ -13,7 +13,8 @@ import org.opentcs.access.SharedKernelServicePortal;
 import static org.opentcs.util.Assertions.checkState;
 
 /**
- * Implementation of the {@link SharedKernelServicePortal} interface to give access to a shared portal object.
+ * Implementation of the {@link SharedKernelServicePortal} interface to give access to a shared
+ * portal object.
  *
  * @author Stefan Walter (Fraunhofer IML)
  * @author Martin Grzenia (Fraunhofer IML)

@@ -125,8 +125,7 @@ public class OpenTCSDrawingEditor
     double yTop = drawingArea.y;
     double yBottom = drawingArea.y + drawingArea.height;
 
-    // An empty drawing only contains the origin figure, which shall be
-    // on the bottom left 
+    // An empty drawing only contains the origin figure, which shall be on the bottom left.
     if (visibleRect.width > drawingArea.width && visibleRect.height > drawingArea.height) {
       xLeft = -drawingArea.width / 2 - MARGIN;
       xRight = visibleRect.width + xLeft - (MARGIN + wFigure / 2);
@@ -330,9 +329,11 @@ public class OpenTCSDrawingEditor
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_DOWN_MASK), MoveAction.South.ID);
 
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.SHIFT_DOWN_MASK), MoveAction.West.ID);
-    m.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.SHIFT_DOWN_MASK), MoveAction.East.ID);
+    m.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.SHIFT_DOWN_MASK),
+          MoveAction.East.ID);
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.SHIFT_DOWN_MASK), MoveAction.North.ID);
-    m.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_DOWN_MASK), MoveAction.South.ID);
+    m.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_DOWN_MASK),
+          MoveAction.South.ID);
 
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK), MoveAction.West.ID);
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK), MoveAction.East.ID);
@@ -367,7 +368,7 @@ public class OpenTCSDrawingEditor
     /**
      * Creates a new instance.
      */
-    public CompositeFigureEventHandler() {
+    CompositeFigureEventHandler() {
     }
 
     @Override

@@ -56,6 +56,12 @@ public class DefaultPlantOverviewInjectionModule
   private static final Logger LOG
       = LoggerFactory.getLogger(DefaultPlantOverviewInjectionModule.class);
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultPlantOverviewInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     File applicationHome = new File(System.getProperty("opentcs.home", "."));

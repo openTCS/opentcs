@@ -12,6 +12,7 @@ import java.io.Serializable;
 /**
  * A conversion relationship between two units.
  *
+ * @param <U> The type of units the relation is valid for.
  * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @author Stefan Walter (Fraunhofer IML)
  */
@@ -67,7 +68,7 @@ public class Relation<U>
   /**
    * Returns the conversion relationship as a number.
    *
-   * @return The relation value between the two units. 
+   * @return The relation value between the two units.
    */
   public double relationValue() {
     return fRelationValue;
@@ -89,8 +90,17 @@ public class Relation<U>
     }
   }
 
-  public static enum Operation {
+  /**
+   * The supported operations.
+   */
+  public enum Operation {
+    /**
+     * A division.
+     */
     DIVISION,
+    /**
+     * A multiplication.
+     */
     MULTIPLICATION
   }
 }

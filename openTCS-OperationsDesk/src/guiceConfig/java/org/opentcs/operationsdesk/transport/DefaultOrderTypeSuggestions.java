@@ -25,6 +25,9 @@ public class DefaultOrderTypeSuggestions
    */
   private final Set<String> typeSuggestions = new HashSet<>();
 
+  /**
+   * Creates a new instance.
+   */
   public DefaultOrderTypeSuggestions() {
     typeSuggestions.add(OrderConstants.TYPE_NONE);
     typeSuggestions.add(OrderConstants.TYPE_CHARGE);

@@ -54,7 +54,9 @@ public class ContainsLockedTargetLocationsTest {
     localObjectPool = new HashMap<>();
     objectService = mock(TCSObjectService.class);
     when(objectService.fetchObject(any(), ArgumentMatchers.<TCSObjectReference<?>>any()))
-        .thenAnswer(invocation -> localObjectPool.get((TCSObjectReference<?>) invocation.getArgument(1)));
+        .thenAnswer(
+            invocation -> localObjectPool.get((TCSObjectReference<?>) invocation.getArgument(1))
+        );
     filter = new ContainsLockedTargetLocations(objectService);
   }
 

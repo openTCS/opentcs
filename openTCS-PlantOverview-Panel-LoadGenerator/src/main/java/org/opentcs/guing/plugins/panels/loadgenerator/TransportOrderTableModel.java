@@ -32,14 +32,14 @@ class TransportOrderTableModel
   /**
    * The column names.
    */
-  private static final String[] COLUMN_NAMES = new String[] {
+  private static final String[] COLUMN_NAMES = new String[]{
     "#",
     BUNDLE.getString("transportOrderTableModel.column_deadline.headerText"),
     BUNDLE.getString("transportOrderTableModel.column_vehicle.headerText")};
   /**
    * The column classes.
    */
-  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[] {
+  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
     Integer.class,
     TransportOrderData.Deadline.class,
     TCSObjectReference.class,};
@@ -51,7 +51,7 @@ class TransportOrderTableModel
   /**
    * Creates a new instance.
    */
-  public TransportOrderTableModel() {
+  TransportOrderTableModel() {
   }
 
   /**
@@ -161,10 +161,10 @@ class TransportOrderTableModel
 
     for (TransportOrderData curData : transportOrderDataList) {
       result.getTransportOrders().add(new TransportOrderEntry(
-              curData.getDeadline(),
-              curData.getDriveOrders(),
-              curData.getIntendedVehicle() == null ? null : curData.getIntendedVehicle().getName(),
-              curData.getProperties())
+          curData.getDeadline(),
+          curData.getDriveOrders(),
+          curData.getIntendedVehicle() == null ? null : curData.getIntendedVehicle().getName(),
+          curData.getProperties())
       );
     }
 

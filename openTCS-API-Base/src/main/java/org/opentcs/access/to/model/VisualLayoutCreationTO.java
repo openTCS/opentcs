@@ -182,7 +182,7 @@ public class VisualLayoutCreationTO
   }
 
   /**
-   * Creates a copy of this object with the given layout's scale on the Y axis (in mm/pixel)
+   * Creates a copy of this object with the given layout's scale on the Y axis (in mm/pixel).
    *
    * @param scaleY The new scale.
    * @return A copy of this object, differing in the given value.
@@ -211,7 +211,7 @@ public class VisualLayoutCreationTO
   }
 
   /**
-   * Creates a copy of this object with the given model elements
+   * Creates a copy of this object with the given model elements.
    *
    * @param modelElements The new model layout elements.
    * @return A copy of this object, differing in the layout elements of this visual layout.

@@ -111,10 +111,12 @@ public class OpenTCSDragTracker
         if (!transformedFigures.isEmpty()) {
           if (!isDragging) {
             isDragging = true;
-            updateCursor(editor.findView((Container) evt.getSource()), new Point(evt.getX(), evt.getY()));
+            updateCursor(editor.findView((Container) evt.getSource()),
+                         new Point(evt.getX(), evt.getY()));
           }
 
-          Point2D.Double currentPoint = drawingView.viewToDrawing(new Point(evt.getX(), evt.getY()));
+          Point2D.Double currentPoint
+              = drawingView.viewToDrawing(new Point(evt.getX(), evt.getY()));
           double offsetX = currentPoint.x - previousPoint.x;
           double offsetY = currentPoint.y - previousPoint.y;
           dragRect.x += offsetX;

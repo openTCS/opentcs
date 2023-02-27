@@ -28,6 +28,12 @@ class RemoteTransportOrderServiceProxy
     extends RemoteTCSObjectServiceProxy<RemoteTransportOrderService>
     implements TransportOrderService {
 
+  /**
+   * Creates a new instance.
+   */
+  RemoteTransportOrderServiceProxy() {
+  }
+
   @Override
   public OrderSequence createOrderSequence(OrderSequenceCreationTO to)
       throws KernelRuntimeException {

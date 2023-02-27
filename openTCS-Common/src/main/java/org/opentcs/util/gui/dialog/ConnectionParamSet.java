@@ -87,7 +87,7 @@ public class ConnectionParamSet {
 
   /**
    * Returns the description.
-   * 
+   *
    * @return The description.
    */
   public String getDescription() {

@@ -18,6 +18,12 @@ import org.opentcs.drivers.peripherals.PeripheralJobCallback;
 public class DefaultPeripheralJobDispatcherModule
     extends KernelInjectionModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultPeripheralJobDispatcherModule() {
+  }
+
   @Override
   protected void configure() {
     configureDispatcherDependencies();
@@ -26,8 +32,10 @@ public class DefaultPeripheralJobDispatcherModule
 
   private void configureDispatcherDependencies() {
     bind(DefaultPeripheralJobDispatcherConfiguration.class)
-        .toInstance(getConfigBindingProvider().get(DefaultPeripheralJobDispatcherConfiguration.PREFIX,
-                                                   DefaultPeripheralJobDispatcherConfiguration.class));
+        .toInstance(
+            getConfigBindingProvider().get(DefaultPeripheralJobDispatcherConfiguration.PREFIX,
+                                           DefaultPeripheralJobDispatcherConfiguration.class)
+        );
 
     bind(PeripheralJobCallback.class).to(DefaultPeripheralJobDispatcher.class);
     bind(PeripheralReleaseStrategy.class).to(DefaultPeripheralReleaseStrategy.class);

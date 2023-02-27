@@ -25,6 +25,12 @@ public class ServiceWebApiModule
    */
   private static final Logger LOG = LoggerFactory.getLogger(ServiceWebApiModule.class);
 
+  /**
+   * Creates a new instance.
+   */
+  public ServiceWebApiModule() {
+  }
+
   @Override
   protected void configure() {
     ServiceWebApiConfiguration configuration

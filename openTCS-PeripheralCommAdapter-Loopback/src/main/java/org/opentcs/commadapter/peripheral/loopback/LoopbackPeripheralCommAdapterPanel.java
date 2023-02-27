@@ -38,7 +38,8 @@ public class LoopbackPeripheralCommAdapterPanel
   /**
    * This class's logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(LoopbackPeripheralCommAdapterPanel.class);
+  private static final Logger LOG
+      = LoggerFactory.getLogger(LoopbackPeripheralCommAdapterPanel.class);
   /**
    * The service portal to use.
    */
@@ -102,6 +103,7 @@ public class LoopbackPeripheralCommAdapterPanel
     }
   }
 
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always regenerated
@@ -240,6 +242,7 @@ public class LoopbackPeripheralCommAdapterPanel
 
     getAccessibleContext().setAccessibleName(bundle.getString("loopbackPeripheralCommAdapterPanel.accessibleName")); // NOI18N
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
 
   private void manualModeRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualModeRadioButtonActionPerformed
     sendCommAdapterCommand(new EnableManualModeCommand(manualModeRadioButton.isSelected()));
@@ -275,6 +278,7 @@ public class LoopbackPeripheralCommAdapterPanel
     sendCommAdapterCommand(new FinishJobProcessingCommand(true));
   }//GEN-LAST:event_failCurrentJobButtonActionPerformed
 
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JRadioButton automaticModeRadioButton;
   private javax.swing.JButton failCurrentJobButton;
@@ -285,4 +289,5 @@ public class LoopbackPeripheralCommAdapterPanel
   private javax.swing.JLabel stateLabel;
   private javax.swing.JPanel statePanel;
   // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
 }

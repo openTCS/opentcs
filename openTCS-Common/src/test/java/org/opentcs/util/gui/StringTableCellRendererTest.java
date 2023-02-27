@@ -43,7 +43,8 @@ public class StringTableCellRendererTest {
   public void returnsLabelWithNameAsText() {
     Vehicle vehicle = new Vehicle("VehicleName");
     TCSObjectReference<Vehicle> vehicleReference = vehicle.getReference();
-    Component result = renderer.getTableCellRendererComponent(null, vehicleReference, false, false, 0, 0);
+    Component result
+        = renderer.getTableCellRendererComponent(null, vehicleReference, false, false, 0, 0);
     assertThat(result, is(instanceOf(JLabel.class)));
     JLabel labelResult = (JLabel) result;
     assertThat(labelResult.getText(), is(equalTo("VehicleName")));

@@ -38,7 +38,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class SendToBackAction
     extends AbstractSelectedAction {
 
-  public final static String ID = "edit.sendToBack";
+  /**
+   * This action's ID.
+   */
+  public static final String ID = "edit.sendToBack";
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
 
@@ -65,7 +68,8 @@ public class SendToBackAction
     fireUndoableEditHappened(new AbstractUndoableEdit() {
       @Override
       public String getPresentationName() {
-        return ResourceBundleUtil.getBundle(TOOLBAR_PATH).getString("sendToBackAction.undo.presentationName");
+        return ResourceBundleUtil.getBundle(TOOLBAR_PATH)
+            .getString("sendToBackAction.undo.presentationName");
       }
 
       @Override

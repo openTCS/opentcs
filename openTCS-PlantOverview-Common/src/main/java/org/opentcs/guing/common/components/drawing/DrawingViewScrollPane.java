@@ -139,7 +139,7 @@ public class DrawingViewScrollPane
     origin.addListener(getVerticalRuler());
     origin.addListener(this);
 
-    // Notify the rulers directly. This is necessary to initialize/update the rulers scale when a 
+    // Notify the rulers directly. This is necessary to initialize/update the rulers scale when a
     // model is created or loaded.
     // Calling origin.notifyScaleChanged() would lead to all model elements being notified (loading
     // times for bigger models would suffer).
@@ -149,7 +149,6 @@ public class DrawingViewScrollPane
 
   @Override
   public void originLocationChanged(EventObject evt) {
-
   }
 
   @Override
@@ -160,7 +159,7 @@ public class DrawingViewScrollPane
   private class PlacardScrollbar
       extends JScrollBar {
 
-    public PlacardScrollbar() {
+    PlacardScrollbar() {
       super(JScrollBar.HORIZONTAL);
       setPreferredSize(new Dimension(100, 18));
     }
@@ -171,7 +170,7 @@ public class DrawingViewScrollPane
 
     private final JToggleButton rulersButton;
 
-    public RulersToggleListener(JToggleButton rulersButton) {
+    RulersToggleListener(JToggleButton rulersButton) {
       this.rulersButton = requireNonNull(rulersButton, "rulersButton");
     }
 

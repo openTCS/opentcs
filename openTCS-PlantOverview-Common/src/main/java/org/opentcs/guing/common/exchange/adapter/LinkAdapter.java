@@ -28,6 +28,12 @@ import org.opentcs.guing.common.model.SystemModel;
 public class LinkAdapter
     extends AbstractProcessAdapter {
 
+  /**
+   * Creates a new instance.
+   */
+  public LinkAdapter() {
+  }
+
   @Override
   public void updateModelProperties(TCSObject<?> tcsObject,
                                     ModelComponent modelComponent,

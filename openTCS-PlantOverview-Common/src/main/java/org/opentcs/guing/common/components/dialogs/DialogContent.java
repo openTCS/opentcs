@@ -66,7 +66,7 @@ public abstract class DialogContent
 
   /**
    * Returns whether or not the component is modal.
-   * 
+   *
    * @return Whether or not the component is modal.
    */
   public boolean getModal() {

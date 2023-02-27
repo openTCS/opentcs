@@ -78,7 +78,9 @@ public class ViewManagerModeling
   }
 
   public void setBitmapToModellingView(File file) {
-    getDrawingViewMap().get(drawingViewModellingDockable).getDrawingView().addBackgroundBitmap(file);
+    getDrawingViewMap().get(drawingViewModellingDockable)
+        .getDrawingView()
+        .addBackgroundBitmap(file);
   }
 
   /**

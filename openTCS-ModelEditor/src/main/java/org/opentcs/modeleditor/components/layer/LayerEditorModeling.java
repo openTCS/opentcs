@@ -33,7 +33,7 @@ public interface LayerEditorModeling
       throws IllegalArgumentException;
 
   /**
-   * Adds the given model component to the layer that is set in the component's layer wrapper 
+   * Adds the given model component to the layer that is set in the component's layer wrapper
    * property.
    *
    * @param modelComponent The model component to add.

@@ -37,9 +37,12 @@ import org.opentcs.guing.base.model.SimpleFolder;
 public class BlockModel
     extends SimpleFolder {
 
+  /**
+   * The key/name of the 'type' property.
+   */
   public static final String TYPE = "Type";
   /**
-   * Key for the elements property.
+   * The key/name of the 'elements' property.
    */
   public static final String ELEMENTS = "blockElements";
   /**
@@ -220,7 +223,9 @@ public class BlockModel
     setProperty(ELEMENTS, pElements);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
-    pMiscellaneous.setDescription(bundle.getString("blockModel.property_miscellaneous.description"));
+    pMiscellaneous.setDescription(
+        bundle.getString("blockModel.property_miscellaneous.description")
+    );
     pMiscellaneous.setHelptext(bundle.getString("blockModel.property_miscellaneous.helptext"));
     pMiscellaneous.setOperatingEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
@@ -234,15 +239,21 @@ public class BlockModel
     /**
      * Single vehicle only allowed.
      */
-    SINGLE_VEHICLE_ONLY(ResourceBundle.getBundle(BUNDLE_PATH).getString("blockModel.type.singleVehicleOnly.description")),
+    SINGLE_VEHICLE_ONLY(
+        ResourceBundle.getBundle(BUNDLE_PATH)
+            .getString("blockModel.type.singleVehicleOnly.description")
+    ),
     /**
      * Same direction only allowed.
      */
-    SAME_DIRECTION_ONLY(ResourceBundle.getBundle(BUNDLE_PATH).getString("blockModel.type.sameDirectionOnly.description"));
+    SAME_DIRECTION_ONLY(
+        ResourceBundle.getBundle(BUNDLE_PATH)
+            .getString("blockModel.type.sameDirectionOnly.description")
+    );
 
     private final String description;
 
-    private Type(String description) {
+    Type(String description) {
       this.description = requireNonNull(description, "description");
     }
 

@@ -69,8 +69,7 @@ public class ToolBarManager
   /**
    * A list of all toolbars.
    */
-  private final List<JToolBar> toolBarList
-      = Collections.synchronizedList(new LinkedList<JToolBar>());
+  private final List<JToolBar> toolBarList = Collections.synchronizedList(new LinkedList<>());
   /**
    * A tool bar for actions creating new items.
    */
@@ -141,11 +140,12 @@ public class ToolBarManager
     requireNonNull(creationToolFactory, "creationToolFactory");
     this.selectionToolFactory = requireNonNull(selectionToolFactory, "selectionToolFactory");
 
-    ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH);
+    ResourceBundleUtil labels
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH);
 
     // --- 1. ToolBar: Creation ---
-    // Selection, Drag | Create Point, Location, Path, Link | 
-    // Create Location Type, Vehicle, Block, Static Route | 
+    // Selection, Drag | Create Point, Location, Path, Link |
+    // Create Location Type, Vehicle, Block, Static Route |
     // Create Transport Order | Find, Show Vehicles
     toolBarCreation.setActionMap(actionMap);
     // --- Selection Tool ---
@@ -164,11 +164,12 @@ public class ToolBarManager
     // --- Create Location Figure ---
     LabeledLocationFigure llf = crsObjFactory.createLocationFigure();
     creationTool = creationToolFactory.createCreationTool(llf);
-    buttonCreateLocation = addToolButton(toolBarCreation,
-                                         editor,
-                                         creationTool,
-                                         labels.getString("toolBarManager.button_createLocation.tooltipText"),
-                                         ImageDirectory.getImageIcon("/toolbar/location.22.png"));
+    buttonCreateLocation
+        = addToolButton(toolBarCreation,
+                        editor,
+                        creationTool,
+                        labels.getString("toolBarManager.button_createLocation.tooltipText"),
+                        ImageDirectory.getImageIcon("/toolbar/location.22.png"));
     creationTool.setToolDoneAfterCreation(false);
 
     // --- Create Path Figure ---
@@ -180,11 +181,12 @@ public class ToolBarManager
     // --- Create Link ---
     LinkConnection lc = crsObjFactory.createLinkConnection();
     connectionTool = creationToolFactory.createConnectionTool(lc);
-    buttonCreateLink = addToolButton(toolBarCreation,
-                                     editor,
-                                     connectionTool,
-                                     labels.getString("toolBarManager.button_createLink.tooltipText"),
-                                     ImageDirectory.getImageIcon("/toolbar/link.22.png"));
+    buttonCreateLink
+        = addToolButton(toolBarCreation,
+                        editor,
+                        connectionTool,
+                        labels.getString("toolBarManager.button_createLink.tooltipText"),
+                        ImageDirectory.getImageIcon("/toolbar/link.22.png"));
     connectionTool.setToolDoneAfterCreation(false);
 
     toolBarCreation.addSeparator();

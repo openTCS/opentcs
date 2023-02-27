@@ -178,7 +178,7 @@ public class PeripheralInteractionTest {
 
     private final Route.Step dummyStep;
 
-    public DummyMovementCommand() {
+    DummyMovementCommand() {
       Point srcPoint = new Point("Point-01");
       Point destPoint = new Point("Point-02");
       Path path = new Path("Point-01 --- Point-02",

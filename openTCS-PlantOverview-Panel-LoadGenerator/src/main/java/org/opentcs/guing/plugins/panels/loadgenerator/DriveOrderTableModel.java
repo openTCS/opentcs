@@ -32,14 +32,14 @@ class DriveOrderTableModel
   /**
    * The column names.
    */
-  private final String[] columnNames = new String[] {
+  private final String[] columnNames = new String[]{
     bundle.getString("driveOrderTableModel.column_location.headerText"),
     bundle.getString("driveOrderTableModel.column_operation.headerText")
   };
   /**
    * The column classes.
    */
-  private final Class<?>[] columnClasses = new Class<?>[] {
+  private final Class<?>[] columnClasses = new Class<?>[]{
     TCSObjectReference.class,
     String.class
   };
@@ -53,7 +53,7 @@ class DriveOrderTableModel
    *
    * @param driveOrders The actual list of drive orders.
    */
-  public DriveOrderTableModel(List<DriveOrderStructure> driveOrders) {
+  DriveOrderTableModel(List<DriveOrderStructure> driveOrders) {
     requireNonNull(driveOrders, "driveOrders");
 
     for (DriveOrderStructure curDOS : driveOrders) {
@@ -64,7 +64,7 @@ class DriveOrderTableModel
   /**
    * Creates a new instance.
    */
-  public DriveOrderTableModel() {
+  DriveOrderTableModel() {
   }
 
   @Override

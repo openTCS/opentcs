@@ -202,7 +202,7 @@ public class TransportOrderData {
      * @param newLabel This deadline as a string
      * @param deadline The value
      */
-    private Deadline(String newLabel, int deadline) {
+    Deadline(String newLabel, int deadline) {
       this.millis = deadline;
       this.label = newLabel;
     }

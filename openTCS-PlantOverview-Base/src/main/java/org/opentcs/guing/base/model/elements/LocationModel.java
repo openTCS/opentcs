@@ -326,59 +326,85 @@ public class LocationModel
     setProperty(ElementPropKeys.LOC_POS_Y, pLocPosY);
 
     StringProperty pLocLabelOffsetX = new StringProperty(this);
-    pLocLabelOffsetX.setDescription(bundle.getString("locationModel.property_labelOffsetX.description"));
+    pLocLabelOffsetX.setDescription(
+        bundle.getString("locationModel.property_labelOffsetX.description")
+    );
     pLocLabelOffsetX.setHelptext(bundle.getString("locationModel.property_labelOffsetX.helptext"));
     pLocLabelOffsetX.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_LABEL_OFFSET_X, pLocLabelOffsetX);
 
     StringProperty pLocLabelOffsetY = new StringProperty(this);
-    pLocLabelOffsetY.setDescription(bundle.getString("locationModel.property_labelOffsetY.description"));
+    pLocLabelOffsetY.setDescription(
+        bundle.getString("locationModel.property_labelOffsetY.description")
+    );
     pLocLabelOffsetY.setHelptext(bundle.getString("locationModel.property_labelOffsetY.helptext"));
     pLocLabelOffsetY.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_LABEL_OFFSET_Y, pLocLabelOffsetY);
 
     StringProperty pLocLabelOrientationAngle = new StringProperty(this);
-    pLocLabelOrientationAngle.setDescription(bundle.getString("locationModel.property_labelOrientationAngle.description"));
-    pLocLabelOrientationAngle.setHelptext(bundle.getString("locationModel.property_labelOrientationAngle.helptext"));
+    pLocLabelOrientationAngle.setDescription(
+        bundle.getString("locationModel.property_labelOrientationAngle.description")
+    );
+    pLocLabelOrientationAngle.setHelptext(
+        bundle.getString("locationModel.property_labelOrientationAngle.helptext")
+    );
     pLocLabelOrientationAngle.setModellingEditable(false);
     setProperty(ElementPropKeys.LOC_LABEL_ORIENTATION_ANGLE, pLocLabelOrientationAngle);
 
     LayerWrapperProperty pLayerWrapper = new LayerWrapperProperty(this, new NullLayerWrapper());
-    pLayerWrapper.setDescription(bundle.getString("locationModel.property_layerWrapper.description"));
+    pLayerWrapper.setDescription(
+        bundle.getString("locationModel.property_layerWrapper.description")
+    );
     pLayerWrapper.setHelptext(bundle.getString("locationModel.property_layerWrapper.helptext"));
     pLayerWrapper.setModellingEditable(false);
     setProperty(LAYER_WRAPPER, pLayerWrapper);
 
     StringProperty peripheralReservationTokenProperty = new StringProperty(this);
-    peripheralReservationTokenProperty.setDescription(bundle.getString("locationModel.property_peripheralReservationToken.description"));
-    peripheralReservationTokenProperty.setHelptext(bundle.getString("locationModel.property_peripheralReservationToken.helptext"));
+    peripheralReservationTokenProperty.setDescription(
+        bundle.getString("locationModel.property_peripheralReservationToken.description")
+    );
+    peripheralReservationTokenProperty.setHelptext(
+        bundle.getString("locationModel.property_peripheralReservationToken.helptext")
+    );
     peripheralReservationTokenProperty.setOperatingEditable(false);
     peripheralReservationTokenProperty.setModellingEditable(false);
     setProperty(PERIPHERAL_RESERVATION_TOKEN, peripheralReservationTokenProperty);
 
     StringProperty peripheralStateProperty = new StringProperty(this);
-    peripheralStateProperty.setDescription(bundle.getString("locationModel.property_peripheralState.description"));
-    peripheralStateProperty.setHelptext(bundle.getString("locationModel.property_peripheralState.helptext"));
+    peripheralStateProperty.setDescription(
+        bundle.getString("locationModel.property_peripheralState.description")
+    );
+    peripheralStateProperty.setHelptext(
+        bundle.getString("locationModel.property_peripheralState.helptext")
+    );
     peripheralStateProperty.setOperatingEditable(false);
     peripheralStateProperty.setModellingEditable(false);
     setProperty(PERIPHERAL_STATE, peripheralStateProperty);
 
     StringProperty peripheralProcState = new StringProperty(this);
-    peripheralProcState.setDescription(bundle.getString("locationModel.property_peripheralProcState.description"));
-    peripheralProcState.setHelptext(bundle.getString("locationModel.property_peripheralProcState.helptext"));
+    peripheralProcState.setDescription(
+        bundle.getString("locationModel.property_peripheralProcState.description")
+    );
+    peripheralProcState.setHelptext(
+        bundle.getString("locationModel.property_peripheralProcState.helptext")
+    );
     peripheralProcState.setOperatingEditable(false);
     peripheralProcState.setModellingEditable(false);
     setProperty(PERIPHERAL_PROC_STATE, peripheralProcState);
 
     StringProperty peripheralJob = new StringProperty(this);
-    peripheralJob.setDescription(bundle.getString("locationModel.property_peripheralJob.description"));
+    peripheralJob.setDescription(
+        bundle.getString("locationModel.property_peripheralJob.description")
+    );
     peripheralJob.setHelptext(bundle.getString("locationModel.property_peripheralJob.helptext"));
     peripheralJob.setOperatingEditable(false);
     peripheralJob.setModellingEditable(false);
     setProperty(PERIPHERAL_JOB, peripheralJob);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
-    pMiscellaneous.setDescription(bundle.getString("locationModel.property_miscellaneous.description"));
+    pMiscellaneous.setDescription(
+        bundle.getString("locationModel.property_miscellaneous.description")
+    );
     pMiscellaneous.setHelptext(bundle.getString("locationModel.property_miscellaneous.helptext"));
     pMiscellaneous.setOperatingEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);

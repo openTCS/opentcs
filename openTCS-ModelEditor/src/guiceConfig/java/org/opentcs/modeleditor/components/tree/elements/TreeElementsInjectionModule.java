@@ -20,6 +20,12 @@ import org.opentcs.guing.common.components.tree.elements.VehicleUserObject;
 public class TreeElementsInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public TreeElementsInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     install(new FactoryModuleBuilder()

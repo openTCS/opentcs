@@ -58,15 +58,26 @@ public class SpeedProperty
     validRange.setMin(0);
   }
 
-  public static enum Unit {
-
+  /**
+   * Supported speed units.
+   */
+  public enum Unit {
+    /**
+     * Kilometers per hour.
+     */
     KM_H("km/h"),
+    /**
+     * Meters per second.
+     */
     M_S("m/s"),
+    /**
+     * Millimeters per second.
+     */
     MM_S("mm/s");
 
     private final String displayString;
 
-    private Unit(String displayString) {
+    Unit(String displayString) {
       this.displayString = displayString;
     }
 

@@ -28,8 +28,8 @@ public class OrderReservationPool {
   /**
    * Reservations of orders for vehicles.
    */
-  private final Map<TCSObjectReference<TransportOrder>, TCSObjectReference<Vehicle>> orderReservations
-      = Collections.synchronizedMap(new HashMap<TCSObjectReference<TransportOrder>, TCSObjectReference<Vehicle>>());
+  private final Map<TCSObjectReference<TransportOrder>, TCSObjectReference<Vehicle>> reservations
+      = Collections.synchronizedMap(new HashMap<>());
 
   /**
    * Creates a new instance.
@@ -42,7 +42,7 @@ public class OrderReservationPool {
    * Clears all reservations.
    */
   public void clear() {
-    orderReservations.clear();
+    reservations.clear();
   }
 
   /**
@@ -52,25 +52,25 @@ public class OrderReservationPool {
    * @return <code>true</code> if, and only if, there is a reservation.
    */
   public boolean isReserved(@Nonnull TCSObjectReference<TransportOrder> orderRef) {
-    return orderReservations.containsKey(orderRef);
+    return reservations.containsKey(orderRef);
   }
 
   public void addReservation(@Nonnull TCSObjectReference<TransportOrder> orderRef,
                              @Nonnull TCSObjectReference<Vehicle> vehicleRef) {
-    orderReservations.put(orderRef, vehicleRef);
+    reservations.put(orderRef, vehicleRef);
   }
 
   public void removeReservation(@Nonnull TCSObjectReference<TransportOrder> orderRef) {
-    orderReservations.remove(orderRef);
+    reservations.remove(orderRef);
   }
 
   public void removeReservations(@Nonnull TCSObjectReference<Vehicle> vehicleRef) {
-    orderReservations.values().removeIf(value -> vehicleRef.equals(value));
+    reservations.values().removeIf(value -> vehicleRef.equals(value));
   }
 
   public List<TCSObjectReference<TransportOrder>> findReservations(
       @Nonnull TCSObjectReference<Vehicle> vehicleRef) {
-    return orderReservations.entrySet().stream()
+    return reservations.entrySet().stream()
         .filter(entry -> vehicleRef.equals(entry.getValue()))
         .map(entry -> entry.getKey())
         .collect(Collectors.toList());

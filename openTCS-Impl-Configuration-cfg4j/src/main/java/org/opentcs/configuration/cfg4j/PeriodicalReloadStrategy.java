@@ -93,7 +93,7 @@ public class PeriodicalReloadStrategy
   private class ReloadTask
       extends CyclicTask {
 
-    public ReloadTask(long tSleep) {
+    ReloadTask(long tSleep) {
       super(tSleep);
     }
 

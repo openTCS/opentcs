@@ -62,13 +62,13 @@ class AllocatorTask
   /**
    * Creates a new instance.
    */
-  public AllocatorTask(@Nonnull InternalPlantModelService plantModelService,
-                       @Nonnull ReservationPool reservationPool,
-                       @Nonnull Queue<AllocatorCommand.Allocate> deferredAllocations,
-                       @Nonnull Scheduler.Module allocationAdvisor,
-                       @Nonnull ScheduledExecutorService kernelExecutor,
-                       @Nonnull @GlobalSyncObject Object globalSyncObject,
-                       @Nonnull AllocatorCommand command) {
+  AllocatorTask(@Nonnull InternalPlantModelService plantModelService,
+                @Nonnull ReservationPool reservationPool,
+                @Nonnull Queue<AllocatorCommand.Allocate> deferredAllocations,
+                @Nonnull Scheduler.Module allocationAdvisor,
+                @Nonnull ScheduledExecutorService kernelExecutor,
+                @Nonnull @GlobalSyncObject Object globalSyncObject,
+                @Nonnull AllocatorCommand command) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
     this.deferredAllocations = requireNonNull(deferredAllocations, "deferredAllocations");

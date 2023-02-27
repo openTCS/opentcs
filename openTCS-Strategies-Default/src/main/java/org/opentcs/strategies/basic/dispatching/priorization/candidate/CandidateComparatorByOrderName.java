@@ -28,6 +28,12 @@ public class CandidateComparatorByOrderName
 
   private final Comparator<TransportOrder> delegate = new TransportOrderComparatorByName();
 
+  /**
+   * Creates a new instance.
+   */
+  public CandidateComparatorByOrderName() {
+  }
+
   @Override
   public int compare(AssignmentCandidate candidate1, AssignmentCandidate candidate2) {
     return delegate.compare(candidate1.getTransportOrder(), candidate2.getTransportOrder());

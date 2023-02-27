@@ -17,7 +17,7 @@ import org.opentcs.strategies.basic.dispatching.selection.VehicleSelectionFilter
 
 /**
  * A collection of {@link VehicleSelectionFilter}s.
- * 
+ *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public class CompositeVehicleSelectionFilter

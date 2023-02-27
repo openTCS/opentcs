@@ -31,7 +31,7 @@ public class BlocksTreeViewManager
     super(treeView, userObjectUtil, mouseListener);
     
     // If the user clicks on an element in the tree view that is contained in several blocks,
-    // then we don't want to select the first element but instead the element in the block that 
+    // then we don't want to select the first element but instead the element in the block that
     // the user clicked on.
     initSpecializedSelector();
   }

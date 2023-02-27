@@ -43,7 +43,8 @@ public class EditMenu
   public EditMenu(ViewActionMap actionMap) {
     requireNonNull(actionMap, "actionMap");
 
-    final ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
+    final ResourceBundleUtil labels
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
 
     this.setText(labels.getString("editMenu.text"));
     this.setToolTipText(labels.getString("editMenu.tooltipText"));

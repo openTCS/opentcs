@@ -44,6 +44,12 @@ public class PathAdapter
    */
   private static final Logger LOG = LoggerFactory.getLogger(PathAdapter.class);
 
+  /**
+   * Creates a new instance.
+   */
+  public PathAdapter() {
+  }
+
   @Override
   public void updateModelProperties(TCSObject<?> tcsObject,
                                     ModelComponent modelComponent,

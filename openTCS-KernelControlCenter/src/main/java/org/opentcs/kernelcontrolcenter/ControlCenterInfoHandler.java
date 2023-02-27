@@ -40,16 +40,16 @@ public class ControlCenterInfoHandler
    */
   private static final Logger LOG = LoggerFactory.getLogger(ControlCenterInfoHandler.class);
   /**
-   * This class's configuration.
-   */
-  private final KernelControlCenterConfiguration configuration;
-  /**
    * Formats time stamps.
    */
   private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter
       .ofLocalizedDateTime(FormatStyle.SHORT)
       .withLocale(Locale.getDefault())
       .withZone(ZoneId.systemDefault());
+  /**
+   * This class's configuration.
+   */
+  private final KernelControlCenterConfiguration configuration;
   /**
    * The text area we're writing in.
    */

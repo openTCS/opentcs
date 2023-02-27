@@ -24,6 +24,12 @@ public class LoadGeneratorPanelModule
    */
   private static final Logger LOG = LoggerFactory.getLogger(LoadGeneratorPanelModule.class);
 
+  /**
+   * Creates a new instance.
+   */
+  public LoadGeneratorPanelModule() {
+  }
+
   @Override
   protected void configure() {
     ContinuousLoadPanelConfiguration configuration

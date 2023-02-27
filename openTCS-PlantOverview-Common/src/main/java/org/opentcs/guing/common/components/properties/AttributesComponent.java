@@ -16,7 +16,7 @@ import org.opentcs.guing.common.model.ComponentSelectionListener;
 import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.UndoRedoManager;
 
 /**
- * A component for viewing and editing of properties. 
+ * A component for viewing and editing of properties.
  * Shows a table with two columns. The left column contains the name of the property.
  * The right column contains the value of the property and can be clicked to edit the value.
  *

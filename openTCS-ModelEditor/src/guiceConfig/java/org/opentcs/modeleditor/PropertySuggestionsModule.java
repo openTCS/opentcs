@@ -18,6 +18,12 @@ import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 public class PropertySuggestionsModule
     extends PlantOverviewInjectionModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public PropertySuggestionsModule() {
+  }
+
   @Override
   protected void configure() {
     propertySuggestionsBinder().addBinding()

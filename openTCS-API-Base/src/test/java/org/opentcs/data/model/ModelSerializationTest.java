@@ -19,7 +19,7 @@ import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 
 /**
- * Tests for proper serialization and deserialization of classes derived by TCSObject
+ * Tests for proper serialization and deserialization of classes derived by TCSObject.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
@@ -52,7 +52,8 @@ public class ModelSerializationTest {
       throws Exception {
     @SuppressWarnings("unchecked")
     Location originalObject = new Location("Location1", mock(TCSObjectReference.class));
-    Location deserializedObject = (Location) deserializeTCSObject(serializeTCSObject(originalObject));
+    Location deserializedObject
+        = (Location) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
   }
@@ -61,7 +62,8 @@ public class ModelSerializationTest {
   public void shouldSerializeAndDeserializeLocationType()
       throws Exception {
     LocationType originalObject = new LocationType("LocationType1");
-    LocationType deserializedObject = (LocationType) deserializeTCSObject(serializeTCSObject(originalObject));
+    LocationType deserializedObject
+        = (LocationType) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
   }
@@ -70,7 +72,9 @@ public class ModelSerializationTest {
   public void shouldSerializeAndDeserializePath()
       throws Exception {
     @SuppressWarnings("unchecked")
-    Path originalObject = new Path("Path1", mock(TCSObjectReference.class), mock(TCSObjectReference.class));
+    Path originalObject = new Path("Path1",
+                                   mock(TCSObjectReference.class),
+                                   mock(TCSObjectReference.class));
     Path deserializedObject = (Path) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);

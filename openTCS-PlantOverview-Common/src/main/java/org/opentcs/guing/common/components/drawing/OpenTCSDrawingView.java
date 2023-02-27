@@ -98,7 +98,7 @@ public interface OpenTCSDrawingView
    *
    * @param model The vehicle model.
    */
-  void followVehicle(@Nonnull final VehicleModel model);
+  void followVehicle(@Nonnull VehicleModel model);
 
   /**
    * Releases the view and stops following the current vehicle.

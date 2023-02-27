@@ -74,7 +74,8 @@ public class GetVehicleAttachmentInfoResponseTO {
     if (attachmentInformation == null) {
       return null;
     }
-    GetVehicleAttachmentInfoResponseTO attachmentInformationTO = new GetVehicleAttachmentInfoResponseTO();
+    GetVehicleAttachmentInfoResponseTO attachmentInformationTO
+        = new GetVehicleAttachmentInfoResponseTO();
 
     attachmentInformationTO.setVehicleName(
         attachmentInformation.getVehicleReference()

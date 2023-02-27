@@ -26,6 +26,12 @@ public class VehicleComparatorByEnergyLevel
   public static final String CONFIGURATION_KEY = "BY_ENERGY_LEVEL";
 
   /**
+   * Creates a new instance.
+   */
+  public VehicleComparatorByEnergyLevel() {
+  }
+
+  /**
    * Compares two vehicles by their energy level.
    * Note: this comparator imposes orderings that are inconsistent with equals.
    *

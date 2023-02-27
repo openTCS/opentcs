@@ -25,6 +25,12 @@ public class BasePlantModelTO {
 
   private String version = "";
 
+  /**
+   * Creates a new instance.
+   */
+  public BasePlantModelTO() {
+  }
+
   @XmlAttribute(required = true)
   public String getVersion() {
     return version;

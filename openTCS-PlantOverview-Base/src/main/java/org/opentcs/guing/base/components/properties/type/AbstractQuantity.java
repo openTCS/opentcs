@@ -33,6 +33,11 @@ public abstract class AbstractQuantity<U extends Enum<U>>
    */
   private static final Logger LOG = LoggerFactory.getLogger(AbstractQuantity.class);
   /**
+   * A {@link ValidRangePair} indicating the range of the valid values
+   * for this quantity.
+   */
+  protected ValidRangePair validRange = new ValidRangePair();
+  /**
    * The unit's enum class;
    */
   private final Class<U> fUnitClass;
@@ -56,11 +61,6 @@ public abstract class AbstractQuantity<U extends Enum<U>>
    * Whether or not this property is unsigned.
    */
   private boolean fIsUnsigned;
-  /**
-   * A {@link ValidRangePair} indicating the range of the valid values
-   * for this quantity.
-   */
-  protected ValidRangePair validRange = new ValidRangePair();
 
   /**
    * Creates a new instance.

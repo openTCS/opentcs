@@ -141,7 +141,8 @@ public class OpenTCSSDIApplication
     if (frame != null) {
       frame.setTitle(OpenTCSView.NAME + " - \""
           + modelName + "\" - "
-          + BUNDLE.getString("openTcsSdiApplication.frameTitle_connectedTo.text") + portalManager.getDescription()
+          + BUNDLE.getString("openTcsSdiApplication.frameTitle_connectedTo.text")
+          + portalManager.getDescription()
           + " (" + portalManager.getHost() + ":" + portalManager.getPort() + ")");
     }
   }
@@ -172,7 +173,7 @@ public class OpenTCSSDIApplication
 
     private final OpenTCSView opentcsView;
 
-    public TitleUpdater(OpenTCSView opentcsView) {
+    TitleUpdater(OpenTCSView opentcsView) {
       this.opentcsView = requireNonNull(opentcsView, "opentcsView");
     }
 
@@ -206,7 +207,7 @@ public class OpenTCSSDIApplication
 
     private final OpenTCSView opentcsView;
 
-    public WindowStatusUpdater(OpenTCSView opentcsView) {
+    WindowStatusUpdater(OpenTCSView opentcsView) {
       this.opentcsView = requireNonNull(opentcsView, "opentcsView");
     }
 

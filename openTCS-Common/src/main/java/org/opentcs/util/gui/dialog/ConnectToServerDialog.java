@@ -28,11 +28,6 @@ public class ConnectToServerDialog
     extends JDialog {
 
   /**
-   * This class's resource bundle.
-   */
-  private static final ResourceBundle BUNDLE
-      = ResourceBundle.getBundle(I18nCommon.BUNDLE_PATH);
-  /**
    * A return status code - returned if Cancel button has been pressed.
    */
   public static final int RET_CANCEL = 0;
@@ -40,6 +35,11 @@ public class ConnectToServerDialog
    * A return status code - returned if OK button has been pressed.
    */
   public static final int RET_OK = 1;
+  /**
+   * This class's resource bundle.
+   */
+  private static final ResourceBundle BUNDLE
+      = ResourceBundle.getBundle(I18nCommon.BUNDLE_PATH);
   /**
    * The connection's description.
    */

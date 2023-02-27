@@ -25,7 +25,8 @@ public class LocationTypeActionsEditorPanel
   /**
    * The bundle to be used.
    */
-  private final ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
+  private final ResourceBundleUtil bundle
+      = ResourceBundleUtil.getBundle(I18nPlantOverview.PROPERTIES_PATH);
 
   /**
    * Creates a new instance.
@@ -50,7 +51,9 @@ public class LocationTypeActionsEditorPanel
     JDialog parent = (JDialog) getTopLevelAncestor();
     StringPanel content = new StringPanel(
         bundle.getString("locationTypeActionsEditorPanel.dialog_actionDefinitionEdit.title"),
-        bundle.getString("locationTypeActionsEditorPanel.dialog_actionDefinition.label_action.text"),
+        bundle.getString(
+            "locationTypeActionsEditorPanel.dialog_actionDefinition.label_action.text"
+        ),
         value);
     StandardDetailsDialog dialog = new StandardDetailsDialog(parent, true, content);
     dialog.setLocationRelativeTo(parent);
@@ -67,7 +70,9 @@ public class LocationTypeActionsEditorPanel
     JDialog parent = (JDialog) getTopLevelAncestor();
     StringPanel content = new StringPanel(
         bundle.getString("locationTypeActionsEditorPanel.dialog_actionDefinitionAdd.title"),
-        bundle.getString("locationTypeActionsEditorPanel.dialog_actionDefinition.label_action.text"),
+        bundle.getString(
+            "locationTypeActionsEditorPanel.dialog_actionDefinition.label_action.text"
+        ),
         "");
     StandardDetailsDialog dialog = new StandardDetailsDialog(parent, true, content);
     dialog.setLocationRelativeTo(parent);

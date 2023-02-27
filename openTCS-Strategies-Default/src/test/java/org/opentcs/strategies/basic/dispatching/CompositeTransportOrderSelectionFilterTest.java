@@ -22,10 +22,16 @@ import org.opentcs.strategies.basic.dispatching.selection.TransportOrderSelectio
 import org.opentcs.strategies.basic.dispatching.selection.orders.CompositeTransportOrderSelectionFilter;
 
 /**
+ * Unit tests for {@link CompositeTransportOrderSelectionFilter}.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public class CompositeTransportOrderSelectionFilterTest {
+
+  private static final String NAME_TRANSPORT = "Transport";
+  private static final String NAME_ORDER = "Order";
+  private static final String NAME_TRANSPORT_ORDER = "TransportOrder";
+  private static final String NAME_RANDOM = "SomeRandomName";
 
   /**
    * The class to test.
@@ -33,11 +39,6 @@ public class CompositeTransportOrderSelectionFilterTest {
   private CompositeTransportOrderSelectionFilter transportOrderSelectionFilter;
 
   private List<TransportOrder> transportOrders;
-
-  private static final String NAME_TRANSPORT = "Transport";
-  private static final String NAME_ORDER = "Order";
-  private static final String NAME_TRANSPORT_ORDER = "TransportOrder";
-  private static final String NAME_RANDOM = "SomeRandomName";
 
   public CompositeTransportOrderSelectionFilterTest() {
   }

@@ -34,6 +34,12 @@ public class PointTO
   private String type = "";
   private List<OutgoingPath> outgoingPaths = new ArrayList<>();
 
+  /**
+   * Creates a new instance.
+   */
+  public PointTO() {
+  }
+
   @XmlAttribute(required = true)
   public Long getxPosition() {
     return xPosition;
@@ -104,6 +110,12 @@ public class PointTO
   public static class OutgoingPath {
 
     private String name = "";
+
+    /**
+     * Creates a new instance.
+     */
+    public OutgoingPath() {
+    }
 
     @XmlAttribute(required = true)
     public String getName() {

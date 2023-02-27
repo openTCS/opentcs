@@ -23,6 +23,12 @@ import org.opentcs.guing.common.persistence.unified.UnifiedModelPersistor;
 public class DefaultPersistenceInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultPersistenceInjectionModule() {
+  }
+
   @Override
   protected void configure() {
     bind(ModelManager.class).to(OpenTCSModelManager.class).in(Singleton.class);

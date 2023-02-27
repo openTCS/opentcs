@@ -24,6 +24,12 @@ import org.opentcs.kernelcontrolcenter.vehicles.DriverGUI;
 public class DefaultKernelControlCenterExtensionsModule
     extends ControlCenterInjectionModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public DefaultKernelControlCenterExtensionsModule() {
+  }
+
   @Override
   protected void configure() {
     configureControlCenterDependencies();

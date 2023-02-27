@@ -30,8 +30,12 @@ public class UniqueNameGenerator
   public UniqueNameGenerator(ElementNamingSchemeConfiguration config) {
     registerNamePattern(PointModel.class, config.pointPrefix(), config.pointNumberPattern());
     registerNamePattern(PathModel.class, config.pathPrefix(), config.pathNumberPattern());
-    registerNamePattern(LocationTypeModel.class, config.locationTypePrefix(), config.locationTypeNumberPattern());
-    registerNamePattern(LocationModel.class, config.locationPrefix(), config.locationNumberPattern());
+    registerNamePattern(
+        LocationTypeModel.class, config.locationTypePrefix(), config.locationTypeNumberPattern()
+    );
+    registerNamePattern(
+        LocationModel.class, config.locationPrefix(), config.locationNumberPattern()
+    );
     registerNamePattern(LinkModel.class, config.linkPrefix(), config.linkNumberPattern());
     registerNamePattern(BlockModel.class, config.blockPrefix(), config.blockNumberPattern());
     registerNamePattern(LayoutModel.class, config.layoutPrefix(), config.layoutNumberPattern());

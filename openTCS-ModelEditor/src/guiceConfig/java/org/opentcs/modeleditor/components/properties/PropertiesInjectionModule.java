@@ -42,9 +42,14 @@ import org.opentcs.modeleditor.application.menus.MenuItemComponentsFactory;
 public class PropertiesInjectionModule
     extends PlantOverviewInjectionModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public PropertiesInjectionModule() {
+  }
+
   @Override
   protected void configure() {
-
     install(new FactoryModuleBuilder().build(PropertiesPanelFactory.class));
     install(new FactoryModuleBuilder().build(CellEditorFactory.class));
     install(new FactoryModuleBuilder().build(PropertiesComponentsFactory.class));

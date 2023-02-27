@@ -17,6 +17,12 @@ import com.google.inject.AbstractModule;
 public class DialogsInjectionModule
     extends AbstractModule {
 
+  /**
+   * Creates a new instance.
+   */
+  public DialogsInjectionModule() {
+  }
+
   @Override
   protected void configure() {
   }

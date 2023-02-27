@@ -19,6 +19,12 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
 public class LoopbackPeripheralCommAdapterDescription
     extends PeripheralCommAdapterDescription {
 
+  /**
+   * Creates a new instance.
+   */
+  public LoopbackPeripheralCommAdapterDescription() {
+  }
+
   @Override
   public String getDescription() {
     return ResourceBundle.getBundle(BUNDLE_PATH)

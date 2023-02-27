@@ -75,7 +75,8 @@ public class QuantityCellEditor
 
     // Check if unitString is a valid unit
     if (!property().isPossibleUnit(unitString)) {
-      showCellEditingErrorMsg("quantityCellEditor.dialog_errorUnit.message", property().getPossibleUnits());
+      showCellEditingErrorMsg("quantityCellEditor.dialog_errorUnit.message",
+                              property().getPossibleUnits());
       return;
     }
 

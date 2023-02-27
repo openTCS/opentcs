@@ -22,13 +22,13 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class ViewToolBarsMenu
     extends JMenu {
 
-  private static final ResourceBundleUtil labelsMenu
+  private static final ResourceBundleUtil LABELS_MENU
       = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
-  private static final ResourceBundleUtil labelsToolbar
+  private static final ResourceBundleUtil LABELS_TOOLBAR
       = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH);
 
   public ViewToolBarsMenu(Collection<Action> viewActions) {
-    super(labelsMenu.getString("viewToolBarsMenu.text"));
+    super(LABELS_MENU.getString("viewToolBarsMenu.text"));
     requireNonNull(viewActions, "viewActions");
 
     JCheckBoxMenuItem checkBoxMenuItem;
@@ -36,7 +36,9 @@ public class ViewToolBarsMenu
       checkBoxMenuItem = new JCheckBoxMenuItem(a);
       add(checkBoxMenuItem);
 
-      if (checkBoxMenuItem.getText().equals(labelsToolbar.getString("toolBarManager.toolbar_drawing.title"))) {
+      if (checkBoxMenuItem.getText().equals(
+          LABELS_TOOLBAR.getString("toolBarManager.toolbar_drawing.title")
+      )) {
         checkBoxMenuItem.setEnabled(false); // "Draw"-Toolbar musn't be disabled.
       }
     }

@@ -54,7 +54,7 @@ class PropertyTableModel
    *
    * @param data The properties.
    */
-  public PropertyTableModel(Map<String, String> data) {
+  PropertyTableModel(Map<String, String> data) {
     requireNonNull(data, "data");
 
     for (Entry<String, String> entry : data.entrySet()) {
@@ -65,7 +65,7 @@ class PropertyTableModel
   /**
    * Creates a new instance.
    */
-  public PropertyTableModel() {
+  PropertyTableModel() {
   }
 
   @Override
@@ -191,7 +191,7 @@ class PropertyTableModel
     /**
      * Creates a new instance.
      */
-    public PropEntry() {
+    PropEntry() {
     }
 
     /**
@@ -200,7 +200,7 @@ class PropertyTableModel
      * @param key The key
      * @param value The value
      */
-    public PropEntry(String key, String value) {
+    PropEntry(String key, String value) {
       this.key = requireNonNull(key, "key");
       this.value = requireNonNull(value, "value");
     }

@@ -65,6 +65,18 @@ public abstract class AbstractTreeViewPanel
                EditableComponent {
 
   /**
+   * The undo manger.
+   */
+  protected final UndoRedoManager fUndoRedoManager;
+  /**
+   *
+   */
+  protected final List<Figure> bufferedFigures = new ArrayList<>();
+  /**
+   *
+   */
+  protected List<UserObject> bufferedUserObjects = new ArrayList<>();
+  /**
    * The root node.
    */
   private SortableTreeNode fRootNode;
@@ -80,23 +92,13 @@ public abstract class AbstractTreeViewPanel
    * The components manager.
    */
   private final ComponentsManager componentsManager;
-  /**
-   * The undo manger.
-   */
-  protected final UndoRedoManager fUndoRedoManager;
-  /**
-   *
-   */
-  protected List<UserObject> bufferedUserObjects = new ArrayList<>();
-  /**
-   *
-   */
-  protected final List<Figure> bufferedFigures = new ArrayList<>();
 
   /**
    * Creates a new instance.
    *
    * @param undoRedoManager The undo redo manager
+   * @param modelManager The model manager.
+   * @param componentsManager The components manager.
    */
   @Inject
   public AbstractTreeViewPanel(UndoRedoManager undoRedoManager,
@@ -228,9 +230,10 @@ public abstract class AbstractTreeViewPanel
   public DefaultMutableTreeNode findFirst(Object dataObject) {
     DefaultMutableTreeNode searchNode = null;
 
-    List<DefaultMutableTreeNode> children = Collections.list(fRootNode.preorderEnumeration()).stream()
-        .map(treeNode -> (DefaultMutableTreeNode) treeNode)
-        .collect(Collectors.toList());
+    List<DefaultMutableTreeNode> children
+        = Collections.list(fRootNode.preorderEnumeration()).stream()
+            .map(treeNode -> (DefaultMutableTreeNode) treeNode)
+            .collect(Collectors.toList());
 
     for (DefaultMutableTreeNode child : children) {
       UserObject userObject = (UserObject) child.getUserObject();
@@ -263,9 +266,10 @@ public abstract class AbstractTreeViewPanel
 
   @Override
   public void sortChildren() {
-    List<DefaultMutableTreeNode> children = Collections.list(fRootNode.preorderEnumeration()).stream()
-        .map(treeNode -> (DefaultMutableTreeNode) treeNode)
-        .collect(Collectors.toList());
+    List<DefaultMutableTreeNode> children
+        = Collections.list(fRootNode.preorderEnumeration()).stream()
+            .map(treeNode -> (DefaultMutableTreeNode) treeNode)
+            .collect(Collectors.toList());
 
     for (DefaultMutableTreeNode child : children) {
       sortItems(child);
@@ -489,9 +493,10 @@ public abstract class AbstractTreeViewPanel
   private List<DefaultMutableTreeNode> findAll(Object dataObject) {
     List<DefaultMutableTreeNode> searchNodes = new ArrayList<>();
 
-    List<DefaultMutableTreeNode> children = Collections.list(fRootNode.preorderEnumeration()).stream()
-        .map(treeNode -> (DefaultMutableTreeNode) treeNode)
-        .collect(Collectors.toList());
+    List<DefaultMutableTreeNode> children
+        = Collections.list(fRootNode.preorderEnumeration()).stream()
+            .map(treeNode -> (DefaultMutableTreeNode) treeNode)
+            .collect(Collectors.toList());
 
     for (DefaultMutableTreeNode child : children) {
       UserObject userObject = (UserObject) child.getUserObject();
@@ -513,9 +518,10 @@ public abstract class AbstractTreeViewPanel
   private List<DefaultMutableTreeNode> findAll(UserObject o) {
     List<DefaultMutableTreeNode> searchNodes = new ArrayList<>();
 
-    List<DefaultMutableTreeNode> children = Collections.list(fRootNode.preorderEnumeration()).stream()
-        .map(treeNode -> (DefaultMutableTreeNode) treeNode)
-        .collect(Collectors.toList());
+    List<DefaultMutableTreeNode> children
+        = Collections.list(fRootNode.preorderEnumeration()).stream()
+            .map(treeNode -> (DefaultMutableTreeNode) treeNode)
+            .collect(Collectors.toList());
 
     for (DefaultMutableTreeNode child : children) {
       UserObject userObject = (UserObject) child.getUserObject();
@@ -534,7 +540,8 @@ public abstract class AbstractTreeViewPanel
    * @return the user object for the selected path.
    */
   private UserObject getUserObject() {
-    DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) objectTree.getLastSelectedPathComponent();
+    DefaultMutableTreeNode treeNode
+        = (DefaultMutableTreeNode) objectTree.getLastSelectedPathComponent();
 
     return treeNode != null ? (UserObject) treeNode.getUserObject() : null;
   }
@@ -555,7 +562,8 @@ public abstract class AbstractTreeViewPanel
 
     @Override
     public String getPresentationName() {
-      return ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH).getString("abstractTreeViewPanel.deleteEdit.presentationName");
+      return ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH)
+          .getString("abstractTreeViewPanel.deleteEdit.presentationName");
     }
 
     @Override
@@ -592,7 +600,8 @@ public abstract class AbstractTreeViewPanel
 
     @Override
     public String getPresentationName() {
-      return ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH).getString("abstractTreeViewPanel.pasteEdit.presentationName");
+      return ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH)
+          .getString("abstractTreeViewPanel.pasteEdit.presentationName");
     }
 
     @Override

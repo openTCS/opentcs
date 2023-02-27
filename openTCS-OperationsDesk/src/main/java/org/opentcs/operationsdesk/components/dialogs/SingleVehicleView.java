@@ -124,7 +124,8 @@ public class SingleVehicleView
     this.menuFactory = requireNonNull(menuFactory, "menuFactory");
     this.modelManager = requireNonNull(modelManager, "modelManager");
     requireNonNull(crsObjFactory, "crsObjFactory");
-    this.fVehicleView = new VehicleView(fVehicleModel, crsObjFactory.createVehicleFigure(fVehicleModel));
+    this.fVehicleView = new VehicleView(fVehicleModel,
+                                        crsObjFactory.createVehicleFigure(fVehicleModel));
 
     initComponents();
 
@@ -166,16 +167,22 @@ public class SingleVehicleView
     switch (integrationLevel) {
       case TO_BE_IGNORED:
       case TO_BE_NOTICED:
-        integratedStateLabel.setText(BUNDLE.getString("singleVehicleView.label_integratedState.no.text"));
+        integratedStateLabel.setText(
+            BUNDLE.getString("singleVehicleView.label_integratedState.no.text")
+        );
         integratedStateLabel.setOpaque(false);
         break;
       case TO_BE_RESPECTED:
-        integratedStateLabel.setText(BUNDLE.getString("singleVehicleView.label_integratedState.partially.text"));
+        integratedStateLabel.setText(
+            BUNDLE.getString("singleVehicleView.label_integratedState.partially.text")
+        );
         integratedStateLabel.setOpaque(true);
         integratedStateLabel.setBackground(ORANGE);
         break;
       case TO_BE_UTILIZED:
-        integratedStateLabel.setText(BUNDLE.getString("singleVehicleView.label_integratedState.fully.text"));
+        integratedStateLabel.setText(
+            BUNDLE.getString("singleVehicleView.label_integratedState.fully.text")
+        );
         integratedStateLabel.setOpaque(true);
         integratedStateLabel.setBackground(GREEN);
         break;
@@ -410,14 +417,14 @@ public class SingleVehicleView
 
     private final VehicleFigure figure;
 
-    public VehicleView(VehicleModel vehicleModel, VehicleFigure figure) {
+    VehicleView(VehicleModel vehicleModel, VehicleFigure figure) {
       this.figure = requireNonNull(figure, "figure");
       requireNonNull(vehicleModel, "vehicleModel");
 
       vehicleModel.addAttributesChangeListener(this);
 
       setBackground(Color.WHITE);
-      
+
       Rectangle r = figure.getBounds().getBounds();
       r.grow(10, 10);
       setPreferredSize(new Dimension(r.width, r.height));
@@ -448,7 +455,8 @@ public class SingleVehicleView
      */
     private void drawVehicle(Graphics2D g2d) {
       figure.setIgnorePrecisePosition(true);
-      Point2D.Double posDialog = new Point2D.Double(fVehicleView.getWidth() / 2, fVehicleView.getHeight() / 2);
+      Point2D.Double posDialog = new Point2D.Double(fVehicleView.getWidth() / 2,
+                                                    fVehicleView.getHeight() / 2);
       figure.setBounds(posDialog, null);
       figure.setAngle(0.0);
       figure.forcedDraw(g2d);
@@ -460,7 +468,7 @@ public class SingleVehicleView
 
     private final VehicleModel vehicleModel;
 
-    public VehicleMouseAdapter(VehicleModel vehicleModel) {
+    VehicleMouseAdapter(VehicleModel vehicleModel) {
       this.vehicleModel = requireNonNull(vehicleModel, "vehicleModel");
     }
 

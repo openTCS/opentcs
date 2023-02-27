@@ -18,6 +18,12 @@ import org.opentcs.data.model.visualization.LayerGroup;
 public class LayerGroupCellRenderer
     extends DefaultTableCellRenderer {
 
+  /**
+   * Creates a new instance.
+   */
+  public LayerGroupCellRenderer() {
+  }
+
   @Override
   protected void setValue(Object value) {
     setText(((LayerGroup) value).getName());

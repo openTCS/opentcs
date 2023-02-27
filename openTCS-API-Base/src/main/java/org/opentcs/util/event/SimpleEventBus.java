@@ -30,6 +30,12 @@ public class SimpleEventBus
    */
   private final Set<EventHandler> listeners = new CopyOnWriteArraySet<>();
 
+  /**
+   * Creates a new instance.
+   */
+  public SimpleEventBus() {
+  }
+
   @Override
   public void onEvent(Object event) {
     try {

@@ -199,7 +199,7 @@ public interface VehicleCommAdapter
    * Processes a generic message to the communication adapter.
    * This method provides a generic one-way communication channel to the comm adapter. The message
    * can be anything, including <code>null</code>, and since
-   * {@link VehicleService#sendCommAdapterMessage(org.opentcs.data.TCSObjectReference, java.lang.Object)}
+   * {@link VehicleService#sendCommAdapterMessage(org.opentcs.data.TCSObjectReference, Object)}
    * provides a way to send a message from outside the kernel, it can basically originate from any
    * source. The message thus does not necessarily have to be meaningful to the concrete comm
    * adapter implementation at all.
