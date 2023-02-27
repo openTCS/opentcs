@@ -12,7 +12,7 @@ The openTCS developers
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
-== Unreleased
+== Version 5.8 (2023-02-27)
 
 * New features:
 ** Add support for explicitly triggering rerouting of single vehicles, including optional _forced_ rerouting from a vehicle's current position even if it was not routed to that position by openTCS.
