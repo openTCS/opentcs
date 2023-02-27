@@ -12,6 +12,11 @@ The openTCS developers
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+== Version 5.8.1 (2023-02-27)
+
+* Fixes:
+** Properly set the date for 5.8 in the changelog.
+
 == Version 5.8 (2023-02-27)
 
 * New features:
