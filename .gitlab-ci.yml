@@ -117,10 +117,22 @@ lint:
   interruptible: true
   image: ${CI_REGISTRY_IMAGE}/codequality:${CODEQUALITY_IMAGE_TAG}
   variables:
+    CHANGELOG_FILE: openTCS-Documentation/src/docs/release-notes/changelog.adoc
+    MALFORMED_HEADERS_FILE: malformed_section_headers.txt
     CODE_CLIMATE_FILE: gl-code-quality-report.json
   dependencies:
     - build
   script:
+    - echo "Checking for changelog headers that do not match 'Version x.y.z (yyyy-mm-dd)'..."
+    - grep --extended-regexp "^==[^=]" $CHANGELOG_FILE
+      | grep --invert-match --extended-regexp "^== Version [0-9]+\.[0-9]+(\.[0-9]+)? +\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\)$"
+      > $MALFORMED_HEADERS_FILE
+    - if [ -s $MALFORMED_HEADERS_FILE -a $NO_BUILD_NUMBER = "true" ] ; then
+        echo "Found malformed changelog headers:" ;
+        cat $MALFORMED_HEADERS_FILE ;
+        exit 1 ;
+      fi
+    - rm -f $MALFORMED_HEADERS_FILE
     - echo "Running CheckStyle checks..."
     - ./gradlew checkstyleMain checkstyleTest checkstyleGuiceConfig
     - echo "Converting CheckStyle reports to CodeClimate report..."
