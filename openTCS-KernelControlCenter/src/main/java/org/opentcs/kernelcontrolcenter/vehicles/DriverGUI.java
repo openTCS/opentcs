@@ -277,16 +277,18 @@ public class DriverGUI
 
     pointComboBox.addItemListener((ItemEvent e) -> {
       try {
-        Point newPoint = (Point) e.getItem();
-        LocalVehicleEntry vehicleEntry = vehicleEntryPool.getEntryFor(getSelectedVehicleName());
-        if (vehicleEntry.getAttachedCommAdapterDescription().isSimVehicleCommAdapter()) {
-          callWrapper.call(() -> servicePortal.getVehicleService().sendCommAdapterCommand(
-              vehicleEntry.getAttachmentInformation().getVehicleReference(),
-              new InitPositionCommand(newPoint.getName())));
-        }
-        else {
-          LOG.debug("Vehicle {}: Not a simulation adapter -> not setting initial position.",
-                    vehicleEntry.getVehicleName());
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+          Point newPoint = (Point) e.getItem();
+          LocalVehicleEntry vehicleEntry = vehicleEntryPool.getEntryFor(getSelectedVehicleName());
+          if (vehicleEntry.getAttachedCommAdapterDescription().isSimVehicleCommAdapter()) {
+            callWrapper.call(() -> servicePortal.getVehicleService().sendCommAdapterCommand(
+                vehicleEntry.getAttachmentInformation().getVehicleReference(),
+                new InitPositionCommand(newPoint.getName())));
+          }
+          else {
+            LOG.debug("Vehicle {}: Not a simulation adapter -> not setting initial position.",
+                      vehicleEntry.getVehicleName());
+          }
         }
       }
       catch (Exception ex) {
