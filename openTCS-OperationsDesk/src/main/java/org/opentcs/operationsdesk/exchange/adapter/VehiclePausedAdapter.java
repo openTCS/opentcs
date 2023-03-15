@@ -84,7 +84,9 @@ public class VehiclePausedAdapter
       // Check if the kernel is in operating mode, too.
       if (portal.getState() == Kernel.State.OPERATING) {
         Vehicle vehicle = portal.getVehicleService().fetchObject(Vehicle.class, model.getName());
-        portal.getVehicleService().updateVehiclePaused(vehicle.getReference(), paused);
+        if (vehicle != null && vehicle.isPaused() != paused) {
+          portal.getVehicleService().updateVehiclePaused(vehicle.getReference(), paused);
+        }
       }
     }
     catch (ServiceUnavailableException exc) {
