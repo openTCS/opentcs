@@ -230,29 +230,11 @@ task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask
     // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
     backends = ['html5', 'pdf']
   }
-  attributes 'base-javaSrc': project(':openTCS-API-Base').javaSrcDir,
-             'base-testSrc': project(':openTCS-API-Base').testSrcDir,
-             'loopback-javaSrc': project(':openTCS-CommAdapter-Loopback').javaSrcDir,
+  attributes 'documentation-testSrc': project.testSrcDir,
              'loopback-guiceSrc': project(':openTCS-CommAdapter-Loopback').guiceSrcDir,
-             'loopback-testSrc': project(':openTCS-CommAdapter-Loopback').testSrcDir,
-             'peripheral-loopback-javaSrc': project(':openTCS-PeripheralCommAdapter-Loopback').javaSrcDir,
              'peripheral-loopback-guiceSrc': project(':openTCS-PeripheralCommAdapter-Loopback').guiceSrcDir,
-             'peripheral-loopback-testSrc': project(':openTCS-PeripheralCommAdapter-Loopback').testSrcDir,
-             'kernel-javaSrc': project(':openTCS-Kernel').javaSrcDir,
-             'kernel-guiceSrc': project(':openTCS-Kernel').guiceSrcDir,
-             'kernel-testSrc': project(':openTCS-Kernel').testSrcDir,
-             'controlCenter-javaSrc': project(':openTCS-KernelControlCenter').javaSrcDir,
              'controlCenter-guiceSrc': project(':openTCS-KernelControlCenter').guiceSrcDir,
-             'controlCenter-testSrc': project(':openTCS-KernelControlCenter').testSrcDir,
-             'loadGeneratorPanel-javaSrc': project(':openTCS-PlantOverview-Panel-LoadGenerator').javaSrcDir,
              'loadGeneratorPanel-guiceSrc': project(':openTCS-PlantOverview-Panel-LoadGenerator').guiceSrcDir,
-             'loadGeneratorPanel-testSrc': project(':openTCS-PlantOverview-Panel-LoadGenerator').testSrcDir,
-             'modelEditor-javaSrc': project(':openTCS-ModelEditor').javaSrcDir,
-             'modelEditor-guiceSrc': project(':openTCS-ModelEditor').guiceSrcDir,
-             'modelEditor-testSrc': project(':openTCS-ModelEditor').testSrcDir,
-             'operationsDesk-javaSrc': project(':openTCS-OperationsDesk').javaSrcDir,
-             'operationsDesk-guiceSrc': project(':openTCS-OperationsDesk').guiceSrcDir,
-             'operationsDesk-testSrc': project(':openTCS-OperationsDesk').testSrcDir,
              'imagesoutdir': devManualImagesDir, // Set the images directory for the output of asciidoctor-diagram
              // Attributes specific to the HTML output
              'webfonts': false, // Disable webfonts

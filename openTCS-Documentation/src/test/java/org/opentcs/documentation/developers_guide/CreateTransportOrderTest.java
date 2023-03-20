@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.documentation;
+package org.opentcs.documentation.developers_guide;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -55,88 +55,78 @@ public class CreateTransportOrderTest {
   @Test
   public void demoCreateTransportOrderToLocation() {
     // Note: Keep these lines to a maximum of 80 characters for the documentation!
-    // tag::documentation_createNewTransportOrder[]
-    // Create a list of destinations the vehicle is supposed to travel to. Every
-    // destination is described by the name of the destination location in the
-    // plant model and an operation the vehicle is supposed to perform there.
+
+    // tag::createTransportOrder_createDestinations[]
     List<DestinationCreationTO> destinations
         = List.of(
             new DestinationCreationTO("Some location", "Some operation")
         );
-    // Put as many destinations into the list as necessary. Then create a
-    // transport order description with a name for the new transport order and
-    // the list of destinations.
-    // Note that the given name needs to be unique.
+    // end::createTransportOrder_createDestinations[]
+
+    // tag::createTransportOrder_createTransportOrderCreationTO[]
     TransportOrderCreationTO orderTO
         = new TransportOrderCreationTO("MyTransportOrder", destinations);
-    // Optionally, express that the full name of the order should be generated
-    // by the kernel. (If you do not do this, you need to ensure that the name
-    // of the transport order given above is unique.)
+    // end::createTransportOrder_createTransportOrderCreationTO[]
+
+    // tag::createTransportOrder_setIncompleteName[]
     orderTO = orderTO.withIncompleteName(true);
-    // Optionally, assign a specific vehicle to the transport order.
-    orderTO = orderTO.withIntendedVehicleName("Some vehicle");
-    // Optionally, set a deadline for the transport order.
-    orderTO = orderTO.withDeadline(Instant.now().plus(1, ChronoUnit.HOURS));
+    // end::createTransportOrder_setIncompleteName[]
 
-    // Get a TransportOrderService and ask it to create a transport order using
-    // the given description.
-    TransportOrderService transportOrderService
-        = getATransportOrderServiceReference();
+    // tag::createTransportOrder_setMoreOptionalParameters[]
+    orderTO = orderTO
+        .withIntendedVehicleName("Some vehicle")
+        .withDeadline(Instant.now().plus(1, ChronoUnit.HOURS));
+    // end::createTransportOrder_setMoreOptionalParameters[]
+
+    // tag::createTransportOrder_useServiceToCreateOrder[]
+    TransportOrderService transportOrderService = getATransportOrderService();
     transportOrderService.createTransportOrder(orderTO);
+    // end::createTransportOrder_useServiceToCreateOrder[]
 
-    // Optionally, get a DispatcherService and trigger the kernel's dispatcher
-    // explicitly to have it check for a vehicle that can process the transport
-    // order. (You only need to do this if you need the dispatcher to be
-    // triggered immediately after creating the transport order. If you do not
-    // do this, the dispatcher will still be triggered periodically.)
-    DispatcherService dispatcherService = getADispatcherServiceReference();
+    // tag::createTransportOrder_triggerDispatcher[]
+    DispatcherService dispatcherService = getADispatcherService();
     dispatcherService.dispatch();
-    // end::documentation_createNewTransportOrder[]
+    // end::createTransportOrder_triggerDispatcher[]
   }
 
   @Test
   public void demoCreateTransportOrderToPoint() {
     // Note: Keep these lines to a maximum of 80 characters for the documentation!
-    // tag::documentation_createNewTransportOrderToPoint[]
-    // Create a list containing a single destination to a point, using
-    // Destination.OP_MOVE as the operation to be executed.
+
+    // tag::createTransportOrderToPoint_createDestinations[]
     List<DestinationCreationTO> destinations
         = List.of(
             new DestinationCreationTO("Some point", Destination.OP_MOVE)
         );
+    // end::createTransportOrderToPoint_createDestinations[]
 
-    // Create a transport order description with a name for the new transport
-    // order and the (single-element) list of destinations.
+    // tag::createTransportOrderToPoint_createTransportOrderCreationTO[]
     TransportOrderCreationTO orderTO
         = new TransportOrderCreationTO("MyTransportOrder", destinations)
             .withIntendedVehicleName("Some vehicle")
             .withIncompleteName(true);
+    // end::createTransportOrderToPoint_createTransportOrderCreationTO[]
 
-    // Get a TransportOrderService and ask it to create a transport order using
-    // the given description.
-    TransportOrderService transportOrderService
-        = getATransportOrderServiceReference();
+    // tag::createTransportOrderToPoint_useServiceToCreateOrder[]
+    TransportOrderService transportOrderService = getATransportOrderService();
     transportOrderService.createTransportOrder(orderTO);
+    // end::createTransportOrderToPoint_useServiceToCreateOrder[]
 
-    // Optionally, get a DispatcherService and trigger the kernel's dispatcher
-    // explicitly to have it check for a vehicle that can process the transport
-    // order. (You only need to do this if you need the dispatcher to be
-    // triggered immediately after creating the transport order. If you do not
-    // do this, the dispatcher will still be triggered periodically.)
-    DispatcherService dispatcherService = getADispatcherServiceReference();
+    // tag::createTransportOrderToPoint_triggerDispatcher[]
+    DispatcherService dispatcherService = getADispatcherService();
     dispatcherService.dispatch();
-    // end::documentation_createNewTransportOrderToPoint[]
+    // end::createTransportOrderToPoint_triggerDispatcher[]
   }
 
   private Location someDestinationLocation() {
     return new Location("Location", new LocationType("LocationType").getReference());
   }
 
-  private TransportOrderService getATransportOrderServiceReference() {
+  private TransportOrderService getATransportOrderService() {
     return orderService;
   }
 
-  private DispatcherService getADispatcherServiceReference() {
+  private DispatcherService getADispatcherService() {
     return dispService;
   }
 

@@ -146,14 +146,14 @@ For getting information from a communication adapter to a kernel client, there a
 Communication adapters may publish events via their `VehicleProcessModel` instance to emit information encapsulated in an event for any listeners registered with the kernel.
 Apparently, listeners must already be registered before such an event is emitted by the communication adapter, or they will miss it.
 To register a client as a listener, use `EventSource.subscribe()`.
-You can get the EventSource instance used by the kernel through dependency injection by using the qualifier annotation `org.opentcs.customizations.ApplicationEventBus`.
+You can get the `EventSource` instance used by the kernel through dependency injection by using the qualifier annotation `ApplicationEventBus`.
 
 Alternatively, communication adapters may use their `VehicleProcessModel` to set properties in the corresponding `Vehicle` object.
 Kernel clients may then retrieve the information from it:
 
 [source, java]
 ----
-include::{kernel-testSrc}/org/opentcs/documentation/ReceiveCommAdapterMessageTest.java[tags=documentation_receiveMessageFromVehicle]
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/ReceiveCommAdapterMessageTest.java[tags=documentation_receiveMessageFromVehicle, indent=0]
 ----
 
 Communication adapters may also use their `VehicleProcessModel` to set properties in the corresponding `TransportOrder` object a vehicle is currently processing.
@@ -161,7 +161,7 @@ This basically works the same way as with the `Vehicle` object:
 
 [source, java]
 ----
-include::{kernel-testSrc}/org/opentcs/documentation/ReceiveCommAdapterMessageTest.java[tags=documentation_receiveMessageFromTransportOrder]
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/ReceiveCommAdapterMessageTest.java[tags=documentation_receiveMessageFromTransportOrder, indent=0]
 ----
 
 Unlike information published via events, data stored as properties in `Vehicle` or `TransportOrder` objects can be retrieved at any time.
