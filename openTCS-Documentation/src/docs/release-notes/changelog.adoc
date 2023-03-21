@@ -16,6 +16,11 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 ...
 
+== Version 5.8.2 (2023-03-21)
+
+* Fixes:
+** Remove a duplicate key from the OpenAPI specification.
+
 == Version 5.8.1 (2023-02-27)
 
 * Fixes:

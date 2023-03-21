@@ -881,10 +881,6 @@ components:
             The order sequence this transport order belongs to. 
             May be null in case this order isn't part of any sequence.
           example: MyOrderSequence
-        type:
-          type: string
-          description: The type of the transport order
-          example: some type
         destinations:
           type: array
           items:
