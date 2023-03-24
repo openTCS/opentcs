@@ -63,11 +63,10 @@ build_code_quality_image:
     - echo "Building code quality image with tag ${CODEQUALITY_IMAGE_TAG}..."
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-    - >-
-      /kaniko/executor
+    - '/kaniko/executor
       --context "${CI_PROJECT_DIR}/.gitlab/docker/codequality"
       --dockerfile "${CI_PROJECT_DIR}/.gitlab/docker/codequality/Dockerfile"
-      --destination "${CI_REGISTRY_IMAGE}/codequality:${CODEQUALITY_IMAGE_TAG}"
+      --destination "${CI_REGISTRY_IMAGE}/codequality:${CODEQUALITY_IMAGE_TAG}"'
 
 build:
   stage: build
@@ -124,14 +123,15 @@ lint:
     - build
   script:
     - echo "Checking for changelog headers that do not match 'Version x.y.z (yyyy-mm-dd)'..."
-    - grep --extended-regexp "^==[^=]" $CHANGELOG_FILE
-      | grep --invert-match --extended-regexp "^== Version [0-9]+\.[0-9]+(\.[0-9]+)? +\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\)$"
-      > $MALFORMED_HEADERS_FILE
-    - if [ -s $MALFORMED_HEADERS_FILE -a $NO_BUILD_NUMBER = "true" ] ; then
+    - '( grep --extended-regexp "^==[^=]" $CHANGELOG_FILE
+        | grep --invert-match --extended-regexp "^== Version [0-9]+\.[0-9]+(\.[0-9]+)? +\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\)$"
+        > $MALFORMED_HEADERS_FILE )
+      || true'
+    - 'if [ -s $MALFORMED_HEADERS_FILE -a $NO_BUILD_NUMBER = "true" ] ; then
         echo "Found malformed changelog headers:" ;
         cat $MALFORMED_HEADERS_FILE ;
         exit 1 ;
-      fi
+      fi'
     - rm -f $MALFORMED_HEADERS_FILE
     - echo "Running CheckStyle checks..."
     - ./gradlew checkstyleMain checkstyleTest checkstyleGuiceConfig
@@ -155,12 +155,12 @@ deploy_private:
   dependencies:
     - build
   script:
-    - ./gradlew -x check publish
+    - './gradlew -x check publish
         -PDO_DEPLOY_PRIVATE="true"
         -PDO_DEPLOY_PUBLIC="false"
         -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
         -PSIGNING_KEY="$SIGNING_KEY"
-        -PSIGNING_PASSWORD="$SIGNING_PASSWORD"
+        -PSIGNING_PASSWORD="$SIGNING_PASSWORD"'
   cache:
     key: build_test_deploy-$(date +%Y-%m)
     paths:
@@ -174,7 +174,7 @@ deploy_public:
   dependencies:
     - build
   script:
-    - ./gradlew -x check publish
+    - './gradlew -x check publish
         -PDO_DEPLOY_PRIVATE="false"
         -PDO_DEPLOY_PUBLIC="true"
         -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
@@ -182,7 +182,7 @@ deploy_public:
         -PSIGNING_PASSWORD="$SIGNING_PASSWORD"
         -PDEPLOY_REPO_PUBLIC_URL="$DEPLOY_REPO_PUBLIC_URL"
         -PDEPLOY_REPO_PUBLIC_USERNAME="$DEPLOY_REPO_PUBLIC_USERNAME"
-        -PDEPLOY_REPO_PUBLIC_PASSWORD="$DEPLOY_REPO_PUBLIC_PASSWORD"
+        -PDEPLOY_REPO_PUBLIC_PASSWORD="$DEPLOY_REPO_PUBLIC_PASSWORD"'
   cache:
     key: build_test_deploy-$(date +%Y-%m)
     paths:
