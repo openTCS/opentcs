@@ -5,9 +5,5 @@
   ],
   "assigneesFromCodeOwners": true,
   "assigneesSampleSize": 1,
-  "dependencyDashboardApproval": true,
-  "dependencyDashboardLabels": [
-    "review",
-    "enhancement"
-  ]
+  "dependencyDashboardApproval": true
 }
