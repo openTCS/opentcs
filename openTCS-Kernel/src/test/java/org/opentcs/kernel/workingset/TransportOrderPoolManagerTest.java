@@ -15,6 +15,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
@@ -93,13 +95,15 @@ public class TransportOrderPoolManagerTest {
     assertThat(objectRepo.getObjects(OrderSequence.class), is(empty()));
   }
 
-  @Test
-  public void removeSingleTransportOrder() {
+  @ParameterizedTest
+  @EnumSource(value = TransportOrder.State.class,
+              names = {"FINISHED", "FAILED", "UNROUTABLE"})
+  public void removeSingleTransportOrderIfFinished(TransportOrder.State state) {
     TransportOrder order = orderPoolManager.createTransportOrder(
         new TransportOrderCreationTO("some-order",
                                      List.of(new DestinationCreationTO("some-location", "NOP")))
     );
-
+    orderPoolManager.setTransportOrderState(order.getReference(), state);
     orderPoolManager.removeTransportOrder(order.getReference());
 
     assertThat(objectRepo.getObjects(TransportOrder.class), is(empty()));

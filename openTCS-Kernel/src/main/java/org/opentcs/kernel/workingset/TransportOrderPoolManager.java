@@ -303,9 +303,9 @@ public class TransportOrderPoolManager
   public TransportOrder removeTransportOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
     TransportOrder order = getObjectRepo().getObject(TransportOrder.class, ref);
-    // Make sure orders currently being processed are not removed.
-    checkArgument(!order.hasState(TransportOrder.State.BEING_PROCESSED),
-                  "Transport order %s is being processed.",
+    // Make sure only orders in a final state are removed.
+    checkArgument(order.getState().isFinalState(),
+                  "Transport order %s is not in a final state.",
                   order.getName());
     getObjectRepo().removeObject(ref);
     emitObjectEvent(null,
