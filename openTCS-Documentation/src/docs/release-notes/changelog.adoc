@@ -17,6 +17,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Other changes:
 ** Update Gradle wrapper to 7.6.
 ** Update License Gradle Plugin to 0.16.1.
+** Update Gradle Swagger Generator Plugin to 2.19.2.
 
 == Version 5.8.2 (2023-03-21)
 
