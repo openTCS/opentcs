@@ -14,7 +14,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
-...
+* Other changes:
+** Update Gradle wrapper to 7.6.
+** Update License Gradle Plugin to 0.16.1.
 
 == Version 5.8.2 (2023-03-21)
 
