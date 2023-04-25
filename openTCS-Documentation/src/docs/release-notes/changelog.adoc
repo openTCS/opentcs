@@ -14,6 +14,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
+* New Features:
+** Provide information about available communication adapters for peripheral devices in the Java API.
 * Other changes:
 ** Update Gradle wrapper to 7.6.
 ** Update License Gradle Plugin to 0.16.1.

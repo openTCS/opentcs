@@ -10,6 +10,7 @@ package org.opentcs.kernel.peripherals;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
@@ -38,6 +39,10 @@ public class PeripheralEntryPool
    */
   private final TCSObjectService objectService;
   /**
+   * The peripheral comm adapter registry.
+   */
+  private final PeripheralCommAdapterRegistry commAdapterRegistry;
+  /**
    * The entries of this pool.
    */
   private final Map<TCSResourceReference<Location>, PeripheralEntry> entries = new HashMap<>();
@@ -50,10 +55,13 @@ public class PeripheralEntryPool
    * Creates a new instance.
    *
    * @param objectService The object service.
+   * @param commAdapterRegistry The peripheral comm adapter registry.
    */
   @Inject
-  public PeripheralEntryPool(@Nonnull TCSObjectService objectService) {
+  public PeripheralEntryPool(@Nonnull TCSObjectService objectService,
+                             @Nonnull PeripheralCommAdapterRegistry commAdapterRegistry) {
     this.objectService = requireNonNull(objectService, "objectService");
+    this.commAdapterRegistry = requireNonNull(commAdapterRegistry, "commAdapterRegistry");
   }
 
   @Override
@@ -62,8 +70,18 @@ public class PeripheralEntryPool
       return;
     }
 
-    objectService.fetchObjects(Location.class).stream()
-        .forEach(location -> entries.put(location.getReference(), new PeripheralEntry(location)));
+    for (Location location : objectService.fetchObjects(Location.class)) {
+      entries.put(
+          location.getReference(),
+          new PeripheralEntry(
+              location,
+              commAdapterRegistry.findFactoriesFor(location).stream()
+                  .map(factory -> factory.getDescription())
+                  .collect(Collectors.toList())
+          )
+      );
+    }
+
     LOG.debug("Initialized peripheral entry pool: {}", entries);
     initialized = true;
   }

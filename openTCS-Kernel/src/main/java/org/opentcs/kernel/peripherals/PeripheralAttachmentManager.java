@@ -162,6 +162,7 @@ public class PeripheralAttachmentManager
 
     PeripheralEntry entry = peripheralEntryPool.getEntryFor(location);
     return new PeripheralAttachmentInformation(entry.getLocation(),
+                                               entry.getAvailableCommAdapters(),
                                                entry.getCommAdapterFactory().getDescription());
   }
 
@@ -197,6 +198,7 @@ public class PeripheralAttachmentManager
     eventHandler.onEvent(new PeripheralAttachmentEvent(
         entry.getLocation(),
         new PeripheralAttachmentInformation(entry.getLocation(),
+                                            entry.getAvailableCommAdapters(),
                                             entry.getCommAdapterFactory().getDescription()))
     );
     eventHandler.onEvent(new PeripheralProcessModelEvent(

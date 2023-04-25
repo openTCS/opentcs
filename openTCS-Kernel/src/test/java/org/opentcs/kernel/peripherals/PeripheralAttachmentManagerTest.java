@@ -58,7 +58,7 @@ public class PeripheralAttachmentManagerTest {
     peripheralService = mock(InternalPeripheralService.class);
     commAdapterRegistry = mock(PeripheralCommAdapterRegistry.class);
     commAdapterFactory = mock(PeripheralCommAdapterFactory.class);
-    peripheralEntryPool = new PeripheralEntryPool(peripheralService);
+    peripheralEntryPool = new PeripheralEntryPool(peripheralService, commAdapterRegistry);
     attachmentManager = spy(
         new PeripheralAttachmentManager(peripheralService,
                                         mock(LocalPeripheralControllerPool.class),
