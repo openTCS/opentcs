@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import java.util.HashSet;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
@@ -28,6 +29,7 @@ import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetTransportOrderResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.filter.PeripheralJobFilter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.filter.TransportOrderFilter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.filter.VehicleFilter;
@@ -283,6 +285,34 @@ public class RequestStatusHandler {
     try {
       kernelExecutor.submit(
           () -> vehicleService.attachCommAdapter(vehicle.getReference(), newAdapter)
+      ).get();
+    }
+    catch (InterruptedException exc) {
+      throw new IllegalStateException("Unexpectedly interrupted");
+    }
+    catch (ExecutionException exc) {
+      if (exc.getCause() instanceof RuntimeException) {
+        throw (RuntimeException) exc.getCause();
+      }
+      throw new KernelRuntimeException(exc.getCause());
+    }
+  }
+
+  public void putVehicleAllowedOrderTypes(String name,
+                                          PutVehicleAllowedOrderTypesTO allowedOrderTypes)
+      throws ObjectUnknownException {
+    requireNonNull(name, "name");
+    requireNonNull(allowedOrderTypes, "allowedOrderTypes");
+
+    Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
+    if (vehicle == null) {
+      throw new ObjectUnknownException("Unknown vehicle: " + name);
+    }
+
+    try {
+      kernelExecutor.submit(
+          () -> vehicleService.updateVehicleAllowedOrderTypes(
+              vehicle.getReference(), new HashSet<>(allowedOrderTypes.getOrderTypes()))
       ).get();
     }
     catch (InterruptedException exc) {

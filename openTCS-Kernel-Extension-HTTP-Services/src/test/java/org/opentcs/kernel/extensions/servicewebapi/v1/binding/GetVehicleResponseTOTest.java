@@ -65,6 +65,12 @@ public class GetVehicleResponseTOTest {
                     List.of("some-path", "some-point"),
                     List.of("some-other-path", "some-other-point")
                 )
+            )
+            .setAllowedOrderTypes(
+                List.of(
+                    "OrderType001",
+                    "OrderType002"
+                )
             );
 
     Approvals.verify(jsonBinder.toJson(to));

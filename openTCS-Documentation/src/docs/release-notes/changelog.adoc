@@ -14,7 +14,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
-* New Features:
+* New features:
+** Add support for updating and retrieving a vehicle's allowed order types via the web API.
 ** Provide information about available communication adapters for peripheral devices in the Java API.
 * Other changes:
 ** Update Gradle wrapper to 7.6.

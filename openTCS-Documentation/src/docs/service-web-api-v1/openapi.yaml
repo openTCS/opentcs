@@ -423,6 +423,47 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/allowedOrderTypes":
+    put:
+      tags:
+        - Vehicles
+      summary: Sets the allowed order types for the named vehicle.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AllowedOrderTypes"
+        description: The list of all order types to be allowed.
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: The submitted data is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
   "/vehicles/{NAME}/commAdapter/attachmentInformation":
     get:
       tags:
@@ -1004,6 +1045,18 @@ components:
       required:
         - locationName
         - operation
+    AllowedOrderTypes:
+      title: Allowed Order Types
+      type: object
+      properties:
+        orderTypes:
+          type: array
+          items:
+            type: string
+            description: The names of the allowed order types.
+          example: ["some-order-type", "another-order-type", "third-order-type" ]
+      required:
+        - orderTypes
     VehicleState:
       title: Vehicle State
       type: object
@@ -1088,6 +1141,12 @@ components:
             $ref: "#/components/schemas/ResourceSet"
           description: The resources claimed - i.e. not yet allocated - for the vehicle's route.
           example: [ [ "Path-0041--0042", "Point-0042" ], [ "Path-0042--0043", "Point-0043", "Location-2345" ] ]
+        allowedOrderTypes:
+          type: array
+          items:
+            type: string
+            description: The allowed order types for this vehicle.
+          example: ["OrderType001", "OrderType002"]
       required:
         - length
         - energyLevelGood

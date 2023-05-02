@@ -20,6 +20,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetTransportOrderR
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleAttachmentInfoResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
@@ -112,6 +113,8 @@ public class V1RequestHandler
                  this::handlePostWithdrawalByVehicle);
     service.post("/vehicles/:NAME/rerouteRequest",
                  this::handlePostVehicleRerouteRequest);
+    service.put("/vehicles/:NAME/allowedOrderTypes",
+                this::handlePutVehicleAllowedOrderTypes);
     service.get("/vehicles/:NAME",
                 this::handleGetVehicleByName);
     service.get("/vehicles",
@@ -283,6 +286,15 @@ public class V1RequestHandler
         request.params(":NAME"),
         valueIfKeyPresent(request.queryMap(), "newValue")
     );
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handlePutVehicleAllowedOrderTypes(Request request, Response response)
+      throws ObjectUnknownException, IllegalArgumentException {
+    statusInformationProvider.putVehicleAllowedOrderTypes(
+        request.params(":NAME"),
+        jsonBinder.fromJson(request.body(), PutVehicleAllowedOrderTypesTO.class));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }

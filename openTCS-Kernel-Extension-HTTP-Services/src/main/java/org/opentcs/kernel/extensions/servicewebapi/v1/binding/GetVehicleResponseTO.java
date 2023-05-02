@@ -58,6 +58,8 @@ public class GetVehicleResponseTO {
 
   private List<List<String>> claimedResources = new ArrayList<>();
 
+  private List<String> allowedOrderTypes = new ArrayList<>();
+
   public GetVehicleResponseTO() {
   }
 
@@ -196,6 +198,15 @@ public class GetVehicleResponseTO {
     return this;
   }
 
+  public List<String> getAllowedOrderTypes() {
+    return allowedOrderTypes;
+  }
+
+  public GetVehicleResponseTO setAllowedOrderTypes(List<String> allowedOrderTypes) {
+    this.allowedOrderTypes = requireNonNull(allowedOrderTypes, "allowedOrderTypes");
+    return this;
+  }
+
   /**
    * Creates a <Code>VehicleState</Code> instance from a <Code>Vehicle</Code> instance.
    *
@@ -227,6 +238,11 @@ public class GetVehicleResponseTO {
     vehicleState.setState(vehicle.getState());
     vehicleState.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
     vehicleState.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));
+    vehicleState.setAllowedOrderTypes(vehicle.getAllowedOrderTypes()
+        .stream()
+        .sorted()
+        .collect(Collectors.toCollection(ArrayList::new))
+    );
     return vehicleState;
   }
 
