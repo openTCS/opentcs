@@ -13,17 +13,14 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
-import org.opentcs.access.SchedulerAllocationState;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.opentcs.access.rmi.services.RegistrationName;
-import org.opentcs.access.rmi.services.RemoteSchedulerService;
-import org.opentcs.components.kernel.services.SchedulerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is the standard implementation of the {@link RemoteSchedulerService} interface.
+ * This class is the standard implementation of the {@code RemoteSchedulerService} interface.
  * <p>
  * Upon creation, an instance of this class registers itself with the RMI registry by the name
  * {@link RegistrationName#REMOTE_SCHEDULER_SERVICE}.
@@ -31,9 +28,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
+@Deprecated
 public class StandardRemoteSchedulerService
     extends KernelRemoteService
-    implements RemoteSchedulerService {
+    implements org.opentcs.access.rmi.services.RemoteSchedulerService {
 
   /**
    * This class's logger.
@@ -42,7 +40,7 @@ public class StandardRemoteSchedulerService
   /**
    * The scheduler service to invoke methods on.
    */
-  private final SchedulerService schedulerService;
+  private final org.opentcs.components.kernel.services.SchedulerService schedulerService;
   /**
    * The user manager.
    */
@@ -78,11 +76,12 @@ public class StandardRemoteSchedulerService
    * @param registryProvider The provider for the registry with which this remote service registers.
    */
   @Inject
-  public StandardRemoteSchedulerService(SchedulerService schedulerService,
-                                        UserManager userManager,
-                                        RmiKernelInterfaceConfiguration configuration,
-                                        SocketFactoryProvider socketFactoryProvider,
-                                        RegistryProvider registryProvider) {
+  public StandardRemoteSchedulerService(
+      org.opentcs.components.kernel.services.SchedulerService schedulerService,
+      UserManager userManager,
+      RmiKernelInterfaceConfiguration configuration,
+      SocketFactoryProvider socketFactoryProvider,
+      RegistryProvider registryProvider) {
     this.schedulerService = requireNonNull(schedulerService, "schedulerService");
     this.userManager = requireNonNull(userManager, "userManager");
     this.configuration = requireNonNull(configuration, "configuration");
@@ -141,7 +140,7 @@ public class StandardRemoteSchedulerService
   }
 
   @Override
-  public SchedulerAllocationState fetchSchedulerAllocations(ClientID clientId) {
+  public org.opentcs.access.SchedulerAllocationState fetchSchedulerAllocations(ClientID clientId) {
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 
     return schedulerService.fetchSchedulerAllocations();

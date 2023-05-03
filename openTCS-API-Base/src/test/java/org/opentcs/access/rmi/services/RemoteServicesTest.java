@@ -42,6 +42,7 @@ public class RemoteServicesTest {
   private static final Logger LOG = LoggerFactory.getLogger(RemoteServicesTest.class);
 
   @Test
+  @SuppressWarnings("deprecation")
   public void shouldMapAllMethodsInServiceInterfaces() {
     checkMapping(DispatcherService.class, RemoteDispatcherService.class);
     checkMapping(NotificationService.class, RemoteNotificationService.class);

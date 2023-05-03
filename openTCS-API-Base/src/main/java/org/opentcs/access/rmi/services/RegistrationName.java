@@ -45,6 +45,7 @@ public interface RegistrationName {
   /**
    * The name the {@link RemoteSchedulerService} registers itself with a RMI registry.
    */
+  @Deprecated
   String REMOTE_SCHEDULER_SERVICE = RemoteSchedulerService.class.getCanonicalName();
   /**
    * The name the {@link RemoteQueryService} registers itself with a RMI registry.

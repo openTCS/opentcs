@@ -131,6 +131,7 @@ public interface KernelServicePortal {
    * @return The service a client can use to access methods regarding the scheduler.
    */
   @Nonnull
+  @Deprecated
   SchedulerService getSchedulerService();
 
   /**
@@ -156,7 +157,7 @@ public interface KernelServicePortal {
    */
   @Nonnull
   PeripheralJobService getPeripheralJobService();
-  
+
   /**
    * Returns the service a client can use to access methods regarding the peripheral dispatcher.
    *

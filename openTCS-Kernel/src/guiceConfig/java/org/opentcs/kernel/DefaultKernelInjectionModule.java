@@ -33,7 +33,6 @@ import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.components.kernel.services.QueryService;
 import org.opentcs.components.kernel.services.RouterService;
-import org.opentcs.components.kernel.services.SchedulerService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.components.kernel.services.VehicleService;
@@ -62,7 +61,6 @@ import org.opentcs.kernel.services.StandardPeripheralService;
 import org.opentcs.kernel.services.StandardPlantModelService;
 import org.opentcs.kernel.services.StandardQueryService;
 import org.opentcs.kernel.services.StandardRouterService;
-import org.opentcs.kernel.services.StandardSchedulerService;
 import org.opentcs.kernel.services.StandardTCSObjectService;
 import org.opentcs.kernel.services.StandardTransportOrderService;
 import org.opentcs.kernel.services.StandardVehicleService;
@@ -165,6 +163,7 @@ public class DefaultKernelInjectionModule
     peripheralCommAdaptersBinder();
   }
 
+  @SuppressWarnings("deprecation")
   private void configureKernelServicesDependencies() {
     bind(StandardPlantModelService.class).in(Singleton.class);
     bind(PlantModelService.class).to(StandardPlantModelService.class);
@@ -190,8 +189,9 @@ public class DefaultKernelInjectionModule
     bind(StandardDispatcherService.class).in(Singleton.class);
     bind(DispatcherService.class).to(StandardDispatcherService.class);
 
-    bind(StandardSchedulerService.class).in(Singleton.class);
-    bind(SchedulerService.class).to(StandardSchedulerService.class);
+    bind(org.opentcs.kernel.services.StandardSchedulerService.class).in(Singleton.class);
+    bind(org.opentcs.components.kernel.services.SchedulerService.class)
+        .to(org.opentcs.kernel.services.StandardSchedulerService.class);
 
     bind(StandardQueryService.class).in(Singleton.class);
     bind(QueryService.class).to(StandardQueryService.class);

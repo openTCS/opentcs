@@ -36,6 +36,7 @@ public class RmiServicesModule
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   protected void configure() {
     RmiKernelInterfaceConfiguration configuration
         = getConfigBindingProvider().get(RmiKernelInterfaceConfiguration.PREFIX,

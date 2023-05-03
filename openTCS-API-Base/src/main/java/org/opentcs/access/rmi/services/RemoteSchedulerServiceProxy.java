@@ -18,6 +18,7 @@ import org.opentcs.components.kernel.services.SchedulerService;
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
+@Deprecated
 class RemoteSchedulerServiceProxy
     extends AbstractRemoteServiceProxy<RemoteSchedulerService>
     implements SchedulerService {
@@ -29,6 +30,7 @@ class RemoteSchedulerServiceProxy
   }
 
   @Override
+  @Deprecated
   public SchedulerAllocationState fetchSchedulerAllocations()
       throws KernelRuntimeException {
     checkServiceAvailability();

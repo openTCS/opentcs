@@ -10,12 +10,17 @@ package org.opentcs.components.kernel.services;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SchedulerAllocationState;
 import org.opentcs.components.kernel.Scheduler;
+import org.opentcs.data.model.Vehicle;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides methods concerning the {@link Scheduler}.
  *
  * @author Martin Grzenia (Fraunhofer IML)
+ * @deprecated
  */
+@Deprecated
+@ScheduledApiChange(when = "6.0", details = "Will be removed.")
 public interface SchedulerService {
 
   /**
@@ -23,7 +28,10 @@ public interface SchedulerService {
    *
    * @return The current state of resource allocations.
    * @throws KernelRuntimeException In case there is an exception executing this method.
+   * @deprecated Acquire allocations from {@link Vehicle}, instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   SchedulerAllocationState fetchSchedulerAllocations()
       throws KernelRuntimeException;
 }

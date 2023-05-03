@@ -10,12 +10,16 @@ package org.opentcs.util;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides helper methods for working with enums.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * @deprecated Use Java streams, instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "6.0", details = "Will be removed.")
 public final class Enums {
 
   /**

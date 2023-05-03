@@ -14,12 +14,17 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.data.model.TCSResource;
+import org.opentcs.data.model.Vehicle;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Represents the current state of resource allocations.
  *
  * @author Martin Grzenia (Fraunhofer IML)
+ * @deprecated Acquire allocations from {@link Vehicle}, instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "6.0", details = "Will be removed.")
 public class SchedulerAllocationState
     implements Serializable {
 

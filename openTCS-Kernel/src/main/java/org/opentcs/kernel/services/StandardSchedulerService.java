@@ -9,18 +9,17 @@ package org.opentcs.kernel.services;
 
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
-import org.opentcs.access.SchedulerAllocationState;
 import org.opentcs.components.kernel.Scheduler;
-import org.opentcs.components.kernel.services.SchedulerService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 
 /**
- * This class is the standard implementation of the {@link SchedulerService} interface.
+ * This class is the standard implementation of the {@code SchedulerService} interface.
  *
  * @author Martin Grzenia (Fraunhofer IML)
  */
+@Deprecated
 public class StandardSchedulerService
-    implements SchedulerService {
+    implements org.opentcs.components.kernel.services.SchedulerService {
 
   /**
    * A global object to be used for synchronization within the kernel.
@@ -45,9 +44,9 @@ public class StandardSchedulerService
   }
 
   @Override
-  public SchedulerAllocationState fetchSchedulerAllocations() {
+  public org.opentcs.access.SchedulerAllocationState fetchSchedulerAllocations() {
     synchronized (globalSyncObject) {
-      return new SchedulerAllocationState(scheduler.getAllocations());
+      return new org.opentcs.access.SchedulerAllocationState(scheduler.getAllocations());
     }
   }
 }

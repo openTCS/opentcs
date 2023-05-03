@@ -108,6 +108,7 @@ public class RemoteKernelServicePortalProxy
   /**
    * The scheduler service.
    */
+  @SuppressWarnings("deprecation")
   private final RemoteSchedulerServiceProxy schedulerService = new RemoteSchedulerServiceProxy();
   /**
    * The query service.
@@ -290,6 +291,7 @@ public class RemoteKernelServicePortalProxy
 
   @Override
   @Nonnull
+  @Deprecated
   public SchedulerService getSchedulerService() {
     return schedulerService;
   }
@@ -312,6 +314,7 @@ public class RemoteKernelServicePortalProxy
     return peripheralDispatcherService;
   }
 
+  @SuppressWarnings("deprecation")
   private void updateServiceLogins(Registry registry)
       throws RemoteException, NotBoundException {
     plantModelService
