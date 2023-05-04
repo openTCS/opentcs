@@ -24,9 +24,7 @@ import org.opentcs.guing.base.model.ModelComponent;
 /**
  * Abstract implementation for connections:
  * <ol>
- * <li>between two points {
- *
- * @see PathModel}</li>
+ * <li>between two points {@link PathModel}</li>
  * <li>between a point and a location {@link LinkModel}</li>
  * </ol>
  *

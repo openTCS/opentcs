@@ -40,6 +40,8 @@ compileTestJava {
   options.compilerArgs << "-Xlint:-serial"
 }
 
+javadoc.options.addBooleanOption('Xdoclint:none', true)
+
 task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates a jar from the source files.') {
   classifier = 'sources'
   from sourceSets.main.allSource

@@ -120,7 +120,6 @@ task apiBase(type: Javadoc, description: 'Creates Javadoc for base API.') {
   classpath = project(':openTCS-API-Base').sourceSets.main.compileClasspath
   options {
     header = "openTCS ${project.version}"
-    footer = "openTCS ${project.version}"
     overview = "${project(':openTCS-API-Base').projectDir}/src/main/java/overview.html"
     group("Basic data structures", "org.opentcs.data*")
     group("Interfaces and supporting classes for accessing the kernel", "org.opentcs.access*")
@@ -128,6 +127,8 @@ task apiBase(type: Javadoc, description: 'Creates Javadoc for base API.') {
     group("Communication adapter framework", "org.opentcs.drivers*")
     group("Configuration-related interfaces and annotation", "org.opentcs.configuration*")
     group("Utility classes", "org.opentcs.util*")
+
+    addBooleanOption('Xdoclint:none', true)
   }
 }
 
@@ -139,7 +140,6 @@ task apiInjection(type: Javadoc, description: 'Creates Javadoc for injection API
   classpath = project(':openTCS-API-Injection').sourceSets.main.compileClasspath
   options {
     header = "openTCS ${project.version}"
-    footer = "openTCS ${project.version}"
     overview = "${project(':openTCS-API-Injection').projectDir}/src/main/java/overview.html"
     group("Classes supporting customization of openTCS applications", "org.opentcs.customizations*")
   }
