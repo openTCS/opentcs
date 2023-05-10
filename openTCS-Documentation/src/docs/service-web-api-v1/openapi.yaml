@@ -26,6 +26,8 @@ servers:
 tags:
   - name: Transport orders
     description: Working with transport orders
+  - name: Order Sequences
+    description: Working with order sequences
   - name: Vehicles
     description: Working with vehicles
   - name: Peripheral jobs
@@ -218,6 +220,142 @@ paths:
                 items:
                   type: string
                   description: Details on the actual error.
+  /orderSequences:
+    get:
+      tags:
+        - Order Sequences
+      summary: Retrieves a set of order sequences.
+      description: ""
+      parameters:
+        - name: intendedVehicle
+          in: query
+          description: >-
+            The name of the vehicle that is intended to process the order sequences to be retrieved.
+          required: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: ArrayOfOrderSequences
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrderSequenceState"
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find the intended vehicle 'Vehicle-0001'.
+  "/orderSequences/{NAME}":
+    get:
+      tags:
+        - Order Sequences
+      summary: Retrieves a single named order sequence.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the order sequence to be retrieved.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderSequenceState"
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find order sequence 'Sequence-002'.
+    post:
+      tags:
+        - Order Sequences
+      summary: Creates a new order sequence with the given name.
+      description: ""
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderSequenceState"
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find Vehicle 'Vehicle-002'.
+        "409":
+          description: An object with the same name already exists in the model.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Order sequence 'Sequence-002' already exists.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the order sequence to be created.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderSequence"
+        description: The details of the order sequence to be created.
+  "/orderSequences/{NAME}/complete":
+    put:
+      tags:
+        - Order Sequences
+      summary: Sets the complete flag for the named order sequence.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the order sequence.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find order sequence 'Sequence-002'.
   /vehicles:
     get:
       tags:
@@ -920,7 +1058,7 @@ components:
           type: string
           description: >-
             The order sequence this transport order belongs to. 
-            May be null in case this order isn't part of any sequence.
+            May be `null` in case this order isn't part of any sequence.
           example: MyOrderSequence
         destinations:
           type: array
@@ -993,7 +1131,7 @@ components:
           type: string
           description: >-
             The order sequence this transport order belongs to.
-            May be null in case this order isn't part of any sequence.
+            May be `null` in case this order isn't part of any sequence.
           example: MyOrderSequence
         type:
           type: string
@@ -1057,6 +1195,89 @@ components:
           example: ["some-order-type", "another-order-type", "third-order-type" ]
       required:
         - orderTypes
+    OrderSequenceState:
+      title: Order Sequence State
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: The name of the order sequence.
+          example: Sequence-001
+        type:
+          type: string
+          description: The type of the order sequence.
+          example: Park
+        orders:
+          type: array
+          example: [ "some-order", "another-order", "order-3" ]
+          items:
+            type: string
+            description: The sequence of orders of the order sequence.
+        finishedIndex:
+          type: integer
+          description: >-
+            The index of the order that was last finished in the sequence.
+            -1 if none was finished yet.
+          example: 3
+        complete:
+          type: boolean
+          description: Indicates whether this order sequence is complete and will not be extended by more orders.
+          example: false
+        finished:
+          type: boolean
+          description: Indicates whether this order sequence has been processed completely.
+          example: false
+        failureFatal:
+          type: boolean
+          description: Indicates whether the failure of one order in this sequence is fatal to all subsequent orders.
+          example: false
+        intendedVehicle:
+          type: string
+          description: >- 
+            The name of the vehicle that is intended to process the order sequence.
+            If this sequence is free to be processed by any vehicle, this is `null`.
+          example: Vehicle-0001
+        processingVehicle:
+          type: string
+          description: >- 
+            The vehicle processing this order sequence, or `null`, if no vehicle has been assigned to it, yet.
+          example: Vehicle-0002
+        properties:
+              type: array
+              items:
+                $ref: "#/components/schemas/Property"
+              description: The order sequences properties
+    OrderSequence:
+      title: Order Sequence
+      type: object
+      additionalProperties: false
+      properties:
+        incompleteName:
+          type: boolean
+          description: >- 
+            Indicates whether the name is incomplete and requires to be completed when creating the actual order sequence.
+            (How exactly this is done is decided by the kernel.)
+          example: false
+        type:
+          type: string
+          description: The type of the order sequence.
+          example: Park
+        intendedVehicle:
+          type: string
+          description: >- 
+            The name of the vehicle that is intended to process the order sequence.
+            If this sequence is free to be processed by any vehicle, this is `null`.
+          example: Vehicle-0001
+        failureFatal:
+          type: boolean
+          description: Indicates whether the failure of one order in this sequence is fatal to all subsequent orders.
+          example: false
+        properties:
+              type: array
+              items:
+                $ref: "#/components/schemas/Property"
+              description: The order sequence's properties
     VehicleState:
       title: Vehicle State
       type: object

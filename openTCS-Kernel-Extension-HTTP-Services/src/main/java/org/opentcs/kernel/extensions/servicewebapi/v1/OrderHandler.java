@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.order.DestinationCreationTO;
+import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
@@ -35,9 +36,11 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderConstants;
+import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostOrderSequenceRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.posttransportorder.Destination;
@@ -197,6 +200,40 @@ public class OrderHandler {
       return kernelExecutor.submit(
           () -> {
             PeripheralJob result = jobService.createPeripheralJob(finalJobCreationTO);
+            return result;
+          }
+      ).get();
+    }
+    catch (InterruptedException exc) {
+      throw new IllegalStateException("Unexpectedly interrupted");
+    }
+    catch (ExecutionException exc) {
+      if (exc.getCause() instanceof RuntimeException) {
+        throw (RuntimeException) exc.getCause();
+      }
+      throw new KernelRuntimeException(exc.getCause());
+    }
+  }
+
+  public OrderSequence createOrderSequence(String name, PostOrderSequenceRequestTO sequence)
+      throws ObjectUnknownException,
+             ObjectExistsException,
+             KernelRuntimeException,
+             IllegalStateException {
+    requireNonNull(name, "name");
+    requireNonNull(sequence, "sequence");
+
+    OrderSequenceCreationTO to = new OrderSequenceCreationTO(name)
+        .withFailureFatal(sequence.isFailureFatal())
+        .withIncompleteName(sequence.isIncompleteName())
+        .withIntendedVehicleName(sequence.getIntendedVehicle())
+        .withProperties(properties(sequence.getProperties()))
+        .withType(sequence.getType());
+
+    try {
+      return kernelExecutor.submit(
+          () -> {
+            OrderSequence result = orderService.createOrderSequence(to);
             return result;
           }
       ).get();

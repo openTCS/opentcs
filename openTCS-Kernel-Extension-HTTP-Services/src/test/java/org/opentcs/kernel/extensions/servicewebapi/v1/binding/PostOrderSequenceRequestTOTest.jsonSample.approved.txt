@@ -1,0 +1,13 @@
+{
+  "incompleteName" : true,
+  "type" : "Transport",
+  "intendedVehicle" : "some-vehicle",
+  "failureFatal" : true,
+  "properties" : [ {
+    "key" : "some-key",
+    "value" : "some-value"
+  }, {
+    "key" : "another-key",
+    "value" : "another-value"
+  } ]
+}
