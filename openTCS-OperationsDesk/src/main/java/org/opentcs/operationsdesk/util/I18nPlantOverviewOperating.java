@@ -51,6 +51,10 @@ public interface I18nPlantOverviewOperating {
    */
   String TODETAIL_PATH = "i18n.org.opentcs.plantoverview.operating.dialogs.transportOrderDetail";
   /**
+   * Path to the resources related to the peripheral job details dialog.
+   */
+  String PJDETAIL_PATH = "i18n.org.opentcs.plantoverview.operating.dialogs.peripheralJobDetail";
+  /**
    * Path to the resources related to the transportorder sequence panel.
    */
   String TO_SEQUENCE_PATH = "i18n.org.opentcs.plantoverview.operating.panels.orderSequences";

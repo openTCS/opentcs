@@ -11,16 +11,17 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
 import org.opentcs.data.ObjectHistory;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.order.TransportOrderHistoryCodes;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
- * A formatter for standard object history events/entries.
+ * A formatter for history events/entries related to {@link TransportOrder}s.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
-public class StandardObjectHistoryEntryFormatter
+public class TransportOrderHistoryEntryFormatter
     implements ObjectHistoryEntryFormatter {
 
   /**
@@ -32,7 +33,7 @@ public class StandardObjectHistoryEntryFormatter
   /**
    * Creates a new instance.
    */
-  public StandardObjectHistoryEntryFormatter() {
+  public TransportOrderHistoryEntryFormatter() {
   }
 
   @Override
@@ -42,13 +43,13 @@ public class StandardObjectHistoryEntryFormatter
     switch (entry.getEventCode()) {
       case TransportOrderHistoryCodes.ORDER_CREATED:
         return Optional.of(
-            bundle.getString("standardObjectHistoryEntryFormatter.code_orderCreated.text")
+            bundle.getString("transportOrderHistoryEntryFormatter.code_orderCreated.text")
         );
 
       case TransportOrderHistoryCodes.ORDER_DISPATCHING_DEFERRED:
         return Optional.of(
             bundle.getString(
-                "standardObjectHistoryEntryFormatter.code_orderDispatchingDeferred.text"
+                "transportOrderHistoryEntryFormatter.code_orderDispatchingDeferred.text"
             )
             + " " + entry.getSupplement().toString()
         );
@@ -56,20 +57,20 @@ public class StandardObjectHistoryEntryFormatter
       case TransportOrderHistoryCodes.ORDER_DISPATCHING_RESUMED:
         return Optional.of(
             bundle.getString(
-                "standardObjectHistoryEntryFormatter.code_orderDispatchingResumed.text"
+                "transportOrderHistoryEntryFormatter.code_orderDispatchingResumed.text"
             )
         );
 
       case TransportOrderHistoryCodes.ORDER_ASSIGNED_TO_VEHICLE:
         return Optional.of(
-            bundle.getString("standardObjectHistoryEntryFormatter.code_orderAssignedToVehicle.text")
+            bundle.getString("transportOrderHistoryEntryFormatter.code_orderAssignedToVehicle.text")
             + " '" + entry.getSupplement().toString() + "'"
         );
 
       case TransportOrderHistoryCodes.ORDER_RESERVED_FOR_VEHICLE:
         return Optional.of(
             bundle.getString(
-                "standardObjectHistoryEntryFormatter.code_orderReservedForVehicle.text"
+                "transportOrderHistoryEntryFormatter.code_orderReservedForVehicle.text"
             )
             + " '" + entry.getSupplement().toString() + "'"
         );
@@ -77,19 +78,19 @@ public class StandardObjectHistoryEntryFormatter
       case TransportOrderHistoryCodes.ORDER_PROCESSING_VEHICLE_CHANGED:
         return Optional.of(
             bundle.getString(
-                "standardObjectHistoryEntryFormatter.code_orderProcVehicleChanged.text"
+                "transportOrderHistoryEntryFormatter.code_orderProcVehicleChanged.text"
             )
             + " '" + entry.getSupplement().toString() + "'"
         );
 
       case TransportOrderHistoryCodes.ORDER_DRIVE_ORDER_FINISHED:
         return Optional.of(
-            bundle.getString("standardObjectHistoryEntryFormatter.code_driveOrderFinished.text")
+            bundle.getString("transportOrderHistoryEntryFormatter.code_driveOrderFinished.text")
         );
 
       case TransportOrderHistoryCodes.ORDER_REACHED_FINAL_STATE:
         return Optional.of(
-            bundle.getString("standardObjectHistoryEntryFormatter.code_orderReachedFinalState.text")
+            bundle.getString("transportOrderHistoryEntryFormatter.code_orderReachedFinalState.text")
         );
 
       default:

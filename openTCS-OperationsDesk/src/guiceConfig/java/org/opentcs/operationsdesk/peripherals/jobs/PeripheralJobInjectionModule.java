@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.peripherals.jobs;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import javax.inject.Singleton;
 
 /**
@@ -26,6 +27,7 @@ public class PeripheralJobInjectionModule
 
   @Override
   protected void configure() {
+    install(new FactoryModuleBuilder().build(PeripheralJobViewFactory.class));
     bind(PeripheralJobsContainer.class).in(Singleton.class);
   }
 }

@@ -14,11 +14,18 @@ import java.util.Set;
 import javax.inject.Inject;
 import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
 import org.opentcs.data.ObjectHistory;
+import org.opentcs.operationsdesk.peripherals.jobs.PeripheralJobHistoryEntryFormatter;
 
 /**
  * A composite formatter for history entries that first tries to apply all registered formatters,
- * then {@link StandardObjectHistoryEntryFormatter}, then a fallback function to ensure that the
- * returned value is <em>never empty</em>.
+ * then a set of standard formatters, then a fallback function to ensure that the returned value is
+ * <em>never empty</em>.
+ * <p>
+ * The set of standard formatters is composed of:
+ * <ul>
+ * <li>{@link TransportOrderHistoryEntryFormatter}</li>
+ * <li>{@link PeripheralJobHistoryEntryFormatter}</li>
+ * </ul>
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
@@ -41,7 +48,8 @@ public class CompositeObjectHistoryEntryFormatter
       formatters.add(formatter);
     }
 
-    formatters.add(new StandardObjectHistoryEntryFormatter());
+    formatters.add(new TransportOrderHistoryEntryFormatter());
+    formatters.add(new PeripheralJobHistoryEntryFormatter());
     formatters.add(this::fallbackFormat);
   }
 

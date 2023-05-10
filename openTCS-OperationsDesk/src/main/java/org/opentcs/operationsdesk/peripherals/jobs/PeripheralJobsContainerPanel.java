@@ -15,9 +15,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -32,6 +34,8 @@ import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.peripherals.PeripheralJob;
+import org.opentcs.guing.common.components.dialogs.DialogContent;
+import org.opentcs.guing.common.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.common.util.IconToolkit;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.PERIPHERALJOB_PATH;
@@ -64,6 +68,11 @@ public class PeripheralJobsContainerPanel
    * Maintains a set of all peripheral jobs existing on the kernel side.
    */
   private final PeripheralJobsContainer peripheralJobsContainer;
+
+  /**
+   * Factory for creating peripheral job views.
+   */
+  private final PeripheralJobViewFactory peripheralJobViewFactory;
   /**
    * The table showing the peripheral jobs.
    */
@@ -79,13 +88,17 @@ public class PeripheralJobsContainerPanel
    * @param portalProvider Provides access to a kernel service portal.
    * @param peripheralJobsContainer Maintains a set of all peripheral jobs existing on the kernel
    * side.
+   * @param peripheralJobViewFactory The factory for creating peripheral job views.
    */
   @Inject
   public PeripheralJobsContainerPanel(SharedKernelServicePortalProvider portalProvider,
-                                      PeripheralJobsContainer peripheralJobsContainer) {
+                                      PeripheralJobsContainer peripheralJobsContainer,
+                                      PeripheralJobViewFactory peripheralJobViewFactory) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.peripheralJobsContainer = requireNonNull(peripheralJobsContainer,
                                                   "peripheralJobsContainer");
+    this.peripheralJobViewFactory = requireNonNull(peripheralJobViewFactory,
+                                                   "peripheralJobViewFactory");
 
     initComponents();
   }
@@ -173,12 +186,23 @@ public class PeripheralJobsContainerPanel
   }
 
   private void showSelectedJob() {
-    int rowIndex = table.getSelectedRow();
-    if (rowIndex > -1) {
-      PeripheralJob selectedJob = tableModel.getEntryAt(table.convertRowIndexToModel(rowIndex));
-      // TODO Show a dialog with details about the selected job
-    }
+    getSelectedJob().ifPresent(job -> {
+      DialogContent content = peripheralJobViewFactory.createPeripheralJobView(job);
+      StandardContentDialog dialog
+          = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
+                                      content,
+                                      true,
+                                      StandardContentDialog.CLOSE);
+      dialog.setVisible(true);
+    });
+  }
 
+  private Optional<PeripheralJob> getSelectedJob() {
+    int rowIndex = table.getSelectedRow();
+    if (rowIndex == -1) {
+      return Optional.empty();
+    }
+    return Optional.of(tableModel.getEntryAt(table.convertRowIndexToModel(rowIndex)));
   }
 
   private void showPopupMenuForSelectedJob(int x, int y) {
