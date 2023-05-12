@@ -295,6 +295,31 @@ public class OrderHandler {
     });
   }
 
+  public void withdrawPeripheral(String name)
+      throws ObjectUnknownException {
+    requireNonNull(name, "name");
+
+    Location location = jobService.fetchObject(Location.class, name);
+    if (location == null) {
+      throw new ObjectUnknownException("Unknown location: " + name);
+    }
+
+    try {
+      kernelExecutor.submit(
+          () -> jobDispatcherService.withdrawByLocation(location.getReference())
+      ).get();
+    }
+    catch (InterruptedException exc) {
+      throw new IllegalStateException("Unexpectedly interrupted");
+    }
+    catch (ExecutionException exc) {
+      if (exc.getCause() instanceof RuntimeException) {
+        throw (RuntimeException) exc.getCause();
+      }
+      throw new KernelRuntimeException(exc.getCause());
+    }
+  }
+
   public void withdrawPeripheralJob(String name)
       throws ObjectUnknownException {
     requireNonNull(name, "name");

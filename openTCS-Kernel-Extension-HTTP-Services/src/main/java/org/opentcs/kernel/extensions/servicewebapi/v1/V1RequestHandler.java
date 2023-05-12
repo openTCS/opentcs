@@ -17,6 +17,7 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.kernel.extensions.servicewebapi.HttpConstants;
 import org.opentcs.kernel.extensions.servicewebapi.RequestHandler;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetOrderSequenceResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralAttachmentInfoResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetTransportOrderResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleAttachmentInfoResponseTO;
@@ -142,6 +143,16 @@ public class V1RequestHandler
                 this::handlePutOrderSequenceComplete);
     service.post("/dispatcher/trigger",
                  this::handlePostDispatcherTrigger);
+    service.post("/peripherals/dispatcher/trigger",
+                 this::handlePostPeripheralJobsDispatchTrigger);
+    service.post("/peripherals/:NAME/withdrawal",
+                 this::handlePostPeripheralWithdrawal);
+    service.put("/peripherals/:NAME/commAdapter/enabled",
+                this::handlePutPeripheralCommAdapterEnabled);
+    service.get("/peripherals/:NAME/commAdapter/attachmentInformation",
+                this::handleGetPeripheralCommAdapterAttachmentInfo);
+    service.put("/peripherals/:NAME/commAdapter/attachment",
+                this::handlePutPeripheralCommAdapterAttachment);
     service.get("/peripheralJobs",
                 this::handleGetPeripheralJobs);
     service.get("/peripheralJobs/:NAME",
@@ -350,6 +361,32 @@ public class V1RequestHandler
     return "";
   }
 
+  private Object handlePostPeripheralWithdrawal(Request request, Response response)
+      throws KernelRuntimeException {
+    orderHandler.withdrawPeripheral(request.params(":NAME"));
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handlePutPeripheralCommAdapterEnabled(Request request, Response response)
+      throws ObjectUnknownException, IllegalArgumentException {
+    statusInformationProvider.putPeripheralCommAdapterEnabled(
+        request.params(":NAME"),
+        valueIfKeyPresent(request.queryMap(), "newValue")
+    );
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handleGetPeripheralCommAdapterAttachmentInfo(Request request, Response response)
+      throws ObjectUnknownException, IllegalArgumentException {
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return jsonBinder.toJson(GetPeripheralAttachmentInfoResponseTO.fromAttachmentInformation(
+        statusInformationProvider.getPeripheralCommAdapterAttachmentInformation(
+            request.params(":NAME")))
+    );
+  }
+
   private Object handleGetPeripheralJobs(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
@@ -358,6 +395,16 @@ public class V1RequestHandler
             valueIfKeyPresent(request.queryMap(), "relatedTransportOrder")
         )
     );
+  }
+
+  private Object handlePutPeripheralCommAdapterAttachment(Request request, Response response)
+      throws ObjectUnknownException, IllegalArgumentException {
+    statusInformationProvider.putPeripheralCommAdapter(
+        request.params(":NAME"),
+        valueIfKeyPresent(request.queryMap(), "newValue")
+    );
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
   }
 
   private Object handleGetPeripheralJobsByName(Request request, Response response) {

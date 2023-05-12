@@ -32,6 +32,8 @@ tags:
     description: Working with vehicles
   - name: Peripheral jobs
     description: Working with peripheral jobs
+  - name: Peripherals
+    description: Working with peripherals
   - name: Status
     description: Retrieving status updates
 security:
@@ -904,6 +906,149 @@ paths:
                 items:
                   type: string
                   description: Details on the actual error.
+  "/peripherals/{NAME}/commAdapter/attachmentInformation":
+    get:
+      tags:
+        - Peripherals
+      summary: Retrieves the driver attachment information of this peripheral.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the peripheral device/location.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeripheralAttachmentInformation"
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find location 'Fire door 002'.
+  "/peripherals/{NAME}/commAdapter/attachment":
+    put:
+      tags:
+        - Peripherals
+      summary: Attaches the given peripheral driver to this peripheral.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the peripheral device/location.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The description class name of the peripheral driver that is to be attached.
+          required: true
+          example: org.opentcs.somePeripheral.driver001
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: The submitted value is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: "Unknown peripheral driver class name: org.opentcs.somePeripheral.driver0011"
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find location 'Fire door 003'.
+  "/peripherals/{NAME}/commAdapter/enabled":
+    put:
+      tags:
+        - Peripherals
+      summary: Sets the enabled state for the named peripheral's driver.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the peripheral device/location.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The peripheral driver's new enabled state.
+          required: true
+          example: true
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find location 'Fire door 003'.
+  "/peripherals/{NAME}/withdrawal":
+    post:
+      tags:
+        - Peripherals
+      summary: Withdraws the peripheral jobs assigned to the given peripheral.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the peripheral device/location.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find location 'Fire door 003'.
+  /peripherals/dispatcher/trigger:
+    post:
+      tags:
+        - Peripherals
+      summary: Explicitly triggers dispatching of peripheral jobs/devices.
+      description: >-
+        Triggers the kernel's dispatcher to assign peripheral jobs to peripheral devices.
+        This usually happens automatically, but depending on the kernel configuration, explicitly triggering it may be necessary.
+      responses:
+        "200":
+          description: Successful response
   /events:
     get:
       tags:
@@ -1722,3 +1867,16 @@ components:
       required:
         - operation
         - locationName
+    PeripheralAttachmentInformation:
+      title: Attachment Information
+      type: object
+      additionalProperties: false
+      properties:
+        locationReference:
+          type: string
+          description: The name of the location.
+          example: Fire door 001
+        attachedCommAdapter:
+          type: string
+          description: The description class name of the peripheral driver currently attached to this location.
+          example: org.opentcs.somePeripheral.driver001

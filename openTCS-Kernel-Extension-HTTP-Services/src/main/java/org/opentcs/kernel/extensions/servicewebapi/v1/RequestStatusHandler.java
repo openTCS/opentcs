@@ -17,14 +17,18 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
+import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
+import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformation;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetOrderSequenceResponseTO;
@@ -45,6 +49,10 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.filter.VehicleFilter;
 public class RequestStatusHandler {
 
   /**
+   * The service used to manage peripherals.
+   */
+  private final PeripheralService peripheralService;
+  /**
    * The service we use to fetch objects.
    */
   private final TransportOrderService orderService;
@@ -60,14 +68,17 @@ public class RequestStatusHandler {
   /**
    * Creates a new instance.
    *
+   * @param peripheralService The service used to manage peripherals.
    * @param orderService The service we use to get the transport orders.
    * @param vehicleService Used to update vehicle instances.
    * @param kernelExecutor The kernel's executor service.
    */
   @Inject
-  public RequestStatusHandler(TransportOrderService orderService,
+  public RequestStatusHandler(PeripheralService peripheralService,
+                              TransportOrderService orderService,
                               VehicleService vehicleService,
                               @KernelExecutor ExecutorService kernelExecutor) {
+    this.peripheralService = requireNonNull(peripheralService, "peripheralService");
     this.orderService = requireNonNull(orderService, "orderService");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
@@ -115,6 +126,76 @@ public class RequestStatusHandler {
         .map(t -> GetTransportOrderResponseTO.fromTransportOrder(t))
         .findAny()
         .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + name));
+  }
+
+  public void putPeripheralCommAdapter(String name, String value)
+      throws ObjectUnknownException {
+    requireNonNull(name, "name");
+    requireNonNull(value, "value");
+
+    Location location = peripheralService.fetchObject(Location.class, name);
+    if (location == null) {
+      throw new ObjectUnknownException("Unknown location: " + name);
+    }
+
+    PeripheralCommAdapterDescription newAdapter
+        = peripheralService.fetchAttachmentInformation(location.getReference())
+            .getAvailableCommAdapters()
+            .stream()
+            .filter(description -> description.getClass().getName().equals(value))
+            .findAny()
+            .orElseThrow(
+                () -> new IllegalArgumentException("Unknown peripheral driver class name: " + value)
+            );
+
+    try {
+      kernelExecutor.submit(
+          () -> peripheralService.attachCommAdapter(location.getReference(), newAdapter)
+      ).get();
+    }
+    catch (InterruptedException exc) {
+      throw new IllegalStateException("Unexpectedly interrupted");
+    }
+    catch (ExecutionException exc) {
+      if (exc.getCause() instanceof RuntimeException) {
+        throw (RuntimeException) exc.getCause();
+      }
+      throw new KernelRuntimeException(exc.getCause());
+    }
+  }
+
+  public void putPeripheralCommAdapterEnabled(String name, String value)
+      throws ObjectUnknownException, IllegalArgumentException {
+    requireNonNull(name, "name");
+    requireNonNull(value, "value");
+
+    Location location = peripheralService.fetchObject(Location.class, name);
+    if (location == null) {
+      throw new ObjectUnknownException("Unknown location: " + name);
+    }
+
+    if (Boolean.parseBoolean(value)) {
+      kernelExecutor.submit(
+          () -> peripheralService.enableCommAdapter(location.getReference())
+      );
+    }
+    else {
+      kernelExecutor.submit(
+          () -> peripheralService.disableCommAdapter(location.getReference())
+      );
+    }
+  }
+
+  public PeripheralAttachmentInformation getPeripheralCommAdapterAttachmentInformation(String name)
+      throws ObjectUnknownException {
+    requireNonNull(name, "name");
+
+    Location location = peripheralService.fetchObject(Location.class, name);
+    if (location == null) {
+      throw new ObjectUnknownException("Unknown location: " + name);
+    }
+
+    return peripheralService.fetchAttachmentInformation(location.getReference());
   }
 
   /**

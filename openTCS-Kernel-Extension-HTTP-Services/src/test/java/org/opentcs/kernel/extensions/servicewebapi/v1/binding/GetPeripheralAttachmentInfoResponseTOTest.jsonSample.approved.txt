@@ -1,0 +1,5 @@
+{
+  "locationName" : "Location001",
+  "availableCommAdapters" : [ "com.example.someperipheraldriver.descriptionclass", "com.example.someotherperipheraldriver.descriptionclass2" ],
+  "attachedCommAdapter" : "com.example.someperipheraldriver.descriptionclass"
+}
