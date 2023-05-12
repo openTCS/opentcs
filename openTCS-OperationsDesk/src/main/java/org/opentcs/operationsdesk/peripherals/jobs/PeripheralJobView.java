@@ -13,7 +13,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
-import java.util.Map.Entry;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -134,9 +133,11 @@ public class PeripheralJobView
               )
         }
     );
-    for (Entry<String, String> entry : peripheralJob.getProperties().entrySet()) {
-      tableModel.addRow(new String[]{entry.getKey(), entry.getValue()});
-    }
+    peripheralJob.getProperties().entrySet().stream()
+        .sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
+        .forEach(entry -> {
+          tableModel.addRow(new String[]{entry.getKey(), entry.getValue()});
+        });
 
     return tableModel;
   }

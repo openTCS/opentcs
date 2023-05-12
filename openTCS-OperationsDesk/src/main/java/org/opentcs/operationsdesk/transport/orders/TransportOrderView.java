@@ -142,9 +142,11 @@ public class TransportOrderView
               )
         }
     );
-    for (Entry<String, String> entry : fTransportOrder.getProperties().entrySet()) {
-      tableModel.addRow(new String[]{entry.getKey(), entry.getValue()});
-    }
+    fTransportOrder.getProperties().entrySet().stream()
+        .sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
+        .forEach(entry -> {
+          tableModel.addRow(new String[]{entry.getKey(), entry.getValue()});
+        });
 
     return tableModel;
   }

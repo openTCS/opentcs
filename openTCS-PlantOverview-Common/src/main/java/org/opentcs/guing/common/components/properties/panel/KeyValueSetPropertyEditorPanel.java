@@ -78,9 +78,11 @@ public class KeyValueSetPropertyEditorPanel
 
     model.setRowCount(0);
 
-    for (KeyValueProperty p : getProperty().getItems()) {
-      model.addRow(new String[]{p.getKey(), p.getValue()});
-    }
+    getProperty().getItems().stream()
+        .sorted((p1, p2) -> p1.getKey().compareTo(p2.getKey()))
+        .forEach(keyValueProperty
+            -> model.addRow(new String[]{keyValueProperty.getKey(), keyValueProperty.getValue()})
+        );
 
     sortItems();
     updateView();

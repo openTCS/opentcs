@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.TreeSet;
 import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
-import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.Property;
 import org.opentcs.guing.common.components.dialogs.DetailsDialogContent;
@@ -61,9 +60,11 @@ public class KeyValueSetPropertyViewerEditorPanel
 
     model.setRowCount(0);
 
-    for (KeyValueProperty p : fProperty.getItems()) {
-      model.addRow(new String[]{p.getKey(), p.getValue()});
-    }
+    getProperty().getItems().stream()
+        .sorted((p1, p2) -> p1.getKey().compareTo(p2.getKey()))
+        .forEach(keyValueProperty
+            -> model.addRow(new String[]{keyValueProperty.getKey(), keyValueProperty.getValue()})
+        );
 
     sortItems();
   }

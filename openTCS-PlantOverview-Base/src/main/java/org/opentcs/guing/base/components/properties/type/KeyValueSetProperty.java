@@ -8,8 +8,8 @@
 package org.opentcs.guing.base.components.properties.type;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.opentcs.guing.base.model.ModelComponent;
 
 /**
@@ -102,18 +102,10 @@ public class KeyValueSetProperty
       return fValue.toString();
     }
 
-    StringBuilder sb = new StringBuilder();
-    Iterator<KeyValueProperty> iItems = getItems().iterator();
-
-    while (iItems.hasNext()) {
-      sb.append(iItems.next());
-
-      if (iItems.hasNext()) {
-        sb.append(", ");
-      }
-    }
-
-    return sb.toString();
+    return getItems().stream()
+        .sorted((i1, i2) -> i1.getKey().compareTo(i2.getKey()))
+        .map(item -> item.toString())
+        .collect(Collectors.joining(", "));
   }
 
   @Override
