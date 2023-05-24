@@ -24,6 +24,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 *** The dispatcher for peripheral jobs can be triggered via an additional route.
 ** Provide information about available communication adapters for peripheral devices in the Java API.
 ** Add a detail panel for peripheral jobs to the Operations Desk.
+** Add property and history information to the order sequence detail panel in the Operations Desk.
 * Other changes:
 ** Update Gradle wrapper to 7.6.
 ** Update License Gradle Plugin to 0.16.1.

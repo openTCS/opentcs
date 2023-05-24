@@ -8,18 +8,30 @@
 package org.opentcs.operationsdesk.transport.sequences;
 
 import com.google.inject.assistedinject.Assisted;
+import java.awt.Component;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import static java.util.Objects.requireNonNull;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
+import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.common.components.dialogs.DialogContent;
+import org.opentcs.operationsdesk.transport.CompositeObjectHistoryEntryFormatter;
 import org.opentcs.operationsdesk.transport.UneditableTableModel;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
@@ -40,6 +52,10 @@ public class OrderSequenceView
    */
   private static final Logger LOG = LoggerFactory.getLogger(OrderSequenceView.class);
   /**
+   * A formatter for timestamps.
+   */
+  private static final DateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+  /**
    * The order sequence to be shown.
    */
   private final OrderSequence fOrderSequence;
@@ -47,17 +63,24 @@ public class OrderSequenceView
    * The portal provider to be used.
    */
   private final SharedKernelServicePortalProvider portalProvider;
+  /**
+   * A formatter for history entries.
+   */
+  private final ObjectHistoryEntryFormatter historyEntryFormatter;
 
   /**
    * Creates new instance.
    *
    * @param sequence The order sequence.
+   * @param historyEntryFormatter A formatter for history entries.
    * @param portalProvider Provides access to a portal.
    */
   @Inject
   public OrderSequenceView(@Assisted OrderSequence sequence,
+                           @Nonnull CompositeObjectHistoryEntryFormatter historyEntryFormatter,
                            SharedKernelServicePortalProvider portalProvider) {
     this.fOrderSequence = requireNonNull(sequence, "sequence");
+    this.historyEntryFormatter = requireNonNull(historyEntryFormatter, "historyEntryFormatter");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     initComponents();
     initFields();
@@ -112,8 +135,6 @@ public class OrderSequenceView
 
     textType.setText(getOrderSequence().getType());
 
-    // TODO...
-    // Transport orders
     DefaultTableModel tableModel = new UneditableTableModel();
     tableModel.setColumnIdentifiers(new String[]{"Name"});
 
@@ -124,6 +145,59 @@ public class OrderSequenceView
     }
 
     transportOrdersTable.setModel(tableModel);
+
+    propertiesTable.setModel(createPropertiesTableModel());
+
+    historyTable.setModel(createHistoryTableModel());
+    historyTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+    historyTable.getColumnModel().getColumn(1).setPreferredWidth(300);
+    historyTable.getColumnModel().getColumn(1).setCellRenderer(new ToolTipCellRenderer());
+  }
+
+  private TableModel createPropertiesTableModel() {
+    DefaultTableModel tableModel = new UneditableTableModel();
+
+    tableModel.setColumnIdentifiers(
+        new String[]{
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
+              .getString(
+                  "orderSequenceView.table_properties.column_propertiesKey.headerText"
+              ),
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
+              .getString(
+                  "orderSequenceView.table_properties.column_propertiesValue.headerText"
+              )
+        }
+    );
+    fOrderSequence.getProperties().entrySet().stream()
+        .sorted((e1, e2) -> e1.getKey().compareTo(e2.getKey()))
+        .forEach(entry -> {
+          tableModel.addRow(new String[]{entry.getKey(), entry.getValue()});
+        });
+
+    return tableModel;
+  }
+
+  private TableModel createHistoryTableModel() {
+    DefaultTableModel tableModel = new UneditableTableModel();
+
+    tableModel.setColumnIdentifiers(
+        new String[]{
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
+              .getString("orderSequenceView.table_history.column_timestamp.headerText"),
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
+              .getString("orderSequenceView.table_history.column_event.headerText")
+        }
+    );
+
+    for (ObjectHistory.Entry entry : fOrderSequence.getHistory().getEntries()) {
+      tableModel.addRow(new String[]{
+        TIMESTAMP_FORMAT.format(Date.from(entry.getTimestamp())),
+        historyEntryFormatter.apply(entry).get()
+      });
+    }
+
+    return tableModel;
   }
 
   // CHECKSTYLE:OFF
@@ -155,17 +229,23 @@ public class OrderSequenceView
     transportOrdersPanel = new javax.swing.JPanel();
     transportOrdersScrollPane = new javax.swing.JScrollPane();
     transportOrdersTable = new javax.swing.JTable();
+    propertiesPanel = new javax.swing.JPanel();
+    propertiesScrollPane = new javax.swing.JScrollPane();
+    propertiesTable = new javax.swing.JTable();
+    historyPanel = new javax.swing.JPanel();
+    historyScrollPane = new javax.swing.JScrollPane();
+    historyTable = new javax.swing.JTable();
 
     setLayout(new java.awt.GridBagLayout());
 
-    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/operating/panels/orderSequences"); // NOI18N
+    java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/operating/dialogs/orderSequenceDetail"); // NOI18N
     generalPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("orderSequenceView.panel_general.border.title"))); // NOI18N
     generalPanel.setLayout(new java.awt.GridBagLayout());
 
     jPanel1.setLayout(new java.awt.GridBagLayout());
 
     labelName.setFont(labelName.getFont());
-    labelName.setText("Name:");
+    labelName.setText(bundle.getString("orderSequenceView.panel_general.label_name.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
@@ -185,8 +265,8 @@ public class OrderSequenceView
     jPanel1.add(textFieldName, gridBagConstraints);
 
     labelFinishedIndex.setFont(labelFinishedIndex.getFont());
-    labelFinishedIndex.setText(bundle.getString("orderSequenceView.label_finishedIndex.text")); // NOI18N
-    labelFinishedIndex.setToolTipText(bundle.getString("orderSequenceView.label_finishedIndex.tooltipText")); // NOI18N
+    labelFinishedIndex.setText(bundle.getString("orderSequenceView.panel_general.label_finishedIndex.text")); // NOI18N
+    labelFinishedIndex.setToolTipText(bundle.getString("orderSequenceView.panel_general.label_finishedIndex.tooltipText")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
@@ -206,7 +286,7 @@ public class OrderSequenceView
     jPanel1.add(textFieldFinishedIndex, gridBagConstraints);
 
     labelIntendedVehicle.setFont(labelIntendedVehicle.getFont());
-    labelIntendedVehicle.setText(bundle.getString("orderSequenceView.label_intendedVehicle.text")); // NOI18N
+    labelIntendedVehicle.setText(bundle.getString("orderSequenceView.panel_general.label_intendedVehicle.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 2;
@@ -226,7 +306,7 @@ public class OrderSequenceView
     jPanel1.add(textFieldIntendedVehicle, gridBagConstraints);
 
     labelProcessingVehicle.setFont(labelProcessingVehicle.getFont());
-    labelProcessingVehicle.setText(bundle.getString("orderSequenceView.label_processingVehicle.text")); // NOI18N
+    labelProcessingVehicle.setText(bundle.getString("orderSequenceView.panel_general.label_processingVehicle.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 3;
@@ -246,7 +326,7 @@ public class OrderSequenceView
     jPanel1.add(textFieldProcessingVehicle, gridBagConstraints);
 
     labelType.setFont(labelType.getFont());
-    labelType.setText(bundle.getString("orderSequenceView.label_type.text")); // NOI18N
+    labelType.setText(bundle.getString("orderSequenceView.panel_general.label_type.text")); // NOI18N
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 4;
@@ -273,8 +353,8 @@ public class OrderSequenceView
 
     jPanel2.setLayout(new java.awt.GridBagLayout());
 
-    checkBoxComplete.setText(bundle.getString("orderSequenceView.checkBox_complete.text")); // NOI18N
-    checkBoxComplete.setToolTipText(bundle.getString("orderSequenceView.checkBox_complete.tooltipText")); // NOI18N
+    checkBoxComplete.setText(bundle.getString("orderSequenceView.panel_general.checkBox_complete.text")); // NOI18N
+    checkBoxComplete.setToolTipText(bundle.getString("orderSequenceView.panel_general.checkBox_complete.tooltipText")); // NOI18N
     checkBoxComplete.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         checkBoxCompleteActionPerformed(evt);
@@ -286,8 +366,8 @@ public class OrderSequenceView
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     jPanel2.add(checkBoxComplete, gridBagConstraints);
 
-    checkBoxFinished.setText(bundle.getString("orderSequenceView.checkBox_finished.text")); // NOI18N
-    checkBoxFinished.setToolTipText(bundle.getString("orderSequenceView.checkBox_finished.tooltipText")); // NOI18N
+    checkBoxFinished.setText(bundle.getString("orderSequenceView.panel_general.checkBox_finished.text")); // NOI18N
+    checkBoxFinished.setToolTipText(bundle.getString("orderSequenceView.panel_general.checkBox_finished.tooltipText")); // NOI18N
     checkBoxFinished.setEnabled(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
@@ -295,8 +375,8 @@ public class OrderSequenceView
     gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
     jPanel2.add(checkBoxFinished, gridBagConstraints);
 
-    checkBoxFailureFatal.setText(bundle.getString("orderSequenceView.checkBox_failureFatal.text")); // NOI18N
-    checkBoxFailureFatal.setToolTipText(bundle.getString("orderSequenceView.checkBox_failureFatal.tooltipText")); // NOI18N
+    checkBoxFailureFatal.setText(bundle.getString("orderSequenceView.panel_general.checkBox_failureFatal.text")); // NOI18N
+    checkBoxFailureFatal.setToolTipText(bundle.getString("orderSequenceView.panel_general.checkBox_failureFatal.tooltipText")); // NOI18N
     checkBoxFailureFatal.setEnabled(false);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
@@ -331,18 +411,73 @@ public class OrderSequenceView
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
-    gridBagConstraints.gridwidth = 2;
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
+    gridBagConstraints.weightx = 0.5;
+    gridBagConstraints.weighty = 0.5;
     add(transportOrdersPanel, gridBagConstraints);
+
+    propertiesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("orderSequenceView.panel_properties.border.text"))); // NOI18N
+    propertiesPanel.setLayout(new java.awt.BorderLayout());
+
+    propertiesScrollPane.setPreferredSize(new java.awt.Dimension(150, 100));
+
+    propertiesTable.setModel(new javax.swing.table.DefaultTableModel(
+      new Object [][] {
+        {},
+        {},
+        {},
+        {}
+      },
+      new String [] {
+
+      }
+    ));
+    propertiesScrollPane.setViewportView(propertiesTable);
+
+    propertiesPanel.add(propertiesScrollPane, java.awt.BorderLayout.CENTER);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 0.5;
+    gridBagConstraints.weighty = 0.5;
+    add(propertiesPanel, gridBagConstraints);
+
+    historyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(bundle.getString("orderSequenceView.panel_history.border.text"))); // NOI18N
+    historyPanel.setLayout(new java.awt.BorderLayout());
+
+    historyScrollPane.setPreferredSize(new java.awt.Dimension(150, 100));
+
+    historyTable.setModel(new javax.swing.table.DefaultTableModel(
+      new Object [][] {
+        {},
+        {},
+        {},
+        {}
+      },
+      new String [] {
+
+      }
+    ));
+    historyScrollPane.setViewportView(historyTable);
+
+    historyPanel.add(historyScrollPane, java.awt.BorderLayout.CENTER);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 0.5;
+    gridBagConstraints.weighty = 0.5;
+    add(historyPanel, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
 
   private void checkBoxCompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxCompleteActionPerformed
     ResourceBundleUtil bundle
-        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TO_SEQUENCE_PATH);
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH);
     int n = JOptionPane.showConfirmDialog(
         this,
         bundle.getString("orderSequenceView.optionPane_markSequenceCompleteConfirmation.message"),
@@ -371,6 +506,9 @@ public class OrderSequenceView
   private javax.swing.JCheckBox checkBoxFailureFatal;
   private javax.swing.JCheckBox checkBoxFinished;
   private javax.swing.JPanel generalPanel;
+  private javax.swing.JPanel historyPanel;
+  private javax.swing.JScrollPane historyScrollPane;
+  private javax.swing.JTable historyTable;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel2;
   private javax.swing.JLabel labelFinishedIndex;
@@ -378,6 +516,9 @@ public class OrderSequenceView
   private javax.swing.JLabel labelName;
   private javax.swing.JLabel labelProcessingVehicle;
   private javax.swing.JLabel labelType;
+  private javax.swing.JPanel propertiesPanel;
+  private javax.swing.JScrollPane propertiesScrollPane;
+  private javax.swing.JTable propertiesTable;
   private javax.swing.JTextField textFieldFinishedIndex;
   private javax.swing.JTextField textFieldIntendedVehicle;
   private javax.swing.JTextField textFieldName;
@@ -388,4 +529,36 @@ public class OrderSequenceView
   private javax.swing.JTable transportOrdersTable;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+
+  /**
+   * A cell renderer that adds a tool tip with the cell's value.
+   */
+  private static class ToolTipCellRenderer
+      extends DefaultTableCellRenderer {
+
+    /**
+     * Creates a new instance.
+     */
+    ToolTipCellRenderer() {
+    }
+
+    @Override
+    public Component getTableCellRendererComponent(JTable table,
+                                                   Object value,
+                                                   boolean isSelected,
+                                                   boolean hasFocus,
+                                                   int row,
+                                                   int column) {
+      Component component = super.getTableCellRendererComponent(table,
+                                                                value,
+                                                                isSelected,
+                                                                hasFocus,
+                                                                row,
+                                                                column);
+
+      ((JComponent) component).setToolTipText(value.toString());
+
+      return component;
+    }
+  }
 }
