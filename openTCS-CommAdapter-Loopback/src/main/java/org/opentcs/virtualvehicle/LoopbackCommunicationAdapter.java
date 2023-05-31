@@ -130,6 +130,9 @@ public class LoopbackCommunicationAdapter
       initVehiclePosition(initialPos);
     }
     getProcessModel().setVehicleState(Vehicle.State.IDLE);
+    getProcessModel().setVehicleLoadHandlingDevices(
+        Arrays.asList(new LoadHandlingDevice(LHD_NAME, false))
+    );
     initialized = true;
   }
 
@@ -159,9 +162,11 @@ public class LoopbackCommunicationAdapter
       if (!getProcessModel().getVehicleLoadHandlingDevices().isEmpty()
           && getProcessModel().getVehicleLoadHandlingDevices().get(0).isFull()) {
         loadState = LoadState.FULL;
+        getProcessModel().setVehicleLength(configuration.vehicleLengthLoaded());
       }
       else {
         loadState = LoadState.EMPTY;
+        getProcessModel().setVehicleLength(configuration.vehicleLengthUnloaded());
       }
     }
   }

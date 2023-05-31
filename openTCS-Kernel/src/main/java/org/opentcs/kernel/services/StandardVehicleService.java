@@ -218,6 +218,14 @@ public class StandardVehicleService
   }
 
   @Override
+  public void updateVehicleLength(TCSObjectReference<Vehicle> ref, int length)
+      throws ObjectUnknownException {
+    synchronized (globalSyncObject) {
+      plantModelManager.setVehicleLength(ref, length);
+    }
+  }
+
+  @Override
   public void updateVehicleTransportOrder(TCSObjectReference<Vehicle> vehicleRef,
                                           TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException {

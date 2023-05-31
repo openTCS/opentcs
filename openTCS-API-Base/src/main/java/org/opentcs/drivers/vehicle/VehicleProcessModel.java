@@ -94,6 +94,10 @@ public class VehicleProcessModel {
    * The vehicle's current state.
    */
   private Vehicle.State state = Vehicle.State.UNKNOWN;
+  /**
+   * The vehicle's current length.
+   */
+  private int length;
 
   /**
    * Creates a new instance.
@@ -103,6 +107,7 @@ public class VehicleProcessModel {
   public VehicleProcessModel(@Nonnull Vehicle attachedVehicle) {
     this.vehicle = requireNonNull(attachedVehicle, "attachedVehicle");
     this.vehicleReference = vehicle.getReference();
+    this.length = vehicle.getLength();
   }
 
   /**
@@ -410,6 +415,29 @@ public class VehicleProcessModel {
   }
 
   /**
+   * Returns the vehicle's current length.
+   *
+   * @return The vehicle's current length.
+   */
+  public int getVehicleLength() {
+    return length;
+  }
+
+  /**
+   * Sets the vehicle's current length.
+   *
+   * @param length The new length.
+   */
+  public void setVehicleLength(int length) {
+    int oldValue = this.length;
+    this.length = length;
+
+    getPropertyChangeSupport().firePropertyChange(Attribute.LENGTH.name(),
+                                                  oldValue,
+                                                  length);
+  }
+
+  /**
    * Sets a property of the transport order the vehicle is currently processing.
    *
    * @param key The property's key.
@@ -594,6 +622,10 @@ public class VehicleProcessModel {
      * Indicates a change of the vehicle's state.
      */
     STATE,
+    /**
+     * Indicates a change of the vehicle's length.
+     */
+    LENGTH,
     /**
      * Indicates a new user notification was published.
      */

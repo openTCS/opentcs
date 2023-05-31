@@ -69,6 +69,10 @@ public class VehicleProcessModelTO
    * The vehicle's state.
    */
   private Vehicle.State vehicleState = Vehicle.State.UNKNOWN;
+  /**
+   * The vehicle's length.
+   */
+  private int length;
 
   /**
    * Creates a new instance.
@@ -169,6 +173,15 @@ public class VehicleProcessModelTO
 
   public VehicleProcessModelTO setVehicleState(@Nonnull Vehicle.State state) {
     this.vehicleState = requireNonNull(state, "state");
+    return this;
+  }
+
+  public int getLength() {
+    return length;
+  }
+
+  public VehicleProcessModelTO setLength(int length) {
+    this.length = length;
     return this;
   }
 }

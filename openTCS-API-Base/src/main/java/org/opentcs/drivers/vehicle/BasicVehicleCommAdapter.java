@@ -238,7 +238,8 @@ public abstract class BasicVehicleCommAdapter
         .setOrientationAngle(getProcessModel().getVehicleOrientationAngle())
         .setPrecisePosition(getProcessModel().getVehiclePrecisePosition())
         .setVehiclePosition(getProcessModel().getVehiclePosition())
-        .setVehicleState(getProcessModel().getVehicleState());
+        .setVehicleState(getProcessModel().getVehicleState())
+        .setLength(getProcessModel().getVehicleLength());
   }
 
   @Override

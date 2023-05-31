@@ -233,12 +233,10 @@ public class DefaultVehicleController
         commAdapter.getProcessModel().getVehicleLoadHandlingDevices()
     );
     updateVehicleState(commAdapter.getProcessModel().getVehicleState());
+    updateVehicleLength(commAdapter.getProcessModel().getVehicleLength());
 
     claimedResources.clear();
-    // Add a first entry into allocatedResources to shift freeing of resources
-    // in commandExecuted() by one - we need to free the resources allocated for
-    // the command before the one executed there.
-    allocatedResources.add(null);
+    allocatedResources.clear();
 
     peripheralInteractor.initialize();
 
@@ -625,16 +623,24 @@ public class DefaultVehicleController
       pendingCommand = null;
       interactionsPendingCommand = null;
       peripheralInteractor.clear();
-      // Free all resource sets that were reserved for future commands, except the current one...
-      Set<TCSResource<?>> neededResources = allocatedResources.poll();
-      for (Set<TCSResource<?>> resSet : allocatedResources) {
-        if (resSet != null) {
-          scheduler.free(this, resSet);
-        }
+
+      // Free all resource sets that were reserved for future commands, except the current one and
+      // the ones the vehicle is still covering with its length.
+      SplitResources splitResources;
+      if (lastCommandExecuted != null) {
+        splitResources = SplitResources.from(allocatedResources,
+                                             toResourceSet(lastCommandExecuted.getStep()));
+      }
+      else {
+        // Happens if the very first transport order was withdrawn before the vehicle has made
+        // any movement. Ensure the resources for the current command/position are retained.
+        splitResources = SplitResources.from(allocatedResources, allocatedResources.peek());
+      }
+      for (Set<TCSResource<?>> resSet : splitResources.getResourcesAhead()) {
+        scheduler.free(this, resSet);
       }
       allocatedResources.clear();
-      // Put the resources for the current command/position back in...
-      allocatedResources.add(neededResources);
+      allocatedResources.addAll(splitResources.getResourcesPassed());
     }
   }
 
@@ -822,6 +828,9 @@ public class DefaultVehicleController
     else if (Objects.equals(evt.getPropertyName(), VehicleProcessModel.Attribute.STATE.name())) {
       updateVehicleState((Vehicle.State) evt.getNewValue());
     }
+    else if (Objects.equals(evt.getPropertyName(), VehicleProcessModel.Attribute.LENGTH.name())) {
+      updateVehicleLength((int) evt.getNewValue());
+    }
     else if (Objects.equals(evt.getPropertyName(),
                             VehicleProcessModel.Attribute.COMMAND_EXECUTED.name())) {
       commandExecuted((MovementCommand) evt.getNewValue());
@@ -940,14 +949,19 @@ public class DefaultVehicleController
       }
       // Remove the command from the queue, since it has been processed successfully.
       lastCommandExecuted = commandsSent.remove();
-      // Free resources allocated for the command before the one now executed.
-      Set<TCSResource<?>> oldResources = allocatedResources.poll();
-      if (oldResources != null) {
+
+      // Free resources allocated for executed commands, but keep as many as needed for the
+      // vehicle's current length.
+      int freeableResourceSetCount
+          = ResourceMath.freeableResourceSetCount(
+              SplitResources.from(allocatedResources, toResourceSet(lastCommandExecuted.getStep()))
+                  .getResourcesPassed(),
+              commAdapter.getProcessModel().getVehicleLength()
+          );
+      for (int i = 0; i < freeableResourceSetCount; i++) {
+        Set<TCSResource<?>> oldResources = allocatedResources.poll();
         LOG.debug("{}: Freeing resources: {}", vehicle.getName(), oldResources);
         scheduler.free(this, oldResources);
-      }
-      else {
-        LOG.debug("{}: Nothing to free.", vehicle.getName());
       }
 
       vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
@@ -1023,6 +1037,10 @@ public class DefaultVehicleController
   private void updateVehicleState(Vehicle.State newState) {
     requireNonNull(newState, "newState");
     vehicleService.updateVehicleState(vehicle.getReference(), newState);
+  }
+
+  private void updateVehicleLength(int newLength) {
+    vehicleService.updateVehicleLength(vehicle.getReference(), newLength);
   }
 
   /**

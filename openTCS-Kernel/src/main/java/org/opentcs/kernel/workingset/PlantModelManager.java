@@ -421,6 +421,32 @@ public class PlantModelManager
   }
 
   /**
+   * Sets a vehicle's length.
+   *
+   * @param ref A reference to the vehicle to be modified.
+   * @param newLength The vehicle's new length.
+   * @return The modified vehicle.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   */
+  public Vehicle setVehicleLength(TCSObjectReference<Vehicle> ref,
+                                  int newLength)
+      throws ObjectUnknownException {
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+
+    LOG.debug("Vehicle's length changes: {} -- {} -> {}",
+              previousState.getName(),
+              previousState.getLength(),
+              newLength);
+
+    Vehicle vehicle = previousState.withLength(newLength);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return vehicle;
+  }
+
+  /**
    * Sets a vehicle integration level.
    *
    * @param ref A reference to the vehicle to be modified.

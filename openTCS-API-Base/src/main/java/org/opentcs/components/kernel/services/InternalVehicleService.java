@@ -166,6 +166,16 @@ public interface InternalVehicleService
       throws ObjectUnknownException;
 
   /**
+   * Updates a vehicle's length.
+   *
+   * @param ref A reference to the vehicle to be modified.
+   * @param length The vehicle's new length.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   */
+  void updateVehicleLength(TCSObjectReference<Vehicle> ref, int length)
+      throws ObjectUnknownException;
+
+  /**
    * Updates a vehicle's transport order.
    *
    * @param vehicleRef A reference to the vehicle to be modified.
