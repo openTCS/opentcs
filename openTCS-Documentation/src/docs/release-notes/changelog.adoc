@@ -35,6 +35,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update Gradle wrapper to 7.6.
 ** Update License Gradle Plugin to 0.16.1.
 ** Update Gradle Swagger Generator Plugin to 2.19.2.
+** Update JUnit 5 to 5.9.3.
+** Update ApprovalTests to 18.6.0.
 ** Deprecate `SchedulerService.fetchSchedulerAllocations()`, as allocations are now part of the `Vehicle` class.
 ** Deprecate utility class `Enums`, as its methods can easily be implemented with Java streams these days.
 ** Display properties of plant model elements, transport orders and peripheral jobs in the Model Editor and Operations Desk applications in lexicographically sorted order.
