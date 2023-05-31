@@ -7,74 +7,110 @@
  */
 package org.opentcs.kernel.workingset;
 
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.util.event.SimpleEventBus;
 
 /**
- * A test class for NotificationBuffer.
+ * Tests for {@link NotificationBuffer}.
  *
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class NotificationBufferTest {
 
-  /**
-   * A constant capacity for buffers to be tested here.
-   */
-  private static final int CAPACITY = 100;
-  /**
-   * The buffer to be tested here.
-   */
-  private NotificationBuffer testBuffer;
+  private NotificationBuffer notificationBuffer;
+
+  private UserNotification notification1;
+  private UserNotification notification2;
+  private UserNotification notification3;
+  private UserNotification notification4;
 
   @BeforeEach
   public void setUp() {
-    testBuffer = new NotificationBuffer(new SimpleEventBus());
-    testBuffer.setCapacity(CAPACITY);
+    notificationBuffer = new NotificationBuffer(new SimpleEventBus());
+
+    notification1 = new UserNotification("notification-1", UserNotification.Level.NOTEWORTHY);
+    notification2 = new UserNotification("notification-2", UserNotification.Level.NOTEWORTHY);
+    notification3 = new UserNotification("notification-3", UserNotification.Level.NOTEWORTHY);
+    notification4 = new UserNotification("notification-4", UserNotification.Level.NOTEWORTHY);
   }
 
-  /**
-   * Verifies that getMessageCount() returns the correct number.
-   */
   @Test
-  public void testMessageCountValidity() {
-    int cutBackCount = CAPACITY / 2;
-    testBuffer.setCutBackCount(cutBackCount);
-    // Fill the buffer to its capacity.
-    for (int i = 1; i <= CAPACITY; i++) {
-      testBuffer.addNotification(new UserNotification("message text",
-                                                      UserNotification.Level.INFORMATIONAL));
-      assertEquals(i, testBuffer.getMessageCount());
-      List<UserNotification> messages = testBuffer.getNotifications();
-      assertEquals(i, messages.size());
-    }
-    // Add one more message to exceed the capacity.
-    testBuffer.addNotification(
-        new UserNotification("message text", UserNotification.Level.INFORMATIONAL)
+  public void keepAllNotificationsBeforeOverflow() {
+    notificationBuffer.setCapacity(3);
+
+    notificationBuffer.addNotification(notification1);
+    notificationBuffer.addNotification(notification2);
+    notificationBuffer.addNotification(notification3);
+
+    assertThat(notificationBuffer.getNotifications(null),
+               contains(notification1, notification2, notification3));
+  }
+
+  @Test
+  public void keepYoungestNotificationsAfterOverflow() {
+    notificationBuffer.setCapacity(3);
+
+    notificationBuffer.addNotification(notification1);
+    notificationBuffer.addNotification(notification2);
+    notificationBuffer.addNotification(notification3);
+    notificationBuffer.addNotification(notification4);
+
+    assertThat(notificationBuffer.getNotifications(null),
+               contains(notification2, notification3, notification4));
+  }
+
+  @Test
+  public void removeExtraNotificationsOnCapacityReduction() {
+    notificationBuffer.setCapacity(4);
+
+    notificationBuffer.addNotification(notification1);
+    notificationBuffer.addNotification(notification2);
+    notificationBuffer.addNotification(notification3);
+    notificationBuffer.addNotification(notification4);
+
+    assertThat(notificationBuffer.getNotifications(null), hasSize(4));
+    assertThat(notificationBuffer.getNotifications(null),
+               contains(notification1, notification2, notification3, notification4));
+
+    notificationBuffer.setCapacity(2);
+
+    assertThat(notificationBuffer.getNotifications(null), hasSize(2));
+    assertThat(notificationBuffer.getNotifications(null), contains(notification3, notification4));
+  }
+
+  @Test
+  public void removeAllNotificationsOnClear() {
+    notificationBuffer.setCapacity(3);
+    notificationBuffer.addNotification(notification1);
+    notificationBuffer.addNotification(notification2);
+
+    notificationBuffer.clear();
+
+    assertThat(notificationBuffer.getNotifications(null), is(empty()));
+  }
+
+  @Test
+  public void returnNotificationsMatchingFilter() {
+    notificationBuffer.setCapacity(3);
+
+    notificationBuffer.addNotification(notification1);
+    notificationBuffer.addNotification(notification2);
+    notificationBuffer.addNotification(notification3);
+    notificationBuffer.addNotification(notification4);
+
+    assertThat(
+        notificationBuffer.getNotifications(
+            notification -> notification.getText().equals("notification-2")
+        ),
+        contains(notification2)
     );
-    assertEquals(cutBackCount, testBuffer.getMessageCount());
-    List<UserNotification> messages = testBuffer.getNotifications();
-    assertEquals(cutBackCount, messages.size());
   }
 
-  /**
-   * Verify the buffer's capacity and its cut back count.
-   */
-  @Test
-  public void testCapacityAndCutBackCount() {
-    for (int cutBackCount = 0; cutBackCount < CAPACITY; cutBackCount++) {
-      testBuffer.setCutBackCount(cutBackCount);
-      // Add one more message than the buffer can hold.
-      for (int i = 0; i < (CAPACITY + 1); i++) {
-        testBuffer.addNotification(new UserNotification("message text",
-                                                        UserNotification.Level.INFORMATIONAL));
-      }
-      // The number of messages should now be equal to the buffer's capacity.
-      assertEquals(cutBackCount, testBuffer.getMessageCount());
-      testBuffer.clear();
-    }
-  }
 }

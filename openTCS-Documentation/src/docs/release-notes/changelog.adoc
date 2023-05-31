@@ -29,6 +29,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Provide information about available communication adapters for peripheral devices in the Java API.
 ** Add a detail panel for peripheral jobs to the Operations Desk.
 ** Add property and history information to the order sequence detail panel in the Operations Desk.
+* Bugs fixed:
+** When publishing new user notifications and the number of notifications exceeds the kernel's capacity, keep the youngest ones, not the oldest ones.
 * Other changes:
 ** Update Gradle wrapper to 7.6.
 ** Update License Gradle Plugin to 0.16.1.

@@ -11,29 +11,26 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.Queue;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.NotificationPublicationEvent;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.notification.UserNotification;
+import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A buffer which can store a (configurable) limited number of
- * {@link UserNotification Message} objects.
+ * {@link UserNotification UserNotification} objects.
  * <p>
- * The actual size of a buffer can be influenced by two parameters, its
- * <code>capacity</code> and <code>cut back count</code>. When a new message is
- * added to the buffer and the number of messages in the buffer exceeds its
- * <code>capacity</code>, messages are removed from from the buffer until it
- * contains not more than <code>cut back count</code>.
- * </p>
- * <p>
- * Which messages are removed is decided by sorting all messages with the
- * <code>Comparator</code> given to the constructor. The last/highest elements
- * according to the sorting order of that <code>Comparator</code> are removed.
+ * When a new message is added to the buffer and the number of messages in the buffer exceeds its
+ * <code>capacity</code>, messages are removed from the buffer until it contains not more than
+ * <code>capacity</code>.
  * </p>
  * <p>
  * Note that no synchronization is done inside this class. Concurrent access of
@@ -51,16 +48,11 @@ public class NotificationBuffer {
   /**
    * The actual messages.
    */
-  private final List<UserNotification> notifications = new LinkedList<>();
+  private final Queue<UserNotification> notifications = new LinkedList<>();
   /**
    * The maximum number of messages that should be kept in this buffer.
    */
   private int capacity = 500;
-  /**
-   * The number of messages that will be kept when this buffer's capacity is
-   * exceeded and messages are removed.
-   */
-  private int cutBackCount;
   /**
    * A listener for events concerning the stored messages.
    */
@@ -74,7 +66,6 @@ public class NotificationBuffer {
   @Inject
   public NotificationBuffer(@ApplicationEventBus EventHandler eventListener) {
     messageEventListener = requireNonNull(eventListener, "eventListener");
-    cutBackCount = capacity;
   }
 
   /**
@@ -88,58 +79,16 @@ public class NotificationBuffer {
 
   /**
    * Adjusts this buffer's <code>capacity</code>.
-   * If the new capacity is less than this buffer's <code>cut back count</code>,
-   * the latter is set to the new capacity as well.
    * If the new capacity is less than the current number of messages in this
    * buffer, messages are removed until the number of messages equals the
-   * buffer's <code>cut back count</code>.
+   * buffer's <code>capacity</code>.
    *
-   * @param newCapacity The buffer's new capacity. Must be at least 1.
-   * @throws IllegalArgumentException If <code>newCapacity</code> is less than
-   * 1.
+   * @param capacity The buffer's new capacity. Must be at least 1.
+   * @throws IllegalArgumentException If <code>newCapacity</code> is less than 1.
    */
-  public void setCapacity(int newCapacity) {
-    if (newCapacity < 1) {
-      throw new IllegalArgumentException("newCapacity must be at least 1");
-    }
-    capacity = newCapacity;
-    if (cutBackCount > capacity) {
-      cutBackCount = capacity;
-    }
+  public void setCapacity(int capacity) {
+    this.capacity = checkInRange(capacity, 1, Integer.MAX_VALUE, "capacity");
     cutBackMessages();
-  }
-
-  /**
-   * Returns this buffer's <code>cut back count</code>.
-   *
-   * @return This buffer's <code>cut back count</code>.
-   */
-  public int getCutBackCount() {
-    return cutBackCount;
-  }
-
-  /**
-   * Sets this buffer's new <code>cut back count</code>.
-   *
-   * @param newValue This buffer's new <code>cut back count</code>. Must be
-   * greater than 0 and less than or equal to this buffer's
-   * <code>capacity</code>.
-   */
-  public void setCutBackCount(int newValue) {
-    if (newValue < 0 || newValue > capacity) {
-      throw new IllegalArgumentException(
-          "newValue must be greater than 0 and less than or equal to capacity");
-    }
-    cutBackCount = newValue;
-  }
-
-  /**
-   * Returns the number of messages currently in this buffer.
-   *
-   * @return The number of messages currently in this buffer.
-   */
-  public int getMessageCount() {
-    return notifications.size();
   }
 
   /**
@@ -159,29 +108,22 @@ public class NotificationBuffer {
   }
 
   /**
-   * Returns all messages.
-   *
-   * @return A list of all existing Message objects.
-   */
-  public List<UserNotification> getNotifications() {
-    return new ArrayList<>(notifications);
-  }
-
-  /**
    * Returns all notifications that are accepted by the given filter, or all notifications, if no
    * filter is given.
    *
-   * @param predicate The predicate used to filter. May be <code>null</code>.
+   * @param predicate The predicate used to filter. May be <code>null</code> to return all
+   * notifications.
    * @return A list of notifications accepted by the given filter.
    */
-  public List<UserNotification> getNotifications(Predicate<UserNotification> predicate) {
-    List<UserNotification> result = new ArrayList<>(notifications.size());
-    for (UserNotification notification : notifications) {
-      if (predicate == null || predicate.test(notification)) {
-        result.add(notification);
-      }
-    }
-    return result;
+  public List<UserNotification> getNotifications(@Nullable Predicate<UserNotification> predicate) {
+    Predicate<UserNotification> filterPredicate
+        = predicate == null
+            ? (notification) -> true
+            : predicate;
+
+    return notifications.stream()
+        .filter(filterPredicate)
+        .collect(Collectors.toCollection(ArrayList::new));
   }
 
   /**
@@ -192,23 +134,17 @@ public class NotificationBuffer {
   }
 
   /**
-   * Removes messages until we're down to this buffer's <code>cut back count</code>.
-   */
-  private void cutBackMessages() {
-    if (notifications.size() > capacity) {
-      // Cut back number of messages.
-      while (notifications.size() > cutBackCount) {
-        notifications.remove(notifications.size() - 1);
-      }
-    }
-  }
-
-  /**
    * Emits an event for the given message.
    *
    * @param message The message to emit an event for.
    */
   public void emitMessageEvent(UserNotification message) {
     messageEventListener.onEvent(new NotificationPublicationEvent(message));
+  }
+
+  private void cutBackMessages() {
+    while (notifications.size() > capacity) {
+      notifications.remove();
+    }
   }
 }

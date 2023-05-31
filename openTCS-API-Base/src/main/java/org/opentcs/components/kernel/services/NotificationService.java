@@ -24,7 +24,7 @@ public interface NotificationService {
    *
    * @param predicate A filter predicate that accepts the user notifications to be returned. May be
    * {@code null} to return all existing user notifications.
-   * @return A list of user notifications.
+   * @return A list of user notifications, in the order in which they were published.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   List<UserNotification> fetchUserNotifications(Predicate<UserNotification> predicate)
