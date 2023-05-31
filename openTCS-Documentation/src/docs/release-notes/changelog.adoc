@@ -32,7 +32,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Bugs fixed:
 ** When publishing new user notifications and the number of notifications exceeds the kernel's capacity, keep the youngest ones, not the oldest ones.
 * Other changes:
-** Update Gradle wrapper to 7.6.
+** Update Gradle wrapper to 7.6.1.
 ** Update License Gradle Plugin to 0.16.1.
 ** Update Gradle Swagger Generator Plugin to 2.19.2.
 ** Update JUnit 5 to 5.9.3.
