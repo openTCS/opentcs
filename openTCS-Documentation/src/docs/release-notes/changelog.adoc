@@ -14,6 +14,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
+* New features:
+** Visualize a vehicle's claimed and allocated resources in the Operations Desk instead of the route of its current drive order.
 * Bugs fixed:
 ** Properly check validity of destination operations when creating transport orders.
 

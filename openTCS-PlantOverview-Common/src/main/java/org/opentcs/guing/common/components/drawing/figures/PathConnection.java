@@ -633,14 +633,22 @@ public class PathConnection
 
   private void drawRouteDecoration(Graphics2D g) {
     for (VehicleModel vehicleModel : getModel().getVehicleModels()) {
-      Stroke stroke = Strokes.PATH_ON_ROUTE;
-      Color color = transparentColor(vehicleModel.getDriveOrderColor(), 192);
-      if (vehicleModel.getDriveOrderState() == TransportOrder.State.WITHDRAWN) {
-        stroke = Strokes.PATH_ON_WITHDRAWN_ROUTE;
-        color = Color.GRAY;
-      }
+      boolean isPathAllocated = vehicleModel.getAllocatedResources().getItems().stream()
+          .flatMap(set -> set.stream())
+          .anyMatch(resource -> resource.getName().equals(getModel().getName()));
 
-      drawDecoration(g, stroke, color);
+      if (vehicleModel.getDriveOrderState() == TransportOrder.State.WITHDRAWN) {
+        if (isPathAllocated) {
+          drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
+        }
+      }
+      else {
+        Color color = vehicleModel.getDriveOrderColor();
+        if (!isPathAllocated) {
+          color = transparentColor(color, 70);
+        }
+        drawDecoration(g, Strokes.PATH_ON_ROUTE, color);
+      }
     }
   }
 
