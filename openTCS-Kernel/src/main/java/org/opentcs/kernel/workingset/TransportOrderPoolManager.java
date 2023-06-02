@@ -28,9 +28,12 @@ import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
+import org.opentcs.data.model.Location.Link;
+import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
+import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import static org.opentcs.util.Assertions.checkArgument;
@@ -98,9 +101,14 @@ public class TransportOrderPoolManager
    * @return The newly created transport order.
    * @throws ObjectExistsException If an object with the new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
-   * @throws IllegalArgumentException If the order is supposed to be part of an order sequence, but
-   * the sequence is already complete, the categories of the two differ or the intended vehicles of
-   * the two differ.
+   * @throws IllegalArgumentException One of:
+   * <ol>
+   * <li>The order is supposed to be part of an order sequence, but
+   * the sequence is already complete.</li>
+   * <li>The type of the transport order and the order sequence differ.</li>
+   * <li>The intended vehicle of the transport order and the order sequence differ.</li>
+   * <li>A destination operation is not a valid operation on the destination object.</li>
+   * </ol>
    */
   public TransportOrder createTransportOrder(TransportOrderCreationTO to)
       throws ObjectUnknownException, ObjectExistsException, IllegalArgumentException {
@@ -527,11 +535,25 @@ public class TransportOrderPoolManager
   }
 
   private List<DriveOrder> toDriveOrders(List<DestinationCreationTO> dests)
-      throws ObjectUnknownException {
+      throws ObjectUnknownException, IllegalArgumentException {
     List<DriveOrder> result = new ArrayList<>(dests.size());
     for (DestinationCreationTO destTo : dests) {
       TCSObject<?> destObject = getObjectRepo().getObjectOrNull(destTo.getDestLocationName());
-      if (!(destObject instanceof Location || destObject instanceof Point)) {
+
+      if (destObject instanceof Point) {
+        if (!isValidOperationOnPoint(destTo.getDestOperation())) {
+          throw new IllegalArgumentException(destTo.getDestOperation()
+              + " is not a valid operation for point destination " + destObject.getName());
+        }
+      }
+      else if (destObject instanceof Location) {
+        if (!isValidLocationDestination(destTo, (Location) destObject)) {
+          throw new IllegalArgumentException(destTo.getDestOperation()
+              + " is not a valid operation for location destination " + destObject.getName());
+          
+        }
+      }
+      else {
         throw new ObjectUnknownException(destTo.getDestLocationName());
       }
       result.add(new DriveOrder(new DriveOrder.Destination(destObject.getReference())
@@ -539,6 +561,32 @@ public class TransportOrderPoolManager
           .withProperties(destTo.getProperties())));
     }
     return result;
+  }
+
+  private boolean isValidOperationOnPoint(String operation) {
+    return operation.equals(Destination.OP_MOVE)
+        || operation.equals(Destination.OP_PARK);
+  }
+
+  private boolean isValidLocationDestination(DestinationCreationTO dest, Location location) {
+    LocationType type = getObjectRepo()
+        .getObjectOrNull(LocationType.class, location.getType().getName());
+
+    return type != null
+        && isValidOperationOnLocationType(dest.getDestOperation(), type)
+        && location.getAttachedLinks().stream()
+            .anyMatch(link -> isValidOperationOnLink(dest.getDestOperation(), link));
+  }
+
+  private boolean isValidOperationOnLink(String operation, Link link) {
+    return link.getAllowedOperations().isEmpty()
+        || link.getAllowedOperations().contains(operation)
+        || operation.equals(Destination.OP_NOP);
+  }
+
+  private boolean isValidOperationOnLocationType(String operation, LocationType type) {
+    return type.isAllowedOperation(operation)
+        || operation.equals(Destination.OP_NOP);
   }
 
   @Nullable

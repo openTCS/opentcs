@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel.workingset;
 
+import java.util.HashSet;
 import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -20,6 +21,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
@@ -62,7 +64,10 @@ public class TransportOrderPoolManagerTest {
             .withLocationType(new LocationTypeCreationTO("some-location-type"))
             .withLocation(new LocationCreationTO("some-location",
                                                  "some-location-type",
-                                                 new Triple(1, 2, 3)))
+                                                 new Triple(1, 2, 3))
+                .withLink("some-point", new HashSet<>())
+            )
+            .withPoint(new PointCreationTO("some-point"))
     );
   }
 

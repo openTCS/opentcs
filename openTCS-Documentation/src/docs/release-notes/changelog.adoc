@@ -14,7 +14,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
-...
+* Bugs fixed:
+** Properly check validity of destination operations when creating transport orders.
 
 == Version 5.9 (2023-05-31)
 

@@ -437,7 +437,7 @@ public class DefaultRouter
     }
     // If it's a "normal" transport order, look for destination points adjacent
     // to the destination location.
-    else {
+    else if (dest.getDestination().getReferentClass() == Location.class) {
       final Set<Point> result = new HashSet<>();
       final Location destLoc = objectService.fetchObject(Location.class,
                                                          dest.getDestination().getName());
@@ -461,6 +461,9 @@ public class DefaultRouter
         }
       }
       return result;
+    }
+    else {
+      return new HashSet<>();
     }
   }
 

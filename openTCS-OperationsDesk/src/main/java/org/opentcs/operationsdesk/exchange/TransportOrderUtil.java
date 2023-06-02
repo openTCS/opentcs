@@ -138,7 +138,7 @@ public class TransportOrderUtil {
 
       sharedPortal.getPortal().getDispatcherService().dispatch();
     }
-    catch (KernelRuntimeException e) {
+    catch (KernelRuntimeException | IllegalArgumentException e) {
       LOG.warn("Unexpected exception", e);
     }
   }
