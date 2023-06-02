@@ -25,6 +25,7 @@ import org.opentcs.guing.common.components.dockable.DockableTitleComparator;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingView;
 import org.opentcs.operationsdesk.components.dockable.DockingManagerOperating;
 import org.opentcs.operationsdesk.peripherals.jobs.PeripheralJobsContainerPanel;
+import org.opentcs.operationsdesk.notifications.UserNotificationsContainerPanel;
 import org.opentcs.operationsdesk.transport.orders.TransportOrdersContainerPanel;
 import org.opentcs.operationsdesk.transport.sequences.OrderSequencesContainerPanel;
 import org.opentcs.util.event.EventSource;
@@ -47,6 +48,10 @@ public class ViewManagerOperating
    * Where we register event listeners.
    */
   private final EventSource eventSource;
+  /**
+   * Map for user notification dockable -> user notification container panel.
+   */
+  private final Map<DefaultSingleCDockable, UserNotificationsContainerPanel> userNotificationViews;
   /**
    * Map for transport order dockable -> transport order container panel.
    */
@@ -72,6 +77,7 @@ public class ViewManagerOperating
     super(eventSource);
     this.dockingManager = requireNonNull(dockingManager, "dockingManager");
     this.eventSource = requireNonNull(eventSource, "eventSource");
+    userNotificationViews = new TreeMap<>(new DockableTitleComparator());
     transportOrderViews = new TreeMap<>(new DockableTitleComparator());
     orderSequenceViews = new TreeMap<>(new DockableTitleComparator());
     peripheralJobViews = new TreeMap<>(new DockableTitleComparator());
@@ -86,9 +92,14 @@ public class ViewManagerOperating
    */
   public void reset() {
     super.reset();
+    userNotificationViews.clear();
     transportOrderViews.clear();
     orderSequenceViews.clear();
     peripheralJobViews.clear();
+  }
+
+  public Map<DefaultSingleCDockable, UserNotificationsContainerPanel> getUserNotificationMap() {
+    return userNotificationViews;
   }
 
   public Map<DefaultSingleCDockable, TransportOrdersContainerPanel> getTransportOrderMap() {
@@ -115,6 +126,10 @@ public class ViewManagerOperating
         .collect(Collectors.toList());
   }
 
+  public int getNextUserNotificationViewIndex() {
+    return nextAvailableIndex(userNotificationViews.keySet());
+  }
+
   public int getNextTransportOrderViewIndex() {
     return nextAvailableIndex(transportOrderViews.keySet());
   }
@@ -125,6 +140,20 @@ public class ViewManagerOperating
 
   public int getNextPeripheralJobViewIndex() {
     return nextAvailableIndex(peripheralJobViews.keySet());
+  }
+
+  public DefaultSingleCDockable getLastUserNotificationView() {
+    int biggestIndex = getNextUserNotificationViewIndex();
+    DefaultSingleCDockable lastUNView = null;
+    Iterator<DefaultSingleCDockable> userNotificationViewIterator
+        = userNotificationViews.keySet().iterator();
+    for (int i = 0; i < biggestIndex; i++) {
+      if (userNotificationViewIterator.hasNext()) {
+        lastUNView = userNotificationViewIterator.next();
+      }
+    }
+
+    return lastUNView;
   }
 
   public DefaultSingleCDockable getLastTransportOrderView() {
@@ -167,6 +196,21 @@ public class ViewManagerOperating
     }
 
     return lastView;
+  }
+
+  /**
+   * Puts a <code>UserNotificationsContainerPanel</code> with a key dockable
+   * into the user notification view map.
+   *
+   * @param dockable The dockable the panel is wrapped into. Used as the key.
+   * @param panel The panel.
+   */
+  public void addUserNotificationView(DefaultSingleCDockable dockable,
+                                      UserNotificationsContainerPanel panel) {
+    requireNonNull(dockable, "dockable");
+    requireNonNull(panel, "panel");
+
+    userNotificationViews.put(dockable, panel);
   }
 
   /**

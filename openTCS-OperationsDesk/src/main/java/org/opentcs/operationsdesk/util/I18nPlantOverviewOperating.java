@@ -47,6 +47,10 @@ public interface I18nPlantOverviewOperating {
    */
   String SYSTEM_PATH = "i18n.org.opentcs.plantoverview.operating.system";
   /**
+   * Path to the resources related to the user notifications details dialog.
+   */
+  String UNDETAIL_PATH = "i18n.org.opentcs.plantoverview.operating.dialogs.userNotificationDetail";
+  /**
    * Path to the resources related to the transport order details dialog.
    */
   String TODETAIL_PATH = "i18n.org.opentcs.plantoverview.operating.dialogs.transportOrderDetail";
@@ -66,6 +70,11 @@ public interface I18nPlantOverviewOperating {
    * Path to the resources related to toolbars.
    */
   String TOOLBAR_PATH = "i18n.org.opentcs.plantoverview.operating.toolbar";
+  /**
+   * Path to the resources related to the userNotification panel.
+   */
+  String USERNOTIFICATION_PATH
+      = "i18n.org.opentcs.plantoverview.operating.panels.userNotifications";
   /**
    * Path to the resources related to the transportorder panel.
    */

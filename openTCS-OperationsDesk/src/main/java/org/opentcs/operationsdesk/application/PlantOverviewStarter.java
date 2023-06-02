@@ -17,6 +17,7 @@ import org.opentcs.operationsdesk.exchange.AttributeAdapterRegistry;
 import org.opentcs.operationsdesk.exchange.KernelEventFetcher;
 import org.opentcs.operationsdesk.exchange.OpenTCSEventDispatcher;
 import org.opentcs.operationsdesk.peripherals.jobs.PeripheralJobsContainer;
+import org.opentcs.operationsdesk.notifications.UserNotificationsContainer;
 import org.opentcs.operationsdesk.transport.orders.TransportOrdersContainer;
 import org.opentcs.operationsdesk.transport.sequences.OrderSequencesContainer;
 
@@ -59,6 +60,10 @@ public class PlantOverviewStarter {
    */
   private final TransportOrdersContainer transportOrdersContainer;
   /**
+   * Maintains a list of the most recent user notifications.
+   */
+  private final UserNotificationsContainer userNotificationsContainer;
+  /**
    * Maintains a set of all peripheral jobs existing on the kernel side.
    */
   private final PeripheralJobsContainer peripheralJobsContainer;
@@ -85,6 +90,7 @@ public class PlantOverviewStarter {
    * side.
    * @param orderSequencesContainer Maintains a set of all peripheral jobs existing on the kernel
    * side.
+   * @param userNotificationsContainer Maintains a list of the most recent user notifications.
    */
   @Inject
   public PlantOverviewStarter(ProgressIndicator progressIndicator,
@@ -96,7 +102,8 @@ public class PlantOverviewStarter {
                               AttributeAdapterRegistry attributeAdapterRegistry,
                               TransportOrdersContainer transportOrdersContainer,
                               PeripheralJobsContainer peripheralJobsContainer,
-                              OrderSequencesContainer orderSequencesContainer) {
+                              OrderSequencesContainer orderSequencesContainer,
+                              UserNotificationsContainer userNotificationsContainer) {
     this.progressIndicator = requireNonNull(progressIndicator, "progressIndicator");
     this.application = requireNonNull(application, "application");
     this.opentcsView = requireNonNull(opentcsView, "opentcsView");
@@ -111,6 +118,8 @@ public class PlantOverviewStarter {
                                                   "peripheralJobsContainer");
     this.orderSequencesContainer = requireNonNull(orderSequencesContainer,
                                                   "orderSequencesContainer");
+    this.userNotificationsContainer = requireNonNull(userNotificationsContainer,
+                                                     "userNotificationsContainer");
   }
 
   public void startPlantOverview() {
@@ -121,6 +130,7 @@ public class PlantOverviewStarter {
     transportOrdersContainer.initialize();
     peripheralJobsContainer.initialize();
     orderSequencesContainer.initialize();
+    userNotificationsContainer.initialize();
 
     opentcsView.init();
     progressIndicator.initialize();

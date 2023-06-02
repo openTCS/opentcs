@@ -126,6 +126,7 @@ import org.opentcs.operationsdesk.components.drawing.OpenTCSDrawingEditorOperati
 import org.opentcs.operationsdesk.event.KernelStateChangeEvent;
 import org.opentcs.operationsdesk.exchange.TransportOrderUtil;
 import org.opentcs.operationsdesk.peripherals.jobs.PeripheralJobsContainerPanel;
+import org.opentcs.operationsdesk.notifications.UserNotificationsContainerPanel;
 import org.opentcs.operationsdesk.transport.orders.TransportOrdersContainerPanel;
 import org.opentcs.operationsdesk.transport.sequences.OrderSequencesContainerPanel;
 import org.opentcs.operationsdesk.util.Cursors;
@@ -274,6 +275,10 @@ public class OpenTCSView
    */
   private final PropertiesPanelFactory propertiesPanelFactory;
   /**
+   * A provider for panels showing the user notifications.
+   */
+  private final Provider<UserNotificationsContainerPanel> unContainerPanelProvider;
+  /**
    * A provider for panels showing the transport orders.
    */
   private final Provider<TransportOrdersContainerPanel> toContainerPanelProvider;
@@ -337,6 +342,7 @@ public class OpenTCSView
    * @param actionMapProvider A provider for ActionMaps.
    * @param toolBarManagerProvider A provider for the tool bar manager.
    * @param propertiesPanelFactory A factory for properties-related panels.
+   * @param unContainerPanelProvider A provider for panels showing the user notifications.
    * @param toContainerPanelProvider A provider for panels showing the transport orders.
    * @param osContainerPanelProvider A provider for panels showing the order sequences.
    * @param pjContainerPanelProvider A provider for panels showing the peripheral jobs.
@@ -369,6 +375,7 @@ public class OpenTCSView
                      Provider<ViewActionMap> actionMapProvider,
                      Provider<ToolBarManager> toolBarManagerProvider,
                      PropertiesPanelFactory propertiesPanelFactory,
+                     Provider<UserNotificationsContainerPanel> unContainerPanelProvider,
                      Provider<TransportOrdersContainerPanel> toContainerPanelProvider,
                      Provider<OrderSequencesContainerPanel> osContainerPanelProvider,
                      Provider<PeripheralJobsContainerPanel> pjContainerPanelProvider,
@@ -399,6 +406,8 @@ public class OpenTCSView
     this.actionMapProvider = requireNonNull(actionMapProvider, "actionMapProvider");
     this.toolBarManagerProvider = requireNonNull(toolBarManagerProvider, "toolBarManagerProvider");
     this.propertiesPanelFactory = requireNonNull(propertiesPanelFactory, "propertiesPanelFactory");
+    this.unContainerPanelProvider = requireNonNull(unContainerPanelProvider,
+                                                   "unContainerPanelProvider");
     this.toContainerPanelProvider = requireNonNull(toContainerPanelProvider,
                                                    "toContainerPanelProvider");
     this.osContainerPanelProvider = requireNonNull(osContainerPanelProvider,
@@ -669,11 +678,54 @@ public class OpenTCSView
   }
 
   /**
+   * Adds a new user notification view.
+   */
+  public void addUserNotificationView() {
+    int biggestIndex = viewManager.getNextUserNotificationViewIndex();
+    DefaultSingleCDockable lastUNView = viewManager.getLastUserNotificationView();
+    UserNotificationsContainerPanel panel = unContainerPanelProvider.get();
+    DefaultSingleCDockable newDockable
+        = dockingManager.createDockable(
+            "userNotifications" + biggestIndex,
+            bundle.getString(
+                "openTcsView.panel_operatingUserNotificationsView.title")
+            + " " + biggestIndex, panel, true);
+    viewManager.addUserNotificationView(newDockable, panel);
+
+    panel.initView();
+
+    newDockable.addVetoClosingListener(
+        dockableHandlerFactory.createDockableClosingHandler(newDockable)
+    );
+
+    final int indexToInsert;
+
+    if (lastUNView != null) {
+      indexToInsert = dockingManager
+          .getTabPane(DockingManagerOperating.COURSE_TAB_PANE_ID)
+          .getStation()
+          .indexOf(lastUNView.intern()) + 1;
+    }
+    else {
+      indexToInsert = viewManager.getDrawingViewMap().size()
+          + viewManager.getOrderSequenceMap().size()
+          + viewManager.getTransportOrderMap().size()
+          + viewManager.getDrawingViewMap().size();
+    }
+
+    dockingManager.addTabTo(newDockable, DockingManagerOperating.COURSE_TAB_PANE_ID, indexToInsert);
+  }
+
+  /**
    * Restores the layout to default.
    */
   public void resetWindowArrangement() {
     for (DefaultSingleCDockable dock : new ArrayList<>(viewManager.getDrawingViewMap().keySet())) {
       removeDrawingView(dock);
+    }
+    for (DefaultSingleCDockable dock
+             : new ArrayList<>(viewManager.getUserNotificationMap().keySet())) {
+      dockingManager.removeDockable(dock);
     }
     for (DefaultSingleCDockable dock
              : new ArrayList<>(viewManager.getTransportOrderMap().keySet())) {
@@ -1395,6 +1447,7 @@ public class OpenTCSView
     if (configuration.enablePeripheralJobsPanel()) {
       addPeripheralJobsView();
     }
+    addUserNotificationView();
 
     dockingManager.getTabPane(DockingManagerOperating.COURSE_TAB_PANE_ID)
         .getStation()

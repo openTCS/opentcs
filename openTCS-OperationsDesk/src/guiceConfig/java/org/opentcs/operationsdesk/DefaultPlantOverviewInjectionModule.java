@@ -33,6 +33,7 @@ import org.opentcs.operationsdesk.application.ApplicationInjectionModule;
 import org.opentcs.operationsdesk.components.ComponentsInjectionModule;
 import org.opentcs.operationsdesk.exchange.ExchangeInjectionModule;
 import org.opentcs.operationsdesk.model.ModelInjectionModule;
+import org.opentcs.operationsdesk.notifications.NotificationInjectionModule;
 import org.opentcs.operationsdesk.peripherals.jobs.PeripheralJobInjectionModule;
 import org.opentcs.operationsdesk.persistence.DefaultPersistenceInjectionModule;
 import org.opentcs.operationsdesk.transport.TransportInjectionModule;
@@ -77,6 +78,7 @@ public class DefaultPlantOverviewInjectionModule
     install(new ModelInjectionModule());
     install(new DefaultPersistenceInjectionModule());
     install(new TransportInjectionModule());
+    install(new NotificationInjectionModule());
     install(new PeripheralJobInjectionModule());
     install(new UtilInjectionModule());
 
