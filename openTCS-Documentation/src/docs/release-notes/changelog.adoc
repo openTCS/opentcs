@@ -19,6 +19,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** User notifications are now shown in a table in the Operations Desk.
 * Bugs fixed:
 ** Properly check validity of destination operations when creating transport orders.
+* Other changes:
+** Removed documentation for server side web API errors (code 500).
 
 == Version 5.9 (2023-05-31)
 

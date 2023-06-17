@@ -136,17 +136,6 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Transport order 'TOrder-01' already exists.
-        "500":
-          description: >-
-            Unexpectedly interrupted or there was an exception in the kernel
-            while executing this method.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-                  description: Details on the actual error.
       parameters:
         - name: NAME
           in: path
@@ -212,16 +201,6 @@ paths:
       responses:
         "200":
           description: Successful response
-        "500":
-          description: >-
-            Unexpectedly interrupted or there was an exception in the kernel while executing this method.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-                  description: Details on the actual error.
   /orderSequences:
     get:
       tags:
@@ -721,16 +700,6 @@ paths:
       responses:
         "200":
           description: Successful response
-        "500":
-          description: >-
-            Unexpectedly interrupted or there was an exception in the kernel while executing this method.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-                  description: Details on the actual error.
   /peripheralJobs:
     get:
       tags:
@@ -849,16 +818,6 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Peripheral job 'PJob-01' already exists.
-        "500":
-          description: >-
-            Unexpectedly interrupted or there was an exception in the kernel while executing this method.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-                  description: Details on the actual error.
   "/peripheralJobs/{NAME}/withdrawal":
     post:
       tags:
@@ -896,16 +855,6 @@ paths:
       responses:
         "200":
           description: Successful response
-        "500":
-          description: >-
-            Unexpectedly interrupted or there was an exception in the kernel while executing this method.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-                  description: Details on the actual error.
   "/peripherals/{NAME}/commAdapter/attachmentInformation":
     get:
       tags:
@@ -1121,16 +1070,6 @@ paths:
       responses:
         "200":
           description: Successful response
-        "500":
-          description: >-
-            Unexpectedly interrupted or there was an exception in the kernel while executing this method.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-                  description: Details on the actual error.
 components:
   securitySchemes:
     ApiKeyAuth:
