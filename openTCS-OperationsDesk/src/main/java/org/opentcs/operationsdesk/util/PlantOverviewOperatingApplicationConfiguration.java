@@ -93,12 +93,6 @@ public interface PlantOverviewOperatingApplicationConfiguration {
   boolean ignoreVehicleOrientationAngle();
 
   @ConfigurationEntry(
-      type = "Boolean",
-      description = "Whether to enable and show the panel for peripheral jobs.",
-      orderKey = "9_misc")
-  boolean enablePeripheralJobsPanel();
-
-  @ConfigurationEntry(
       type = "Integer",
       description = "The maximum number of most recent user notifications to be displayed.",
       orderKey = "9_misc")

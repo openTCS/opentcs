@@ -1444,9 +1444,7 @@ public class OpenTCSView
 
     addTransportOrderView();
     addTransportOrderSequenceView();
-    if (configuration.enablePeripheralJobsPanel()) {
-      addPeripheralJobsView();
-    }
+    addPeripheralJobsView();
     addUserNotificationView();
 
     dockingManager.getTabPane(DockingManagerOperating.COURSE_TAB_PANE_ID)
