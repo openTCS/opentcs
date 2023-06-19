@@ -18,8 +18,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes which communication adapter a location is currently associated with.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralAttachmentInformation
     implements Serializable {

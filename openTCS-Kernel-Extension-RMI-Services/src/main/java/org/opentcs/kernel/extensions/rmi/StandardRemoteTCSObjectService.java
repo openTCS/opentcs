@@ -23,8 +23,6 @@ import org.opentcs.data.TCSObjectReference;
 
 /**
  * This class is the standard implementation of the {@link RemoteTCSObjectService} interface.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class StandardRemoteTCSObjectService
     extends KernelRemoteService

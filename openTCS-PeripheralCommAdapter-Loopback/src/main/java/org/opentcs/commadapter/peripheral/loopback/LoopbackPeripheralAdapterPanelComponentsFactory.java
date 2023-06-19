@@ -9,8 +9,6 @@ package org.opentcs.commadapter.peripheral.loopback;
 
 /**
  * A factory for creating various comm adapter panel-specific instances.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface LoopbackPeripheralAdapterPanelComponentsFactory {
 

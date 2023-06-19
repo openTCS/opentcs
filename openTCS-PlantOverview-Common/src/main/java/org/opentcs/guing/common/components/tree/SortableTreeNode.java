@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A tree node that can be sorted.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class SortableTreeNode
     extends DefaultMutableTreeNode {

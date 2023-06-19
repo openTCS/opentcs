@@ -14,8 +14,6 @@ import org.opentcs.data.model.Point;
 
 /**
  * Compares parking positions by their priorities.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ParkingPositionPriorityComparator
     implements Comparator<Point> {

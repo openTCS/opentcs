@@ -12,8 +12,6 @@ import javax.annotation.Nullable;
 /**
  * This interface declares methods that a vehicle driver intended for simulation
  * must implement.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface SimVehicleCommAdapter
     extends VehicleCommAdapter {

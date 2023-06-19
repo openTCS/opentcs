@@ -52,8 +52,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Assigns transport orders to vehicles that are currently not processing any and are not bound to
  * any order sequences.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AssignFreeOrdersPhase
     implements Phase {

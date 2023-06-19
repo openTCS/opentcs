@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides generic information about the openTCS environment.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public final class Environment {
 

@@ -16,8 +16,6 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 
 /**
  * Utility methods concerning colors/colored elements.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Colors {
 

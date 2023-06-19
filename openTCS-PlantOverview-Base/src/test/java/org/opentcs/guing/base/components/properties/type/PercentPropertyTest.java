@@ -13,8 +13,6 @@ import org.opentcs.guing.base.model.AbstractModelComponent;
 
 /**
  * A test for a percent property.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PercentPropertyTest {
 

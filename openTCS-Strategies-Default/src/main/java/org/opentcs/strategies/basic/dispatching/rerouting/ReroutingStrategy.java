@@ -15,8 +15,6 @@ import org.opentcs.data.order.TransportOrder;
 
 /**
  * A strategy for rerouting {@link Vehicle}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface ReroutingStrategy {
 

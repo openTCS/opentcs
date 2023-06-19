@@ -17,7 +17,6 @@ import org.opentcs.guing.base.model.ModelComponent;
  * It manages its model component and is responsible for executing user interactions e.g. selecting,
  * deleting, double clicking.
  *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @see ModelComponent
  */
 public interface UserObject {

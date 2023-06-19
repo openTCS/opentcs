@@ -14,8 +14,6 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 
 /**
  * A factory for ModelComponents.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ModelComponentFactory {
 

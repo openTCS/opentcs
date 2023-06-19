@@ -13,8 +13,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 /**
  * An event that notifies all {@link AttributesChangeListener}s that a model component has been
  * changed.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class AttributesChangeEvent
     extends EventObject {

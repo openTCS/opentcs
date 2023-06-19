@@ -10,8 +10,6 @@ package org.opentcs.virtualvehicle;
 /**
  * Declares the method that is called to notify a listener about a new velocity
  * value.
- *
- * @author Iryna Felko (Fraunhofer IML)
  */
 public interface VelocityListener {
 

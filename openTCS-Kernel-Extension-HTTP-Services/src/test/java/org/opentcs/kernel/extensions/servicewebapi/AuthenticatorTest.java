@@ -16,8 +16,6 @@ import static org.mockito.Mockito.when;
 import spark.Request;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AuthenticatorTest {
 

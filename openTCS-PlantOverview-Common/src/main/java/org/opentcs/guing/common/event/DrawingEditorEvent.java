@@ -18,7 +18,6 @@ import org.jhotdraw.draw.Figure;
  * Event object that a DrawingEditor fires when a Figure object was selected,
  * added or removed.
  *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @see DrawingEditorListener
  */
 public class DrawingEditorEvent

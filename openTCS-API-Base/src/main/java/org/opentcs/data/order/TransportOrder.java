@@ -36,8 +36,6 @@ import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_REACHED_FI
  * Transport orders may depend on other transport orders in the systems, which means they may not be
  * processed before the orders they depend on have been processed.
  * </p>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrder
     extends TCSObject<TransportOrder>

@@ -11,8 +11,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * Attribute of a {@link ModelComponent}.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public abstract class AbstractModelAttribute
     implements ModelAttribute {

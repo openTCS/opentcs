@@ -12,8 +12,6 @@ import javax.swing.JOptionPane;
 /**
  * A helper class that shows a message dedicated to the user in a
  * dialog.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class UserMessageHelper {
 

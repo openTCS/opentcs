@@ -31,9 +31,6 @@ import org.opentcs.data.order.TransportOrder;
  * Test for the developers asciidoc documentation to show how a tranport order is created.
  * This test has no meaning and it just exists for the documentation to refer to and to guarantee
  * an example that compiles.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CreateTransportOrderTest {
 

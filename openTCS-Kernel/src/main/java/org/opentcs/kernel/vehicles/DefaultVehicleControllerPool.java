@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Maintains associations of {@link Vehicle}, {@link VehicleController} and
  * {@link VehicleCommAdapter}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public final class DefaultVehicleControllerPool
     implements LocalVehicleControllerPool {

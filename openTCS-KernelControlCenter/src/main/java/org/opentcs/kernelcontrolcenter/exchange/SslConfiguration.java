@@ -12,8 +12,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure the ssl connection.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
  */
 @ConfigurationPrefix(SslConfiguration.PREFIX)
 public interface SslConfiguration {

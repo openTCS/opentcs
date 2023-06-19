@@ -14,8 +14,6 @@ import org.opentcs.drivers.peripherals.PeripheralController;
 
 /**
  * A factory for {@link PeripheralController} instances.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralControllerFactory {
 

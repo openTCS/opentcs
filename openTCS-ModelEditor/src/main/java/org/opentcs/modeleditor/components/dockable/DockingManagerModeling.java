@@ -28,9 +28,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * Utility class for working with dockables.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DockingManagerModeling
     extends AbstractDockingManager {

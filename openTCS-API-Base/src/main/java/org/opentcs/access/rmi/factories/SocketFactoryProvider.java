@@ -14,8 +14,6 @@ import javax.annotation.Nullable;
 /**
  * A provider for instances of {@link RMIClientSocketFactory} and {@link RMIServerSocketFactory}.
  * Generally one provider should provide compatible factories for clients and servers.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface SocketFactoryProvider {
 

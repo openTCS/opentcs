@@ -13,8 +13,6 @@ import org.opentcs.data.peripherals.PeripheralJob;
 
 /**
  * Filters a set of peripheral jobs for job related to a vehicle and/or a transport order.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class PeripheralJobFilter
     implements Predicate<PeripheralJob> {

@@ -12,9 +12,6 @@ import java.util.Comparator;
 
 /**
  * Compares two <code>DefaultSingleCDockable</code> instances by their titles.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DockableTitleComparator
     implements Comparator<DefaultSingleCDockable> {

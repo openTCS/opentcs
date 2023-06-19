@@ -12,8 +12,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure the naming convention for model elements.
- *
- * @author Leonard Schuengel (Fraunhofer IML)
  */
 @ConfigurationPrefix(ElementNamingSchemeConfiguration.PREFIX)
 public interface ElementNamingSchemeConfiguration {

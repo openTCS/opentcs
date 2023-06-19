@@ -21,8 +21,6 @@ import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 
 /**
  * Declares the methods the vehicle service must provide which are not accessible to remote peers.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface InternalVehicleService
     extends VehicleService {

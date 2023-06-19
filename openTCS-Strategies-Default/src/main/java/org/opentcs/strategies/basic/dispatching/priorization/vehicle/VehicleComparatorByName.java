@@ -12,8 +12,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * Compares {@link Vehicle}s by their names.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleComparatorByName
     implements Comparator<Vehicle> {

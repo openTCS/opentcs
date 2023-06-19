@@ -31,8 +31,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Creates recharging orders for any vehicles with a degraded energy level.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class RechargeIdleVehiclesPhase
     implements Phase {

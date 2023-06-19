@@ -25,9 +25,6 @@ import org.opentcs.data.model.TCSResource;
 
 /**
  * Unit tests for {@link ReservationPool}.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ReservationPoolTest {
 

@@ -10,9 +10,6 @@ package org.opentcs.configuration.cfg4j;
 import org.cfg4j.source.ConfigurationSource;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface SupplementaryConfigurationSource
     extends ConfigurationSource {

@@ -14,8 +14,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 
 /**
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class OrderSequenceFilter
     implements Predicate<OrderSequence> {

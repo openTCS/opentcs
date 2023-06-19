@@ -23,9 +23,6 @@ import org.opentcs.operationsdesk.transport.sequences.OrderSequencesContainer;
 
 /**
  * The plant overview application's entry point.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PlantOverviewStarter {
 

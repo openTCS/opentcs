@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Configures the load generator panel.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LoadGeneratorPanelModule
     extends PlantOverviewInjectionModule {

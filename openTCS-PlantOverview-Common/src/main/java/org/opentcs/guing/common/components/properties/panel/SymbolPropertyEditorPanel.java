@@ -25,9 +25,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * User interface to edit a symbol property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class SymbolPropertyEditorPanel
     extends JPanel

@@ -23,8 +23,6 @@ import org.opentcs.guing.common.util.ModelComponentFactory;
 /**
  * Extends the standard system model with a cache of model components
  * to provide a more efficient lookup of components by name.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class CachedSystemModel
     extends StandardSystemModel {

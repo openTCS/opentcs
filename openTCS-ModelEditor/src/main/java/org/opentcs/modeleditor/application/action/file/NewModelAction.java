@@ -17,8 +17,6 @@ import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.MENU_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class NewModelAction
     extends AbstractAction {

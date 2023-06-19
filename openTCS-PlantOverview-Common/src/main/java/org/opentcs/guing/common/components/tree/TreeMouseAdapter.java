@@ -30,8 +30,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A mouse adapter for the <code>TreeView</code> for components and blocks.
- *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public class TreeMouseAdapter
     extends MouseAdapter {

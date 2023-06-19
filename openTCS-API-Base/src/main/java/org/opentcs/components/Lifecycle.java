@@ -9,8 +9,6 @@ package org.opentcs.components;
 
 /**
  * Defines methods for controlling a generic component's lifecycle.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface Lifecycle {
 
@@ -18,7 +16,7 @@ public interface Lifecycle {
    * (Re-)Initializes this component before it is being used.
    */
   void initialize();
-  
+
   /**
    * Checks whether this component is initialized.
    *

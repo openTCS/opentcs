@@ -20,8 +20,6 @@ import org.opentcs.util.ClassMatcher;
 
 /**
  * Builds {@link KernelServicePortal} instances for connections to remote portals.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class KernelServicePortalBuilder {
 

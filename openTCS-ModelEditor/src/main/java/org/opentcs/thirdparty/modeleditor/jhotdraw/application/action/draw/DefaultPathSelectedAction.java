@@ -1,6 +1,5 @@
 /**
  * (c): IML, JHotDraw.
- *
  */
 package org.opentcs.thirdparty.modeleditor.jhotdraw.application.action.draw;
 
@@ -19,8 +18,6 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.application.toolbar.OpenTCSCo
 
 /**
  * This action manages the behaviour when the user selects the path button.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class DefaultPathSelectedAction
     extends org.jhotdraw.draw.action.AbstractSelectedAction {

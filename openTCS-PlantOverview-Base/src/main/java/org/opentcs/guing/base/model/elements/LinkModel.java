@@ -17,8 +17,6 @@ import org.opentcs.guing.base.components.properties.type.StringSetProperty;
 
 /**
  * Basic implementation of link between a point and a location.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class LinkModel
     extends AbstractConnection {

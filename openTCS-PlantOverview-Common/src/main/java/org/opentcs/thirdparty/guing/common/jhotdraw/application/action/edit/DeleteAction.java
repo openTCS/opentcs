@@ -1,6 +1,5 @@
 /**
  * (c): IML, JHotDraw.
- *
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit;
 

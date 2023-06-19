@@ -15,8 +15,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.StatusMe
 
 /**
  * A set of status messages sent via the status channel.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class GetEventsResponseTO {
 

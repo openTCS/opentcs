@@ -13,8 +13,6 @@ import static org.opentcs.virtualvehicle.I18nLoopbackCommAdapter.BUNDLE_PATH;
 
 /**
  * The loopback adapter's {@link VehicleCommAdapterDescription}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LoopbackCommunicationAdapterDescription
     extends VehicleCommAdapterDescription {

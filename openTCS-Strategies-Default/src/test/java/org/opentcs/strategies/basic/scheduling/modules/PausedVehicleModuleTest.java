@@ -23,8 +23,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * Unit tests for {@link PausedVehicleModule}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PausedVehicleModuleTest {
 

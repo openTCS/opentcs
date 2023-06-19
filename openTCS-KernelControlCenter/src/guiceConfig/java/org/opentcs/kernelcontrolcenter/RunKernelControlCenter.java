@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The kernel control center process's default entry point.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class RunKernelControlCenter {
 

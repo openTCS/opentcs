@@ -12,8 +12,6 @@ import javax.annotation.Nonnull;
 
 /**
  * Provides the description for a peripheral communication adapter.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class PeripheralCommAdapterDescription
     implements Serializable {

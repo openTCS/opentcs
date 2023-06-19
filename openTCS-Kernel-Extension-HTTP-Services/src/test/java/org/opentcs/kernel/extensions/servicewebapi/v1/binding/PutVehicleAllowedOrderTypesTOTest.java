@@ -14,8 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 
 /**
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class PutVehicleAllowedOrderTypesTOTest {
 

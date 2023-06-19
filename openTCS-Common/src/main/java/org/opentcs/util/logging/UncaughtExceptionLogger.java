@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An UncaughtExceptionHandler that logs everything not caught and then exits.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class UncaughtExceptionLogger
     implements Thread.UncaughtExceptionHandler {

@@ -34,8 +34,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action to find a vehicle on the drawing.
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class FindVehicleAction
     extends AbstractAction {

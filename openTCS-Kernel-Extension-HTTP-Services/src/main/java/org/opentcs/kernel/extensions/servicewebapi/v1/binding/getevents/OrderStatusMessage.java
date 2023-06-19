@@ -18,8 +18,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * A status message containing details about a transport order.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OrderStatusMessage
     extends StatusMessage {

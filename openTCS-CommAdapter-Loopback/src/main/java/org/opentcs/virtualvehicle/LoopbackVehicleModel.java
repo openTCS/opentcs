@@ -14,8 +14,6 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
 
 /**
  * An observable model of a virtual vehicle's and its comm adapter's attributes.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LoopbackVehicleModel
     extends VehicleProcessModel

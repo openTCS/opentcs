@@ -27,8 +27,6 @@ import static org.opentcs.util.Assertions.checkInRange;
 
 /**
  * Describes a vehicle's current state.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Vehicle
     extends TCSObject<Vehicle>

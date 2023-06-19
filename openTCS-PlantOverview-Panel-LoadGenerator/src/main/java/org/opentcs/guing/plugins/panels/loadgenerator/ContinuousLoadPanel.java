@@ -61,8 +61,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A panel for continously creating transport orders.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ContinuousLoadPanel
     extends PluggablePanel {

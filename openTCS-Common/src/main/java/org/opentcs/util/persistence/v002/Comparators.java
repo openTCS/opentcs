@@ -11,8 +11,6 @@ import java.util.Comparator;
 
 /**
  * Some comparator implementations for JAXB classes.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public final class Comparators {
 

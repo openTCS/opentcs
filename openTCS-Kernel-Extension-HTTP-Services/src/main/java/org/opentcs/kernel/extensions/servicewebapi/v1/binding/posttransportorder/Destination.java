@@ -17,8 +17,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * A destination of a transport.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Destination {
 

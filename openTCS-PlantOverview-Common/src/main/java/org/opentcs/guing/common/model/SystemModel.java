@@ -25,8 +25,6 @@ import org.opentcs.guing.common.components.drawing.course.DrawingMethod;
 
 /**
  * Interface for the date model of the whole system model.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface SystemModel
     extends ModelComponent {

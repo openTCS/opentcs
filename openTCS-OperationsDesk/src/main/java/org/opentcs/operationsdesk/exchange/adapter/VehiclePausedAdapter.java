@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Updates a vehicle's paused state with the kernel when it changes.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehiclePausedAdapter
     implements AttributesChangeListener {

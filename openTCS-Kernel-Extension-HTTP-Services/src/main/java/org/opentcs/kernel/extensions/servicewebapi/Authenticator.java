@@ -17,8 +17,6 @@ import spark.Request;
 
 /**
  * Authenticates incoming requests.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Authenticator {
 

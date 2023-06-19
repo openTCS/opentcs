@@ -30,8 +30,6 @@ import org.opentcs.util.persistence.v003.VisualLayoutTO.ModelLayoutElement;
 
 /**
  * The parser for V004 models.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class V004ModelParser {
 

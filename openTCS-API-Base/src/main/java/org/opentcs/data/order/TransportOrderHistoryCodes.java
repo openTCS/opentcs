@@ -10,8 +10,6 @@ package org.opentcs.data.order;
 /**
  * Defines constants for basic history event codes related to transport orders and documents how the
  * respective supplementary information is to be interpreted.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface TransportOrderHistoryCodes {
 

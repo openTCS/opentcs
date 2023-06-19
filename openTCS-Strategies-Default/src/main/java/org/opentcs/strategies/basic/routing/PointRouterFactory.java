@@ -11,8 +11,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * Implementations of this interface construct point routers.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface PointRouterFactory {
 

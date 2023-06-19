@@ -18,9 +18,6 @@ import org.jhotdraw.geom.BezierPath;
 /**
  * A {@link Liner} that constrains a connection to a fourth-order curved
  * line.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class TripleBezierLiner
     implements org.jhotdraw.draw.liner.Liner {

@@ -26,8 +26,6 @@ import org.opentcs.data.order.TransportOrder;
  * Randomly creates batches of transport orders.
  * Destinations and operations chosen are random and not guaranteed to work in
  * a real plant.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class RandomOrderBatchCreator
     implements OrderBatchCreator {

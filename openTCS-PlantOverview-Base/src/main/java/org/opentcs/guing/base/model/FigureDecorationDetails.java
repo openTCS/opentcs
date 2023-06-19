@@ -13,8 +13,6 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 
 /**
  * Provides methods to configure the data that is used to decorate a model component's figure.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface FigureDecorationDetails {
 

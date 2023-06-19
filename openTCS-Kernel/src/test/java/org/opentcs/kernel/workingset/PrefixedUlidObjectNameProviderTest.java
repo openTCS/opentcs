@@ -21,8 +21,6 @@ import org.opentcs.access.to.CreationTO;
 
 /**
  * Tests for a {@link PrefixedUlidObjectNameProvider}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PrefixedUlidObjectNameProviderTest {
 

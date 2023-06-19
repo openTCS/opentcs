@@ -12,8 +12,6 @@ import org.opentcs.access.Kernel;
 /**
  * Listener interface implemented by classes interested in changes of a
  * connected kernel's state.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface KernelStateHandler {
 

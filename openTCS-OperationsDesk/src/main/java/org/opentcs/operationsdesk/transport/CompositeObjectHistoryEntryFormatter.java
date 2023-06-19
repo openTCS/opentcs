@@ -26,8 +26,6 @@ import org.opentcs.operationsdesk.peripherals.jobs.PeripheralJobHistoryEntryForm
  * <li>{@link TransportOrderHistoryEntryFormatter}</li>
  * <li>{@link PeripheralJobHistoryEntryFormatter}</li>
  * </ul>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CompositeObjectHistoryEntryFormatter
     implements ObjectHistoryEntryFormatter {

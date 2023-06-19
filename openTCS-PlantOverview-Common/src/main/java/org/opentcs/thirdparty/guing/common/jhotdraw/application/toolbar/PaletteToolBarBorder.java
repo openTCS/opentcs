@@ -1,6 +1,5 @@
 /**
  * (c): IML, JHotDraw.
- *
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar;
 
@@ -22,8 +21,6 @@ import org.jhotdraw.gui.plaf.palette.PaletteToolBarUI;
 
 /**
  * A toolbar border.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class PaletteToolBarBorder
     extends org.jhotdraw.gui.plaf.palette.PaletteToolBarBorder {

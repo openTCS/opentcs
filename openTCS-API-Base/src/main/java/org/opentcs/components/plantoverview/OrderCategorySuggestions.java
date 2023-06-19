@@ -13,7 +13,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 /**
  * Implementations of this class provide suggestions for transport order categories.
  *
- * @author Martin Grzenia (Fraunhofer IML)
  * @deprecated Use {@link OrderTypeSuggestions} instead.
  */
 @Deprecated

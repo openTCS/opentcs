@@ -15,8 +15,6 @@ import static org.opentcs.util.Assertions.checkInRange;
 
 /**
  * A set of parameters for a connection to the portal.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ConnectionParamSet {
 
@@ -93,7 +91,7 @@ public class ConnectionParamSet {
   public String getDescription() {
     return description;
   }
-  
+
   /**
    * Returns the host parameter.
    *

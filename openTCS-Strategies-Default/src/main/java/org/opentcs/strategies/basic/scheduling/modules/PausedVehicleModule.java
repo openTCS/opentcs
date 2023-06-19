@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
  * Note that this module assumes that a client's {@link Scheduler.Client#getId()} returns the name
  * of a vehicle.
  * </p>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PausedVehicleModule
     implements Scheduler.Module {

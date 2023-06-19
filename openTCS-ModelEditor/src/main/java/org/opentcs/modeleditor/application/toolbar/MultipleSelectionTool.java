@@ -23,10 +23,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar.Abstract
 
 /**
  * The default selection tool.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class MultipleSelectionTool
     extends AbstractMultipleSelectionTool {
@@ -35,7 +31,7 @@ public class MultipleSelectionTool
    * A factory for menu items.
    */
   private final MenuFactory menuFactory;
-  
+
   /**
    * Creates a new instance.
    *

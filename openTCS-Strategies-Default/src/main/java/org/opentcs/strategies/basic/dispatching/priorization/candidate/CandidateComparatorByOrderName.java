@@ -14,8 +14,6 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
 
 /**
  * Compares {@link AssignmentCandidate}s by name of the order.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CandidateComparatorByOrderName
     implements Comparator<AssignmentCandidate> {

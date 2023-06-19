@@ -38,10 +38,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 /**
  * A listener for dragging of the drawing view and single objects inside the
  * view.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ViewDragScrollListener
     extends MouseAdapter {

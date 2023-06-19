@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Configures/binds the loopback communication adapters of the openTCS kernel.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LoopbackCommAdapterModule
     extends KernelInjectionModule {

@@ -9,8 +9,6 @@ package org.opentcs.kernel.extensions.adminwebapi.v1;
 
 /**
  * Describes the kernel process's current status.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Status {
 

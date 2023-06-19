@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A panel containing all locations representing peripheral devices.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralsPanel
     extends ControlCenterPanel {

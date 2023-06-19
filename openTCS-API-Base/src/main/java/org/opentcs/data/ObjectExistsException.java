@@ -12,8 +12,6 @@ import org.opentcs.access.KernelRuntimeException;
 /**
  * Thrown when an object was supposed to be created or renamed, but another
  * object with the same ID/name/attributes already exists.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ObjectExistsException
     extends KernelRuntimeException {

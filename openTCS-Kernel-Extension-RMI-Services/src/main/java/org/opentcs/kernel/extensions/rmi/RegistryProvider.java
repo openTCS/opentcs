@@ -20,8 +20,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides the one {@link Registry} instance used for RMI communication.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class RegistryProvider
     implements Lifecycle {

@@ -12,9 +12,6 @@ import java.util.List;
 
 /**
  * Abstract implementation of a composite model component that holds a set of child components.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class CompositeModelComponent
     extends AbstractModelComponent {

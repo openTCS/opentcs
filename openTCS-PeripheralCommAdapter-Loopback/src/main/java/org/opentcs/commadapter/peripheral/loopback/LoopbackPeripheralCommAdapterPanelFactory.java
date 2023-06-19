@@ -22,8 +22,6 @@ import org.opentcs.drivers.peripherals.management.PeripheralCommAdapterPanelFact
 
 /**
  * A factory for creating {@link LoopbackPeripheralCommAdapterPanel} instances.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LoopbackPeripheralCommAdapterPanelFactory
     implements PeripheralCommAdapterPanelFactory {

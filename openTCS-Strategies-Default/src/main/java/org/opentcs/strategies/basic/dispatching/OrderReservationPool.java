@@ -20,8 +20,6 @@ import org.opentcs.data.order.TransportOrder;
 
 /**
  * Stores reservations of orders for vehicles.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OrderReservationPool {
 

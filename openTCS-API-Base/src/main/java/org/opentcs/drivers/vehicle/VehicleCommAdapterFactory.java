@@ -14,8 +14,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * Provides communication adapter instances for vehicles to be controlled.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface VehicleCommAdapterFactory
     extends Lifecycle {

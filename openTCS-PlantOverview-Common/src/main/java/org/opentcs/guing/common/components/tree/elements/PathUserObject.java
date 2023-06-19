@@ -18,8 +18,6 @@ import org.opentcs.guing.common.util.IconToolkit;
 
 /**
  * Represents a path in the TreeView.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class PathUserObject
     extends FigureUserObject

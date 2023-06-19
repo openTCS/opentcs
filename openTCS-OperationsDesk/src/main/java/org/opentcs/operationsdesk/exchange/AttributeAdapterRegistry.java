@@ -27,8 +27,6 @@ import org.opentcs.util.event.EventSource;
 /**
  * Handles registering of model attribute adapters that update a model component's attribute with
  * the kernel when it changes.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class AttributeAdapterRegistry
     implements EventHandler,

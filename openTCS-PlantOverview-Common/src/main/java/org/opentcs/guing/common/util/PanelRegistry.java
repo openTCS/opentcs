@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A registry for all plugin panel factories.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PanelRegistry {
 

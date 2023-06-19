@@ -25,8 +25,6 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByEnergyLevel;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class CandidateComparatorByEnergyLevelTest {
 

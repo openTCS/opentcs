@@ -20,8 +20,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 /**
  * Declares the methods the plant model service must provide which are not accessible to remote
  * peers.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface InternalPlantModelService
     extends PlantModelService {

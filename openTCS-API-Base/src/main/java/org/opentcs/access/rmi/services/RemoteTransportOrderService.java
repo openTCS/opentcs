@@ -30,8 +30,6 @@ import org.opentcs.data.order.TransportOrder;
  * explicitly documented here again. See the corresponding API documentation in
  * {@link TransportOrderService} for these, instead.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface RemoteTransportOrderService
     extends RemoteTCSObjectService,

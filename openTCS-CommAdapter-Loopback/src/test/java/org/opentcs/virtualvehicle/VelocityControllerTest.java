@@ -21,8 +21,6 @@ import static org.mockito.Mockito.verify;
 import org.opentcs.data.model.Vehicle;
 
 /**
- *
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public class VelocityControllerTest {
 

@@ -22,8 +22,6 @@ import org.opentcs.guing.common.util.IconToolkit;
 /**
  * A Block object in the tree view.
  *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  * @see Block
  */
 public class BlockUserObject

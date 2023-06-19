@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
  * Once a {@link ConfigurationSource} is registered to this strategy, a task is started reloading
  * all registered {@link ConfigurationSource}s periodically at the specified interval.
  * Once there are no more {@link ConfigurationSource}s registered, the task is terminated.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeriodicalReloadStrategy
     implements ReloadStrategy {

@@ -24,7 +24,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * UI for viewing a key value property without being able to edit the property.
  *
  * @see KeyValueSetProperty
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class KeyValueSetPropertyViewerEditorPanel
     extends JPanel

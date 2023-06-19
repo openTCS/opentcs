@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Performs a full dispatch run.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class FullDispatchTask
     implements Runnable,

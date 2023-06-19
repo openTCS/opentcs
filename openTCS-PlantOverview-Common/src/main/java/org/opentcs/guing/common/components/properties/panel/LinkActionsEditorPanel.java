@@ -20,8 +20,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 /**
  * Allows editing of actions that a vehicle can execute at a station.
  * Which actions are possible is determined by the station type.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class LinkActionsEditorPanel
     extends StringSetPropertyEditorPanel {

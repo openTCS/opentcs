@@ -15,9 +15,6 @@ import org.opentcs.guing.common.components.drawing.DrawingViewScrollPane;
 /**
  * Manages the mapping of dockables to drawing views, transport order views and
  * order sequence views.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface ViewManager {
 

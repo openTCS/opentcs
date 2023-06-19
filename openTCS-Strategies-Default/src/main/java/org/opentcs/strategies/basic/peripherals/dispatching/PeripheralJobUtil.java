@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides service functions for working with peripheral jobs and their states.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralJobUtil {
 

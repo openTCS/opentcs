@@ -32,8 +32,6 @@ import org.opentcs.thirdparty.operationsdesk.jhotdraw.application.action.file.Cl
 
 /**
  * A custom ActionMap for the plant overview application.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ViewActionMap
     extends ActionMap {
@@ -102,7 +100,7 @@ public class ViewActionMap
 
     // Menu View -> Add transport order sequence view
     put(AddTransportOrderSequenceViewAction.ID, new AddTransportOrderSequenceViewAction(view));
-    
+
     put(AddPeripheralJobViewAction.ID, new AddPeripheralJobViewAction(view));
 
     put(RestoreDockingLayoutAction.ID, new RestoreDockingLayoutAction(view));

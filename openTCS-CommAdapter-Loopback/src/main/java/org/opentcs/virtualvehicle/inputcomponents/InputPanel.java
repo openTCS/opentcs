@@ -13,8 +13,6 @@ import java.util.List;
 /**
  * Base class for panels that provide input methods for the user and can be
  * embedded in an {@link InputDialog}.
- *
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public abstract class InputPanel
     extends javax.swing.JPanel {

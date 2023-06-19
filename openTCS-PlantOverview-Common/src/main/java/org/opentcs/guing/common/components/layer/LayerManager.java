@@ -12,8 +12,6 @@ import org.opentcs.util.event.EventHandler;
 
 /**
  * Organizes the layers in a plant model.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface LayerManager
     extends Lifecycle,

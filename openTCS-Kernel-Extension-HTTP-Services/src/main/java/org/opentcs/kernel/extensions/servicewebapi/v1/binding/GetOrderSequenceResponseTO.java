@@ -20,8 +20,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * The current state of an order sequence.
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class GetOrderSequenceResponseTO {
 

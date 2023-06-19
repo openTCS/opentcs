@@ -16,8 +16,6 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(

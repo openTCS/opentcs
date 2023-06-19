@@ -12,8 +12,6 @@ import org.opentcs.access.KernelRuntimeException;
 /**
  * Thrown when an object was supposed to be returned/removed/modified, but could
  * not be found.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ObjectUnknownException
     extends KernelRuntimeException {

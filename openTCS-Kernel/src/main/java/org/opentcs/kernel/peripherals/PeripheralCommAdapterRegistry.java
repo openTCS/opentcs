@@ -26,9 +26,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A registry for all peripheral communication adapters in the system.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralCommAdapterRegistry
     implements Lifecycle {

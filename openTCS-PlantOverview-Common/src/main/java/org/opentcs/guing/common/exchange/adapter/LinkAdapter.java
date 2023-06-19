@@ -21,9 +21,6 @@ import org.opentcs.guing.common.model.SystemModel;
 
 /**
  * An adapter for <code>Links</code>.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LinkAdapter
     extends AbstractProcessAdapter {

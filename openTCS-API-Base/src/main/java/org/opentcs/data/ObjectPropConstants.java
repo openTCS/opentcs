@@ -13,8 +13,6 @@ import org.opentcs.data.model.visualization.LocationRepresentation;
 
 /**
  * Defines some reserved/commonly used property keys and values.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ObjectPropConstants {
 

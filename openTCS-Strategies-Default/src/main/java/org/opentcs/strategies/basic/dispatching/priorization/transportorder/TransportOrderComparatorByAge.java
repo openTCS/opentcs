@@ -13,8 +13,6 @@ import org.opentcs.data.order.TransportOrder;
 /**
  * Compares {@link TransportOrder}s by age.
  * Note: this comparator imposes orderings that are inconsistent with equals.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrderComparatorByAge
     implements Comparator<TransportOrder> {

@@ -10,8 +10,6 @@ package org.opentcs.data.model.visualization;
 /**
  * Defines some reserved/commonly used property keys of
  * {@link LayoutElement LayoutElements}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ElementPropKeys {
 

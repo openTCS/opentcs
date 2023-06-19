@@ -30,9 +30,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for VisualLayout instances.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LayoutAdapter
     extends AbstractProcessAdapter {

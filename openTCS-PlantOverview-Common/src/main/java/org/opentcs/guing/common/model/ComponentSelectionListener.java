@@ -10,8 +10,6 @@ package org.opentcs.guing.common.model;
 import org.opentcs.guing.base.model.ModelComponent;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ComponentSelectionListener {
 

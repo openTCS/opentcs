@@ -16,8 +16,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * Contains information for a potential assignment of a transport order to a vehicle.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AssignmentCandidate {
 

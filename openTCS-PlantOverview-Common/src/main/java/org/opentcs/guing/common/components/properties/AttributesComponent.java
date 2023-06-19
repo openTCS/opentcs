@@ -19,9 +19,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.Undo
  * A component for viewing and editing of properties.
  * Shows a table with two columns. The left column contains the name of the property.
  * The right column contains the value of the property and can be clicked to edit the value.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AttributesComponent
     extends JPanel

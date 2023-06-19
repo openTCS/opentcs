@@ -20,8 +20,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A module implementation that forwards method calls to all submodules.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AllocationAdvisor
     implements Scheduler.Module {

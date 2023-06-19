@@ -26,8 +26,6 @@ import org.opentcs.components.kernel.services.QueryService;
  * explicitly documented here again. See the corresponding API documentation in
  * {@link QueryService} for these, instead.
  * </p>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface RemoteQueryService
     extends Remote {

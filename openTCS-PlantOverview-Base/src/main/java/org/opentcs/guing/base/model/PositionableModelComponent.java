@@ -9,8 +9,6 @@ package org.opentcs.guing.base.model;
 
 /**
  * Defines constants for {@link ModelComponent}s that have model coordinates.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PositionableModelComponent
     extends ModelComponent {

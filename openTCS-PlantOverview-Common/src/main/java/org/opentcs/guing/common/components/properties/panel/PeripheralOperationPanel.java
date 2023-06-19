@@ -23,8 +23,6 @@ import org.opentcs.util.gui.StringListCellRenderer;
 
 /**
  * User interface for a single line text.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class PeripheralOperationPanel
     extends JPanel

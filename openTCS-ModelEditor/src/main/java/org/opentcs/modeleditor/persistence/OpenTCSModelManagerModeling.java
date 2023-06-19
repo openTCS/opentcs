@@ -41,9 +41,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Manages (loads, persists and keeps) the driving course model.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OpenTCSModelManagerModeling
     extends OpenTCSModelManager

@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
  * <code>runActualTask()</code>, which will be called until the task is
  * terminated by calling <code>terminate()</code>; after each call of
  * <code>runActualTask()</code>, a configurable delay may be inserted.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class CyclicTask
     implements Runnable {

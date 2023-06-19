@@ -14,8 +14,6 @@ import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
 
 /**
  * Uses the estimated travel time (length/maximum velocity) for an edge as its weight.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class EdgeEvaluatorTravelTime
     implements EdgeEvaluator {

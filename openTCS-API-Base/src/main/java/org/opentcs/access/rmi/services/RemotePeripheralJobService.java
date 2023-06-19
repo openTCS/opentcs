@@ -27,8 +27,6 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * explicitly documented here again. See the corresponding API documentation in
  * {@link PeripheralJobService} for these, instead.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface RemotePeripheralJobService
     extends RemoteTCSObjectService,

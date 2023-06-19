@@ -15,8 +15,6 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
 /**
  * Compares {@link AssignmentCandidate}s by age of the order.
  * Note: this comparator imposes orderings that are inconsistent with equals.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CandidateComparatorByOrderAge
     implements Comparator<AssignmentCandidate> {

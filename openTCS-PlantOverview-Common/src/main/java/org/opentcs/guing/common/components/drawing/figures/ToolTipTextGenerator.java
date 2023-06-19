@@ -26,8 +26,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * Generates tooltip texts for various model elements.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ToolTipTextGenerator {
 

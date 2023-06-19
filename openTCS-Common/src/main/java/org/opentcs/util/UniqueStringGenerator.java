@@ -18,7 +18,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 /**
  * Provides a way to acquire unique strings.
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @param <S> The type of the selectors/keys to be used for mapping to name
  * patterns.
  */

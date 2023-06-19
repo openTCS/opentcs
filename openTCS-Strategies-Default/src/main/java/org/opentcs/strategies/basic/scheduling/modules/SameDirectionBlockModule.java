@@ -34,8 +34,6 @@ import org.slf4j.LoggerFactory;
  * Checks if the resources a client may allocate are part of a
  * {@link Block.Type#SAME_DIRECTION_ONLY} block and whether the client is allowed to drive along
  * the block in the requested direction.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class SameDirectionBlockModule
     implements Scheduler.Module {

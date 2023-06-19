@@ -16,9 +16,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 /**
  * A wide combobox which sets the selected item when receiving an update event from a
  * {@link LocalVehicleEntry}.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class CommAdapterComboBox
     extends JComboBox<VehicleCommAdapterDescription>

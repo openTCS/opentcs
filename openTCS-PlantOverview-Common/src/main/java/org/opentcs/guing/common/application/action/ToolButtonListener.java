@@ -15,9 +15,6 @@ import org.jhotdraw.draw.tool.Tool;
 
 /**
  * A listener if a tool was (de)selected.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public final class ToolButtonListener
     implements ItemListener {

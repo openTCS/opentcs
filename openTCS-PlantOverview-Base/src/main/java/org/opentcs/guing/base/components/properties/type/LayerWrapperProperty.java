@@ -12,8 +12,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property that contains a {@link LayerWrapper} instance.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LayerWrapperProperty
     extends AbstractComplexProperty {

@@ -20,8 +20,6 @@ import org.jhotdraw.draw.handle.BoundsOutlineHandle;
 import org.opentcs.guing.common.components.drawing.figures.PointFigure;
 
 /**
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class PointOutlineHandle
     extends BoundsOutlineHandle {

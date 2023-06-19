@@ -11,8 +11,6 @@ import javax.swing.JPanel;
 
 /**
  * A base class for panels associated with comm adapters.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class VehicleCommAdapterPanel
     extends JPanel {

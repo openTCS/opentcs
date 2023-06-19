@@ -32,8 +32,6 @@ import org.opentcs.data.order.DriveOrder;
 
 /**
  * Finds assigned, preferred or (routing-wise) cheapest recharge locations for vehicles.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultRechargePositionSupplier
     implements RechargePositionSupplier {

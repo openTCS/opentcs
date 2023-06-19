@@ -18,8 +18,6 @@ import org.opentcs.guing.common.event.DrawingEditorListener;
 
 /**
  * Handles drawing editor events that the layer editor needs to know about.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LayerEditorEventHandler
     implements DrawingEditorListener {

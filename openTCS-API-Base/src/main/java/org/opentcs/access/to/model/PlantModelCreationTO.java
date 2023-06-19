@@ -21,8 +21,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a plant model.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PlantModelCreationTO
     extends CreationTO

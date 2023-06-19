@@ -26,8 +26,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * User interface to edit a set of order type strings.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class OrderTypesPropertyEditorPanel
     extends JPanel

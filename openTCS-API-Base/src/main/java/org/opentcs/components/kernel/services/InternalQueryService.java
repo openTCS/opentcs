@@ -13,8 +13,6 @@ import org.opentcs.components.kernel.QueryResponder;
 
 /**
  * Declares query-related methods not accessible to remote peers.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface InternalQueryService
     extends QueryService {

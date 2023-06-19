@@ -16,7 +16,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  * A layout element describing the way in which a model element is to be
  * displayed.
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @deprecated Will be removed in favor of dedicated layout classes in corresponding TCS data
  * objects.
  */

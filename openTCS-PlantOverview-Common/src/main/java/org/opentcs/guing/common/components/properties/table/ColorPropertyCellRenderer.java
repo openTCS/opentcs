@@ -16,8 +16,6 @@ import org.opentcs.guing.base.components.properties.type.ColorProperty;
 
 /**
  * A cell renderer for a color property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class ColorPropertyCellRenderer
     extends JLabel

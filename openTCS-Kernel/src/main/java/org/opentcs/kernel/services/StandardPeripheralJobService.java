@@ -23,8 +23,6 @@ import org.opentcs.kernel.workingset.PeripheralJobPoolManager;
 
 /**
  * This class is the standard implementation of the {@link PeripheralJobService} interface.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class StandardPeripheralJobService
     extends AbstractTCSObjectService

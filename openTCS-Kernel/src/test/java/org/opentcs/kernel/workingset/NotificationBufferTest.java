@@ -19,8 +19,6 @@ import org.opentcs.util.event.SimpleEventBus;
 
 /**
  * Tests for {@link NotificationBuffer}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class NotificationBufferTest {
 

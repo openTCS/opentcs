@@ -31,8 +31,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Maintains a set of all order sequences existing on the kernel.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class OrderSequencesContainer
     implements Lifecycle,

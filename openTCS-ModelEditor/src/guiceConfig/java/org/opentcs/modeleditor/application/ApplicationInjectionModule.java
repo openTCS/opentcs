@@ -29,8 +29,6 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.application.OpenTCSSDIApplica
 
 /**
  * An injection module for this package.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ApplicationInjectionModule
     extends AbstractModule {

@@ -17,8 +17,6 @@ import org.opentcs.strategies.basic.scheduling.modules.SingleVehicleBlockModule;
 
 /**
  * Guice configuration for the default scheduler.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultSchedulerModule
     extends KernelInjectionModule {

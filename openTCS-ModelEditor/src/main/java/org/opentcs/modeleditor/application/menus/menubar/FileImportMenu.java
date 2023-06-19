@@ -19,8 +19,6 @@ import org.opentcs.modeleditor.util.I18nPlantOverviewModeling;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class FileImportMenu
     extends JMenu {

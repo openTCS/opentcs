@@ -26,8 +26,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A popup menu for actions for multiple selected vehicles.
- *
- * @author Leonard Schuengel (Fraunhofer IML)
  */
 public class VehiclePopupMenu
     extends JPopupMenu {

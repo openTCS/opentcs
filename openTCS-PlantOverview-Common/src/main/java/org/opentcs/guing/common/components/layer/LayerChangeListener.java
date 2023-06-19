@@ -9,8 +9,6 @@ package org.opentcs.guing.common.components.layer;
 
 /**
  * Listens for changes to/updates on layer data.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface LayerChangeListener {
 

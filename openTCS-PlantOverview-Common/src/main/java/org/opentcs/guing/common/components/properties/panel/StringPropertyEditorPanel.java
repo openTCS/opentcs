@@ -16,8 +16,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A panel that can edit a string property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class StringPropertyEditorPanel
     extends JPanel

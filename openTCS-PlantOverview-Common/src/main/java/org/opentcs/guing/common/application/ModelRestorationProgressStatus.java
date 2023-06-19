@@ -12,8 +12,6 @@ import org.opentcs.guing.common.util.I18nPlantOverview;
 
 /**
  * Progress status for the process of loading a model.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public enum ModelRestorationProgressStatus
     implements ProgressStatus {

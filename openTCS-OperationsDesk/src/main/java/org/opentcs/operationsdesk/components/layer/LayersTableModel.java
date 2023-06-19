@@ -25,8 +25,6 @@ import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 
 /**
  * A table model for layers.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 class LayersTableModel
     extends AbstractTableModel

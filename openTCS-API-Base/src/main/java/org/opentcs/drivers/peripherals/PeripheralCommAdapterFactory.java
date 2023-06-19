@@ -14,8 +14,6 @@ import org.opentcs.data.model.Location;
 
 /**
  * Provides communication adapter instances for peripheral devices to be controlled.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralCommAdapterFactory
     extends Lifecycle {

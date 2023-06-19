@@ -13,8 +13,6 @@ import java.time.Instant;
 
 /**
  * A generic status message.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,

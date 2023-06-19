@@ -23,8 +23,6 @@ import org.opentcs.data.model.Vehicle.ProcState;
 import org.opentcs.data.model.Vehicle.State;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class GetVehicleResponseTO {
 

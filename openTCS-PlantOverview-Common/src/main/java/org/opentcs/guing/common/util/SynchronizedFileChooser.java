@@ -17,8 +17,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * and vice versa.
  * The file filters are only checked if they are of type {@link FileNameExtensionFilter}, because
  * with a normal {@link FileFilter} the value of a file extension is unknown.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class SynchronizedFileChooser
     extends javax.swing.JFileChooser {

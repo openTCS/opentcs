@@ -17,8 +17,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * A Vehicle object in the tree view.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class VehicleUserObjectModeling
     extends VehicleUserObject {

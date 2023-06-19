@@ -17,7 +17,6 @@ import org.opentcs.data.ObjectUnknownException;
 /**
  * An base class for remote service proxy implementations.
  *
- * @author Martin Grzenia (Fraunhofer IML)
  * @param <R> The remote service's type.
  */
 abstract class AbstractRemoteServiceProxy<R extends Remote> {

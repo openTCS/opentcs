@@ -22,7 +22,6 @@ import static org.opentcs.util.Assertions.checkArgument;
  * Describes a position in the driving course at which a {@link Vehicle} may be located.
  *
  * @see Path
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Point
     extends TCSResource<Point>

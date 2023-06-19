@@ -15,8 +15,6 @@ import javax.swing.KeyStroke;
 
 /**
  * Cancel Button which closes a dialog by pressing ESC.
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class CancelButton
     extends JButton {

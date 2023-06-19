@@ -17,8 +17,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class TransportOrderFilterTest {
 

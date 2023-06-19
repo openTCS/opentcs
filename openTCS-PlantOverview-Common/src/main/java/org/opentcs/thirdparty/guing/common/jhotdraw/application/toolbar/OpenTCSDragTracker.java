@@ -1,6 +1,5 @@
 /**
  * (c): IML, JHotDraw.
- *
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar;
 
@@ -25,9 +24,6 @@ import org.opentcs.guing.common.components.drawing.figures.liner.BezierLinerEdit
 
 /**
  * Utility to follow the drags made by the user.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OpenTCSDragTracker
     extends DefaultDragTracker {

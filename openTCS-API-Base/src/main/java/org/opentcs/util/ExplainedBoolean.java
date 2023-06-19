@@ -12,8 +12,6 @@ import javax.annotation.Nonnull;
 
 /**
  * A boolean with an explanation/reason for its value.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ExplainedBoolean {
 

@@ -18,9 +18,6 @@ import org.opentcs.data.model.TCSResource;
 /**
  * A vehicle's resources, split into resources the vehicle has already passed (including the
  * resources for the vehicle's current position) and resources that still lay ahead of it.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class SplitResources {
 

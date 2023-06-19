@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Provides a pool of {@link VehicleEntry}s with an entry for every {@link Vehicle} object in the
  * kernel.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class VehicleEntryPool
     implements Lifecycle {

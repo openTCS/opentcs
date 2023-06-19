@@ -12,8 +12,6 @@ import java.awt.geom.Point2D;
 
 /**
  * A coordinate system strategy that converts pixel coordinates into real coordinates.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class NormalCoordinateSystem
     implements CoordinateSystem {

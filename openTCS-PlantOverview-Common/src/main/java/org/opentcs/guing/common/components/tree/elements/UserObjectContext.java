@@ -15,8 +15,6 @@ import javax.swing.JPopupMenu;
  * A context indicating if an user object is contained in
  * the components, blocks or groups tree view. Currently it only
  * offers a tree dependant popup menu.
- *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public interface UserObjectContext {
 

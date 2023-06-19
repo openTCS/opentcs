@@ -28,9 +28,6 @@ import org.slf4j.LoggerFactory;
 /**
  * A ModelPersister implementation realizing persistence of models with XML
  * files.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public class XMLFileModelPersister
     implements ModelPersister {

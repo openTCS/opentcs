@@ -21,7 +21,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 /**
  * An aggregation of model elements.
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @deprecated Will be removed.
  */
 @Deprecated

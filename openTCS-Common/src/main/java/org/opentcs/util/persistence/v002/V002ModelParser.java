@@ -13,8 +13,6 @@ import java.util.Objects;
 
 /**
  * The parser for V002 models.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class V002ModelParser {
 

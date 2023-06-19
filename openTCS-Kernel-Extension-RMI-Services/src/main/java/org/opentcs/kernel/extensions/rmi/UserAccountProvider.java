@@ -11,8 +11,6 @@ import java.util.Set;
 
 /**
  * Provides user account data.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface UserAccountProvider {
 

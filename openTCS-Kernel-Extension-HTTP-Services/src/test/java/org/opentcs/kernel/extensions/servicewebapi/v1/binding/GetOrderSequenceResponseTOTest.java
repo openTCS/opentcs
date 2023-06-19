@@ -15,8 +15,6 @@ import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class GetOrderSequenceResponseTOTest {
 

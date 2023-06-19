@@ -9,11 +9,9 @@ package org.opentcs.guing.common.util;
 
 /**
  * Defines constants regarding internationalization.
- *
- * @author Leonard Schuengel (Fraunhofer IML)
  */
 public interface I18nPlantOverview {
-  
+
   /**
    * Path to the resources related the menu bar.
    */

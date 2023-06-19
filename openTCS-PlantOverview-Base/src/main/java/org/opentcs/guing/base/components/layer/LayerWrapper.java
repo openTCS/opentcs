@@ -17,8 +17,6 @@ import org.opentcs.guing.base.model.ModelComponent;
  * Wraps a {@link Layer} instance and the {@link LayerGroup} instance that the layer is assigned to.
  * Instances of this class are referenced by {@link ModelComponent}s. This allows multiple model
  * components to be updated simultaneously with the update of only one layer wrapper.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LayerWrapper {
 

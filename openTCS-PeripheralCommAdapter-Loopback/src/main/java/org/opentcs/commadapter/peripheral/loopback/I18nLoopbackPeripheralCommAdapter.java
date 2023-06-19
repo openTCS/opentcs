@@ -9,8 +9,6 @@ package org.opentcs.commadapter.peripheral.loopback;
 
 /**
  * Defines constants regarding internationalization.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface I18nLoopbackPeripheralCommAdapter {
 

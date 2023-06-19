@@ -13,8 +13,6 @@ import javax.annotation.Nonnull;
 
 /**
  * Provides utilty methods for working with colors.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Colors {
 

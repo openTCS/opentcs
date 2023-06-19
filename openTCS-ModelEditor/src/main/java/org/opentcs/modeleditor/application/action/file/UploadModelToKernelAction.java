@@ -19,8 +19,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action to upload the (local) model to the kernel.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class UploadModelToKernelAction
     extends AbstractAction {

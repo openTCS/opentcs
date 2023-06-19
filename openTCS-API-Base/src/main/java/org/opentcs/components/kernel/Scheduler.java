@@ -58,8 +58,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  * client would call {@link #freeAll(org.opentcs.components.kernel.Scheduler.Client) freeAll()} to
  * inform the <code>Scheduler</code> about this.)
  * </p>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface Scheduler
     extends Lifecycle {

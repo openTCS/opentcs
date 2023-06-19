@@ -25,8 +25,6 @@ import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLE
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class SendVehicleToPointAction
     extends AbstractAction {

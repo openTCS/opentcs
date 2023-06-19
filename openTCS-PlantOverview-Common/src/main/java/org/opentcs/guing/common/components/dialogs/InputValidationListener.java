@@ -9,8 +9,6 @@ package org.opentcs.guing.common.components.dialogs;
 
 /**
  * A Listener Interface, instances can handle validation of the user input.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public interface InputValidationListener {
 

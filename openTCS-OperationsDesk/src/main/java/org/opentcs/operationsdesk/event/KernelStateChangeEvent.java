@@ -13,8 +13,6 @@ import org.opentcs.access.Kernel;
 
 /**
  * Informs listeners about a change of the kernel's state.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class KernelStateChangeEvent
     extends EventObject {

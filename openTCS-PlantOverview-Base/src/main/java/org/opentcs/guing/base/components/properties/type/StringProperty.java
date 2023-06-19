@@ -12,8 +12,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property for a string.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class StringProperty
     extends AbstractProperty {

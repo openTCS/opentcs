@@ -15,8 +15,6 @@ import org.opentcs.guing.base.model.elements.BlockModel.Type;
 
 /**
  * A cell renderer for a {@link BlockTypeProperty}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class BlockTypePropertyCellRenderer
     extends StandardPropertyCellRenderer {

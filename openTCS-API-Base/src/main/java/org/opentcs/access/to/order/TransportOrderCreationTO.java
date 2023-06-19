@@ -21,8 +21,6 @@ import org.opentcs.data.order.OrderConstants;
 
 /**
  * A transfer object describing a transport order.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrderCreationTO
     extends CreationTO

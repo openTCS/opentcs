@@ -14,8 +14,6 @@ import org.opentcs.data.model.TCSResource;
 
 /**
  * A command for the scheduler's allocation task.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 abstract class AllocatorCommand
     implements Comparable<AllocatorCommand> {

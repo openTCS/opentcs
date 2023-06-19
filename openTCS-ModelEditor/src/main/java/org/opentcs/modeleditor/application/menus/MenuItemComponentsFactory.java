@@ -11,8 +11,6 @@ import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
 
 /**
  * A factory for creating instances in relation to menu items.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface MenuItemComponentsFactory {
 

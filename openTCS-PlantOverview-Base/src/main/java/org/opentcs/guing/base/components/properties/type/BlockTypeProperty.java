@@ -13,8 +13,6 @@ import org.opentcs.guing.base.model.elements.BlockModel.Type;
 
 /**
  * Subclass for a {@link Type} selection property.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class BlockTypeProperty
     extends SelectionProperty<Type> {

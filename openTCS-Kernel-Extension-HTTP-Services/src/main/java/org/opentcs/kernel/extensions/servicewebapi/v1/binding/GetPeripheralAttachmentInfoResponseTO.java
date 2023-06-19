@@ -15,8 +15,6 @@ import javax.annotation.Nullable;
 import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformation;
 
 /**
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class GetPeripheralAttachmentInfoResponseTO {
 

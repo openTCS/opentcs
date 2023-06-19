@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Updates a path's lock state with the kernel when it changes.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PathLockAdapter
     implements AttributesChangeListener {

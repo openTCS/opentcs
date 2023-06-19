@@ -15,8 +15,6 @@ import org.opentcs.guing.base.model.PeripheralOperationModel;
 
 /**
  * A property that contains a list of Peripheral operations.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class PeripheralOperationsProperty
     extends AbstractComplexProperty {

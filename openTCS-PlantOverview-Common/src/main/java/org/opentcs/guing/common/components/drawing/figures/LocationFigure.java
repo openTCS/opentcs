@@ -40,9 +40,6 @@ import org.opentcs.guing.common.components.drawing.ZoomPoint;
 
 /**
  * A figure for locations.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LocationFigure
     extends TCSFigure

@@ -23,9 +23,6 @@ import org.opentcs.guing.common.model.SystemModel;
  * Basic implementation of a <code>ProcessAdapter</code>.
  * Synchronizes between the local <code>ModelComponent</code> and the
  * corresponding kernel object.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class AbstractProcessAdapter
     implements ProcessAdapter {

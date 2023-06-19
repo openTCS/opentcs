@@ -12,8 +12,6 @@ import javax.swing.JPopupMenu;
 
 /**
  * A null context. Use this when no special context is required.
- *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public class NullContext
     implements UserObjectContext {

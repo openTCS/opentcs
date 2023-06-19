@@ -31,9 +31,6 @@ import org.slf4j.LoggerFactory;
 /**
  * A pool of {@link LocalPeripheralEntry}'s for every location in the kernel that represents a
  * peripheral device.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LocalPeripheralEntryPool
     implements EventHandler,

@@ -20,8 +20,6 @@ import org.slf4j.LoggerFactory;
  * The main purpose of this class is to provide an easy to use way to validate
  * text inputs using it's nested class {@link TextInputPanel.TextInputValidator
  * TextInputValidator}.
- *
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public abstract class TextInputPanel
     extends InputPanel {

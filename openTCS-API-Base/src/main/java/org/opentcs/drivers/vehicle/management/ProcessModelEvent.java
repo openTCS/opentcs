@@ -14,8 +14,6 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
 
 /**
  * Instances of this class represent events emitted by/for changes on {@link VehicleProcessModel}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ProcessModelEvent
     extends CommAdapterEvent

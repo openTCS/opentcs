@@ -12,8 +12,6 @@ import javax.swing.ImageIcon;
 /**
  * This utility class declares the main image directory.
  * It also provides utility methods to get the url to files in the directory.
- *
- * @author Leonard Schuengel (Fraunhofer IML)
  */
 public final class ImageDirectory {
 

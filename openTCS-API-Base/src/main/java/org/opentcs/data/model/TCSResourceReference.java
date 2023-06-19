@@ -13,7 +13,6 @@ import org.opentcs.data.TCSObjectReference;
 /**
  * A transient reference to a {@link TCSResource}.
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @param <E> The actual resource class.
  */
 public class TCSResourceReference<E extends TCSResource<E>>

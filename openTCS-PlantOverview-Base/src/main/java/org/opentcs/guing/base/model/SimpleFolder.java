@@ -10,8 +10,6 @@ package org.opentcs.guing.base.model;
 /**
  * The simplest form of a component in the system model that contains child elements.
  * SimpleFolder is used for plain folders.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class SimpleFolder
     extends CompositeModelComponent {

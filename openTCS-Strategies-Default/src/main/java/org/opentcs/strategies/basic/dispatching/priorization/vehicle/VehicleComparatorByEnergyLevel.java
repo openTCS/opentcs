@@ -13,8 +13,6 @@ import org.opentcs.data.model.Vehicle;
 /**
  * Compares {@link Vehicle}s by energy level, sorting higher energy levels up.
  * Note: this comparator imposes orderings that are inconsistent with equals.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleComparatorByEnergyLevel
     implements Comparator<Vehicle> {

@@ -17,8 +17,6 @@ import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.data.model.Point;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ParkingPositionPriorityComparatorTest {
 

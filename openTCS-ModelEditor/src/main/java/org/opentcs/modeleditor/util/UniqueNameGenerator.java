@@ -20,8 +20,6 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.util.UniqueStringGenerator;
 
 /**
- *
- * @author Leonard Schuengel (Fraunhofer IML)
  */
 public class UniqueNameGenerator
     extends UniqueStringGenerator<Class<? extends ModelComponent>> {

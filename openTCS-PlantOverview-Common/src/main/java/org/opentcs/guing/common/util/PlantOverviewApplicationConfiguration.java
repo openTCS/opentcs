@@ -14,8 +14,6 @@ import org.opentcs.util.gui.dialog.ConnectionParamSet;
 
 /**
  * Provides methods to configure the PlantOverview application.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(PlantOverviewApplicationConfiguration.PREFIX)
 public interface PlantOverviewApplicationConfiguration {

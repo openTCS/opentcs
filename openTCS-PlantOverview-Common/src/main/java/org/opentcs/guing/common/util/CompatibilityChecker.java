@@ -12,8 +12,6 @@ import javax.swing.JOptionPane;
 
 /**
  * Provides environment compatibility checks.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CompatibilityChecker {
 

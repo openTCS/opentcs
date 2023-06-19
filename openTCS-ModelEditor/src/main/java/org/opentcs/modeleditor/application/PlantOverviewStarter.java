@@ -16,9 +16,6 @@ import org.opentcs.guing.common.event.EventLogger;
 
 /**
  * The plant overview application's entry point.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PlantOverviewStarter {
 

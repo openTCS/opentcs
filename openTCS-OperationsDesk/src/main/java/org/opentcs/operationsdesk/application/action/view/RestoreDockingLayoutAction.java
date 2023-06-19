@@ -13,8 +13,6 @@ import org.opentcs.operationsdesk.application.OpenTCSView;
 
 /**
  * Action for resetting the docking layout.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class RestoreDockingLayoutAction
     extends AbstractAction {

@@ -14,8 +14,6 @@ import org.opentcs.guing.base.components.properties.type.Property;
 
 /**
  * An undo action for a property change.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class PropertyUndoActivity
     extends javax.swing.undo.AbstractUndoableEdit {

@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Filters assignment candidates with which the transport order is actually processable by the
  * vehicle.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class IsProcessable
     implements AssignmentCandidateSelectionFilter {

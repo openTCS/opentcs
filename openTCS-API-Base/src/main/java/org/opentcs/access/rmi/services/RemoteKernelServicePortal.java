@@ -18,8 +18,6 @@ import org.opentcs.access.rmi.ClientID;
 
 /**
  * Declares the methods provided by the {@link KernelServicePortal} via RMI.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface RemoteKernelServicePortal
     extends Remote {

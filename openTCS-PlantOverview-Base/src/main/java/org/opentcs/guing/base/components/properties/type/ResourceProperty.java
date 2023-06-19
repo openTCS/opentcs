@@ -16,8 +16,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property that holds a list of sets of {@link TCSResourceReference}s.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class ResourceProperty
     extends AbstractComplexProperty {

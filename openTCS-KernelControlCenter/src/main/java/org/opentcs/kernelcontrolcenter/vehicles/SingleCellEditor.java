@@ -21,8 +21,6 @@ import javax.swing.table.TableCellEditor;
 
 /**
  * A cell editor for maintaining different editors in one column.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 final class SingleCellEditor
     implements TableCellEditor {

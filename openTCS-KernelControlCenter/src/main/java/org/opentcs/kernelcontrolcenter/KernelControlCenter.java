@@ -47,9 +47,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A GUI frontend for basic control over the kernel.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class KernelControlCenter
     extends JFrame

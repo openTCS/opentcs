@@ -19,9 +19,6 @@ import org.opentcs.guing.base.model.CompositeModelComponent;
 
 /**
  * Basic implementation of a layout.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class LayoutModel
     extends CompositeModelComponent {

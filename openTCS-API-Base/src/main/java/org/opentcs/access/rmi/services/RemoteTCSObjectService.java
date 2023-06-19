@@ -30,8 +30,6 @@ import org.opentcs.data.TCSObjectReference;
  * explicitly documented here again. See the corresponding API documentation in
  * {@link TCSObjectService} for these, instead.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface RemoteTCSObjectService
     extends Remote {

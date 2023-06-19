@@ -27,8 +27,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides methods for parsing {@link PlantModelCreationTO}s from/to a file.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ModelParser {
 

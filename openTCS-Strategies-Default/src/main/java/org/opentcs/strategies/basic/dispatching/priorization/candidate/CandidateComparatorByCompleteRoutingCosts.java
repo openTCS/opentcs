@@ -13,8 +13,6 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 /**
  * Compares {@link AssignmentCandidate}s by routing costs.
  * Note: this comparator imposes orderings that are inconsistent with equals.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CandidateComparatorByCompleteRoutingCosts
     implements Comparator<AssignmentCandidate> {

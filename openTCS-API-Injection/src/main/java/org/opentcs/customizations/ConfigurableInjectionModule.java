@@ -12,8 +12,6 @@ import com.google.inject.AbstractModule;
 /**
  * A base class for Guice modules adding or customizing bindings for the kernel application and the
  * plant overview application.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class ConfigurableInjectionModule
     extends AbstractModule {

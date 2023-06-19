@@ -17,8 +17,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.Undo
 
 /**
  * The TreeViewPanel for components.
- *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public class ComponentsTreeViewPanel
     extends AbstractTreeViewPanel {

@@ -21,8 +21,6 @@ import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformatio
 /**
  * The default implementation of the vehicle service.
  * Delegates method invocations to the corresponding remote service.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 class RemotePeripheralServiceProxy
     extends RemoteTCSObjectServiceProxy<RemotePeripheralService>

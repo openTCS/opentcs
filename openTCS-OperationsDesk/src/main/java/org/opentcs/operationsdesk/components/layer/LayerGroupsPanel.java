@@ -24,8 +24,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * A panel to display and edit layer groups.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LayerGroupsPanel
     extends JPanel {

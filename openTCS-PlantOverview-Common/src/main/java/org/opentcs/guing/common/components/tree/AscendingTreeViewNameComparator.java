@@ -12,8 +12,6 @@ import java.util.Comparator;
 /**
  * Compares two elements of a tree view for sorting.
  * Sorts based on their name in descending order.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class AscendingTreeViewNameComparator
     implements Comparator<Object> {

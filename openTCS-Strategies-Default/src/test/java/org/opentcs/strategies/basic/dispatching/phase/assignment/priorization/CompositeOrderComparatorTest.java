@@ -27,8 +27,6 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
 
 /**
  * Unit tests for {@link CompositeOrderComparator}.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class CompositeOrderComparatorTest {
 

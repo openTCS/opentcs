@@ -47,8 +47,7 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.model.SystemModel;
 
 /**
- *
- * @author Mats Wilhelm (Fraunhofer IML)
+ * Unit tests for {@link ModelValidator}.
  */
 public class ModelValidatorTest {
 

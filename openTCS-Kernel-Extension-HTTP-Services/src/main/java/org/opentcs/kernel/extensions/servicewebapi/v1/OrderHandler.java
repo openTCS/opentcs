@@ -48,8 +48,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * Handles requests for creating or withdrawing transport orders.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OrderHandler {
 

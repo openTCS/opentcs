@@ -19,8 +19,6 @@ import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPa
 
 /**
  * Creates load generator panels.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ContinuousLoadPanelFactory
     implements PluggablePanelFactory {

@@ -17,8 +17,6 @@ import javax.swing.event.DocumentListener;
 
 /**
  * A validator for the input of the textfield.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class EditableComboBoxListener<E>
     implements DocumentListener {

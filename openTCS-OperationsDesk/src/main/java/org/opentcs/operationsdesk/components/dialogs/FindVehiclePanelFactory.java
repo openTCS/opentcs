@@ -12,8 +12,6 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingView;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface FindVehiclePanelFactory {
 

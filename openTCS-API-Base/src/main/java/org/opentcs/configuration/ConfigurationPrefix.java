@@ -15,14 +15,12 @@ import java.lang.annotation.Target;
 
 /**
  * Marks an interface that provides some configuration for a specific class.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @Target({TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface ConfigurationPrefix {
-  
+
   /**
    * Returns the name of the class the interface configures.
    *

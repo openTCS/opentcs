@@ -10,9 +10,6 @@ package org.opentcs.guing.common.components.drawing.course;
 /**
  * A drawing method where the position of a figure and the real position are in relation
  * to each other.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class CoordinateBasedDrawingMethod
     implements DrawingMethod {

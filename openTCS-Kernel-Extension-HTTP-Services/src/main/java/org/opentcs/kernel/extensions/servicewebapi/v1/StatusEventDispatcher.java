@@ -33,8 +33,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides descriptions of recent events.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class StatusEventDispatcher
     implements Lifecycle,

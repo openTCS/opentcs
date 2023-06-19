@@ -18,8 +18,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * Manages (loads, saves and keeps) the driving course model.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ModelManagerModeling
     extends ModelManager {

@@ -14,8 +14,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure the PlantOverview application (in operating mode).
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(PlantOverviewOperatingApplicationConfiguration.PREFIX)
 public interface PlantOverviewOperatingApplicationConfiguration {

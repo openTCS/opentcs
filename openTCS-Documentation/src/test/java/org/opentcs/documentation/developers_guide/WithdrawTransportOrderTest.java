@@ -22,8 +22,6 @@ import org.opentcs.data.order.TransportOrder;
  * Test for the developers asciidoc documentation to show how a tranport order is withdrawn.
  * This test has no meaning and it just exists for the documentation to refer to and to guarantee
  * an example that compiles.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class WithdrawTransportOrderTest {
 

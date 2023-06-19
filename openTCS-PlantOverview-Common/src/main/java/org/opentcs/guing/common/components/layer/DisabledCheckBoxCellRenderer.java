@@ -16,8 +16,6 @@ import javax.swing.table.TableCellRenderer;
 
 /**
  * A table cell renderer for a disabled check box.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DisabledCheckBoxCellRenderer
     implements TableCellRenderer {

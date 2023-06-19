@@ -20,8 +20,6 @@ import org.opentcs.strategies.basic.dispatching.selection.ReparkVehicleSelection
 
 /**
  * Filters vehicles that are reparkable.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class IsReparkable
     implements ReparkVehicleSelectionFilter {

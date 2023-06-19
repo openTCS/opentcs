@@ -42,9 +42,6 @@ import org.opentcs.operationsdesk.util.VehicleCourseObjectFactory;
 
 /**
  * A single vehicle in the {@link VehiclesPanel}.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class SingleVehicleView
     extends JPanel

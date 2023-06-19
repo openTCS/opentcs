@@ -24,8 +24,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * Represents a job that is to be processed by a peripheral device.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralJob
     extends TCSObject<PeripheralJob>

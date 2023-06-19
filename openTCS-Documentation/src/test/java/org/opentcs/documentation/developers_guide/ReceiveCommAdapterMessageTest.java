@@ -14,9 +14,6 @@ import org.opentcs.data.order.TransportOrder;
 
 /**
  * Tests showing how to receive messages from communication adapters.
- *
- * @author Martin Grzenia (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ReceiveCommAdapterMessageTest {
 

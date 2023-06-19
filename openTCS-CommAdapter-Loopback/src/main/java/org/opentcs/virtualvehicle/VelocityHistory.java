@@ -11,8 +11,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * A <code>VelocityListener</code> that keeps velocity values in a ring buffer.
- *
- * @author Iryna Felko (Fraunhofer IML)
  */
 public class VelocityHistory {
 

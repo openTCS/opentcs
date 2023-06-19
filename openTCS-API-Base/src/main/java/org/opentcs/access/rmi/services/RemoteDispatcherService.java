@@ -30,8 +30,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  * explicitly documented here again. See the corresponding API documentation in
  * {@link DispatcherService} for these, instead.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface RemoteDispatcherService
     extends Remote {

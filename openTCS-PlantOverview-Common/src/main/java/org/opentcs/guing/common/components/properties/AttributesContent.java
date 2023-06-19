@@ -13,8 +13,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.Undo
 
 /**
  * Interface for Swing components that allow editing and viewing a model component attribute.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface AttributesContent {
 

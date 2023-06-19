@@ -23,8 +23,6 @@ import spark.Service;
 
 /**
  * Provides an HTTP interface for basic administration needs.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ServiceWebApi
     implements KernelExtension {

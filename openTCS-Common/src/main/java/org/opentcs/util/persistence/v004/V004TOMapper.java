@@ -40,8 +40,6 @@ import org.opentcs.util.Colors;
 /**
  * Provides methods for mapping {@link PlantModelCreationTO} to {@link V004PlantModelTO} and
  * vice versa.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class V004TOMapper {
 

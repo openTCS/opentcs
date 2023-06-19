@@ -237,12 +237,10 @@
     <!-- Checks for Javadoc comments. -->
     <module name="JavadocType">
       <property name="scope" value="public"/>
-      <property name="authorFormat" value="\S"/>
       <property name="severity" value="warning"/>
     </module>
     <module name="JavadocType">
       <property name="scope" value="package"/>
-      <property name="authorFormat" value="\S"/>
       <property name="severity" value="warning"/>
     </module>
 

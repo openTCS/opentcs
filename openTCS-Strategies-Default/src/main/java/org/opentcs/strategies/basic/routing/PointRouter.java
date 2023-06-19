@@ -15,8 +15,6 @@ import org.opentcs.data.order.Route;
 
 /**
  * Computes routes between points.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface PointRouter {
 

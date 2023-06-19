@@ -24,8 +24,6 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.application.action.edit.Paste
 
 /**
  * The application's "Edit" menu.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class EditMenu
     extends JMenu {

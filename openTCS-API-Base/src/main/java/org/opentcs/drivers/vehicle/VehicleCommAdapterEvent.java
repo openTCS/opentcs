@@ -12,8 +12,6 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * An event emitted by a communication adapter.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleCommAdapterEvent
     implements Serializable {

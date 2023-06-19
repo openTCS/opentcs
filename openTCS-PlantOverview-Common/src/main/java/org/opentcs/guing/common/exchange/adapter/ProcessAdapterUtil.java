@@ -21,8 +21,6 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 
 /**
  * A utility class providing process adapters.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ProcessAdapterUtil {
 

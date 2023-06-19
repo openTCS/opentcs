@@ -19,7 +19,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 /**
  * A transfer object describing a group in the plant model.
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @deprecated Will be removed.
  */
 @Deprecated

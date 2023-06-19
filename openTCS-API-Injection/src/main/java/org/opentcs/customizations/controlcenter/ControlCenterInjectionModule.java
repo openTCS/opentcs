@@ -16,8 +16,6 @@ import org.opentcs.drivers.vehicle.management.VehicleCommAdapterPanelFactory;
 /**
  * A base class for Guice modules adding or customizing bindings for the kernel control center
  * application.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class ControlCenterInjectionModule
     extends ConfigurableInjectionModule {

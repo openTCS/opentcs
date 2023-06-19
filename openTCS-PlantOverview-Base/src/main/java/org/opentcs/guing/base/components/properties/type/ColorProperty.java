@@ -12,8 +12,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A color property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public final class ColorProperty
     extends AbstractProperty {

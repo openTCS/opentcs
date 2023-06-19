@@ -24,8 +24,6 @@ import org.opentcs.strategies.basic.dispatching.selection.TransportOrderSelectio
  * Note: This filter is not a {@link TransportOrderSelectionFilter} by intention, since it is not
  * intended to be used in contexts where {@link ObjectHistory} entries are created.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class IsFreelyDispatchableToAnyVehicle
     implements Predicate<TransportOrder> {

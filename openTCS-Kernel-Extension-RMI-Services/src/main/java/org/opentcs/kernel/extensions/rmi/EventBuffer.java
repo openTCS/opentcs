@@ -17,8 +17,6 @@ import org.opentcs.util.event.EventHandler;
 
 /**
  * Stores events and keeps them until a client fetches them.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class EventBuffer
     implements EventHandler {

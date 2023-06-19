@@ -56,8 +56,6 @@ import org.opentcs.util.event.EventHandler;
 
 /**
  * Sets up and manages a list of tool bars in the graphical user interface.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ToolBarManager
     implements EventHandler {

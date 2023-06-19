@@ -15,8 +15,6 @@ import org.opentcs.drivers.peripherals.PeripheralProcessModel;
 
 /**
  * The process model for the loopback peripheral communication adapter.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LoopbackPeripheralProcessModel
     extends PeripheralProcessModel

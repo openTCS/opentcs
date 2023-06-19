@@ -12,8 +12,6 @@ package org.opentcs.guing.common.components.drawing.course;
  * <p>
  * <ul> <li> symbolic: No relation between the real position and the position of the figure.
  * <li> coordinate based: The position of the figure is the exact real position. </ul>
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface DrawingMethod {
 

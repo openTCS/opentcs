@@ -31,8 +31,6 @@ import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformatio
  * explicitly documented here again. See the corresponding API documentation in
  * {@link PeripheralService} for these, instead.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface RemotePeripheralService
     extends RemoteTCSObjectService,

@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A table model for peripheral jobs.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 class PeripheralJobTableModel
     extends AbstractTableModel

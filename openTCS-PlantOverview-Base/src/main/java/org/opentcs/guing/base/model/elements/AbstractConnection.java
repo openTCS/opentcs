@@ -27,9 +27,6 @@ import org.opentcs.guing.base.model.ModelComponent;
  * <li>between two points {@link PathModel}</li>
  * <li>between a point and a location {@link LinkModel}</li>
  * </ol>
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class AbstractConnection
     extends AbstractModelComponent

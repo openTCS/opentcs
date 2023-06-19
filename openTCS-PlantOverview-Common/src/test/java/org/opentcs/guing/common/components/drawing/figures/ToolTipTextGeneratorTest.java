@@ -18,8 +18,6 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ToolTipTextGeneratorTest {
 

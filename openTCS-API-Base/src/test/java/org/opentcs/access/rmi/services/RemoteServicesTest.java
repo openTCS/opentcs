@@ -30,9 +30,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Tests for the remote service interfaces.
- *
- * @author Martin Grzenia (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class RemoteServicesTest {
 

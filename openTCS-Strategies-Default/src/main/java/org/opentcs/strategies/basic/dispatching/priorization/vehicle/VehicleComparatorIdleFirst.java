@@ -13,8 +13,6 @@ import org.opentcs.data.model.Vehicle;
 /**
  * Compares {@link Vehicle}s by their states, ordering IDLE vehicles first.
  * Note: this comparator imposes orderings that are inconsistent with equals.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleComparatorIdleFirst
     implements Comparator<Vehicle> {

@@ -16,8 +16,6 @@ import bibliothek.gui.dock.common.intern.station.CommonDockStation;
 import bibliothek.gui.dock.common.intern.station.CommonDockStationFactory;
 
 /**
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class CStackDockStation
     extends StackDockStation

@@ -11,8 +11,6 @@ import java.io.Serializable;
 
 /**
  * Provides the description for a vehicle comm adapter.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class VehicleCommAdapterDescription
     implements Serializable {

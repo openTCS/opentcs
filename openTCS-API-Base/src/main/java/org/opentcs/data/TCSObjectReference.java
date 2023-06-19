@@ -14,7 +14,6 @@ import javax.annotation.Nonnull;
 /**
  * A transient reference to a {@link TCSObject}.
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @param <E> The actual object class.
  */
 public class TCSObjectReference<E extends TCSObject<E>>

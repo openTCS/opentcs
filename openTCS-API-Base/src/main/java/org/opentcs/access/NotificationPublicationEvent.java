@@ -13,8 +13,6 @@ import org.opentcs.data.notification.UserNotification;
 
 /**
  * Instances of this class represent events emitted by/for notifications being published.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class NotificationPublicationEvent
     implements Serializable {

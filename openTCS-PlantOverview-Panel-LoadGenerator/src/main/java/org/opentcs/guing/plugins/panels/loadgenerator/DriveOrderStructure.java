@@ -14,8 +14,6 @@ import org.opentcs.data.model.Location;
  * This class provides the data structure for storing
  * and holding the elements typically drive order consists of:
  * location and available operation type at this location.
- *
- * @author Iryna Felko (Fraunhofer IML)
  */
 public class DriveOrderStructure {
 

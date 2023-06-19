@@ -30,8 +30,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The kernel process's default entry point.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class RunKernel {
 

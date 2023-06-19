@@ -18,8 +18,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 /**
  * A label belonging to another {@code Figure} that shows the name of the affiliated object in the
  * kernel model.
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class TCSLabelFigure
     extends LabelFigure {

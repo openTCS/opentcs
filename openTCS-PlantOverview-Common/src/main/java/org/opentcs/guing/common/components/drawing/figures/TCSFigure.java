@@ -18,8 +18,6 @@ import org.opentcs.guing.common.components.drawing.ZoomPoint;
 
 /**
  * Base implementation for figures.
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public abstract class TCSFigure
     extends AbstractAttributedDecoratedFigure

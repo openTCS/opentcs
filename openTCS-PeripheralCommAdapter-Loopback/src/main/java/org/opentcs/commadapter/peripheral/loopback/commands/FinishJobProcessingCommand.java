@@ -14,8 +14,6 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapter;
 /**
  * A command to trigger the comm adapter in manual mode and finish the job the simulated peripheral
  * device is currently processing.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class FinishJobProcessingCommand
     implements PeripheralAdapterCommand {

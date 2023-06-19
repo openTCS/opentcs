@@ -23,8 +23,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 /**
  * A route for a {@link Vehicle}, consisting of a sequence of steps (pairs of {@link Path}s and
  * {@link Point}s) that need to be processed in their given order.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Route
     implements Serializable {

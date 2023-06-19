@@ -11,8 +11,6 @@ import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 
 /**
  * Configures/binds the default importers and exporters of the openTCS plant overview.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultImportersExportersModule
     extends PlantOverviewInjectionModule {

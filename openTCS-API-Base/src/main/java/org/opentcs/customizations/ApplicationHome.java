@@ -23,8 +23,6 @@ import javax.inject.Qualifier;
  * <pre>
  * public MyClass(@ApplicationHome File applicationHome) { ... }
  * </pre>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @Qualifier
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})

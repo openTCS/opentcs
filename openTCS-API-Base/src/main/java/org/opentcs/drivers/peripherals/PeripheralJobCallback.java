@@ -12,8 +12,6 @@ import org.opentcs.data.peripherals.PeripheralJob;
 
 /**
  * A callback used to inform about the successful or failed completion of jobs.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralJobCallback {
 

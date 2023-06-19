@@ -22,9 +22,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Simulates the velocity of a vehicle depending on the length of the way and
  * the time it has moved already.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Iryna Felko (Fraunhofer IML)
  */
 public class VelocityController {
 

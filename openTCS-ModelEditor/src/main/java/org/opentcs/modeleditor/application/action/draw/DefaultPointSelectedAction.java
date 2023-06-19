@@ -24,9 +24,6 @@ import org.opentcs.guing.common.util.ImageDirectory;
 
 /**
  * This action manages the behaviour when the user selects the point button.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultPointSelectedAction
     extends AbstractSelectedAction {

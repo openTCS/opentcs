@@ -24,9 +24,6 @@ import org.opentcs.guing.common.components.drawing.course.Origin;
 
 /**
  * A Figure for the coordinate system's origin.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OriginFigure
     extends AbstractAttributedFigure {

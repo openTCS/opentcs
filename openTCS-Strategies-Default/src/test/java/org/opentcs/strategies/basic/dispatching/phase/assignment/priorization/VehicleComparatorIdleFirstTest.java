@@ -19,8 +19,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorIdleFirst;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleComparatorIdleFirstTest {
 

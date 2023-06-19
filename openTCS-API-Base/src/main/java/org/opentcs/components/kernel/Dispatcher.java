@@ -23,8 +23,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  * transport order being introduced into the system or a vehicle becoming
  * available for processing existing orders.
  * </p>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface Dispatcher
     extends Lifecycle {

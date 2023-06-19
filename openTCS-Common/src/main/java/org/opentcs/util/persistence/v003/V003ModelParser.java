@@ -17,8 +17,6 @@ import org.opentcs.util.persistence.v002.V002PlantModelTO;
 
 /**
  * The parser for V003 models.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class V003ModelParser {
 

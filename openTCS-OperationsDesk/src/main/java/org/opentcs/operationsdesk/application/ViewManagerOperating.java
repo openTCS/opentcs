@@ -33,9 +33,6 @@ import org.opentcs.util.event.EventSource;
 /**
  * Manages the mapping of dockables to drawing views, transport order views and
  * order sequence views.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ViewManagerOperating
     extends AbstractViewManager {

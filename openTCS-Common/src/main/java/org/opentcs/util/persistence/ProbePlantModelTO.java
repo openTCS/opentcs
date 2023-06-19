@@ -22,8 +22,6 @@ import org.xml.sax.SAXException;
 /**
  * Allows reading a model file to access basic information (such as the model version) for
  * validation purposes.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @XmlRootElement(name = "model")
 @XmlAccessorType(XmlAccessType.PROPERTY)

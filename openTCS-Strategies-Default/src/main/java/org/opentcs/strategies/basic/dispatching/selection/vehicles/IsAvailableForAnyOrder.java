@@ -25,8 +25,6 @@ import org.opentcs.strategies.basic.dispatching.selection.VehicleSelectionFilter
  * Note: This filter is not a {@link VehicleSelectionFilter} by intention, since it is not
  * intended to be used in contexts where {@link ObjectHistory} entries are created.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class IsAvailableForAnyOrder
     implements Predicate<Vehicle> {

@@ -27,8 +27,6 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByOrderAge;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class CandidateComparatorByOrderAgeTest {
 

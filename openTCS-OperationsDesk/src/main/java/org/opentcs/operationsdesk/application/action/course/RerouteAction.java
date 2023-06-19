@@ -28,8 +28,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An action for triggering a rerouting of a selected set of vehicles.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class RerouteAction
     extends AbstractAction {

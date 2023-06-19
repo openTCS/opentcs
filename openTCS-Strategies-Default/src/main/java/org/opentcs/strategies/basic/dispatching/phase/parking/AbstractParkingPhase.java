@@ -30,8 +30,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The base class for parking phases.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class AbstractParkingPhase
     implements Phase {

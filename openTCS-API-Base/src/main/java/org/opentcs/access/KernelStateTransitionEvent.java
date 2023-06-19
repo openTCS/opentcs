@@ -11,8 +11,6 @@ import java.io.Serializable;
 
 /**
  * Emitted by/for kernel state changes.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class KernelStateTransitionEvent
     implements Serializable {

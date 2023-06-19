@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A base class for peripheral communication adapters mainly providing command queue processing.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class BasicPeripheralCommAdapter
     implements PeripheralCommAdapter {

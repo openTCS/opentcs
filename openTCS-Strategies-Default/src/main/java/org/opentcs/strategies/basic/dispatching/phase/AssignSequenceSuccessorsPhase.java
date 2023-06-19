@@ -23,8 +23,6 @@ import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAs
 
 /**
  * Assigns vehicles to the next transport orders in their respective order sequences, if any.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AssignSequenceSuccessorsPhase
     implements Phase {

@@ -43,8 +43,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Tests for the {@link AttachmentManager}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class AttachmentManagerTest {
 

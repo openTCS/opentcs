@@ -12,8 +12,6 @@ import javax.annotation.Nonnull;
 
 /**
  * A command a peripheral communication adapter may execute.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralAdapterCommand
     extends Serializable {

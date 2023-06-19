@@ -12,8 +12,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Configuration entries for the administration web API.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @ConfigurationPrefix(AdminWebApiConfiguration.PREFIX)
 public interface AdminWebApiConfiguration {

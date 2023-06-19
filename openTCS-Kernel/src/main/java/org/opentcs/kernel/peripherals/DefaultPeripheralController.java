@@ -34,8 +34,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Realizes a bidirectional connection between the kernel and a comm adapter controlling a
  * peripheral device.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DefaultPeripheralController
     implements PeripheralController,

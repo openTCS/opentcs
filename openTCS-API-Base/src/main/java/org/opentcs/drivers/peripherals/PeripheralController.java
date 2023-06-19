@@ -15,8 +15,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides high-level methods for the system to control a peripheral device.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralController
     extends Lifecycle {

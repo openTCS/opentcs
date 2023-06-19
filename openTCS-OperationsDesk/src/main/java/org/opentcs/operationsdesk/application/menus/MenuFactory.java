@@ -12,8 +12,6 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 
 /**
  * A factory for various menus and menu items.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface MenuFactory {
 

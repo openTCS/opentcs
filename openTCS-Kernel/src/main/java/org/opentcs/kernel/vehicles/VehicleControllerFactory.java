@@ -12,8 +12,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 
 /**
  * A factory for <code>VehicleManager</code> instances.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface VehicleControllerFactory {
 

@@ -21,7 +21,6 @@ import javax.annotation.Nullable;
 /**
  * Describes the base behaviour of TCS data objects.
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @param <E> The actual object class.
  */
 public abstract class TCSObject<E extends TCSObject<E>>

@@ -14,8 +14,6 @@ import java.util.Set;
 /**
  * Instances of this class store user account data, including name, password
  * and granted permissions of the user.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class UserAccount
     implements Serializable {

@@ -13,8 +13,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A figure that is based on/is a graphical representation for a {@link ModelComponent}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface ModelBasedFigure
     extends Figure {

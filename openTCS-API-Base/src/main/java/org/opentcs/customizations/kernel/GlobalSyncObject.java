@@ -15,8 +15,6 @@ import javax.inject.Qualifier;
 
 /**
  * Annotation type to mark an injectable synchronization object for the kernel.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @Qualifier
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})

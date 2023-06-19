@@ -20,7 +20,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 /**
  * Represents the current state of resource allocations.
  *
- * @author Martin Grzenia (Fraunhofer IML)
  * @deprecated Acquire allocations from {@link Vehicle}, instead.
  */
 @Deprecated

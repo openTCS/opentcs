@@ -20,8 +20,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action to trigger the creation of a block.
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class CreateBlockAction
     extends AbstractAction {
@@ -30,7 +28,7 @@ public class CreateBlockAction
    * This action class's ID.
    */
   public static final String ID = "openTCS.createBlock";
-  
+
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
   /**
    * The GUI manager instance we're working with.
@@ -44,10 +42,10 @@ public class CreateBlockAction
    */
   public CreateBlockAction(GuiManager guiManager) {
     this.guiManager = guiManager;
-    
+
     putValue(NAME, BUNDLE.getString("createBlockAction.name"));
     putValue(SHORT_DESCRIPTION, BUNDLE.getString("createBlockAction.shortDescription"));
-    
+
     ImageIcon iconSmall = ImageDirectory.getImageIcon("/toolbar/blockdevice-3.16.png");
     ImageIcon iconLarge = ImageDirectory.getImageIcon("/toolbar/blockdevice-3.22.png");
     putValue(SMALL_ICON, iconSmall);

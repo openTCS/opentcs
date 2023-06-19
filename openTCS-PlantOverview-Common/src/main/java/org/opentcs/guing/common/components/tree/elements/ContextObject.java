@@ -8,9 +8,6 @@
 package org.opentcs.guing.common.components.tree.elements;
 
 /**
- *
- *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public interface ContextObject {
 

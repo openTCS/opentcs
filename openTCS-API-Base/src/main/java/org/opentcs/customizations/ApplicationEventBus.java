@@ -16,8 +16,6 @@ import org.opentcs.util.event.EventBus;
 
 /**
  * Annotation type to mark a single application-wide injectable {@link EventBus}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @Qualifier
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})

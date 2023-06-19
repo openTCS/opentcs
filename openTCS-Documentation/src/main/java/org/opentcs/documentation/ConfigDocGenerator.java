@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Generates a file documenting an application's configuration entries.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ConfigDocGenerator {
 

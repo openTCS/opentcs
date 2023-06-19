@@ -36,8 +36,6 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.application.action.file.Close
 
 /**
  * A custom ActionMap for the plant overview application.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ViewActionMap
     extends ActionMap {

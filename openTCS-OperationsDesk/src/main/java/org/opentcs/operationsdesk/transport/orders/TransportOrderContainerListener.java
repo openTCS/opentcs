@@ -12,8 +12,6 @@ import org.opentcs.data.order.TransportOrder;
 
 /**
  * Listener for changes in the {@link TransportOrdersContainerPanel}.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public interface TransportOrderContainerListener {
 

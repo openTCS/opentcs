@@ -23,8 +23,6 @@ import org.opentcs.strategies.basic.dispatching.selection.orders.CompositeTransp
 
 /**
  * Unit tests for {@link CompositeTransportOrderSelectionFilter}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class CompositeTransportOrderSelectionFilterTest {
 

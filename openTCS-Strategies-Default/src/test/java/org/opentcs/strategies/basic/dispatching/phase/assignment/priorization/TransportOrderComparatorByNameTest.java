@@ -19,8 +19,6 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorByName;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class TransportOrderComparatorByNameTest {
 

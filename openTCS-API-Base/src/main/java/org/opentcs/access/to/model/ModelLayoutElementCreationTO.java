@@ -16,7 +16,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 /**
  * A transfer object describing a model layout element in the visual layout.
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @deprecated Will be removed in favor of dedicated layout classes in corresponding TCS data
  * objects.
  */

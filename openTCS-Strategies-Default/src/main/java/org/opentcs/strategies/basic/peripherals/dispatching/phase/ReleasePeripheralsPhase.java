@@ -19,8 +19,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Releases the reservations of peripherals.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ReleasePeripheralsPhase
     implements PeripheralDispatcherPhase {

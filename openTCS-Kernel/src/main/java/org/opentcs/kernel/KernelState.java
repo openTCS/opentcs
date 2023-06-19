@@ -16,8 +16,6 @@ import org.opentcs.kernel.workingset.PlantModelManager;
 /**
  * The abstract base class for classes that implement state specific kernel
  * behaviour.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class KernelState
     implements Lifecycle {

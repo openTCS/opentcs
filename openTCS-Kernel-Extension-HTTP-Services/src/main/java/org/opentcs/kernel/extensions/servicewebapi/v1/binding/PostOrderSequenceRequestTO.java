@@ -16,8 +16,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * An order sequence to be created by the kernel.
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class PostOrderSequenceRequestTO {
 

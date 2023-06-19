@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Reroutes a {@link Vehicle} from its current position, but only if the vehicle is allowed to
  * allocated the resources for that position.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ForcedReroutingStrategy
     extends AbstractReroutingStrategy {
@@ -50,11 +48,11 @@ public class ForcedReroutingStrategy
   protected Optional<Point> determineRerouteSource(Vehicle vehicle) {
     Point currentVehiclePosition = transportOrderService.fetchObject(Point.class,
                                                                      vehicle.getCurrentPosition());
-    
+
     if (currentVehiclePosition == null) {
       return Optional.empty();
     }
-    
+
     VehicleController vehicleController
         = vehicleControllerPool.getVehicleController(vehicle.getName());
     if (!vehicleController.mayAllocateNow(Set.of(currentVehiclePosition))) {

@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A {@link ConfigurationSource} caching the properties of another {@link ConfigurationSource}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class CachedConfigurationSource
     implements ConfigurationSource,

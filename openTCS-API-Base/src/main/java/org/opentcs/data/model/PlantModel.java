@@ -16,8 +16,6 @@ import org.opentcs.data.model.visualization.VisualLayout;
 
 /**
  * An immutable representation of a complete plant model's state.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PlantModel
     implements Serializable {

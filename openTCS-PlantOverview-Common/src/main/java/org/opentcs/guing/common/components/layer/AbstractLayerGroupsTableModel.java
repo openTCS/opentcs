@@ -19,8 +19,6 @@ import org.opentcs.guing.common.util.I18nPlantOverview;
 
 /**
  * A table model for layer groups.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class AbstractLayerGroupsTableModel
     extends AbstractTableModel

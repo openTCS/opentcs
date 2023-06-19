@@ -30,9 +30,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Action for pausing all vehicles.
- *
- * @author Preity Gupta (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PauseAllVehiclesAction
     extends AbstractAction {

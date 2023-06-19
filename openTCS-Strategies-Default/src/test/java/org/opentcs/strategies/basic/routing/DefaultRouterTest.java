@@ -29,8 +29,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * Test cases for the {@link DefaultRouter}.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class DefaultRouterTest {
 

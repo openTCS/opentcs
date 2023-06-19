@@ -57,10 +57,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The panel corresponding to the LoopbackCommunicationAdapter.
- *
- * @author Iryna Felko (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LoopbackCommAdapterPanel
     extends VehicleCommAdapterPanel {

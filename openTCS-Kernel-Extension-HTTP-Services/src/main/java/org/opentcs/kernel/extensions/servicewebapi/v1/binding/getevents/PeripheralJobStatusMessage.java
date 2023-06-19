@@ -17,8 +17,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * A status message containing information about a peripheral job.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class PeripheralJobStatusMessage
     extends StatusMessage {

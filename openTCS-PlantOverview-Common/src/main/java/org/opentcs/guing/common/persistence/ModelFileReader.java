@@ -16,8 +16,6 @@ import org.opentcs.access.to.model.PlantModelCreationTO;
 
 /**
  * Interface to read a file containing a {@link PlantModelCreationTO}.
- *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public interface ModelFileReader {
 

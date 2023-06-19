@@ -9,9 +9,6 @@ package org.opentcs.access;
 
 /**
  * Provides access to a shared {@link KernelServicePortal} instance.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface SharedKernelServicePortal
     extends AutoCloseable {

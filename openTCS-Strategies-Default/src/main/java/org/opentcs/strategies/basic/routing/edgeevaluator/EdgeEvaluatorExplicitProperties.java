@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Uses an edge's explicit routing cost (given as a property value) as its weight.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class EdgeEvaluatorExplicitProperties
     implements EdgeEvaluator {

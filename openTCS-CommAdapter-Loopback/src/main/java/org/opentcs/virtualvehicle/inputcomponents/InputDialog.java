@@ -17,8 +17,6 @@ import javax.swing.border.EmptyBorder;
  * creating the dialog. <code>InputDialog</code> listens to
  * <code>InputPanel</code>'s {@link ValidationEvent} to dynamically
  * enable/disable the <i>ok</i>-button if the panel validates it's input.
- *
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public class InputDialog
     extends javax.swing.JDialog

@@ -9,11 +9,9 @@ package org.opentcs.modeleditor.util;
 
 /**
  * Defines application-specific constants regarding internationalization.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface I18nPlantOverviewModeling {
-  
+
   /**
    * Path to the resources related to the create group dialog.
    */

@@ -49,8 +49,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The default implementation for the {@link KernelServicePortal}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class RemoteKernelServicePortalProxy
     extends AbstractRemoteServiceProxy<RemoteKernelServicePortal>

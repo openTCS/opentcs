@@ -9,8 +9,6 @@ package org.opentcs.kernel.extensions.rmi;
 
 /**
  * Defines the possible permission flags of kernel clients.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public enum UserPermission {
 

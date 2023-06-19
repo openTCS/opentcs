@@ -13,8 +13,6 @@ import javax.inject.Singleton;
 
 /**
  * A Guice module for this package.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DialogsInjectionModule
     extends AbstractModule {

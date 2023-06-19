@@ -56,8 +56,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * Abstract implementation of a tree view to display model components in a tree.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public abstract class AbstractTreeViewPanel
     extends JPanel

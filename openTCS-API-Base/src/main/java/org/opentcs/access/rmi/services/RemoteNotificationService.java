@@ -28,8 +28,6 @@ import org.opentcs.data.notification.UserNotification;
  * explicitly documented here again. See the corresponding API documentation in
  * {@link NotificationService} for these, instead.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface RemoteNotificationService
     extends Remote {

@@ -142,10 +142,6 @@ import org.slf4j.LoggerFactory;
  * Visualizes the driving course and other kernel objects as well as messages
  * received by the kernel.
  * (Contains everything underneath the tool bars.)
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OpenTCSView
     extends AbstractView

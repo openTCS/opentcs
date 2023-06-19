@@ -17,8 +17,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(propOrder = {"name", "id", "members", "properties"})

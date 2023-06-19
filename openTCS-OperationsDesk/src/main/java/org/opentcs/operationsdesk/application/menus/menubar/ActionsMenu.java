@@ -27,8 +27,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * The application's menu for run-time actions.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ActionsMenu
     extends JMenu {

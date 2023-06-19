@@ -11,8 +11,6 @@ import java.util.EventObject;
 
 /**
  * An event that indicates that the model name has changed.
- *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public class ModelNameChangeEvent
     extends EventObject {

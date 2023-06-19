@@ -13,8 +13,6 @@ import java.io.Serializable;
  * A conversion relationship between two units.
  *
  * @param <U> The type of units the relation is valid for.
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Relation<U>
     implements Serializable {

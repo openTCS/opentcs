@@ -28,9 +28,6 @@ import javax.swing.JComponent;
 
 /**
  * Utility class for working with dockables.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class AbstractDockingManager
     implements DockingManager {

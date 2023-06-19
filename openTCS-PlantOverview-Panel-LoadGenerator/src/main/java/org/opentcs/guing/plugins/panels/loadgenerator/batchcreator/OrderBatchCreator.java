@@ -13,8 +13,6 @@ import org.opentcs.data.order.TransportOrder;
 
 /**
  * Declares the methods of transport order batch creators.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface OrderBatchCreator {
 

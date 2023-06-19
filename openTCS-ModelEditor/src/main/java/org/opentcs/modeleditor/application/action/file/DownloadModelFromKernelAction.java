@@ -20,8 +20,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action to load the current kernel model in the plant overview.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class DownloadModelFromKernelAction
     extends AbstractAction {

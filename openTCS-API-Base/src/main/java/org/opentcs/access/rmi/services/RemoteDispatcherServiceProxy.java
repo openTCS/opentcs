@@ -19,8 +19,6 @@ import org.opentcs.data.order.TransportOrder;
 /**
  * The default implementation of the dispatcher service.
  * Delegates method invocations to the corresponding remote service.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 class RemoteDispatcherServiceProxy
     extends AbstractRemoteServiceProxy<RemoteDispatcherService>

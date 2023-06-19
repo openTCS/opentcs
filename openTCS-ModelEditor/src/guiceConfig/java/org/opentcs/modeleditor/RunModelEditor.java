@@ -28,8 +28,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The plant overview process's default entry point.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class RunModelEditor {
 

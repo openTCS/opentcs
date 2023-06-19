@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Periodically checks for idle peripheral devices that could process a peripheral job.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeriodicPeripheralRedispatchingTask
     implements Runnable {

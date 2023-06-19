@@ -15,8 +15,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 
 /**
  * A command to set a vehicle's state.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class SetStateCommand
     implements AdapterCommand {

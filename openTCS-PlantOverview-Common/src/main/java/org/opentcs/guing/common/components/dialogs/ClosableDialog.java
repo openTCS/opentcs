@@ -16,9 +16,6 @@ import javax.swing.border.EmptyBorder;
 
 /**
  * A dialog that has a close button.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ClosableDialog
     extends JDialog {

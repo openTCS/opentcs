@@ -12,8 +12,6 @@ import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 
 /**
  * This module configures the multibinder used to suggest key value properties in the editor.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class PropertySuggestionsModule
     extends PlantOverviewInjectionModule {

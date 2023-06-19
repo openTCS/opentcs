@@ -31,8 +31,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Maintains a set of all peripheral jobs existing on the kernel side.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralJobsContainer
     implements EventHandler,

@@ -34,8 +34,6 @@ import org.opentcs.drivers.vehicle.MovementCommand;
 
 /**
  * Defines test cases for {@link PeripheralInteraction}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralInteractionTest {
 

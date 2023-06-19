@@ -31,8 +31,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Periodically fetches events from the kernel, if connected, and publishes them via the local event
  * bus.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class KernelEventFetcher
     implements Lifecycle,

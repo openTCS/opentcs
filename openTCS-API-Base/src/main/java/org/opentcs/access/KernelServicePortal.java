@@ -23,8 +23,6 @@ import org.opentcs.components.kernel.services.VehicleService;
 
 /**
  * Provides clients access to kernel services.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface KernelServicePortal {
 

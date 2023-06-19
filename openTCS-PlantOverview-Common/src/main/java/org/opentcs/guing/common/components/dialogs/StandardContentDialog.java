@@ -18,8 +18,6 @@ import javax.swing.border.EmptyBorder;
 
 /**
  * A standard dialog with an OK and a cancel button.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class StandardContentDialog
     extends javax.swing.JDialog

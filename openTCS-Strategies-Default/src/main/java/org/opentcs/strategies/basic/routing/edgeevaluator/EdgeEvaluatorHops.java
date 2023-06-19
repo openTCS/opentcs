@@ -13,8 +13,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * Uses a weight of 1 for every edge.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class EdgeEvaluatorHops
     implements EdgeEvaluator {

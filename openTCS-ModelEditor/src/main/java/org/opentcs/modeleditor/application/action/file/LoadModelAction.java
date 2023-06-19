@@ -17,8 +17,6 @@ import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.MENU_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class LoadModelAction
     extends AbstractAction {
@@ -37,7 +35,7 @@ public class LoadModelAction
    */
   public LoadModelAction(GuiManager view) {
     this.view = view;
-    
+
     putValue(NAME, BUNDLE.getString("loadModelAction.name"));
     putValue(SHORT_DESCRIPTION, BUNDLE.getString("loadModelAction.shortDescription"));
     putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("ctrl L"));

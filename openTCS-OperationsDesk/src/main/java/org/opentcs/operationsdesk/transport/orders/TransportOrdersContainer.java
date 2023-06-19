@@ -33,8 +33,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Maintains a set of all transport orders existing on the kernel side.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrdersContainer
     implements EventHandler,

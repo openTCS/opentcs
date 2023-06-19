@@ -17,8 +17,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * Abstract implementation of a UserObject.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public abstract class AbstractUserObject
     implements UserObject {

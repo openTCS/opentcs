@@ -12,8 +12,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * A factory for various components related to a vehicle controller.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface VehicleControllerComponentsFactory {
 

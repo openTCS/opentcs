@@ -15,8 +15,6 @@ import org.junit.jupiter.api.Test;
 
 /**
  * A test case for class UniqueStringGenerator.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class UniqueStringGeneratorTest {
 

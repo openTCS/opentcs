@@ -13,8 +13,6 @@ import java.io.Serializable;
 
 /**
  * Represents an exact point that won't change when zooming the model.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class ZoomPoint
     implements Serializable {

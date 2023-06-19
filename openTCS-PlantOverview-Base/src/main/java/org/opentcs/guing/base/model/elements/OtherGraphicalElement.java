@@ -14,8 +14,6 @@ import org.opentcs.guing.base.model.AbstractModelComponent;
 /**
  * A graphical component with illustrating effect, but without any impact
  * on the driving course.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class OtherGraphicalElement
     extends AbstractModelComponent {

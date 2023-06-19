@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides methods to resolve the position of a {@link Vehicle}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class VehiclePositionResolver {
 

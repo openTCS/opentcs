@@ -16,8 +16,6 @@ import org.jhotdraw.draw.liner.Liner;
 import org.jhotdraw.geom.BezierPath;
 
 /**
- *
- * @author Leonard Schuengel (Fraunhofer IML)
  */
 public class PolyPathLiner
     implements org.jhotdraw.draw.liner.Liner {

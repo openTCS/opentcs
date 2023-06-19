@@ -12,8 +12,6 @@ import java.io.Serializable;
 /**
  * A message that informs a communication adapter that it/the vehicle should
  * reset currently active errors if possible.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ClearError
     implements Serializable {

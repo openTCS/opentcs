@@ -14,8 +14,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 /**
  * Provides methods to configure the {@link RemoteKernelServicePortal} and the
  * {@link KernelRemoteService}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(RmiKernelInterfaceConfiguration.PREFIX)
 public interface RmiKernelInterfaceConfiguration {

@@ -13,8 +13,6 @@ import org.opentcs.util.Environment;
 
 /**
  * An about dialog.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AboutDialog
     extends JDialog {

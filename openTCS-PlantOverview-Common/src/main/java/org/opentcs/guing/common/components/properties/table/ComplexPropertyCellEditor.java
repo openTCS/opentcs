@@ -25,8 +25,6 @@ import org.opentcs.guing.common.components.dialogs.StandardDetailsDialog;
 
 /**
  * A cell editor for a complex property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class ComplexPropertyCellEditor
     extends javax.swing.AbstractCellEditor

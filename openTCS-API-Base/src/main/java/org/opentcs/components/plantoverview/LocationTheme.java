@@ -16,9 +16,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides a location theme.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface LocationTheme {
 

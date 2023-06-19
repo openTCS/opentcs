@@ -11,8 +11,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property for a boolean value.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class BooleanProperty
     extends AbstractProperty {

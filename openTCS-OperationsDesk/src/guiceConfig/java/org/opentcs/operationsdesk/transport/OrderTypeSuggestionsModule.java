@@ -13,8 +13,6 @@ import org.opentcs.guing.common.transport.OrderTypeSuggestionsPool;
 
 /**
  * A Guice module for the transport order type suggestions.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class OrderTypeSuggestionsModule
     extends PlantOverviewInjectionModule {

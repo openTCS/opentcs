@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Static methods related to window icons.
- *
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public final class Icons {
 

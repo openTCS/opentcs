@@ -22,8 +22,6 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.components.tree.elements.UserObjectContext.ContextType;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class UserObjectUtil {
 

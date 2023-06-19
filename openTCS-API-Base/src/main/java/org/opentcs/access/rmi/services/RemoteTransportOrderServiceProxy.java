@@ -21,8 +21,6 @@ import org.opentcs.data.order.TransportOrder;
 /**
  * The default implementation of the transport order service.
  * Delegates method invocations to the corresponding remote service.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 class RemoteTransportOrderServiceProxy
     extends RemoteTCSObjectServiceProxy<RemoteTransportOrderService>

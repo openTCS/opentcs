@@ -15,10 +15,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * Provides a vehicle theme.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public interface VehicleTheme {
 

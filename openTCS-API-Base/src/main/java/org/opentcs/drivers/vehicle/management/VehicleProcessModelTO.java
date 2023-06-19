@@ -23,8 +23,6 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
 
 /**
  * A serializable representation of a {@link VehicleProcessModel}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class VehicleProcessModelTO
     implements Serializable {

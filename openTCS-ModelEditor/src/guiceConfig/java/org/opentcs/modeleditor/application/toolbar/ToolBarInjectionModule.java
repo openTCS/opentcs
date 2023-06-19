@@ -17,8 +17,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar.OpenTCSD
 import org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar.OpenTCSSelectAreaTracker;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ToolBarInjectionModule
     extends AbstractModule {

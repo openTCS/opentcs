@@ -32,10 +32,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A view on a peripheral job.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
- * @author Leonard Schüngel(Fraunhofer IML)
  */
 public class PeripheralJobView
     extends DialogContent {

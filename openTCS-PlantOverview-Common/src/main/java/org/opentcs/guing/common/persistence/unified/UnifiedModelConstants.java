@@ -14,8 +14,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * Constants related to reading and writing the kernel's model file format.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface UnifiedModelConstants {
 

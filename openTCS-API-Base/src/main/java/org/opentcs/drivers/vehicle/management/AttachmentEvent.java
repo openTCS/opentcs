@@ -13,8 +13,6 @@ import javax.annotation.Nonnull;
 
 /**
  * Instances of this class represent events emitted by/for attaching comm adapters.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class AttachmentEvent
     extends CommAdapterEvent

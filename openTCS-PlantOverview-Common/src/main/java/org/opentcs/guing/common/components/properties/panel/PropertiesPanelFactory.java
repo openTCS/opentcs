@@ -11,8 +11,6 @@ import javax.swing.JPanel;
 
 /**
  * A factory for properties-related panels.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface PropertiesPanelFactory {
 

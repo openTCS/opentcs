@@ -13,8 +13,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * Uses an edge's length as its weight.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class EdgeEvaluatorDistance
     implements EdgeEvaluator {

@@ -12,8 +12,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Configuration entries for the service web API.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @ConfigurationPrefix(ServiceWebApiConfiguration.PREFIX)
 public interface ServiceWebApiConfiguration {

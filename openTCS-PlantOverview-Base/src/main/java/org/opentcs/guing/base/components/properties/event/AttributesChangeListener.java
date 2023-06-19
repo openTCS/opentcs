@@ -10,7 +10,6 @@ package org.opentcs.guing.base.components.properties.event;
 /**
  * Interface that controllers/views implement.
  *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @see AttributesChangeEvent
  */
 public interface AttributesChangeListener {

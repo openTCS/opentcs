@@ -9,8 +9,6 @@ package org.opentcs.access.rmi.services;
 
 /**
  * Provides callback methods for instances interested in service updates.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface ServiceListener {
 

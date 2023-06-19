@@ -18,8 +18,6 @@ import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
  * Compares {@link TransportOrder}s by their deadlines, ordering those with a deadline at risk
  * first.
  * Note: this comparator imposes orderings that are inconsistent with equals.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class TransportOrderComparatorDeadlineAtRiskFirst
     implements Comparator<TransportOrder> {

@@ -11,8 +11,6 @@ import org.opentcs.components.Lifecycle;
 
 /**
  * Declares the methods that a generic kernel extension must implement.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface KernelExtension
     extends Lifecycle {

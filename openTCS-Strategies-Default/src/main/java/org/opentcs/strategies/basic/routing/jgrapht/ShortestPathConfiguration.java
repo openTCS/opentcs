@@ -13,8 +13,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure the shortest path algorithm.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @ConfigurationPrefix(ShortestPathConfiguration.PREFIX)
 public interface ShortestPathConfiguration {

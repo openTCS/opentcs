@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A utility class for loading icons.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class IconToolkit {
 

@@ -9,8 +9,6 @@ package org.opentcs.common;
 
 /**
  * Defines the credentials for a guest user account.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface GuestUserCredentials {
 

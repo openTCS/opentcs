@@ -13,8 +13,6 @@ import javax.inject.Singleton;
 
 /**
  * A Guice module for this package.
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class NotificationInjectionModule
     extends AbstractModule {

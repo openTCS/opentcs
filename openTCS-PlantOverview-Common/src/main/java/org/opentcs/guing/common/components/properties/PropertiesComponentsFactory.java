@@ -13,8 +13,6 @@ import org.opentcs.guing.common.util.UserMessageHelper;
 
 /**
  * A factory for creating instances in relation to properties.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PropertiesComponentsFactory {
 

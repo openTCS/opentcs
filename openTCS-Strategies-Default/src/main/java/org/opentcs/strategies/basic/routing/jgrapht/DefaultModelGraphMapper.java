@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Mapper to translate a collection of points and paths into a weighted graph.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultModelGraphMapper
     implements ModelGraphMapper {
@@ -62,7 +60,7 @@ public class DefaultModelGraphMapper
     requireNonNull(points, "points");
     requireNonNull(paths, "paths");
     requireNonNull(vehicle, "vehicle");
-    
+
     edgeEvaluator.onGraphComputationStart(vehicle);
 
     Graph<String, Edge> graph = new DirectedWeightedMultigraph<>(Edge.class);
@@ -116,7 +114,7 @@ public class DefaultModelGraphMapper
         }
       }
     }
-    
+
     edgeEvaluator.onGraphComputationEnd(vehicle);
 
     return graph;

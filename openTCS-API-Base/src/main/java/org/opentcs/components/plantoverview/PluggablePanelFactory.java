@@ -13,8 +13,6 @@ import org.opentcs.access.Kernel;
 
 /**
  * Produces plugin panels to extend an openTCS user interface.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface PluggablePanelFactory {
 

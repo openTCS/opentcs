@@ -18,8 +18,6 @@ import org.jhotdraw.geom.BezierPath;
 /**
  * A {@link Liner} that constrains a connection to a quadratic or cubic curved
  * line.
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class TupelBezierLiner
     implements org.jhotdraw.draw.liner.Liner {

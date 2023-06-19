@@ -12,8 +12,6 @@ import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.Test;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CompatibilityCheckerTest {
 
@@ -22,7 +20,7 @@ public class CompatibilityCheckerTest {
     // "13.0.2" is a string that is returned by AdoptOpenJDK 13
     assertThat(CompatibilityChecker.versionCompatibleWithDockingFrames("13.0.2"), is(true));
   }
-  
+
   @Test
   public void refuseIncompatibleVersion() {
     // "13" is a string that is returned by Oracle JDK 13

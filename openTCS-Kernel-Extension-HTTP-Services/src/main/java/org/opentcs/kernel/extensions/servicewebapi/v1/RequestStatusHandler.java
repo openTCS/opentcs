@@ -43,8 +43,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.filter.VehicleFilter;
 
 /**
  * Handles requests for getting the current state of model elements.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class RequestStatusHandler {
 

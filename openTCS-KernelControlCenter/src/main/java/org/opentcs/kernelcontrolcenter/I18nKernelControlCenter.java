@@ -9,8 +9,6 @@ package org.opentcs.kernelcontrolcenter;
 
 /**
  * Defines constants regarding internationalization.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface I18nKernelControlCenter {
 

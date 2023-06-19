@@ -38,8 +38,6 @@ import org.opentcs.util.event.EventHandler;
 /**
  * A menu item for copying the value of the layout properties of selected points
  * or locations to the corresponding model properties.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class LayoutToModelMenuItem
     extends JMenuItem {

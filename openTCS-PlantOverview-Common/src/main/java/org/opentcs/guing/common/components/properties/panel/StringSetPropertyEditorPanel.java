@@ -20,8 +20,6 @@ import org.opentcs.guing.common.components.dialogs.DetailsDialogContent;
 
 /**
  * User interface to edit a string set.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public abstract class StringSetPropertyEditorPanel
     extends JPanel

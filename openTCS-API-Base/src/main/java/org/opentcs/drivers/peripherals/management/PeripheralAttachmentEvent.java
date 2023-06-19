@@ -15,8 +15,6 @@ import org.opentcs.data.model.TCSResourceReference;
 
 /**
  * Instances of this class represent events emitted by/for attaching comm adapters.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralAttachmentEvent
     extends PeripheralCommAdapterEvent

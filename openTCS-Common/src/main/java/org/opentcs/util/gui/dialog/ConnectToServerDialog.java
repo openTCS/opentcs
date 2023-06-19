@@ -20,9 +20,6 @@ import org.opentcs.util.gui.Icons;
 
 /**
  * A dialog that lets the user enter parameters for a connection to the portal.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ConnectToServerDialog
     extends JDialog {

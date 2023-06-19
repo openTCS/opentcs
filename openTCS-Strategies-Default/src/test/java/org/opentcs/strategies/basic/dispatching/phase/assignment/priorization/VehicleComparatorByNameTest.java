@@ -20,8 +20,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorByName;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class VehicleComparatorByNameTest {
   private VehicleComparatorByName comparator;
@@ -31,7 +29,7 @@ public class VehicleComparatorByNameTest {
     comparator = new VehicleComparatorByName();
   }
 
-  
+
   @Test
   public void sortsAlphabeticallyByName() {
     Vehicle vehicle1 = new Vehicle("AA");
@@ -49,5 +47,5 @@ public class VehicleComparatorByNameTest {
     assertThat(list.get(1), is(theInstance(vehicle3)));
     assertThat(list.get(2), is(theInstance(vehicle2)));
   }
-  
+
 }

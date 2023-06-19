@@ -15,8 +15,6 @@ import org.opentcs.guing.common.application.GuiManager;
 
 /**
  * Context for the component tree view.
- *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public class ComponentContext
     implements UserObjectContext {

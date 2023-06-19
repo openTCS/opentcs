@@ -11,8 +11,6 @@ import javax.swing.JTextArea;
 
 /**
  * A factory providing {@link ControlCenterInfoHandler} instances.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface ControlCenterInfoHandlerFactory {
 

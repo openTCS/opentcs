@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Loopback adapter-specific Gucie configuration for the Kernel.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LoopbackPeripheralKernelModule
     extends KernelInjectionModule {

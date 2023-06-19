@@ -26,8 +26,6 @@ import org.opentcs.guing.common.util.UserMessageHelper;
 
 /**
  * Base implementation for a cell editor to edit a property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public abstract class AbstractPropertyCellEditor
     extends javax.swing.DefaultCellEditor {

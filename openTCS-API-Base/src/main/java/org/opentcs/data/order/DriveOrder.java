@@ -25,7 +25,6 @@ import static org.opentcs.util.Assertions.checkArgument;
  * supposed to execute.
  *
  * @see TransportOrder
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DriveOrder
     implements Serializable {

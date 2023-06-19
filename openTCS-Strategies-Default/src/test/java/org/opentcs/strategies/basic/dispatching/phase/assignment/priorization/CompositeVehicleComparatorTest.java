@@ -25,8 +25,6 @@ import org.opentcs.strategies.basic.dispatching.priorization.CompositeVehicleCom
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorIdleFirst;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class CompositeVehicleComparatorTest {
 

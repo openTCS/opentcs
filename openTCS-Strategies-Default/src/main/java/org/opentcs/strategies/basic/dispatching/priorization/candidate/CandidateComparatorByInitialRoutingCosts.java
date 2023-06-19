@@ -14,8 +14,6 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
  * Compares {@link AssignmentCandidate}s by routing costs to the transport order's first
  * destination.
  * Note: this comparator imposes orderings that are inconsistent with equals.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CandidateComparatorByInitialRoutingCosts
     implements Comparator<AssignmentCandidate> {

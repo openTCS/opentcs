@@ -27,8 +27,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A configuration binding provider implementation using cfg4j.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class Cfg4jConfigurationBindingProvider
     implements ConfigurationBindingProvider {

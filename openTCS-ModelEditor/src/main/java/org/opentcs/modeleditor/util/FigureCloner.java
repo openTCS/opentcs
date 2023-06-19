@@ -33,8 +33,6 @@ import org.opentcs.guing.common.util.Comparators;
 
 /**
  * A helper class for cloning figures.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class FigureCloner {
 

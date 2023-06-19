@@ -16,8 +16,6 @@ import org.opentcs.guing.common.components.dialogs.DetailsDialogContent;
 
 /**
  * An user interface to select a value in a combobox.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class SelectionPanel
     extends JPanel

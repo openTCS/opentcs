@@ -12,8 +12,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure the {@link DefaultPeripheralJobDispatcher}
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(DefaultPeripheralJobDispatcherConfiguration.PREFIX)
 public interface DefaultPeripheralJobDispatcherConfiguration {

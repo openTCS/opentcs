@@ -18,8 +18,6 @@ import org.opentcs.data.model.visualization.LocationRepresentation;
 
 /**
  * Describes the type of a {@link Location}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LocationType
     extends TCSObject<LocationType>

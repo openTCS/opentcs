@@ -13,8 +13,6 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 
 /**
  * The result of an assignment candidate filter operation.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CandidateFilterResult {
 

@@ -34,9 +34,6 @@ import org.slf4j.LoggerFactory;
  * <li>Accessing the command queue/sent queue from outside should always be
  * protected by synchronization on the BasicVehicleCommunicationAdapter instance.</li>
  * </ul>
- *
- * @author Iryna Felko (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class BasicVehicleCommAdapter
     implements VehicleCommAdapter,

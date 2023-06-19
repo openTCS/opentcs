@@ -15,8 +15,6 @@ import org.opentcs.data.model.Vehicle;
 /**
  * Determines a vehicle's routing group by reading it's {@link Router#PROPKEY_ROUTING_GROUP}
  * property. Returns {@link #DEFAULT_ROUTING_GROUP} if the property does not exist or is invalid.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DefaultRoutingGroupMapper
     implements GroupMapper {

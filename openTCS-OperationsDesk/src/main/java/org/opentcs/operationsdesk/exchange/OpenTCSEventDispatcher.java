@@ -37,9 +37,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A central event dispatcher between the kernel and the plant overview.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OpenTCSEventDispatcher
     implements Lifecycle,

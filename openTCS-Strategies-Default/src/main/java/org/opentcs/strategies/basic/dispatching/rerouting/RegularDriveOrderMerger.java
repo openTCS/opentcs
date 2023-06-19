@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
  * Merges two drive orders so that the merged drive order follows the route of {@code orderA} up to
  * the point where both drive orders ({@code orderA} and {@code orderB}) start to diverge. From
  * there, the merged drive order follows the route of {@code orderB}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class RegularDriveOrderMerger
     extends AbstractDriveOrderMerger {

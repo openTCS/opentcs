@@ -31,8 +31,6 @@ import org.opentcs.data.order.TransportOrder;
 
 /**
  * Defines test cases for {@link ContainsLockedTargetLocations}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ContainsLockedTargetLocationsTest {
 

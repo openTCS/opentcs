@@ -22,9 +22,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * An undo for the modification of a coordinate property.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class CoordinateUndoActivity
     extends AbstractUndoableEdit {

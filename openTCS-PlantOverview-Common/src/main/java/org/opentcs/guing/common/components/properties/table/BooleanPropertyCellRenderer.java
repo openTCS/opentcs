@@ -15,8 +15,6 @@ import org.opentcs.guing.base.components.properties.type.MultipleDifferentValues
 
 /**
  * A cell renderer for a boolean property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class BooleanPropertyCellRenderer
     extends JCheckBox

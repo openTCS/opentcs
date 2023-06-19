@@ -30,9 +30,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A task that periodically removes orders in a final state.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class OrderCleanerTask
     implements Runnable {

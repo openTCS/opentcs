@@ -19,8 +19,6 @@ import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
 /**
  * Checks for transport orders that are still in state RAW, and attempts to prepare them for
  * assignment.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CheckNewOrdersPhase
     implements Phase {

@@ -16,8 +16,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * Creates model elements that can be used in tests.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DataObjectFactory {
 

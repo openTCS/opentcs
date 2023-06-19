@@ -12,8 +12,6 @@ import javax.annotation.Nullable;
 
 /**
  * This class provides methods for parsing.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class Parsers {
 

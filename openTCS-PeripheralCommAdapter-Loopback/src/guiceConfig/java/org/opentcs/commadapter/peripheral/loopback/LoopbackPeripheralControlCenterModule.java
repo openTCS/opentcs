@@ -12,8 +12,6 @@ import org.opentcs.customizations.controlcenter.ControlCenterInjectionModule;
 
 /**
  * Loopback adapter-specific Gucie configuration for the Kernel Control Center.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LoopbackPeripheralControlCenterModule
     extends ControlCenterInjectionModule {

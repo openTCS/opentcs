@@ -16,8 +16,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 /**
  * This interface declares the methods that a driver communicating with and controlling a
  * peripheral device must implement.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralCommAdapter
     extends Lifecycle {

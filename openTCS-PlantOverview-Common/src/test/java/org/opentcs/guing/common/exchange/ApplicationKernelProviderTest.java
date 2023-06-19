@@ -22,8 +22,6 @@ import org.opentcs.guing.common.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.util.gui.dialog.ConnectToServerDialog;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ApplicationKernelProviderTest {
 

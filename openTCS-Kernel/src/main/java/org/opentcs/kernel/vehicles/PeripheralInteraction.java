@@ -42,8 +42,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Once the interaction is finished, an interaction-specific callback is executed.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralInteraction {
 

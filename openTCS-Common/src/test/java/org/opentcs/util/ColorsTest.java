@@ -12,8 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ColorsTest {
 

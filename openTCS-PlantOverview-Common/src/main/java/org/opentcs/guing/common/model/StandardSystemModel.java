@@ -48,8 +48,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * Base implementation for a SystemModel.
  * Holds the vehicles and the layout of the model. The SystemModel has a map of base components
  * for each component type (e.g. points, locations, vehicles, ...).
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class StandardSystemModel
     extends CompositeModelComponent

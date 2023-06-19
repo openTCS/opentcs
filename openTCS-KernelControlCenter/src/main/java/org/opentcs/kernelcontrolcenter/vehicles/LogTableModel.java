@@ -26,9 +26,6 @@ import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PAT
 
 /**
  * A table model for holding {@link UserNotification} instances in rows.
- *
- * @author Iryna Felko (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 final class LogTableModel
     extends AbstractTableModel {

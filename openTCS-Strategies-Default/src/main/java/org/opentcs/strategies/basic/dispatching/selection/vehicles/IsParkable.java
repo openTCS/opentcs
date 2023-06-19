@@ -20,8 +20,6 @@ import org.opentcs.strategies.basic.dispatching.selection.ParkVehicleSelectionFi
 
 /**
  * Filters vehicles that are parkable.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class IsParkable
     implements ParkVehicleSelectionFilter {

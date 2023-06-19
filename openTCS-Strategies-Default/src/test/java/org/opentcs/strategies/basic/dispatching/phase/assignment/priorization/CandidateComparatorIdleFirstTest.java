@@ -26,8 +26,6 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorIdleFirst;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class CandidateComparatorIdleFirstTest {
 

@@ -43,10 +43,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Displays information about a vehicle (VehicleModel) graphically.
- *
- * @author Iryna Felko (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DetailPanel
     extends JPanel

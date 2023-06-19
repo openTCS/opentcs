@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Creates {@link PointRouter} instances with algorithm implementations created by subclasses.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class AbstractPointRouterFactory
     implements PointRouterFactory {

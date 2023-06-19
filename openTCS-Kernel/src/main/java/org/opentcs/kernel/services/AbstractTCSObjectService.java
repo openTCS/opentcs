@@ -22,8 +22,6 @@ import org.opentcs.data.TCSObjectReference;
 
 /**
  * Delegate method calls to the {@link TCSObjectService} implementation.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class AbstractTCSObjectService
     implements TCSObjectService {

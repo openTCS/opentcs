@@ -32,8 +32,6 @@ import org.opentcs.util.persistence.BasePlantModelTO;
 import org.xml.sax.SAXException;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @XmlRootElement(name = "model")
 @XmlAccessorType(XmlAccessType.PROPERTY)

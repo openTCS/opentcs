@@ -11,8 +11,6 @@ import org.opentcs.components.Lifecycle;
 
 /**
  * Provides methods used in a kernel client application's context.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface KernelClientApplication
     extends Lifecycle {

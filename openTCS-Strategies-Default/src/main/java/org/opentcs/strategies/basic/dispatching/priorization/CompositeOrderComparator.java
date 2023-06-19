@@ -19,8 +19,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A composite of all configured transport order comparators.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CompositeOrderComparator
     implements Comparator<TransportOrder> {

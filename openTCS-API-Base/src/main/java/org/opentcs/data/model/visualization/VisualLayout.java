@@ -20,8 +20,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes the visual attributes of a model.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VisualLayout
     extends TCSObject<VisualLayout>

@@ -32,8 +32,6 @@ import org.slf4j.LoggerFactory;
  * Upon creation, an instance of this class registers itself with the RMI registry by the name
  * {@link RegistrationName#REMOTE_PERIPHERAL_JOB_SERVICE}.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class StandardRemotePeripheralJobService
     extends StandardRemoteTCSObjectService

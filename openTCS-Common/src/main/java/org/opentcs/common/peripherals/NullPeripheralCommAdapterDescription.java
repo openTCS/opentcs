@@ -11,8 +11,6 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
 
 /**
  * A {@link PeripheralCommAdapterDescription} for no comm adapter.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class NullPeripheralCommAdapterDescription
     extends PeripheralCommAdapterDescription {

@@ -12,8 +12,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property for a graphical symbol.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class SymbolProperty
     extends AbstractComplexProperty {

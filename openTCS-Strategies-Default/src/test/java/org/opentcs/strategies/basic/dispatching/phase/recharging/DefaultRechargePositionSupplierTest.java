@@ -32,8 +32,6 @@ import org.opentcs.data.order.DriveOrder.Destination;
 
 /**
  * Tests for {@link DefaultRechargePositionSupplier}.
- *
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public class DefaultRechargePositionSupplierTest {
 

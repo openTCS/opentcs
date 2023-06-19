@@ -27,8 +27,6 @@ import org.opentcs.data.model.Path;
  * explicitly documented here again. See the corresponding API documentation in
  * {@link RouterService} for these, instead.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface RemoteRouterService
     extends Remote {

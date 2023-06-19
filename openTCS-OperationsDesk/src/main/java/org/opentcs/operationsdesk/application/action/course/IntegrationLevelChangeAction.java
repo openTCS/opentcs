@@ -24,8 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author Leonard Schuengel (Fraunhofer IML)
  */
 public class IntegrationLevelChangeAction
     extends AbstractAction {

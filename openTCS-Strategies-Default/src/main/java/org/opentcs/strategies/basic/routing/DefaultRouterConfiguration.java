@@ -12,8 +12,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure the {@link DefaultRouter}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(DefaultRouterConfiguration.PREFIX)
 public interface DefaultRouterConfiguration {

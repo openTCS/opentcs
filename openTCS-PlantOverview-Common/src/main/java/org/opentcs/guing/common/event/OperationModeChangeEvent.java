@@ -13,8 +13,6 @@ import org.opentcs.guing.common.application.OperationMode;
 
 /**
  * Informs listeners about a change of the application's mode of operation.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OperationModeChangeEvent
     extends EventObject {

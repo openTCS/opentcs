@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Controls a task that periodically fetches for kernel events.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class KernelEventFetcher
     implements EventHandler,

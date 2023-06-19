@@ -21,8 +21,6 @@ import org.opentcs.strategies.basic.dispatching.selection.TransportOrderSelectio
 
 /**
  * Filters transport orders that contain locked target locations.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ContainsLockedTargetLocations
     implements TransportOrderSelectionFilter {

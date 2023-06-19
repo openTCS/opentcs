@@ -18,8 +18,6 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 /**
  * An entry for a vehicle present in kernel with detailed information about its attachment state
  * and latest process model.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LocalVehicleEntry {
 

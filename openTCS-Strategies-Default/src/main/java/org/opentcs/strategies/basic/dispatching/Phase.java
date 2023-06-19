@@ -11,8 +11,6 @@ import org.opentcs.components.Lifecycle;
 
 /**
  * Describes a reusable dispatching (sub-)task with a life cycle.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface Phase
     extends Runnable,

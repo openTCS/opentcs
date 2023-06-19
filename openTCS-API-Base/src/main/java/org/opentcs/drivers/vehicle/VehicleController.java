@@ -26,9 +26,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides high-level methods for the kernel to control a vehicle.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface VehicleController
     extends Lifecycle,

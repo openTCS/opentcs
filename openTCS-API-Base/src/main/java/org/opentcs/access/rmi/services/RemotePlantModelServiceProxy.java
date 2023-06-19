@@ -21,8 +21,6 @@ import org.opentcs.data.model.PlantModel;
 /**
  * The default implementation of the plant model service.
  * Delegates method invocations to the corresponding remote service.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 class RemotePlantModelServiceProxy
     extends RemoteTCSObjectServiceProxy<RemotePlantModelService>

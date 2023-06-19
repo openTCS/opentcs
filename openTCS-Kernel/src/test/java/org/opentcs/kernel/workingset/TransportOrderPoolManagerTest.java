@@ -32,8 +32,6 @@ import org.opentcs.util.event.SimpleEventBus;
 
 /**
  * Unit tests for {@link TransportOrderPoolManager}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrderPoolManagerTest {
 

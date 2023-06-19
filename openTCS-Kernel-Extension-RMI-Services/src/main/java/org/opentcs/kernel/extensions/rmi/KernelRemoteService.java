@@ -13,8 +13,6 @@ import org.opentcs.components.Lifecycle;
 
 /**
  * A base class for kernel-side implementations of remote services.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class KernelRemoteService
     implements Lifecycle {

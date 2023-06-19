@@ -23,8 +23,6 @@ import org.opentcs.data.order.DriveOrder;
  * <code>TransportOrderData</code> implements functionalities for creating
  * and for local storing of xml telegrams.
  * The transport/drive oder data is stored in this class.
- *
- * @author Iryna Felko (Fraunhofer IML)
  */
 public class TransportOrderData {
 

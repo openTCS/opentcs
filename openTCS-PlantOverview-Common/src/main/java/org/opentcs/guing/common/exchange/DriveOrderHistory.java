@@ -15,8 +15,6 @@ import org.opentcs.guing.base.model.FigureDecorationDetails;
 
 /**
  * Keeps track of the drive order components of vehicles.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DriveOrderHistory {
 

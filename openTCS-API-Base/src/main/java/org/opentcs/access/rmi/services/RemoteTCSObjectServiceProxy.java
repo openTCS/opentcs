@@ -21,7 +21,6 @@ import org.opentcs.data.TCSObjectReference;
  * The default implementation of the tcs object service.
  * Delegates method invocations to the corresponding remote service.
  *
- * @author Martin Grzenia (Fraunhofer IML)
  * @param <R> The remote service's type.
  */
 abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>

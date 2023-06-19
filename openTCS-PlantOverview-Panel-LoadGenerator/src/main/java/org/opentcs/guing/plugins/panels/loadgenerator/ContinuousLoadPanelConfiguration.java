@@ -12,8 +12,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure the continuous load panel.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(ContinuousLoadPanelConfiguration.PREFIX)
 public interface ContinuousLoadPanelConfiguration {

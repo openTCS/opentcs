@@ -9,8 +9,6 @@ package org.opentcs.access;
 
 /**
  * Declares the methods an openTCS kernel implements.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface Kernel {
 

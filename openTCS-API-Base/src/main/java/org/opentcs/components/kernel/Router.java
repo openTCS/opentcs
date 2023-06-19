@@ -28,8 +28,6 @@ import org.opentcs.data.order.TransportOrder;
  * A router finds routes from a start point to an end point, rating them
  * according to implementation specific criteria/costs parameters.
  * </p>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface Router
     extends Lifecycle {

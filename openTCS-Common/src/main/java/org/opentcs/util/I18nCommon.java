@@ -9,8 +9,6 @@ package org.opentcs.util;
 
 /**
  * Defines constants regarding internationalization.
- *
- * @author Leonard Schuengel (Fraunhofer IML)
  */
 public interface I18nCommon {
 

@@ -15,8 +15,6 @@ import org.opentcs.guing.common.components.dockable.DockingManager;
 
 /**
  * A Guice module for this package.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DockableInjectionModule
     extends AbstractModule {

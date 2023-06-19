@@ -30,8 +30,6 @@ import org.opentcs.guing.base.model.PositionableModelComponent;
 
 /**
  * Basic implementation of a point.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class PointModel
     extends AbstractConnectableModelComponent

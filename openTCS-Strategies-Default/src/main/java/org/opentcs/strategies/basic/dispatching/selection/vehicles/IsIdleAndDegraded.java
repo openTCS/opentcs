@@ -15,8 +15,6 @@ import org.opentcs.strategies.basic.dispatching.selection.RechargeVehicleSelecti
 
 /**
  * Filters vehicles that are idle and have a degraded energy level.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class IsIdleAndDegraded
     implements RechargeVehicleSelectionFilter {

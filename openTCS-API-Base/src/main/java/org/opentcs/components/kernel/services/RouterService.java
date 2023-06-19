@@ -15,8 +15,6 @@ import org.opentcs.data.model.Path;
 
 /**
  * Provides methods concerning the {@link Router}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface RouterService {
 

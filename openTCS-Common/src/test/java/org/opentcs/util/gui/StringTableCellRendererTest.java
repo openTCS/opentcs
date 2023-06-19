@@ -19,8 +19,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class StringTableCellRendererTest {
 

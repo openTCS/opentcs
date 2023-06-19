@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A logging handler that writes all INFO-logs to KernelControlCenter's logging text area.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class ControlCenterInfoHandler
     implements EventHandler {

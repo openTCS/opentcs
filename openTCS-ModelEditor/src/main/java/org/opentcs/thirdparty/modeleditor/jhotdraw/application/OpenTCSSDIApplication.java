@@ -1,6 +1,5 @@
 /**
  * (c): IML, JHotDraw.
- *
  */
 package org.opentcs.thirdparty.modeleditor.jhotdraw.application;
 
@@ -33,8 +32,6 @@ import org.opentcs.util.gui.Icons;
 
 /**
  * The enclosing SDI application.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class OpenTCSSDIApplication
     extends SDIApplication

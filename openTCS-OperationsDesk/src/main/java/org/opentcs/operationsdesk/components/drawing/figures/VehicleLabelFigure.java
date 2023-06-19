@@ -19,9 +19,6 @@ import org.opentcs.guing.common.components.drawing.figures.TCSFigure;
 import org.opentcs.guing.common.components.drawing.figures.TCSLabelFigure;
 
 /**
- *
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class VehicleLabelFigure
     extends TCSLabelFigure {

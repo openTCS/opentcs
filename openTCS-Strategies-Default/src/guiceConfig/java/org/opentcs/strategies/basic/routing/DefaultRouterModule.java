@@ -27,8 +27,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Guice configuration for the default router.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultRouterModule
     extends KernelInjectionModule {

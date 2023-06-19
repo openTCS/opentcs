@@ -13,8 +13,6 @@ import static org.opentcs.util.Assertions.checkInRange;
 /**
  * A message that informs a communication adapter about a speed multiplier it/the vehicle should
  * apply.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class SetSpeedMultiplier
     implements Serializable {

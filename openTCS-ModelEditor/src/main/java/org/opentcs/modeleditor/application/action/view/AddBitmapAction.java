@@ -19,8 +19,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * Actions for adding background bitmaps to the drawing view.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class AddBitmapAction
     extends AbstractAction {

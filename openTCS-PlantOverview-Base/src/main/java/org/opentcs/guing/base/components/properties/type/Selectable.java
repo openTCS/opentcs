@@ -14,7 +14,6 @@ import java.util.List;
  * possible values to choose from.
  *
  * @param <E> The type of elements that can be selected from.
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public interface Selectable<E> {
 

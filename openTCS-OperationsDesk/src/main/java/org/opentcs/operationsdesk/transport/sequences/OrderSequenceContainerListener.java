@@ -13,8 +13,6 @@ import org.opentcs.data.order.OrderSequence;
 /**
  *
  * Listener for changes in the {@link OrderSequencesContainerPanel}.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public interface OrderSequenceContainerListener {
 

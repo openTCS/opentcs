@@ -11,8 +11,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property for an integer value.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class IntegerProperty
     extends AbstractProperty {

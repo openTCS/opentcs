@@ -15,8 +15,6 @@ import org.opentcs.guing.common.application.OperationMode;
 
 /**
  * A table model for the PropertiesTable.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class AttributesTableModel
     extends javax.swing.table.DefaultTableModel {

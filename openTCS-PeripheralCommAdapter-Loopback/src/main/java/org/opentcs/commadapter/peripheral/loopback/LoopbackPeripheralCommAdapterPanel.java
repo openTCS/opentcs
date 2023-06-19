@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The panel for the loopback peripheral communication adapter.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LoopbackPeripheralCommAdapterPanel
     extends PeripheralCommAdapterPanel {

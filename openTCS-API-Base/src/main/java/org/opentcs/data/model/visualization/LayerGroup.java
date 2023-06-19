@@ -12,8 +12,6 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Describes a layer group in a plant model.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LayerGroup
     implements Serializable {

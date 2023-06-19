@@ -42,7 +42,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.components.drawing.AbstractO
 
 /**
  * A DrawingView implementation for the openTCS plant overview.
- *
  */
 public class OpenTCSDrawingViewOperating
     extends AbstractOpenTCSDrawingView {

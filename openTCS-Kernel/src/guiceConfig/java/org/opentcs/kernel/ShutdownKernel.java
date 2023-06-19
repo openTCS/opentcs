@@ -13,9 +13,6 @@ import java.net.URL;
 
 /**
  * Shuts down a running kernel via its administration interface.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ShutdownKernel {
 

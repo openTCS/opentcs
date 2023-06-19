@@ -12,7 +12,6 @@ package org.opentcs.data.model.visualization;
  *
  * @see org.opentcs.data.ObjectPropConstants#LOCTYPE_DEFAULT_REPRESENTATION
  * @see org.opentcs.data.ObjectPropConstants#LOC_DEFAULT_REPRESENTATION
- * @author Stefan Walter (Fraunhofer IML)
  */
 public enum LocationRepresentation {
 

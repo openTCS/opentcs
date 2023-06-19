@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
  * the current route progress index reported by the vehicle that is processing the drive order. From
  * there, the merged drive order follows the route of {@code orderB}. This means that the merged
  * drive order may contain a gap/may not be continuous.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ForcedDriveOrderMerger
     extends AbstractDriveOrderMerger {

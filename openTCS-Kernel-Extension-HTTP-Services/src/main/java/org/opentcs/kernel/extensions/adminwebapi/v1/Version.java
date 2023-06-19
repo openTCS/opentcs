@@ -11,8 +11,6 @@ import org.opentcs.util.Environment;
 
 /**
  * Describes the version of the running kernel.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Version {
 

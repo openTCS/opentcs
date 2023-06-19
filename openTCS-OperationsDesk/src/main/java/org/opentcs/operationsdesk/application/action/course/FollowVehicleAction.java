@@ -20,8 +20,6 @@ import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLE
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class FollowVehicleAction
     extends AbstractAction {
@@ -30,7 +28,7 @@ public class FollowVehicleAction
    * Automatically moves the drawing so a vehicle is always visible.
    */
   public static final String ID = "course.vehicle.follow";
-  
+
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(VEHICLEPOPUP_PATH);
   /**
    * The vehicle.
@@ -52,7 +50,7 @@ public class FollowVehicleAction
                              OpenTCSDrawingEditor drawingEditor) {
     this.vehicleModel = requireNonNull(vehicle, "vehicle");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
-    
+
     putValue(NAME, BUNDLE.getString("followVehicleAction.name"));
   }
 

@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Provides a pool of {@link PeripheralEntry}s with an entry for every {@link Location} object in
  * the kernel.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralEntryPool
     implements Lifecycle {

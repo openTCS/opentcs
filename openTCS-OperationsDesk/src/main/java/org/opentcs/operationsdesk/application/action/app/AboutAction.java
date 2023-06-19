@@ -28,9 +28,6 @@ import org.opentcs.util.Environment;
 
 /**
  * Displays a dialog showing information about the application.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AboutAction
     extends AbstractAction {

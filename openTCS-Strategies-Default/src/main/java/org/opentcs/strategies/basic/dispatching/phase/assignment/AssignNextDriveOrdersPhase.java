@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Assigns the next drive order to each vehicle waiting for it, or finishes the respective transport
  * order if the vehicle has finished its last drive order.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AssignNextDriveOrdersPhase
     implements Phase {

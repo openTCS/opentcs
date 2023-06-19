@@ -11,8 +11,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 
 /**
  * A {@link VehicleCommAdapterDescription} for no comm adapter.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class NullVehicleCommAdapterDescription
     extends VehicleCommAdapterDescription {

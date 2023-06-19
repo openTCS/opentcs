@@ -22,8 +22,6 @@ import org.opentcs.operationsdesk.application.action.course.WithdrawAction;
 
 /**
  * A factory for various actions.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ActionFactory {
 

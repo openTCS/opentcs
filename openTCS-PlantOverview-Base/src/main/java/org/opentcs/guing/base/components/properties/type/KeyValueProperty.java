@@ -11,9 +11,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property containing a key-value pair.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class KeyValueProperty
     extends AbstractComplexProperty {

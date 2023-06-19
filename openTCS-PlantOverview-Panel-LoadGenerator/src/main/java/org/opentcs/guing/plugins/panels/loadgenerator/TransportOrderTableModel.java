@@ -19,8 +19,6 @@ import org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding.TransportOrders
 
 /**
  * A table model for transport orders.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 class TransportOrderTableModel
     extends AbstractTableModel {

@@ -15,8 +15,6 @@ import javax.inject.Qualifier;
 
 /**
  * Annotation type to mark the application's main frame.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @Qualifier
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})

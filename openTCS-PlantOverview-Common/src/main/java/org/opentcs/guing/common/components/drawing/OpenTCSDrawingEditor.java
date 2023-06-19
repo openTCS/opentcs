@@ -45,10 +45,6 @@ import org.opentcs.util.event.EventHandler;
  * and the <code>Drawing</code>.
  * It also offers methods to add specific unique figures to the
  * <code>Drawing</code>.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OpenTCSDrawingEditor
     extends DefaultDrawingEditor

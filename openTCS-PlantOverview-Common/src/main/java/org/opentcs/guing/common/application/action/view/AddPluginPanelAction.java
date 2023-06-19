@@ -16,8 +16,6 @@ import org.opentcs.guing.common.application.PluginPanelManager;
 
 /**
  * An action to add a plugin panel.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class AddPluginPanelAction
     extends AbstractAction {

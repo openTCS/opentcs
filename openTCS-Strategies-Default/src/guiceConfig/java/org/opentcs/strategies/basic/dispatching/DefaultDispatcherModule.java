@@ -62,8 +62,6 @@ import org.opentcs.strategies.basic.dispatching.selection.vehicles.IsReparkable;
 
 /**
  * Guice configuration for the default dispatcher.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultDispatcherModule
     extends KernelInjectionModule {

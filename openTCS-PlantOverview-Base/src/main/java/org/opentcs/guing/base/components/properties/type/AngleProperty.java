@@ -13,9 +13,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property for angles.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AngleProperty
     extends AbstractQuantity<AngleProperty.Unit> {

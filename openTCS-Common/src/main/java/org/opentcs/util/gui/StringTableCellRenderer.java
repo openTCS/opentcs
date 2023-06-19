@@ -18,7 +18,6 @@ import javax.swing.table.TableCellRenderer;
 /**
  * Renders values to JLabels.
  *
- * @author Mustafa Yalciner (Fraunhofer IML)
  * @param <E> The type of the table cell values that the representer can represent.
  */
 public class StringTableCellRenderer<E>

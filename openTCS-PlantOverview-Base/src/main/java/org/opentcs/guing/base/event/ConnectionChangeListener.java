@@ -9,8 +9,6 @@ package org.opentcs.guing.base.event;
 
 /**
  * Interface for listeners that want to be informed on connection changes.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface ConnectionChangeListener {
 

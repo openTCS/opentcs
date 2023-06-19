@@ -12,8 +12,6 @@ import org.opentcs.guing.base.model.elements.AbstractConnection;
 
 /**
  * An event for changes on connections.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class ConnectionChangeEvent
     extends EventObject {

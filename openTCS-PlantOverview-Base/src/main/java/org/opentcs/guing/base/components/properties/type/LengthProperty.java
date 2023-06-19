@@ -13,9 +13,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property for a length.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LengthProperty
     extends AbstractQuantity<LengthProperty.Unit> {

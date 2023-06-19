@@ -16,8 +16,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action for adding new peripheral job views.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class AddPeripheralJobViewAction
     extends AbstractAction {

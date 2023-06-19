@@ -26,8 +26,6 @@ import bibliothek.util.Path;
 
 /**
  * A tab dockable copied from the dockingframes examples.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class CStack
     extends AbstractDockableCStation<CStackDockStation>

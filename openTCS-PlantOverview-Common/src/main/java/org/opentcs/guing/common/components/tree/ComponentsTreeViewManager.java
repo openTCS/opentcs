@@ -16,8 +16,6 @@ import org.opentcs.guing.common.components.tree.elements.UserObjectUtil;
 
 /**
  * The tree view manager for components.
- *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public class ComponentsTreeViewManager
     extends TreeViewManager {

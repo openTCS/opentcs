@@ -12,8 +12,6 @@ import org.opentcs.guing.common.model.SystemModel;
 
 /**
  * Manages (loads, persists and keeps) the driving course model.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ModelManager {
 

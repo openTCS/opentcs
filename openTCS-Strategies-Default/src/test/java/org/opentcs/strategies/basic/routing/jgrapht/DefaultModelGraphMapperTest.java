@@ -24,8 +24,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorComposite;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultModelGraphMapperTest {
 

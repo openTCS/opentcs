@@ -12,8 +12,6 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Instances of this class represent events emitted by/for business objects.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TCSObjectEvent
     implements Serializable {

@@ -15,8 +15,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action for adding new transport order sequence views.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class AddTransportOrderSequenceViewAction
     extends AbstractAction {

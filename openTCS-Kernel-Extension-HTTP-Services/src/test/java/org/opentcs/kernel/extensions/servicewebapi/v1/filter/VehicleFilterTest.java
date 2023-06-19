@@ -14,8 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.opentcs.data.model.Vehicle;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class VehicleFilterTest {
 

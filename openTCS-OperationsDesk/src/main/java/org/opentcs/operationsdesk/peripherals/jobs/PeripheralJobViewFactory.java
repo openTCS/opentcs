@@ -11,8 +11,6 @@ import org.opentcs.data.peripherals.PeripheralJob;
 
 /**
  * Creates peripheral job-related GUI elements.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public interface PeripheralJobViewFactory {
 

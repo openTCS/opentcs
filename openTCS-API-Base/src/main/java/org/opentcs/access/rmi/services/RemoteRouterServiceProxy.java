@@ -17,8 +17,6 @@ import org.opentcs.data.model.Path;
 /**
  * The default implementation of the router service.
  * Delegates method invocations to the corresponding remote service.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 class RemoteRouterServiceProxy
     extends AbstractRemoteServiceProxy<RemoteRouterService>

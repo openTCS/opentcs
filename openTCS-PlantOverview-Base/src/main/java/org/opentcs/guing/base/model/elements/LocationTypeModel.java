@@ -21,8 +21,6 @@ import org.opentcs.guing.base.model.AbstractModelComponent;
 
 /**
  * Basic implementation of a location type.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class LocationTypeModel
     extends AbstractModelComponent {

@@ -37,8 +37,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A basic {@link Router} implementation.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultRouter
     implements Router {

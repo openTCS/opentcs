@@ -35,9 +35,6 @@ import org.opentcs.guing.common.components.drawing.figures.decoration.PointOutli
 
 /**
  * {@link PointFigure} with a label.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LabeledPointFigure
     extends LabeledFigure {

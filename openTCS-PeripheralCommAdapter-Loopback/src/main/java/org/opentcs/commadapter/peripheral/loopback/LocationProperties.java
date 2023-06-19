@@ -8,8 +8,6 @@
 package org.opentcs.commadapter.peripheral.loopback;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface LocationProperties {
 

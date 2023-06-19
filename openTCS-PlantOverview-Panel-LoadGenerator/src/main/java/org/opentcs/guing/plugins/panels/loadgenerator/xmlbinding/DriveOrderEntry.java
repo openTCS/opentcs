@@ -13,9 +13,6 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * Stores a drive order definition for XML marshalling/unmarshalling.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 @XmlType(propOrder = {"locationName", "vehicleOperation"})
 public class DriveOrderEntry {

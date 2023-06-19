@@ -24,8 +24,6 @@ import org.opentcs.access.rmi.ClientID;
  * explicitly documented here again. See the corresponding API documentation in
  * {@code SchedulerService} for these, instead.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @Deprecated
 public interface RemoteSchedulerService

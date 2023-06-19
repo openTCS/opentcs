@@ -30,8 +30,6 @@ import org.opentcs.thirdparty.operationsdesk.jhotdraw.application.OpenTCSSDIAppl
 
 /**
  * An injection module for this package.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ApplicationInjectionModule
     extends AbstractModule {

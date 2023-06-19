@@ -10,8 +10,6 @@ package org.opentcs.guing.base.event;
 /**
  * Interface for listener that want to be informed wenn a block area has
  * changed.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface BlockChangeListener {
 

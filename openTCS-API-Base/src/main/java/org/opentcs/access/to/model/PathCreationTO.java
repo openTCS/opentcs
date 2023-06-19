@@ -22,8 +22,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A transfer object describing a path in the plant model.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PathCreationTO
     extends CreationTO

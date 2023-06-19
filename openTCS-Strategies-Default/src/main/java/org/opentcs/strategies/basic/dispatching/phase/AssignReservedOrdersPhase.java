@@ -24,8 +24,6 @@ import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAs
 /**
  * Assigns reserved transport orders (if any) to vehicles that have just finished their withdrawn
  * ones.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AssignReservedOrdersPhase
     implements Phase {

@@ -14,8 +14,6 @@ import org.opentcs.components.plantoverview.PlantModelImporter;
 import org.opentcs.guing.common.application.GuiManager;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ImportPlantModelAction
     extends AbstractAction {

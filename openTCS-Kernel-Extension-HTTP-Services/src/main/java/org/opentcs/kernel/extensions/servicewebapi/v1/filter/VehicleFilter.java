@@ -12,8 +12,6 @@ import javax.annotation.Nullable;
 import org.opentcs.data.model.Vehicle;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class VehicleFilter
     implements Predicate<Vehicle> {

@@ -19,8 +19,6 @@ import org.opentcs.guing.base.components.properties.type.Property;
 
 /**
  * Allows to change properties with the same name of multiple model components at the same time.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class PropertiesCollection
     extends CompositeModelComponent {

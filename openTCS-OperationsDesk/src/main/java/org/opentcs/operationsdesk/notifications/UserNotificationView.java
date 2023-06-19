@@ -20,8 +20,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A view of a user notification.
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class UserNotificationView
     extends DialogContent {

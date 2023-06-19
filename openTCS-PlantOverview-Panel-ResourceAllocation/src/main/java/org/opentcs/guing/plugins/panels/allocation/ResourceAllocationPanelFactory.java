@@ -20,9 +20,6 @@ import static org.opentcs.guing.plugins.panels.allocation.I18nPlantOverviewPanel
 /**
  * Provides a {@link ResourceAllocationPanel} for the plant overview if the kernel is in operating
  * state.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class ResourceAllocationPanelFactory
     implements PluggablePanelFactory {

@@ -15,8 +15,6 @@ import org.opentcs.guing.base.model.elements.PointModel.Type;
 
 /**
  * A cell renderer for a {@link PointTypeProperty}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PointTypePropertyCellRenderer
     extends StandardPropertyCellRenderer {

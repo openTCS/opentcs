@@ -11,8 +11,6 @@ import org.opentcs.guing.common.components.layer.LayerGroupEditor;
 
 /**
  * Provides methods to edit layer groups.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface LayerGroupEditorModeling
     extends LayerGroupEditor {

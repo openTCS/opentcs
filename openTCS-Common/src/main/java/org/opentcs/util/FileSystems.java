@@ -12,8 +12,6 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * This class provides helper methods for working with file systems.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public final class FileSystems {
 

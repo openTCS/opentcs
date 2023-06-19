@@ -10,11 +10,9 @@ package org.opentcs.operationsdesk.components.dialogs;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface SingleVehicleViewFactory {
-  
+
   /**
    * Creates a new SingleVehicleView for the given model.
    *

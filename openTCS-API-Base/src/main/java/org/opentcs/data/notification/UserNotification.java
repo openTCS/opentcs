@@ -14,8 +14,6 @@ import javax.annotation.Nullable;
 
 /**
  * A notification to be read by a user.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class UserNotification
     implements Serializable {

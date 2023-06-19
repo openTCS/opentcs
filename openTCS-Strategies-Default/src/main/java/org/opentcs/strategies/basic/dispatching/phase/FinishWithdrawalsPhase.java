@@ -17,8 +17,6 @@ import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
 
 /**
  * Finishes withdrawals of transport orders after the vehicle has come to a halt.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class FinishWithdrawalsPhase
     implements Phase {

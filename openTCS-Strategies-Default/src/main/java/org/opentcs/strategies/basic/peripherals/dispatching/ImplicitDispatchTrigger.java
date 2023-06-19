@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An event listener that triggers the peripheral job dispatcher on certain events.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ImplicitDispatchTrigger
     implements EventHandler {

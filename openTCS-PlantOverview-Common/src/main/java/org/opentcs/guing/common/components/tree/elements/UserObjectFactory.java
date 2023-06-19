@@ -18,8 +18,6 @@ import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface UserObjectFactory {
 

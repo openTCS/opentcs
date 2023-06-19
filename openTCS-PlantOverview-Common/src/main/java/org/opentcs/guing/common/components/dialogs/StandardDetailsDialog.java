@@ -19,8 +19,6 @@ import org.opentcs.guing.base.components.properties.type.Property;
 /**
  * A dialog in which a {@link DialogContent} can be added.
  * The dialog has an OK and a cancel button.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class StandardDetailsDialog
     extends javax.swing.JDialog

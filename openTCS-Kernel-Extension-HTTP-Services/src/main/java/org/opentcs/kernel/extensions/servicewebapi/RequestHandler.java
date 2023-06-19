@@ -12,8 +12,6 @@ import spark.Service;
 
 /**
  * A request handler.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface RequestHandler
     extends Lifecycle {

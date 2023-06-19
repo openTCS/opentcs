@@ -20,8 +20,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides methods concerning the {@link Dispatcher}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface DispatcherService {
 

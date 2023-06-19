@@ -17,8 +17,6 @@ import org.opentcs.guing.common.application.ViewManager;
 
 /**
  * Handles closing of a dockable.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DockableClosingHandler
     implements CVetoClosingListener {

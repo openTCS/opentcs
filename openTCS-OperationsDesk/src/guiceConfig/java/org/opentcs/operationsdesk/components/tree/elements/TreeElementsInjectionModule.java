@@ -14,8 +14,6 @@ import org.opentcs.guing.common.components.tree.elements.VehicleUserObject;
 
 /**
  * A Guice module for this package.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TreeElementsInjectionModule
     extends AbstractModule {

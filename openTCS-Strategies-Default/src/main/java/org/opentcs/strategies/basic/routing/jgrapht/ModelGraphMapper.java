@@ -16,8 +16,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * Translates model data to weighted graphs.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ModelGraphMapper {
 

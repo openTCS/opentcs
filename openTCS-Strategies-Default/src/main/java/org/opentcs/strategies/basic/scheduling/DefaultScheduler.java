@@ -44,9 +44,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Implements a basic simple scheduler strategy for resources used by vehicles, preventing
  * collisions.
- *
- * @author Iryna Felko (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultScheduler
     implements Scheduler,

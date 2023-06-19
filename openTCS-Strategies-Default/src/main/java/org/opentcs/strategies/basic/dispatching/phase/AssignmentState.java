@@ -19,8 +19,6 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 
 /**
  * The result of trying to assign a set of vehicles/transport orders.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class AssignmentState {
 

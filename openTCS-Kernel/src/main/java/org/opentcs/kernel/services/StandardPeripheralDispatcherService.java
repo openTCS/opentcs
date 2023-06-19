@@ -22,8 +22,6 @@ import org.opentcs.kernel.workingset.TCSObjectRepository;
 
 /**
  * This class is the standard implementation of the {@link PeripheralDispatcherService} interface.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class StandardPeripheralDispatcherService
     implements PeripheralDispatcherService {

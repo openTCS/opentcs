@@ -11,8 +11,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * A factory for various loopback specific instances.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface LoopbackAdapterComponentsFactory {
 

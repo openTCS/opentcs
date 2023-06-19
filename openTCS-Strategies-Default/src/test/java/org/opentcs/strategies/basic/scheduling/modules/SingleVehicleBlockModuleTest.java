@@ -29,8 +29,6 @@ import org.opentcs.strategies.basic.scheduling.ReservationPool;
 
 /**
  * Unit tests for {@link SingleVehicleBlockModule}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class SingleVehicleBlockModuleTest {
 

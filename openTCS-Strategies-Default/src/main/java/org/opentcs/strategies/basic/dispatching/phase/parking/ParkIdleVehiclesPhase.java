@@ -22,9 +22,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Creates parking orders for idle vehicles not already at a parking position considering all
  * parking positions.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ParkIdleVehiclesPhase
     extends AbstractParkingPhase {

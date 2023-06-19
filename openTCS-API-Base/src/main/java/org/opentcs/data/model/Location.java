@@ -33,7 +33,6 @@ import org.opentcs.data.model.visualization.LocationRepresentation;
  * </p>
  *
  * @see LocationType
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Location
     extends TCSResource<Location>

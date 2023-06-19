@@ -28,8 +28,6 @@ import org.slf4j.LoggerFactory;
  * Checks if the resources a client may allocate are part of a
  * {@link Block.Type#SINGLE_VEHICLE_ONLY} block and whether the expanded resources are all available
  * to the client.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class SingleVehicleBlockModule
     implements Scheduler.Module {

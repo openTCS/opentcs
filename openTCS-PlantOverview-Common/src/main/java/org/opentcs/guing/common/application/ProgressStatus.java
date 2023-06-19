@@ -9,8 +9,6 @@ package org.opentcs.guing.common.application;
 
 /**
  * A state of progress, to be used with {@link ProgressIndicator}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ProgressStatus {
 

@@ -41,9 +41,6 @@ import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 
 /**
  * Allows creation of transport orders.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CreateTransportOrderPanel
     extends DialogContent {

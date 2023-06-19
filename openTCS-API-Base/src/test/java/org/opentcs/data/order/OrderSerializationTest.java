@@ -24,8 +24,6 @@ import org.opentcs.data.model.Location;
 
 /**
  * Tests for proper serialization and deserialization for TransportOrder and OrderSequence.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class OrderSerializationTest {
 

@@ -21,8 +21,6 @@ import org.opentcs.util.persistence.ModelParser;
 /**
  * Implementation of [@link ModelFileReader} to deserialize a {@link PlantModelCreationTO} from a
  * xml file.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class UnifiedModelReader
     implements ModelFileReader {

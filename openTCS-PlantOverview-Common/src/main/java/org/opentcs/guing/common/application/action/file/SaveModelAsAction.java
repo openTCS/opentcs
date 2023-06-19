@@ -17,8 +17,6 @@ import org.opentcs.guing.common.util.ImageDirectory;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class SaveModelAsAction
     extends AbstractAction {

@@ -18,8 +18,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A formatter for history events/entries related to {@link TransportOrder}s.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrderHistoryEntryFormatter
     implements ObjectHistoryEntryFormatter {

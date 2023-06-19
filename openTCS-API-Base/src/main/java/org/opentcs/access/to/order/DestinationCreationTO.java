@@ -15,8 +15,6 @@ import org.opentcs.access.to.CreationTO;
 
 /**
  * A transfer object describing a destination of a drive order.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DestinationCreationTO
     extends CreationTO

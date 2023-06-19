@@ -16,8 +16,6 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * The base class for a plant model transfer object.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @XmlTransient
 @XmlAccessorType(XmlAccessType.PROPERTY)

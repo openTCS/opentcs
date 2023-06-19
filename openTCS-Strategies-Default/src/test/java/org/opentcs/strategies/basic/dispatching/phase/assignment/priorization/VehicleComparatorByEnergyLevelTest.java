@@ -19,8 +19,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorByEnergyLevel;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleComparatorByEnergyLevelTest {
 

@@ -43,8 +43,6 @@ import org.opentcs.util.event.EventHandler;
 
 /**
  * This class is the standard implementation of the {@link PlantModelService} interface.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class StandardPlantModelService
     extends AbstractTCSObjectService

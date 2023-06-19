@@ -18,8 +18,6 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
  * Compares {@link AssignmentCandidate}s by their transport order's deadlines, ordering those with a
  * deadline at risk first.
  * Note: this comparator imposes orderings that are inconsistent with equals.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class CandidateComparatorDeadlineAtRiskFirst
     implements Comparator<AssignmentCandidate> {

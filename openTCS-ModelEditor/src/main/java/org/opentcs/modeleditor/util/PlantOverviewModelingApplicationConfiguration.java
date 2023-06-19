@@ -13,12 +13,10 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure the PlantOverview application (in modeling mode).
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(PlantOverviewModelingApplicationConfiguration.PREFIX)
 public interface PlantOverviewModelingApplicationConfiguration {
-  
+
   /**
    * This configuration's prefix.
    */

@@ -9,8 +9,6 @@ package org.opentcs.guing.common.components.drawing;
 
 /**
  * Allows the configuration of drawing options.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DrawingOptions {
 

@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Null-object implementation of {@link VehicleController}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class NullVehicleController
     implements VehicleController {

@@ -12,8 +12,6 @@ import org.opentcs.data.order.TransportOrder;
 
 /**
  * Compares {@link TransportOrder}s by their names.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrderComparatorByName
     implements Comparator<TransportOrder> {

@@ -24,8 +24,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * A factory for drawing views.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DrawingViewFactory {
 

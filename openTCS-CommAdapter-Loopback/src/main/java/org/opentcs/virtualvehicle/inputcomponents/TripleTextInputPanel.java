@@ -22,8 +22,6 @@ import javax.swing.text.Document;
  * {@link TripleTextInputPanel.Builder Builder}-class must be used.
  * The <code>Object</code> that is returned by {@link InputPanel#getInput} is
  * an <code>Array</code> of three <code>Strings</code>.
- *
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public final class TripleTextInputPanel
     extends TextInputPanel {
@@ -325,7 +323,7 @@ public final class TripleTextInputPanel
     private final String[] formats = new String[3];
     /**
      * Show a reset button in the panel.
-     * Default is <code>false</code>. 
+     * Default is <code>false</code>.
      */
     private boolean resetButton;
     /**
@@ -363,7 +361,7 @@ public final class TripleTextInputPanel
     }
 
     /**
-     * Set the labels for the text fields. 
+     * Set the labels for the text fields.
      * Passing <code>null</code> means there should not be such a label.
      * @param label1 The label of the first text field
      * @param label2 The label of the second text field
@@ -404,7 +402,7 @@ public final class TripleTextInputPanel
 
     /**
      * Set the same text for the unit label for all three text fields.
-     * @param unit The unit 
+     * @param unit The unit
      * @return the isntance of this <code>Builder</code>
      */
     public Builder setUnitLabels(String unit) {

@@ -21,8 +21,6 @@ import javax.rmi.ssl.SslRMIClientSocketFactory;
 /**
  * This implementation is similar to {@link SslRMIClientSocketFactory} but allows the use of a
  * custom SSLConext.
- *
- * @author Leonard Schuengel (Fraunhofer IML)
  */
 class CustomSslRMIClientSocketFactory
     implements RMIClientSocketFactory,

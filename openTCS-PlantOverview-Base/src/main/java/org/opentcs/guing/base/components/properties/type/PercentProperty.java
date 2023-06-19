@@ -12,9 +12,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property for percentages.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PercentProperty
     extends AbstractQuantity<PercentProperty.Unit> {

@@ -16,8 +16,6 @@ import org.opentcs.guing.common.util.UserMessageHelper;
 
 /**
  * A cell editor for boolean properties.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class BooleanPropertyCellEditor
     extends AbstractPropertyCellEditor {

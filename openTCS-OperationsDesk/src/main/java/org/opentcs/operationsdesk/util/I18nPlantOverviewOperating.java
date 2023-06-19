@@ -9,8 +9,6 @@ package org.opentcs.operationsdesk.util;
 
 /**
  * Defines application-specific constants regarding internationalization.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface I18nPlantOverviewOperating {
 

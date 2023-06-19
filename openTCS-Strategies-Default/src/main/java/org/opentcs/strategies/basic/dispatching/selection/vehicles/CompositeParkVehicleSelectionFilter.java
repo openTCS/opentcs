@@ -17,8 +17,6 @@ import org.opentcs.strategies.basic.dispatching.selection.ParkVehicleSelectionFi
 
 /**
  * A collection of {@link ParkVehicleSelectionFilter}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class CompositeParkVehicleSelectionFilter
     implements ParkVehicleSelectionFilter {

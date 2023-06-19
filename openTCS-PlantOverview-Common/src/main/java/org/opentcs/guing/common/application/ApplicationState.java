@@ -13,8 +13,6 @@ import javax.inject.Inject;
 /**
  * Keeps and provides information about the current state of the application as
  * a whole.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ApplicationState {
 

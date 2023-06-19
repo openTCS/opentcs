@@ -20,8 +20,6 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class EdgeEvaluatorExplicitPropertiesTest {
 

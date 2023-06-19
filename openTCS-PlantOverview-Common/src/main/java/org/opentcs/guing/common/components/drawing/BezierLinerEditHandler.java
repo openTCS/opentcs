@@ -16,8 +16,6 @@ import org.opentcs.guing.common.components.drawing.figures.liner.BezierLinerEdit
 
 /**
  * Updates a bezier-style PathConnection's control points on edits.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class BezierLinerEditHandler
     implements UndoableEditListener {

@@ -15,8 +15,6 @@ import org.opentcs.data.order.TransportOrder;
  * A filter for {@link TransportOrder}s.
  * Returns a collection of reasons for filtering the transport order.
  * If the returned collection is empty, no reason to filter it was encountered.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface TransportOrderSelectionFilter
     extends Function<TransportOrder, Collection<String>> {

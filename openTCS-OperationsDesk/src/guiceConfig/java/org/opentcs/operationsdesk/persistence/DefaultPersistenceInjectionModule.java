@@ -16,9 +16,6 @@ import org.opentcs.guing.common.persistence.unified.UnifiedModelPersistor;
 
 /**
  * Default bindings for model readers and persistors.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DefaultPersistenceInjectionModule
     extends AbstractModule {

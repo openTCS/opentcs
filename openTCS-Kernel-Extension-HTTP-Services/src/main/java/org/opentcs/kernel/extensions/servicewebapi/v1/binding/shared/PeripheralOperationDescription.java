@@ -12,8 +12,6 @@ import org.opentcs.data.peripherals.PeripheralOperation.ExecutionTrigger;
 
 /**
  * Describes a peripheral operation.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class PeripheralOperationDescription {
 

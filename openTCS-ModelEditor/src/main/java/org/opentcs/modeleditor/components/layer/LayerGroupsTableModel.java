@@ -14,8 +14,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * The table model for layer groups for the Model Editor application.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 class LayerGroupsTableModel
     extends AbstractLayerGroupsTableModel {

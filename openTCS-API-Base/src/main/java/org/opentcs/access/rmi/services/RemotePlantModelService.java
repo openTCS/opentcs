@@ -30,8 +30,6 @@ import org.opentcs.data.model.PlantModel;
  * explicitly documented here again. See the corresponding API documentation in
  * {@link PlantModelService} for these, instead.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface RemotePlantModelService
     extends RemoteTCSObjectService,

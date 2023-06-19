@@ -29,8 +29,6 @@ import org.opentcs.guing.base.model.FigureDecorationDetails;
 
 /**
  * A connection between two points.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class PathModel
     extends AbstractConnection

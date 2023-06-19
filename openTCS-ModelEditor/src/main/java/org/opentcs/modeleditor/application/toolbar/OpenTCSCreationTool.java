@@ -22,8 +22,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A custom tool used to create {@code PointFigure}s and {@code LocationFigure}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class OpenTCSCreationTool
     extends CreationTool {

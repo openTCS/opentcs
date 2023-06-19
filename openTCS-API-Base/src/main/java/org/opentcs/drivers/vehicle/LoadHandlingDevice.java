@@ -14,8 +14,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes a single load handling device on a vehicle.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LoadHandlingDevice
     implements Serializable {

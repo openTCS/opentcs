@@ -27,8 +27,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Dispatches transport orders and vehicles.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultDispatcher
     implements Dispatcher {

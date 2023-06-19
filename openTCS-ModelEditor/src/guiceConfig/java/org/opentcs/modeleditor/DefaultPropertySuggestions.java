@@ -17,8 +17,6 @@ import org.opentcs.components.plantoverview.PropertySuggestions;
 
 /**
  * The default property suggestions of the baseline plant overview.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class DefaultPropertySuggestions
     implements PropertySuggestions {

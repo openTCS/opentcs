@@ -11,8 +11,6 @@ import java.io.Serializable;
 
 /**
  * A generic 3-tuple of long integer values, usable for 3D coordinates and vectors, for instance.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Triple
     implements Serializable {

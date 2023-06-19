@@ -24,8 +24,6 @@ import org.opentcs.access.SslParameterSet;
 
 /**
  * Provides methods for creating client-side and server-side {@link SSLContext} instances.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 class SecureSslContextFactory
     implements Serializable {

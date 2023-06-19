@@ -28,8 +28,6 @@ import org.opentcs.operationsdesk.components.tree.elements.TreeElementsInjection
 
 /**
  * A Guice module for this package.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ComponentsInjectionModule
     extends AbstractModule {

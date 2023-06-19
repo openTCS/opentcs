@@ -13,8 +13,6 @@ import javax.swing.JMenuBar;
 
 /**
  * The plant overview's main menu bar.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ApplicationMenuBar
     extends JMenuBar {

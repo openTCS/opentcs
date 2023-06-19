@@ -15,8 +15,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 
 /**
  * A command to set a vehicle's property.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class SetVehiclePropertyCommand
     implements AdapterCommand {

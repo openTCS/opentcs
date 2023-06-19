@@ -23,8 +23,6 @@ import org.opentcs.util.event.EventSource;
 import org.opentcs.util.event.SimpleEventBus;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class StatusEventDispatcherTest {
 

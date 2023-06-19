@@ -12,8 +12,6 @@ import org.opentcs.guing.base.model.elements.BlockModel;
 
 /**
  * An event that informs listener about changes in a block area.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class BlockChangeEvent
     extends EventObject {

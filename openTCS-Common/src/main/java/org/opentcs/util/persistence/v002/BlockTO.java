@@ -19,8 +19,6 @@ import javax.xml.bind.annotation.XmlType;
 import org.opentcs.data.model.Block;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(propOrder = {"name", "id", "type", "members", "properties"})

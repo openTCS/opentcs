@@ -9,8 +9,6 @@ package org.opentcs.guing.common.components.layer;
 
 /**
  * Provides methods to edit layer groups.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface LayerGroupEditor {
 

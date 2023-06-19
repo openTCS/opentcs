@@ -19,8 +19,6 @@ import org.opentcs.data.TCSObjectReference;
 
 /**
  * Provides methods concerning {@link TCSObject}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface TCSObjectService {
 

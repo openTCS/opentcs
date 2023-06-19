@@ -10,8 +10,6 @@ package org.opentcs.common;
 /**
  * This interface provides access to vehicle-property keys that are used in both the
  * plant overview as well as in the kernel.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public interface LoopbackAdapterConstants {
 

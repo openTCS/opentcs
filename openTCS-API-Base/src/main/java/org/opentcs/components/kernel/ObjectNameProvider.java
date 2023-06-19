@@ -12,8 +12,6 @@ import org.opentcs.access.to.CreationTO;
 
 /**
  * Provides names for {@link CreationTO}s.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ObjectNameProvider
     extends Function<CreationTO, String> {

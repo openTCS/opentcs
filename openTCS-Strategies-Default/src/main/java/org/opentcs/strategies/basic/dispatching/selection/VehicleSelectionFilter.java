@@ -15,8 +15,6 @@ import org.opentcs.data.model.Vehicle;
  * A filter for {@link Vehicle}s.
  * Returns a collection of reasons for filtering the vehicle.
  * If the returned collection is empty, no reason to filter it was encountered.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface VehicleSelectionFilter
     extends Function<Vehicle, Collection<String>> {

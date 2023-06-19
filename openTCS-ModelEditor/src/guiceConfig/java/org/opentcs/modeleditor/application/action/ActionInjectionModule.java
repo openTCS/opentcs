@@ -12,8 +12,6 @@ import javax.inject.Singleton;
 
 /**
  * An injection module for this package.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ActionInjectionModule
     extends AbstractModule {

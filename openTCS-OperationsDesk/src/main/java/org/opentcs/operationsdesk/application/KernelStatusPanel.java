@@ -23,9 +23,6 @@ import org.opentcs.guing.common.util.MessageDisplay;
 
 /**
  * A panel that displays kernel messages.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class KernelStatusPanel
     extends JScrollPane

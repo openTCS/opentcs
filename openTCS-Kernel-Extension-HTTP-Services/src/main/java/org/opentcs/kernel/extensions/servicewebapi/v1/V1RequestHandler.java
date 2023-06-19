@@ -32,8 +32,6 @@ import spark.Service;
 
 /**
  * Handles requests and produces responses for version 1 of the web API.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class V1RequestHandler
     implements RequestHandler {

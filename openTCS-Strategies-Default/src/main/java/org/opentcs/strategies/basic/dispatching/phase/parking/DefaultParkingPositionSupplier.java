@@ -25,9 +25,6 @@ import org.slf4j.LoggerFactory;
  * A parking position supplier that tries to find parking positions that are unoccupied,
  * not on the current route of any other vehicle and as close as possible to the
  * parked vehicle's current position.
- *
- * @author Youssef Zaki (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultParkingPositionSupplier
     extends AbstractParkingPositionSupplier {

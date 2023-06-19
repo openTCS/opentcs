@@ -13,8 +13,6 @@ import org.opentcs.guing.common.components.dialogs.DetailsDialogContent;
 
 /**
  * User interface for a single line text.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class StringPanel
     extends JPanel

@@ -20,8 +20,6 @@ import org.opentcs.data.model.visualization.LocationRepresentation;
 
 /**
  * A transfer object describing a location in a plant model.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LocationCreationTO
     extends CreationTO

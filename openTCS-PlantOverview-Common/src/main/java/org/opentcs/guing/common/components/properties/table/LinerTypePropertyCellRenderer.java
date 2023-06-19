@@ -15,8 +15,6 @@ import org.opentcs.guing.base.model.elements.PathModel.Type;
 
 /**
  * A cell renderer for a {@link LinerTypeProperty}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LinerTypePropertyCellRenderer
     extends StandardPropertyCellRenderer {

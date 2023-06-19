@@ -12,8 +12,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure to {@link LoopbackCommunicationAdapter}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(VirtualVehicleConfiguration.PREFIX)
 public interface VirtualVehicleConfiguration {
@@ -47,13 +45,13 @@ public interface VirtualVehicleConfiguration {
                      "1.0 is real time, greater values speed up simulation."},
       orderKey = "2_behaviour_1")
   double simulationTimeFactor();
-  
+
   @ConfigurationEntry(
       type = "Integer",
       description = {"The virtual vehicle's length in mm when it's loaded."},
       orderKey = "2_behaviour_2")
   int vehicleLengthLoaded();
-  
+
   @ConfigurationEntry(
       type = "Integer",
       description = {"The virtual vehicle's length in mm when it's unloaded."},

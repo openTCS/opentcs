@@ -19,8 +19,6 @@ import org.opentcs.data.order.Route;
 
 /**
  * An abstract implementation of {@link DriveOrderMerger} defining the basic merging algorithm.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class AbstractDriveOrderMerger
     implements DriveOrderMerger {

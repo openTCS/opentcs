@@ -16,7 +16,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 /**
  * Provides methods concerning the {@link Scheduler}.
  *
- * @author Martin Grzenia (Fraunhofer IML)
  * @deprecated
  */
 @Deprecated

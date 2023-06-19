@@ -26,8 +26,6 @@ import static org.opentcs.util.Assertions.checkArgument;
  * <p>
  * Provides access to a set of data objects and ensures they have unique names.
  * </p>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TCSObjectRepository {
 

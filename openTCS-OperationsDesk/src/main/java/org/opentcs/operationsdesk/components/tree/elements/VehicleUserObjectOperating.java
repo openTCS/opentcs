@@ -19,8 +19,6 @@ import org.opentcs.operationsdesk.application.menus.MenuFactory;
 
 /**
  * A Vehicle in the tree view.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class VehicleUserObjectOperating
     extends VehicleUserObject {

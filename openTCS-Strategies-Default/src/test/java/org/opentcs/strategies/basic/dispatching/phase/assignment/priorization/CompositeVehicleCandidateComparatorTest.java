@@ -31,8 +31,6 @@ import org.opentcs.strategies.basic.dispatching.priorization.CompositeVehicleCan
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByInitialRoutingCosts;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class CompositeVehicleCandidateComparatorTest {
 

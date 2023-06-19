@@ -17,8 +17,6 @@ import org.opentcs.strategies.basic.dispatching.selection.VehicleSelectionFilter
 
 /**
  * A collection of {@link VehicleSelectionFilter}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class CompositeVehicleSelectionFilter
     implements VehicleSelectionFilter {
@@ -27,7 +25,7 @@ public class CompositeVehicleSelectionFilter
    * The {@link VehicleSelectionFilter}s.
    */
   private final Set<VehicleSelectionFilter> filters;
-  
+
   @Inject
   public CompositeVehicleSelectionFilter(Set<VehicleSelectionFilter> filters) {
     this.filters = requireNonNull(filters, "filters");

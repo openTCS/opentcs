@@ -11,8 +11,6 @@ package org.opentcs.guing.base.components.properties.type;
  * Interface for properties.
  * Wraps a type into a property to be able to change a value without creating a new object.
  * The property object stays the same while the value changes.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface Property
     extends ModelAttribute,

@@ -46,8 +46,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Shows a table of the kernel's peripheral jobs.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralJobsContainerPanel
     extends JPanel {

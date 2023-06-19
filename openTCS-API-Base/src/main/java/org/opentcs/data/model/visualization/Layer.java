@@ -12,8 +12,6 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Describes a layer in a plant model which is used to group model elements.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class Layer
     implements Serializable {

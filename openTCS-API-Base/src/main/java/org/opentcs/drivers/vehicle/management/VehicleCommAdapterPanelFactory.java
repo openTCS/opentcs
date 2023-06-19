@@ -16,8 +16,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 
 /**
  * Provides comm adapter specific panels used for interaction and displaying information.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface VehicleCommAdapterPanelFactory
     extends Lifecycle {

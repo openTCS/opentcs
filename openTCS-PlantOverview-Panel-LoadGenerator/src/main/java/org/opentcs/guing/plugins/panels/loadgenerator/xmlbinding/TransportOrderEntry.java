@@ -20,9 +20,6 @@ import org.opentcs.guing.plugins.panels.loadgenerator.TransportOrderData;
 
 /**
  * Stores a transport order definition for XML marshalling/unmarshalling.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 @XmlType(propOrder = {"properties", "driveOrders", "deadline", "intendedVehicle"})
 public class TransportOrderEntry {

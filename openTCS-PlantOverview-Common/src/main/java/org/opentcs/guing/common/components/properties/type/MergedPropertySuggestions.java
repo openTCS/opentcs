@@ -16,8 +16,6 @@ import org.opentcs.components.plantoverview.PropertySuggestions;
 
 /**
  * Merges {@link PropertySuggestions} instances to a single one.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class MergedPropertySuggestions
     implements PropertySuggestions {
@@ -49,7 +47,7 @@ public class MergedPropertySuggestions
   public Set<String> getValueSuggestions() {
     return valueSuggestions;
   }
-  
+
   @Override
   public Set<String> getValueSuggestionsFor(String key){
     Set<String> mergedCustomSuggestions = new HashSet<>();

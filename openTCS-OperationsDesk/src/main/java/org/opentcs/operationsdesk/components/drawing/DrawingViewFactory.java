@@ -24,8 +24,6 @@ import org.opentcs.operationsdesk.exchange.TransportOrderUtil;
 
 /**
  * A factory for drawing views.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DrawingViewFactory {
 

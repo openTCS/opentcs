@@ -19,8 +19,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A command for moving a step.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @ScheduledApiChange(when = "6.0", details = "Will become a class with 'with' methods.")
 public interface MovementCommand {

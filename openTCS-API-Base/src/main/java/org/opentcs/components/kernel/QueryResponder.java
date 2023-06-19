@@ -9,8 +9,6 @@ package org.opentcs.components.kernel;
 
 /**
  * A responder for generic queries.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface QueryResponder {
 

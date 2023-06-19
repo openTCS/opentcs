@@ -32,8 +32,6 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
  * explicitly documented here again. See the corresponding API documentation in
  * {@link VehicleService} for these, instead.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface RemoteVehicleService
     extends RemoteTCSObjectService,

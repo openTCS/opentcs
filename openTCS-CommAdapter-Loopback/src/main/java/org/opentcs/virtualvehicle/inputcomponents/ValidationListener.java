@@ -11,8 +11,6 @@ import java.util.EventListener;
 
 /**
  * A listener interface for {@link ValidationEvent ValidationEvents}.
- *
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public interface ValidationListener
     extends EventListener {

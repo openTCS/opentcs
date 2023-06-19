@@ -14,8 +14,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
 
 /**
  * A Vehicle adapter factory that creates no vehicles adapters.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class NullVehicleCommAdapterFactory
     implements VehicleCommAdapterFactory {

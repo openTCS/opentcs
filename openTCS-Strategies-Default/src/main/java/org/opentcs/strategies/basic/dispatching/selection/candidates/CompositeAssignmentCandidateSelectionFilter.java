@@ -17,8 +17,6 @@ import org.opentcs.strategies.basic.dispatching.selection.AssignmentCandidateSel
 
 /**
  * A collection of {@link AssignmentCandidateSelectionFilter}s.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CompositeAssignmentCandidateSelectionFilter
     implements AssignmentCandidateSelectionFilter {

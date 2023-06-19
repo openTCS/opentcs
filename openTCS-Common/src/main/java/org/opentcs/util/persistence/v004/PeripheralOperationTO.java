@@ -13,8 +13,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class PeripheralOperationTO

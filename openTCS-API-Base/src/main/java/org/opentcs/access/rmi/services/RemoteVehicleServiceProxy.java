@@ -22,8 +22,6 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 /**
  * The default implementation of the vehicle service.
  * Delegates method invocations to the corresponding remote service.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 class RemoteVehicleServiceProxy
     extends RemoteTCSObjectServiceProxy<RemoteVehicleService>

@@ -24,8 +24,6 @@ import org.opentcs.guing.common.components.drawing.figures.PointFigure;
 
 /**
  * A factory for Figures and ModelComponents.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CourseObjectFactory {
 

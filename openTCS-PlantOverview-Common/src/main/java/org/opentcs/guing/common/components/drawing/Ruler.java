@@ -26,9 +26,6 @@ import org.opentcs.guing.common.components.drawing.course.OriginChangeListener;
 
 /**
  * A ruler.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class Ruler
     extends JComponent

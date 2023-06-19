@@ -34,8 +34,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Manages users allowed to connect/operate with the kernel and authenticated clients.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class UserManager
     implements EventHandler,

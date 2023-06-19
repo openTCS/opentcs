@@ -18,8 +18,6 @@ import java.lang.annotation.Target;
 
 /**
  * A container annotation for {@link ScheduledApiChange}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @Target({CONSTRUCTOR, FIELD, METHOD, TYPE})
 @Retention(RetentionPolicy.SOURCE)

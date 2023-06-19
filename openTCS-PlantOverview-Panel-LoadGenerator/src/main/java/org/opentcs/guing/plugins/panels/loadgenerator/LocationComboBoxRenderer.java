@@ -16,8 +16,6 @@ import org.opentcs.data.model.Location;
 
 /**
  * A combo box renderer for locations.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 class LocationComboBoxRenderer
     extends JLabel

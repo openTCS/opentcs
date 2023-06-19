@@ -25,8 +25,6 @@ import org.opentcs.guing.common.util.PanelRegistry;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ViewPluginPanelsMenu
     extends JMenu {

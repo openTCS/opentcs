@@ -14,8 +14,6 @@ import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComp
 
 /**
  * Compares {@link AssignmentCandidate}s by name of the vehicle.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CandidateComparatorByVehicleName
     implements Comparator<AssignmentCandidate> {

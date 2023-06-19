@@ -12,8 +12,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * Interface to specify how an attribute of a model component must appear.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface ModelAttribute
     extends Serializable {

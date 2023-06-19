@@ -11,8 +11,6 @@ import java.util.Comparator;
 import org.opentcs.guing.base.model.ModelComponent;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Comparators {
 

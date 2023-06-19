@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Configures the admin web API extension.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AdminWebApiModule
     extends KernelInjectionModule {

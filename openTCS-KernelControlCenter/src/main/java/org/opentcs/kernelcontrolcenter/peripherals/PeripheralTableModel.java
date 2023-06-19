@@ -28,9 +28,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A model for displaying a table of peripherals.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralTableModel
     extends AbstractTableModel

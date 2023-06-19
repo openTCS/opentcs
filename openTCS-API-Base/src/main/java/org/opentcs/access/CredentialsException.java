@@ -11,8 +11,6 @@ import java.io.Serializable;
 
 /**
  * Thrown when there are insufficient user permissions to perform an operation.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CredentialsException
     extends KernelRuntimeException

@@ -32,8 +32,6 @@ import org.opentcs.strategies.basic.dispatching.priorization.CompositeOrderCandi
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByDeadline;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class CompositeOrderCandidateComparatorTest {
 

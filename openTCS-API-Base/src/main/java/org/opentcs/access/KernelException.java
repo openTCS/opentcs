@@ -11,8 +11,6 @@ import java.io.Serializable;
 
 /**
  * An exception thrown by the openTCS kernel.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class KernelException
     extends Exception

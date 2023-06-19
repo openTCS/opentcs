@@ -18,8 +18,6 @@ import javax.annotation.Nonnull;
 
 /**
  * The base class for all creation transfer objects.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CreationTO
     implements Serializable {

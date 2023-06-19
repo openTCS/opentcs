@@ -16,8 +16,6 @@ import org.opentcs.guing.common.model.SystemModel;
  * different one.
  * For every stage of the transition from the current/old system model to the
  * new one, a separate event is emitted.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class SystemModelTransitionEvent
     extends EventObject {

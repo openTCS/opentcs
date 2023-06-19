@@ -28,9 +28,6 @@ import org.opentcs.guing.common.components.drawing.course.Origin;
 
 /**
  * {@link LocationFigure} with a label.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LabeledLocationFigure
     extends LabeledFigure {

@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the standard openTCS kernel in modelling mode.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class KernelStateModelling
     extends KernelStateOnline {

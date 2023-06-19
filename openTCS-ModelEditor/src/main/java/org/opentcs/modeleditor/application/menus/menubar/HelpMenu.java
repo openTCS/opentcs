@@ -18,8 +18,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * The application's "Help" menu.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class HelpMenu
     extends JMenu {

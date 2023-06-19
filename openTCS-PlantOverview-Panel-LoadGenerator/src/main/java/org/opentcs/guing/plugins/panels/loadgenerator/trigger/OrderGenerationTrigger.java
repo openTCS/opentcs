@@ -11,8 +11,6 @@ import org.opentcs.access.KernelRuntimeException;
 
 /**
  * Declares the methods of transport order generation triggers.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface OrderGenerationTrigger {
 

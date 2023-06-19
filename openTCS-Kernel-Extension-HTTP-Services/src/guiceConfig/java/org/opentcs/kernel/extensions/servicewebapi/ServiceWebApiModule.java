@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Configures the service web API extension.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ServiceWebApiModule
     extends KernelInjectionModule {

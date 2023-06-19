@@ -16,8 +16,6 @@ import org.opentcs.data.peripherals.PeripheralOperation;
 
 /**
  * A transfer object describing an operation to be performed by a peripheral device.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralOperationCreationTO
     extends CreationTO

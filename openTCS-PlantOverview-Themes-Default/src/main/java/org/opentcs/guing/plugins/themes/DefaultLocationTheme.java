@@ -22,9 +22,6 @@ import org.opentcs.data.model.visualization.LocationRepresentation;
 
 /**
  * Default location theme implementation.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultLocationTheme
     implements LocationTheme {

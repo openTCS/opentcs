@@ -15,9 +15,6 @@ import javax.swing.table.TableModel;
 
 /**
  * A button for filtering table entries.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class FilterButton
     extends JToggleButton {

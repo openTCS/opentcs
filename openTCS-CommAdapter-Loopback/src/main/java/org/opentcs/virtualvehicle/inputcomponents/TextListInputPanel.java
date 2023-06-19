@@ -14,7 +14,6 @@ import javax.swing.event.ListSelectionListener;
 /**
  * An input panel with a text field for user input as well as a list of predefined
  * inputs to select from.
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public final class TextListInputPanel
     extends TextInputPanel {

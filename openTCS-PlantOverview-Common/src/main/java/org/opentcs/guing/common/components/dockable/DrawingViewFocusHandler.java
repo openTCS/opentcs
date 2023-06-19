@@ -19,8 +19,6 @@ import org.opentcs.guing.common.components.drawing.OpenTCSDrawingView;
 
 /**
  * Handles focussing of dockable drawing views.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DrawingViewFocusHandler
     implements CFocusListener {

@@ -13,9 +13,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * Provides some central services for various parts of the plant overview application.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface GuiManager {
 
@@ -57,7 +54,7 @@ public interface GuiManager {
    * Loads a plant model.
    */
   void loadModel();
-  
+
   /**
    * Imports a plant model using the given importer.
    *
@@ -75,7 +72,7 @@ public interface GuiManager {
    * @return
    */
   boolean saveModelAs();
-  
+
   /**
    * Exports a plant model using the given exporter.
    *

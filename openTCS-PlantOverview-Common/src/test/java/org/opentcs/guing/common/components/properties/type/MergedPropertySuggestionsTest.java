@@ -18,8 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.opentcs.components.plantoverview.PropertySuggestions;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class MergedPropertySuggestionsTest {
 

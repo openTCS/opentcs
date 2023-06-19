@@ -12,9 +12,6 @@ import java.beans.PropertyChangeListener;
 
 /**
  * Utility class for working with dockables.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface DockingManager {
 

@@ -48,10 +48,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A panel containing all vehicles and detailed information.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DriverGUI
     extends ControlCenterPanel {

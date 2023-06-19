@@ -14,8 +14,6 @@ import javax.annotation.Nullable;
 
 /**
  * A key-value property.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class Property {
 

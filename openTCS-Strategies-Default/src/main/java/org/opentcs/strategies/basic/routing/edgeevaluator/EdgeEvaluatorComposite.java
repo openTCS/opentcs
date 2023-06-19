@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
 /**
  * A {@link EdgeEvaluator} computing costs as the sum of the costs computed by all configured
  * evaluators.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class EdgeEvaluatorComposite
     implements EdgeEvaluator {

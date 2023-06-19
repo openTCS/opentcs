@@ -10,8 +10,6 @@ package org.opentcs.guing.common.components.dialogs;
 /**
  * Defines a dialog that allows for easy editing of a property.
  * The actual editing of the properties is implemented in a {@link DetailsDialogContent}.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface DetailsDialog {
 

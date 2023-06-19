@@ -12,8 +12,6 @@ import org.opentcs.data.order.OrderSequence;
 
 /**
  * Implementations of this interface check whether an order sequence may be removed.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface OrderSequenceCleanupApproval
     extends Predicate<OrderSequence> {

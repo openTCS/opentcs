@@ -11,8 +11,6 @@ import java.io.Serializable;
 
 /**
  * Emitted when the kernel loads a model.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ModelTransitionEvent
     implements Serializable {

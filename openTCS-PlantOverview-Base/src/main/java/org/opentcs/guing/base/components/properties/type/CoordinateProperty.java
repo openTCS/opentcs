@@ -12,9 +12,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 /**
  * An attribute for coordinates.
  * Examples: 1 mm, 20 cm, 3.4 m, 17.98 km
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CoordinateProperty
     extends LengthProperty {

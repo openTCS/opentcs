@@ -35,8 +35,6 @@ import org.slf4j.LoggerFactory;
  * Note that no synchronization is done inside this class. Concurrent access of instances of this
  * class must be synchronized externally.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralJobPoolManager
     extends TCSObjectManager {

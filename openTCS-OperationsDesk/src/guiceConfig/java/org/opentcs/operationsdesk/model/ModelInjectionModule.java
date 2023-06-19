@@ -12,9 +12,6 @@ import org.opentcs.guing.common.model.SystemModel;
 
 /**
  * A Guice module for the model package.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ModelInjectionModule
     extends AbstractModule {

@@ -12,8 +12,6 @@ import org.opentcs.data.model.visualization.LayerGroup;
 
 /**
  * A table cell renderer for {@link LayerGroup}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LayerGroupCellRenderer
     extends DefaultTableCellRenderer {

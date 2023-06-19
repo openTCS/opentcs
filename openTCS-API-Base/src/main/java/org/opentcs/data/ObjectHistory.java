@@ -18,8 +18,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A history of events related to an object.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ObjectHistory
     implements Serializable {

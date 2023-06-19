@@ -29,8 +29,6 @@ import org.opentcs.data.order.Route.Step;
 import org.opentcs.strategies.basic.routing.PointRouter;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ShortestPathPointRouterTest {
 

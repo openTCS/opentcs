@@ -19,8 +19,6 @@ import org.opentcs.data.model.Block;
 
 /**
  * A transfer object describing a block in the plant model.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class BlockCreationTO
     extends CreationTO

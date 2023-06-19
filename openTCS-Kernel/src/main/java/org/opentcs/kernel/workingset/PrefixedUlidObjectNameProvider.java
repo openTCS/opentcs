@@ -16,8 +16,6 @@ import org.opentcs.components.kernel.ObjectNameProvider;
 /**
  * Provides names for objects based on ULIDs, prefixed with the name taken from a given
  * {@link CreationTO}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PrefixedUlidObjectNameProvider
     implements ObjectNameProvider {

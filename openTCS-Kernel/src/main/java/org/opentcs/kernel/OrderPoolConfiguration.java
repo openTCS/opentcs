@@ -12,8 +12,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure the {@link OrderCleanerTask}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(OrderPoolConfiguration.PREFIX)
 public interface OrderPoolConfiguration {

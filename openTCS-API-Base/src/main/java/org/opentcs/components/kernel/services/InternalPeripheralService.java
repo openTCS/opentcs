@@ -17,8 +17,6 @@ import org.opentcs.data.peripherals.PeripheralJob;
 /**
  * Declares the methods the peripheral service must provide which are not accessible to remote
  * peers.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface InternalPeripheralService
     extends PeripheralService {

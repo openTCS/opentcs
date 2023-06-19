@@ -10,8 +10,6 @@ package org.opentcs.data.peripherals;
 /**
  * Defines constants for basic history event codes related to peripheral jobs and documents how the
  * respective supplementary information is to be interpreted.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralJobHistoryCodes {
 

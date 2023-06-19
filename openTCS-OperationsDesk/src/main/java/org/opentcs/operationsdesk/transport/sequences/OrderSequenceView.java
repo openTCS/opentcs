@@ -40,9 +40,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Displays an order sequence.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OrderSequenceView
     extends DialogContent {

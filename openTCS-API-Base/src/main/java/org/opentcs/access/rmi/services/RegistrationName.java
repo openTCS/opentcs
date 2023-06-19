@@ -9,8 +9,6 @@ package org.opentcs.access.rmi.services;
 
 /**
  * Defines the names used for binding the remote services in the RMI registry.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface RegistrationName {
 

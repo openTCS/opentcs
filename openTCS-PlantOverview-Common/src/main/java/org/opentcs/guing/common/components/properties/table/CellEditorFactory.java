@@ -11,8 +11,6 @@ import javax.swing.JPanel;
 
 /**
  * A factory for cell editors.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface CellEditorFactory {
 

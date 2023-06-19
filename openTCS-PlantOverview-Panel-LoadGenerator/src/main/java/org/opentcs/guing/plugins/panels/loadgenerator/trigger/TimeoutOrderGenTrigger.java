@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Triggers creation of a batch of orders after a given timeout.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TimeoutOrderGenTrigger
     implements OrderGenerationTrigger {

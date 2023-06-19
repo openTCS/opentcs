@@ -17,8 +17,6 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DestinationState;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class GetTransportOrderResponseTO {
 

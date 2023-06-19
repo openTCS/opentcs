@@ -13,8 +13,6 @@ import org.opentcs.guing.common.components.drawing.course.Origin;
 
 /**
  * Constants that are relevant to figures.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface FigureConstants {
 

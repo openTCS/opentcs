@@ -19,8 +19,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A panel that can edit a quantity property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class QuantityEditorPanel
     extends JPanel

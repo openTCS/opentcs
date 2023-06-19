@@ -22,9 +22,6 @@ import org.opentcs.data.model.Vehicle;
 /**
  * An implementation of <code>VehicleTheme</code> using a single image, disregarding vehicles'
  * states.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class StatelessImageVehicleTheme
     implements VehicleTheme {

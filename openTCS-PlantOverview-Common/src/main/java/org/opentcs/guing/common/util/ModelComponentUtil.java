@@ -16,8 +16,6 @@ import org.opentcs.guing.common.model.SystemModel;
 
 /**
  * Provides utility methods for {@link ModelComponent}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ModelComponentUtil {
 

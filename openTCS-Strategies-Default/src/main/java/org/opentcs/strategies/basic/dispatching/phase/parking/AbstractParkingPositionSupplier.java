@@ -20,9 +20,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * An abstract base class for parking position suppliers.
- *
- * @author Youssef Zaki (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class AbstractParkingPositionSupplier
     implements ParkingPositionSupplier {

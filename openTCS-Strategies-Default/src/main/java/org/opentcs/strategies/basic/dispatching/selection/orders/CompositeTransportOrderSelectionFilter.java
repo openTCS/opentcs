@@ -17,8 +17,6 @@ import org.opentcs.strategies.basic.dispatching.selection.TransportOrderSelectio
 
 /**
  * A collection of {@link TransportOrderSelectionFilter}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class CompositeTransportOrderSelectionFilter
     implements TransportOrderSelectionFilter {
@@ -27,7 +25,7 @@ public class CompositeTransportOrderSelectionFilter
    * The {@link TransportOrderSelectionFilter}s.
    */
   private final Set<TransportOrderSelectionFilter> filters;
-  
+
   @Inject
   public CompositeTransportOrderSelectionFilter(Set<TransportOrderSelectionFilter> filters) {
     this.filters = requireNonNull(filters, "filters");

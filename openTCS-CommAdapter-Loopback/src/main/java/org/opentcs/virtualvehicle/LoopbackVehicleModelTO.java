@@ -11,8 +11,6 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 
 /**
  * A serializable representation of a {@link LoopbackVehicleModel}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LoopbackVehicleModelTO
     extends VehicleProcessModelTO {

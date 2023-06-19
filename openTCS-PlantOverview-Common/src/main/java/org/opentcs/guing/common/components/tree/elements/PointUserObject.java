@@ -19,8 +19,6 @@ import org.opentcs.guing.common.util.IconToolkit;
 
 /**
  * Represents a point in the TreeView.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class PointUserObject
     extends FigureUserObject

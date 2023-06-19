@@ -18,7 +18,6 @@ import org.opentcs.common.GuestUserCredentials;
  * Provides only one (guest) user account.
  *
  * @see GuestUserCredentials
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DefaultUserAccountProvider
     implements UserAccountProvider {

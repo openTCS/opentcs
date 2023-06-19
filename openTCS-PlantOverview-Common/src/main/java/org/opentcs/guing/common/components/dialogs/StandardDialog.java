@@ -18,8 +18,6 @@ import org.opentcs.util.gui.Icons;
 
 /**
  * A dialog with an ok and a cancel button.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class StandardDialog
     extends JDialog {

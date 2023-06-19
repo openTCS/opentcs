@@ -14,8 +14,6 @@ import org.opentcs.access.to.model.PlantModelCreationTO;
 /**
  * Implementations provide a way to export plant model data, for instance to write it to a file in a
  * third-party format or to a database.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface PlantModelExporter {
 

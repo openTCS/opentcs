@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Initializes an openTCS kernel instance.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class KernelStarter {
 

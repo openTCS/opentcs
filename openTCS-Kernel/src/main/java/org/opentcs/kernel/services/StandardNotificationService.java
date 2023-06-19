@@ -18,8 +18,6 @@ import org.opentcs.kernel.workingset.NotificationBuffer;
 
 /**
  * This class is the standard implementation of the {@link NotificationService} interface.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class StandardNotificationService
     implements NotificationService {

@@ -83,8 +83,6 @@ import org.opentcs.util.logging.UncaughtExceptionLogger;
 
 /**
  * A Guice module for the openTCS kernel application.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultKernelInjectionModule
     extends KernelInjectionModule {

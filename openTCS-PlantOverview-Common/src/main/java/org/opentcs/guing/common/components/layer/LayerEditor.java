@@ -9,8 +9,6 @@ package org.opentcs.guing.common.components.layer;
 
 /**
  * Provides methods to edit layers.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface LayerEditor {
 

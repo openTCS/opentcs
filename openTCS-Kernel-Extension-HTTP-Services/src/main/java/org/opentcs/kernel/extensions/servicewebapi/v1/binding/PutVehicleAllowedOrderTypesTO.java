@@ -15,8 +15,6 @@ import javax.annotation.Nonnull;
 
 /**
  * An update for a vehicle's list of allowed order types.
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class PutVehicleAllowedOrderTypesTO {
 

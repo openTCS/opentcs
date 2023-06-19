@@ -23,8 +23,6 @@ import org.opentcs.kernel.workingset.PlantModelManager;
 
 /**
  * This class is the standard implementation of the {@link RouterService} interface.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class StandardRouterService
     implements RouterService {

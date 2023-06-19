@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An abstract implementation of {@link ReroutingStrategy} defining the basic rerouting algorithm.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class AbstractReroutingStrategy
     implements ReroutingStrategy {

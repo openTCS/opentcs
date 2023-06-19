@@ -22,8 +22,6 @@ import org.opentcs.util.Comparators;
  * <li>The location of a job's operation has to match the given location.</li>
  * <li>If this applies to multiple jobs, the oldest one is selected.</li>
  * </ul>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DefaultJobSelectionStrategy
     implements JobSelectionStrategy {

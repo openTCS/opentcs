@@ -15,8 +15,6 @@ import java.io.IOException;
 
 /**
  * Binds JSON strings to objects and vice versa.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class JsonBinder {
 

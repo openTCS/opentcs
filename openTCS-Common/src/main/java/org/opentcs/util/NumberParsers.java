@@ -12,8 +12,6 @@ import static org.opentcs.util.Assertions.checkInRange;
 
 /**
  * Provides methods for optimized parsing of numbers from character sequences.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public final class NumberParsers {
 

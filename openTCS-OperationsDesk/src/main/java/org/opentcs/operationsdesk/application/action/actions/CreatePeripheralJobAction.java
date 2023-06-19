@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An action to trigger the creation of a peripheral job.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class CreatePeripheralJobAction
     extends AbstractAction {

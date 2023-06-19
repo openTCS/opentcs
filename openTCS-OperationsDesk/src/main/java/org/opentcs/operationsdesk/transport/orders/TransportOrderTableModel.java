@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A table model for transport orders.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class TransportOrderTableModel
     extends AbstractTableModel

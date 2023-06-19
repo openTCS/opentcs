@@ -20,8 +20,6 @@ import org.opentcs.data.model.Point;
  * by {@link Integer#parseInt(java.lang.String)}.
  * If these prerequisites are not met, <code>null</code> is returned.
  * </p>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ParkingPositionToPriorityFunction
     implements Function<Point, Integer> {

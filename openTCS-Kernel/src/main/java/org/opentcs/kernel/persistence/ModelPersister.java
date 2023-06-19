@@ -13,8 +13,6 @@ import org.opentcs.access.to.model.PlantModelCreationTO;
 /**
  * Provides methods to persist and load models.
  * Only a single model is persisted at a time.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ModelPersister {
 

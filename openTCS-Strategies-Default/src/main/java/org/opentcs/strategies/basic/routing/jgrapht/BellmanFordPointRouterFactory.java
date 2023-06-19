@@ -18,8 +18,6 @@ import org.opentcs.strategies.basic.routing.PointRouter;
 
 /**
  * Creates {@link PointRouter} instances based on the Bellman-Ford algorithm.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class BellmanFordPointRouterFactory
     extends AbstractPointRouterFactory {

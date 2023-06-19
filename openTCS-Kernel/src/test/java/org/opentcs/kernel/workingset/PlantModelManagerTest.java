@@ -37,8 +37,6 @@ import org.opentcs.util.event.SimpleEventBus;
 
 /**
  * Unit tests for {@link PlantModelManager}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PlantModelManagerTest {
 

@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Updates a vehicle's allowed order types with the kernel when it changes.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class VehicleAllowedOrderTypesAdapter
     implements AttributesChangeListener {

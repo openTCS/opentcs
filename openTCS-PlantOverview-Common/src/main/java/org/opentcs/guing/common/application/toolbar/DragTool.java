@@ -12,8 +12,6 @@ import org.jhotdraw.draw.tool.AbstractTool;
 
 /**
  * The tool to drag the drawing.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class DragTool
     extends AbstractTool {

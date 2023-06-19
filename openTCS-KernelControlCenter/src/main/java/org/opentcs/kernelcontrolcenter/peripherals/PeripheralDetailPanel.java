@@ -25,9 +25,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Displays the comm adapter panels for a given peripheral device.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralDetailPanel
     extends JPanel

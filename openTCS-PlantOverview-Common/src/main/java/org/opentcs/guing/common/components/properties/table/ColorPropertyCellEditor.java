@@ -19,8 +19,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A cell editor for a color property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class ColorPropertyCellEditor
     extends javax.swing.AbstractCellEditor

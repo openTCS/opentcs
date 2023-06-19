@@ -42,8 +42,6 @@ import org.slf4j.LoggerFactory;
  * connected to the kernel.
  * </li>
  * </ul>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DefaultServiceCallWrapper
     implements CallWrapper {

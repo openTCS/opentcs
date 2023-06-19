@@ -26,8 +26,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  * A communication adapter is basically a driver that converts high-level
  * commands sent by openTCS to a form that the controlled vehicles understand.
  * </p>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface VehicleCommAdapter
     extends Lifecycle {

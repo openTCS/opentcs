@@ -24,8 +24,6 @@ import org.opentcs.util.event.SimpleEventBus;
 
 /**
  * A Guice configuration module for this package.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ExchangeInjectionModule
     extends AbstractModule {

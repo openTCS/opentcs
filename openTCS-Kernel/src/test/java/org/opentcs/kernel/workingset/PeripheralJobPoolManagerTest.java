@@ -25,8 +25,6 @@ import org.opentcs.util.event.SimpleEventBus;
 
 /**
  * Unit tests for {@link PeripheralJobPoolManager}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PeripheralJobPoolManagerTest {
 

@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An event listener that triggers dispatching of vehicles and transport orders on certain events.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ImplicitDispatchTrigger
     implements EventHandler {

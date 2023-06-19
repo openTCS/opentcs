@@ -25,8 +25,6 @@ import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 import org.opentcs.util.gui.StringListCellRenderer;
 
 /**
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class CreatePeripheralJobPanel
     extends DialogContent {

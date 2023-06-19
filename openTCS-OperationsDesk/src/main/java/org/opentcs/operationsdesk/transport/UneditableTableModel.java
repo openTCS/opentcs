@@ -11,8 +11,6 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  * A table model in which each cell is uneditable.
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class UneditableTableModel
     extends DefaultTableModel {

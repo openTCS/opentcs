@@ -9,8 +9,6 @@ package org.opentcs.util.event;
 
 /**
  * A source of events that can be subscribed to.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface EventSource {
 

@@ -8,8 +8,6 @@
 package org.opentcs.guing.common.components;
 
 /**
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public interface EditableComponent
     extends org.jhotdraw.gui.EditableComponent {

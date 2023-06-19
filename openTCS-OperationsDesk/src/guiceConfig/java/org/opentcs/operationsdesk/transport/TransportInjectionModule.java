@@ -16,8 +16,6 @@ import org.opentcs.operationsdesk.transport.sequences.OrderSequencesContainer;
 
 /**
  * A Guice module for this package.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportInjectionModule
     extends AbstractModule {

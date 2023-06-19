@@ -13,8 +13,6 @@ import org.opentcs.virtualvehicle.LoopbackCommunicationAdapter;
 
 /**
  * A command to trigger the comm adapter in single step mode.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class TriggerCommand
     implements AdapterCommand {

@@ -15,8 +15,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action for adding new drawing views.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class AddDrawingViewAction
     extends AbstractAction {

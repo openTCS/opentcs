@@ -13,9 +13,6 @@ import org.opentcs.guing.base.components.properties.type.Property;
  * Interface for components to edit properties.
  * Classes that implement this interface are generally embedded in a dialog.
  * The dialog then calls these methods.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface DetailsDialogContent {
 

@@ -11,8 +11,6 @@ import java.io.Serializable;
 
 /**
  * A runtime exception thrown by the openTCS kernel.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class KernelRuntimeException
     extends RuntimeException

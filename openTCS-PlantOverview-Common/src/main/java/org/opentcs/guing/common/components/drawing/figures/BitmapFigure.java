@@ -28,8 +28,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A Figure displaying a bitmap.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class BitmapFigure
     extends AbstractAttributedDecoratedFigure

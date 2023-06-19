@@ -9,8 +9,6 @@ package org.opentcs.guing.common.components.drawing.figures;
 
 /**
  * Defines fixed ordinals for some figures.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface FigureOrdinals {
 

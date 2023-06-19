@@ -12,8 +12,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure to {@link LoopbackPeripheralCommAdapter}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(VirtualPeripheralConfiguration.PREFIX)
 public interface VirtualPeripheralConfiguration {

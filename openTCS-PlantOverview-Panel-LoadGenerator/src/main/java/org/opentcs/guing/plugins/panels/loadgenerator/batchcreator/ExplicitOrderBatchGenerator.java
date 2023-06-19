@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A batch generator for creating explicit transport orders.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class ExplicitOrderBatchGenerator
     implements OrderBatchCreator {

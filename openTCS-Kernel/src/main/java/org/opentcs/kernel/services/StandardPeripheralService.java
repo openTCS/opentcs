@@ -30,8 +30,6 @@ import org.opentcs.kernel.workingset.PlantModelManager;
 
 /**
  * This class is the standard implementation of the {@link PeripheralService} interface.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class StandardPeripheralService
     extends AbstractTCSObjectService

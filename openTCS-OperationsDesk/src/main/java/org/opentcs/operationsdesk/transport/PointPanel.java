@@ -25,8 +25,6 @@ import org.opentcs.guing.common.components.dialogs.InputValidationListener;
 
 /**
  * A UI to select a location or a point as a vehicle destination.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class PointPanel
     extends DialogContent {

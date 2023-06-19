@@ -29,9 +29,6 @@ import org.opentcs.guing.common.components.properties.event.TableSelectionChange
  * A table in which properties are displayed and can be edited.
  * The table has two columns, the first with the name of the property and the second with the
  * value of the property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AttributesTable
     extends JTable {

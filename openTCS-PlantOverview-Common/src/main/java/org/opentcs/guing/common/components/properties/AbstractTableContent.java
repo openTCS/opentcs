@@ -26,8 +26,6 @@ import org.opentcs.guing.common.components.properties.table.AttributesTable;
 
 /**
  * Base implementation for content that displays model properties in a table.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public abstract class AbstractTableContent
     extends AbstractAttributesContent

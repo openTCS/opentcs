@@ -11,8 +11,6 @@ import java.util.List;
 import org.opentcs.guing.common.components.tree.elements.UserObject;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface ComponentsManager {
 

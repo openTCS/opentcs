@@ -20,8 +20,6 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
 
 /**
  * Represents a {@link Vehicle} in the {@link VehicleEntryPool}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleEntry
     implements PropertyChangeListener {

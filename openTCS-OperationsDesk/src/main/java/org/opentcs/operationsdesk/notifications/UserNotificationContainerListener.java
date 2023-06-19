@@ -12,8 +12,6 @@ import org.opentcs.data.notification.UserNotification;
 
 /**
  * Listener for changes in the {@link UserNotificationsContainerPanel}.
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public interface UserNotificationContainerListener {
 

@@ -60,9 +60,6 @@ import org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfigur
 
 /**
  * The graphical representation of a vehicle.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleFigure
     extends TCSFigure

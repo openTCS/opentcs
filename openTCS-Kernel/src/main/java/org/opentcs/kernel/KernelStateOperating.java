@@ -38,8 +38,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class implements the standard openTCS kernel in normal operation.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class KernelStateOperating
     extends KernelStateOnline {

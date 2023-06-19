@@ -19,8 +19,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A cell editor for a quantity property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class QuantityCellEditor
     extends AbstractPropertyCellEditor {

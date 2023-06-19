@@ -31,9 +31,6 @@ import org.opentcs.guing.common.components.drawing.ZoomPoint;
 
 /**
  * A figure that represents a decision point.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PointFigure
     extends TCSFigure {

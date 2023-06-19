@@ -13,8 +13,6 @@ import org.opentcs.guing.base.model.elements.PathModel;
 import org.opentcs.guing.base.model.elements.PointModel;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface FigureFactory {
 

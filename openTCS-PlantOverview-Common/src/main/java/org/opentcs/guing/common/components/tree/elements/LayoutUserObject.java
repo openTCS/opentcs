@@ -15,9 +15,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * Represents a point object in the TreeView.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LayoutUserObject
     extends FigureUserObject {

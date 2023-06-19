@@ -26,8 +26,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * User interface to edit a peripheral operations property.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class PeripheralOperationsPropertyEditorPanel
     extends JPanel

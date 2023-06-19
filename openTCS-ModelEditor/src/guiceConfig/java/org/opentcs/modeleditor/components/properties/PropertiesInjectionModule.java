@@ -36,8 +36,6 @@ import org.opentcs.modeleditor.application.menus.MenuItemComponentsFactory;
 
 /**
  * A Guice module for this package.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PropertiesInjectionModule
     extends PlantOverviewInjectionModule {

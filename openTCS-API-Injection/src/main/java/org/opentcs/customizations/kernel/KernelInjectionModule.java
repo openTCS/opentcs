@@ -26,8 +26,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
 
 /**
  * A base class for Guice modules adding or customizing bindings for the kernel application.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class KernelInjectionModule
     extends ConfigurableInjectionModule {

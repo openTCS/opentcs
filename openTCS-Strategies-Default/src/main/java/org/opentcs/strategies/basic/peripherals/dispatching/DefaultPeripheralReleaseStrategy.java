@@ -20,8 +20,6 @@ import org.opentcs.data.model.PeripheralInformation;
  * <li>A peripheral's processing state must be {@link PeripheralInformation.ProcState#IDLE}</li>
  * <li>A peripheral's reservation token must be set.</li>
  * </ul>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DefaultPeripheralReleaseStrategy
     implements PeripheralReleaseStrategy {

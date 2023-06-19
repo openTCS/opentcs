@@ -19,8 +19,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.Undo
 
 /**
  * A cell editor wrapped in an undo manager.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class UndoableCellEditor
     extends javax.swing.AbstractCellEditor

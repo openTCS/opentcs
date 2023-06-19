@@ -13,8 +13,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class NumberParsersTest {
 

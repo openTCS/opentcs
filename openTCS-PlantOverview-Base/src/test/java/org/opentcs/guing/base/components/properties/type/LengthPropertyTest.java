@@ -18,9 +18,6 @@ import org.opentcs.guing.base.model.AbstractModelComponent;
 
 /**
  * A test for a length property.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LengthPropertyTest {
 

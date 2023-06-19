@@ -31,7 +31,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * UI for editing a set of key value pairs.
  *
  * @see KeyValueSetProperty
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class KeyValueSetPropertyEditorPanel
     extends KeyValueSetPropertyViewerEditorPanel

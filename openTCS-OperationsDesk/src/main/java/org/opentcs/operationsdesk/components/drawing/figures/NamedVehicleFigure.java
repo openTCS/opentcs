@@ -27,8 +27,6 @@ import org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfigur
 
 /**
  * A vehicle figure that adds the name of the vehicle into the image.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class NamedVehicleFigure
     extends VehicleFigure {

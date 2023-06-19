@@ -1,6 +1,5 @@
 /**
  * (c): IML, JHotDraw.
- *
  */
 package org.opentcs.thirdparty.modeleditor.jhotdraw.application.toolbar;
 
@@ -31,8 +30,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A tool to connect two figures with a path for instance.
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class OpenTCSConnectionTool
     extends ConnectionTool {

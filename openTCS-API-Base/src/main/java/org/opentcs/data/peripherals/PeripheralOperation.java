@@ -15,8 +15,6 @@ import org.opentcs.data.model.TCSResourceReference;
 
 /**
  * Describes an operation that is to be executed by a peripheral device.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralOperation
     implements Serializable {

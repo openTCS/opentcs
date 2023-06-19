@@ -27,8 +27,6 @@ import org.opentcs.guing.common.components.drawing.course.OriginChangeListener;
 
 /**
  * A custom scroll pane to wrap an <code>OpenTCSDrawingView</code>.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DrawingViewScrollPane
     extends JScrollPane

@@ -18,8 +18,6 @@ import org.opentcs.guing.common.util.UserMessageHelper;
 
 /**
  * A cell editor for a string property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class StringPropertyCellEditor
     extends AbstractPropertyCellEditor {

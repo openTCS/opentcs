@@ -13,8 +13,6 @@ import org.opentcs.data.order.TransportOrder;
 
 /**
  * The result of a transport order filter operation.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OrderFilterResult {
 

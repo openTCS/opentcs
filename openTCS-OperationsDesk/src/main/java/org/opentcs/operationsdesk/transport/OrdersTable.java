@@ -14,8 +14,6 @@ import javax.swing.table.TableModel;
 
 /**
  * A table for transport orders.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class OrdersTable
     extends JTable {

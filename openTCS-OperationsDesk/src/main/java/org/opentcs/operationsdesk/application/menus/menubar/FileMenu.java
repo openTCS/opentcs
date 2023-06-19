@@ -21,8 +21,6 @@ import org.opentcs.thirdparty.operationsdesk.jhotdraw.application.action.file.Cl
 
 /**
  * The application's "File" menu.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class FileMenu
     extends JMenu {

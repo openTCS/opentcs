@@ -16,8 +16,6 @@ import javax.swing.UIManager;
 
 /**
  * Shows a dialog with a text area and a label to describe the content of it.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class TextAreaDialog
     extends JDialog {

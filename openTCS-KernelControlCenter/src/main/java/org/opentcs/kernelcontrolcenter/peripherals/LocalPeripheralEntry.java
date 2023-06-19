@@ -18,9 +18,6 @@ import org.opentcs.drivers.peripherals.PeripheralProcessModel;
 
 /**
  * An entry for a peripheral device registered with the kernel.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LocalPeripheralEntry {
 

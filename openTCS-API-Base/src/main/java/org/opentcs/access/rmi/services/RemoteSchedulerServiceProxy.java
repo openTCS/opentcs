@@ -15,8 +15,6 @@ import org.opentcs.components.kernel.services.SchedulerService;
 /**
  * The default implementation of the scheduler service.
  * Delegates method invocations to the corresponding remote service.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @Deprecated
 class RemoteSchedulerServiceProxy

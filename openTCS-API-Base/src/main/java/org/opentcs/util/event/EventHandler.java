@@ -9,8 +9,6 @@ package org.opentcs.util.event;
 
 /**
  * A handler for events emitted by an {@link EventSource}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface EventHandler {
 

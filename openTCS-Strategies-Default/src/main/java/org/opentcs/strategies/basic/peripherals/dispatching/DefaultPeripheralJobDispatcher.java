@@ -32,8 +32,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Dispatches peripheral jobs and peripheral devices represented by locations.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DefaultPeripheralJobDispatcher
     implements PeripheralJobDispatcher,

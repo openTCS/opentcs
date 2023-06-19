@@ -11,8 +11,6 @@ import java.io.Serializable;
 
 /**
  * A command a comm adapter may execute.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface AdapterCommand
     extends Serializable {

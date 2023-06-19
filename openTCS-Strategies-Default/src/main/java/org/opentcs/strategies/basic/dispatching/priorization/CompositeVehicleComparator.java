@@ -19,8 +19,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A composite of all configured vehicle comparators.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CompositeVehicleComparator
     implements Comparator<Vehicle> {

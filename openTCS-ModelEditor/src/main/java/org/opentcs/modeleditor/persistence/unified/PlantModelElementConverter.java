@@ -45,8 +45,6 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.model.SystemModel;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PlantModelElementConverter {
 

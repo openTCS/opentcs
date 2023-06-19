@@ -14,7 +14,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 /**
  * A layout element describing an image to be displayed.
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @deprecated Will be removed.
  */
 @Deprecated

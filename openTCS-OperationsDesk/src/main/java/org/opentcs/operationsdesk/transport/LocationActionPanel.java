@@ -25,8 +25,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A UI to select a point or location as a destination for a vehicle.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class LocationActionPanel
     extends DialogContent {

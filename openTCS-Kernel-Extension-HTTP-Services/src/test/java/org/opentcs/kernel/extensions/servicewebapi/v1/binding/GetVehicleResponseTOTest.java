@@ -18,8 +18,6 @@ import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 
 /**
  * Unit tests for {@link GetVehicleResponseTO}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class GetVehicleResponseTOTest {
 

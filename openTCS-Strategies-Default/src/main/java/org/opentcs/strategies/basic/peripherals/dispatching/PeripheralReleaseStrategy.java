@@ -12,8 +12,6 @@ import org.opentcs.data.model.Location;
 
 /**
  * A strategy that determines peripherals whose reservations are to be released.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralReleaseStrategy {
 

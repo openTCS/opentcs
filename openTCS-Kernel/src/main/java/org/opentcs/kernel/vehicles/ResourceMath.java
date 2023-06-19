@@ -19,8 +19,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * Utility methods for resource-related computations.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ResourceMath {
 

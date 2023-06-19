@@ -9,8 +9,6 @@ package org.opentcs.guing.common.application;
 
 /**
  * Makes progress information available in some way.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ProgressIndicator {
 

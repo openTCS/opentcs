@@ -39,8 +39,6 @@ import org.opentcs.util.gui.StringTableCellRenderer;
 
 /**
  * Shows a table of the most recent user notifications.
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class UserNotificationsContainerPanel
     extends JPanel {

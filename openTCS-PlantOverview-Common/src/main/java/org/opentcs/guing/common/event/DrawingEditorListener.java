@@ -14,7 +14,6 @@ import org.opentcs.guing.common.components.drawing.OpenTCSDrawingEditor;
  * events from the <code>DrawingEditor</code>. Events are: figure added,
  * figure removed and figure selected.
  *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @see DrawingEditorEvent
  */
 public interface DrawingEditorListener {

@@ -13,8 +13,6 @@ import javax.annotation.Nonnull;
 
 /**
  * Objects implementing this interface provide a set for suggested property keys and values each.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public interface PropertySuggestions {
 

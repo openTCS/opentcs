@@ -41,9 +41,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Shows a table of the kernel's order sequences.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OrderSequencesContainerPanel
     extends JPanel {

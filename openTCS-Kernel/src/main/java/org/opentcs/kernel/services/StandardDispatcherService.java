@@ -21,8 +21,6 @@ import org.opentcs.kernel.workingset.TCSObjectRepository;
 
 /**
  * This class is the standard implementation of the {@link DispatcherService} interface.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class StandardDispatcherService
     implements DispatcherService {

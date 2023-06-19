@@ -44,8 +44,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A Guice module for the openTCS plant overview application.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultPlantOverviewInjectionModule
     extends PlantOverviewInjectionModule {

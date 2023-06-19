@@ -11,8 +11,6 @@ import java.util.Set;
 
 /**
  * Implementations of this class provide suggestions for transport order types.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface OrderTypeSuggestions {
 

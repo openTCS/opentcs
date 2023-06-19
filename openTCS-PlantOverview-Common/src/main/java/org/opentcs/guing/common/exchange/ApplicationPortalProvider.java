@@ -21,9 +21,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides an {@link ApplicationPortal} for clients in the kernel control center application.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ApplicationPortalProvider
     implements SharedKernelServicePortalProvider {

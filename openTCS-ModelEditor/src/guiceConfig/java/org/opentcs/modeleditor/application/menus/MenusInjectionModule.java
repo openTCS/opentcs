@@ -11,8 +11,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class MenusInjectionModule
     extends AbstractModule {

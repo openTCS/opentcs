@@ -19,8 +19,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * A helper for selecting blocks/block elements.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class BlockSelector {
 

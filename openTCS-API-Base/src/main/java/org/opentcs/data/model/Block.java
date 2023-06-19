@@ -21,7 +21,6 @@ import org.opentcs.data.TCSObject;
  * An aggregation of resources with distinct usage rules depending on the block's type.
  *
  * @see TCSResource
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Block
     extends TCSResource<Block>

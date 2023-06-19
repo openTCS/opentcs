@@ -12,8 +12,6 @@ import org.opentcs.drivers.peripherals.PeripheralJobCallback;
 
 /**
  * Guice configuration for the default peripheral job dispatcher.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DefaultPeripheralJobDispatcherModule
     extends KernelInjectionModule {

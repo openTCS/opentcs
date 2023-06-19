@@ -15,8 +15,6 @@ import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComp
 /**
  * Compares {@link AssignmentCandidate}s by the energy level of their vehicles.
  * Note: this comparator imposes orderings that are inconsistent with equals.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CandidateComparatorByEnergyLevel
     implements Comparator<AssignmentCandidate> {

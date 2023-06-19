@@ -27,8 +27,6 @@ import org.opentcs.data.order.Route;
 
 /**
  * Test cases for {@link RegularDriveOrderMerger}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class RegularDriveOrderMergerTest {
 

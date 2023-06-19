@@ -23,8 +23,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A placard panel for drawing views.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DrawingViewPlacardPanel
     extends JPanel {

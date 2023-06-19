@@ -19,8 +19,6 @@ import org.opentcs.util.ExplainedBoolean;
 
 /**
  * A {@link PeripheralCommAdapter} implementation that is doing nothing.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class NullPeripheralCommAdapter
     implements PeripheralCommAdapter {

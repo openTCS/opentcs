@@ -18,8 +18,6 @@ import org.opentcs.strategies.basic.routing.PointRouter;
 
 /**
  * Creates {@link PointRouter} instances based on the Dijkstra algorithm.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DijkstraPointRouterFactory
     extends AbstractPointRouterFactory {

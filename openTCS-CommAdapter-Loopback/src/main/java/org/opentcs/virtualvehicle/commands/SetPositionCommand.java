@@ -13,8 +13,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 
 /**
  * A command to set a vehicle's position.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class SetPositionCommand
     implements AdapterCommand {

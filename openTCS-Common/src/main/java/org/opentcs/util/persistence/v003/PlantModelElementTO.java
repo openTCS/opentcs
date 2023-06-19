@@ -18,8 +18,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @XmlTransient
 @XmlAccessorType(XmlAccessType.PROPERTY)

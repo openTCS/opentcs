@@ -19,9 +19,6 @@ import org.opentcs.guing.base.model.AbstractModelComponent;
  * A test for an angle property.
  * For Degrees, min value is 0 and max value is 360.
  * For Radians, min value is 0 and max value is 2*PI ~ 6.283185
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class AnglePropertyTest {
 

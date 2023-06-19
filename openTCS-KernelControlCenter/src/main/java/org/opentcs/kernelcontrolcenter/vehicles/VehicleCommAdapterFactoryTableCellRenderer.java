@@ -17,8 +17,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
  * A {@link TableCellRenderer} for {@link VehicleCommAdapterDescription} instances.
  * This class provides a representation of any VehicleCommAdapterDescription instance by writing
  * its actual description on a JLabel.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 class VehicleCommAdapterFactoryTableCellRenderer
     extends DefaultTableCellRenderer {

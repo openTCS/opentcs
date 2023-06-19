@@ -12,8 +12,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides common kernel configuration entries.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(KernelApplicationConfiguration.PREFIX)
 public interface KernelApplicationConfiguration {

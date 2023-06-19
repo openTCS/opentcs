@@ -15,8 +15,6 @@ import org.opentcs.data.order.DriveOrder;
 
 /**
  * A strategy for finding locations suitable for recharging vehicles.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface RechargePositionSupplier
     extends Lifecycle {

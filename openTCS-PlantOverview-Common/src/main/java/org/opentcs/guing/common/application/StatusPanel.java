@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A panel at the bottom of the view, showing the mouse position and status.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class StatusPanel
     extends JPanel {

@@ -11,8 +11,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * Defines the different types {@link Vehicle}s can be rerouted.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public enum ReroutingType {
 

@@ -15,8 +15,6 @@ import org.opentcs.data.peripherals.PeripheralJob;
 
 /**
  * Provides methods concerning {@link PeripheralJob}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralJobService
     extends TCSObjectService {

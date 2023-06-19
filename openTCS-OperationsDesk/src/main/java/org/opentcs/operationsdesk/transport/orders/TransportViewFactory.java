@@ -13,8 +13,6 @@ import org.opentcs.operationsdesk.transport.sequences.OrderSequenceView;
 
 /**
  * Creates transport order-related GUI components.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface TransportViewFactory {
 

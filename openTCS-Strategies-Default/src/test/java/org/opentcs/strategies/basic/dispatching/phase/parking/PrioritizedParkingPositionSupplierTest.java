@@ -28,8 +28,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * Tests for {@link PrioritizedParkingPositionSupplier}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PrioritizedParkingPositionSupplierTest {
 

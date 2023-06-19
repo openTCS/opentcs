@@ -16,8 +16,6 @@ import org.opentcs.util.event.EventHandler;
 /**
  * An AttributesComponent intended to be shown permanently to display the
  * properties of the currently selected driving course components.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class SelectionPropertiesComponent
     extends AttributesComponent

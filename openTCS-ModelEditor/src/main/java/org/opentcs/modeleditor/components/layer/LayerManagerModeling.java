@@ -31,8 +31,6 @@ import org.opentcs.util.event.EventBus;
 
 /**
  * The {@link LayerManager} implementation for the model editor application.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LayerManagerModeling
     extends DefaultLayerManager

@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Assigns peripheral jobs to peripheral devices that are currently not processing any and are
  * not reserved for any reservation token.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class AssignFreePeripheralsPhase
     implements PeripheralDispatcherPhase {

@@ -17,8 +17,6 @@ import org.opentcs.strategies.basic.dispatching.selection.ReparkVehicleSelection
 
 /**
  * A collection of {@link ReparkVehicleSelectionFilter}s.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class CompositeReparkVehicleSelectionFilter
     implements ReparkVehicleSelectionFilter {
@@ -27,7 +25,7 @@ public class CompositeReparkVehicleSelectionFilter
    * The {@link ParkVehicleSelectionFilter}s.
    */
   private final Set<ReparkVehicleSelectionFilter> filters;
-  
+
   @Inject
   public CompositeReparkVehicleSelectionFilter(Set<ReparkVehicleSelectionFilter> filters) {
     this.filters = requireNonNull(filters, "filters");

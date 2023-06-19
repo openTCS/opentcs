@@ -33,9 +33,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A panel to display the allocated resources of each vehicle with atleast one allocation.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class ResourceAllocationPanel
     extends PluggablePanel

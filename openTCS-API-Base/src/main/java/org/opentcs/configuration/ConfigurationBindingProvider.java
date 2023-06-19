@@ -9,8 +9,6 @@ package org.opentcs.configuration;
 
 /**
  * A provider to get bindings (implementations) for configuration interfaces.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface ConfigurationBindingProvider {
 

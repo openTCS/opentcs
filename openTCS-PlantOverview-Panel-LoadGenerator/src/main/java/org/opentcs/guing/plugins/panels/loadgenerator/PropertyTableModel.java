@@ -19,8 +19,6 @@ import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPa
 
 /**
  * Table model for transport order proerties.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 class PropertyTableModel
     extends AbstractTableModel {
@@ -61,7 +59,7 @@ class PropertyTableModel
       this.data.add(new PropEntry(entry.getKey(), entry.getValue()));
     }
   }
-  
+
   /**
    * Creates a new instance.
    */

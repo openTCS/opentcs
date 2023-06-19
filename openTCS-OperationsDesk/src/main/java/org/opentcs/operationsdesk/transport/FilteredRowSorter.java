@@ -17,7 +17,6 @@ import javax.swing.table.TableRowSorter;
 /**
  * A table model sorter that implements some convinience methods for easier filtering.
  *
- * @author Leonard Schüngel (Fraunhofer IML)
  * @param <T> The table model class
  */
 public class FilteredRowSorter<T extends TableModel>

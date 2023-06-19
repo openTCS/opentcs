@@ -13,8 +13,6 @@ import java.io.Serializable;
 
 /**
  * A strategy that can translate pixel coordinates to real coordinates.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface CoordinateSystem
     extends Serializable {

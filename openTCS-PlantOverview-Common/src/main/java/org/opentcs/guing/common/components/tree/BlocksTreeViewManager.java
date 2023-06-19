@@ -18,8 +18,6 @@ import org.opentcs.guing.common.components.tree.elements.UserObjectUtil;
 
 /**
  * A tree view manager for blocks.
- *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public class BlocksTreeViewManager
     extends TreeViewManager {
@@ -29,7 +27,7 @@ public class BlocksTreeViewManager
                                UserObjectUtil userObjectUtil,
                                MouseListener mouseListener) {
     super(treeView, userObjectUtil, mouseListener);
-    
+
     // If the user clicks on an element in the tree view that is contained in several blocks,
     // then we don't want to select the first element but instead the element in the block that
     // the user clicked on.

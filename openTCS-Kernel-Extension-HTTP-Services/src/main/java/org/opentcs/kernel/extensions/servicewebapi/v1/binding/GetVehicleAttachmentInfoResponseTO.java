@@ -14,8 +14,6 @@ import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 
 /**
  * Arranges the data from a vehicle's <code>AttachmentInformation</code> for transferring.
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class GetVehicleAttachmentInfoResponseTO {
 

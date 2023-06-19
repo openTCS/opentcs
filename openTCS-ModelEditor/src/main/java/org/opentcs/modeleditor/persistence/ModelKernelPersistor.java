@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Persists data kept in {@link SystemModel}s to the kernel.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ModelKernelPersistor {
 

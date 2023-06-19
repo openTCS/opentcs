@@ -12,8 +12,6 @@ import org.opentcs.data.peripherals.PeripheralJob;
 
 /**
  * Listens for changes to the {@link PeripheralJobsContainer}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralJobsContainerListener {
 

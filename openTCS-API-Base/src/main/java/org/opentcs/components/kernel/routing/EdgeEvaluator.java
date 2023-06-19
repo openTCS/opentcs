@@ -13,8 +13,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Computes the weight of edges in the routing graph.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface EdgeEvaluator {
 

@@ -18,9 +18,6 @@ import org.opentcs.guing.common.util.I18nPlantOverview;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
- *
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class BezierLinerEdit
     extends javax.swing.undo.AbstractUndoableEdit {

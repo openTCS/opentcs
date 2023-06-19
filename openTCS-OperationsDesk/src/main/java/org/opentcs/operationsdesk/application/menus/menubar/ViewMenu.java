@@ -24,8 +24,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * The application's menu for view-related operations.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ViewMenu
     extends JMenu {

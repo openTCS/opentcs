@@ -20,8 +20,6 @@ import javax.swing.plaf.basic.BasicComboBoxEditor;
 
 /**
  * An editor for editable combo boxes.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class EditableComboBoxEditor<E>
     extends BasicComboBoxEditor

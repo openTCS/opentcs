@@ -26,9 +26,6 @@ import org.opentcs.guing.base.model.elements.PointModel;
 
 /**
  * A dashed line that connects a decision point with a location.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LinkConnection
     extends SimpleLineConnection {

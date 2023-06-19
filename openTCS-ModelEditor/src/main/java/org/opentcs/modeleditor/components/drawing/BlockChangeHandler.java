@@ -25,8 +25,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.guing.common.util.ModelComponentUtil;
 
 /**
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class BlockChangeHandler
     implements BlockChangeListener {

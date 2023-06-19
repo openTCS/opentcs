@@ -43,8 +43,6 @@ import org.opentcs.util.event.SimpleEventBus;
 
 /**
  * Tests the operating state of the kernel.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class KernelStateOperatingTest {
 

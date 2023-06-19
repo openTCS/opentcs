@@ -13,8 +13,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure the {@link DefaultDispatcher}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(DefaultDispatcherConfiguration.PREFIX)
 public interface DefaultDispatcherConfiguration {

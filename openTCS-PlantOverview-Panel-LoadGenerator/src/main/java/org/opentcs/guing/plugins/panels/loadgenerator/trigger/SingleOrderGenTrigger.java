@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Triggers creation of transport orders only once.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class SingleOrderGenTrigger
     implements OrderGenerationTrigger {

@@ -20,8 +20,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action to trigger the creation of a location type.
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class CreateLocationTypeAction
     extends AbstractAction {

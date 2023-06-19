@@ -45,9 +45,6 @@ import org.opentcs.util.event.SimpleEventBus;
 
 /**
  * Test cases for StandardVehicleController.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultVehicleControllerTest {
 

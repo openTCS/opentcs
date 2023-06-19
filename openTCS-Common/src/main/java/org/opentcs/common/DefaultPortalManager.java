@@ -26,9 +26,6 @@ import org.slf4j.LoggerFactory;
 /**
  * The default implementation of {@link PortalManager}, providing a single
  * {@link KernelServicePortal}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultPortalManager
     implements PortalManager {

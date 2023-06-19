@@ -11,8 +11,6 @@ import org.opentcs.components.kernel.Query;
 
 /**
  * Provides generic/pluggable query functionality.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface QueryService {
 

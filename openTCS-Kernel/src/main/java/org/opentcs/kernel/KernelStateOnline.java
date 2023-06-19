@@ -12,8 +12,6 @@ import org.opentcs.kernel.workingset.PlantModelManager;
 
 /**
  * The base class for the kernel's online states.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class KernelStateOnline
     extends KernelState {

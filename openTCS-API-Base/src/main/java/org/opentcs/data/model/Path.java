@@ -23,8 +23,6 @@ import static org.opentcs.util.Assertions.checkInRange;
 
 /**
  * Describes a connection between two {@link Point}s which a {@link Vehicle} may traverse.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Path
     extends TCSResource<Path>

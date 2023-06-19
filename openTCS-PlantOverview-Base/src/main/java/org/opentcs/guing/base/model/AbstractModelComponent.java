@@ -19,12 +19,7 @@ import org.opentcs.guing.base.components.properties.type.Property;
 import org.opentcs.guing.base.components.properties.type.StringProperty;
 
 /**
- *
  * Abstract implementation of a model component.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class AbstractModelComponent
     implements ModelComponent {

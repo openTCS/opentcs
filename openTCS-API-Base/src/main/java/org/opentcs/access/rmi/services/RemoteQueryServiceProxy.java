@@ -14,8 +14,6 @@ import org.opentcs.components.kernel.services.QueryService;
 /**
  * The default implementation of the query service.
  * Delegates method invocations to the corresponding remote service.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 class RemoteQueryServiceProxy
     extends AbstractRemoteServiceProxy<RemoteQueryService>

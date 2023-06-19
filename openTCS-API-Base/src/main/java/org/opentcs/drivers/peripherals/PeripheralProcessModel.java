@@ -16,8 +16,6 @@ import org.opentcs.data.model.TCSResourceReference;
 
 /**
  * A model of a peripheral device's and its communication adapter's attributes.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralProcessModel
     implements Serializable {

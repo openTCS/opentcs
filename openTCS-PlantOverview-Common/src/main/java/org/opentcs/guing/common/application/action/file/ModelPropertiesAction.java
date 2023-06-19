@@ -23,8 +23,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * Shows a message window with some of the currently loaded model's properties.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ModelPropertiesAction
     extends AbstractAction {

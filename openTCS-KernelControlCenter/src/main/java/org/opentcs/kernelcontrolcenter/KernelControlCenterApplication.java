@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The kernel control center application's entry point.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class KernelControlCenterApplication
     implements KernelClientApplication {

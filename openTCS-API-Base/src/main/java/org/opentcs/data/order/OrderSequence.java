@@ -45,8 +45,6 @@ import static org.opentcs.util.Assertions.checkInRange;
  * considered (and marked as) failed, too, and the order sequence will implicitly be marked as
  * <em>complete</em> (and <em>finished</em>).</li>
  * </ul>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OrderSequence
     extends TCSObject<OrderSequence>

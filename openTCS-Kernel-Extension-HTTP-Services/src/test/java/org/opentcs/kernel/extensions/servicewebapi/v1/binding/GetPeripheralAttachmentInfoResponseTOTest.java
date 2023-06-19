@@ -15,8 +15,6 @@ import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 
 /**
  * Unit tests for {@link GetVehicleAttachmentInfoResponseTO}.
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class GetPeripheralAttachmentInfoResponseTOTest {
 

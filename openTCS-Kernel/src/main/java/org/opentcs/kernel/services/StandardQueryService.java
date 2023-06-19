@@ -20,8 +20,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * The default implementation of the {@link InternalQueryService} interface.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class StandardQueryService
     implements InternalQueryService {

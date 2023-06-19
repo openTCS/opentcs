@@ -30,9 +30,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * Tests for {@link AbstractParkingPositionSupplier}.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class AbstractParkingPositionSupplierTest {
 

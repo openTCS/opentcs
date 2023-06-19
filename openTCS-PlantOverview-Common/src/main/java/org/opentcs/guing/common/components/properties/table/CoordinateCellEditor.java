@@ -17,8 +17,6 @@ import org.opentcs.guing.common.util.UserMessageHelper;
 
 /**
  * A cell editor for a coordinate property.
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class CoordinateCellEditor
     extends QuantityCellEditor {

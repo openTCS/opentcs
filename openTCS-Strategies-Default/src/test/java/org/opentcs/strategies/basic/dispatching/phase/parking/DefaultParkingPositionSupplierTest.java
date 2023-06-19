@@ -30,8 +30,6 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class DefaultParkingPositionSupplierTest {
 

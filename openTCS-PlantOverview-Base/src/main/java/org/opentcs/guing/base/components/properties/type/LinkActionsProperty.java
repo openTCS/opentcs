@@ -11,8 +11,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property for link actions.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LinkActionsProperty
     extends StringSetProperty {

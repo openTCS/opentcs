@@ -12,7 +12,6 @@ import java.io.Serializable;
 /**
  * Marks a query (parameter) object.
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @param <T> The result type.
  */
 public interface Query<T> {

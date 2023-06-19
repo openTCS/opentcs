@@ -13,8 +13,6 @@ import org.opentcs.drivers.vehicle.VehicleControllerPool;
 
 /**
  * Manages the attachment of vehicle controllers to vehicles and comm adapters.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface LocalVehicleControllerPool
     extends VehicleControllerPool,

@@ -18,8 +18,6 @@ import org.opentcs.data.order.TransportOrder;
 /**
  * Declares the methods the transport order service must provide which are not accessible to remote
  * peers.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface InternalTransportOrderService
     extends TransportOrderService {

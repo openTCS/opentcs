@@ -14,8 +14,6 @@ import org.opentcs.customizations.kernel.GlobalSyncObject;
 
 /**
  * This class is the standard implementation of the {@code SchedulerService} interface.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @Deprecated
 public class StandardSchedulerService

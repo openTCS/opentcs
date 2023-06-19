@@ -21,8 +21,6 @@ import static org.opentcs.guing.plugins.panels.allocation.I18nPlantOverviewPanel
 /**
  * A model for a resource allocation tree to display an alphabetically ordered view for vehicle
  * names and their not ordered allocated resources.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class AllocationTreeModel
     extends DefaultTreeModel {

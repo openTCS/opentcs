@@ -17,8 +17,6 @@ import org.opentcs.operationsdesk.components.drawing.figures.VehicleFigureFactor
 
 /**
  * A factory for Figures and ModelComponents.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleCourseObjectFactory
     extends CourseObjectFactory  {

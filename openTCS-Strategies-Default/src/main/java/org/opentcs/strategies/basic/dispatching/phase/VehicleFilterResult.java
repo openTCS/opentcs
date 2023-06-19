@@ -13,8 +13,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * The result of a vehicle filter operation.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleFilterResult {
 

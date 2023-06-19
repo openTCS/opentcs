@@ -11,8 +11,6 @@ import org.opentcs.guing.base.components.layer.LayerWrapper;
 
 /**
  * Provides a method to get the currently active layer.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface ActiveLayerProvider {
 

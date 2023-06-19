@@ -15,7 +15,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 /**
  * Provides helper methods for working with enums.
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @deprecated Use Java streams, instead.
  */
 @Deprecated

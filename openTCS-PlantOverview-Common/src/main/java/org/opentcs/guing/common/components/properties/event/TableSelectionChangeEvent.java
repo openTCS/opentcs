@@ -12,8 +12,6 @@ import org.opentcs.guing.common.components.properties.table.AttributesTable;
 
 /**
  * An Event emitted when a line in a table is selected.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class TableSelectionChangeEvent
     extends EventObject {

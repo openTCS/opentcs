@@ -12,8 +12,6 @@ import org.opentcs.drivers.LowLevelCommunicationEvent;
 
 /**
  * Instances of this class represent events emitted by/for comm adapter changes.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public abstract class CommAdapterEvent
     implements LowLevelCommunicationEvent,

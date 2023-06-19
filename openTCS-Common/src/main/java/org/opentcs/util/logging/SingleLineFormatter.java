@@ -20,8 +20,6 @@ import java.util.logging.LogRecord;
  * A <code>Formatter</code> for <code>LogRecord</code>s that formats messages
  * for output on a single line (except when a <code>Throwable</code> is
  * associated with the <code>LogRecord</code>.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class SingleLineFormatter
     extends Formatter {

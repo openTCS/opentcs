@@ -19,8 +19,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * A transport order to be processed by the kernel.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PostTransportOrderRequestTO {
 

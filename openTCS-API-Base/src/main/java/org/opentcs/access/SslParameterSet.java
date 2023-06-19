@@ -15,8 +15,6 @@ import javax.annotation.Nullable;
 
 /**
  * A set of parameters to be used for SSL-encrypted socket connections.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class SslParameterSet
     implements Serializable {

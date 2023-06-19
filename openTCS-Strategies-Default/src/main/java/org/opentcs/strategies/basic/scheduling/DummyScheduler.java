@@ -20,8 +20,6 @@ import org.opentcs.data.model.TCSResource;
 /**
  * A <code>Scheduler</code> implementation that does not really do any resource management - all
  * allocations are granted immediately without checking.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DummyScheduler
     implements Scheduler {

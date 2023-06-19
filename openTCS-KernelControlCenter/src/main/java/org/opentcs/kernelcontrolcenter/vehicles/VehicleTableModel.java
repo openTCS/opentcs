@@ -27,8 +27,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A model for displaying a list/table of vehicles in the kernel GUI.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class VehicleTableModel
     extends AbstractTableModel

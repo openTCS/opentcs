@@ -21,9 +21,6 @@ import org.opentcs.operationsdesk.components.drawing.figures.VehicleFigure;
 
 /**
  * Panel to select a Vehicle that will be searched for in the view.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class FindVehiclePanel
     extends JPanel {

@@ -27,8 +27,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class EdgeEvaluatorCompositeTest {
 

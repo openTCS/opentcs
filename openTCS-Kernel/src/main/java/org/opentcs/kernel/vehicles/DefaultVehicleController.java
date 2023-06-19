@@ -69,8 +69,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Realizes a bidirectional connection between the kernel and a communication adapter controlling a
  * vehicle.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DefaultVehicleController
     implements VehicleController,

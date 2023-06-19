@@ -15,8 +15,6 @@ import org.opentcs.guing.base.components.properties.type.StringProperty;
 
 /**
  * Defines a component in the system model.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface ModelComponent
     extends Cloneable {

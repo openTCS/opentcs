@@ -19,8 +19,6 @@ import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformatio
 
 /**
  * Provides methods concerning peripheral devices represented by {@link Location}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralService
     extends TCSObjectService {

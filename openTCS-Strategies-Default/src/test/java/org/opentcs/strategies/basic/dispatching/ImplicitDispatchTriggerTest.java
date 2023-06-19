@@ -18,8 +18,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ImplicitDispatchTriggerTest {
 

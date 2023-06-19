@@ -38,8 +38,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Manages interactions with peripheral devices that are to be performed before or after the
  * execution of movement commands.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralInteractor
     implements EventHandler,

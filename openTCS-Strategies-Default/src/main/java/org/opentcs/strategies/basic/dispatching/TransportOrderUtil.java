@@ -33,8 +33,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides service functions for working with transport orders and their states.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrderUtil
     implements Lifecycle {

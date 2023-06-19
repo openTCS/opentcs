@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Configures the resource allocation panel.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AllocationPanelModule
     extends PlantOverviewInjectionModule {

@@ -15,8 +15,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * A strategy for finding parking positions for vehicles.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ParkingPositionSupplier
     extends Lifecycle {

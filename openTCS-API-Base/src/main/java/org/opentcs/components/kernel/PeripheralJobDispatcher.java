@@ -21,8 +21,6 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * be a new peripheral job being introduced into the system or a peripheral device becoming
  * available for processing existing jobs.
  * </p>
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralJobDispatcher
     extends Lifecycle {

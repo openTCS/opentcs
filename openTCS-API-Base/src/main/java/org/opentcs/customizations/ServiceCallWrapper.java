@@ -17,8 +17,6 @@ import org.opentcs.util.CallWrapper;
 /**
  * Annotation type to mark an injectable {@link CallWrapper} that wraps method calls on kernel
  * services.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @Qualifier
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})

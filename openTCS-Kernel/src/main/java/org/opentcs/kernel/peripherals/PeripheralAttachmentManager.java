@@ -30,9 +30,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Manages attachment and detachment of peripheral communication adapters to location.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralAttachmentManager
     implements Lifecycle {

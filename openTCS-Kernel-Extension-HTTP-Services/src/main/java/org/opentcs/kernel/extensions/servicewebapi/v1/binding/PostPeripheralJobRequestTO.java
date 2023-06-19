@@ -13,8 +13,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * A peripheral job to be processed by the kernel.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class PostPeripheralJobRequestTO {
 

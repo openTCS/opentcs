@@ -11,8 +11,6 @@ import com.google.inject.AbstractModule;
 
 /**
  * A Guice module for this package.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportInjectionModule
     extends AbstractModule {

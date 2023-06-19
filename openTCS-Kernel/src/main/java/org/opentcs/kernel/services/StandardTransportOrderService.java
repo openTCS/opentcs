@@ -29,8 +29,6 @@ import org.opentcs.kernel.workingset.TransportOrderPoolManager;
 
 /**
  * This class is the standard implementation of the {@link TransportOrderService} interface.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class StandardTransportOrderService
     extends AbstractTCSObjectService

@@ -13,8 +13,6 @@ import org.opentcs.data.model.TCSResourceReference;
 
 /**
  * Maintains associations between locations and peripheral controllers.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralControllerPool {
 

@@ -16,8 +16,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 
 /**
  * A command to set the {@link LoadHandlingDevice}s attached to a vehicle.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class SetLoadHandlingDevicesCommand
     implements AdapterCommand {

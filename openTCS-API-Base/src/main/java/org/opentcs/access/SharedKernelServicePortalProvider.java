@@ -11,9 +11,6 @@ import org.opentcs.components.kernel.services.ServiceUnavailableException;
 
 /**
  * Pools access to a {@link KernelServicePortal} instance for multiple clients.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface SharedKernelServicePortalProvider {
 

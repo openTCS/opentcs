@@ -44,8 +44,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Validator for a {@link SystemModel} and its {@link ModelComponent}s.
  * Validates if the model component can safely be added to a system model.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class ModelValidator {
 

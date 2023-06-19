@@ -26,8 +26,6 @@ import org.opentcs.util.event.SimpleEventBus;
 
 /**
  * A test case for StandardKernel.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class StandardKernelTest {
 

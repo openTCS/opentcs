@@ -39,8 +39,6 @@ import org.slf4j.LoggerFactory;
 /**
  * A {@link VehicleCommAdapter} that does not really communicate with a physical vehicle but roughly
  * simulates one.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LoopbackCommunicationAdapter
     extends BasicVehicleCommAdapter

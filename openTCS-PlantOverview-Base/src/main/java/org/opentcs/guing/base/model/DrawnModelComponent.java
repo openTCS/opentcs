@@ -11,8 +11,6 @@ import org.opentcs.guing.base.components.properties.type.LayerWrapperProperty;
 
 /**
  * A model component that is drawn and represented by a corresponding figure.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface DrawnModelComponent
     extends ModelComponent {

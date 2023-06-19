@@ -20,10 +20,6 @@ import org.opentcs.guing.common.util.UserMessageHelper;
 
 /**
  * A test for the {@link QuantityCellEditor}.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Leonard Schuengel (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class QuantityCellEditorTest {
 

@@ -12,8 +12,6 @@ import java.util.EventObject;
 /**
  * This event instructs the receiver(s) to reset the currently selected
  * interaction tool for the user.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ResetInteractionToolCommand
     extends EventObject {

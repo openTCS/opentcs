@@ -31,8 +31,6 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
 
 /**
  * Unit tests for {@link CandidateComparatorDeadlineAtRiskFirst}.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class CandidateComparatorDeadlineAtRiskFirstTest {
 

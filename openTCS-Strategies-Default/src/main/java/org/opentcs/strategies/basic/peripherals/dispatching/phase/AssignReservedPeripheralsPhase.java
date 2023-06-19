@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
  * Assigns the next peripheral job that matches a peripheral's reservation token to peripherals that
  * are currently not processing any.
  * Peripherals with no reservation token set are not cosidered in this phase.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class AssignReservedPeripheralsPhase
     implements PeripheralDispatcherPhase {

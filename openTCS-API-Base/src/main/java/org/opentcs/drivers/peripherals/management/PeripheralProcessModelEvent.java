@@ -17,8 +17,6 @@ import org.opentcs.drivers.peripherals.PeripheralProcessModel;
 /**
  * Instances of this class represent events emitted by/for changes on
  * {@link PeripheralProcessModel}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralProcessModelEvent
     extends PeripheralCommAdapterEvent

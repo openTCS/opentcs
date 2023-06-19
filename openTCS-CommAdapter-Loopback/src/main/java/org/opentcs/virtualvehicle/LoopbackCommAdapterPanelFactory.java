@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A factory for creating {@link LoopbackCommAdapterPanel} instances.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LoopbackCommAdapterPanelFactory
     implements VehicleCommAdapterPanelFactory {

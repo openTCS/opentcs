@@ -11,8 +11,6 @@ import javax.annotation.Nullable;
 
 /**
  * Utility methods for checking preconditions, postconditions etc..
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Assertions {
 

@@ -22,8 +22,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * Panel for selecting a property from a combo box.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class SelectionPropertyEditorPanel
     extends JPanel

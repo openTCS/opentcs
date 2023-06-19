@@ -13,8 +13,6 @@ import org.opentcs.components.Lifecycle;
 /**
  * Declares methods that a pluggable panel should provide for the enclosing
  * application.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class PluggablePanel
     extends JPanel

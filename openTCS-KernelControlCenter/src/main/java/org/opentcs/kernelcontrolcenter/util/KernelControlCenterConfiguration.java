@@ -14,8 +14,6 @@ import org.opentcs.util.gui.dialog.ConnectionParamSet;
 
 /**
  * Provides methods to configure the KernelControlCenter application.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(KernelControlCenterConfiguration.PREFIX)
 public interface KernelControlCenterConfiguration {

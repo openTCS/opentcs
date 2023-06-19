@@ -17,8 +17,6 @@ import org.opentcs.strategies.basic.dispatching.selection.RechargeVehicleSelecti
 
 /**
  * A collection of {@link RechargeVehicleSelectionFilter}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class CompositeRechargeVehicleSelectionFilter
     implements RechargeVehicleSelectionFilter {
@@ -27,7 +25,7 @@ public class CompositeRechargeVehicleSelectionFilter
    * The {@link RechargeVehicleSelectionFilter}s.
    */
   private final Set<RechargeVehicleSelectionFilter> filters;
-  
+
   @Inject
   public CompositeRechargeVehicleSelectionFilter(Set<RechargeVehicleSelectionFilter> filters) {
     this.filters = requireNonNull(filters, "filters");

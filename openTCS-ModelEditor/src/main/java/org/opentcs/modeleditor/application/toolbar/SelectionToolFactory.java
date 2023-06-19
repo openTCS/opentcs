@@ -12,8 +12,6 @@ import java.util.Collection;
 import javax.swing.Action;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface SelectionToolFactory {
 

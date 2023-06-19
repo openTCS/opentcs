@@ -16,8 +16,6 @@ import org.opentcs.access.to.CreationTO;
 
 /**
  * A transfer object describing a peripheral job.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralJobCreationTO
     extends CreationTO

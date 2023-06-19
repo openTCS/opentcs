@@ -13,8 +13,6 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for {@link Assertions}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class AssertionsTest {
 

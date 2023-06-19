@@ -22,8 +22,6 @@ import org.slf4j.LoggerFactory;
  * state when dispatching them was last tried.
  * A potential reason for this is that a vehicle temporarily reported an error because a safety
  * sensor was triggered.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PeriodicVehicleRedispatchingTask
     implements Runnable {

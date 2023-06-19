@@ -19,8 +19,6 @@ import org.opentcs.guing.base.components.properties.type.Property;
 
 /**
  * A standard cell renderer for for properties in general.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class StandardPropertyCellRenderer
     extends javax.swing.table.DefaultTableCellRenderer {

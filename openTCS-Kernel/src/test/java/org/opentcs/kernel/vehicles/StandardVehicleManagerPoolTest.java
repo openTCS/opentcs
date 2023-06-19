@@ -17,9 +17,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 
 /**
  * Tests for the {@link StandardVehicleManagerPoolTest}.
- *
- * @author Philipp Seifert (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class StandardVehicleManagerPoolTest {
 

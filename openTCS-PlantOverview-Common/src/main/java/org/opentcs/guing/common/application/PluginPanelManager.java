@@ -10,8 +10,6 @@ package org.opentcs.guing.common.application;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PluginPanelManager {
 

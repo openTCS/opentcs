@@ -19,8 +19,6 @@ import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPa
 
 /**
  * A table model for drive orders.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 class DriveOrderTableModel
     extends AbstractTableModel {

@@ -18,8 +18,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * Unit tests for {@link PostTransportOrderRequestTO}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PostTransportOrderRequestTOTest {
 

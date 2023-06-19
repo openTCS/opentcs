@@ -11,8 +11,6 @@ import bibliothek.gui.dock.common.DefaultSingleCDockable;
 
 /**
  * A factory for handlers related to dockables.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface DockableHandlerFactory {
 

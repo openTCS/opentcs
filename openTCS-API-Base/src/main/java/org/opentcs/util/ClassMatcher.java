@@ -15,8 +15,6 @@ import java.util.function.Predicate;
 
 /**
  * Checks whether the input argument is assignable to any of a given set of classes.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ClassMatcher
     implements Predicate<Object>,

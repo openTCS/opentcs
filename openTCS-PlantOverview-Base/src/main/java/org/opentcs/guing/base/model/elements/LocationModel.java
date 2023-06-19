@@ -36,8 +36,6 @@ import org.opentcs.guing.base.model.PositionableModelComponent;
 
 /**
  * Basic implementation for every kind of location.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class LocationModel
     extends AbstractConnectableModelComponent

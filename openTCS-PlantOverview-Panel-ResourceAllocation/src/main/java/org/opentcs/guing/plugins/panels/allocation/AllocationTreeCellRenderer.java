@@ -20,8 +20,6 @@ import org.opentcs.data.model.TCSResourceReference;
 
 /**
  * Renders the tree nodes with vehicle, point and path icons.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class AllocationTreeCellRenderer
     extends DefaultTreeCellRenderer {

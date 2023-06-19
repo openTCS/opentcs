@@ -16,8 +16,6 @@ import org.opentcs.guing.common.components.tree.elements.UserObject;
 
 /**
  * A cell renderer for a node in the tree view.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class TreeViewCellRenderer
     extends DefaultTreeCellRenderer {

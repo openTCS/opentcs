@@ -14,8 +14,6 @@ import org.opentcs.data.notification.UserNotification;
 
 /**
  * Provides methods concerning {@link UserNotification}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface NotificationService {
 

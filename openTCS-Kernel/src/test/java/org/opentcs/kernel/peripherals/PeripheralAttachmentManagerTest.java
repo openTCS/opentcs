@@ -39,8 +39,6 @@ import org.opentcs.util.event.EventHandler;
 
 /**
  * Tests for the {@link PeripheralAttachmentManager}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralAttachmentManagerTest {
 

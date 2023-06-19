@@ -11,8 +11,6 @@ import java.util.ResourceBundle;
 import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class MultipleDifferentValues
     implements AcceptableInvalidValue {

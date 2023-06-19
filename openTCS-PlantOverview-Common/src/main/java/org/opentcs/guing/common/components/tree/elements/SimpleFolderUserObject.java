@@ -16,8 +16,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * A folder in the TreeView with no added functionality.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class SimpleFolderUserObject
     extends AbstractUserObject {

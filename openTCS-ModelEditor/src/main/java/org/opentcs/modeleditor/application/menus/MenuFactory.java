@@ -9,8 +9,6 @@ package org.opentcs.modeleditor.application.menus;
 
 /**
  * A factory for various menus and menu items.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface MenuFactory {
 

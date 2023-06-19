@@ -19,8 +19,6 @@ import org.opentcs.drivers.peripherals.PeripheralProcessModel;
 
 /**
  * An entry for a peripheral device represented by a {@link Location}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralEntry {
 

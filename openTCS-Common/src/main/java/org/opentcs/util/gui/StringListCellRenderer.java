@@ -18,7 +18,6 @@ import javax.swing.ListCellRenderer;
 /**
  * Renders values to JLabels.
  *
- * @author Mustafa Yalciner (Fraunhofer IML)
  * @param <E> The type of the values to be rendered.
  */
 public class StringListCellRenderer<E>

@@ -14,8 +14,6 @@ import javax.annotation.Nonnull;
 
 /**
  * Identifies a remote client unambiguously.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ClientID
 implements Serializable {
@@ -27,7 +25,7 @@ implements Serializable {
    * The client's UUID.
    */
   private final UUID uuid;
-  
+
   /**
    * Creates a new ClientID.
    *
@@ -37,7 +35,7 @@ implements Serializable {
     this.clientName = requireNonNull(clientName, "clientName");
     uuid = UUID.randomUUID();
   }
-  
+
   /**
    * Return the client's name.
    *
@@ -47,7 +45,7 @@ implements Serializable {
   public String getClientName() {
     return clientName;
   }
-  
+
   /**
    * Checks if this object equals another one.
    *
@@ -66,12 +64,12 @@ implements Serializable {
       return false;
     }
   }
-  
+
   @Override
   public int hashCode() {
     return uuid.hashCode();
   }
-  
+
   @Override
   public String toString() {
     return clientName + ":" + uuid;

@@ -12,8 +12,6 @@ import org.opentcs.configuration.ConfigurationPrefix;
 
 /**
  * Provides methods to configure {@link EdgeEvaluatorExplicitProperties}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @ConfigurationPrefix(ExplicitPropertiesConfiguration.PREFIX)
 public interface ExplicitPropertiesConfiguration {

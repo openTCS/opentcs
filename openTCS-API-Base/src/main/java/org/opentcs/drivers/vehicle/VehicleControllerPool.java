@@ -11,8 +11,6 @@ import javax.annotation.Nonnull;
 
 /**
  * Maintains associations between vehicles and vehicle controllers.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface VehicleControllerPool {
 

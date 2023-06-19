@@ -13,8 +13,6 @@ import java.util.concurrent.Callable;
  * Provides methods for wrapping other method calls.
  * This can be useful to ensure preparations have been done for a larger set of various method
  * calls, for example.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface CallWrapper {
 

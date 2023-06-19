@@ -14,8 +14,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 
 /**
  * A command to set a vehicle's precise position.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class SetPrecisePositionCommand
     implements AdapterCommand {

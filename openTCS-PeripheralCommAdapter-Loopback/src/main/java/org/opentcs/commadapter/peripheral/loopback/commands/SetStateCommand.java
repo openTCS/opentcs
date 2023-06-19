@@ -16,8 +16,6 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapter;
 
 /**
  * A command to set the peripheral device's state.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class SetStateCommand
     implements PeripheralAdapterCommand {

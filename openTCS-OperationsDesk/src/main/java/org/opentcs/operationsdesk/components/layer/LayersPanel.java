@@ -27,8 +27,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * A panel to display and edit layers.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LayersPanel
     extends JPanel {

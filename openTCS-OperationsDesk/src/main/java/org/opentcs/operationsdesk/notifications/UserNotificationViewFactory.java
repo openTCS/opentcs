@@ -11,8 +11,6 @@ import org.opentcs.data.notification.UserNotification;
 
 /**
  * Creates user notification related GUI components.
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public interface UserNotificationViewFactory {
 

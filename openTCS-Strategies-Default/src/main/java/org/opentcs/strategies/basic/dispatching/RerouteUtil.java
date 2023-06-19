@@ -39,8 +39,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Provides some utility methods used for rerouting vehicles.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class RerouteUtil {
 

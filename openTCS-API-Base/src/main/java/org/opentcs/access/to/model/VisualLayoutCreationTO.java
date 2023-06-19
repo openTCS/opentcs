@@ -20,8 +20,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a visual layout in the plant model.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VisualLayoutCreationTO
     extends CreationTO

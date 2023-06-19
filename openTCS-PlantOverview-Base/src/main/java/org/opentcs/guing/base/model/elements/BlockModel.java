@@ -31,8 +31,6 @@ import org.opentcs.guing.base.model.SimpleFolder;
 /**
  * A block area. Contains figure components that are part of this block
  * area.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class BlockModel
     extends SimpleFolder {

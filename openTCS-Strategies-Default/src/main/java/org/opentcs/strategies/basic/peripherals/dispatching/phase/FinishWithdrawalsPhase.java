@@ -24,8 +24,6 @@ import org.opentcs.strategies.basic.peripherals.dispatching.PeripheralDispatcher
 
 /**
  * Finishes withdrawals of peripheral jobs after their related transport order has failed.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class FinishWithdrawalsPhase
     implements PeripheralDispatcherPhase {

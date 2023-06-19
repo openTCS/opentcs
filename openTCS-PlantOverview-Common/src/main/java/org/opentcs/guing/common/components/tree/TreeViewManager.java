@@ -28,7 +28,6 @@ import org.opentcs.util.event.EventHandler;
  * The tree view manager is the interface between the application and the TreeView.
  * It passes actions on to the TreeView.
  *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @see TreeView
  */
 public abstract class TreeViewManager

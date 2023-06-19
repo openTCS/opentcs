@@ -17,8 +17,6 @@ import org.opentcs.data.notification.UserNotification;
 /**
  * The default implementation of the notification service.
  * Delegates method invocations to the corresponding remote service.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 class RemoteNotificationServiceProxy
     extends AbstractRemoteServiceProxy<RemoteNotificationService>

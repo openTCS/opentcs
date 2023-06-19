@@ -16,7 +16,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 /**
  * A generic layout element that is to be displayed.
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @deprecated Will be removed.
  */
 @Deprecated

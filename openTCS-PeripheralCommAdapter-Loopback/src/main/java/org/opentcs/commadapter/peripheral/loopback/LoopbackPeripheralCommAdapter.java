@@ -34,8 +34,6 @@ import org.opentcs.util.event.EventHandler;
 
 /**
  * A {@link PeripheralCommAdapter} implementation that is doing nothing.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LoopbackPeripheralCommAdapter
     extends BasicPeripheralCommAdapter {

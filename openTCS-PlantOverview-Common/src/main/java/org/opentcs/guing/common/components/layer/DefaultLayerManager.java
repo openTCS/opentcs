@@ -31,8 +31,6 @@ import org.opentcs.util.event.EventBus;
 
 /**
  * The default implementation of {@link LayerManager}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DefaultLayerManager
     implements LayerManager,

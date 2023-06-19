@@ -9,8 +9,6 @@ package org.opentcs.data.order;
 
 /**
  * Defines some constants for {@link TransportOrder}s and {@link OrderSequence}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface OrderConstants {
 

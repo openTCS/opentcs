@@ -14,8 +14,6 @@ import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * The table model for layer groups for the Operations Desk application.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 class LayerGroupsTableModel
     extends AbstractLayerGroupsTableModel {

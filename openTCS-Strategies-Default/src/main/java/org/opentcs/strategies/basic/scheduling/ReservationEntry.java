@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
  * Contains reservation information for a resource - a reference to the
  * <code>ResourceUser</code> currently holding the resource and a counter
  * for how many times the <code>ResouceUser</code> has allocated the resource.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ReservationEntry {
 

@@ -16,8 +16,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Some commonly used comparator implementations.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public final class Comparators {
 

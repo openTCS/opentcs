@@ -9,8 +9,6 @@ package org.opentcs.data.model;
 
 /**
  * Defines some constants used for plant models.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface ModelConstants {
 

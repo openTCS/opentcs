@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A command for initializing the comm adapter's position.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class InitPositionCommand
     implements AdapterCommand {

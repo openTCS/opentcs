@@ -12,8 +12,6 @@ import org.opentcs.data.model.TCSResourceReference;
 
 /**
  * A factory for various loopback specific instances.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface LoopbackPeripheralAdapterComponentsFactory {
 

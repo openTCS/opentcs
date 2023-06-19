@@ -13,8 +13,6 @@ import org.opentcs.data.model.Path;
 
 /**
  * A wrapper for {@link Path}s that can be used to build routing graphs.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Edge {
 

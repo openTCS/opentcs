@@ -40,8 +40,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is the standard implementation of the {@link VehicleService} interface.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class StandardVehicleService
     extends AbstractTCSObjectService

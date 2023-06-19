@@ -17,8 +17,6 @@ import org.opentcs.data.model.Vehicle;
 import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class EdgeEvaluatorTravelTimeTest {
 

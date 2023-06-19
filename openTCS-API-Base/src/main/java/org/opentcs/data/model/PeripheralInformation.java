@@ -16,8 +16,6 @@ import org.opentcs.data.peripherals.PeripheralJob;
 
 /**
  * Contains details about a peripheral device a location may represent.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralInformation
     implements Serializable {

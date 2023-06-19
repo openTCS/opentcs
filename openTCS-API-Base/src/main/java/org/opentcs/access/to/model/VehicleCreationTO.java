@@ -18,8 +18,6 @@ import static org.opentcs.util.Assertions.checkInRange;
 
 /**
  * A transfer object describing a block in the plant model.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleCreationTO
     extends CreationTO

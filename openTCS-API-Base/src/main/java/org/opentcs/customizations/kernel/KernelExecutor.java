@@ -15,8 +15,6 @@ import javax.inject.Qualifier;
 
 /**
  * Annotation type to mark a central injectable {@code ScheduledExecutorService}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @Qualifier
 @Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})

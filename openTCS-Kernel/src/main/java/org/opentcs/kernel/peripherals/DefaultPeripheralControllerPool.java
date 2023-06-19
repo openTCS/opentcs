@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Maintains associations of {@link Location}, {@link PeripheralController} and
  * {@link PeripheralCommAdapter}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DefaultPeripheralControllerPool
     implements LocalPeripheralControllerPool {

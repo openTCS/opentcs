@@ -28,8 +28,6 @@ import org.opentcs.strategies.basic.dispatching.priorization.candidate.Candidate
 
 /**
  * Unit tests for {@link CandidateComparatorByDeadline}.
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class CandidateComparatorByDeadlineTest {
 

@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Configures the RMI services extension.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class RmiServicesModule
     extends KernelInjectionModule {

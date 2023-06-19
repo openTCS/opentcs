@@ -17,8 +17,6 @@ import org.opentcs.data.peripherals.PeripheralJob;
 
 /**
  * Provides methods concerning the {@link PeripheralJobDispatcher}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralDispatcherService {
 

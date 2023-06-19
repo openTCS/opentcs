@@ -19,8 +19,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A cell editor for an integer property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class IntegerPropertyCellEditor
     extends AbstractPropertyCellEditor {

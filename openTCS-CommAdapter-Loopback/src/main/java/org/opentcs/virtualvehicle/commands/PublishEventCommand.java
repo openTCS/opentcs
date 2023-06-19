@@ -15,8 +15,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
 
 /**
  * A command to publish {@link VehicleCommAdapterEvent}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PublishEventCommand
     implements AdapterCommand {

@@ -12,8 +12,6 @@ import org.opentcs.data.order.DriveOrder;
 
 /**
  * Provides a method to merge two {@link DriveOrder}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface DriveOrderMerger {
 

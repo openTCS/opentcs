@@ -13,8 +13,6 @@ import javax.inject.Singleton;
 
 /**
  * A Guice module for this package.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PeripheralJobInjectionModule
     extends AbstractModule {

@@ -17,8 +17,6 @@ import org.opentcs.guing.common.components.layer.LayerManager;
 
 /**
  * A Guice module for this package.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LayersInjectionModule
     extends PlantOverviewInjectionModule {

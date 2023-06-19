@@ -15,8 +15,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a shape layout element in the visual layout.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @Deprecated
 @ScheduledApiChange(details = "Will be removed.", when = "6.0")

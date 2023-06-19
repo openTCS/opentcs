@@ -11,8 +11,6 @@ import java.io.Serializable;
 
 /**
  * A generic 2-tuple of long integer values, usable for 2D coordinates and vectors, for instance.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class Couple
     implements Serializable {

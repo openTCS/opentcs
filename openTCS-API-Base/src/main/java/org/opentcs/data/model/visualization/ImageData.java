@@ -14,7 +14,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 /**
  * Generic image data that can be stored along with a layout.
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @deprecated Will be removed.
  */
 @Deprecated

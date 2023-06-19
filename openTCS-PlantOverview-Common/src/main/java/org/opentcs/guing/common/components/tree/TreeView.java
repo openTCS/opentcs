@@ -22,7 +22,6 @@ import org.opentcs.guing.common.components.tree.elements.UserObject;
  * (e.g. Article, Figure, ...). It knows which methods to call to when an object is selected
  * in the tree or is deleted or is double-clicked.
  *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @see UserObject
  */
 public interface TreeView {

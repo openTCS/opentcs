@@ -19,8 +19,6 @@ import org.opentcs.data.model.TCSResource;
 
 /**
  * Tests for {@link ResourceMath}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ResourceMathTest {
 

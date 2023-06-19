@@ -37,8 +37,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A helper class for creating transport orders with the kernel.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrderUtil {
 

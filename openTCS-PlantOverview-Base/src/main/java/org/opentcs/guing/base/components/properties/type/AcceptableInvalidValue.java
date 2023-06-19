@@ -9,8 +9,6 @@ package org.opentcs.guing.base.components.properties.type;
 
 /**
  * An invalid but still acceptable value for a property.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface AcceptableInvalidValue {
 

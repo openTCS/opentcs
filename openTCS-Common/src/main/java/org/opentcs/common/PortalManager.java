@@ -12,8 +12,6 @@ import org.opentcs.components.kernel.services.ServiceUnavailableException;
 
 /**
  * Declares methods for managing a connection to a remote portal.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface PortalManager {
 

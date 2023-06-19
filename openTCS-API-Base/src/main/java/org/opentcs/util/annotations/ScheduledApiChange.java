@@ -30,8 +30,6 @@ import java.lang.annotation.Target;
  * <li>For users of the openTCS API to gain knowledge about upcoming changes.</li>
  * <li>For openTCS developers to easily find pending changes during pre-release cleanups.</li>
  * </ol>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 @Target({CONSTRUCTOR, FIELD, METHOD, TYPE})
 @Retention(RetentionPolicy.SOURCE)

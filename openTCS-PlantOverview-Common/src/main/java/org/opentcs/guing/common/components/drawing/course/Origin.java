@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 /**
  * The origin of the coordinate system. Represents the current scale, coordinate system and
  * position of the origin on the screen.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public final class Origin {
 

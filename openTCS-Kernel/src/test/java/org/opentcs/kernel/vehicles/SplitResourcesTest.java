@@ -23,8 +23,6 @@ import org.opentcs.data.model.TCSResource;
 
 /**
  * Tests for {@link SplitResources}.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class SplitResourcesTest {
 

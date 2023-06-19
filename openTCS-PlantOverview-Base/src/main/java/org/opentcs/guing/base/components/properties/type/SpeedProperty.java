@@ -13,9 +13,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property for speeds.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class SpeedProperty
     extends AbstractQuantity<SpeedProperty.Unit> {

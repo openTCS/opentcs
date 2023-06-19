@@ -12,8 +12,6 @@ import java.util.EventObject;
 /**
  * Interface for classes that want to be notified about origin position changes
  * and origin scale changes.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public interface OriginChangeListener {
 

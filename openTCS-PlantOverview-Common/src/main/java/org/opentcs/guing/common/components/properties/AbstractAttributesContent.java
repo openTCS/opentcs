@@ -13,8 +13,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.Undo
 
 /**
  * Base implementation for visualisation of model component properties.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public abstract class AbstractAttributesContent
     implements AttributesContent {

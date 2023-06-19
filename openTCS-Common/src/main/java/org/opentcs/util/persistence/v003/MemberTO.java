@@ -11,8 +11,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class MemberTO

@@ -17,7 +17,6 @@ import org.opentcs.data.TCSObject;
  * Describes a resource that {@link Vehicle}s may claim for exclusive usage.
  *
  * @see Scheduler
- * @author Stefan Walter (Fraunhofer IML)
  * @param <E> The actual resource class.
  */
 public abstract class TCSResource<E extends TCSResource<E>>

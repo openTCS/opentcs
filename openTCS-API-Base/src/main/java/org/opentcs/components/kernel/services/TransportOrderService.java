@@ -18,8 +18,6 @@ import org.opentcs.data.order.TransportOrder;
 
 /**
  * Provides methods concerning {@link TransportOrder}s and {@link OrderSequence}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface TransportOrderService
     extends TCSObjectService {

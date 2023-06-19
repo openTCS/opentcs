@@ -22,8 +22,6 @@ import javax.swing.ListCellRenderer;
  * an object from the provided content list.
  *
  * @param <E> Type of the elements in the dropdown list
- *
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public final class DropdownListInputPanel<E>
     extends InputPanel {

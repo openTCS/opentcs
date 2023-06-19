@@ -27,7 +27,6 @@ import org.opentcs.util.gui.BoundsPopupMenuListener;
  * A panel for editing a property (key-value pair).
  *
  * @see KeyValueProperty
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class KeyValuePropertyEditorPanel
     extends JPanel

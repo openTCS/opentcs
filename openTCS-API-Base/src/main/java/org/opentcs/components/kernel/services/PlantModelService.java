@@ -18,8 +18,6 @@ import org.opentcs.data.model.PlantModel;
 
 /**
  * Provides methods concerning the plant model.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PlantModelService
     extends TCSObjectService {

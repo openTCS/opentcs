@@ -11,8 +11,6 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.components.drawing.figures.FigureFactory;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface VehicleFigureFactory
     extends FigureFactory {

@@ -22,8 +22,6 @@ package org.opentcs.virtualvehicle.inputcomponents;
  * <br>
  * The <code>Object</code> that is returned by {@link InputPanel#getInput} is
  * a <code>String</code> (the text in the text field).
- *
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public final class SingleTextInputPanel
     extends TextInputPanel {

@@ -31,8 +31,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Converts {@link SystemModel} instances to plant model data.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ModelExportAdapter {
 

@@ -15,8 +15,6 @@ import org.opentcs.components.plantoverview.OrderTypeSuggestions;
 
 /**
  * A collection of all transport order types suggested.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class OrderTypeSuggestionsPool
     implements OrderTypeSuggestions {

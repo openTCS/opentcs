@@ -13,8 +13,6 @@ import org.opentcs.guing.base.model.elements.PointModel.Type;
 
 /**
  * Subclass for a {@link Type} selection property.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PointTypeProperty
     extends SelectionProperty<Type> {

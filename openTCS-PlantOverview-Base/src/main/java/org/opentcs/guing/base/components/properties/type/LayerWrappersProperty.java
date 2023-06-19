@@ -16,8 +16,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property that contains a list of layer wrappers.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LayerWrappersProperty
     extends AbstractComplexProperty {

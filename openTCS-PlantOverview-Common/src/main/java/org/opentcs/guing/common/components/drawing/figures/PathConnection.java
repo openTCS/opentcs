@@ -55,9 +55,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A connection between two points.
- *
- * @author Heinz Huber (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class PathConnection
     extends SimpleLineConnection {

@@ -25,8 +25,6 @@ import org.opentcs.util.event.EventBus;
 
 /**
  * Test cases for the {@link KernelControlCenterApplication}.
- *
- * @author Mats Wilhelm (Fraunhofer IML)
  */
 public class KernelControlCenterApplicationTest {
 

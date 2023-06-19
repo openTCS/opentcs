@@ -21,8 +21,6 @@ import org.opentcs.access.SslParameterSet;
  * implemented over the SSL or TLS protocols.
  * Since these factories don't support anonymous cipher suites a keystore on the server-side and a
  * truststore on the client-side is necessary.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class SecureSocketFactoryProvider
     implements SocketFactoryProvider {

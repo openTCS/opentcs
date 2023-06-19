@@ -11,8 +11,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * Base implementation for a property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public abstract class AbstractProperty
     extends AbstractModelAttribute

@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
  * Also specifies conversion relations (see {@link Relation}) between units that allow conversion
  * to other units.
  *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  * @param <U> The enum type.
  */
 public abstract class AbstractQuantity<U extends Enum<U>>

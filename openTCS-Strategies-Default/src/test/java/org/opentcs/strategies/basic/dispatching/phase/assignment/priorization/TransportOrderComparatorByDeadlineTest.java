@@ -21,8 +21,6 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorByDeadline;
 
 /**
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrderComparatorByDeadlineTest {
 

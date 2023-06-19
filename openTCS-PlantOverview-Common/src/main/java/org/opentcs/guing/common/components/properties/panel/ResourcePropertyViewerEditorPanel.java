@@ -29,8 +29,6 @@ import org.opentcs.util.gui.StringTableCellRenderer;
 
 /**
  * UI for viewing a resource property without being able to edit the property.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class ResourcePropertyViewerEditorPanel
     extends JPanel

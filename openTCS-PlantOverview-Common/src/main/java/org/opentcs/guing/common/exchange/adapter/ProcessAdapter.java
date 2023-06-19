@@ -17,9 +17,6 @@ import org.opentcs.guing.common.model.SystemModel;
 /**
  * Receives messages from a <code>ModelComponent</code> and its kernel
  * equivalent and delegates them to the respective other one.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface ProcessAdapter
     extends Serializable {

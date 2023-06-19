@@ -15,8 +15,6 @@ import javax.swing.ImageIcon;
 
 /**
  * Provides cursors for various situations.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public final class Cursors {
 

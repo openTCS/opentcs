@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
  * This is a convenience wrapper for accessing resources stored in a ResourceBundle.
  *
  * @author Werner Randelshofer, Hausmatt 10, CH-6405 Immensee, Switzerland
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ResourceBundleUtil
     implements Serializable {

@@ -15,7 +15,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 /**
  * A property whose value is one out of a list of possible values.
  *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  * @param <E> The type of the enum.
  */
 public class SelectionProperty<E extends Enum<E>>

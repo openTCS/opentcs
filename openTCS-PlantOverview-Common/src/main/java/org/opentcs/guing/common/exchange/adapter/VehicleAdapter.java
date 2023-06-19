@@ -33,9 +33,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for vehicles.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleAdapter
     extends AbstractProcessAdapter {

@@ -35,9 +35,6 @@ import org.opentcs.guing.common.util.I18nPlantOverview;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
- *
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class BlockMouseListener
     extends TreeMouseAdapter {

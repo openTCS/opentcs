@@ -18,8 +18,6 @@ import org.opentcs.util.persistence.ModelParser;
 
 /**
  * Serializes the data kept in a {@link PlantModelCreationTO} to a xml file.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class UnifiedModelPersistor
     implements ModelFilePersistor {

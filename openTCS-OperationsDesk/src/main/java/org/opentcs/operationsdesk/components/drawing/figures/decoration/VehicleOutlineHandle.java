@@ -18,8 +18,6 @@ import org.jhotdraw.draw.handle.BoundsOutlineHandle;
 import org.opentcs.operationsdesk.components.drawing.figures.VehicleFigure;
 
 /**
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class VehicleOutlineHandle
     extends BoundsOutlineHandle {

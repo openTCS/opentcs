@@ -16,8 +16,6 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapterFactory;
 
 /**
  * A factory for loopback communication adapters (virtual peripherals).
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LoopbackPeripheralCommAdapterFactory
     implements PeripheralCommAdapterFactory {

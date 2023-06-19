@@ -27,10 +27,6 @@ import org.slf4j.LoggerFactory;
  * A parking position supplier that tries to find the parking position with the highest priority
  * that is unoccupied, not on the current route of any other vehicle and as close as possible to the
  * vehicle's current position.
- *
- * @author Youssef Zaki (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class PrioritizedParkingPositionSupplier
     extends AbstractParkingPositionSupplier {
@@ -109,14 +105,14 @@ public class PrioritizedParkingPositionSupplier
 
   private Set<Point> filterPositionsWithHighestPriority(Set<Point> positions) {
     checkArgument(!positions.isEmpty(), "'positions' must not be empty");
-    
+
     Map<Integer, List<Point>> prioritiesToPositions = positions.stream()
         .collect(Collectors.groupingBy(point -> priorityFunction.apply(point)));
 
     Integer highestPriority = prioritiesToPositions.keySet().stream()
         .reduce(Integer::min)
         .get();
-    
+
     return new HashSet<>(prioritiesToPositions.get(highestPriority));
   }
 }

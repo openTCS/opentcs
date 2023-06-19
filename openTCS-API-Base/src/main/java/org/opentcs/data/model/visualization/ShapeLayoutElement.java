@@ -18,7 +18,6 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  * properties.
  * </p>
  *
- * @author Stefan Walter (Fraunhofer IML)
  * @deprecated Will be removed.
  */
 @Deprecated

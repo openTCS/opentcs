@@ -17,8 +17,6 @@ import org.opentcs.drivers.peripherals.PeripheralProcessModel;
 
 /**
  * Provides peripheral comm adapter specific panels used for interaction and displaying information.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface PeripheralCommAdapterPanelFactory
     extends Lifecycle {

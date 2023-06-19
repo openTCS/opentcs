@@ -26,9 +26,6 @@ import org.opentcs.data.notification.UserNotification;
 
 /**
  * An observable model of a vehicle's and its comm adapter's attributes.
- *
- * @author Iryna Felko (Fraunhofer IML)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class VehicleProcessModel {
 

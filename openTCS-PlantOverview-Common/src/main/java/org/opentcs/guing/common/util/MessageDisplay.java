@@ -12,8 +12,6 @@ import org.opentcs.data.notification.UserNotification;
 /**
  * Implementations of this interface provide a way to display messages to the
  * user.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface MessageDisplay {
 

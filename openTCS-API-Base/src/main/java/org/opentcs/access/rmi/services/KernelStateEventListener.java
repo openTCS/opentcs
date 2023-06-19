@@ -11,8 +11,6 @@ import org.opentcs.access.Kernel;
 
 /**
  * A listener for events concerning kernel state changes.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 interface KernelStateEventListener {
 

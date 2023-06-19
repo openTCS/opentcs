@@ -17,8 +17,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.Undo
 
 /**
  * A TreeViewPanel for blocks.
- *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public class BlocksTreeViewPanel
     extends AbstractTreeViewPanel {

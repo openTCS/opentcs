@@ -9,8 +9,6 @@ package org.opentcs.guing.common.components.layer;
 
 /**
  * Organizes the layer groups in a plant model.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface LayerGroupManager
     extends LayerGroupEditor {

@@ -38,9 +38,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Manages attachment and detachment of communication adapters to vehicles.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class AttachmentManager
     implements Lifecycle {

@@ -11,8 +11,6 @@ import org.opentcs.guing.common.components.EditableComponent;
 
 /**
  * A JTree which delegates actions to it's parent.
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class StandardActionTree
     extends javax.swing.JTree

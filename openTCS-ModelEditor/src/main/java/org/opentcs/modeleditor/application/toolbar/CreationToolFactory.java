@@ -13,8 +13,6 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.application.toolbar.OpenTCSCo
 
 /**
  * A factory for tools concerned with the creation of figures/model elements.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface CreationToolFactory {
 

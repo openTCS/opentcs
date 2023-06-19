@@ -14,8 +14,6 @@ import org.opentcs.guing.base.model.elements.BlockModel;
 
 /**
  * Context for the block tree view.
- *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public class BlockContext
     implements UserObjectContext {

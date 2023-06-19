@@ -48,8 +48,6 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class V002DrivingCoursePersistenceTest {
 

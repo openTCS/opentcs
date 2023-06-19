@@ -12,8 +12,6 @@ import javax.annotation.Nonnull;
 
 /**
  * The default implementation of {@link VehicleCommAdapterDescription}.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DefaultVehicleCommAdapterDescription
     extends VehicleCommAdapterDescription {

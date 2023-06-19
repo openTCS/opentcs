@@ -36,8 +36,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for vehicles specific to the Operations Desk application.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class OpsDeskVehicleAdapter
     extends VehicleAdapter {

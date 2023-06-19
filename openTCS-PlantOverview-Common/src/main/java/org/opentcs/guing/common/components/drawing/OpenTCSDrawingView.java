@@ -20,8 +20,6 @@ import org.opentcs.guing.common.components.drawing.figures.BitmapFigure;
 import org.opentcs.util.event.EventHandler;
 
 /**
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface OpenTCSDrawingView
     extends DrawingView,

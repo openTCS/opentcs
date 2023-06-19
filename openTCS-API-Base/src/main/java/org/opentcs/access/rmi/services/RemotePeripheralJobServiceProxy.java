@@ -18,8 +18,6 @@ import org.opentcs.data.peripherals.PeripheralJob;
 /**
  * The default implementation of the peripheral job service.
  * Delegates method invocations to the corresponding remote service.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 class RemotePeripheralJobServiceProxy
     extends RemoteTCSObjectServiceProxy<RemotePeripheralJobService>

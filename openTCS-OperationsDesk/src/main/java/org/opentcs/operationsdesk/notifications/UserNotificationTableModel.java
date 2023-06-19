@@ -19,8 +19,6 @@ import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 
 /**
  * A table model for user notifications.
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class UserNotificationTableModel
     extends AbstractTableModel

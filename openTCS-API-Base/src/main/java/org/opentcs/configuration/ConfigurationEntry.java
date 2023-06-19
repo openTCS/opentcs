@@ -15,8 +15,6 @@ import java.lang.annotation.Target;
 
 /**
  * Marks an interface's method that provides a configuration value.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 @Target({METHOD})
 @Retention(RetentionPolicy.RUNTIME)

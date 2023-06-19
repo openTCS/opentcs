@@ -18,8 +18,6 @@ import org.opentcs.drivers.vehicle.MovementCommand;
 
 /**
  * The default movement command implementation.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class MovementCommandImpl
     implements MovementCommand {

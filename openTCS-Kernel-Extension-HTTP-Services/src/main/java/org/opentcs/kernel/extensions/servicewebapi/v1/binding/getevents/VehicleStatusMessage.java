@@ -18,8 +18,6 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  * A status message containing information about a vehicle.
- *
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public class VehicleStatusMessage
     extends StatusMessage {

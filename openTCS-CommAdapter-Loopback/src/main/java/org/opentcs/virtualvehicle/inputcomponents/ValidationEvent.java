@@ -11,8 +11,6 @@ import java.util.EventObject;
 
 /**
  * An event holding a single boolean variable indicating if something is valid.
- *
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public class ValidationEvent
     extends EventObject {

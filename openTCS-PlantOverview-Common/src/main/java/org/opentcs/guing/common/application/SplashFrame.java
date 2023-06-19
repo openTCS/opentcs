@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A frame for displaying the progress of longer-running processes.
- *
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class SplashFrame
     extends JFrame

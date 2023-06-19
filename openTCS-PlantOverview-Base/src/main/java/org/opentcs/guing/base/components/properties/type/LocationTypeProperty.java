@@ -14,8 +14,6 @@ import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property that can take a value from a given set of location types.
- *
- * @author Philipp Seifert (Philipp.Seifert@iml.fraunhofer.de)
  */
 public class LocationTypeProperty
     extends AbstractProperty

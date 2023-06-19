@@ -22,9 +22,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Updates a location's lock state with the kernel when it changes.
- *
- * @author Stefan Walter (Fraunhofer IML)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LocationLockAdapter
     implements AttributesChangeListener {

@@ -19,8 +19,6 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.components.drawing.OpenTCSDra
 
 /**
  * A Guice module for this package.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class DrawingInjectionModule
     extends AbstractModule {

@@ -14,8 +14,6 @@ import org.opentcs.data.peripherals.PeripheralJob;
 
 /**
  * A strategy for selecting a peripheral job to be processed next.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface JobSelectionStrategy {
 

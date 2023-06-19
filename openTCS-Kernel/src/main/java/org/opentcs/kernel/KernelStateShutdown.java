@@ -15,8 +15,6 @@ import org.opentcs.kernel.workingset.PlantModelManager;
 
 /**
  * This class implements the standard openTCS kernel when it's shut down.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class KernelStateShutdown
     extends KernelState {

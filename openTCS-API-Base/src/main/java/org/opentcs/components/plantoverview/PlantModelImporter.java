@@ -15,8 +15,6 @@ import org.opentcs.access.to.model.PlantModelCreationTO;
 /**
  * Implementations provide a way to import plant model data that is read from some external source
  * or generated.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface PlantModelImporter {
 

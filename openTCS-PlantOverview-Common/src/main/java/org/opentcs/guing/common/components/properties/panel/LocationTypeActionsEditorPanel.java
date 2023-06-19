@@ -15,9 +15,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * Allows editing of actions that a vehicle can execute at stations with the location type.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LocationTypeActionsEditorPanel
     extends StringSetPropertyEditorPanel {

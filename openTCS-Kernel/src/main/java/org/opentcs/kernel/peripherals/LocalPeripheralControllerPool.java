@@ -15,8 +15,6 @@ import org.opentcs.drivers.peripherals.PeripheralControllerPool;
 
 /**
  * Manages the attachment of peripheral controllers to locations and peripheral comm adapters.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface LocalPeripheralControllerPool
     extends PeripheralControllerPool,

@@ -47,8 +47,6 @@ import org.slf4j.LoggerFactory;
  * Note that no synchronization is done inside this class. Concurrent access of instances of this
  * class must be synchronized externally.
  * </p>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrderPoolManager
     extends TCSObjectManager {
@@ -550,7 +548,6 @@ public class TransportOrderPoolManager
         if (!isValidLocationDestination(destTo, (Location) destObject)) {
           throw new IllegalArgumentException(destTo.getDestOperation()
               + " is not a valid operation for location destination " + destObject.getName());
-          
         }
       }
       else {

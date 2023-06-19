@@ -24,8 +24,6 @@ import org.opentcs.util.event.EventHandler;
 
 /**
  * Shows every vehicle available in the system in a panel.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class VehiclesPanel
     extends JPanel

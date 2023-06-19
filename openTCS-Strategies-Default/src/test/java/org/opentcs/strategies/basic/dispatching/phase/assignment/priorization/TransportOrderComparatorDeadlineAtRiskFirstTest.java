@@ -24,8 +24,6 @@ import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorDeadlineAtRiskFirst;
 
 /**
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class TransportOrderComparatorDeadlineAtRiskFirstTest {
 

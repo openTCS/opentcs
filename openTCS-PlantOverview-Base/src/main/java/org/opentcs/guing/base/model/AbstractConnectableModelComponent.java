@@ -13,9 +13,6 @@ import org.opentcs.guing.base.model.elements.AbstractConnection;
 
 /**
  * A {@link ModelComponent} that can be connected with another model component.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public abstract class AbstractConnectableModelComponent
     extends AbstractModelComponent

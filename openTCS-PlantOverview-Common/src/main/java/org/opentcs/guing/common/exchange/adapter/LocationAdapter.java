@@ -33,9 +33,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for locations.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class LocationAdapter
     extends AbstractProcessAdapter {

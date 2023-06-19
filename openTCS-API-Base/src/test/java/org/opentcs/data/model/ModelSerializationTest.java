@@ -20,8 +20,6 @@ import org.opentcs.data.TCSObjectReference;
 
 /**
  * Tests for proper serialization and deserialization of classes derived by TCSObject.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class ModelSerializationTest {
 

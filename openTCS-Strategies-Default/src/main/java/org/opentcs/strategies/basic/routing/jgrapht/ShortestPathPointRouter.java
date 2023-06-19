@@ -30,8 +30,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <em>Note that this implementation does not integrate static routes.</em>
  * </p>
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ShortestPathPointRouter
     implements PointRouter {

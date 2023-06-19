@@ -21,8 +21,6 @@ import org.opentcs.guing.common.util.IconToolkit;
 
 /**
  * Represents a Figure component in the TreeView.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class FigureUserObject
     extends AbstractUserObject {

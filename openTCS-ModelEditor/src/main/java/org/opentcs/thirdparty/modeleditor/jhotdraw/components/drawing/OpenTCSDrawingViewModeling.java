@@ -48,7 +48,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A DrawingView implementation for the openTCS plant overview.
- *
  */
 public class OpenTCSDrawingViewModeling
     extends AbstractOpenTCSDrawingView {

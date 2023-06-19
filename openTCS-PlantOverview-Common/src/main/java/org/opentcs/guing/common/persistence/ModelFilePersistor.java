@@ -15,8 +15,6 @@ import org.opentcs.access.to.model.PlantModelCreationTO;
 
 /**
  * Interface to persist a {@link PlantModelCreationTO} to a local file.
- *
- * @author Tobias Marquardt (Fraunhofer IML)
  */
 public interface ModelFilePersistor {
 

@@ -25,8 +25,6 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.application.action.file.Close
 
 /**
  * The application's "File" menu.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class FileMenu
     extends JMenu {

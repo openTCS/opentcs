@@ -13,8 +13,6 @@ import java.awt.event.ComponentListener;
 /**
  * Triggers a (re-)initialization of the view's offset figures when notified
  * about resize events.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class OffsetListener
     implements ComponentListener {

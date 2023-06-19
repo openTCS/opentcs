@@ -32,8 +32,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Maintains a list of the most recent user notifications.
- *
- * @author Sebastian Bonna (Fraunhofer IML)
  */
 public class UserNotificationsContainer
     implements EventHandler,

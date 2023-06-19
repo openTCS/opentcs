@@ -1,6 +1,5 @@
 /**
  * (c): IML, JHotDraw.
- *
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit;
 
@@ -35,7 +34,6 @@ import org.slf4j.LoggerFactory;
  * operations.
  *
  * @author Werner Randelshofer
- * @author Heinz Huber (Fraunhofer IML)
  */
 public class UndoRedoManager
     extends UndoManager

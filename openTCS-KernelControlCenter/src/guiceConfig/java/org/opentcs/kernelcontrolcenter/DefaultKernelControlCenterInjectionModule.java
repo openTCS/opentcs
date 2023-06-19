@@ -46,8 +46,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A Guice module for the openTCS kernel control center application.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class DefaultKernelControlCenterInjectionModule
     extends ConfigurableInjectionModule {

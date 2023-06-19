@@ -56,10 +56,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Shows a table of the kernel's transport orders.
- *
- * @author Sven Liebing (ifak e.V. Magdeburg)
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class TransportOrdersContainerPanel
     extends JPanel {

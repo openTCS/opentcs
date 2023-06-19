@@ -25,8 +25,6 @@ import org.opentcs.kernel.workingset.TCSObjectRepository;
 
 /**
  * This class is the standard implementation of the {@link TCSObjectService} interface.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class StandardTCSObjectService
     implements TCSObjectService {

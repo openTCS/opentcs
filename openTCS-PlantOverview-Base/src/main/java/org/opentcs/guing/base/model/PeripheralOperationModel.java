@@ -13,8 +13,6 @@ import org.opentcs.data.peripherals.PeripheralOperation;
 
 /**
  * A Bean to hold the Peripheral operation.
- *
- * @author Leonard Schüngel (Fraunhofer IML)
  */
 public class PeripheralOperationModel {
 

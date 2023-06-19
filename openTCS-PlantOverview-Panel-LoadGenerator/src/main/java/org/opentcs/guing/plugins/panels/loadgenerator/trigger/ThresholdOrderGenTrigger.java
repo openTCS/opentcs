@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Triggers creation of a batch of orders if the number of transport orders
  * in progress drop to or below a given threshold.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class ThresholdOrderGenTrigger
     implements EventHandler,

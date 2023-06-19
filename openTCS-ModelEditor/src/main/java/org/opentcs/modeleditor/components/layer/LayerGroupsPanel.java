@@ -35,8 +35,6 @@ import org.opentcs.modeleditor.util.I18nPlantOverviewModeling;
 
 /**
  * A panel to display and edit layer groups.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public class LayerGroupsPanel
     extends JPanel {

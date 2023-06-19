@@ -27,8 +27,6 @@ import spark.Response;
 
 /**
  * Handles requests and produces responses for version 1 of the admin web API.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class V1RequestHandler
     implements Lifecycle {

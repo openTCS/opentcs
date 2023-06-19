@@ -28,8 +28,6 @@ import javax.swing.plaf.basic.BasicComboPopup;
  * <p>
  * This class will only work for a JComboBox that uses a BasicComboPop.
  * </p>
- *
- * @author Mustafa Yalciner (Fraunhofer IML)
  */
 public class BoundsPopupMenuListener
     implements PopupMenuListener {

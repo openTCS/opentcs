@@ -20,8 +20,6 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 
 /**
  * Provides methods concerning {@link Vehicle}s.
- *
- * @author Martin Grzenia (Fraunhofer IML)
  */
 public interface VehicleService
     extends TCSObjectService {
@@ -122,7 +120,7 @@ public interface VehicleService
   void updateVehicleIntegrationLevel(TCSObjectReference<Vehicle> ref,
                                      Vehicle.IntegrationLevel integrationLevel)
       throws ObjectUnknownException, KernelRuntimeException, IllegalArgumentException;
-  
+
   /**
    * Updates the vehicle's paused state.
    *

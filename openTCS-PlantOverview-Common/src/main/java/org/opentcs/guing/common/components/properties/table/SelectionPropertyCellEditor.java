@@ -19,8 +19,6 @@ import org.opentcs.guing.common.util.UserMessageHelper;
 
 /**
  * A cell editor for a selection property.
- *
- * @author Sebastian Naumann (ifak e.V. Magdeburg)
  */
 public class SelectionPropertyCellEditor
     extends AbstractPropertyCellEditor {

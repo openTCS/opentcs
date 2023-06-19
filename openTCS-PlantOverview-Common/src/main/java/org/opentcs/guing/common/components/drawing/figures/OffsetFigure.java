@@ -17,19 +17,17 @@ import org.opentcs.guing.common.components.drawing.course.Origin;
  * An OffsetFigure is an (invisible) figure that moves as the user drags the view
  * beyond its current bounds, so the view becomes larger resp is repainted
  * larger.
- *
- * @author Philipp Seifert (Fraunhofer IML)
  */
 public class OffsetFigure
     extends OriginFigure {
-  
+
   public OffsetFigure() {
     super();
     setModel(new Origin()); // The figure needs a model to work
     set(AttributeKeys.STROKE_COLOR, Color.darkGray);
     setVisible(false);      // only visible for test
   }
-  
+
   @Override
   protected void drawStroke(Graphics2D g) {
     // Shape: "Crosshair" with square

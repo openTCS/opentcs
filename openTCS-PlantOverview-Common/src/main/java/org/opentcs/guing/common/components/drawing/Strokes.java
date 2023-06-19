@@ -12,8 +12,6 @@ import java.awt.Stroke;
 
 /**
  * Strokes used in the drawing.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public class Strokes {
 
