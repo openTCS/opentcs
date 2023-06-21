@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
@@ -30,7 +28,6 @@ import org.opentcs.components.kernel.services.PeripheralDispatcherService;
 import org.opentcs.components.kernel.services.PeripheralJobService;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.components.kernel.services.VehicleService;
-import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Location;
@@ -40,6 +37,7 @@ import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
+import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostOrderSequenceRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
@@ -72,9 +70,9 @@ public class OrderHandler {
    */
   private final PeripheralDispatcherService jobDispatcherService;
   /**
-   * Executes tasks modifying kernel data.
+   * Executes calls via the kernel executor and waits for the outcome.
    */
-  private final ExecutorService kernelExecutor;
+  private final KernelExecutorWrapper executorWrapper;
 
   /**
    * Creates a new instance.
@@ -84,7 +82,7 @@ public class OrderHandler {
    * @param dispatcherService Used to withdraw transport orders.
    * @param jobService Used to create peripheral jobs.
    * @param jobDispatcherService Used to dispatch peripheral jobs.
-   * @param kernelExecutor Executes tasks modifying kernel data.
+   * @param executorWrapper Executes calls via the kernel executor and waits for the outcome.
    */
   @Inject
   public OrderHandler(TransportOrderService orderService,
@@ -92,13 +90,13 @@ public class OrderHandler {
                       DispatcherService dispatcherService,
                       PeripheralJobService jobService,
                       PeripheralDispatcherService jobDispatcherService,
-                      @KernelExecutor ExecutorService kernelExecutor) {
+                      KernelExecutorWrapper executorWrapper) {
     this.orderService = requireNonNull(orderService, "orderService");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.jobService = requireNonNull(jobService, "jobService");
     this.jobDispatcherService = requireNonNull(jobDispatcherService, "jobDispatcherService");
-    this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
+    this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
   }
 
   public TransportOrder createOrder(String name, PostTransportOrderRequestTO order)
@@ -121,96 +119,67 @@ public class OrderHandler {
             .withType(order.getType() == null ? OrderConstants.TYPE_NONE : order.getType())
             .withProperties(properties(order.getProperties()));
 
-    try {
-      return kernelExecutor.submit(
-          () -> {
-            TransportOrder result = orderService.createTransportOrder(to);
-            return result;
-          }
-      ).get();
-    }
-    catch (InterruptedException exc) {
-      throw new IllegalStateException("Unexpectedly interrupted");
-    }
-    catch (ExecutionException exc) {
-      if (exc.getCause() instanceof RuntimeException) {
-        throw (RuntimeException) exc.getCause();
-      }
-      throw new KernelRuntimeException(exc.getCause());
-    }
+    return executorWrapper.callAndWait(() -> {
+      return orderService.createTransportOrder(to);
+    });
   }
 
   public PeripheralJob createPeripheralJob(String name, PostPeripheralJobRequestTO job) {
     requireNonNull(name, "name");
     requireNonNull(job, "job");
 
-    // Check if the vehicle, location and transport order exist.
-    if (job.getRelatedVehicle() != null
-        && vehicleService.fetchObject(Vehicle.class, job.getRelatedVehicle()) == null) {
-      throw new ObjectUnknownException("Unknown vehicle: " + job.getRelatedVehicle());
-    }
-    if (job.getRelatedTransportOrder() != null
-        && vehicleService.fetchObject(TransportOrder.class,
-                                      job.getRelatedTransportOrder()) == null) {
-      throw new ObjectUnknownException(
-          "Unknown transport order: " + job.getRelatedTransportOrder()
-      );
-    }
-    if (job.getPeripheralOperation().getLocationName() != null
-        && vehicleService.fetchObject(Location.class,
-                                      job.getPeripheralOperation().getLocationName()) == null) {
-      throw new ObjectUnknownException(
-          "Unknown location: " + job.getPeripheralOperation().getLocationName()
-      );
-    }
-
-    PeripheralOperationCreationTO operationCreationTO = new PeripheralOperationCreationTO(
-        job.getPeripheralOperation().getOperation(),
-        job.getPeripheralOperation().getLocationName())
-        .withCompletionRequired(job.getPeripheralOperation().isCompletionRequired());
-    if (job.getPeripheralOperation().getExecutionTrigger() != null) {
-      operationCreationTO = operationCreationTO
-          .withExecutionTrigger(job.getPeripheralOperation().getExecutionTrigger());
-    }
-
-    PeripheralJobCreationTO jobCreationTO = new PeripheralJobCreationTO(
-        name,
-        job.getReservationToken(),
-        operationCreationTO)
-        .withIncompleteName(job.isIncompleteName());
-    if (job.getProperties() != null) {
-      jobCreationTO = jobCreationTO.withProperties(job.getProperties().stream()
-          .collect(Collectors.toMap(
-              property -> property.getKey(),
-              property -> property.getValue()
-          ))
-      );
-    }
-    if (job.getRelatedTransportOrder() != null) {
-      jobCreationTO = jobCreationTO.withRelatedTransportOrderName(job.getRelatedTransportOrder());
-    }
-    if (job.getRelatedVehicle() != null) {
-      jobCreationTO = jobCreationTO.withRelatedVehicleName(job.getRelatedVehicle());
-    }
-
-    try {
-      final PeripheralJobCreationTO finalJobCreationTO = jobCreationTO;
-      return kernelExecutor.submit(
-          () -> {
-            PeripheralJob result = jobService.createPeripheralJob(finalJobCreationTO);
-            return result;
-          }
-      ).get();
-    }
-    catch (InterruptedException exc) {
-      throw new IllegalStateException("Unexpectedly interrupted");
-    }
-    catch (ExecutionException exc) {
-      if (exc.getCause() instanceof RuntimeException) {
-        throw (RuntimeException) exc.getCause();
+    return executorWrapper.callAndWait(() -> {
+      // Check if the vehicle, location and transport order exist.
+      if (job.getRelatedVehicle() != null
+          && vehicleService.fetchObject(Vehicle.class, job.getRelatedVehicle()) == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + job.getRelatedVehicle());
       }
-      throw new KernelRuntimeException(exc.getCause());
-    }
+      if (job.getRelatedTransportOrder() != null
+          && vehicleService.fetchObject(TransportOrder.class,
+                                        job.getRelatedTransportOrder()) == null) {
+        throw new ObjectUnknownException(
+            "Unknown transport order: " + job.getRelatedTransportOrder()
+        );
+      }
+      if (job.getPeripheralOperation().getLocationName() != null
+          && vehicleService.fetchObject(Location.class,
+                                        job.getPeripheralOperation().getLocationName()) == null) {
+        throw new ObjectUnknownException(
+            "Unknown location: " + job.getPeripheralOperation().getLocationName()
+        );
+      }
+
+      PeripheralOperationCreationTO operationCreationTO = new PeripheralOperationCreationTO(
+          job.getPeripheralOperation().getOperation(),
+          job.getPeripheralOperation().getLocationName())
+          .withCompletionRequired(job.getPeripheralOperation().isCompletionRequired());
+      if (job.getPeripheralOperation().getExecutionTrigger() != null) {
+        operationCreationTO = operationCreationTO
+            .withExecutionTrigger(job.getPeripheralOperation().getExecutionTrigger());
+      }
+
+      PeripheralJobCreationTO jobCreationTO = new PeripheralJobCreationTO(
+          name,
+          job.getReservationToken(),
+          operationCreationTO)
+          .withIncompleteName(job.isIncompleteName());
+      if (job.getProperties() != null) {
+        jobCreationTO = jobCreationTO.withProperties(job.getProperties().stream()
+            .collect(Collectors.toMap(
+                property -> property.getKey(),
+                property -> property.getValue()
+            ))
+        );
+      }
+      if (job.getRelatedTransportOrder() != null) {
+        jobCreationTO = jobCreationTO.withRelatedTransportOrderName(job.getRelatedTransportOrder());
+      }
+      if (job.getRelatedVehicle() != null) {
+        jobCreationTO = jobCreationTO.withRelatedVehicleName(job.getRelatedVehicle());
+      }
+
+      return jobService.createPeripheralJob(jobCreationTO);
+    });
   }
 
   public OrderSequence createOrderSequence(String name, PostOrderSequenceRequestTO sequence)
@@ -228,42 +197,28 @@ public class OrderHandler {
         .withProperties(properties(sequence.getProperties()))
         .withType(sequence.getType());
 
-    try {
-      return kernelExecutor.submit(
-          () -> {
-            OrderSequence result = orderService.createOrderSequence(to);
-            return result;
-          }
-      ).get();
-    }
-    catch (InterruptedException exc) {
-      throw new IllegalStateException("Unexpectedly interrupted");
-    }
-    catch (ExecutionException exc) {
-      if (exc.getCause() instanceof RuntimeException) {
-        throw (RuntimeException) exc.getCause();
-      }
-      throw new KernelRuntimeException(exc.getCause());
-    }
+    return executorWrapper.callAndWait(() -> {
+      return orderService.createOrderSequence(to);
+    });
   }
 
   public void triggerDispatcher() {
-    kernelExecutor.submit(() -> dispatcherService.dispatch());
+    executorWrapper.callAndWait(() -> dispatcherService.dispatch());
   }
 
   public void triggerJobDispatcher() {
-    kernelExecutor.submit(() -> jobDispatcherService.dispatch());
+    executorWrapper.callAndWait(() -> jobDispatcherService.dispatch());
   }
 
   public void withdrawByTransportOrder(String name, boolean immediate, boolean disableVehicle)
       throws ObjectUnknownException {
     requireNonNull(name, "name");
 
-    if (orderService.fetchObject(TransportOrder.class, name) == null) {
-      throw new ObjectUnknownException("Unknown transport order: " + name);
-    }
+    executorWrapper.callAndWait(() -> {
+      if (orderService.fetchObject(TransportOrder.class, name) == null) {
+        throw new ObjectUnknownException("Unknown transport order: " + name);
+      }
 
-    kernelExecutor.submit(() -> {
       TransportOrder order = orderService.fetchObject(TransportOrder.class, name);
       if (disableVehicle && order.getProcessingVehicle() != null) {
         vehicleService.updateVehicleIntegrationLevel(order.getProcessingVehicle(),
@@ -278,12 +233,12 @@ public class OrderHandler {
       throws ObjectUnknownException {
     requireNonNull(name, "name");
 
-    Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
-    if (vehicle == null) {
-      throw new ObjectUnknownException("Unknown vehicle: " + name);
-    }
+    executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + name);
+      }
 
-    kernelExecutor.submit(() -> {
       if (disableVehicle) {
         vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
                                                      Vehicle.IntegrationLevel.TO_BE_RESPECTED);
@@ -297,49 +252,40 @@ public class OrderHandler {
       throws ObjectUnknownException {
     requireNonNull(name, "name");
 
-    Location location = jobService.fetchObject(Location.class, name);
-    if (location == null) {
-      throw new ObjectUnknownException("Unknown location: " + name);
-    }
-
-    try {
-      kernelExecutor.submit(
-          () -> jobDispatcherService.withdrawByLocation(location.getReference())
-      ).get();
-    }
-    catch (InterruptedException exc) {
-      throw new IllegalStateException("Unexpectedly interrupted");
-    }
-    catch (ExecutionException exc) {
-      if (exc.getCause() instanceof RuntimeException) {
-        throw (RuntimeException) exc.getCause();
+    executorWrapper.callAndWait(() -> {
+      Location location = jobService.fetchObject(Location.class, name);
+      if (location == null) {
+        throw new ObjectUnknownException("Unknown location: " + name);
       }
-      throw new KernelRuntimeException(exc.getCause());
-    }
+
+      jobDispatcherService.withdrawByLocation(location.getReference());
+    });
   }
 
   public void withdrawPeripheralJob(String name)
       throws ObjectUnknownException {
     requireNonNull(name, "name");
 
-    PeripheralJob job = jobService.fetchObject(PeripheralJob.class, name);
-    if (job == null) {
-      throw new ObjectUnknownException("Unknown peripheral job: " + name);
-    }
+    executorWrapper.callAndWait(() -> {
+      PeripheralJob job = jobService.fetchObject(PeripheralJob.class, name);
+      if (job == null) {
+        throw new ObjectUnknownException("Unknown peripheral job: " + name);
+      }
 
-    kernelExecutor.submit(() -> jobDispatcherService.withdrawByPeripheralJob(job.getReference()));
+      jobDispatcherService.withdrawByPeripheralJob(job.getReference());
+    });
   }
 
   public void reroute(String vehicleName, boolean forced)
       throws ObjectUnknownException {
     requireNonNull(vehicleName, "vehicleName");
 
-    Vehicle vehicle = orderService.fetchObject(Vehicle.class, vehicleName);
-    if (vehicle == null) {
-      throw new ObjectUnknownException("Unknown vehicle: " + vehicleName);
-    }
+    executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = orderService.fetchObject(Vehicle.class, vehicleName);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + vehicleName);
+      }
 
-    kernelExecutor.submit(() -> {
       dispatcherService.reroute(
           vehicle.getReference(),
           forced ? ReroutingType.FORCED : ReroutingType.REGULAR
@@ -383,5 +329,4 @@ public class OrderHandler {
     }
     return result;
   }
-
 }

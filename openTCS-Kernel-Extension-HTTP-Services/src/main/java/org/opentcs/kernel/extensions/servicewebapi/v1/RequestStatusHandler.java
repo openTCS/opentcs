@@ -11,16 +11,13 @@ import java.util.HashSet;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.components.kernel.services.VehicleService;
-import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Vehicle;
@@ -31,6 +28,7 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
 import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformation;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.AttachmentInformation;
+import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetOrderSequenceResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetTransportOrderResponseTO;
@@ -59,9 +57,9 @@ public class RequestStatusHandler {
    */
   private final VehicleService vehicleService;
   /**
-   * The kernel's executor service.
+   * Executes calls via the kernel executor and waits for the outcome.
    */
-  private final ExecutorService kernelExecutor;
+  private final KernelExecutorWrapper executorWrapper;
 
   /**
    * Creates a new instance.
@@ -69,17 +67,17 @@ public class RequestStatusHandler {
    * @param peripheralService The service used to manage peripherals.
    * @param orderService The service we use to get the transport orders.
    * @param vehicleService Used to update vehicle instances.
-   * @param kernelExecutor The kernel's executor service.
+   * @param executorWrapper Executes calls via the kernel executor and waits for the outcome.
    */
   @Inject
   public RequestStatusHandler(PeripheralService peripheralService,
                               TransportOrderService orderService,
                               VehicleService vehicleService,
-                              @KernelExecutor ExecutorService kernelExecutor) {
+                              KernelExecutorWrapper executorWrapper) {
     this.peripheralService = requireNonNull(peripheralService, "peripheralService");
     this.orderService = requireNonNull(orderService, "orderService");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
-    this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
+    this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
   }
 
   /**
@@ -93,18 +91,20 @@ public class RequestStatusHandler {
   public List<GetTransportOrderResponseTO> getTransportOrdersState(
       @Nullable String intendedVehicle
   ) {
-    if (intendedVehicle != null) {
-      Vehicle vehicle = orderService.fetchObject(Vehicle.class, intendedVehicle);
-      if (vehicle == null) {
-        throw new ObjectUnknownException("Unknown vehicle: " + intendedVehicle);
+    return executorWrapper.callAndWait(() -> {
+      if (intendedVehicle != null) {
+        Vehicle vehicle = orderService.fetchObject(Vehicle.class, intendedVehicle);
+        if (vehicle == null) {
+          throw new ObjectUnknownException("Unknown vehicle: " + intendedVehicle);
+        }
       }
-    }
 
-    return orderService.fetchObjects(TransportOrder.class,
-                                     new TransportOrderFilter(intendedVehicle))
-        .stream()
-        .map(order -> GetTransportOrderResponseTO.fromTransportOrder(order))
-        .collect(Collectors.toList());
+      return orderService.fetchObjects(TransportOrder.class,
+                                       new TransportOrderFilter(intendedVehicle))
+          .stream()
+          .map(order -> GetTransportOrderResponseTO.fromTransportOrder(order))
+          .collect(Collectors.toList());
+    });
   }
 
   /**
@@ -131,35 +131,26 @@ public class RequestStatusHandler {
     requireNonNull(name, "name");
     requireNonNull(value, "value");
 
-    Location location = peripheralService.fetchObject(Location.class, name);
-    if (location == null) {
-      throw new ObjectUnknownException("Unknown location: " + name);
-    }
-
-    PeripheralCommAdapterDescription newAdapter
-        = peripheralService.fetchAttachmentInformation(location.getReference())
-            .getAvailableCommAdapters()
-            .stream()
-            .filter(description -> description.getClass().getName().equals(value))
-            .findAny()
-            .orElseThrow(
-                () -> new IllegalArgumentException("Unknown peripheral driver class name: " + value)
-            );
-
-    try {
-      kernelExecutor.submit(
-          () -> peripheralService.attachCommAdapter(location.getReference(), newAdapter)
-      ).get();
-    }
-    catch (InterruptedException exc) {
-      throw new IllegalStateException("Unexpectedly interrupted");
-    }
-    catch (ExecutionException exc) {
-      if (exc.getCause() instanceof RuntimeException) {
-        throw (RuntimeException) exc.getCause();
+    executorWrapper.callAndWait(() -> {
+      Location location = peripheralService.fetchObject(Location.class, name);
+      if (location == null) {
+        throw new ObjectUnknownException("Unknown location: " + name);
       }
-      throw new KernelRuntimeException(exc.getCause());
-    }
+
+      PeripheralCommAdapterDescription newAdapter
+          = peripheralService.fetchAttachmentInformation(location.getReference())
+              .getAvailableCommAdapters()
+              .stream()
+              .filter(description -> description.getClass().getName().equals(value))
+              .findAny()
+              .orElseThrow(
+                  () -> new IllegalArgumentException(
+                      "Unknown peripheral driver class name: " + value
+                  )
+              );
+
+      peripheralService.attachCommAdapter(location.getReference(), newAdapter);
+    });
   }
 
   public void putPeripheralCommAdapterEnabled(String name, String value)
@@ -167,33 +158,34 @@ public class RequestStatusHandler {
     requireNonNull(name, "name");
     requireNonNull(value, "value");
 
-    Location location = peripheralService.fetchObject(Location.class, name);
-    if (location == null) {
-      throw new ObjectUnknownException("Unknown location: " + name);
-    }
+    executorWrapper.callAndWait(() -> {
+      Location location = peripheralService.fetchObject(Location.class, name);
+      if (location == null) {
+        throw new ObjectUnknownException("Unknown location: " + name);
+      }
 
-    if (Boolean.parseBoolean(value)) {
-      kernelExecutor.submit(
-          () -> peripheralService.enableCommAdapter(location.getReference())
-      );
-    }
-    else {
-      kernelExecutor.submit(
-          () -> peripheralService.disableCommAdapter(location.getReference())
-      );
-    }
+      if (Boolean.parseBoolean(value)) {
+        peripheralService.enableCommAdapter(location.getReference());
+      }
+      else {
+        peripheralService.disableCommAdapter(location.getReference());
+      }
+
+    });
   }
 
   public PeripheralAttachmentInformation getPeripheralCommAdapterAttachmentInformation(String name)
       throws ObjectUnknownException {
     requireNonNull(name, "name");
 
-    Location location = peripheralService.fetchObject(Location.class, name);
-    if (location == null) {
-      throw new ObjectUnknownException("Unknown location: " + name);
-    }
+    return executorWrapper.callAndWait(() -> {
+      Location location = peripheralService.fetchObject(Location.class, name);
+      if (location == null) {
+        throw new ObjectUnknownException("Unknown location: " + name);
+      }
 
-    return peripheralService.fetchAttachmentInformation(location.getReference());
+      return peripheralService.fetchAttachmentInformation(location.getReference());
+    });
   }
 
   /**
@@ -209,20 +201,25 @@ public class RequestStatusHandler {
       @Nullable String relatedVehicle,
       @Nullable String relatedTransportOrder
   ) {
-    // If a related vehicle or transport order is set, make sure they exist.
-    if (relatedVehicle != null && orderService.fetchObject(Vehicle.class, relatedVehicle) == null) {
-      throw new ObjectUnknownException("Unknown vehicle: " + relatedVehicle);
-    }
-    if (relatedTransportOrder != null
-        && orderService.fetchObject(TransportOrder.class, relatedTransportOrder) == null) {
-      throw new ObjectUnknownException("Unknown transport order: " + relatedTransportOrder);
-    }
 
-    return orderService.fetchObjects(PeripheralJob.class,
-                                     new PeripheralJobFilter(relatedVehicle, relatedTransportOrder))
-        .stream()
-        .map(peripheralJob -> GetPeripheralJobResponseTO.fromPeripheralJob(peripheralJob))
-        .collect(Collectors.toList());
+    return executorWrapper.callAndWait(() -> {
+      // If a related vehicle or transport order is set, make sure they exist.
+      if (relatedVehicle != null
+          && orderService.fetchObject(Vehicle.class, relatedVehicle) == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + relatedVehicle);
+      }
+      if (relatedTransportOrder != null
+          && orderService.fetchObject(TransportOrder.class, relatedTransportOrder) == null) {
+        throw new ObjectUnknownException("Unknown transport order: " + relatedTransportOrder);
+      }
+
+      return orderService.fetchObjects(PeripheralJob.class,
+                                       new PeripheralJobFilter(relatedVehicle,
+                                                               relatedTransportOrder))
+          .stream()
+          .map(peripheralJob -> GetPeripheralJobResponseTO.fromPeripheralJob(peripheralJob))
+          .collect(Collectors.toList());
+    });
   }
 
   /**
@@ -234,12 +231,14 @@ public class RequestStatusHandler {
   public GetPeripheralJobResponseTO getPeripheralJobByName(@Nonnull String name) {
     requireNonNull(name, "name");
 
-    PeripheralJob job = orderService.fetchObject(PeripheralJob.class, name);
-    if (job == null) {
-      throw new ObjectUnknownException("Unknown peripheral job: " + name);
-    }
+    return executorWrapper.callAndWait(() -> {
+      PeripheralJob job = orderService.fetchObject(PeripheralJob.class, name);
+      if (job == null) {
+        throw new ObjectUnknownException("Unknown peripheral job: " + name);
+      }
 
-    return GetPeripheralJobResponseTO.fromPeripheralJob(job);
+      return GetPeripheralJobResponseTO.fromPeripheralJob(job);
+    });
   }
 
   /**
@@ -250,12 +249,13 @@ public class RequestStatusHandler {
    * @return A list of vehicles, that match the filter.
    */
   public List<GetVehicleResponseTO> getVehiclesState(@Nullable String procState) {
-    List<GetVehicleResponseTO> vehicles = orderService.fetchObjects(Vehicle.class,
-                                                                    new VehicleFilter(procState))
-        .stream()
-        .map(vehicle -> GetVehicleResponseTO.fromVehicle(vehicle))
-        .collect(Collectors.toList());
-    return vehicles;
+
+    return executorWrapper.callAndWait(() -> {
+      return orderService.fetchObjects(Vehicle.class, new VehicleFilter(procState))
+          .stream()
+          .map(vehicle -> GetVehicleResponseTO.fromVehicle(vehicle))
+          .collect(Collectors.toList());
+    });
   }
 
   /**
@@ -269,11 +269,13 @@ public class RequestStatusHandler {
       throws ObjectUnknownException {
     requireNonNull(name, "name");
 
-    return orderService.fetchObjects(Vehicle.class, v -> v.getName().equals(name))
-        .stream()
-        .map(v -> GetVehicleResponseTO.fromVehicle(v))
-        .findAny()
-        .orElseThrow(() -> new ObjectUnknownException("Unknown vehicle: " + name));
+    return executorWrapper.callAndWait(() -> {
+      return orderService.fetchObjects(Vehicle.class, v -> v.getName().equals(name))
+          .stream()
+          .map(v -> GetVehicleResponseTO.fromVehicle(v))
+          .findAny()
+          .orElseThrow(() -> new ObjectUnknownException("Unknown vehicle: " + name));
+    });
   }
 
   public void putVehicleIntegrationLevel(String name, String value)
@@ -281,16 +283,15 @@ public class RequestStatusHandler {
     requireNonNull(name, "name");
     requireNonNull(value, "value");
 
-    Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
-    if (vehicle == null) {
-      throw new ObjectUnknownException("Unknown vehicle: " + name);
-    }
+    executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + name);
+      }
 
-    Vehicle.IntegrationLevel level = Vehicle.IntegrationLevel.valueOf(value);
-
-    kernelExecutor.submit(
-        () -> vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(), level)
-    );
+      vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
+                                                   Vehicle.IntegrationLevel.valueOf(value));
+    });
   }
 
   public void putVehiclePaused(String name, String value)
@@ -298,16 +299,14 @@ public class RequestStatusHandler {
     requireNonNull(name, "name");
     requireNonNull(value, "value");
 
-    Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
-    if (vehicle == null) {
-      throw new ObjectUnknownException("Unknown vehicle: " + name);
-    }
+    executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + name);
+      }
 
-    boolean paused = Boolean.parseBoolean(value);
-
-    kernelExecutor.submit(
-        () -> vehicleService.updateVehiclePaused(vehicle.getReference(), paused)
-    );
+      vehicleService.updateVehiclePaused(vehicle.getReference(), Boolean.parseBoolean(value));
+    });
   }
 
   public void putVehicleCommAdapterEnabled(String name, String value)
@@ -315,33 +314,33 @@ public class RequestStatusHandler {
     requireNonNull(name, "name");
     requireNonNull(value, "value");
 
-    Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
-    if (vehicle == null) {
-      throw new ObjectUnknownException("Unknown vehicle: " + name);
-    }
+    executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + name);
+      }
 
-    if (Boolean.parseBoolean(value)) {
-      kernelExecutor.submit(
-          () -> vehicleService.enableCommAdapter(vehicle.getReference())
-      );
-    }
-    else {
-      kernelExecutor.submit(
-          () -> vehicleService.disableCommAdapter(vehicle.getReference())
-      );
-    }
+      if (Boolean.parseBoolean(value)) {
+        vehicleService.enableCommAdapter(vehicle.getReference());
+      }
+      else {
+        vehicleService.disableCommAdapter(vehicle.getReference());
+      }
+    });
   }
 
   public AttachmentInformation getVehicleCommAdapterAttachmentInformation(String name)
       throws ObjectUnknownException {
     requireNonNull(name, "name");
 
-    Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
-    if (vehicle == null) {
-      throw new ObjectUnknownException("Unknown vehicle: " + name);
-    }
+    return executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + name);
+      }
 
-    return vehicleService.fetchAttachmentInformation(vehicle.getReference());
+      return vehicleService.fetchAttachmentInformation(vehicle.getReference());
+    });
   }
 
   public void putVehicleCommAdapter(String name, String value)
@@ -349,35 +348,23 @@ public class RequestStatusHandler {
     requireNonNull(name, "name");
     requireNonNull(value, "value");
 
-    Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
-    if (vehicle == null) {
-      throw new ObjectUnknownException("Unknown vehicle: " + name);
-    }
-
-    VehicleCommAdapterDescription newAdapter
-        = vehicleService.fetchAttachmentInformation(vehicle.getReference())
-            .getAvailableCommAdapters()
-            .stream()
-            .filter(description -> description.getClass().getName().equals(value))
-            .findAny()
-            .orElseThrow(
-                () -> new IllegalArgumentException("Unknown vehicle driver class name: " + value)
-            );
-
-    try {
-      kernelExecutor.submit(
-          () -> vehicleService.attachCommAdapter(vehicle.getReference(), newAdapter)
-      ).get();
-    }
-    catch (InterruptedException exc) {
-      throw new IllegalStateException("Unexpectedly interrupted");
-    }
-    catch (ExecutionException exc) {
-      if (exc.getCause() instanceof RuntimeException) {
-        throw (RuntimeException) exc.getCause();
+    executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + name);
       }
-      throw new KernelRuntimeException(exc.getCause());
-    }
+
+      VehicleCommAdapterDescription newAdapter
+          = vehicleService.fetchAttachmentInformation(vehicle.getReference())
+              .getAvailableCommAdapters()
+              .stream()
+              .filter(description -> description.getClass().getName().equals(value))
+              .findAny()
+              .orElseThrow(
+                  () -> new IllegalArgumentException("Unknown vehicle driver class name: " + value)
+              );
+      vehicleService.attachCommAdapter(vehicle.getReference(), newAdapter);
+    });
   }
 
   public void putVehicleAllowedOrderTypes(String name,
@@ -386,53 +373,46 @@ public class RequestStatusHandler {
     requireNonNull(name, "name");
     requireNonNull(allowedOrderTypes, "allowedOrderTypes");
 
-    Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
-    if (vehicle == null) {
-      throw new ObjectUnknownException("Unknown vehicle: " + name);
-    }
-
-    try {
-      kernelExecutor.submit(
-          () -> vehicleService.updateVehicleAllowedOrderTypes(
-              vehicle.getReference(), new HashSet<>(allowedOrderTypes.getOrderTypes()))
-      ).get();
-    }
-    catch (InterruptedException exc) {
-      throw new IllegalStateException("Unexpectedly interrupted");
-    }
-    catch (ExecutionException exc) {
-      if (exc.getCause() instanceof RuntimeException) {
-        throw (RuntimeException) exc.getCause();
+    executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + name);
       }
-      throw new KernelRuntimeException(exc.getCause());
-    }
+      vehicleService.updateVehicleAllowedOrderTypes(
+          vehicle.getReference(), new HashSet<>(allowedOrderTypes.getOrderTypes())
+      );
+    });
   }
 
   public List<GetOrderSequenceResponseTO> getOrderSequences(@Nullable String intendedVehicle) {
-    if (intendedVehicle != null) {
-      Vehicle vehicle = orderService.fetchObject(Vehicle.class, intendedVehicle);
-      if (vehicle == null) {
-        throw new ObjectUnknownException("Unknown vehicle: " + intendedVehicle);
+    return executorWrapper.callAndWait(() -> {
+      if (intendedVehicle != null) {
+        Vehicle vehicle = orderService.fetchObject(Vehicle.class, intendedVehicle);
+        if (vehicle == null) {
+          throw new ObjectUnknownException("Unknown vehicle: " + intendedVehicle);
+        }
       }
-    }
 
-    return orderService.fetchObjects(OrderSequence.class,
-                                     new OrderSequenceFilter(intendedVehicle))
-        .stream()
-        .map(order -> GetOrderSequenceResponseTO.fromOrderSequence(order))
-        .collect(Collectors.toList());
+      return orderService.fetchObjects(OrderSequence.class,
+                                       new OrderSequenceFilter(intendedVehicle))
+          .stream()
+          .map(order -> GetOrderSequenceResponseTO.fromOrderSequence(order))
+          .collect(Collectors.toList());
+    });
   }
 
   public GetOrderSequenceResponseTO getOrderSequenceByName(String name)
       throws ObjectUnknownException {
     requireNonNull(name, "name");
 
-    return orderService.fetchObjects(OrderSequence.class,
-                                     o -> o.getName().equals(name))
-        .stream()
-        .map(o -> GetOrderSequenceResponseTO.fromOrderSequence(o))
-        .findAny()
-        .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + name));
+    return executorWrapper.callAndWait(() -> {
+      return orderService.fetchObjects(OrderSequence.class,
+                                       o -> o.getName().equals(name))
+          .stream()
+          .map(o -> GetOrderSequenceResponseTO.fromOrderSequence(o))
+          .findAny()
+          .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + name));
+    });
   }
 
   public void putOrderSequenceComplete(String name)
@@ -442,24 +422,12 @@ public class RequestStatusHandler {
              ExecutionException {
     requireNonNull(name, "name");
 
-    OrderSequence orderSequence = orderService.fetchObject(OrderSequence.class, name);
-    if (orderSequence == null) {
-      throw new ObjectUnknownException("Unknown order sequence: " + name);
-    }
-
-    try {
-      kernelExecutor.submit(
-          () -> orderService.markOrderSequenceComplete(orderSequence.getReference())
-      ).get();
-    }
-    catch (InterruptedException exc) {
-      throw new IllegalStateException("Unexpectedly interrupted");
-    }
-    catch (ExecutionException exc) {
-      if (exc.getCause() instanceof RuntimeException) {
-        throw (RuntimeException) exc.getCause();
+    executorWrapper.callAndWait(() -> {
+      OrderSequence orderSequence = orderService.fetchObject(OrderSequence.class, name);
+      if (orderSequence == null) {
+        throw new ObjectUnknownException("Unknown order sequence: " + name);
       }
-      throw new KernelRuntimeException(exc.getCause());
-    }
+      orderService.markOrderSequenceComplete(orderSequence.getReference());
+    });
   }
 }

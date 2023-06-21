@@ -12,6 +12,8 @@ import static java.util.Objects.requireNonNull;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.inject.Inject;
+import org.opentcs.access.Kernel;
+import org.opentcs.access.KernelStateTransitionEvent;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.TCSObject;
@@ -62,6 +64,10 @@ public class StatusEventDispatcher
    * Whether this instance is initialized.
    */
   private boolean initialized;
+  /**
+   * Whether we are collecting events.
+   */
+  private boolean eventCollectingOn;
 
   @Inject
   public StatusEventDispatcher(ServiceWebApiConfiguration configuration,
@@ -74,11 +80,6 @@ public class StatusEventDispatcher
   public void initialize() {
     if (isInitialized()) {
       return;
-    }
-
-    synchronized (events) {
-      eventCount = 0;
-      events.clear();
     }
 
     eventSource.subscribe(this);
@@ -104,33 +105,16 @@ public class StatusEventDispatcher
 
   @Override
   public void onEvent(Object event) {
-    if (!(event instanceof TCSObjectEvent)) {
+    if (event instanceof KernelStateTransitionEvent) {
+      handleStateTransition((KernelStateTransitionEvent) event);
+    }
+
+    if (!eventCollectingOn) {
       return;
     }
-    TCSObject<?> object = ((TCSObjectEvent) event).getCurrentOrPreviousObjectState();
-    if (object instanceof TransportOrder) {
-      synchronized (events) {
-        addOrderStatusMessage((TransportOrder) object, eventCount);
-        eventCount++;
-        cleanUpEvents();
-        events.notifyAll();
-      }
-    }
-    else if (object instanceof Vehicle) {
-      synchronized (events) {
-        addVehicleStatusMessage((Vehicle) object, eventCount);
-        eventCount++;
-        cleanUpEvents();
-        events.notifyAll();
-      }
-    }
-    else if (object instanceof PeripheralJob) {
-      synchronized (events) {
-        addPeripheralStatusMessage((PeripheralJob) object, eventCount);
-        eventCount++;
-        cleanUpEvents();
-        events.notifyAll();
-      }
+
+    if (event instanceof TCSObjectEvent) {
+      handleObjectEvent((TCSObjectEvent) event);
     }
   }
 
@@ -164,6 +148,48 @@ public class StatusEventDispatcher
       result.getStatusMessages().addAll(messages);
     }
     return result;
+  }
+
+  private void handleStateTransition(KernelStateTransitionEvent event) {
+    boolean wasOn = eventCollectingOn;
+    eventCollectingOn
+        = event.getEnteredState() == Kernel.State.OPERATING && event.isTransitionFinished();
+
+    // When switching collecting of events on, ensure we start clean.
+    if (!wasOn && eventCollectingOn) {
+      synchronized (events) {
+        eventCount = 0;
+        events.clear();
+      }
+    }
+  }
+
+  private void handleObjectEvent(TCSObjectEvent event) {
+    TCSObject<?> object = event.getCurrentOrPreviousObjectState();
+    if (object instanceof TransportOrder) {
+      synchronized (events) {
+        addOrderStatusMessage((TransportOrder) object, eventCount);
+        eventCount++;
+        cleanUpEvents();
+        events.notifyAll();
+      }
+    }
+    else if (object instanceof Vehicle) {
+      synchronized (events) {
+        addVehicleStatusMessage((Vehicle) object, eventCount);
+        eventCount++;
+        cleanUpEvents();
+        events.notifyAll();
+      }
+    }
+    else if (object instanceof PeripheralJob) {
+      synchronized (events) {
+        addPeripheralStatusMessage((PeripheralJob) object, eventCount);
+        eventCount++;
+        cleanUpEvents();
+        events.notifyAll();
+      }
+    }
   }
 
   private void addOrderStatusMessage(TransportOrder order, long sequenceNumber) {

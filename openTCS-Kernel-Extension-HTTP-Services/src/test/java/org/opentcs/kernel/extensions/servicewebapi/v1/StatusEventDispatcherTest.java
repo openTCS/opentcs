@@ -15,6 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import org.opentcs.access.Kernel;
+import org.opentcs.access.KernelStateTransitionEvent;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration;
@@ -53,6 +55,9 @@ public class StatusEventDispatcherTest {
     final int eventCount = capacity * 2;
     when(configuration.statusEventsCapacity()).thenReturn(capacity);
     statusEventDispatcher.initialize();
+    statusEventDispatcher.onEvent(
+        new KernelStateTransitionEvent(Kernel.State.MODELLING, Kernel.State.OPERATING, true)
+    );
 
     TransportOrder order = new TransportOrder("SomeOrder", new ArrayList<>());
     for (int i = 0; i < eventCount; i++) {
@@ -73,6 +78,9 @@ public class StatusEventDispatcherTest {
     final int eventCount = capacity / 2;
     when(configuration.statusEventsCapacity()).thenReturn(capacity);
     statusEventDispatcher.initialize();
+    statusEventDispatcher.onEvent(
+        new KernelStateTransitionEvent(Kernel.State.MODELLING, Kernel.State.OPERATING, true)
+    );
 
     TransportOrder order = new TransportOrder("SomeOrder", new ArrayList<>());
     for (int i = 0; i < 5; i++) {

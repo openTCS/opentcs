@@ -43,7 +43,7 @@ public class ServiceWebApiModule
     bind(ServiceWebApiConfiguration.class)
         .toInstance(configuration);
 
-    extensionsBinderOperating().addBinding()
+    extensionsBinderAllModes().addBinding()
         .to(ServiceWebApi.class)
         .in(Singleton.class);
   }
