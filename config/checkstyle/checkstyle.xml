@@ -18,6 +18,12 @@
     <property name="files" value=".*Test.java"/>
   </module>
 
+  <!-- For thirdparty packages and for package info files we allow the license header to differ. -->
+  <module name="SuppressionSingleFilter">
+    <property name="checks" value="Header"/>
+    <property name="files" value=".*[/\\]org[/\\]opentcs[/\\]thirdparty[/\\].*|.*[/\\]package-info.java"/>
+  </module>
+
   <module name="SuppressWithPlainTextCommentFilter">
     <property name="offCommentFormat" value="// CHECKSTYLE:OFF.*"/>
     <property name="onCommentFormat" value="// CHECKSTYLE:ON"/>
@@ -26,6 +32,12 @@
   <property name="severity" value="warning"/>
 
   <property name="fileExtensions" value="java, properties"/>
+
+  <module name="Header">
+    <property name="headerFile" value="${config_loc}/java.header"/>
+    <property name="fileExtensions" value="java"/>
+    <property name="severity" value="error"/>
+  </module>
 
   <module name="FileLength">
     <property name="max" value="2000"/>

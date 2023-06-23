@@ -1,9 +1,0 @@
-apply plugin: 'com.github.hierynomus.license'
-
-license {
-  header = rootProject.file('config/LICENSE')
-  include "**/*.java"
-  exclude "**/package-info.java"
-  exclude "org/opentcs/thirdparty/**/*"
-  strictCheck true
-}

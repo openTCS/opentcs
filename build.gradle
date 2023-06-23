@@ -7,8 +7,6 @@ buildscript {
     }
   }
   dependencies {
-    // License plugin
-    classpath 'gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1'
     // Stats plugin
     classpath 'org.kordamp.gradle:stats-gradle-plugin:0.2.2'
     // JaCoCo log plugin
