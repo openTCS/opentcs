@@ -21,3 +21,19 @@ Briefly and clearly describe the purpose of your contribution in the correspondi
 
 The openTCS project uses the [SemVer](https://semver.org/) for versioning.
 The release versions are tagged with their respective version.
+
+## Working on the code in this project
+
+### Primary formatting rules
+
+* Maximum line length: 100 characters.
+* Do not use tabs, use spaces only.
+* Indentation step size: 2 spaces.
+
+### IDE: NetBeans
+
+To build the project from NetBeans, register a Java platform named "JDK 13 - openTCS" (without the quotes) within NetBeans.
+This JDK will be used by NetBeans for running the build process.
+
+The NetBeans settings contained in this project include formatting rules.
+Please apply them before submitting contributions to keep the formatting consistent.
