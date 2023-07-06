@@ -24,6 +24,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** The peripheral jobs panel in the Operations Desk application will now always be shown.
    The option to enable or disable it via the configuration file has been removed.
 ** Removed documentation for server side web API errors (code 500).
+** Sync points' layout and model coordinates in the demo plant model.
 
 == Version 5.9 (2023-05-31)
 

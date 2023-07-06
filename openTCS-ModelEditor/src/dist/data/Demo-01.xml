@@ -1,236 +1,236 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model version="0.0.4" name="Demo-01">
-    <point name="Point-0001" xPosition="53288" yPosition="-3893" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0001" xPosition="28000" yPosition="11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0001 --- Point-0002"/>
         <outgoingPath name="Point-0001 --- Point-0003"/>
         <pointLayout xPosition="28000" yPosition="11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0002" xPosition="50474" yPosition="-5769" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
+    <point name="Point-0002" xPosition="25000" yPosition="9000" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
         <outgoingPath name="Point-0002 --- Point-0014"/>
         <pointLayout xPosition="25000" yPosition="9000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0003" xPosition="53288" yPosition="-9522" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0003" xPosition="28000" yPosition="5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0003 --- Point-0004"/>
         <outgoingPath name="Point-0003 --- Point-0005"/>
         <pointLayout xPosition="28000" yPosition="5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0004" xPosition="50474" yPosition="-11398" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
+    <point name="Point-0004" xPosition="25000" yPosition="3000" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
         <outgoingPath name="Point-0004 --- Point-0008"/>
         <pointLayout xPosition="25000" yPosition="3000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0005" xPosition="53288" yPosition="-15151" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0005" xPosition="28000" yPosition="-1000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0005 --- Point-0006"/>
         <outgoingPath name="Point-0005 --- Point-0007"/>
         <pointLayout xPosition="28000" yPosition="-1000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0006" xPosition="50474" yPosition="-17027" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
+    <point name="Point-0006" xPosition="25000" yPosition="-3000" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
         <outgoingPath name="Point-0006 --- Point-0009"/>
         <pointLayout xPosition="25000" yPosition="-3000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0007" xPosition="53288" yPosition="-20780" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0007" xPosition="28000" yPosition="-7000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0007 --- Point-0010"/>
         <outgoingPath name="Point-0007 --- Point-0012"/>
         <pointLayout xPosition="28000" yPosition="-7000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0008" xPosition="47659" yPosition="-13275" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0008" xPosition="22000" yPosition="1000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0008 --- Point-0009"/>
         <pointLayout xPosition="22000" yPosition="1000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0009" xPosition="47659" yPosition="-18904" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0009" xPosition="22000" yPosition="-5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0009 --- Point-0011"/>
         <pointLayout xPosition="22000" yPosition="-5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0010" xPosition="50474" yPosition="-22657" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
+    <point name="Point-0010" xPosition="25000" yPosition="-9000" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
         <outgoingPath name="Point-0010 --- Point-0011"/>
         <pointLayout xPosition="25000" yPosition="-9000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0011" xPosition="47659" yPosition="-24533" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0011" xPosition="22000" yPosition="-11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0011 --- Point-0013"/>
         <pointLayout xPosition="22000" yPosition="-11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0012" xPosition="50474" yPosition="-28286" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
+    <point name="Point-0012" xPosition="25000" yPosition="-15000" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
         <outgoingPath name="Point-0012 --- Point-0013"/>
         <pointLayout xPosition="25000" yPosition="-15000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0013" xPosition="43906" yPosition="-28286" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0013" xPosition="18000" yPosition="-15000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0013 --- Point-0015"/>
         <outgoingPath name="Point-0013 --- Point-0018"/>
         <outgoingPath name="Point-0013 --- Point-0057"/>
         <pointLayout xPosition="18000" yPosition="-15000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0014" xPosition="47659" yPosition="-7646" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0014" xPosition="22000" yPosition="7000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0014 --- Point-0008"/>
         <pointLayout xPosition="22000" yPosition="7000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0015" xPosition="34384" yPosition="-24533" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0015" xPosition="7850" yPosition="-11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0015 --- Point-0016"/>
         <outgoingPath name="Point-0015 --- Point-0050"/>
         <pointLayout xPosition="7850" yPosition="-11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0016" xPosition="25143" yPosition="-24533" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0016" xPosition="-2000" yPosition="-11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0016 --- Point-0017"/>
         <outgoingPath name="Point-0016 --- Point-0022"/>
         <outgoingPath name="Point-0016 --- Point-0046"/>
         <pointLayout xPosition="-2000" yPosition="-11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0017" xPosition="15761" yPosition="-28286" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0017" xPosition="-12000" yPosition="-15000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0017 --- Point-0020"/>
         <pointLayout xPosition="-12000" yPosition="-15000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0018" xPosition="34525" yPosition="-28286" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0018" xPosition="8000" yPosition="-15000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0018 --- Point-0019"/>
         <pointLayout xPosition="8000" yPosition="-15000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0019" xPosition="25143" yPosition="-28286" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0019" xPosition="-2000" yPosition="-15000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0019 --- Point-0017"/>
         <outgoingPath name="Point-0019 --- Point-0022"/>
         <pointLayout xPosition="-2000" yPosition="-15000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0020" xPosition="8255" yPosition="-25471" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0020" xPosition="-20000" yPosition="-12000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0020 --- Point-0021"/>
         <pointLayout xPosition="-20000" yPosition="-12000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0021" xPosition="4503" yPosition="-21718" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0021" xPosition="-24000" yPosition="-8000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0021 --- Point-0023"/>
         <pointLayout xPosition="-24000" yPosition="-8000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0022" xPosition="15761" yPosition="-24533" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0022" xPosition="-12000" yPosition="-11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0022 --- Point-0056"/>
         <pointLayout xPosition="-12000" yPosition="-11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0023" xPosition="4503" yPosition="-17966" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0023" xPosition="-24000" yPosition="-4000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0023 --- Point-0024"/>
         <pointLayout xPosition="-24000" yPosition="-4000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0024" xPosition="4503" yPosition="-13275" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0024" xPosition="-24000" yPosition="1000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0024 --- Point-0025"/>
         <pointLayout xPosition="-24000" yPosition="1000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0025" xPosition="4503" yPosition="-8584" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0025" xPosition="-24000" yPosition="6000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0025 --- Point-0026"/>
         <outgoingPath name="Point-0025 --- Point-0030"/>
         <outgoingPath name="Point-0025 --- Point-0042"/>
         <pointLayout xPosition="-24000" yPosition="6000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0026" xPosition="4503" yPosition="-3893" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0026" xPosition="-24000" yPosition="11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0026 --- Point-0027"/>
         <pointLayout xPosition="-24000" yPosition="11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0027" xPosition="8255" yPosition="-140" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
+    <point name="Point-0027" xPosition="-20000" yPosition="15000" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
         <outgoingPath name="Point-0027 --- Point-0032"/>
         <pointLayout xPosition="-20000" yPosition="15000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0028" xPosition="19514" yPosition="-3893" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0028" xPosition="-8000" yPosition="11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0028 --- Point-0029"/>
         <pointLayout xPosition="-8000" yPosition="11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0029" xPosition="25143" yPosition="-3893" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0029" xPosition="-2000" yPosition="11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0029 --- Point-0035"/>
         <pointLayout xPosition="-2000" yPosition="11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0030" xPosition="8255" yPosition="-3893" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0030" xPosition="-20000" yPosition="11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0030 --- Point-0032"/>
         <pointLayout xPosition="-20000" yPosition="11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0032" xPosition="14823" yPosition="-3893" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0032" xPosition="-13000" yPosition="11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0032 --- Point-0028"/>
         <pointLayout xPosition="-13000" yPosition="11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0033" xPosition="49535" yPosition="-140" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0033" xPosition="24000" yPosition="15000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0033 --- Point-0001"/>
         <pointLayout xPosition="24000" yPosition="15000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0034" xPosition="42030" yPosition="-3893" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0034" xPosition="16000" yPosition="11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0034 --- Point-0014"/>
         <outgoingPath name="Point-0034 --- Point-0033"/>
         <pointLayout xPosition="16000" yPosition="11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0035" xPosition="29834" yPosition="-3893" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0035" xPosition="3000" yPosition="11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0035 --- Point-0036"/>
         <pointLayout xPosition="3000" yPosition="11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0036" xPosition="35463" yPosition="-3893" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0036" xPosition="9000" yPosition="11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0036 --- Point-0034"/>
         <pointLayout xPosition="9000" yPosition="11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0037" xPosition="19514" yPosition="-7646" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0037" xPosition="-8000" yPosition="7000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0037 --- Point-0028"/>
         <pointLayout xPosition="-8000" yPosition="7000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0038" xPosition="25143" yPosition="-7646" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0038" xPosition="-2000" yPosition="7000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0038 --- Point-0037"/>
         <pointLayout xPosition="-2000" yPosition="7000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0039" xPosition="14823" yPosition="-5769" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0039" xPosition="-13000" yPosition="9000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0039 --- Point-0040"/>
         <pointLayout xPosition="-13000" yPosition="9000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0040" xPosition="19514" yPosition="-5769" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0040" xPosition="-8000" yPosition="9000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0040 --- Point-0041"/>
         <pointLayout xPosition="-8000" yPosition="9000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0041" xPosition="25143" yPosition="-5769" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0041" xPosition="-2000" yPosition="9000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0041 --- Point-0035"/>
         <pointLayout xPosition="-2000" yPosition="9000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0042" xPosition="8255" yPosition="-5769" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0042" xPosition="-20000" yPosition="9000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0042 --- Point-0039"/>
         <pointLayout xPosition="-20000" yPosition="9000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0043" xPosition="16699" yPosition="-9522" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0043" xPosition="-11000" yPosition="5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0043 --- Point-0052"/>
         <pointLayout xPosition="-11000" yPosition="5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0044" xPosition="33586" yPosition="-9522" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0044" xPosition="7000" yPosition="5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0044 --- Point-0047"/>
         <pointLayout xPosition="7000" yPosition="5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0045" xPosition="33586" yPosition="-20780" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0045" xPosition="7000" yPosition="-7000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0045 --- Point-0016"/>
         <outgoingPath name="Point-0045 --- Point-0055"/>
         <pointLayout xPosition="7000" yPosition="-7000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0046" xPosition="16699" yPosition="-20780" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0046" xPosition="-11000" yPosition="-7000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0046 --- Point-0054"/>
         <pointLayout xPosition="-11000" yPosition="-7000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0047" xPosition="37339" yPosition="-13275" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0047" xPosition="11000" yPosition="1000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0047 --- Point-0053"/>
         <pointLayout xPosition="11000" yPosition="1000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0048" xPosition="12946" yPosition="-13275" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0048" xPosition="-15000" yPosition="1000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0048 --- Point-0043"/>
         <pointLayout xPosition="-15000" yPosition="1000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0049" xPosition="28895" yPosition="-11398" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0049" xPosition="2000" yPosition="3000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0049 --- Point-0038"/>
         <pointLayout xPosition="2000" yPosition="3000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0050" xPosition="28895" yPosition="-18904" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0050" xPosition="2000" yPosition="-5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0050 --- Point-0051"/>
         <pointLayout xPosition="2000" yPosition="-5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0051" xPosition="28895" yPosition="-15151" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0051" xPosition="2000" yPosition="-1000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0051 --- Point-0049"/>
         <pointLayout xPosition="2000" yPosition="-1000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0052" xPosition="25143" yPosition="-9522" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0052" xPosition="-2000" yPosition="5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0052 --- Point-0044"/>
         <pointLayout xPosition="-2000" yPosition="5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0053" xPosition="37339" yPosition="-17027" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0053" xPosition="11000" yPosition="-3000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0053 --- Point-0045"/>
         <pointLayout xPosition="11000" yPosition="-3000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0054" xPosition="12946" yPosition="-17027" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0054" xPosition="-15000" yPosition="-3000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0054 --- Point-0048"/>
         <pointLayout xPosition="-15000" yPosition="-3000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0055" xPosition="25143" yPosition="-20780" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0055" xPosition="-2000" yPosition="-7000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0055 --- Point-0046"/>
         <pointLayout xPosition="-2000" yPosition="-7000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0056" xPosition="8255" yPosition="-21718" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0056" xPosition="-20000" yPosition="-8000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0056 --- Point-0023"/>
         <pointLayout xPosition="-20000" yPosition="-8000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
@@ -740,5 +740,5 @@
         <layer id="0" ordinal="0" visible="true" name="Default layer" groupId="0"/>
         <layerGroup id="0" name="Default layer group" visible="true"/>
     </visualLayout>
-    <property name="tcs:modelFileLastModified" value="2022-05-04T06:09:43Z"/>
+    <property name="tcs:modelFileLastModified" value="2023-07-06T13:56:41Z"/>
 </model>
