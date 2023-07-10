@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.kernelcontrolcenter.vehicles;
+package org.opentcs.kernelcontrolcenter.util;
 
 import java.awt.Component;
 import java.awt.event.KeyEvent;
@@ -22,7 +22,7 @@ import javax.swing.table.TableCellEditor;
 /**
  * A cell editor for maintaining different editors in one column.
  */
-final class SingleCellEditor
+public final class SingleCellEditor
     implements TableCellEditor {
 
   /**
@@ -47,7 +47,7 @@ final class SingleCellEditor
    *
    * @param table The JTable associated
    */
-  SingleCellEditor(JTable table) {
+  public SingleCellEditor(JTable table) {
     this.table = table;
     editors = new HashMap<>();
     defaultEditor = new DefaultCellEditor(new JTextField());
@@ -127,7 +127,7 @@ final class SingleCellEditor
       row = table.getSelectionModel().getAnchorSelectionIndex();
     }
     else {
-      row = table.rowAtPoint(e.getPoint());
+      row = table.convertRowIndexToModel(table.rowAtPoint(e.getPoint()));
     }
     editor = editors.get(row);
     if (editor == null) {

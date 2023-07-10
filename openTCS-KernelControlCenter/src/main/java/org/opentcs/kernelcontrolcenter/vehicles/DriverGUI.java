@@ -38,6 +38,7 @@ import org.opentcs.drivers.vehicle.commands.InitPositionCommand;
 import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
+import org.opentcs.kernelcontrolcenter.util.SingleCellEditor;
 import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.CallWrapper;
 import org.opentcs.util.Comparators;

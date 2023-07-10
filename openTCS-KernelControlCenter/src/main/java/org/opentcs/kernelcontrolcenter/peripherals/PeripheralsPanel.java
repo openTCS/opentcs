@@ -8,11 +8,16 @@
 package org.opentcs.kernelcontrolcenter.peripherals;
 
 import java.awt.EventQueue;
+import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
+import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JOptionPane;
 import javax.swing.RowFilter;
 import javax.swing.table.TableRowSorter;
 import org.opentcs.access.Kernel;
@@ -21,8 +26,12 @@ import org.opentcs.common.peripherals.NullPeripheralCommAdapterDescription;
 import org.opentcs.components.kernelcontrolcenter.ControlCenterPanel;
 import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
+import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformation;
+import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
+import org.opentcs.kernelcontrolcenter.util.SingleCellEditor;
 import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.CallWrapper;
+import org.opentcs.util.gui.BoundsPopupMenuListener;
 import org.opentcs.util.gui.StringTableCellRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +67,10 @@ public class PeripheralsPanel
    */
   private TableRowSorter<PeripheralTableModel> sorter;
   /**
+   * This instance's resource bundle.
+   */
+  private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
+  /**
    * Whether this component is initialized.
    */
   private boolean initialized;
@@ -81,6 +94,10 @@ public class PeripheralsPanel
     this.detailPanel = requireNonNull(detailPanel, "detailPanel");
 
     initComponents();
+
+    peripheralTable.setDefaultRenderer(PeripheralCommAdapterDescription.class,
+                                       new CommAdapterFactoryTableCellRenderer());
+
     peripheralDetailsPanel.add(detailPanel);
   }
 
@@ -146,7 +163,96 @@ public class PeripheralsPanel
       entry.addPropertyChangeListener(model);
     });
 
+    initComboBoxes();
     updateRowFilter();
+  }
+
+  private void initComboBoxes() {
+    SingleCellEditor adpaterCellEditor = new SingleCellEditor(peripheralTable);
+
+    int index = 0;
+    for (LocalPeripheralEntry entry : peripheralEntryPool.getEntries().values()) {
+      initCommAdaptersComboBox(entry, index, adpaterCellEditor);
+      index++;
+    }
+
+    peripheralTable.getColumn(PeripheralTableModel.adapterColumnIdentifier())
+        .setCellEditor(adpaterCellEditor);
+  }
+
+  private void initCommAdaptersComboBox(LocalPeripheralEntry peripheralEntry,
+                                        int rowIndex,
+                                        SingleCellEditor adapterCellEditor) {
+    final PeripheralAdapterComboBox comboBox = new PeripheralAdapterComboBox();
+    PeripheralAttachmentInformation ai;
+    try {
+      ai = callWrapper.call(() -> servicePortal.getPeripheralService().fetchAttachmentInformation(
+          peripheralEntry.getLocation()
+      ));
+    }
+    catch (Exception ex) {
+      LOG.warn("Error fetching attachment information for {}",
+               peripheralEntry.getLocation().getName(),
+               ex
+      );
+      return;
+    }
+
+    for (PeripheralCommAdapterDescription factory : ai.getAvailableCommAdapters()) {
+      comboBox.addItem(factory);
+    }
+    if (ai.getAvailableCommAdapters().isEmpty()) {
+      comboBox.addItem(new NullPeripheralCommAdapterDescription());
+    }
+
+    // Set the selection to the attached comm adapter. (The peripheral is already attached to a comm
+    // adapter due to auto attachment on startup.)
+    comboBox.setSelectedItem(ai.getAttachedCommAdapter());
+
+    comboBox.setRenderer(new AdapterFactoryCellRenderer());
+    comboBox.addPopupMenuListener(new BoundsPopupMenuListener());
+    comboBox.addItemListener((ItemEvent evt) -> {
+      if (evt.getStateChange() == ItemEvent.DESELECTED) {
+        return;
+      }
+
+      // If we selected a comm adapter that's already attached, do nothing.
+      if (Objects.equals(evt.getItem(), peripheralEntry.getAttachedCommAdapter())) {
+        LOG.debug("{} is already attached to: {}",
+                  peripheralEntry.getLocation().getName(),
+                  evt.getItem()
+        );
+        return;
+      }
+
+      int reply = JOptionPane.showConfirmDialog(
+          null,
+          bundle.getString("peripheralsPanel.optionPane_driverChangeConfirmation.message"),
+          bundle.getString("peripheralsPanel.optionPane_driverChangeConfirmation.title"),
+          JOptionPane.YES_NO_OPTION);
+      if (reply == JOptionPane.NO_OPTION) {
+        return;
+      }
+
+      PeripheralCommAdapterDescription factory = comboBox.getSelectedItem();
+      try {
+        callWrapper.call(() -> servicePortal.getPeripheralService().attachCommAdapter(
+            peripheralEntry.getLocation(),
+            factory
+        ));
+      }
+      catch (Exception ex) {
+        LOG.warn("Error attaching adapter {} to vehicle {}",
+                 factory,
+                 peripheralEntry.getLocation().getName(),
+                 ex);
+        return;
+      }
+      LOG.info("Attaching comm adapter {} to {}", factory, peripheralEntry.getLocation().getName());
+    });
+    adapterCellEditor.setEditorAt(rowIndex, new DefaultCellEditor(comboBox));
+
+    peripheralEntry.addPropertyChangeListener(comboBox);
   }
 
   private void updateRowFilter() {

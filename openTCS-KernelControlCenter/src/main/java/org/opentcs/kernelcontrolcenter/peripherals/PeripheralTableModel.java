@@ -19,7 +19,6 @@ import javax.swing.table.AbstractTableModel;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
 import org.opentcs.drivers.peripherals.PeripheralProcessModel;
-import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformation;
 import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.CallWrapper;
@@ -88,6 +87,15 @@ public class PeripheralTableModel
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");
   }
 
+  /**
+   * Returns the identifier for the adapter column.
+   *
+   * @return the idenfitier for the adapter column.
+   */
+  public static String adapterColumnIdentifier() {
+    return COLUMN_NAMES[COLUMN_ADAPTER];
+  }
+
   public void addData(LocalPeripheralEntry entry) {
     entries.add(entry);
     fireTableRowsInserted(entries.size() - 1, entries.size() - 1);
@@ -134,6 +142,7 @@ public class PeripheralTableModel
   @Override
   public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
     requireNonNull(aValue, "aValue");
+
     LocalPeripheralEntry entry = entries.get(rowIndex);
     switch (columnIndex) {
       case COLUMN_LOCATION:
@@ -170,7 +179,7 @@ public class PeripheralTableModel
       case COLUMN_LOCATION:
         return false;
       case COLUMN_ADAPTER:
-        return false;
+        return true;
       case COLUMN_ENABLED:
         return true;
       default:
@@ -207,9 +216,11 @@ public class PeripheralTableModel
 
     if (Objects.equals(evt.getPropertyName(),
                        LocalPeripheralEntry.Attribute.ATTACHED_COMM_ADAPTER.name())) {
-      PeripheralAttachmentInformation oldInfo = (PeripheralAttachmentInformation) evt.getOldValue();
-      PeripheralAttachmentInformation newInfo = (PeripheralAttachmentInformation) evt.getNewValue();
-      return !oldInfo.getAttachedCommAdapter().equals(newInfo.getAttachedCommAdapter());
+      PeripheralCommAdapterDescription oldInfo
+          = (PeripheralCommAdapterDescription) evt.getOldValue();
+      PeripheralCommAdapterDescription newInfo
+          = (PeripheralCommAdapterDescription) evt.getNewValue();
+      return !oldInfo.equals(newInfo);
     }
     if (Objects.equals(evt.getPropertyName(),
                        LocalPeripheralEntry.Attribute.PROCESS_MODEL.name())) {

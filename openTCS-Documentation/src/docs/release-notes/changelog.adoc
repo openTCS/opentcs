@@ -18,6 +18,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Visualize a vehicle's claimed and allocated resources in the Operations Desk instead of the route of its current drive order.
 ** User notifications are now shown in a table in the Operations Desk.
 ** Keep web API running across kernel mode changes, e.g. when uploading a new plant model.
+** Make peripheral adapters selectable in the Kernel Control Center.
 * Bugs fixed:
 ** Properly check validity of destination operations when creating transport orders.
 * Other changes:
