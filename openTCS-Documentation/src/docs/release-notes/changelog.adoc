@@ -21,6 +21,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Make peripheral adapters selectable in the Kernel Control Center.
 * Bugs fixed:
 ** Properly check validity of destination operations when creating transport orders.
+** Improve legibility of some text elements in the Model Editor and Operations Desk applications that would not be legible on some systems (e.g. Ubuntu 20.04).
 * Other changes:
 ** The peripheral jobs panel in the Operations Desk application will now always be shown.
    The option to enable or disable it via the configuration file has been removed.

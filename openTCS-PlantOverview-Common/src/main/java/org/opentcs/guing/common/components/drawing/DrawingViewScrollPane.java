@@ -15,7 +15,6 @@ import java.util.EventObject;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JViewport;
@@ -62,7 +61,6 @@ public class DrawingViewScrollPane
     setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
     setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     setViewportBorder(BorderFactory.createLineBorder(new Color(0, 0, 0)));
-    setHorizontalScrollBar(new PlacardScrollbar());
     setLayout(new PlacardScrollPaneLayout());
     setBorder(new EmptyBorder(0, 0, 0, 0));
 
@@ -77,6 +75,12 @@ public class DrawingViewScrollPane
     setRowHeaderView(newVerticalRuler);
 
     this.add(placardPanel, JScrollPane.LOWER_LEFT_CORNER);
+
+    // Increase the preferred height of the horizontal scroll bar, which also affects the height of
+    // the corner in which the DrawingViewPlacardPanel is located. This ensures there is enough
+    // vertical space for all components in all graphical environments. (Without this, the vertical
+    // space is not sufficient for some components e.g. on Ubuntu 20.04.)
+    getHorizontalScrollBar().setPreferredSize(new Dimension(100, 34));
 
     // Register handler for rulers toggle button.
     placardPanel.getToggleRulersButton().addItemListener(
@@ -152,15 +156,6 @@ public class DrawingViewScrollPane
   @Override
   public void originScaleChanged(EventObject evt) {
     drawingView.getComponent().revalidate();
-  }
-
-  private class PlacardScrollbar
-      extends JScrollBar {
-
-    PlacardScrollbar() {
-      super(JScrollBar.HORIZONTAL);
-      setPreferredSize(new Dimension(100, 18));
-    }
   }
 
   private class RulersToggleListener

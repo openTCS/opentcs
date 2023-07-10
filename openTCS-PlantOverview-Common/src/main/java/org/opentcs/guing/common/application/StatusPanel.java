@@ -8,10 +8,9 @@
 package org.opentcs.guing.common.application;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -53,13 +52,10 @@ public class StatusPanel
     setLayout(new GridBagLayout());
 
     textFieldPosition.setEditable(false);
-    textFieldPosition.setText("X 0000 Y 0000 W 0000 H 0000");
-    textFieldPosition.setMinimumSize(new Dimension(240, 20));
-    textFieldPosition.setPreferredSize(new Dimension(240, 20));
     GridBagConstraints gridBagConstraints = new GridBagConstraints();
     gridBagConstraints.gridx = 1;
     gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.fill = GridBagConstraints.BOTH;
     add(textFieldPosition, gridBagConstraints);
 
     textFieldStatus.setEditable(false);
@@ -114,8 +110,12 @@ public class StatusPanel
    * @param text The text to set.
    */
   public void setPositionText(String text) {
-    Objects.requireNonNull(text, "text is null");
-    textFieldPosition.setText(text);
+    requireNonNull(text, "text");
+
+    // Add a space in front of the position text to avoid that a part of the lefthand side gets cut
+    // off with some graphical environments (observed on Windows 10).
+    textFieldPosition.setText(" " + text);
+    revalidate();
   }
 
   private void showOptionPane(String text) {

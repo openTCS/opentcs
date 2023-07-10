@@ -7,11 +7,13 @@
  */
 package org.opentcs.guing.common.components.drawing;
 
+import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
 import static java.util.Objects.requireNonNull;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -56,31 +58,37 @@ public class DrawingViewPlacardPanel
     requireNonNull(drawingView, "drawingView");
     this.drawingOptions = requireNonNull(drawingOptions, "drawingOptions");
 
-    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+    setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+    // Create an extra panel so that the contents can be centered vertically.
+    JPanel vCenteringPanel = new JPanel();
+    vCenteringPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+    this.add(Box.createVerticalGlue());
+    this.add(vCenteringPanel);
 
     this.zoomComboBox = zoomComboBox(drawingView);
-    this.add(zoomComboBox);
+    vCenteringPanel.add(zoomComboBox);
 
-    this.add(zoomViewToWindowButton(drawingView));
+    vCenteringPanel.add(zoomViewToWindowButton(drawingView));
 
     // Show/hide grid
     JToggleButton toggleConstrainerButton = toggleConstrainerButton(drawingView);
     toggleConstrainerButton.setSelected(drawingView.isConstrainerVisible());
-    this.add(toggleConstrainerButton);
+    vCenteringPanel.add(toggleConstrainerButton);
 
     // Show/hide rulers
     toggleRulersButton = toggleRulersButton();
-    this.add(toggleRulersButton);
+    vCenteringPanel.add(toggleRulersButton);
 
     // Show/hide leabels
     JToggleButton toggleLabelsButton = toggleLabelsButton(drawingView);
     toggleLabelsButton.setSelected(drawingView.isLabelsVisible());
-    this.add(toggleLabelsButton);
+    vCenteringPanel.add(toggleLabelsButton);
 
     // Show/hide blocks
     JToggleButton toggleBlocksButton = toggleBlocksButton(drawingView);
     toggleBlocksButton.setSelected(drawingOptions.isBlocksVisible());
-    this.add(toggleBlocksButton);
+    vCenteringPanel.add(toggleBlocksButton);
   }
 
   public JComboBox<ZoomItem> getZoomComboBox() {
