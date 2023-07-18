@@ -272,8 +272,11 @@ public abstract class AbstractOpenTCSDrawingView
 
   @Override // DrawingView
   public void removeNotify(DrawingEditor editor) {
-    // XXX Is setting the scale factor (to invalidate the handles) really necessary?
-    setScaleFactor(getScaleFactor());
+    // super.removeNotify(editor) sets the drawing editor of this drawing view to null.
+    // Handles that exist when this method is invoked, will therefore afterwards have a reference to
+    // a drawing view without a drawing editor. To avoid NPEs on such handles, clear the selection
+    // which removes and implicitly invalidates any handles.
+    clearSelection();
 
     super.removeNotify(editor);
   }
