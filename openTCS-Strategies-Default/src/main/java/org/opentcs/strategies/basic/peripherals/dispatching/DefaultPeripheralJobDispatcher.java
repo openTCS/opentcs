@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.opentcs.components.kernel.PeripheralJobDispatcher;
@@ -19,6 +20,7 @@ import org.opentcs.components.kernel.services.InternalPeripheralJobService;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.data.order.TransportOrder;
@@ -234,7 +236,26 @@ public class DefaultPeripheralJobDispatcher
   }
 
   @Override
-  public void peripheralJobFinished(PeripheralJob job) {
+  @Deprecated
+  public void peripheralJobFinished(@Nonnull PeripheralJob job) {
+    requireNonNull(job, "job");
+
+    peripheralJobFinished(job.getReference());
+  }
+
+  @Override
+  @Deprecated
+  public void peripheralJobFailed(@Nonnull PeripheralJob job) {
+    requireNonNull(job, "job");
+
+    peripheralJobFailed(job.getReference());
+  }
+
+  @Override
+  public void peripheralJobFinished(@Nonnull TCSObjectReference<PeripheralJob> ref) {
+    requireNonNull(ref, "ref");
+
+    PeripheralJob job = peripheralJobService.fetchObject(PeripheralJob.class, ref);
     if (job.getState() != PeripheralJob.State.BEING_PROCESSED) {
       LOG.info("Peripheral job not in state BEING_PROCESSED, ignoring: {} ({})",
                job.getName(),
@@ -247,7 +268,10 @@ public class DefaultPeripheralJobDispatcher
   }
 
   @Override
-  public void peripheralJobFailed(PeripheralJob job) {
+  public void peripheralJobFailed(@Nonnull TCSObjectReference<PeripheralJob> ref) {
+    requireNonNull(ref, "ref");
+
+    PeripheralJob job = peripheralJobService.fetchObject(PeripheralJob.class, ref);
     if (job.getState() != PeripheralJob.State.BEING_PROCESSED) {
       LOG.info("Peripheral job not in state BEING_PROCESSED, ignoring: {} ({})",
                job.getName(),

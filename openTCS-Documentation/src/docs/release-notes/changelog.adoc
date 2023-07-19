@@ -23,6 +23,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Properly check validity of destination operations when creating transport orders.
 ** Improve legibility of some text elements in the Model Editor and Operations Desk applications that would not be legible on some systems (e.g. Ubuntu 20.04).
 ** Ensure the Model Editor application is still operable when resetting the window arrangement while a model element is selected.
+** When a peripheral job is reported as finished or failed via `PeripheralJobCallback`, ensure that it is properly marked as such, which was previously not the case in some situations.
 * Other changes:
 ** The peripheral jobs panel in the Operations Desk application will now always be shown.
    The option to enable or disable it via the configuration file has been removed.

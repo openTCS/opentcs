@@ -114,10 +114,10 @@ public class LoopbackPeripheralCommAdapter
 
     jobTaskQueue.add(() -> {
       if (failJobs) {
-        callback.peripheralJobFailed(job);
+        callback.peripheralJobFailed(job.getReference());
       }
       else {
-        callback.peripheralJobFinished(job);
+        callback.peripheralJobFinished(job.getReference());
       }
       setProcessModel(getProcessModel().withState(PeripheralInformation.State.IDLE));
       sendProcessModelChangedEvent(PeripheralProcessModel.Attribute.STATE);
