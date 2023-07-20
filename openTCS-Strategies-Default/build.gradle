@@ -8,7 +8,7 @@ dependencies {
   api project(':openTCS-API-Injection')
   api project(':openTCS-Common')
 
-  implementation group: 'org.jgrapht', name: 'jgrapht-core', version: '1.5.1'
+  implementation group: 'org.jgrapht', name: 'jgrapht-core', version: '1.5.2'
 }
 
 task release {
