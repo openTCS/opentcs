@@ -14,7 +14,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import javax.annotation.Nonnull;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.Scheduler.Client;
-import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.model.TCSResource;
 import org.slf4j.Logger;
@@ -30,10 +29,6 @@ class AllocatorTask
    * This class's Logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(AllocatorTask.class);
-  /**
-   * The plant model service.
-   */
-  private final InternalPlantModelService plantModelService;
   /**
    * The reservation pool.
    */
@@ -62,14 +57,12 @@ class AllocatorTask
   /**
    * Creates a new instance.
    */
-  AllocatorTask(@Nonnull InternalPlantModelService plantModelService,
-                @Nonnull ReservationPool reservationPool,
+  AllocatorTask(@Nonnull ReservationPool reservationPool,
                 @Nonnull Queue<AllocatorCommand.Allocate> deferredAllocations,
                 @Nonnull Scheduler.Module allocationAdvisor,
                 @Nonnull ScheduledExecutorService kernelExecutor,
                 @Nonnull @GlobalSyncObject Object globalSyncObject,
                 @Nonnull AllocatorCommand command) {
-    this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
     this.deferredAllocations = requireNonNull(deferredAllocations, "deferredAllocations");
     this.allocationAdvisor = requireNonNull(allocationAdvisor, "allocationAdvisor");
@@ -207,8 +200,7 @@ class AllocatorTask
    */
   private void scheduleRetryWaitingAllocations() {
     for (AllocatorCommand.Allocate allocate : deferredAllocations) {
-      kernelExecutor.submit(new AllocatorTask(plantModelService,
-                                              reservationPool,
+      kernelExecutor.submit(new AllocatorTask(reservationPool,
                                               deferredAllocations,
                                               allocationAdvisor,
                                               kernelExecutor,
