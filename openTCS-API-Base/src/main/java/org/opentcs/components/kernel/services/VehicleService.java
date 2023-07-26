@@ -11,6 +11,7 @@ import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -144,4 +145,6 @@ public interface VehicleService
   void updateVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
                                       Set<String> allowedOrderTypes)
       throws ObjectUnknownException, KernelRuntimeException;
+
+    void setVehicleCurrentPosition(TCSObjectReference<Vehicle> vRef, TCSObjectReference<Point> pointRef);
 }

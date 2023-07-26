@@ -13,6 +13,19 @@ dependencies {
   api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
   api group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.14.2'
   api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.14.2'
+  api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.0'
+  api group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.13.0'
+  api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.0'
+  implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+  implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+  implementation group: 'com.alibaba', name: 'fastjson', version: '1.2.83'
+  implementation group: 'dom4j', name: 'dom4j', version: '1.6'
+
+  implementation 'com.alibaba:fastjson:+'
+  implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.4'
+
+  compileOnly 'org.projectlombok:lombok:1.18.18'
+  annotationProcessor 'org.projectlombok:lombok:1.18.18'
 }
 
 task release {

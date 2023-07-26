@@ -348,4 +348,11 @@ public class StandardVehicleService
       plantModelManager.setVehicleAllowedOrderTypes(ref, allowedOrderTypes);
     }
   }
+
+  @Override
+  public void setVehicleCurrentPosition(TCSObjectReference<Vehicle> vRef,TCSObjectReference<Point> pointRef) throws ObjectUnknownException {
+    synchronized (globalSyncObject) {
+      plantModelManager.setVehiclePosition(vRef,pointRef);
+    }
+  }
 }

@@ -16,6 +16,7 @@ import org.opentcs.access.SslParameterSet;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.kernel.extensions.HeliWeb.heli.HeLiRequestHandler;
 import org.opentcs.kernel.extensions.servicewebapi.v1.V1RequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,8 @@ public class ServiceWebApi
    * Handles requests for API version 1.
    */
   private final V1RequestHandler v1RequestHandler;
+
+  private final HeLiRequestHandler heLiRequestHandler;
   /**
    * Binds JSON data to objects and vice versa.
    */
@@ -74,12 +77,14 @@ public class ServiceWebApi
                        SslParameterSet sslParamSet,
                        Authenticator authenticator,
                        JsonBinder jsonBinder,
-                       V1RequestHandler v1RequestHandler) {
+                       V1RequestHandler v1RequestHandler,
+                       HeLiRequestHandler heLiRequestHandler) {
     this.configuration = requireNonNull(configuration, "configuration");
     this.sslParamSet = requireNonNull(sslParamSet, "sslParamSet");
     this.authenticator = requireNonNull(authenticator, "authenticator");
     this.jsonBinder = requireNonNull(jsonBinder, "jsonBinder");
     this.v1RequestHandler = requireNonNull(v1RequestHandler, "v1RequestHandler");
+    this.heLiRequestHandler = requireNonNull(heLiRequestHandler, "heLiRequestHandler");
   }
 
   @Override
@@ -135,6 +140,7 @@ public class ServiceWebApi
 
     // Register routes for API versions here.
     service.path("/v1", () -> v1RequestHandler.addRoutes(service));
+    service.path("/heli", () -> heLiRequestHandler.addRoutes(service));
 
     service.exception(IllegalArgumentException.class, (exception, request, response) -> {
                     response.status(400);

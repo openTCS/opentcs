@@ -13,6 +13,7 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
@@ -166,5 +167,11 @@ class RemoteVehicleServiceProxy
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);
     }
+  }
+
+
+  @Override
+  public void setVehicleCurrentPosition(TCSObjectReference<Vehicle> vRef, TCSObjectReference<Point> pointRef) throws ObjectUnknownException {
+    //:todo 未实现
   }
 }
