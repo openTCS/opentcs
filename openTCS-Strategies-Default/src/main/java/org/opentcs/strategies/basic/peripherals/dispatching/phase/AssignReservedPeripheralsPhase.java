@@ -9,6 +9,7 @@ package org.opentcs.strategies.basic.peripherals.dispatching.phase;
 
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Location;
@@ -18,6 +19,7 @@ import org.opentcs.drivers.peripherals.PeripheralControllerPool;
 import org.opentcs.strategies.basic.peripherals.dispatching.PeripheralDispatcherPhase;
 import org.opentcs.strategies.basic.peripherals.dispatching.PeripheralJobUtil;
 import org.opentcs.util.Comparators;
+import org.opentcs.util.ExplainedBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,8 +85,10 @@ public class AssignReservedPeripheralsPhase
 
   @Override
   public void run() {
-    for (Location location : objectService.fetchObjects(Location.class,
-                                                        this::reservedAndAvailable)) {
+    Set<Location> availablePeripherals = objectService.fetchObjects(Location.class,
+                                                                    this::reservedAndAvailable);
+    LOG.debug("Available for dispatching: {} peripheral devices.", availablePeripherals.size());
+    for (Location location : availablePeripherals) {
       checkForReservedJobs(location);
     }
   }
@@ -105,6 +109,7 @@ public class AssignReservedPeripheralsPhase
   }
 
   private void checkForReservedJobs(Location location) {
+    LOG.debug("Trying to find job for peripheral '{}'...", location.getName());
     objectService.fetchObjects(PeripheralJob.class, this::toBeProcessed).stream()
         .filter(job -> matchesReservationToken(job, location))
         .filter(job -> matchesLocation(job, location))
@@ -129,8 +134,17 @@ public class AssignReservedPeripheralsPhase
   }
 
   private boolean canProcess(Location location, PeripheralJob job) {
-    return peripheralControllerPool.getPeripheralController(location.getReference())
-        .canProcess(job).getValue();
+    ExplainedBoolean canProcess
+        = peripheralControllerPool.getPeripheralController(location.getReference()).canProcess(job);
+    if (!canProcess.getValue()) {
+      LOG.debug("{} cannot process peripheral job {}: {}",
+                location.getName(),
+                job.getName(),
+                canProcess.getReason());
+
+    }
+
+    return canProcess.getValue();
   }
 
   private void assignJob(PeripheralJob job, Location location) {

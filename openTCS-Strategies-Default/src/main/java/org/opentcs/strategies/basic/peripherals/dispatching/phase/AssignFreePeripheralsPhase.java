@@ -10,7 +10,6 @@ package org.opentcs.strategies.basic.peripherals.dispatching.phase;
 import java.util.Collection;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -131,26 +130,15 @@ public class AssignFreePeripheralsPhase
 
   private void tryAssignJob(Location location, Collection<PeripheralJob> availableJobs) {
     LOG.debug("Trying to find job for peripheral '{}'...", location.getName());
-    Optional<PeripheralJob> selectedJob = jobSelectionStrategy.select(
-        availableJobs.stream()
-            .filter(job -> matchesLocation(job, location))
-            .collect(Collectors.toList()),
-        location
-    );
-    if (selectedJob.isEmpty()) {
-      return;
-    }
-
-    ExplainedBoolean canProcess = canProcess(location, selectedJob.get());
-    if (!canProcess.getValue()) {
-      LOG.debug("{} cannot process peripheral job {}: {}",
-                location.getName(),
-                selectedJob.get().getName(),
-                canProcess.getReason());
-      return;
-    }
-
-    assignJob(selectedJob.get(), location);
+    jobSelectionStrategy
+        .select(
+            availableJobs.stream()
+                .filter(job -> matchesLocation(job, location))
+                .collect(Collectors.toList()),
+            location
+        )
+        .filter(job -> canProcess(location, job))
+        .ifPresent(job -> assignJob(job, location));
   }
 
   private boolean matchesLocation(PeripheralJob job, Location location) {
@@ -158,9 +146,17 @@ public class AssignFreePeripheralsPhase
                           location.getReference());
   }
 
-  private ExplainedBoolean canProcess(Location location, PeripheralJob job) {
-    return peripheralControllerPool
-        .getPeripheralController(location.getReference()).canProcess(job);
+  private boolean canProcess(Location location, PeripheralJob job) {
+    ExplainedBoolean canProcess
+        = peripheralControllerPool.getPeripheralController(location.getReference()).canProcess(job);
+    if (!canProcess.getValue()) {
+      LOG.debug("{} cannot process peripheral job {}: {}",
+                location.getName(),
+                job.getName(),
+                canProcess.getReason());
+    }
+
+    return canProcess.getValue();
   }
 
   private void assignJob(PeripheralJob job, Location location) {
