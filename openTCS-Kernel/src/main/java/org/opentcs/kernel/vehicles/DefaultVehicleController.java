@@ -11,7 +11,6 @@ import com.google.inject.assistedinject.Assisted;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1335,26 +1334,6 @@ public class DefaultVehicleController
           .dropWhile(step -> !Objects.equals(step, lastCommandedStep))
           .skip(1)
           .collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    // If we have already sent commands to the vehicle, the resources for the corresponding steps
-    // have already been allocated and thus should not be contained in the set of claimed resources.
-    // We can try to remove them, but we want to do this only if they are the next resources in the
-    // remaining claim.
-    if (!commandsSent.isEmpty()) {
-      boolean remainingClaimStartsWithCommandsSent
-          = Collections.indexOfSubList(remainingClaimCurrentDriveOrder,
-                                       commandsSent.stream()
-                                           .map(command -> command.getStep())
-                                           .collect(Collectors.toList())) == 0;
-      if (remainingClaimStartsWithCommandsSent) {
-        remainingClaimCurrentDriveOrder.removeAll(commandsSent);
-      }
-      else {
-        // This should never happen. Something doesn't line up with the drive order's route.
-        LOG.warn("{}: Claiming resources that should have already been allocated for the vehicle.",
-                 vehicle.getName());
-      }
     }
 
     return Stream.concat(remainingClaimCurrentDriveOrder.stream(),
