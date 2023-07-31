@@ -14,6 +14,7 @@ import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 
@@ -43,6 +44,11 @@ public interface RemoteTransportOrderService
       throws RemoteException;
 
   void markOrderSequenceComplete(ClientID clientId, TCSObjectReference<OrderSequence> ref)
+      throws RemoteException;
+
+  void updateTransportOrderIntendedVehicle(ClientID clientId,
+                                           TCSObjectReference<TransportOrder> orderRef,
+                                           TCSObjectReference<Vehicle> vehicleRef)
       throws RemoteException;
   // CHECKSTYLE:ON
 }

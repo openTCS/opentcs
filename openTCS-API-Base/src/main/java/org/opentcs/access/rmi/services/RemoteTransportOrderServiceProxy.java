@@ -15,6 +15,7 @@ import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 
@@ -65,6 +66,20 @@ class RemoteTransportOrderServiceProxy
 
     try {
       getRemoteService().markOrderSequenceComplete(getClientId(), ref);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public void updateTransportOrderIntendedVehicle(TCSObjectReference<TransportOrder> orderRef,
+                                                  TCSObjectReference<Vehicle> vehicleRef)
+      throws ObjectUnknownException, IllegalArgumentException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().updateTransportOrderIntendedVehicle(getClientId(), orderRef, vehicleRef);
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

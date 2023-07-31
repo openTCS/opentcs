@@ -19,6 +19,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** User notifications are now shown in a table in the Operations Desk.
 ** Keep web API running across kernel mode changes, e.g. when uploading a new plant model.
 ** Make peripheral adapters selectable in the Kernel Control Center.
+** Allow setting the intended vehicle on a transport order through the transport order service or the web API as long as the transport order has not been assigned to a vehicle, yet.
 * Bugs fixed:
 ** Properly check validity of destination operations when creating transport orders.
 ** Improve legibility of some text elements in the Model Editor and Operations Desk applications that would not be legible on some systems (e.g. Ubuntu 20.04).

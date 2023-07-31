@@ -24,6 +24,7 @@ import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.slf4j.Logger;
@@ -184,6 +185,23 @@ public class StandardRemoteTransportOrderService
 
     try {
       kernelExecutor.submit(() -> transportOrderService.markOrderSequenceComplete(ref)).get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
+
+  @Override
+  public void updateTransportOrderIntendedVehicle(ClientID clientId,
+                                                  TCSObjectReference<TransportOrder> orderRef,
+                                                  TCSObjectReference<Vehicle> vehicleRef) {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_ORDER);
+
+    try {
+      kernelExecutor.submit(() -> transportOrderService.updateTransportOrderIntendedVehicle(
+          orderRef,
+          vehicleRef
+      )).get();
     }
     catch (InterruptedException | ExecutionException exc) {
       throw findSuitableExceptionFor(exc);

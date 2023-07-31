@@ -190,6 +190,38 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Could not find transport order 'TOrder-01'.
+  "/transportOrders/{NAME}/intendedVehicle":
+    put:
+      tags:
+        - Transport orders
+      summary: Updates the transport order's intended vehicle.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the transport order to be updated.
+          required: true
+          schema:
+            type: string
+        - name: vehicle
+          in: query
+          description: The name of the vehicle to assign the transport order to.
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find transport order 'TOrder-01'.
   /transportOrders/dispatcher/trigger:
     post:
       tags:

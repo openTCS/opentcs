@@ -127,6 +127,8 @@ public class V1RequestHandler
                  this::handlePostWithdrawalByOrder);
     service.post("/transportOrders/:NAME",
                  this::handlePostTransportOrder);
+    service.put("/transportOrders/:NAME/intendedVehicle",
+                this::handlePutTransportOrderIntendedVehicle);
     service.get("/transportOrders/:NAME",
                 this::handleGetTransportOrderByName);
     service.get("/transportOrders",
@@ -223,6 +225,16 @@ public class V1RequestHandler
             )
         )
     );
+  }
+
+  private Object handlePutTransportOrderIntendedVehicle(Request request, Response response)
+      throws ObjectUnknownException {
+    orderHandler.updateTransportOrderIntendedVehicle(
+        request.params(":NAME"),
+        request.queryParamOrDefault("vehicle", null)
+    );
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return "";
   }
 
   private Object handlePostOrderSequence(Request request, Response response)

@@ -16,6 +16,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.order.DestinationCreationTO;
@@ -289,6 +290,30 @@ public class OrderHandler {
       dispatcherService.reroute(
           vehicle.getReference(),
           forced ? ReroutingType.FORCED : ReroutingType.REGULAR
+      );
+    });
+  }
+
+  public void updateTransportOrderIntendedVehicle(String orderName, @Nullable String vehicleName)
+      throws ObjectUnknownException {
+    requireNonNull(orderName, "orderName");
+
+    executorWrapper.callAndWait(() -> {
+      TransportOrder order = orderService.fetchObject(TransportOrder.class, orderName);
+      if (order == null) {
+        throw new ObjectUnknownException("Unknown transport order: " + orderName);
+      }
+      Vehicle vehicle = null;
+      if (vehicleName != null) {
+        vehicle = orderService.fetchObject(Vehicle.class, vehicleName);
+        if (vehicle == null) {
+          throw new ObjectUnknownException("Unknown vehicle: " + vehicleName);
+        }
+      }
+
+      orderService.updateTransportOrderIntendedVehicle(
+          order.getReference(),
+          vehicle != null ? vehicle.getReference() : null
       );
     });
   }

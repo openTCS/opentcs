@@ -299,6 +299,51 @@ public class TransportOrderPoolManager
   }
 
   /**
+   * Set a transport order's intended vehicle.
+   *
+   * @param orderRef A reference to the transport order to be modified.
+   * @param vehicleRef A reference to the vehicle intended for the transport order.
+   * @return The modified transport order.
+   * @throws ObjectUnknownException If the referenced transport order is not
+   * in this pool or if the intended vehicle is not null and not in this this pool.
+   * @throws IllegalArgumentException If the transport order is not in the dispatchable state.
+   */
+  public TransportOrder setTransportOrderIntendedVehicle(
+      TCSObjectReference<TransportOrder> orderRef,
+      TCSObjectReference<Vehicle> vehicleRef)
+      throws ObjectUnknownException, IllegalArgumentException {
+    TransportOrder order = getObjectRepo().getObject(TransportOrder.class, orderRef);
+
+    if (!canSetIntendedVehicle(order)) {
+      throw new IllegalArgumentException(String.format(
+          "Cannot set intended vehicle '%s' for transport order '%s' in state '%s'",
+          vehicleRef.getName(),
+          order.getName(),
+          order.getState()
+      ));
+    }
+
+    if (vehicleRef != null) {
+      if (getObjectRepo().getObjectOrNull(Vehicle.class, vehicleRef) == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + vehicleRef.getName());
+      }
+    }
+
+    LOG.info("Transport order's intended vehicle changes: {} -- {} -> {}",
+             order.getName(),
+             toObjectName(order.getIntendedVehicle()),
+             toObjectName(vehicleRef));
+
+    TransportOrder previousState = order;
+    order = order.withIntendedVehicle(vehicleRef);
+    getObjectRepo().replaceObject(order);
+    emitObjectEvent(order,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return order;
+  }
+
+  /**
    * Removes the referenced transport order from this pool.
    *
    * @param ref A reference to the transport order to be removed.
@@ -614,5 +659,11 @@ public class TransportOrderPoolManager
   @Nullable
   private String toObjectName(TCSObjectReference<?> ref) {
     return ref == null ? null : ref.getName();
+  }
+
+  private boolean canSetIntendedVehicle(TransportOrder order) {
+    return order.hasState(TransportOrder.State.RAW)
+        || order.hasState(TransportOrder.State.ACTIVE)
+        || order.hasState(TransportOrder.State.DISPATCHABLE);
   }
 }

@@ -189,4 +189,13 @@ public class StandardTransportOrderService
     }
   }
 
+  @Override
+  public void updateTransportOrderIntendedVehicle(TCSObjectReference<TransportOrder> orderRef,
+                                                  TCSObjectReference<Vehicle> vehicleRef)
+      throws ObjectUnknownException, IllegalArgumentException {
+    synchronized (globalSyncObject) {
+      orderPoolManager.setTransportOrderIntendedVehicle(orderRef, vehicleRef);
+    }
+  }
+
 }

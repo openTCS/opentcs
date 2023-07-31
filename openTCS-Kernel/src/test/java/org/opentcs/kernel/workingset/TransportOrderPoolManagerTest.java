@@ -9,11 +9,14 @@ package org.opentcs.kernel.workingset;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,10 +25,12 @@ import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
+import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.data.model.Triple;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.util.event.SimpleEventBus;
@@ -96,6 +101,71 @@ public class TransportOrderPoolManagerTest {
 
     assertThat(objectRepo.getObjects(TransportOrder.class), is(empty()));
     assertThat(objectRepo.getObjects(OrderSequence.class), is(empty()));
+  }
+
+  @ParameterizedTest
+  @EnumSource(value = TransportOrder.State.class,
+              names = {"RAW", "ACTIVE", "DISPATCHABLE"})
+  public void allowSettingIntendedVehicleOnUnassignedTransportOrder(TransportOrder.State state) {
+    plantModelManager.createPlantModelObjects(
+        new PlantModelCreationTO("some-model")
+            .withPoint(new PointCreationTO("some-point"))
+            .withLocationType(
+                new LocationTypeCreationTO("some-location-type")
+                    .withAllowedOperations(List.of("NOP"))
+            )
+            .withLocation(
+                new LocationCreationTO("some-location", "some-location-type", new Triple(1, 2, 3))
+                    .withLink("some-point", Set.of("NOP"))
+            )
+            .withVehicle(new VehicleCreationTO("some-vehicle"))
+    );
+    Vehicle vehicle = objectRepo.getObject(Vehicle.class, "some-vehicle");
+
+    TransportOrder order = orderPoolManager.createTransportOrder(
+        new TransportOrderCreationTO("some-order",
+                                     List.of(new DestinationCreationTO("some-location", "NOP")))
+    );
+    orderPoolManager.setTransportOrderState(order.getReference(), state);
+
+    TransportOrder result
+        = orderPoolManager.setTransportOrderIntendedVehicle(order.getReference(),
+                                                            vehicle.getReference());
+
+    assertThat(result.getIntendedVehicle(), is(equalTo(vehicle.getReference())));
+  }
+
+  @ParameterizedTest
+  @EnumSource(value = TransportOrder.State.class,
+              names = {"BEING_PROCESSED", "WITHDRAWN", "FINISHED", "FAILED", "UNROUTABLE"})
+  public void disallowSettingIntendedVehicleOnAssignedTransportOrder(TransportOrder.State state) {
+    plantModelManager.createPlantModelObjects(
+        new PlantModelCreationTO("some-model")
+            .withPoint(new PointCreationTO("some-point"))
+            .withLocationType(
+                new LocationTypeCreationTO("some-location-type")
+                    .withAllowedOperations(List.of("NOP"))
+            )
+            .withLocation(
+                new LocationCreationTO("some-location", "some-location-type", new Triple(1, 2, 3))
+                    .withLink("some-point", Set.of("NOP"))
+            )
+            .withVehicle(new VehicleCreationTO("some-vehicle"))
+    );
+    Vehicle vehicle = objectRepo.getObject(Vehicle.class, "some-vehicle");
+
+    TransportOrder order = orderPoolManager.createTransportOrder(
+        new TransportOrderCreationTO("some-order",
+                                     List.of(new DestinationCreationTO("some-location", "NOP")))
+    );
+    orderPoolManager.setTransportOrderState(order.getReference(), state);
+
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          orderPoolManager.setTransportOrderIntendedVehicle(order.getReference(),
+                                                            vehicle.getReference());
+        });
   }
 
   @ParameterizedTest

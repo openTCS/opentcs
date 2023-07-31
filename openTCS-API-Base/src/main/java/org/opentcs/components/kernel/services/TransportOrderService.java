@@ -13,6 +13,7 @@ import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 
@@ -62,4 +63,18 @@ public interface TransportOrderService
    */
   void markOrderSequenceComplete(TCSObjectReference<OrderSequence> ref)
       throws ObjectUnknownException, KernelRuntimeException;
+
+  /**
+   * Updates a transport order's intended vehicle.
+   *
+   * @param orderRef A reference to the transport order to be modified.
+   * @param vehicleRef A reference to the vehicle that is intended for the transport order.
+   * @throws ObjectUnknownException If the referenced transport order does not exist or
+   * if the vehicle does not exist.
+   * @throws IllegalArgumentException If the transport order has already being assigned to
+   * a vehicle.
+   */
+  void updateTransportOrderIntendedVehicle(TCSObjectReference<TransportOrder> orderRef,
+                                           TCSObjectReference<Vehicle> vehicleRef)
+      throws ObjectUnknownException, IllegalArgumentException;
 }
