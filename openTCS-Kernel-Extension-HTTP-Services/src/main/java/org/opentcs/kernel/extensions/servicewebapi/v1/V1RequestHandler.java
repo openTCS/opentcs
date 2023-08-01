@@ -24,6 +24,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleAttachme
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostOrderSequenceRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PlantModelTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -49,6 +50,8 @@ public class V1RequestHandler
    */
   private final OrderHandler orderHandler;
 
+  private final PlantModelHandler plantModelHandler;
+
   private final RequestStatusHandler statusInformationProvider;
   /**
    * Whether this instance is initialized.
@@ -59,10 +62,12 @@ public class V1RequestHandler
   public V1RequestHandler(JsonBinder jsonBinder,
                           StatusEventDispatcher statusEventDispatcher,
                           OrderHandler orderHandler,
+                          PlantModelHandler plantModelHandler,
                           RequestStatusHandler requestHandler) {
     this.jsonBinder = requireNonNull(jsonBinder, "jsonBinder");
     this.statusEventDispatcher = requireNonNull(statusEventDispatcher, "statusEventDispatcher");
     this.orderHandler = requireNonNull(orderHandler, "orderHandler");
+    this.plantModelHandler = requireNonNull(plantModelHandler, "plantModelHandler");
     this.statusInformationProvider = requireNonNull(requestHandler, "requestHandler");
   }
 
@@ -141,6 +146,10 @@ public class V1RequestHandler
                 this::handleGetOrderSequenceByName);
     service.put("/orderSequences/:NAME/complete",
                 this::handlePutOrderSequenceComplete);
+    service.put("/plantModel",
+                this::handlePutPlantModel);
+    service.get("/plantModel",
+                this::handleGetPlantModel);
     service.post("/dispatcher/trigger",
                  this::handlePostDispatcherTrigger);
     service.post("/peripherals/dispatcher/trigger",
@@ -316,6 +325,21 @@ public class V1RequestHandler
             valueIfKeyPresent(request.queryMap(), "intendedVehicle")
         )
     );
+  }
+
+  private Object handlePutPlantModel(Request request, Response response)
+      throws ObjectUnknownException,
+             IllegalArgumentException,
+             InterruptedException,
+             ExecutionException {
+    plantModelHandler.putPlantModel(jsonBinder.fromJson(request.body(), PlantModelTO.class));
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handleGetPlantModel(Request request, Response response) {
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return jsonBinder.toJson(plantModelHandler.getPlantModel());
   }
 
   private Object handleGetTransportOrderByName(Request request, Response response) {

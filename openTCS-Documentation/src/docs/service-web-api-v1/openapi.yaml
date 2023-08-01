@@ -18,7 +18,7 @@ info:
     Optionally, an access key can be set in the kernel configuration.
     The configured value is then expected to be sent by the client in an HTTP header named `X-Api-Access-Key`.
   # IMPORTANT: When updating this version number, remember to mention that in the changelog, too!
-  version: 1.1.0
+  version: 1.2.0
   title: openTCS web API specification
 servers:
   - url: http://localhost:55200/v1
@@ -34,6 +34,8 @@ tags:
     description: Working with peripheral jobs
   - name: Peripherals
     description: Working with peripherals
+  - name: Plant models
+    description: Working with plant models
   - name: Status
     description: Retrieving status updates
 security:
@@ -993,6 +995,41 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Could not find location 'Fire door 003'.
+  /plantModel:
+    get:
+      tags:
+        - Plant models
+      summary: Retrieves the currently loaded plant model.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlantModel"
+    put:
+      tags:
+        - Plant models
+      summary: Uploads a new plant model with the given information.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlantModel"
+        description: The details of the plant model to be uploaded.
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: The submitted plant model is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
   "/peripherals/{NAME}/withdrawal":
     post:
       tags:
@@ -1414,17 +1451,17 @@ components:
           example: 1000
         energyLevelGood:
           type: integer
-          description: The value at/above which the vehicle's energy level is considered
+          description: The value (in %) at/above which the vehicle's energy level is considered
             'good'.
           example: 90
         energyLevelCritical:
           type: integer
-          description: The value at/below which the vehicle's energy level is considered
+          description: The value (in %) at/below which the vehicle's energy level is considered
             'critical'.
           example: 30
         energyLevel:
           type: integer
-          description: The vehicle's remaining energy (in percent of the maximum).
+          description: The vehicle's remaining energy (in %).
           example: 60
         integrationLevel:
           type: string
@@ -1851,3 +1888,509 @@ components:
           type: string
           description: The description class name of the peripheral driver currently attached to this location.
           example: org.opentcs.somePeripheral.driver001
+    PlantModel:
+      title: Plant model
+      type: object
+      properties:
+        name:
+          type: string
+          description: The plant model's name.
+          example: Plant Model 001
+        points:
+          type: array
+          description: The plant model's points.
+          items:
+            $ref: "#/components/schemas/PlantModelPoint"
+        paths:
+          type: array
+          description: The plant model's paths.
+          items:
+            $ref: "#/components/schemas/PlantModelPath"
+        locationTypes:
+          type: array
+          description: The plant model's location types.
+          items:
+            $ref: "#/components/schemas/PlantModelLocationType"
+        locations:
+          type: array
+          description: The plant model's locations.
+          items:
+            $ref: "#/components/schemas/PlantModelLocation"
+        blocks:
+          type: array
+          description: The plant model's blocks.
+          items:
+            $ref: "#/components/schemas/PlantModelBlock"
+        vehicles:
+          type: array
+          description: The plant model's vehicles.
+          items:
+            $ref: "#/components/schemas/PlantModelVehicle"
+        visualLayout:
+          type: object
+          description: The plant model's visual layout.
+          $ref: "#/components/schemas/PlantModelVisualLayout"
+        properties:
+          type: array
+          description: The plant model's properties.
+          items:
+            $ref: "#/components/schemas/Property"
+      required:
+        - name
+    PlantModelPoint:
+      title: Point
+      type: object
+      properties:
+        name:
+          type: string
+          description: This point's name.
+          example: some point
+        position:
+          type: object
+          description: This point's position (in mm).
+          $ref: "#/components/schemas/PlantModelTriple"
+        vehicleOrientationAngle:
+          oneOf:
+            - type: string
+            - type: number
+              format: double
+          description: >-
+            The vehicle's (assumed) orientation angle (-360..360) when it is at this position.
+            May be a string ("NaN") if an orientation angle is not defined for this point.
+          example: 73.3
+        type:
+          type: string
+          description: This point's type.
+          enum:
+            - REPORT_POSITION
+            - HALT_POSITION
+            - PARK_POSITION
+        layout:
+          type: object
+          description: Describes the graphical representation of this point.
+          properties:
+            position:
+              $ref: "#/components/schemas/PlantModelCouple"
+            labelOffset:
+              $ref: "#/components/schemas/PlantModelCouple"
+            layerId:
+              type: integer
+              example: 3
+        properties:
+          type: array
+          description: This point's properties.
+          items:
+            $ref: "#/components/schemas/Property"
+      required:
+        - name
+    PlantModelPath:
+      title: Path
+      type: object
+      properties:
+        name:
+          type: string
+          description: This path's name.
+          example: some path
+        srcPointName:
+          type: string
+          description: The point name this path originates in.
+          example: some point
+        destPointName:
+          type: string
+          description: The point name this path ends in.
+          example: another point
+        length:
+          type: integer
+          format: int64
+          description: This path's length (in mm).
+          example: 1300
+        maxVelocity:
+          type: integer
+          description: >-
+            The absolute maximum allowed forward velocity on this path (in mm/s).
+            A value of 0 (default) means forward movement is not allowed on this path.
+          example: 1000
+        maxReverseVelocity:
+          type: integer
+          description: >-
+            The absolute maximum allowed reverse velocity on this path (in mm/s).
+            A value of 0 (default) means reverse movement is not allowed on this path.
+          example: 300
+        peripheralOperations:
+          type: array
+          description: The peripheral operations to be performed when a vehicle travels along this path.
+          items:
+            type: object
+            properties:
+              operation:
+                type: string
+                example: some operation
+              locationName:
+                type: string
+                example: some location
+              executionTrigger:
+                type: string
+                enum:
+                  - BEFORE_MOVEMENT
+                  - AFTER_MOVEMENT
+              completionRequired:
+                type: boolean
+        locked:
+          type: boolean
+          description: A flag for marking this path as locked (i.e. to prevent vehicles from using it).
+        layout:
+          type: object
+          description: The information regarding the grahical representation of this path.
+          properties:
+            connectionType:
+              type: string
+              enum:
+                - DIRECT
+                - ELBOW
+                - SLANTED
+                - POLYPATH
+                - BEZIER
+                - BEZIER_3
+            controlPoints:
+              type: array
+              items:
+                $ref: "#/components/schemas/PlantModelCouple"
+            layerId:
+              type: integer
+              example: 3
+        properties:
+          items:
+            $ref: "#/components/schemas/Property"
+      required:
+        - name
+        - srcPointName
+        - destPointName
+    PlantModelLocationType:
+      title: Location Type
+      type: object
+      properties:
+        name:
+          type: string
+          description: This location type's name.
+          example: some location type
+        allowedOperations:
+          type: array
+          description: The allowed operations for this location type.
+          items:
+            type: string
+            example: ["some operation", "another operation"]
+        allowedPeripheralOperations:
+          type: array
+          description: The allowed peripheral operations for this location type.
+          items:
+            type: string
+            example: ["some peripheral operation", "another peripheral operation"]
+        layout:
+          type: object
+          description: The information regarding the grahical representation of this location type.
+          properties:
+            locationRepresentation:
+              type: string
+              enum:
+                - NONE
+                - DEFAULT
+                - LOAD_TRANSFER_GENERIC
+                - LOAD_TRANSFER_ALT_1
+                - LOAD_TRANSFER_ALT_2
+                - LOAD_TRANSFER_ALT_3
+                - LOAD_TRANSFER_ALT_4
+                - LOAD_TRANSFER_ALT_5
+                - WORKING_GENERIC
+                - WORKING_ALT_1
+                - WORKING_ALT_2
+                - RECHARGE_GENERIC
+                - RECHARGE_ALT_1
+                - RECHARGE_ALT_2
+        properties:
+          type: object
+          description: This location type's properties.
+          items:
+            $ref: "#/components/schemas/Property"
+      required:
+        - name
+    PlantModelLocation:
+      title: Location
+      type: object
+      properties:
+        name:
+          type: string
+          description: This location's name.
+          example: some location
+        typeName:
+          type: string
+          description: The name of this location's type.
+          example: some location type
+        position:
+          type: object
+          description: This location's position (in mm).
+          $ref: "#/components/schemas/PlantModelTriple"
+        links:
+          type: array
+          description: >-
+            The links attaching points to this location.
+            This is a map of point names to allowed operations.
+          items:
+            type: object
+            properties:
+              pointName:
+                type: string
+                example: some point
+              allowedOperations:
+                type: array
+                items:
+                  type: string
+                  example: some operation
+        locked:
+          type: boolean
+          description: A flag for marking this location as locked (i.e. to prevent vehicles from using it).
+        layout:
+          type: object
+          description: The information regarding the grahical representation of this location.
+          properties:
+            position:
+              $ref: "#/components/schemas/PlantModelCouple"
+            labelOffset:
+              $ref: "#/components/schemas/PlantModelCouple"
+            locationRepresentation:
+              type: string
+              enum:
+                - NONE
+                - DEFAULT
+                - LOAD_TRANSFER_GENERIC
+                - LOAD_TRANSFER_ALT_1
+                - LOAD_TRANSFER_ALT_2
+                - LOAD_TRANSFER_ALT_3
+                - LOAD_TRANSFER_ALT_4
+                - LOAD_TRANSFER_ALT_5
+                - WORKING_GENERIC
+                - WORKING_ALT_1
+                - WORKING_ALT_2
+                - RECHARGE_GENERIC
+                - RECHARGE_ALT_1
+                - RECHARGE_ALT_2
+            layerId:
+              type: integer
+              example: 3
+        properties:
+          type: array
+          description: This location's properties.
+          items:
+            $ref: "#/components/schemas/Property"
+      required:
+        - name
+        - typeName
+        - position
+    PlantModelBlock:
+      title: Block
+      type: object
+      properties:
+        name:
+          type: string
+          description: This block's name.
+          example: some block
+        type:
+          type: string
+          description: This block's type.
+          enum:
+            - SINGLE_VEHICLE_ONLY
+            - SAME_DIRECTION_ONLY
+        memberNames:
+          type: array
+          items:
+            type: string
+          description: This block's member names.
+          example: ["some point", "another point"]
+        layout:
+          type: object
+          description: The information regarding the grahical representation of this block.
+          properties:
+            color:
+              type: string
+              pattern: ^#([A-Fa-f0-9]{6})$
+              example: "#FF0000"
+        properties:
+          type: array
+          description: This block's properties.
+          items:
+            $ref: "#/components/schemas/Property"
+      required:
+        - name
+    PlantModelVehicle:
+      title: Vehicle
+      type: object
+      properties:
+        name:
+          type: string
+          description: This vehicle's name.
+          example: some vehicle
+        length:
+          type: integer
+          description: The vehicle's length (in mm).
+          example: 1000
+        energyLevelCritical:
+          type: integer
+          description: The energy level value (in %) at/below which the vehicle should be recharged.
+          example: 15
+        energyLevelGood:
+          type: integer
+          description: The energy level value (in %) at/above which the vehicle can be dispatched again when charging.
+          example: 60
+        energyLevelFullyRecharged:
+          type: integer
+          description: The energy level value (in %) at/above which the vehicle is considered fully recharged.
+          example: 90
+        energyLevelSufficientlyRecharged:
+          type: integer
+          description: The energy level value (in %) at/above which the vehicle is considered sufficiently recharged.
+          example: 50
+        maxVelocity:
+          type: integer
+          description: The vehicle's maximum velocity (in mm/s).
+          example: 2000
+        maxReverseVelocity:
+          type: integer
+          description: The vehicle's maximum reverse velocity (in mm/s).
+          example: 733
+        layout:
+          type: object
+          description: The information regarding the grahical representation of this vehicle.
+          properties:
+            routeColor:
+              type: string
+              pattern: ^#([A-Fa-f0-9]{6})$
+              example: "#00FF00"
+        properties:
+          type: array
+          description: This vehicle's properties.
+          items:
+            $ref: "#/components/schemas/Property"
+      required:
+        - name
+    PlantModelVisualLayout:
+      title: Visual Layout
+      type: object
+      properties:
+        name:
+          type: string
+          description: This visual layout's name.
+          example: some visual layout
+        scaleX:
+          type: number
+          description: This layout's scale on the X axis (in mm/pixel).
+          example: 50.0
+        scaleY:
+          type: number
+          description: This layout's scale on the Y axis (in mm/pixel).
+          example: 50.0
+        layers:
+          type: array
+          description: This layout's layers.
+          items:
+            $ref: "#/components/schemas/PlantModelLayer"
+        layerGroups:
+          type: array
+          description: The layout's layer groups.
+          items:
+            $ref: "#/components/schemas/PlantModelLayerGroup"
+        properties:
+          type: array
+          description: This visual layout's properties.
+          items:
+            $ref: "#/components/schemas/Property"
+      required:
+        - name
+    PlantModelTriple:
+      title: Triple
+      type: object
+      properties:
+        x:
+          type: integer
+          format: int64
+          description: The Triple's x value.
+          example: 1500
+        y:
+          type: integer
+          format: int64
+          description: The Triple's y value.
+          example: 2000
+        z:
+          type: integer
+          format: int64
+          description: The Triple's z value.
+          example: 500
+      required:
+        - x
+        - y
+        - z
+    PlantModelCouple:
+      title: Couple
+      type: object
+      properties:
+        x:
+          type: integer
+          format: int64
+          description: The Couple's x value.
+          example: 1500
+        y:
+          type: integer
+          format: int64
+          description: The Couple's y value.
+          example: 2000
+      required:
+        - x
+        - y
+    PlantModelLayer:
+      title: Layer
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique ID of this layer.
+          example: 3
+        ordinal:
+          type: integer
+          description: >-
+            The ordinal of this layer.
+            Layers with a higher ordinal are positioned above layers with a lower ordinal.
+          example: 3
+        visible:
+          type: boolean
+          description: Whether this layer is visible or not.
+        name:
+          type: string
+          description: The name of this layer.
+          example: some layer
+        groupId:
+          type: integer
+          description: The ID of the layer group this layer is assigned to.
+          example: 3
+      required:
+        - id
+        - ordinal
+        - visible
+        - name
+        - groupId
+    PlantModelLayerGroup:
+      title: Layer Group
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The unique ID of this layer group.
+          example: 3
+        name:
+          type: string
+          description: The name of this layer group.
+          example: some layer
+        visible:
+          description: Whether this layer group is visible or not.
+          type: boolean
+      required:
+        - id
+        - name
+        - visible
