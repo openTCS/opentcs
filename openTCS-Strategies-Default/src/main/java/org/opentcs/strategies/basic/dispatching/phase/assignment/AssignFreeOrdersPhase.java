@@ -173,7 +173,7 @@ public class AssignFreeOrdersPhase
     Map<Boolean, List<VehicleFilterResult>> vehiclesSplitByFilter
         = objectService.fetchObjects(Vehicle.class, isAvailableForAnyOrder)
             .stream()
-            .map(order -> new VehicleFilterResult(order, vehicleSelectionFilter.apply(order)))
+            .map(vehicle -> new VehicleFilterResult(vehicle, vehicleSelectionFilter.apply(vehicle)))
             .collect(Collectors.partitioningBy(filterResult -> !filterResult.isFiltered()));
 
     Collection<Vehicle> availableVehicles = vehiclesSplitByFilter.get(Boolean.TRUE).stream()
