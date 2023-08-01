@@ -447,11 +447,13 @@ public class DefaultVehicleController
   }
 
   private boolean driveOrdersContinual(DriveOrder oldOrder, DriveOrder newOrder) {
-    LOG.debug("Checking drive order continuity for {} (old) and {} (new).", oldOrder, newOrder);
+    LOG.debug("{}: Checking drive order continuity for {} (old) and {} (new).",
+              vehicle.getName(), oldOrder, newOrder);
 
     int lastCommandExecutedRouteIndex = getLastCommandExecutedRouteIndex();
     if (lastCommandExecutedRouteIndex == Vehicle.ROUTE_INDEX_DEFAULT) {
-      LOG.debug("No route progress, yet. Considering drive orders continuous.");
+      LOG.debug("{}: No route progress, yet. Considering drive orders continuous.",
+                vehicle.getName());
       return true;
     }
 
@@ -460,16 +462,19 @@ public class DefaultVehicleController
 
     List<Step> oldProcessedSteps = oldSteps.subList(0, lastCommandExecutedRouteIndex + 1);
     List<Step> newProcessedSteps = newSteps.subList(0, lastCommandExecutedRouteIndex + 1);
-    LOG.debug("Comparing steps up to the last executed command for equality: {} and {}",
+    LOG.debug("{}: Comparing steps up to the last executed command for equality: {} and {}",
+              vehicle.getName(),
               oldProcessedSteps,
               newProcessedSteps);
     if (!Objects.equals(oldProcessedSteps, newProcessedSteps)) {
-      LOG.debug("Steps are not equal. Not considering drive orders continuous.");
+      LOG.debug("{}: Steps are not equal. Not considering drive orders continuous.",
+                vehicle.getName());
       return false;
     }
 
     if (isForcedRerouting(newOrder)) {
-      LOG.debug("New order with forced rerouting. Considering drive orders continuous.");
+      LOG.debug("{}: New order with forced rerouting. Considering drive orders continuous.",
+                vehicle.getName());
       return true;
     }
 
@@ -478,11 +483,13 @@ public class DefaultVehicleController
                                                   futureOrCurrentPositionIndex + 1);
     List<Step> newPendingSteps = newSteps.subList(lastCommandExecutedRouteIndex + 1,
                                                   futureOrCurrentPositionIndex + 1);
-    LOG.debug("Comparing pending steps for equality: {} and {} ",
+    LOG.debug("{}: Comparing pending steps for equality: {} and {} ",
+              vehicle.getName(),
               oldPendingSteps,
               oldPendingSteps);
     if (!Objects.equals(oldPendingSteps, newPendingSteps)) {
-      LOG.debug("Steps are not equal. Not considering drive orders continuous.");
+      LOG.debug("{}: Steps are not equal. Not considering drive orders continuous.",
+                vehicle.getName());
       return false;
     }
 
@@ -543,7 +550,8 @@ public class DefaultVehicleController
       lastCommandSent = commandsSentList.get(commandsSentList.size() - 1);
     }
 
-    LOG.debug("Discarding future commands up to '{}' (inclusively): {}",
+    LOG.debug("{}: Discarding future commands up to '{}' (inclusively): {}",
+              vehicle.getName(),
               lastCommandSent,
               futureCommands);
     for (int i = 0; i < lastCommandSent.getStep().getRouteIndex() + 1; i++) {
@@ -1353,7 +1361,8 @@ public class DefaultVehicleController
   private boolean isForcedRerouting(DriveOrder newOrder) {
     int lastCommandExecutedRouteIndex = getLastCommandExecutedRouteIndex();
     if (lastCommandExecutedRouteIndex == Vehicle.ROUTE_INDEX_DEFAULT) {
-      LOG.debug("No route progress, yet. Not considering rerouting as forced.");
+      LOG.debug("{}: No route progress, yet. Not considering rerouting as forced.",
+                vehicle.getName());
       return false;
     }
 
