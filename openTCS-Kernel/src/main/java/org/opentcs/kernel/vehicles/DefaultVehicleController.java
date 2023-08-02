@@ -887,12 +887,9 @@ public class DefaultVehicleController
     Vehicle currVehicle = vehicleService.fetchObject(Vehicle.class, vehicle.getReference());
 
     if (currVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_RESPECTED
-        || currVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED) {
+        || currVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
+        || currVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_NOTICED) {
       setVehiclePosition(position);
-    }
-    else if (currVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_NOTICED) {
-      Point point = vehicleService.fetchObject(Point.class, position);
-      updatePosition(toReference(point), null);
     }
   }
 
