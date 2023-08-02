@@ -1927,8 +1927,6 @@ components:
           items:
             $ref: "#/components/schemas/PlantModelVehicle"
         visualLayout:
-          type: object
-          description: The plant model's visual layout.
           $ref: "#/components/schemas/PlantModelVisualLayout"
         properties:
           type: array
@@ -1946,8 +1944,6 @@ components:
           description: This point's name.
           example: some point
         position:
-          type: object
-          description: This point's position (in mm).
           $ref: "#/components/schemas/PlantModelTriple"
         vehicleOrientationAngle:
           oneOf:
@@ -2126,8 +2122,6 @@ components:
           description: The name of this location's type.
           example: some location type
         position:
-          type: object
-          description: This location's position (in mm).
           $ref: "#/components/schemas/PlantModelTriple"
         links:
           type: array
