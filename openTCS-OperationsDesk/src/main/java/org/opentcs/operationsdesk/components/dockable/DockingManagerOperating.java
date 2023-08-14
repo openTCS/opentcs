@@ -21,7 +21,6 @@ import org.opentcs.guing.common.components.dockable.CStack;
 import org.opentcs.guing.common.components.properties.SelectionPropertiesComponent;
 import org.opentcs.guing.common.components.tree.BlocksTreeViewManager;
 import org.opentcs.guing.common.components.tree.ComponentsTreeViewManager;
-import org.opentcs.operationsdesk.application.KernelStatusPanel;
 import org.opentcs.operationsdesk.components.dialogs.VehiclesPanel;
 import org.opentcs.operationsdesk.components.layer.LayerGroupsPanel;
 import org.opentcs.operationsdesk.components.layer.LayersPanel;
@@ -70,10 +69,6 @@ public class DockingManagerOperating
    */
   private final SelectionPropertiesComponent selectionPropertiesComponent;
   /**
-   * The panel that displays kernel messages.
-   */
-  private final KernelStatusPanel kernelStatusPanel;
-  /**
    * The panel displaying the layers in the plant model.
    */
   private final LayersPanel layersPanel;
@@ -103,7 +98,6 @@ public class DockingManagerOperating
    * @param blocksTreeViewManager The tree view manager for blocks.
    * @param selectionPropertiesComponent The panel displaying the properties of the currently
    * selected driving course components.
-   * @param kernelStatusPanel The panel that displays kernel messages.
    * @param layersPanel The panel displaying the layers in the plant model.
    * @param layerGroupsPanel The panel displaying the layer groups in the plant model.
    */
@@ -113,7 +107,6 @@ public class DockingManagerOperating
                                  ComponentsTreeViewManager componentsTreeViewManager,
                                  BlocksTreeViewManager blocksTreeViewManager,
                                  SelectionPropertiesComponent selectionPropertiesComponent,
-                                 KernelStatusPanel kernelStatusPanel,
                                  LayersPanel layersPanel,
                                  LayerGroupsPanel layerGroupsPanel) {
     super(new CControl(applicationFrame));
@@ -123,7 +116,6 @@ public class DockingManagerOperating
     this.blocksTreeViewManager = requireNonNull(blocksTreeViewManager, "blocksTreeViewManager");
     this.selectionPropertiesComponent = requireNonNull(selectionPropertiesComponent,
                                                        "selectionPropertiesComponent");
-    this.kernelStatusPanel = requireNonNull(kernelStatusPanel, "kernelStatusPanel");
     this.layersPanel = requireNonNull(layersPanel, "layersPanel");
     this.layerGroupsPanel = requireNonNull(layerGroupsPanel, "layerGroupsPanel");
   }
@@ -182,11 +174,6 @@ public class DockingManagerOperating
              createDockable(PROPERTIES_ID,
                             bundle.getString("dockingManagerOperating.panel_properties.title"),
                             selectionPropertiesComponent,
-                            false));
-    grid.add(0, 700, 250, 200,
-             createDockable(STATUS_ID,
-                            bundle.getString("dockingManagerOperating.panel_status.title"),
-                            kernelStatusPanel,
                             false));
     DefaultSingleCDockable layersDock
         = createDockable(LAYERS_ID,

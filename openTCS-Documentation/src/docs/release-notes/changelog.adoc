@@ -22,6 +22,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update web API specification and implementation to version 1.2.0:
 *** Add support for specifying and retrieving complete plant models via the web API.
 *** Keep web API running across kernel mode changes, e.g. when uploading a new plant model.
+** Remove the kernel messages panel from the Operations Desk; it has been superseded by the user notifications tab.
 * Bugs fixed:
 ** Properly check validity of destination operations when creating transport orders.
 ** Improve legibility of some text elements in the Model Editor and Operations Desk applications that would not be legible on some systems (e.g. Ubuntu 20.04).

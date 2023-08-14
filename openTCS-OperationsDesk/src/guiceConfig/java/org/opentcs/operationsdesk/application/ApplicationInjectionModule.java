@@ -21,7 +21,6 @@ import org.opentcs.guing.common.application.ProgressIndicator;
 import org.opentcs.guing.common.application.SplashFrame;
 import org.opentcs.guing.common.application.StatusPanel;
 import org.opentcs.guing.common.application.ViewManager;
-import org.opentcs.guing.common.util.MessageDisplay;
 import org.opentcs.operationsdesk.application.action.ActionInjectionModule;
 import org.opentcs.operationsdesk.application.menus.MenusInjectionModule;
 import org.opentcs.operationsdesk.application.toolbar.ToolBarInjectionModule;
@@ -52,9 +51,6 @@ public class ApplicationInjectionModule
     install(new ToolBarInjectionModule());
 
     bind(ApplicationState.class).in(Singleton.class);
-
-    bind(MessageDisplay.class).to(KernelStatusPanel.class);
-    bind(KernelStatusPanel.class).in(Singleton.class);
 
     bind(UndoRedoManager.class).in(Singleton.class);
 

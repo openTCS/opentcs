@@ -11,7 +11,6 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelStateTransitionEvent;
-import org.opentcs.access.NotificationPublicationEvent;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.common.ClientConnectionMode;
@@ -28,7 +27,6 @@ import org.opentcs.guing.common.event.OperationModeChangeEvent;
 import org.opentcs.guing.common.exchange.adapter.ProcessAdapter;
 import org.opentcs.guing.common.exchange.adapter.ProcessAdapterUtil;
 import org.opentcs.guing.common.persistence.ModelManager;
-import org.opentcs.guing.common.util.MessageDisplay;
 import org.opentcs.operationsdesk.event.KernelStateChangeEvent;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
@@ -46,10 +44,6 @@ public class OpenTCSEventDispatcher
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(OpenTCSEventDispatcher.class);
-  /**
-   * A display for messages received from the kernel.
-   */
-  private final MessageDisplay messageDisplay;
   /**
    * Where we get events from and send them to.
    */
@@ -79,19 +73,16 @@ public class OpenTCSEventDispatcher
    * Creates a new instance.
    *
    * @param portalProvider Provides a access to a portal.
-   * @param messageDisplay A display for messages received from the kernel.
    * @param eventBus Where this instance gets events from and sends them to.
    * @param processAdapterUtil The process adapter util.
    * @param modelManager The model manager.
    */
   @Inject
   public OpenTCSEventDispatcher(SharedKernelServicePortalProvider portalProvider,
-                                MessageDisplay messageDisplay,
                                 @ApplicationEventBus EventBus eventBus,
                                 ProcessAdapterUtil processAdapterUtil,
                                 ModelManager modelManager) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
-    this.messageDisplay = requireNonNull(messageDisplay, "messageDisplay");
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.processAdapterUtil = requireNonNull(processAdapterUtil, "processAdapterUtil");
     this.modelManager = requireNonNull(modelManager, "modelManager");
@@ -170,9 +161,6 @@ public class OpenTCSEventDispatcher
             this,
             KernelStateChangeEvent.convertKernelState(kse.getEnteredState())));
       }
-    }
-    else if (event instanceof NotificationPublicationEvent) {
-      messageDisplay.display(((NotificationPublicationEvent) event).getNotification());
     }
     else if (event instanceof OperationModeChangeEvent) {
       handleOperationModeChange((OperationModeChangeEvent) event);

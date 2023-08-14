@@ -64,7 +64,6 @@ import org.opentcs.components.plantoverview.PluggablePanelFactory;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.notification.UserNotification;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.base.components.properties.type.AbstractProperty;
@@ -231,10 +230,6 @@ public class OpenTCSView
    */
   private SharedKernelServicePortal sharedPortal;
   /**
-   * A panel that displays kernel messages.
-   */
-  private final KernelStatusPanel kernelStatusPanel;
-  /**
    * A panel for mouse position/status.
    */
   private final StatusPanel statusPanel;
@@ -332,7 +327,6 @@ public class OpenTCSView
    * @param undoRedoManager Allows for undoing and redoing actions.
    * @param componentsTreeManager Manages the components tree view.
    * @param blocksTreeManager Manages the blocks tree view.
-   * @param kernelStatusPanel A panel that displays kernel messages.
    * @param propertiesComponent Displays properties of the currently selected model component(s).
    * @param vehiclesPanel A panel showing all the vehicles in the system model.
    * @param actionMapProvider A provider for ActionMaps.
@@ -365,7 +359,6 @@ public class OpenTCSView
                      UndoRedoManager undoRedoManager,
                      ComponentsTreeViewManager componentsTreeManager,
                      BlocksTreeViewManager blocksTreeManager,
-                     KernelStatusPanel kernelStatusPanel,
                      SelectionPropertiesComponent propertiesComponent,
                      VehiclesPanel vehiclesPanel,
                      Provider<ViewActionMap> actionMapProvider,
@@ -396,7 +389,6 @@ public class OpenTCSView
     this.fUndoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
     this.fComponentsTreeManager = requireNonNull(componentsTreeManager, "componentsTreeManager");
     this.fBlocksTreeManager = requireNonNull(blocksTreeManager, "blocksTreeManager");
-    this.kernelStatusPanel = requireNonNull(kernelStatusPanel, "kernelStatusPanel");
     this.fPropertiesComponent = requireNonNull(propertiesComponent, "propertiesComponent");
     this.vehiclesPanel = requireNonNull(vehiclesPanel, "vehiclesPanel");
     this.actionMapProvider = requireNonNull(actionMapProvider, "actionMapProvider");
@@ -746,15 +738,6 @@ public class OpenTCSView
     new Thread(() -> setOperatingState()).start();
   }
 
-  /**
-   * Logs a message to the status text area.
-   *
-   * @param message The message to log.
-   */
-  private void log(UserNotification message) {
-    kernelStatusPanel.display(message);
-  }
-
   @Override  // GuiManager
   public void createEmptyModel() {
     CloseFileAction action = (CloseFileAction) getActionMap().get(CloseFileAction.ID);
@@ -955,10 +938,6 @@ public class OpenTCSView
 
   private void handleKernelInModellingMode() {
     createEmptyModel();
-    String text = bundle.getFormatted("openTcsView.message_kernelInModelling.text",
-                                      bundle.getString("openTcsView.state_modelling.text"),
-                                      bundle.getString("openTcsView.state_operating.text"));
-    log(new UserNotification(text, UserNotification.Level.INFORMATIONAL));
   }
 
   private void setModelNameProperty(String modelName) {
