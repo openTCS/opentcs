@@ -95,4 +95,10 @@ public interface PlantOverviewOperatingApplicationConfiguration {
       description = "The maximum number of most recent user notifications to be displayed.",
       orderKey = "9_misc")
   int userNotificationDisplayCount();
+
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether the forced withdrawal context menu entry should be enabled.",
+      orderKey = "10_misc")
+  boolean allowForcedWithdrawal();
 }

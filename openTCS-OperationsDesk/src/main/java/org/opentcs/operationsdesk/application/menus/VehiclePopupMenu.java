@@ -22,6 +22,7 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.operationsdesk.application.action.ActionFactory;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
+import org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfiguration;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
@@ -35,11 +36,13 @@ public class VehiclePopupMenu
    *
    * @param modelManager Provides access to the current system model.
    * @param actionFactory A factory for menu actions.
+   * @param configuration The application configuration.
    * @param vehicles a set of all currently selected Vehicles.
    */
   @Inject
   public VehiclePopupMenu(ModelManager modelManager,
                           ActionFactory actionFactory,
+                          PlantOverviewOperatingApplicationConfiguration configuration,
                           @Assisted Collection<VehicleModel> vehicles) {
     requireNonNull(modelManager, "modelManager");
     requireNonNull(actionFactory, "actionFactory");
@@ -178,7 +181,7 @@ public class VehiclePopupMenu
     withdrawSubMenu.add(action);
 
     action = actionFactory.createWithdrawAction(vehicles, true);
-    action.setEnabled(isAnyProcessingOrder(vehicles));
+    action.setEnabled(configuration.allowForcedWithdrawal() && isAnyProcessingOrder(vehicles));
     withdrawSubMenu.add(action);
 
     add(withdrawSubMenu);
