@@ -7,6 +7,7 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase;
 
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -102,8 +103,10 @@ public class AssignReservedOrdersPhase
     orderReservationPool.findReservations(vehicle.getReference()).stream()
         .map(orderRef -> objectService.fetchObject(TransportOrder.class, orderRef))
         .filter(order -> order.hasState(TransportOrder.State.DISPATCHABLE))
+        // A transport order's intended vehicle can change after its creation and also after
+        // reservation. Only handle orders where the intended vehicle (still) fits the reservation.
+        .filter(order -> hasNoOrMatchingIntendedVehicle(order, vehicle))
         .limit(1)
-        .peek(order -> orderReservationPool.removeReservations(vehicle.getReference()))
         .map(order -> computeCandidate(vehicle,
                                        objectService.fetchObject(Point.class,
                                                                  vehicle.getCurrentPosition()),
@@ -117,12 +120,22 @@ public class AssignReservedOrdersPhase
                                                                  candidate.getTransportOrder(),
                                                                  candidate.getDriveOrders())
         );
+
+    // Regardless of whether a reserved order could be assigned to the vehicle or not, remove any
+    // reservations for the vehicle and allow it to be reserved (again) in the subsequent dispatcher
+    // phases.
+    orderReservationPool.removeReservations(vehicle.getReference());
   }
 
   private boolean available(Vehicle vehicle) {
     return vehicle.hasProcState(Vehicle.ProcState.IDLE)
         && (vehicle.hasState(Vehicle.State.IDLE)
             || vehicle.hasState(Vehicle.State.CHARGING));
+  }
+
+  private boolean hasNoOrMatchingIntendedVehicle(TransportOrder order, Vehicle vehicle) {
+    return order.getIntendedVehicle() == null
+        || Objects.equals(order.getIntendedVehicle(), vehicle.getReference());
   }
 
   private Optional<AssignmentCandidate> computeCandidate(Vehicle vehicle,
