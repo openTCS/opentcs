@@ -20,5 +20,26 @@ insert_final_newline = true
 # Trim trailing whitespaces
 trim_trailing_whitespace = true
 
+# Configure the visual guide for IntelliJ IDEA
+ij_visual_guides = 100
+
 [*.bat]
 end_of_line = crlf
+
+[*.java]
+# Configure code style rules for IntelliJ IDEA
+ij_java_align_multiline_binary_operation = true
+ij_java_align_multiline_extends_list = true
+ij_java_align_multiline_parameters_in_calls = true
+ij_java_align_multiline_throws_list = true
+ij_java_catch_on_new_line = true
+ij_java_continuation_indent_size = 4
+ij_java_else_on_new_line = true
+ij_java_enum_constants_wrap = split_into_lines
+ij_java_extends_keyword_wrap = split_into_lines
+ij_java_throws_keyword_wrap = split_into_lines
+
+ij_java_doc_align_param_comments = false
+ij_java_doc_align_exception_comments = false
+ij_java_doc_preserve_line_breaks = true
+
