@@ -8,242 +8,326 @@
 package org.opentcs.util.persistence;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import javax.xml.XMLConstants;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.UUID;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.util.persistence.v004.AllowedOperationTO;
+import org.opentcs.util.persistence.v004.AllowedPeripheralOperationTO;
 import org.opentcs.util.persistence.v004.BlockTO;
 import org.opentcs.util.persistence.v004.LocationTO;
-import org.opentcs.util.persistence.v004.LocationTO.Link;
 import org.opentcs.util.persistence.v004.LocationTypeTO;
 import org.opentcs.util.persistence.v004.MemberTO;
 import org.opentcs.util.persistence.v004.PathTO;
+import org.opentcs.util.persistence.v004.PeripheralOperationTO;
 import org.opentcs.util.persistence.v004.PointTO;
-import org.opentcs.util.persistence.v004.PointTO.OutgoingPath;
 import org.opentcs.util.persistence.v004.PropertyTO;
 import org.opentcs.util.persistence.v004.V004PlantModelTO;
 import org.opentcs.util.persistence.v004.VehicleTO;
 import org.opentcs.util.persistence.v004.VisualLayoutTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 /**
  */
 public class V004DrivingCoursePersistenceTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(V004DrivingCoursePersistenceTest.class);
+  private V004PlantModelTO plantModel;
+
+  @BeforeEach
+  public void setUp() {
+    plantModel = createPlantModel();
+  }
 
   @Test
-  public void testToXml()
+  public void persistAndMaterializeModelAttributes()
       throws IOException {
-    V004PlantModelTO model = new V004PlantModelTO();
-    model.setVersion("0.0.4");
-    model.setName("Demo");
+    plantModel.setVersion("0.0.4");
+    plantModel.getProperties().add(new PropertyTO().setName("some-prop").setValue("some-prop-val"));
 
-    PointTO point1 = createPoint("Point1", 1, 2, 3, Float.NaN, "HALT_POSITION",
-                                 Arrays.asList(createOutgoingPath("Path1")),
-                                 new ArrayList<>());
-    PointTO point2 = createPoint("Point2", 4, 5, 6, Float.NaN, "PARK_POSITION",
-                                 Arrays.asList(createOutgoingPath("Path2"),
-                                               createOutgoingPath("Path3")),
-                                 new ArrayList<>());
-    model.setPoints(Arrays.asList(point1, point2));
+    // Write to XML...
+    String xmlOutput = toXml(plantModel);
+    // ...then parse it back and verify it contains the same elements.
+    V004PlantModelTO parsedModel = V004PlantModelTO.fromXml(new StringReader(xmlOutput));
 
-    PathTO path1 = createPath();
-    model.setPaths(Arrays.asList(path1));
+    assertThat(parsedModel.getVersion(), is(equalTo("0.0.4")));
+    assertThat(parsedModel.getProperties(), hasSize(1));
+    assertThat(parsedModel.getProperties().get(0).getName(), is(equalTo("some-prop")));
+    assertThat(parsedModel.getProperties().get(0).getValue(), is(equalTo("some-prop-val")));
+  }
 
-    VehicleTO vehicle = createVehicle();
-    model.setVehicles(Arrays.asList(vehicle));
+  @Test
+  public void persistAndMaterializePoints()
+      throws IOException {
+    plantModel.getPoints().get(0).setName("my-point");
+    plantModel.getPoints().get(0).setxPosition(1L);
+    plantModel.getPoints().get(0).setyPosition(2L);
+    plantModel.getPoints().get(0).setzPosition(3L);
+    plantModel.getPoints().get(0).setVehicleOrientationAngle(12.34f);
+    plantModel.getPoints().get(0).setType("REPORT_POSITION");
+    plantModel.getPoints().get(0).getOutgoingPaths()
+        .add(new PointTO.OutgoingPath().setName("some-path"));
 
-    LocationTypeTO locType = createLocationType();
+    // Write to XML...
+    String xmlOutput = toXml(plantModel);
+    // ...then parse it back and verify it contains the same elements.
+    V004PlantModelTO parsedModel = V004PlantModelTO.fromXml(new StringReader(xmlOutput));
 
-    model.setLocationTypes(Arrays.asList(locType));
+    assertThat(parsedModel.getPoints(), hasSize(2));
+    assertThat(parsedModel.getPoints().get(0).getName(), is(equalTo("my-point")));
+    assertThat(parsedModel.getPoints().get(0).getxPosition(), is(1L));
+    assertThat(parsedModel.getPoints().get(0).getyPosition(), is(2L));
+    assertThat(parsedModel.getPoints().get(0).getzPosition(), is(3L));
+    assertThat(parsedModel.getPoints().get(0).getVehicleOrientationAngle(), is(12.34f));
+    assertThat(parsedModel.getPoints().get(0).getType(), is(equalTo("REPORT_POSITION")));
+    assertThat(parsedModel.getPoints().get(0).getOutgoingPaths(), hasSize(1));
+    assertThat(parsedModel.getPoints().get(0).getOutgoingPaths().get(0).getName(),
+               is(equalTo("some-path")));
+  }
 
-    LocationTO loc = createLocation();
-    model.setLocations(Arrays.asList(loc));
+  @Test
+  public void persistAndMaterializePaths()
+      throws IOException {
+    plantModel.getPaths().get(0).setName("my-path");
+    plantModel.getPaths().get(0).setSourcePoint("some-source-point");
+    plantModel.getPaths().get(0).setDestinationPoint("some-dest-point");
+    plantModel.getPaths().get(0).setLength(1234L);
+    plantModel.getPaths().get(0).setLocked(true);
+    plantModel.getPaths().get(0).setMaxVelocity(9876L);
+    plantModel.getPaths().get(0).setMaxReverseVelocity(5432L);
+    plantModel.getPaths().get(0).getPeripheralOperations().add(
+        new PeripheralOperationTO()
+            .setLocationName("some-loc-name")
+            .setExecutionTrigger("BEFORE_MOVEMENT")
+            .setCompletionRequired(true)
+    );
 
-    BlockTO block = createBlock();
-    model.setBlocks(Arrays.asList(block));
+    // Write to XML...
+    String xmlOutput = toXml(plantModel);
+    // ...then parse it back and verify it contains the same elements.
+    V004PlantModelTO parsedModel = V004PlantModelTO.fromXml(new StringReader(xmlOutput));
 
-    model.setVisualLayout(createVisualLayout());
+    assertThat(parsedModel.getPaths(), hasSize(1));
+    assertThat(parsedModel.getPaths().get(0).getName(), is(equalTo("my-path")));
+    assertThat(parsedModel.getPaths().get(0).getLength(), is(1234L));
+    assertThat(parsedModel.getPaths().get(0).isLocked(), is(true));
+    assertThat(parsedModel.getPaths().get(0).getMaxVelocity(), is(9876L));
+    assertThat(parsedModel.getPaths().get(0).getMaxReverseVelocity(), is(5432L));
+    assertThat(parsedModel.getPaths().get(0).getSourcePoint(), is(equalTo("some-source-point")));
+    assertThat(parsedModel.getPaths().get(0).getDestinationPoint(), is(equalTo("some-dest-point")));
+    assertThat(parsedModel.getPaths().get(0).getPeripheralOperations(), hasSize(1));
+    assertThat(parsedModel.getPaths().get(0).getPeripheralOperations().get(0).getLocationName(),
+               is(equalTo("some-loc-name")));
+    assertThat(parsedModel.getPaths().get(0).getPeripheralOperations().get(0).getExecutionTrigger(),
+               is(equalTo("BEFORE_MOVEMENT")));
+    assertThat(
+        parsedModel.getPaths().get(0).getPeripheralOperations().get(0).isCompletionRequired(),
+        is(true)
+    );
+  }
 
+  @Test
+  public void persistAndMaterializeLocationTypes()
+      throws IOException {
+    plantModel.getLocationTypes().get(0).setName("my-location-type");
+    plantModel.getLocationTypes().get(0).getAllowedPeripheralOperations().add(
+        (AllowedPeripheralOperationTO) new AllowedPeripheralOperationTO().setName("some-op")
+    );
+
+    // Write to XML...
+    String xmlOutput = toXml(plantModel);
+    // ...then parse it back and verify it contains the same elements.
+    V004PlantModelTO parsedModel = V004PlantModelTO.fromXml(new StringReader(xmlOutput));
+
+    assertThat(parsedModel.getLocationTypes(), hasSize(1));
+    assertThat(parsedModel.getLocationTypes().get(0).getName(), is(equalTo("my-location-type")));
+    assertThat(parsedModel.getLocationTypes().get(0).getAllowedPeripheralOperations(), hasSize(1));
+    assertThat(
+        parsedModel.getLocationTypes().get(0).getAllowedPeripheralOperations().get(0).getName(),
+        is(equalTo("some-op"))
+    );
+  }
+
+  @Test
+  public void persistAndMaterializeLocations()
+      throws IOException {
+    plantModel.getLocations().get(0).setName("my-location");
+    plantModel.getLocations().get(0).setType("some-loc-type");
+    plantModel.getLocations().get(0).setLocked(true);
+    plantModel.getLocations().get(0).setxPosition(1L);
+    plantModel.getLocations().get(0).setyPosition(2L);
+    plantModel.getLocations().get(0).setzPosition(3L);
+    plantModel.getLocations().get(0).getLinks().add(
+        new LocationTO.Link()
+            .setPoint("some-point")
+            .setAllowedOperations(new ArrayList<>(List.of(
+                (AllowedOperationTO) new AllowedOperationTO().setName("some-op")
+            )))
+    );
+
+    // Write to XML...
+    String xmlOutput = toXml(plantModel);
+    // ...then parse it back and verify it contains the same elements.
+    V004PlantModelTO parsedModel = V004PlantModelTO.fromXml(new StringReader(xmlOutput));
+
+    assertThat(parsedModel.getLocations(), hasSize(1));
+    assertThat(parsedModel.getLocations().get(0).getName(), is(equalTo("my-location")));
+    assertThat(parsedModel.getLocations().get(0).getType(), is(equalTo("some-loc-type")));
+    assertThat(parsedModel.getLocations().get(0).isLocked(), is(true));
+    assertThat(parsedModel.getLocations().get(0).getxPosition(), is(1L));
+    assertThat(parsedModel.getLocations().get(0).getyPosition(), is(2L));
+    assertThat(parsedModel.getLocations().get(0).getzPosition(), is(3L));
+    assertThat(parsedModel.getLocations().get(0).getLinks(), hasSize(1));
+    assertThat(parsedModel.getLocations().get(0).getLinks().get(0).getPoint(),
+               is(equalTo("some-point")));
+    assertThat(parsedModel.getLocations().get(0).getLinks().get(0).getAllowedOperations(),
+               hasSize(1));
+    assertThat(
+        parsedModel.getLocations().get(0).getLinks().get(0).getAllowedOperations().get(0).getName(),
+        is(equalTo("some-op"))
+    );
+  }
+
+  @Test
+  public void persistAndMaterializeBlocks()
+      throws IOException {
+    plantModel.getBlocks().get(0).setName("my-block");
+    plantModel.getBlocks().get(0).setType("SAME_DIRECTION_ONLY");
+    plantModel.getBlocks().get(0).getMembers().add(
+        (MemberTO) new MemberTO().setName("some-member")
+    );
+
+    // Write to XML...
+    String xmlOutput = toXml(plantModel);
+    // ...then parse it back and verify it contains the same elements.
+    V004PlantModelTO parsedModel = V004PlantModelTO.fromXml(new StringReader(xmlOutput));
+
+    assertThat(parsedModel.getBlocks(), hasSize(1));
+    assertThat(parsedModel.getBlocks().get(0).getName(), is(equalTo("my-block")));
+    assertThat(parsedModel.getBlocks().get(0).getType(), is(equalTo("SAME_DIRECTION_ONLY")));
+    assertThat(parsedModel.getBlocks().get(0).getMembers(), hasSize(1));
+    assertThat(parsedModel.getBlocks().get(0).getMembers().get(0).getName(),
+               is(equalTo("some-member")));
+  }
+
+  @Test
+  public void persistAndMaterializeVehicles()
+      throws IOException {
+    plantModel.getVehicles().get(0).setName("my-vehicle");
+    plantModel.getVehicles().get(0).setLength(1234L);
+    plantModel.getVehicles().get(0).setMaxVelocity(333);
+    plantModel.getVehicles().get(0).setMaxReverseVelocity(444);
+    plantModel.getVehicles().get(0).setEnergyLevelCritical(33L);
+    plantModel.getVehicles().get(0).setEnergyLevelGood(88L);
+    plantModel.getVehicles().get(0).setEnergyLevelSufficientlyRecharged(66L);
+    plantModel.getVehicles().get(0).setEnergyLevelFullyRecharged(99L);
+
+    // Write to XML...
+    String xmlOutput = toXml(plantModel);
+    // ...then parse it back and verify it contains the same elements.
+    V004PlantModelTO parsedModel = V004PlantModelTO.fromXml(new StringReader(xmlOutput));
+
+    assertThat(parsedModel.getVehicles(), hasSize(1));
+    assertThat(parsedModel.getVehicles().get(0).getName(), is(equalTo("my-vehicle")));
+    assertThat(parsedModel.getVehicles().get(0).getLength(), is(1234L));
+    assertThat(parsedModel.getVehicles().get(0).getMaxVelocity(), is(333));
+    assertThat(parsedModel.getVehicles().get(0).getMaxReverseVelocity(), is(444));
+    assertThat(parsedModel.getVehicles().get(0).getEnergyLevelCritical(), is(33L));
+    assertThat(parsedModel.getVehicles().get(0).getEnergyLevelGood(), is(88L));
+    assertThat(parsedModel.getVehicles().get(0).getEnergyLevelSufficientlyRecharged(), is(66L));
+    assertThat(parsedModel.getVehicles().get(0).getEnergyLevelFullyRecharged(), is(99L));
+  }
+
+  private String toXml(V004PlantModelTO plantModel)
+      throws IOException {
     StringWriter writer = new StringWriter();
-    model.toXml(writer);
-
-    String xmlOutput = writer.toString();
-    LOG.info(xmlOutput);
-
-    try {
-      assertTrue(validateXml(new StringReader(xmlOutput)));
-    }
-    catch (SAXException | IOException ex) {
-      LOG.error("", ex);
-    }
+    plantModel.toXml(writer);
+    return writer.toString();
   }
 
-  private boolean validateXml(Reader reader)
-      throws SAXException, IOException {
-    Source schemaFile = new StreamSource(getClass().getResourceAsStream(
-        "/org/opentcs/util/persistence/model-0.0.4.xsd"));
-    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-    Schema schema = schemaFactory.newSchema(schemaFile);
-    try {
-      schema.newValidator().validate(new StreamSource(reader));
-      LOG.info("XML is valid.");
-      return true;
-    }
-    catch (SAXException e) {
-      LOG.info("XML is NOT valid.", e);
-      return false;
-    }
-  }
-
-  private PointTO createPoint(String name, long xPosition, long yPosition, long zPosition,
-                              Float vehicleOrientationAngle, String type,
-                              List<OutgoingPath> outgoingPaths,
-                              List<PropertyTO> properties) {
-    PointTO p = new PointTO();
-    p.setName(name);
-    p.setProperties(properties);
-    p.setxPosition(xPosition);
-    p.setyPosition(yPosition);
-    p.setzPosition(zPosition);
-    p.setVehicleOrientationAngle(vehicleOrientationAngle);
-    p.setType(type);
-    p.setOutgoingPaths(outgoingPaths);
-    p.setPointLayout(new PointTO.PointLayout()
-        .setxPosition(xPosition)
-        .setyPosition(yPosition)
-        .setxLabelOffset(20L)
-        .setyLabelOffset(20L)
-        .setLayerId(0));
-    return p;
-  }
-
-  private OutgoingPath createOutgoingPath(String name) {
-    OutgoingPath op = new OutgoingPath();
-    op.setName(name);
-    return op;
-  }
-
-  private PathTO createPath() {
-    PathTO p = new PathTO();
-    p.setName("Point1 --- Point2");
-    p.setSourcePoint("Point1");
-    p.setDestinationPoint("Point2");
-    p.setLength(100L);
-    p.setMaxVelocity(1000L);
-    p.setMaxReverseVelocity(200L);
-    p.setLocked(false);
-    p.setPathLayout(new PathTO.PathLayout()
-        .setConnectionType("DIRECT")
-        .setControlPoints(new ArrayList<>())
-        .setLayerId(0));
-
-    PropertyTO property = new PropertyTO();
-    property.setName("Property1");
-    property.setValue("Value1");
-    p.setProperties(Arrays.asList(property));
-    return p;
-  }
-
-  private LocationTypeTO createLocationType() {
-    LocationTypeTO locType = new LocationTypeTO();
-
-    locType.setName("Transfer station");
-
-    AllowedOperationTO ao1 = new AllowedOperationTO();
-    ao1.setName("NOP");
-    AllowedOperationTO ao2 = new AllowedOperationTO();
-    ao2.setName("Load cargo");
-    locType.setAllowedOperations(Arrays.asList(ao1, ao2));
-
-    locType.setLocationTypeLayout(new LocationTypeTO.LocationTypeLayout()
-        .setLocationRepresentation("LOAD_TRANSFER_GENERIC"));
-
-    return locType;
-  }
-
-  private LocationTO createLocation() {
-    LocationTO loc = new LocationTO();
-
-    loc.setName("Storage 02");
-    loc.setxPosition(100L);
-    loc.setyPosition(200L);
-    loc.setzPosition(300L);
-    loc.setType("Transfer station");
-    loc.setLocationLayout(new LocationTO.LocationLayout()
-        .setxPosition(100L)
-        .setyPosition(200L)
-        .setxLabelOffset(20L)
-        .setyLabelOffset(20L)
-        .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
-        .setLayerId(0));
-
-    Link link = new Link();
-    link.setPoint("Point1");
-    loc.setLinks(Arrays.asList(link));
-
-    return loc;
-  }
-
-  private BlockTO createBlock() {
-    BlockTO block = new BlockTO();
-    block.setName("Block-001");
-
-    MemberTO member = new MemberTO();
-    member.setName("Point1 --- Point2");
-    block.setMembers(Arrays.asList(member));
-
-    block.setBlockLayout(new BlockTO.BlockLayout()
-        .setColor("#FF0000"));
-
-    return block;
-  }
-
-  private VisualLayoutTO createVisualLayout() {
-    VisualLayoutTO vl = new VisualLayoutTO();
-    vl.setName("VLayout-01");
-    vl.setScaleX(50.0f);
-    vl.setScaleY(50.0f);
-    vl.setLayers(Arrays.asList(new VisualLayoutTO.Layer()
-        .setId(0)
-        .setOrdinal(0)
-        .setVisible(Boolean.TRUE)
-        .setName("Layer 0")
-        .setGroupId(0)));
-    vl.setLayerGroups(Arrays.asList(new VisualLayoutTO.LayerGroup()
-        .setId(0)
-        .setName("Layer group 0")
-        .setVisible(Boolean.TRUE)));
-
-    PropertyTO property = new PropertyTO();
-    property.setName("tcs:vehicleThemeClass");
-    property.setValue("...");
-    vl.setProperties(Arrays.asList(property));
-
-    return vl;
-  }
-
-  private VehicleTO createVehicle() {
-    VehicleTO vehicle = new VehicleTO();
-    vehicle.setName("Vehicle-01");
-    vehicle.setLength(1000L);
-    vehicle.setEnergyLevelCritical(30L);
-    vehicle.setEnergyLevelGood(90L);
-    vehicle.setVehicleLayout(new VehicleTO.VehicleLayout()
-        .setColor("#FF0000"));
-    return vehicle;
+  private V004PlantModelTO createPlantModel() {
+    return (V004PlantModelTO) new V004PlantModelTO()
+        .setName(UUID.randomUUID().toString())
+        .setPoints(new ArrayList<>(List.of(
+            (PointTO) new PointTO()
+                .setPointLayout(new PointTO.PointLayout()
+                    .setxPosition(1L)
+                    .setyPosition(2L)
+                    .setxLabelOffset(20L)
+                    .setyLabelOffset(20L)
+                    .setLayerId(0))
+                .setName(UUID.randomUUID().toString()),
+            (PointTO) new PointTO()
+                .setPointLayout(new PointTO.PointLayout()
+                    .setxPosition(4L)
+                    .setyPosition(5L)
+                    .setxLabelOffset(20L)
+                    .setyLabelOffset(20L)
+                    .setLayerId(0))
+                .setName(UUID.randomUUID().toString())
+        )))
+        .setPaths(new ArrayList<>(List.of(
+            (PathTO) new PathTO()
+                .setPathLayout(new PathTO.PathLayout()
+                    .setConnectionType("DIRECT")
+                    .setLayerId(0))
+                .setName(UUID.randomUUID().toString())
+        )))
+        .setLocationTypes(new ArrayList<>(List.of(
+            (LocationTypeTO) new LocationTypeTO()
+                .setLocationTypeLayout(new LocationTypeTO.LocationTypeLayout()
+                    .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
+                )
+                .setName(UUID.randomUUID().toString())
+        )))
+        .setLocations(List.of(
+            (LocationTO) new LocationTO()
+                .setLocationLayout(new LocationTO.LocationLayout()
+                    .setxPosition(100L)
+                    .setyPosition(200L)
+                    .setxLabelOffset(20L)
+                    .setyLabelOffset(20L)
+                    .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
+                    .setLayerId(0))
+                .setName(UUID.randomUUID().toString())
+        ))
+        .setBlocks(List.of(
+            (BlockTO) new BlockTO()
+                .setBlockLayout(
+                    new BlockTO.BlockLayout()
+                        .setColor("#FF0000")
+                )
+                .setName(UUID.randomUUID().toString())
+        ))
+        .setVehicles(List.of(
+            (VehicleTO) new VehicleTO()
+                .setVehicleLayout(
+                    new VehicleTO.VehicleLayout()
+                        .setColor("#FF0000")
+                )
+                .setName(UUID.randomUUID().toString())
+        ))
+        .setVisualLayout(
+            (VisualLayoutTO) new VisualLayoutTO()
+                .setScaleX(50.0f)
+                .setScaleY(50.0f)
+                .setLayers(List.of(new VisualLayoutTO.Layer()
+                    .setId(0)
+                    .setOrdinal(0)
+                    .setVisible(Boolean.TRUE)
+                    .setName(UUID.randomUUID().toString())
+                    .setGroupId(0)))
+                .setLayerGroups(List.of(new VisualLayoutTO.LayerGroup()
+                    .setId(0)
+                    .setName(UUID.randomUUID().toString())
+                    .setVisible(Boolean.TRUE)))
+                .setName(UUID.randomUUID().toString())
+        )
+        .setVersion("0.0.4");
   }
 }

@@ -16,7 +16,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-import org.opentcs.data.model.Block;
 
 /**
  */
@@ -25,7 +24,7 @@ import org.opentcs.data.model.Block;
 public class BlockTO
     extends PlantModelElementTO {
 
-  private String type = Block.Type.SINGLE_VEHICLE_ONLY.name();
+  private String type = "SINGLE_VEHICLE_ONLY";
   private List<MemberTO> members = new ArrayList<>();
   private BlockLayout blockLayout = new BlockLayout();
 

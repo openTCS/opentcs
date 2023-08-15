@@ -21,7 +21,6 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(propOrder = {"name",
-                      "locationNamePrefix",
                       "allowedOperations",
                       "allowedPeripheralOperations",
                       "properties",
@@ -29,7 +28,6 @@ import javax.xml.bind.annotation.XmlType;
 public class LocationTypeTO
     extends PlantModelElementTO {
 
-  private String locationNamePrefix;
   private List<AllowedOperationTO> allowedOperations = new ArrayList<>();
   private List<AllowedPeripheralOperationTO> allowedPeripheralOperations = new ArrayList<>();
   private LocationTypeLayout locationTypeLayout = new LocationTypeLayout();
@@ -38,16 +36,6 @@ public class LocationTypeTO
    * Creates a new instance.
    */
   public LocationTypeTO() {
-  }
-
-  @XmlAttribute
-  public String getLocationNamePrefix() {
-    return locationNamePrefix;
-  }
-
-  public LocationTypeTO setLocationNamePrefix(String locationNamePrefix) {
-    this.locationNamePrefix = locationNamePrefix;
-    return this;
   }
 
   @XmlElement(name = "allowedOperation")

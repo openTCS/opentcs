@@ -29,7 +29,7 @@ public class PointTO
   private Long yPosition = 0L;
   private Long zPosition = 0L;
   private Float vehicleOrientationAngle = 0.0F;
-  private String type = "";
+  private String type = "HALT_POSITION";
   private List<OutgoingPath> outgoingPaths = new ArrayList<>();
   private PointLayout pointLayout = new PointLayout();
 

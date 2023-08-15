@@ -261,8 +261,7 @@ public class V004ModelParser {
           LocationTypeTO result = new LocationTypeTO();
           result.setName(locationType.getName())
               .setProperties(convertProperties(locationType.getProperties()));
-          result.setLocationNamePrefix(locationType.getLocationNamePrefix())
-              .setAllowedOperations(convertAllowedOperations(locationType.getAllowedOperations()))
+          result.setAllowedOperations(convertAllowedOperations(locationType.getAllowedOperations()))
               .setLocationTypeLayout(new LocationTypeTO.LocationTypeLayout()
                   .setLocationRepresentation(locationRepresentation));
           return result;
