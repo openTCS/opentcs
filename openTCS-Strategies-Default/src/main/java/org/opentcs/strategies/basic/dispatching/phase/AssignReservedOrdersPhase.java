@@ -90,8 +90,13 @@ public class AssignReservedOrdersPhase
 
   @Override
   public void run() {
-    for (Vehicle vehicle : objectService.fetchObjects(Vehicle.class, this::available)) {
-      checkForReservedOrder(vehicle);
+    for (Vehicle vehicle : objectService.fetchObjects(Vehicle.class)) {
+      if (availableForReservedOrders(vehicle)) {
+        checkForReservedOrder(vehicle);
+      }
+      else if (unusableForReservedOrders(vehicle)) {
+        orderReservationPool.removeReservations(vehicle.getReference());
+      }
     }
   }
 
@@ -127,10 +132,16 @@ public class AssignReservedOrdersPhase
     orderReservationPool.removeReservations(vehicle.getReference());
   }
 
-  private boolean available(Vehicle vehicle) {
+  private boolean availableForReservedOrders(Vehicle vehicle) {
     return vehicle.hasProcState(Vehicle.ProcState.IDLE)
         && (vehicle.hasState(Vehicle.State.IDLE)
-            || vehicle.hasState(Vehicle.State.CHARGING));
+            || vehicle.hasState(Vehicle.State.CHARGING))
+        && vehicle.getCurrentPosition() != null
+        && vehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED;
+  }
+
+  private boolean unusableForReservedOrders(Vehicle vehicle) {
+    return vehicle.getIntegrationLevel() != Vehicle.IntegrationLevel.TO_BE_UTILIZED;
   }
 
   private boolean hasNoOrMatchingIntendedVehicle(TransportOrder order, Vehicle vehicle) {
