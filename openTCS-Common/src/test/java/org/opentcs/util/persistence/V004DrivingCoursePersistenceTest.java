@@ -103,7 +103,7 @@ public class V004DrivingCoursePersistenceTest {
     plantModel.getPaths().get(0).getPeripheralOperations().add(
         new PeripheralOperationTO()
             .setLocationName("some-loc-name")
-            .setExecutionTrigger("BEFORE_MOVEMENT")
+            .setExecutionTrigger("AFTER_ALLOCATION")
             .setCompletionRequired(true)
     );
 
@@ -124,7 +124,7 @@ public class V004DrivingCoursePersistenceTest {
     assertThat(parsedModel.getPaths().get(0).getPeripheralOperations().get(0).getLocationName(),
                is(equalTo("some-loc-name")));
     assertThat(parsedModel.getPaths().get(0).getPeripheralOperations().get(0).getExecutionTrigger(),
-               is(equalTo("BEFORE_MOVEMENT")));
+               is(equalTo("AFTER_ALLOCATION")));
     assertThat(
         parsedModel.getPaths().get(0).getPeripheralOperations().get(0).isCompletionRequired(),
         is(true)

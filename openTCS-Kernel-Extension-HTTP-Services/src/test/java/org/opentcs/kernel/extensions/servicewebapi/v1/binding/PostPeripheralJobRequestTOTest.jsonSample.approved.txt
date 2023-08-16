@@ -6,7 +6,7 @@
   "peripheralOperation" : {
     "operation" : "some-operation",
     "locationName" : "some-location",
-    "executionTrigger" : "BEFORE_MOVEMENT",
+    "executionTrigger" : "AFTER_ALLOCATION",
     "completionRequired" : true
   },
   "properties" : [ {

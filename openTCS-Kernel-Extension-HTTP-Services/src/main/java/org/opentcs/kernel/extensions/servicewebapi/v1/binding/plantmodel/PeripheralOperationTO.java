@@ -19,7 +19,7 @@ public class PeripheralOperationTO {
 
   private String operation;
   private String locationName;
-  private String executionTrigger = PeripheralOperation.ExecutionTrigger.BEFORE_MOVEMENT.name();
+  private String executionTrigger = PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION.name();
   private boolean completionRequired;
 
   @JsonCreator

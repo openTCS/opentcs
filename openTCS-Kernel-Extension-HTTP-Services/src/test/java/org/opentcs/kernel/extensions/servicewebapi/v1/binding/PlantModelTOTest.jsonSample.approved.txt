@@ -83,7 +83,7 @@
     "peripheralOperations" : [ {
       "operation" : "some-op",
       "locationName" : "some-location",
-      "executionTrigger" : "BEFORE_MOVEMENT",
+      "executionTrigger" : "AFTER_ALLOCATION",
       "completionRequired" : true
     } ],
     "locked" : true,

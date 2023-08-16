@@ -284,7 +284,7 @@ When exactly a peripheral job is created for a peripheral operation defined on a
 As described in <<Peripheral operation>>, the _execution trigger_ of a peripheral operation defines when the operation is to be performed by the peripheral device.
 Note the following regarding the creation time of the peripheral job belonging to a peripheral operation:
 
-* `BEFORE_MOVEMENT`: The peripheral job is created as soon as the resource for the corresponding path has been allocated for the vehicle.
+* `AFTER_ALLOCATION` (previously named `BEFORE_MOVEMENT`): The peripheral job is created as soon as the resource for the corresponding path has been allocated for the vehicle.
   This means that if a vehicle can accept multiple (points and) paths in advance, a peripheral job may be created before the vehicle even reaches the actual path.
 * `AFTER_MOVEMENT`: The peripheral job is created as soon as the vehicle has completely traversed the path and reported the corresponding movement command as executed (i.e. when the vehicle reached the respective end point of the path).
 

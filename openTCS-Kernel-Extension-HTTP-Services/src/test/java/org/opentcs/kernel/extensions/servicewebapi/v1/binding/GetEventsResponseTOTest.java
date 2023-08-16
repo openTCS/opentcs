@@ -117,7 +117,7 @@ public class GetEventsResponseTOTest {
             new PeripheralOperationDescription()
                 .setOperation("some-operation")
                 .setLocationName("some-location")
-                .setExecutionTrigger(PeripheralOperation.ExecutionTrigger.BEFORE_MOVEMENT)
+                .setExecutionTrigger(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION)
                 .setCompletionRequired(true)
         )
         .setState(PeripheralJob.State.BEING_PROCESSED)

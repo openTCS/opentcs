@@ -1865,9 +1865,9 @@ components:
           type: string
           description: The moment at which this operation is to be performed.
           enum:
-            - BEFORE_MOVEMENT
+            - AFTER_ALLOCATION
             - AFTER_MOVEMENT
-          default: BEFORE_MOVEMENT
+          default: AFTER_ALLOCATION
         completionRequired:
           type: boolean
           description: Whether the completion of this operation is required to allow a vehicle to continue driving.
@@ -2027,7 +2027,7 @@ components:
               executionTrigger:
                 type: string
                 enum:
-                  - BEFORE_MOVEMENT
+                  - AFTER_ALLOCATION
                   - AFTER_MOVEMENT
               completionRequired:
                 type: boolean

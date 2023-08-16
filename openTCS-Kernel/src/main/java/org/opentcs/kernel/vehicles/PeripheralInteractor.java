@@ -161,14 +161,14 @@ public class PeripheralInteractor
     Map<PeripheralOperation.ExecutionTrigger, List<PeripheralOperation>> operations
         = path.getPeripheralOperations().stream()
             .collect(Collectors.groupingBy(t -> t.getExecutionTrigger()));
-    operations.computeIfAbsent(PeripheralOperation.ExecutionTrigger.BEFORE_MOVEMENT,
+    operations.computeIfAbsent(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION,
                                executionTrigger -> new ArrayList<>());
     operations.computeIfAbsent(PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT,
                                executionTrigger -> new ArrayList<>());
     String reservationToken = determineReservationToken();
 
     List<PeripheralOperation> preMovementOperations
-        = operations.get(PeripheralOperation.ExecutionTrigger.BEFORE_MOVEMENT);
+        = operations.get(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION);
     if (!preMovementOperations.isEmpty()) {
       preMovementInteractions.put(movementCommand,
                                   new PeripheralInteraction(vehicleRef,

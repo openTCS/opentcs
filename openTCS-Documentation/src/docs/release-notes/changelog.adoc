@@ -34,6 +34,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Other changes:
 ** The peripheral jobs panel in the Operations Desk application will now always be shown.
    The option to enable or disable it via the configuration file has been removed.
+** Rename peripheral operation execution trigger `BEFORE_MOVEMENT` to `AFTER_ALLOCATION`, as this name reflects better when the operation is actually triggered.
+   The previous name is deprecated but may still be used; it will implicitly be converted to the new name.
 ** Removed documentation for server side web API errors (code 500).
 ** Sync points' layout and model coordinates in the demo plant model.
 ** Update Gradle wrapper to 7.6.2.

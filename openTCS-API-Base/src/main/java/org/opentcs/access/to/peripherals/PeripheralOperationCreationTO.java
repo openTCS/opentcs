@@ -42,8 +42,8 @@ public class PeripheralOperationCreationTO
 
   /**
    * Creates a new instance with {@code executionTrigger} set to
-   * {@link PeripheralOperation.ExecutionTrigger#BEFORE_MOVEMENT} and {@code completionRequired} set
-   * to {@code false}.
+   * {@link PeripheralOperation.ExecutionTrigger#AFTER_ALLOCATION} and {@code completionRequired}
+   * set to {@code false}.
    *
    * @param operation The operation to be performed by the peripheral device.
    * @param locationName The name of the location the peripheral device is associated with.
@@ -52,10 +52,11 @@ public class PeripheralOperationCreationTO
     super("");
     this.operation = requireNonNull(operation, "operation");
     this.locationName = requireNonNull(locationName, "locationName");
-    this.executionTrigger = PeripheralOperation.ExecutionTrigger.BEFORE_MOVEMENT;
+    this.executionTrigger = PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION;
     this.completionRequired = false;
   }
 
+  @SuppressWarnings("deprecation")
   private PeripheralOperationCreationTO(
       @Nonnull String name,
       @Nonnull Map<String, String> properties,
@@ -66,7 +67,12 @@ public class PeripheralOperationCreationTO
     super(name, properties);
     this.operation = requireNonNull(operation, "operation");
     this.locationName = requireNonNull(locationName, "locationName");
-    this.executionTrigger = requireNonNull(executionTrigger, "executionTrigger");
+    requireNonNull(executionTrigger, "executionTrigger");
+    this.executionTrigger
+        = (executionTrigger == PeripheralOperation.ExecutionTrigger.BEFORE_MOVEMENT)
+            ? PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION
+            : executionTrigger;
+
     this.completionRequired = completionRequired;
   }
 

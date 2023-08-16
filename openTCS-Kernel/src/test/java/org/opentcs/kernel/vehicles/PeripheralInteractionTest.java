@@ -80,7 +80,7 @@ public class PeripheralInteractionTest {
   public void shouldNotWaitForOperationCompletion() {
     PeripheralOperation operation = new PeripheralOperation(createLocation().getReference(),
                                                             RESERVATION_TOKEN,
-                                                            ExecutionTrigger.BEFORE_MOVEMENT,
+                                                            ExecutionTrigger.AFTER_ALLOCATION,
                                                             false);
 
     peripheralInteraction = new PeripheralInteraction(VEHICLE.getReference(),
@@ -106,7 +106,7 @@ public class PeripheralInteractionTest {
   public void shouldWaitForOperationCompletion() {
     PeripheralOperation operation = new PeripheralOperation(createLocation().getReference(),
                                                             RESERVATION_TOKEN,
-                                                            ExecutionTrigger.BEFORE_MOVEMENT,
+                                                            ExecutionTrigger.AFTER_ALLOCATION,
                                                             true);
 
     PeripheralJob peripheralJob = new PeripheralJob("SomeJob", RESERVATION_TOKEN, operation);
@@ -138,7 +138,7 @@ public class PeripheralInteractionTest {
   public void shouldCallbackOnFailedRequiredInteraction() {
     PeripheralOperation operation = new PeripheralOperation(createLocation().getReference(),
                                                             RESERVATION_TOKEN,
-                                                            ExecutionTrigger.BEFORE_MOVEMENT,
+                                                            ExecutionTrigger.AFTER_ALLOCATION,
                                                             true);
 
     PeripheralJob peripheralJob = new PeripheralJob("SomeJob", RESERVATION_TOKEN, operation);

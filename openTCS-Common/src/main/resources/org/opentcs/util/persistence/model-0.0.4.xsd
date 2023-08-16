@@ -213,6 +213,7 @@
   <xsd:simpleType name="executionTriggerType">
     <xsd:restriction base="xsd:string">
       <xsd:enumeration value="BEFORE_MOVEMENT"/>
+      <xsd:enumeration value="AFTER_ALLOCATION"/>
       <xsd:enumeration value="AFTER_MOVEMENT"/>
     </xsd:restriction>
   </xsd:simpleType>

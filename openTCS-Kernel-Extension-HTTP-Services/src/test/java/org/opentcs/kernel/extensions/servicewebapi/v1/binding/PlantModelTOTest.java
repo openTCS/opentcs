@@ -74,7 +74,7 @@ public class PlantModelTOTest {
                 .setLocked(true)
                 .setPeripheralOperations(List.of(new PeripheralOperationTO("some-op",
                                                                            "some-location")
-                    .setExecutionTrigger("BEFORE_MOVEMENT")
+                    .setExecutionTrigger("AFTER_ALLOCATION")
                     .setCompletionRequired(true)))
                 .setLayout(new PathTO.Layout()
                     .setConnectionType("SLANTED")

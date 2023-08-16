@@ -49,11 +49,8 @@ public class PeripheralOperationPanel
         .forEach(locationComboBox::addItem);
     loadOperations();
 
-    //Load triggers
-    for (PeripheralOperation.ExecutionTrigger trigger
-             : PeripheralOperation.ExecutionTrigger.values()) {
-      triggerComboBox.addItem(trigger);
-    }
+    triggerComboBox.addItem(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION);
+    triggerComboBox.addItem(PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT);
   }
 
   private void loadOperations() {
