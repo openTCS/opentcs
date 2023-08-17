@@ -211,6 +211,20 @@ public class OrderHandler {
     executorWrapper.callAndWait(() -> jobDispatcherService.dispatch());
   }
 
+  public void tryImmediateAssignment(String name)
+      throws ObjectUnknownException, IllegalArgumentException {
+    requireNonNull(name, "name");
+
+    executorWrapper.callAndWait(() -> {
+      TransportOrder order = orderService.fetchObject(TransportOrder.class, name);
+      if (order == null) {
+        throw new ObjectUnknownException("Unknown transport order: " + name);
+      }
+
+      dispatcherService.assignNow(order.getReference());
+    });
+  }
+
   public void withdrawByTransportOrder(String name, boolean immediate, boolean disableVehicle)
       throws ObjectUnknownException {
     requireNonNull(name, "name");

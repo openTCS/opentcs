@@ -10,6 +10,7 @@ package org.opentcs.kernel.services;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.Dispatcher;
+import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentException;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectUnknownException;
@@ -84,6 +85,14 @@ public class StandardDispatcherService
       throws ObjectUnknownException {
     synchronized (globalSyncObject) {
       dispatcher.reroute(objectRepo.getObject(Vehicle.class, ref), reroutingType);
+    }
+  }
+
+  @Override
+  public void assignNow(TCSObjectReference<TransportOrder> ref)
+      throws ObjectUnknownException, TransportOrderAssignmentException {
+    synchronized (globalSyncObject) {
+      dispatcher.assignNow(objectRepo.getObject(TransportOrder.class, ref));
     }
   }
 }

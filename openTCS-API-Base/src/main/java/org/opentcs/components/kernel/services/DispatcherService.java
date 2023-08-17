@@ -10,6 +10,7 @@ package org.opentcs.components.kernel.services;
 import javax.annotation.Nonnull;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.Dispatcher;
+import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
@@ -71,5 +72,20 @@ public interface DispatcherService {
   default void reroute(@Nonnull TCSObjectReference<Vehicle> ref,
                        @Nonnull ReroutingType reroutingType)
       throws ObjectUnknownException, KernelRuntimeException {
+  }
+
+  /**
+   * Assign the referenced transport order (to its intended vehicle) <em>now</em>.
+   *
+   * @param ref The transport order to be assigned.
+   * @throws ObjectUnknownException If the referenced transport order does not exist.
+   * @throws TransportOrderAssignmentException If the given transport order could not be assigned
+   * to its intended vehicle.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void assignNow(TCSObjectReference<TransportOrder> ref)
+      throws ObjectUnknownException, TransportOrderAssignmentException, KernelRuntimeException {
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 }

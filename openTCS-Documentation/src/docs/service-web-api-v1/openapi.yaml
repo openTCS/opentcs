@@ -151,6 +151,41 @@ paths:
             schema:
               $ref: "#/components/schemas/TransportOrder"
         description: The details of the transport order to be created.
+  "/transportOrders/{NAME}/immediateAssignment":
+    post:
+      tags:
+        - Transport orders
+      summary: Immediately assigns the transport order to its intended vehicle.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the transport order to be assigned.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Referencing transport order with invalid state.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not assign transport order 'TOrder-01' to vehicle 'Vehicle-0001'.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find transport order 'TOrder-01'.
   "/transportOrders/{NAME}/withdrawal":
     post:
       tags:

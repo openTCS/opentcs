@@ -7,7 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
+import org.opentcs.strategies.basic.dispatching.phase.assignment.OrderAssigner;
 import static com.google.common.base.Preconditions.checkState;
+import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -15,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.opentcs.components.kernel.Dispatcher;
+import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentException;
+import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentVeto;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
@@ -63,6 +67,10 @@ public class DefaultDispatcher
   private final DefaultDispatcherConfiguration configuration;
 
   private final RerouteUtil rerouteUtil;
+
+  private final OrderAssigner orderAssigner;
+
+  private final TransportOrderAssignmentChecker transportOrderAssignmentChecker;
   /**
    *
    */
@@ -86,6 +94,9 @@ public class DefaultDispatcher
    * @param periodicDispatchTaskProvider Provides the periodic vehicle redospatching task.
    * @param configuration The dispatcher configuration.
    * @param rerouteUtil The reroute util.
+   * @param orderAssigner Handles assignments of transport orders to vehicles.
+   * @param transportOrderAssignmentChecker Checks whether the assignment of transport orders to
+   * vehicles is possible.
    */
   @Inject
   public DefaultDispatcher(OrderReservationPool orderReservationPool,
@@ -96,7 +107,9 @@ public class DefaultDispatcher
                            FullDispatchTask fullDispatchTask,
                            Provider<PeriodicVehicleRedispatchingTask> periodicDispatchTaskProvider,
                            DefaultDispatcherConfiguration configuration,
-                           RerouteUtil rerouteUtil) {
+                           RerouteUtil rerouteUtil,
+                           OrderAssigner orderAssigner,
+                           TransportOrderAssignmentChecker transportOrderAssignmentChecker) {
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
@@ -107,6 +120,9 @@ public class DefaultDispatcher
                                                        "periodicDispatchTaskProvider");
     this.configuration = requireNonNull(configuration, "configuration");
     this.rerouteUtil = requireNonNull(rerouteUtil, "rerouteUtil");
+    this.orderAssigner = requireNonNull(orderAssigner, "orderAssigner");
+    this.transportOrderAssignmentChecker = requireNonNull(transportOrderAssignmentChecker,
+                                                          "transportOrderAssignmentChecker");
   }
 
   @Override
@@ -219,5 +235,27 @@ public class DefaultDispatcher
       );
       rerouteUtil.reroute(vehicle, reroutingType);
     });
+  }
+
+  @Override
+  public void assignNow(TransportOrder transportOrder)
+      throws TransportOrderAssignmentException {
+    requireNonNull(transportOrder, "transportOrder");
+
+    TransportOrderAssignmentVeto assignmentVeto
+        = transportOrderAssignmentChecker.checkTransportOrderAssignment(transportOrder);
+
+    if (assignmentVeto != TransportOrderAssignmentVeto.NO_VETO) {
+      throw new TransportOrderAssignmentException(
+          transportOrder.getReference(),
+          transportOrder.getIntendedVehicle(),
+          assignmentVeto
+      );
+    }
+
+    orderAssigner.tryAssignments(
+        List.of(vehicleService.fetchObject(Vehicle.class, transportOrder.getIntendedVehicle())),
+        List.of(transportOrder)
+    );
   }
 }

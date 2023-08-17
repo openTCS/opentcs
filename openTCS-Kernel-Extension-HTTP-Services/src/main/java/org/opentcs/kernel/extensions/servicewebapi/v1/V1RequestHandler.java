@@ -128,6 +128,8 @@ public class V1RequestHandler
                 this::handleGetVehicles);
     service.post("/transportOrders/dispatcher/trigger",
                  this::handlePostDispatcherTrigger);
+    service.post("/transportOrders/:NAME/immediateAssignment",
+                 this::handlePostImmediateAssignment);
     service.post("/transportOrders/:NAME/withdrawal",
                  this::handlePostWithdrawalByOrder);
     service.post("/transportOrders/:NAME",
@@ -282,6 +284,13 @@ public class V1RequestHandler
              InterruptedException,
              ExecutionException {
     statusInformationProvider.putOrderSequenceComplete(request.params(":NAME"));
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handlePostImmediateAssignment(Request request, Response response)
+      throws ObjectUnknownException {
+    orderHandler.tryImmediateAssignment(request.params(":NAME"));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }

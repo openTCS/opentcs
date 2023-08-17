@@ -208,4 +208,17 @@ public class StandardRemoteDispatcherService
       throw findSuitableExceptionFor(exc);
     }
   }
+
+  @Override
+  public void assignNow(ClientID clientId, TCSObjectReference<TransportOrder> ref) {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_ORDER);
+
+    try {
+      kernelExecutor.submit(() -> dispatcherService.assignNow(ref))
+          .get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
 }

@@ -19,9 +19,12 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** User notifications are now shown in a table in the Operations Desk.
 ** Make peripheral adapters selectable in the Kernel Control Center.
 ** Allow setting the intended vehicle on a transport order through the transport order service or the web API as long as the transport order has not been assigned to a vehicle, yet.
+** Add support for immediate assignment of a transport order to its intended vehicle through the dispatcher service.
+   For more details, see the new "Immediate transport order assignment" section in the user's guide.
 ** Update web API specification and implementation to version 1.2.0:
 *** Add support for specifying and retrieving complete plant models via the web API.
 *** Keep web API running across kernel mode changes, e.g. when uploading a new plant model.
+*** Add a new endpoint for immediate assignment of transport orders to their intended vehicles.
 ** Remove the kernel messages panel from the Operations Desk; it has been superseded by the user notifications tab.
 ** Add a configuration entry for enabling/disabling forced withdrawals from the Operations Desk.
 * Bugs fixed:

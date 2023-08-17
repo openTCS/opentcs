@@ -77,6 +77,29 @@ It is possible to assign fixed positions to vehicles instead, by setting propert
   If this location is already occupied, the vehicle is not sent to any other recharging location.
   Takes precedence over `tcs:preferredRechargeLocation`.
 
+==== Immediate transport order assignment
+
+In addition to the _implicit_ assignment of transport orders according to the flow and rules described in the previous sections, transport orders can also be assigned _explicitly_ (i.e. immediately).
+Immediate assignment of transport orders is supported for transport orders that have their intended vehicle set.
+This can be helpful in situations where a transport order and its intended vehicle are generally in a state where an assignment would be possible, but is prevented by certain filter criteria in the regular dispatcher flow.
+
+Although the immediate assignment of transport orders bypasses some of the filter criteria in the regular dispatcher flow, it works only in specific situations.
+Regarding the transport order's state:
+
+* The transport order's state must be `DISPATCHABLE`.
+* The transport order must not be part of an order sequence.
+* The transport order's intended vehicle must be set.
+
+As for the (intended) vehicle's state:
+
+* The vehicle's processing state must be `IDLE`.
+* The vehicle's state must be `IDLE` or `CHARGING`.
+* The vehicle's integration level must be `TO_BE_UTILIZED`.
+* The vehicle must be reported at a known position.
+* The vehicle must not process an order sequence.
+
+NOTE: In addition to the state of the respective transport order and its intended vehicle, the dispatcher may have further implementation-specific reasons to reject an immediate assignment.
+
 === Default router
 
 The default router finds the cheapest route from one position in the driving course to another one.
