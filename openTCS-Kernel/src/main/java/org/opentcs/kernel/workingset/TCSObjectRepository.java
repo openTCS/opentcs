@@ -290,7 +290,8 @@ public class TCSObjectRepository {
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 
-    TCSObject<?> obj = objects.getOrDefault(ref.getReferentClass(), Map.of()).remove(ref.getName());
+    Map<String, TCSObject<?>> map = objects.get(ref.getReferentClass());
+    TCSObject<?> obj = (map == null) ? null : map.remove(ref.getName());
     if (obj == null) {
       throw new ObjectUnknownException(ref);
     }

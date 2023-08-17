@@ -11,12 +11,14 @@ import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.ObjectExistsException;
+import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
@@ -43,6 +45,18 @@ public class TCSObjectRepositoryTest {
 
     assertThat(pool.getObjectOrNull(Point.class, "Point-00001"), is(point1));
     assertThat(pool.getObjectOrNull(Point.class, "Point-00002"), is(point2));
+    assertThat(pool.getObject(Point.class, "Point-00001"), is(point1));
+    assertThat(pool.getObject(Point.class, "Point-00002"), is(point2));
+  }
+
+  @Test
+  public void returnNullForNonexistentObjectByClassAndName() {
+    assertThat(pool.getObjectOrNull(Point.class, "some-name"), is(nullValue()));
+  }
+
+  @Test
+  public void throwOnGetNonexistentObjectByClassAndName() {
+    assertThrows(ObjectUnknownException.class, () -> pool.getObject(Point.class, "some-name"));
   }
 
   @Test
@@ -55,6 +69,18 @@ public class TCSObjectRepositoryTest {
 
     assertThat(pool.getObjectOrNull("Point-00001"), is(point1));
     assertThat(pool.getObjectOrNull("Point-00002"), is(point2));
+    assertThat(pool.getObject("Point-00001"), is(point1));
+    assertThat(pool.getObject("Point-00002"), is(point2));
+  }
+
+  @Test
+  public void returnNullForNonexistentObjectByName() {
+    assertThat(pool.getObjectOrNull("some-name"), is(nullValue()));
+  }
+
+  @Test
+  public void throwOnGetNonexistentObjectByName() {
+    assertThrows(ObjectUnknownException.class, () -> pool.getObject("some-name"));
   }
 
   @Test
@@ -67,6 +93,20 @@ public class TCSObjectRepositoryTest {
 
     assertThat(pool.getObjectOrNull(Point.class, point1.getReference()), is(point1));
     assertThat(pool.getObjectOrNull(Point.class, point2.getReference()), is(point2));
+    assertThat(pool.getObject(Point.class, point1.getReference()), is(point1));
+    assertThat(pool.getObject(Point.class, point2.getReference()), is(point2));
+  }
+
+  @Test
+  public void returnNullForNonexistentObjectByClassAndRef() {
+    assertThat(pool.getObjectOrNull(Point.class, new Point("some-point").getReference()),
+               is(nullValue()));
+  }
+
+  @Test
+  public void throwOnGetNonexistentObjectByClassAndRef() {
+    assertThrows(ObjectUnknownException.class,
+                 () -> pool.getObject(Point.class, new Point("some-point").getReference()));
   }
 
   @Test
@@ -79,6 +119,20 @@ public class TCSObjectRepositoryTest {
 
     assertThat(pool.getObjectOrNull(point1.getReference()), is(point1));
     assertThat(pool.getObjectOrNull(point2.getReference()), is(point2));
+    assertThat(pool.getObject(point1.getReference()), is(point1));
+    assertThat(pool.getObject(point2.getReference()), is(point2));
+  }
+
+  @Test
+  public void returnNullForNonexistentObjectByRef() {
+    assertThat(pool.getObjectOrNull(new Point("some-point").getReference()), is(nullValue()));
+  }
+
+  @Test
+  public void throwOnGetNonexistentObjectByRef() {
+    Point point = new Point("some-point");
+
+    assertThrows(ObjectUnknownException.class, () -> pool.getObject(point.getReference()));
   }
 
   @Test
@@ -99,6 +153,25 @@ public class TCSObjectRepositoryTest {
 
     assertThat(paths.size(), is(1));
     assertThat(paths, contains(path1));
+  }
+
+  @Test
+  public void returnObjectsByClassAndPredicate() {
+    Point point1 = new Point("Point-00001");
+    Point point2 = new Point("Point-00002");
+    Path path1 = new Path("Path-00001", point1.getReference(), point2.getReference());
+
+    pool.addObject(point1);
+    pool.addObject(point2);
+    pool.addObject(path1);
+
+    Set<Point> points = pool.getObjects(Point.class, point -> true);
+    Set<Path> paths = pool.getObjects(Path.class, path -> false);
+
+    assertThat(points.size(), is(2));
+    assertThat(points, containsInAnyOrder(point1, point2));
+
+    assertThat(paths, is(empty()));
   }
 
   @Test
@@ -142,7 +215,13 @@ public class TCSObjectRepositoryTest {
   }
 
   @Test
-  public void throwOnDuplicateName() {
+  public void throwOnRemoveNonexistentObjectByRef() {
+    assertThrows(ObjectUnknownException.class,
+                 () -> pool.removeObject(new Point("some-point").getReference()));
+  }
+
+  @Test
+  public void throwOnAddObjectWithExistingName() {
     pool.addObject(new Point("some-point"));
     // Another object with the same name.
     assertThrows(ObjectExistsException.class, () -> pool.addObject(new Point("some-point")));

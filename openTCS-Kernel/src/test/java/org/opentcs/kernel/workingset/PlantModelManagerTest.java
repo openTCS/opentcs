@@ -7,9 +7,12 @@
  */
 package org.opentcs.kernel.workingset;
 
+import java.util.List;
 import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -24,6 +27,7 @@ import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
+import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Group;
 import org.opentcs.data.model.Location;
@@ -40,39 +44,48 @@ import org.opentcs.util.event.SimpleEventBus;
  */
 public class PlantModelManagerTest {
 
-  /**
-   * The object pool backing the test model.
-   */
   private TCSObjectRepository objectRepo;
-  /**
-   * The plant model manager to be tested here.
-   */
   private PlantModelManager plantModelManager;
+  private PlantModelCreationTO plantModelCreationTo;
 
   @BeforeEach
+  @SuppressWarnings("deprecation")
   public void setUp() {
     objectRepo = new TCSObjectRepository();
     plantModelManager = new PlantModelManager(objectRepo, new SimpleEventBus());
+    plantModelCreationTo = new PlantModelCreationTO("some-plant-model")
+        .withPoint(new PointCreationTO("point1"))
+        .withPoint(new PointCreationTO("point2"))
+        .withPath(
+            new PathCreationTO("some-path", "point1", "point2")
+                .withPeripheralOperations(List.of(
+                    new PeripheralOperationCreationTO("some-op", "some-location")
+                ))
+        )
+        .withLocationType(
+            new LocationTypeCreationTO("some-location-type")
+                .withAllowedOperations(List.of("some-op"))
+        )
+        .withLocation(
+            new LocationCreationTO("some-location",
+                                   "some-location-type",
+                                   new Triple(1, 2, 3))
+                .withLink("point1", Set.of("some-op"))
+        )
+        .withBlock(new BlockCreationTO("some-block"))
+        .withGroup(new GroupCreationTO("some-group"))
+        .withVehicle(new VehicleCreationTO("some-vehicle"))
+        .withVisualLayout(new VisualLayoutCreationTO("some-visual-layout"))
+        .withProperty("some-prop-key", "some-prop-value");
   }
 
   @Test
   @SuppressWarnings("deprecation")
-  public void storePlantModelElementsInRepo() {
-    plantModelManager.createPlantModelObjects(
-        new PlantModelCreationTO("some-plant-model")
-            .withPoint(new PointCreationTO("point1"))
-            .withPoint(new PointCreationTO("point2"))
-            .withPath(new PathCreationTO("some-path", "point1", "point2"))
-            .withLocationType(new LocationTypeCreationTO("some-location-type"))
-            .withLocation(new LocationCreationTO("some-location",
-                                                 "some-location-type",
-                                                 new Triple(1, 2, 3)))
-            .withBlock(new BlockCreationTO("some-block"))
-            .withGroup(new GroupCreationTO("some-group"))
-            .withVehicle(new VehicleCreationTO("some-vehicle"))
-            .withVisualLayout(new VisualLayoutCreationTO("some-visual-layout"))
-    );
+  public void importPlantModel() {
+    plantModelManager.createPlantModelObjects(plantModelCreationTo);
 
+    assertThat(plantModelManager.getName(), is(equalTo("some-plant-model")));
+    assertThat(plantModelManager.getProperties(), hasEntry("some-prop-key", "some-prop-value"));
     assertThat(objectRepo.getObjects(Point.class), hasSize(2));
     assertThat(objectRepo.getObject(Point.class, "point1"), is(notNullValue()));
     assertThat(objectRepo.getObject(Point.class, "point2"), is(notNullValue()));
@@ -90,6 +103,29 @@ public class PlantModelManagerTest {
     assertThat(objectRepo.getObject(Vehicle.class, "some-vehicle"), is(notNullValue()));
     assertThat(objectRepo.getObjects(VisualLayout.class), hasSize(1));
     assertThat(objectRepo.getObject(VisualLayout.class, "some-visual-layout"), is(notNullValue()));
+  }
+
+  @Test
+  @SuppressWarnings("deprecation")
+  public void exportPlantModel() {
+    plantModelManager.createPlantModelObjects(plantModelCreationTo);
+
+    PlantModelCreationTO exportedModel = plantModelManager.createPlantModelCreationTO();
+
+    assertThat(exportedModel.getName(), is(equalTo("some-plant-model")));
+    assertThat(exportedModel.getPoints(), hasSize(2));
+    assertThat(exportedModel.getPaths(), hasSize(1));
+    assertThat(exportedModel.getLocationTypes(), hasSize(1));
+    assertThat(exportedModel.getLocations(), hasSize(1));
+    assertThat(exportedModel.getBlocks(), hasSize(1));
+    assertThat(exportedModel.getGroups(), hasSize(1));
+    assertThat(exportedModel.getVehicles(), hasSize(1));
+  }
+
+  @Test
+  @SuppressWarnings("deprecation")
+  public void clearPlantModel() {
+    plantModelManager.createPlantModelObjects(plantModelCreationTo);
 
     plantModelManager.clear();
 
