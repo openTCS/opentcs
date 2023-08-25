@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.exchange.adapter;
 
 import java.util.HashSet;
+import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -22,6 +23,7 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
+import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.base.model.FigureDecorationDetails;
 import org.opentcs.guing.base.model.elements.PathModel;
@@ -139,7 +141,11 @@ public class OpsDeskVehicleAdapter
     if (driveOrder == null) {
       return null;
     }
-    return systemModel.getPointModel(driveOrder.getDestination().getDestination().getName());
+
+    List<Route.Step> routeSteps = driveOrder.getRoute().getSteps();
+    return systemModel.getPointModel(
+        routeSteps.get(routeSteps.size() - 1).getDestinationPoint().getName()
+    );
   }
 
   private Set<FigureDecorationDetails> getDriveOrderComponents(@Nullable DriveOrder driveOrder,
