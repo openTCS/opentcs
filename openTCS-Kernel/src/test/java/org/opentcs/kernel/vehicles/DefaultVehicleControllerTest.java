@@ -123,7 +123,8 @@ public class DefaultVehicleControllerTest {
                                                         mock(DispatcherService.class),
                                                         scheduler,
                                                         eventBus,
-                                                        componentsFactory);
+                                                        componentsFactory,
+                                                        mock(MovementCommandMapper.class));
     stdVehicleController.initialize();
   }
 

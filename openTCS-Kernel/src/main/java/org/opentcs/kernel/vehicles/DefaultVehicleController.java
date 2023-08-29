@@ -12,9 +12,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +22,6 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -37,7 +34,6 @@ import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
@@ -46,7 +42,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.ReroutingType;
-import org.opentcs.data.order.Route;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.AdapterCommand;
@@ -149,6 +144,10 @@ public class DefaultVehicleController
    */
   private final PeripheralInteractor peripheralInteractor;
   /**
+   * Maps drive orders to movement commands.
+   */
+  private final MovementCommandMapper movementCommandMapper;
+  /**
    * The transport order that the vehicle is currently processing.
    */
   private volatile TransportOrder transportOrder;
@@ -174,6 +173,7 @@ public class DefaultVehicleController
    * @param scheduler The scheduler managing resource allocations.
    * @param eventBus The event bus this instance should register with and send events to.
    * @param componentsFactory A factory for various components related to a vehicle controller.
+   * @param movementCommandMapper Maps drive orders to movement commands.
    */
   @Inject
   public DefaultVehicleController(@Assisted @Nonnull Vehicle vehicle,
@@ -183,7 +183,8 @@ public class DefaultVehicleController
                                   @Nonnull DispatcherService dispatcherService,
                                   @Nonnull Scheduler scheduler,
                                   @Nonnull @ApplicationEventBus EventBus eventBus,
-                                  @Nonnull VehicleControllerComponentsFactory componentsFactory) {
+                                  @Nonnull VehicleControllerComponentsFactory componentsFactory,
+                                  @Nonnull MovementCommandMapper movementCommandMapper) {
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.commAdapter = requireNonNull(adapter, "adapter");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
@@ -194,6 +195,7 @@ public class DefaultVehicleController
     requireNonNull(componentsFactory, "componentsFactory");
     this.peripheralInteractor
         = componentsFactory.createPeripheralInteractor(vehicle.getReference());
+    this.movementCommandMapper = requireNonNull(movementCommandMapper, "movementCommandMapper");
   }
 
   @Override
@@ -390,7 +392,7 @@ public class DefaultVehicleController
       vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
                                                    toListOfResourceSets(claimedResources));
 
-      createFutureCommands(newOrder, orderProperties);
+      futureCommands.addAll(movementCommandMapper.toMovementCommands(newOrder, orderProperties));
 
       if (canSendNextCommand()) {
         allocateForNextCommand();
@@ -427,7 +429,7 @@ public class DefaultVehicleController
       vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
                                                    toListOfResourceSets(claimedResources));
 
-      createFutureCommands(newOrder, orderProperties);
+      futureCommands.addAll(movementCommandMapper.toMovementCommands(newOrder, orderProperties));
       // The current drive order got updated but our queue of future commands now contains commands
       // that have already been processed, so discard these
       discardSentFutureCommands();
@@ -634,7 +636,7 @@ public class DefaultVehicleController
       SplitResources splitResources;
       if (lastCommandExecuted != null) {
         splitResources = SplitResources.from(allocatedResources,
-                                             toResourceSet(lastCommandExecuted.getStep()));
+                                             getNeededResources(lastCommandExecuted));
       }
       else {
         // Happens if the very first transport order was withdrawn before the vehicle has made
@@ -956,7 +958,7 @@ public class DefaultVehicleController
       // vehicle's current length.
       int freeableResourceSetCount
           = ResourceMath.freeableResourceSetCount(
-              SplitResources.from(allocatedResources, toResourceSet(lastCommandExecuted.getStep()))
+              SplitResources.from(allocatedResources, getNeededResources(lastCommandExecuted))
                   .getResourcesPassed(),
               commAdapter.getProcessModel().getVehicleLength()
           );
@@ -999,40 +1001,6 @@ public class DefaultVehicleController
     // Check if we can send another command to the comm adapter.
     else if (canSendNextCommand()) {
       allocateForNextCommand();
-    }
-  }
-
-  private void createFutureCommands(DriveOrder newOrder, Map<String, String> orderProperties) {
-    // Start processing the new order, i.e. fill futureCommands with corresponding command objects.
-    String op = newOrder.getDestination().getOperation();
-    Route orderRoute = newOrder.getRoute();
-    Point finalDestination = orderRoute.getFinalDestinationPoint();
-    Location finalDestinationLocation
-        = vehicleService.fetchObject(Location.class,
-                                     newOrder.getDestination().getDestination().getName());
-    Map<String, String> destProperties = newOrder.getDestination().getProperties();
-    Iterator<Step> stepIter = orderRoute.getSteps().iterator();
-    while (stepIter.hasNext()) {
-      Step curStep = stepIter.next();
-      // Ignore report positions on the route.
-      if (curStep.getDestinationPoint().isHaltingPosition()) {
-        boolean isFinalMovement = !stepIter.hasNext();
-
-        String operation = isFinalMovement ? op : MovementCommand.NO_OPERATION;
-        Location location = isFinalMovement ? finalDestinationLocation : null;
-
-        futureCommands.add(
-            new MovementCommandImpl(orderRoute,
-                                    curStep,
-                                    operation,
-                                    location,
-                                    isFinalMovement,
-                                    finalDestinationLocation,
-                                    finalDestination,
-                                    op,
-                                    mergeProperties(orderProperties, destProperties))
-        );
-      }
     }
   }
 
@@ -1117,6 +1085,10 @@ public class DefaultVehicleController
     if (cmd.getStep().getPath() != null) {
       result.add(cmd.getStep().getPath());
     }
+    if (cmd.getOpLocation() != null) {
+      result.add(cmd.getOpLocation());
+    }
+
     return result;
   }
 
@@ -1288,24 +1260,6 @@ public class DefaultVehicleController
     }
   }
 
-  /**
-   * Merges the properties of a transport order and those of a drive order.
-   *
-   * @param orderProps The properties of a transport order.
-   * @param destProps The properties of a drive order destination.
-   * @return The merged properties.
-   */
-  private static Map<String, String> mergeProperties(Map<String, String> orderProps,
-                                                     Map<String, String> destProps) {
-    requireNonNull(orderProps, "orderProps");
-    requireNonNull(destProps, "destProps");
-
-    Map<String, String> result = new HashMap<>();
-    result.putAll(orderProps);
-    result.putAll(destProps);
-    return result;
-  }
-
   private static List<Set<TCSResourceReference<?>>> toListOfResourceSets(
       Queue<Set<TCSResource<?>>> resources
   ) {
@@ -1323,36 +1277,30 @@ public class DefaultVehicleController
   }
 
   private List<Set<TCSResource<?>>> remainingRequiredClaim(@Nonnull TransportOrder order) {
-    List<Step> remainingClaimCurrentDriveOrder
-        = new ArrayList<>(order.getCurrentDriveOrder().getRoute().getSteps());
+    List<MovementCommand> futureMovementCommands = order.getAllDriveOrders().stream()
+        .skip(order.getCurrentDriveOrderIndex())
+        .map(driveOrder -> movementCommandMapper.toMovementCommands(driveOrder,
+                                                                    order.getProperties()))
+        .flatMap(movementCommandQueue -> movementCommandQueue.stream())
+        .collect(Collectors.toList());
 
     // Commands that we have already sent to the vehicle or executed should not be included in the
     // remaining claim.
     if (!commandsSent.isEmpty() || lastCommandExecuted != null) {
-      Step lastCommandedStep = commandsSent.stream()
+      MovementCommand lastCommandedCommand = commandsSent.stream()
           .reduce((cmd1, cmd2) -> cmd2)
-          .orElse(lastCommandExecuted)
-          .getStep();
+          .orElse(lastCommandExecuted);
 
-      // Skip until we find the step, and skip the step itself, too (thus the skip(1)).
-      remainingClaimCurrentDriveOrder = remainingClaimCurrentDriveOrder.stream()
-          .dropWhile(step -> !Objects.equals(step, lastCommandedStep))
+      futureMovementCommands = futureMovementCommands.stream()
+          .dropWhile(command -> !Objects.equals(command, lastCommandedCommand))
           .skip(1)
           .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    return Stream.concat(remainingClaimCurrentDriveOrder.stream(),
-                         order.getFutureDriveOrders().stream()
-                             .flatMap(driveOrder -> driveOrder.getRoute().getSteps().stream()))
-        .filter(step -> step.getDestinationPoint().isHaltingPosition())
-        .map(step -> toResourceSet(step))
+    return futureMovementCommands.stream()
+        .filter(command -> command.getStep().getDestinationPoint().isHaltingPosition())
+        .map(command -> getNeededResources(command))
         .collect(Collectors.toList());
-  }
-
-  private Set<TCSResource<?>> toResourceSet(Step step) {
-    return step.getPath() != null
-        ? Set.of(step.getDestinationPoint(), step.getPath())
-        : Set.of(step.getDestinationPoint());
   }
 
   private boolean isForcedRerouting(DriveOrder newOrder) {
