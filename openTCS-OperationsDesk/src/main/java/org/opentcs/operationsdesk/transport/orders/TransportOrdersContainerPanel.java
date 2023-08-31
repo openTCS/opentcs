@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.JButton;
@@ -35,7 +36,10 @@ import javax.swing.SortOrder;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentException;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
+import static org.opentcs.data.order.TransportOrder.State.ACTIVE;
 import static org.opentcs.data.order.TransportOrder.State.BEING_PROCESSED;
 import static org.opentcs.data.order.TransportOrder.State.DISPATCHABLE;
 import static org.opentcs.data.order.TransportOrder.State.FAILED;
@@ -48,6 +52,7 @@ import org.opentcs.operationsdesk.exchange.TransportOrderUtil;
 import org.opentcs.operationsdesk.transport.CreateTransportOrderPanel;
 import org.opentcs.operationsdesk.transport.FilterButton;
 import org.opentcs.operationsdesk.transport.FilteredRowSorter;
+import org.opentcs.operationsdesk.transport.IntendedVehiclesPanel;
 import org.opentcs.operationsdesk.transport.OrdersTable;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
@@ -223,6 +228,135 @@ public class TransportOrdersContainerPanel
     );
   }
 
+  private void setIntendedVehicle() {
+    getSelectedTransportOrder().ifPresent(transportOrder -> {
+      ResourceBundleUtil bundle
+          = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
+
+      Set<Vehicle> vehicles = null;
+      try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+        vehicles = sharedPortal.getPortal().getVehicleService().fetchObjects(Vehicle.class);
+      }
+      catch (KernelRuntimeException exc) {
+        LOG.warn("Exception retrieving vehicles", exc);
+        JOptionPane.showMessageDialog(
+            this,
+            bundle.getString("transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_setIntendedVehicle.error.message"),
+            bundle.getString("transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_setIntendedVehicle.error.title"),
+            ERROR);
+        return;
+      }
+
+      IntendedVehiclesPanel panel = new IntendedVehiclesPanel(vehicles);
+      StandardContentDialog dialog = new StandardContentDialog(this, panel);
+      panel.addInputValidationListener(dialog);
+      dialog.setTitle(bundle.getString(
+          "transportOrdersContainerPanel.table_orders.popupMenuItem_setIntendedVehicle.text"
+      ));
+      dialog.setVisible(true);
+
+      if (dialog.getReturnStatus() != StandardContentDialog.RET_OK) {
+        return;
+      }
+      try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+        sharedPortal.getPortal().getTransportOrderService().updateTransportOrderIntendedVehicle(
+            transportOrder.getReference(),
+            panel.getSelectedVehicle()
+                .map(v -> v.getReference())
+                .orElse(null)
+        );
+      }
+      catch (KernelRuntimeException exc) {
+        LOG.warn("Exception setting intended vehicle {} on transport order {}",
+                 panel.getSelectedVehicle()
+                     .map(v -> v.getName())
+                     .orElse("null"),
+                 transportOrder.getName(),
+                 exc);
+        JOptionPane.showMessageDialog(
+            this,
+            bundle.getString("transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_setIntendedVehicle.error.message"),
+            bundle.getString("transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_setIntendedVehicle.error.title"),
+            ERROR);
+      }
+    });
+  }
+
+  private void assignTransportOrderToVehicle() {
+    getSelectedTransportOrder().ifPresent(transportOrder -> {
+      try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+        sharedPortal.getPortal().getDispatcherService().assignNow(transportOrder.getReference());
+      }
+      catch (TransportOrderAssignmentException exc) {
+        LOG.warn("Exception assigning transport order: {}", transportOrder.getName(), exc);
+        ResourceBundleUtil bundle
+            = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
+        JOptionPane.showMessageDialog(
+            this,
+            mapOrderAssignmentVetoToReason(exc),
+            bundle.getString("transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_assignToVehicle.error.title"),
+            ERROR);
+      }
+      catch (KernelRuntimeException exc) {
+        LOG.warn("Exception assigning transport order: {}", transportOrder.getName(), exc);
+        ResourceBundleUtil bundle
+            = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
+        JOptionPane.showMessageDialog(
+            this,
+            bundle.getString("transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_assignToVehicle.error.genericMessage"),
+            bundle.getString("transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_assignToVehicle.error.title"),
+            ERROR);
+      }
+    });
+  }
+
+  private String mapOrderAssignmentVetoToReason(TransportOrderAssignmentException exc) {
+    ResourceBundleUtil bundle
+        = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
+    switch (exc.getTransportOrderAssignmentVeto()) {
+      case TRANSPORT_ORDER_STATE_INVALID:
+        return bundle.getString("transportOrdersContainerPanel.table_orders."
+            + "popupMenuItem_assignToVehicle.error.transportOrderStateInvalid");
+      case TRANSPORT_ORDER_PART_OF_ORDER_SEQUENCE:
+        return bundle.getString("transportOrdersContainerPanel.table_orders."
+            + "popupMenuItem_assignToVehicle.error.transportOrderIsPartOfSequence");
+      case TRANSPORT_ORDER_INTENDED_VEHICLE_NOT_SET:
+        return bundle.getString("transportOrdersContainerPanel.table_orders."
+            + "popupMenuItem_assignToVehicle.error.transportOrderIntendedVehicleNotSet");
+      case VEHICLE_PROCESSING_STATE_INVALID:
+        return bundle.getString("transportOrdersContainerPanel.table_orders."
+            + "popupMenuItem_assignToVehicle.error.vehicleProcessingStateInvalid");
+      case VEHICLE_STATE_INVALID:
+        return bundle.getString("transportOrdersContainerPanel.table_orders."
+            + "popupMenuItem_assignToVehicle.error.vehicleStateInvalid");
+      case VEHICLE_INTEGRATION_LEVEL_INVALID:
+        return bundle.getString("transportOrdersContainerPanel.table_orders."
+            + "popupMenuItem_assignToVehicle.error.vehicleIntegrationLevelInvalid");
+      case VEHICLE_CURRENT_POSITION_UNKNOWN:
+        return bundle.getString("transportOrdersContainerPanel.table_orders."
+            + "popupMenuItem_assignToVehicle.error.vehiclePositionUnknown");
+      case VEHICLE_PROCESSING_ORDER_SEQUENCE:
+        return bundle.getString("transportOrdersContainerPanel.table_orders."
+            + "popupMenuItem_assignToVehicle.error.vehicleIsProcessingOrderSequence");
+      case GENERIC_VETO:
+        return bundle.getString("transportOrdersContainerPanel.table_orders."
+            + "popupMenuItem_assignToVehicle.error.genericMessage");
+      case NO_VETO:
+      default:
+        LOG.warn("TransportOrderAssignmentException with unmapped veto: {}, caused by: {}",
+                 exc.getTransportOrderAssignmentVeto().name(),
+                 exc);
+        return exc.getTransportOrderAssignmentVeto().name();
+    }
+  }
+
   private void showPopupMenuForSelectedTransportOrder(int x, int y) {
     boolean singleRowSelected = fTable.getSelectedRowCount() <= 1;
     ResourceBundleUtil bundle
@@ -249,6 +383,29 @@ public class TransportOrdersContainerPanel
     );
     item.setEnabled(singleRowSelected);
     item.addActionListener((ActionEvent evt) -> createCopyOfSelectedTransportOrder());
+
+    menu.add(new JSeparator());
+
+    Optional<TransportOrder> maybeTransportOrder = getSelectedTransportOrder();
+    maybeTransportOrder.ifPresent(transportOrder -> {
+      boolean statePreparing = (transportOrder.getState() == RAW
+          || transportOrder.getState() == ACTIVE
+          || transportOrder.getState() == DISPATCHABLE);
+
+      JMenuItem menuItem = menu.add(bundle.getString(
+          "transportOrdersContainerPanel.table_orders.popupMenuItem_setIntendedVehicle.text")
+      );
+      menuItem.setEnabled(singleRowSelected && statePreparing);
+      menuItem.addActionListener((ActionEvent evt) -> setIntendedVehicle());
+
+      menuItem = menu.add(bundle.getString(
+          "transportOrdersContainerPanel.table_orders.popupMenuItem_assignToVehicle.text")
+      );
+      menuItem.setEnabled(singleRowSelected
+          && statePreparing
+          && transportOrder.getIntendedVehicle() != null);
+      menuItem.addActionListener((ActionEvent evt) -> assignTransportOrderToVehicle());
+    });
 
     menu.show(fTable, x, y);
   }
