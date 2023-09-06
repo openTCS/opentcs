@@ -7,10 +7,10 @@
  */
 package org.opentcs.operationsdesk.exchange.adapter;
 
-import java.util.HashSet;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,6 +21,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
@@ -29,7 +30,7 @@ import org.opentcs.guing.base.model.FigureDecorationDetails;
 import org.opentcs.guing.base.model.elements.PathModel;
 import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
-import org.opentcs.guing.common.exchange.DriveOrderHistory;
+import org.opentcs.guing.common.exchange.SchedulingHistory;
 import org.opentcs.guing.common.exchange.adapter.VehicleAdapter;
 import org.opentcs.guing.common.model.SystemModel;
 import org.opentcs.operationsdesk.transport.orders.TransportOrdersContainer;
@@ -46,20 +47,19 @@ public class OpsDeskVehicleAdapter
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(OpsDeskVehicleAdapter.class);
-
   /**
-   * Keeps track of the drive order components of vehicles.
+   * Keeps track of resources/components allocated and claimed by vehicles.
    */
-  private final DriveOrderHistory driveOrderHistory;
+  private final SchedulingHistory schedulingHistory;
   /**
    * Maintains a set of all transport orders.
    */
   private final TransportOrdersContainer transportOrdersContainer;
 
   @Inject
-  public OpsDeskVehicleAdapter(DriveOrderHistory driveOrderHistory,
+  public OpsDeskVehicleAdapter(SchedulingHistory schedulingHistory,
                                @Nonnull TransportOrdersContainer transportOrdersContainer) {
-    this.driveOrderHistory = requireNonNull(driveOrderHistory, "driveOrderHistory");
+    this.schedulingHistory = requireNonNull(schedulingHistory, "schedulingHistory");
     this.transportOrdersContainer = requireNonNull(transportOrdersContainer,
                                                    "transportOrdersContainer");
   }
@@ -73,21 +73,6 @@ public class OpsDeskVehicleAdapter
     TransportOrder transportOrder = getTransportOrder(objectService, vehicle.getTransportOrder());
 
     if (transportOrder != null) {
-      Set<FigureDecorationDetails> driveOrderComponents
-          = getDriveOrderComponents(transportOrder.getCurrentDriveOrder(),
-                                    vehicle.getRouteProgressIndex(),
-                                    systemModel);
-      for (FigureDecorationDetails component : driveOrderComponents) {
-        component.addVehicleModel(vehicleModel);
-      }
-
-      Set<FigureDecorationDetails> finishedComponents
-          = driveOrderHistory.updateDriveOrderComponents(vehicleModel.getName(),
-                                                         driveOrderComponents);
-      for (FigureDecorationDetails component : finishedComponents) {
-        component.removeVehicleModel(vehicleModel);
-      }
-
       vehicleModel.setCurrentDriveOrderPath(
           getCurrentDriveOrderPath(transportOrder.getCurrentDriveOrder(),
                                    vehicle.getRouteProgressIndex(),
@@ -101,13 +86,20 @@ public class OpsDeskVehicleAdapter
       vehicleModel.setDriveOrderState(transportOrder.getState());
     }
     else {
-      Set<FigureDecorationDetails> finishedComponents
-          = driveOrderHistory.updateDriveOrderComponents(vehicleModel.getName(), new HashSet<>());
-      for (FigureDecorationDetails component : finishedComponents) {
-        component.removeVehicleModel(vehicleModel);
-      }
       vehicleModel.setCurrentDriveOrderPath(null);
       vehicleModel.setDriveOrderDestination(null);
+    }
+
+    Set<FigureDecorationDetails> allocatedAndClaimedComponents
+        = getAllocatedAndClaimedComponents(vehicle, systemModel);
+    for (FigureDecorationDetails component : allocatedAndClaimedComponents) {
+      component.addVehicleModel(vehicleModel);
+    }
+
+    Set<FigureDecorationDetails> noLongerAllocatedOrClaimedComponents = schedulingHistory
+        .updateAllocatedAndClaimedComponents(vehicleModel.getName(), allocatedAndClaimedComponents);
+    for (FigureDecorationDetails component : noLongerAllocatedOrClaimedComponents) {
+      component.removeVehicleModel(vehicleModel);
     }
   }
 
@@ -148,32 +140,19 @@ public class OpsDeskVehicleAdapter
     );
   }
 
-  private Set<FigureDecorationDetails> getDriveOrderComponents(@Nullable DriveOrder driveOrder,
-                                                               int routeProgressIndex,
-                                                               SystemModel systemModel) {
-    if (driveOrder == null) {
-      return new HashSet<>();
-    }
+  private Set<FigureDecorationDetails> getAllocatedAndClaimedComponents(Vehicle vehicle,
+                                                                        SystemModel systemModel) {
+    return Stream.concat(vehicle.getAllocatedResources().stream(),
+                         vehicle.getClaimedResources().stream())
+        .flatMap(resourceSet -> resourceSet.stream())
+        .filter(this::isResourceRepresentedByFigureDecorationDetails)
+        .map(res -> (FigureDecorationDetails) systemModel.getModelComponent(res.getName()))
+        .collect(Collectors.toSet());
+  }
 
-    Set<FigureDecorationDetails> result = new HashSet<>();
-    driveOrder.getRoute().getSteps().stream()
-        .skip(routeProgressIndex + 1)
-        .flatMap(step -> Stream.of(step.getPath(), step.getDestinationPoint()))
-        .filter(pointOrPath -> pointOrPath != null) // paths may be null
-        .forEach(pointOrPath -> {
-          if (pointOrPath instanceof Point) {
-            result.add(systemModel.getPointModel(pointOrPath.getName()));
-          }
-          else if (pointOrPath instanceof Path) {
-            result.add(systemModel.getPathModel(pointOrPath.getName()));
-          }
-        });
-
-    TCSObjectReference<?> ref = driveOrder.getDestination().getDestination();
-    if (ref.getReferentClass().isAssignableFrom(Location.class)) {
-      result.add(systemModel.getLocationModel(ref.getName()));
-    }
-
-    return result;
+  private boolean isResourceRepresentedByFigureDecorationDetails(TCSResourceReference<?> ref) {
+    return ref.getReferentClass().isAssignableFrom(Point.class)
+        || ref.getReferentClass().isAssignableFrom(Path.class)
+        || ref.getReferentClass().isAssignableFrom(Location.class);
   }
 }

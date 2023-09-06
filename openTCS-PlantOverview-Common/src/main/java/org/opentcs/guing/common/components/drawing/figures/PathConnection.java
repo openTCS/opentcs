@@ -14,11 +14,14 @@ import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
 import java.util.StringJoiner;
 import javax.inject.Inject;
 import org.jhotdraw.draw.AttributeKey;
@@ -32,6 +35,7 @@ import org.jhotdraw.draw.liner.ElbowLiner;
 import org.jhotdraw.draw.liner.Liner;
 import org.jhotdraw.draw.liner.SlantedLiner;
 import org.jhotdraw.geom.BezierPath;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.type.AbstractProperty;
@@ -630,21 +634,28 @@ public class PathConnection
 
   private void drawRouteDecoration(Graphics2D g) {
     for (VehicleModel vehicleModel : getModel().getVehicleModels()) {
-      boolean isPathAllocated = vehicleModel.getAllocatedResources().getItems().stream()
-          .flatMap(set -> set.stream())
-          .anyMatch(resource -> resource.getName().equals(getModel().getName()));
+      boolean isAllocated = vehicleModel.getAllocatedResources().getItems().stream()
+          .flatMap(resourceSet -> resourceSet.stream())
+          .anyMatch(resource -> Objects.equals(resource.getName(), getModel().getName()));
+      boolean isClaimed = getCurrentDriveOrderClaim(vehicleModel).stream()
+          .flatMap(resourceSet -> resourceSet.stream())
+          .anyMatch(resource -> Objects.equals(resource.getName(), getModel().getName()));
 
-      if (vehicleModel.getDriveOrderState() == TransportOrder.State.WITHDRAWN) {
-        if (isPathAllocated) {
+      if (isAllocated) {
+        if (vehicleModel.getDriveOrderState() == TransportOrder.State.WITHDRAWN) {
           drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
         }
+        else {
+          drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
+        }
+      }
+      else if (isClaimed) {
+        drawDecoration(g,
+                       Strokes.PATH_ON_ROUTE,
+                       transparentColor(vehicleModel.getDriveOrderColor(), 70));
       }
       else {
-        Color color = vehicleModel.getDriveOrderColor();
-        if (!isPathAllocated) {
-          color = transparentColor(color, 70);
-        }
-        drawDecoration(g, Strokes.PATH_ON_ROUTE, color);
+        // Don't draw any decoration.
       }
     }
   }
@@ -839,5 +850,39 @@ public class PathConnection
       }
     }
     return false;
+  }
+
+  private List<Set<TCSResourceReference<?>>> getCurrentDriveOrderClaim(VehicleModel vehicle) {
+    List<Set<TCSResourceReference<?>>> result = new ArrayList<>();
+
+    boolean driveOrderEndFound = false;
+    for (Set<TCSResourceReference<?>> res : vehicle.getClaimedResources().getItems()) {
+      result.add(res);
+
+      if (containsDriveOrderDestination(res, vehicle)) {
+        driveOrderEndFound = true;
+        break;
+      }
+    }
+
+    if (driveOrderEndFound) {
+      return result;
+    }
+    else {
+      // With the end of the drive order not found, there is nothing from the current drive order in
+      // the claimed resources.
+      return List.of();
+    }
+  }
+
+  private boolean containsDriveOrderDestination(Set<TCSResourceReference<?>> resources,
+                                                VehicleModel vehicle) {
+    if (vehicle.getDriveOrderDestination() == null) {
+      return false;
+    }
+
+    return resources.stream()
+        .anyMatch(resource -> Objects.equals(resource.getName(),
+                                             vehicle.getDriveOrderDestination().getName()));
   }
 }
