@@ -508,6 +508,12 @@ public class PlantModelManager
                                      Vehicle.ProcState newState)
       throws ObjectUnknownException {
     Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+
+    LOG.debug("Vehicle's proc state changes: {} -- {} -> {}",
+              previousState.getName(),
+              previousState.getProcState(),
+              newState);
+
     Vehicle vehicle = previousState.withProcState(newState);
     getObjectRepo().replaceObject(vehicle);
     emitObjectEvent(vehicle,
