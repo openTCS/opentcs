@@ -99,7 +99,7 @@ public class OrderSequenceView
 
   @Override
   public final void initFields() {
-    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TO_SEQUENCE_PATH)
+    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
         .getString("orderSequenceView.title"));
     // Name
     String name = getOrderSequence().getName();
