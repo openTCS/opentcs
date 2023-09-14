@@ -36,6 +36,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Ensure that order reservations for vehicles are properly cleared in case a vehicle's integration level is changed to anything other than `TO_BE_UTILIZED`.
 ** Show a vehicle's destination in the vehicles panel in the Operations Desk application in cases where the vehicle is processing a transport order with a destination location.
 ** Show the correct title in the order sequence details panel in the Operations Desk application.
+** Properly handle resources for withdrawn orders, fixing an issue where a vehicle would still wait for a pending resource allocation with the transport order remaining in state `WITHDRAWN`.
 * Other changes:
 ** The peripheral jobs panel in the Operations Desk application will now always be shown.
    The option to enable or disable it via the configuration file has been removed.

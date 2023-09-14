@@ -194,7 +194,7 @@ public class DefaultDispatcher
       LOG.debug("Scheduling withdrawal for transport order '{}' (immediate={})...",
                 order.getName(),
                 immediateAbort);
-      transportOrderUtil.abortOrder(order, immediateAbort, false);
+      transportOrderUtil.abortOrder(order, immediateAbort);
     });
   }
 
@@ -208,7 +208,7 @@ public class DefaultDispatcher
       LOG.debug("Scheduling withdrawal for vehicle '{}' (immediate={})...",
                 vehicle.getName(),
                 immediateAbort);
-      transportOrderUtil.abortOrder(vehicle, immediateAbort, false, false);
+      transportOrderUtil.abortOrder(vehicle, immediateAbort);
     });
   }
 

@@ -241,7 +241,7 @@ public class OrderAssigner {
       orderReservationPool.addReservation(candidate.getTransportOrder().getReference(),
                                           candidate.getVehicle().getReference());
       assignmentState.getReservedCandidates().add(candidate);
-      transportOrderUtil.abortOrder(candidate.getVehicle(), false, false, false);
+      transportOrderUtil.abortOrder(candidate.getVehicle(), false);
     }
   }
 

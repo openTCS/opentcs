@@ -155,12 +155,6 @@ public class DefaultVehicleController
    * The drive order that the vehicle currently has to process.
    */
   private volatile DriveOrder currentDriveOrder;
-  /**
-   * Flag indicating that we're currently waiting for resources to be allocated
-   * by the scheduler, ensuring that we do not allocate more than one set of
-   * resources at a time (which can cause deadlocks).
-   */
-  private volatile boolean waitingForAllocation;
 
   /**
    * Creates a new instance associated with the given vehicle.
@@ -440,9 +434,8 @@ public class DefaultVehicleController
       vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
                                                      updatedVehicle.getRouteProgressIndex());
 
-      // The vehilce may now process previously restricted steps
-      if (updatedVehicle.getState() == Vehicle.State.IDLE
-          && canSendNextCommand()) {
+      // The vehicle may now process previously restricted steps.
+      if (canSendNextCommand()) {
         allocateForNextCommand();
       }
     }
@@ -530,9 +523,7 @@ public class DefaultVehicleController
 
   private void discardFutureCommands() {
     futureCommands.clear();
-    scheduler.clearPendingAllocations(this);
-    waitingForAllocation = false;
-    pendingCommand = null;
+    withdrawPendingResourceAllocations();
   }
 
   private void discardSentFutureCommands() {
@@ -566,20 +557,26 @@ public class DefaultVehicleController
       if (immediate) {
         clearDriveOrder();
 
+        withdrawPendingResourceAllocations();
+
         claimedResources.clear();
         scheduler.claim(this, List.of());
       }
       else {
         abortDriveOrder();
 
-        List<Set<TCSResource<?>>> newClaim = new ArrayList<>();
-        if (pendingResources != null) {
-          newClaim.add(pendingResources);
-        }
+        List<Set<TCSResource<?>>> newClaim
+            = pendingResources == null
+                ? List.of()
+                : List.of(pendingResources);
+
+        withdrawPendingResourceAllocations();
 
         claimedResources.clear();
         claimedResources.addAll(newClaim);
         scheduler.claim(this, newClaim);
+
+        checkForPendingCommands();
       }
 
       vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
@@ -595,10 +592,9 @@ public class DefaultVehicleController
     synchronized (commAdapter) {
       currentDriveOrder = null;
 
-      // Clear pending resource allocations. If they still arrive, we will
-      // refuse them in allocationSuccessful().
-      waitingForAllocation = false;
-      pendingResources = null;
+      // XXX May be removed after this method has been made private / integrated into
+      // abortTransportOrder().
+      resetPendingResourceAllocations();
 
       vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
                                                      Vehicle.ROUTE_INDEX_DEFAULT);
@@ -626,7 +622,9 @@ public class DefaultVehicleController
       commAdapter.clearCommandQueue();
       commandsSent.clear();
       futureCommands.clear();
-      pendingCommand = null;
+      // XXX May be removed after this method has been made private / integrated into
+      // abortTransportOrder().
+      resetPendingResourceAllocations();
       interactionsPendingCommand = null;
       peripheralInteractor.clear();
 
@@ -717,8 +715,6 @@ public class DefaultVehicleController
   public boolean allocationSuccessful(@Nonnull Set<TCSResource<?>> resources) {
     requireNonNull(resources, "resources");
 
-    // Look up the command the resources were required for.
-    MovementCommand command;
     synchronized (commAdapter) {
       // Check if we've actually been waiting for these resources now. If not,
       // let the scheduler know that we don't want them.
@@ -730,34 +726,12 @@ public class DefaultVehicleController
         return false;
       }
 
-      command = pendingCommand;
-      // If there was no command in the queue, it must have been withdrawn in
-      // the meantime - let the scheduler know that we don't need the resources
-      // any more.
-      if (command == null) {
-        LOG.warn("{}: No pending command, pending resources = {}, refusing allocated resources: {}",
-                 vehicle.getName(),
-                 pendingResources,
-                 resources);
-        waitingForAllocation = false;
-        pendingResources = null;
-        // In case the contoller's vehicle got rerouted while waiting for resource allocation
-        // the pending command is reset and therefore the associated allocation will be ignored.
-        // Since there's now a new/updated route we need to trigger the next allocation. Otherwise
-        // the vehicle would wait forever to get the next command.
-        if (canSendNextCommand()) {
-          allocateForNextCommand();
-        }
-        return false;
-      }
-
-      pendingCommand = null;
-      pendingResources = null;
-
       LOG.debug("{}: Accepting allocated resources: {}", vehicle.getName(), resources);
       allocatedResources.add(resources);
       claimedResources.poll();
-      waitingForAllocation = false;
+
+      MovementCommand command = pendingCommand;
+      resetPendingResourceAllocations();
 
       vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
                                                    toListOfResourceSets(claimedResources));
@@ -873,6 +847,25 @@ public class DefaultVehicleController
     }
   }
 
+  private void withdrawPendingResourceAllocations() {
+    scheduler.clearPendingAllocations(this);
+    resetPendingResourceAllocations();
+  }
+
+  private void resetPendingResourceAllocations() {
+    pendingResources = null;
+    pendingCommand = null;
+  }
+
+  /**
+   * Indicates whether we're currently waiting for resources to be allocated by the scheduler.
+   *
+   * @return <code>true</code> if we're currently waiting for resources to be allocated.
+   */
+  private boolean isWaitingForAllocation() {
+    return pendingResources != null;
+  }
+
   private void updateVehiclePrecisePosition(Triple precisePosition)
       throws ObjectUnknownException {
     // Get an up-to-date copy of the vehicle
@@ -979,13 +972,13 @@ public class DefaultVehicleController
   private void checkForPendingCommands() {
     // Check if there are more commands to be processed for the current drive order.
     if (interactionsPendingCommand == null
-        && pendingCommand == null
+        && !isWaitingForAllocation()
         && futureCommands.isEmpty()) {
       LOG.debug("{}: No more commands in current drive order", vehicle.getName());
       // Check if there are still commands that have been sent to the communication adapter but
       // not yet executed. If not, the whole order has been executed completely - let the kernel
       // know about that so it can give us the next drive order.
-      if (commandsSent.isEmpty() && !waitingForAllocation) {
+      if (commandsSent.isEmpty()) {
         LOG.debug("{}: Current drive order processed", vehicle.getName());
         currentDriveOrder = null;
         // Let the kernel/dispatcher know that the drive order has been processed completely (by
@@ -1033,11 +1026,7 @@ public class DefaultVehicleController
       LOG.debug("{}: Cannot send, movement execution is not allowed", vehicle.getName());
       return false;
     }
-    if (waitingForAllocation) {
-      LOG.debug("{}: Cannot send, waiting for allocation", vehicle.getName());
-      return false;
-    }
-    if (pendingCommand != null) {
+    if (isWaitingForAllocation()) {
       LOG.debug("{}: Cannot send, resource allocation is pending for: {}",
                 vehicle.getName(),
                 pendingCommand);
@@ -1056,18 +1045,16 @@ public class DefaultVehicleController
    * Allocate the resources needed for executing the next command.
    */
   private void allocateForNextCommand() {
-    checkState(pendingCommand == null, "pendingCommand != null");
+    checkState(!isWaitingForAllocation(),
+               "%s: Already waiting for allocation: %s",
+               vehicle.getName(),
+               pendingResources);
 
     // Find out which resources are actually needed for the next command.
-    MovementCommand moveCmd = futureCommands.poll();
-    pendingResources = getNeededResources(moveCmd);
+    pendingCommand = futureCommands.poll();
+    pendingResources = getNeededResources(pendingCommand);
     LOG.debug("{}: Allocating resources: {}", vehicle.getName(), pendingResources);
     scheduler.allocate(this, pendingResources);
-    // Remember that we're waiting for an allocation. This ensures that we only
-    // wait for one allocation at a time, and that we get the resources from the
-    // scheduler in the right order.
-    waitingForAllocation = true;
-    pendingCommand = moveCmd;
   }
 
   /**
@@ -1076,6 +1063,7 @@ public class DefaultVehicleController
    * @param cmd The command for which to return the needed resources.
    * @return A set of resources needed for executing the given command.
    */
+  @Nonnull
   private Set<TCSResource<?>> getNeededResources(MovementCommand cmd) {
     requireNonNull(cmd, "cmd");
 
@@ -1218,9 +1206,10 @@ public class DefaultVehicleController
   private void resetVehiclePosition() {
     synchronized (commAdapter) {
       checkState(currentDriveOrder == null, "%s: Vehicle has a drive order", vehicle.getName());
-      checkState(!waitingForAllocation,
-                 "%s: Vehicle is waiting for resource allocation",
-                 vehicle.getName());
+      checkState(!isWaitingForAllocation(),
+                 "%s: Vehicle is waiting for resource allocation (%s)",
+                 vehicle.getName(),
+                 pendingResources);
 
       setVehiclePosition(null);
     }

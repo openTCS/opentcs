@@ -7,19 +7,16 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
-import static com.google.common.base.Preconditions.checkState;
 import java.util.Collections;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.components.kernel.services.InternalVehicleService;
-import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -28,6 +25,7 @@ import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
+import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,18 +56,9 @@ public class TransportOrderUtil
    */
   private final VehicleControllerPool vehicleControllerPool;
   /**
-   * Stores reservations of transport orders for vehicles.
-   */
-  private final OrderReservationPool orderReservationPool;
-  /**
    * This class's configuration.
    */
   private final DefaultDispatcherConfiguration configuration;
-  /**
-   * A list of vehicles that are to be disabled/made UNAVAILABLE after they have
-   * finished/aborted their current transport orders.
-   */
-  private final Set<TCSObjectReference<Vehicle>> vehiclesToDisable = ConcurrentHashMap.newKeySet();
   /**
    * Whether this instance is initialized.
    */
@@ -80,13 +69,11 @@ public class TransportOrderUtil
                             @Nonnull InternalVehicleService vehicleService,
                             @Nonnull DefaultDispatcherConfiguration configuration,
                             @Nonnull Router router,
-                            @Nonnull VehicleControllerPool vehicleControllerPool,
-                            @Nonnull OrderReservationPool orderReservationPool) {
+                            @Nonnull VehicleControllerPool vehicleControllerPool) {
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.router = requireNonNull(router, "router");
     this.vehicleControllerPool = requireNonNull(vehicleControllerPool, "vehicleControllerPool");
-    this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
@@ -95,8 +82,6 @@ public class TransportOrderUtil
     if (isInitialized()) {
       return;
     }
-
-    vehiclesToDisable.clear();
 
     initialized = true;
   }
@@ -171,10 +156,10 @@ public class TransportOrderUtil
     LOG.debug("Updating state of transport order {} to {}...", ref.getName(), newState);
     switch (newState) {
       case FINISHED:
-        setTOStateFinished(ref);
+        markOrderAndSequenceAsFinished(ref);
         break;
       case FAILED:
-        setTOStateFailed(ref);
+        markOrderAndSequenceAsFailed(ref);
         break;
       default:
         // Set the transport order's state.
@@ -201,8 +186,6 @@ public class TransportOrderUtil
     LOG.debug("Assigning vehicle {} to order {}.", vehicle.getName(), transportOrder.getName());
     final TCSObjectReference<Vehicle> vehicleRef = vehicle.getReference();
     final TCSObjectReference<TransportOrder> orderRef = transportOrder.getReference();
-    // If the transport order was reserved, forget the reservation now.
-    orderReservationPool.removeReservation(orderRef);
     // Set the vehicle's and transport order's state.
     vehicleService.updateVehicleProcState(vehicleRef, Vehicle.ProcState.PROCESSING_ORDER);
     updateTransportOrderState(orderRef, TransportOrder.State.BEING_PROCESSED);
@@ -264,16 +247,49 @@ public class TransportOrderUtil
     return true;
   }
 
-  public void finishAbortion(Vehicle vehicle) {
-    finishAbortion(vehicle.getTransportOrder(),
-                   vehicle,
-                   vehiclesToDisable.contains(vehicle.getReference()));
+  /**
+   * Let a given vehicle abort any order it may currently be processing.
+   *
+   * @param vehicle The vehicle which should abort its order.
+   * @param immediateAbort Whether to abort the order immediately instead of
+   * just withdrawing it for a smooth abortion.
+   */
+  public void abortOrder(Vehicle vehicle, boolean immediateAbort) {
+    requireNonNull(vehicle, "vehicle");
+
+    if (vehicle.getTransportOrder() == null) {
+      return;
+    }
+
+    abortAssignedOrder(
+        transportOrderService.fetchObject(TransportOrder.class, vehicle.getTransportOrder()),
+        vehicle,
+        immediateAbort
+    );
   }
 
-  @SuppressWarnings("deprecation")
-  private void finishAbortion(TCSObjectReference<TransportOrder> orderRef,
-                              Vehicle vehicle,
-                              boolean disableVehicle) {
+  public void abortOrder(TransportOrder order, boolean immediateAbort) {
+    requireNonNull(order, "order");
+
+    if (order.getState().isFinalState()) {
+      return;
+    }
+
+    if (order.getProcessingVehicle() == null) {
+      updateTransportOrderState(order.getReference(), TransportOrder.State.FAILED);
+    }
+    else {
+      abortAssignedOrder(order,
+                         vehicleService.fetchObject(Vehicle.class, order.getProcessingVehicle()),
+                         immediateAbort);
+    }
+  }
+
+  public void finishAbortion(Vehicle vehicle) {
+    finishAbortion(vehicle.getTransportOrder(), vehicle);
+  }
+
+  private void finishAbortion(TCSObjectReference<TransportOrder> orderRef, Vehicle vehicle) {
     requireNonNull(orderRef, "orderRef");
     requireNonNull(vehicle, "vehicle");
 
@@ -282,83 +298,12 @@ public class TransportOrderUtil
     // The current transport order has been aborted - update its state
     // and that of the vehicle.
     updateTransportOrderState(orderRef, TransportOrder.State.FAILED);
-    // Check if we're supposed to disable the vehicle and set its proc
-    // state accordingly.
-    if (disableVehicle) {
-      vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
-                                                   Vehicle.IntegrationLevel.TO_BE_RESPECTED);
-      vehiclesToDisable.remove(vehicle.getReference());
-    }
+
     vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.IDLE);
     vehicleService.updateVehicleTransportOrder(vehicle.getReference(), null);
+
     // Let the router know that the vehicle doesn't have a route any more.
     router.selectRoute(vehicle, null);
-  }
-
-  /**
-   * Let a given vehicle abort any order it may currently be processing.
-   *
-   * @param vehicle The vehicle which should abort its order.
-   * @param immediateAbort Whether to abort the order immediately instead of
-   * just withdrawing it for a smooth abortion.
-   * @param disableVehicle Whether to disable the vehicle, i.e. set its
-   * procState to UNAVAILABLE.
-   * @param resetVehiclePosition Whether to reset the vehicle position.
-   */
-  @SuppressWarnings("deprecation")
-  public void abortOrder(Vehicle vehicle,
-                         boolean immediateAbort,
-                         boolean disableVehicle,
-                         boolean resetVehiclePosition) {
-    TCSObjectReference<TransportOrder> orderRef = vehicle.getTransportOrder();
-
-    // If the vehicle does NOT have an order, update its processing state now.
-    if (orderRef == null) {
-      if (disableVehicle) {
-        vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
-                                                     Vehicle.IntegrationLevel.TO_BE_RESPECTED);
-        // Since the vehicle is now disabled, release any order reservations
-        // for it, too. Disabled vehicles should not keep reservations, and
-        // this is a good fallback trigger to get rid of them in general.
-        orderReservationPool.removeReservations(vehicle.getReference());
-      }
-      vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.IDLE);
-    }
-    else {
-      abortAssignedOrder(transportOrderService.fetchObject(TransportOrder.class, orderRef),
-                         vehicle,
-                         immediateAbort,
-                         disableVehicle);
-    }
-    // If requested, reset the vehicle position to null and free all resources.
-    if (immediateAbort && resetVehiclePosition) {
-      vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
-                                                   Vehicle.IntegrationLevel.TO_BE_IGNORED);
-    }
-  }
-
-  public void abortOrder(TransportOrder order,
-                         boolean immediateAbort,
-                         boolean disableVehicle) {
-    TCSObjectReference<Vehicle> vehicleRef = order.getProcessingVehicle();
-
-    // If the order is NOT currently being processed by any vehicle, just make
-    // sure it's not going to be processed later, either.
-    if (vehicleRef == null) {
-      if (!order.getState().isFinalState()) {
-        updateTransportOrderState(order.getReference(),
-                                  TransportOrder.State.FAILED);
-        // The order was not processed by any vehicle but there still might be a reservation for
-        // that order.
-        orderReservationPool.removeReservation(order.getReference());
-      }
-    }
-    else {
-      abortAssignedOrder(order,
-                         vehicleService.fetchObject(Vehicle.class, vehicleRef),
-                         immediateAbort,
-                         disableVehicle);
-    }
   }
 
   /**
@@ -368,128 +313,108 @@ public class TransportOrderUtil
    * @param order The order.
    * @param immediateAbort Whether to abort the order immediately instead of
    * just withdrawing it for a smooth abortion.
-   * @param disableVehicle Whether to disable the vehicle, i.e. set its
-   * procState to UNAVAILABLE.
    */
   private void abortAssignedOrder(TransportOrder order,
                                   Vehicle vehicle,
-                                  boolean immediateAbort,
-                                  boolean disableVehicle) {
+                                  boolean immediateAbort) {
     requireNonNull(order, "order");
     requireNonNull(vehicle, "vehicle");
+    checkArgument(!order.getState().isFinalState(),
+                  "%s: Order already in final state: %s",
+                  vehicle.getName(),
+                  order.getName());
 
     // Mark the order as withdrawn so we can react appropriately when the
-    // vehicle reports the remaining movements as finished
-    if (!order.getState().isFinalState()
-        && !order.hasState(TransportOrder.State.WITHDRAWN)) {
-      updateTransportOrderState(order.getReference(),
-                                TransportOrder.State.WITHDRAWN);
-    }
+    // vehicle reports the remaining movements as finished.
+    updateTransportOrderState(order.getReference(), TransportOrder.State.WITHDRAWN);
 
     VehicleController vehicleController
         = vehicleControllerPool.getVehicleController(vehicle.getName());
 
     if (immediateAbort) {
-      LOG.info("{}: Immediate abort of transport order {}...",
-               vehicle.getName(),
-               order.getName());
+      LOG.info("{}: Immediate abort of transport order {}...", vehicle.getName(), order.getName());
       vehicleController.abortTransportOrder(true);
-      finishAbortion(order.getReference(), vehicle, disableVehicle);
+      finishAbortion(order.getReference(), vehicle);
     }
     else {
-      if (disableVehicle) {
-        // Remember that the vehicle should be disabled after finishing the
-        // orders it already received.
-        LOG.debug("{}: To be disabled later", vehicle.getName());
-        vehiclesToDisable.add(vehicle.getReference());
-      }
       vehicleController.abortTransportOrder(false);
-      // XXX What if the controller does not have any more movements to be
-      // finished? Will it ever re-dispatch the vehicle in that case?
     }
   }
 
   /**
-   * Properly sets a transport order to a finished state, setting related
-   * properties.
+   * Properly marks a transport order as FINISHED, also updating its wrapping sequence, if any.
    *
    * @param ref A reference to the transport order to be modified.
-   * @throws ObjectUnknownException If the referenced order could not be found.
    */
-  private void setTOStateFinished(TCSObjectReference<TransportOrder> ref) {
+  private void markOrderAndSequenceAsFinished(TCSObjectReference<TransportOrder> ref) {
     requireNonNull(ref, "ref");
 
-    // Set the transport order's state.
-    transportOrderService.updateTransportOrderState(ref, TransportOrder.State.FINISHED);
     TransportOrder order = transportOrderService.fetchObject(TransportOrder.class, ref);
-    // If it is part of an order sequence, we should proceed to its next order.
-    if (order.getWrappingSequence() != null) {
-      OrderSequence seq = transportOrderService.fetchObject(OrderSequence.class,
-                                                            order.getWrappingSequence());
-      // Sanity check: The finished order must be the next one in the sequence;
-      // if it is not, something has already gone wrong.
-      checkState(ref.equals(seq.getNextUnfinishedOrder()),
-                 "Finished TO %s != next unfinished TO %s in sequence %s",
-                 ref,
-                 seq.getNextUnfinishedOrder(),
-                 seq);
+    Optional<OrderSequence> osOpt = extractWrappingSequence(order);
+
+    // Sanity check: The finished order must be the next one in the sequence.
+    osOpt.ifPresent(
+        seq -> checkArgument(ref.equals(seq.getNextUnfinishedOrder()),
+                             "TO %s != next unfinished TO %s in sequence %s",
+                             ref,
+                             seq.getNextUnfinishedOrder(),
+                             seq)
+    );
+
+    transportOrderService.updateTransportOrderState(ref, TransportOrder.State.FINISHED);
+
+    osOpt.ifPresent(seq -> {
       transportOrderService.updateOrderSequenceFinishedIndex(seq.getReference(),
                                                              seq.getFinishedIndex() + 1);
-      // Get an up-to-date copy of the order sequence
-      seq = transportOrderService.fetchObject(OrderSequence.class, seq.getReference());
-      // If the sequence is complete and this was its last order, the sequence
-      // is also finished.
-      if (seq.isComplete() && seq.getNextUnfinishedOrder() == null) {
-        transportOrderService.markOrderSequenceFinished(seq.getReference());
-        // Reset the processing vehicle's back reference on the sequence.
-        vehicleService.updateVehicleOrderSequence(seq.getProcessingVehicle(), null);
-      }
-    }
+
+      // Finish the order sequence, using an up-to-date copy.
+      finishOrderSequence(transportOrderService.fetchObject(OrderSequence.class,
+                                                            seq.getReference()));
+    });
   }
 
   /**
-   * Properly sets a transport order to a failed state, setting related
-   * properties.
+   * Properly marks a transport order as FAILED, also updating its wrapping sequence, if any.
    *
    * @param ref A reference to the transport order to be modified.
-   * @throws ObjectUnknownException If the referenced order could not be found.
    */
-  private void setTOStateFailed(TCSObjectReference<TransportOrder> ref) {
+  private void markOrderAndSequenceAsFailed(TCSObjectReference<TransportOrder> ref) {
     requireNonNull(ref, "ref");
 
     TransportOrder failedOrder = transportOrderService.fetchObject(TransportOrder.class, ref);
     transportOrderService.updateTransportOrderState(ref, TransportOrder.State.FAILED);
-    // A transport order has failed - check if it's part of an order
-    // sequence that we need to take care of.
-    if (failedOrder.getWrappingSequence() == null) {
-      return;
-    }
-    OrderSequence sequence = transportOrderService.fetchObject(OrderSequence.class,
-                                                               failedOrder.getWrappingSequence());
 
-    if (sequence.isFailureFatal()) {
-      // Mark the sequence as complete to make sure no further orders are
-      // added.
-      transportOrderService.markOrderSequenceComplete(sequence.getReference());
-      // Mark all orders of the sequence that are not in a final state as
-      // FAILED.
-      sequence.getOrders().stream()
-          .map(curRef -> transportOrderService.fetchObject(TransportOrder.class, curRef))
-          .filter(o -> !o.getState().isFinalState())
-          .forEach(o -> updateTransportOrderState(o.getReference(), TransportOrder.State.FAILED));
-      // Move the finished index of the sequence to its end.
-      transportOrderService.updateOrderSequenceFinishedIndex(sequence.getReference(),
-                                                             sequence.getOrders().size() - 1);
-    }
-    else {
-      // Since failure of an order in the sequence is not fatal, increment the
-      // finished index of the sequence by one to move to the next order.
-      transportOrderService.updateOrderSequenceFinishedIndex(sequence.getReference(),
-                                                             sequence.getFinishedIndex() + 1);
-    }
-    // The sequence may have changed. Get an up-to-date copy.
-    sequence = transportOrderService.fetchObject(OrderSequence.class,
-                                                 failedOrder.getWrappingSequence());
+    Optional<OrderSequence> osOpt = extractWrappingSequence(failedOrder);
+    osOpt.ifPresent(seq -> {
+      if (seq.isFailureFatal()) {
+        // Mark the sequence as complete to make sure no further orders are added.
+        transportOrderService.markOrderSequenceComplete(seq.getReference());
+        // Mark all orders of the sequence that are not in a final state as FAILED.
+        seq.getOrders().stream()
+            .map(curRef -> transportOrderService.fetchObject(TransportOrder.class, curRef))
+            .filter(o -> !o.getState().isFinalState())
+            .forEach(
+                o -> transportOrderService.updateTransportOrderState(o.getReference(),
+                                                                     TransportOrder.State.FAILED)
+            );
+        // Move the finished index of the sequence to its end.
+        transportOrderService.updateOrderSequenceFinishedIndex(seq.getReference(),
+                                                               seq.getOrders().size() - 1);
+      }
+      else {
+        // Since failure of an order in the sequence is not fatal, increment the
+        // finished index of the sequence by one to move to the next order.
+        transportOrderService.updateOrderSequenceFinishedIndex(seq.getReference(),
+                                                               seq.getFinishedIndex() + 1);
+      }
+
+      // Finish the order sequence, using an up-to-date copy.
+      finishOrderSequence(transportOrderService.fetchObject(OrderSequence.class,
+                                                            failedOrder.getWrappingSequence()));
+    });
+  }
+
+  private void finishOrderSequence(OrderSequence sequence) {
     // Mark the sequence as finished if there's nothing more to do in it.
     if (sequence.isComplete() && sequence.getNextUnfinishedOrder() == null) {
       transportOrderService.markOrderSequenceFinished(sequence.getReference());
@@ -499,5 +424,12 @@ public class TransportOrderUtil
         vehicleService.updateVehicleOrderSequence(sequence.getProcessingVehicle(), null);
       }
     }
+  }
+
+  private Optional<OrderSequence> extractWrappingSequence(TransportOrder order) {
+    return order.getWrappingSequence() == null
+        ? Optional.empty()
+        : Optional.of(transportOrderService.fetchObject(OrderSequence.class,
+                                                        order.getWrappingSequence()));
   }
 }
