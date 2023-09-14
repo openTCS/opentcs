@@ -9,7 +9,6 @@ package org.opentcs.guing.common.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -325,7 +324,7 @@ public class StandardSystemModel
    * @return A list of all model components in that folder.
    */
   private List<ModelComponent> getAll(CompositeModelComponent folder) {
-    List<ModelComponent> result = new LinkedList<>();
+    List<ModelComponent> result = new ArrayList<>();
     for (ModelComponent component : folder.getChildComponents()) {
       if (component instanceof CompositeModelComponent) {
         result.addAll(getAll((CompositeModelComponent) component));

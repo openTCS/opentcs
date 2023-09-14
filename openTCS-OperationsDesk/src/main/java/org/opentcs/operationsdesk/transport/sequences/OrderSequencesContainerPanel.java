@@ -13,7 +13,7 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
@@ -178,8 +178,7 @@ public class OrderSequencesContainerPanel
   }
 
   private List<FilterButton> createFilterButtons() {
-
-    List<FilterButton> buttons = new LinkedList<>();
+    List<FilterButton> buttons = new ArrayList<>();
 
     FilterButton b1 = new FilterButton(
         IconToolkit.instance().getImageIconByFullPath(ICON_PATH + "filterFinished.16x16.gif"),

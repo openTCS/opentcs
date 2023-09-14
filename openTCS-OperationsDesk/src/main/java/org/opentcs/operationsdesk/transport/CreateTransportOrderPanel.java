@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -213,8 +212,7 @@ public class CreateTransportOrderPanel
 
       typeComboBox.setSelectedItem(fPattern.getType());
 
-      List<DriveOrder> driveOrders = new LinkedList<>();
-      driveOrders.addAll(fPattern.getAllDriveOrders());
+      List<DriveOrder> driveOrders = new ArrayList<>(fPattern.getAllDriveOrders());
 
       DefaultTableModel model = (DefaultTableModel) driveOrdersTable.getModel();
       for (DriveOrder o : driveOrders) {

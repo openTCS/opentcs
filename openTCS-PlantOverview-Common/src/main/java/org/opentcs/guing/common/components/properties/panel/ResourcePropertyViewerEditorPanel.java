@@ -11,7 +11,6 @@ import com.google.inject.Inject;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JPanel;
@@ -164,7 +163,7 @@ public class ResourcePropertyViewerEditorPanel
     private final int columnPoint = 1;
     private final int columnLocation = 2;
 
-    private List<List<TCSResourceReference<?>>> values = new LinkedList<>();
+    private List<List<TCSResourceReference<?>>> values = new ArrayList<>();
 
     ItemsTableModel() {
     }

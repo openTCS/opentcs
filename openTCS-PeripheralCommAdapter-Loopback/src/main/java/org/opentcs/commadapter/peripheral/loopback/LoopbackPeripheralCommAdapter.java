@@ -9,7 +9,7 @@ package org.opentcs.commadapter.peripheral.loopback;
 
 import com.google.inject.assistedinject.Assisted;
 import java.time.Duration;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.concurrent.Future;
@@ -50,7 +50,7 @@ public class LoopbackPeripheralCommAdapter
    * The queue of tasks to be executed to simulate the processing of jobs.
    * This queue may contain at most one item at any time.
    */
-  private final Queue<Runnable> jobTaskQueue = new LinkedList<>();
+  private final Queue<Runnable> jobTaskQueue = new ArrayDeque<>();
   /**
    * A future for the current job task's execution.
    * Indicates whehter the current job task has been executed or whether it is still to be executed.

@@ -7,10 +7,9 @@
  */
 package org.opentcs.modeleditor.persistence;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -99,9 +98,7 @@ public class ModelValidatorTest {
     components = new HashMap<>();
 
     when(model.getAll()).thenAnswer((InvocationOnMock invocation) -> {
-      List<ModelComponent> result = new LinkedList<>();
-      components.values().stream().forEach(result::add);
-      return result;
+      return new ArrayList<>(components.values());
     });
     when(model.getLocationTypeModels()).thenAnswer((InvocationOnMock invocation) -> {
       return components.values().stream()

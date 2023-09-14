@@ -8,8 +8,8 @@
 package org.opentcs.operationsdesk.transport.orders;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
@@ -94,7 +94,7 @@ public class TransportOrderTableModel
     Instant.class
   };
 
-  private final List<TransportOrder> entries = new LinkedList<>();
+  private final List<TransportOrder> entries = new ArrayList<>();
 
   /**
    * Creates a new instance.

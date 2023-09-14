@@ -7,7 +7,7 @@
  */
 package org.opentcs.guing.base.components.properties.type;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import org.opentcs.guing.base.model.ModelComponent;
 
@@ -63,7 +63,7 @@ public class AngleProperty
   }
 
   private static List<Relation<Unit>> relations() {
-    List<Relation<Unit>> relations = new LinkedList<>();
+    List<Relation<Unit>> relations = new ArrayList<>();
     relations.add(new Relation<>(Unit.DEG, Unit.RAD, 180.0 / Math.PI));
     relations.add(new Relation<>(Unit.RAD, Unit.DEG, Math.PI / 180.0));
     return relations;

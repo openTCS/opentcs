@@ -8,7 +8,6 @@
 package org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -39,7 +38,7 @@ public class TransportOrderEntry {
   /**
    * Properties of the transport order data.
    */
-  private List<XMLMapEntry> properties = new LinkedList<>();
+  private List<XMLMapEntry> properties = new ArrayList<>();
 
   /**
    * Creates a new instance.

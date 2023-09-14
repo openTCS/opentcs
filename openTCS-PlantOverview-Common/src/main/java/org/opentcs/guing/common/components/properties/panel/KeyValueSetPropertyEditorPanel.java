@@ -10,7 +10,7 @@ package org.opentcs.guing.common.components.properties.panel;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import java.awt.Dimension;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
@@ -89,7 +89,7 @@ public class KeyValueSetPropertyEditorPanel
 
   @Override
   public void updateValues() {
-    List<KeyValueProperty> items = new LinkedList<>();
+    List<KeyValueProperty> items = new ArrayList<>();
     TableModel model = itemsTable.getModel();
     int size = model.getRowCount();
 

@@ -10,9 +10,9 @@ package org.opentcs.guing.common.components.drawing.figures;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
-import java.util.LinkedList;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
@@ -86,7 +86,7 @@ public abstract class LabeledFigure
 
   @Override
   public Collection<Handle> createHandles(int detailLevel) {
-    LinkedList<Handle> handles = new LinkedList<>();
+    Collection<Handle> handles = new ArrayList<>();
 
     switch (detailLevel) {
       case -1: // Mouse Moved

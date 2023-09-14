@@ -9,9 +9,9 @@ package org.opentcs.drivers.vehicle;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,7 +70,7 @@ public class VehicleProcessModel {
   /**
    * User notifications published by the comm adapter.
    */
-  private final Queue<UserNotification> notifications = new LinkedList<>();
+  private final Queue<UserNotification> notifications = new ArrayDeque<>();
   /**
    * The vehicle's precise position.
    */

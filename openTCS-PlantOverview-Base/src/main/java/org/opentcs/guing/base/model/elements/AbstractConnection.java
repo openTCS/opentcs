@@ -7,7 +7,7 @@
  */
 package org.opentcs.guing.base.model.elements;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
@@ -52,8 +52,7 @@ public abstract class AbstractConnection
   /**
    * Listeners that are interested in changes of the connected objects.
    */
-  private transient List<ConnectionChangeListener> fConnectionChangeListeners
-      = new LinkedList<>();
+  private transient List<ConnectionChangeListener> fConnectionChangeListeners = new ArrayList<>();
 
   /**
    * Creates a new instance.
@@ -128,7 +127,7 @@ public abstract class AbstractConnection
    */
   public void addConnectionChangeListener(ConnectionChangeListener listener) {
     if (fConnectionChangeListeners == null) {
-      fConnectionChangeListeners = new LinkedList<>();
+      fConnectionChangeListeners = new ArrayList<>();
     }
 
     if (!fConnectionChangeListeners.contains(listener)) {
@@ -172,7 +171,7 @@ public abstract class AbstractConnection
   public AbstractConnection clone()
       throws CloneNotSupportedException {
     AbstractConnection clone = (AbstractConnection) super.clone();
-    clone.fConnectionChangeListeners = new LinkedList<>();
+    clone.fConnectionChangeListeners = new ArrayList<>();
 
     return clone;
   }

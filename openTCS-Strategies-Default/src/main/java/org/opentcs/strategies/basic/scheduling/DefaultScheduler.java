@@ -10,7 +10,6 @@ package org.opentcs.strategies.basic.scheduling;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -159,7 +158,7 @@ public class DefaultScheduler
     requireNonNull(client, "client");
 
     synchronized (globalSyncObject) {
-      reservationPool.setClaim(client, new LinkedList<>());
+      reservationPool.setClaim(client, new ArrayList<>());
 
       allocationAdvisor.setAllocationState(client,
                                            reservationPool.allocatedResources(client),

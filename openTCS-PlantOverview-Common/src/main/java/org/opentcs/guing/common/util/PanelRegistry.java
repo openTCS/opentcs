@@ -7,7 +7,7 @@
  */
 package org.opentcs.guing.common.util;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -28,7 +28,7 @@ public class PanelRegistry {
   /**
    * The registered factories.
    */
-  private final List<PluggablePanelFactory> factories = new LinkedList<>();
+  private final List<PluggablePanelFactory> factories = new ArrayList<>();
 
   /**
    * Creates a new instance.
@@ -55,6 +55,6 @@ public class PanelRegistry {
    * @return The registered factories.
    */
   public List<PluggablePanelFactory> getFactories() {
-    return new LinkedList<>(factories);
+    return new ArrayList<>(factories);
   }
 }

@@ -7,8 +7,8 @@
  */
 package org.opentcs.guing.base.components.properties.type;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import org.opentcs.guing.base.model.ModelComponent;
 
@@ -21,7 +21,7 @@ public class StringSetProperty
   /**
    * The strings.
    */
-  private List<String> fItems = new LinkedList<>();
+  private List<String> fItems = new ArrayList<>();
 
   /**
    * Creates a new instance.
@@ -73,8 +73,7 @@ public class StringSetProperty
   @Override
   public void copyFrom(Property property) {
     StringSetProperty other = (StringSetProperty) property;
-    List<String> items = new LinkedList<>(other.getItems());
-    setItems(items);
+    setItems(new ArrayList<>(other.getItems()));
   }
 
   @Override
@@ -96,8 +95,7 @@ public class StringSetProperty
   @Override
   public Object clone() {
     StringSetProperty clone = (StringSetProperty) super.clone();
-    List<String> items = new LinkedList<>(getItems());
-    clone.setItems(items);
+    clone.setItems(new ArrayList<>(getItems()));
 
     return clone;
   }

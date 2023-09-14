@@ -7,7 +7,7 @@
  */
 package org.opentcs.kernel.vehicles;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -146,6 +146,6 @@ public class NullVehicleController
   @Override
   public Queue<MovementCommand> getCommandsSent() {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
-    return new LinkedList<>();
+    return new ArrayDeque<>();
   }
 }

@@ -7,7 +7,7 @@
  */
 package org.opentcs.guing.base.components.properties.type;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import org.opentcs.guing.base.model.ModelComponent;
 
 /**
@@ -44,7 +44,7 @@ public class PercentProperty
    * @param isInteger Whether only the integer part of the value is relevant.
    */
   public PercentProperty(ModelComponent model, double value, Unit unit, boolean isInteger) {
-    super(model, value, unit, Unit.class, new LinkedList<Relation<Unit>>());
+    super(model, value, unit, Unit.class, new ArrayList<Relation<Unit>>());
     setInteger(isInteger);
   }
 

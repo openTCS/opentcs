@@ -10,7 +10,6 @@ package org.opentcs.guing.base.model.elements;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
@@ -50,7 +49,7 @@ public class BlockModel
   /**
    * A list of change listeners for this object.
    */
-  private List<BlockChangeListener> fListeners = new LinkedList<>();
+  private List<BlockChangeListener> fListeners = new ArrayList<>();
 
   /**
    * Creates a new instance.

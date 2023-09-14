@@ -7,7 +7,7 @@
  */
 package org.opentcs.guing.base.components.properties.type;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentcs.guing.base.model.ModelComponent;
@@ -40,15 +40,13 @@ public class PeripheralOperationsProperty
   @Override
   public void copyFrom(Property property) {
     PeripheralOperationsProperty other = (PeripheralOperationsProperty) property;
-    List<PeripheralOperationModel> items = new LinkedList<>(other.getValue());
-    setValue(items);
+    setValue(new ArrayList<>(other.getValue()));
   }
 
   @Override
   public Object clone() {
     PeripheralOperationsProperty clone = (PeripheralOperationsProperty) super.clone();
-    List<PeripheralOperationModel> items = new LinkedList<>(getValue());
-    clone.setValue(items);
+    clone.setValue(new ArrayList<>(getValue()));
     return clone;
   }
 

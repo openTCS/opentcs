@@ -8,8 +8,8 @@
 package org.opentcs.operationsdesk.application.action;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
@@ -53,7 +53,7 @@ public class ToolBarManager
   /**
    * A list of all toolbars.
    */
-  private final List<JToolBar> toolBarList = Collections.synchronizedList(new LinkedList<>());
+  private final List<JToolBar> toolBarList = Collections.synchronizedList(new ArrayList<>());
   /**
    * A tool bar for actions creating new items.
    */
@@ -188,12 +188,12 @@ public class ToolBarManager
    */
   private JToggleButton addSelectionToolButton(JToolBar toolBar,
                                                DrawingEditor editor) {
-    LinkedList<Action> drawingActions = new LinkedList<>();
+    List<Action> drawingActions = new ArrayList<>();
     // Drawing Actions
     drawingActions.add(new SelectSameAction(editor));
 
     MultipleSelectionTool selectionTool
-        = selectionToolFactory.createMultipleSelectionTool(drawingActions, new LinkedList<>());
+        = selectionToolFactory.createMultipleSelectionTool(drawingActions, new ArrayList<>());
 
     ButtonGroup buttonGroup;
 

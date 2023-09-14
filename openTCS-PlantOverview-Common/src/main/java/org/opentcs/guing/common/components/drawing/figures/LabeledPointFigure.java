@@ -11,9 +11,9 @@ import com.google.common.base.Strings;
 import com.google.inject.assistedinject.Assisted;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
-import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.Action;
@@ -93,8 +93,7 @@ public class LabeledPointFigure
 
   @Override
   public Collection<Action> getActions(Point2D.Double p) {
-    LinkedList<Action> editOptions = new LinkedList<>();
-    return editOptions;
+    return new ArrayList<>();
   }
 
   @Override
@@ -217,7 +216,7 @@ public class LabeledPointFigure
 
   @Override
   public Collection<Handle> createHandles(int detailLevel) {
-    LinkedList<Handle> handles = new LinkedList<>();
+    Collection<Handle> handles = new ArrayList<>();
 
     if (!isVisible()) {
       return handles;

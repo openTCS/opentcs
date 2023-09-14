@@ -9,9 +9,8 @@ package org.opentcs.virtualvehicle;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
@@ -65,7 +64,7 @@ public class VelocityController {
   /**
    * This controller's processing queue.
    */
-  private final Queue<WayEntry> wayEntries = new LinkedList<>();
+  private final Queue<WayEntry> wayEntries = new ArrayDeque<>();
   /**
    * A set of velocity listeners.
    */
@@ -248,9 +247,8 @@ public class VelocityController {
    * @param newEntry The way entry to add.
    */
   public void addWayEntry(WayEntry newEntry) {
-    if (newEntry == null) {
-      throw new NullPointerException("newEntry is null");
-    }
+    requireNonNull(newEntry, "newEntry");
+
     wayEntries.add(newEntry);
   }
 
@@ -288,14 +286,8 @@ public class VelocityController {
     }
     final int oldPosition = currentPosition;
     final int oldVelocity = currentVelocity;
-    final Iterator<WayEntry> wayEntryIter = wayEntries.iterator();
-    final WayEntry curWayEntry
-        = wayEntryIter.hasNext() ? wayEntryIter.next() : null;
-    final int targetVelocity;
-    final long accelerationDistance;
+    final WayEntry curWayEntry = wayEntries.peek();
     if (curWayEntry == null || paused) {
-      targetVelocity = 0;
-      accelerationDistance = 1;
       currentAcceleration = 0;
       currentVelocity = 0;
     }
@@ -313,9 +305,9 @@ public class VelocityController {
           LOG.warn("Unhandled orientation: {}, assuming forward.", orientation);
           maxVelocity = maxFwdVelocity;
       }
-      targetVelocity = Math.min(curWayEntry.targetVelocity, maxVelocity);
+      final int targetVelocity = Math.min(curWayEntry.targetVelocity, maxVelocity);
       // Accelerate as quickly as possible.
-      accelerationDistance = 10;
+      final long accelerationDistance = 10;
       // Recompute the acceleration to reach/keep the desired velocity.
       currentAcceleration
           = (currentVelocity == targetVelocity) ? 0

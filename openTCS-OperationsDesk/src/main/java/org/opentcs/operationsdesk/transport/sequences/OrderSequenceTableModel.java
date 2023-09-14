@@ -7,8 +7,8 @@
  */
 package org.opentcs.operationsdesk.transport.sequences;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
@@ -63,7 +63,7 @@ public class OrderSequenceTableModel
     String.class
   };
 
-  private final List<OrderSequence> entries = new LinkedList<>();
+  private final List<OrderSequence> entries = new ArrayList<>();
 
   /**
    * Creates a new instance.

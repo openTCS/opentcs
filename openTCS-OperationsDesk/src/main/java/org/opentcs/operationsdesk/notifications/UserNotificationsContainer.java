@@ -155,10 +155,8 @@ public class UserNotificationsContainer
 
   private void initNotifications() {
     setUserNotifications(fetchNotificationsIfOnLine());
-    if (userNotifications.size() > capacity) {
-      userNotifications
-          .subList(0, userNotifications.size() - capacity)
-          .clear();
+    while (userNotifications.size() > capacity) {
+      userNotifications.remove(0);
     }
     listeners.forEach(listener -> listener.containerInitialized(userNotifications));
   }

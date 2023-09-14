@@ -14,7 +14,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
-import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import javax.swing.Action;
@@ -86,9 +85,7 @@ public class LabeledLocationFigure
 
   @Override
   public Collection<Action> getActions(Point2D.Double p) {
-    LinkedList<Action> editOptions = new LinkedList<>();
-
-    return editOptions;
+    return new ArrayList<>();
   }
 
   @Override

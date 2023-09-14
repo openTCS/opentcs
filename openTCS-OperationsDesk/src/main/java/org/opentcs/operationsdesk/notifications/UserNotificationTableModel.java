@@ -8,7 +8,7 @@
 package org.opentcs.operationsdesk.notifications;
 
 import java.time.Instant;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
@@ -64,7 +64,7 @@ public class UserNotificationTableModel
     String.class
   };
 
-  private final List<UserNotification> entries = new LinkedList<>();
+  private final List<UserNotification> entries = new ArrayList<>();
 
   /**
    * Creates a new instance.

@@ -13,8 +13,8 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import org.jhotdraw.draw.AbstractAttributedFigure;
 import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.handle.Handle;
@@ -154,7 +154,7 @@ public class OriginFigure
   @Override
   public Collection<Handle> createHandles(int detailLevel) {
     // No handles for the origin figure.
-    return new LinkedList<>();
+    return new ArrayList<>();
   }
 
   @Override

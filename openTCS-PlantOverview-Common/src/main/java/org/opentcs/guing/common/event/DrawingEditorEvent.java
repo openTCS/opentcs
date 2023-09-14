@@ -8,7 +8,6 @@
 package org.opentcs.guing.common.event;
 
 import java.util.EventObject;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import org.jhotdraw.draw.DrawingEditor;
@@ -47,8 +46,7 @@ public class DrawingEditorEvent
    */
   public DrawingEditorEvent(DrawingEditor editor, Figure figure) {
     super(editor);
-    fFigures = new LinkedList<>();
-    fFigures.add(figure);
+    fFigures = List.of(figure);
   }
 
   /**

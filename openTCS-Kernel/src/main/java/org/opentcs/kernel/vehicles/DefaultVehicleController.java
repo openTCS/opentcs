@@ -10,10 +10,10 @@ package org.opentcs.kernel.vehicles;
 import com.google.inject.assistedinject.Assisted;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -108,7 +108,7 @@ public class DefaultVehicleController
   /**
    * A list of commands that still need to be sent to the communication adapter.
    */
-  private final Queue<MovementCommand> futureCommands = new LinkedList<>();
+  private final Deque<MovementCommand> futureCommands = new ArrayDeque<>();
   /**
    * A command for which a resource allocation is pending and which has not yet been sent to the
    * adapter.
@@ -125,7 +125,7 @@ public class DefaultVehicleController
   /**
    * A list of commands that have been sent to the communication adapter.
    */
-  private final Queue<MovementCommand> commandsSent = new LinkedList<>();
+  private final Deque<MovementCommand> commandsSent = new ArrayDeque<>();
   /**
    * The last command that has been executed.
    */
@@ -133,11 +133,11 @@ public class DefaultVehicleController
   /**
    * The resources this controller has claimed for future allocation.
    */
-  private final Queue<Set<TCSResource<?>>> claimedResources = new LinkedList<>();
+  private final Deque<Set<TCSResource<?>>> claimedResources = new ArrayDeque<>();
   /**
    * The resources this controller has allocated for each command.
    */
-  private final Deque<Set<TCSResource<?>>> allocatedResources = new LinkedList<>();
+  private final Deque<Set<TCSResource<?>>> allocatedResources = new ArrayDeque<>();
   /**
    * Manages interactions with peripheral devices that are to be performed before or after the
    * execution of movement commands.
@@ -499,7 +499,7 @@ public class DefaultVehicleController
   }
 
   private int getFutureOrCurrentPositionIndex() {
-    if (getCommandsSent().isEmpty() && getInteractionsPendingCommand().isEmpty()) {
+    if (commandsSent.isEmpty() && getInteractionsPendingCommand().isEmpty()) {
       LOG.debug("{}: No commands expected to be executed. Last executed command route index: {}",
                 vehicle.getName(),
                 getLastCommandExecutedRouteIndex());
@@ -513,7 +513,7 @@ public class DefaultVehicleController
       return getInteractionsPendingCommand().get().getStep().getRouteIndex();
     }
 
-    MovementCommand lastCommandSent = new LinkedList<>(getCommandsSent()).getLast();
+    MovementCommand lastCommandSent = commandsSent.getLast();
     LOG.debug("{}: Using the last command sent to the communication adapter. Route index: {}",
               vehicle.getName(),
               lastCommandSent.getStep().getRouteIndex());
@@ -548,8 +548,7 @@ public class DefaultVehicleController
       }
     }
     else {
-      List<MovementCommand> commandsSentList = new ArrayList<>(commandsSent);
-      lastCommandSent = commandsSentList.get(commandsSentList.size() - 1);
+      lastCommandSent = commandsSent.getLast();
     }
 
     LOG.debug("{}: Discarding future commands up to '{}' (inclusively): {}",
@@ -695,7 +694,7 @@ public class DefaultVehicleController
 
   @Override
   public Queue<MovementCommand> getCommandsSent() {
-    return new LinkedList<>(commandsSent);
+    return new ArrayDeque<>(commandsSent);
   }
 
   @Override
@@ -1155,7 +1154,7 @@ public class DefaultVehicleController
   private void updatePositionWithOrder(String position, Point point) {
     // If a drive order is being processed, check if the reported position
     // is the one we expect.
-    MovementCommand moveCommand = commandsSent.stream().findFirst().get();
+    MovementCommand moveCommand = commandsSent.getFirst();
 
     Point dstPoint = moveCommand.getStep().getDestinationPoint();
     if (dstPoint.getName().equals(position)) {

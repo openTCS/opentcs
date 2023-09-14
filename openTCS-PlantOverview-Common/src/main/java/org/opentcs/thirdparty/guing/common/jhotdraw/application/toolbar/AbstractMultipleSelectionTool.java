@@ -7,9 +7,9 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractButton;
@@ -185,20 +185,19 @@ public abstract class AbstractMultipleSelectionTool
     JPopupMenu menu = new JPopupMenu();
     JMenu submenu = null;
     String submenuName = null;
-    LinkedList<Action> popupActions = new LinkedList<>();
+    List<Action> popupActions = new ArrayList<>();
     if (figure != null) {
-      LinkedList<Action> figureActions = new LinkedList<>(
-          figure.getActions(viewToDrawing(p)));
-      if (popupActions.size() != 0 && figureActions.size() != 0) {
+      List<Action> figureActions = new ArrayList<>(figure.getActions(viewToDrawing(p)));
+      if (!popupActions.isEmpty() && !figureActions.isEmpty()) {
         popupActions.add(null);
       }
       popupActions.addAll(figureActions);
-      if (popupActions.size() != 0 && !selectionActions.isEmpty()) {
+      if (!popupActions.isEmpty() && !selectionActions.isEmpty()) {
         popupActions.add(null);
       }
       popupActions.addAll(selectionActions);
     }
-    if (popupActions.size() != 0 && !drawingActions.isEmpty()) {
+    if (!popupActions.isEmpty() && !drawingActions.isEmpty()) {
       popupActions.add(null);
     }
     popupActions.addAll(drawingActions);

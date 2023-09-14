@@ -7,9 +7,9 @@
  */
 package org.opentcs.strategies.basic.scheduling.modules;
 
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -261,7 +261,7 @@ public class SameDirectionBlockModule
     /**
      * The queue of pending permission requests.
      */
-    private final Queue<PermissionRequest> pendingRequests = new LinkedList<>();
+    private final Queue<PermissionRequest> pendingRequests = new ArrayDeque<>();
 
     BlockPermission(Block block) {
       this.block = requireNonNull(block, "block");

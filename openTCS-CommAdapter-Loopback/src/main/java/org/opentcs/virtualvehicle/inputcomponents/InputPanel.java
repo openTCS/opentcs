@@ -7,7 +7,7 @@
  */
 package org.opentcs.virtualvehicle.inputcomponents;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +32,7 @@ public abstract class InputPanel
   /**
    * List of ValidationListeners that will receive ValidationEvents.
    */
-  private final List<ValidationListener> validationListeners = new LinkedList<>();
+  private final List<ValidationListener> validationListeners = new ArrayList<>();
   /**
    * Title of the panel. Might be used by the surrounding dialog.
    */

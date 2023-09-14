@@ -7,7 +7,7 @@
  */
 package org.opentcs.guing.base.components.properties.type;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import org.opentcs.guing.base.model.ModelComponent;
 
@@ -44,7 +44,7 @@ public class SpeedProperty
   }
 
   private static List<Relation<Unit>> relations() {
-    List<Relation<Unit>> relations = new LinkedList<>();
+    List<Relation<Unit>> relations = new ArrayList<>();
     relations.add(new Relation<>(Unit.KM_H, Unit.M_S, 3.6));
     relations.add(new Relation<>(Unit.M_S, Unit.MM_S, 0.001));
     return relations;

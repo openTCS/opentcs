@@ -14,7 +14,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
@@ -238,7 +237,7 @@ public class OpenTCSDrawingEditor
   }
 
   public Collection<OpenTCSDrawingView> getAllViews() {
-    Collection<OpenTCSDrawingView> result = new LinkedList<>();
+    Collection<OpenTCSDrawingView> result = new ArrayList<>();
     for (DrawingView view : getDrawingViews()) {
       result.add((OpenTCSDrawingView) view);
     }

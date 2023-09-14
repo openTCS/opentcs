@@ -25,7 +25,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -804,7 +803,7 @@ public class OpenTCSView
       DrawingView drawingView = fDrawingEditor.getActiveView();
       drawingView.clearSelection();
 
-      Collection<Figure> figures = new LinkedList<>();
+      Collection<Figure> figures = new ArrayList<>(components.size());
       for (ModelComponent comp : components) {
         Figure figure = findFigure(comp);
 
@@ -1091,7 +1090,7 @@ public class OpenTCSView
     toolBarPanel.setLayout(new BoxLayout(toolBarPanel, BoxLayout.LINE_AXIS));
     toolBar.setBorder(new PaletteToolBarBorder());
 
-    final List<JToolBar> lToolBars = new LinkedList<>();
+    final List<JToolBar> lToolBars = new ArrayList<>();
 
     // The new wholeComponentPanel for the whole component.
     JPanel wholeComponentPanel = new JPanel(new BorderLayout());
@@ -1671,7 +1670,7 @@ public class OpenTCSView
       }
       else {
         // Multiple figures selected.
-        List<ModelComponent> models = new LinkedList<>();
+        List<ModelComponent> models = new ArrayList<>();
         Set<ModelComponent> components = new HashSet<>();
 
         for (Figure figure : event.getFigures()) {

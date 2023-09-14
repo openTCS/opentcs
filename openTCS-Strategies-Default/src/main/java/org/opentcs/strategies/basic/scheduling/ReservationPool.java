@@ -7,9 +7,9 @@
  */
 package org.opentcs.strategies.basic.scheduling;
 
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -77,7 +77,7 @@ public class ReservationPool {
   public List<Set<TCSResource<?>>> getClaim(@Nonnull Scheduler.Client client) {
     requireNonNull(client, "client");
 
-    return claimsByClient.getOrDefault(client, new LinkedList<>()).stream()
+    return claimsByClient.getOrDefault(client, new ArrayDeque<>()).stream()
         .map(resourceSet -> Set.copyOf(resourceSet))
         .collect(Collectors.toList());
   }
@@ -93,7 +93,7 @@ public class ReservationPool {
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
-    claimsByClient.put(client, new LinkedList<>(resources));
+    claimsByClient.put(client, new ArrayDeque<>(resources));
   }
 
   /**

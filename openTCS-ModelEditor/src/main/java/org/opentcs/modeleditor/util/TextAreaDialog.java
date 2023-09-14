@@ -7,8 +7,8 @@
  */
 package org.opentcs.modeleditor.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -41,7 +41,7 @@ public class TextAreaDialog
    * @return the content of the text area
    */
   public Collection<String> getContent() {
-    return new LinkedList<>(contents);
+    return new ArrayList<>(contents);
   }
 
   /**

@@ -10,7 +10,6 @@ package org.opentcs.guing.plugins.panels.loadgenerator;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -80,10 +79,12 @@ public class TransportOrderData {
    * the new generated transport order.
    */
   public List<DriveOrder.Destination> getDestinations() {
-    List<DriveOrder.Destination> destinations = new LinkedList<>();
+    List<DriveOrder.Destination> destinations = new ArrayList<>(driveOrders.size());
     for (DriveOrderStructure i : driveOrders) {
-      destinations.add(new DriveOrder.Destination(i.getDriveOrderLocation())
-          .withOperation(i.getDriveOrderVehicleOperation()));
+      destinations.add(
+          new DriveOrder.Destination(i.getDriveOrderLocation())
+              .withOperation(i.getDriveOrderVehicleOperation())
+      );
     }
     return destinations;
   }

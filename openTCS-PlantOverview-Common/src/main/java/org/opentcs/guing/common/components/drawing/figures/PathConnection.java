@@ -17,7 +17,6 @@ import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
@@ -556,7 +555,7 @@ public class PathConnection
 
   @Override
   public Collection<Handle> createHandles(int detailLevel) {
-    List<Handle> handles = new LinkedList<>();
+    Collection<Handle> handles = new ArrayList<>();
 
     if (!isVisible()) {
       return handles;

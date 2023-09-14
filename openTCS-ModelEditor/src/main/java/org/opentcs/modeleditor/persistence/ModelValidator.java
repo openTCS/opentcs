@@ -10,9 +10,9 @@ package org.opentcs.modeleditor.persistence;
 import com.google.common.base.Strings;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import java.awt.Component;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
@@ -59,7 +59,7 @@ public class ModelValidator {
   /**
    * The collection of errors which happened after the last reset.
    */
-  private final List<String> errors = new LinkedList<>();
+  private final List<String> errors = new ArrayList<>();
 
   /**
    * Creates a new instance.
@@ -74,7 +74,7 @@ public class ModelValidator {
    * @return the collection of errors as string
    */
   public final List<String> getErrors() {
-    return new LinkedList<>(errors);
+    return new ArrayList<>(errors);
   }
 
   /**

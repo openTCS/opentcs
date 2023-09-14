@@ -12,8 +12,8 @@ import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
@@ -50,7 +50,7 @@ public class OpenTCSSelectAreaTracker
    * The hover handles, are the handles of the figure over which the mouse
    * pointer is currently hovering.
    */
-  private final List<Handle> hoverHandles = new LinkedList<>();
+  private final List<Handle> hoverHandles = new ArrayList<>();
   /**
    * The hover Figure is the figure, over which the mouse is currently hovering.
    */

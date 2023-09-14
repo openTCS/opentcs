@@ -7,7 +7,7 @@
  */
 package org.opentcs.guing.base.components.properties.type;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import org.opentcs.guing.base.model.ModelComponent;
 
@@ -43,7 +43,7 @@ public class LengthProperty
   }
 
   private static List<Relation<Unit>> relations() {
-    List<Relation<Unit>> relations = new LinkedList<>();
+    List<Relation<Unit>> relations = new ArrayList<>();
     relations.add(new Relation<>(Unit.MM, Unit.CM, 10));
     relations.add(new Relation<>(Unit.CM, Unit.M, 100));
     relations.add(new Relation<>(Unit.M, Unit.KM, 1000));

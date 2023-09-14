@@ -7,8 +7,8 @@
  */
 package org.opentcs.commadapter.peripheral.loopback;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
@@ -74,7 +74,7 @@ public class LoopbackPeripheralCommAdapterPanelFactory
     requireNonNull(processModel, "processModel");
 
     if (!providesPanelsFor(description, processModel)) {
-      return new LinkedList<>();
+      return new ArrayList<>();
     }
 
     return Arrays.asList(panelComponentsFactory

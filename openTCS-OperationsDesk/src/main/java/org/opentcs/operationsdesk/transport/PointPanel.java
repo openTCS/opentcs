@@ -10,7 +10,6 @@ package org.opentcs.operationsdesk.transport;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Vector;
@@ -36,7 +35,7 @@ public class PointPanel
   /**
    * List of Listeners to be notified about the validity of user input.
    */
-  private final List<InputValidationListener> validationListeners = new LinkedList<>();
+  private final List<InputValidationListener> validationListeners = new ArrayList<>();
 
   /**
    * Creates new instance.

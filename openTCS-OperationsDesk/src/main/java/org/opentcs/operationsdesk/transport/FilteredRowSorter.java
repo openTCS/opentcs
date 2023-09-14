@@ -7,7 +7,7 @@
  */
 package org.opentcs.operationsdesk.transport;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.swing.RowFilter;
@@ -25,7 +25,7 @@ public class FilteredRowSorter<T extends TableModel>
   /**
    * Keeps all the active filters.
    */
-  private final List<RowFilter<Object, Object>> filters = new LinkedList<>();
+  private final List<RowFilter<Object, Object>> filters = new ArrayList<>();
 
   public FilteredRowSorter(T model) {
     super(model);

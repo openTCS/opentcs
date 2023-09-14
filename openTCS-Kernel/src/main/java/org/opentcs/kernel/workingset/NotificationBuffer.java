@@ -7,8 +7,8 @@
  */
 package org.opentcs.kernel.workingset;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
@@ -46,7 +46,7 @@ public class NotificationBuffer {
   /**
    * The actual messages.
    */
-  private final Queue<UserNotification> notifications = new LinkedList<>();
+  private final Queue<UserNotification> notifications = new ArrayDeque<>();
   /**
    * The maximum number of messages that should be kept in this buffer.
    */

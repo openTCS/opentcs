@@ -7,8 +7,8 @@
  */
 package org.opentcs.guing.base.model.elements;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -229,7 +229,7 @@ public class PathModel
     setProperty(LOCKED, pLocked);
 
     PeripheralOperationsProperty pOperations
-        = new PeripheralOperationsProperty(this, new LinkedList<>());
+        = new PeripheralOperationsProperty(this, new ArrayList<>());
     pOperations.setDescription(
         bundle.getString("pathModel.property_peripheralOperations.description")
     );

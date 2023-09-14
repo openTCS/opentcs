@@ -10,9 +10,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractAction;
@@ -23,7 +23,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 import javax.swing.text.StyledEditorKit;
-import org.jhotdraw.app.Disposable;
 import org.jhotdraw.app.action.ActionUtil;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.AttributeKeys;
@@ -79,7 +78,7 @@ public class ButtonFactory {
       = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH);
 
   static {
-    LinkedList<ColorIcon> m = new LinkedList<>();
+    List<ColorIcon> m = new ArrayList<>();
     m.add(new ColorIcon(0x800000, "Cayenne"));
     m.add(new ColorIcon(0x808000, "Asparagus"));
     m.add(new ColorIcon(0x008000, "Clover"));
@@ -607,7 +606,6 @@ public class ButtonFactory {
     popupButton.setFocusable(false);
 
     HashMap<AttributeKey, Object> attributes;
-    java.util.List<Disposable> dsp = new LinkedList<>();
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_CAP, BasicStroke.CAP_BUTT);
@@ -617,7 +615,6 @@ public class ButtonFactory {
                                  BUNDLE.getString("buttonFactory.action_strokeCapButt.name"),
                                  null);
     popupButton.add(action);
-    dsp.add(action);
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_CAP, BasicStroke.CAP_ROUND);
@@ -626,7 +623,6 @@ public class ButtonFactory {
                                  BUNDLE.getString("buttonFactory.action_strokeCapRound.name"),
                                  null);
     popupButton.add(action);
-    dsp.add(action);
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_CAP, BasicStroke.CAP_SQUARE);
@@ -635,7 +631,6 @@ public class ButtonFactory {
                                  BUNDLE.getString("buttonFactory.action_strokeCapSquare.name"),
                                  null);
     popupButton.add(action);
-    dsp.add(action);
 
     return popupButton;
   }
@@ -648,7 +643,6 @@ public class ButtonFactory {
     popupButton.setFocusable(false);
 
     HashMap<AttributeKey, Object> attributes;
-    java.util.List<Disposable> dsp = new LinkedList<>();
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_JOIN, BasicStroke.JOIN_BEVEL);
@@ -658,7 +652,6 @@ public class ButtonFactory {
                                  BUNDLE.getString("buttonFactory.action_strokeJoinBevel.name"),
                                  null);
     popupButton.add(action);
-    dsp.add(action);
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_JOIN, BasicStroke.JOIN_ROUND);
@@ -667,7 +660,6 @@ public class ButtonFactory {
                                  BUNDLE.getString("buttonFactory.action_strokeJoinRound.name"),
                                  null);
     popupButton.add(action);
-    dsp.add(action);
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_JOIN, BasicStroke.JOIN_MITER);
@@ -676,7 +668,6 @@ public class ButtonFactory {
                                  BUNDLE.getString("buttonFactory.action_strokeJoinMiter.name"),
                                  null);
     popupButton.add(action);
-    dsp.add(action);
 
     return popupButton;
   }
@@ -697,8 +688,8 @@ public class ButtonFactory {
 
     JComponentPopup popupMenu = new JComponentPopup();
     JFontChooser fontChooser = new JFontChooser();
-    new LinkedList<Disposable>().add(
-        new FontChooserHandler(editor, AttributeKeys.FONT_FACE, fontChooser, popupMenu));
+
+    new FontChooserHandler(editor, AttributeKeys.FONT_FACE, fontChooser, popupMenu);
 
     popupMenu.add(fontChooser);
     fontPopupButton.setPopupMenu(popupMenu);

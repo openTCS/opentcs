@@ -8,8 +8,8 @@
 package org.opentcs.drivers.vehicle.management;
 
 import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
@@ -46,7 +46,7 @@ public class VehicleProcessModelTO
   /**
    * User notifications published by the comm adapter.
    */
-  private Queue<UserNotification> notifications = new LinkedList<>();
+  private Queue<UserNotification> notifications = new ArrayDeque<>();
   /**
    * The percise position of the vehicle.
    */

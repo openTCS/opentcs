@@ -7,7 +7,7 @@
  */
 package org.opentcs.guing.common.components.properties.table;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
@@ -40,8 +40,7 @@ public class AttributesTable
   /**
    * List of table change listeners.
    */
-  private final List<TableChangeListener> fTableChangeListeners
-      = new LinkedList<>();
+  private final List<TableChangeListener> fTableChangeListeners = new ArrayList<>();
 
   /**
    * Creates a new instance.
@@ -153,6 +152,8 @@ public class AttributesTable
   public void tableChanged(TableModelEvent event) {
     super.tableChanged(event);
 
+    // Explicitly check for null here, because JTable fires an event before this class's constructor
+    // is run.
     if (fTableChangeListeners != null) {
       for (TableChangeListener listener : fTableChangeListeners) {
         listener.tableModelChanged();

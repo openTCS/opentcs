@@ -15,8 +15,8 @@
  */
 package org.opentcs.thirdparty.modeleditor.jhotdraw.application.action.draw;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import static javax.swing.Action.SMALL_ICON;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
@@ -63,7 +63,7 @@ public class SendToBackAction
   @Override
   public void actionPerformed(java.awt.event.ActionEvent e) {
     final DrawingView view = getView();
-    final LinkedList<Figure> figures = new LinkedList<>(view.getSelectedFigures());
+    final Collection<Figure> figures = new ArrayList<>(view.getSelectedFigures());
     sendToBack(view, figures);
     fireUndoableEditHappened(new AbstractUndoableEdit() {
       @Override

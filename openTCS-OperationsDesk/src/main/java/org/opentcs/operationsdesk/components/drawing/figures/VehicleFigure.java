@@ -19,9 +19,9 @@ import java.awt.image.ImageObserver;
 import static java.awt.image.ImageObserver.ABORT;
 import static java.awt.image.ImageObserver.ALLBITS;
 import static java.awt.image.ImageObserver.FRAMEBITS;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
@@ -423,7 +423,7 @@ public class VehicleFigure
 
   @Override
   public Collection<Handle> createHandles(int detailLevel) {
-    LinkedList<Handle> handles = new LinkedList<>();
+    Collection<Handle> handles = new ArrayList<>();
 
     switch (detailLevel) {
       case -1: // Mouse Moved
