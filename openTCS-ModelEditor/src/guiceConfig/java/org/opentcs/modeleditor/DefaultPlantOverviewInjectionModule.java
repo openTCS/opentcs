@@ -31,6 +31,7 @@ import org.opentcs.guing.common.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.modeleditor.application.ApplicationInjectionModule;
 import org.opentcs.modeleditor.components.ComponentsInjectionModule;
 import org.opentcs.modeleditor.exchange.ExchangeInjectionModule;
+import org.opentcs.modeleditor.math.path.PathLengthFunctionInjectionModule;
 import org.opentcs.modeleditor.model.ModelInjectionModule;
 import org.opentcs.modeleditor.persistence.DefaultPersistenceInjectionModule;
 import org.opentcs.modeleditor.transport.TransportInjectionModule;
@@ -71,6 +72,7 @@ public class DefaultPlantOverviewInjectionModule
     install(new ApplicationInjectionModule());
     install(new ComponentsInjectionModule());
     install(new ExchangeInjectionModule());
+    install(new PathLengthFunctionInjectionModule());
     install(new ModelInjectionModule());
     install(new DefaultPersistenceInjectionModule());
     install(new TransportInjectionModule());

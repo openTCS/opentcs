@@ -32,6 +32,10 @@ public class ActionsMenu
    * A menu item for assuming the layout coordinates from the model coordinates.
    */
   private final JMenuItem cbiAlignModelWithLayout;
+  /**
+   * A menu item for calculating the euclidean distance for paths.
+   */
+  private final JMenuItem calculatePathLength;
 
   /**
    * Creates a new instance.
@@ -65,6 +69,9 @@ public class ActionsMenu
     // Menu item Actions -> Copy layout to model
     cbiAlignLayoutWithModel = menuFactory.createLayoutToModelMenuItem(true);
     add(cbiAlignLayoutWithModel);
+
+    calculatePathLength = menuFactory.createCalculatePathLengthMenuItem();
+    add(calculatePathLength);
   }
 
 }

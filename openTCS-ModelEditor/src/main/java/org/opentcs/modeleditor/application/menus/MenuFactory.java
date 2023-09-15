@@ -31,4 +31,11 @@ public interface MenuFactory {
    * @return The created menu item.
    */
   ModelToLayoutMenuItem createModelToLayoutMenuItem(boolean copyAll);
+
+  /**
+   * Creates a menu item for calculating the length of paths.
+   *
+   * @return The created menu item.
+   */
+  CalculatePathLengthMenuItem createCalculatePathLengthMenuItem();
 }
