@@ -14,7 +14,9 @@ import org.jhotdraw.draw.DrawingEditor;
 import org.opentcs.guing.common.components.drawing.DrawingOptions;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingView;
+import org.opentcs.guing.common.components.drawing.figures.ToolTipTextGenerator;
 import org.opentcs.guing.common.util.CourseObjectFactory;
+import org.opentcs.operationsdesk.components.drawing.figures.ToolTipTextGeneratorOperationsDesk;
 import org.opentcs.operationsdesk.components.drawing.figures.VehicleFigureFactory;
 import org.opentcs.operationsdesk.util.VehicleCourseObjectFactory;
 import org.opentcs.thirdparty.operationsdesk.components.drawing.OpenTCSDrawingViewOperating;
@@ -43,5 +45,8 @@ public class DrawingInjectionModule
     bind(OpenTCSDrawingView.class).to(OpenTCSDrawingViewOperating.class);
 
     bind(DrawingOptions.class).in(Singleton.class);
+
+    bind(ToolTipTextGeneratorOperationsDesk.class).in(Singleton.class);
+    bind(ToolTipTextGenerator.class).to(ToolTipTextGeneratorOperationsDesk.class);
   }
 }

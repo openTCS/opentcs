@@ -29,6 +29,8 @@
     <property name="onCommentFormat" value="// CHECKSTYLE:ON"/>
   </module>
 
+  <module name="SuppressWarningsFilter"/>
+
   <property name="severity" value="warning"/>
 
   <property name="fileExtensions" value="java, properties"/>
@@ -71,6 +73,8 @@
       <property name="offCommentFormat" value="// CHECKSTYLE:OFF.*"/>
       <property name="onCommentFormat" value="// CHECKSTYLE:ON"/>
     </module>
+
+    <module name="SuppressWarningsHolder"/>
 
     <module name="IllegalImport">
       <property name="severity" value="error"/>

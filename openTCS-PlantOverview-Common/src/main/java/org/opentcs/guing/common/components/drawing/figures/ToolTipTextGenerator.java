@@ -8,11 +8,12 @@
 package org.opentcs.guing.common.components.drawing.figures;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
-import org.opentcs.data.model.Vehicle;
+import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.model.ModelComponent;
 import static org.opentcs.guing.base.model.ModelComponent.MISCELLANEOUS;
@@ -34,11 +35,32 @@ public class ToolTipTextGenerator {
    */
   private final ModelManager modelManager;
 
+  /**
+   * Create a new instance.
+   *
+   * @param modelManager The model manager to use.
+   */
   @Inject
   public ToolTipTextGenerator(ModelManager modelManager) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
   }
 
+  /**
+   * Generate a tooltip text for a vehicle model.
+   *
+   * @param model The vehicle model.
+   * @return A tooltip text for the model element.
+   */
+  public String getToolTipText(VehicleModel model) {
+    return "";
+  }
+
+  /**
+   * Generate a tooltip text for a point model.
+   *
+   * @param model The point model.
+   * @return A tooltip text for the model element.
+   */
   public String getToolTipText(PointModel model) {
     String pointDesc = model.getDescription();
     StringBuilder sb = new StringBuilder("<html>");
@@ -52,6 +74,12 @@ public class ToolTipTextGenerator {
     return sb.toString();
   }
 
+  /**
+   * Generate a tooltip text for a location model.
+   *
+   * @param model The location model.
+   * @return A tooltip text for the model element.
+   */
   public String getToolTipText(LocationModel model) {
     String locationDesc = model.getDescription();
     StringBuilder sb = new StringBuilder("<html>");
@@ -66,6 +94,12 @@ public class ToolTipTextGenerator {
     return sb.toString();
   }
 
+  /**
+   * Generate a tooltip text for a path model.
+   *
+   * @param model The path model.
+   * @return A tooltip text for the model element.
+   */
   public String getToolTipText(PathModel model) {
     String pathDesc = model.getDescription();
     StringBuilder sb = new StringBuilder("<html>");
@@ -79,52 +113,17 @@ public class ToolTipTextGenerator {
     return sb.toString();
   }
 
-  public String getToolTipText(VehicleModel model) {
-    String vehicleDesc = model.getDescription();
-    StringBuilder sb = new StringBuilder("<html>");
-
-    sb.append(vehicleDesc).append(" ").append("<b>").append(model.getName()).append("</b>");
-
-    appendVehicleState(sb, model);
-    appendMiscProps(sb, model);
-
-    sb.append("</html>");
-
-    return sb.toString();
-  }
-
+  /**
+   * Generate a tooltip text for a link model.
+   *
+   * @param model The link model.
+   * @return A tooltip text for the model element.
+   */
   public String getToolTipText(LinkModel model) {
     return new StringBuilder("<html>")
         .append(model.getDescription()).append(" ")
         .append("<b>").append(model.getName()).append("</b>")
         .append("</html>").toString();
-  }
-
-  private String energyColorString(Vehicle vehicle) {
-    if (vehicle.isEnergyLevelCritical()) {
-      return "red";
-    }
-    else if (vehicle.isEnergyLevelDegraded()) {
-      return "orange";
-    }
-    else if (vehicle.isEnergyLevelGood()) {
-      return "green";
-    }
-    else {
-      return "black";
-    }
-  }
-
-  private String stateColorString(Vehicle vehicle) {
-    switch (vehicle.getState()) {
-      case ERROR:
-        return "red";
-      case UNAVAILABLE:
-      case UNKNOWN:
-        return "orange";
-      default:
-        return "black";
-    }
   }
 
   private void appendBlockInfo(StringBuilder sb, ModelComponent component) {
@@ -145,46 +144,24 @@ public class ToolTipTextGenerator {
     sb.append(blocksToToolTipContent(partOfBlocks));
   }
 
-  private void appendMiscProps(StringBuilder sb, ModelComponent component) {
+  protected void appendMiscProps(StringBuilder sb, ModelComponent component) {
     KeyValueSetProperty miscProps = (KeyValueSetProperty) component.getProperty(MISCELLANEOUS);
 
     if (miscProps.getItems().isEmpty()) {
       return;
     }
 
-    sb.append("<hr>");
-    sb.append(miscProps.getDescription()).append(": ");
-    sb.append("<ul>");
+    sb.append("<hr>\n");
+    sb.append(miscProps.getDescription()).append(": \n");
+    sb.append("<ul>\n");
     miscProps.getItems().stream()
-        .sorted((o1, o2) -> o1.getKey().compareTo(o2.getKey()))
+        .sorted(Comparator.comparing(KeyValueProperty::getKey))
         .forEach(kvp -> {
           sb.append("<li>")
               .append(kvp.getKey()).append(": ").append(kvp.getValue())
-              .append("</li>");
+              .append("</li>\n");
         });
-    sb.append("</ul>");
-  }
-
-  private void appendVehicleState(StringBuilder sb, VehicleModel model) {
-    sb.append("<hr>").append(model.getPropertyPoint().getDescription()).append(": ")
-        .append(model.getPoint() != null ? model.getPoint().getName() : "?");
-    sb.append("<br>").append(model.getPropertyNextPoint().getDescription()).append(": ")
-        .append(model.getNextPoint() != null ? model.getNextPoint().getName() : "?");
-
-    sb.append("<br>").append(model.getPropertyState().getDescription())
-        .append(": <font color=").append(stateColorString(model.getVehicle())).append(">")
-        .append(model.getPropertyState().getValue())
-        .append("</font>");
-
-    sb.append("<br>").append(model.getPropertyProcState().getDescription()).append(": ")
-        .append(model.getPropertyProcState().getValue());
-    sb.append("<br>").append(model.getPropertyIntegrationLevel().getDescription()).append(": ")
-        .append(model.getPropertyIntegrationLevel().getValue());
-
-    sb.append("<br>").append(model.getPropertyEnergyLevel().getDescription())
-        .append(": <font color=").append(energyColorString(model.getVehicle())).append(">")
-        .append(model.getPropertyEnergyLevel().getValue())
-        .append("%</font>");
+    sb.append("</ul>\n");
   }
 
   private void appendPeripheralInformation(StringBuilder sb, LocationModel model) {

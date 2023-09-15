@@ -28,6 +28,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Remove the kernel messages panel from the Operations Desk; it has been superseded by the user notifications tab.
 ** Add a configuration entry for enabling/disabling forced withdrawals from the Operations Desk.
 ** Add a menu item for recalculating the lengths of paths (for now, simply based on the Euclidean distance between the start and end point) to the Model Editor.
+** Show peripheral jobs that a vehicle must wait for before it can continue in the vehicle's tooltip.
 * Bugs fixed:
 ** Properly check validity of destination operations when creating transport orders.
 ** Improve legibility of some text elements in the Model Editor and Operations Desk applications that would not be legible on some systems (e.g. Ubuntu 20.04).

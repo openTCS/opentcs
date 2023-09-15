@@ -7,17 +7,21 @@
  */
 package org.opentcs.guing.common.components.drawing.figures;
 
+import java.util.ArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
-import org.opentcs.guing.base.model.elements.VehicleModel;
+import org.opentcs.guing.base.model.elements.PointModel;
+import org.opentcs.guing.common.model.SystemModel;
 import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
+ * Tests the {@link ToolTipTextGenerator}.
  */
 public class ToolTipTextGeneratorTest {
 
@@ -27,35 +31,39 @@ public class ToolTipTextGeneratorTest {
 
   @BeforeEach
   public void setUp() {
-    modelManager = Mockito.mock(ModelManager.class);
+    SystemModel systemModel = mock(SystemModel.class);
+    when(systemModel.getBlockModels()).thenReturn(new ArrayList<>());
+
+    modelManager = mock(ModelManager.class);
+    when(modelManager.getModel()).thenReturn(systemModel);
     toolTipTextGenerator = new ToolTipTextGenerator(modelManager);
   }
 
   @Test
   public void sortsPropertiesLexicographically() {
-    final String PROP1_KEY = "prop1";
-    final String PROP2_KEY = "prop2";
-    final String PROP3_KEY = "prop3";
-    final String PROP4_KEY = "prop4";
+    final String propKey1 = "prop1";
+    final String propKey2 = "prop2";
+    final String propKey3 = "prop3";
+    final String propkey4 = "prop4";
 
-    VehicleModel vehicleModel = new VehicleModel();
-    vehicleModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(vehicleModel,
-                                                                         PROP4_KEY,
-                                                                         "some-value"));
-    vehicleModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(vehicleModel,
-                                                                         PROP2_KEY,
-                                                                         "some-value"));
-    vehicleModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(vehicleModel,
-                                                                         PROP3_KEY,
-                                                                         "some-value"));
-    vehicleModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(vehicleModel,
-                                                                         PROP1_KEY,
-                                                                         "some-value"));
+    PointModel pointModel = new PointModel();
+    pointModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(pointModel,
+                                                                       propkey4,
+                                                                       "some-value"));
+    pointModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(pointModel,
+                                                                       propKey2,
+                                                                       "some-value"));
+    pointModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(pointModel,
+                                                                       propKey3,
+                                                                       "some-value"));
+    pointModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(pointModel,
+                                                                       propKey1,
+                                                                       "some-value"));
 
-    String toolTipText = toolTipTextGenerator.getToolTipText(vehicleModel);
+    String toolTipText = toolTipTextGenerator.getToolTipText(pointModel);
 
-    assertThat(toolTipText.indexOf(PROP1_KEY), is(lessThan(toolTipText.indexOf(PROP2_KEY))));
-    assertThat(toolTipText.indexOf(PROP2_KEY), is(lessThan(toolTipText.indexOf(PROP3_KEY))));
-    assertThat(toolTipText.indexOf(PROP3_KEY), is(lessThan(toolTipText.indexOf(PROP4_KEY))));
+    assertThat(toolTipText.indexOf(propKey1), is(lessThan(toolTipText.indexOf(propKey2))));
+    assertThat(toolTipText.indexOf(propKey2), is(lessThan(toolTipText.indexOf(propKey3))));
+    assertThat(toolTipText.indexOf(propKey3), is(lessThan(toolTipText.indexOf(propkey4))));
   }
 }
