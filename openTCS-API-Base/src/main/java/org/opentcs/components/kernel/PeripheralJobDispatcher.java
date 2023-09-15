@@ -16,7 +16,7 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * This interface declares the methods a peripheral job dispatcher module for the openTCS kernel
  * must implement.
  * <p>
- * A peripheral job dispatcher manages the distribution of peripheral jobs among the perihperal
+ * A peripheral job dispatcher manages the distribution of peripheral jobs among the peripheral
  * devices represented by locations in a system. It is basically event-driven, where an event can
  * be a new peripheral job being introduced into the system or a peripheral device becoming
  * available for processing existing jobs.
