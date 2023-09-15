@@ -272,6 +272,9 @@ public class TransportOrderUtil
     requireNonNull(order, "order");
 
     if (order.getState().isFinalState()) {
+      LOG.info("Transport order '{}' already in final state '{}', skipping withdrawal.",
+               order.getName(),
+               order.getState());
       return;
     }
 

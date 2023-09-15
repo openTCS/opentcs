@@ -206,12 +206,12 @@ public class DefaultPeripheralJobDispatcher
   public void withdrawJob(PeripheralJob job) {
     requireNonNull(job, "job");
     checkState(isInitialized(), "Not initialized");
-    checkArgument(
-        !job.getState().isFinalState(),
-        "Cannot withdraw job because it is already in final state (%s): %s",
-        job.getState(),
-        job.getName()
-    );
+    if (job.getState().isFinalState()) {
+      LOG.info("Peripheral job '{}' already in final state '{}', skipping withdrawal.",
+               job.getName(),
+               job.getState());
+      return;
+    }
     checkArgument(
         !isRelatedToNonFinalTransportOrder(job),
         "Cannot withdraw job because it is related to transport order in non-final state: %s",

@@ -115,6 +115,12 @@ public class PeripheralJobPoolManager
       throws ObjectUnknownException {
     PeripheralJob previousState = getObjectRepo().getObject(PeripheralJob.class, ref);
 
+    checkArgument(!previousState.getState().isFinalState(),
+                  "Peripheral job %s already in a final state, not changing %s -> %s.",
+                  ref.getName(),
+                  previousState.getState(),
+                  newState);
+
     LOG.info("Peripheral job's state changes: {} -- {} -> {}",
              previousState.getName(),
              previousState.getState(),

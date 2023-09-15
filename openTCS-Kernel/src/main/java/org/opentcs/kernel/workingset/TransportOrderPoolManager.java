@@ -156,6 +156,12 @@ public class TransportOrderPoolManager
       throws ObjectUnknownException {
     TransportOrder previousState = getObjectRepo().getObject(TransportOrder.class, ref);
 
+    checkArgument(!previousState.getState().isFinalState(),
+                  "Transport order %s already in a final state, not changing %s -> %s.",
+                  ref.getName(),
+                  previousState.getState(),
+                  newState);
+
     LOG.info("Transport order's state changes: {} -- {} -> {}",
              previousState.getName(),
              previousState.getState(),
