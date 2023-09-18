@@ -65,10 +65,10 @@ dependencies {
 
 distributions {
   main {
-    contents.from(baseApiDir) {
+    contents.from(project(':openTCS-API-Base').javadoc.destinationDir) {
       into('developer/api-base')
     }
-    contents.from(injectionApiDir) {
+    contents.from(project(':openTCS-API-Injection').javadoc.destinationDir) {
       into('developer/api-injection')
     }
     contents.from(webApiDir) {
@@ -88,8 +88,8 @@ distributions {
 }
 
 task renderDocs {
-  dependsOn 'apiBase'
-  dependsOn 'apiInjection'
+  dependsOn project(':openTCS-API-Base').javadoc
+  dependsOn project(':openTCS-API-Injection').javadoc
   dependsOn 'asciidoctor'
   dependsOn 'generateSwaggerUI'
 }
@@ -97,6 +97,7 @@ task renderDocs {
 installDist.dependsOn renderDocs
 
 distTar {
+  enabled = false
   dependsOn renderDocs
   archiveBaseName = archiveBaseName.get().toLowerCase()
 }
@@ -109,39 +110,6 @@ distZip {
 task release {
   dependsOn build
   dependsOn installDist
-}
-
-task apiBase(type: Javadoc, description: 'Creates Javadoc for base API.') {
-  title = "openTCS ${project.version} Base API documentation"
-  destinationDir = baseApiDir
-
-  source = project(':openTCS-API-Base').sourceSets.main.allJava
-  classpath = project(':openTCS-API-Base').sourceSets.main.compileClasspath
-  options {
-    header = "openTCS ${project.version}"
-    overview = "${project(':openTCS-API-Base').projectDir}/src/main/java/overview.html"
-    group("Basic data structures", "org.opentcs.data*")
-    group("Interfaces and supporting classes for accessing the kernel", "org.opentcs.access*")
-    group("Kernel strategies, plant overview panels and other components", "org.opentcs.components*")
-    group("Communication adapter framework", "org.opentcs.drivers*")
-    group("Configuration-related interfaces and annotation", "org.opentcs.configuration*")
-    group("Utility classes", "org.opentcs.util*")
-
-    addBooleanOption('Xdoclint:none', true)
-  }
-}
-
-task apiInjection(type: Javadoc, description: 'Creates Javadoc for injection API.') {
-  title = "openTCS ${project.version} Injection API documentation"
-  destinationDir = injectionApiDir
-
-  source = project(':openTCS-API-Injection').sourceSets.main.allJava
-  classpath = project(':openTCS-API-Injection').sourceSets.main.compileClasspath
-  options {
-    header = "openTCS ${project.version}"
-    overview = "${project(':openTCS-API-Injection').projectDir}/src/main/java/overview.html"
-    group("Classes supporting customization of openTCS applications", "org.opentcs.customizations*")
-  }
 }
 
 asciidoctor {
@@ -265,141 +233,67 @@ task configdocgen {
     javaexec {
       classpath configurations.configdocgen
       main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/KernelApplicationConfigurationEntries.adoc",
-              "org.opentcs.kernel.KernelApplicationConfiguration"]
-    }
+      args = [
+        "org.opentcs.kernel.KernelApplicationConfiguration",
+        "${configDocDir}/KernelApplicationConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/OrderPoolConfigurationEntries.adoc",
-              "org.opentcs.kernel.OrderPoolConfiguration"]
-    }
+        "org.opentcs.kernel.OrderPoolConfiguration",
+        "${configDocDir}/OrderPoolConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/DefaultDispatcherConfigurationEntries.adoc",
-              "org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration"]
-    }
+        "org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration",
+        "${configDocDir}/DefaultDispatcherConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/DefaultRouterConfigurationEntries.adoc",
-              "org.opentcs.strategies.basic.routing.DefaultRouterConfiguration"]
-    }
+        "org.opentcs.strategies.basic.routing.DefaultRouterConfiguration",
+        "${configDocDir}/DefaultRouterConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/ShortestPathConfigurationEntries.adoc",
-              "org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration"]
-    }
+        "org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration",
+        "${configDocDir}/ShortestPathConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/ExplicitPropertiesConfigurationEntries.adoc",
-              "org.opentcs.strategies.basic.routing.edgeevaluator.ExplicitPropertiesConfiguration"]
-    }
+        "org.opentcs.strategies.basic.routing.edgeevaluator.ExplicitPropertiesConfiguration",
+        "${configDocDir}/ExplicitPropertiesConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/DefaultPeripheralJobDispatcherConfigurationEntries.adoc",
-              "org.opentcs.strategies.basic.peripherals.dispatching.DefaultPeripheralJobDispatcherConfiguration"]
-    }
+        "org.opentcs.strategies.basic.peripherals.dispatching.DefaultPeripheralJobDispatcherConfiguration",
+        "${configDocDir}/DefaultPeripheralJobDispatcherConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/AdminWebApiConfigurationEntries.adoc",
-              "org.opentcs.kernel.extensions.adminwebapi.AdminWebApiConfiguration"]
-    }
+        "org.opentcs.kernel.extensions.adminwebapi.AdminWebApiConfiguration",
+        "${configDocDir}/AdminWebApiConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/ServiceWebApiConfigurationEntries.adoc",
-              "org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration"]
-    }
+        "org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration",
+        "${configDocDir}/ServiceWebApiConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/RmiKernelInterfaceConfigurationEntries.adoc",
-              "org.opentcs.kernel.extensions.rmi.RmiKernelInterfaceConfiguration"]
-    }
+        "org.opentcs.kernel.extensions.rmi.RmiKernelInterfaceConfiguration",
+        "${configDocDir}/RmiKernelInterfaceConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/KernelSslConfigurationEntries.adoc",
-              "org.opentcs.kernel.SslConfiguration"]
-    }
+        "org.opentcs.kernel.SslConfiguration",
+        "${configDocDir}/KernelSslConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/VirtualVehicleConfigurationEntries.adoc",
-              "org.opentcs.virtualvehicle.VirtualVehicleConfiguration"]
-    }
+        "org.opentcs.virtualvehicle.VirtualVehicleConfiguration",
+        "${configDocDir}/VirtualVehicleConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/VirtualPeripheralConfigurationEntries.adoc",
-              "org.opentcs.commadapter.peripheral.loopback.VirtualPeripheralConfiguration"]
-    }
+        "org.opentcs.commadapter.peripheral.loopback.VirtualPeripheralConfiguration",
+        "${configDocDir}/VirtualPeripheralConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/KernelControlCenterApplicationConfigurationEntries.adoc",
-              "org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration"]
-    }
+        "org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration",
+        "${configDocDir}/KernelControlCenterApplicationConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/KccSslConfigurationEntries.adoc",
-              "org.opentcs.kernelcontrolcenter.exchange.SslConfiguration"]
-    }
+        "org.opentcs.kernelcontrolcenter.exchange.SslConfiguration",
+        "${configDocDir}/KccSslConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/PlantOverviewApplicationConfigurationEntries.adoc",
-              "org.opentcs.guing.common.util.PlantOverviewApplicationConfiguration"]
-    }
+        "org.opentcs.guing.common.util.PlantOverviewApplicationConfiguration",
+        "${configDocDir}/PlantOverviewApplicationConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/PoSslConfigurationEntries.adoc",
-              "org.opentcs.guing.common.exchange.SslConfiguration"]
-    }
+        "org.opentcs.guing.common.exchange.SslConfiguration",
+        "${configDocDir}/PoSslConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/PlantOverviewModelingApplicationConfigurationEntries.adoc",
-              "org.opentcs.modeleditor.util.PlantOverviewModelingApplicationConfiguration"]
-    }
+        "org.opentcs.modeleditor.util.PlantOverviewModelingApplicationConfiguration",
+        "${configDocDir}/PlantOverviewModelingApplicationConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/PO_ElementNamingSchemeConfigurationEntries.adoc",
-              "org.opentcs.modeleditor.util.ElementNamingSchemeConfiguration"]
-    }
+        "org.opentcs.modeleditor.util.ElementNamingSchemeConfiguration",
+        "${configDocDir}/PO_ElementNamingSchemeConfigurationEntries.adoc",
 
-    javaexec {
-      classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
-      args = ["${configDocDir}/PlantOverviewOperatingApplicationConfigurationEntries.adoc",
-              "org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfiguration"]
+        "org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfiguration",
+        "${configDocDir}/PlantOverviewOperatingApplicationConfigurationEntries.adoc"
+      ]
     }
   }
 }

@@ -72,6 +72,7 @@ distZip {
 }
 
 distTar {
+  enabled = false
   classifier = 'bin'
   dependsOn subDists
   compression = Compression.GZIP

@@ -39,76 +39,68 @@ public class ConfigDocGenerator {
   /**
    * Generates a file documenting an application's configuration entries.
    *
-   * @param args The first argument is expected to be the name of the file to write the
-   * documentation to. The second argument is expected to be the fully qualified name of the
-   * configuration interface.
+   * @param args The arguments are expected to be pairs of (1) the fully qualified name of a
+   * configuration interface and (2) the name of a file to write the documentation to.
    * @throws Exception In case there was a problem processing the input.
    */
   public static void main(String[] args)
       throws Exception {
-    checkArgument(args.length >= 2,
-                  "Expected at least 2 arguments, got %s.",
-                  args.length);
+    checkArgument(args.length >= 2, "Expected at least 2 arguments, got %d.", args.length);
+    checkArgument(args.length % 2 == 0, "Expected even number of arguments, got %d.", args.length);
 
-    for (int i = 1; i < args.length; i++) {
-      Class<?> clazz = ConfigDocGenerator.class.getClassLoader().loadClass(args[1]);
-
-      SortedSet<Entry> configurationEntries = new TreeSet<>();
-      for (Method method : clazz.getMethods()) {
-        configurationEntries.add(extractEntry(method));
-      }
-
-      checkArgument(!configurationEntries.isEmpty(),
-                    "No configuration keys in {}.",
-                    clazz.getName());
-
-      generateFile(args[0], extractPrefix(clazz), configurationEntries);
+    for (int i = 0; i < args.length; i += 2) {
+      processConfigurationInterface(args[i], args[i + 1]);
     }
+  }
+
+  private static void processConfigurationInterface(String className, String outputFilePath)
+      throws ClassNotFoundException {
+    Class<?> clazz = ConfigDocGenerator.class.getClassLoader().loadClass(className);
+
+    SortedSet<Entry> configurationEntries = new TreeSet<>();
+    for (Method method : clazz.getMethods()) {
+      configurationEntries.add(extractEntry(method));
+    }
+
+    checkArgument(!configurationEntries.isEmpty(),
+                  "No configuration keys in {}.",
+                  clazz.getName());
+
+    generateFile(outputFilePath, extractPrefix(clazz), configurationEntries);
   }
 
   private static String extractPrefix(Class<?> clazz) {
-    ConfigurationPrefix newAnnotation = clazz.getAnnotation(ConfigurationPrefix.class);
-    if (newAnnotation != null) {
-      return newAnnotation.value();
-    }
-    ConfigurationPrefix oldAnnotation = clazz.getAnnotation(ConfigurationPrefix.class);
-    if (oldAnnotation != null) {
-      return oldAnnotation.value();
-    }
-    throw new IllegalArgumentException("Missing prefix annotation at class " + clazz.getName());
+    ConfigurationPrefix annotation = clazz.getAnnotation(ConfigurationPrefix.class);
+    checkArgument(annotation != null, "Missing prefix annotation at class %s", clazz.getName());
+    return annotation.value();
   }
 
   private static Entry extractEntry(Method method) {
-    ConfigurationEntry newAnnotation = method.getAnnotation(ConfigurationEntry.class);
-    if (newAnnotation != null) {
-      return new Entry(method.getName(),
-                       newAnnotation.type(),
-                       newAnnotation.description(),
-                       newAnnotation.orderKey());
-    }
-    ConfigurationEntry oldAnnotation = method.getAnnotation(ConfigurationEntry.class);
-    if (oldAnnotation != null) {
-      return new Entry(method.getName(),
-                       oldAnnotation.type(),
-                       oldAnnotation.description(),
-                       oldAnnotation.orderKey());
-    }
-    throw new IllegalArgumentException("Missing entry annotation at method " + method.getName());
+    ConfigurationEntry annotation = method.getAnnotation(ConfigurationEntry.class);
+    checkArgument(annotation != null, "Missing entry annotation at method %s", method.getName());
+    return new Entry(method.getName(),
+                     annotation.type(),
+                     annotation.description(),
+                     annotation.orderKey());
   }
 
   /**
    * Writes the configurationEntries to a file using AsciiDoc syntax for a table.
    *
-   * @param filePath The output file path to wirte to.
-   * @param configurationPrefix The prefix of the configuration entries.
-   * @param configurationEntries The set of all configuration entries.
+   * @param outputFilePath The output file path to write to.
+   * @param configurationPrefix The configuration entries' prefix.
+   * @param configurationEntries The configuration entries.
    */
-  private static void generateFile(String filePath,
+  private static void generateFile(String outputFilePath,
                                    String configurationPrefix,
                                    Collection<Entry> configurationEntries) {
-    try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, true))) {
+    try (PrintWriter writer = new PrintWriter(new FileWriter(outputFilePath, true))) {
       writeTableHeader(writer, configurationPrefix);
-      configurationEntries.forEach(entry -> writeTableContent(writer, entry));
+
+      for (Entry entry : configurationEntries) {
+        writeTableContent(writer, entry);
+      }
+
       writer.println("|===");
       writer.println();
     }
