@@ -1,7 +1,7 @@
 apply plugin: 'java-library'
 apply plugin: 'jacoco'
 
-archivesBaseName = name.toLowerCase()
+base.archivesName = name.toLowerCase()
 
 repositories {
   mavenLocal()
@@ -19,6 +19,7 @@ dependencies {
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.0'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.10.0'
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.0'
+  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.9.3'
 
   testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.5.0'
@@ -51,7 +52,7 @@ javadoc {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates a jar from the source files.') {
-  classifier = 'sources'
+  archiveClassifier = 'sources'
   from sourceSets.main.allSource
 }
 

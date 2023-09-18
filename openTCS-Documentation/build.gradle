@@ -232,7 +232,7 @@ task configdocgen {
 
     javaexec {
       classpath configurations.configdocgen
-      main = "org.opentcs.documentation.ConfigDocGenerator"
+      mainClass = "org.opentcs.documentation.ConfigDocGenerator"
       args = [
         "org.opentcs.kernel.KernelApplicationConfiguration",
         "${configDocDir}/KernelApplicationConfigurationEntries.adoc",
