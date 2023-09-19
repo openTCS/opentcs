@@ -39,6 +39,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Show a vehicle's destination in the vehicles panel in the Operations Desk application in cases where the vehicle is processing a transport order with a destination location.
 ** Show the correct title in the order sequence details panel in the Operations Desk application.
 ** Properly handle resources for withdrawn orders, fixing an issue where a vehicle would still wait for a pending resource allocation with the transport order remaining in state `WITHDRAWN`.
+** Properly handle situations in which vehicles are rerouted more than once during a single drive order, fixing an issue where routes would otherwise not be considered continuous.
 * Changes affecting developers:
 ** Removed documentation for server side web API errors (code 500).
 ** Introduce data structure `Pose` in the Java API, and use it to replace and deprecate the previously separate position and orientation angle members in `Point` and `PointCreationTO`.

@@ -52,6 +52,7 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.ProcessModelEvent;
+import static org.opentcs.kernel.vehicles.MovementComparisons.equalsInMovement;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.ExplainedBoolean;
@@ -447,47 +448,48 @@ public class DefaultVehicleController
 
     int lastCommandExecutedRouteIndex = getLastCommandExecutedRouteIndex();
     if (lastCommandExecutedRouteIndex == Vehicle.ROUTE_INDEX_DEFAULT) {
-      LOG.debug("{}: No route progress, yet. Considering drive orders continuous.",
-                vehicle.getName());
+      LOG.debug("{}: Drive orders continuous: No route progress, yet.", vehicle.getName());
       return true;
     }
 
     List<Step> oldSteps = oldOrder.getRoute().getSteps();
     List<Step> newSteps = newOrder.getRoute().getSteps();
 
+    // Compare already processed steps (up to and including the last executed command) for equality.
     List<Step> oldProcessedSteps = oldSteps.subList(0, lastCommandExecutedRouteIndex + 1);
     List<Step> newProcessedSteps = newSteps.subList(0, lastCommandExecutedRouteIndex + 1);
-    LOG.debug("{}: Comparing steps up to the last executed command for equality: {} and {}",
+    LOG.debug("{}: Comparing already processed steps for equality: {} (old) and {} (new)",
               vehicle.getName(),
               oldProcessedSteps,
               newProcessedSteps);
-    if (!Objects.equals(oldProcessedSteps, newProcessedSteps)) {
-      LOG.debug("{}: Steps are not equal. Not considering drive orders continuous.",
+    if (!equalsInMovement(oldProcessedSteps, newProcessedSteps)) {
+      LOG.debug("{}: Drive orders not continuous: Mismatching old and new processed steps.",
                 vehicle.getName());
       return false;
     }
 
     if (isForcedRerouting(newOrder)) {
-      LOG.debug("{}: New order with forced rerouting. Considering drive orders continuous.",
-                vehicle.getName());
+      LOG.debug("{}: Drive orders continuous: New order with forced rerouting.", vehicle.getName());
       return true;
     }
 
+    // Compare pending steps (after the last executed command) for equality.
     int futureOrCurrentPositionIndex = getFutureOrCurrentPositionIndex();
     List<Step> oldPendingSteps = oldSteps.subList(lastCommandExecutedRouteIndex + 1,
                                                   futureOrCurrentPositionIndex + 1);
     List<Step> newPendingSteps = newSteps.subList(lastCommandExecutedRouteIndex + 1,
                                                   futureOrCurrentPositionIndex + 1);
-    LOG.debug("{}: Comparing pending steps for equality: {} and {} ",
+    LOG.debug("{}: Comparing pending steps for equality: {} (old) and {} (new)",
               vehicle.getName(),
               oldPendingSteps,
-              oldPendingSteps);
-    if (!Objects.equals(oldPendingSteps, newPendingSteps)) {
-      LOG.debug("{}: Steps are not equal. Not considering drive orders continuous.",
+              newPendingSteps);
+    if (!equalsInMovement(oldPendingSteps, newPendingSteps)) {
+      LOG.debug("{}: Drive orders not continuous: Mismatching old and new pending steps.",
                 vehicle.getName());
       return false;
     }
 
+    LOG.debug("{}: Drive orders continuous.", vehicle.getName());
     return true;
   }
 
@@ -1280,7 +1282,7 @@ public class DefaultVehicleController
           .orElse(lastCommandExecuted);
 
       futureMovementCommands = futureMovementCommands.stream()
-          .dropWhile(command -> !Objects.equals(command, lastCommandedCommand))
+          .dropWhile(command -> !equalsInMovement(command, lastCommandedCommand))
           .skip(1)
           .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -1299,7 +1301,7 @@ public class DefaultVehicleController
       return false;
     }
 
-    // If it's a forced rerouting, the step after the one the vehicle executed last shoud be marked
+    // If it's a forced rerouting, the step after the one the vehicle executed last should be marked
     // accordingly.
     Step nextPendingStep = newOrder.getRoute().getSteps().get(lastCommandExecutedRouteIndex + 1);
     if (nextPendingStep.getReroutingType() == ReroutingType.FORCED) {
