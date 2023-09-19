@@ -14,8 +14,9 @@ import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
-import static org.opentcs.util.Assertions.checkArgument;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a point in the plant model.
@@ -25,15 +26,9 @@ public class PointCreationTO
     implements Serializable {
 
   /**
-   * This point's position (in mm).
+   * The pose of the vehicle at this point.
    */
-  @Nonnull
-  private final Triple position;
-  /**
-   * The vehicle's (assumed) orientation angle (-360..360) when it is at this position.
-   * May be Double.NaN if an orientation angle is not defined for this point.
-   */
-  private final double vehicleOrientationAngle;
+  private final Pose pose;
   /**
    * This point's type.
    */
@@ -51,21 +46,18 @@ public class PointCreationTO
    */
   public PointCreationTO(@Nonnull String name) {
     super(name);
-    this.position = new Triple(0, 0, 0);
-    this.vehicleOrientationAngle = Double.NaN;
+    this.pose = new Pose(new Triple(0, 0, 0), Double.NaN);
     this.type = Point.Type.HALT_POSITION;
     this.layout = new Layout();
   }
 
   private PointCreationTO(@Nonnull String name,
                           @Nonnull Map<String, String> properties,
-                          @Nonnull Triple position,
-                          double vehicleOrientationAngle,
+                          @Nonnull Pose pose,
                           @Nonnull Point.Type type,
                           @Nonnull Layout layout) {
     super(name, properties);
-    this.position = requireNonNull(position, "position");
-    this.vehicleOrientationAngle = vehicleOrientationAngle;
+    this.pose = requireNonNull(pose, "pose");
     this.type = requireNonNull(type, "type");
     this.layout = requireNonNull(layout, "layout");
   }
@@ -80,8 +72,31 @@ public class PointCreationTO
   public PointCreationTO withName(@Nonnull String name) {
     return new PointCreationTO(name,
                                getModifiableProperties(),
-                               position,
-                               vehicleOrientationAngle,
+                               pose,
+                               type,
+                               layout);
+  }
+
+  /**
+   * Returns the pose of the vehicle at this point.
+   *
+   * @return The pose of the vehicle at this point.
+   */
+  @Nonnull
+  public Pose getPose() {
+    return pose;
+  }
+
+  /**
+   * Creates a copy of this object with the given pose.
+   *
+   * @param pose The new pose.
+   * @return A copy of this object, differing in the given position.
+   */
+  public PointCreationTO withPose(@Nonnull Pose pose) {
+    return new PointCreationTO(getName(),
+                               getModifiableProperties(),
+                               pose,
                                type,
                                layout);
   }
@@ -90,10 +105,13 @@ public class PointCreationTO
    * Returns the position of this point (in mm).
    *
    * @return The position of this point (in mm).
+   * @deprecated Use {@link #getPose()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   @Nonnull
   public Triple getPosition() {
-    return position;
+    return pose.getPosition();
   }
 
   /**
@@ -101,12 +119,14 @@ public class PointCreationTO
    *
    * @param position The new position.
    * @return A copy of this object, differing in the given position.
+   * @deprecated Use {@link #withPose(org.opentcs.data.model.Pose)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public PointCreationTO withPosition(@Nonnull Triple position) {
     return new PointCreationTO(getName(),
                                getModifiableProperties(),
-                               position,
-                               vehicleOrientationAngle,
+                               pose.withPosition(position),
                                type,
                                layout);
   }
@@ -116,9 +136,12 @@ public class PointCreationTO
    * (-360..360, or {@code Double.NaN}, if an orientation angle is not specified for this point.)
    *
    * @return The vehicle's orientation angle when it's at this position.
+   * @deprecated Use {@link #getPose()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public double getVehicleOrientationAngle() {
-    return vehicleOrientationAngle;
+    return pose.getOrientationAngle();
   }
 
   /**
@@ -129,18 +152,14 @@ public class PointCreationTO
    *
    * @param vehicleOrientationAngle The new angle.
    * @return A copy of this object, differing in the given angle.
+   * @deprecated Use {@link #withPose(org.opentcs.data.model.Pose)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public PointCreationTO withVehicleOrientationAngle(double vehicleOrientationAngle) {
-    checkArgument(
-        Double.isNaN(vehicleOrientationAngle)
-        || vehicleOrientationAngle >= -360.0
-        || vehicleOrientationAngle <= 360.0,
-        "vehicleOrientationAngle not in [-360..360]: " + vehicleOrientationAngle
-    );
     return new PointCreationTO(getName(),
                                getModifiableProperties(),
-                               position,
-                               vehicleOrientationAngle,
+                               pose.withOrientationAngle(vehicleOrientationAngle),
                                type,
                                layout);
   }
@@ -164,8 +183,7 @@ public class PointCreationTO
   public PointCreationTO withType(@Nonnull Point.Type type) {
     return new PointCreationTO(getName(),
                                getProperties(),
-                               position,
-                               vehicleOrientationAngle,
+                               pose,
                                type,
                                layout);
   }
@@ -180,8 +198,7 @@ public class PointCreationTO
   public PointCreationTO withProperties(@Nonnull Map<String, String> properties) {
     return new PointCreationTO(getName(),
                                properties,
-                               position,
-                               vehicleOrientationAngle,
+                               pose,
                                type,
                                layout);
   }
@@ -200,8 +217,7 @@ public class PointCreationTO
   public PointCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
     return new PointCreationTO(getName(),
                                propertiesWith(key, value),
-                               position,
-                               vehicleOrientationAngle,
+                               pose,
                                type,
                                layout);
   }
@@ -224,8 +240,7 @@ public class PointCreationTO
   public PointCreationTO withLayout(Layout layout) {
     return new PointCreationTO(getName(),
                                getModifiableProperties(),
-                               position,
-                               vehicleOrientationAngle,
+                               pose,
                                type,
                                layout);
   }
@@ -234,8 +249,7 @@ public class PointCreationTO
   public String toString() {
     return "PointCreationTO{"
         + "name=" + getName()
-        + ", position=" + position
-        + ", vehicleOrientationAngle=" + vehicleOrientationAngle
+        + ", pose=" + pose
         + ", type=" + type
         + ", layout=" + layout
         + ", properties=" + getProperties()

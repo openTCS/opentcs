@@ -16,10 +16,10 @@ import java.util.Set;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
-import static org.opentcs.util.Assertions.checkArgument;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
- * Describes a position in the driving course at which a {@link Vehicle} may be located.
+ * A point in the driving course at which a {@link Vehicle} may be located.
  *
  * @see Path
  */
@@ -28,19 +28,13 @@ public class Point
     implements Serializable {
 
   /**
-   * This point's coordinates in mm.
+   * The pose of the vehicle at this point.
    */
-  private final Triple position;
+  private final Pose pose;
   /**
    * This point's type.
    */
   private final Type type;
-  /**
-   * The vehicle's (assumed) orientation angle (-360..360) when it is at this
-   * position.
-   * May be Double.NaN if an orientation angle is not defined for this point.
-   */
-  private final double vehicleOrientationAngle;
   /**
    * A set of references to paths ending in this point.
    */
@@ -69,9 +63,8 @@ public class Point
    */
   public Point(String name) {
     super(name);
-    this.position = new Triple(0, 0, 0);
+    this.pose = new Pose(new Triple(0, 0, 0), Double.NaN);
     this.type = Type.HALT_POSITION;
-    this.vehicleOrientationAngle = Double.NaN;
     this.incomingPaths = new HashSet<>();
     this.outgoingPaths = new HashSet<>();
     this.attachedLinks = new HashSet<>();
@@ -82,22 +75,16 @@ public class Point
   private Point(String name,
                 Map<String, String> properties,
                 ObjectHistory history,
-                Triple position,
+                Pose pose,
                 Type type,
-                double vehicleOrientationAngle,
                 Set<TCSObjectReference<Path>> incomingPaths,
                 Set<TCSObjectReference<Path>> outgoingPaths,
                 Set<Location.Link> attachedLinks,
                 TCSObjectReference<Vehicle> occupyingVehicle,
                 Layout layout) {
     super(name, properties, history);
-    this.position = requireNonNull(position, "position");
+    this.pose = requireNonNull(pose, "pose");
     this.type = requireNonNull(type, "type");
-    checkArgument(Double.isNaN(vehicleOrientationAngle)
-        || (vehicleOrientationAngle >= -360.0 && vehicleOrientationAngle <= 360.0),
-                  "angle not in [-360..360]: %s",
-                  vehicleOrientationAngle);
-    this.vehicleOrientationAngle = vehicleOrientationAngle;
     this.incomingPaths = setWithoutNullValues(requireNonNull(incomingPaths, "incomingPaths"));
     this.outgoingPaths = setWithoutNullValues(requireNonNull(outgoingPaths, "outgoingPaths"));
     this.attachedLinks = setWithoutNullValues(requireNonNull(attachedLinks, "attachedLinks"));
@@ -110,9 +97,8 @@ public class Point
     return new Point(getName(),
                      propertiesWith(key, value),
                      getHistory(),
-                     position,
+                     pose,
                      type,
-                     vehicleOrientationAngle,
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
@@ -125,9 +111,8 @@ public class Point
     return new Point(getName(),
                      properties,
                      getHistory(),
-                     position,
+                     pose,
                      type,
-                     vehicleOrientationAngle,
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
@@ -140,9 +125,8 @@ public class Point
     return new Point(getName(),
                      getProperties(),
                      getHistory().withEntryAppended(entry),
-                     position,
+                     pose,
                      type,
-                     vehicleOrientationAngle,
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
@@ -155,9 +139,36 @@ public class Point
     return new Point(getName(),
                      getProperties(),
                      history,
-                     position,
+                     pose,
                      type,
-                     vehicleOrientationAngle,
+                     incomingPaths,
+                     outgoingPaths,
+                     attachedLinks,
+                     occupyingVehicle,
+                     layout);
+  }
+
+  /**
+   * Returns the pose of the vehicle at this point.
+   *
+   * @return The pose of the vehicle at this point.
+   */
+  public Pose getPose() {
+    return pose;
+  }
+
+  /**
+   * Creates a copy of this object, with the given pose.
+   *
+   * @param pose The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Point withPose(Pose pose) {
+    return new Point(getName(),
+                     getProperties(),
+                     getHistory(),
+                     pose,
+                     type,
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
@@ -169,9 +180,12 @@ public class Point
    * Returns the physical coordinates of this point in mm.
    *
    * @return The physical coordinates of this point in mm.
+   * @deprecated Use {@link #getPose()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public Triple getPosition() {
-    return position;
+    return pose.getPosition();
   }
 
   /**
@@ -179,14 +193,16 @@ public class Point
    *
    * @param position The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withPose(org.opentcs.data.model.Pose)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public Point withPosition(Triple position) {
     return new Point(getName(),
                      getProperties(),
                      getHistory(),
-                     position,
+                     pose.withPosition(position),
                      type,
-                     vehicleOrientationAngle,
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
@@ -200,9 +216,12 @@ public class Point
    * specified for this point.)
    *
    * @return The vehicle's orientation angle when it's at this position.
+   * @deprecated Use {@link #getPose()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public double getVehicleOrientationAngle() {
-    return vehicleOrientationAngle;
+    return pose.getOrientationAngle();
   }
 
   /**
@@ -210,14 +229,16 @@ public class Point
    *
    * @param vehicleOrientationAngle The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withPose(org.opentcs.data.model.Pose)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public Point withVehicleOrientationAngle(double vehicleOrientationAngle) {
     return new Point(getName(),
                      getProperties(),
                      getHistory(),
-                     position,
+                     pose.withOrientationAngle(vehicleOrientationAngle),
                      type,
-                     vehicleOrientationAngle,
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
@@ -244,9 +265,8 @@ public class Point
     return new Point(getName(),
                      getProperties(),
                      getHistory(),
-                     position,
+                     pose,
                      type,
-                     vehicleOrientationAngle,
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
@@ -303,9 +323,8 @@ public class Point
     return new Point(getName(),
                      getProperties(),
                      getHistory(),
-                     position,
+                     pose,
                      type,
-                     vehicleOrientationAngle,
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
@@ -332,9 +351,8 @@ public class Point
     return new Point(getName(),
                      getProperties(),
                      getHistory(),
-                     position,
+                     pose,
                      type,
-                     vehicleOrientationAngle,
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
@@ -361,9 +379,8 @@ public class Point
     return new Point(getName(),
                      getProperties(),
                      getHistory(),
-                     position,
+                     pose,
                      type,
-                     vehicleOrientationAngle,
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
@@ -390,9 +407,8 @@ public class Point
     return new Point(getName(),
                      getProperties(),
                      getHistory(),
-                     position,
+                     pose,
                      type,
-                     vehicleOrientationAngle,
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,
@@ -419,9 +435,8 @@ public class Point
     return new Point(getName(),
                      getProperties(),
                      getHistory(),
-                     position,
+                     pose,
                      type,
-                     vehicleOrientationAngle,
                      incomingPaths,
                      outgoingPaths,
                      attachedLinks,

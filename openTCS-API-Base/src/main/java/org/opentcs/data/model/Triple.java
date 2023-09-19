@@ -18,15 +18,15 @@ public class Triple
   /**
    * The X coordinate.
    */
-  private long x;
+  private final long x;
   /**
    * The Y coordinate.
    */
-  private long y;
+  private final long y;
   /**
    * The Z coordinate.
    */
-  private long z;
+  private final long z;
 
   /**
    * Creates a new Triple with the given values.
@@ -72,6 +72,9 @@ public class Triple
   public boolean equals(Object obj) {
     if (!(obj instanceof Triple)) {
       return false;
+    }
+    if (this == obj) {
+      return true;
     }
     Triple other = (Triple) obj;
     if (this.x != other.x) {

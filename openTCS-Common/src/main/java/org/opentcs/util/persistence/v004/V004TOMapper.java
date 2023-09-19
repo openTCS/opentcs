@@ -30,6 +30,7 @@ import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.visualization.Layer;
 import org.opentcs.data.model.visualization.LayerGroup;
@@ -104,10 +105,12 @@ public class V004TOMapper {
     for (PointTO point : points) {
       result.add(
           new PointCreationTO(point.getName())
-              .withPosition(new Triple(point.getxPosition(),
-                                       point.getyPosition(),
-                                       point.getzPosition()))
-              .withVehicleOrientationAngle(point.getVehicleOrientationAngle().doubleValue())
+              .withPose(
+                  new Pose(
+                      new Triple(point.getxPosition(), point.getyPosition(), point.getzPosition()),
+                      point.getVehicleOrientationAngle().doubleValue()
+                  )
+              )
               .withType(Point.Type.valueOf(point.getType()))
               .withProperties(convertProperties(point.getProperties()))
               .withLayout(
@@ -350,9 +353,9 @@ public class V004TOMapper {
     for (PointCreationTO point : points) {
       PointTO pointTO = new PointTO();
       pointTO.setName(point.getName());
-      pointTO.setxPosition(point.getPosition().getX())
-          .setyPosition(point.getPosition().getY())
-          .setVehicleOrientationAngle((float) point.getVehicleOrientationAngle())
+      pointTO.setxPosition(point.getPose().getPosition().getX())
+          .setyPosition(point.getPose().getPosition().getY())
+          .setVehicleOrientationAngle((float) point.getPose().getOrientationAngle())
           .setType(point.getType().name())
           .setOutgoingPaths(getOutgoingPaths(point, paths))
           .setPointLayout(new PointTO.PointLayout()

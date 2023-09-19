@@ -39,14 +39,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Show a vehicle's destination in the vehicles panel in the Operations Desk application in cases where the vehicle is processing a transport order with a destination location.
 ** Show the correct title in the order sequence details panel in the Operations Desk application.
 ** Properly handle resources for withdrawn orders, fixing an issue where a vehicle would still wait for a pending resource allocation with the transport order remaining in state `WITHDRAWN`.
-* Other changes:
-** The peripheral jobs panel in the Operations Desk application will now always be shown.
-   The option to enable or disable it via the configuration file has been removed.
-** Rename peripheral operation execution trigger `BEFORE_MOVEMENT` to `AFTER_ALLOCATION`, as this name reflects better when the operation is actually triggered.
-   The previous name is deprecated but may still be used; it will implicitly be converted to the new name.
+* Changes affecting developers:
 ** Removed documentation for server side web API errors (code 500).
-** Sync points' layout and model coordinates in the demo plant model.
-** Adjust resource management and let a vehicle claim and allocate the destination location(s) of its transport order in addition to points and paths along its route.
+** Introduce data structure `Pose` in the Java API, and use it to replace and deprecate the previously separate position and orientation angle members in `Point` and `PointCreationTO`.
 ** Update Gradle wrapper to 8.3.
 ** Update Jackson to 2.15.2.
 ** Update JAXB Runtime to 2.3.8.
@@ -56,6 +51,13 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update ApprovalTests to 19.0.0.
 ** Update Checkstyle to 10.12.3.
 ** Update JaCoCo log plugin to 3.1.0.
+* Other changes:
+** The peripheral jobs panel in the Operations Desk application will now always be shown.
+   The option to enable or disable it via the configuration file has been removed.
+** Rename peripheral operation execution trigger `BEFORE_MOVEMENT` to `AFTER_ALLOCATION`, as this name reflects better when the operation is actually triggered.
+   The previous name is deprecated but may still be used; it will implicitly be converted to the new name.
+** Sync points' layout and model coordinates in the demo plant model.
+** Adjust resource management and let a vehicle claim and allocate the destination location(s) of its transport order in addition to points and paths along its route.
 
 == Version 5.9 (2023-05-31)
 

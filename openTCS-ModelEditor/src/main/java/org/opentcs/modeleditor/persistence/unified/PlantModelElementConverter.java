@@ -59,12 +59,12 @@ public class PlantModelElementConverter {
 
     model.setName(pointTO.getName());
 
-    model.getPropertyModelPositionX().setValueAndUnit(pointTO.getPosition().getX(),
+    model.getPropertyModelPositionX().setValueAndUnit(pointTO.getPose().getPosition().getX(),
                                                       LengthProperty.Unit.MM);
-    model.getPropertyModelPositionY().setValueAndUnit(pointTO.getPosition().getY(),
+    model.getPropertyModelPositionY().setValueAndUnit(pointTO.getPose().getPosition().getY(),
                                                       LengthProperty.Unit.MM);
     model.getPropertyVehicleOrientationAngle().setValueAndUnit(
-        pointTO.getVehicleOrientationAngle(),
+        pointTO.getPose().getOrientationAngle(),
         AngleProperty.Unit.DEG
     );
     model.getPropertyType().setValue(mapPointType(pointTO.getType()));

@@ -33,6 +33,7 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.PlantModel;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
@@ -266,11 +267,11 @@ public class PlantModelHandler {
   private List<PointTO> toPointTOs(Set<Point> points) {
     return points.stream()
         .map(point -> new PointTO(point.getName())
-        .setPosition(new TripleTO(point.getPosition().getX(),
-                                  point.getPosition().getY(),
-                                  point.getPosition().getZ()))
+        .setPosition(new TripleTO(point.getPose().getPosition().getX(),
+                                  point.getPose().getPosition().getY(),
+                                  point.getPose().getPosition().getZ()))
         .setType(point.getType().name())
-        .setVehicleOrientationAngle(point.getVehicleOrientationAngle())
+        .setVehicleOrientationAngle(point.getPose().getOrientationAngle())
         .setProperties(toPropertyTOs(point.getProperties()))
         .setLayout(new PointTO.Layout()
             .setLabelOffset(new CoupleTO(point.getLayout().getLabelOffset().getX(),
@@ -287,17 +288,22 @@ public class PlantModelHandler {
         .map(
             point -> new PointCreationTO(point.getName())
                 .withProperties(toPropertyMap(point.getProperties()))
-                .withPosition(new Triple(point.getPosition().getX(),
-                                         point.getPosition().getY(),
-                                         point.getPosition().getZ()))
-                .withVehicleOrientationAngle(point.getVehicleOrientationAngle())
+                .withPose(
+                    new Pose(
+                        new Triple(point.getPosition().getX(),
+                                   point.getPosition().getY(),
+                                   point.getPosition().getZ()),
+                        point.getVehicleOrientationAngle()
+                    )
+                )
                 .withType(Point.Type.valueOf(point.getType()))
                 .withLayout(new PointCreationTO.Layout(
                     new Couple(point.getLayout().getPosition().getX(),
                                point.getLayout().getPosition().getY()),
                     new Couple(point.getLayout().getLabelOffset().getX(),
                                point.getLayout().getLabelOffset().getY()),
-                    point.getLayout().getLayerId())))
+                    point.getLayout().getLayerId()))
+        )
         .collect(Collectors.toCollection(ArrayList::new));
 
   }

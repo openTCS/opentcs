@@ -42,6 +42,7 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
@@ -856,8 +857,12 @@ public class PlantModelManager
     for (Point curPoint : points) {
       result.add(
           new PointCreationTO(curPoint.getName())
-              .withPosition(curPoint.getPosition())
-              .withVehicleOrientationAngle(curPoint.getVehicleOrientationAngle())
+              .withPose(
+                  new Pose(
+                      curPoint.getPose().getPosition(),
+                      curPoint.getPose().getOrientationAngle()
+                  )
+              )
               .withType(curPoint.getType())
               .withProperties(curPoint.getProperties())
               .withLayout(new PointCreationTO.Layout(curPoint.getLayout().getPosition(),
@@ -1105,9 +1110,8 @@ public class PlantModelManager
       throws ObjectExistsException {
     // Get a unique ID for the new point and create an instance.
     Point newPoint = new Point(to.getName())
-        .withPosition(to.getPosition())
+        .withPose(new Pose(to.getPose().getPosition(), to.getPose().getOrientationAngle()))
         .withType(to.getType())
-        .withVehicleOrientationAngle(to.getVehicleOrientationAngle())
         .withProperties(to.getProperties())
         .withLayout(new Point.Layout(to.getLayout().getPosition(),
                                      to.getLayout().getLabelOffset(),

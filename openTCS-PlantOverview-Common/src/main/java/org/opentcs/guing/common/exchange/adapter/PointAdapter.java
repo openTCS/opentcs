@@ -14,6 +14,7 @@ import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
 import org.opentcs.guing.base.components.layer.LayerWrapper;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
@@ -48,12 +49,12 @@ public class PointAdapter
     model.getPropertyName().setText(point.getName());
 
     // Position in model
-    model.getPropertyModelPositionX().setValueAndUnit(point.getPosition().getX(),
+    model.getPropertyModelPositionX().setValueAndUnit(point.getPose().getPosition().getX(),
                                                       LengthProperty.Unit.MM);
-    model.getPropertyModelPositionY().setValueAndUnit(point.getPosition().getY(),
+    model.getPropertyModelPositionY().setValueAndUnit(point.getPose().getPosition().getY(),
                                                       LengthProperty.Unit.MM);
     model.getPropertyVehicleOrientationAngle()
-        .setValueAndUnit(point.getVehicleOrientationAngle(), AngleProperty.Unit.DEG);
+        .setValueAndUnit(point.getPose().getOrientationAngle(), AngleProperty.Unit.DEG);
 
     updateModelType(model, point);
     updateMiscModelProperties(model, point);
@@ -67,8 +68,12 @@ public class PointAdapter
     PlantModelCreationTO result = plantModel
         .withPoint(
             new PointCreationTO(modelComponent.getName())
-                .withPosition(getKernelCoordinates((PointModel) modelComponent))
-                .withVehicleOrientationAngle(getKernelVehicleAngle((PointModel) modelComponent))
+                .withPose(
+                    new Pose(
+                        getKernelCoordinates((PointModel) modelComponent),
+                        getKernelVehicleAngle((PointModel) modelComponent)
+                    )
+                )
                 .withType(getKernelPointType((PointModel) modelComponent))
                 .withProperties(getKernelProperties(modelComponent))
                 .withLayout(getLayout((PointModel) modelComponent))
