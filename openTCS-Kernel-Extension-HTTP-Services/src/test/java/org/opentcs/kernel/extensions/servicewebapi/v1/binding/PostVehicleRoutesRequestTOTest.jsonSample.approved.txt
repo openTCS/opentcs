@@ -1,0 +1,4 @@
+{
+  "destinationPoints" : [ "C", "F" ],
+  "sourcePoint" : "A"
+}

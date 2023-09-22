@@ -21,10 +21,12 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralAttac
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetTransportOrderResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleAttachmentInfoResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostOrderSequenceRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PlantModelTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import spark.QueryParamsMap;
 import spark.Request;
@@ -106,6 +108,8 @@ public class V1RequestHandler
                 this::handleGetEvents);
     service.post("/vehicles/dispatcher/trigger",
                  this::handlePostDispatcherTrigger);
+    service.post("/vehicles/:NAME/routeComputationQuery",
+                this::handleGetVehicleRoutes);
     service.put("/vehicles/:NAME/commAdapter/attachment",
                 this::handlePutVehicleCommAdapterAttachment);
     service.get("/vehicles/:NAME/commAdapter/attachmentInformation",
@@ -209,6 +213,18 @@ public class V1RequestHandler
             request.params(":NAME")
         )
     )
+    );
+  }
+
+  private Object handleGetVehicleRoutes(Request request, Response response)
+      throws ObjectUnknownException, IllegalArgumentException {
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return jsonBinder.toJson(PostVehicleRoutesResponseTO.fromMap(
+            statusInformationProvider.getVehicleRoutes(
+                request.params(":NAME"),
+                jsonBinder.fromJson(request.body(), PostVehicleRoutesRequestTO.class)
+            )
+        )
     );
   }
 

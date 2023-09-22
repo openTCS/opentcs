@@ -758,6 +758,51 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/routeComputationQuery":
+    post:
+      tags:
+        - Vehicles
+      summary: Computes routes for the named vehicle to the given destination points.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoutesRequest"
+        description: The destination points and optional source point for the routes to be computed.
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoutesResponse"
+        "400":
+          description: The submitted request body is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: "Unknown source point: Point-X"
   /vehicles/dispatcher/trigger:
     post:
       tags:
@@ -2423,3 +2468,110 @@ components:
         - id
         - name
         - visible
+    Route:
+      title: Route
+      type: object
+      properties:
+        destinationPoint:
+          type: string
+          description: The computed route's destination point.
+          example: Point-A
+        costs:
+          type: integer
+          format: int64
+          description: The costs for the computed route, or `-1`, if no route could be computed.
+          example: 33475
+        steps:
+          type: array
+          description: >-
+            An array containing the computed route's steps, or `null`, if no route could be
+            computed.
+          items:
+            $ref: "#/components/schemas/Step"
+      required:
+        - destinationPoint
+        - costs
+        - steps
+    Step:
+      title: Single step of a route
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path to travel for this step.
+          example: Point-A --- Point-B
+        sourcePoint:
+          type: string
+          description: The source point for this step.
+          example: Point-A
+        destinationPoint:
+          type: string
+          description: The destination point for this step.
+          example: Point-B
+        vehicleOrientation:
+          type: string
+          default: UNDEFINED
+          enum:
+            - FORWARD
+            - BACKWARD
+            - UNDEFINED
+      required:
+        - destinationPoint
+        - vehicleOrientation
+    RoutesRequest:
+      title: Requested routes
+      type: object
+      properties:
+        sourcePoint:
+          type: string
+          description: >-
+            The (optional) starting point for route computation.
+            If `null` or not set, the vehicle's current position will be used.
+          example: Point-A
+        destinationPoints:
+          type: array
+          description: The destination point for each route to be computed.
+          example:
+            - Point-C
+            - Point-D
+            - Point-E
+      required:
+        - destinationPoints
+    RoutesResponse:
+      title: Computed routes for different destination points.
+      type: object
+      properties:
+        routes:
+          type: array
+          description: The list of computed routes.
+          items:
+            $ref: "#/components/schemas/Route"
+      required:
+        - Routes
+      example:
+        routes:
+          - destinationPoint: Point-C
+            costs: 77644
+            steps:
+              - path: Point-A --- Point-B
+                sourcePoint: Point-A
+                destinationPoint: Point-B
+                vehicleOrientation: FORWARD
+              - path: Point-B --- Point-C
+                sourcePoint: Point-B
+                destinationPoint: Point-C
+                vehicleOrientation: FORWARD
+          - destinationPoint: Point-D
+            costs: -1
+            steps: null
+          - destinationPoint: Point-E
+            costs: 67934
+            steps:
+              - path: Point-A --- Point-D
+                sourcePoint: Point-A
+                destinationPoint: Point-D
+                vehicleOrientation: FORWARD
+              - path: Point-D --- Point-E
+                sourcePoint: Point-D
+                destinationPoint: Point-E
+                vehicleOrientation: BACKWARD

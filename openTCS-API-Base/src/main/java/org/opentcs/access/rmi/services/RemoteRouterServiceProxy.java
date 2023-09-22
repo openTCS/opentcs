@@ -8,11 +8,16 @@
 package org.opentcs.access.rmi.services;
 
 import java.rmi.RemoteException;
+import java.util.Map;
+import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
+import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.Route;
 
 /**
  * The default implementation of the router service.
@@ -48,6 +53,25 @@ class RemoteRouterServiceProxy
 
     try {
       getRemoteService().updateRoutingTopology(getClientId());
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public Map<TCSObjectReference<Point>, Route> computeRoutes(
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<Point> sourcePointRef,
+      Set<TCSObjectReference<Point>> destinationPointRefs)
+      throws KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      return getRemoteService().computeRoutes(getClientId(),
+                                              vehicleRef,
+                                              sourcePointRef,
+                                              destinationPointRefs);
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

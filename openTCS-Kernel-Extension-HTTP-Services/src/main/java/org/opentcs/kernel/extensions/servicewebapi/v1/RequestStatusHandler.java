@@ -9,19 +9,25 @@ package org.opentcs.kernel.extensions.servicewebapi.v1;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.services.PeripheralService;
+import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
+import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
+import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
@@ -33,6 +39,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetOrderSequenceRe
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetTransportOrderResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.filter.OrderSequenceFilter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.filter.PeripheralJobFilter;
@@ -57,6 +64,10 @@ public class RequestStatusHandler {
    */
   private final VehicleService vehicleService;
   /**
+   * Used to get information about potential routes.
+   */
+  private final RouterService routerService;
+  /**
    * Executes calls via the kernel executor and waits for the outcome.
    */
   private final KernelExecutorWrapper executorWrapper;
@@ -73,10 +84,12 @@ public class RequestStatusHandler {
   public RequestStatusHandler(PeripheralService peripheralService,
                               TransportOrderService orderService,
                               VehicleService vehicleService,
+                              RouterService routerService,
                               KernelExecutorWrapper executorWrapper) {
     this.peripheralService = requireNonNull(peripheralService, "peripheralService");
     this.orderService = requireNonNull(orderService, "orderService");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
+    this.routerService = requireNonNull(routerService, "routerService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
   }
 
@@ -381,6 +394,50 @@ public class RequestStatusHandler {
       vehicleService.updateVehicleAllowedOrderTypes(
           vehicle.getReference(), new HashSet<>(allowedOrderTypes.getOrderTypes())
       );
+    });
+  }
+
+  public Map<TCSObjectReference<Point>, Route> getVehicleRoutes(String name,
+                                                                PostVehicleRoutesRequestTO request)
+      throws ObjectUnknownException {
+    requireNonNull(name, "name");
+    requireNonNull(request, "request");
+
+    return executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = orderService.fetchObject(Vehicle.class, name);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + name);
+      }
+
+      TCSObjectReference<Point> sourcePointRef;
+      if (request.getSourcePoint() == null) {
+        if (vehicle.getCurrentPosition() == null) {
+          throw new IllegalArgumentException("Unknown vehicle position: " + vehicle.getName());
+        }
+        sourcePointRef = vehicle.getCurrentPosition();
+      }
+      else {
+        Point sourcePoint = orderService.fetchObject(Point.class, request.getSourcePoint());
+        if (sourcePoint == null) {
+          throw new ObjectUnknownException("Unknown source point: " + request.getSourcePoint());
+        }
+        sourcePointRef = sourcePoint.getReference();
+      }
+
+      Set<TCSObjectReference<Point>> destinationPointRefs = request.getDestinationPoints()
+          .stream()
+          .map(destPointName -> {
+            Point destPoint = orderService.fetchObject(Point.class, destPointName);
+            if (destPoint == null) {
+              throw new ObjectUnknownException("Unknown destination point: " + destPoint);
+            }
+            return destPoint.getReference();
+          })
+          .collect(Collectors.toSet());
+
+      return routerService.computeRoutes(vehicle.getReference(),
+                                         sourcePointRef,
+                                         destinationPointRefs);
     });
   }
 

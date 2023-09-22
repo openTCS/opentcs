@@ -9,10 +9,15 @@ package org.opentcs.access.rmi.services;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Map;
+import java.util.Set;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
+import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.Route;
 
 /**
  * Declares the methods provided by the {@link RouterService} via RMI.
@@ -36,6 +41,13 @@ public interface RemoteRouterService
       throws RemoteException;
 
   public void updateRoutingTopology(ClientID clientId)
+      throws RemoteException;
+
+  public Map<TCSObjectReference<Point>, Route> computeRoutes(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<Point> sourcePointRef,
+      Set<TCSObjectReference<Point>> destinationPointRefs)
       throws RemoteException;
   // CHECKSTYLE:ON
 }

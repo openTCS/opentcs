@@ -11,7 +11,9 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import javax.inject.Inject;
@@ -23,6 +25,9 @@ import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
+import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,6 +172,25 @@ public class StandardRemoteRouterService
 
     try {
       kernelExecutor.submit(() -> routerService.updateRoutingTopology()).get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
+
+  @Override
+  public Map<TCSObjectReference<Point>, Route> computeRoutes(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<Point> sourcePointRef,
+      Set<TCSObjectReference<Point>> destinationPointRefs) {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
+
+    try {
+      return kernelExecutor.submit(() -> routerService.computeRoutes(vehicleRef,
+                                                                     sourcePointRef,
+                                                                     destinationPointRefs))
+          .get();
     }
     catch (InterruptedException | ExecutionException exc) {
       throw findSuitableExceptionFor(exc);
