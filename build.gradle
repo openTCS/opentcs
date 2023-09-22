@@ -7,7 +7,12 @@ buildscript {
 
 plugins {
   id 'org.barfuin.gradle.jacocolog' version '3.1.0'
+  id 'com.github.jk1.dependency-license-report' version '2.5'
 }
+
+import com.github.jk1.license.filter.LicenseBundleNormalizer
+import com.github.jk1.license.render.CsvReportRenderer
+import com.github.jk1.license.render.InventoryHtmlReportRenderer
 
 apply plugin: 'base' // To add "clean" task to the root project.
 apply plugin: 'distribution'
@@ -139,4 +144,15 @@ publishing {
       }
     }
   }
+}
+
+licenseReport {
+  outputDir = "${buildDir}/license-report"
+  configurations = ['runtimeClasspath', 'guiceConfigRuntimeClasspath']
+  excludeBoms = true
+  filters = [new LicenseBundleNormalizer(bundlePath: "$projectDir/config/license-normalizer-bundle.json")]
+  renderers = [
+    new CsvReportRenderer('third-party-licenses.csv'),
+    new InventoryHtmlReportRenderer('third-party-licenses.html')
+  ]
 }
