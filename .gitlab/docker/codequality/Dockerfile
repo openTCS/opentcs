@@ -10,6 +10,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteract
   sed \
   && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g violations-command-line@1.21.0
+RUN npm install -g violations-command-line@1.25.3
 
 CMD ["/bin/bash"]
