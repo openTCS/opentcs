@@ -2,21 +2,15 @@ buildscript {
   repositories {
     mavenLocal()
     mavenCentral()
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
   }
-  dependencies {
-    // Stats plugin
-    classpath 'org.kordamp.gradle:stats-gradle-plugin:0.2.2'
-    // JaCoCo log plugin
-    classpath 'org.barfuin.gradle.jacocolog:gradle-jacoco-log:3.1.0'
-  }
+}
+
+plugins {
+  id 'org.barfuin.gradle.jacocolog' version '3.1.0'
 }
 
 apply plugin: 'base' // To add "clean" task to the root project.
 apply plugin: 'distribution'
-apply plugin: 'org.barfuin.gradle.jacocolog'
 
 apply from: "${rootDir}/gradle/common.gradle"
 apply from: "${rootDir}/gradle/publishing-common.gradle"
@@ -48,10 +42,6 @@ distributions {
       project(':openTCS-Documentation').ext.collectableDistDir
     }
   }
-}
-
-task statsAggregate(type: org.kordamp.gradle.stats.AggregateStatsReportTask) {
-  subprojects.each { dependsOn("${it.name}:stats") }
 }
 
 task subDists {
