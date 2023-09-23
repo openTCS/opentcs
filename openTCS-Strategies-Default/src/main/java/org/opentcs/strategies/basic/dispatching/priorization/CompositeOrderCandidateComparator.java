@@ -41,7 +41,7 @@ public class CompositeOrderCandidateComparator
     for (String priorityKey : Lists.reverse(configuration.orderCandidatePriorities())) {
       Comparator<AssignmentCandidate> configuredComparator = availableComparators.get(priorityKey);
       checkArgument(configuredComparator != null,
-                    "Unknown order candidate priority key: %s",
+                    "Unknown order candidate priority key: '%s'",
                     priorityKey);
       composite = configuredComparator.thenComparing(composite);
     }

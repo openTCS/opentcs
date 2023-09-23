@@ -31,10 +31,12 @@ import org.opentcs.strategies.basic.dispatching.priorization.candidate.Candidate
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByOrderAge;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByOrderName;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByVehicleName;
+import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorDeadlineAtRiskFirst;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorIdleFirst;
 import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorByAge;
 import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorByDeadline;
 import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorByName;
+import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorDeadlineAtRiskFirst;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorByEnergyLevel;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorByName;
 import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComparatorIdleFirst;
@@ -147,6 +149,9 @@ public class DefaultDispatcherModule
         .addBinding(TransportOrderComparatorByDeadline.CONFIGURATION_KEY)
         .to(TransportOrderComparatorByDeadline.class);
     orderComparatorBinder
+        .addBinding(TransportOrderComparatorDeadlineAtRiskFirst.CONFIGURATION_KEY)
+        .to(TransportOrderComparatorDeadlineAtRiskFirst.class);
+    orderComparatorBinder
         .addBinding(TransportOrderComparatorByName.CONFIGURATION_KEY)
         .to(TransportOrderComparatorByName.class);
 
@@ -162,6 +167,9 @@ public class DefaultDispatcherModule
     candidateComparatorBinder
         .addBinding(CandidateComparatorByDeadline.CONFIGURATION_KEY)
         .to(CandidateComparatorByDeadline.class);
+    candidateComparatorBinder
+        .addBinding(CandidateComparatorDeadlineAtRiskFirst.CONFIGURATION_KEY)
+        .to(CandidateComparatorDeadlineAtRiskFirst.class);
     candidateComparatorBinder
         .addBinding(CandidateComparatorByEnergyLevel.CONFIGURATION_KEY)
         .to(CandidateComparatorByEnergyLevel.class);

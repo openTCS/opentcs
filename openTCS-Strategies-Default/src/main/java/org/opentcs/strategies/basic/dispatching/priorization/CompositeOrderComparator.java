@@ -39,7 +39,7 @@ public class CompositeOrderComparator
 
     for (String priorityKey : Lists.reverse(configuration.orderPriorities())) {
       Comparator<TransportOrder> configuredComparator = availableComparators.get(priorityKey);
-      checkArgument(configuredComparator != null, "Unknown order priority key: %s", priorityKey);
+      checkArgument(configuredComparator != null, "Unknown order priority key: '%s'", priorityKey);
       composite = configuredComparator.thenComparing(composite);
     }
     this.compositeComparator = composite;

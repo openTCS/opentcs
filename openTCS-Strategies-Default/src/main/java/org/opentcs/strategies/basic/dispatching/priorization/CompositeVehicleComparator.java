@@ -39,7 +39,9 @@ public class CompositeVehicleComparator
 
     for (String priorityKey : Lists.reverse(configuration.vehiclePriorities())) {
       Comparator<Vehicle> configuredComparator = availableComparators.get(priorityKey);
-      checkArgument(configuredComparator != null, "Unknown vehicle priority key: %s", priorityKey);
+      checkArgument(configuredComparator != null,
+                    "Unknown vehicle priority key: '%s'",
+                    priorityKey);
       composite = configuredComparator.thenComparing(composite);
     }
     this.compositeComparator = composite;
