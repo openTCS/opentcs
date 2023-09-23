@@ -12,7 +12,7 @@ The openTCS developers
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
-== Unreleased
+== Version 5.10 (2023-09-23)
 
 * New features and enhancements:
 ** Visualize a vehicle's currently allocated resources and the claimed resource of its current drive order in the Operations Desk instead of just the route of its current drive order.
