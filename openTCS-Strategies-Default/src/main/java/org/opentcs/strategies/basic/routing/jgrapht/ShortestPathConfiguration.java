@@ -28,7 +28,9 @@ public interface ShortestPathConfiguration {
         "The routing algorithm to be used. Valid values:",
         "'DIJKSTRA': Routes are computed using Dijkstra's algorithm.",
         "'BELLMAN_FORD': Routes are computed using the Bellman-Ford algorithm.",
-        "'FLOYD_WARSHALL': Routes are computed using the Floyd-Warshall algorithm."})
+        "'FLOYD_WARSHALL': Routes are computed using the Floyd-Warshall algorithm."},
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START
+  )
   Algorithm algorithm();
 
   @ConfigurationEntry(
@@ -41,7 +43,9 @@ public interface ShortestPathConfiguration {
         "'EXPLICIT_PROPERTIES': A route's cost equals the sum of the explicitly given costs "
         + "extracted from path properties.",
         "'HOPS': A route's cost equals the number of paths it consists of."
-      })
+      },
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START
+  )
   List<String> edgeEvaluators();
 
   /**

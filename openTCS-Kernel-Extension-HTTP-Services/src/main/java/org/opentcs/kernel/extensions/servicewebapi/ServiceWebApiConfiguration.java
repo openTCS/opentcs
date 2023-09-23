@@ -24,36 +24,48 @@ public interface ServiceWebApiConfiguration {
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether to enable the interface.",
-      orderKey = "0")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0"
+  )
   boolean enable();
 
   @ConfigurationEntry(
       type = "IP address",
       description = "Address to which to bind the HTTP server, e.g. 0.0.0.0 or 127.0.0.1.",
-      orderKey = "1")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "1"
+  )
   String bindAddress();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "Port to which to bind the HTTP server.",
-      orderKey = "2")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "2"
+  )
   int bindPort();
 
   @ConfigurationEntry(
       type = "String",
       description = "Key allowing access to the API.",
-      orderKey = "3")
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
+      orderKey = "3"
+  )
   String accessKey();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "Maximum number of status events to be kept.",
-      orderKey = "4")
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
+      orderKey = "4"
+  )
   int statusEventsCapacity();
 
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether to use SSL to encrypt connections.",
-      orderKey = "5")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "5"
+  )
   boolean useSsl();
 }

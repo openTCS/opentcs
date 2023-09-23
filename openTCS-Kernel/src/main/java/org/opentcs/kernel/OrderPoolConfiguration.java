@@ -23,11 +23,15 @@ public interface OrderPoolConfiguration {
 
   @ConfigurationEntry(
       type = "Long",
-      description = "The interval between sweeps (in ms).")
+      description = "The interval between sweeps (in ms).",
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_NEW_PLANT_MODEL
+  )
   long sweepInterval();
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The minimum age of orders or peripheral jobs to remove in a sweep (in ms).")
+      description = "The minimum age of orders or peripheral jobs to remove in a sweep (in ms).",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY
+  )
   int sweepAge();
 }

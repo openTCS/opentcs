@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.opentcs.configuration.ConfigurationEntry;
+import static org.opentcs.configuration.ConfigurationEntry.ChangesApplied.UNSPECIFIED;
 import org.opentcs.configuration.ConfigurationPrefix;
 import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
@@ -56,17 +57,18 @@ public class ConfigDocGenerator {
   private static void processConfigurationInterface(String className, String outputFilePath)
       throws ClassNotFoundException {
     Class<?> clazz = ConfigDocGenerator.class.getClassLoader().loadClass(className);
+    String prefix = extractPrefix(clazz);
 
     SortedSet<Entry> configurationEntries = new TreeSet<>();
     for (Method method : clazz.getMethods()) {
-      configurationEntries.add(extractEntry(method));
+      configurationEntries.add(extractEntry(method, prefix));
     }
 
     checkArgument(!configurationEntries.isEmpty(),
                   "No configuration keys in {}.",
                   clazz.getName());
 
-    generateFile(outputFilePath, extractPrefix(clazz), configurationEntries);
+    generateFile(outputFilePath, configurationEntries);
   }
 
   private static String extractPrefix(Class<?> clazz) {
@@ -75,33 +77,30 @@ public class ConfigDocGenerator {
     return annotation.value();
   }
 
-  private static Entry extractEntry(Method method) {
+  private static Entry extractEntry(Method method, String prefix) {
     ConfigurationEntry annotation = method.getAnnotation(ConfigurationEntry.class);
     checkArgument(annotation != null, "Missing entry annotation at method %s", method.getName());
-    return new Entry(method.getName(),
+    return new Entry(prefix,
+                     method.getName(),
                      annotation.type(),
+                     changesAppliedWhen(annotation.changesApplied()),
                      annotation.description(),
                      annotation.orderKey());
   }
 
   /**
-   * Writes the configurationEntries to a file using AsciiDoc syntax for a table.
+   * Writes the configuration entries to a file using AsciiDoc syntax.
    *
    * @param outputFilePath The output file path to write to.
-   * @param configurationPrefix The configuration entries' prefix.
    * @param configurationEntries The configuration entries.
    */
   private static void generateFile(String outputFilePath,
-                                   String configurationPrefix,
                                    Collection<Entry> configurationEntries) {
     try (PrintWriter writer = new PrintWriter(new FileWriter(outputFilePath, true))) {
-      writeTableHeader(writer, configurationPrefix);
-
       for (Entry entry : configurationEntries) {
-        writeTableContent(writer, entry);
+        writeEntry(writer, entry);
       }
 
-      writer.println("|===");
       writer.println();
     }
     catch (IOException ex) {
@@ -109,32 +108,35 @@ public class ConfigDocGenerator {
     }
   }
 
-  private static void writeTableHeader(final PrintWriter writer, String configurationPrefix) {
-    writer.print(".Configuration options with prefix '");
-    writer.print(configurationPrefix);
-    writer.println('\'');
-    writer.println("[cols=\"2,1,3\", options=\"header\"]");
-    writer.println("|===");
-    writer.println("|Key");
-    writer.println("|Type");
-    writer.println("|Description");
-    writer.println();
-  }
+  private static void writeEntry(final PrintWriter writer, Entry entry) {
+    writer.print("`");
+    writer.print(entry.prefix);
+    writer.print('.');
+    writer.print(entry.name);
+    writer.println("`::");
 
-  private static void writeTableContent(final PrintWriter writer, Entry entry) {
-    writer.print('|');
-    writer.println(entry.name);
-
-    writer.print('|');
+    writer.print("* Type: ");
     writer.println(entry.type);
 
-    writer.print('|');
-    for (int i = 0; i < (entry.description.length - 1); i++) {
-      writer.print(entry.description[i]);
-      writer.println(" +");
+    writer.print("* Trigger for changes to be applied: ");
+    writer.println(entry.changesApplied);
+
+    writer.print("* Description: ");
+    writer.println(String.join(" +\n", entry.description));
+  }
+
+  private static String changesAppliedWhen(ConfigurationEntry.ChangesApplied changesApplied) {
+    switch (changesApplied) {
+      case ON_APPLICATION_START:
+        return "on application start";
+      case ON_NEW_PLANT_MODEL:
+        return "when/after plant model is loaded";
+      case INSTANTLY:
+        return "instantly";
+      default:
+      case UNSPECIFIED:
+        return "unspecified";
     }
-    writer.println(entry.description[entry.description.length - 1]);
-    writer.println();
   }
 
   /**
@@ -144,6 +146,10 @@ public class ConfigDocGenerator {
       implements Comparable<Entry> {
 
     /**
+     * The prefix of this configuration entry.
+     */
+    private final String prefix;
+    /**
      * The name of this configuration entry.
      */
     private final String name;
@@ -151,6 +157,10 @@ public class ConfigDocGenerator {
      * A description for the data type of this configuration entry.
      */
     private final String type;
+    /**
+     * Whether a change of the configuration value requires a restart of the application.
+     */
+    private final String changesApplied;
     /**
      * A description for this configuration entry.
      */
@@ -160,12 +170,16 @@ public class ConfigDocGenerator {
      */
     private final String orderKey;
 
-    Entry(String name,
+    Entry(String prefix,
+          String name,
           String type,
+          String changesApplied,
           String[] description,
           String orderKey) {
+      this.prefix = prefix;
       this.name = name;
       this.type = type;
+      this.changesApplied = changesApplied;
       this.description = description;
       this.orderKey = orderKey;
     }

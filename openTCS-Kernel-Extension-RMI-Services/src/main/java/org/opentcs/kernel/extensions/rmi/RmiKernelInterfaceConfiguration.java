@@ -26,90 +26,120 @@ public interface RmiKernelInterfaceConfiguration {
   @ConfigurationEntry(
       type = "Boolean",
       description = {"Whether to enable the interface."},
-      orderKey = "0")
+      orderKey = "0",
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START
+  )
   Boolean enable();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the RMI.",
-      orderKey = "0_address_1")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0_address_1"
+  )
   int registryPort();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the remote kernel service portal.",
-      orderKey = "0_address_3")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0_address_3"
+  )
   int remoteKernelServicePortalPort();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the remote plant model service.",
-      orderKey = "0_address_4")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0_address_4"
+  )
   int remotePlantModelServicePort();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the remote transport order service.",
-      orderKey = "0_address_5")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0_address_5"
+  )
   int remoteTransportOrderServicePort();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the remote vehicle service.",
-      orderKey = "0_address_6")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0_address_6"
+  )
   int remoteVehicleServicePort();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the remote notification service.",
-      orderKey = "0_address_7")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0_address_7"
+  )
   int remoteNotificationServicePort();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the remote scheduler service.",
-      orderKey = "0_address_8")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0_address_8"
+  )
   int remoteSchedulerServicePort();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the remote router service.",
-      orderKey = "0_address_9")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0_address_9"
+  )
   int remoteRouterServicePort();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the remote dispatcher service.",
-      orderKey = "0_address_10")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0_address_10"
+  )
   int remoteDispatcherServicePort();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the remote query service.",
-      orderKey = "0_address_11")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0_address_11"
+  )
   int remoteQueryServicePort();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the remote peripheral service.",
-      orderKey = "0_address_12")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0_address_12"
+  )
   int remotePeripheralServicePort();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The TCP port of the remote peripheral job service.",
-      orderKey = "0_address_13")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0_address_13"
+  )
   int remotePeripheralJobServicePort();
 
   @ConfigurationEntry(
       type = "Long",
       description = "The interval for cleaning out inactive clients (in ms).",
-      orderKey = "2_sweeping")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "2_sweeping"
+  )
   long clientSweepInterval();
 
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether to use SSL to encrypt connections.",
-      orderKey = "0_address_11")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0_address_11"
+  )
   boolean useSsl();
 }

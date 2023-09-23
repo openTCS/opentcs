@@ -24,6 +24,8 @@ public interface DefaultPeripheralJobDispatcherConfiguration {
   @ConfigurationEntry(
       type = "Integer",
       description = "The interval between redispatching of peripheral devices.",
-      orderKey = "9_misc")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_NEW_PLANT_MODEL,
+      orderKey = "9_misc"
+  )
   long idlePeripheralRedispatchingInterval();
 }

@@ -30,6 +30,7 @@ public interface DefaultDispatcherConfiguration {
                      "BY_DEADLINE: Sort by deadline, most urgent first.",
                      "DEADLINE_AT_RISK_FIRST: Sort orders with deadlines at risk first.",
                      "BY_NAME: Sort by name, lexicographically."},
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
       orderKey = "0_assign")
   List<String> orderPriorities();
 
@@ -40,6 +41,7 @@ public interface DefaultDispatcherConfiguration {
                      "BY_ENERGY_LEVEL: Sort by energy level, highest first.",
                      "IDLE_FIRST: Sort vehicles with state IDLE first.",
                      "BY_NAME: Sort by name, lexicographically."},
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
       orderKey = "0_assign")
   List<String> vehiclePriorities();
 
@@ -52,6 +54,7 @@ public interface DefaultDispatcherConfiguration {
                      "BY_COMPLETE_ROUTING_COSTS: Sort by complete routing costs, lowest first.",
                      "BY_INITIAL_ROUTING_COSTS: Sort by routing costs for the first destination.",
                      "BY_VEHICLE_NAME: Sort by vehicle name, lexicographically."},
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
       orderKey = "0_assign")
   List<String> vehicleCandidatePriorities();
 
@@ -65,36 +68,42 @@ public interface DefaultDispatcherConfiguration {
                      "BY_COMPLETE_ROUTING_COSTS: Sort by complete routing costs, lowest first.",
                      "BY_INITIAL_ROUTING_COSTS: Sort by routing costs for the first destination.",
                      "BY_ORDER_NAME: Sort by transport order name, lexicographically."},
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
       orderKey = "0_assign")
   List<String> orderCandidatePriorities();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The time window (in ms) before its deadline in which an order becomes urgent.",
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
       orderKey = "0_assign_special_0")
   long deadlineAtRiskPeriod();
 
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether orders to the current position with no operation should be assigned.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
       orderKey = "1_orders_special_0")
   boolean assignRedundantOrders();
 
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether unroutable incoming transport orders should be marked as UNROUTABLE.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
       orderKey = "1_orders_special_1")
   boolean dismissUnroutableTransportOrders();
 
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether vehicles should be rerouted immediately on topology changes.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
       orderKey = "1_orders_special_2")
   boolean rerouteOnTopologyChanges();
 
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether vehicles should be rerouted as soon as they finish a drive order.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
       orderKey = "1_orders_special_3")
   boolean rerouteOnDriveOrderFinished();
 
@@ -110,30 +119,35 @@ public interface DefaultDispatcherConfiguration {
         "PAUSE_AT_PATH_LOCK: Send further orders to the vehicle only until it reaches a locked "
         + "path; then wait for another rerouting opportunity."
       },
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
       orderKey = "1_orders_special_4")
   ReroutingImpossibleStrategy reroutingImpossibleStrategy();
 
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether to automatically create parking orders for idle vehicles.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
       orderKey = "2_park_0")
   boolean parkIdleVehicles();
 
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether to consider parking position priorities when creating parking orders.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
       orderKey = "2_park_1")
   boolean considerParkingPositionPriorities();
 
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether to repark vehicles to parking positions with higher priorities.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
       orderKey = "2_park_2")
   boolean reparkVehiclesToHigherPriorityPositions();
 
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether to automatically create recharge orders for idle vehicles.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
       orderKey = "3_recharge_0")
   boolean rechargeIdleVehicles();
 
@@ -141,12 +155,14 @@ public interface DefaultDispatcherConfiguration {
       type = "Boolean",
       description = {"Whether vehicles must be recharged until they are fully charged.",
                      "If false, vehicle must only be recharged until sufficiently charged."},
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
       orderKey = "3_recharge_1")
   boolean keepRechargingUntilFullyCharged();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The interval between redispatching of vehicles.",
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_NEW_PLANT_MODEL,
       orderKey = "9_misc")
   long idleVehicleRedispatchingInterval();
 

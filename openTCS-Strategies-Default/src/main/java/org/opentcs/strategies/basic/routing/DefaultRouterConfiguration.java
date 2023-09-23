@@ -23,7 +23,9 @@ public interface DefaultRouterConfiguration {
 
   @ConfigurationEntry(
       type = "Boolean",
-      description = "Whether to compute a route even if the vehicle is already at the destination.")
+      description = "Whether to compute a route even if the vehicle is already at the destination.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY
+  )
   boolean routeToCurrentPosition();
 
 }

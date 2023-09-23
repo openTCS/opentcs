@@ -24,19 +24,25 @@ public interface AdminWebApiConfiguration {
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether to enable the admin interface.",
-      orderKey = "0")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "0"
+  )
   boolean enable();
 
   @ConfigurationEntry(
       type = "IP address",
       description = "Address to which to bind the HTTP server, e.g. 0.0.0.0. (Default: 127.0.0.1.)",
-      orderKey = "1")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "1"
+  )
   String bindAddress();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "Port to which to bind the HTTP server.",
-      orderKey = "2")
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "2"
+  )
   int bindPort();
 
 }

@@ -36,9 +36,39 @@ public @interface ConfigurationEntry {
   String[] description();
 
   /**
+   * Indicates when changes to the configuration entry's value are applied.
+   *
+   * @return A value indicating when changes to the configuration entry's value are applied.
+   */
+  ChangesApplied changesApplied() default ChangesApplied.UNSPECIFIED;
+
+  /**
    * Returns the optional ordering key that this entry belongs to (for grouping/sorting of entries).
    *
    * @return The optional ordering key that this entry belongs to (for grouping/sorting of entries).
    */
   String orderKey() default "";
+
+  /**
+   * Indicates when changes to the configuration entry's value are applied.
+   */
+  enum ChangesApplied {
+    /**
+     * When a configuration change is applied is not explicitly specified.
+     */
+    UNSPECIFIED,
+    /**
+     * Changes to the configuration value are picked up when the application is (re)started.
+     */
+    ON_APPLICATION_START,
+    /**
+     * Changes to the configuration value are picked up when/after a plant model is loaded.
+     */
+    ON_NEW_PLANT_MODEL,
+    /**
+     * Changes to the configuration value are picked up during runtime instantly, without
+     * requiring an explicit trigger.
+     */
+    INSTANTLY
+  }
 }
