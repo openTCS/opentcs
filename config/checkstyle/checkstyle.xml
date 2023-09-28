@@ -252,10 +252,6 @@
 
     <!-- Checks for Javadoc comments. -->
     <module name="JavadocType">
-      <property name="scope" value="public"/>
-      <property name="severity" value="warning"/>
-    </module>
-    <module name="JavadocType">
       <property name="scope" value="package"/>
       <property name="severity" value="warning"/>
     </module>
@@ -283,11 +279,6 @@
       <property name="scope" value="public"/>
       <property name="allowMissingPropertyJavadoc" value="true"/>
       <property name="severity" value="warning"/>
-    </module>
-    <module name="MissingJavadocMethod">
-      <property name="scope" value="package"/>
-      <property name="allowMissingPropertyJavadoc" value="true"/>
-      <property name="severity" value="info"/>
     </module>
 
     <module name="ModifierOrder">
