@@ -40,11 +40,6 @@ public class TCSObjectReference<E extends TCSObject<E>>
     name = referent.getName();
   }
 
-  private TCSObjectReference(@Nonnull Class<?> clazz, @Nonnull String newName) {
-    name = requireNonNull(newName, "newName");
-    referentClass = requireNonNull(clazz, "clazz");
-  }
-
   /**
    * Returns the referenced object's class.
    *

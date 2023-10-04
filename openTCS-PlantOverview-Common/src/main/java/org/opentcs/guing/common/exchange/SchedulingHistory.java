@@ -63,13 +63,6 @@ public class SchedulingHistory {
   }
 
   private Set<FigureDecorationDetails> getAllocatedAndClaimedComponents(String vehicleName) {
-    Set<FigureDecorationDetails> result = allocatedAndClaimedComponents.get(vehicleName);
-
-    if (result == null) {
-      result = new HashSet<>();
-      allocatedAndClaimedComponents.put(vehicleName, result);
-    }
-
-    return result;
+    return allocatedAndClaimedComponents.computeIfAbsent(vehicleName, v -> new HashSet<>());
   }
 }

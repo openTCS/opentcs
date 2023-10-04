@@ -7,7 +7,6 @@
  */
 package org.opentcs.guing.common.components.properties.panel;
 
-import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
@@ -99,11 +98,8 @@ public class SymbolPropertyEditorPanel
 
   private void init() {
     for (LocationRepresentation cur : LocationRepresentation.values()) {
-      Image image = locationTheme.getImageFor(cur);
-      if (image != null) {
-        fRepresentations.add(cur);
-        fSymbols.add(new ImageIcon(image));
-      }
+      fRepresentations.add(cur);
+      fSymbols.add(new ImageIcon(locationTheme.getImageFor(cur)));
     }
   }
 

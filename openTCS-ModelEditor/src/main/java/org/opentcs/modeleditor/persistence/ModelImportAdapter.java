@@ -85,7 +85,6 @@ public class ModelImportAdapter {
   public SystemModel convert(PlantModelCreationTO model)
       throws IllegalArgumentException {
     requireNonNull(model, "model");
-//    checkArgument(!model.getVisualLayouts().isEmpty(), "Model does not contain a visual layout");
 
     SystemModel systemModel = systemModelProvider.get();
     systemModel.setName(model.getName());

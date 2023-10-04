@@ -88,9 +88,8 @@ public class OriginFigure
 
   @Override
   public Rectangle2D.Double getBounds() {
-    Rectangle2D r2 = fDisplayBox.getBounds2D();
     Rectangle2D.Double r2d = new Rectangle2D.Double();
-    r2d.setRect(r2);
+    r2d.setRect(fDisplayBox.getBounds2D());
 
     return r2d;
   }
@@ -147,8 +146,6 @@ public class OriginFigure
     fZoomPoint.setY(anchor.y);
     fDisplayBox.x = (int) (anchor.x - 0.5 * fSideLength);
     fDisplayBox.y = (int) (anchor.y - 0.5 * fSideLength);
-//    fDisplayBox.x = (int) (anchor.x);
-//    fDisplayBox.y = (int) (anchor.y);
   }
 
   @Override

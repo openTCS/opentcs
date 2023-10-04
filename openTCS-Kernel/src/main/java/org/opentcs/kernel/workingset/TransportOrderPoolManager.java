@@ -329,10 +329,8 @@ public class TransportOrderPoolManager
       ));
     }
 
-    if (vehicleRef != null) {
-      if (getObjectRepo().getObjectOrNull(Vehicle.class, vehicleRef) == null) {
-        throw new ObjectUnknownException("Unknown vehicle: " + vehicleRef.getName());
-      }
+    if (vehicleRef != null && getObjectRepo().getObjectOrNull(Vehicle.class, vehicleRef) == null) {
+      throw new ObjectUnknownException("Unknown vehicle: " + vehicleRef.getName());
     }
 
     LOG.info("Transport order's intended vehicle changes: {} -- {} -> {}",
@@ -538,11 +536,7 @@ public class TransportOrderPoolManager
       throws ObjectUnknownException {
     Set<TCSObjectReference<TransportOrder>> result = new HashSet<>();
     for (String dependencyName : to.getDependencyNames()) {
-      TransportOrder dep = getObjectRepo().getObject(TransportOrder.class, dependencyName);
-      if (dep == null) {
-        throw new ObjectUnknownException(dependencyName);
-      }
-      result.add(dep.getReference());
+      result.add(getObjectRepo().getObject(TransportOrder.class, dependencyName).getReference());
     }
     return result;
   }
@@ -555,9 +549,6 @@ public class TransportOrderPoolManager
     }
     OrderSequence sequence = getObjectRepo().getObject(OrderSequence.class,
                                                        to.getWrappingSequence());
-    if (sequence == null) {
-      throw new ObjectUnknownException(to.getWrappingSequence());
-    }
     checkArgument(!sequence.isComplete(), "Order sequence %s is already complete", sequence);
     checkArgument(Objects.equals(to.getType(), sequence.getType()),
                   "Order sequence %s has different type than order %s: %s != %s",

@@ -1310,11 +1310,7 @@ public class PlantModelManager
       throws ObjectExistsException, ObjectUnknownException {
     Set<TCSObjectReference<?>> members = new HashSet<>();
     for (String memberName : to.getMemberNames()) {
-      TCSObject<?> object = getObjectRepo().getObject(memberName);
-      if (object == null) {
-        throw new ObjectUnknownException(memberName);
-      }
-      members.add(object.getReference());
+      members.add(getObjectRepo().getObject(memberName).getReference());
     }
     org.opentcs.data.model.Group newGroup = new org.opentcs.data.model.Group(to.getName())
         .withMembers(members)
@@ -1465,9 +1461,8 @@ public class PlantModelManager
     emitObjectEvent(newBlock, oldBlock, TCSObjectEvent.Type.OBJECT_MODIFIED);
   }
 
-  private void overrideVehicleLayoutData(TCSObject<?> object, Map<String, String> properties)
+  private void overrideVehicleLayoutData(Vehicle oldVehicle, Map<String, String> properties)
       throws NumberFormatException {
-    Vehicle oldVehicle = (Vehicle) object;
     Color routeColor = properties.get(ElementPropKeys.VEHICLE_ROUTE_COLOR) != null
         ? Colors.decodeFromHexRGB(properties.get(ElementPropKeys.VEHICLE_ROUTE_COLOR))
         : oldVehicle.getLayout().getRouteColor();

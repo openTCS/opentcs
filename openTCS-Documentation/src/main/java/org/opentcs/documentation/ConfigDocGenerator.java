@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.opentcs.configuration.ConfigurationEntry;
-import static org.opentcs.configuration.ConfigurationEntry.ChangesApplied.UNSPECIFIED;
 import org.opentcs.configuration.ConfigurationPrefix;
 import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;

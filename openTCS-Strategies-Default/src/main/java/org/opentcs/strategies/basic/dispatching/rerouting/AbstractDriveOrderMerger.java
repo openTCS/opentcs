@@ -36,15 +36,10 @@ public abstract class AbstractDriveOrderMerger
 
   @Override
   public DriveOrder mergeDriveOrders(DriveOrder orderA, DriveOrder orderB, Vehicle vehicle) {
-    // Merge the drive order routes
-    Route mergedRoute = mergeRoutes(orderA.getRoute(), orderB.getRoute(), vehicle);
-
-    DriveOrder mergedOrder = new DriveOrder(orderA.getDestination())
+    return new DriveOrder(orderA.getDestination())
         .withState(orderA.getState())
         .withTransportOrder(orderA.getTransportOrder())
-        .withRoute(mergedRoute);
-
-    return mergedOrder;
+        .withRoute(mergeRoutes(orderA.getRoute(), orderB.getRoute(), vehicle));
   }
 
   /**

@@ -55,8 +55,7 @@ public class ProbePlantModelTO
 
   private static Unmarshaller createUnmarshaller()
       throws JAXBException, SAXException {
-    Unmarshaller unmarshaller = createContext().createUnmarshaller();
-    return unmarshaller;
+    return createContext().createUnmarshaller();
   }
 
   private static JAXBContext createContext()

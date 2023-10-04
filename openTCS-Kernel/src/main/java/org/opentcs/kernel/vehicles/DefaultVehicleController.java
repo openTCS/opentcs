@@ -48,7 +48,6 @@ import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
-import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.ProcessModelEvent;
@@ -827,7 +826,7 @@ public class DefaultVehicleController
     }
     else if (Objects.equals(evt.getPropertyName(),
                             VehicleProcessModel.Attribute.COMM_ADAPTER_EVENT.name())) {
-      eventBus.onEvent((VehicleCommAdapterEvent) evt.getNewValue());
+      eventBus.onEvent(evt.getNewValue());
     }
     else if (Objects.equals(evt.getPropertyName(),
                             VehicleProcessModel.Attribute.VEHICLE_PROPERTY.name())) {

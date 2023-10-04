@@ -120,11 +120,9 @@ public class KernelServicePortalBuilder {
    */
   public KernelServicePortal build()
       throws ServiceUnavailableException, CredentialsException {
-    RemoteKernelServicePortalProxy portal = new RemoteKernelServicePortalProxy(
-        userName,
-        password,
-        socketFactoryProvider,
-        eventFilter);
-    return portal;
+    return new RemoteKernelServicePortalProxy(userName,
+                                              password,
+                                              socketFactoryProvider,
+                                              eventFilter);
   }
 }

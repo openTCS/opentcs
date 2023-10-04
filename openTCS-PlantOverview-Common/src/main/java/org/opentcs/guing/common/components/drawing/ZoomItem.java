@@ -24,8 +24,6 @@ public class ZoomItem {
 
   @Override
   public String toString() {
-    String s = String.format("%d %%", (int) (scaleFactor * 100));
-    //      System.out.println(s);
-    return s;
+    return String.format("%d %%", (int) (scaleFactor * 100));
   }
 }

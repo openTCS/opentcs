@@ -121,11 +121,7 @@ public class BlockChangeHandler
   }
 
   private Set<FigureDecorationDetails> getBlockElements(BlockModel block) {
-    if (!blockElementsHistory.containsKey(block)) {
-      blockElementsHistory.put(block, new HashSet<>());
-    }
-
-    return blockElementsHistory.get(block);
+    return blockElementsHistory.computeIfAbsent(block, b -> new HashSet<>());
   }
 
   private void updateBlock(BlockModel block) {

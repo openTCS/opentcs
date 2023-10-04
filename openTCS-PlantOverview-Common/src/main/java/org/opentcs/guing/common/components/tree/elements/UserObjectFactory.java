@@ -23,8 +23,6 @@ public interface UserObjectFactory {
 
   BlockUserObject createBlockUserObject(BlockModel model, UserObjectContext context);
 
-//  FigureUserObject createFigureUserObject(AbstractFigureComponent model);
-
   LayoutUserObject createLayoutUserObject(LayoutModel model);
 
   LinkUserObject createLinkUserObject(LinkModel model);

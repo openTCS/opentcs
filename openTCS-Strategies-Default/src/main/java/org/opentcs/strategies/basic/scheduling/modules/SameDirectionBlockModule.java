@@ -156,10 +156,7 @@ public class SameDirectionBlockModule
 
   @Override
   public boolean hasPreparedAllocation(Scheduler.Client client, Set<TCSResource<?>> resources) {
-    return !permissions.values().stream()
-        .filter(permission -> permission.hasPendingRequests())
-        .findAny()
-        .isPresent();
+    return permissions.values().stream().noneMatch(BlockPermission::hasPendingRequests);
   }
 
   @Override

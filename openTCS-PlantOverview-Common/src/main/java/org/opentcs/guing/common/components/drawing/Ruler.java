@@ -98,11 +98,10 @@ public abstract class Ruler
       super.paintComponent(g);
 
       Rectangle drawHere = g.getClipBounds();
-//      Point translation = (Point) drawingView.getTranslation().clone();
       Point translation = new Point((int) -drawingView.getDrawingToViewTransform().getTranslateX(),
                                     (int) -drawingView.getDrawingToViewTransform().getTranslateY());
-      // if we scroll right the translation isn't incremented by default
-      // we use the translation of the visible rect instead
+      // If we scroll right, the translation isn't incremented by default.
+      // We use the translation of the visible rectangle instead.
       int visibleRectX = drawingView.getComponent().getVisibleRect().x + STANDARD_TRANSLATION;
       if (STANDARD_TRANSLATION == translation.x) {
         translation.x = visibleRectX;
@@ -257,11 +256,10 @@ public abstract class Ruler
       super.paintComponent(g);
 
       Rectangle drawHere = g.getClipBounds();
-//      Point translation = (Point) drawingView.getTranslation().clone();
       Point translation = new Point((int) -drawingView.getDrawingToViewTransform().getTranslateX(),
                                     (int) -drawingView.getDrawingToViewTransform().getTranslateY());
-      // if we scroll downwards the translation isn't incremented by default
-      // we use the translation of the visible rect instead
+      // If we scroll downwards, the translation isn't incremented by default.
+      // We use the translation of the visible rectangle instead.
       if (translation.y == STANDARD_TRANSLATION) {
         translation.y = drawingView.getComponent().getVisibleRect().y + STANDARD_TRANSLATION;
       }

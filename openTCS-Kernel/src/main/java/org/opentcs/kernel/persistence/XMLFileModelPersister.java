@@ -7,27 +7,22 @@
  */
 package org.opentcs.kernel.persistence;
 
-import static com.google.common.base.Strings.emptyToNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
-import static java.util.Optional.ofNullable;
 import javax.inject.Inject;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.customizations.ApplicationHome;
 import static org.opentcs.util.Assertions.checkState;
-import org.opentcs.util.FileSystems;
 import org.opentcs.util.persistence.ModelParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A ModelPersister implementation realizing persistence of models with XML
- * files.
+ * A {@link ModelPersister} implementation using an XML file.
  */
 public class XMLFileModelPersister
     implements ModelPersister {
@@ -66,15 +61,6 @@ public class XMLFileModelPersister
     this.dataDirectory = new File(requireNonNull(directory, "directory"), "data");
 
     this.modelFile = new File(dataDirectory, MODEL_FILE_NAME);
-  }
-
-  @Override
-  public Optional<String> getPersistentModelName()
-      throws IllegalStateException {
-    if (!hasSavedModel()) {
-      return Optional.empty();
-    }
-    return Optional.of(readXMLModelName(modelFile));
   }
 
   @Override
@@ -169,37 +155,6 @@ public class XMLFileModelPersister
       return false;
     }
     return true;
-  }
-
-  @Override
-  public void removeModel()
-      throws IllegalStateException {
-    LOG.debug("Removing model...");
-    // If the model file does not exist, don't do anything
-    if (!modelFileExists()) {
-      return;
-    }
-    try {
-      createBackup();
-      if (!FileSystems.deleteRecursively(modelFile)) {
-        throw new IOException("Cannot delete " + modelFile.getPath());
-      }
-    }
-    catch (IOException exc) {
-      throw new IllegalStateException("Exception removing model", exc);
-    }
-  }
-
-  /**
-   * Reads a model's name from a given InputStream.
-   *
-   * @param modelFile The file containing the model.
-   * @throws IOException If an exception occured while loading
-   */
-  private String readXMLModelName(File modelFile)
-      throws IllegalStateException {
-    return ofNullable(emptyToNull(readXMLModel(modelFile).getName()))
-        .orElse("ModelNameMissing");
   }
 
   /**

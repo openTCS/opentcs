@@ -300,7 +300,6 @@ public class ToolBarManager
 
     toggleButton.setSelected(true);
     toggleButton.addItemListener(new ToolButtonListener(selectionTool, editor));
-//    toggleButton.setFocusable(false);
     buttonGroup.add(toggleButton);
     toolBar.add(toggleButton);
 
@@ -335,7 +334,6 @@ public class ToolBarManager
 
     button.setSelected(false);
     button.addItemListener(new ToolButtonListener(dragTool, editor));
-//    button.setFocusable(false);
 
     ButtonGroup group = (ButtonGroup) toolBar.getClientProperty("toolButtonGroup");
     group.add(button);
@@ -403,7 +401,6 @@ public class ToolBarManager
     toggleButton.setText(null);
     toggleButton.setToolTipText(toolTipText);
     toggleButton.addItemListener(new ToolButtonListener(tool, editor));
-//    toggleButton.setFocusable(false);
 
     ToolListener toolHandler = (ToolListener) toolBar.getClientProperty("toolHandler");
     tool.addToolListener(toolHandler);

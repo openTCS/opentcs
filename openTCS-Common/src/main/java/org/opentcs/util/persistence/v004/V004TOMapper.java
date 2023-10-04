@@ -62,7 +62,7 @@ public class V004TOMapper {
    * @return The mapped {@link PlantModelCreationTO} instance.
    */
   public PlantModelCreationTO map(V004PlantModelTO model) {
-    PlantModelCreationTO result = new PlantModelCreationTO(model.getName())
+    return new PlantModelCreationTO(model.getName())
         .withPoints(toPointCreationTO(model.getPoints()))
         .withVehicles(toVehicleCreationTO(model.getVehicles()))
         .withPaths(toPathCreationTO(model.getPaths()))
@@ -71,8 +71,6 @@ public class V004TOMapper {
         .withBlocks(toBlockCreationTO(model.getBlocks()))
         .withVisualLayout(toVisualLayoutCreationTO(model.getVisualLayout()))
         .withProperties(convertProperties(model.getProperties()));
-
-    return result;
   }
 
   /**

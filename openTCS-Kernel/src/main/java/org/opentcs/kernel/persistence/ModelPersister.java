@@ -7,7 +7,6 @@
  */
 package org.opentcs.kernel.persistence;
 
-import java.util.Optional;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 
 /**
@@ -15,15 +14,6 @@ import org.opentcs.access.to.model.PlantModelCreationTO;
  * Only a single model is persisted at a time.
  */
 public interface ModelPersister {
-
-  /**
-   * Returns the name the persisted model.
-   *
-   * @return The model name which is optional as there might be no persisted model.
-   * @throws IllegalStateException If reading the model name from the model file failed.
-   */
-  Optional<String> getPersistentModelName()
-      throws IllegalStateException;
 
   /**
    * Find out if there is a persisted model at the moment.
@@ -48,14 +38,4 @@ public interface ModelPersister {
    * @throws IllegalStateException If reading the model is not possible for some reason.
    */
   PlantModelCreationTO readModel() throws IllegalStateException;
-
-  /**
-   * Remove currently persisted the model.
-   * Has no effect if there is no persisted model.
-   *
-   * @throws IllegalStateException If removing the model with the given name is not possible for
-   * some reason.
-   */
-  void removeModel()
-      throws IllegalStateException;
 }

@@ -86,7 +86,7 @@ public class UndoRedoManager
   }
 
   @Override
-  public void discardAllEdits() {
+  public synchronized void discardAllEdits() {
     super.discardAllEdits();
     updateActions();
     setHasSignificantEdits(false);
@@ -145,7 +145,7 @@ public class UndoRedoManager
    * @see CompoundEdit#addEdit
    */
   @Override
-  public boolean addEdit(UndoableEdit anEdit) {
+  public synchronized boolean addEdit(UndoableEdit anEdit) {
     if (undoOrRedoInProgress) {
       anEdit.die();
       return true;

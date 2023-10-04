@@ -140,8 +140,6 @@ public class Cfg4jConfigurationBindingProvider
     ConfigurationSource mergedSource
         = new MergeConfigurationSource(sources.toArray(new ConfigurationSource[sources.size()]));
 
-    ConfigurationSource cachedSource = new CachedConfigurationSource(mergedSource, environment);
-
-    return cachedSource;
+    return new CachedConfigurationSource(mergedSource, environment);
   }
 }
