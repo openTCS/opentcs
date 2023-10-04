@@ -20,110 +20,50 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 public final class Comparators {
 
   /**
-   * A <code>Comparator</code> for ordering <code>TCSObject</code>s ascendingly
-   * by their names.
-   */
-  private static final Comparator<TCSObject<?>> OBJECTS_BY_NAME
-      = (TCSObject<?> o1, TCSObject<?> o2) -> o1.getName().compareTo(o2.getName());
-  /**
-   * A comparator for sorting transport orders by their age, with the oldest ones coming first.
-   */
-  private static final Comparator<TransportOrder> ORDERS_BY_AGE
-      = (TransportOrder o1, TransportOrder o2) -> {
-        if (o1.getCreationTime().isBefore(o2.getCreationTime())) {
-          return -1;
-        }
-        else if (o1.getCreationTime().isAfter(o2.getCreationTime())) {
-          return 1;
-        }
-        else {
-          return OBJECTS_BY_NAME.compare(o1, o2);
-        }
-      };
-  /**
-   * A comparator for sorting transport orders by their deadline, with those with the earliest
-   * deadline coming first.
-   * If two orders have exactly the same deadline, they are sorted by their (unique) creation
-   * times, with the older one coming first.
-   */
-  private static final Comparator<TransportOrder> ORDERS_BY_DEADLINE
-      = (TransportOrder o1, TransportOrder o2) -> {
-        if (o1.getDeadline().isBefore(o2.getDeadline())) {
-          return -1;
-        }
-        else if (o1.getDeadline().isAfter(o2.getDeadline())) {
-          return 1;
-        }
-        else {
-          return ORDERS_BY_AGE.compare(o1, o2);
-        }
-      };
-  /**
-   * A comparator for sorting peripheral jobs by their age, with the oldest ones coming first.
-   */
-  private static final Comparator<PeripheralJob> JOBS_BY_AGE
-      = (PeripheralJob o1, PeripheralJob o2) -> {
-        if (o1.getCreationTime().isBefore(o2.getCreationTime())) {
-          return -1;
-        }
-        else if (o1.getCreationTime().isAfter(o2.getCreationTime())) {
-          return 1;
-        }
-        else {
-          return OBJECTS_BY_NAME.compare(o1, o2);
-        }
-      };
-
-  /**
    * Prevents undesired instantiation.
    */
   private Comparators() {
   }
 
   /**
-   * Returns a comparator for ordering <code>TCSObject</code>s ascendingly
-   * by their names.
+   * Returns a comparator for sorting <code>TCSObject</code>s lexicographically by their names.
    *
-   * @return A comparator for ordering <code>TCSObject</code>s ascendingly
-   * by their names.
+   * @return A comparator for sorting <code>TCSObject</code>s lexicographically by their names.
    */
   public static Comparator<TCSObject<?>> objectsByName() {
-    return OBJECTS_BY_NAME;
+    return Comparator.comparing(TCSObject::getName);
   }
 
   /**
-   * Returns a comparator for ordering <code>TCSObjectReference</code>s ascendingly
-   * by their names.
+   * Returns a comparator for sorting <code>TCSObjectReference</code>s lexicographically by their
+   * names.
    *
-   * @return A comparator for ordering <code>TCSObjectReference</code>s ascendingly
-   * by their names.
+   * @return A comparator for sorting <code>TCSObjectReference</code>s lexicographically by their
+   * names.
    */
   public static Comparator<TCSObjectReference<?>> referencesByName() {
-    return (TCSObjectReference<?> o1, TCSObjectReference<?> o2)
-        -> o1.getName().compareTo(o2.getName());
+    return Comparator.comparing(TCSObjectReference::getName);
   }
 
   /**
-   * A comparator for sorting transport orders by their priority, with those
-   * with the highest priority coming first.
-   * Transport orders are sorted by their deadlines first; if two orders have
-   * exactly the same deadline, they are sorted by their (unique) creation
-   * times, with the older one coming first.
+   * A comparator for sorting transport orders by their deadlines, with the most urgent ones coming
+   * first.
+   * Transport orders are sorted by their deadlines first; if two orders have exactly the same
+   * deadline, they are sorted by their (unique) creation times, with the older one coming first.
    *
-   * @return A comparator for sorting transport orders by their priority.
+   * @return A comparator for sorting transport orders by their deadlines.
    */
   public static Comparator<TransportOrder> ordersByDeadline() {
-    return ORDERS_BY_DEADLINE;
+    return Comparator.comparing(TransportOrder::getDeadline).thenComparing(ordersByAge());
   }
 
   /**
-   * A comparator for sorting transport orders by their age, with the oldest
-   * ones coming first.
+   * A comparator for sorting transport orders by their age, with the oldest ones coming first.
    *
    * @return A comparator for sorting transport orders by their age.
    */
   public static Comparator<TransportOrder> ordersByAge() {
-    return ORDERS_BY_AGE;
+    return Comparator.comparing(TransportOrder::getCreationTime).thenComparing(objectsByName());
   }
 
   /**
@@ -132,7 +72,7 @@ public final class Comparators {
    * @return A comparator for sorting peripheral jobs by their age.
    */
   public static Comparator<PeripheralJob> jobsByAge() {
-    return JOBS_BY_AGE;
+    return Comparator.comparing(PeripheralJob::getCreationTime).thenComparing(objectsByName());
   }
 
   /**

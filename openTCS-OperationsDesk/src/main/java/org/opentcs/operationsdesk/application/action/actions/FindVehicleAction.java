@@ -11,6 +11,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
@@ -24,7 +25,6 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.components.dialogs.ClosableDialog;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.common.persistence.ModelManager;
-import org.opentcs.guing.common.util.Comparators;
 import org.opentcs.guing.common.util.ImageDirectory;
 import org.opentcs.operationsdesk.components.dialogs.FindVehiclePanel;
 import org.opentcs.operationsdesk.components.dialogs.FindVehiclePanelFactory;
@@ -93,13 +93,12 @@ public class FindVehicleAction
   }
 
   private void findVehicle() {
-    List<VehicleModel> vehicles
-        = new ArrayList<>(modelManager.getModel().getVehicleModels());
+    List<VehicleModel> vehicles = new ArrayList<>(modelManager.getModel().getVehicleModels());
     if (vehicles.isEmpty()) {
       return;
     }
 
-    Collections.sort(vehicles, Comparators.modelComponentsByName());
+    Collections.sort(vehicles, Comparator.comparing(VehicleModel::getName));
     FindVehiclePanel content = panelFactory.createFindVehiclesPanel(vehicles,
                                                                     drawingEditor.getActiveView());
     String title = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.FINDVEHICLE_PATH)

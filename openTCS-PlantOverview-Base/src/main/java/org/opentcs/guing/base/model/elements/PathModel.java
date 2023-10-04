@@ -9,6 +9,7 @@ package org.opentcs.guing.base.model.elements;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -62,14 +63,12 @@ public class PathModel
    * The set of vehicle models for which this model component's figure is to be decorated to
    * indicate that it is part of the route of the respective vehicles.
    */
-  private Set<VehicleModel> vehicles
-      = new TreeSet<>((v1, v2) -> v1.getName().compareTo(v2.getName()));
+  private Set<VehicleModel> vehicles = new TreeSet<>(Comparator.comparing(VehicleModel::getName));
   /**
    * The set of block models for which this model component's figure is to be decorated to indicate
    * that it is part of the respective block.
    */
-  private Set<BlockModel> blocks
-      = new TreeSet<>((b1, b2) -> b1.getName().compareTo(b2.getName()));
+  private Set<BlockModel> blocks = new TreeSet<>(Comparator.comparing(BlockModel::getName));
 
   /**
    * Creates a new instance.

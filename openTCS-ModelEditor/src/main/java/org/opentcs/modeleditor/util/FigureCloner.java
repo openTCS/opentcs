@@ -10,6 +10,7 @@ package org.opentcs.modeleditor.util;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +30,6 @@ import org.opentcs.guing.common.components.drawing.figures.FigureConstants;
 import org.opentcs.guing.common.components.drawing.figures.LabeledFigure;
 import org.opentcs.guing.common.components.drawing.figures.SimpleLineConnection;
 import org.opentcs.guing.common.persistence.ModelManager;
-import org.opentcs.guing.common.util.Comparators;
 
 /**
  * A helper class for cloning figures.
@@ -62,7 +62,7 @@ public class FigureCloner {
 
     // Buffer for Links and Paths associated with the cloned Points and Locations
     TreeSet<AbstractConnection> bufferedConnections
-        = new TreeSet<>(Comparators.modelComponentsByName());
+        = new TreeSet<>(Comparator.comparing(AbstractConnection::getName));
     // References the prototype Points and Locations to their clones
     Map<ModelComponent, ModelComponent> mClones = new HashMap<>();
     List<Figure> clonedFigures = new ArrayList<>();
