@@ -10,10 +10,8 @@ package org.opentcs.virtualvehicle;
 import static com.google.common.base.Preconditions.checkArgument;
 import java.io.Serializable;
 import java.util.ArrayDeque;
-import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
-import java.util.Set;
 import org.opentcs.data.model.Vehicle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,10 +63,6 @@ public class VelocityController {
    * This controller's processing queue.
    */
   private final Queue<WayEntry> wayEntries = new ArrayDeque<>();
-  /**
-   * A set of velocity listeners.
-   */
-  private final Set<VelocityListener> velocityListeners = new HashSet<>();
   /**
    * True, if the vehicle has been paused, e.g. via the kernel gui
    * or a by a client message.
@@ -187,30 +181,6 @@ public class VelocityController {
   }
 
   /**
-   * Adds a velocity listener to this vehicle controller's set of listeners.
-   *
-   * @param listener The velocity listener to be added.
-   */
-  public void addVelocityListener(VelocityListener listener) {
-    if (listener == null) {
-      throw new NullPointerException("listener is null");
-    }
-    velocityListeners.add(listener);
-  }
-
-  /**
-   * Removes a velocity listener from this vehicle controller's set of listeners.
-   *
-   * @param listener The velocity listener to be removed.
-   */
-  public void removeVelocityListener(VelocityListener listener) {
-    if (listener == null) {
-      throw new IllegalArgumentException("listener is null");
-    }
-    velocityListeners.remove(listener);
-  }
-
-  /**
    * Returns this controller's current velocity.
    *
    * @return This controller's current velocity.
@@ -281,9 +251,8 @@ public class VelocityController {
    * Must be at least 1.
    */
   public void advanceTime(int dt) {
-    if (dt < 1) {
-      throw new IllegalArgumentException("dt is less than 1");
-    }
+    checkArgument(dt >= 1, "dt is less than 1: %d", dt);
+
     final int oldPosition = currentPosition;
     final int oldVelocity = currentVelocity;
     final WayEntry curWayEntry = wayEntries.peek();
@@ -325,10 +294,6 @@ public class VelocityController {
     }
     // The given time has now passed.
     currentTime += dt;
-    // Let the listeners know about the new velocity value.
-    for (VelocityListener curListener : velocityListeners) {
-      curListener.addVelocityValue(currentVelocity);
-    }
   }
 
   /**

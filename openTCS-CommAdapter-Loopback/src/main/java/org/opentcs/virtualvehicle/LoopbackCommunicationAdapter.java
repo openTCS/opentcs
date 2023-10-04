@@ -174,7 +174,6 @@ public class LoopbackCommunicationAdapter
     if (isEnabled()) {
       return;
     }
-    getProcessModel().getVelocityController().addVelocityListener(getProcessModel());
     super.enable();
   }
 
@@ -183,7 +182,6 @@ public class LoopbackCommunicationAdapter
     if (!isEnabled()) {
       return;
     }
-    getProcessModel().getVelocityController().removeVelocityListener(getProcessModel());
     super.disable();
   }
 

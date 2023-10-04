@@ -16,8 +16,7 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
  * An observable model of a virtual vehicle's and its comm adapter's attributes.
  */
 public class LoopbackVehicleModel
-    extends VehicleProcessModel
-    implements VelocityListener {
+    extends VehicleProcessModel {
 
   /**
    * Indicates whether this communication adapter is in single step mode or not (i.e. in automatic
@@ -40,10 +39,6 @@ public class LoopbackVehicleModel
    * The velocity controller for calculating the simulated vehicle's velocity and current position.
    */
   private final VelocityController velocityController;
-  /**
-   * Keeps a log of recent velocity values.
-   */
-  private final VelocityHistory velocityHistory = new VelocityHistory(100, 10);
 
   public LoopbackVehicleModel(Vehicle attachedVehicle) {
     super(attachedVehicle);
@@ -237,26 +232,6 @@ public class LoopbackVehicleModel
     return velocityController;
   }
 
-  /**
-   * Returns a log of recent velocity values of the vehicle.
-   *
-   * @return A log of recent velocity values.
-   */
-  @Nonnull
-  public VelocityHistory getVelocityHistory() {
-    return velocityHistory;
-  }
-
-  @Override
-  public void addVelocityValue(int velocityValue) {
-    // Store the new value in the history...
-    velocityHistory.addVelocityValue(velocityValue);
-    // ...and let all observers know about it.
-    getPropertyChangeSupport().firePropertyChange(Attribute.VELOCITY_HISTORY.name(),
-                                                  null,
-                                                  velocityHistory);
-  }
-
   private int parseOperatingTime(Vehicle vehicle) {
     String opTime = vehicle.getProperty(LoopbackAdapterConstants.PROPKEY_OPERATING_TIME);
     // Ensure it's a positive value.
@@ -335,9 +310,5 @@ public class LoopbackVehicleModel
      * Indicates a change of the virtual vehicle's paused setting.
      */
     VEHICLE_PAUSED,
-    /**
-     * Indicates a change of the virtual vehicle's velocity history.
-     */
-    VELOCITY_HISTORY,
   }
 }
