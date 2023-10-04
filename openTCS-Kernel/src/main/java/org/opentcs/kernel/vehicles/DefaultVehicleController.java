@@ -1107,7 +1107,7 @@ public class DefaultVehicleController
     }
 
     if (nextCommand == null) {
-      futureCommands.stream()
+      nextCommand = futureCommands.stream()
           .filter(cmd -> cmd != null)
           .findFirst()
           .orElse(null);

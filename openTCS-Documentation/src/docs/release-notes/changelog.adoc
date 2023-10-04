@@ -14,7 +14,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
-...
+* Bugs fixed:
+** When updating the vehicle's prospective next position, actually consider its future movement commands.
 
 == Version 5.10 (2023-09-23)
 
