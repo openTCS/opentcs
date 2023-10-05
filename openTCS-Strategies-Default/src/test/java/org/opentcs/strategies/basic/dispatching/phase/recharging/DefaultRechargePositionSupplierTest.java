@@ -7,16 +7,14 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.recharging;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.oneOf;
 import org.junit.jupiter.api.AfterEach;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
@@ -35,24 +33,63 @@ import org.opentcs.data.order.DriveOrder.Destination;
  */
 public class DefaultRechargePositionSupplierTest {
 
-  /**
-   * The plant model service used by the recharge strategy.
-   */
+  private Point currentPosition;
+  private Vehicle vehicle;
+  private LocationType rechargeLocType;
+  private Location rechargeLoc1;
+  private Location rechargeLoc2;
+  private Location rechargeLoc3;
+  private Point locationAccessPoint;
+
   private InternalPlantModelService plantModelService;
-  /**
-   * The router used by the recharge strategy.
-   */
   private Router router;
-  /**
-   * The supplier instance to be tested.
-   */
   private DefaultRechargePositionSupplier rechargePosSupplier;
 
   @BeforeEach
   public void setUp() {
+    currentPosition = new Point("current-position");
+    vehicle = new Vehicle("some-vehicle")
+        .withCurrentPosition(currentPosition.getReference())
+        .withRechargeOperation("Do some recharging");
+
+    rechargeLocType = new LocationType("some-recharge-loc-type")
+        .withAllowedOperations(List.of(vehicle.getRechargeOperation()));
+
+    rechargeLoc1 = new Location("recharge-loc-1", rechargeLocType.getReference());
+    rechargeLoc2 = new Location("recharge-loc-2", rechargeLocType.getReference());
+    rechargeLoc3 = new Location("recharge-loc-3", rechargeLocType.getReference());
+
+    locationAccessPoint = new Point("location-access-point");
+
+    Location.Link link1
+        = new Location.Link(rechargeLoc1.getReference(), locationAccessPoint.getReference());
+    Location.Link link2
+        = new Location.Link(rechargeLoc2.getReference(), locationAccessPoint.getReference());
+    Location.Link link3
+        = new Location.Link(rechargeLoc3.getReference(), locationAccessPoint.getReference());
+
+    rechargeLoc1 = rechargeLoc1.withAttachedLinks(Set.of(link1));
+    rechargeLoc2 = rechargeLoc2.withAttachedLinks(Set.of(link2));
+    rechargeLoc3 = rechargeLoc3.withAttachedLinks(Set.of(link3));
+
+    locationAccessPoint = locationAccessPoint.withAttachedLinks(Set.of(link1, link2, link3));
+
     plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
     rechargePosSupplier = new DefaultRechargePositionSupplier(plantModelService, router);
+
+    when(plantModelService.fetchObject(Point.class, currentPosition.getReference()))
+        .thenReturn(currentPosition);
+    when(plantModelService.fetchObject(Point.class, locationAccessPoint.getReference()))
+        .thenReturn(locationAccessPoint);
+    when(plantModelService.fetchObject(LocationType.class, rechargeLocType.getReference()))
+        .thenReturn(rechargeLocType);
+    when(plantModelService.fetchObjects(Location.class))
+        .thenReturn(Set.of(rechargeLoc1, rechargeLoc2, rechargeLoc3));
+    when(plantModelService.expandResources(Set.of(locationAccessPoint.getReference())))
+        .thenReturn(Set.of(locationAccessPoint));
+
+    rechargePosSupplier.initialize();
   }
 
   @AfterEach
@@ -61,93 +98,148 @@ public class DefaultRechargePositionSupplierTest {
   }
 
   @Test
-  public void findExistingRechargePosition() {
-    Point currentVehiclePoint = new Point("Current vehicle point")
-        .withType(Point.Type.HALT_POSITION);
-    Vehicle vehicle = new Vehicle("Some vehicle")
-        .withRechargeOperation("Do some recharging")
-        .withCurrentPosition(currentVehiclePoint.getReference());
-
-    Point locationAccessPoint = new Point("Location access point")
-        .withType(Point.Type.HALT_POSITION);
-
-    LocationType rechargeLocType = new LocationType("Recharge location type")
-        .withAllowedOperations(Collections.singletonList(vehicle.getRechargeOperation()));
-    Location location = new Location("Recharge location", rechargeLocType.getReference());
-
-    Location.Link link = new Location.Link(location.getReference(),
-                                           locationAccessPoint.getReference());
-    location = location.withAttachedLinks(new HashSet<>(Arrays.asList(link)));
-
-    locationAccessPoint = locationAccessPoint.withAttachedLinks(new HashSet<>(Arrays.asList(link)));
-
-    when(plantModelService.fetchObjects(Location.class))
-        .thenReturn(Collections.singleton(location));
-    when(plantModelService.fetchObject(LocationType.class, rechargeLocType.getReference()))
-        .thenReturn(rechargeLocType);
-    when(plantModelService.fetchObject(Point.class, currentVehiclePoint.getReference()))
-        .thenReturn(currentVehiclePoint);
-    when(plantModelService.fetchObject(Point.class, locationAccessPoint.getReference()))
-        .thenReturn(locationAccessPoint);
-
-    rechargePosSupplier.initialize();
-
-    List<Destination> result = rechargePosSupplier.findRechargeSequence(vehicle);
-    assertNotNull(result);
-    assertThat(result, is(not(empty())));
+  public void returnEmptyListForUnknownVehiclePosition() {
+    assertThat(
+        rechargePosSupplier.findRechargeSequence(vehicle.withCurrentPosition(null)),
+        is(empty())
+    );
   }
 
   @Test
-  public void returnsEmptyListIfNoRechargePositionExists() {
-    Point currentVehiclePoint = new Point("Current vehicle point");
-    Vehicle vehicle = new Vehicle("Some vehicle")
-        .withCurrentPosition(currentVehiclePoint.getReference());
-
-    when(plantModelService.fetchObject(Point.class, currentVehiclePoint.getReference()))
-        .thenReturn(currentVehiclePoint);
-
-    rechargePosSupplier.initialize();
-
-    List<Destination> result = rechargePosSupplier.findRechargeSequence(vehicle);
-    assertNotNull(result);
-    assertThat(result, is(empty()));
+  public void returnEmptyListForUnknownRechargeOperation() {
+    assertThat(
+        rechargePosSupplier.findRechargeSequence(
+            vehicle.withRechargeOperation("some-unknown-recharge-operation")
+        ),
+        is(empty())
+    );
   }
 
   @Test
-  public void returnsEmptyListIfAssignedRechargePositionDoesNotExist() {
-    Point currentVehiclePoint = new Point("Current vehicle point");
-    Vehicle vehicle = new Vehicle("Some vehicle")
-        .withRechargeOperation("Do some recharging")
-        .withCurrentPosition(currentVehiclePoint.getReference())
-        .withProperty(Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION, "someUnknownLocation");
-
-    Point locationAccessPoint = new Point("Location access point")
-        .withType(Point.Type.HALT_POSITION);
-
-    LocationType rechargeLocType = new LocationType("Recharge location type")
-        .withAllowedOperations(Arrays.asList("Recharge"));
-    Location location = new Location("Recharge location", rechargeLocType.getReference());
-
-    Location.Link link = new Location.Link(location.getReference(),
-                                           locationAccessPoint.getReference());
-    location = location.withAttachedLinks(new HashSet<>(Arrays.asList(link)));
-
-    locationAccessPoint = locationAccessPoint.withAttachedLinks(new HashSet<>(Arrays.asList(link)));
-
-    when(plantModelService.fetchObjects(Location.class))
-        .thenReturn(Collections.singleton(location));
-    when(plantModelService.fetchObject(LocationType.class, rechargeLocType.getReference()))
-        .thenReturn(rechargeLocType);
-    when(plantModelService.fetchObject(Point.class, currentVehiclePoint.getReference()))
-        .thenReturn(currentVehiclePoint);
-    when(plantModelService.fetchObject(Point.class, locationAccessPoint.getReference()))
-        .thenReturn(locationAccessPoint);
-
-    rechargePosSupplier.initialize();
-
-    List<Destination> result = rechargePosSupplier.findRechargeSequence(vehicle);
-    assertNotNull(result);
-    assertThat(result, is(empty()));
+  public void returnEmptyListForNonexistentAssignedRechargeLocation() {
+    assertThat(
+        rechargePosSupplier.findRechargeSequence(
+            vehicle.withProperty(
+                Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION,
+                "some-unknown-location")
+        ),
+        is(empty())
+    );
   }
 
+  @Test
+  public void returnAnyForNonexistentPreferredRechargeLocation() {
+    List<Destination> result = rechargePosSupplier.findRechargeSequence(
+        vehicle.withProperty(
+            Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION,
+            "some-unknown-location")
+    );
+
+    assertThat(result, hasSize(1));
+    assertThat(
+        result.get(0).getDestination(),
+        is(oneOf(
+            rechargeLoc1.getReference(),
+            rechargeLoc2.getReference(),
+            rechargeLoc2.getReference()
+        ))
+    );
+  }
+
+  @Test
+  public void returnAnyIfVehicleHasNoAssignedOrPreferredLocation() {
+    List<Destination> result = rechargePosSupplier.findRechargeSequence(vehicle);
+
+    assertThat(result, hasSize(1));
+    assertThat(
+        result.get(0).getDestination(),
+        is(oneOf(
+            rechargeLoc1.getReference(),
+            rechargeLoc2.getReference(),
+            rechargeLoc2.getReference()
+        ))
+    );
+  }
+
+  @Test
+  public void returnAssignedRechargeLocationIfSet() {
+    List<Destination> result;
+
+    result = rechargePosSupplier.findRechargeSequence(
+        vehicle.withProperty(Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION, rechargeLoc1.getName())
+    );
+
+    assertThat(result, hasSize(1));
+    assertThat(result.get(0).getDestination(), is(rechargeLoc1.getReference()));
+
+    result = rechargePosSupplier.findRechargeSequence(
+        vehicle.withProperty(Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION, rechargeLoc2.getName())
+    );
+
+    assertThat(result, hasSize(1));
+    assertThat(result.get(0).getDestination(), is(rechargeLoc2.getReference()));
+
+    result = rechargePosSupplier.findRechargeSequence(
+        vehicle.withProperty(Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION, rechargeLoc3.getName())
+    );
+
+    assertThat(result, hasSize(1));
+    assertThat(result.get(0).getDestination(), is(rechargeLoc3.getReference()));
+  }
+
+  @Test
+  public void returnPreferredRechargeLocationIfSet() {
+    List<Destination> result;
+
+    result = rechargePosSupplier.findRechargeSequence(
+        vehicle.withProperty(Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION, rechargeLoc1.getName())
+    );
+
+    assertThat(result, hasSize(1));
+    assertThat(result.get(0).getDestination(), is(rechargeLoc1.getReference()));
+
+    result = rechargePosSupplier.findRechargeSequence(
+        vehicle.withProperty(Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION, rechargeLoc2.getName())
+    );
+
+    assertThat(result, hasSize(1));
+    assertThat(result.get(0).getDestination(), is(rechargeLoc2.getReference()));
+
+    result = rechargePosSupplier.findRechargeSequence(
+        vehicle.withProperty(Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION, rechargeLoc3.getName())
+    );
+
+    assertThat(result, hasSize(1));
+    assertThat(result.get(0).getDestination(), is(rechargeLoc3.getReference()));
+  }
+
+  @Test
+  public void givePrecedenceToAssignedOverPreferredIfBothSet() {
+    vehicle = vehicle.withProperty(
+        Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION,
+        rechargeLoc2.getName()
+    );
+
+    List<Destination> result;
+
+    result = rechargePosSupplier.findRechargeSequence(
+        vehicle.withProperty(Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION, rechargeLoc1.getName())
+    );
+
+    assertThat(result, hasSize(1));
+    assertThat(
+        result.get(0).getDestination(),
+        is(rechargeLoc1.getReference())
+    );
+
+    result = rechargePosSupplier.findRechargeSequence(
+        vehicle.withProperty(Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION, rechargeLoc3.getName())
+    );
+
+    assertThat(result, hasSize(1));
+    assertThat(
+        result.get(0).getDestination(),
+        is(rechargeLoc3.getReference())
+    );
+  }
 }

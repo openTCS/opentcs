@@ -7,9 +7,6 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.recharging;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +61,7 @@ public class DefaultRechargePositionSupplier
 
   @Override
   public void initialize() {
-    if (initialized) {
+    if (isInitialized()) {
       return;
     }
 
@@ -78,7 +75,7 @@ public class DefaultRechargePositionSupplier
 
   @Override
   public void terminate() {
-    if (!initialized) {
+    if (!isInitialized()) {
       return;
     }
 
@@ -90,7 +87,7 @@ public class DefaultRechargePositionSupplier
     requireNonNull(vehicle, "vehicle");
 
     if (vehicle.getCurrentPosition() == null) {
-      return new ArrayList<>();
+      return List.of();
     }
 
     Map<Location, Set<Point>> rechargeLocations
@@ -103,28 +100,18 @@ public class DefaultRechargePositionSupplier
       Location location = pickLocationWithName(assignedRechargeLocationName,
                                                rechargeLocations.keySet());
       if (location == null) {
-        return new ArrayList<>();
+        return List.of();
       }
-      // XXX Strictly, we should check whether there is a viable route to the location.
-      return Arrays.asList(createDestination(location, vehicle.getRechargeOperation()));
+      // XXX We should check whether there actually is a viable route to the location.
+      return List.of(createDestination(location, vehicle.getRechargeOperation()));
     }
 
-    String preferredRechargeLocationName = vehicle.getProperty(PROPKEY_PREFERRED_RECHARGE_LOCATION);
-    if (assignedRechargeLocationName != null) {
-      Location location = pickLocationWithName(preferredRechargeLocationName,
-                                               rechargeLocations.keySet());
-      if (location != null) {
-        // XXX Strictly, we should check whether there is a viable route to the location.
-        return Arrays.asList(createDestination(location, vehicle.getRechargeOperation()));
-      }
-    }
-
-    Location bestLocation = findCheapestLocation(rechargeLocations, vehicle);
-    if (bestLocation != null) {
-      return Arrays.asList(createDestination(bestLocation, vehicle.getRechargeOperation()));
-    }
-
-    return new ArrayList<>();
+    // XXX We should check whether there actually is a viable route to the chosen location.
+    return Optional.ofNullable(vehicle.getProperty(PROPKEY_PREFERRED_RECHARGE_LOCATION))
+        .map(name -> pickLocationWithName(name, rechargeLocations.keySet()))
+        .or(() -> Optional.ofNullable(findCheapestLocation(rechargeLocations, vehicle)))
+        .map(location -> List.of(createDestination(location, vehicle.getRechargeOperation())))
+        .orElse(List.of());
   }
 
   @Nullable
@@ -238,7 +225,7 @@ public class DefaultRechargePositionSupplier
                                        Vehicle vehicle,
                                        Set<Point> targetedPoints) {
     return expandPoints(accessPoint).stream()
-        .allMatch(point -> !pointOccupiedOrTargetedByOtherVehicle(point,
+        .noneMatch(point -> pointOccupiedOrTargetedByOtherVehicle(point,
                                                                   vehicle,
                                                                   targetedPoints));
   }
@@ -263,7 +250,7 @@ public class DefaultRechargePositionSupplier
    * @return A set of all points from all blocks that the given point is a member of.
    */
   private Set<Point> expandPoints(Point point) {
-    return plantModelService.expandResources(Collections.singleton(point.getReference())).stream()
+    return plantModelService.expandResources(Set.of(point.getReference())).stream()
         .filter(resource -> Point.class.equals(resource.getReference().getReferentClass()))
         .map(resource -> (Point) resource)
         .collect(Collectors.toSet());
