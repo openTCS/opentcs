@@ -8,6 +8,7 @@
 package org.opentcs.data;
 
 import java.io.Serializable;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 
@@ -60,13 +61,16 @@ public class TCSObjectReference<E extends TCSObject<E>>
 
   @Override
   public boolean equals(Object otherObj) {
-    if (otherObj instanceof TCSObjectReference) {
-      TCSObjectReference<?> otherRef = (TCSObjectReference<?>) otherObj;
-      return referentClass.equals(otherRef.referentClass) && name.equals(otherRef.name);
+    if (otherObj == this) {
+      return true;
     }
-    else {
+    if (!(otherObj instanceof TCSObjectReference)) {
       return false;
     }
+
+    TCSObjectReference<?> otherRef = (TCSObjectReference<?>) otherObj;
+    return Objects.equals(referentClass, otherRef.referentClass)
+        && Objects.equals(name, otherRef.name);
   }
 
   @Override

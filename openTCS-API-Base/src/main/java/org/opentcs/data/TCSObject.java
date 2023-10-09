@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -163,23 +164,23 @@ public abstract class TCSObject<E extends TCSObject<E>>
 
   /**
    * Checks if this object is equal to another one.
-   * Two <code>TCSObject</code>s are equal if both their IDs and their runtime
-   * classes are equal.
+   * Two <code>TCSObject</code>s are equal if both their names and their runtime classes are equal.
    *
    * @param obj The object to compare this one to.
-   * @return <code>true</code> if, and only if, <code>obj</code> is also a
-   * <code>TCSObject</code> and both its ID and runtime class equal those of
-   * this object.
+   * @return <code>true</code> if, and only if, <code>obj</code> is also a <code>TCSObject</code>
+   * and both its name and runtime class equal those of this object.
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof TCSObject) {
-      TCSObject<?> other = (TCSObject<?>) obj;
-      return this.getName().equals(other.getName()) && this.getClass().equals(other.getClass());
+    if (obj == this) {
+      return true;
     }
-    else {
+    if (!(obj instanceof TCSObject)) {
       return false;
     }
+
+    return Objects.equals(getClass(), obj.getClass())
+        && Objects.equals(getName(), ((TCSObject<?>) obj).getName());
   }
 
   /**
