@@ -118,6 +118,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TransportOrderState"
+        "400":
+          description: The submitted data is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
         "404":
           description: Referencing object that could not be found.
           content:
@@ -145,6 +155,7 @@ paths:
           required: true
           schema:
             type: string
+            example: TOrder-002
       requestBody:
         content:
           application/json:
@@ -347,6 +358,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/OrderSequenceState"
+        "400":
+          description: The submitted data is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
         "404":
           description: Referencing object that could not be found.
           content:
@@ -374,6 +395,7 @@ paths:
           required: true
           schema:
             type: string
+            example: OrderSequence-01
       requestBody:
         content:
           application/json:
@@ -912,6 +934,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PeripheralJobState"
+        "400":
+          description: The submitted data is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
         "404":
           description: Referencing object that could not be found.
           content:
@@ -1292,7 +1324,7 @@ components:
           description: >-
             The order sequence this transport order belongs to. 
             May be `null` in case this order isn't part of any sequence.
-          example: MyOrderSequence
+          example: OrderSequence-01
         destinations:
           type: array
           items:
@@ -1305,7 +1337,7 @@ components:
         locationName:
           type: string
           description: The name of the destination location
-          example: Storage-01
+          example: Storage 01
         operation:
           type: string
           description: The destination operation
@@ -1365,11 +1397,11 @@ components:
           description: >-
             The order sequence this transport order belongs to.
             May be `null` in case this order isn't part of any sequence.
-          example: MyOrderSequence
+          example: OrderSequence-01
         type:
           type: string
           description: The (optional) type of the transport order
-          example: some type
+          example: Park
         destinations:
           type: array
           minItems: 1
@@ -1390,7 +1422,7 @@ components:
           maxItems: 2147483647
           items:
             type: string
-            example: TOrder-002
+            example: TOrder-001
           description: The transport order's dependencies
       required:
         - destinations
@@ -1425,7 +1457,7 @@ components:
           items:
             type: string
             description: The names of the allowed order types.
-          example: ["some-order-type", "another-order-type", "third-order-type" ]
+          example: ["Park", "Load cargo", "Unload cargo" ]
       required:
         - orderTypes
     OrderSequenceState:
@@ -1501,7 +1533,7 @@ components:
           description: >- 
             The name of the vehicle that is intended to process the order sequence.
             If this sequence is free to be processed by any vehicle, this is `null`.
-          example: Vehicle-0001
+          example: Vehicle-01
         failureFatal:
           type: boolean
           description: Indicates whether the failure of one order in this sequence is fatal to all subsequent orders.
@@ -1641,8 +1673,8 @@ components:
         type:
           type: string
           enum:
-            - OrderStatusMessage
-            - VehicleStatusMessage
+            - TransportOrder
+            - Vehicle
             - PeripheralJob
         sequenceNumber:
           type: integer
@@ -1786,6 +1818,8 @@ components:
         - properties:
             type:
               type: string
+              enum:
+                  - PeripheralJob
               default: PeripheralJob
             sequenceNumber:
               example: 126
@@ -1940,7 +1974,7 @@ components:
         locationName:
           type: string
           description: The name of the location the peripheral device is associated with.
-          example: Location-01
+          example: Loading Bay
         executionTrigger:
           type: string
           description: The moment at which this operation is to be performed.
@@ -1975,44 +2009,281 @@ components:
         name:
           type: string
           description: The plant model's name.
-          example: Plant Model 001
+          example: Plant Model 01
         points:
           type: array
           description: The plant model's points.
           items:
             $ref: "#/components/schemas/PlantModelPoint"
+          example:
+            - name: "Point-A"
+              position: 
+                x: 15000
+                y: 20000
+                z: 0
+              vehicleOrientationAngle: 90
+              type: "HALT_POSITION"
+              layout: 
+                position:
+                  x: 15000
+                  y: 20000
+                labelOffset:
+                  x: 10
+                  y: 10
+                layerId: 0
+              properties:
+                - name: isExampleProperty
+                  value: true
+            - name: "Point-B"
+              position: 
+                x: 30000
+                y: 20000
+                z: 0
+              vehicleOrientationAngle: 90
+              type: "HALT_POSITION"
+              layout: 
+                position:
+                  x: 30000
+                  y: 20000
+                labelOffset:
+                  x: 10
+                  y: 10
+                layerId: 0
+              properties:
+                - name: isExampleProperty
+                  value: true
+            - name: "Point-C"
+              position: 
+                x: 10000
+                y: 30000
+                z: 0
+              vehicleOrientationAngle: "NaN"
+              type: "HALT_POSITION"
+              layout: 
+                position:
+                  x: 10000
+                  y: 30000
+                labelOffset:
+                  x: 10
+                  y: 10
+                layerId: 0
+            - name: "Point-D"
+              position: 
+                x: 25000
+                y: 30000
+                z: 0
+              vehicleOrientationAngle: "NaN"
+              type: "HALT_POSITION"
+              layout: 
+                position:
+                  x: 25000
+                  y: 30000
+                labelOffset:
+                  x: 10
+                  y: 10
+                layerId: 0
         paths:
           type: array
           description: The plant model's paths.
           items:
             $ref: "#/components/schemas/PlantModelPath"
+          example:
+            - name: "Path-AB"
+              srcPointName: "Point-A"
+              destPointName: "Point-B"
+              maxVelocity: 2500
+              maxReverseVelocity: 2500
+              locked: false
+              layout:
+                connectionType: "DIRECT"
+                layerId: 0
+              properties:
+                - name: pathPropertyKey
+                  value: exampleValue
+            - name: "Path-BC"
+              srcPointName: "Point-B"
+              destPointName: "Point-C"
+              maxVelocity: 2500
+              maxReverseVelocity: 2500
+              layout:
+                connectionType: "DIRECT"
+                layerId: 0
+            - name: "Path-CA"
+              srcPointName: "Point-C"
+              destPointName: "Point-A"
+              maxVelocity: 2500
+              maxReverseVelocity: 2500
+              layout:
+                connectionType: "DIRECT"
+                layerId: 0
+            - name: "Path-CD"
+              srcPointName: "Point-C"
+              destPointName: "Point-D"
+              maxVelocity: 1500
+              maxReverseVelocity: 1000
+              layout:
+                connectionType: "DIRECT"
+                layerId: 0
+            - name: "Path-DA"
+              srcPointName: "Point-D"
+              destPointName: "Point-A"
+              maxVelocity: 2500
+              maxReverseVelocity: 2500
+              layout:
+                connectionType: "DIRECT"
+                layerId: 0
+            - name: "Path-DB"
+              srcPointName: "Point-D"
+              destPointName: "Point-B"
+              maxVelocity: 2500
+              maxReverseVelocity: 2500
+              layout:
+                connectionType: "DIRECT"
+                layerId: 0
         locationTypes:
           type: array
           description: The plant model's location types.
           items:
             $ref: "#/components/schemas/PlantModelLocationType"
+          example:
+            - name: "Transfer-station"
+              allowedOperations: 
+                - Load cargo
+                - Unload cargo
+              layout:
+                locationRepresentation: "LOAD_TRANSFER_GENERIC"
+              properties:
+                - name: "locationTypePropertyKey"
+                  value: "locationTypePropertyValue"
+            - name: "Working-station"
+              allowedOperations: 
+                - Cut
+                - Drill
+              layout:
+                locationRepresentation: "WORKING_GENERIC"
         locations:
           type: array
           description: The plant model's locations.
           items:
             $ref: "#/components/schemas/PlantModelLocation"
+          example:
+            - name: "Storage 01"
+              typeName: "Transfer-station"
+              position: 
+                x: 15000
+                y: 10000
+                z: 0
+              links:
+                - pointName: "Point-A"
+              locked: false
+              layout:
+                position:
+                  x: 15000
+                  y: 10000
+                labelOffset:
+                  x: 10
+                  y: 10
+                locationRepresentation: "LOAD_TRANSFER_ALT_1"
+                layerId: 0
+            - name: "Storage 02"
+              typeName: "Transfer-station"
+              position: 
+                x: 30000
+                y: 10000
+                z: 0
+              links:
+                - pointName: "Point-B"
+              locked: false
+              layout:
+                position:
+                  x: 30000
+                  y: 10000
+                labelOffset:
+                  x: 10
+                  y: 10
+                layerId: 0
+            - name: "Workshop"
+              typeName: "Working-station"
+              position: 
+                x: 35000
+                y: 30000
+                z: 0
+              links:
+                - pointName: "Point-D"
+              locked: false
+              layout:
+                position:
+                  x: 35000
+                  y: 30000
+                labelOffset:
+                  x: 10
+                  y: 10
+                layerId: 0
+            - name: "Loading Bay"
+              typeName: "Transfer-station"
+              position: 
+                x: 0
+                y: 30000
+                z: 0
+              links:
+                - pointName: "Point-C"
+              locked: false
+              layout:
+                position:
+                  x: 0
+                  y: 30000
+                labelOffset:
+                  x: 10
+                  y: 10
+                layerId: 0
         blocks:
           type: array
           description: The plant model's blocks.
           items:
             $ref: "#/components/schemas/PlantModelBlock"
+          example:
+            - name: "Block-01"
+              type: "SINGLE_VEHICLE_ONLY"
+              memberNames:
+                - Path-BC
+                - Path-DA
+              layout:
+                color: "#FF0000"
         vehicles:
           type: array
           description: The plant model's vehicles.
           items:
             $ref: "#/components/schemas/PlantModelVehicle"
+          example:
+            - name: "Vehicle-01"
+              length: 1000
+              energyLevelCritical: 15
+              energyLevelGood: 50
+              energyLevelFullyRecharged: 97
+              energyLevelSufficientlyRecharged: 75
+              maxVelocity: 1500
+              maxReverseVelocity: 750
+              layout:
+                routeColor: "#00FF00"
+            - name: "Vehicle-02"
+              length: 1000
+              energyLevelCritical: 15
+              energyLevelGood: 50
+              energyLevelFullyRecharged: 97
+              energyLevelSufficientlyRecharged: 75
+              maxVelocity: 1500
+              maxReverseVelocity: 750
+              layout:
+                routeColor: "#550055"
         visualLayout:
           $ref: "#/components/schemas/PlantModelVisualLayout"
         properties:
           type: array
           description: The plant model's properties.
           items:
-            $ref: "#/components/schemas/Property"
+            example:
+              name: "modelPropertyExample"
+              value: "value"
       required:
         - name
     PlantModelPoint:
@@ -2278,7 +2549,7 @@ components:
           items:
             type: string
           description: This block's member names.
-          example: ["some point", "another point"]
+          example: ["Path-AB", "Path-BC"]
         layout:
           type: object
           description: The information regarding the grahical representation of this block.
@@ -2375,7 +2646,9 @@ components:
           type: array
           description: This visual layout's properties.
           items:
-            $ref: "#/components/schemas/Property"
+            example:
+              name: "visualLayoutProperty"
+              value: "value"
       required:
         - name
     PlantModelTriple:
@@ -2425,13 +2698,13 @@ components:
         id:
           type: integer
           description: The unique ID of this layer.
-          example: 3
+          example: 0
         ordinal:
           type: integer
           description: >-
             The ordinal of this layer.
             Layers with a higher ordinal are positioned above layers with a lower ordinal.
-          example: 3
+          example: 0
         visible:
           type: boolean
           description: Whether this layer is visible or not.
@@ -2442,7 +2715,7 @@ components:
         groupId:
           type: integer
           description: The ID of the layer group this layer is assigned to.
-          example: 3
+          example: 0
       required:
         - id
         - ordinal
@@ -2456,7 +2729,7 @@ components:
         id:
           type: integer
           description: The unique ID of this layer group.
-          example: 3
+          example: 0
         name:
           type: string
           description: The name of this layer group.
