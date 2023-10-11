@@ -27,6 +27,10 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 /**
  * Provides high-level methods for the kernel to control a vehicle.
  */
+@ScheduledApiChange(
+    when = "6.0",
+    details = "Will not extend Scheduler.Client any more; should be done by implementations."
+)
 public interface VehicleController
     extends Lifecycle,
             Scheduler.Client {
