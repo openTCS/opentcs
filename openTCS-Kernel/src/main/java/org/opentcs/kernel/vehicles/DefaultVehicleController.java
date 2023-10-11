@@ -547,9 +547,12 @@ public class DefaultVehicleController
               vehicle.getName(),
               lastCommandSent,
               futureCommands);
-    for (int i = 0; i < lastCommandSent.getStep().getRouteIndex() + 1; i++) {
+    // Discard commands up to lastCommandSent...
+    while (!equalsInMovement(futureCommands.peek(), lastCommandSent)) {
       futureCommands.poll();
     }
+    // ...and also discard lastCommandSent itself.
+    futureCommands.poll();
   }
 
   @Override
