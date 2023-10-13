@@ -10,18 +10,24 @@ package org.opentcs.kernel.extensions.servicewebapi;
 /**
  * Defines some HTTP-related constants.
  */
-public interface HttpConstants {
+public class HttpConstants {
 
   /**
    * Name of the header that is expected to contain the API access keys.
    */
-  String HEADER_NAME_ACCESS_KEY = "X-Api-Access-Key";
+  public static final String HEADER_NAME_ACCESS_KEY = "X-Api-Access-Key";
   /**
    * Content type for plain text.
    */
-  String CONTENT_TYPE_TEXT_PLAIN_UTF8 = "text/plain; charset=utf-8";
+  public static final String CONTENT_TYPE_TEXT_PLAIN_UTF8 = "text/plain; charset=utf-8";
   /**
    * Content type for JSON structures.
    */
-  String CONTENT_TYPE_APPLICATION_JSON_UTF8 = "application/json; charset=utf-8";
+  public static final String CONTENT_TYPE_APPLICATION_JSON_UTF8 = "application/json; charset=utf-8";
+
+  /**
+   * Prevents instantiation.
+   */
+  private HttpConstants() {
+  }
 }

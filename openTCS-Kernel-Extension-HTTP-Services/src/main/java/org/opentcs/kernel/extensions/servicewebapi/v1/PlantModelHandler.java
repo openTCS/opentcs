@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.access.to.model.BlockCreationTO;
@@ -88,9 +87,7 @@ public class PlantModelHandler {
 
   public void putPlantModel(PlantModelTO putPlantModel)
       throws ObjectUnknownException,
-             IllegalArgumentException,
-             InterruptedException,
-             ExecutionException {
+             IllegalArgumentException {
     requireNonNull(putPlantModel, "putPlantModel");
 
     PlantModelCreationTO plantModelCreationTO = new PlantModelCreationTO(putPlantModel.getName())
@@ -325,7 +322,6 @@ public class PlantModelHandler {
             .setConnectionType(path.getLayout().getConnectionType().name())
             .setControlPoints(toCoupleTOs(path.getLayout().getControlPoints()))))
         .collect(Collectors.toList());
-
   }
 
   private List<PathCreationTO> toPathCreationTOs(List<PathTO> paths) {

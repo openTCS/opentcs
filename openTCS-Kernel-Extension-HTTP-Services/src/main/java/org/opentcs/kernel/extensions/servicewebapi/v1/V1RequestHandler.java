@@ -39,38 +39,37 @@ import spark.Service;
 public class V1RequestHandler
     implements RequestHandler {
 
-  /**
-   * Binds JSON data to objects and vice versa.
-   */
   private final JsonBinder jsonBinder;
-  /**
-   * Collects interesting events and provides them for client requests.
-   */
   private final StatusEventDispatcher statusEventDispatcher;
-  /**
-   * Creates transport orders.
-   */
-  private final OrderHandler orderHandler;
-
+  private final TransportOrderDispatcherHandler orderDispatcherHandler;
+  private final TransportOrderHandler transportOrderHandler;
+  private final PeripheralJobHandler peripheralJobHandler;
+  private final PeripheralJobDispatcherHandler jobDispatcherHandler;
   private final PlantModelHandler plantModelHandler;
+  private final VehicleHandler vehicleHandler;
+  private final PeripheralHandler peripheralHandler;
 
-  private final RequestStatusHandler statusInformationProvider;
-  /**
-   * Whether this instance is initialized.
-   */
   private boolean initialized;
 
   @Inject
   public V1RequestHandler(JsonBinder jsonBinder,
                           StatusEventDispatcher statusEventDispatcher,
-                          OrderHandler orderHandler,
+                          TransportOrderDispatcherHandler orderDispatcherHandler,
+                          TransportOrderHandler transportOrderHandler,
+                          PeripheralJobHandler peripheralJobHandler,
+                          PeripheralJobDispatcherHandler jobDispatcherHandler,
                           PlantModelHandler plantModelHandler,
-                          RequestStatusHandler requestHandler) {
+                          VehicleHandler vehicleHandler,
+                          PeripheralHandler peripheralHandler) {
     this.jsonBinder = requireNonNull(jsonBinder, "jsonBinder");
     this.statusEventDispatcher = requireNonNull(statusEventDispatcher, "statusEventDispatcher");
-    this.orderHandler = requireNonNull(orderHandler, "orderHandler");
+    this.orderDispatcherHandler = requireNonNull(orderDispatcherHandler, "orderDispatcherHandler");
+    this.transportOrderHandler = requireNonNull(transportOrderHandler, "transportOrderHandler");
+    this.peripheralJobHandler = requireNonNull(peripheralJobHandler, "peripheralJobHandler");
+    this.jobDispatcherHandler = requireNonNull(jobDispatcherHandler, "jobDispatcherHandler");
     this.plantModelHandler = requireNonNull(plantModelHandler, "plantModelHandler");
-    this.statusInformationProvider = requireNonNull(requestHandler, "requestHandler");
+    this.vehicleHandler = requireNonNull(vehicleHandler, "vehicleHandler");
+    this.peripheralHandler = requireNonNull(peripheralHandler, "peripheralHandler");
   }
 
   @Override
@@ -109,7 +108,7 @@ public class V1RequestHandler
     service.post("/vehicles/dispatcher/trigger",
                  this::handlePostDispatcherTrigger);
     service.post("/vehicles/:NAME/routeComputationQuery",
-                this::handleGetVehicleRoutes);
+                 this::handleGetVehicleRoutes);
     service.put("/vehicles/:NAME/commAdapter/attachment",
                 this::handlePutVehicleCommAdapterAttachment);
     service.get("/vehicles/:NAME/commAdapter/attachmentInformation",
@@ -183,7 +182,7 @@ public class V1RequestHandler
   private Object handlePostDispatcherTrigger(Request request, Response response)
       throws KernelRuntimeException {
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    orderHandler.triggerDispatcher();
+    orderDispatcherHandler.triggerDispatcher();
     return "";
   }
 
@@ -197,7 +196,7 @@ public class V1RequestHandler
 
   private Object handlePutVehicleCommAdapterEnabled(Request request, Response response)
       throws ObjectUnknownException, IllegalArgumentException {
-    statusInformationProvider.putVehicleCommAdapterEnabled(
+    vehicleHandler.putVehicleCommAdapterEnabled(
         request.params(":NAME"),
         valueIfKeyPresent(request.queryMap(), "newValue")
     );
@@ -209,7 +208,7 @@ public class V1RequestHandler
       throws ObjectUnknownException, IllegalArgumentException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(GetVehicleAttachmentInfoResponseTO.fromAttachmentInformation(
-        statusInformationProvider.getVehicleCommAdapterAttachmentInformation(
+        vehicleHandler.getVehicleCommAdapterAttachmentInformation(
             request.params(":NAME")
         )
     )
@@ -220,17 +219,17 @@ public class V1RequestHandler
       throws ObjectUnknownException, IllegalArgumentException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(PostVehicleRoutesResponseTO.fromMap(
-            statusInformationProvider.getVehicleRoutes(
-                request.params(":NAME"),
-                jsonBinder.fromJson(request.body(), PostVehicleRoutesRequestTO.class)
-            )
+        vehicleHandler.getVehicleRoutes(
+            request.params(":NAME"),
+            jsonBinder.fromJson(request.body(), PostVehicleRoutesRequestTO.class)
         )
+    )
     );
   }
 
   private Object handlePutVehicleCommAdapterAttachment(Request request, Response response)
       throws ObjectUnknownException, IllegalArgumentException {
-    statusInformationProvider.putVehicleCommAdapter(
+    vehicleHandler.putVehicleCommAdapter(
         request.params(":NAME"),
         valueIfKeyPresent(request.queryMap(), "newValue")
     );
@@ -246,7 +245,7 @@ public class V1RequestHandler
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
         GetTransportOrderResponseTO.fromTransportOrder(
-            orderHandler.createOrder(
+            transportOrderHandler.createOrder(
                 request.params(":NAME"),
                 jsonBinder.fromJson(request.body(), PostTransportOrderRequestTO.class)
             )
@@ -256,7 +255,7 @@ public class V1RequestHandler
 
   private Object handlePutTransportOrderIntendedVehicle(Request request, Response response)
       throws ObjectUnknownException {
-    orderHandler.updateTransportOrderIntendedVehicle(
+    transportOrderHandler.updateTransportOrderIntendedVehicle(
         request.params(":NAME"),
         request.queryParamOrDefault("vehicle", null)
     );
@@ -272,7 +271,7 @@ public class V1RequestHandler
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
         GetOrderSequenceResponseTO.fromOrderSequence(
-            orderHandler.createOrderSequence(
+            transportOrderHandler.createOrderSequence(
                 request.params(":NAME"),
                 jsonBinder.fromJson(request.body(), PostOrderSequenceRequestTO.class)))
     );
@@ -281,7 +280,7 @@ public class V1RequestHandler
   private Object handleGetOrderSequences(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
-        statusInformationProvider.getOrderSequences(
+        transportOrderHandler.getOrderSequences(
             valueIfKeyPresent(request.queryMap(), "intendedVehicle")
         )
     );
@@ -290,7 +289,7 @@ public class V1RequestHandler
   private Object handleGetOrderSequenceByName(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
-        statusInformationProvider.getOrderSequenceByName(request.params(":NAME"))
+        transportOrderHandler.getOrderSequenceByName(request.params(":NAME"))
     );
   }
 
@@ -299,46 +298,46 @@ public class V1RequestHandler
              IllegalArgumentException,
              InterruptedException,
              ExecutionException {
-    statusInformationProvider.putOrderSequenceComplete(request.params(":NAME"));
+    transportOrderHandler.putOrderSequenceComplete(request.params(":NAME"));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }
 
   private Object handlePostImmediateAssignment(Request request, Response response)
       throws ObjectUnknownException {
-    orderHandler.tryImmediateAssignment(request.params(":NAME"));
+    orderDispatcherHandler.tryImmediateAssignment(request.params(":NAME"));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }
 
   private Object handlePostWithdrawalByOrder(Request request, Response response)
       throws ObjectUnknownException {
-    orderHandler.withdrawByTransportOrder(request.params(":NAME"),
-                                          immediate(request),
-                                          disableVehicle(request));
+    orderDispatcherHandler.withdrawByTransportOrder(request.params(":NAME"),
+                                                    immediate(request),
+                                                    disableVehicle(request));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }
 
   private Object handlePostWithdrawalByVehicle(Request request, Response response)
       throws ObjectUnknownException {
-    orderHandler.withdrawByVehicle(request.params(":NAME"),
-                                   immediate(request),
-                                   disableVehicle(request));
+    orderDispatcherHandler.withdrawByVehicle(request.params(":NAME"),
+                                             immediate(request),
+                                             disableVehicle(request));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }
 
   private Object handlePostPeripheralJobWithdrawal(Request request, Response response)
       throws KernelRuntimeException {
-    orderHandler.withdrawPeripheralJob(request.params(":NAME"));
+    jobDispatcherHandler.withdrawPeripheralJob(request.params(":NAME"));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }
 
   private Object handlePostVehicleRerouteRequest(Request request, Response response)
       throws ObjectUnknownException {
-    orderHandler.reroute(request.params(":NAME"), forced(request));
+    orderDispatcherHandler.reroute(request.params(":NAME"), forced(request));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }
@@ -346,7 +345,7 @@ public class V1RequestHandler
   private Object handleGetTransportOrders(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
-        statusInformationProvider.getTransportOrdersState(
+        transportOrderHandler.getTransportOrders(
             valueIfKeyPresent(request.queryMap(), "intendedVehicle")
         )
     );
@@ -354,9 +353,7 @@ public class V1RequestHandler
 
   private Object handlePutPlantModel(Request request, Response response)
       throws ObjectUnknownException,
-             IllegalArgumentException,
-             InterruptedException,
-             ExecutionException {
+             IllegalArgumentException {
     plantModelHandler.putPlantModel(jsonBinder.fromJson(request.body(), PlantModelTO.class));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
@@ -370,7 +367,7 @@ public class V1RequestHandler
   private Object handleGetTransportOrderByName(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
-        statusInformationProvider.getTransportOrderByName(request.params(":NAME"))
+        transportOrderHandler.getTransportOrderByName(request.params(":NAME"))
     );
   }
 
@@ -378,8 +375,8 @@ public class V1RequestHandler
       throws IllegalArgumentException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
-        statusInformationProvider.getVehiclesState(valueIfKeyPresent(request.queryMap(),
-                                                                     "procState"))
+        vehicleHandler.getVehiclesState(valueIfKeyPresent(request.queryMap(),
+                                                          "procState"))
     );
   }
 
@@ -387,13 +384,13 @@ public class V1RequestHandler
       throws ObjectUnknownException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
-        statusInformationProvider.getVehicleStateByName(request.params(":NAME"))
+        vehicleHandler.getVehicleStateByName(request.params(":NAME"))
     );
   }
 
   private Object handlePutVehicleIntegrationLevel(Request request, Response response)
       throws ObjectUnknownException, IllegalArgumentException {
-    statusInformationProvider.putVehicleIntegrationLevel(
+    vehicleHandler.putVehicleIntegrationLevel(
         request.params(":NAME"),
         valueIfKeyPresent(request.queryMap(), "newValue")
     );
@@ -403,7 +400,7 @@ public class V1RequestHandler
 
   private Object handlePutVehiclePaused(Request request, Response response)
       throws ObjectUnknownException, IllegalArgumentException {
-    statusInformationProvider.putVehiclePaused(
+    vehicleHandler.putVehiclePaused(
         request.params(":NAME"),
         valueIfKeyPresent(request.queryMap(), "newValue")
     );
@@ -413,7 +410,7 @@ public class V1RequestHandler
 
   private Object handlePutVehicleAllowedOrderTypes(Request request, Response response)
       throws ObjectUnknownException, IllegalArgumentException {
-    statusInformationProvider.putVehicleAllowedOrderTypes(
+    vehicleHandler.putVehicleAllowedOrderTypes(
         request.params(":NAME"),
         jsonBinder.fromJson(request.body(), PutVehicleAllowedOrderTypesTO.class));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
@@ -422,14 +419,14 @@ public class V1RequestHandler
 
   private Object handlePostPeripheralWithdrawal(Request request, Response response)
       throws KernelRuntimeException {
-    orderHandler.withdrawPeripheral(request.params(":NAME"));
+    jobDispatcherHandler.withdrawPeripheralJobByLocation(request.params(":NAME"));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }
 
   private Object handlePutPeripheralCommAdapterEnabled(Request request, Response response)
       throws ObjectUnknownException, IllegalArgumentException {
-    statusInformationProvider.putPeripheralCommAdapterEnabled(
+    peripheralHandler.putPeripheralCommAdapterEnabled(
         request.params(":NAME"),
         valueIfKeyPresent(request.queryMap(), "newValue")
     );
@@ -441,7 +438,7 @@ public class V1RequestHandler
       throws ObjectUnknownException, IllegalArgumentException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(GetPeripheralAttachmentInfoResponseTO.fromAttachmentInformation(
-        statusInformationProvider.getPeripheralCommAdapterAttachmentInformation(
+        peripheralHandler.getPeripheralCommAdapterAttachmentInformation(
             request.params(":NAME")))
     );
   }
@@ -449,7 +446,7 @@ public class V1RequestHandler
   private Object handleGetPeripheralJobs(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
-        statusInformationProvider.getPeripheralJobs(
+        peripheralJobHandler.getPeripheralJobs(
             valueIfKeyPresent(request.queryMap(), "relatedVehicle"),
             valueIfKeyPresent(request.queryMap(), "relatedTransportOrder")
         )
@@ -458,7 +455,7 @@ public class V1RequestHandler
 
   private Object handlePutPeripheralCommAdapterAttachment(Request request, Response response)
       throws ObjectUnknownException, IllegalArgumentException {
-    statusInformationProvider.putPeripheralCommAdapter(
+    peripheralHandler.putPeripheralCommAdapter(
         request.params(":NAME"),
         valueIfKeyPresent(request.queryMap(), "newValue")
     );
@@ -469,7 +466,7 @@ public class V1RequestHandler
   private Object handleGetPeripheralJobsByName(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
-        statusInformationProvider.getPeripheralJobByName(request.params(":NAME"))
+        peripheralJobHandler.getPeripheralJobByName(request.params(":NAME"))
     );
   }
 
@@ -477,7 +474,7 @@ public class V1RequestHandler
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
         GetPeripheralJobResponseTO.fromPeripheralJob(
-            orderHandler.createPeripheralJob(
+            peripheralJobHandler.createPeripheralJob(
                 request.params(":NAME"),
                 jsonBinder.fromJson(request.body(), PostPeripheralJobRequestTO.class)
             )
@@ -487,7 +484,7 @@ public class V1RequestHandler
 
   private Object handlePostPeripheralJobsDispatchTrigger(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    orderHandler.triggerJobDispatcher();
+    jobDispatcherHandler.triggerJobDispatcher();
     return "";
   }
 

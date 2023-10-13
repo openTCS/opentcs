@@ -458,6 +458,16 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/VehicleState"
+        "400":
+          description: The submitted data is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse input.
   "/vehicles/{NAME}":
     get:
       tags:
