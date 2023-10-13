@@ -18,6 +18,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** When updating the vehicle's prospective next position, actually consider its future movement commands.
 ** Actually use a vehicle's preferred recharge location if it is defined.
 ** When rerouting vehicles, properly consider that movement commands are not created for _report points_ along a vehicle's route.
+* Changes affecting developers:
+** Update Mockito to 5.6.0.
+** Update ApprovalTests to 22.0.0.
 
 == Version 5.10 (2023-09-23)
 
