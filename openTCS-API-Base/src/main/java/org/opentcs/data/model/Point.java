@@ -452,7 +452,11 @@ public class Point
     /**
      * Indicates a position at which a vehicle is expected to report in.
      * Halting or even parking at such a position is not allowed.
+     *
+     * @deprecated Support for report points will be removed.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "6.0", details = "Will be removed")
     REPORT_POSITION,
     /**
      * Indicates a position at which a vehicle may halt temporarily, e.g. for executing an

@@ -304,6 +304,7 @@ public class PlantModelElementConverter {
     return model;
   }
 
+  @SuppressWarnings("deprecation")
   private PointModel.Type mapPointType(Point.Type type) {
     switch (type) {
       case HALT_POSITION:

@@ -192,7 +192,8 @@ public class PointFigure
     g.draw(this.getShape());
   }
 
-  @Override  // AbstractAttributedFigure
+  @SuppressWarnings("deprecation")
+  @Override
   protected void drawFill(Graphics2D g) {
     Rectangle rect = fDisplayBox;
 

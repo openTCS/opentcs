@@ -96,6 +96,7 @@ public class PointAdapter
     model.getPropertyLayerWrapper().setValue(layerWrapper);
   }
 
+  @SuppressWarnings("deprecation")
   private void updateModelType(PointModel model, Point point) {
     PointModel.Type value;
 
@@ -137,6 +138,7 @@ public class PointAdapter
     );
   }
 
+  @SuppressWarnings("deprecation")
   private Point.Type convertPointType(PointModel.Type type) {
     requireNonNull(type, "type");
     switch (type) {

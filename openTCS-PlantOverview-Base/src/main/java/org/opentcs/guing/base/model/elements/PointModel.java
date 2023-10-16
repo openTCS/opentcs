@@ -28,6 +28,7 @@ import org.opentcs.guing.base.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.base.model.AbstractModelComponent;
 import org.opentcs.guing.base.model.FigureDecorationDetails;
 import org.opentcs.guing.base.model.PositionableModelComponent;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Basic implementation of a point.
@@ -264,7 +265,11 @@ public class PointModel
          ResourceBundle.getBundle(BUNDLE_PATH).getString("pointModel.type.halt.helptext")),
     /**
      * A reporting position.
+     *
+     * @deprecated Support for report points will be removed.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "6.0", details = "Will be removed")
     REPORT(ResourceBundle.getBundle(BUNDLE_PATH).getString("pointModel.type.report.description"),
            ResourceBundle.getBundle(BUNDLE_PATH).getString("pointModel.type.report.helptext")),
     /**
