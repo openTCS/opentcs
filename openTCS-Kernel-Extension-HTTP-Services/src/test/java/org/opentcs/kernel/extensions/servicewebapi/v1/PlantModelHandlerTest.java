@@ -160,7 +160,7 @@ public class PlantModelHandlerTest {
                     new Vehicle("some-vehicle")
                 )
             )
-            .withVisuaLayouts(
+            .withVisualLayouts(
                 Set.of(
                     new VisualLayout("some-layout")
                 )

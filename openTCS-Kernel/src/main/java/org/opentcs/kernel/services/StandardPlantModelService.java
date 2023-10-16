@@ -154,7 +154,7 @@ public class StandardPlantModelService
           .withLocations(fetchObjects(Location.class))
           .withBlocks(fetchObjects(Block.class))
           .withVehicles(fetchObjects(Vehicle.class))
-          .withVisuaLayouts(fetchObjects(VisualLayout.class));
+          .withVisualLayouts(fetchObjects(VisualLayout.class));
     }
   }
 

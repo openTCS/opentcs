@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opentcs.data.model.visualization.VisualLayout;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * An immutable representation of a complete plant model's state.
@@ -188,7 +189,20 @@ public class PlantModel
     return visualLayouts;
   }
 
+  /**
+   * Returns an instance with the visual layouts replaced by the given ones.
+   *
+   * @param visualLayouts The visual layouts to be set.
+   * @return The instance with the visual layouts replaced by the given ones.
+   * @deprecated Use {@link #withVisualLayouts(java.util.Set)} instead.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public PlantModel withVisuaLayouts(@Nonnull Set<VisualLayout> visualLayouts) {
+    return withVisualLayouts(visualLayouts);
+  }
+
+  public PlantModel withVisualLayouts(@Nonnull Set<VisualLayout> visualLayouts) {
     return new PlantModel(name,
                           properties,
                           points,
