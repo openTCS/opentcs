@@ -821,7 +821,7 @@ public class DefaultVehicleController
     }
     else if (Objects.equals(evt.getPropertyName(),
                             VehicleProcessModel.Attribute.COMMAND_FAILED.name())) {
-      dispatcherService.withdrawByVehicle(vehicle.getReference(), true);
+      commandFailed((MovementCommand) evt.getNewValue());
     }
     else if (Objects.equals(evt.getPropertyName(),
                             VehicleProcessModel.Attribute.USER_NOTIFICATION.name())) {
@@ -937,6 +937,10 @@ public class DefaultVehicleController
   private void commandExecuted(MovementCommand executedCommand) {
     requireNonNull(executedCommand, "executedCommand");
 
+    LOG.debug("{}: Communication adapter reports movement command as executed: {}",
+              vehicle.getName(),
+              executedCommand);
+
     synchronized (commAdapter) {
       // Check if the executed command is the one we expect at this point.
       MovementCommand expectedCommand = commandsSent.peek();
@@ -971,6 +975,13 @@ public class DefaultVehicleController
                                                          this::checkForPendingCommands,
                                                          this::onMovementInteractionFailed);
     }
+  }
+
+  private void commandFailed(MovementCommand failedCommand) {
+    LOG.debug("{}: Communication adapter reports movement command as failed: {}",
+              vehicle.getName(),
+              failedCommand);
+    dispatcherService.withdrawByVehicle(vehicle.getReference(), true);
   }
 
   private void checkForPendingCommands() {
