@@ -14,6 +14,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
+* New features and enhancements:
+** Update web API specification and implementation to version 1.3.0:
+*** Add new endpoints for updating the _locked_ state of paths and locations.
 * Bugs fixed:
 ** When updating the vehicle's prospective next position, actually consider its future movement commands.
 ** Actually use a vehicle's preferred recharge location if it is defined.

@@ -47,6 +47,8 @@ public class V1RequestHandler
   private final PeripheralJobDispatcherHandler jobDispatcherHandler;
   private final PlantModelHandler plantModelHandler;
   private final VehicleHandler vehicleHandler;
+  private final PathHandler pathHandler;
+  private final LocationHandler locationHandler;
   private final PeripheralHandler peripheralHandler;
 
   private boolean initialized;
@@ -60,6 +62,8 @@ public class V1RequestHandler
                           PeripheralJobDispatcherHandler jobDispatcherHandler,
                           PlantModelHandler plantModelHandler,
                           VehicleHandler vehicleHandler,
+                          PathHandler pathHandler,
+                          LocationHandler locationHandler,
                           PeripheralHandler peripheralHandler) {
     this.jsonBinder = requireNonNull(jsonBinder, "jsonBinder");
     this.statusEventDispatcher = requireNonNull(statusEventDispatcher, "statusEventDispatcher");
@@ -69,6 +73,8 @@ public class V1RequestHandler
     this.jobDispatcherHandler = requireNonNull(jobDispatcherHandler, "jobDispatcherHandler");
     this.plantModelHandler = requireNonNull(plantModelHandler, "plantModelHandler");
     this.vehicleHandler = requireNonNull(vehicleHandler, "vehicleHandler");
+    this.pathHandler = requireNonNull(pathHandler, "pathHandler");
+    this.locationHandler = requireNonNull(locationHandler, "locationHandler");
     this.peripheralHandler = requireNonNull(peripheralHandler, "peripheralHandler");
   }
 
@@ -155,6 +161,10 @@ public class V1RequestHandler
                 this::handlePutPlantModel);
     service.get("/plantModel",
                 this::handleGetPlantModel);
+    service.put("/paths/:NAME/locked",
+                this::handlePutPathLocked);
+    service.put("/locations/:NAME/locked",
+                this::handlePutLocationLocked);
     service.post("/dispatcher/trigger",
                  this::handlePostDispatcherTrigger);
     service.post("/peripherals/dispatcher/trigger",
@@ -362,6 +372,24 @@ public class V1RequestHandler
   private Object handleGetPlantModel(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(plantModelHandler.getPlantModel());
+  }
+
+  private Object handlePutPathLocked(Request request, Response response) {
+    pathHandler.updatePathLock(
+        request.params(":NAME"),
+        valueIfKeyPresent(request.queryMap(), "newValue")
+    );
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handlePutLocationLocked(Request request, Response response) {
+    locationHandler.updateLocationLock(
+        request.params(":NAME"),
+        valueIfKeyPresent(request.queryMap(), "newValue")
+    );
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
   }
 
   private Object handleGetTransportOrderByName(Request request, Response response) {

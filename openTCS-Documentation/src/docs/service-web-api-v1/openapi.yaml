@@ -9,16 +9,16 @@ info:
     Bodies of HTTP requests and responses, where applicable, are JSON structures.
     The encoding used may be UTF-8, UTF-16 or UTF-32.
     Where time stamps are used, they are encoded using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601); the time zone used is UTC.
-    
-    
+
+
     The TCP port to be used for the HTTP requests is configuration-dependent; by default, it is 55200.
-    
-    
+
+
     By default, requests are accepted without requiring any authentication.
     Optionally, an access key can be set in the kernel configuration.
     The configured value is then expected to be sent by the client in an HTTP header named `X-Api-Access-Key`.
   # IMPORTANT: When updating this version number, remember to mention that in the changelog, too!
-  version: 1.2.0
+  version: 1.3.0
   title: openTCS web API specification
 servers:
   - url: http://localhost:55200/v1
@@ -39,7 +39,7 @@ tags:
   - name: Status
     description: Retrieving status updates
 security:
-  - ApiKeyAuth: []
+  - ApiKeyAuth: [ ]
 paths:
   /transportOrders:
     get:
@@ -1152,6 +1152,72 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Could not parse JSON input.
+  /paths/{NAME}/locked:
+    put:
+      tags:
+        - Plant models
+      summary: Sets the locked state for the named path.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the path.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The path's new locked state.
+          required: true
+          example: true
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find path 'Point-0001 --- Point-0002'.
+  /locations/{NAME}/locked:
+    put:
+      tags:
+        - Plant models
+      summary: Sets the locked state for the named location.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the location.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The location's new locked state.
+          required: true
+          example: true
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find location 'Storage 01'.
   "/peripherals/{NAME}/withdrawal":
     post:
       tags:
@@ -1332,7 +1398,7 @@ components:
         wrappingSequence:
           type: string
           description: >-
-            The order sequence this transport order belongs to. 
+            The order sequence this transport order belongs to.
             May be `null` in case this order isn't part of any sequence.
           example: OrderSequence-01
         destinations:
@@ -1467,7 +1533,7 @@ components:
           items:
             type: string
             description: The names of the allowed order types.
-          example: ["Park", "Load cargo", "Unload cargo" ]
+          example: [ "Park", "Load cargo", "Unload cargo" ]
       required:
         - orderTypes
     OrderSequenceState:
@@ -1509,20 +1575,20 @@ components:
           example: false
         intendedVehicle:
           type: string
-          description: >- 
+          description: >-
             The name of the vehicle that is intended to process the order sequence.
             If this sequence is free to be processed by any vehicle, this is `null`.
           example: Vehicle-0001
         processingVehicle:
           type: string
-          description: >- 
+          description: >-
             The vehicle processing this order sequence, or `null`, if no vehicle has been assigned to it, yet.
           example: Vehicle-0002
         properties:
-              type: array
-              items:
-                $ref: "#/components/schemas/Property"
-              description: The order sequences properties
+          type: array
+          items:
+            $ref: "#/components/schemas/Property"
+          description: The order sequences properties
     OrderSequence:
       title: Order Sequence
       type: object
@@ -1530,7 +1596,7 @@ components:
       properties:
         incompleteName:
           type: boolean
-          description: >- 
+          description: >-
             Indicates whether the name is incomplete and requires to be completed when creating the actual order sequence.
             (How exactly this is done is decided by the kernel.)
           example: false
@@ -1540,7 +1606,7 @@ components:
           example: Park
         intendedVehicle:
           type: string
-          description: >- 
+          description: >-
             The name of the vehicle that is intended to process the order sequence.
             If this sequence is free to be processed by any vehicle, this is `null`.
           example: Vehicle-01
@@ -1549,10 +1615,10 @@ components:
           description: Indicates whether the failure of one order in this sequence is fatal to all subsequent orders.
           example: false
         properties:
-              type: array
-              items:
-                $ref: "#/components/schemas/Property"
-              description: The order sequence's properties
+          type: array
+          items:
+            $ref: "#/components/schemas/Property"
+          description: The order sequence's properties
     VehicleState:
       title: Vehicle State
       type: object
@@ -1642,7 +1708,7 @@ components:
           items:
             type: string
             description: The allowed order types for this vehicle.
-          example: ["OrderType001", "OrderType002"]
+          example: [ "OrderType001", "OrderType002" ]
       required:
         - length
         - energyLevelGood
@@ -1829,7 +1895,7 @@ components:
             type:
               type: string
               enum:
-                  - PeripheralJob
+                - PeripheralJob
               default: PeripheralJob
             sequenceNumber:
               example: 126
@@ -2027,13 +2093,13 @@ components:
             $ref: "#/components/schemas/PlantModelPoint"
           example:
             - name: "Point-A"
-              position: 
+              position:
                 x: 15000
                 y: 20000
                 z: 0
               vehicleOrientationAngle: 90
               type: "HALT_POSITION"
-              layout: 
+              layout:
                 position:
                   x: 15000
                   y: 20000
@@ -2045,13 +2111,13 @@ components:
                 - name: isExampleProperty
                   value: true
             - name: "Point-B"
-              position: 
+              position:
                 x: 30000
                 y: 20000
                 z: 0
               vehicleOrientationAngle: 90
               type: "HALT_POSITION"
-              layout: 
+              layout:
                 position:
                   x: 30000
                   y: 20000
@@ -2063,13 +2129,13 @@ components:
                 - name: isExampleProperty
                   value: true
             - name: "Point-C"
-              position: 
+              position:
                 x: 10000
                 y: 30000
                 z: 0
               vehicleOrientationAngle: "NaN"
               type: "HALT_POSITION"
-              layout: 
+              layout:
                 position:
                   x: 10000
                   y: 30000
@@ -2078,13 +2144,13 @@ components:
                   y: 10
                 layerId: 0
             - name: "Point-D"
-              position: 
+              position:
                 x: 25000
                 y: 30000
                 z: 0
               vehicleOrientationAngle: "NaN"
               type: "HALT_POSITION"
-              layout: 
+              layout:
                 position:
                   x: 25000
                   y: 30000
@@ -2157,7 +2223,7 @@ components:
             $ref: "#/components/schemas/PlantModelLocationType"
           example:
             - name: "Transfer-station"
-              allowedOperations: 
+              allowedOperations:
                 - Load cargo
                 - Unload cargo
               layout:
@@ -2166,7 +2232,7 @@ components:
                 - name: "locationTypePropertyKey"
                   value: "locationTypePropertyValue"
             - name: "Working-station"
-              allowedOperations: 
+              allowedOperations:
                 - Cut
                 - Drill
               layout:
@@ -2179,7 +2245,7 @@ components:
           example:
             - name: "Storage 01"
               typeName: "Transfer-station"
-              position: 
+              position:
                 x: 15000
                 y: 10000
                 z: 0
@@ -2197,7 +2263,7 @@ components:
                 layerId: 0
             - name: "Storage 02"
               typeName: "Transfer-station"
-              position: 
+              position:
                 x: 30000
                 y: 10000
                 z: 0
@@ -2214,7 +2280,7 @@ components:
                 layerId: 0
             - name: "Workshop"
               typeName: "Working-station"
-              position: 
+              position:
                 x: 35000
                 y: 30000
                 z: 0
@@ -2231,7 +2297,7 @@ components:
                 layerId: 0
             - name: "Loading Bay"
               typeName: "Transfer-station"
-              position: 
+              position:
                 x: 0
                 y: 30000
                 z: 0
@@ -2435,13 +2501,13 @@ components:
           description: The allowed operations for this location type.
           items:
             type: string
-            example: ["some operation", "another operation"]
+            example: [ "some operation", "another operation" ]
         allowedPeripheralOperations:
           type: array
           description: The allowed peripheral operations for this location type.
           items:
             type: string
-            example: ["some peripheral operation", "another peripheral operation"]
+            example: [ "some peripheral operation", "another peripheral operation" ]
         layout:
           type: object
           description: The information regarding the grahical representation of this location type.
@@ -2559,7 +2625,7 @@ components:
           items:
             type: string
           description: This block's member names.
-          example: ["Path-AB", "Path-BC"]
+          example: [ "Path-AB", "Path-BC" ]
         layout:
           type: object
           description: The information regarding the grahical representation of this block.
