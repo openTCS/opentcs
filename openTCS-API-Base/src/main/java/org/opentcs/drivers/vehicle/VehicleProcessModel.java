@@ -501,6 +501,32 @@ public class VehicleProcessModel {
                                                   failedCommand);
   }
 
+  /**
+   * Notifies observers that the vehicle would like to have its integration level changed.
+   *
+   * @param level The integration level to change to.
+   */
+  public void integrationLevelChangeRequested(@Nonnull Vehicle.IntegrationLevel level) {
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.INTEGRATION_LEVEL_CHANGE_REQUESTED.name(),
+        null,
+        level
+    );
+  }
+
+  /**
+   * Notifies observers that the vehicle would like to have its current transport order withdrawn.
+   *
+   * @param forced Whether a forced withdrawal is requested.
+   */
+  public void transportOrderWithdrawalRequested(boolean forced) {
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.TRANSPORT_ORDER_WITHDRAWAL_REQUESTED.name(),
+        null,
+        forced
+    );
+  }
+
   protected PropertyChangeSupport getPropertyChangeSupport() {
     return pcs;
   }
@@ -654,6 +680,14 @@ public class VehicleProcessModel {
     /**
      * Indicates a change of a transport order property.
      */
-    TRANSPORT_ORDER_PROPERTY;
+    TRANSPORT_ORDER_PROPERTY,
+    /**
+     * Indicates a request to change the integration level of the vehicle.
+     */
+    INTEGRATION_LEVEL_CHANGE_REQUESTED,
+    /**
+     * Indicates a request to withdraw the vehicles current transport order.
+     */
+    TRANSPORT_ORDER_WITHDRAWAL_REQUESTED;
   }
 }

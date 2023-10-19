@@ -849,6 +849,17 @@ public class DefaultVehicleController
                                             propUpdate.getValue());
       }
     }
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.INTEGRATION_LEVEL_CHANGE_REQUESTED.name())) {
+      vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
+                                                   (Vehicle.IntegrationLevel) evt.getNewValue());
+    }
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.TRANSPORT_ORDER_WITHDRAWAL_REQUESTED.name())) {
+      dispatcherService.withdrawByVehicle(vehicle.getReference(), (Boolean) evt.getNewValue());
+    }
   }
 
   private void withdrawPendingResourceAllocations() {

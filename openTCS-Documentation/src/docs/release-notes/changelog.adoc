@@ -22,6 +22,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Actually use a vehicle's preferred recharge location if it is defined.
 ** When rerouting vehicles, properly consider that movement commands are not created for _report points_ along a vehicle's route.
 * Changes affecting developers:
+** Allow communication adapters to request transport order withdrawals and integration level updates via `VehicleProcessModel`.
 ** Update Gradle wrapper to 8.4.
 ** Update Jackson to 2.15.3.
 ** Update Mockito to 5.6.0.
