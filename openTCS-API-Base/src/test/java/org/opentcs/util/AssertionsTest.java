@@ -30,21 +30,70 @@ public class AssertionsTest {
   }
 
   @Test
-  public void checkInRangeShouldIncludeBoundaries() {
+  public void checkArgumentShouldThrowIfExpressionIsFalse() {
+    assertThrows(IllegalArgumentException.class,
+                 () -> Assertions.checkArgument(false, "The given expression is not true!"));
+  }
+
+  @Test
+  public void checkStateShouldFormatIntegerMessageTemplateArgument() {
+    try {
+      Assertions.checkState(false, "%s", 456);
+    }
+    catch (IllegalStateException exc) {
+      assertEquals("456", exc.getMessage());
+    }
+  }
+
+  @Test
+  public void checkStateShouldThrowIfExpressionIsFalse() {
+    assertThrows(IllegalStateException.class,
+                 () -> Assertions.checkState(false, "The given expression is not true"));
+  }
+
+  @Test
+  public void checkInRangeShouldSucceedWithinBoundaries() {
     assertEquals(22, Assertions.checkInRange(22, 22, 24));
     assertEquals(23, Assertions.checkInRange(23, 22, 24));
     assertEquals(24, Assertions.checkInRange(24, 22, 24));
+    assertEquals(Integer.MAX_VALUE,
+                 Assertions.checkInRange(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE));
+    assertEquals(Integer.MIN_VALUE,
+                 Assertions.checkInRange(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE));
   }
 
   @Test
   public void checkInRangeShouldFailOnLessThanMinimum() {
     assertThrows(IllegalArgumentException.class,
-                 () -> org.opentcs.util.Assertions.checkInRange(21, 22, 24));
+                 () -> Assertions.checkInRange(21, 22, 24));
   }
 
   @Test
   public void checkInRangeShouldFailOnMoreThanMaximum() {
     assertThrows(IllegalArgumentException.class,
-                 () -> org.opentcs.util.Assertions.checkInRange(25, 22, 24));
+                 () -> Assertions.checkInRange(25, 22, 24));
+  }
+
+  @Test
+  public void checkInRangeLongShouldSucceedWithinBoundaries() {
+    assertEquals(23, Assertions.checkInRange(23, 23, 25));
+    assertEquals(24, Assertions.checkInRange(24, 23, 25));
+    assertEquals(25, Assertions.checkInRange(25, 23, 25));
+    assertEquals(Long.MIN_VALUE,
+                 Assertions.checkInRange(Long.MIN_VALUE, Long.MIN_VALUE, Long.MIN_VALUE));
+    assertEquals(Long.MAX_VALUE,
+                 Assertions.checkInRange(Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE));
+  }
+
+  @Test
+  public void checkInRangeLongShouldFailOnLessThanMinimum() {
+    assertThrows(IllegalArgumentException.class,
+                 () -> Assertions.checkInRange(22, 23, 25));
+  }
+
+  @Test
+  public void checkInRangeLongShouldFailOnMoreThanMaximum() {
+    assertThrows(IllegalArgumentException.class,
+                 () -> Assertions.checkInRange(26, 23, 25));
   }
 }
