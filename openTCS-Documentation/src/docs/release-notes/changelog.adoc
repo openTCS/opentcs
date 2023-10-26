@@ -12,6 +12,10 @@ The openTCS developers
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+== Unreleased
+
+...
+
 == Version 5.11 (2023-10-26)
 
 * New features and enhancements:
