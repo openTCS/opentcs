@@ -444,7 +444,6 @@ paths:
             type: string
             default: null
             enum:
-              - UNAVAILABLE
               - IDLE
               - AWAITING_ORDER
               - PROCESSING_ORDER
