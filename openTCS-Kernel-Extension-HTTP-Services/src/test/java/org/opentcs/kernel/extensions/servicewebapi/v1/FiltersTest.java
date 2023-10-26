@@ -11,6 +11,8 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Vehicle;
@@ -241,6 +243,48 @@ public class FiltersTest {
                 job.withRelatedTransportOrder(order.getReference())
             ),
         is(true)
+    );
+  }
+
+  @ParameterizedTest
+  @EnumSource(Vehicle.ProcState.class)
+  public void acceptVehiclesWithAnyProcState(Vehicle.ProcState procState) {
+    assertThat(
+        Filters.vehicleWithProcState(null)
+            .test(
+                new Vehicle("some-vehicle")
+                    .withProcState(procState)
+            ),
+        is(true)
+    );
+  }
+
+  @Test
+  public void acceptVehiclesWithGivenProcStateOnly() {
+    assertThat(
+        Filters.vehicleWithProcState(Vehicle.ProcState.IDLE)
+            .test(
+                new Vehicle("some-vehicle")
+                    .withProcState(Vehicle.ProcState.IDLE)
+            ),
+        is(true)
+    );
+
+    assertThat(
+        Filters.vehicleWithProcState(Vehicle.ProcState.IDLE)
+            .test(
+                new Vehicle("some-vehicle")
+                    .withProcState(Vehicle.ProcState.AWAITING_ORDER)
+            ),
+        is(false)
+    );
+    assertThat(
+        Filters.vehicleWithProcState(Vehicle.ProcState.IDLE)
+            .test(
+                new Vehicle("some-vehicle")
+                    .withProcState(Vehicle.ProcState.PROCESSING_ORDER)
+            ),
+        is(false)
     );
   }
 }

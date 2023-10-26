@@ -94,4 +94,17 @@ public class Filters {
         ? job -> true
         : job -> Objects.equals(orderRef, job.getRelatedTransportOrder());
   }
+
+  /**
+   * Returns a predicate that is true only for vehicles whose processing state is the given one.
+   * In case the given procState is null, all vehicles are accepted.
+   *
+   * @param procState The processing state.
+   * @return A predicate that is true only for vehicles whose processing state is the given one.
+   */
+  public static Predicate<Vehicle> vehicleWithProcState(@Nullable Vehicle.ProcState procState) {
+    return procState == null
+        ? vehicle -> true
+        : vehicle -> Objects.equals(procState, vehicle.getProcState());
+  }
 }

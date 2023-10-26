@@ -10,7 +10,6 @@ package org.opentcs.kernel.extensions.servicewebapi.v1;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
@@ -71,10 +70,7 @@ public class VehicleHandler {
           ? null
           : Vehicle.ProcState.valueOf(procStateName);
 
-      return vehicleService.fetchObjects(
-          Vehicle.class,
-          vehicle -> Objects.equals(pState, vehicle.getProcState())
-      )
+      return vehicleService.fetchObjects(Vehicle.class, Filters.vehicleWithProcState(pState))
           .stream()
           .map(GetVehicleResponseTO::fromVehicle)
           .collect(Collectors.toList());
