@@ -97,6 +97,8 @@ public class VehicleAdapter
       model.getPropertyAllowedOrderTypes().setItems(vehicle.getAllowedOrderTypes());
       model.setVehicle(vehicle);
 
+      model.getPropertyEnvelopeKey().setText(vehicle.getEnvelopeKey());
+      
       updateMiscModelProperties(model, vehicle);
       updateModelDriveOrder(objectService, vehicle, model, systemModel);
       updateModelLayoutProperties(model, vehicle);
@@ -128,6 +130,7 @@ public class VehicleAdapter
                 )
                 .withMaxVelocity(getMaximumVelocity(vehicleModel))
                 .withMaxReverseVelocity(getMaximumReverseVelocity(vehicleModel))
+                .withEnvelopeKey(getEnvelopeKey(vehicleModel))
                 .withProperties(getKernelProperties(vehicleModel))
                 .withLayout(getLayout(vehicleModel))
         );
@@ -227,6 +230,10 @@ public class VehicleAdapter
 
   private int getEnergyLevelSufficientlyRecharged(VehicleModel model) {
     return (Integer) model.getPropertyEnergyLevelSufficientlyRecharged().getValue();
+  }
+  
+  private String getEnvelopeKey(VehicleModel model) {
+    return model.getPropertyEnvelopeKey().getText();
   }
 
   private VehicleCreationTO.Layout getLayout(VehicleModel model) {

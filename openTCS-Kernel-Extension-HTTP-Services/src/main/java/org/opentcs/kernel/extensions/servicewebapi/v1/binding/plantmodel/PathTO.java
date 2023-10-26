@@ -14,6 +14,7 @@ import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.data.model.Path;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.EnvelopeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 
 /**
@@ -29,6 +30,7 @@ public class PathTO {
   private List<PeripheralOperationTO> peripheralOperations = List.of();
   private boolean locked;
   private Layout layout = new Layout();
+  private List<EnvelopeTO> vehicleEnvelopes = List.of();
   private List<PropertyTO> properties = List.of();
 
   @JsonCreator
@@ -136,6 +138,16 @@ public class PathTO {
 
   public PathTO setLayout(@Nonnull Layout layout) {
     this.layout = requireNonNull(layout, "layout");
+    return this;
+  }
+
+  @Nonnull
+  public List<EnvelopeTO> getVehicleEnvelopes() {
+    return vehicleEnvelopes;
+  }
+
+  public PathTO setVehicleEnvelopes(@Nonnull List<EnvelopeTO> vehicleEnvelopes) {
+    this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     return this;
   }
 

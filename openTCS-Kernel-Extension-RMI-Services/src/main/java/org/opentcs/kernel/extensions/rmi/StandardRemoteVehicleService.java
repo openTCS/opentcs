@@ -285,4 +285,21 @@ public class StandardRemoteVehicleService
       throw findSuitableExceptionFor(exc);
     }
   }
+
+  @Override
+  public void updateVehicleEnvelopeKey(ClientID clientId,
+                                       TCSObjectReference<Vehicle> ref,
+                                       String envelopeKey)
+      throws RemoteException {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
+
+    try {
+      kernelExecutor.submit(
+          () -> vehicleService.updateVehicleEnvelopeKey(ref, envelopeKey)
+      ).get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
 }

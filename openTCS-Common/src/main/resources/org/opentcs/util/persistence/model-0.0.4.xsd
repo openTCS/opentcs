@@ -58,6 +58,10 @@
   <!-- Data type for point elements -->
   <xsd:complexType name="pointType">
     <xsd:sequence>
+      <xsd:element name="vehicleEnvelope"
+                   type="vehicleEnvelopeType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="outgoingPath"
                    minOccurs="0"
                    maxOccurs="unbounded">
@@ -124,6 +128,10 @@
   <!-- Data type for path elements -->
   <xsd:complexType name="pathType">
     <xsd:sequence>
+      <xsd:element name="vehicleEnvelope"
+                   type="vehicleEnvelopeType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="peripheralOperation"
                    minOccurs="0"
                    maxOccurs="unbounded">
@@ -218,6 +226,27 @@
     </xsd:restriction>
   </xsd:simpleType>
 
+  <!-- Data type for vehicle envelope elements for points and paths -->
+  <xsd:complexType name="vehicleEnvelopeType">
+    <xsd:sequence>
+      <xsd:element name="vertex"
+                   type="vertexType"
+                   minOccurs="1"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="key"
+                   type="xsd:string"
+                   use="required"/>
+  </xsd:complexType>
+  <xsd:complexType name="vertexType">
+    <xsd:attribute name="x"
+                   type="xsd:long"
+                   use="required"/>
+    <xsd:attribute name="y"
+                   type="xsd:long"
+                   use="required"/>
+  </xsd:complexType>
+  
   <!-- Data type for vehicle elements -->
   <xsd:complexType name="vehicleType">
     <xsd:sequence>
@@ -247,6 +276,8 @@
                    type="xsd:unsignedInt"/>
     <xsd:attribute name="maxReverseVelocity"
                    type="xsd:unsignedInt"/>
+    <xsd:attribute name="envelopeKey"
+                   type="xsd:string"/>
   </xsd:complexType>
 
   <!-- Data type for vehicle layout type elements -->

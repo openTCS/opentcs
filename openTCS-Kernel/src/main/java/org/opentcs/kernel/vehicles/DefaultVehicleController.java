@@ -716,6 +716,11 @@ public class DefaultVehicleController
   }
 
   @Override
+  public TCSObjectReference<Vehicle> getRelatedVehicle() {
+    return vehicle.getReference();
+  }
+
+  @Override
   public boolean allocationSuccessful(@Nonnull Set<TCSResource<?>> resources) {
     requireNonNull(resources, "resources");
 

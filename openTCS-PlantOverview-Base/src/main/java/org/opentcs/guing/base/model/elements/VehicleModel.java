@@ -129,6 +129,10 @@ public class VehicleModel
    */
   public static final String CLAIMED_RESOURCES = "ClaimedResources";
   /**
+   * The name/key of the 'envelope key' property.
+   */
+  public static final String ENVELOPE_KEY = "EnvelopeKey";
+  /**
    * This class's resource bundle.
    */
   private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
@@ -481,6 +485,10 @@ public class VehicleModel
     return (OrderTypesProperty) getProperty(ALLOWED_ORDER_TYPES);
   }
 
+  public StringProperty getPropertyEnvelopeKey() {
+    return (StringProperty) getProperty(ENVELOPE_KEY);
+  }
+  
   public KeyValueSetProperty getPropertyMiscellaneous() {
     return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
@@ -661,6 +669,13 @@ public class VehicleModel
     pOrientationAngle.setModellingEditable(false);
     setProperty(ORIENTATION_ANGLE, pOrientationAngle);
 
+    StringProperty pEnvelopeKey = new StringProperty(this);
+    pEnvelopeKey.setDescription(bundle.getString("vehicleModel.property_envelopeKey.description"));
+    pEnvelopeKey.setHelptext(bundle.getString("vehicleModel.property_envelopeKey.helptext"));
+    pEnvelopeKey.setModellingEditable(true);
+    pEnvelopeKey.setOperatingEditable(false);
+    setProperty(ENVELOPE_KEY, pEnvelopeKey);
+    
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(
         bundle.getString("vehicleModel.property_miscellaneous.description")

@@ -52,6 +52,7 @@ public class GetVehicleResponseTOTest {
             .setCurrentPosition("some-point")
             .setPrecisePosition(new GetVehicleResponseTO.PrecisePosition(1, 2, 3))
             .setState(Vehicle.State.EXECUTING)
+            .setEnvelopeKey("envelopeType-01")
             .setAllocatedResources(
                 List.of(
                     List.of("some-path", "some-point"),

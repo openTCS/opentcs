@@ -17,6 +17,7 @@ import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.model.Couple;
+import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Path.Layout.ConnectionType;
 import static org.opentcs.util.Assertions.checkArgument;
 
@@ -60,6 +61,10 @@ public class PathCreationTO
    */
   private final boolean locked;
   /**
+   * A map of envelope keys to envelopes that vehicles traversing this path may occupy.
+   */
+  private final Map<String, Envelope> vehicleEnvelopes;
+  /**
    * The information regarding the grahical representation of this path.
    */
   private final Layout layout;
@@ -82,6 +87,7 @@ public class PathCreationTO
     this.maxReverseVelocity = 0;
     this.peripheralOperations = List.of();
     this.locked = false;
+    this.vehicleEnvelopes = Map.of();
     this.layout = new Layout();
   }
 
@@ -94,6 +100,7 @@ public class PathCreationTO
                          int maxReverseVelocity,
                          List<PeripheralOperationCreationTO> peripheralOperations,
                          boolean locked,
+                         @Nonnull Map<String, Envelope> vehicleEnvelopes,
                          @Nonnull Layout layout) {
     super(name, properties);
     this.srcPointName = requireNonNull(srcPointName, "srcPointName");
@@ -104,6 +111,7 @@ public class PathCreationTO
     this.peripheralOperations = new ArrayList<>(requireNonNull(peripheralOperations,
                                                                "peripheralOperations"));
     this.locked = locked;
+    this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     this.layout = requireNonNull(layout, "layout");
   }
 
@@ -124,6 +132,7 @@ public class PathCreationTO
                               maxReverseVelocity,
                               peripheralOperations,
                               locked,
+                              vehicleEnvelopes,
                               layout);
   }
 
@@ -153,6 +162,7 @@ public class PathCreationTO
                               maxReverseVelocity,
                               peripheralOperations,
                               locked,
+                              vehicleEnvelopes,
                               layout);
   }
 
@@ -182,6 +192,7 @@ public class PathCreationTO
                               maxReverseVelocity,
                               peripheralOperations,
                               locked,
+                              vehicleEnvelopes,
                               layout);
   }
 
@@ -211,6 +222,7 @@ public class PathCreationTO
                               maxReverseVelocity,
                               peripheralOperations,
                               locked,
+                              vehicleEnvelopes,
                               layout);
   }
 
@@ -243,6 +255,7 @@ public class PathCreationTO
                               maxReverseVelocity,
                               peripheralOperations,
                               locked,
+                              vehicleEnvelopes,
                               layout);
   }
 
@@ -275,6 +288,7 @@ public class PathCreationTO
                               maxReverseVelocity,
                               peripheralOperations,
                               locked,
+                              vehicleEnvelopes,
                               layout);
   }
 
@@ -304,6 +318,7 @@ public class PathCreationTO
                               maxReverseVelocity,
                               peripheralOperations,
                               locked,
+                              vehicleEnvelopes,
                               layout);
   }
 
@@ -334,6 +349,7 @@ public class PathCreationTO
                               maxReverseVelocity,
                               peripheralOperations,
                               locked,
+                              vehicleEnvelopes,
                               layout);
   }
 
@@ -354,6 +370,7 @@ public class PathCreationTO
                               maxReverseVelocity,
                               peripheralOperations,
                               locked,
+                              vehicleEnvelopes,
                               layout);
   }
 
@@ -378,6 +395,36 @@ public class PathCreationTO
                               maxReverseVelocity,
                               peripheralOperations,
                               locked,
+                              vehicleEnvelopes,
+                              layout);
+  }
+
+  /**
+   * Returns a map of envelope keys to envelopes that vehicles traversing this path may occupy.
+   *
+   * @return A map of envelope keys to envelopes that vehicles traversing this path may occupy.
+   */
+  public Map<String, Envelope> getVehicleEnvelopes() {
+    return vehicleEnvelopes;
+  }
+
+  /**
+   * Creates a copy of this object, with the given vehicle envelopes.
+   *
+   * @param vehicleEnvelopes The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public PathCreationTO withVehicleEnvelopes(@Nonnull Map<String, Envelope> vehicleEnvelopes) {
+    return new PathCreationTO(getName(),
+                              srcPointName,
+                              destPointName,
+                              getModifiableProperties(),
+                              length,
+                              maxVelocity,
+                              maxReverseVelocity,
+                              peripheralOperations,
+                              locked,
+                              vehicleEnvelopes,
                               layout);
   }
 
@@ -406,6 +453,7 @@ public class PathCreationTO
                               maxReverseVelocity,
                               peripheralOperations,
                               locked,
+                              vehicleEnvelopes,
                               layout);
   }
 
@@ -421,6 +469,7 @@ public class PathCreationTO
         + ", peripheralOperations=" + peripheralOperations
         + ", locked=" + locked
         + ", layout=" + layout
+        + ", vehicleEnvelopes=" + vehicleEnvelopes
         + ", properties=" + getProperties()
         + '}';
   }

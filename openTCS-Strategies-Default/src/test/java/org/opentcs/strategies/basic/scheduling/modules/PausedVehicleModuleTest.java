@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Vehicle;
 
@@ -71,6 +72,11 @@ public class PausedVehicleModuleTest {
     @Override
     public String getId() {
       return id;
+    }
+
+    @Override
+    public TCSObjectReference<Vehicle> getRelatedVehicle() {
+      return null;
     }
 
     @Override

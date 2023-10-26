@@ -27,6 +27,7 @@ import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Couple;
+import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -57,6 +58,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.Vehicle
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VisualLayoutTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.TripleTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.EnvelopeTO;
 import org.opentcs.util.Colors;
 
 /**
@@ -269,6 +271,7 @@ public class PlantModelHandler {
                                   point.getPose().getPosition().getZ()))
         .setType(point.getType().name())
         .setVehicleOrientationAngle(point.getPose().getOrientationAngle())
+        .setVehicleEnvelopes(toEnvelopeTOs(point.getVehicleEnvelopes()))
         .setProperties(toPropertyTOs(point.getProperties()))
         .setLayout(new PointTO.Layout()
             .setLabelOffset(new CoupleTO(point.getLayout().getLabelOffset().getX(),
@@ -300,6 +303,7 @@ public class PlantModelHandler {
                     new Couple(point.getLayout().getLabelOffset().getX(),
                                point.getLayout().getLabelOffset().getY()),
                     point.getLayout().getLayerId()))
+                .withVehicleEnvelopes(toVehicleEnvelopeMap(point.getVehicleEnvelopes()))
         )
         .collect(Collectors.toCollection(ArrayList::new));
 
@@ -337,6 +341,7 @@ public class PlantModelHandler {
                 .withMaxReverseVelocity(path.getMaxReverseVelocity())
                 .withLocked(path.isLocked())
                 .withLayout(toPathCreationTOLayout(path.getLayout()))
+                .withVehicleEnvelopes(toVehicleEnvelopeMap(path.getVehicleEnvelopes()))
                 .withPeripheralOperations(
                     toPeripheralOperationCreationTOs(path.getPeripheralOperations())))
         .collect(Collectors.toCollection(ArrayList::new));
@@ -419,6 +424,30 @@ public class PlantModelHandler {
   private Map<String, String> toPropertyMap(List<PropertyTO> properties) {
     return properties.stream()
         .collect(Collectors.toMap(PropertyTO::getName, PropertyTO::getValue));
+  }
+
+  private Map<String, Envelope> toVehicleEnvelopeMap(List<EnvelopeTO> envelopeEntries) {
+    return envelopeEntries.stream()
+        .collect(Collectors.toMap(
+            EnvelopeTO::getKey,
+            entry -> {
+              List<Couple> couples = entry.getVertices().stream()
+                  .map(coupleTO -> new Couple(coupleTO.getX(), coupleTO.getY()))
+                  .collect(Collectors.toList());
+              return new Envelope(couples);
+            }
+        ));
+  }
+
+  private List<EnvelopeTO> toEnvelopeTOs(Map<String, Envelope> envelopeMap) {
+    return envelopeMap.entrySet().stream()
+        .map(entry -> new EnvelopeTO(
+        entry.getKey(),
+        entry.getValue().getVertices().stream()
+            .map(couple -> new CoupleTO(couple.getX(), couple.getY()))
+            .collect(Collectors.toList()))
+        )
+        .collect(Collectors.toList());
   }
 
   private List<PropertyTO> toPropertyTOs(Map<String, String> properties) {

@@ -20,8 +20,10 @@ import static org.hamcrest.collection.IsMapWithSize.anEmptyMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.Scheduler;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
+import org.opentcs.data.model.Vehicle;
 
 /**
  * Unit tests for {@link ReservationPool}.
@@ -133,6 +135,11 @@ public class ReservationPoolTest {
     @Override
     public String getId() {
       return getClass().getName();
+    }
+
+    @Override
+    public TCSObjectReference<Vehicle> getRelatedVehicle() {
+      return null;
     }
 
     @Override

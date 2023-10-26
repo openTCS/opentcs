@@ -17,6 +17,7 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides methods concerning {@link Vehicle}s.
@@ -144,4 +145,20 @@ public interface VehicleService
   void updateVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
                                       Set<String> allowedOrderTypes)
       throws ObjectUnknownException, KernelRuntimeException;
+
+  /**
+   * Updates the vehicle's envelope key.
+   *
+   * @param ref A reference to the vehicle.
+   * @param envelopeKey The vehicle's new envelope key.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @throws IllegalArgumentException If the referenced vehicle is processing a transport order or
+   * is currently claiming/allocating resources.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void updateVehicleEnvelopeKey(TCSObjectReference<Vehicle> ref, String envelopeKey)
+      throws ObjectUnknownException, IllegalArgumentException, KernelRuntimeException {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
 }

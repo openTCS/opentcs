@@ -167,4 +167,17 @@ class RemoteVehicleServiceProxy
       throw findSuitableExceptionFor(ex);
     }
   }
+
+  @Override
+  public void updateVehicleEnvelopeKey(TCSObjectReference<Vehicle> ref, String envelopeKey)
+      throws ObjectUnknownException, KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().updateVehicleEnvelopeKey(getClientId(), ref, envelopeKey);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
 }

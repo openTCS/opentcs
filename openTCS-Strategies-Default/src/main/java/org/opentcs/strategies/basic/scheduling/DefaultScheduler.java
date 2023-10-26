@@ -27,6 +27,7 @@ import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.TCSObjectEvent;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.Allocate;
@@ -413,6 +414,11 @@ public class DefaultScheduler
       return "DefaultScheduler-DummyClient";
     }
 
+    @Override
+    public TCSObjectReference<Vehicle> getRelatedVehicle() {
+      return null;
+    }
+    
     @Override
     public boolean allocationSuccessful(Set<TCSResource<?>> resources) {
       return false;

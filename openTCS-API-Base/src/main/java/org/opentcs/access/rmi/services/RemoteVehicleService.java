@@ -18,6 +18,7 @@ import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods provided by the {@link VehicleService} via RMI.
@@ -79,5 +80,12 @@ public interface RemoteVehicleService
                                       TCSObjectReference<Vehicle> ref,
                                       Set<String> allowedOrderTypes)
       throws RemoteException;
+
+  @ScheduledApiChange(when = "6.0", details = "Deault implementation will be removed.")
+  default void updateVehicleEnvelopeKey(ClientID clientId,
+                                        TCSObjectReference<Vehicle> ref,
+                                        String envelopeKey)
+      throws RemoteException {
+  }
   // CHECKSTYLE:ON
 }

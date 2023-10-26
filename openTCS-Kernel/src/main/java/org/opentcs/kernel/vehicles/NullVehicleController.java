@@ -14,7 +14,9 @@ import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.TCSResource;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.AdapterCommand;
@@ -132,6 +134,12 @@ public class NullVehicleController
     return vehicleName;
   }
 
+  @Override
+  public TCSObjectReference<Vehicle> getRelatedVehicle() {
+    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
+    return null;
+  }
+  
   @Override
   public boolean allocationSuccessful(Set<TCSResource<?>> resources) {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);

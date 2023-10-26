@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlType;
                       "maxReverseVelocity",
                       "peripheralOperations",
                       "locked",
+                      "vehicleEnvelopes",
                       "properties",
                       "pathLayout"})
 public class PathTO
@@ -41,6 +42,7 @@ public class PathTO
   private Long maxReverseVelocity = 0L;
   private List<PeripheralOperationTO> peripheralOperations = new ArrayList<>();
   private Boolean locked = false;
+  private List<VehicleEnvelopeTO> vehicleEnvelopes = new ArrayList<>();
   private PathLayout pathLayout = new PathLayout();
 
   /**
@@ -124,6 +126,16 @@ public class PathTO
 
   public PathTO setLocked(Boolean locked) {
     this.locked = locked;
+    return this;
+  }
+
+  @XmlElement(name = "vehicleEnvelope")
+  public List<VehicleEnvelopeTO> getVehicleEnvelopes() {
+    return vehicleEnvelopes;
+  }
+
+  public PathTO setVehicleEnvelopes(@Nonnull List<VehicleEnvelopeTO> vehicleEnvelopes) {
+    this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     return this;
   }
 

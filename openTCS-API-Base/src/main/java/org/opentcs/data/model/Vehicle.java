@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -143,6 +144,10 @@ public class Vehicle
    */
   private final double orientationAngle;
   /**
+   * The key for selecting the envelope to be used for resources the vehicle occupies.
+   */
+  private final String envelopeKey;
+  /**
    * The information regarding the grahical representation of this vehicle.
    */
   private final Layout layout;
@@ -178,6 +183,7 @@ public class Vehicle
     this.orientationAngle = Double.NaN;
     this.energyLevel = 100;
     this.loadHandlingDevices = List.of();
+    this.envelopeKey = null;
     this.layout = new Layout();
   }
 
@@ -208,6 +214,7 @@ public class Vehicle
                   double orientationAngle,
                   int energyLevel,
                   List<LoadHandlingDevice> loadHandlingDevices,
+                  String envelopeKey,
                   Layout layout) {
     super(name, properties, history);
     this.length = checkInRange(length, 1, Integer.MAX_VALUE, "length");
@@ -249,6 +256,7 @@ public class Vehicle
     this.energyLevel = checkInRange(energyLevel, 0, 100, "energyLevel");
     this.loadHandlingDevices = listWithoutNullValues(requireNonNull(loadHandlingDevices,
                                                                     "loadHandlingDevices"));
+    this.envelopeKey = envelopeKey;
     this.layout = requireNonNull(layout, "layout");
   }
 
@@ -281,6 +289,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -313,6 +322,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -345,6 +355,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -377,6 +388,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -423,6 +435,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -522,6 +535,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -570,6 +584,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -616,6 +631,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -663,6 +679,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -711,6 +728,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -757,6 +775,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -803,6 +822,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -849,6 +869,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -906,6 +927,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -961,6 +983,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1007,6 +1030,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1056,6 +1080,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1103,6 +1128,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1152,6 +1178,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1201,6 +1228,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1247,6 +1275,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1295,6 +1324,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1341,6 +1371,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1387,6 +1418,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1435,6 +1467,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1483,6 +1516,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1531,6 +1565,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1579,6 +1614,55 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
+                       layout);
+  }
+
+  /**
+   * Returns the key for selecting the envelope to be used for resources the vehicle occupies.
+   *
+   * @return The key for selecting the envelope to be used for resources the vehicle occupies.
+   */
+  @Nullable
+  public String getEnvelopeKey() {
+    return envelopeKey;
+  }
+
+  /**
+   * Creates a copy of this object, with the given envelope key.
+   *
+   * @param envelopeKey The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Vehicle withEnvelopeKey(@Nullable String envelopeKey) {
+    return new Vehicle(getName(),
+                       getProperties(),
+                       getHistory(),
+                       length,
+                       energyLevelGood,
+                       energyLevelCritical,
+                       energyLevelFullyRecharged,
+                       energyLevelSufficientlyRecharged,
+                       maxVelocity,
+                       maxReverseVelocity,
+                       rechargeOperation,
+                       procState,
+                       transportOrder,
+                       orderSequence,
+                       allowedOrderTypes,
+                       routeProgressIndex,
+                       claimedResources,
+                       allocatedResources,
+                       state,
+                       integrationLevel,
+                       paused,
+                       currentPosition,
+                       nextPosition,
+                       precisePosition,
+                       orientationAngle,
+                       energyLevel,
+                       loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1625,6 +1709,7 @@ public class Vehicle
                        orientationAngle,
                        energyLevel,
                        loadHandlingDevices,
+                       envelopeKey,
                        layout);
   }
 
@@ -1666,6 +1751,7 @@ public class Vehicle
         + ", maxReverseVelocity=" + maxReverseVelocity
         + ", rechargeOperation=" + rechargeOperation
         + ", allowedOrderTypes=" + allowedOrderTypes
+        + ", envelopeKey=" + envelopeKey
         + '}';
   }
 

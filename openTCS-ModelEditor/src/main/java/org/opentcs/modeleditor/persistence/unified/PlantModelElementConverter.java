@@ -23,6 +23,7 @@ import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.model.Block;
+import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.visualization.Layer;
 import org.opentcs.data.model.visualization.LayerGroup;
@@ -33,6 +34,7 @@ import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.components.properties.type.PercentProperty;
 import org.opentcs.guing.base.components.properties.type.SpeedProperty;
+import org.opentcs.guing.base.model.EnvelopeModel;
 import org.opentcs.guing.base.model.PeripheralOperationModel;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.LayoutModel;
@@ -68,6 +70,13 @@ public class PlantModelElementConverter {
         AngleProperty.Unit.DEG
     );
     model.getPropertyType().setValue(mapPointType(pointTO.getType()));
+
+    for (Map.Entry<String, Envelope> entry : pointTO.getVehicleEnvelopes().entrySet()) {
+      model.getPropertyVehicleEnvelopes().getValue().add(
+          new EnvelopeModel(entry.getKey(), entry.getValue().getVertices())
+      );
+    }
+
     for (Map.Entry<String, String> property : pointTO.getProperties().entrySet()) {
       model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
                                                                     property.getKey(),
@@ -103,6 +112,12 @@ public class PlantModelElementConverter {
     model.getPropertyStartComponent().setText(pathTO.getSrcPointName());
     model.getPropertyEndComponent().setText(pathTO.getDestPointName());
     model.getPropertyLocked().setValue(pathTO.isLocked());
+
+    for (Map.Entry<String, Envelope> entry : pathTO.getVehicleEnvelopes().entrySet()) {
+      model.getPropertyVehicleEnvelopes().getValue().add(
+          new EnvelopeModel(entry.getKey(), entry.getValue().getVertices())
+      );
+    }
 
     for (Map.Entry<String, String> property : pathTO.getProperties().entrySet()) {
       model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
@@ -153,6 +168,9 @@ public class PlantModelElementConverter {
     model.getPropertyEnergyLevelSufficientlyRecharged().setValueAndUnit(
         vehicleTO.getEnergyLevelSufficientlyRecharged(), PercentProperty.Unit.PERCENT
     );
+
+    model.getPropertyEnvelopeKey().setText(vehicleTO.getEnvelopeKey());
+
     for (Map.Entry<String, String> property : vehicleTO.getProperties().entrySet()) {
       model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
                                                                     property.getKey(),

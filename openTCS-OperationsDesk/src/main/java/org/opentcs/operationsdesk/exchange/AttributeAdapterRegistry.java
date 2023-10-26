@@ -20,6 +20,7 @@ import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.operationsdesk.exchange.adapter.LocationLockAdapter;
 import org.opentcs.operationsdesk.exchange.adapter.PathLockAdapter;
 import org.opentcs.operationsdesk.exchange.adapter.VehicleAllowedOrderTypesAdapter;
+import org.opentcs.operationsdesk.exchange.adapter.VehicleEnvelopeKeyAdapter;
 import org.opentcs.operationsdesk.exchange.adapter.VehiclePausedAdapter;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;
@@ -101,6 +102,7 @@ public class AttributeAdapterRegistry
       model.addAttributesChangeListener(new VehicleAllowedOrderTypesAdapter(portalProvider,
                                                                             model));
       model.addAttributesChangeListener(new VehiclePausedAdapter(portalProvider, model));
+      model.addAttributesChangeListener(new VehicleEnvelopeKeyAdapter(portalProvider, model));
     }
     for (PathModel model : modelManager.getModel().getPathModels()) {
       model.addAttributesChangeListener(new PathLockAdapter(portalProvider, model));

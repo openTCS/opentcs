@@ -58,6 +58,8 @@ public class GetVehicleResponseTO {
 
   private List<String> allowedOrderTypes = new ArrayList<>();
 
+  private String envelopeKey;
+
   public GetVehicleResponseTO() {
   }
 
@@ -205,6 +207,16 @@ public class GetVehicleResponseTO {
     return this;
   }
 
+  @Nullable
+  public String getEnvelopeKey() {
+    return envelopeKey;
+  }
+
+  public GetVehicleResponseTO setEnvelopeKey(@Nullable String envelopeKey) {
+    this.envelopeKey = envelopeKey;
+    return this;
+  }
+
   /**
    * Creates a <Code>VehicleState</Code> instance from a <Code>Vehicle</Code> instance.
    *
@@ -236,6 +248,7 @@ public class GetVehicleResponseTO {
     vehicleState.setState(vehicle.getState());
     vehicleState.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
     vehicleState.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));
+    vehicleState.setEnvelopeKey(vehicle.getEnvelopeKey());
     vehicleState.setAllowedOrderTypes(vehicle.getAllowedOrderTypes()
         .stream()
         .sorted()

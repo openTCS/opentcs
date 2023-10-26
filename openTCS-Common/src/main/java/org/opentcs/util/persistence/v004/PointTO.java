@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(propOrder = {"name", "xPosition", "yPosition", "zPosition", "vehicleOrientationAngle",
-                      "type", "outgoingPaths", "properties", "pointLayout"})
+                      "type", "vehicleEnvelopes", "outgoingPaths", "properties", "pointLayout"})
 public class PointTO
     extends PlantModelElementTO {
 
@@ -30,6 +30,7 @@ public class PointTO
   private Long zPosition = 0L;
   private Float vehicleOrientationAngle = 0.0F;
   private String type = "HALT_POSITION";
+  private List<VehicleEnvelopeTO> vehicleEnvelopes = new ArrayList<>();
   private List<OutgoingPath> outgoingPaths = new ArrayList<>();
   private PointLayout pointLayout = new PointLayout();
 
@@ -105,6 +106,16 @@ public class PointTO
     return this;
   }
 
+  @XmlElement(name = "vehicleEnvelope")
+  public List<VehicleEnvelopeTO> getVehicleEnvelopes() {
+    return vehicleEnvelopes;
+  }
+
+  public PointTO setVehicleEnvelopes(@Nonnull List<VehicleEnvelopeTO> vehicleEnvelopes) {
+    this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
+    return this;
+  }
+  
   @XmlElement(required = true)
   public PointLayout getPointLayout() {
     return pointLayout;

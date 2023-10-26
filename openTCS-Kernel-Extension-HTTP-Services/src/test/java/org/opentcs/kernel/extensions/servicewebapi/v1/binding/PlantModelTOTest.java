@@ -22,6 +22,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.Locatio
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PathTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PeripheralOperationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PointTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.EnvelopeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.TripleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
@@ -47,6 +48,19 @@ public class PlantModelTOTest {
                 .setPosition(new TripleTO(25000, -15000, 0))
                 .setVehicleOrientationAngle(73.3)
                 .setType("PARK_POSITION")
+                .setVehicleEnvelopes(
+                    List.of(
+                        new EnvelopeTO(
+                            "envelopeType-01",
+                            List.of(
+                                new CoupleTO(25500, -15500),
+                                new CoupleTO(25500, -14500),
+                                new CoupleTO(24500, -14500),
+                                new CoupleTO(24500, -15500)
+                            )
+                        )
+                    )
+                )
                 .setLayout(new PointTO.Layout()
                     .setPosition(new CoupleTO(25000, -15000))
                     .setLabelOffset(new CoupleTO(-10, -20))
@@ -72,6 +86,19 @@ public class PlantModelTOTest {
                 .setMaxVelocity(13)
                 .setMaxReverseVelocity(3)
                 .setLocked(true)
+                .setVehicleEnvelopes(
+                    List.of(
+                        new EnvelopeTO(
+                            "envelopeType-01",
+                            List.of(
+                                new CoupleTO(25500, -15500),
+                                new CoupleTO(25500, -14500),
+                                new CoupleTO(17500, -14500),
+                                new CoupleTO(17500, -15500)
+                            )
+                        )
+                    )
+                )
                 .setPeripheralOperations(List.of(new PeripheralOperationTO("some-op",
                                                                            "some-location")
                     .setExecutionTrigger("AFTER_ALLOCATION")

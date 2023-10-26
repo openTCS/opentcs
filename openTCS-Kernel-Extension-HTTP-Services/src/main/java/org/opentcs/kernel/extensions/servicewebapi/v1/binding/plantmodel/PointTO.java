@@ -10,6 +10,7 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.TripleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.EnvelopeTO;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
@@ -26,6 +27,7 @@ public class PointTO {
   private double vehicleOrientationAngle = Double.NaN;
   private String type = Point.Type.HALT_POSITION.name();
   private Layout layout = new Layout();
+  private List<EnvelopeTO> vehicleEnvelopes = List.of();
   private List<PropertyTO> properties = List.of();
 
   @JsonCreator
@@ -89,6 +91,16 @@ public class PointTO {
 
   public PointTO setLayout(@Nonnull Layout pointLayout) {
     this.layout = requireNonNull(pointLayout, "pointLayout");
+    return this;
+  }
+
+  @Nonnull
+  public List<EnvelopeTO> getVehicleEnvelopes() {
+    return vehicleEnvelopes;
+  }
+
+  public PointTO setVehicleEnvelopes(@Nonnull List<EnvelopeTO> vehicleEnvelopes) {
+    this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     return this;
   }
 

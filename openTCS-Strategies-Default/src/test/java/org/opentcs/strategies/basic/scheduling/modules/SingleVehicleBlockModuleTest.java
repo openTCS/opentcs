@@ -20,11 +20,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.scheduling.ReservationPool;
 
 /**
@@ -133,6 +135,11 @@ public class SingleVehicleBlockModuleTest {
     @Override
     public String getId() {
       return "SampleClient";
+    }
+
+    @Override
+    public TCSObjectReference<Vehicle> getRelatedVehicle() {
+      return null;
     }
 
     @Override

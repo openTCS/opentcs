@@ -7,12 +7,15 @@
  */
 package org.opentcs.guing.common.exchange.adapter;
 
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import java.util.stream.Collectors;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Couple;
+import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
@@ -21,6 +24,7 @@ import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.model.ModelComponent;
+import org.opentcs.guing.base.model.EnvelopeModel;
 import org.opentcs.guing.base.model.elements.LayoutModel;
 import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.common.model.SystemModel;
@@ -57,6 +61,13 @@ public class PointAdapter
         .setValueAndUnit(point.getPose().getOrientationAngle(), AngleProperty.Unit.DEG);
 
     updateModelType(model, point);
+
+    for (Map.Entry<String, Envelope> entry : point.getVehicleEnvelopes().entrySet()) {
+      model.getPropertyVehicleEnvelopes().getValue().add(
+          new EnvelopeModel(entry.getKey(), entry.getValue().getVertices())
+      );
+    }
+
     updateMiscModelProperties(model, point);
     updateModelLayoutProperties(model, point, systemModel.getLayoutModel());
   }
@@ -75,6 +86,7 @@ public class PointAdapter
                     )
                 )
                 .withType(getKernelPointType((PointModel) modelComponent))
+                .withVehicleEnvelopes(getKernelVehicleEnvelopes((PointModel) modelComponent))
                 .withProperties(getKernelProperties(modelComponent))
                 .withLayout(getLayout((PointModel) modelComponent))
         );
@@ -126,6 +138,14 @@ public class PointAdapter
 
   private double getKernelVehicleAngle(PointModel model) {
     return model.getPropertyVehicleOrientationAngle().getValueByUnit(AngleProperty.Unit.DEG);
+  }
+
+  private Map<String, Envelope> getKernelVehicleEnvelopes(PointModel model) {
+    return model.getPropertyVehicleEnvelopes().getValue().stream()
+        .collect(
+            Collectors.toMap(EnvelopeModel::getKey,
+                             envelopeModel -> new Envelope(envelopeModel.getVertices()))
+        );
   }
 
   private PointCreationTO.Layout getLayout(PointModel model) {

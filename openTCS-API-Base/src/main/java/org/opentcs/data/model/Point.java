@@ -52,6 +52,10 @@ public class Point
    */
   private final TCSObjectReference<Vehicle> occupyingVehicle;
   /**
+   * A map of envelope keys to envelopes that vehicles located at this point may occupy.
+   */
+  private final Map<String, Envelope> vehicleEnvelopes;
+  /**
    * The information regarding the grahical representation of this point.
    */
   private final Layout layout;
@@ -69,6 +73,7 @@ public class Point
     this.outgoingPaths = new HashSet<>();
     this.attachedLinks = new HashSet<>();
     this.occupyingVehicle = null;
+    this.vehicleEnvelopes = Map.of();
     this.layout = new Layout();
   }
 
@@ -81,6 +86,7 @@ public class Point
                 Set<TCSObjectReference<Path>> outgoingPaths,
                 Set<Location.Link> attachedLinks,
                 TCSObjectReference<Vehicle> occupyingVehicle,
+                Map<String, Envelope> vehicleEnvelopes,
                 Layout layout) {
     super(name, properties, history);
     this.pose = requireNonNull(pose, "pose");
@@ -89,6 +95,7 @@ public class Point
     this.outgoingPaths = setWithoutNullValues(requireNonNull(outgoingPaths, "outgoingPaths"));
     this.attachedLinks = setWithoutNullValues(requireNonNull(attachedLinks, "attachedLinks"));
     this.occupyingVehicle = occupyingVehicle;
+    this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     this.layout = requireNonNull(layout, "layout");
   }
 
@@ -103,6 +110,7 @@ public class Point
                      outgoingPaths,
                      attachedLinks,
                      occupyingVehicle,
+                     vehicleEnvelopes,
                      layout);
   }
 
@@ -117,6 +125,7 @@ public class Point
                      outgoingPaths,
                      attachedLinks,
                      occupyingVehicle,
+                     vehicleEnvelopes,
                      layout);
   }
 
@@ -131,6 +140,7 @@ public class Point
                      outgoingPaths,
                      attachedLinks,
                      occupyingVehicle,
+                     vehicleEnvelopes,
                      layout);
   }
 
@@ -145,6 +155,7 @@ public class Point
                      outgoingPaths,
                      attachedLinks,
                      occupyingVehicle,
+                     vehicleEnvelopes,
                      layout);
   }
 
@@ -173,6 +184,7 @@ public class Point
                      outgoingPaths,
                      attachedLinks,
                      occupyingVehicle,
+                     vehicleEnvelopes,
                      layout);
   }
 
@@ -207,6 +219,7 @@ public class Point
                      outgoingPaths,
                      attachedLinks,
                      occupyingVehicle,
+                     vehicleEnvelopes,
                      layout);
   }
 
@@ -243,6 +256,7 @@ public class Point
                      outgoingPaths,
                      attachedLinks,
                      occupyingVehicle,
+                     vehicleEnvelopes,
                      layout);
   }
 
@@ -271,6 +285,7 @@ public class Point
                      outgoingPaths,
                      attachedLinks,
                      occupyingVehicle,
+                     vehicleEnvelopes,
                      layout);
   }
 
@@ -329,6 +344,7 @@ public class Point
                      outgoingPaths,
                      attachedLinks,
                      occupyingVehicle,
+                     vehicleEnvelopes,
                      layout);
   }
 
@@ -357,6 +373,7 @@ public class Point
                      outgoingPaths,
                      attachedLinks,
                      occupyingVehicle,
+                     vehicleEnvelopes,
                      layout);
   }
 
@@ -385,6 +402,7 @@ public class Point
                      outgoingPaths,
                      attachedLinks,
                      occupyingVehicle,
+                     vehicleEnvelopes,
                      layout);
   }
 
@@ -413,6 +431,36 @@ public class Point
                      outgoingPaths,
                      attachedLinks,
                      occupyingVehicle,
+                     vehicleEnvelopes,
+                     layout);
+  }
+
+  /**
+   * Returns a map of envelope keys to envelopes that vehicles located at this point may occupy.
+   *
+   * @return A map of envelope keys to envelopes that vehicles located at this point may occupy.
+   */
+  public Map<String, Envelope> getVehicleEnvelopes() {
+    return vehicleEnvelopes;
+  }
+
+  /**
+   * Creates a copy of this object, with the given vehicle envelopes.
+   *
+   * @param vehicleEnvelopes The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Point withVehicleEnvelopes(Map<String, Envelope> vehicleEnvelopes) {
+    return new Point(getName(),
+                     getProperties(),
+                     getHistory(),
+                     pose,
+                     type,
+                     incomingPaths,
+                     outgoingPaths,
+                     attachedLinks,
+                     occupyingVehicle,
+                     vehicleEnvelopes,
                      layout);
   }
 
@@ -441,6 +489,7 @@ public class Point
                      outgoingPaths,
                      attachedLinks,
                      occupyingVehicle,
+                     vehicleEnvelopes,
                      layout);
   }
 

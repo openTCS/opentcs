@@ -20,6 +20,22 @@
       },
       "layerId" : 0
     },
+    "vehicleEnvelopes" : [ {
+      "key" : "envelopeType-01",
+      "vertices" : [ {
+        "x" : 25500,
+        "y" : -15500
+      }, {
+        "x" : 25500,
+        "y" : -14500
+      }, {
+        "x" : 24500,
+        "y" : -14500
+      }, {
+        "x" : 24500,
+        "y" : -15500
+      } ]
+    } ],
     "properties" : [ {
       "name" : "point-prop",
       "value" : "point-value"
@@ -44,6 +60,7 @@
       },
       "layerId" : 0
     },
+    "vehicleEnvelopes" : [ ],
     "properties" : [ {
       "name" : "point-prop",
       "value" : "point-value"
@@ -68,6 +85,7 @@
       },
       "layerId" : 0
     },
+    "vehicleEnvelopes" : [ ],
     "properties" : [ {
       "name" : "point-prop",
       "value" : "point-value"
@@ -101,6 +119,22 @@
       } ],
       "layerId" : 0
     },
+    "vehicleEnvelopes" : [ {
+      "key" : "envelopeType-01",
+      "vertices" : [ {
+        "x" : 25500,
+        "y" : -15500
+      }, {
+        "x" : 25500,
+        "y" : -14500
+      }, {
+        "x" : 17500,
+        "y" : -14500
+      }, {
+        "x" : 17500,
+        "y" : -15500
+      } ]
+    } ],
     "properties" : [ {
       "name" : "path-prop",
       "value" : "path-value"
@@ -119,6 +153,7 @@
       "controlPoints" : [ ],
       "layerId" : 0
     },
+    "vehicleEnvelopes" : [ ],
     "properties" : [ ]
   } ],
   "locationTypes" : [ {

@@ -550,6 +550,32 @@ public class PlantModelManager
   }
 
   /**
+   * Sets a vehicle's envelope key.
+   *
+   * @param ref A reference to the vehicle to be modified.
+   * @param envelopeKey The vehicle's new envelope key.
+   * @return The modified vehicle.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   */
+  public Vehicle setVehicleEnvelopeKey(TCSObjectReference<Vehicle> ref,
+                                       String envelopeKey)
+      throws ObjectUnknownException {
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+
+    LOG.info("Vehicle's envelope key change: {} -- {} -> {}",
+             previousState.getName(),
+             previousState.getEnvelopeKey(),
+             envelopeKey);
+
+    Vehicle vehicle = previousState.withEnvelopeKey(envelopeKey);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(vehicle,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return vehicle;
+  }
+
+  /**
    * Sets a vehicle's position.
    *
    * @param ref A reference to the vehicle to be modified.
@@ -864,6 +890,7 @@ public class PlantModelManager
                   )
               )
               .withType(curPoint.getType())
+              .withVehicleEnvelopes(curPoint.getVehicleEnvelopes())
               .withProperties(curPoint.getProperties())
               .withLayout(new PointCreationTO.Layout(curPoint.getLayout().getPosition(),
                                                      curPoint.getLayout().getLabelOffset(),
@@ -895,6 +922,7 @@ public class PlantModelManager
               .withMaxReverseVelocity(curPath.getMaxReverseVelocity())
               .withLocked(curPath.isLocked())
               .withPeripheralOperations(getPeripheralOperations(curPath))
+              .withVehicleEnvelopes(curPath.getVehicleEnvelopes())
               .withProperties(curPath.getProperties())
               .withLayout(new PathCreationTO.Layout(curPath.getLayout().getConnectionType(),
                                                     curPath.getLayout().getControlPoints(),
@@ -935,6 +963,7 @@ public class PlantModelManager
               .withEnergyLevelSufficientlyRecharged(vehicle.getEnergyLevelSufficientlyRecharged())
               .withMaxVelocity(vehicle.getMaxVelocity())
               .withMaxReverseVelocity(vehicle.getMaxReverseVelocity())
+              .withEnvelopeKey(vehicle.getEnvelopeKey())
               .withProperties(vehicle.getProperties())
               .withLayout(new VehicleCreationTO.Layout(vehicle.getLayout().getRouteColor()))
       );
@@ -1112,6 +1141,7 @@ public class PlantModelManager
     Point newPoint = new Point(to.getName())
         .withPose(new Pose(to.getPose().getPosition(), to.getPose().getOrientationAngle()))
         .withType(to.getType())
+        .withVehicleEnvelopes(to.getVehicleEnvelopes())
         .withProperties(to.getProperties())
         .withLayout(new Point.Layout(to.getLayout().getPosition(),
                                      to.getLayout().getLabelOffset(),
@@ -1143,6 +1173,7 @@ public class PlantModelManager
         .withMaxVelocity(to.getMaxVelocity())
         .withMaxReverseVelocity(to.getMaxReverseVelocity())
         .withPeripheralOperations(mapPeripheralOperationTOs(to.getPeripheralOperations()))
+        .withVehicleEnvelopes(to.getVehicleEnvelopes())
         .withProperties(to.getProperties())
         .withLocked(to.isLocked())
         .withLayout(new Path.Layout(to.getLayout().getConnectionType(),
@@ -1255,6 +1286,7 @@ public class PlantModelManager
         .withEnergyLevelSufficientlyRecharged(to.getEnergyLevelSufficientlyRecharged())
         .withMaxVelocity(to.getMaxVelocity())
         .withMaxReverseVelocity(to.getMaxReverseVelocity())
+        .withEnvelopeKey(to.getEnvelopeKey())
         .withProperties(to.getProperties())
         .withLayout(new Vehicle.Layout(to.getLayout().getRouteColor()));
     getObjectRepo().addObject(newVehicle);

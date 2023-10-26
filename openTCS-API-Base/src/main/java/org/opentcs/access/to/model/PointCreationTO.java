@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.Couple;
+import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
@@ -35,6 +36,10 @@ public class PointCreationTO
   @Nonnull
   private final Point.Type type;
   /**
+   * A map of envelope keys to envelopes that vehicles located at this point may occupy.
+   */
+  private final Map<String, Envelope> vehicleEnvelopes;
+  /**
    * The information regarding the grahical representation of this point.
    */
   private final Layout layout;
@@ -48,6 +53,7 @@ public class PointCreationTO
     super(name);
     this.pose = new Pose(new Triple(0, 0, 0), Double.NaN);
     this.type = Point.Type.HALT_POSITION;
+    this.vehicleEnvelopes = Map.of();
     this.layout = new Layout();
   }
 
@@ -55,10 +61,12 @@ public class PointCreationTO
                           @Nonnull Map<String, String> properties,
                           @Nonnull Pose pose,
                           @Nonnull Point.Type type,
+                          @Nonnull Map<String, Envelope> vehicleEnvelopes,
                           @Nonnull Layout layout) {
     super(name, properties);
     this.pose = requireNonNull(pose, "pose");
     this.type = requireNonNull(type, "type");
+    this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     this.layout = requireNonNull(layout, "layout");
   }
 
@@ -74,6 +82,7 @@ public class PointCreationTO
                                getModifiableProperties(),
                                pose,
                                type,
+                               vehicleEnvelopes,
                                layout);
   }
 
@@ -98,6 +107,7 @@ public class PointCreationTO
                                getModifiableProperties(),
                                pose,
                                type,
+                               vehicleEnvelopes,
                                layout);
   }
 
@@ -128,6 +138,7 @@ public class PointCreationTO
                                getModifiableProperties(),
                                pose.withPosition(position),
                                type,
+                               vehicleEnvelopes,
                                layout);
   }
 
@@ -161,6 +172,7 @@ public class PointCreationTO
                                getModifiableProperties(),
                                pose.withOrientationAngle(vehicleOrientationAngle),
                                type,
+                               vehicleEnvelopes,
                                layout);
   }
 
@@ -185,6 +197,7 @@ public class PointCreationTO
                                getProperties(),
                                pose,
                                type,
+                               vehicleEnvelopes,
                                layout);
   }
 
@@ -200,6 +213,7 @@ public class PointCreationTO
                                properties,
                                pose,
                                type,
+                               vehicleEnvelopes,
                                layout);
   }
 
@@ -219,6 +233,31 @@ public class PointCreationTO
                                propertiesWith(key, value),
                                pose,
                                type,
+                               vehicleEnvelopes,
+                               layout);
+  }
+
+  /**
+   * Returns a map of envelope keys to envelopes that vehicles located at this point may occupy.
+   *
+   * @return A map of envelope keys to envelopes that vehicles located at this point may occupy.
+   */
+  public Map<String, Envelope> getVehicleEnvelopes() {
+    return vehicleEnvelopes;
+  }
+
+  /**
+   * Creates a copy of this object, with the given vehicle envelopes.
+   *
+   * @param vehicleEnvelopes The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public PointCreationTO withVehicleEnvelopes(@Nonnull Map<String, Envelope> vehicleEnvelopes) {
+    return new PointCreationTO(getName(),
+                               getModifiableProperties(),
+                               pose,
+                               type,
+                               vehicleEnvelopes,
                                layout);
   }
 
@@ -242,6 +281,7 @@ public class PointCreationTO
                                getModifiableProperties(),
                                pose,
                                type,
+                               vehicleEnvelopes,
                                layout);
   }
 
@@ -251,6 +291,7 @@ public class PointCreationTO
         + "name=" + getName()
         + ", pose=" + pose
         + ", type=" + type
+        + ", vehicleEnvelopes=" + vehicleEnvelopes
         + ", layout=" + layout
         + ", properties=" + getProperties()
         + '}';

@@ -15,8 +15,16 @@ This change log lists the most relevant changes for past releases in reverse chr
 == Unreleased
 
 * New features and enhancements:
+** Add support for vehicle envelopes.
+   In an openTCS plant model, envelopes can now be defined for points and paths a vehicle occupies or traverses.
+   For vehicles, an envelope key can be defined to indicate which envelopes defined at points and paths should be considered for the respective vehicle.
+   This way, it is now possible to prevent vehicles from allocating physical areas intersecting with areas already allocated by other vehicles.
+   (Note that the Model Editor application does not provide any means to set envelopes, yet.
+   At this point, envelopes can only be input programmatically, i.e. via the Java or web API.)
 ** Update web API specification and implementation to version 1.3.0:
 *** Add new endpoints for updating the _locked_ state of paths and locations.
+*** Extend the endpoints for creating and retrieving plant models with respect to the newly added support for vehicle envelopes.
+*** Add a new endpoint for updating a vehicle's envelope key.
 * Bugs fixed:
 ** When updating the vehicle's prospective next position, actually consider its future movement commands.
 ** Actually use a vehicle's preferred recharge location if it is defined.

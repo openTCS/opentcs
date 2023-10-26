@@ -835,6 +835,39 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: "Unknown source point: Point-X"
+  "/vehicles/{NAME}/envelopeKey":
+    put:
+      tags:
+        - Vehicles
+      summary: Sets the envelope key for this vehicle.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The vehicle's new envelope key.
+          required: false
+          example: envelopeType-01
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
   /vehicles/dispatcher/trigger:
     post:
       tags:
@@ -1709,6 +1742,10 @@ components:
             type: string
             description: The allowed order types for this vehicle.
           example: [ "OrderType001", "OrderType002" ]
+        envelopeKey:
+          type: string
+          description: The envelope key for this vehicle.
+          example: envelopeType-01
       required:
         - length
         - energyLevelGood
@@ -2388,6 +2425,11 @@ components:
             - REPORT_POSITION
             - HALT_POSITION
             - PARK_POSITION
+        vehicleEnvelopes:
+          type: array
+          description: A map of envelope keys to envelopes that vehicles located at this point may occupy.
+          items:
+            $ref: "#/components/schemas/PlantModelEnvelope"
         layout:
           type: object
           description: Describes the graphical representation of this point.
@@ -2461,6 +2503,11 @@ components:
         locked:
           type: boolean
           description: A flag for marking this path as locked (i.e. to prevent vehicles from using it).
+        vehicleEnvelopes:
+          type: array
+          description: A map of envelope keys to envelopes that vehicles traversing this path may occupy.
+          items:
+            $ref: "#/components/schemas/PlantModelEnvelope"
         layout:
           type: object
           description: The information regarding the grahical representation of this path.
@@ -2817,6 +2864,26 @@ components:
         - id
         - name
         - visible
+    PlantModelEnvelope:
+      title:  Envelope
+      type: object
+      properties:
+        envelopeKey:
+          type: string
+          description: This envelope's key.
+          example: envelopeType-01
+        vertices:
+          type: array
+          description: The sequence of vertices this envelope consists of.
+          items:
+            $ref: "#/components/schemas/PlantModelCouple"
+          example:
+            - x: 1500
+              y: 1750
+            - x: 1600
+              y: 1820
+            - x: 1700
+              y: 1890
     Route:
       title: Route
       type: object

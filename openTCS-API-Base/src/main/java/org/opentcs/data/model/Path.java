@@ -59,6 +59,10 @@ public class Path
    */
   private final boolean locked;
   /**
+   * A map of envelope keys to envelopes that vehicles traversing this path may occupy.
+   */
+  private final Map<String, Envelope> vehicleEnvelopes;
+  /**
    * The information regarding the grahical representation of this path.
    */
   private final Layout layout;
@@ -81,6 +85,7 @@ public class Path
     this.maxReverseVelocity = 1000;
     this.peripheralOperations = List.of();
     this.locked = false;
+    this.vehicleEnvelopes = Map.of();
     this.layout = new Layout();
   }
 
@@ -94,6 +99,7 @@ public class Path
                int maxReverseVelocity,
                List<PeripheralOperation> peripheralOperations,
                boolean locked,
+               Map<String, Envelope> vehicleEnvelopes,
                Layout layout) {
     super(name, properties, history);
     this.sourcePoint = requireNonNull(sourcePoint, "sourcePoint");
@@ -107,6 +113,7 @@ public class Path
     this.peripheralOperations = new ArrayList<>(requireNonNull(peripheralOperations,
                                                                "peripheralOperations"));
     this.locked = locked;
+    this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     this.layout = requireNonNull(layout, "layout");
   }
 
@@ -122,6 +129,7 @@ public class Path
                     maxReverseVelocity,
                     peripheralOperations,
                     locked,
+                    vehicleEnvelopes,
                     layout);
   }
 
@@ -137,6 +145,7 @@ public class Path
                     maxReverseVelocity,
                     peripheralOperations,
                     locked,
+                    vehicleEnvelopes,
                     layout);
   }
 
@@ -152,6 +161,7 @@ public class Path
                     maxReverseVelocity,
                     peripheralOperations,
                     locked,
+                    vehicleEnvelopes,
                     layout);
   }
 
@@ -167,6 +177,7 @@ public class Path
                     maxReverseVelocity,
                     peripheralOperations,
                     locked,
+                    vehicleEnvelopes,
                     layout);
   }
 
@@ -196,6 +207,7 @@ public class Path
                     maxReverseVelocity,
                     peripheralOperations,
                     locked,
+                    vehicleEnvelopes,
                     layout);
   }
 
@@ -244,6 +256,7 @@ public class Path
                     maxReverseVelocity,
                     peripheralOperations,
                     locked,
+                    vehicleEnvelopes,
                     layout);
   }
 
@@ -274,6 +287,7 @@ public class Path
                     maxReverseVelocity,
                     peripheralOperations,
                     locked,
+                    vehicleEnvelopes,
                     layout);
   }
 
@@ -303,6 +317,7 @@ public class Path
                     maxReverseVelocity,
                     peripheralOperations,
                     locked,
+                    vehicleEnvelopes,
                     layout);
   }
 
@@ -334,6 +349,38 @@ public class Path
                     maxReverseVelocity,
                     peripheralOperations,
                     locked,
+                    vehicleEnvelopes,
+                    layout);
+  }
+
+  /**
+   * Returns a map of envelope keys to envelopes that vehicles traversing this path may occupy.
+   *
+   * @return A map of envelope keys to envelopes that vehicles traversing this path may occupy.
+   */
+  public Map<String, Envelope> getVehicleEnvelopes() {
+    return vehicleEnvelopes;
+  }
+
+  /**
+   *
+   * Creates a copy of this object, with the given vehicle envelopes.
+   *
+   * @param vehicleEnvelopes The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Path withVehicleEnvelopes(Map<String, Envelope> vehicleEnvelopes) {
+    return new Path(getName(),
+                    getProperties(),
+                    getHistory(),
+                    sourcePoint,
+                    destinationPoint,
+                    length,
+                    maxVelocity,
+                    maxReverseVelocity,
+                    peripheralOperations,
+                    locked,
+                    vehicleEnvelopes,
                     layout);
   }
 
@@ -363,6 +410,7 @@ public class Path
                     maxReverseVelocity,
                     peripheralOperations,
                     locked,
+                    vehicleEnvelopes,
                     layout);
   }
 

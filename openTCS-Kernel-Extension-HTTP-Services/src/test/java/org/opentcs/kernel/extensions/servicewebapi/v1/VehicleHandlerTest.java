@@ -228,6 +228,26 @@ class VehicleHandlerTest {
   }
 
   @Test
+  public void setVehicleEnvelopeKey() {
+    handler.putVehicleEnvelopeKey("some-vehicle", "some-key");
+
+    then(vehicleService).should().updateVehicleEnvelopeKey(vehicle.getReference(), "some-key");
+  }
+
+  @Test
+  public void nullVehicleEnvelopeKey() {
+    handler.putVehicleEnvelopeKey("some-vehicle", null);
+
+    then(vehicleService).should().updateVehicleEnvelopeKey(vehicle.getReference(), null);
+  }
+
+  @Test
+  public void throwOnSetEnvelopeUnknownVehicle() {
+    assertThatExceptionOfType(ObjectUnknownException.class)
+        .isThrownBy(() -> handler.putVehicleEnvelopeKey("some-unknown-vehicle", "some-key"));
+  }
+
+  @Test
   public void updateVehicleAllowedOrderTypes() {
     // Act
     handler.putVehicleAllowedOrderTypes(

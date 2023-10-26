@@ -9,6 +9,7 @@ package org.opentcs.util.persistence.v004;
 
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -35,6 +36,7 @@ public class VehicleTO
   private Long energyLevelGood = 0L;
   private Long energyLevelFullyRecharged = 0L;
   private Long energyLevelSufficientlyRecharged = 0L;
+  private String envelopeKey;
   private VehicleLayout vehicleLayout = new VehicleLayout();
 
   /**
@@ -123,6 +125,17 @@ public class VehicleTO
 
   public VehicleTO setMaxReverseVelocity(@Nonnull int maxReverseVelocity) {
     this.maxReverseVelocity = maxReverseVelocity;
+    return this;
+  }
+  
+  @XmlAttribute
+  @Nullable
+  public String getEnvelopeKey() {
+    return envelopeKey;
+  }
+
+  public VehicleTO setEnvelopeKey(@Nullable String envelopeKey) {
+    this.envelopeKey = envelopeKey;
     return this;
   }
 

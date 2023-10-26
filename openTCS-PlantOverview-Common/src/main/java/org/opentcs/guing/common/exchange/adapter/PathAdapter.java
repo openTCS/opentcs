@@ -9,6 +9,7 @@ package org.opentcs.guing.common.exchange.adapter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.PathCreationTO;
@@ -17,11 +18,13 @@ import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Couple;
+import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.guing.base.components.layer.LayerWrapper;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.components.properties.type.SpeedProperty;
+import org.opentcs.guing.base.model.EnvelopeModel;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.PeripheralOperationModel;
 import org.opentcs.guing.base.model.elements.LayoutModel;
@@ -73,6 +76,12 @@ public class PathAdapter
       );
     }
 
+    for (Map.Entry<String, Envelope> entry : path.getVehicleEnvelopes().entrySet()) {
+      model.getPropertyVehicleEnvelopes().getValue().add(
+          new EnvelopeModel(entry.getKey(), entry.getValue().getVertices())
+      );
+    }
+
     updateMiscModelProperties(model, path);
     updateModelLayoutProperties(model, path, systemModel.getLayoutModel());
     model.propertiesChanged(model);
@@ -100,6 +109,7 @@ public class PathAdapter
                 .withProperties(getKernelProperties(pathModel))
                 .withLocked(getLocked(pathModel))
                 .withPeripheralOperations(getPeripheralOperations(pathModel))
+                .withVehicleEnvelopes(getKernelVehicleEnvelopes(pathModel))
                 .withLayout(getLayout(pathModel))
         );
 
@@ -188,6 +198,14 @@ public class PathAdapter
     }
 
     return (long) pLength.getValueByUnit(LengthProperty.Unit.MM);
+  }
+
+  private Map<String, Envelope> getKernelVehicleEnvelopes(PathModel model) {
+    return model.getPropertyVehicleEnvelopes().getValue().stream()
+        .collect(
+            Collectors.toMap(EnvelopeModel::getKey,
+                             envelopeModel -> new Envelope(envelopeModel.getVertices()))
+        );
   }
 
   private PathCreationTO.Layout getLayout(PathModel model) {

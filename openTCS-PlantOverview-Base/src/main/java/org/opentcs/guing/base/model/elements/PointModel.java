@@ -7,6 +7,7 @@
  */
 package org.opentcs.guing.base.model.elements;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import static java.util.Objects.requireNonNull;
@@ -18,6 +19,7 @@ import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.base.components.layer.NullLayerWrapper;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
+import org.opentcs.guing.base.components.properties.type.EnvelopesProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.LayerWrapperProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
@@ -46,6 +48,10 @@ public class PointModel
    * Key for the type.
    */
   public static final String TYPE = "Type";
+  /**
+   * Key for the vehicle envelopes at this point.
+   */
+  public static final String VEHICLE_ENVELOPES = "vehicleEnvelopes";
   /**
    * The point's default position for both axes.
    */
@@ -92,6 +98,10 @@ public class PointModel
   @SuppressWarnings("unchecked")
   public SelectionProperty<Type> getPropertyType() {
     return (SelectionProperty<Type>) getProperty(TYPE);
+  }
+
+  public EnvelopesProperty getPropertyVehicleEnvelopes() {
+    return (EnvelopesProperty) getProperty(VEHICLE_ENVELOPES);
   }
 
   public KeyValueSetProperty getPropertyMiscellaneous() {
@@ -191,6 +201,12 @@ public class PointModel
     pType.setHelptext(bundle.getString("pointModel.property_type.helptext"));
     pType.setCollectiveEditable(true);
     setProperty(TYPE, pType);
+
+    EnvelopesProperty pEnvelope = new EnvelopesProperty(this, new ArrayList<>());
+    pEnvelope.setDescription(bundle.getString("pointModel.property_vehicleEnvelopes.description"));
+    pEnvelope.setHelptext(bundle.getString("pointModel.property_vehicleEnvelopes.helptext"));
+    pEnvelope.setModellingEditable(false);
+    setProperty(VEHICLE_ENVELOPES, pEnvelope);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(

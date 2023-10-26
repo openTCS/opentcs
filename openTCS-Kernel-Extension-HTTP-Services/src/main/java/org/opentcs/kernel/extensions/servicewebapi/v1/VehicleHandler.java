@@ -126,6 +126,20 @@ public class VehicleHandler {
     });
   }
 
+  public void putVehicleEnvelopeKey(String name, String value)
+      throws ObjectUnknownException, IllegalArgumentException {
+    requireNonNull(name, "name");
+
+    executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, name);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + name);
+      }
+
+      vehicleService.updateVehicleEnvelopeKey(vehicle.getReference(), value);
+    });
+  }
+
   public void putVehicleCommAdapterEnabled(String name, String value)
       throws ObjectUnknownException, IllegalArgumentException {
     requireNonNull(name, "name");

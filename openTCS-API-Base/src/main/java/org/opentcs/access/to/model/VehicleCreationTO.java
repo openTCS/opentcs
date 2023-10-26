@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentcs.access.to.CreationTO;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkInRange;
@@ -52,6 +53,10 @@ public class VehicleCreationTO
    */
   private final int maxReverseVelocity;
   /**
+   * The key for selecting the envelope to be used for resources the vehicle occupies.
+   */
+  private final String envelopeKey;
+  /**
    * The information regarding the grahical representation of this vehicle.
    */
   private final Layout layout;
@@ -70,6 +75,7 @@ public class VehicleCreationTO
     this.energyLevelSufficientlyRecharged = 30;
     this.maxVelocity = 1000;
     this.maxReverseVelocity = 1000;
+    this.envelopeKey = null;
     this.layout = new Layout();
   }
 
@@ -82,6 +88,7 @@ public class VehicleCreationTO
                             int energyLevelSufficientlyRecharged,
                             int maxVelocity,
                             int maxReverseVelocity,
+                            @Nullable String envelopeKey,
                             @Nonnull Layout layout) {
     super(name, properties);
     this.length = length;
@@ -91,6 +98,7 @@ public class VehicleCreationTO
     this.energyLevelSufficientlyRecharged = energyLevelSufficientlyRecharged;
     this.maxVelocity = maxVelocity;
     this.maxReverseVelocity = maxReverseVelocity;
+    this.envelopeKey = envelopeKey;
     this.layout = requireNonNull(layout, "layout");
   }
 
@@ -111,6 +119,7 @@ public class VehicleCreationTO
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity,
+                                 envelopeKey,
                                  layout);
   }
 
@@ -131,6 +140,7 @@ public class VehicleCreationTO
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity,
+                                 envelopeKey,
                                  layout);
   }
 
@@ -155,6 +165,7 @@ public class VehicleCreationTO
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity,
+                                 envelopeKey,
                                  layout);
   }
 
@@ -184,6 +195,7 @@ public class VehicleCreationTO
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity,
+                                 envelopeKey,
                                  layout);
   }
 
@@ -216,6 +228,7 @@ public class VehicleCreationTO
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity,
+                                 envelopeKey,
                                  layout);
   }
 
@@ -250,6 +263,7 @@ public class VehicleCreationTO
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity,
+                                 envelopeKey,
                                  layout);
   }
 
@@ -281,6 +295,7 @@ public class VehicleCreationTO
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity,
+                                 envelopeKey,
                                  layout);
   }
 
@@ -313,6 +328,7 @@ public class VehicleCreationTO
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity,
+                                 envelopeKey,
                                  layout);
   }
 
@@ -337,6 +353,7 @@ public class VehicleCreationTO
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity,
+                                 envelopeKey,
                                  layout);
   }
 
@@ -361,6 +378,38 @@ public class VehicleCreationTO
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity,
+                                 envelopeKey,
+                                 layout);
+  }
+
+  /**
+   * Returns the key for selecting the envelope to be used for resources the vehicle occupies.
+   *
+   * @return The key for selecting the envelope to be used for resources the vehicle occupies.
+   */
+  @Nullable
+  public String getEnvelopeKey() {
+    return envelopeKey;
+  }
+
+  /**
+   *
+   * Creates a copy of this object, with the given envelope key.
+   *
+   * @param envelopeKey The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public VehicleCreationTO withEnvelopeKey(@Nullable String envelopeKey) {
+    return new VehicleCreationTO(getName(),
+                                 getModifiableProperties(),
+                                 length,
+                                 energyLevelCritical,
+                                 energyLevelGood,
+                                 energyLevelFullyRecharged,
+                                 energyLevelSufficientlyRecharged,
+                                 maxVelocity,
+                                 maxReverseVelocity,
+                                 envelopeKey,
                                  layout);
   }
 
@@ -389,6 +438,7 @@ public class VehicleCreationTO
                                  energyLevelSufficientlyRecharged,
                                  maxVelocity,
                                  maxReverseVelocity,
+                                 envelopeKey,
                                  layout);
   }
 
@@ -403,6 +453,7 @@ public class VehicleCreationTO
         + ", energyLevelSufficientlyRecharged=" + energyLevelSufficientlyRecharged
         + ", maxVelocity=" + maxVelocity
         + ", maxReverseVelocity=" + maxReverseVelocity
+        + ", envelopeKey=" + envelopeKey
         + ", layout=" + layout
         + ", properties=" + getProperties()
         + '}';

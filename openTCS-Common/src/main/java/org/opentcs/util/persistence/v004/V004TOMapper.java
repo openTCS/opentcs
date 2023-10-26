@@ -28,6 +28,7 @@ import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Couple;
+import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
@@ -110,6 +111,7 @@ public class V004TOMapper {
                   )
               )
               .withType(Point.Type.valueOf(point.getType()))
+              .withVehicleEnvelopes(toEnvelopeMap(point.getVehicleEnvelopes()))
               .withProperties(convertProperties(point.getProperties()))
               .withLayout(
                   new PointCreationTO.Layout(
@@ -141,6 +143,7 @@ public class V004TOMapper {
               )
               .withMaxReverseVelocity(vehicle.getMaxReverseVelocity())
               .withMaxVelocity(vehicle.getMaxVelocity())
+              .withEnvelopeKey(vehicle.getEnvelopeKey())
               .withProperties(convertProperties(vehicle.getProperties()))
               .withLayout(new VehicleCreationTO.Layout(
                   Colors.decodeFromHexRGB(vehicle.getVehicleLayout().getColor())
@@ -166,6 +169,7 @@ public class V004TOMapper {
               .withPeripheralOperations(
                   toPeripheralOperationCreationTOs(path.getPeripheralOperations())
               )
+              .withVehicleEnvelopes(toEnvelopeMap(path.getVehicleEnvelopes()))
               .withProperties(convertProperties(path.getProperties()))
               .withLayout(new PathCreationTO.Layout(
                   Path.Layout.ConnectionType.valueOf(path.getPathLayout().getConnectionType()),
@@ -356,6 +360,7 @@ public class V004TOMapper {
           .setVehicleOrientationAngle((float) point.getPose().getOrientationAngle())
           .setType(point.getType().name())
           .setOutgoingPaths(getOutgoingPaths(point, paths))
+          .setVehicleEnvelopes(toVehicleEnvelopeTOs(point.getVehicleEnvelopes()))
           .setPointLayout(new PointTO.PointLayout()
               .setxPosition(point.getLayout().getPosition().getX())
               .setyPosition(point.getLayout().getPosition().getY())
@@ -385,6 +390,7 @@ public class V004TOMapper {
           .setEnergyLevelCritical((long) vehicle.getEnergyLevelCritical())
           .setEnergyLevelFullyRecharged((long) vehicle.getEnergyLevelFullyRecharged())
           .setEnergyLevelSufficientlyRecharged((long) vehicle.getEnergyLevelSufficientlyRecharged())
+          .setEnvelopeKey(vehicle.getEnvelopeKey())
           .setVehicleLayout(new VehicleTO.VehicleLayout()
               .setColor(Colors.encodeToHexRGB(vehicle.getLayout().getRouteColor())))
           .setProperties(convertProperties(vehicle.getProperties()));
@@ -410,6 +416,7 @@ public class V004TOMapper {
           .setMaxReverseVelocity((long) path.getMaxReverseVelocity())
           .setPeripheralOperations(toPeripheralOperationTOs(path.getPeripheralOperations()))
           .setLocked(path.isLocked())
+          .setVehicleEnvelopes(toVehicleEnvelopeTOs(path.getVehicleEnvelopes()))
           .setPathLayout(new PathTO.PathLayout()
               .setConnectionType(path.getLayout().getConnectionType().name())
               .setControlPoints(path.getLayout().getControlPoints().stream()
@@ -632,5 +639,43 @@ public class V004TOMapper {
 
   private boolean isNullOrEmpty(String s) {
     return s == null || s.isEmpty();
+  }
+
+  private Map<String, Envelope> toEnvelopeMap(List<VehicleEnvelopeTO> envelopeTOs) {
+    return envelopeTOs.stream()
+        .collect(
+            Collectors.toMap(VehicleEnvelopeTO::getKey,
+                             vehicleEnvelopeTO -> toEnvelope(vehicleEnvelopeTO))
+        );
+  }
+
+  private Envelope toEnvelope(VehicleEnvelopeTO vehicleEnvelopeTO) {
+    return new Envelope(
+        vehicleEnvelopeTO.getVertices().stream()
+            .map(coupleTO -> new Couple(coupleTO.getX(), coupleTO.getY()))
+            .collect(Collectors.toList())
+    );
+  }
+
+  private List<VehicleEnvelopeTO> toVehicleEnvelopeTOs(Map<String, Envelope> envelopeMap) {
+    return envelopeMap.entrySet()
+        .stream()
+        .sorted(Map.Entry.comparingByKey())
+        .map(
+            entry -> new VehicleEnvelopeTO()
+                .setKey(entry.getKey())
+                .setVertices(toCoupleTOs(entry.getValue().getVertices()))
+        )
+        .collect(Collectors.toList());
+  }
+
+  private List<CoupleTO> toCoupleTOs(List<Couple> couples) {
+    return couples.stream()
+        .map(
+            couple -> new CoupleTO()
+                .setX(couple.getX())
+                .setY(couple.getY())
+        )
+        .collect(Collectors.toList());
   }
 }

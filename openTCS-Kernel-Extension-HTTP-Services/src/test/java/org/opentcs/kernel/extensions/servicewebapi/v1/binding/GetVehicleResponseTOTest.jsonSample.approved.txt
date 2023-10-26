@@ -21,5 +21,6 @@
   "state" : "EXECUTING",
   "allocatedResources" : [ [ "some-path", "some-point" ], [ "some-other-path", "some-other-point" ] ],
   "claimedResources" : [ [ "some-path", "some-point" ], [ "some-other-path", "some-other-point" ] ],
-  "allowedOrderTypes" : [ "OrderType001", "OrderType002" ]
+  "allowedOrderTypes" : [ "OrderType001", "OrderType002" ],
+  "envelopeKey" : "envelopeType-01"
 }

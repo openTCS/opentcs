@@ -11,8 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentcs.components.Lifecycle;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.TCSResource;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
@@ -265,6 +268,18 @@ public interface Scheduler
      */
     @Nonnull
     String getId();
+
+    /**
+     * Returns a reference to the {@link Vehicle} that this client is related to.
+     *
+     * @return A reference to the {@link Vehicle} that this client is related to or {@code null}, if
+     * this client is not related to any {@link Vehicle}.
+     */
+    @Nullable
+    @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+    default TCSObjectReference<Vehicle> getRelatedVehicle() {
+      return null;
+    }
 
     /**
      * Called when resources have been reserved for this client.

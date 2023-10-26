@@ -348,4 +348,22 @@ public class StandardVehicleService
       plantModelManager.setVehicleAllowedOrderTypes(ref, allowedOrderTypes);
     }
   }
+
+  @Override
+  public void updateVehicleEnvelopeKey(TCSObjectReference<Vehicle> ref, String envelopeKey)
+      throws ObjectUnknownException, IllegalArgumentException, KernelRuntimeException {
+    synchronized (globalSyncObject) {
+      Vehicle vehicle = fetchObject(Vehicle.class, ref);
+      if (vehicle.isProcessingOrder()
+          || !vehicle.getClaimedResources().isEmpty()
+          || !vehicle.getAllocatedResources().isEmpty()) {
+        throw new IllegalArgumentException(
+            "Updating a vehicle's envelope key while the vehicle is processing an order or "
+            + "claiming/allocating resources is currently not supported."
+        );
+      }
+
+      plantModelManager.setVehicleEnvelopeKey(ref, envelopeKey);
+    }
+  }
 }

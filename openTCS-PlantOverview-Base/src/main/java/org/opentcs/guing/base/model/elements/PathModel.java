@@ -18,6 +18,7 @@ import org.opentcs.data.model.visualization.ElementPropKeys;
 import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.base.components.layer.NullLayerWrapper;
 import org.opentcs.guing.base.components.properties.type.BooleanProperty;
+import org.opentcs.guing.base.components.properties.type.EnvelopesProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.LayerWrapperProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
@@ -55,6 +56,10 @@ public class PathModel
    * Key for the peripheral operations on this path.
    */
   public static final String PERIPHERAL_OPERATIONS = "peripheralOperations";
+  /**
+   * Key for the vehicle envelopes on this path.
+   */
+  public static final String VEHICLE_ENVELOPES = "vehicleEnvelopes";
   /**
    * This class's resource bundle.
    */
@@ -105,6 +110,10 @@ public class PathModel
 
   public StringProperty getPropertyPathControlPoints() {
     return (StringProperty) getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
+  }
+  
+  public EnvelopesProperty getPropertyVehicleEnvelopes() {
+    return (EnvelopesProperty) getProperty(VEHICLE_ENVELOPES);
   }
 
   public KeyValueSetProperty getPropertyMiscellaneous() {
@@ -234,6 +243,12 @@ public class PathModel
     );
     pOperations.setHelptext(bundle.getString("pathModel.property_peripheralOperations.helptext"));
     setProperty(PERIPHERAL_OPERATIONS, pOperations);
+
+    EnvelopesProperty pEnvelope = new EnvelopesProperty(this, new ArrayList<>());
+    pEnvelope.setDescription(bundle.getString("pathModel.property_vehicleEnvelopes.description"));
+    pEnvelope.setHelptext(bundle.getString("pathModel.property_vehicleEnvelopes.helptext"));
+    pEnvelope.setModellingEditable(false);
+    setProperty(VEHICLE_ENVELOPES, pEnvelope);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(bundle.getString("pathModel.property_miscellaneous.description"));

@@ -131,6 +131,8 @@ public class V1RequestHandler
                  this::handlePostVehicleRerouteRequest);
     service.put("/vehicles/:NAME/allowedOrderTypes",
                 this::handlePutVehicleAllowedOrderTypes);
+    service.put("/vehicles/:NAME/envelopeKey",
+                this::handlePutVehicleEnvelopeKey);
     service.get("/vehicles/:NAME",
                 this::handleGetVehicleByName);
     service.get("/vehicles",
@@ -441,6 +443,16 @@ public class V1RequestHandler
     vehicleHandler.putVehicleAllowedOrderTypes(
         request.params(":NAME"),
         jsonBinder.fromJson(request.body(), PutVehicleAllowedOrderTypesTO.class));
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handlePutVehicleEnvelopeKey(Request request, Response response)
+      throws ObjectUnknownException, IllegalArgumentException {
+    vehicleHandler.putVehicleEnvelopeKey(
+        request.params(":NAME"),
+        valueIfKeyPresent(request.queryMap(), "newValue")
+    );
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }
