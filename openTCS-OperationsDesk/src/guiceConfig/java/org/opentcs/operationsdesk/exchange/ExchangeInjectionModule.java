@@ -13,8 +13,8 @@ import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.common.DefaultPortalManager;
 import org.opentcs.common.PortalManager;
 import org.opentcs.customizations.ApplicationEventBus;
+import org.opentcs.guing.common.exchange.AllocationHistory;
 import org.opentcs.guing.common.exchange.ApplicationPortalProvider;
-import org.opentcs.guing.common.exchange.SchedulingHistory;
 import org.opentcs.guing.common.exchange.adapter.VehicleAdapter;
 import org.opentcs.operationsdesk.exchange.adapter.OpsDeskVehicleAdapter;
 import org.opentcs.util.event.EventBus;
@@ -63,7 +63,7 @@ public class ExchangeInjectionModule
     bind(OpenTCSEventDispatcher.class)
         .in(Singleton.class);
 
-    bind(SchedulingHistory.class)
+    bind(AllocationHistory.class)
         .in(Singleton.class);
 
     bind(VehicleAdapter.class)

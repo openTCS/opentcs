@@ -7,7 +7,10 @@
  */
 package org.opentcs.guing.base.model;
 
+import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nonnull;
+import org.opentcs.guing.base.AllocationState;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 
@@ -17,26 +20,31 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 public interface FigureDecorationDetails {
 
   /**
-   * Adds a vehicle model.
+   * Returns a map of vehicles that claim or allocate the resource (the figure is associated with)
+   * to the respective allocation state.
+   * <p>
+   * This information is used to decorate a model component's figure to indicate that it is part of
+   * the route of the respective vehicles.
+   *
+   * @return A map of vehicles to allocation states.
+   */
+  @Nonnull
+  Map<VehicleModel, AllocationState> getAllocationStates();
+
+  /**
+   * Updates the allocation state for the given vehicle.
+   *
+   * @param model The vehicle model.
+   * @param allocationState The vehicle's new allocation state.
+   */
+  void updateAllocationState(@Nonnull VehicleModel model, @Nonnull AllocationState allocationState);
+
+  /**
+   * Clears the allocation state for the given vehicle.
    *
    * @param model The vehicle model.
    */
-  void addVehicleModel(VehicleModel model);
-
-  /**
-   * Removes a vehicle model.
-   *
-   * @param model The vehicle model.
-   */
-  void removeVehicleModel(VehicleModel model);
-
-  /**
-   * Returns a set of vehicle models for which a model component's figure is to be decorated to
-   * indicate that the model component is part of the route of the respective vehicles.
-   *
-   * @return A set of vehicle models.
-   */
-  Set<VehicleModel> getVehicleModels();
+  void clearAllocationState(@Nonnull VehicleModel model);
 
   /**
    * Adds a block model.

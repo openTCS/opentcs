@@ -11,26 +11,23 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Location;
-import org.opentcs.data.model.Path;
-import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.guing.base.AllocationState;
 import org.opentcs.guing.base.model.FigureDecorationDetails;
 import org.opentcs.guing.base.model.elements.PathModel;
 import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
-import org.opentcs.guing.common.exchange.SchedulingHistory;
+import org.opentcs.guing.common.exchange.AllocationHistory;
 import org.opentcs.guing.common.exchange.adapter.VehicleAdapter;
 import org.opentcs.guing.common.model.SystemModel;
 import org.opentcs.operationsdesk.transport.orders.TransportOrdersContainer;
@@ -48,18 +45,18 @@ public class OpsDeskVehicleAdapter
    */
   private static final Logger LOG = LoggerFactory.getLogger(OpsDeskVehicleAdapter.class);
   /**
-   * Keeps track of resources/components allocated and claimed by vehicles.
+   * Keeps track of the resources claimed and allocated by vehicles.
    */
-  private final SchedulingHistory schedulingHistory;
+  private final AllocationHistory allocationHistory;
   /**
    * Maintains a set of all transport orders.
    */
   private final TransportOrdersContainer transportOrdersContainer;
 
   @Inject
-  public OpsDeskVehicleAdapter(SchedulingHistory schedulingHistory,
+  public OpsDeskVehicleAdapter(AllocationHistory allocationHistory,
                                @Nonnull TransportOrdersContainer transportOrdersContainer) {
-    this.schedulingHistory = requireNonNull(schedulingHistory, "schedulingHistory");
+    this.allocationHistory = requireNonNull(allocationHistory, "allocationHistory");
     this.transportOrdersContainer = requireNonNull(transportOrdersContainer,
                                                    "transportOrdersContainer");
   }
@@ -90,17 +87,7 @@ public class OpsDeskVehicleAdapter
       vehicleModel.setDriveOrderDestination(null);
     }
 
-    Set<FigureDecorationDetails> allocatedAndClaimedComponents
-        = getAllocatedAndClaimedComponents(vehicle, systemModel);
-    for (FigureDecorationDetails component : allocatedAndClaimedComponents) {
-      component.addVehicleModel(vehicleModel);
-    }
-
-    Set<FigureDecorationDetails> noLongerAllocatedOrClaimedComponents = schedulingHistory
-        .updateAllocatedAndClaimedComponents(vehicleModel.getName(), allocatedAndClaimedComponents);
-    for (FigureDecorationDetails component : noLongerAllocatedOrClaimedComponents) {
-      component.removeVehicleModel(vehicleModel);
-    }
+    updateAllocationStates(vehicle, systemModel, vehicleModel);
   }
 
   @Nullable
@@ -140,19 +127,35 @@ public class OpsDeskVehicleAdapter
     );
   }
 
-  private Set<FigureDecorationDetails> getAllocatedAndClaimedComponents(Vehicle vehicle,
-                                                                        SystemModel systemModel) {
-    return Stream.concat(vehicle.getAllocatedResources().stream(),
-                         vehicle.getClaimedResources().stream())
-        .flatMap(resourceSet -> resourceSet.stream())
-        .filter(this::isResourceRepresentedByFigureDecorationDetails)
-        .map(res -> (FigureDecorationDetails) systemModel.getModelComponent(res.getName()))
-        .collect(Collectors.toSet());
+  private void updateAllocationStates(Vehicle vehicle,
+                                      SystemModel systemModel,
+                                      VehicleModel vehicleModel) {
+    AllocationHistory.Entry entry = allocationHistory.updateHistory(vehicle);
+
+    for (FigureDecorationDetails component
+             : toFigureDecorationDetails(entry.getCurrentClaimedResources(), systemModel)) {
+      component.updateAllocationState(vehicleModel, AllocationState.CLAIMED);
+    }
+
+    for (FigureDecorationDetails component
+             : toFigureDecorationDetails(entry.getCurrentAllocatedResources(), systemModel)) {
+      component.updateAllocationState(vehicleModel, AllocationState.ALLOCATED);
+    }
+
+    for (FigureDecorationDetails component
+             : toFigureDecorationDetails(entry.getPreviouslyClaimedOrAllocatedResources(),
+                                         systemModel)) {
+      component.clearAllocationState(vehicleModel);
+    }
   }
 
-  private boolean isResourceRepresentedByFigureDecorationDetails(TCSResourceReference<?> ref) {
-    return ref.getReferentClass().isAssignableFrom(Point.class)
-        || ref.getReferentClass().isAssignableFrom(Path.class)
-        || ref.getReferentClass().isAssignableFrom(Location.class);
+  private Set<FigureDecorationDetails> toFigureDecorationDetails(
+      Set<TCSResourceReference<?>> resources,
+      SystemModel systemModel) {
+    return resources.stream()
+        .map(res -> systemModel.getModelComponent(res.getName()))
+        .filter(modelComponent -> modelComponent instanceof FigureDecorationDetails)
+        .map(modelComponent -> (FigureDecorationDetails) modelComponent)
+        .collect(Collectors.toSet());
   }
 }

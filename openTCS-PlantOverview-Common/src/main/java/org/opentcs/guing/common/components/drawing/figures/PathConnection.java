@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -36,6 +37,7 @@ import org.jhotdraw.draw.liner.SlantedLiner;
 import org.jhotdraw.geom.BezierPath;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.guing.base.AllocationState;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.type.AbstractProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
@@ -632,28 +634,24 @@ public class PathConnection
   }
 
   private void drawRouteDecoration(Graphics2D g) {
-    for (VehicleModel vehicleModel : getModel().getVehicleModels()) {
-      boolean isAllocated = vehicleModel.getAllocatedResources().getItems().stream()
-          .flatMap(resourceSet -> resourceSet.stream())
-          .anyMatch(resource -> Objects.equals(resource.getName(), getModel().getName()));
-      boolean isClaimed = getCurrentDriveOrderClaim(vehicleModel).stream()
-          .flatMap(resourceSet -> resourceSet.stream())
-          .anyMatch(resource -> Objects.equals(resource.getName(), getModel().getName()));
-
-      if (isAllocated) {
-        if (vehicleModel.getDriveOrderState() == TransportOrder.State.WITHDRAWN) {
-          drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
-        }
-        else {
-          drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
-        }
-      }
-      else if (isClaimed) {
-        drawDecoration(g,
-                       Strokes.PATH_ON_ROUTE,
-                       transparentColor(vehicleModel.getDriveOrderColor(), 70));
-      }
-      else {
+    for (Map.Entry<VehicleModel, AllocationState> entry
+             : getModel().getAllocationStates().entrySet()) {
+      VehicleModel vehicleModel = entry.getKey();
+      switch (entry.getValue()) {
+        case CLAIMED:
+          drawDecoration(g,
+                         Strokes.PATH_ON_ROUTE,
+                         transparentColor(vehicleModel.getDriveOrderColor(), 70));
+          break;
+        case ALLOCATED:
+          if (vehicleModel.getDriveOrderState() == TransportOrder.State.WITHDRAWN) {
+            drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
+          }
+          else {
+            drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
+          }
+          break;
+        default:
         // Don't draw any decoration.
       }
     }

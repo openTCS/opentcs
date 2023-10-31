@@ -10,11 +10,15 @@ package org.opentcs.guing.base.model.elements;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
+import javax.annotation.Nonnull;
 import org.opentcs.data.model.visualization.ElementPropKeys;
+import org.opentcs.guing.base.AllocationState;
 import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.base.components.layer.NullLayerWrapper;
 import org.opentcs.guing.base.components.properties.type.BooleanProperty;
@@ -65,10 +69,11 @@ public class PathModel
    */
   private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
-   * The set of vehicle models for which this model component's figure is to be decorated to
-   * indicate that it is part of the route of the respective vehicles.
+   * The map of vehicle models to allocations states for which this model component's figure is to
+   * be decorated to indicate that it is part of the route of the respective vehicles.
    */
-  private Set<VehicleModel> vehicles = new TreeSet<>(Comparator.comparing(VehicleModel::getName));
+  private Map<VehicleModel, AllocationState> allocationStates
+      = new TreeMap<>(Comparator.comparing(VehicleModel::getName));
   /**
    * The set of block models for which this model component's figure is to be decorated to indicate
    * that it is part of the respective block.
@@ -111,7 +116,7 @@ public class PathModel
   public StringProperty getPropertyPathControlPoints() {
     return (StringProperty) getProperty(ElementPropKeys.PATH_CONTROL_POINTS);
   }
-  
+
   public EnvelopesProperty getPropertyVehicleEnvelopes() {
     return (EnvelopesProperty) getProperty(VEHICLE_ENVELOPES);
   }
@@ -125,18 +130,24 @@ public class PathModel
   }
 
   @Override
-  public void addVehicleModel(VehicleModel model) {
-    vehicles.add(model);
+  @Nonnull
+  public Map<VehicleModel, AllocationState> getAllocationStates() {
+    return allocationStates;
   }
 
   @Override
-  public void removeVehicleModel(VehicleModel model) {
-    vehicles.remove(model);
+  public void updateAllocationState(VehicleModel model, AllocationState allocationState) {
+    requireNonNull(model, "model");
+    requireNonNull(allocationStates, "allocationStates");
+
+    allocationStates.put(model, allocationState);
   }
 
   @Override
-  public Set<VehicleModel> getVehicleModels() {
-    return vehicles;
+  public void clearAllocationState(@Nonnull VehicleModel model) {
+    requireNonNull(model, "model");
+
+    allocationStates.remove(model);
   }
 
   @Override
@@ -155,11 +166,13 @@ public class PathModel
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "checkstyle:LineLength"})
   public AbstractConnection clone()
       throws CloneNotSupportedException {
     PathModel clone = (PathModel) super.clone();
-    clone.setVehicleModels((Set<VehicleModel>) ((TreeSet<VehicleModel>) vehicles).clone());
+    clone.setAllocationStates(
+        (Map<VehicleModel, AllocationState>) ((TreeMap<VehicleModel, AllocationState>) allocationStates).clone()
+    );
     clone.setBlockModels((Set<BlockModel>) ((TreeSet<BlockModel>) blocks).clone());
 
     return clone;
@@ -257,8 +270,8 @@ public class PathModel
     setProperty(MISCELLANEOUS, pMiscellaneous);
   }
 
-  private void setVehicleModels(Set<VehicleModel> vehicles) {
-    this.vehicles = vehicles;
+  private void setAllocationStates(Map<VehicleModel, AllocationState> allocationStates) {
+    this.allocationStates = allocationStates;
   }
 
   private void setBlockModels(Set<BlockModel> blocks) {
