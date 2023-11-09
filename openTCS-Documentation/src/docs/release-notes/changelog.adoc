@@ -14,7 +14,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
-...
+* Bugs fixed:
+** The load generator plugin now avoids unsuitable locations when generating orders.
+   For example, locations without a link are considered unsuitable, which usually includes locations representing peripheral devices.
 
 == Version 5.11 (2023-10-26)
 

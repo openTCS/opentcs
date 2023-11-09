@@ -13,14 +13,20 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.TransportOrderService;
+import org.opentcs.data.TCSObject;
+import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
+import org.opentcs.data.model.LocationType;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.TransportOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Randomly creates batches of transport orders.
@@ -30,6 +36,10 @@ import org.opentcs.data.order.TransportOrder;
 public class RandomOrderBatchCreator
     implements OrderBatchCreator {
 
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(RandomOrderBatchCreator.class);
   /**
    * The transport order sergice we talk to.
    */
@@ -71,14 +81,16 @@ public class RandomOrderBatchCreator
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.batchSize = batchSize;
     this.orderSize = orderSize;
-    locations = new ArrayList<>(transportOrderService.fetchObjects(Location.class));
+    this.locations = initializeLocations();
   }
 
   @Override
   public Set<TransportOrder> createOrderBatch()
       throws KernelRuntimeException {
     Set<TransportOrder> createdOrders = new HashSet<>();
-    if (locations.isEmpty()) {
+
+    if (this.locations.isEmpty()) {
+      LOG.info("Could not find suitable destination locations");
       return createdOrders;
     }
     for (int i = 0; i < batchSize; i++) {
@@ -94,13 +106,26 @@ public class RandomOrderBatchCreator
       throws KernelRuntimeException {
     List<DestinationCreationTO> dests = new ArrayList<>();
     for (int j = 0; j < orderSize; j++) {
-      Location destLoc = locations.get(random.nextInt(locations.size()));
+      Location destLoc = this.locations.get(random.nextInt(this.locations.size()));
       dests.add(new DestinationCreationTO(destLoc.getName(), Destination.OP_NOP));
     }
-    TransportOrder newOrder = transportOrderService.createTransportOrder(
+    return transportOrderService.createTransportOrder(
         new TransportOrderCreationTO("TOrder-", dests).withIncompleteName(true)
     );
+  }
 
-    return newOrder;
+  private List<Location> initializeLocations() {
+    Set<TCSObjectReference<LocationType>> suitableLocationTypeRefs =
+        transportOrderService.fetchObjects(LocationType.class)
+            .stream()
+            .filter(locationType -> locationType.isAllowedOperation(Destination.OP_NOP))
+            .map(TCSObject::getReference)
+            .collect(Collectors.toSet());
+
+    return transportOrderService.fetchObjects(Location.class)
+               .stream()
+               .filter(location -> !location.getAttachedLinks().isEmpty())
+               .filter(location -> suitableLocationTypeRefs.contains(location.getType()))
+               .collect(Collectors.toList());
   }
 }
