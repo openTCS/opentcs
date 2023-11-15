@@ -180,22 +180,20 @@ public class StandardRemoteKernelClientPortal
     requireNonNull(userName, "userName");
     requireNonNull(password, "password");
 
-    synchronized (userManager.getKnownClients()) {
-      UserAccount account = userManager.getUser(userName);
-      if (account == null || !account.getPassword().equals(password)) {
-        LOG.debug("Authentication failed for user {}.", userName);
-        throw new CredentialsException("Authentication failed for user " + userName);
-      }
-
-      // Generate a new ID for the client.
-      ClientID clientId = new ClientID(userName);
-      // Add an entry for the newly connected client.
-      ClientEntry clientEntry = new ClientEntry(userName, account.getPermissions());
-      clientEntry.getEventBuffer().setEventFilter(eventFilter);
-      userManager.getKnownClients().put(clientId, clientEntry);
-      LOG.debug("New client named {} logged in", clientId.getClientName());
-      return clientId;
+    UserAccount account = userManager.getUser(userName);
+    if (account == null || !account.getPassword().equals(password)) {
+      LOG.debug("Authentication failed for user {}.", userName);
+      throw new CredentialsException("Authentication failed for user " + userName);
     }
+
+    // Generate a new ID for the client.
+    ClientID clientId = new ClientID(userName);
+    // Add an entry for the newly connected client.
+    ClientEntry clientEntry = new ClientEntry(userName, account.getPermissions());
+    clientEntry.getEventBuffer().setEventFilter(eventFilter);
+    userManager.registerClient(clientId, clientEntry);
+    LOG.debug("New client named {} logged in", clientId.getClientName());
+    return clientId;
   }
 
   @Override
@@ -204,10 +202,8 @@ public class StandardRemoteKernelClientPortal
 
     // Forget the client so it won't be able to call methods on this kernel and won't receive
     // events any more.
-    synchronized (userManager.getKnownClients()) {
-      userManager.getKnownClients().remove(clientID);
-      LOG.debug("Client named {} logged out", clientID.getClientName());
-    }
+    userManager.unregisterClient(clientID);
+    LOG.debug("Client named {} logged out", clientID.getClientName());
   }
 
   @Override

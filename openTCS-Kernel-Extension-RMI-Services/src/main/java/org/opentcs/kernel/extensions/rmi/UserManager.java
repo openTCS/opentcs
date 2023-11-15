@@ -8,6 +8,7 @@
 package org.opentcs.kernel.extensions.rmi;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
@@ -151,8 +153,8 @@ public class UserManager
   @Override
   public void onEvent(Object event) {
     // Forward the event to all clients' event buffers.
-    synchronized (getKnownClients()) {
-      for (ClientEntry curEntry : getKnownClients().values()) {
+    synchronized (knownClients) {
+      for (ClientEntry curEntry : knownClients.values()) {
         curEntry.getEventBuffer().onEvent(event);
       }
     }
@@ -164,7 +166,7 @@ public class UserManager
    * @return The directory of users allowed to connect/operate with the kernel.
    */
   public Map<String, UserAccount> getKnownUsers() {
-    return knownUsers;
+    return Collections.unmodifiableMap(knownUsers);
   }
 
   /**
@@ -173,7 +175,7 @@ public class UserManager
    * @return The directory of authenticated clients (a mapping of ClientIDs to user names).
    */
   public Map<ClientID, ClientEntry> getKnownClients() {
-    return knownClients;
+    return Collections.unmodifiableMap(knownClients);
   }
 
   /**
@@ -200,13 +202,44 @@ public class UserManager
     return knownClients.get(clientID);
   }
 
+  /**
+   * Adds a new ClientEntry to the map of all known and authenticated clients.
+   *
+   * @param clientID The client id to identify the given ClientEntry.
+   * @param clientEntry The ClientEntry object to be registered.
+   */
+  public void registerClient(@Nonnull ClientID clientID, @Nonnull ClientEntry clientEntry) {
+    requireNonNull(clientID, "clientID");
+    requireNonNull(clientEntry, "clientEntry");
+
+    synchronized (knownClients) {
+      if (isClientRegistered(clientID)) {
+        return;
+      }
+      knownClients.put(clientID, clientEntry);
+    }
+  }
+
+  /**
+   * Removes the given client from the map of known clients.
+   *
+   * @param clientID The client id to be removed.
+   */
+  public void unregisterClient(@Nonnull ClientID clientID) {
+    requireNonNull(clientID, "clientID");
+
+    synchronized (knownClients) {
+      knownClients.remove(clientID);
+    }
+  }
+
   public List<Object> pollEvents(ClientID clientID, long timeout) {
     requireNonNull(clientID, "clientID");
     checkInRange(timeout, 0, Long.MAX_VALUE, "timeout");
 
     ClientEntry clientEntry;
     EventBuffer eventBuffer;
-    synchronized (getKnownClients()) {
+    synchronized (knownClients) {
       clientEntry = getClient(clientID);
       checkArgument(clientEntry != null, "Unknown client ID: %s", clientID);
       eventBuffer = clientEntry.getEventBuffer();
@@ -214,7 +247,7 @@ public class UserManager
     // Get events or wait for one to arrive if none is currently there.
     List<Object> events = eventBuffer.getEvents(timeout);
     // Set the client's 'alive' flag.
-    synchronized (getKnownClients()) {
+    synchronized (knownClients) {
       clientEntry.setAlive(true);
     }
     return events;
@@ -237,7 +270,7 @@ public class UserManager
     requireNonNull(clientID, "clientID");
     requireNonNull(requiredPermission, "requiredPermission");
 
-    synchronized (getKnownClients()) {
+    synchronized (knownClients) {
       ClientEntry clientEntry = getClient(clientID);
       // Check if the client is known.
       if (clientEntry == null) {
@@ -269,6 +302,10 @@ public class UserManager
     if (!checkCredentialsForRole(clientID, requiredPermission)) {
       throw new CredentialsException("Client permissions insufficient.");
     }
+  }
+  
+  private boolean isClientRegistered(@Nonnull ClientID clientID) {
+    return knownClients.containsKey(clientID);
   }
 
   /**
