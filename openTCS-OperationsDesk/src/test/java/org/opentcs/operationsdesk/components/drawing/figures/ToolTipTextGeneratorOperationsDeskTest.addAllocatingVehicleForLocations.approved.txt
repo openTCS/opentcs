@@ -1,0 +1,2 @@
+<html>Location <b>Location-0001</b><hr><br>Reservation token: <br>Peripheral state: <br>Processing state: <br>Peripheral job: <hr>
+Allocated by: Vehicle-001<br></html>

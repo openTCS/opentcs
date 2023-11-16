@@ -8,14 +8,19 @@
 package org.opentcs.operationsdesk.components.drawing.figures;
 
 import java.util.Comparator;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.data.model.Vehicle;
 import static org.opentcs.data.model.Vehicle.State.ERROR;
 import static org.opentcs.data.model.Vehicle.State.UNAVAILABLE;
 import static org.opentcs.data.model.Vehicle.State.UNKNOWN;
 import org.opentcs.data.peripherals.PeripheralJob;
+import org.opentcs.guing.base.AllocationState;
+import org.opentcs.guing.base.model.FigureDecorationDetails;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.components.drawing.figures.ToolTipTextGenerator;
 import org.opentcs.guing.common.persistence.ModelManager;
@@ -74,6 +79,28 @@ public class ToolTipTextGeneratorOperationsDesk
 
     sb.append("</html>\n");
     return sb.toString();
+  }
+
+  @Override
+  protected void appendAllocatingVehicle(StringBuilder sb, FigureDecorationDetails figure) {
+    List<Entry<VehicleModel, AllocationState>> allocationStates = figure.getAllocationStates()
+        .entrySet()
+        .stream()
+        .filter(entry -> entry.getValue() == AllocationState.ALLOCATED)
+        .collect(Collectors.toList());
+
+    if (allocationStates.isEmpty()) {
+      return;
+    }
+
+    sb.append("<hr>\n");
+    allocationStates
+        .forEach(entry -> {
+          sb.append(getResourceAllocatedByText())
+              .append(" ")
+              .append(entry.getKey().getName())
+              .append("<br>");
+        });
   }
 
   private void appendPeripheralInformationVehicle(StringBuilder sb, VehicleModel vehicle) {
@@ -165,5 +192,11 @@ public class ToolTipTextGeneratorOperationsDesk
       default:
         return "black";
     }
+  }
+
+  @SuppressWarnings("checkstyle:LineLength")
+  private String getResourceAllocatedByText() {
+    return ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MISC_PATH)
+        .getString("toolTipTextGeneratorOperationsDesk.figureDecorationDetails.resourceAllocatedBy.text");
   }
 }

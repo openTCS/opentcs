@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
+import org.opentcs.guing.base.model.FigureDecorationDetails;
 import org.opentcs.guing.base.model.ModelComponent;
 import static org.opentcs.guing.base.model.ModelComponent.MISCELLANEOUS;
 import org.opentcs.guing.base.model.elements.BlockModel;
@@ -68,6 +69,7 @@ public class ToolTipTextGenerator {
 
     appendBlockInfo(sb, model);
     appendMiscProps(sb, model);
+    appendAllocatingVehicle(sb, model);
 
     sb.append("</html>");
 
@@ -88,6 +90,7 @@ public class ToolTipTextGenerator {
     appendBlockInfo(sb, model);
     appendPeripheralInformation(sb, model);
     appendMiscProps(sb, model);
+    appendAllocatingVehicle(sb, model);
 
     sb.append("</html>");
 
@@ -107,6 +110,7 @@ public class ToolTipTextGenerator {
 
     appendBlockInfo(sb, model);
     appendMiscProps(sb, model);
+    appendAllocatingVehicle(sb, model);
 
     sb.append("</html>");
 
@@ -162,6 +166,11 @@ public class ToolTipTextGenerator {
               .append("</li>\n");
         });
     sb.append("</ul>\n");
+  }
+
+  protected void appendAllocatingVehicle(StringBuilder sb, FigureDecorationDetails figure) {
+    // Displaying information about allocating vehicles is only relevant in the Operations Desk
+    // application, which is why this method is empty here.
   }
 
   private void appendPeripheralInformation(StringBuilder sb, LocationModel model) {

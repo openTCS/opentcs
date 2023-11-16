@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.components.drawing.figures;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 import org.approvaltests.Approvals;
@@ -20,7 +21,12 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralOperation;
+import org.opentcs.guing.base.AllocationState;
+import org.opentcs.guing.base.model.elements.LocationModel;
+import org.opentcs.guing.base.model.elements.PathModel;
+import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
+import org.opentcs.guing.common.model.SystemModel;
 import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.operationsdesk.peripherals.jobs.PeripheralJobsContainer;
 
@@ -42,7 +48,12 @@ public class ToolTipTextGeneratorOperationsDeskTest {
   public void setup() {
     Locale.setDefault(Locale.forLanguageTag("en"));
 
+    SystemModel systemModel = mock(SystemModel.class);
+    when(systemModel.getBlockModels()).thenReturn(new ArrayList<>());
+
     ModelManager modelManager = mock(ModelManager.class);
+    when(modelManager.getModel()).thenReturn(systemModel);
+
     peripheralJobsContainer = mock(PeripheralJobsContainer.class);
     toolTipTextGenerator = new ToolTipTextGeneratorOperationsDesk(
         modelManager,
@@ -53,6 +64,7 @@ public class ToolTipTextGeneratorOperationsDeskTest {
     vehicleModel = new VehicleModel();
     vehicleModel.setVehicle(vehicle);
     vehicleModel.setName(vehicle.getName());
+
     locationType = new LocationType("Loc-Type-001");
     location = new Location("Location-001", locationType.getReference());
   }
@@ -212,6 +224,51 @@ public class ToolTipTextGeneratorOperationsDeskTest {
         .thenReturn(Arrays.asList(secondJob, firstJob));
 
     Approvals.verify(toolTipTextGenerator.getToolTipText(vehicleModel));
+  }
+
+  @Test
+  public void addAllocatingVehicleForPoints() {
+    Vehicle vehicle2 = new Vehicle("Vehicle-002");
+    VehicleModel vehicleModel2 = new VehicleModel();
+    vehicleModel2.setVehicle(vehicle2);
+    vehicleModel2.setName(vehicle2.getName());
+
+    PointModel point = new PointModel();
+    point.setName("Point-0001");
+    point.updateAllocationState(vehicleModel, AllocationState.ALLOCATED);
+    point.updateAllocationState(vehicleModel2, AllocationState.CLAIMED);
+
+    Approvals.verify(toolTipTextGenerator.getToolTipText(point));
+  }
+
+  @Test
+  public void addAllocatingVehicleForPaths() {
+    Vehicle vehicle2 = new Vehicle("Vehicle-002");
+    VehicleModel vehicleModel2 = new VehicleModel();
+    vehicleModel2.setVehicle(vehicle2);
+    vehicleModel2.setName(vehicle2.getName());
+
+    PathModel path = new PathModel();
+    path.setName("Path-0001");
+    path.updateAllocationState(vehicleModel, AllocationState.ALLOCATED);
+    path.updateAllocationState(vehicleModel2, AllocationState.CLAIMED);
+
+    Approvals.verify(toolTipTextGenerator.getToolTipText(path));
+  }
+
+  @Test
+  public void addAllocatingVehicleForLocations() {
+    Vehicle vehicle2 = new Vehicle("Vehicle-002");
+    VehicleModel vehicleModel2 = new VehicleModel();
+    vehicleModel2.setVehicle(vehicle2);
+    vehicleModel2.setName(vehicle2.getName());
+
+    LocationModel location = new LocationModel();
+    location.setName("Location-0001");
+    location.updateAllocationState(vehicleModel, AllocationState.ALLOCATED);
+    location.updateAllocationState(vehicleModel2, AllocationState.CLAIMED);
+
+    Approvals.verify(toolTipTextGenerator.getToolTipText(location));
   }
 
 }
