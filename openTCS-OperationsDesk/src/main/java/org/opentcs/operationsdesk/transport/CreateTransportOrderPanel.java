@@ -21,6 +21,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
@@ -585,7 +586,7 @@ public class CreateTransportOrderPanel
     AbstractConnectableModelComponent location = fDestinationModels.get(index);
     String action = fActions.get(index);
     EditDriveOrderPanel contentPanel
-        = new EditDriveOrderPanel(fModelManager.getModel().getLocationModels(), location, action);
+        = new EditDriveOrderPanel(fetchSuitableLocations(), location, action);
     StandardContentDialog dialog
         = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
                                     contentPanel);
@@ -608,7 +609,7 @@ public class CreateTransportOrderPanel
 
   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
     EditDriveOrderPanel contentPanel
-        = new EditDriveOrderPanel(fModelManager.getModel().getLocationModels());
+        = new EditDriveOrderPanel(fetchSuitableLocations());
     StandardContentDialog dialog
         = new StandardContentDialog(JOptionPane.getFrameForComponent(this), contentPanel);
     dialog.setVisible(true);
@@ -637,6 +638,13 @@ public class CreateTransportOrderPanel
       updateButtons();
     }
   }//GEN-LAST:event_addButtonActionPerformed
+
+  private List<LocationModel> fetchSuitableLocations() {
+    return fModelManager.getModel().getLocationModels().stream()
+        .filter(lm -> !lm.getLocation().getAttachedLinks().isEmpty())
+        .filter(lm -> !lm.getLocationType().getLocationType().getAllowedOperations().isEmpty())
+        .collect(Collectors.toList());
+  }
 
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
