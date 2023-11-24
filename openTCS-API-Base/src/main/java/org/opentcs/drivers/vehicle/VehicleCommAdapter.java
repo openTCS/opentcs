@@ -65,6 +65,57 @@ public interface VehicleCommAdapter
   VehicleProcessModelTO createTransferableProcessModel();
 
   /**
+   * Returns this adapter's queue of unsent commands.
+   * <p>
+   * Unsent {@link MovementCommand}s are commands that the comm adapter received from the
+   * {@link VehicleController} it's associated with. When a command is sent to the vehicle, the
+   * command is removed from this queue and added to the {@link #getSentCommands() queue of sent
+   * commands}.
+   * </p>
+   *
+   * @return This adapter's queue of unsent commands.
+   * @see #getCommandsCapacity()
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default Queue<MovementCommand> getUnsentCommands() {
+    return getCommandQueue();
+  }
+
+  /**
+   * Returns this adapter's queue of sent commands.
+   * <p>
+   * Sent {@link MovementCommand}s are commands that the comm adapter has sent to the vehicle
+   * already but which have not yet been processed by it.
+   * </p>
+   *
+   * @return This adapter's queue of sent commands.
+   * @see #getCommandQueueCapacity()
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default Queue<MovementCommand> getSentCommands() {
+    return getSentQueue();
+  }
+
+  /**
+   * Indicates how many commands this comm adapter accepts.
+   * <p>
+   * This capacity considers both the {@link #getUnsentCommands() queue of unsent commands} and the
+   * {@link #getSentCommands() queue of sent commands}. This means that:
+   * <ul>
+   * <li>The number of elements in both queues combined must not exceed this number.</li>
+   * <li>The vehicle will have at most this number of (not yet completed) commands at any given
+   * point of time.</li>
+   * </ul>
+   * </p>
+   *
+   * @return The number of commands this comm adapter accepts.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default int getCommandsCapacity() {
+    return getCommandQueueCapacity();
+  }
+
+  /**
    * Indicates how many commands this comm adapter accepts.
    * <p>
    * This capacity considers both the {@link #getCommandQueue() command queue} and the
@@ -73,7 +124,10 @@ public interface VehicleCommAdapter
    * </p>
    *
    * @return The number of commands this comm adapter accepts.
+   * @deprecated Use {@link #getCommandsCapacity()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   int getCommandQueueCapacity();
 
   /**
@@ -86,8 +140,11 @@ public interface VehicleCommAdapter
    *
    * @return This adapter's command queue.
    * @see #getCommandQueueCapacity()
+   * @deprecated Use {@link #getUnsentCommands()} instead.
    */
   @Nonnull
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   Queue<MovementCommand> getCommandQueue();
 
   /**
@@ -105,7 +162,11 @@ public interface VehicleCommAdapter
    * Returns the capacity of this adapter's {@link #getSentQueue() <em>sent queue</em>}.
    *
    * @return The capacity of this adapter's <em>sent queue</em>.
+   * @deprecated Will be removed without a replacement, as this method no longer seems to serve any
+   * purpose.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   int getSentQueueCapacity();
 
   /**
@@ -116,8 +177,11 @@ public interface VehicleCommAdapter
    * which have not yet been processed by it.
    * @see #getSentQueueCapacity()
    * @see #getCommandQueueCapacity()
+   * @deprecated Use {@link #getSentCommands()} instead.
    */
   @Nonnull
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   Queue<MovementCommand> getSentQueue();
 
   /**
@@ -128,22 +192,28 @@ public interface VehicleCommAdapter
   String getRechargeOperation();
 
   /**
-   * Appends a command to this communication adapter's command queue.
-   * The return value of this method indicates whether the command was really
-   * added to the queue. The primary reason for a commmand not being added to
-   * the queue is that it would exceed its capacity.
+   * Appends a command to this communication adapter's queue of
+   * {@link #getUnsentCommands() unsent commands}.
+   * <p>
+   * The return value of this method indicates whether the command was really added to the queue.
+   * The primary reason for a commmand not being added to the queue is that it would exceed the
+   * adapter's {@link #getCommandsCapacity() commands capacity}.
+   * </p>
    *
-   * @param newCommand The command to be added to this adapter's command queue.
-   * @return <code>true</code> if, and only if, the new command was added to
-   * this adapter's command queue.
+   * @param newCommand The command to be added to this adapter's queue of
+   * {@link #getUnsentCommands() unsent commands}.
+   * @return <code>true</code> if, and only if, the new command was added to the queue.
    */
   boolean enqueueCommand(@Nonnull MovementCommand newCommand);
 
   /**
-   * Clears this communication adapter's command queue.
-   * All commands in the queue that have not been sent to this adapter's
-   * vehicle, yet, will be removed from the command queue. Any operation the
-   * vehicle might currently be executing will still be completed, though.
+   * Clears this communication adapter's command queues (i.e. the queues of
+   * {@link #getUnsentCommands() unsent} and {@link #getSentCommands() sent} commands).
+   * <p>
+   * All commands in the queue that have not been sent to this adapter's vehicle, yet, will be
+   * removed. Whether commands the vehicle has already received are still executed is up to the
+   * implementation and/or the vehicle.
+   * </p>
    */
   void clearCommandQueue();
 

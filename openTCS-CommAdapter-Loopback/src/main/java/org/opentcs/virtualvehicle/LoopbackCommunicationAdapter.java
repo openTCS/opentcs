@@ -108,7 +108,6 @@ public class LoopbackCommunicationAdapter
                                       @KernelExecutor ScheduledExecutorService kernelExecutor) {
     super(new LoopbackVehicleModel(vehicle),
           configuration.commandQueueCapacity(),
-          1,
           configuration.rechargeOperation(),
           kernelExecutor);
     this.vehicle = requireNonNull(vehicle, "vehicle");
@@ -201,6 +200,14 @@ public class LoopbackCommunicationAdapter
     }
   }
 
+  @Override
+  protected synchronized boolean canSendNextCommand() {
+    // Considering the state of the simulation here ensures that not more than one movement command
+    // is sent to this adapter at any time (which is crucial for the current implementation of the
+    // simulation).
+    return !isSimulationRunning && super.canSendNextCommand();
+  }
+  
   @Override
   public void onVehiclePaused(boolean paused) {
     getProcessModel().setVehiclePaused(paused);
@@ -299,10 +306,12 @@ public class LoopbackCommunicationAdapter
    */
   public synchronized void trigger() {
     if (getProcessModel().isSingleStepModeEnabled()
-        && !getSentQueue().isEmpty()
+        && !getSentCommands().isEmpty()
         && !isSimulationRunning) {
       isSimulationRunning = true;
-      ((ExecutorService) getExecutor()).submit(() -> startVehicleSimulation(getSentQueue().peek()));
+      ((ExecutorService) getExecutor()).submit(
+          () -> startVehicleSimulation(getSentCommands().peek())
+      );
     }
   }
 
@@ -399,18 +408,18 @@ public class LoopbackCommunicationAdapter
 
   private void finishVehicleSimulation(MovementCommand command) {
     //Set the vehicle state to idle
-    if (getSentQueue().size() <= 1 && getCommandQueue().isEmpty()) {
+    if (getSentCommands().size() <= 1 && getUnsentCommands().isEmpty()) {
       getProcessModel().setVehicleState(Vehicle.State.IDLE);
     }
-    if (Objects.equals(getSentQueue().peek(), command)) {
+    if (Objects.equals(getSentCommands().peek(), command)) {
       // Let the comm adapter know we have finished this command.
-      getProcessModel().commandExecuted(getSentQueue().poll());
+      getProcessModel().commandExecuted(getSentCommands().poll());
     }
     else {
       LOG.warn("{}: Simulated command not oldest in sent queue: {} != {}",
                getName(),
                command,
-               getSentQueue().peek());
+               getSentCommands().peek());
     }
     isSimulationRunning = false;
   }

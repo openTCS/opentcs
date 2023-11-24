@@ -25,9 +25,9 @@ public class CurrentMovementCommandFailedCommand
 
   @Override
   public void execute(VehicleCommAdapter adapter) {
-    MovementCommand failedCommand = adapter.getSentQueue().peek();
+    MovementCommand failedCommand = adapter.getSentCommands().peek();
     if (failedCommand != null) {
-      adapter.getProcessModel().commandFailed(adapter.getSentQueue().peek());
+      adapter.getProcessModel().commandFailed(adapter.getSentCommands().peek());
     }
   }
 }

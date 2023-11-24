@@ -173,8 +173,7 @@ public class AttachmentManagerTest {
 
     SimpleCommAdapter(Vehicle vehicle) {
       super(new VehicleProcessModel(vehicle),
-            0,
-            0,
+            1,
             "",
             Executors.newSingleThreadScheduledExecutor());
     }

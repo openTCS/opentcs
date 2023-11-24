@@ -31,8 +31,9 @@ import org.slf4j.LoggerFactory;
  * Implementation notes:
  * </p>
  * <ul>
- * <li>Accessing the command queue/sent queue from outside should always be
- * protected by synchronization on the BasicVehicleCommunicationAdapter instance.</li>
+ * <li>Accessing the queues of {@link #getUnsentCommands() unsent} and
+ * {@link #getSentCommands() sent} commands from outside should always be protected by
+ * synchronization on the {@link BasicVehicleCommAdapter} instance.</li>
  * </ul>
  */
 public abstract class BasicVehicleCommAdapter
@@ -92,6 +93,7 @@ public abstract class BasicVehicleCommAdapter
    * @param commandQueueCapacity The number of commands this comm adapter's command queue accepts.
    * Must be at least 1.
    * @param sentQueueCapacity The maximum number of orders to be sent to a vehicle.
+   * Must be at least 1.
    * @param rechargeOperation The string to recognize as a recharge operation.
    * @param executor The executor to run tasks on.
    * @deprecated Use more specific constructor instead.
@@ -105,11 +107,11 @@ public abstract class BasicVehicleCommAdapter
                                  Executor executor) {
     this.vehicleModel = requireNonNull(vehicleModel, "vehicleModel");
     this.commandQueueCapacity = checkInRange(commandQueueCapacity,
-                                             0,
+                                             1,
                                              Integer.MAX_VALUE,
                                              "commandQueueCapacity");
     this.sentQueueCapacity = checkInRange(sentQueueCapacity,
-                                          0,
+                                          1,
                                           Integer.MAX_VALUE,
                                           "sentQueueCapacity");
     this.rechargeOperation = requireNonNull(rechargeOperation, "rechargeOperation");
@@ -123,9 +125,13 @@ public abstract class BasicVehicleCommAdapter
    * @param commandQueueCapacity The number of commands this comm adapter's command queue accepts.
    * Must be at least 1.
    * @param sentQueueCapacity The maximum number of orders to be sent to a vehicle.
+   * Must be at least 1.
    * @param rechargeOperation The string to recognize as a recharge operation.
    * @param executor The executor to run tasks on.
+   * @deprecated Use constructor with {@code commandsCapacity} parameter instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed")
   public BasicVehicleCommAdapter(VehicleProcessModel vehicleModel,
                                  int commandQueueCapacity,
                                  int sentQueueCapacity,
@@ -134,6 +140,25 @@ public abstract class BasicVehicleCommAdapter
     this(vehicleModel,
          commandQueueCapacity,
          sentQueueCapacity,
+         rechargeOperation,
+         (Executor) executor);
+  }
+
+  /**
+   * Creates a new instance.
+   *
+   * @param vehicleModel An observable model of the vehicle's and its comm adapter's attributes.
+   * @param commandsCapacity The number of commands this comm adapter accepts. Must be at least 1.
+   * @param rechargeOperation The string to recognize as a recharge operation.
+   * @param executor The executor to run tasks on.
+   */
+  public BasicVehicleCommAdapter(VehicleProcessModel vehicleModel,
+                                 int commandsCapacity,
+                                 String rechargeOperation,
+                                 ScheduledExecutorService executor) {
+    this(vehicleModel,
+         commandsCapacity,
+         commandsCapacity,
          rechargeOperation,
          (Executor) executor);
   }
@@ -240,26 +265,45 @@ public abstract class BasicVehicleCommAdapter
   }
 
   @Override
+  public synchronized Queue<MovementCommand> getUnsentCommands() {
+    return getCommandQueue();
+  }
+
+  @Override
+  public synchronized Queue<MovementCommand> getSentCommands() {
+    return getSentQueue();
+  }
+
+  @Override
+  public int getCommandsCapacity() {
+    return getCommandQueueCapacity();
+  }
+
+  @Override
+  @Deprecated
   public int getCommandQueueCapacity() {
     return commandQueueCapacity;
   }
 
   @Override
+  @Deprecated
   public synchronized Queue<MovementCommand> getCommandQueue() {
     return commandQueue;
   }
 
   @Override
   public boolean canAcceptNextCommand() {
-    return (getCommandQueue().size() + getSentQueue().size()) < getCommandQueueCapacity();
+    return (getUnsentCommands().size() + getSentCommands().size()) < getCommandsCapacity();
   }
 
   @Override
+  @Deprecated
   public int getSentQueueCapacity() {
     return sentQueueCapacity;
   }
 
   @Override
+  @Deprecated
   public synchronized Queue<MovementCommand> getSentQueue() {
     return sentQueue;
   }
@@ -273,24 +317,20 @@ public abstract class BasicVehicleCommAdapter
   public synchronized boolean enqueueCommand(MovementCommand newCommand) {
     requireNonNull(newCommand, "newCommand");
 
-    boolean commandAdded = false;
-    if (getCommandQueue().size() < getCommandQueueCapacity()) {
-      LOG.debug("{}: Adding command: {}", getName(), newCommand);
-      getCommandQueue().add(newCommand);
-      commandAdded = true;
+    if (!canAcceptNextCommand()) {
+      return false;
     }
-    if (commandAdded) {
-      getProcessModel().commandEnqueued(newCommand);
-    }
-    return commandAdded;
+
+    LOG.debug("{}: Adding command: {}", getName(), newCommand);
+    getUnsentCommands().add(newCommand);
+    getProcessModel().commandEnqueued(newCommand);
+    return true;
   }
 
   @Override
   public synchronized void clearCommandQueue() {
-    if (!getCommandQueue().isEmpty()) {
-      getCommandQueue().clear();
-    }
-    getSentQueue().clear();
+    getUnsentCommands().clear();
+    getSentCommands().clear();
   }
 
   @Override
@@ -350,15 +390,18 @@ public abstract class BasicVehicleCommAdapter
 
   /**
    * Checks whether a new command can be sent to the vehicle.
-   * The default implementation of this method returns <code>true</code> only if
-   * the number of commands sent already is less than the vehicle's capacity and
-   * there is at least one command in the queue that is waiting to be sent.
+   * <p>
+   * This method returns <code>true</code> only if there is at least one command in the
+   * {@link #getUnsentCommands() queue of unsent commands} waiting to be sent.
+   * </p>
    *
-   * @return <code>true</code> if, and only if, a new command can be sent to the
-   * vehicle.
+   * @return <code>true</code> if, and only if, a new command can be sent to the vehicle.
    */
   protected synchronized boolean canSendNextCommand() {
-    return (getSentQueue().size() < sentQueueCapacity) && !getCommandQueue().isEmpty();
+    // Since canAcceptNextCommand() already ensures that the combined sizes of the queues of unsent
+    // and sent commands don't exceeed the number of commands the comm adapters can accept, the only
+    // thing to do here is to check if there are any commands to be sent.
+    return !getUnsentCommands().isEmpty();
   }
 
   // Abstract methods start here.
@@ -423,7 +466,7 @@ public abstract class BasicVehicleCommAdapter
           LOG.debug("{}: Cannot send another command, skipping.", getName());
           return;
         }
-        MovementCommand curCmd = getCommandQueue().poll();
+        MovementCommand curCmd = getUnsentCommands().poll();
         if (curCmd == null) {
           LOG.debug("{}: Nothing to send, skipping.", getName());
           return;
@@ -432,7 +475,7 @@ public abstract class BasicVehicleCommAdapter
           LOG.debug("{}: Sending command: {}", getName(), curCmd);
           sendCommand(curCmd);
           // Remember that we sent this command to the vehicle.
-          getSentQueue().add(curCmd);
+          getSentCommands().add(curCmd);
           // Notify listeners that this command was sent.
           getProcessModel().commandSent(curCmd);
         }
