@@ -27,10 +27,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import org.jhotdraw.geom.Geom;
 import org.opentcs.data.model.TCSResourceReference;
-import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.base.AllocationState;
-import static org.opentcs.guing.base.AllocationState.ALLOCATED;
-import static org.opentcs.guing.base.AllocationState.CLAIMED;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
@@ -163,12 +160,10 @@ public class PointFigure
                          transparentColor(vehicleModel.getDriveOrderColor(), 70));
           break;
         case ALLOCATED:
-          if (vehicleModel.getDriveOrderState() == TransportOrder.State.WITHDRAWN) {
-            drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
-          }
-          else {
-            drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
-          }
+          drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
+          break;
+        case ALLOCATED_WITHDRAWN:
+          drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
           break;
         default:
         // Don't draw any decoration.

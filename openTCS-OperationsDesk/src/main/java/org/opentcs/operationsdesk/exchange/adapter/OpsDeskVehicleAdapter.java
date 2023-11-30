@@ -7,9 +7,12 @@
  */
 package org.opentcs.operationsdesk.exchange.adapter;
 
-import java.util.List;
 import static java.util.Objects.requireNonNull;
+import static org.opentcs.data.order.TransportOrder.State.WITHDRAWN;
+import java.util.List;
 import java.util.Set;
+import org.opentcs.data.model.TCSResourceReference;
+import org.opentcs.data.model.Vehicle;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,8 +20,6 @@ import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.TCSResourceReference;
-import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
@@ -138,7 +139,17 @@ public class OpsDeskVehicleAdapter
     }
 
     for (FigureDecorationDetails component
-             : toFigureDecorationDetails(entry.getCurrentAllocatedResources(), systemModel)) {
+             : toFigureDecorationDetails(entry.getCurrentAllocatedResourcesAhead(), systemModel)) {
+      if (vehicleModel.getDriveOrderState() == WITHDRAWN) {
+        component.updateAllocationState(vehicleModel, AllocationState.ALLOCATED_WITHDRAWN);
+      }
+      else {
+        component.updateAllocationState(vehicleModel, AllocationState.ALLOCATED);
+      }
+    }
+
+    for (FigureDecorationDetails component
+             : toFigureDecorationDetails(entry.getCurrentAllocatedResourcesBehind(), systemModel)) {
       component.updateAllocationState(vehicleModel, AllocationState.ALLOCATED);
     }
 

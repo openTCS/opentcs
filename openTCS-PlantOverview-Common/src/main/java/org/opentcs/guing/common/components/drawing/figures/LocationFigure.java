@@ -33,7 +33,6 @@ import org.jhotdraw.geom.Geom;
 import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.visualization.LocationRepresentation;
-import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.base.AllocationState;
 import static org.opentcs.guing.base.AllocationState.ALLOCATED;
 import static org.opentcs.guing.base.AllocationState.CLAIMED;
@@ -170,7 +169,7 @@ public class LocationFigure
 
   private void drawRouteDecoration(Graphics2D g) {
     for (Map.Entry<VehicleModel, AllocationState> entry
-             : getModel().getAllocationStates().entrySet()) {
+        : getModel().getAllocationStates().entrySet()) {
       VehicleModel vehicleModel = entry.getKey();
       switch (entry.getValue()) {
         case CLAIMED:
@@ -179,12 +178,10 @@ public class LocationFigure
                          transparentColor(vehicleModel.getDriveOrderColor(), 70));
           break;
         case ALLOCATED:
-          if (vehicleModel.getDriveOrderState() == TransportOrder.State.WITHDRAWN) {
-            drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
-          }
-          else {
-            drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
-          }
+          drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
+          break;
+        case ALLOCATED_WITHDRAWN:
+          drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
           break;
         default:
         // Don't draw any decoration.

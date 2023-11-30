@@ -36,7 +36,6 @@ import org.jhotdraw.draw.liner.Liner;
 import org.jhotdraw.draw.liner.SlantedLiner;
 import org.jhotdraw.geom.BezierPath;
 import org.opentcs.data.model.TCSResourceReference;
-import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.base.AllocationState;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.type.AbstractProperty;
@@ -644,12 +643,10 @@ public class PathConnection
                          transparentColor(vehicleModel.getDriveOrderColor(), 70));
           break;
         case ALLOCATED:
-          if (vehicleModel.getDriveOrderState() == TransportOrder.State.WITHDRAWN) {
-            drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
-          }
-          else {
-            drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
-          }
+          drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
+          break;
+        case ALLOCATED_WITHDRAWN:
+          drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
           break;
         default:
         // Don't draw any decoration.
