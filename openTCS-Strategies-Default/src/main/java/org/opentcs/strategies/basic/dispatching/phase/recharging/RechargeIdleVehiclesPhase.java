@@ -19,6 +19,7 @@ import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
+import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
@@ -148,6 +149,7 @@ public class RechargeIdleVehiclesPhase
             .withIncompleteName(true)
             .withIntendedVehicleName(vehicle.getName())
             .withDispensable(!vehicle.isEnergyLevelCritical())
+            .withType(OrderConstants.TYPE_CHARGE)
     );
 
     Point vehiclePosition = orderService.fetchObject(Point.class, vehicle.getCurrentPosition());
