@@ -53,6 +53,8 @@ public class StandardNotificationService
 
   @Override
   public void publishUserNotification(UserNotification notification) {
+    requireNonNull(notification, "notification");
+
     synchronized (globalSyncObject) {
       notificationBuffer.addNotification(notification);
     }

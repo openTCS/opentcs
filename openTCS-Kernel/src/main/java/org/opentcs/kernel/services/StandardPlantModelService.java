@@ -104,6 +104,8 @@ public class StandardPlantModelService
   @Override
   public Set<TCSResource<?>> expandResources(Set<TCSResourceReference<?>> resources)
       throws ObjectUnknownException {
+    requireNonNull(resources, "resources");
+    
     synchronized (globalSyncObject) {
       return plantModelManager.expandResources(resources);
     }
@@ -161,6 +163,7 @@ public class StandardPlantModelService
   @Override
   public void createPlantModel(PlantModelCreationTO to)
       throws ObjectUnknownException, ObjectExistsException, IllegalStateException {
+    requireNonNull(to, "to");
 
     boolean kernelInOperating = kernel.getState() == Kernel.State.OPERATING;
     // If we are in state operating, change the kernel state before creating the plant model
@@ -207,6 +210,8 @@ public class StandardPlantModelService
   @Override
   public void updateLocationLock(TCSObjectReference<Location> ref, boolean locked)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    
     synchronized (globalSyncObject) {
       plantModelManager.setLocationLocked(ref, locked);
     }
@@ -216,6 +221,8 @@ public class StandardPlantModelService
   @Override
   public void updateLocationReservationToken(TCSObjectReference<Location> ref, String token)
       throws ObjectUnknownException, KernelRuntimeException {
+    requireNonNull(ref, "ref");
+    
     synchronized (globalSyncObject) {
       plantModelManager.setLocationReservationToken(ref, token);
     }

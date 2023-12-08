@@ -53,6 +53,9 @@ public class StandardTCSObjectService
 
   @Override
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, TCSObjectReference<T> ref) {
+    requireNonNull(clazz, "clazz");
+    requireNonNull(ref, "ref");
+
     synchronized (getGlobalSyncObject()) {
       return getObjectRepo().getObjectOrNull(clazz, ref);
     }
@@ -60,6 +63,8 @@ public class StandardTCSObjectService
 
   @Override
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, String name) {
+    requireNonNull(clazz, "clazz");
+
     synchronized (getGlobalSyncObject()) {
       return getObjectRepo().getObjectOrNull(clazz, name);
     }
@@ -67,6 +72,8 @@ public class StandardTCSObjectService
 
   @Override
   public <T extends TCSObject<T>> Set<T> fetchObjects(Class<T> clazz) {
+    requireNonNull(clazz, "clazz");
+
     synchronized (getGlobalSyncObject()) {
       Set<T> objects = getObjectRepo().getObjects(clazz);
       Set<T> copies = new HashSet<>();
@@ -80,6 +87,9 @@ public class StandardTCSObjectService
   @Override
   public <T extends TCSObject<T>> Set<T> fetchObjects(@Nonnull Class<T> clazz,
                                                       @Nonnull Predicate<? super T> predicate) {
+    requireNonNull(clazz, "clazz");
+    requireNonNull(predicate, "predicate");
+
     synchronized (getGlobalSyncObject()) {
       return getObjectRepo().getObjects(clazz, predicate);
     }
@@ -88,6 +98,9 @@ public class StandardTCSObjectService
   @Override
   public void updateObjectProperty(TCSObjectReference<?> ref, String key, @Nullable String value)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(key, "key");
+
     synchronized (getGlobalSyncObject()) {
       objectManager.setObjectProperty(ref, key, value);
     }
@@ -96,6 +109,9 @@ public class StandardTCSObjectService
   @Override
   public void appendObjectHistoryEntry(TCSObjectReference<?> ref, ObjectHistory.Entry entry)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(entry, "entry");
+
     synchronized (getGlobalSyncObject()) {
       objectManager.appendObjectHistoryEntry(ref, entry);
     }

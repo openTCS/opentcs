@@ -78,6 +78,9 @@ public class StandardPeripheralService
   public void attachCommAdapter(TCSResourceReference<Location> ref,
                                 PeripheralCommAdapterDescription description)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(description, "description");
+
     synchronized (globalSyncObject) {
       attachmentManager.attachAdapterToLocation(ref, description);
     }
@@ -86,6 +89,8 @@ public class StandardPeripheralService
   @Override
   public void disableCommAdapter(TCSResourceReference<Location> ref)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       peripheralEntryPool.getEntryFor(ref).getCommAdapter().disable();
     }
@@ -94,6 +99,8 @@ public class StandardPeripheralService
   @Override
   public void enableCommAdapter(TCSResourceReference<Location> ref)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       peripheralEntryPool.getEntryFor(ref).getCommAdapter().enable();
     }
@@ -103,6 +110,8 @@ public class StandardPeripheralService
   public PeripheralAttachmentInformation fetchAttachmentInformation(
       TCSResourceReference<Location> ref)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       return attachmentManager.getAttachmentInformation(ref);
     }
@@ -111,6 +120,8 @@ public class StandardPeripheralService
   @Override
   public PeripheralProcessModel fetchProcessModel(TCSResourceReference<Location> ref)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       return peripheralEntryPool.getEntryFor(ref).getCommAdapter().getProcessModel();
     }
@@ -120,6 +131,9 @@ public class StandardPeripheralService
   public void sendCommAdapterCommand(TCSResourceReference<Location> ref,
                                      PeripheralAdapterCommand command)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(command, "command");
+
     synchronized (globalSyncObject) {
       PeripheralEntry entry = peripheralEntryPool.getEntryFor(ref);
       synchronized (entry.getCommAdapter()) {
@@ -132,6 +146,9 @@ public class StandardPeripheralService
   public void updatePeripheralProcState(TCSResourceReference<Location> ref,
                                         PeripheralInformation.ProcState state)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(state, "state");
+
     synchronized (globalSyncObject) {
       plantModelManager.setLocationProcState(ref, state);
     }
@@ -141,6 +158,8 @@ public class StandardPeripheralService
   public void updatePeripheralReservationToken(TCSResourceReference<Location> ref,
                                                String reservationToken)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       plantModelManager.setLocationReservationToken(ref, reservationToken);
     }
@@ -150,6 +169,9 @@ public class StandardPeripheralService
   public void updatePeripheralState(TCSResourceReference<Location> ref,
                                     PeripheralInformation.State state)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(state, "state");
+
     synchronized (globalSyncObject) {
       plantModelManager.setLocationState(ref, state);
     }
@@ -159,6 +181,8 @@ public class StandardPeripheralService
   public void updatePeripheralJob(TCSResourceReference<Location> ref,
                                   TCSObjectReference<PeripheralJob> peripheralJob)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       plantModelManager.setLocationPeripheralJob(ref, peripheralJob);
     }

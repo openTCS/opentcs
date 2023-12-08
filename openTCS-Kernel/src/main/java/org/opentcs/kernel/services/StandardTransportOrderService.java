@@ -76,6 +76,8 @@ public class StandardTransportOrderService
   @Override
   public void markOrderSequenceFinished(TCSObjectReference<OrderSequence> ref)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       OrderSequence seq = globalObjectPool.getObject(OrderSequence.class, ref);
       // Make sure we don't execute this if the sequence is already marked as finished, as that
@@ -98,6 +100,8 @@ public class StandardTransportOrderService
   @Override
   public void updateOrderSequenceFinishedIndex(TCSObjectReference<OrderSequence> ref, int index)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       orderPoolManager.setOrderSequenceFinishedIndex(ref, index);
     }
@@ -107,6 +111,8 @@ public class StandardTransportOrderService
   public void updateOrderSequenceProcessingVehicle(TCSObjectReference<OrderSequence> seqRef,
                                                    TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException {
+    requireNonNull(seqRef, "seqRef");
+
     synchronized (globalSyncObject) {
       orderPoolManager.setOrderSequenceProcessingVehicle(seqRef, vehicleRef);
     }
@@ -117,6 +123,9 @@ public class StandardTransportOrderService
                                                     TCSObjectReference<Vehicle> vehicleRef,
                                                     List<DriveOrder> driveOrders)
       throws ObjectUnknownException, IllegalArgumentException {
+    requireNonNull(orderRef, "orderRef");
+    requireNonNull(driveOrders, "driveOrders");
+
     synchronized (globalSyncObject) {
       orderPoolManager.setTransportOrderProcessingVehicle(orderRef, vehicleRef, driveOrders);
     }
@@ -126,6 +135,9 @@ public class StandardTransportOrderService
   public void updateTransportOrderDriveOrders(TCSObjectReference<TransportOrder> ref,
                                               List<DriveOrder> driveOrders)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(driveOrders, "driveOrders");
+
     synchronized (globalSyncObject) {
       orderPoolManager.setTransportOrderDriveOrders(ref, driveOrders);
     }
@@ -134,6 +146,8 @@ public class StandardTransportOrderService
   @Override
   public void updateTransportOrderNextDriveOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       orderPoolManager.setTransportOrderNextDriveOrder(ref);
     }
@@ -143,6 +157,9 @@ public class StandardTransportOrderService
   public void updateTransportOrderState(TCSObjectReference<TransportOrder> ref,
                                         TransportOrder.State state)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(state, "state");
+
     synchronized (globalSyncObject) {
       orderPoolManager.setTransportOrderState(ref, state);
     }
@@ -150,6 +167,8 @@ public class StandardTransportOrderService
 
   @Override
   public OrderSequence createOrderSequence(OrderSequenceCreationTO to) {
+    requireNonNull(to, "to");
+
     synchronized (globalSyncObject) {
       return orderPoolManager.createOrderSequence(to);
     }
@@ -158,6 +177,8 @@ public class StandardTransportOrderService
   @Override
   public TransportOrder createTransportOrder(TransportOrderCreationTO to)
       throws ObjectUnknownException, ObjectExistsException {
+    requireNonNull(to, "to");
+
     synchronized (globalSyncObject) {
       return orderPoolManager.createTransportOrder(to);
     }
@@ -166,6 +187,8 @@ public class StandardTransportOrderService
   @Override
   public void markOrderSequenceComplete(TCSObjectReference<OrderSequence> ref)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       OrderSequence seq = globalObjectPool.getObject(OrderSequence.class, ref);
       // Make sure we don't execute this if the sequence is already marked as finished, as that
@@ -193,6 +216,8 @@ public class StandardTransportOrderService
   public void updateTransportOrderIntendedVehicle(TCSObjectReference<TransportOrder> orderRef,
                                                   TCSObjectReference<Vehicle> vehicleRef)
       throws ObjectUnknownException, IllegalArgumentException {
+    requireNonNull(orderRef, "orderRef");
+
     synchronized (globalSyncObject) {
       orderPoolManager.setTransportOrderIntendedVehicle(orderRef, vehicleRef);
     }

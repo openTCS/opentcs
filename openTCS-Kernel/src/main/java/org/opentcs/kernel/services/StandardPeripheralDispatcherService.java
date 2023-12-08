@@ -65,6 +65,8 @@ public class StandardPeripheralDispatcherService
   @Override
   public void withdrawByLocation(TCSResourceReference<Location> ref)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       dispatcher.withdrawJob(objectRepo.getObject(Location.class, ref));
     }
@@ -73,6 +75,8 @@ public class StandardPeripheralDispatcherService
   @Override
   public void withdrawByPeripheralJob(TCSObjectReference<PeripheralJob> ref)
       throws ObjectUnknownException, KernelRuntimeException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       dispatcher.withdrawJob(objectRepo.getObject(PeripheralJob.class, ref));
     }

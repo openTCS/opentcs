@@ -105,6 +105,8 @@ public class StandardVehicleService
   @Override
   public void updateVehicleEnergyLevel(TCSObjectReference<Vehicle> ref, int energyLevel)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleEnergyLevel(ref, energyLevel);
     }
@@ -114,6 +116,9 @@ public class StandardVehicleService
   public void updateVehicleLoadHandlingDevices(TCSObjectReference<Vehicle> ref,
                                                List<LoadHandlingDevice> devices)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(devices, "devices");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleLoadHandlingDevices(ref, devices);
     }
@@ -123,6 +128,8 @@ public class StandardVehicleService
   public void updateVehicleNextPosition(TCSObjectReference<Vehicle> vehicleRef,
                                         TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
+    requireNonNull(vehicleRef, "vehicleRef");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleNextPosition(vehicleRef, pointRef);
     }
@@ -132,6 +139,8 @@ public class StandardVehicleService
   public void updateVehicleOrderSequence(TCSObjectReference<Vehicle> vehicleRef,
                                          TCSObjectReference<OrderSequence> sequenceRef)
       throws ObjectUnknownException {
+    requireNonNull(vehicleRef, "vehicleRef");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleOrderSequence(vehicleRef, sequenceRef);
     }
@@ -140,6 +149,8 @@ public class StandardVehicleService
   @Override
   public void updateVehicleOrientationAngle(TCSObjectReference<Vehicle> ref, double angle)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleOrientationAngle(ref, angle);
     }
@@ -149,6 +160,8 @@ public class StandardVehicleService
   public void updateVehiclePosition(TCSObjectReference<Vehicle> vehicleRef,
                                     TCSObjectReference<Point> pointRef)
       throws ObjectUnknownException {
+    requireNonNull(vehicleRef, "vehicleRef");
+
     synchronized (globalSyncObject) {
       LOG.debug("Vehicle {} has reached point {}.", vehicleRef, pointRef);
       plantModelManager.setVehiclePosition(vehicleRef, pointRef);
@@ -158,6 +171,8 @@ public class StandardVehicleService
   @Override
   public void updateVehiclePrecisePosition(TCSObjectReference<Vehicle> ref, Triple position)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehiclePrecisePosition(ref, position);
     }
@@ -166,6 +181,9 @@ public class StandardVehicleService
   @Override
   public void updateVehicleProcState(TCSObjectReference<Vehicle> ref, Vehicle.ProcState state)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(state, "state");
+
     synchronized (globalSyncObject) {
       LOG.debug("Updating procState of vehicle {} to {}...", ref.getName(), state);
       plantModelManager.setVehicleProcState(ref, state);
@@ -176,6 +194,9 @@ public class StandardVehicleService
   public void updateVehicleRechargeOperation(TCSObjectReference<Vehicle> ref,
                                              String rechargeOperation)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(rechargeOperation, "rechargeOperation");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleRechargeOperation(ref, rechargeOperation);
     }
@@ -184,6 +205,8 @@ public class StandardVehicleService
   @Override
   public void updateVehicleRouteProgressIndex(TCSObjectReference<Vehicle> ref, int index)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleRouteProgressIndex(ref, index);
     }
@@ -193,6 +216,9 @@ public class StandardVehicleService
   public void updateVehicleClaimedResources(TCSObjectReference<Vehicle> ref,
                                             List<Set<TCSResourceReference<?>>> resources)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(resources, "resources");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleClaimedResources(ref, resources);
     }
@@ -202,6 +228,9 @@ public class StandardVehicleService
   public void updateVehicleAllocatedResources(TCSObjectReference<Vehicle> ref,
                                               List<Set<TCSResourceReference<?>>> resources)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(resources, "resources");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleAllocatedResources(ref, resources);
     }
@@ -210,6 +239,9 @@ public class StandardVehicleService
   @Override
   public void updateVehicleState(TCSObjectReference<Vehicle> ref, Vehicle.State state)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(state, "state");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleState(ref, state);
     }
@@ -218,6 +250,8 @@ public class StandardVehicleService
   @Override
   public void updateVehicleLength(TCSObjectReference<Vehicle> ref, int length)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleLength(ref, length);
     }
@@ -227,6 +261,8 @@ public class StandardVehicleService
   public void updateVehicleTransportOrder(TCSObjectReference<Vehicle> vehicleRef,
                                           TCSObjectReference<TransportOrder> orderRef)
       throws ObjectUnknownException {
+    requireNonNull(vehicleRef, "vehicleRef");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleTransportOrder(vehicleRef, orderRef);
     }
@@ -236,6 +272,9 @@ public class StandardVehicleService
   public void attachCommAdapter(TCSObjectReference<Vehicle> ref,
                                 VehicleCommAdapterDescription description)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(description, "description");
+
     synchronized (globalSyncObject) {
       attachmentManager.attachAdapterToVehicle(ref.getName(),
                                                commAdapterRegistry.findFactoryFor(description));
@@ -245,6 +284,8 @@ public class StandardVehicleService
   @Override
   public void disableCommAdapter(TCSObjectReference<Vehicle> ref)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       VehicleEntry entry = vehicleEntryPool.getEntryFor(ref.getName());
       if (entry == null) {
@@ -258,6 +299,8 @@ public class StandardVehicleService
   @Override
   public void enableCommAdapter(TCSObjectReference<Vehicle> ref)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       VehicleEntry entry = vehicleEntryPool.getEntryFor(ref.getName());
       if (entry == null) {
@@ -271,6 +314,8 @@ public class StandardVehicleService
   @Override
   public AttachmentInformation fetchAttachmentInformation(TCSObjectReference<Vehicle> ref)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       return attachmentManager.getAttachmentInformation(ref.getName());
     }
@@ -279,6 +324,8 @@ public class StandardVehicleService
   @Override
   public VehicleProcessModelTO fetchProcessModel(TCSObjectReference<Vehicle> ref)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       VehicleEntry entry = vehicleEntryPool.getEntryFor(ref.getName());
       if (entry == null) {
@@ -292,6 +339,9 @@ public class StandardVehicleService
   @Override
   public void sendCommAdapterCommand(TCSObjectReference<Vehicle> ref, AdapterCommand command)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(command, "command");
+
     synchronized (globalSyncObject) {
       vehicleControllerPool
           .getVehicleController(ref.getName())
@@ -302,6 +352,8 @@ public class StandardVehicleService
   @Override
   public void sendCommAdapterMessage(TCSObjectReference<Vehicle> ref, Object message)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       vehicleControllerPool
           .getVehicleController(ref.getName())
@@ -313,6 +365,9 @@ public class StandardVehicleService
   public void updateVehicleIntegrationLevel(TCSObjectReference<Vehicle> ref,
                                             Vehicle.IntegrationLevel integrationLevel)
       throws ObjectUnknownException, KernelRuntimeException {
+    requireNonNull(ref, "ref");
+    requireNonNull(integrationLevel, "integrationLevel");
+
     synchronized (globalSyncObject) {
       Vehicle vehicle = fetchObject(Vehicle.class, ref);
 
@@ -333,6 +388,8 @@ public class StandardVehicleService
   @Override
   public void updateVehiclePaused(TCSObjectReference<Vehicle> ref, boolean paused)
       throws ObjectUnknownException, KernelRuntimeException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehiclePaused(ref, paused);
 
@@ -344,6 +401,9 @@ public class StandardVehicleService
   public void updateVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
                                              Set<String> allowedOrderTypes)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(allowedOrderTypes, "allowedOrderTypes");
+
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleAllowedOrderTypes(ref, allowedOrderTypes);
     }
@@ -352,6 +412,8 @@ public class StandardVehicleService
   @Override
   public void updateVehicleEnvelopeKey(TCSObjectReference<Vehicle> ref, String envelopeKey)
       throws ObjectUnknownException, IllegalArgumentException, KernelRuntimeException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       Vehicle vehicle = fetchObject(Vehicle.class, ref);
       if (vehicle.isProcessingOrder()

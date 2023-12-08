@@ -65,6 +65,8 @@ public class StandardDispatcherService
   @Override
   public void withdrawByVehicle(TCSObjectReference<Vehicle> ref, boolean immediateAbort)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       dispatcher.withdrawOrder(objectRepo.getObject(Vehicle.class, ref), immediateAbort);
     }
@@ -74,6 +76,8 @@ public class StandardDispatcherService
   public void withdrawByTransportOrder(TCSObjectReference<TransportOrder> ref,
                                        boolean immediateAbort)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       dispatcher.withdrawOrder(objectRepo.getObject(TransportOrder.class, ref),
                                immediateAbort);
@@ -83,6 +87,9 @@ public class StandardDispatcherService
   @Override
   public void reroute(TCSObjectReference<Vehicle> ref, ReroutingType reroutingType)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(reroutingType, "reroutingType");
+
     synchronized (globalSyncObject) {
       dispatcher.reroute(objectRepo.getObject(Vehicle.class, ref), reroutingType);
     }
@@ -91,6 +98,8 @@ public class StandardDispatcherService
   @Override
   public void assignNow(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException, TransportOrderAssignmentException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       dispatcher.assignNow(objectRepo.getObject(TransportOrder.class, ref));
     }

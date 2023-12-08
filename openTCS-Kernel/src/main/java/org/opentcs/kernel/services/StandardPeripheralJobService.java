@@ -57,6 +57,9 @@ public class StandardPeripheralJobService
   public void updatePeripheralJobState(TCSObjectReference<PeripheralJob> ref,
                                        PeripheralJob.State state)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(state, "state");
+
     synchronized (globalSyncObject) {
       jobPoolManager.setPeripheralJobState(ref, state);
     }
@@ -65,6 +68,8 @@ public class StandardPeripheralJobService
   @Override
   public PeripheralJob createPeripheralJob(PeripheralJobCreationTO to)
       throws ObjectUnknownException, ObjectExistsException, KernelRuntimeException {
+    requireNonNull(to, "to");
+
     synchronized (globalSyncObject) {
       return jobPoolManager.createPeripheralJob(to);
     }

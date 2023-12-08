@@ -43,18 +43,25 @@ public abstract class AbstractTCSObjectService
   @Override
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, TCSObjectReference<T> ref)
       throws CredentialsException {
+    requireNonNull(clazz, "clazz");
+    requireNonNull(ref, "ref");
+
     return getObjectService().fetchObject(clazz, ref);
   }
 
   @Override
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, String name)
       throws CredentialsException {
+    requireNonNull(clazz, "clazz");
+
     return getObjectService().fetchObject(clazz, name);
   }
 
   @Override
   public <T extends TCSObject<T>> Set<T> fetchObjects(Class<T> clazz)
       throws CredentialsException {
+    requireNonNull(clazz, "clazz");
+
     return getObjectService().fetchObjects(clazz);
   }
 
@@ -62,6 +69,9 @@ public abstract class AbstractTCSObjectService
   public <T extends TCSObject<T>> Set<T> fetchObjects(@Nonnull Class<T> clazz,
                                                       @Nonnull Predicate<? super T> predicate)
       throws CredentialsException {
+    requireNonNull(clazz, "clazz");
+    requireNonNull(predicate, "predicate");
+
     return getObjectService().fetchObjects(clazz, predicate);
   }
 
@@ -70,12 +80,18 @@ public abstract class AbstractTCSObjectService
                                    String key,
                                    @Nullable String value)
       throws ObjectUnknownException, CredentialsException {
+    requireNonNull(ref, "ref");
+    requireNonNull(key, "key");
+
     getObjectService().updateObjectProperty(ref, key, value);
   }
 
   @Override
   public void appendObjectHistoryEntry(TCSObjectReference<?> ref, ObjectHistory.Entry entry)
       throws ObjectUnknownException, KernelRuntimeException {
+    requireNonNull(ref, "ref");
+    requireNonNull(entry, "entry");
+
     getObjectService().appendObjectHistoryEntry(ref, entry);
   }
 

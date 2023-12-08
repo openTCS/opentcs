@@ -94,6 +94,8 @@ public class StandardRouterService
   @Override
   public void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
       throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
     synchronized (globalSyncObject) {
       plantModelManager.setPathLocked(ref, locked);
       if (kernel.getState() == Kernel.State.OPERATING
@@ -116,6 +118,10 @@ public class StandardRouterService
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<Point> sourcePointRef,
       Set<TCSObjectReference<Point>> destinationPointRefs) {
+    requireNonNull(vehicleRef, "vehicleRef");
+    requireNonNull(sourcePointRef, "sourcePointRef");
+    requireNonNull(destinationPointRefs, "destinationPointRefs");
+
     synchronized (globalSyncObject) {
       Map<TCSObjectReference<Point>, Route> result = new HashMap<>();
       Vehicle vehicle = objectService.fetchObject(Vehicle.class, vehicleRef);
