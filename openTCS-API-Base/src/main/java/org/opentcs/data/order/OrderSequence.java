@@ -10,6 +10,7 @@ package org.opentcs.data.order;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -18,6 +19,11 @@ import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import static org.opentcs.data.order.OrderSequenceHistoryCodes.SEQUENCE_COMPLETED;
+import static org.opentcs.data.order.OrderSequenceHistoryCodes.SEQUENCE_CREATED;
+import static org.opentcs.data.order.OrderSequenceHistoryCodes.SEQUENCE_FINISHED;
+import static org.opentcs.data.order.OrderSequenceHistoryCodes.SEQUENCE_ORDER_APPENDED;
+import static org.opentcs.data.order.OrderSequenceHistoryCodes.SEQUENCE_PROCESSING_VEHICLE_CHANGED;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkInRange;
 
@@ -94,7 +100,9 @@ public class OrderSequence
    * @param name This sequence's name.
    */
   public OrderSequence(String name) {
-    super(name);
+    super(name,
+          new HashMap<>(),
+          new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(SEQUENCE_CREATED)));
     this.type = OrderConstants.TYPE_NONE;
     this.orders = List.of();
     this.finishedIndex = -1;
@@ -238,7 +246,7 @@ public class OrderSequence
 
     return new OrderSequence(getName(),
                              getProperties(),
-                             getHistory(),
+                             historyForAppendedOrder(order),
                              type,
                              intendedVehicle,
                              ordersWithAppended(order),
@@ -324,7 +332,7 @@ public class OrderSequence
   public OrderSequence withComplete(boolean complete) {
     return new OrderSequence(getName(),
                              getProperties(),
-                             getHistory(),
+                             historyForComplete(complete),
                              type,
                              intendedVehicle,
                              orders,
@@ -357,7 +365,7 @@ public class OrderSequence
   public OrderSequence withFinished(boolean finished) {
     return new OrderSequence(getName(),
                              getProperties(),
-                             getHistory(),
+                             historyForFinished(finished),
                              type,
                              intendedVehicle,
                              orders,
@@ -452,7 +460,7 @@ public class OrderSequence
   public OrderSequence withProcessingVehicle(TCSObjectReference<Vehicle> processingVehicle) {
     return new OrderSequence(getName(),
                              getProperties(),
-                             getHistory(),
+                             historyForNewProcessingVehicle(processingVehicle),
                              type,
                              intendedVehicle,
                              orders,
@@ -469,5 +477,33 @@ public class OrderSequence
     result.addAll(orders);
     result.add(order);
     return result;
+  }
+
+  private ObjectHistory historyForNewProcessingVehicle(TCSObjectReference<Vehicle> ref) {
+    return getHistory().withEntryAppended(
+        new ObjectHistory.Entry(SEQUENCE_PROCESSING_VEHICLE_CHANGED,
+                                ref == null ? "" : ref.getName())
+    );
+  }
+
+  private ObjectHistory historyForAppendedOrder(TCSObjectReference<TransportOrder> ref) {
+    return getHistory().withEntryAppended(
+        new ObjectHistory.Entry(SEQUENCE_ORDER_APPENDED,
+                                ref == null ? "" : ref.getName())
+    );
+  }
+
+  private ObjectHistory historyForFinished(boolean finished) {
+    return finished
+        ? getHistory().withEntryAppended(
+            new ObjectHistory.Entry(SEQUENCE_FINISHED))
+        : getHistory();
+  }
+
+  private ObjectHistory historyForComplete(boolean complete) {
+    return complete
+        ? getHistory().withEntryAppended(
+            new ObjectHistory.Entry(SEQUENCE_COMPLETED))
+        : getHistory();
   }
 }

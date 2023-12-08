@@ -18,6 +18,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** In the Operations Desk application, show the vehicle that is allocating a resource in the tooltips of points, paths and locations.
 ** In the Operations Desk application, only offer locations as transport order destinations that are actually linked to at least one point and that have allowed operations.
 ** In the Operations Desk application, if a vehicle's transport order is withdrawn regularly (i.e. while allowing the vehicle to finish its movements), only the allocated resources in front of the vehicle are highlighted in grey, while the allocated resources behind the vehicle remain highlighted in the vehicle's route color.
+** As with transport orders, the event history of order sequences is now also filled with relevant event data.
 * Bugs fixed:
 ** The load generator plugin now avoids unsuitable locations when generating orders.
    For example, locations without a link are considered unsuitable, which usually includes locations representing peripheral devices.

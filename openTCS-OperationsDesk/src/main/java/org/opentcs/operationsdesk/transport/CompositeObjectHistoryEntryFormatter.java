@@ -48,6 +48,7 @@ public class CompositeObjectHistoryEntryFormatter
 
     formatters.add(new TransportOrderHistoryEntryFormatter());
     formatters.add(new PeripheralJobHistoryEntryFormatter());
+    formatters.add(new OrderSequenceHistoryEntryFormatter());
     formatters.add(this::fallbackFormat);
   }
 
