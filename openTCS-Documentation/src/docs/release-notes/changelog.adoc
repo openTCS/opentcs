@@ -22,6 +22,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Bugs fixed:
 ** The load generator plugin now avoids unsuitable locations when generating orders.
    For example, locations without a link are considered unsuitable, which usually includes locations representing peripheral devices.
+** When retrieving a plant model's visual layout via the web API, its properties are now also provided properly.
+   Previously, a visual layout's properties would always be empty.
 * Changes affecting developers:
 ** Revamp management of `MovementCommand` queues in `BasicVehicleCommAdapter`.
 *** Deprecate methods in `VehicleCommAdapter` related to a communication adapter's command queues and introduce new methods with more descriptive names as a replacement.
