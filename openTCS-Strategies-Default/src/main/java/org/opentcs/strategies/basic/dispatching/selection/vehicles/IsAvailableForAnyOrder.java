@@ -67,7 +67,8 @@ public class IsAvailableForAnyOrder
         && !needsMoreCharging(vehicle)
         && (processesNoOrder(vehicle)
             || processesDispensableOrder(vehicle))
-        && !hasOrderReservation(vehicle);
+        && !hasOrderReservation(vehicle)
+        && !vehicle.isPaused();
   }
 
   private boolean needsMoreCharging(Vehicle vehicle) {
