@@ -323,7 +323,7 @@ public class TransportOrderPoolManager
     if (!canSetIntendedVehicle(order)) {
       throw new IllegalArgumentException(String.format(
           "Cannot set intended vehicle '%s' for transport order '%s' in state '%s'",
-          vehicleRef.getName(),
+          toObjectName(vehicleRef),
           order.getName(),
           order.getState()
       ));
@@ -653,9 +653,9 @@ public class TransportOrderPoolManager
     }
   }
 
-  @Nullable
+  @Nonnull
   private String toObjectName(TCSObjectReference<?> ref) {
-    return ref == null ? null : ref.getName();
+    return ref == null ? "null" : ref.getName();
   }
 
   private boolean canSetIntendedVehicle(TransportOrder order) {
