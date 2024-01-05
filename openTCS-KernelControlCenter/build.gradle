@@ -45,7 +45,6 @@ task release {
 
 run {
   systemProperties(['java.util.logging.config.file':'./config/logging.config',\
-                    'java.security.policy':'file:./config/java.policy',\
                     'sun.java2d.d3d':'false',\
                     'opentcs.base':'.',\
                     'opentcs.home':'.',\

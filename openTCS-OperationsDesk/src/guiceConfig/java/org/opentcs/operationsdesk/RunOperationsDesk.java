@@ -48,7 +48,6 @@ public class RunOperationsDesk {
    * @param args the command line arguments
    */
   public static void main(final String[] args) {
-    System.setSecurityManager(new SecurityManager());
     Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionLogger(false));
 
     Environment.logSystemInfo();

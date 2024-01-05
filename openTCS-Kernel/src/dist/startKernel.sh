@@ -26,7 +26,6 @@ ${JAVA} -enableassertions \
     -Dopentcs.home="${OPENTCS_HOME}" \
     -Dopentcs.cfg4j.reload.interval=10000 \
     -Djava.util.logging.config.file=${OPENTCS_CONFIGDIR}/logging.config \
-    -Djava.security.policy=file:${OPENTCS_CONFIGDIR}/java.policy \
     -XX:-OmitStackTraceInFastThrow \
     -classpath "${OPENTCS_CP}" \
     org.opentcs.kernel.RunKernel
