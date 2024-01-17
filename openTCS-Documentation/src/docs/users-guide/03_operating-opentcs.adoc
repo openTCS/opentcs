@@ -298,6 +298,16 @@ How a peripheral job can be withdrawn depends on whether it is related to a tran
 ** For transport orders that are withdrawn regularly, related peripheral jobs are aborted after the vehicle has completed its pending movements.
 ** For transport orders that are withdrawn forcibly, related peripheral jobs are aborted immediately.
 
+===== Consequence of peripheral jobs failing
+
+When a peripheral job fails, the related transport order (if any) is implicitly withdrawn under the following circumstances:
+
+* The peripheral job was created implicitly by a vehicle traversing a path (see <<Implicit creation of peripheral jobs>>).
+* The _completion required_ flag of the peripheral job's peripheral operation is set to `true`.
+
+In such cases, it is not reasonable to continue the transport order, as the _completion required_ flag not only indicates that the vehicle should wait for the peripheral operation to be completed, but also for it to be completed _successfully_.
+Otherwise, the prerequisites for continuing driving / the transport order may not be met.
+
 ==== Removing a vehicle from a running system
 
 There may be situations in which you want to remove a single vehicle from a system, e.g. because the vehicle temporarily cannot be used by openTCS due to a hardware defect that has to be dealt with first.

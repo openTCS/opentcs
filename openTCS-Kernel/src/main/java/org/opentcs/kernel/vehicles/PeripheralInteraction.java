@@ -69,7 +69,7 @@ public class PeripheralInteraction {
    * The jobs that are required to be finished in order for this interaction itself to be marked as
    * finished.
    */
-  private final List<PeripheralJob> requiredJobs = new ArrayList<>();
+  private final List<PeripheralJob> pendingJobsWithCompletionRequired = new ArrayList<>();
   /**
    * The peripheral job service to use for creating jobs.
    */
@@ -135,13 +135,13 @@ public class PeripheralInteraction {
     for (PeripheralOperation operation : operations) {
       PeripheralJob job = createPeripheralJob(operation);
       if (operation.isCompletionRequired()) {
-        requiredJobs.add(job);
+        pendingJobsWithCompletionRequired.add(job);
       }
     }
 
     state = State.STARTED;
 
-    if (requiredJobs.isEmpty()) {
+    if (pendingJobsWithCompletionRequired.isEmpty()) {
       onInteractionFinished();
     }
   }
@@ -154,8 +154,9 @@ public class PeripheralInteraction {
    */
   public void onPeripheralJobFinished(@Nonnull PeripheralJob job) {
     requireNonNull(job, "job");
-    if (requiredJobs.remove(job) && requiredJobs.isEmpty()) {
-      // The last required job has been finished.
+    if (pendingJobsWithCompletionRequired.remove(job)
+        && pendingJobsWithCompletionRequired.isEmpty()) {
+      // The last pending job has been finished.
       onInteractionFinished();
     }
   }
@@ -168,7 +169,13 @@ public class PeripheralInteraction {
    */
   public void onPeripheralJobFailed(@Nonnull PeripheralJob job) {
     requireNonNull(job, "job");
-    if (requiredJobs.contains(job)) {
+    if (pendingJobsWithCompletionRequired.contains(job)) {
+      // As soon as one of the jobs for this interaction fails, the entire interaction itself is
+      // considered failed. At this point, we're no longer interested in any of the pending jobs and
+      // don't expect any other job to be reported as finished or failed. Therefore, simply forget
+      // all pending jobs and mark the interaction as failed. This also ensures that the callback
+      // for the failed interaction is called only once.
+      pendingJobsWithCompletionRequired.clear();
       onInteractionFailed();
     }
   }
@@ -188,7 +195,7 @@ public class PeripheralInteraction {
    * @return Whether the interaction is finished.
    */
   public boolean isFinished() {
-    return hasState(State.FINSHED);
+    return hasState(State.FINISHED);
   }
 
   /**
@@ -229,7 +236,7 @@ public class PeripheralInteraction {
   public List<PeripheralOperation> getPendingRequiredOperations() {
     // If we're already done interacting with the peripheral device, there cannot be any pending
     // operations.
-    if (hasState(State.FINSHED)) {
+    if (hasState(State.FINISHED)) {
       return new ArrayList<>();
     }
 
@@ -237,9 +244,9 @@ public class PeripheralInteraction {
       return new ArrayList<>();
     }
 
-    if (!requiredJobs.isEmpty()) {
+    if (!pendingJobsWithCompletionRequired.isEmpty()) {
       // The interaction is still ongoing. Jobs are not yet finished or have even failed.
-      return requiredJobs.stream()
+      return pendingJobsWithCompletionRequired.stream()
           .map(job -> job.getPeripheralOperation())
           .collect(Collectors.toList());
     }
@@ -254,8 +261,8 @@ public class PeripheralInteraction {
   private void onInteractionFinished() {
     checkState(interactionSucceededCallback != null, "The interaction hasn't been started yet.");
     checkState(!hasState(State.FAILED), "The interaction has already been marked as failed.");
-    checkState(!hasState(State.FINSHED), "The interaction has already been marked as finished.");
-    state = State.FINSHED;
+    checkState(!hasState(State.FINISHED), "The interaction has already been marked as finished.");
+    state = State.FINISHED;
 
     LOG.debug("{}: Peripheral interaction finished for movement to {}",
               vehicleRef.getName(),
@@ -283,7 +290,7 @@ public class PeripheralInteraction {
 
   private void onInteractionFailed() {
     checkState(interactionFailedCallback != null, "The interaction hasn't been started yet.");
-    checkState(!hasState(State.FINSHED), "The interaction has already been marked as finished.");
+    checkState(!hasState(State.FINISHED), "The interaction has already been marked as finished.");
     checkState(!hasState(State.FAILED), "The interaction has already been marked as failed.");
     state = State.FAILED;
 
@@ -304,9 +311,9 @@ public class PeripheralInteraction {
     STARTED,
     /**
      * The interaction was finished.
-     * All of the required operations (if any) have been finished successfully.
+     * All the required operations (if any) have been finished successfully.
      */
-    FINSHED,
+    FINISHED,
     /**
      * The interaction has failed.
      * At least one of the required operations failed.

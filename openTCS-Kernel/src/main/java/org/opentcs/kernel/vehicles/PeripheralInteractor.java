@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
@@ -22,6 +21,7 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
 import org.opentcs.components.kernel.services.PeripheralJobService;
 import org.opentcs.customizations.ApplicationEventBus;
+import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
@@ -64,13 +64,13 @@ public class PeripheralInteractor
    */
   private final EventSource eventSource;
   /**
-   * The peripheral interactions to be performed BEFORE the exexution of a movement command mapped
+   * The peripheral interactions to be performed BEFORE the execution of a movement command mapped
    * to the corresponding movement command.
    */
   private final Map<MovementCommand, PeripheralInteraction> preMovementInteractions
       = new HashMap<>();
   /**
-   * The peripheral interactions to be performed AFTER the exexution of a movement command mapped
+   * The peripheral interactions to be performed AFTER the execution of a movement command mapped
    * to the corresponding movement command.
    */
   private final Map<MovementCommand, PeripheralInteraction> postMovementInteractions
@@ -138,9 +138,18 @@ public class PeripheralInteractor
       return;
     }
 
-    if (objectEvent.getCurrentOrPreviousObjectState() instanceof PeripheralJob) {
-      onPeripheralJobChange(objectEvent);
+    TCSObject<?> currentOrPreviousObjectState = objectEvent.getCurrentOrPreviousObjectState();
+    if (!(currentOrPreviousObjectState instanceof PeripheralJob)) {
+      return;
     }
+
+    // Since a PeripheralInteraction only keeps track of peripheral jobs where the completion
+    // required flag is set, we can ignore all peripheral jobs where this is not the case.
+    if (!hasCompletionRequiredFlagSet((PeripheralJob) currentOrPreviousObjectState)) {
+      return;
+    }
+
+    onPeripheralJobChange(objectEvent);
   }
 
   /**
@@ -227,7 +236,7 @@ public class PeripheralInteractor
       preMovementInteractions.remove(movementCommand);
     }
 
-    // Peripheral jobs have been created. Disptach them.
+    // Peripheral jobs have been created. Dispatch them.
     peripheralDispatcherService.dispatch();
   }
 
@@ -266,7 +275,7 @@ public class PeripheralInteractor
       postMovementInteractions.remove(movementCommand);
     }
 
-    // Peripheral jobs have been created. Disptach them.
+    // Peripheral jobs have been created. Dispatch them.
     peripheralDispatcherService.dispatch();
   }
 
@@ -361,27 +370,21 @@ public class PeripheralInteractor
                   postMovementInteractions.values().stream())
         .forEach(interaction -> interaction.onPeripheralJobFinished(job));
 
-    Set<MovementCommand> preMovementsPrepared = preMovementInteractions.entrySet().stream()
-        .filter(entry -> entry.getValue().isFinished())
-        .map(entry -> entry.getKey())
-        .collect(Collectors.toSet());
-    Set<MovementCommand> postMovementsPrepared = postMovementInteractions.entrySet().stream()
-        .filter(entry -> entry.getValue().isFinished())
-        .map(entry -> entry.getKey())
-        .collect(Collectors.toSet());
-
-    preMovementsPrepared.forEach(
-        movementCommand -> preMovementInteractions.remove(movementCommand)
-    );
-    postMovementsPrepared.forEach(
-        movementCommand -> postMovementInteractions.remove(movementCommand)
-    );
+    // With a peripheral job finished, an associated interaction might now be finished as well. If
+    // that's the case, forget the interaction.
+    preMovementInteractions.entrySet().removeIf(entry -> entry.getValue().isFinished());
+    postMovementInteractions.entrySet().removeIf(entry -> entry.getValue().isFinished());
   }
 
   private void onPeripheralJobFailed(PeripheralJob job) {
     Stream.concat(preMovementInteractions.values().stream(),
                   postMovementInteractions.values().stream())
         .forEach(interaction -> interaction.onPeripheralJobFailed(job));
+
+    // With a peripheral job failed, an associated interaction might now be failed as well. If
+    // that's the case, forget the interaction.
+    preMovementInteractions.entrySet().removeIf(entry -> entry.getValue().isFailed());
+    postMovementInteractions.entrySet().removeIf(entry -> entry.getValue().isFailed());
   }
 
   /**
@@ -403,5 +406,9 @@ public class PeripheralInteractor
     }
 
     return vehicle.getName();
+  }
+
+  private boolean hasCompletionRequiredFlagSet(PeripheralJob job) {
+    return job.getPeripheralOperation().isCompletionRequired();
   }
 }

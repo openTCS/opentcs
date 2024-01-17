@@ -752,7 +752,7 @@ public class DefaultVehicleController
       peripheralInteractor.prepareInteractions(transportOrder.getReference(), command);
       peripheralInteractor.startPreMovementInteractions(command,
                                                         () -> sendCommand(command),
-                                                        this::onMovementInteractionFailed);
+                                                        this::onPreMovementInteractionFailed);
     }
     // Let the scheduler know we've accepted the resources given.
     return true;
@@ -784,8 +784,35 @@ public class DefaultVehicleController
     }
   }
 
-  private void onMovementInteractionFailed() {
-    LOG.warn("{}: Movement interaction failed.", vehicle.getName());
+  private void onPreMovementInteractionFailed() {
+    // Implementation remark: This method is called only for interactions where a peripheral job
+    // with the completion required flag set has failed.
+    LOG.warn("{}: Pre-movement interaction failed.", vehicle.getName());
+
+    // With a failed pre-movement interaction, the movement command for the latest allocated
+    // resources will not be sent to the vehicle. Therefore, free these resources.
+    Set<TCSResource<?>> res = allocatedResources.pollLast();
+    scheduler.free(this, res);
+    vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
+                                                   toListOfResourceSets(allocatedResources));
+
+    // Ensure there is no command with pending interactions that would otherwise prevent the vehicle
+    // state from being set properly in checkForPendingCommands().
+    interactionsPendingCommand = null;
+
+    dispatcherService.withdrawByVehicle(vehicle.getReference(), false);
+  }
+
+  private void onPostMovementInteractionFailed() {
+    // Implementation remark: This method is called only for interactions where a peripheral job
+    // with the completion required flag set has failed.
+    LOG.warn("{}: Post-movement interaction failed.", vehicle.getName());
+
+    // Ensure there is no command with pending interactions that would otherwise prevent the vehicle
+    // state from being set properly in checkForPendingCommands().
+    interactionsPendingCommand = null;
+
+    dispatcherService.withdrawByVehicle(vehicle.getReference(), false);
   }
 
   @SuppressWarnings("unchecked")
@@ -989,7 +1016,7 @@ public class DefaultVehicleController
 
       peripheralInteractor.startPostMovementInteractions(executedCommand,
                                                          this::checkForPendingCommands,
-                                                         this::onMovementInteractionFailed);
+                                                         this::onPostMovementInteractionFailed);
     }
   }
 
