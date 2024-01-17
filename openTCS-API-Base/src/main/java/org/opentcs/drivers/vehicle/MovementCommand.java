@@ -65,8 +65,20 @@ public interface MovementCommand {
    * Checks whether an operation is to be executed in addition to moving or not.
    *
    * @return <code>true</code> if, and only if, no operation is to be executed.
+   * @deprecated Use {@link #hasEmptyOperation()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   boolean isWithoutOperation();
+
+  /**
+   * Indicates whether an operation is to be executed in addition to moving or not.
+   *
+   * @return <code>true</code> if, and only if, no operation is to be executed.
+   */
+  default boolean hasEmptyOperation() {
+    return isWithoutOperation();
+  };
 
   /**
    * Returns the location at which the operation is to be executed. (May be

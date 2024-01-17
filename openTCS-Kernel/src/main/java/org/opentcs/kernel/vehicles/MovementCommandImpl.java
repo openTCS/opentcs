@@ -119,7 +119,13 @@ public class MovementCommandImpl
   }
 
   @Override
+  @Deprecated
   public boolean isWithoutOperation() {
+    return isEmptyOperation(operation);
+  }
+
+  @Override
+  public boolean hasEmptyOperation() {
     return isEmptyOperation(operation);
   }
 

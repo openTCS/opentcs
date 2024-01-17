@@ -201,7 +201,13 @@ public class PeripheralInteractionTest {
     }
 
     @Override
+    @Deprecated
     public boolean isWithoutOperation() {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean hasEmptyOperation() {
       throw new UnsupportedOperationException("Not supported yet.");
     }
 

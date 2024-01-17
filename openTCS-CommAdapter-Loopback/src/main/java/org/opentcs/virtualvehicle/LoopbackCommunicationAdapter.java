@@ -207,7 +207,7 @@ public class LoopbackCommunicationAdapter
     // simulation).
     return !isSimulationRunning && super.canSendNextCommand();
   }
-  
+
   @Override
   public void onVehiclePaused(boolean paused) {
     getProcessModel().setVehiclePaused(paused);
@@ -367,7 +367,7 @@ public class LoopbackCommunicationAdapter
       //and we can move on.
       getProcessModel().setVehiclePosition(prevWayEntry.getDestPointName());
       LOG.debug("Movement simulation finished.");
-      if (!command.isWithoutOperation()) {
+      if (!command.hasEmptyOperation()) {
         LOG.debug("Starting operation simulation...");
         ((ScheduledExecutorService) getExecutor()).schedule(() -> operationSimulation(command),
                                                             SIMULATION_TASKS_DELAY,
