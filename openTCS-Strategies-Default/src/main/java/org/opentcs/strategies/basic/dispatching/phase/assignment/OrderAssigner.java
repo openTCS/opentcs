@@ -20,6 +20,7 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
@@ -253,7 +254,9 @@ public class OrderAssigner {
   }
 
   private boolean orderAssignableToVehicle(TransportOrder order, Vehicle vehicle) {
-    return order.getIntendedVehicle() == null
-        || Objects.equals(order.getIntendedVehicle(), vehicle.getReference());
+    return (order.getIntendedVehicle() == null
+            || Objects.equals(order.getIntendedVehicle(), vehicle.getReference()))
+        && (vehicle.getAllowedOrderTypes().contains(order.getType())
+            || vehicle.getAllowedOrderTypes().contains(OrderConstants.TYPE_ANY));
   }
 }

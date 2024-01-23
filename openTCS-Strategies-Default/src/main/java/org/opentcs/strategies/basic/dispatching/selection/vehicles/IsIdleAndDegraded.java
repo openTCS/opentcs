@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.OrderConstants;
 import org.opentcs.strategies.basic.dispatching.selection.RechargeVehicleSelectionFilter;
 
 /**
@@ -36,6 +37,12 @@ public class IsIdleAndDegraded
         && vehicle.hasState(Vehicle.State.IDLE)
         && vehicle.getCurrentPosition() != null
         && vehicle.getOrderSequence() == null
-        && vehicle.isEnergyLevelDegraded();
+        && vehicle.isEnergyLevelDegraded()
+        && hasAllowedOrderTypesForCharging(vehicle);
+  }
+  
+  private boolean hasAllowedOrderTypesForCharging(Vehicle vehicle) {
+    return vehicle.getAllowedOrderTypes().contains(OrderConstants.TYPE_CHARGE)
+        || vehicle.getAllowedOrderTypes().contains(OrderConstants.TYPE_ANY);
   }
 }

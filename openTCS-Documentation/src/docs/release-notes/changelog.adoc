@@ -24,6 +24,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Other changes:
 ** Eliminate use of Java's `SecurityManager` from the code.
    It hasn't been necessary for quite a while, and does not exist any more with Java 21.
+** The default strategies for parking and (re)charging vehicles now create transport orders only for vehicles that are actually allowed to process them (according to the respective vehicle's allowed order types).
 
 == Version 5.12 (2023-12-15)
 
