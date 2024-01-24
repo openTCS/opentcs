@@ -41,8 +41,8 @@ public class AssignmentCandidate {
    *
    * @param vehicle The vehicle that would be assigned to the transport order.
    * @param transportOrder The transport order that would be assigned to the vehicle.
-   * @param driveOrders The drive orders containing the computed route the vehicle would take. May
-   * not be empty.
+   * @param driveOrders The drive orders containing the computed route the vehicle would take.
+   * May not be empty and the route of each drive order may not be null.
    */
   public AssignmentCandidate(Vehicle vehicle,
                              TransportOrder transportOrder,
@@ -51,6 +51,8 @@ public class AssignmentCandidate {
     this.transportOrder = requireNonNull(transportOrder, "transportOrder");
     this.driveOrders = requireNonNull(driveOrders, "driveOrders");
     checkArgument(!driveOrders.isEmpty(), "driveOrders is empty");
+    driveOrders.forEach(driveOrder -> checkArgument(driveOrder.getRoute() != null,
+                                                    "a drive order's route is null"));
     this.completeRoutingCosts = cumulatedCosts(driveOrders);
   }
 
