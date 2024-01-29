@@ -21,6 +21,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update JUnit to 5.10.1.
 ** Update ApprovalTests to 22.3.3.
 ** Update Mockito to 5.8.0.
+** Update Jackson to 2.16.1.
 * Other changes:
 ** Eliminate use of Java's `SecurityManager` from the code.
    It hasn't been necessary for quite a while, and does not exist any more with Java 21.
