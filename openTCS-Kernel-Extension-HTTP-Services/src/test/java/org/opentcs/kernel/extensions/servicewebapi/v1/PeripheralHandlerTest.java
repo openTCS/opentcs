@@ -30,7 +30,7 @@ import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 /**
  * Unit tests for {@link PeripheralJobHandler}.
  */
-public class PeripheralHandlerTest {
+class PeripheralHandlerTest {
 
   private PeripheralService peripheralService;
   private KernelExecutorWrapper executorWrapper;
@@ -43,7 +43,7 @@ public class PeripheralHandlerTest {
   private PeripheralAttachmentInformation attachmentInfo;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     peripheralService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
 
@@ -68,7 +68,7 @@ public class PeripheralHandlerTest {
   }
 
   @Test
-  public void attachNullPeripheralAdapter() {
+  void attachNullPeripheralAdapter() {
     handler.putPeripheralCommAdapter(
         "some-location",
         NullPeripheralCommAdapterDescription.class.getName()
@@ -80,7 +80,7 @@ public class PeripheralHandlerTest {
   }
 
   @Test
-  public void attachMockPeripheralAdapter() {
+  void attachMockPeripheralAdapter() {
     handler.putPeripheralCommAdapter(
         "some-location",
         MockPeripheralCommAdapterDescription.class.getName()
@@ -92,7 +92,7 @@ public class PeripheralHandlerTest {
   }
 
   @Test
-  public void throwOnAttachAdapterForUnknownLocation() {
+  void throwOnAttachAdapterForUnknownLocation() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(
             () -> handler.putPeripheralCommAdapter(
@@ -103,7 +103,7 @@ public class PeripheralHandlerTest {
   }
 
   @Test
-  public void throwOnAttachUnknownAdapter() {
+  void throwOnAttachUnknownAdapter() {
     assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(
             () -> handler.putPeripheralCommAdapter(
@@ -114,7 +114,7 @@ public class PeripheralHandlerTest {
   }
 
   @Test
-  public void enableCommAdapter() {
+  void enableCommAdapter() {
     handler.putPeripheralCommAdapterEnabled("some-location", "true");
 
     then(peripheralService).should().enableCommAdapter(location.getReference());
@@ -122,7 +122,7 @@ public class PeripheralHandlerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"false", "flase", "some-value-that-is-not-true"})
-  public void disableCommAdapterOnAnyNontrueValue(String value) {
+  void disableCommAdapterOnAnyNontrueValue(String value) {
     handler.putPeripheralCommAdapterEnabled("some-location", value);
 
     then(peripheralService).should().disableCommAdapter(location.getReference());
@@ -130,26 +130,26 @@ public class PeripheralHandlerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"true ", "false"})
-  public void throwOnEnableUnknownLocation(String value) {
+  void throwOnEnableUnknownLocation(String value) {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.putPeripheralCommAdapterEnabled("some-unknown-location", value));
   }
 
   @Test
-  public void fetchAttachmentInformation() {
+  void fetchAttachmentInformation() {
     assertThat(handler.getPeripheralCommAdapterAttachmentInformation("some-location"))
         .isSameAs(attachmentInfo);
   }
 
   @Test
-  public void throwOnFetchInfoForUnknownLocation() {
+  void throwOnFetchInfoForUnknownLocation() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(
             () -> handler.getPeripheralCommAdapterAttachmentInformation("some-unknown-location")
         );
   }
 
-  public static class MockPeripheralCommAdapterDescription
+  static class MockPeripheralCommAdapterDescription
       extends PeripheralCommAdapterDescription {
 
     @Override

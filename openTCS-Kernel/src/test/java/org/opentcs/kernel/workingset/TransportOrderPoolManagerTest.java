@@ -38,7 +38,7 @@ import org.opentcs.util.event.SimpleEventBus;
 /**
  * Unit tests for {@link TransportOrderPoolManager}.
  */
-public class TransportOrderPoolManagerTest {
+class TransportOrderPoolManagerTest {
 
   /**
    * The object repository.
@@ -54,7 +54,7 @@ public class TransportOrderPoolManagerTest {
   private TransportOrderPoolManager orderPoolManager;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     objectRepo = new TCSObjectRepository();
     plantModelManager = new PlantModelManager(objectRepo, new SimpleEventBus());
     orderPoolManager = new TransportOrderPoolManager(objectRepo,
@@ -75,7 +75,7 @@ public class TransportOrderPoolManagerTest {
   }
 
   @Test
-  public void storeCreatedObjectsInRepo() {
+  void storeCreatedObjectsInRepo() {
     orderPoolManager.createTransportOrder(
         new TransportOrderCreationTO("some-order",
                                      List.of(new DestinationCreationTO("some-location", "NOP")))
@@ -90,7 +90,7 @@ public class TransportOrderPoolManagerTest {
   }
 
   @Test
-  public void removeAllCreatedObjectsOnClear() {
+  void removeAllCreatedObjectsOnClear() {
     orderPoolManager.createTransportOrder(
         new TransportOrderCreationTO("some-order",
                                      List.of(new DestinationCreationTO("some-location", "NOP")))
@@ -106,7 +106,7 @@ public class TransportOrderPoolManagerTest {
   @ParameterizedTest
   @EnumSource(value = TransportOrder.State.class,
               names = {"RAW", "ACTIVE", "DISPATCHABLE"})
-  public void allowSettingIntendedVehicleOnUnassignedTransportOrder(TransportOrder.State state) {
+  void allowSettingIntendedVehicleOnUnassignedTransportOrder(TransportOrder.State state) {
     plantModelManager.createPlantModelObjects(
         new PlantModelCreationTO("some-model")
             .withPoint(new PointCreationTO("some-point"))
@@ -138,7 +138,7 @@ public class TransportOrderPoolManagerTest {
   @ParameterizedTest
   @EnumSource(value = TransportOrder.State.class,
               names = {"BEING_PROCESSED", "WITHDRAWN", "FINISHED", "FAILED", "UNROUTABLE"})
-  public void disallowSettingIntendedVehicleOnAssignedTransportOrder(TransportOrder.State state) {
+  void disallowSettingIntendedVehicleOnAssignedTransportOrder(TransportOrder.State state) {
     plantModelManager.createPlantModelObjects(
         new PlantModelCreationTO("some-model")
             .withPoint(new PointCreationTO("some-point"))
@@ -171,7 +171,7 @@ public class TransportOrderPoolManagerTest {
   @ParameterizedTest
   @EnumSource(value = TransportOrder.State.class,
               names = {"FINISHED", "FAILED", "UNROUTABLE"})
-  public void removeSingleTransportOrderIfFinished(TransportOrder.State state) {
+  void removeSingleTransportOrderIfFinished(TransportOrder.State state) {
     TransportOrder order = orderPoolManager.createTransportOrder(
         new TransportOrderCreationTO("some-order",
                                      List.of(new DestinationCreationTO("some-location", "NOP")))
@@ -183,7 +183,7 @@ public class TransportOrderPoolManagerTest {
   }
 
   @Test
-  public void removeSingleOrderSequence() {
+  void removeSingleOrderSequence() {
     OrderSequence sequence = orderPoolManager.createOrderSequence(
         new OrderSequenceCreationTO("some-sequence")
     );

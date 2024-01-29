@@ -21,7 +21,7 @@ import org.opentcs.data.model.Vehicle;
 /**
  * Unit tests for {@link VelocityController}.
  */
-public class VelocityControllerTest {
+class VelocityControllerTest {
 
   private static final int MAX_DECEL = -1000;
   private static final int MAX_ACCEL = 1000;
@@ -35,28 +35,28 @@ public class VelocityControllerTest {
   private VelocityController controller;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     controller = new VelocityController(MAX_DECEL, MAX_ACCEL, MAX_REV_VELO, MAX_FWD_VELO);
   }
 
   @Test
-  public void initialControllerHasNoWayEntries() {
+  void initialControllerHasNoWayEntries() {
     assertFalse(controller.hasWayEntries());
     assertNull(controller.getCurrentWayEntry());
   }
 
   @Test
-  public void throwOnAddingNullWayEntry() {
+  void throwOnAddingNullWayEntry() {
     assertThrows(NullPointerException.class, () -> controller.addWayEntry(null));
   }
 
   @Test
-  public void throwOnAdvancingWithNegativeTime() {
+  void throwOnAdvancingWithNegativeTime() {
     assertThrows(IllegalArgumentException.class, () -> controller.advanceTime(-1));
   }
 
   @Test
-  public void advanceTimeAdvancesTime() {
+  void advanceTimeAdvancesTime() {
     long timeBefore = controller.getCurrentTime();
 
     controller.advanceTime(5);
@@ -65,7 +65,7 @@ public class VelocityControllerTest {
   }
 
   @Test
-  public void vehicleDoesNotChangePositionWhilePaused() {
+  void vehicleDoesNotChangePositionWhilePaused() {
     VelocityController.WayEntry wayEntry
         = new VelocityController.WayEntry(WAY_LENGTH,
                                           MAX_VELO,
@@ -82,7 +82,7 @@ public class VelocityControllerTest {
   }
 
   @Test
-  public void processWayEntriesInGivenOrder() {
+  void processWayEntriesInGivenOrder() {
     controller = new VelocityController(MAX_DECEL, 1000, MAX_REV_VELO, 500);
 
     VelocityController.WayEntry firstEntry
@@ -102,7 +102,7 @@ public class VelocityControllerTest {
   }
 
   @Test
-  public void accelerateToMaxVelocityLimitedByController() {
+  void accelerateToMaxVelocityLimitedByController() {
     final int maxFwdVelocity = 500; // mm/s
     final int maxAcceleration = 250; // mm/s^2
     controller = new VelocityController(MAX_DECEL, maxAcceleration, MAX_REV_VELO, maxFwdVelocity);
@@ -133,7 +133,7 @@ public class VelocityControllerTest {
   }
 
   @Test
-  public void accelerateToMaxVelocityLimitedByWayEntry() {
+  void accelerateToMaxVelocityLimitedByWayEntry() {
     final int maxFwdVelocity = 500; // mm/s
     final int maxAcceleration = 500; // mm/s^2
     controller = new VelocityController(MAX_DECEL, maxAcceleration, MAX_REV_VELO, maxFwdVelocity);

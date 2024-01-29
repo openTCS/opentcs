@@ -32,7 +32,7 @@ import org.opentcs.data.order.TransportOrder;
 /**
  * Defines test cases for {@link ContainsLockedTargetLocations}.
  */
-public class ContainsLockedTargetLocationsTest {
+class ContainsLockedTargetLocationsTest {
 
   /**
    * The class to test.
@@ -48,7 +48,7 @@ public class ContainsLockedTargetLocationsTest {
   private Map<TCSObjectReference<?>, TCSObject<?>> localObjectPool;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     localObjectPool = new HashMap<>();
     objectService = mock(TCSObjectService.class);
     when(objectService.fetchObject(any(), ArgumentMatchers.<TCSObjectReference<?>>any()))
@@ -59,19 +59,19 @@ public class ContainsLockedTargetLocationsTest {
   }
 
   @Test
-  public void shouldFilterTransportOrderWithLockedLocation() {
+  void shouldFilterTransportOrderWithLockedLocation() {
     Collection<String> result = filter.apply(transportOrderWithLockedLocation());
     assertFalse(result.isEmpty());
   }
 
   @Test
-  public void shouldIgnoreTransportOrderWithUnlockedLocation() {
+  void shouldIgnoreTransportOrderWithUnlockedLocation() {
     Collection<String> result = filter.apply(transportOrderWithoutLockedLocation());
     assertTrue(result.isEmpty());
   }
 
   @Test
-  public void shouldIgnoreTransportOrderWithPointDestination() {
+  void shouldIgnoreTransportOrderWithPointDestination() {
     Collection<String> result = filter.apply(transportOrderWithPointDestination());
     assertTrue(result.isEmpty());
   }

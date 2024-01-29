@@ -25,13 +25,13 @@ import org.opentcs.data.model.Location;
 /**
  * Tests for proper serialization and deserialization for TransportOrder and OrderSequence.
  */
-public class OrderSerializationTest {
+class OrderSerializationTest {
 
-  public OrderSerializationTest() {
+  OrderSerializationTest() {
   }
 
   @Test
-  public void shouldSerializeAndDeserializeTransportOrder()
+  void shouldSerializeAndDeserializeTransportOrder()
       throws Exception {
     TransportOrder originalObject = createTransportOrder();
     TransportOrder deserializedObject
@@ -44,7 +44,7 @@ public class OrderSerializationTest {
   }
 
   @Test
-  public void shouldSerializeAndDeserializeOrderSequence()
+  void shouldSerializeAndDeserializeOrderSequence()
       throws Exception {
     OrderSequence originalObject = createOrderSequence();
     OrderSequence deserializedObject

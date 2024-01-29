@@ -35,17 +35,17 @@ import org.opentcs.util.persistence.v004.VisualLayoutTO;
 
 /**
  */
-public class V004DrivingCoursePersistenceTest {
+class V004DrivingCoursePersistenceTest {
 
   private V004PlantModelTO plantModel;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     plantModel = createPlantModel();
   }
 
   @Test
-  public void persistAndMaterializeModelAttributes()
+  void persistAndMaterializeModelAttributes()
       throws IOException {
     plantModel.setVersion("0.0.4");
     plantModel.getProperties().add(new PropertyTO().setName("some-prop").setValue("some-prop-val"));
@@ -62,7 +62,7 @@ public class V004DrivingCoursePersistenceTest {
   }
 
   @Test
-  public void persistAndMaterializePoints()
+  void persistAndMaterializePoints()
       throws IOException {
     plantModel.getPoints().get(0).setName("my-point");
     plantModel.getPoints().get(0).setxPosition(1L);
@@ -91,7 +91,7 @@ public class V004DrivingCoursePersistenceTest {
   }
 
   @Test
-  public void persistAndMaterializePaths()
+  void persistAndMaterializePaths()
       throws IOException {
     plantModel.getPaths().get(0).setName("my-path");
     plantModel.getPaths().get(0).setSourcePoint("some-source-point");
@@ -132,7 +132,7 @@ public class V004DrivingCoursePersistenceTest {
   }
 
   @Test
-  public void persistAndMaterializeLocationTypes()
+  void persistAndMaterializeLocationTypes()
       throws IOException {
     plantModel.getLocationTypes().get(0).setName("my-location-type");
     plantModel.getLocationTypes().get(0).getAllowedPeripheralOperations().add(
@@ -154,7 +154,7 @@ public class V004DrivingCoursePersistenceTest {
   }
 
   @Test
-  public void persistAndMaterializeLocations()
+  void persistAndMaterializeLocations()
       throws IOException {
     plantModel.getLocations().get(0).setName("my-location");
     plantModel.getLocations().get(0).setType("some-loc-type");
@@ -194,7 +194,7 @@ public class V004DrivingCoursePersistenceTest {
   }
 
   @Test
-  public void persistAndMaterializeBlocks()
+  void persistAndMaterializeBlocks()
       throws IOException {
     plantModel.getBlocks().get(0).setName("my-block");
     plantModel.getBlocks().get(0).setType("SAME_DIRECTION_ONLY");
@@ -216,7 +216,7 @@ public class V004DrivingCoursePersistenceTest {
   }
 
   @Test
-  public void persistAndMaterializeVehicles()
+  void persistAndMaterializeVehicles()
       throws IOException {
     plantModel.getVehicles().get(0).setName("my-vehicle");
     plantModel.getVehicles().get(0).setLength(1234L);

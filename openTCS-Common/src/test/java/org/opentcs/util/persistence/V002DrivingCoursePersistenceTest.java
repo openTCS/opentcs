@@ -49,12 +49,12 @@ import org.xml.sax.SAXException;
 
 /**
  */
-public class V002DrivingCoursePersistenceTest {
+class V002DrivingCoursePersistenceTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(V002DrivingCoursePersistenceTest.class);
 
   @Test
-  public void testToXml()
+  void testToXml()
       throws IOException {
     V002PlantModelTO model = new V002PlantModelTO();
     model.setVersion("0.0.2");

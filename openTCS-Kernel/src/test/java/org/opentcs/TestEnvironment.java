@@ -5,11 +5,6 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-/*
- *
- * Created on July 25, 2006, 10:30 AM
- */
-
 package org.opentcs;
 
 import java.io.File;
@@ -19,6 +14,7 @@ import org.opentcs.util.FileSystems;
  * A class that keeps/provides commonly used data about the test environment.
  */
 public final class TestEnvironment {
+
   /**
    * The home directory for the openTCS system during tests.
    */
@@ -33,8 +29,8 @@ public final class TestEnvironment {
   private static final File LOG_FILE_DIRECTORY;
 
   static {
-    KERNEL_HOME_DIRECTORY =
-          new File(System.getProperty("java.io.tmpdir"), "openTCS-Tests");
+    KERNEL_HOME_DIRECTORY
+        = new File(System.getProperty("java.io.tmpdir"), "openTCS-Tests");
     KERNEL_DATA_DIRECTORY = new File(KERNEL_HOME_DIRECTORY, "data");
     LOG_FILE_DIRECTORY = new File(System.getProperty("java.io.tmpdir"), "log");
   }
@@ -67,6 +63,8 @@ public final class TestEnvironment {
 
   /**
    * Initializes the test environment.
+   *
+   * @param args The command line arguments.
    */
   public static void main(String[] args) {
     System.out.println("Initializing the test environment...");

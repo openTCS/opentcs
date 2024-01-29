@@ -13,16 +13,16 @@ import org.junit.jupiter.api.Test;
 
 /**
  */
-public class CompatibilityCheckerTest {
+class CompatibilityCheckerTest {
 
   @Test
-  public void acceptCompatibleVersion() {
+  void acceptCompatibleVersion() {
     // "13.0.2" is a string that is returned by AdoptOpenJDK 13
     assertThat(CompatibilityChecker.versionCompatibleWithDockingFrames("13.0.2"), is(true));
   }
 
   @Test
-  public void refuseIncompatibleVersion() {
+  void refuseIncompatibleVersion() {
     // "13" is a string that is returned by Oracle JDK 13
     assertThat(CompatibilityChecker.versionCompatibleWithDockingFrames("13"), is(false));
   }

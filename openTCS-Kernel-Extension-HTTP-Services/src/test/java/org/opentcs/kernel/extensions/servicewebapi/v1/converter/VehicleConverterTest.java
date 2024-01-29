@@ -28,7 +28,7 @@ import org.opentcs.util.Colors;
 /**
  * Tests for {@link VehicleConverter}.
  */
-public class VehicleConverterTest {
+class VehicleConverterTest {
 
   private VehicleConverter vehicleConverter;
   private PropertyConverter propertyConverter;
@@ -37,7 +37,7 @@ public class VehicleConverterTest {
   private List<PropertyTO> propertyList;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     propertyConverter = mock();
     vehicleConverter = new VehicleConverter(propertyConverter);
 
@@ -48,7 +48,7 @@ public class VehicleConverterTest {
   }
 
   @Test
-  public void checkToVehicleCreationTOs() {
+  void checkToVehicleCreationTOs() {
     VehicleTO vehicleTo = new VehicleTO("V1")
         .setLength(1000)
         .setEnergyLevelGood(90)
@@ -77,7 +77,7 @@ public class VehicleConverterTest {
   }
 
   @Test
-  public void checkToVehicleTOs() {
+  void checkToVehicleTOs() {
     Vehicle vehicle = new Vehicle("V1")
         .withLength(1000)
         .withEnergyLevelGood(90)

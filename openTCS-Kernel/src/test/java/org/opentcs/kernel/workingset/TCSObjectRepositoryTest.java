@@ -26,17 +26,17 @@ import org.opentcs.data.model.Point;
 /**
  * Unit tests for {@link TCSObjectRepository}.
  */
-public class TCSObjectRepositoryTest {
+class TCSObjectRepositoryTest {
 
   private TCSObjectRepository pool;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     pool = new TCSObjectRepository();
   }
 
   @Test
-  public void returnObjectByClassAndName() {
+  void returnObjectByClassAndName() {
     Point point1 = new Point("Point-00001");
     Point point2 = new Point("Point-00002");
 
@@ -50,17 +50,17 @@ public class TCSObjectRepositoryTest {
   }
 
   @Test
-  public void returnNullForNonexistentObjectByClassAndName() {
+  void returnNullForNonexistentObjectByClassAndName() {
     assertThat(pool.getObjectOrNull(Point.class, "some-name"), is(nullValue()));
   }
 
   @Test
-  public void throwOnGetNonexistentObjectByClassAndName() {
+  void throwOnGetNonexistentObjectByClassAndName() {
     assertThrows(ObjectUnknownException.class, () -> pool.getObject(Point.class, "some-name"));
   }
 
   @Test
-  public void returnObjectByName() {
+  void returnObjectByName() {
     Point point1 = new Point("Point-00001");
     Point point2 = new Point("Point-00002");
 
@@ -74,17 +74,17 @@ public class TCSObjectRepositoryTest {
   }
 
   @Test
-  public void returnNullForNonexistentObjectByName() {
+  void returnNullForNonexistentObjectByName() {
     assertThat(pool.getObjectOrNull("some-name"), is(nullValue()));
   }
 
   @Test
-  public void throwOnGetNonexistentObjectByName() {
+  void throwOnGetNonexistentObjectByName() {
     assertThrows(ObjectUnknownException.class, () -> pool.getObject("some-name"));
   }
 
   @Test
-  public void returnObjectByClassAndRef() {
+  void returnObjectByClassAndRef() {
     Point point1 = new Point("Point-00001");
     Point point2 = new Point("Point-00002");
 
@@ -98,19 +98,19 @@ public class TCSObjectRepositoryTest {
   }
 
   @Test
-  public void returnNullForNonexistentObjectByClassAndRef() {
+  void returnNullForNonexistentObjectByClassAndRef() {
     assertThat(pool.getObjectOrNull(Point.class, new Point("some-point").getReference()),
                is(nullValue()));
   }
 
   @Test
-  public void throwOnGetNonexistentObjectByClassAndRef() {
+  void throwOnGetNonexistentObjectByClassAndRef() {
     assertThrows(ObjectUnknownException.class,
                  () -> pool.getObject(Point.class, new Point("some-point").getReference()));
   }
 
   @Test
-  public void returnObjectByRef() {
+  void returnObjectByRef() {
     Point point1 = new Point("Point-00001");
     Point point2 = new Point("Point-00002");
 
@@ -124,19 +124,19 @@ public class TCSObjectRepositoryTest {
   }
 
   @Test
-  public void returnNullForNonexistentObjectByRef() {
+  void returnNullForNonexistentObjectByRef() {
     assertThat(pool.getObjectOrNull(new Point("some-point").getReference()), is(nullValue()));
   }
 
   @Test
-  public void throwOnGetNonexistentObjectByRef() {
+  void throwOnGetNonexistentObjectByRef() {
     Point point = new Point("some-point");
 
     assertThrows(ObjectUnknownException.class, () -> pool.getObject(point.getReference()));
   }
 
   @Test
-  public void returnObjectsByClass() {
+  void returnObjectsByClass() {
     Point point1 = new Point("Point-00001");
     Point point2 = new Point("Point-00002");
     Path path1 = new Path("Path-00001", point1.getReference(), point2.getReference());
@@ -156,7 +156,7 @@ public class TCSObjectRepositoryTest {
   }
 
   @Test
-  public void returnObjectsByClassAndPredicate() {
+  void returnObjectsByClassAndPredicate() {
     Point point1 = new Point("Point-00001");
     Point point2 = new Point("Point-00002");
     Path path1 = new Path("Path-00001", point1.getReference(), point2.getReference());
@@ -175,7 +175,7 @@ public class TCSObjectRepositoryTest {
   }
 
   @Test
-  public void replaceObjectWithSameName() {
+  void replaceObjectWithSameName() {
     Point pointV1 = new Point("some-point").withType(Point.Type.HALT_POSITION);
     Point pointV2 = pointV1.withType(Point.Type.PARK_POSITION);
 
@@ -187,7 +187,7 @@ public class TCSObjectRepositoryTest {
   }
 
   @Test
-  public void throwOnReplaceObjectWithNonexistentName() {
+  void throwOnReplaceObjectWithNonexistentName() {
     Point point1 = new Point("some-point").withType(Point.Type.HALT_POSITION);
     Point point2 = new Point("some-other-point").withType(Point.Type.PARK_POSITION);
 
@@ -196,7 +196,7 @@ public class TCSObjectRepositoryTest {
   }
 
   @Test
-  public void throwOnReplaceObjectWithDifferentType() {
+  void throwOnReplaceObjectWithDifferentType() {
     Point point = new Point("my-object");
     LocationType locationType = new LocationType("my-object");
 
@@ -205,7 +205,7 @@ public class TCSObjectRepositoryTest {
   }
 
   @Test
-  public void removeObjectByRef() {
+  void removeObjectByRef() {
     Point point1 = new Point("Point-00001");
 
     pool.addObject(point1);
@@ -215,13 +215,13 @@ public class TCSObjectRepositoryTest {
   }
 
   @Test
-  public void throwOnRemoveNonexistentObjectByRef() {
+  void throwOnRemoveNonexistentObjectByRef() {
     assertThrows(ObjectUnknownException.class,
                  () -> pool.removeObject(new Point("some-point").getReference()));
   }
 
   @Test
-  public void throwOnAddObjectWithExistingName() {
+  void throwOnAddObjectWithExistingName() {
     pool.addObject(new Point("some-point"));
     // Another object with the same name.
     assertThrows(ObjectExistsException.class, () -> pool.addObject(new Point("some-point")));

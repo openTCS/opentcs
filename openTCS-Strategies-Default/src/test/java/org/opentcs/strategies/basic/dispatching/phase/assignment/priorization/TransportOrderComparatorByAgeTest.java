@@ -22,17 +22,17 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
 
 /**
  */
-public class TransportOrderComparatorByAgeTest {
+class TransportOrderComparatorByAgeTest {
 
   private TransportOrderComparatorByAge comparator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     comparator = new TransportOrderComparatorByAge();
   }
 
   @Test
-  public void sortOlderOrdersUp() {
+  void sortOlderOrdersUp() {
     Instant creationTime = Instant.now();
     TransportOrder plainOrder = new TransportOrder("Some order", new ArrayList<>());
     TransportOrder order1 = plainOrder.withCreationTime(creationTime);

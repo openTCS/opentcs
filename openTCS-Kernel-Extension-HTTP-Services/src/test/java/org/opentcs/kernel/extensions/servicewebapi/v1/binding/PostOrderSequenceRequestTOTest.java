@@ -16,17 +16,17 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  */
-public class PostOrderSequenceRequestTOTest {
+class PostOrderSequenceRequestTOTest {
 
   private JsonBinder jsonBinder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jsonBinder = new JsonBinder();
   }
 
   @Test
-  public void jsonSample() {
+  void jsonSample() {
     PostOrderSequenceRequestTO to = new PostOrderSequenceRequestTO()
         .setIncompleteName(true)
         .setType("Transport")

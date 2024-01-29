@@ -25,17 +25,17 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.EnvelopeTO;
 /**
  * Tests for {@link EnvelopeConverter}.
  */
-public class EnvelopeConverterTest {
+class EnvelopeConverterTest {
 
   private EnvelopeConverter envelopeConverter;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     envelopeConverter = new EnvelopeConverter();
   }
 
   @Test
-  public void checkVehicleEnvelopeMap() {
+  void checkVehicleEnvelopeMap() {
     EnvelopeTO envelopeTo = new EnvelopeTO("E1", List.of(new CoupleTO(1, 1)));
 
     Map<String, Envelope> result = envelopeConverter.toVehicleEnvelopeMap(List.of(envelopeTo));
@@ -47,7 +47,7 @@ public class EnvelopeConverterTest {
   }
 
   @Test
-  public void checkEnvelopeTOs() {
+  void checkEnvelopeTOs() {
     Map<String, Envelope> envelopeMap = Map.of("E1", new Envelope(List.of(new Couple(1, 1))));
 
     List<EnvelopeTO> result = envelopeConverter.toEnvelopeTOs(envelopeMap);

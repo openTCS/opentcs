@@ -20,19 +20,19 @@ import org.opentcs.data.model.Vehicle;
 /**
  * Tests for {@link AreaAllocations}.
  */
-public class AreaAllocationsTest {
+class AreaAllocationsTest {
 
   private AreaAllocations areaAllocations;
   private Vehicle vehicle = new Vehicle("some-vehicle");
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     areaAllocations = new AreaAllocations();
     areaAllocations.clearAreaAllocations();
   }
 
   @Test
-  public void allowAreaAllocationWhenNoOtherAllocationsPresent() {
+  void allowAreaAllocationWhenNoOtherAllocationsPresent() {
     GeometryCollection requestedArea = createCollectionWithOneGeometry(new Coordinate(0, 0),
                                                                        new Coordinate(0, 10),
                                                                        new Coordinate(10, 10),
@@ -43,7 +43,7 @@ public class AreaAllocationsTest {
   }
 
   @Test
-  public void prohibitAreaAllocationWhenAreaIsAllocatedByAnotherVehicle() {
+  void prohibitAreaAllocationWhenAreaIsAllocatedByAnotherVehicle() {
     // Arrange
     GeometryCollection requestedArea = createCollectionWithOneGeometry(new Coordinate(0, 0),
                                                                        new Coordinate(0, 10),
@@ -60,7 +60,7 @@ public class AreaAllocationsTest {
   }
 
   @Test
-  public void prohibitAreaAllocationWhenAreaIsIntersectingAreaAllocatedByAnotherVehicle() {
+  void prohibitAreaAllocationWhenAreaIsIntersectingAreaAllocatedByAnotherVehicle() {
     // Arrange
     GeometryCollection allocatedArea = createCollectionWithOneGeometry(new Coordinate(0, 0),
                                                                        new Coordinate(0, 10),
@@ -80,7 +80,7 @@ public class AreaAllocationsTest {
   }
 
   @Test
-  public void allowAreaAllocationWhenAreaIsIntersectingAreaAllocatedBySameVehicle() {
+  void allowAreaAllocationWhenAreaIsIntersectingAreaAllocatedBySameVehicle() {
     // Arrange
     GeometryCollection allocatedArea = createCollectionWithOneGeometry(new Coordinate(0, 0),
                                                                        new Coordinate(0, 10),

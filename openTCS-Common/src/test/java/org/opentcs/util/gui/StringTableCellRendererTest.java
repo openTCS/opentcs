@@ -20,17 +20,17 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  */
-public class StringTableCellRendererTest {
+class StringTableCellRendererTest {
 
   private StringTableCellRenderer<TCSObjectReference<?>> renderer;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     renderer = new StringTableCellRenderer<>(x -> x == null ? "" : x.getName());
   }
 
   @Test
-  public void returnsNullForNullValue() {
+  void returnsNullForNullValue() {
     Component result = renderer.getTableCellRendererComponent(null, null, false, false, 0, 0);
     assertThat(result, is(instanceOf(JLabel.class)));
     JLabel labelResult = (JLabel) result;
@@ -38,7 +38,7 @@ public class StringTableCellRendererTest {
   }
 
   @Test
-  public void returnsLabelWithNameAsText() {
+  void returnsLabelWithNameAsText() {
     Vehicle vehicle = new Vehicle("VehicleName");
     TCSObjectReference<Vehicle> vehicleReference = vehicle.getReference();
     Component result

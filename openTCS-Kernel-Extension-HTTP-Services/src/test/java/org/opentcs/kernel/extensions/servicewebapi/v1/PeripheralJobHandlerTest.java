@@ -42,7 +42,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 /**
  * Unit tests for {@link PeripheralJobHandler}.
  */
-public class PeripheralJobHandlerTest {
+class PeripheralJobHandlerTest {
 
   private PeripheralJobService jobService;
   private PeripheralDispatcherService jobDispatcherService;
@@ -51,7 +51,7 @@ public class PeripheralJobHandlerTest {
   private PeripheralJobHandler handler;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jobService = mock();
     jobDispatcherService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
@@ -62,7 +62,7 @@ public class PeripheralJobHandlerTest {
   }
 
   @Test
-  public void createPeripheralJob() {
+  void createPeripheralJob() {
     // Arrange
     Location location
         = new Location("some-location", new LocationType("some-location-type").getReference());
@@ -113,7 +113,7 @@ public class PeripheralJobHandlerTest {
   }
 
   @Test
-  public void retrievePeripheralJobsUnfiltered() {
+  void retrievePeripheralJobsUnfiltered() {
     // Arrange
     Location location
         = new Location("some-location", new LocationType("some-location-type").getReference());
@@ -151,7 +151,7 @@ public class PeripheralJobHandlerTest {
   }
 
   @Test
-  public void retrievePeripheralJobsFilteredByRelatedVehicle() {
+  void retrievePeripheralJobsFilteredByRelatedVehicle() {
     // Arrange
     Location location
         = new Location("some-location", new LocationType("some-location-type").getReference());
@@ -195,7 +195,7 @@ public class PeripheralJobHandlerTest {
   }
 
   @Test
-  public void retrievePeripheralJobsFilteredByRelatedTransportOrder() {
+  void retrievePeripheralJobsFilteredByRelatedTransportOrder() {
     // Arrange
     Location location
         = new Location("some-location", new LocationType("some-location-type").getReference());
@@ -239,7 +239,7 @@ public class PeripheralJobHandlerTest {
   }
 
   @Test
-  public void retrievPeripheralJobByName() {
+  void retrievPeripheralJobByName() {
     // Arrange
     Location location
         = new Location("some-location", new LocationType("some-location-type").getReference());

@@ -15,17 +15,17 @@ import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 
 /**
  */
-public class PutVehicleAllowedOrderTypesTOTest {
+class PutVehicleAllowedOrderTypesTOTest {
 
   private JsonBinder jsonBinder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jsonBinder = new JsonBinder();
   }
 
   @Test
-  public void jsonSample() {
+  void jsonSample() {
     PutVehicleAllowedOrderTypesTO to
         = new PutVehicleAllowedOrderTypesTO(List.of("some-orderType",
                                                    "another-orderType",

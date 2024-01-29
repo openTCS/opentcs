@@ -19,7 +19,7 @@ import org.opentcs.guing.base.model.elements.PointModel;
 /**
  * Unit tests for {@link EuclideanDistance}.
  */
-public class EuclideanDistanceTest {
+class EuclideanDistanceTest {
 
   private PointModel startPoint;
   private PointModel endPoint;
@@ -27,7 +27,7 @@ public class EuclideanDistanceTest {
   private EuclideanDistance euclideanDistance;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     startPoint = new PointModel();
     endPoint = new PointModel();
     pathModel = new PathModel();
@@ -37,7 +37,7 @@ public class EuclideanDistanceTest {
   }
 
   @Test
-  public void returnZeroForSamePosition() {
+  void returnZeroForSamePosition() {
     startPoint.getPropertyModelPositionX().setValueAndUnit(1000, LengthProperty.Unit.MM);
     startPoint.getPropertyModelPositionY().setValueAndUnit(1000, LengthProperty.Unit.MM);
     endPoint.getPropertyModelPositionX().setValueAndUnit(1000, LengthProperty.Unit.MM);
@@ -47,7 +47,7 @@ public class EuclideanDistanceTest {
   }
 
   @Test
-  public void returnDistanceXForSameY() {
+  void returnDistanceXForSameY() {
     startPoint.getPropertyModelPositionX().setValueAndUnit(2000, LengthProperty.Unit.MM);
     startPoint.getPropertyModelPositionY().setValueAndUnit(1000, LengthProperty.Unit.MM);
     endPoint.getPropertyModelPositionX().setValueAndUnit(4500, LengthProperty.Unit.MM);
@@ -57,7 +57,7 @@ public class EuclideanDistanceTest {
   }
 
   @Test
-  public void returnDistanceYForSameX() {
+  void returnDistanceYForSameX() {
     startPoint.getPropertyModelPositionX().setValueAndUnit(1000, LengthProperty.Unit.MM);
     startPoint.getPropertyModelPositionY().setValueAndUnit(3000, LengthProperty.Unit.MM);
     endPoint.getPropertyModelPositionX().setValueAndUnit(1000, LengthProperty.Unit.MM);
@@ -67,7 +67,7 @@ public class EuclideanDistanceTest {
   }
 
   @Test
-  public void returnEuclideanDistance() {
+  void returnEuclideanDistance() {
     startPoint.getPropertyModelPositionX().setValueAndUnit(2000, LengthProperty.Unit.MM);
     startPoint.getPropertyModelPositionY().setValueAndUnit(1000, LengthProperty.Unit.MM);
     endPoint.getPropertyModelPositionX().setValueAndUnit(4000, LengthProperty.Unit.MM);

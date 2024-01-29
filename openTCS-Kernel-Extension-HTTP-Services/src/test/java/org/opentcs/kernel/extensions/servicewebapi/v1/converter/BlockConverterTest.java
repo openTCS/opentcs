@@ -30,7 +30,7 @@ import org.opentcs.util.Colors;
 /**
  * Tests for {@link BlockConverter}.
  */
-public class BlockConverterTest {
+class BlockConverterTest {
 
   private BlockConverter blockConverter;
   private PropertyConverter propertyConverter;
@@ -39,7 +39,7 @@ public class BlockConverterTest {
   private List<PropertyTO> propertyList;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     propertyConverter = mock();
     blockConverter = new BlockConverter(propertyConverter);
 
@@ -50,7 +50,7 @@ public class BlockConverterTest {
   }
 
   @Test
-  public void checkToBlockCreationTOs() {
+  void checkToBlockCreationTOs() {
     BlockTO blockTO = new BlockTO("block1")
         .setType(Block.Type.SINGLE_VEHICLE_ONLY.name())
         .setMemberNames(Set.of("member1"))
@@ -71,7 +71,7 @@ public class BlockConverterTest {
   }
 
   @Test
-  public void checkToBlockTOs() {
+  void checkToBlockTOs() {
     Block block1 = new Block("B1")
         .withType(Block.Type.SAME_DIRECTION_ONLY)
         .withMembers(Set.of(new Point("point1").getReference()))

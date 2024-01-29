@@ -23,14 +23,14 @@ import org.opentcs.data.order.TransportOrder;
 /**
  * Unit tests for {@link AssignmentCandidate}.
  */
-public class AssignmentCandidateTest {
+class AssignmentCandidateTest {
 
   private Vehicle vehicle;
   private TransportOrder transportOrder;
   private List<DriveOrder> driveOrders;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     vehicle = new Vehicle("vehicle1");
     Point point = new Point("point");
     DriveOrder.Destination destination = new DriveOrder.Destination(point.getReference());
@@ -40,7 +40,7 @@ public class AssignmentCandidateTest {
   }
 
   @Test
-  public void exceptionWhenDriveOrdersEmpty() {
+  void exceptionWhenDriveOrdersEmpty() {
     driveOrders = List.of();
 
     Exception exception = assertThrows(
@@ -54,7 +54,7 @@ public class AssignmentCandidateTest {
   }
 
   @Test
-  public void exceptionWhenRouteEmpty() {
+  void exceptionWhenRouteEmpty() {
     Exception exception = assertThrows(
         IllegalArgumentException.class, () -> {
           AssignmentCandidate assignmentCandidate = new AssignmentCandidate(vehicle,
@@ -66,7 +66,7 @@ public class AssignmentCandidateTest {
   }
 
   @Test
-  public void calculatesCompleteRoutingCosts() {
+  void calculatesCompleteRoutingCosts() {
     Point point1 = new Point("point1");
     Point point2 = new Point("point2");
     Route.Step step1 = new Route.Step(

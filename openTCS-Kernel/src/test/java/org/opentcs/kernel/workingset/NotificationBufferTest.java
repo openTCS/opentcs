@@ -20,7 +20,7 @@ import org.opentcs.util.event.SimpleEventBus;
 /**
  * Tests for {@link NotificationBuffer}.
  */
-public class NotificationBufferTest {
+class NotificationBufferTest {
 
   private NotificationBuffer notificationBuffer;
 
@@ -30,7 +30,7 @@ public class NotificationBufferTest {
   private UserNotification notification4;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     notificationBuffer = new NotificationBuffer(new SimpleEventBus());
 
     notification1 = new UserNotification("notification-1", UserNotification.Level.NOTEWORTHY);
@@ -40,7 +40,7 @@ public class NotificationBufferTest {
   }
 
   @Test
-  public void keepAllNotificationsBeforeOverflow() {
+  void keepAllNotificationsBeforeOverflow() {
     notificationBuffer.setCapacity(3);
 
     notificationBuffer.addNotification(notification1);
@@ -52,7 +52,7 @@ public class NotificationBufferTest {
   }
 
   @Test
-  public void keepYoungestNotificationsAfterOverflow() {
+  void keepYoungestNotificationsAfterOverflow() {
     notificationBuffer.setCapacity(3);
 
     notificationBuffer.addNotification(notification1);
@@ -65,7 +65,7 @@ public class NotificationBufferTest {
   }
 
   @Test
-  public void removeExtraNotificationsOnCapacityReduction() {
+  void removeExtraNotificationsOnCapacityReduction() {
     notificationBuffer.setCapacity(4);
 
     notificationBuffer.addNotification(notification1);
@@ -84,7 +84,7 @@ public class NotificationBufferTest {
   }
 
   @Test
-  public void removeAllNotificationsOnClear() {
+  void removeAllNotificationsOnClear() {
     notificationBuffer.setCapacity(3);
     notificationBuffer.addNotification(notification1);
     notificationBuffer.addNotification(notification2);
@@ -95,7 +95,7 @@ public class NotificationBufferTest {
   }
 
   @Test
-  public void returnNotificationsMatchingFilter() {
+  void returnNotificationsMatchingFilter() {
     notificationBuffer.setCapacity(3);
 
     notificationBuffer.addNotification(notification1);

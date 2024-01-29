@@ -26,17 +26,17 @@ import org.opentcs.strategies.basic.dispatching.priorization.candidate.Candidate
 
 /**
  */
-public class CandidateComparatorByOrderNameTest {
+class CandidateComparatorByOrderNameTest {
 
   private CandidateComparatorByOrderName comparator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     comparator = new CandidateComparatorByOrderName();
   }
 
   @Test
-  public void sortCandidatesAlphabeticallyByOrderName() {
+  void sortCandidatesAlphabeticallyByOrderName() {
     AssignmentCandidate candidate1 = candidateWithOrderName("AA");
     AssignmentCandidate candidate2 = candidateWithOrderName("C");
     AssignmentCandidate candidate3 = candidateWithOrderName("AB");

@@ -31,7 +31,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 /**
  * Tests for {@link VisualLayoutConverter}.
  */
-public class VisualLayoutConverterTest {
+class VisualLayoutConverterTest {
   
   private VisualLayoutConverter visualLayoutConverter;
   private PropertyConverter propertyConverter;
@@ -40,7 +40,7 @@ public class VisualLayoutConverterTest {
   private List<PropertyTO> propertyList;
   
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     propertyConverter = mock();
     visualLayoutConverter = new VisualLayoutConverter(propertyConverter);
 
@@ -51,7 +51,7 @@ public class VisualLayoutConverterTest {
   }
   
   @Test
-  public void checkToVisualLayoutCreationTO() {
+  void checkToVisualLayoutCreationTO() {
     VisualLayoutTO vLayout = new VisualLayoutTO("V1")
         .setScaleX(50.0)
         .setScaleY(50.0)
@@ -74,7 +74,7 @@ public class VisualLayoutConverterTest {
   }
   
   @Test
-  public void checkVisualLayoutTO() {
+  void checkVisualLayoutTO() {
     VisualLayout vLayout = new VisualLayout("V1")
         .withScaleX(50.0)
         .withScaleY(50.0)
@@ -96,7 +96,7 @@ public class VisualLayoutConverterTest {
   }
   
   @Test
-  public void checkToVisualLayoutTOShouldCreateDefault() {
+  void checkToVisualLayoutTOShouldCreateDefault() {
     VisualLayoutTO result = visualLayoutConverter.toVisualLayoutTO(Set.of());
     
     assertThat(result.getName(), is("default visual layout"));

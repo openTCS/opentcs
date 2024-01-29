@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link TCSObjectReference}.
  */
-public class TCSObjectReferenceTest {
+class TCSObjectReferenceTest {
 
   @Test
-  public void considerReferenceForEquality() {
+  void considerReferenceForEquality() {
     TestType1 object = new TestType1("some-name");
 
     assertThat(object.getReference())
@@ -26,14 +26,14 @@ public class TCSObjectReferenceTest {
   }
 
   @Test
-  public void considerNameForEquality() {
+  void considerNameForEquality() {
     assertThat(new TestType1("some-name").getReference())
         .isEqualTo(new TestType1("some-name").getReference())
         .isNotEqualTo(new TestType1("some-other-name").getReference());
   }
 
   @Test
-  public void considerClassForEquality() {
+  void considerClassForEquality() {
     assertThat(new TestType1("some-name").getReference())
         .isEqualTo(new TestType1("some-name").getReference())
         .isNotEqualTo(new TestType2("some-name").getReference())
@@ -41,7 +41,7 @@ public class TCSObjectReferenceTest {
   }
 
   @Test
-  public void considerNameForHashCode() {
+  void considerNameForHashCode() {
     assertThat(new TestType1("some-name").getReference())
         .hasSameHashCodeAs(new TestType1("some-name").getReference())
         .doesNotHaveSameHashCodeAs(new TestType1("some-other-name").getReference());

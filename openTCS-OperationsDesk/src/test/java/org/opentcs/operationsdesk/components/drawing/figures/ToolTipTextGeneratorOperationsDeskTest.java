@@ -33,7 +33,7 @@ import org.opentcs.operationsdesk.peripherals.jobs.PeripheralJobsContainer;
 /**
  * Unit tests for {@link ToolTipTextGeneratorOperationsDesk}.
  */
-public class ToolTipTextGeneratorOperationsDeskTest {
+class ToolTipTextGeneratorOperationsDeskTest {
 
   private ToolTipTextGeneratorOperationsDesk toolTipTextGenerator;
 
@@ -45,7 +45,7 @@ public class ToolTipTextGeneratorOperationsDeskTest {
   private LocationType locationType;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     Locale.setDefault(Locale.forLanguageTag("en"));
 
     SystemModel systemModel = mock(SystemModel.class);
@@ -70,12 +70,12 @@ public class ToolTipTextGeneratorOperationsDeskTest {
   }
 
   @Test
-  public void listNoPeripheralJobs() {
+  void listNoPeripheralJobs() {
     Approvals.verify(toolTipTextGenerator.getToolTipText(vehicleModel));
   }
 
   @Test
-  public void listOnlyPeripheralJobsRelatedToVehicle() {
+  void listOnlyPeripheralJobsRelatedToVehicle() {
     PeripheralJob relatedJob = new PeripheralJob(
         "Job-name-001",
         "ReservationToken-01",
@@ -114,7 +114,7 @@ public class ToolTipTextGeneratorOperationsDeskTest {
   }
 
   @Test
-  public void listOnlyPeripheralJobsWithCompletionRequired() {
+  void listOnlyPeripheralJobsWithCompletionRequired() {
     PeripheralJob completionRequiredJob = new PeripheralJob(
         "Job-name-001",
         "ReservationToken-01",
@@ -196,7 +196,7 @@ public class ToolTipTextGeneratorOperationsDeskTest {
   }
 
   @Test
-  public void sortPeripheralJobsByCreationTime() {
+  void sortPeripheralJobsByCreationTime() {
     PeripheralJob firstJob = new PeripheralJob(
         "This one first",
         "ReservationToken-01",
@@ -227,7 +227,7 @@ public class ToolTipTextGeneratorOperationsDeskTest {
   }
 
   @Test
-  public void addAllocatingVehicleForPoints() {
+  void addAllocatingVehicleForPoints() {
     Vehicle vehicle2 = new Vehicle("Vehicle-002");
     VehicleModel vehicleModel2 = new VehicleModel();
     vehicleModel2.setVehicle(vehicle2);
@@ -242,7 +242,7 @@ public class ToolTipTextGeneratorOperationsDeskTest {
   }
 
   @Test
-  public void addAllocatingVehicleForPaths() {
+  void addAllocatingVehicleForPaths() {
     Vehicle vehicle2 = new Vehicle("Vehicle-002");
     VehicleModel vehicleModel2 = new VehicleModel();
     vehicleModel2.setVehicle(vehicle2);
@@ -257,7 +257,7 @@ public class ToolTipTextGeneratorOperationsDeskTest {
   }
 
   @Test
-  public void addAllocatingVehicleForLocations() {
+  void addAllocatingVehicleForLocations() {
     Vehicle vehicle2 = new Vehicle("Vehicle-002");
     VehicleModel vehicleModel2 = new VehicleModel();
     vehicleModel2.setVehicle(vehicle2);

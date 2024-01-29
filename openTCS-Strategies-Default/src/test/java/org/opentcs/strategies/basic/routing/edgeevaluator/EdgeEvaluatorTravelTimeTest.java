@@ -18,17 +18,17 @@ import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
 
 /**
  */
-public class EdgeEvaluatorTravelTimeTest {
+class EdgeEvaluatorTravelTimeTest {
 
   private EdgeEvaluatorTravelTime edgeEvaluator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     edgeEvaluator = new EdgeEvaluatorTravelTime();
   }
 
   @Test
-  public void computeTravelTime() {
+  void computeTravelTime() {
     Edge edge = new Edge(
         new Path("pathName",
                  new Point("srcPoint").getReference(),
@@ -49,7 +49,7 @@ public class EdgeEvaluatorTravelTimeTest {
   }
 
   @Test
-  public void infiniteCostsForUntraversablePaths() {
+  void infiniteCostsForUntraversablePaths() {
     Edge edge = new Edge(
         new Path("pathName",
                  new Point("srcPoint").getReference(),

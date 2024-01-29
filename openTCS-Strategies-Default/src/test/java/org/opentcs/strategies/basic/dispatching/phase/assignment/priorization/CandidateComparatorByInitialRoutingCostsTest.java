@@ -27,17 +27,17 @@ import org.opentcs.strategies.basic.dispatching.priorization.candidate.Candidate
 /**
  * Unit tests for {@link CandidateComparatorByInitialRoutingCosts}.
  */
-public class CandidateComparatorByInitialRoutingCostsTest {
+class CandidateComparatorByInitialRoutingCostsTest {
 
   private CandidateComparatorByInitialRoutingCosts comparator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     comparator = new CandidateComparatorByInitialRoutingCosts();
   }
 
   @Test
-  public void sortCheapCandidatesUp() {
+  void sortCheapCandidatesUp() {
     AssignmentCandidate candidate1 = candidateWithInitialRoutingCost(10);
     AssignmentCandidate candidate2 = candidateWithInitialRoutingCost(50);
     AssignmentCandidate candidate3 = candidateWithInitialRoutingCost(30);

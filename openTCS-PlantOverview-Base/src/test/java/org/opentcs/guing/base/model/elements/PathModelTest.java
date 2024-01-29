@@ -25,17 +25,17 @@ import org.opentcs.guing.base.components.properties.type.SpeedProperty;
 /**
  * Unit tests for {@link PathModel}.
  */
-public class PathModelTest {
+class PathModelTest {
 
   private PathModel pathModel;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     pathModel = new PathModel();
   }
 
   @Test
-  public void setLength() {
+  void setLength() {
     pathModel.getPropertyLength().setValueAndUnit(4321.0, LengthProperty.Unit.MM);
 
     assertThat(
@@ -45,7 +45,7 @@ public class PathModelTest {
   }
 
   @Test
-  public void setMaxVelocity() {
+  void setMaxVelocity() {
     pathModel.getPropertyMaxVelocity().setValueAndUnit(900.0, SpeedProperty.Unit.MM_S);
 
     assertThat(
@@ -55,7 +55,7 @@ public class PathModelTest {
   }
 
   @Test
-  public void setMaxReverseVelocity() {
+  void setMaxReverseVelocity() {
     pathModel.getPropertyMaxReverseVelocity().setValueAndUnit(900.0, SpeedProperty.Unit.MM_S);
 
     assertThat(
@@ -65,7 +65,7 @@ public class PathModelTest {
   }
 
   @Test
-  public void manageVehicleModels() {
+  void manageVehicleModels() {
     assertThat(pathModel.getAllocationStates(), is(anEmptyMap()));
 
     VehicleModel vehicleModel1 = new VehicleModel();
@@ -89,7 +89,7 @@ public class PathModelTest {
   }
 
   @Test
-  public void manageBlockModels() {
+  void manageBlockModels() {
     assertThat(pathModel.getBlockModels(), is(empty()));
 
     BlockModel blockModel1 = new BlockModel();

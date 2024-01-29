@@ -20,17 +20,17 @@ import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComp
 
 /**
  */
-public class VehicleComparatorIdleFirstTest {
+class VehicleComparatorIdleFirstTest {
 
   private VehicleComparatorIdleFirst comparator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     comparator = new VehicleComparatorIdleFirst();
   }
 
   @Test
-  public void sortIdleVehiclesUp() {
+  void sortIdleVehiclesUp() {
     Vehicle vehicle1 = new Vehicle("Vehicle1").withState(Vehicle.State.CHARGING);
     Vehicle vehicle2 = vehicle1.withState(Vehicle.State.IDLE);
     Vehicle vehicle3 = vehicle1.withState(Vehicle.State.CHARGING);

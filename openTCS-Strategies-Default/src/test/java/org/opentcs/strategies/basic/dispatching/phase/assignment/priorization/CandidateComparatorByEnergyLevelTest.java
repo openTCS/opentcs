@@ -26,17 +26,17 @@ import org.opentcs.strategies.basic.dispatching.priorization.candidate.Candidate
 
 /**
  */
-public class CandidateComparatorByEnergyLevelTest {
+class CandidateComparatorByEnergyLevelTest {
 
   private CandidateComparatorByEnergyLevel comparator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     comparator = new CandidateComparatorByEnergyLevel();
   }
 
   @Test
-  public void sortHighEnergyCandidatesUp() {
+  void sortHighEnergyCandidatesUp() {
     AssignmentCandidate candidate1 = candidateWithVehicleEnergyLevel(10);
     AssignmentCandidate candidate2 = candidateWithVehicleEnergyLevel(50);
     AssignmentCandidate candidate3 = candidateWithVehicleEnergyLevel(30);

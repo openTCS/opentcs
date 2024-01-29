@@ -21,13 +21,13 @@ import org.opentcs.data.TCSObjectReference;
 /**
  * Tests for proper serialization and deserialization of classes derived by TCSObject.
  */
-public class ModelSerializationTest {
+class ModelSerializationTest {
 
-  public ModelSerializationTest() {
+  ModelSerializationTest() {
   }
 
   @Test
-  public void shouldSerializeAndDeserializeBlock()
+  void shouldSerializeAndDeserializeBlock()
       throws Exception {
     Block originalObject = new Block("Block1");
     Block deserializedObject = (Block) deserializeTCSObject(serializeTCSObject(originalObject));
@@ -37,7 +37,7 @@ public class ModelSerializationTest {
 
   @Test
   @SuppressWarnings("deprecation")
-  public void shouldSerializeAndDeserializeGroup()
+  void shouldSerializeAndDeserializeGroup()
       throws Exception {
     Group originalObject = new Group("Group1");
     Group deserializedObject = (Group) deserializeTCSObject(serializeTCSObject(originalObject));
@@ -46,7 +46,7 @@ public class ModelSerializationTest {
   }
 
   @Test
-  public void shouldSerializeAndDeserializeLocation()
+  void shouldSerializeAndDeserializeLocation()
       throws Exception {
     @SuppressWarnings("unchecked")
     Location originalObject = new Location("Location1", mock(TCSObjectReference.class));
@@ -57,7 +57,7 @@ public class ModelSerializationTest {
   }
 
   @Test
-  public void shouldSerializeAndDeserializeLocationType()
+  void shouldSerializeAndDeserializeLocationType()
       throws Exception {
     LocationType originalObject = new LocationType("LocationType1");
     LocationType deserializedObject
@@ -67,7 +67,7 @@ public class ModelSerializationTest {
   }
 
   @Test
-  public void shouldSerializeAndDeserializePath()
+  void shouldSerializeAndDeserializePath()
       throws Exception {
     @SuppressWarnings("unchecked")
     Path originalObject = new Path("Path1",
@@ -79,7 +79,7 @@ public class ModelSerializationTest {
   }
 
   @Test
-  public void shouldSerializeAndDeserializePoint()
+  void shouldSerializeAndDeserializePoint()
       throws Exception {
     Point originalObject = new Point("Point1");
     Point deserializedObject = (Point) deserializeTCSObject(serializeTCSObject(originalObject));
@@ -88,7 +88,7 @@ public class ModelSerializationTest {
   }
 
   @Test
-  public void shouldSerializeAndDeserializeVehicle()
+  void shouldSerializeAndDeserializeVehicle()
       throws Exception {
     Vehicle originalObject = new Vehicle("Vehicle1");
     Vehicle deserializedObject = (Vehicle) deserializeTCSObject(serializeTCSObject(originalObject));

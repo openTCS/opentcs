@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 /**
  * A test case for class UniqueStringGenerator.
  */
-public class UniqueStringGeneratorTest {
+class UniqueStringGeneratorTest {
 
   private static final String PREFIX = "TestPrefix";
 
@@ -27,12 +27,12 @@ public class UniqueStringGeneratorTest {
   private UniqueStringGenerator<Object> generator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     generator = new UniqueStringGenerator<>();
   }
 
   @Test
-  public void testRepeatedGenerationWithoutModification() {
+  void testRepeatedGenerationWithoutModification() {
     String generatedString = generator.getUniqueString(PREFIX,
                                                        PATTERN_TWO_DIGITS);
     assertEquals(PREFIX + "01", generatedString);
@@ -41,7 +41,7 @@ public class UniqueStringGeneratorTest {
   }
 
   @Test
-  public void shouldProvideConfiguredPatterns() {
+  void shouldProvideConfiguredPatterns() {
     final String namePatternPrefix = "SomePrefix";
     final String namePatterPrefix2 = "AnotherPrefix";
     final Object selector = new Object();
@@ -57,7 +57,7 @@ public class UniqueStringGeneratorTest {
   }
 
   @Test
-  public void testRepeatedGenerationWithAddition() {
+  void testRepeatedGenerationWithAddition() {
     String generatedString = generator.getUniqueString(PREFIX,
                                                        PATTERN_TWO_DIGITS);
     assertEquals(PREFIX + "01", generatedString);
@@ -67,20 +67,20 @@ public class UniqueStringGeneratorTest {
   }
 
   @Test
-  public void testNullPrefix() {
+  void testNullPrefix() {
     String generatedString = generator.getUniqueString(null,
                                                        PATTERN_ONE_DIGIT);
     assertEquals("1", generatedString);
   }
 
   @Test
-  public void shouldHaveString() {
+  void shouldHaveString() {
     generator.addString("some string");
     assertTrue(generator.hasString("some string"));
   }
 
   @Test
-  public void shouldNotHaveString() {
+  void shouldNotHaveString() {
     generator.addString("some string");
     assertFalse(generator.hasString("some other string"));
   }

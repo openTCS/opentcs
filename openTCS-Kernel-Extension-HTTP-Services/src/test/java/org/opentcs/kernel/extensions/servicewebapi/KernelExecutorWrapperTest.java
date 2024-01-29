@@ -22,24 +22,24 @@ import org.opentcs.data.ObjectUnknownException;
 /**
  * Tests for {@link KernelExecutorWrapper}.
  */
-public class KernelExecutorWrapperTest {
+class KernelExecutorWrapperTest {
 
   private ExecutorService executorService;
   private KernelExecutorWrapper executorWrapper;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     this.executorService = Executors.newSingleThreadExecutor();
     this.executorWrapper = new KernelExecutorWrapper(executorService);
   }
 
   @AfterEach
-  public void tearDown() {
+  void tearDown() {
     executorService.shutdown();
   }
 
   @Test
-  public void returnValueReturnedInCallable() {
+  void returnValueReturnedInCallable() {
     assertThat(
         executorWrapper.callAndWait(() -> "my result"),
         is("my result")
@@ -47,7 +47,7 @@ public class KernelExecutorWrapperTest {
   }
 
   @Test
-  public void forwardCausingExceptionIfRuntimeException() {
+  void forwardCausingExceptionIfRuntimeException() {
     assertThrows(ObjectUnknownException.class,
                  () -> {
                    executorWrapper.callAndWait(() -> {
@@ -66,7 +66,7 @@ public class KernelExecutorWrapperTest {
   }
 
   @Test
-  public void wrapUnhandledExceptionInKernelRuntimeException() {
+  void wrapUnhandledExceptionInKernelRuntimeException() {
     assertThrows(KernelRuntimeException.class,
                  () -> {
                    executorWrapper.callAndWait(() -> {

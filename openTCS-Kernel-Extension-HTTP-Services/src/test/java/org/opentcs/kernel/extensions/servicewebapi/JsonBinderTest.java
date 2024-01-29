@@ -17,17 +17,17 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link JsonBinder}.
  */
-public class JsonBinderTest {
+class JsonBinderTest {
 
   private JsonBinder jsonBinder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jsonBinder = new JsonBinder();
   }
 
   @Test
-  public void writeAndParseObject() {
+  void writeAndParseObject() {
     String json = jsonBinder.toJson(new TestObject().setName("some-name"));
 
     Approvals.verify(json);
@@ -38,7 +38,7 @@ public class JsonBinderTest {
   }
 
   @Test
-  public void writeAndParseThrowable() {
+  void writeAndParseThrowable() {
     Approvals.verify(jsonBinder.toJson(new TestException("some-message")));
   }
 

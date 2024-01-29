@@ -19,20 +19,20 @@ import org.opentcs.data.order.OrderSequence;
 
 /**
  */
-public class ImplicitDispatchTriggerTest {
+class ImplicitDispatchTriggerTest {
 
   private Dispatcher dispatcher;
 
   private ImplicitDispatchTrigger listener;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     dispatcher = mock(Dispatcher.class);
     listener = new ImplicitDispatchTrigger(dispatcher);
   }
 
   @Test
-  public void dispatchWhenIdleAndEnergyLevelChanged() {
+  void dispatchWhenIdleAndEnergyLevelChanged() {
     Vehicle vehicleOld = new Vehicle("someVehicle")
         .withIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED)
         .withProcState(Vehicle.ProcState.IDLE)
@@ -48,7 +48,7 @@ public class ImplicitDispatchTriggerTest {
   }
 
   @Test
-  public void noDispatchWhenNotIdleAndEnergyLevelChanged() {
+  void noDispatchWhenNotIdleAndEnergyLevelChanged() {
     Vehicle vehicleOld = new Vehicle("someVehicle")
         .withIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED)
         .withProcState(Vehicle.ProcState.PROCESSING_ORDER)
@@ -64,7 +64,7 @@ public class ImplicitDispatchTriggerTest {
   }
 
   @Test
-  public void dispatchWhenProcStateBecameIdle() {
+  void dispatchWhenProcStateBecameIdle() {
     Vehicle vehicleOld = new Vehicle("someVehicle")
         .withIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED)
         .withProcState(Vehicle.ProcState.PROCESSING_ORDER)
@@ -80,7 +80,7 @@ public class ImplicitDispatchTriggerTest {
   }
 
   @Test
-  public void dispatchWhenProcStateBecameAwaitingOrder() {
+  void dispatchWhenProcStateBecameAwaitingOrder() {
     Vehicle vehicleOld = new Vehicle("someVehicle")
         .withIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED)
         .withProcState(Vehicle.ProcState.PROCESSING_ORDER);
@@ -94,7 +94,7 @@ public class ImplicitDispatchTriggerTest {
   }
 
   @Test
-  public void dispatchWhenOrderSequenceNulled() {
+  void dispatchWhenOrderSequenceNulled() {
     Vehicle vehicleOld = new Vehicle("someVehicle")
         .withIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED)
         .withOrderSequence(new OrderSequence("someSequence").getReference());

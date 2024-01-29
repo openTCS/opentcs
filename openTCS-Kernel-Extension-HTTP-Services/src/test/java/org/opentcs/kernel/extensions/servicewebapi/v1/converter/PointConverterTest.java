@@ -34,7 +34,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.TripleTO;
 /**
  * Tests for {@link PointConverter}.
  */
-public class PointConverterTest {
+class PointConverterTest {
 
   private PointConverter pointConverter;
   private PropertyConverter propertyConverter;
@@ -46,7 +46,7 @@ public class PointConverterTest {
   private List<EnvelopeTO> envelopeList;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     propertyConverter = mock();
     envelopeConverter = mock();
     pointConverter = new PointConverter(propertyConverter, envelopeConverter);
@@ -63,7 +63,7 @@ public class PointConverterTest {
   }
 
   @Test
-  public void checkToPointTOs() {
+  void checkToPointTOs() {
     Point point1 = new Point("P1")
         .withPose(new Pose(new Triple(1, 1, 1), 0.5))
         .withType(Point.Type.HALT_POSITION)
@@ -89,7 +89,7 @@ public class PointConverterTest {
   }
 
   @Test
-  public void checkToPointCreationTOs() {
+  void checkToPointCreationTOs() {
     PointTO point1 = new PointTO("P1")
         .setPosition(new TripleTO(1, 1, 1))
         .setVehicleOrientationAngle(0.8)

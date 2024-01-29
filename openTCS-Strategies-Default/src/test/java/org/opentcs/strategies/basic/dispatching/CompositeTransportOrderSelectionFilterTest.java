@@ -24,7 +24,7 @@ import org.opentcs.strategies.basic.dispatching.selection.orders.CompositeTransp
 /**
  * Unit tests for {@link CompositeTransportOrderSelectionFilter}.
  */
-public class CompositeTransportOrderSelectionFilterTest {
+class CompositeTransportOrderSelectionFilterTest {
 
   private static final String NAME_TRANSPORT = "Transport";
   private static final String NAME_ORDER = "Order";
@@ -38,11 +38,11 @@ public class CompositeTransportOrderSelectionFilterTest {
 
   private List<TransportOrder> transportOrders;
 
-  public CompositeTransportOrderSelectionFilterTest() {
+  CompositeTransportOrderSelectionFilterTest() {
   }
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     transportOrders = new ArrayList<>();
     transportOrders.add(createTransportOrder(NAME_TRANSPORT));
     transportOrders.add(createTransportOrder(NAME_ORDER));
@@ -51,7 +51,7 @@ public class CompositeTransportOrderSelectionFilterTest {
   }
 
   @Test
-  public void shouldFilterNoTransportOrders() {
+  void shouldFilterNoTransportOrders() {
     Set<TransportOrderSelectionFilter> filters
         = new HashSet<>(Arrays.asList(new RefuseAllFilter(),
                                       new FilterIfTransportOrderNameContainsTransport(),
@@ -66,7 +66,7 @@ public class CompositeTransportOrderSelectionFilterTest {
   }
 
   @Test
-  public void shouldFilterTransportOrdersContainingTransport() {
+  void shouldFilterTransportOrdersContainingTransport() {
     Set<TransportOrderSelectionFilter> filters
         = new HashSet<>(Arrays.asList(new FilterIfTransportOrderNameContainsTransport()));
     transportOrderSelectionFilter = new CompositeTransportOrderSelectionFilter(filters);
@@ -79,7 +79,7 @@ public class CompositeTransportOrderSelectionFilterTest {
   }
 
   @Test
-  public void shouldFilterTransportOrdersContainingOrder() {
+  void shouldFilterTransportOrdersContainingOrder() {
     Set<TransportOrderSelectionFilter> filters
         = new HashSet<>(Arrays.asList(new FilterIfTransportOrderNameContainsOrder()));
     transportOrderSelectionFilter = new CompositeTransportOrderSelectionFilter(filters);
@@ -92,7 +92,7 @@ public class CompositeTransportOrderSelectionFilterTest {
   }
 
   @Test
-  public void shouldFilterTransportOrdersContainingTransportOrOrder() {
+  void shouldFilterTransportOrdersContainingTransportOrOrder() {
     Set<TransportOrderSelectionFilter> filters
         = new HashSet<>(Arrays.asList(new FilterIfTransportOrderNameContainsTransport(),
                                       new FilterIfTransportOrderNameContainsOrder()));

@@ -19,7 +19,7 @@ import org.opentcs.data.model.Vehicle;
 /**
  * Tests for {@link AllocationHistory}.
  */
-public class AllocationHistoryTest {
+class AllocationHistoryTest {
 
   private AllocationHistory allocationHistory;
   private Vehicle vehicle = new Vehicle("some-vehicle");
@@ -30,12 +30,12 @@ public class AllocationHistoryTest {
   private Path path2 = new Path("path2", point2.getReference(), point3.getReference());
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     allocationHistory = new AllocationHistory();
   }
 
   @Test
-  public void returnEmptyEntryForVehicleClaimingAndAllocatingNoResources() {
+  void returnEmptyEntryForVehicleClaimingAndAllocatingNoResources() {
     AllocationHistory.Entry result = allocationHistory.updateHistory(vehicle);
 
     assertThat(result.getCurrentClaimedResources()).isEmpty();
@@ -45,7 +45,7 @@ public class AllocationHistoryTest {
   }
 
   @Test
-  public void returnEmptyPreviousAllocationsOnFirstUpdate() {
+  void returnEmptyPreviousAllocationsOnFirstUpdate() {
     vehicle = vehicle
         .withAllocatedResources(List.of(Set.of(point1.getReference())))
         .withClaimedResources(List.of(Set.of(path1.getReference(), point2.getReference())));
@@ -63,7 +63,7 @@ public class AllocationHistoryTest {
   }
 
   @Test
-  public void returnPreviousAllocationsOnConsecutiveUpdate() {
+  void returnPreviousAllocationsOnConsecutiveUpdate() {
     vehicle = vehicle
         .withAllocatedResources(List.of(Set.of(point1.getReference())))
         .withClaimedResources(List.of(Set.of(path1.getReference(), point2.getReference())));
@@ -89,7 +89,7 @@ public class AllocationHistoryTest {
   }
 
   @Test
-  public void returnCorrectlyDividedAllocationsAheadOrBehind() {
+  void returnCorrectlyDividedAllocationsAheadOrBehind() {
     vehicle = vehicle
         .withCurrentPosition(point2.getReference())
         .withNextPosition(point3.getReference())

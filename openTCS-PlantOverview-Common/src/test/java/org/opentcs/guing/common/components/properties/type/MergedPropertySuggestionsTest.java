@@ -19,14 +19,14 @@ import org.opentcs.components.plantoverview.PropertySuggestions;
 
 /**
  */
-public class MergedPropertySuggestionsTest {
+class MergedPropertySuggestionsTest {
 
   private PropertySuggestions instance1;
   private PropertySuggestions instance2;
   private PropertySuggestions emptyInstance;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     emptyInstance = new PropertySuggestionsImpl();
 
     instance1 = new PropertySuggestionsImpl();
@@ -51,14 +51,14 @@ public class MergedPropertySuggestionsTest {
   }
 
   @Test
-  public void shouldRemainEmptyForNoSuggestions() {
+  void shouldRemainEmptyForNoSuggestions() {
     MergedPropertySuggestions mergedSuggestions = new MergedPropertySuggestions(new HashSet<>());
     assertTrue(mergedSuggestions.getKeySuggestions().isEmpty());
     assertTrue(mergedSuggestions.getValueSuggestions().isEmpty());
   }
 
   @Test
-  public void shouldRemainEmptyForEmptySuggestions() {
+  void shouldRemainEmptyForEmptySuggestions() {
     Set<PropertySuggestions> sugSet = new HashSet<>(Arrays.asList(emptyInstance));
     MergedPropertySuggestions mergedSuggestions = new MergedPropertySuggestions(sugSet);
     assertTrue(mergedSuggestions.getKeySuggestions().isEmpty());
@@ -66,7 +66,7 @@ public class MergedPropertySuggestionsTest {
   }
 
   @Test
-  public void shouldMergeSuggestions() {
+  void shouldMergeSuggestions() {
     Set<PropertySuggestions> sugSet = new HashSet<>(Arrays.asList(instance1, instance2));
     MergedPropertySuggestions mergedSuggestions = new MergedPropertySuggestions(sugSet);
     assertEquals(Sets.union(instance1.getKeySuggestions(), instance2.getKeySuggestions()),

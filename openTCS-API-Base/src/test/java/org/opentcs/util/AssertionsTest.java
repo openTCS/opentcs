@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link Assertions}.
  */
-public class AssertionsTest {
+class AssertionsTest {
 
-  public AssertionsTest() {
+  AssertionsTest() {
   }
 
   @Test
-  public void checkArgumentShouldFormatIntegerMessageTemplateArgument() {
+  void checkArgumentShouldFormatIntegerMessageTemplateArgument() {
     try {
       Assertions.checkArgument(false, "%s", 123);
     }
@@ -30,13 +30,13 @@ public class AssertionsTest {
   }
 
   @Test
-  public void checkArgumentShouldThrowIfExpressionIsFalse() {
+  void checkArgumentShouldThrowIfExpressionIsFalse() {
     assertThrows(IllegalArgumentException.class,
                  () -> Assertions.checkArgument(false, "The given expression is not true!"));
   }
 
   @Test
-  public void checkStateShouldFormatIntegerMessageTemplateArgument() {
+  void checkStateShouldFormatIntegerMessageTemplateArgument() {
     try {
       Assertions.checkState(false, "%s", 456);
     }
@@ -46,13 +46,13 @@ public class AssertionsTest {
   }
 
   @Test
-  public void checkStateShouldThrowIfExpressionIsFalse() {
+  void checkStateShouldThrowIfExpressionIsFalse() {
     assertThrows(IllegalStateException.class,
                  () -> Assertions.checkState(false, "The given expression is not true"));
   }
 
   @Test
-  public void checkInRangeShouldSucceedWithinBoundaries() {
+  void checkInRangeShouldSucceedWithinBoundaries() {
     assertEquals(22, Assertions.checkInRange(22, 22, 24));
     assertEquals(23, Assertions.checkInRange(23, 22, 24));
     assertEquals(24, Assertions.checkInRange(24, 22, 24));
@@ -63,19 +63,19 @@ public class AssertionsTest {
   }
 
   @Test
-  public void checkInRangeShouldFailOnLessThanMinimum() {
+  void checkInRangeShouldFailOnLessThanMinimum() {
     assertThrows(IllegalArgumentException.class,
                  () -> Assertions.checkInRange(21, 22, 24));
   }
 
   @Test
-  public void checkInRangeShouldFailOnMoreThanMaximum() {
+  void checkInRangeShouldFailOnMoreThanMaximum() {
     assertThrows(IllegalArgumentException.class,
                  () -> Assertions.checkInRange(25, 22, 24));
   }
 
   @Test
-  public void checkInRangeLongShouldSucceedWithinBoundaries() {
+  void checkInRangeLongShouldSucceedWithinBoundaries() {
     assertEquals(23, Assertions.checkInRange(23, 23, 25));
     assertEquals(24, Assertions.checkInRange(24, 23, 25));
     assertEquals(25, Assertions.checkInRange(25, 23, 25));
@@ -86,13 +86,13 @@ public class AssertionsTest {
   }
 
   @Test
-  public void checkInRangeLongShouldFailOnLessThanMinimum() {
+  void checkInRangeLongShouldFailOnLessThanMinimum() {
     assertThrows(IllegalArgumentException.class,
                  () -> Assertions.checkInRange(22, 23, 25));
   }
 
   @Test
-  public void checkInRangeLongShouldFailOnMoreThanMaximum() {
+  void checkInRangeLongShouldFailOnMoreThanMaximum() {
     assertThrows(IllegalArgumentException.class,
                  () -> Assertions.checkInRange(26, 23, 25));
   }

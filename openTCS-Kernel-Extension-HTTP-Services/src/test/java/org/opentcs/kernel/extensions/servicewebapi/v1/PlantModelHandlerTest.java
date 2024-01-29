@@ -53,14 +53,14 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.converter.VisualLayoutConv
 /**
  * Unit tests for {@link PlantModelHandler}.
  */
-public class PlantModelHandlerTest {
+class PlantModelHandlerTest {
 
   private PlantModelService orderService;
   private KernelExecutorWrapper executorWrapper;
   private PlantModelHandler handler;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     orderService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
     EnvelopeConverter envelopeConverter = new EnvelopeConverter();
@@ -81,7 +81,7 @@ public class PlantModelHandlerTest {
   }
 
   @Test
-  public void putPlantModel() {
+  void putPlantModel() {
     // Act
     handler.putPlantModel(
         new PlantModelTO("name")
@@ -150,7 +150,7 @@ public class PlantModelHandlerTest {
   }
 
   @Test
-  public void getPlantModel() {
+  void getPlantModel() {
     // Arrange
     PlantModel plantModel
         = new PlantModel("some-plant-model")

@@ -26,7 +26,7 @@ import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 /**
  * Unit tests for {@link TransportOrderDispatcherHandler}.
  */
-public class TransportOrderDispatcherHandlerTest {
+class TransportOrderDispatcherHandlerTest {
 
   private VehicleService vehicleService;
   private DispatcherService dispatcherService;
@@ -37,7 +37,7 @@ public class TransportOrderDispatcherHandlerTest {
   private TransportOrder order;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     vehicleService = mock();
     dispatcherService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
@@ -57,41 +57,41 @@ public class TransportOrderDispatcherHandlerTest {
   }
 
   @Test
-  public void triggerDispatcher() {
+  void triggerDispatcher() {
     handler.triggerDispatcher();
 
     then(dispatcherService).should().dispatch();
   }
 
   @Test
-  public void tryImmediateAssignmentUsingKnownOrder() {
+  void tryImmediateAssignmentUsingKnownOrder() {
     handler.tryImmediateAssignment("some-order");
 
     then(dispatcherService).should().assignNow(order.getReference());
   }
 
   @Test
-  public void throwOnImmediateAssignmentUsingUnknownOrderName() {
+  void throwOnImmediateAssignmentUsingUnknownOrderName() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.tryImmediateAssignment("some-unknown-order"));
   }
 
   @Test
-  public void withdrawByTransportOrderRegularly() {
+  void withdrawByTransportOrderRegularly() {
     handler.withdrawByTransportOrder("some-order", false, false);
 
     then(dispatcherService).should().withdrawByTransportOrder(order.getReference(), false);
   }
 
   @Test
-  public void withdrawByTransportOrderImmediately() {
+  void withdrawByTransportOrderImmediately() {
     handler.withdrawByTransportOrder("some-order", true, false);
 
     then(dispatcherService).should().withdrawByTransportOrder(order.getReference(), true);
   }
 
   @Test
-  public void withdrawByTransportOrderAlsoDisablingVehicle() {
+  void withdrawByTransportOrderAlsoDisablingVehicle() {
     handler.withdrawByTransportOrder("some-order", false, true);
 
     then(vehicleService)
@@ -102,27 +102,27 @@ public class TransportOrderDispatcherHandlerTest {
   }
 
   @Test
-  public void throwOnWithdrawUsingUnknownOrderName() {
+  void throwOnWithdrawUsingUnknownOrderName() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.withdrawByTransportOrder("some-unknown-order", false, false));
   }
 
   @Test
-  public void withdrawByVehicleRegularly() {
+  void withdrawByVehicleRegularly() {
     handler.withdrawByVehicle("some-vehicle", false, false);
 
     then(dispatcherService).should().withdrawByVehicle(vehicle.getReference(), false);
   }
 
   @Test
-  public void withdrawByVehicleImmediately() {
+  void withdrawByVehicleImmediately() {
     handler.withdrawByVehicle("some-vehicle", true, false);
 
     then(dispatcherService).should().withdrawByVehicle(vehicle.getReference(), true);
   }
 
   @Test
-  public void withdrawByVehicleAlsoDisablingVehicle() {
+  void withdrawByVehicleAlsoDisablingVehicle() {
     handler.withdrawByVehicle("some-vehicle", false, true);
 
     then(vehicleService)
@@ -133,27 +133,27 @@ public class TransportOrderDispatcherHandlerTest {
   }
 
   @Test
-  public void throwOnWithdrawUsingUnknownVehicleName() {
+  void throwOnWithdrawUsingUnknownVehicleName() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.withdrawByVehicle("some-unknown-vehicle", false, false));
   }
 
   @Test
-  public void rerouteRegularly() {
+  void rerouteRegularly() {
     handler.reroute("some-vehicle", false);
 
     then(dispatcherService).should().reroute(vehicle.getReference(), ReroutingType.REGULAR);
   }
 
   @Test
-  public void rerouteForcibly() {
+  void rerouteForcibly() {
     handler.reroute("some-vehicle", true);
 
     then(dispatcherService).should().reroute(vehicle.getReference(), ReroutingType.FORCED);
   }
 
   @Test
-  public void throwOnRerouteUsingUnknownVehicleName() {
+  void throwOnRerouteUsingUnknownVehicleName() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.reroute("some-unknown-vehicle", false));
   }

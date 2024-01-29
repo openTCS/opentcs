@@ -28,7 +28,7 @@ import org.opentcs.data.order.Route;
 /**
  * Test cases for {@link RegularDriveOrderMerger}.
  */
-public class RegularDriveOrderMergerTest {
+class RegularDriveOrderMergerTest {
 
   /**
    * Class under test.
@@ -40,13 +40,13 @@ public class RegularDriveOrderMergerTest {
   private Router router;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     router = mock(Router.class);
     driveOrderMerger = new RegularDriveOrderMerger(router);
   }
 
   @Test
-  public void shouldMergeDriveOrders() {
+  void shouldMergeDriveOrders() {
     // Arrange
     DriveOrder orderA = createDriveOrder(10, "A", "B", "C", "D", "E", "F", "G");
     DriveOrder orderB = createDriveOrder(10, "D", "H", "I", "J");

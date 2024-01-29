@@ -20,19 +20,19 @@ import org.opentcs.guing.base.model.AbstractModelComponent;
  * For Degrees, min value is 0 and max value is 360.
  * For Radians, min value is 0 and max value is 2*PI ~ 6.283185
  */
-public class AnglePropertyTest {
+class AnglePropertyTest {
 
   private AngleProperty property;
 
   @ParameterizedTest
   @ValueSource(strings = {"deg", "rad"})
-  public void testValidUnits(String unit) {
+  void testValidUnits(String unit) {
     property = new AngleProperty(new DummyComponent());
     assertTrue(property.isPossibleUnit(unit));
   }
 
   @Test
-  public void testPropertyConversionDegToRad() {
+  void testPropertyConversionDegToRad() {
     // 180 deg = PI rad
     property = new AngleProperty(new DummyComponent(), 180, Unit.DEG);
     property.convertTo(Unit.RAD);
@@ -41,7 +41,7 @@ public class AnglePropertyTest {
   }
 
   @Test
-  public void testPropertyConversionRadToDeg() {
+  void testPropertyConversionRadToDeg() {
     // 3.7168 rad ~ 212.96 deg
     property = new AngleProperty(new DummyComponent(), 3.7168, Unit.RAD);
     property.convertTo(Unit.DEG);
@@ -50,21 +50,21 @@ public class AnglePropertyTest {
   }
 
   @Test
-  public void testPropertyRange() {
+  void testPropertyRange() {
     property = new AngleProperty(new DummyComponent());
     assertEquals(0, property.getValidRange().getMin(), 0);
     assertEquals(Double.MAX_VALUE, property.getValidRange().getMax(), 0);
   }
 
   @Test
-  public void shouldStayInRangeDeg() {
+  void shouldStayInRangeDeg() {
     property = new AngleProperty(new DummyComponent(), 540, Unit.DEG);
     assertEquals(180.0, property.getValue());
     assertEquals(Unit.DEG, property.getUnit());
   }
 
   @Test
-  public void shouldStayInRangeRad() {
+  void shouldStayInRangeRad() {
     property = new AngleProperty(new DummyComponent(), 10, Unit.RAD);
     assertEquals(3.716, (double) property.getValue(), 0.001);
     assertEquals(AngleProperty.Unit.RAD, property.getUnit());

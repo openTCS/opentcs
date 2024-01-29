@@ -21,17 +21,17 @@ import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComp
 
 /**
  */
-public class VehicleComparatorByNameTest {
+class VehicleComparatorByNameTest {
   private VehicleComparatorByName comparator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     comparator = new VehicleComparatorByName();
   }
 
 
   @Test
-  public void sortsAlphabeticallyByName() {
+  void sortsAlphabeticallyByName() {
     Vehicle vehicle1 = new Vehicle("AA");
     Vehicle vehicle2 = new Vehicle("CC");
     Vehicle vehicle3 = new Vehicle("AB");

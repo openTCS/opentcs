@@ -29,7 +29,7 @@ import org.opentcs.data.model.Point;
 /**
  * Tests for {@link CachingAreaProvider}.
  */
-public class CachingAreaProviderTest {
+class CachingAreaProviderTest {
 
   private CachingAreaProvider areaProvider;
   private TCSObjectService objectService;
@@ -40,7 +40,7 @@ public class CachingAreaProviderTest {
   private Path path2;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     objectService = mock();
     areaProvider = new CachingAreaProvider(objectService);
 
@@ -52,7 +52,7 @@ public class CachingAreaProviderTest {
   }
 
   @Test
-  public void providesEmptyGeometryCollectionWhenCacheIsEmpty() {
+  void providesEmptyGeometryCollectionWhenCacheIsEmpty() {
     // Arrange
     areaProvider.initialize();
 
@@ -68,7 +68,7 @@ public class CachingAreaProviderTest {
   }
 
   @Test
-  public void providesNonEmptyGeometryCollectionForKnownEnvelopeKey() {
+  void providesNonEmptyGeometryCollectionForKnownEnvelopeKey() {
     // Arrange
     point2 = point2.withVehicleEnvelopes(
         Map.of(
@@ -126,7 +126,7 @@ public class CachingAreaProviderTest {
   }
 
   @Test
-  public void providesEmptyGeometryCollectionForUnknownEnvelopeKey() {
+  void providesEmptyGeometryCollectionForUnknownEnvelopeKey() {
     // Arrange
     point2 = point2.withVehicleEnvelopes(
         Map.of(

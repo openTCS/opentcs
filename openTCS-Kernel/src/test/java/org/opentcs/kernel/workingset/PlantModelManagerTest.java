@@ -42,7 +42,7 @@ import org.opentcs.util.event.SimpleEventBus;
 /**
  * Unit tests for {@link PlantModelManager}.
  */
-public class PlantModelManagerTest {
+class PlantModelManagerTest {
 
   private TCSObjectRepository objectRepo;
   private PlantModelManager plantModelManager;
@@ -50,7 +50,7 @@ public class PlantModelManagerTest {
 
   @BeforeEach
   @SuppressWarnings("deprecation")
-  public void setUp() {
+  void setUp() {
     objectRepo = new TCSObjectRepository();
     plantModelManager = new PlantModelManager(objectRepo, new SimpleEventBus());
     plantModelCreationTo = new PlantModelCreationTO("some-plant-model")
@@ -81,7 +81,7 @@ public class PlantModelManagerTest {
 
   @Test
   @SuppressWarnings("deprecation")
-  public void importPlantModel() {
+  void importPlantModel() {
     plantModelManager.createPlantModelObjects(plantModelCreationTo);
 
     assertThat(plantModelManager.getName(), is(equalTo("some-plant-model")));
@@ -107,7 +107,7 @@ public class PlantModelManagerTest {
 
   @Test
   @SuppressWarnings("deprecation")
-  public void exportPlantModel() {
+  void exportPlantModel() {
     plantModelManager.createPlantModelObjects(plantModelCreationTo);
 
     PlantModelCreationTO exportedModel = plantModelManager.createPlantModelCreationTO();
@@ -124,7 +124,7 @@ public class PlantModelManagerTest {
 
   @Test
   @SuppressWarnings("deprecation")
-  public void clearPlantModel() {
+  void clearPlantModel() {
     plantModelManager.createPlantModelObjects(plantModelCreationTo);
 
     plantModelManager.clear();
@@ -140,7 +140,7 @@ public class PlantModelManagerTest {
   }
 
   @Test
-  public void expandResources() {
+  void expandResources() {
     plantModelManager.createPlantModelObjects(
         new PlantModelCreationTO("some-plant-model")
             .withPoint(new PointCreationTO("point-in-block-1"))

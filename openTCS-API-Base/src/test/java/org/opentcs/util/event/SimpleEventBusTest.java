@@ -19,17 +19,17 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link SimpleEventBus}.
  */
-public class SimpleEventBusTest {
+class SimpleEventBusTest {
 
   private SimpleEventBus eventBus;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     eventBus = new SimpleEventBus();
   }
 
   @Test
-  public void forwardEventToSubscribers() {
+  void forwardEventToSubscribers() {
     List<Object> receivedObjects = new ArrayList<>();
     EventHandler eventHandler = (object) -> receivedObjects.add(object);
 

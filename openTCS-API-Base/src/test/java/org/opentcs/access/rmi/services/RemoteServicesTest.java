@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Tests for the remote service interfaces.
  */
-public class RemoteServicesTest {
+class RemoteServicesTest {
 
   /**
    * This class's logger.
@@ -40,7 +40,7 @@ public class RemoteServicesTest {
 
   @Test
   @SuppressWarnings("deprecation")
-  public void shouldMapAllMethodsInServiceInterfaces() {
+  void shouldMapAllMethodsInServiceInterfaces() {
     checkMapping(DispatcherService.class, RemoteDispatcherService.class);
     checkMapping(NotificationService.class, RemoteNotificationService.class);
     checkMapping(PeripheralDispatcherService.class, RemotePeripheralDispatcherService.class);

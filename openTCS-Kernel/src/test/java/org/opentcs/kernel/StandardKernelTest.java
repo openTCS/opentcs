@@ -27,7 +27,7 @@ import org.opentcs.util.event.SimpleEventBus;
 /**
  * A test case for StandardKernel.
  */
-public class StandardKernelTest {
+class StandardKernelTest {
 
   /**
    * The kernel instance to be tested.
@@ -39,7 +39,7 @@ public class StandardKernelTest {
   private KernelState kernelStateOperating;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     // Build a map of providers for our mocked state objects.
     Map<Kernel.State, Provider<KernelState>> stateMap = new HashMap<>();
     kernelStateShutdown = mock(KernelState.class);
@@ -64,7 +64,7 @@ public class StandardKernelTest {
   }
 
   @Test
-  public void testStateSwitchToModelling() {
+  void testStateSwitchToModelling() {
     kernel.setState(Kernel.State.MODELLING);
     assertEquals(Kernel.State.MODELLING, kernel.getState());
     // Verify that the selected state has been initialized.
@@ -72,7 +72,7 @@ public class StandardKernelTest {
   }
 
   @Test
-  public void testStateSwitchToOperating() {
+  void testStateSwitchToOperating() {
     kernel.setState(Kernel.State.OPERATING);
     assertEquals(Kernel.State.OPERATING, kernel.getState());
     // Verify that the selected state has been initialized.

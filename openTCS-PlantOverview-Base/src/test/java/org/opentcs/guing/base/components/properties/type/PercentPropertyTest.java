@@ -14,12 +14,12 @@ import org.opentcs.guing.base.model.AbstractModelComponent;
 /**
  * A test for a percent property.
  */
-public class PercentPropertyTest {
+class PercentPropertyTest {
 
   private PercentProperty property;
 
   @Test
-  public void testPropertyRange() {
+  void testPropertyRange() {
     property = new PercentProperty(new DummyComponent());
     assertEquals(0, property.getValidRange().getMin(), 0);
     assertEquals(100, property.getValidRange().getMax(), 0);

@@ -19,17 +19,17 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 /**
  * Unit tests for {@link GetTransportOrderResponseTO}.
  */
-public class GetTransportOrderResponseTOTest {
+class GetTransportOrderResponseTOTest {
 
   private JsonBinder jsonBinder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jsonBinder = new JsonBinder();
   }
 
   @Test
-  public void jsonSample() {
+  void jsonSample() {
     GetTransportOrderResponseTO to
         = new GetTransportOrderResponseTO()
             .setDispensable(true)

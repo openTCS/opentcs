@@ -31,7 +31,7 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  */
-public class DefaultParkingPositionSupplierTest {
+class DefaultParkingPositionSupplierTest {
 
   private InternalPlantModelService plantModelService;
   private Router router;
@@ -39,7 +39,7 @@ public class DefaultParkingPositionSupplierTest {
   private DefaultParkingPositionSupplier supplier;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
     vehicle = new Vehicle("vehicle");
@@ -47,12 +47,12 @@ public class DefaultParkingPositionSupplierTest {
   }
 
   @AfterEach
-  public void tearDown() {
+  void tearDown() {
     supplier.terminate();
   }
 
   @Test
-  public void returnsEmptyForUnknownVehiclePosition() {
+  void returnsEmptyForUnknownVehiclePosition() {
     vehicle = vehicle.withCurrentPosition(null);
     supplier.initialize();
     Optional<Point> result = supplier.findParkingPosition(vehicle);
@@ -60,7 +60,7 @@ public class DefaultParkingPositionSupplierTest {
   }
 
   @Test
-  public void returnsEmptyForUnknownAssignedParkingPosition() {
+  void returnsEmptyForUnknownAssignedParkingPosition() {
     vehicle = vehicle
         .withCurrentPosition(new Point("dummyPoint").getReference())
         .withProperty(Dispatcher.PROPKEY_ASSIGNED_PARKING_POSITION, "someUnknownPoint");
@@ -70,7 +70,7 @@ public class DefaultParkingPositionSupplierTest {
   }
 
   @Test
-  public void returnsEmptyForNoParkingPositionsFromKernel() {
+  void returnsEmptyForNoParkingPositionsFromKernel() {
     when(plantModelService.fetchObjects(Point.class)).thenReturn(new HashSet<>());
     when(plantModelService.fetchObjects(Block.class)).thenReturn(new HashSet<>());
     vehicle = vehicle.withCurrentPosition(new Point("dummyPoint").getReference());
@@ -80,7 +80,7 @@ public class DefaultParkingPositionSupplierTest {
   }
 
   @Test
-  public void returnsClosestParkingPosition() {
+  void returnsClosestParkingPosition() {
     Point point1 = new Point("vehicle's current position");
     Point point2 = new Point("parking position")
         .withType(Point.Type.PARK_POSITION);

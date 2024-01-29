@@ -22,16 +22,16 @@ import org.opentcs.data.ObjectHistory.Entry;
 /**
  * Unit tests for {@link ObjectHistory}.
  */
-public class ObjectHistoryTest {
+class ObjectHistoryTest {
 
   @Test
-  public void checkIfObjectHistoryInitiallyIsEmpty() {
+  void checkIfObjectHistoryInitiallyIsEmpty() {
     ObjectHistory history = new ObjectHistory();
     assertThat(history.getEntries(), hasSize(0));
   }
 
   @Test
-  public void checkIfEntryListIsUnmodifiable() {
+  void checkIfEntryListIsUnmodifiable() {
     Entry entry1 = new Entry(Instant.now(), "eventCode1");
     Entry entry2 = new Entry(Instant.now(), "eventCode2");
 
@@ -42,7 +42,7 @@ public class ObjectHistoryTest {
   }
 
   @Test
-  public void testObjectHistoryCreationWithEntries() {
+  void testObjectHistoryCreationWithEntries() {
     Entry entry1 = new Entry(Instant.now(), "eventCode1");
     Entry entry2 = new Entry(Instant.now(), "eventCode2");
 
@@ -55,7 +55,7 @@ public class ObjectHistoryTest {
   }
 
   @Test
-  public void checkIfObjectHistoryWithEntryAppendedCreateAndAppendTheGivenEntriesCorrect() {
+  void checkIfObjectHistoryWithEntryAppendedCreateAndAppendTheGivenEntriesCorrect() {
     Entry entry1 = new Entry(Instant.now(), "eventCode1");
     Entry entry2 = new Entry(Instant.now(), "eventCode2");
 
@@ -69,7 +69,7 @@ public class ObjectHistoryTest {
   }
 
   @Test
-  public void checkIfEntryHasTimestampEventCodeAndSupplement() {
+  void checkIfEntryHasTimestampEventCodeAndSupplement() {
     Instant timestamp = Instant.now();
     Entry entry = new Entry(timestamp, "eventCode1", "supplement");
 
@@ -79,13 +79,13 @@ public class ObjectHistoryTest {
   }
 
   @Test
-  public void throwIfSupplementIsNotSerializable() {
+  void throwIfSupplementIsNotSerializable() {
     assertThrows(IllegalArgumentException.class,
                  () -> new Entry(Instant.now(), "eventCode", new Object()));
   }
 
   @Test
-  public void checkIfEntryHasNoSupplement() {
+  void checkIfEntryHasNoSupplement() {
     Instant timestamp = Instant.now();
     Entry entry = new Entry(timestamp, "eventCode1");
 
@@ -95,7 +95,7 @@ public class ObjectHistoryTest {
   }
 
   @Test
-  public void checkIfEntryHasTimestamp() {
+  void checkIfEntryHasTimestamp() {
     Entry entry = new Entry("eventCode1", "supplement");
 
     assertTrue(entry.getTimestamp() != null);
@@ -104,7 +104,7 @@ public class ObjectHistoryTest {
   }
 
   @Test
-  public void checkIfEntryHasTimestampAnNoSupplement() {
+  void checkIfEntryHasTimestampAnNoSupplement() {
     Entry entry = new Entry("eventCode1");
 
     assertTrue(entry.getTimestamp() != null);

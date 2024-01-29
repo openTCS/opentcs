@@ -26,17 +26,17 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 /**
  * Unit tests for {@link GetEventsResponseTO}.
  */
-public class GetEventsResponseTOTest {
+class GetEventsResponseTOTest {
 
   private JsonBinder jsonBinder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jsonBinder = new JsonBinder();
   }
 
   @Test
-  public void jsonSample() {
+  void jsonSample() {
     GetEventsResponseTO to
         = new GetEventsResponseTO()
             .setTimeStamp(Instant.EPOCH)

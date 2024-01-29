@@ -28,7 +28,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 /**
  * Tests for {@link LocationTypeConverter}.
  */
-public class LocationTypeConverterTest {
+class LocationTypeConverterTest {
 
   private LocationTypeConverter locationTypeConverter;
   private PropertyConverter propertyConverter;
@@ -37,7 +37,7 @@ public class LocationTypeConverterTest {
   private List<PropertyTO> propertyList;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     propertyConverter = mock();
     locationTypeConverter = new LocationTypeConverter(propertyConverter);
 
@@ -48,7 +48,7 @@ public class LocationTypeConverterTest {
   }
 
   @Test
-  public void checkToLocationTypeCreationTOs() {
+  void checkToLocationTypeCreationTOs() {
     LocationTypeTO locTypeTo = new LocationTypeTO("LT1")
         .setAllowedOperations(List.of("O1"))
         .setAllowedPeripheralOperations(List.of("PO1"))
@@ -74,7 +74,7 @@ public class LocationTypeConverterTest {
   }
 
   @Test
-  public void checkToLocationTypeTOs() {
+  void checkToLocationTypeTOs() {
     LocationType locType = new LocationType("LT1")
         .withAllowedOperations(List.of("O1"))
         .withAllowedPeripheralOperations(List.of("PO1"))

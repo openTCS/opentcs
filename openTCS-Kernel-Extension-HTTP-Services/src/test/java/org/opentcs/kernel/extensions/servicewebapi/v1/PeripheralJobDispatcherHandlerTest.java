@@ -26,7 +26,7 @@ import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 /**
  * Unit tests for {@link PeripheralJobDispatcherHandler}.
  */
-public class PeripheralJobDispatcherHandlerTest {
+class PeripheralJobDispatcherHandlerTest {
 
   private PeripheralJobService jobService;
   private PeripheralDispatcherService jobDispatcherService;
@@ -38,7 +38,7 @@ public class PeripheralJobDispatcherHandlerTest {
   private PeripheralJob job;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jobService = mock();
     jobDispatcherService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
@@ -66,25 +66,25 @@ public class PeripheralJobDispatcherHandlerTest {
   }
 
   @Test
-  public void withdrawPeripheralJobByLocation() {
+  void withdrawPeripheralJobByLocation() {
     handler.withdrawPeripheralJobByLocation("some-location");
     then(jobDispatcherService).should().withdrawByLocation(location.getReference());
   }
 
   @Test
-  public void throwOnWithdrawPeripheralJobByUnknownLocation() {
+  void throwOnWithdrawPeripheralJobByUnknownLocation() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.withdrawPeripheralJobByLocation("some-unknown-location"));
   }
 
   @Test
-  public void withdrawPeripheralJob() {
+  void withdrawPeripheralJob() {
     handler.withdrawPeripheralJob("some-job");
     then(jobDispatcherService).should().withdrawByPeripheralJob(job.getReference());
   }
 
   @Test
-  public void throwOnWithdrawUnknownPeripheralJob() {
+  void throwOnWithdrawUnknownPeripheralJob() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.withdrawPeripheralJob("some-unknown-job"));
   }

@@ -39,7 +39,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.TripleTO;
 /**
  * Tests for {@link LocationConverter}.
  */
-public class LocationConverterTest {
+class LocationConverterTest {
 
   private LocationConverter locationConverter;
   private PropertyConverter propertyConverter;
@@ -48,7 +48,7 @@ public class LocationConverterTest {
   private List<PropertyTO> propertyList;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     propertyConverter = mock();
     locationConverter = new LocationConverter(propertyConverter);
 
@@ -59,7 +59,7 @@ public class LocationConverterTest {
   }
 
   @Test
-  public void checkLocationCreationTOs() {
+  void checkLocationCreationTOs() {
     LocationTO locationTo = new LocationTO("loc1", "T1", new TripleTO(1, 1, 1))
         .setLinks(
             List.of(
@@ -100,7 +100,7 @@ public class LocationConverterTest {
   }
 
   @Test
-  public void checkToLocationTOs() {
+  void checkToLocationTOs() {
     Location location = new Location("L1", new LocationType("LT1").getReference())
         .withPosition(new Triple(1, 1, 1))
         .withAttachedLinks(

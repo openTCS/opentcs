@@ -16,17 +16,17 @@ import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 /**
  * Unit tests for {@link GetVehicleAttachmentInfoResponseTO}.
  */
-public class GetPeripheralAttachmentInfoResponseTOTest {
+class GetPeripheralAttachmentInfoResponseTOTest {
 
   private JsonBinder jsonBinder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jsonBinder = new JsonBinder();
   }
 
   @Test
-  public void jsonSample() {
+  void jsonSample() {
     GetPeripheralAttachmentInfoResponseTO to
         = new GetPeripheralAttachmentInfoResponseTO(
             "Location001",

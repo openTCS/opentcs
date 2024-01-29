@@ -29,17 +29,17 @@ import org.opentcs.strategies.basic.dispatching.priorization.candidate.Candidate
 /**
  * Unit tests for {@link CandidateComparatorByDeadline}.
  */
-public class CandidateComparatorByDeadlineTest {
+class CandidateComparatorByDeadlineTest {
 
   private CandidateComparatorByDeadline comparator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     comparator = new CandidateComparatorByDeadline();
   }
 
   @Test
-  public void sortEarlyDeadlinesUp() {
+  void sortEarlyDeadlinesUp() {
     Instant deadline = Instant.now();
     AssignmentCandidate candidate1 = candidateWithDeadline(deadline.plusMillis(50));
     AssignmentCandidate candidate2 = candidateWithDeadline(deadline.plusMillis(200));

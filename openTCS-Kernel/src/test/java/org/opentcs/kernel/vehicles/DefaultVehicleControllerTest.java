@@ -46,7 +46,7 @@ import org.opentcs.util.event.SimpleEventBus;
 /**
  * Test cases for StandardVehicleController.
  */
-public class DefaultVehicleControllerTest {
+class DefaultVehicleControllerTest {
 
   private static final String RECHARGE_OP = "recharge";
   /**
@@ -95,7 +95,7 @@ public class DefaultVehicleControllerTest {
   private DefaultVehicleController stdVehicleController;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     vehicle = dataObjectFactory.createVehicle();
     vehicleModel = new VehicleProcessModel(vehicle);
     vehicleModelTO = new VehicleProcessModelTO();
@@ -129,14 +129,14 @@ public class DefaultVehicleControllerTest {
   }
 
   @AfterEach
-  public void tearDown() {
+  void tearDown() {
     stdVehicleController.terminate();
     scheduler.terminate();
   }
 
   // Test cases for implementation of interface VehicleManager start here.
   @Test
-  public void shouldFowardPositionChangeToKernel() {
+  void shouldFowardPositionChangeToKernel() {
     Point point = dataObjectFactory.createPoint();
     doReturn(point).when(vehicleService).fetchObject(Point.class, point.getName());
 
@@ -147,7 +147,7 @@ public class DefaultVehicleControllerTest {
   }
 
   @Test
-  public void shouldForwardPrecisePositionChangeToKernel() {
+  void shouldForwardPrecisePositionChangeToKernel() {
     Triple newPos = new Triple(211, 391, 0);
     vehicleModel.setVehiclePrecisePosition(newPos);
 
@@ -156,7 +156,7 @@ public class DefaultVehicleControllerTest {
   }
 
   @Test
-  public void shouldForwardAngleChangeToKernel() {
+  void shouldForwardAngleChangeToKernel() {
     double newAngle = 7.5;
     vehicleModel.setVehicleOrientationAngle(newAngle);
 
@@ -165,7 +165,7 @@ public class DefaultVehicleControllerTest {
   }
 
   @Test
-  public void shouldForwardEnergyLevelChangeToKernel() {
+  void shouldForwardEnergyLevelChangeToKernel() {
     int newLevel = 80;
     vehicleModel.setVehicleEnergyLevel(newLevel);
     verify(vehicleService).updateVehicleEnergyLevel(vehicle.getReference(),
@@ -173,7 +173,7 @@ public class DefaultVehicleControllerTest {
   }
 
   @Test
-  public void shouldForwardLoadHandlingDevicesChangeToKernel() {
+  void shouldForwardLoadHandlingDevicesChangeToKernel() {
     List<LoadHandlingDevice> devices
         = List.of(new LoadHandlingDevice("MyLoadHandlingDevice", true));
     vehicleModel.setVehicleLoadHandlingDevices(devices);
@@ -183,7 +183,7 @@ public class DefaultVehicleControllerTest {
   }
 
   @Test
-  public void shouldForwardVehicleStateChangeToKernel() {
+  void shouldForwardVehicleStateChangeToKernel() {
     vehicleModel.setVehicleState(Vehicle.State.EXECUTING);
 
     verify(vehicleService).updateVehicleState(vehicle.getReference(),
@@ -191,7 +191,7 @@ public class DefaultVehicleControllerTest {
   }
 
   @Test
-  public void shouldForwardEventToBus() {
+  void shouldForwardEventToBus() {
     final String adapterName = "myAdapter";
     final String eventString = "myString";
     final List<VehicleCommAdapterEvent> eventsReceived = new ArrayList<>();
@@ -211,7 +211,7 @@ public class DefaultVehicleControllerTest {
 
   // Test cases for implementation of interface VehicleController start here.
   @Test
-  public void shouldHaveIdempotentEnabledState() {
+  void shouldHaveIdempotentEnabledState() {
     stdVehicleController.initialize();
     assertTrue(stdVehicleController.isInitialized());
     stdVehicleController.initialize();
@@ -223,7 +223,7 @@ public class DefaultVehicleControllerTest {
   }
 
   @Test
-  public void shouldSetClaimOnNewTransportOrder() {
+  void shouldSetClaimOnNewTransportOrder() {
     Location location = dataObjectFactory.createLocation();
 
     Point dstPoint = dataObjectFactory.createPoint();

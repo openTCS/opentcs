@@ -26,7 +26,7 @@ import org.opentcs.util.event.SimpleEventBus;
 /**
  * Unit tests for {@link PeripheralJobPoolManager}.
  */
-public class PeripheralJobPoolManagerTest {
+class PeripheralJobPoolManagerTest {
 
   /**
    * The object repository.
@@ -42,7 +42,7 @@ public class PeripheralJobPoolManagerTest {
   private PeripheralJobPoolManager jobPoolManager;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     objectRepo = new TCSObjectRepository();
     plantModelManager = new PlantModelManager(objectRepo, new SimpleEventBus());
     jobPoolManager = new PeripheralJobPoolManager(objectRepo,
@@ -60,7 +60,7 @@ public class PeripheralJobPoolManagerTest {
   }
 
   @Test
-  public void storeCreatedObjectsInRepo() {
+  void storeCreatedObjectsInRepo() {
     jobPoolManager.createPeripheralJob(
         new PeripheralJobCreationTO(
             "some-job",
@@ -74,7 +74,7 @@ public class PeripheralJobPoolManagerTest {
   }
 
   @Test
-  public void removeAllCreatedObjectsOnClear() {
+  void removeAllCreatedObjectsOnClear() {
     jobPoolManager.createPeripheralJob(
         new PeripheralJobCreationTO(
             "some-job",

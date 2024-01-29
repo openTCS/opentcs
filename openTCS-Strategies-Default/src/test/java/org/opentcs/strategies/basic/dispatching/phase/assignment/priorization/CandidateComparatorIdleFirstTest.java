@@ -27,17 +27,17 @@ import org.opentcs.strategies.basic.dispatching.priorization.candidate.Candidate
 
 /**
  */
-public class CandidateComparatorIdleFirstTest {
+class CandidateComparatorIdleFirstTest {
 
   private CandidateComparatorIdleFirst comparator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     comparator = new CandidateComparatorIdleFirst();
   }
 
   @Test
-  public void sortVehiclesIdleFirst() {
+  void sortVehiclesIdleFirst() {
     AssignmentCandidate candidate1 = candidateWithVehicleState(Vehicle.State.CHARGING);
     AssignmentCandidate candidate2 = candidateWithVehicleState(Vehicle.State.IDLE);
     AssignmentCandidate candidate3 = candidateWithVehicleState(Vehicle.State.CHARGING);

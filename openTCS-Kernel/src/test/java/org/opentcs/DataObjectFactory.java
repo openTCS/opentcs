@@ -55,7 +55,7 @@ public class DataObjectFactory {
    *
    * @param pointNamePrefix The suffix used for points.
    */
-  public void setPointNamePrefix(String pointNamePrefix) {
+  void setPointNamePrefix(String pointNamePrefix) {
     this.pointNamePrefix = pointNamePrefix;
   }
 
@@ -64,7 +64,7 @@ public class DataObjectFactory {
    *
    * @param pathNamePrefix The prefix used for paths.
    */
-  public void setPathNamePrefix(String pathNamePrefix) {
+  void setPathNamePrefix(String pathNamePrefix) {
     this.pathNamePrefix = pathNamePrefix;
   }
 
@@ -73,7 +73,7 @@ public class DataObjectFactory {
    *
    * @param vehicleNamePrefix The prefix used for vehicles.
    */
-  public void setVehicleNamePrefix(String vehicleNamePrefix) {
+  void setVehicleNamePrefix(String vehicleNamePrefix) {
     this.vehicleNamePrefix = vehicleNamePrefix;
   }
 
@@ -82,7 +82,7 @@ public class DataObjectFactory {
    *
    * @param locTypeNamePrefix The prefix used for location types.
    */
-  public void setLocTypeNamePrefix(String locTypeNamePrefix) {
+  void setLocTypeNamePrefix(String locTypeNamePrefix) {
     this.locTypeNamePrefix = locTypeNamePrefix;
   }
 
@@ -91,7 +91,7 @@ public class DataObjectFactory {
    *
    * @param locationNamePrefix The prefix used for locations.
    */
-  public void setLocationNamePrefix(String locationNamePrefix) {
+  void setLocationNamePrefix(String locationNamePrefix) {
     this.locationNamePrefix = locationNamePrefix;
   }
 
@@ -112,7 +112,7 @@ public class DataObjectFactory {
    * @param dstRef Reference to the end point.
    * @return A new path from the start point to the end point.
    */
-  public Path createPath(TCSObjectReference<Point> srcRef,
+  Path createPath(TCSObjectReference<Point> srcRef,
                          TCSObjectReference<Point> dstRef) {
     ++uniqueIdCounter;
     return new Path(pathNamePrefix + uniqueIdCounter, srcRef, dstRef);
@@ -136,7 +136,7 @@ public class DataObjectFactory {
    *
    * @return A new path with anonymous start and end points.
    */
-  public Path createPath() {
+  Path createPath() {
     Point dstPoint = createPoint();
     ++uniqueIdCounter;
     return createPath(dstPoint.getReference());
@@ -157,7 +157,7 @@ public class DataObjectFactory {
    *
    * @return A new location type.
    */
-  public LocationType createLocationType() {
+  LocationType createLocationType() {
     ++uniqueIdCounter;
     return new LocationType(locTypeNamePrefix + uniqueIdCounter);
   }

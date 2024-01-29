@@ -22,27 +22,27 @@ import org.opentcs.access.to.CreationTO;
 /**
  * Tests for a {@link PrefixedUlidObjectNameProvider}.
  */
-public class PrefixedUlidObjectNameProviderTest {
+class PrefixedUlidObjectNameProviderTest {
 
   private PrefixedUlidObjectNameProvider nameProvider;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     this.nameProvider = new PrefixedUlidObjectNameProvider();
   }
 
   @Test
-  public void shouldUsePrefixFromCreationTO() {
+  void shouldUsePrefixFromCreationTO() {
     assertThat(nameProvider.apply(new CreationTO("SomeName-")), startsWith("SomeName-"));
   }
 
   @Test
-  public void shouldAppendSuffix() {
+  void shouldAppendSuffix() {
     assertThat(nameProvider.apply(new CreationTO("")), is(not("")));
   }
 
   @Test
-  public void shouldProvideNamesInChronologicalOrder() {
+  void shouldProvideNamesInChronologicalOrder() {
     final int count = 100000;
     final CreationTO to = new CreationTO("SomeName-");
 

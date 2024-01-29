@@ -26,7 +26,7 @@ import org.opentcs.data.order.OrderSequence;
 /**
  * Test for {@link IsParkable}.
  */
-public class IsParkableTest {
+class IsParkableTest {
 
   private TCSObjectService objectService;
   private IsParkable isParkable;
@@ -34,7 +34,7 @@ public class IsParkableTest {
   private Point p1;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     objectService = mock();
     isParkable = new IsParkable(objectService);
     p1 = new Point("p1");
@@ -50,8 +50,8 @@ public class IsParkableTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings={OrderConstants.TYPE_ANY,OrderConstants.TYPE_PARK})
-  public void checkVehicleIsParkable(String type) {
+  @ValueSource(strings = {OrderConstants.TYPE_ANY, OrderConstants.TYPE_PARK})
+  void checkVehicleIsParkable(String type) {
     Vehicle vehicle = parkableVehicle
         .withAllowedOrderTypes(Set.of(type));
     assertThat(isParkable.apply(vehicle), hasSize(0));
@@ -60,14 +60,14 @@ public class IsParkableTest {
   @ParameterizedTest
   @EnumSource(value = Vehicle.IntegrationLevel.class,
               names = {"TO_BE_IGNORED", "TO_BE_NOTICED", "TO_BE_RESPECTED"})
-  public void checkVehicleIsNotFullyIntegrated(Vehicle.IntegrationLevel integrationLevel) {
+  void checkVehicleIsNotFullyIntegrated(Vehicle.IntegrationLevel integrationLevel) {
     Vehicle vehicle = parkableVehicle.withIntegrationLevel(integrationLevel);
 
     assertThat(isParkable.apply(vehicle), hasSize(1));
   }
 
   @Test
-  public void checkVehicleHasParkingPosition() {
+  void checkVehicleHasParkingPosition() {
     p1 = p1.withType(Point.Type.PARK_POSITION);
     Vehicle vehicle = parkableVehicle.withCurrentPosition(p1.getReference());
 
@@ -80,7 +80,7 @@ public class IsParkableTest {
   @ParameterizedTest
   @EnumSource(value = Vehicle.State.class,
               names = {"UNKNOWN", "UNAVAILABLE", "ERROR", "EXECUTING", "CHARGING"})
-  public void checkVehicleHasIncorrectState(Vehicle.State state) {
+  void checkVehicleHasIncorrectState(Vehicle.State state) {
     Vehicle vehicle = parkableVehicle.withState(state);
 
     assertThat(isParkable.apply(vehicle), hasSize(1));
@@ -89,14 +89,14 @@ public class IsParkableTest {
   @ParameterizedTest
   @EnumSource(value = Vehicle.ProcState.class,
               names = {"AWAITING_ORDER", "PROCESSING_ORDER"})
-  public void checkVehicleHasIncorrectProcState(Vehicle.ProcState procState) {
+  void checkVehicleHasIncorrectProcState(Vehicle.ProcState procState) {
     Vehicle vehicle = parkableVehicle.withProcState(procState);
 
     assertThat(isParkable.apply(vehicle), hasSize(1));
   }
 
   @Test
-  public void checkVehicleHasOrderSequence() {
+  void checkVehicleHasOrderSequence() {
     Vehicle vehicle = parkableVehicle
         .withOrderSequence(new OrderSequence("OS").getReference());
 
@@ -104,7 +104,7 @@ public class IsParkableTest {
   }
 
   @Test
-  public void checkVehicleIsNotAllowedToPark() {
+  void checkVehicleIsNotAllowedToPark() {
     Vehicle vehicle = parkableVehicle
         .withAllowedOrderTypes(Set.of(OrderConstants.TYPE_CHARGE));
 

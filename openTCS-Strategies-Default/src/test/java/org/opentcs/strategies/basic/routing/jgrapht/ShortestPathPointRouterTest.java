@@ -30,7 +30,7 @@ import org.opentcs.strategies.basic.routing.PointRouter;
 
 /**
  */
-public class ShortestPathPointRouterTest {
+class ShortestPathPointRouterTest {
 
   private Point pointA;
   private Point pointB;
@@ -43,7 +43,7 @@ public class ShortestPathPointRouterTest {
   private ShortestPathPointRouter pointRouter;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     pointA = new Point("A");
     pointB = new Point("B");
     pointC = new Point("C");
@@ -66,36 +66,36 @@ public class ShortestPathPointRouterTest {
   }
 
   @Test
-  public void returnZeroCostsIfDestinationIsSource() {
+  void returnZeroCostsIfDestinationIsSource() {
     assertEquals(0, pointRouter.getCosts(pointA.getReference(), pointA.getReference()));
   }
 
   @Test
-  public void returnEmptyRouteIfDestinationIsSource() {
+  void returnEmptyRouteIfDestinationIsSource() {
     List<Step> steps = pointRouter.getRouteSteps(pointA, pointA);
     assertNotNull(steps);
     assertThat(steps, is(empty()));
   }
 
   @Test
-  public void returnInfiniteCostsIfNoRouteExists() {
+  void returnInfiniteCostsIfNoRouteExists() {
     assertEquals(PointRouter.INFINITE_COSTS,
                  pointRouter.getCosts(pointA.getReference(), pointB.getReference()));
   }
 
   @Test
-  public void returnNullIfNoRouteExists() {
+  void returnNullIfNoRouteExists() {
     assertNull(pointRouter.getRouteSteps(pointA, pointB));
   }
 
   @Test
-  public void returnGraphPathCostsForExistingRoute() {
+  void returnGraphPathCostsForExistingRoute() {
     assertEquals(1234,
                  pointRouter.getCosts(pointA.getReference(), pointC.getReference()));
   }
 
   @Test
-  public void returnGraphPathStepsForExistingRoute() {
+  void returnGraphPathStepsForExistingRoute() {
     List<Step> steps = pointRouter.getRouteSteps(pointA, pointC);
     assertNotNull(steps);
     assertThat(steps, is(not(empty())));

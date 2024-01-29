@@ -36,7 +36,7 @@ import org.opentcs.access.CredentialsException;
 /**
  * Unit tests for {@link UserManager}.
  */
-public class UserManagerTest {
+class UserManagerTest {
 
   private File homedirectory;
   private EventSource eventSource;
@@ -49,7 +49,7 @@ public class UserManagerTest {
   private UserManager manager;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     homedirectory = mock();
     eventSource = mock();
     kernelExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -80,17 +80,17 @@ public class UserManagerTest {
   }
 
   @AfterEach
-  public void tearDown() {
+  void tearDown() {
     kernelExecutor.shutdown();
   }
 
   @Test
-  public void testIfUserManagerIsInitialized() {
+  void testIfUserManagerIsInitialized() {
     assertThat(manager.isInitialized(), is(true));
   }
 
   @Test
-  public void testIfCleanerTaskIsTerminated() {
+  void testIfCleanerTaskIsTerminated() {
     manager.terminate();
 
     assertThat(manager.isInitialized(), is(false));
@@ -98,37 +98,37 @@ public class UserManagerTest {
   }
 
   @Test
-  public void checkGetKnownUsers() {
+  void checkGetKnownUsers() {
     assertThat(manager.getKnownUsers(), is(aMapWithSize(1)));
     assertThat(manager.getKnownUsers(), hasEntry("peter", account1));
   }
 
   @Test
-  public void checkGetUserShouldReturnRightUser() {
+  void checkGetUserShouldReturnRightUser() {
     assertThat(manager.getUser("peter"), is(account1));
   }
 
   @Test
-  public void checkGetUserShouldReturnNullForUnknownUser() {
+  void checkGetUserShouldReturnNullForUnknownUser() {
     assertNull(manager.getUser("marie"));
   }
 
   @Test
-  public void checkGetClientShouldReturnRightClient() {
+  void checkGetClientShouldReturnRightClient() {
     manager.registerClient(id1, client1);
 
     assertThat(manager.getClient(id1), is(client1));
   }
 
   @Test
-  public void checkGetClientShouldReturnNull() {
+  void checkGetClientShouldReturnNull() {
     manager.registerClient(id1, client1);
 
     assertNull(manager.getClient(new ClientID("jet")));
   }
 
   @Test
-  public void checkIfPollEventsReturnsTheCorrectEventList() {
+  void checkIfPollEventsReturnsTheCorrectEventList() {
     manager.registerClient(id1, client1);
 
     client1.getEventBuffer().setEventFilter(event -> true);
@@ -143,35 +143,35 @@ public class UserManagerTest {
   }
 
   @Test
-  public void checkVerifyCredentialsShouldThrowExceptionIfClientHasNoPermission() {
+  void checkVerifyCredentialsShouldThrowExceptionIfClientHasNoPermission() {
     manager.registerClient(id1, client1);
     assertThrows(CredentialsException.class,
                  () -> manager.verifyCredentials(id1, UserPermission.SAVE_MODEL));
   }
 
   @Test
-  public void checkVerifyCredentialsShouldThrowExceptionIfClientDoesNotExist() {
+  void checkVerifyCredentialsShouldThrowExceptionIfClientDoesNotExist() {
     assertThrows(CredentialsException.class,
                  () -> manager.verifyCredentials(new ClientID("unknown-client"),
                                                  UserPermission.SAVE_MODEL));
   }
 
   @Test
-  public void checkVerifyCredentialsShouldThrowNoException() {
+  void checkVerifyCredentialsShouldThrowNoException() {
     manager.registerClient(id1, client1);
     assertDoesNotThrow(
         () -> manager.verifyCredentials(id1, UserPermission.READ_DATA));
   }
 
   @Test
-  public void checkRegisterClient() {
+  void checkRegisterClient() {
     manager.registerClient(id1, client1);
     assertThat(manager.getKnownClients(), is(aMapWithSize(1)));
     assertThat(manager.getKnownClients(), hasEntry(id1, client1));
   }
 
   @Test
-  public void checkUnregisterClient() {
+  void checkUnregisterClient() {
     manager.registerClient(id1, client1);
     manager.unregisterClient(id1);
     assertThat(manager.getKnownClients(), is(anEmptyMap()));

@@ -21,21 +21,21 @@ import org.opentcs.util.event.SimpleEventBus;
 /**
  * Unit tests for {@link TCSObjectManager}.
  */
-public class TCSObjectManagerTest {
+class TCSObjectManagerTest {
 
   private TCSObjectRepository objectRepo;
   private EventBus eventBus;
   private TCSObjectManager objectManager;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     objectRepo = new TCSObjectRepository();
     eventBus = new SimpleEventBus();
     objectManager = new TCSObjectManager(objectRepo, eventBus);
   }
 
   @Test
-  public void emitEvent() {
+  void emitEvent() {
     List<Object> receivedEvents = new ArrayList<>();
     eventBus.subscribe(event -> receivedEvents.add(event));
     Point someObject = new Point("Point-00001").withType(Point.Type.HALT_POSITION);

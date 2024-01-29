@@ -55,7 +55,7 @@ public class XMLFileModelPersisterTest {
   private ArgumentCaptor<File> fileCaptor;
 
   @BeforeEach
-  public void setUp()
+  void setUp()
       throws IOException {
     modelParser = mock(ModelParser.class);
     persister = new XMLFileModelPersister(TestEnvironment.getKernelHomeDirectory(),
@@ -65,7 +65,7 @@ public class XMLFileModelPersisterTest {
   }
 
   @Test
-  public void createXmlFileInGivenDirectory()
+  void createXmlFileInGivenDirectory()
       throws IOException {
     persister.saveModel(createTestModel(MODEL_NAME));
 

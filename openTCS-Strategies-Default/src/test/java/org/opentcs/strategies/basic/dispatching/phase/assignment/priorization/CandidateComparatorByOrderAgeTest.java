@@ -28,17 +28,17 @@ import org.opentcs.strategies.basic.dispatching.priorization.candidate.Candidate
 
 /**
  */
-public class CandidateComparatorByOrderAgeTest {
+class CandidateComparatorByOrderAgeTest {
 
   private CandidateComparatorByOrderAge comparator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     comparator = new CandidateComparatorByOrderAge();
   }
 
   @Test
-  public void sortOldTransportOrdersUp() {
+  void sortOldTransportOrdersUp() {
 
     AssignmentCandidate candidate1 = candidateWithOrderCreationTime(ofEpochMilli(10));
     AssignmentCandidate candidate2 = candidateWithOrderCreationTime(ofEpochMilli(50));

@@ -47,14 +47,14 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 /**
  * Unit tests for {@link TransportOrderHandler}.
  */
-public class TransportOrderHandlerTest {
+class TransportOrderHandlerTest {
 
   private TransportOrderService orderService;
   private KernelExecutorWrapper executorWrapper;
   private TransportOrderHandler handler;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     orderService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
 
@@ -62,7 +62,7 @@ public class TransportOrderHandlerTest {
   }
 
   @Test
-  public void createTransportOrder() {
+  void createTransportOrder() {
     // Arrange
     TransportOrder transportOrder = new TransportOrder("some-order", List.of());
     given(orderService.createTransportOrder(any(TransportOrderCreationTO.class)))
@@ -121,7 +121,7 @@ public class TransportOrderHandlerTest {
   }
 
   @Test
-  public void setTransportOrderIntendedVehicle() {
+  void setTransportOrderIntendedVehicle() {
     // Arrange
     TransportOrder transportOrder = new TransportOrder("some-order", List.of());
     Vehicle vehicle = new Vehicle("some-vehicle");
@@ -153,7 +153,7 @@ public class TransportOrderHandlerTest {
   }
 
   @Test
-  public void retrieveTransportOrdersUnfiltered() {
+  void retrieveTransportOrdersUnfiltered() {
     // Arrange
     TransportOrder transportOrder1 = new TransportOrder("some-order", List.of());
     TransportOrder transportOrder2 = new TransportOrder("some-order-2", List.of());
@@ -172,7 +172,7 @@ public class TransportOrderHandlerTest {
   }
 
   @Test
-  public void retrieveTransportOrdersFilteredByIntendedVehicle() {
+  void retrieveTransportOrdersFilteredByIntendedVehicle() {
     // Arrange
     TransportOrder transportOrder1 = new TransportOrder("some-order", List.of());
     TransportOrder transportOrder2 = new TransportOrder("some-order-2", List.of());
@@ -198,7 +198,7 @@ public class TransportOrderHandlerTest {
   }
 
   @Test
-  public void retrieveTransportOrderByName() {
+  void retrieveTransportOrderByName() {
     // Arrange
     TransportOrder transportOrder = new TransportOrder("some-order", List.of());
 
@@ -218,7 +218,7 @@ public class TransportOrderHandlerTest {
   }
 
   @Test
-  public void createOrderSequence() {
+  void createOrderSequence() {
     // Arrange
     OrderSequence orderSequence = new OrderSequence("some-sequence");
     given(orderService.createOrderSequence(any(OrderSequenceCreationTO.class)))
@@ -257,7 +257,7 @@ public class TransportOrderHandlerTest {
   }
 
   @Test
-  public void setOrderSequenceComplete() {
+  void setOrderSequenceComplete() {
     // Arrange
     OrderSequence orderSequence = new OrderSequence("some-sequence");
 
@@ -274,7 +274,7 @@ public class TransportOrderHandlerTest {
   }
 
   @Test
-  public void retrieveOrderSequencesUnfiltered() {
+  void retrieveOrderSequencesUnfiltered() {
     // Arrange
     OrderSequence sequence1 = new OrderSequence("some-sequence");
     OrderSequence sequence2 = new OrderSequence("some-sequence-2");
@@ -293,7 +293,7 @@ public class TransportOrderHandlerTest {
   }
 
   @Test
-  public void retrieveOrderSequencesFilteredByIntendedVehicle() {
+  void retrieveOrderSequencesFilteredByIntendedVehicle() {
     // Arrange
     OrderSequence sequence1 = new OrderSequence("some-sequence");
     OrderSequence sequence2 = new OrderSequence("some-sequence-2");
@@ -319,7 +319,7 @@ public class TransportOrderHandlerTest {
   }
 
   @Test
-  public void retrieveOrderSequenceByName() {
+  void retrieveOrderSequenceByName() {
     // Arrange
     OrderSequence orderSequence = new OrderSequence("some-sequence");
 

@@ -19,20 +19,20 @@ import org.opentcs.guing.base.model.AbstractModelComponent;
 /**
  * A test for a length property.
  */
-public class LengthPropertyTest {
+class LengthPropertyTest {
 
   private LengthProperty property;
 
   @ParameterizedTest
   @ValueSource(strings = {"mm", "cm", "m", "km"})
-  public void testValidUnits(String unit) {
+  void testValidUnits(String unit) {
     property = new LengthProperty(new DummyComponent());
     assertTrue(property.isPossibleUnit(unit));
   }
 
   @ParameterizedTest
   @MethodSource("paramsFactory")
-  public void testPropertyConversion(Unit unit, Object result) {
+  void testPropertyConversion(Unit unit, Object result) {
     property = new LengthProperty(new DummyComponent(), 10, Unit.CM);
     property.convertTo(unit);
     assertEquals(result, property.getValue());
@@ -40,13 +40,13 @@ public class LengthPropertyTest {
   }
 
   @Test
-  public void testPropertyRange() {
+  void testPropertyRange() {
     property = new LengthProperty(new DummyComponent());
     assertEquals(0, property.getValidRange().getMin(), 0);
     assertEquals(Double.MAX_VALUE, property.getValidRange().getMax(), 0);
   }
 
-  public static Object[][] paramsFactory() {
+  static Object[][] paramsFactory() {
     return new Object[][] {{Unit.MM, 100.0},
                            {Unit.CM, 10.0},
                            {Unit.M, 0.1},

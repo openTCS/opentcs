@@ -23,7 +23,7 @@ import org.opentcs.data.model.TCSResourceReference;
 /**
  * Tests for {@link SplitResources}.
  */
-public class SplitResourcesTest {
+class SplitResourcesTest {
 
   private Point pointA;
   private Point pointB;
@@ -37,7 +37,7 @@ public class SplitResourcesTest {
   private List<Set<TCSResourceReference<?>>> allResources;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     pointA = new Point("A");
     pointB = new Point("B");
     pointC = new Point("C");
@@ -53,7 +53,7 @@ public class SplitResourcesTest {
   }
 
   @Test
-  public void handleEmptyResourceSets() {
+  void handleEmptyResourceSets() {
     SplitResources result = SplitResources.from(List.of(), pointB.getReference());
 
     assertThat(result, is(notNullValue()));
@@ -62,7 +62,7 @@ public class SplitResourcesTest {
   }
 
   @Test
-  public void treatAllResourcesAsBehindForNullDelimiter() {
+  void treatAllResourcesAsBehindForNullDelimiter() {
     SplitResources result = SplitResources.from(allResources, null);
 
     assertThat(result, is(notNullValue()));
@@ -71,7 +71,7 @@ public class SplitResourcesTest {
   }
 
   @Test
-  public void treatDelimiterAsBehind() {
+  void treatDelimiterAsBehind() {
     SplitResources result = SplitResources.from(allResources, pointC.getReference());
 
     assertThat(result, is(notNullValue()));

@@ -32,20 +32,20 @@ import org.opentcs.strategies.basic.dispatching.priorization.candidate.Candidate
 
 /**
  */
-public class CompositeVehicleCandidateComparatorTest {
+class CompositeVehicleCandidateComparatorTest {
 
   private CompositeVehicleCandidateComparator comparator;
   private DefaultDispatcherConfiguration configuration;
   private Map<String, Comparator<AssignmentCandidate>> availableComparators;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     configuration = Mockito.mock(DefaultDispatcherConfiguration.class);
     availableComparators = new HashMap<>();
   }
 
   @Test
-  public void sortNamesUpForOtherwiseEqualInstances() {
+  void sortNamesUpForOtherwiseEqualInstances() {
 
     Mockito.when(configuration.vehicleCandidatePriorities())
         .thenReturn(List.of());
@@ -68,7 +68,7 @@ public class CompositeVehicleCandidateComparatorTest {
   }
 
   @Test
-  public void sortsByNameAndEnergylevel() {
+  void sortsByNameAndEnergylevel() {
     Mockito.when(configuration.vehicleCandidatePriorities())
         .thenReturn(List.of());
     comparator = new CompositeVehicleCandidateComparator(configuration, availableComparators);
@@ -90,7 +90,7 @@ public class CompositeVehicleCandidateComparatorTest {
   }
 
   @Test
-  public void sortsByNameAndRoutingCostAndEnergyLevel() {
+  void sortsByNameAndRoutingCostAndEnergyLevel() {
     String initRoutingCostKey = "BY_INITIAL_ROUTING_COSTS";
     Mockito.when(configuration.vehicleCandidatePriorities())
         .thenReturn(List.of(initRoutingCostKey));

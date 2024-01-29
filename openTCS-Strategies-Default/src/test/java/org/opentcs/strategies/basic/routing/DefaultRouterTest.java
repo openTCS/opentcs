@@ -30,7 +30,7 @@ import org.opentcs.data.model.Vehicle;
 /**
  * Test cases for the {@link DefaultRouter}.
  */
-public class DefaultRouterTest {
+class DefaultRouterTest {
 
   /**
    * The vehicles which are returned when asking the kernel for vehicles.
@@ -63,7 +63,7 @@ public class DefaultRouterTest {
   private DefaultRouterConfiguration configuration;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     objectService = mock(TCSObjectService.class);
     builder = mock(PointRouterFactory.class);
     when(objectService.fetchObjects(Vehicle.class)).thenReturn(vehicles);
@@ -78,7 +78,7 @@ public class DefaultRouterTest {
   }
 
   @Test
-  public void shouldUseDefaultRoutingGroup() {
+  void shouldUseDefaultRoutingGroup() {
     Point sourcePoint = new Point("Some source point");
     Point destinationPoint = new Point("Some destination point");
 
@@ -91,7 +91,7 @@ public class DefaultRouterTest {
   }
 
   @Test
-  public void shouldUseDefinedRoutingGroup() {
+  void shouldUseDefinedRoutingGroup() {
     Point sourcePoint = new Point("Some source point");
     Point destinationPoint = new Point("Some destination point");
 
@@ -104,7 +104,7 @@ public class DefaultRouterTest {
   }
 
   @Test
-  public void shouldUseDefaultAndSetRoutingGroups() {
+  void shouldUseDefaultAndSetRoutingGroups() {
     Point sourcePoint = new Point("Some source point");
     Point destinationPoint = new Point("Some destination point");
 
@@ -117,7 +117,7 @@ public class DefaultRouterTest {
   }
 
   @Test
-  public void shouldUseSetRoutingGroups() {
+  void shouldUseSetRoutingGroups() {
     Point sourcePoint = new Point("Some source point");
     Point destinationPoint = new Point("Some destination point");
 

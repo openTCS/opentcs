@@ -56,7 +56,7 @@ class VehicleHandlerTest {
   private AttachmentInformation attachmentInfo;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     vehicleService = mock();
     routerService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
@@ -79,7 +79,7 @@ class VehicleHandlerTest {
   }
 
   @Test
-  public void attachMockVehicleAdapter() {
+  void attachMockVehicleAdapter() {
     // Act
     handler.putVehicleCommAdapter(
         "some-vehicle",
@@ -94,7 +94,7 @@ class VehicleHandlerTest {
 
 
   @Test
-  public void throwOnAttachAdapterForUnknownVehicle() {
+  void throwOnAttachAdapterForUnknownVehicle() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(
             () -> handler.putVehicleCommAdapter(
@@ -105,7 +105,7 @@ class VehicleHandlerTest {
   }
 
   @Test
-  public void throwOnAttachUnknownAdapter() {
+  void throwOnAttachUnknownAdapter() {
     assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(
             () -> handler.putVehicleCommAdapter(
@@ -116,7 +116,7 @@ class VehicleHandlerTest {
   }
 
   @Test
-  public void enableCommAdapter() {
+  void enableCommAdapter() {
     handler.putVehicleCommAdapterEnabled("some-vehicle", "true");
 
     then(vehicleService).should().enableCommAdapter(vehicle.getReference());
@@ -124,7 +124,7 @@ class VehicleHandlerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"false", "flase", "some-value-that-is-not-true"})
-  public void disableCommAdapterOnAnyNontrueValue(String value) {
+  void disableCommAdapterOnAnyNontrueValue(String value) {
     handler.putVehicleCommAdapterEnabled("some-vehicle", value);
 
     then(vehicleService).should().disableCommAdapter(vehicle.getReference());
@@ -132,19 +132,19 @@ class VehicleHandlerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"true ", "false"})
-  public void throwOnEnableUnknownVehicle(String value) {
+  void throwOnEnableUnknownVehicle(String value) {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.putVehicleCommAdapterEnabled("some-unknown-vehicle", value));
   }
 
   @Test
-  public void fetchAttachmentInformation() {
+  void fetchAttachmentInformation() {
     assertThat(handler.getVehicleCommAdapterAttachmentInformation("some-vehicle"))
         .isSameAs(attachmentInfo);
   }
 
   @Test
-  public void throwOnFetchInfoForUnknownLocation() {
+  void throwOnFetchInfoForUnknownLocation() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(
             () -> handler.getVehicleCommAdapterAttachmentInformation("some-unknown-vehicle")
@@ -153,7 +153,7 @@ class VehicleHandlerTest {
 
   @ParameterizedTest
   @EnumSource(Vehicle.ProcState.class)
-  public void retrieveVehiclesByProcState(Vehicle.ProcState procState) {
+  void retrieveVehiclesByProcState(Vehicle.ProcState procState) {
     // Arrange
     Vehicle vehicleWithProcState = vehicle.withProcState(procState);
     given(vehicleService.fetchObjects(ArgumentMatchers.<Class<Vehicle>>any(), any()))
@@ -166,13 +166,13 @@ class VehicleHandlerTest {
   }
 
   @Test
-  public void throwOnRetrieveVehiclesForUnknownProcState() {
+  void throwOnRetrieveVehiclesForUnknownProcState() {
     assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(() -> handler.getVehiclesState("some-unknown-proc-state"));
   }
 
   @Test
-  public void retrieveVehicleByName() {
+  void retrieveVehicleByName() {
     // Act & Assert: happy path
     GetVehicleResponseTO result = handler.getVehicleStateByName("some-vehicle");
     MatcherAssert.assertThat(result, is(notNullValue()));
@@ -185,7 +185,7 @@ class VehicleHandlerTest {
 
   @ParameterizedTest
   @EnumSource(Vehicle.IntegrationLevel.class)
-  public void updateVehicleIntegrationLevel(Vehicle.IntegrationLevel integrationLevel) {
+  void updateVehicleIntegrationLevel(Vehicle.IntegrationLevel integrationLevel) {
     handler.putVehicleIntegrationLevel("some-vehicle", integrationLevel.name());
     then(vehicleService)
         .should()
@@ -193,7 +193,7 @@ class VehicleHandlerTest {
   }
 
   @Test
-  public void throwOnUpdateIntegrationLevelForUnknownVehicleOrIntegrationLevel() {
+  void throwOnUpdateIntegrationLevelForUnknownVehicleOrIntegrationLevel() {
     // Act & Assert: nonexistent vehicle
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.putVehicleIntegrationLevel("some-unknown-vehicle",
@@ -206,7 +206,7 @@ class VehicleHandlerTest {
   }
 
   @Test
-  public void pauseVehicle() {
+  void pauseVehicle() {
     handler.putVehiclePaused("some-vehicle", "true");
 
     then(vehicleService).should().updateVehiclePaused(vehicle.getReference(), true);
@@ -214,7 +214,7 @@ class VehicleHandlerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"false", "flase", "some-value-that-is-not-true"})
-  public void unpauseVehicleOnAnyNontrueValue(String value) {
+  void unpauseVehicleOnAnyNontrueValue(String value) {
     handler.putVehiclePaused("some-vehicle", value);
 
     then(vehicleService).should().updateVehiclePaused(vehicle.getReference(), false);
@@ -222,33 +222,33 @@ class VehicleHandlerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"true ", "false"})
-  public void throwOnPauseUnknownVehicle(String value) {
+  void throwOnPauseUnknownVehicle(String value) {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.putVehiclePaused("some-unknown-vehicle", value));
   }
 
   @Test
-  public void setVehicleEnvelopeKey() {
+  void setVehicleEnvelopeKey() {
     handler.putVehicleEnvelopeKey("some-vehicle", "some-key");
 
     then(vehicleService).should().updateVehicleEnvelopeKey(vehicle.getReference(), "some-key");
   }
 
   @Test
-  public void nullVehicleEnvelopeKey() {
+  void nullVehicleEnvelopeKey() {
     handler.putVehicleEnvelopeKey("some-vehicle", null);
 
     then(vehicleService).should().updateVehicleEnvelopeKey(vehicle.getReference(), null);
   }
 
   @Test
-  public void throwOnSetEnvelopeUnknownVehicle() {
+  void throwOnSetEnvelopeUnknownVehicle() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.putVehicleEnvelopeKey("some-unknown-vehicle", "some-key"));
   }
 
   @Test
-  public void updateVehicleAllowedOrderTypes() {
+  void updateVehicleAllowedOrderTypes() {
     // Act
     handler.putVehicleAllowedOrderTypes(
         "some-vehicle",
@@ -267,7 +267,7 @@ class VehicleHandlerTest {
   }
 
   @Test
-  public void throwOnUpdateAllowedOrderTypesForUnknownVehicle() {
+  void throwOnUpdateAllowedOrderTypesForUnknownVehicle() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(
             () -> handler.putVehicleAllowedOrderTypes("some-unknown-vehicle",
@@ -276,7 +276,7 @@ class VehicleHandlerTest {
   }
 
   @Test
-  public void retrieveVehicleRoutesForCurrentPosition() {
+  void retrieveVehicleRoutesForCurrentPosition() {
     // Arrange
     Point vehiclePosition = new Point("some-point");
     Point destinationPoint1 = new Point("some-destination-point");
@@ -338,7 +338,7 @@ class VehicleHandlerTest {
   }
 
   @Test
-  public void retrieveVehicleRoutesForPositionProvidedInRequest() {
+  void retrieveVehicleRoutesForPositionProvidedInRequest() {
     // Arrange
     Point sourcePoint = new Point("some-source-point");
     Point destinationPoint1 = new Point("some-destination-point");
@@ -377,7 +377,7 @@ class VehicleHandlerTest {
         );
   }
 
-  public static class MockVehicleCommAdapterDescription
+  static class MockVehicleCommAdapterDescription
       extends VehicleCommAdapterDescription {
 
     @Override

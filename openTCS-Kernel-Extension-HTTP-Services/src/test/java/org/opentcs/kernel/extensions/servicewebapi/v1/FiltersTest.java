@@ -24,10 +24,10 @@ import org.opentcs.data.peripherals.PeripheralOperation;
 /**
  * Unit tests for {@link Filters}.
  */
-public class FiltersTest {
+class FiltersTest {
 
   @Test
-  public void acceptTransportOrdersRegardlessOfIntendedVehicle() {
+  void acceptTransportOrdersRegardlessOfIntendedVehicle() {
     assertThat(
         Filters.transportOrderWithIntendedVehicle(null)
             .test(
@@ -48,7 +48,7 @@ public class FiltersTest {
   }
 
   @Test
-  public void acceptTransportOrdersWithGivenIntendedVehicle() {
+  void acceptTransportOrdersWithGivenIntendedVehicle() {
     Vehicle vehicle = new Vehicle("some-vehicle");
 
     assertThat(
@@ -71,7 +71,7 @@ public class FiltersTest {
   }
 
   @Test
-  public void acceptOrderSequencesRegardlessOfIntendedVehicle() {
+  void acceptOrderSequencesRegardlessOfIntendedVehicle() {
     assertThat(
         Filters.orderSequenceWithIntendedVehicle(null)
             .test(
@@ -92,7 +92,7 @@ public class FiltersTest {
   }
 
   @Test
-  public void acceptOrderSequenceWithGivenIntendedVehicle() {
+  void acceptOrderSequenceWithGivenIntendedVehicle() {
     Vehicle vehicle = new Vehicle("some-vehicle");
 
     assertThat(
@@ -115,7 +115,7 @@ public class FiltersTest {
   }
 
   @Test
-  public void acceptPeripheralJobsRegardlessOfRelatedVehicle() {
+  void acceptPeripheralJobsRegardlessOfRelatedVehicle() {
     Location location
         = new Location("some-location", new LocationType("some-location-type").getReference());
     PeripheralJob job = new PeripheralJob(
@@ -147,7 +147,7 @@ public class FiltersTest {
   }
 
   @Test
-  public void acceptPeripheralJobsWithGivenRelatedVehicle() {
+  void acceptPeripheralJobsWithGivenRelatedVehicle() {
     Location location
         = new Location("some-location", new LocationType("some-location-type").getReference());
     PeripheralJob job = new PeripheralJob(
@@ -180,7 +180,7 @@ public class FiltersTest {
   }
 
   @Test
-  public void acceptPeripheralJobsRegardlessOfRelatedTransportOrder() {
+  void acceptPeripheralJobsRegardlessOfRelatedTransportOrder() {
     Location location
         = new Location("some-location", new LocationType("some-location-type").getReference());
     PeripheralJob job = new PeripheralJob(
@@ -214,7 +214,7 @@ public class FiltersTest {
   }
 
   @Test
-  public void acceptPeripheralJobsWithGivenRelatedTransportOrder() {
+  void acceptPeripheralJobsWithGivenRelatedTransportOrder() {
     Location location
         = new Location("some-location", new LocationType("some-location-type").getReference());
     PeripheralJob job = new PeripheralJob(
@@ -248,7 +248,7 @@ public class FiltersTest {
 
   @ParameterizedTest
   @EnumSource(Vehicle.ProcState.class)
-  public void acceptVehiclesWithAnyProcState(Vehicle.ProcState procState) {
+  void acceptVehiclesWithAnyProcState(Vehicle.ProcState procState) {
     assertThat(
         Filters.vehicleWithProcState(null)
             .test(
@@ -260,7 +260,7 @@ public class FiltersTest {
   }
 
   @Test
-  public void acceptVehiclesWithGivenProcStateOnly() {
+  void acceptVehiclesWithGivenProcStateOnly() {
     assertThat(
         Filters.vehicleWithProcState(Vehicle.ProcState.IDLE)
             .test(

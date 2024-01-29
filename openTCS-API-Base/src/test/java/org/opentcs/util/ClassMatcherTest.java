@@ -15,10 +15,10 @@ import org.opentcs.data.model.Point;
 /**
  * Unit tests for {@link ClassMatcher}.
  */
-public class ClassMatcherTest {
+class ClassMatcherTest {
 
   @Test
-  public void confirmGivenClasses() {
+  void confirmGivenClasses() {
     ClassMatcher classMatcher = new ClassMatcher(Point.class, Path.class);
 
     assertTrue(classMatcher.test(new Point("some-point")));

@@ -29,7 +29,7 @@ class IsIdleAndDegradedTest {
   private IsIdleAndDegraded isIdleAndDegraded;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     isIdleAndDegraded = new IsIdleAndDegraded();
     idleAndDegradedVehicle = new Vehicle("V1")
         .withIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED)
@@ -41,8 +41,8 @@ class IsIdleAndDegradedTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings={OrderConstants.TYPE_ANY,OrderConstants.TYPE_CHARGE})
-  public void checkVehicleIsIdleAndDegraded(String type) {
+  @ValueSource(strings = {OrderConstants.TYPE_ANY, OrderConstants.TYPE_CHARGE})
+  void checkVehicleIsIdleAndDegraded(String type) {
     Vehicle vehicle = idleAndDegradedVehicle
         .withAllowedOrderTypes(Set.of(type));
     assertThat(isIdleAndDegraded.apply(vehicle), hasSize(0));
@@ -51,14 +51,14 @@ class IsIdleAndDegradedTest {
   @ParameterizedTest
   @EnumSource(value = Vehicle.IntegrationLevel.class,
               names = {"TO_BE_IGNORED", "TO_BE_NOTICED", "TO_BE_RESPECTED"})
-  public void checkVehicleIsNotFullyIntegrated(Vehicle.IntegrationLevel integrationLevel) {
+  void checkVehicleIsNotFullyIntegrated(Vehicle.IntegrationLevel integrationLevel) {
     Vehicle vehicle = idleAndDegradedVehicle.withIntegrationLevel(integrationLevel);
 
     assertThat(isIdleAndDegraded.apply(vehicle), hasSize(1));
   }
 
   @Test
-  public void checkVehicleHasNoPosition() {
+  void checkVehicleHasNoPosition() {
     Vehicle vehicle = idleAndDegradedVehicle.withCurrentPosition(null);
 
     assertThat(isIdleAndDegraded.apply(vehicle), hasSize(1));
@@ -67,7 +67,7 @@ class IsIdleAndDegradedTest {
   @ParameterizedTest
   @EnumSource(value = Vehicle.State.class,
               names = {"UNKNOWN", "UNAVAILABLE", "ERROR", "EXECUTING", "CHARGING"})
-  public void checkVehicleHasIncorrectState(Vehicle.State state) {
+  void checkVehicleHasIncorrectState(Vehicle.State state) {
     Vehicle vehicle = idleAndDegradedVehicle.withState(state);
 
     assertThat(isIdleAndDegraded.apply(vehicle), hasSize(1));
@@ -76,14 +76,14 @@ class IsIdleAndDegradedTest {
   @ParameterizedTest
   @EnumSource(value = Vehicle.ProcState.class,
               names = {"AWAITING_ORDER", "PROCESSING_ORDER"})
-  public void checkVehicleHasIncorrectProcState(Vehicle.ProcState procState) {
+  void checkVehicleHasIncorrectProcState(Vehicle.ProcState procState) {
     Vehicle vehicle = idleAndDegradedVehicle.withProcState(procState);
 
     assertThat(isIdleAndDegraded.apply(vehicle), hasSize(1));
   }
 
   @Test
-  public void checkVehicleHasOrderSequence() {
+  void checkVehicleHasOrderSequence() {
     Vehicle vehicle = idleAndDegradedVehicle
         .withOrderSequence(new OrderSequence("OS").getReference());
 
@@ -91,7 +91,7 @@ class IsIdleAndDegradedTest {
   }
 
   @Test
-  public void checkEnergyLevelIsNotDegraded() {
+  void checkEnergyLevelIsNotDegraded() {
     Vehicle vehicle = idleAndDegradedVehicle
         .withEnergyLevel(100);
 
@@ -99,7 +99,7 @@ class IsIdleAndDegradedTest {
   }
 
   @Test
-  public void checkVehicleIsNotAllowedToCharge() {
+  void checkVehicleIsNotAllowedToCharge() {
     Vehicle vehicle = idleAndDegradedVehicle
         .withAllowedOrderTypes(Set.of(OrderConstants.TYPE_PARK));
 

@@ -24,17 +24,17 @@ import org.opentcs.guing.base.components.properties.type.LengthProperty;
 /**
  * Unit tests for {@link PointModel}.
  */
-public class PointModelTest {
+class PointModelTest {
 
   private PointModel pointModel;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     pointModel = new PointModel();
   }
 
   @Test
-  public void setModelPositionX() {
+  void setModelPositionX() {
     pointModel.getPropertyModelPositionX().setValueAndUnit(1234.0, LengthProperty.Unit.MM);
 
     assertThat(
@@ -44,7 +44,7 @@ public class PointModelTest {
   }
 
   @Test
-  public void setModelPositionY() {
+  void setModelPositionY() {
     pointModel.getPropertyModelPositionY().setValueAndUnit(1234.0, LengthProperty.Unit.MM);
 
     assertThat(
@@ -54,7 +54,7 @@ public class PointModelTest {
   }
 
   @Test
-  public void manageVehicleModels() {
+  void manageVehicleModels() {
     assertThat(pointModel.getAllocationStates(), is(anEmptyMap()));
 
     VehicleModel vehicleModel1 = new VehicleModel();
@@ -78,7 +78,7 @@ public class PointModelTest {
   }
 
   @Test
-  public void manageBlockModels() {
+  void manageBlockModels() {
     assertThat(pointModel.getBlockModels(), is(empty()));
 
     BlockModel blockModel1 = new BlockModel();

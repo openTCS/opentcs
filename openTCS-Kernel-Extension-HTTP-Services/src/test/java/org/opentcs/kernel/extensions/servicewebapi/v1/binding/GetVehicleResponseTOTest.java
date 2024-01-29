@@ -19,17 +19,17 @@ import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 /**
  * Unit tests for {@link GetVehicleResponseTO}.
  */
-public class GetVehicleResponseTOTest {
+class GetVehicleResponseTOTest {
 
   private JsonBinder jsonBinder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jsonBinder = new JsonBinder();
   }
 
   @Test
-  public void jsonSample() {
+  void jsonSample() {
     GetVehicleResponseTO to
         = new GetVehicleResponseTO()
             .setName("some-vehicle")

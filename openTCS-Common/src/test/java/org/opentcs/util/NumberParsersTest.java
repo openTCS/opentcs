@@ -14,15 +14,15 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  */
-public class NumberParsersTest {
+class NumberParsersTest {
 
   @ParameterizedTest
   @MethodSource("paramsFactory")
-  public void parsesNumbers(long number) {
+  void parsesNumbers(long number) {
     assertEquals(number, NumberParsers.parsePureDecimalLong(Long.toString(number)));
   }
 
-  public static LongStream paramsFactory() {
+  static LongStream paramsFactory() {
     return LongStream.concat(
         LongStream.of(Long.MIN_VALUE, Long.MIN_VALUE + 1, Long.MAX_VALUE - 1, Long.MAX_VALUE),
         LongStream.rangeClosed(-100, 100)

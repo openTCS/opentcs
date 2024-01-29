@@ -21,17 +21,17 @@ import org.opentcs.guing.common.util.UserMessageHelper;
 /**
  * A test for the {@link QuantityCellEditor}.
  */
-public class QuantityCellEditorTest {
+class QuantityCellEditorTest {
 
   private JTextField textField;
   private QuantityCellEditor quantityCellEditor;
   private LengthProperty lp;
 
-  public QuantityCellEditorTest() {
+  QuantityCellEditorTest() {
   }
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     textField = new JTextField();
     lp = new LengthProperty(mock(ModelComponent.class), 10, LengthProperty.Unit.CM);
     quantityCellEditor = new QuantityCellEditor(textField, mock(UserMessageHelper.class));
@@ -39,12 +39,12 @@ public class QuantityCellEditorTest {
   }
 
   @Test
-  public void testPropertyTextFieldContent() {
+  void testPropertyTextFieldContent() {
     assertEquals(textField.getText(), "10.0 cm");
   }
 
   @Test
-  public void allowValueInRange() {
+  void allowValueInRange() {
     textField.setText("100 cm");
     quantityCellEditor.getCellEditorValue();
     assertEquals(100.0, lp.getValue());
@@ -52,7 +52,7 @@ public class QuantityCellEditorTest {
   }
 
   @Test
-  public void disallowValueOutOfRange() {
+  void disallowValueOutOfRange() {
     // Value out of range, changes mustn't be saved to the property
     textField.setText("-100 cm");
     quantityCellEditor.getCellEditorValue();
@@ -61,7 +61,7 @@ public class QuantityCellEditorTest {
   }
 
   @Test
-  public void allowKnownUnit() {
+  void allowKnownUnit() {
     textField.setText("100 mm");
     quantityCellEditor.getCellEditorValue();
     assertEquals(100.0, lp.getValue());
@@ -69,7 +69,7 @@ public class QuantityCellEditorTest {
   }
 
   @Test
-  public void disallowUnknownUnit() {
+  void disallowUnknownUnit() {
     // Unknown unit, changes mustn't be saved to the property
     textField.setText("100 liter");
     quantityCellEditor.getCellEditorValue();
@@ -78,7 +78,7 @@ public class QuantityCellEditorTest {
   }
 
   @Test
-  public void disallowWrongFormat() {
+  void disallowWrongFormat() {
     // Strings without a blank index not allowed, changes mustn't be saved to the property
     textField.setText("100cm");
     quantityCellEditor.getCellEditorValue();
@@ -87,7 +87,7 @@ public class QuantityCellEditorTest {
   }
 
   @Test
-  public void disallowEmptyInputString() {
+  void disallowEmptyInputString() {
     // Empty string not allowed, changes mustn't be saved to the property
     textField.setText("");
     quantityCellEditor.getCellEditorValue();
@@ -96,7 +96,7 @@ public class QuantityCellEditorTest {
   }
 
   @Test
-  public void disallowCharactersInValue() {
+  void disallowCharactersInValue() {
     // Values mixed with text not allowed, changes musnt be saved to the property
     textField.setText("55asd.5 cm");
     quantityCellEditor.getCellEditorValue();

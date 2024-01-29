@@ -35,14 +35,14 @@ import org.opentcs.util.event.SimpleEventBus;
 /**
  * Unit tests for {@link StatusEventDispatcher}.
  */
-public class StatusEventDispatcherTest {
+class StatusEventDispatcherTest {
 
   private ServiceWebApiConfiguration configuration;
   private EventSource eventSource;
   private StatusEventDispatcher statusEventDispatcher;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     configuration = mock(ServiceWebApiConfiguration.class);
     eventSource = new SimpleEventBus();
     statusEventDispatcher = new StatusEventDispatcher(configuration, eventSource);
@@ -54,19 +54,19 @@ public class StatusEventDispatcherTest {
   }
 
   @AfterEach
-  public void tearDown() {
+  void tearDown() {
     statusEventDispatcher.terminate();
   }
 
   @Test
-  public void returnEmptyListInitially() {
+  void returnEmptyListInitially() {
     GetEventsResponseTO result = statusEventDispatcher.fetchEvents(0, Long.MAX_VALUE, 1);
 
     assertThat(result.getStatusMessages()).isEmpty();
   }
 
   @Test
-  public void suppressEventCollectionInModellingMode() {
+  void suppressEventCollectionInModellingMode() {
     // Arrange
     statusEventDispatcher.onEvent(
         new KernelStateTransitionEvent(Kernel.State.MODELLING, Kernel.State.OPERATING, true)
@@ -90,7 +90,7 @@ public class StatusEventDispatcherTest {
   }
 
   @Test
-  public void respectConfiguredCapacity() {
+  void respectConfiguredCapacity() {
     // Arrange
     statusEventDispatcher.onEvent(
         new KernelStateTransitionEvent(Kernel.State.MODELLING, Kernel.State.OPERATING, true)
@@ -112,7 +112,7 @@ public class StatusEventDispatcherTest {
   }
 
   @Test
-  public void processEventsForRelatedObjects() {
+  void processEventsForRelatedObjects() {
     // Arrange
     statusEventDispatcher.onEvent(
         new KernelStateTransitionEvent(Kernel.State.MODELLING, Kernel.State.OPERATING, true)

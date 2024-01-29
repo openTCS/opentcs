@@ -16,17 +16,17 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  */
-public class GetOrderSequenceResponseTOTest {
+class GetOrderSequenceResponseTOTest {
 
   private JsonBinder jsonBinder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jsonBinder = new JsonBinder();
   }
 
   @Test
-  public void jsonSample() {
+  void jsonSample() {
     GetOrderSequenceResponseTO to = new GetOrderSequenceResponseTO("some-order-sequence")
         .setType("Charge")
         .setOrders(List.of("some-order", "another-order", "order-3"))

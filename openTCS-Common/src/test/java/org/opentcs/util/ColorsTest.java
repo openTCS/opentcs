@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 
 /**
  */
-public class ColorsTest {
+class ColorsTest {
 
   @Test
-  public void testEncodeToHexRGB() {
+  void testEncodeToHexRGB() {
     assertEquals("#000000", Colors.encodeToHexRGB(new Color(0, 0, 0)));
     assertEquals("#FFFFFF", Colors.encodeToHexRGB(new Color(255, 255, 255)));
     assertEquals("#FF0000", Colors.encodeToHexRGB(new Color(255, 0, 0)));
@@ -28,7 +28,7 @@ public class ColorsTest {
   }
 
   @Test
-  public void testDecodeFromHexRGB() {
+  void testDecodeFromHexRGB() {
     Color color;
 
     color = Colors.decodeFromHexRGB("#000000");

@@ -17,20 +17,20 @@ import spark.Request;
 
 /**
  */
-public class AuthenticatorTest {
+class AuthenticatorTest {
 
   private ServiceWebApiConfiguration configuration;
 
   private Authenticator authenticator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     configuration = mock(ServiceWebApiConfiguration.class);
     authenticator = new Authenticator(configuration);
   }
 
   @Test
-  public void allowRequestsIfNoAccessKeyConfigured() {
+  void allowRequestsIfNoAccessKeyConfigured() {
     when(configuration.accessKey()).thenReturn("");
 
     assertTrue(authenticator.isAuthenticated(aRequestWithAccessKey(null)));
@@ -39,14 +39,14 @@ public class AuthenticatorTest {
   }
 
   @Test
-  public void allowRequestIfCorrectAccessKeyGiven() {
+  void allowRequestIfCorrectAccessKeyGiven() {
     when(configuration.accessKey()).thenReturn("my access key");
 
     assertTrue(authenticator.isAuthenticated(aRequestWithAccessKey("my access key")));
   }
 
   @Test
-  public void disallowRequestIfWrongAccessKeyGiven() {
+  void disallowRequestIfWrongAccessKeyGiven() {
     when(configuration.accessKey()).thenReturn("my access key");
 
     assertFalse(authenticator.isAuthenticated(aRequestWithAccessKey(null)));

@@ -32,12 +32,12 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
 /**
  * Unit tests for {@link CandidateComparatorDeadlineAtRiskFirst}.
  */
-public class CandidateComparatorDeadlineAtRiskFirstTest {
+class CandidateComparatorDeadlineAtRiskFirstTest {
 
   private CandidateComparatorDeadlineAtRiskFirst comparator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     DefaultDispatcherConfiguration configuration
         = Mockito.mock(DefaultDispatcherConfiguration.class);
     Mockito.when(configuration.deadlineAtRiskPeriod()).thenReturn(Long.valueOf(60 * 60 * 1000));
@@ -48,7 +48,7 @@ public class CandidateComparatorDeadlineAtRiskFirstTest {
   }
 
   @Test
-  public void sortCriticalDeadlinesUp() {
+  void sortCriticalDeadlinesUp() {
     Instant deadline = Instant.now();
     AssignmentCandidate candidate1 = candidateWithDeadline(deadline.plus(270, ChronoUnit.MINUTES));
     AssignmentCandidate candidate2 = candidateWithDeadline(deadline.plus(30, ChronoUnit.MINUTES));

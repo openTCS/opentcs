@@ -19,20 +19,20 @@ import org.opentcs.guing.base.model.AbstractModelComponent;
 /**
  * A test for a speed property.
  */
-public class SpeedPropertyTest {
+class SpeedPropertyTest {
 
   private SpeedProperty property;
 
   @ParameterizedTest
   @ValueSource(strings = {"mm/s", "m/s", "km/h"})
-  public void testValidUnits(String unit) {
+  void testValidUnits(String unit) {
     property = new SpeedProperty(new DummyComponent());
     assertTrue(property.isPossibleUnit(unit));
   }
 
   @ParameterizedTest
   @MethodSource("paramsFactory")
-  public void testPropertyConversion(Unit unit, Object result) {
+  void testPropertyConversion(Unit unit, Object result) {
     property = new SpeedProperty(new DummyComponent(), 10000.0, Unit.MM_S);
     property.convertTo(unit);
     assertEquals(result, property.getValue());
@@ -40,13 +40,13 @@ public class SpeedPropertyTest {
   }
 
   @Test
-  public void testPropertyRange() {
+  void testPropertyRange() {
     property = new SpeedProperty(new DummyComponent());
     assertEquals(0, property.getValidRange().getMin(), 0);
     assertEquals(Double.MAX_VALUE, property.getValidRange().getMax(), 0);
   }
 
-  public static Object[][] paramsFactory() {
+  static Object[][] paramsFactory() {
     return new Object[][] {{Unit.MM_S, 10000.0},
                            {Unit.M_S, 10.0},
                            {Unit.KM_H, 36.0}};

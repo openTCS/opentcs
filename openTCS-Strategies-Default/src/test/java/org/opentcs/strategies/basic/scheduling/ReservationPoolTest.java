@@ -28,24 +28,24 @@ import org.opentcs.data.model.Vehicle;
 /**
  * Unit tests for {@link ReservationPool}.
  */
-public class ReservationPoolTest {
+class ReservationPoolTest {
 
   private Scheduler.Client client;
   private ReservationPool reservationPool;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     client = new TestClient();
     reservationPool = new ReservationPool();
   }
 
   @Test
-  public void claimIsEmptyInitially() {
+  void claimIsEmptyInitially() {
     assertThat(reservationPool.getClaim(client), is(empty()));
   }
 
   @Test
-  public void claimIsEmptyAfterClear() {
+  void claimIsEmptyAfterClear() {
     Set<TCSResource<?>> resources = Set.of(new Point("point1"), new Point("point2"));
     List<Set<TCSResource<?>>> claim = List.of(resources);
 
@@ -56,7 +56,7 @@ public class ReservationPoolTest {
   }
 
   @Test
-  public void disallowUnclaimingResourcesNotPreviouslyClaimed() {
+  void disallowUnclaimingResourcesNotPreviouslyClaimed() {
     Set<TCSResource<?>> resources = Set.of(new Point("point1"), new Point("point2"));
     List<Set<TCSResource<?>>> claim = List.of(resources);
 
@@ -70,7 +70,7 @@ public class ReservationPoolTest {
   }
 
   @Test
-  public void returnClaimedResources() {
+  void returnClaimedResources() {
     Set<TCSResource<?>> resources = Set.of(new Point("point1"), new Point("point2"));
     List<Set<TCSResource<?>>> claim = List.of(resources);
 
@@ -83,7 +83,7 @@ public class ReservationPoolTest {
   }
 
   @Test
-  public void confirmNextClaim() {
+  void confirmNextClaim() {
     Set<TCSResource<?>> resources = Set.of(new Point("point1"), new Point("point2"));
     List<Set<TCSResource<?>>> claim = List.of(resources);
 
@@ -96,13 +96,13 @@ public class ReservationPoolTest {
   }
 
   @Test
-  public void allocatedResourcesIsEmptyInitially() {
+  void allocatedResourcesIsEmptyInitially() {
     assertThat(reservationPool.allocatedResources(client), is(empty()));
     assertThat(reservationPool.getAllocations(), is(anEmptyMap()));
   }
 
   @Test
-  public void allocatedResourcesIsEmptyAfterClear() {
+  void allocatedResourcesIsEmptyAfterClear() {
     reservationPool.getReservationEntry(new Point("point1")).allocate(client);
     reservationPool.clear();
 
@@ -110,7 +110,7 @@ public class ReservationPoolTest {
   }
 
   @Test
-  public void reflectAllocatedResources() {
+  void reflectAllocatedResources() {
     reservationPool.getReservationEntry(new Point("point1")).allocate(client);
 
     assertThat(reservationPool.allocatedResources(client), hasSize(1));
@@ -118,7 +118,7 @@ public class ReservationPoolTest {
   }
 
   @Test
-  public void allocatedResourcesIsEmptyAfterFreeAll() {
+  void allocatedResourcesIsEmptyAfterFreeAll() {
     reservationPool.getReservationEntry(new Point("point1")).allocate(client);
     reservationPool.freeAll(client);
 

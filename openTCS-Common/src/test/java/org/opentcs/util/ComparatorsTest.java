@@ -25,10 +25,10 @@ import org.opentcs.data.peripherals.PeripheralOperation;
 /**
  * Unit tests for {@link Comparators}.
  */
-public class ComparatorsTest {
+class ComparatorsTest {
 
   @Test
-  public void compareObjectsByName() {
+  void compareObjectsByName() {
     Comparator<TCSObject<?>> comparator = Comparators.objectsByName();
 
     assertThat(comparator.compare(new Point("1"), new Point("1")),
@@ -56,7 +56,7 @@ public class ComparatorsTest {
   }
 
   @Test
-  public void compareReferencesByName() {
+  void compareReferencesByName() {
     Comparator<TCSObjectReference<?>> comparator = Comparators.referencesByName();
 
     assertThat(
@@ -129,7 +129,7 @@ public class ComparatorsTest {
   }
 
   @Test
-  public void compareOrdersByAge() {
+  void compareOrdersByAge() {
     Comparator<TransportOrder> comparator = Comparators.ordersByAge();
 
     TransportOrder order1 = new TransportOrder("order-1", List.of());
@@ -170,7 +170,7 @@ public class ComparatorsTest {
   }
 
   @Test
-  public void compareOrdersByDeadline() {
+  void compareOrdersByDeadline() {
     Comparator<TransportOrder> comparator = Comparators.ordersByDeadline();
 
     TransportOrder order1 = new TransportOrder("order-1", List.of())
@@ -213,7 +213,7 @@ public class ComparatorsTest {
   }
 
   @Test
-  public void comparePeripheralJobsByAge() {
+  void comparePeripheralJobsByAge() {
     Comparator<PeripheralJob> comparator = Comparators.jobsByAge();
 
     LocationType locType = new LocationType("some-loc-type");

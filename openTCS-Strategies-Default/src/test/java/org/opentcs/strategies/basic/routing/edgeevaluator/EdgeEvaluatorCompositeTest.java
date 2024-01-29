@@ -28,7 +28,7 @@ import org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration;
 
 /**
  */
-public class EdgeEvaluatorCompositeTest {
+class EdgeEvaluatorCompositeTest {
 
   private static final String EVALUATOR_MOCK = "EVALUATOR_MOCK";
   private static final String EVALUATOR_1 = "EVALUATOR_1";
@@ -42,7 +42,7 @@ public class EdgeEvaluatorCompositeTest {
   private final Map<String, EdgeEvaluator> evaluators = new HashMap<>();
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     Point srcPoint = new Point("srcPoint");
     Point dstPoint = new Point("dstPoint");
 
@@ -61,7 +61,7 @@ public class EdgeEvaluatorCompositeTest {
   }
 
   @Test
-  public void notifyOnGraphComputation() {
+  void notifyOnGraphComputation() {
     when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_MOCK));
     EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
 
@@ -78,7 +78,7 @@ public class EdgeEvaluatorCompositeTest {
   }
 
   @Test
-  public void computeZeroWithoutComponents() {
+  void computeZeroWithoutComponents() {
     EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
 
     verifyNoInteractions(evaluatorMock);
@@ -86,7 +86,7 @@ public class EdgeEvaluatorCompositeTest {
   }
 
   @Test
-  public void computeSumOfOneComponent() {
+  void computeSumOfOneComponent() {
     when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_1));
     EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
 
@@ -95,7 +95,7 @@ public class EdgeEvaluatorCompositeTest {
   }
 
   @Test
-  public void computeSumOfTwoComponents() {
+  void computeSumOfTwoComponents() {
     when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_1, EVALUATOR_2));
     EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
 
@@ -104,7 +104,7 @@ public class EdgeEvaluatorCompositeTest {
   }
 
   @Test
-  public void computeInfinityIfAnyComponentReturnsInfinity() {
+  void computeInfinityIfAnyComponentReturnsInfinity() {
     when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_1, EVALUATOR_2, EVALUATOR_3));
     EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
 

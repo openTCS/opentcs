@@ -23,17 +23,17 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.Periphe
 /**
  * Tests for {@link PeripheralOperationConverter}.
  */
-public class PeripheralOperationConverterTest {
+class PeripheralOperationConverterTest {
 
   private PeripheralOperationConverter peripheralOpConverter;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     peripheralOpConverter = new PeripheralOperationConverter();
   }
 
   @Test
-  public void checkToPeripheralOperationCreationTOs() {
+  void checkToPeripheralOperationCreationTOs() {
     PeripheralOperationTO peripheralOp = new PeripheralOperationTO("all", "l1")
         .setExecutionTrigger(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION.name())
         .setCompletionRequired(true);
@@ -50,7 +50,7 @@ public class PeripheralOperationConverterTest {
   }
 
   @Test
-  public void checkToPeripheralOperationsTOs() {
+  void checkToPeripheralOperationsTOs() {
     PeripheralOperation peripheralOp = new PeripheralOperation(
         new Location("L1", new LocationType("LT1").getReference()).getReference(),
         "operation",

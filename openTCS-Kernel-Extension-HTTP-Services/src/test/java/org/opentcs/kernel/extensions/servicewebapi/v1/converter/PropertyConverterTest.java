@@ -22,17 +22,17 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 /**
  * Tests for {@link PropertyConverter}.
  */
-public class PropertyConverterTest {
+class PropertyConverterTest {
 
   private PropertyConverter propertyConverter;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     propertyConverter = new PropertyConverter();
   }
 
   @Test
-  public void checkToPropertyTos() {
+  void checkToPropertyTos() {
     Map<String, String> property = Map.of("P1", "1");
 
     List<PropertyTO> result = propertyConverter.toPropertyTOs(property);
@@ -42,7 +42,7 @@ public class PropertyConverterTest {
   }
 
   @Test
-  public void checkToPropertyMap() {
+  void checkToPropertyMap() {
     PropertyTO propTo = new PropertyTO("P1", "1");
 
     Map<String, String> result = propertyConverter.toPropertyMap(List.of(propTo));

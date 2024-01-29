@@ -26,7 +26,7 @@ import org.opentcs.util.event.EventBus;
 /**
  * Test cases for the {@link KernelControlCenterApplication}.
  */
-public class KernelControlCenterApplicationTest {
+class KernelControlCenterApplicationTest {
 
   /**
    * The class to test.
@@ -54,7 +54,7 @@ public class KernelControlCenterApplicationTest {
   private KernelControlCenterConfiguration configuration;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     eventBus = mock(EventBus.class);
     portalManager = mock(PortalManager.class);
     configuration = mock(KernelControlCenterConfiguration.class);
@@ -67,7 +67,7 @@ public class KernelControlCenterApplicationTest {
   }
 
   @Test
-  public void onlyInitializeOnce() {
+  void onlyInitializeOnce() {
     when(configuration.connectAutomaticallyOnStartup()).thenReturn(true);
     application.initialize();
     application.initialize();
@@ -79,7 +79,7 @@ public class KernelControlCenterApplicationTest {
   }
 
   @Test
-  public void onlyTerminateOnce() {
+  void onlyTerminateOnce() {
     when(configuration.connectAutomaticallyOnStartup()).thenReturn(false);
     application.initialize();
     application.terminate();
@@ -91,7 +91,7 @@ public class KernelControlCenterApplicationTest {
   }
 
   @Test
-  public void shouldOnlyConnectOnce() {
+  void shouldOnlyConnectOnce() {
     //When trying to connect, return the value that indicates a successful connection
     when(portalManager.connect(any())).thenReturn(true);
     application.initialize();

@@ -20,28 +20,28 @@ import org.locationtech.jts.geom.Polygon;
 /**
  * Tests for {@link CustomGeometryFactory}.
  */
-public class CustomGeometryFactoryTest {
+class CustomGeometryFactoryTest {
 
   private CustomGeometryFactory factory;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     factory = new CustomGeometryFactory();
   }
 
   @Test
-  public void emptyGeometryIsAValidGeometry() {
+  void emptyGeometryIsAValidGeometry() {
     assertTrue(CustomGeometryFactory.EMPTY_GEOMETRY.isValid());
   }
 
   @Test
-  public void providesEmptyGeometryWhenCreatingPolygonWithZeroCoordinates() {
+  void providesEmptyGeometryWhenCreatingPolygonWithZeroCoordinates() {
     Geometry result = factory.createPolygonOrEmptyGeometry(new Coordinate[]{});
     assertThat(result, is(CustomGeometryFactory.EMPTY_GEOMETRY));
   }
 
   @Test
-  public void providesEmptyGeometryWhenCreatingPolygonWithOneCoordinate() {
+  void providesEmptyGeometryWhenCreatingPolygonWithOneCoordinate() {
     Geometry result = factory.createPolygonOrEmptyGeometry(
         new Coordinate[]{
           new Coordinate(0, 0)
@@ -51,7 +51,7 @@ public class CustomGeometryFactoryTest {
   }
 
   @Test
-  public void providesEmptyGeometryWhenCreatingPolygonWithTwoCoordinates() {
+  void providesEmptyGeometryWhenCreatingPolygonWithTwoCoordinates() {
     Geometry result = factory.createPolygonOrEmptyGeometry(
         new Coordinate[]{
           new Coordinate(0, 0),
@@ -62,7 +62,7 @@ public class CustomGeometryFactoryTest {
   }
 
   @Test
-  public void providesEmptyGeometryWhenCreatingPolygonWithThreeCoordinates() {
+  void providesEmptyGeometryWhenCreatingPolygonWithThreeCoordinates() {
     Geometry result = factory.createPolygonOrEmptyGeometry(
         new Coordinate[]{
           new Coordinate(0, 0),
@@ -74,7 +74,7 @@ public class CustomGeometryFactoryTest {
   }
 
   @Test
-  public void providesValidPolygonWhenCreatingPolygonWithSufficientAmountOfCoordinates() {
+  void providesValidPolygonWhenCreatingPolygonWithSufficientAmountOfCoordinates() {
     Geometry result = factory.createPolygonOrEmptyGeometry(
         new Coordinate[]{
           new Coordinate(0, 0),

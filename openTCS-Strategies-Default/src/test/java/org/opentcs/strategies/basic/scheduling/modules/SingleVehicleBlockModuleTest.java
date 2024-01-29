@@ -32,7 +32,7 @@ import org.opentcs.strategies.basic.scheduling.ReservationPool;
 /**
  * Unit tests for {@link SingleVehicleBlockModule}.
  */
-public class SingleVehicleBlockModuleTest {
+class SingleVehicleBlockModuleTest {
 
   /**
    * The module to test.
@@ -44,14 +44,14 @@ public class SingleVehicleBlockModuleTest {
   private InternalPlantModelService plantModelService;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     reservationPool = mock(ReservationPool.class);
     plantModelService = mock(InternalPlantModelService.class);
     module = new SingleVehicleBlockModule(reservationPool, plantModelService, new Object());
   }
 
   @Test
-  public void shouldAllowAllocatioForNonBlocks() {
+  void shouldAllowAllocatioForNonBlocks() {
     Scheduler.Client client = new SampleClient();
     ModelData model = new ModelData();
 
@@ -60,7 +60,7 @@ public class SingleVehicleBlockModuleTest {
   }
 
   @Test
-  public void shouldAllowAllocationForUnoccupiedBlock() {
+  void shouldAllowAllocationForUnoccupiedBlock() {
     Scheduler.Client client = new SampleClient();
     ModelData model = new ModelData();
 
@@ -73,7 +73,7 @@ public class SingleVehicleBlockModuleTest {
   }
 
   @Test
-  public void shouldDenyAllocationForOccupiedBlock() {
+  void shouldDenyAllocationForOccupiedBlock() {
     Scheduler.Client client = new SampleClient();
     ModelData model = new ModelData();
 
@@ -116,15 +116,15 @@ public class SingleVehicleBlockModuleTest {
       resourcesToAllocate.add(pointB);
     }
 
-    public Set<TCSResource<?>> getBlockResources() {
+    Set<TCSResource<?>> getBlockResources() {
       return blockResources;
     }
 
-    public Set<TCSResource<?>> getResourcesToAllocate() {
+    Set<TCSResource<?>> getResourcesToAllocate() {
       return resourcesToAllocate;
     }
 
-    public Block getBlock() {
+    Block getBlock() {
       return block;
     }
   }

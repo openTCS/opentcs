@@ -30,17 +30,17 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VisualL
 
 /**
  */
-public class PlantModelTOTest {
+class PlantModelTOTest {
 
   private JsonBinder jsonBinder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jsonBinder = new JsonBinder();
   }
 
   @Test
-  public void jsonSample() {
+  void jsonSample() {
     PlantModelTO to = new PlantModelTO("some-name")
         .setPoints(List.of(
             new PointTO("some-point")

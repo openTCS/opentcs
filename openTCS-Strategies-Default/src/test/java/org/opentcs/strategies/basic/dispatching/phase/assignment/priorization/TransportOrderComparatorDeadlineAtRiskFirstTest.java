@@ -25,14 +25,14 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
 
 /**
  */
-public class TransportOrderComparatorDeadlineAtRiskFirstTest {
+class TransportOrderComparatorDeadlineAtRiskFirstTest {
 
   private TransportOrderComparatorDeadlineAtRiskFirst comparator;
 
   private DefaultDispatcherConfiguration configuration;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     configuration = Mockito.mock(DefaultDispatcherConfiguration.class);
     when(configuration.deadlineAtRiskPeriod()).thenReturn(Long.valueOf(60 * 60 * 1000));
 
@@ -40,7 +40,7 @@ public class TransportOrderComparatorDeadlineAtRiskFirstTest {
   }
 
   @Test
-  public void sortCriticalDeadlinesUp() {
+  void sortCriticalDeadlinesUp() {
     Instant deadline = Instant.now();
     TransportOrder plainOrder = new TransportOrder("Some order ", new ArrayList<>());
     TransportOrder order1 = plainOrder.withDeadline(deadline.plus(150, ChronoUnit.MINUTES));

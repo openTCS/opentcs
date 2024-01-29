@@ -28,10 +28,10 @@ import org.opentcs.drivers.vehicle.MovementCommand;
 /**
  * Tests for {@link MovementComparisons}.
  */
-public class MovementComparisonsTest {
+class MovementComparisonsTest {
 
   @Test
-  public void considerIdenticalStepsEqual() {
+  void considerIdenticalStepsEqual() {
     List<Step> stepsA = List.of(createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
                                 createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null));
     List<Step> stepsB = new ArrayList<>(stepsA);
@@ -40,7 +40,7 @@ public class MovementComparisonsTest {
   }
 
   @Test
-  public void considerStepsWithDifferentReroutingTypeEqual() {
+  void considerStepsWithDifferentReroutingTypeEqual() {
     List<Step> stepsA = List.of(createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
                                 createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null));
     List<Step> stepsB = List.of(
@@ -52,7 +52,7 @@ public class MovementComparisonsTest {
   }
 
   @Test
-  public void considerStepsWithDifferentExecutionAllowedEqual() {
+  void considerStepsWithDifferentExecutionAllowedEqual() {
     List<Step> stepsA = List.of(createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
                                 createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null));
     List<Step> stepsB = List.of(createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
@@ -62,7 +62,7 @@ public class MovementComparisonsTest {
   }
 
   @Test
-  public void considerDivergingStepsNotEqual() {
+  void considerDivergingStepsNotEqual() {
     List<Step> stepsA = List.of(createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
                                 createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null),
                                 createStep("C", "D", Vehicle.Orientation.FORWARD, 2, true, null),
@@ -76,7 +76,7 @@ public class MovementComparisonsTest {
   }
 
   @Test
-  public void considerStepsWithDifferentPointsNotEqual() {
+  void considerStepsWithDifferentPointsNotEqual() {
     List<Step> stepsA = List.of(createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
                                 createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null));
     List<Step> stepsB = List.of(createStep("X", "Y", Vehicle.Orientation.FORWARD, 0, true, null),
@@ -86,7 +86,7 @@ public class MovementComparisonsTest {
   }
 
   @Test
-  public void considerStepsWithDifferentOrientationAngleNotEqual() {
+  void considerStepsWithDifferentOrientationAngleNotEqual() {
     List<Step> stepsA = List.of(createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
                                 createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null));
     List<Step> stepsB = List.of(createStep("A", "B", Vehicle.Orientation.BACKWARD, 0, true, null),
@@ -96,7 +96,7 @@ public class MovementComparisonsTest {
   }
 
   @Test
-  public void considerStepsWithDifferentRouteIndicesNotEqual() {
+  void considerStepsWithDifferentRouteIndicesNotEqual() {
     List<Step> stepsA = List.of(createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
                                 createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null));
     List<Step> stepsB = List.of(createStep("A", "B", Vehicle.Orientation.FORWARD, 5, true, null),
@@ -106,7 +106,7 @@ public class MovementComparisonsTest {
   }
 
   @Test
-  public void considerIdenticalMovementCommandsEqual() {
+  void considerIdenticalMovementCommandsEqual() {
     MovementCommand command = new TestMovementCommand(
         createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
         "some-operation"
@@ -116,7 +116,7 @@ public class MovementComparisonsTest {
   }
 
   @Test
-  public void considerMovementCommandsWithDifferentStepsNotEqual() {
+  void considerMovementCommandsWithDifferentStepsNotEqual() {
     MovementCommand commandA = new TestMovementCommand(
         createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
         "some-operation"
@@ -130,7 +130,7 @@ public class MovementComparisonsTest {
   }
 
   @Test
-  public void considerMovementCommandsWithOperationNotEqual() {
+  void considerMovementCommandsWithOperationNotEqual() {
     MovementCommand commandA = new TestMovementCommand(
         createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
         "operation-a"

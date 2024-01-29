@@ -21,13 +21,13 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  */
-public class StringListCellRendererTest {
+class StringListCellRendererTest {
 
   private JList<TCSObjectReference<?>> list;
   private StringListCellRenderer<TCSObjectReference<?>> renderer;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     list = new JList<>();
     renderer = new StringListCellRenderer<>(x -> x == null ? "" : x.getName());
   }
@@ -36,7 +36,7 @@ public class StringListCellRendererTest {
    * Test of getListCellRendererComponent method, of class FunctionalListCellRenderer.
    */
   @Test
-  public void returnsNullForNullValue() {
+  void returnsNullForNullValue() {
     Component result = renderer.getListCellRendererComponent(list, null, 0, true, true);
     assertThat(result, is(instanceOf(JLabel.class)));
     JLabel labelResult = (JLabel) result;
@@ -44,7 +44,7 @@ public class StringListCellRendererTest {
   }
 
   @Test
-  public void returnsLabelWithNameAsText() {
+  void returnsLabelWithNameAsText() {
     Vehicle vehicle = new Vehicle("VehicleName");
     TCSObjectReference<Vehicle> vehicleReference = vehicle.getReference();
     Component result = renderer.getListCellRendererComponent(list, vehicleReference, 0, true, true);

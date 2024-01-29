@@ -21,20 +21,20 @@ import org.opentcs.data.model.Vehicle;
 
 /**
  */
-public class EdgeEvaluatorExplicitPropertiesTest {
+class EdgeEvaluatorExplicitPropertiesTest {
 
   private EdgeEvaluatorExplicitProperties edgeEvaluator;
 
   private ExplicitPropertiesConfiguration configuration;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     configuration = mock(ExplicitPropertiesConfiguration.class);
     edgeEvaluator = new EdgeEvaluatorExplicitProperties(configuration);
   }
 
   @Test
-  public void extractCorrectProperties() {
+  void extractCorrectProperties() {
     Edge edge = new Edge(
         new Path("pathName",
                  new Point("srcPoint").getReference(),
@@ -54,7 +54,7 @@ public class EdgeEvaluatorExplicitPropertiesTest {
   }
 
   @Test
-  public void useConfiguredDefaultValue() {
+  void useConfiguredDefaultValue() {
     when(configuration.defaultValue()).thenReturn("123.456");
 
     Edge edge = new Edge(
@@ -73,7 +73,7 @@ public class EdgeEvaluatorExplicitPropertiesTest {
   }
 
   @Test
-  public void handleInvalidDefaultValue() {
+  void handleInvalidDefaultValue() {
     when(configuration.defaultValue()).thenReturn("some invalid value");
 
     Edge edge = new Edge(

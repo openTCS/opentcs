@@ -27,17 +27,17 @@ import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DISPATCHIN
 /**
  * Tests for {@link DispatchingStatusMarker}.
  */
-public class DispatchingStatusMarkerTest {
+class DispatchingStatusMarkerTest {
 
   private DispatchingStatusMarker dispatchingStatusMarker;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     dispatchingStatusMarker = new DispatchingStatusMarker(mock(TCSObjectService.class));
   }
 
   @Test
-  public void evaluateOrderAsDeferred() {
+  void evaluateOrderAsDeferred() {
     TransportOrder order = new TransportOrder("order", List.of())
         .withHistoryEntry(
             new ObjectHistory.Entry(ORDER_DISPATCHING_DEFERRED, List.of("some-reason"))
@@ -48,7 +48,7 @@ public class DispatchingStatusMarkerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {ORDER_DISPATCHING_RESUMED, "some-unrelated-history-event-code"})
-  public void evaluateOrderAsNotDeferred(String eventCode) {
+  void evaluateOrderAsNotDeferred(String eventCode) {
     TransportOrder order = new TransportOrder("order", List.of())
         .withHistoryEntry(new ObjectHistory.Entry(eventCode, List.of("some-reason")));
 
@@ -56,7 +56,7 @@ public class DispatchingStatusMarkerTest {
   }
 
   @Test
-  public void evaluateOrderDeferralReasonsAsChangedForNotDeferredOrder() {
+  void evaluateOrderDeferralReasonsAsChangedForNotDeferredOrder() {
     TransportOrder order = new TransportOrder("order", List.of());
     OrderFilterResult orderFilterResult = new OrderFilterResult(order, List.of("some-new-reason"));
 
@@ -64,7 +64,7 @@ public class DispatchingStatusMarkerTest {
   }
 
   @Test
-  public void evaluateOrderDeferralReasonsAsChangedForDeferredOrder() {
+  void evaluateOrderDeferralReasonsAsChangedForDeferredOrder() {
     TransportOrder order = new TransportOrder("order", List.of())
         .withHistoryEntry(
             new ObjectHistory.Entry(ORDER_DISPATCHING_DEFERRED, List.of("some-reason"))
@@ -75,7 +75,7 @@ public class DispatchingStatusMarkerTest {
   }
 
   @Test
-  public void evaluateOrderDeferralReasonsAsChangedForResumedOrder() {
+  void evaluateOrderDeferralReasonsAsChangedForResumedOrder() {
     TransportOrder order = new TransportOrder("order", List.of())
         .withHistoryEntry(
             new ObjectHistory.Entry(ORDER_DISPATCHING_DEFERRED, List.of("some-reason"))
@@ -87,7 +87,7 @@ public class DispatchingStatusMarkerTest {
   }
 
   @Test
-  public void evaluateOrderDeferralReasonsAsUnchangedForNotDeferredOrder() {
+  void evaluateOrderDeferralReasonsAsUnchangedForNotDeferredOrder() {
     TransportOrder order = new TransportOrder("order", List.of());
     OrderFilterResult orderFilterResult = new OrderFilterResult(order, List.of());
 
@@ -95,7 +95,7 @@ public class DispatchingStatusMarkerTest {
   }
 
   @Test
-  public void evaluateOrderDeferralReasonsAsUnchangedForDeferredOrder() {
+  void evaluateOrderDeferralReasonsAsUnchangedForDeferredOrder() {
     TransportOrder order = new TransportOrder("order", List.of())
         .withHistoryEntry(
             new ObjectHistory.Entry(ORDER_DISPATCHING_DEFERRED, List.of("some-reason"))
@@ -106,7 +106,7 @@ public class DispatchingStatusMarkerTest {
   }
 
   @Test
-  public void evaluateOrderDeferralReasonsAsUnchangedForResumedOrder() {
+  void evaluateOrderDeferralReasonsAsUnchangedForResumedOrder() {
     TransportOrder order = new TransportOrder("order", List.of())
         .withHistoryEntry(
             new ObjectHistory.Entry(ORDER_DISPATCHING_DEFERRED, List.of("some-reason"))

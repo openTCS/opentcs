@@ -21,17 +21,17 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 /**
  * Unit tests for {@link GetPeripheralJobResponseTO}.
  */
-public class GetPeripheralJobResponseTOTest {
+class GetPeripheralJobResponseTOTest {
 
   private JsonBinder jsonBinder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jsonBinder = new JsonBinder();
   }
 
   @Test
-  public void jsonSample() {
+  void jsonSample() {
     GetPeripheralJobResponseTO to
         = new GetPeripheralJobResponseTO()
             .setName("some-peripheral-job")

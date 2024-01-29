@@ -19,10 +19,10 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link TCSObject}.
  */
-public class TCSObjectTest {
+class TCSObjectTest {
 
   @Test
-  public void considerReferenceForEquality() {
+  void considerReferenceForEquality() {
     TestType1 object = new TestType1("some-name");
 
     assertThat(object)
@@ -31,35 +31,35 @@ public class TCSObjectTest {
   }
 
   @Test
-  public void considerNameForEquality() {
+  void considerNameForEquality() {
     assertThat(new TestType1("some-name"))
         .isEqualTo(new TestType1("some-name"))
         .isNotEqualTo(new TestType1("some-other-name"));
   }
 
   @Test
-  public void considerClassForEquality() {
+  void considerClassForEquality() {
     assertThat(new TestType1("some-name"))
         .isEqualTo(new TestType1("some-name"))
         .isNotEqualTo(new TestType2("some-name"));
   }
 
   @Test
-  public void considerNameForHashCode() {
+  void considerNameForHashCode() {
     assertThat(new TestType1("some-name"))
         .hasSameHashCodeAs(new TestType1("some-name"))
         .doesNotHaveSameHashCodeAs(new TestType1("some-other-name"));
   }
 
   @Test
-  public void considerClassForHashCode() {
+  void considerClassForHashCode() {
     assertThat(new TestType1("some-name"))
         .hasSameHashCodeAs(new TestType1("some-name"))
         .doesNotHaveSameHashCodeAs(new TestType2("some-name"));
   }
 
   @Test
-  public void addProperty() {
+  void addProperty() {
     TestType1 object = new TestType1("some-object")
         .withProperty("some-key", "some-value");
 
@@ -70,7 +70,7 @@ public class TCSObjectTest {
   }
 
   @Test
-  public void removePropertyViaNullValue() {
+  void removePropertyViaNullValue() {
     TestType1 original = new TestType1("some-object")
         .withProperty("some-key", "some-value");
 
@@ -83,7 +83,7 @@ public class TCSObjectTest {
   }
 
   @Test
-  public void filterNullValuesFromMap() {
+  void filterNullValuesFromMap() {
     Map<String, String> input = new HashMap<>();
     input.put("one", "one");
     input.put("two", "two");
@@ -100,7 +100,7 @@ public class TCSObjectTest {
   }
 
   @Test
-  public void filterNullValuesFromList() {
+  void filterNullValuesFromList() {
     List<String> result = TCSObject.listWithoutNullValues(
         Arrays.asList(
             "one",
@@ -118,7 +118,7 @@ public class TCSObjectTest {
   }
 
   @Test
-  public void filterNullValuesFromSet() {
+  void filterNullValuesFromSet() {
     Set<String> result = TCSObject.setWithoutNullValues(
         new HashSet<>(
             Arrays.asList(

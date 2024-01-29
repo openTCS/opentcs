@@ -33,21 +33,21 @@ import org.opentcs.strategies.basic.dispatching.priorization.candidate.Candidate
 
 /**
  */
-public class CompositeOrderCandidateComparatorTest {
+class CompositeOrderCandidateComparatorTest {
 
   private CompositeOrderCandidateComparator comparator;
   private DefaultDispatcherConfiguration configuration;
   private Map<String, Comparator<AssignmentCandidate>> availableComparators;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     configuration = Mockito.mock(DefaultDispatcherConfiguration.class);
     availableComparators = new HashMap<>();
 
   }
 
   @Test
-  public void sortAlphabeticallyForOtherwiseEqualInstances() {
+  void sortAlphabeticallyForOtherwiseEqualInstances() {
 
     Mockito.when(configuration.orderCandidatePriorities())
         .thenReturn(List.of());
@@ -70,7 +70,7 @@ public class CompositeOrderCandidateComparatorTest {
   }
 
   @Test
-  public void sortsByAgeAndName() {
+  void sortsByAgeAndName() {
     Mockito.when(configuration.orderCandidatePriorities())
         .thenReturn(List.of());
     comparator = new CompositeOrderCandidateComparator(configuration, availableComparators);
@@ -92,7 +92,7 @@ public class CompositeOrderCandidateComparatorTest {
   }
 
   @Test
-  public void sortsByAgeAndNameAndInitialRoutingCost() {
+  void sortsByAgeAndNameAndInitialRoutingCost() {
     String deadlineKey = "BY_DEADLINE";
     Mockito.when(configuration.orderCandidatePriorities())
         .thenReturn(List.of(deadlineKey));

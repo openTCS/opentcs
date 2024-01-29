@@ -35,7 +35,7 @@ import org.opentcs.drivers.vehicle.MovementCommand;
 /**
  * Defines test cases for {@link PeripheralInteraction}.
  */
-public class PeripheralInteractionTest {
+class PeripheralInteractionTest {
 
   /**
    * The vehicle instance to use for the tests.
@@ -66,18 +66,18 @@ public class PeripheralInteractionTest {
    */
   private PeripheralInteraction peripheralInteraction;
 
-  public PeripheralInteractionTest() {
+  PeripheralInteractionTest() {
   }
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     peripheralJobService = mock(PeripheralJobService.class);
     succeededCallback = mock(Runnable.class);
     failedCallback = mock(Runnable.class);
   }
 
   @Test
-  public void shouldNotWaitForOperationCompletion() {
+  void shouldNotWaitForOperationCompletion() {
     PeripheralOperation operation = new PeripheralOperation(createLocation().getReference(),
                                                             RESERVATION_TOKEN,
                                                             ExecutionTrigger.AFTER_ALLOCATION,
@@ -103,7 +103,7 @@ public class PeripheralInteractionTest {
   }
 
   @Test
-  public void shouldWaitForOperationCompletion() {
+  void shouldWaitForOperationCompletion() {
     PeripheralOperation operation = new PeripheralOperation(createLocation().getReference(),
                                                             RESERVATION_TOKEN,
                                                             ExecutionTrigger.AFTER_ALLOCATION,
@@ -135,7 +135,7 @@ public class PeripheralInteractionTest {
   }
 
   @Test
-  public void shouldCallbackOnFailedRequiredInteraction() {
+  void shouldCallbackOnFailedRequiredInteraction() {
     PeripheralOperation operation = new PeripheralOperation(createLocation().getReference(),
                                                             RESERVATION_TOKEN,
                                                             ExecutionTrigger.AFTER_ALLOCATION,

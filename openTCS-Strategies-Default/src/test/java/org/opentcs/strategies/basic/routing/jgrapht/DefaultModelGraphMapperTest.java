@@ -25,7 +25,7 @@ import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorComposite
 
 /**
  */
-public class DefaultModelGraphMapperTest {
+class DefaultModelGraphMapperTest {
 
   private Point pointA;
   private Point pointB;
@@ -44,7 +44,7 @@ public class DefaultModelGraphMapperTest {
   private DefaultModelGraphMapper mapper;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     pointA = new Point("A");
     pointB = new Point("B");
     pointC = new Point("C");
@@ -71,7 +71,7 @@ public class DefaultModelGraphMapperTest {
   }
 
   @Test
-  public void createEmptyGraph() {
+  void createEmptyGraph() {
     when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
 
     Graph<String, Edge> graph = mapper.translateModel(new HashSet<>(),
@@ -84,7 +84,7 @@ public class DefaultModelGraphMapperTest {
   }
 
   @Test
-  public void createGraphWithFourPointsAndNoPath() {
+  void createGraphWithFourPointsAndNoPath() {
     when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
 
     Graph<String, Edge> graph
@@ -103,7 +103,7 @@ public class DefaultModelGraphMapperTest {
   }
 
   @Test
-  public void createGraphWithFourPointsAndOneUnidirectionalPath() {
+  void createGraphWithFourPointsAndOneUnidirectionalPath() {
     when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
 
     Graph<String, Edge> graph
@@ -127,7 +127,7 @@ public class DefaultModelGraphMapperTest {
   }
 
   @Test
-  public void createGraphWithFourPointsAndOneBidirectionalPath() {
+  void createGraphWithFourPointsAndOneBidirectionalPath() {
     when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
 
     Graph<String, Edge> graph
@@ -156,7 +156,7 @@ public class DefaultModelGraphMapperTest {
   }
 
   @Test
-  public void createGraphWithFourPointsThreeUnidirectionalAndOneBidirectionalPaths() {
+  void createGraphWithFourPointsThreeUnidirectionalAndOneBidirectionalPaths() {
     when(configuration.algorithm()).thenReturn(ShortestPathConfiguration.Algorithm.DIJKSTRA);
 
     Graph<String, Edge> graph

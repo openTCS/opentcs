@@ -31,7 +31,7 @@ import org.opentcs.data.order.DriveOrder.Destination;
 /**
  * Tests for {@link DefaultRechargePositionSupplier}.
  */
-public class DefaultRechargePositionSupplierTest {
+class DefaultRechargePositionSupplierTest {
 
   private Point currentPosition;
   private Vehicle vehicle;
@@ -46,7 +46,7 @@ public class DefaultRechargePositionSupplierTest {
   private DefaultRechargePositionSupplier rechargePosSupplier;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     currentPosition = new Point("current-position");
     vehicle = new Vehicle("some-vehicle")
         .withCurrentPosition(currentPosition.getReference())
@@ -93,12 +93,12 @@ public class DefaultRechargePositionSupplierTest {
   }
 
   @AfterEach
-  public void tearDown() {
+  void tearDown() {
     rechargePosSupplier.terminate();
   }
 
   @Test
-  public void returnEmptyListForUnknownVehiclePosition() {
+  void returnEmptyListForUnknownVehiclePosition() {
     assertThat(
         rechargePosSupplier.findRechargeSequence(vehicle.withCurrentPosition(null)),
         is(empty())
@@ -106,7 +106,7 @@ public class DefaultRechargePositionSupplierTest {
   }
 
   @Test
-  public void returnEmptyListForUnknownRechargeOperation() {
+  void returnEmptyListForUnknownRechargeOperation() {
     assertThat(
         rechargePosSupplier.findRechargeSequence(
             vehicle.withRechargeOperation("some-unknown-recharge-operation")
@@ -116,7 +116,7 @@ public class DefaultRechargePositionSupplierTest {
   }
 
   @Test
-  public void returnEmptyListForNonexistentAssignedRechargeLocation() {
+  void returnEmptyListForNonexistentAssignedRechargeLocation() {
     assertThat(
         rechargePosSupplier.findRechargeSequence(
             vehicle.withProperty(
@@ -128,7 +128,7 @@ public class DefaultRechargePositionSupplierTest {
   }
 
   @Test
-  public void returnAnyForNonexistentPreferredRechargeLocation() {
+  void returnAnyForNonexistentPreferredRechargeLocation() {
     List<Destination> result = rechargePosSupplier.findRechargeSequence(
         vehicle.withProperty(
             Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION,
@@ -147,7 +147,7 @@ public class DefaultRechargePositionSupplierTest {
   }
 
   @Test
-  public void returnAnyIfVehicleHasNoAssignedOrPreferredLocation() {
+  void returnAnyIfVehicleHasNoAssignedOrPreferredLocation() {
     List<Destination> result = rechargePosSupplier.findRechargeSequence(vehicle);
 
     assertThat(result, hasSize(1));
@@ -162,7 +162,7 @@ public class DefaultRechargePositionSupplierTest {
   }
 
   @Test
-  public void returnAssignedRechargeLocationIfSet() {
+  void returnAssignedRechargeLocationIfSet() {
     List<Destination> result;
 
     result = rechargePosSupplier.findRechargeSequence(
@@ -188,7 +188,7 @@ public class DefaultRechargePositionSupplierTest {
   }
 
   @Test
-  public void returnPreferredRechargeLocationIfSet() {
+  void returnPreferredRechargeLocationIfSet() {
     List<Destination> result;
 
     result = rechargePosSupplier.findRechargeSequence(
@@ -214,7 +214,7 @@ public class DefaultRechargePositionSupplierTest {
   }
 
   @Test
-  public void givePrecedenceToAssignedOverPreferredIfBothSet() {
+  void givePrecedenceToAssignedOverPreferredIfBothSet() {
     vehicle = vehicle.withProperty(
         Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION,
         rechargeLoc2.getName()

@@ -17,17 +17,17 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getvehicleroutes.R
 /**
  * Unit tests for {@link PostVehicleRoutesResponseTO}.
  */
-public class PostVehicleRoutesResponseTOTest {
+class PostVehicleRoutesResponseTOTest {
 
   private JsonBinder jsonBinder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jsonBinder = new JsonBinder();
   }
 
   @Test
-  public void jsonSample() {
+  void jsonSample() {
     Approvals.verify(jsonBinder.toJson(new PostVehicleRoutesResponseTO()
         .setRoutes(
             List.of(

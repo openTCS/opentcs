@@ -18,7 +18,7 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 /**
  * Tests for the {@link StandardVehicleManagerPoolTest}.
  */
-public class StandardVehicleManagerPoolTest {
+class StandardVehicleManagerPoolTest {
 
   /**
    * A name for a vehicle.
@@ -42,7 +42,7 @@ public class StandardVehicleManagerPoolTest {
   private LocalVehicleControllerPool vehManagerPool;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     vehicleService = mock(InternalVehicleService.class);
     commAdapter = mock(VehicleCommAdapter.class);
     vehManagerPool = new DefaultVehicleControllerPool(vehicleService,
@@ -50,25 +50,25 @@ public class StandardVehicleManagerPoolTest {
   }
 
   @Test
-  public void testThrowsNPEIfVehicleNameIsNull() {
+  void testThrowsNPEIfVehicleNameIsNull() {
     assertThrows(NullPointerException.class,
                  () -> vehManagerPool.attachVehicleController(null, commAdapter));
   }
 
   @Test
-  public void testThrowsNPEIfCommAdapterIsNull() {
+  void testThrowsNPEIfCommAdapterIsNull() {
     assertThrows(NullPointerException.class,
                  () -> vehManagerPool.attachVehicleController(A_VEHICLE_NAME, null));
   }
 
   @Test
-  public void testThrowsExceptionForUnknownVehicleName() {
+  void testThrowsExceptionForUnknownVehicleName() {
     assertThrows(IllegalArgumentException.class,
                  () -> vehManagerPool.attachVehicleController(UNKNOWN_VEHICLE_NAME, commAdapter));
   }
 
   @Test
-  public void testThrowsNPEIfDetachingNullVehicleName() {
+  void testThrowsNPEIfDetachingNullVehicleName() {
     assertThrows(NullPointerException.class,
                  () -> vehManagerPool.detachVehicleController(null));
   }

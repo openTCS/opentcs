@@ -30,7 +30,7 @@ import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
 /**
  * Test for {@link IsAvailableForAnyOrder}.
  */
-public class IsAvailableForAnyOrderTest {
+class IsAvailableForAnyOrderTest {
 
   private IsAvailableForAnyOrder isAvailableForAnyOrder;
   private Vehicle vehicleAvailableForAnyOrder;
@@ -39,7 +39,7 @@ public class IsAvailableForAnyOrderTest {
   private List<TCSObjectReference<TransportOrder>> reservationsList;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     TCSObjectService objectService = mock();
     DefaultDispatcherConfiguration configuration = mock();
     orderReservationPool = mock();
@@ -66,14 +66,14 @@ public class IsAvailableForAnyOrderTest {
   }
 
   @Test
-  public void checkVehicleIsAvailable() {
+  void checkVehicleIsAvailable() {
     Vehicle vehicle = vehicleAvailableForAnyOrder;
 
     assertTrue(isAvailableForAnyOrder.test(vehicle));
   }
 
   @Test
-  public void checkVehicleIsPaused() {
+  void checkVehicleIsPaused() {
     Vehicle vehicle = vehicleAvailableForAnyOrder.withPaused(true);
 
     assertFalse(isAvailableForAnyOrder.test(vehicle));
@@ -82,21 +82,21 @@ public class IsAvailableForAnyOrderTest {
   @ParameterizedTest
   @EnumSource(value = Vehicle.IntegrationLevel.class,
               names = {"TO_BE_IGNORED", "TO_BE_NOTICED", "TO_BE_RESPECTED"})
-  public void checkVehicleIsNotFullyIntegrated(Vehicle.IntegrationLevel integrationLevel) {
+  void checkVehicleIsNotFullyIntegrated(Vehicle.IntegrationLevel integrationLevel) {
     Vehicle vehicle = vehicleAvailableForAnyOrder.withIntegrationLevel(integrationLevel);
 
     assertFalse(isAvailableForAnyOrder.test(vehicle));
   }
 
   @Test
-  public void checkVehicleHasNoPosition() {
+  void checkVehicleHasNoPosition() {
     Vehicle vehicle = vehicleAvailableForAnyOrder.withCurrentPosition(null);
 
     assertFalse(isAvailableForAnyOrder.test(vehicle));
   }
 
   @Test
-  public void checkVehicleHasOrderSequence() {
+  void checkVehicleHasOrderSequence() {
     Vehicle vehicle = vehicleAvailableForAnyOrder
         .withOrderSequence(new OrderSequence("OS").getReference());
 
@@ -104,14 +104,14 @@ public class IsAvailableForAnyOrderTest {
   }
 
   @Test
-  public void checkVehicleHasCriticalEnergyLevel() {
+  void checkVehicleHasCriticalEnergyLevel() {
     Vehicle vehicle = vehicleAvailableForAnyOrder.withEnergyLevel(0);
 
     assertFalse(isAvailableForAnyOrder.test(vehicle));
   }
 
   @Test
-  public void checkVehicleNeedsMoreCharging() {
+  void checkVehicleNeedsMoreCharging() {
     Vehicle vehicle = vehicleAvailableForAnyOrder
         .withEnergyLevel(10)
         .withState(Vehicle.State.CHARGING);
@@ -120,7 +120,7 @@ public class IsAvailableForAnyOrderTest {
   }
 
   @Test
-  public void checkVehicleProcessesOrderThatIsNotDispensable() {
+  void checkVehicleProcessesOrderThatIsNotDispensable() {
     Vehicle vehicle = vehicleAvailableForAnyOrder
         .withProcState(Vehicle.ProcState.PROCESSING_ORDER)
         .withTransportOrder(transportOrder.getReference());
@@ -129,7 +129,7 @@ public class IsAvailableForAnyOrderTest {
   }
 
   @Test
-  public void checkVehicleHasOrderReservation() {
+  void checkVehicleHasOrderReservation() {
     Vehicle vehicle = vehicleAvailableForAnyOrder;
 
     reservationsList.add(transportOrder.getReference());

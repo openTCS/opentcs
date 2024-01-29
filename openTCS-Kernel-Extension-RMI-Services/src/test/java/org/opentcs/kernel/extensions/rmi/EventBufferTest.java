@@ -17,10 +17,10 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link EventBuffer}.
  */
-public class EventBufferTest {
+class EventBufferTest {
 
   @Test
-  public void checkGetEventsShouldReturnCorrectAmountOfEvents() {
+  void checkGetEventsShouldReturnCorrectAmountOfEvents() {
     EventBuffer testobject = new EventBuffer(i -> true);
 
     testobject.onEvent(new Object());
@@ -31,7 +31,7 @@ public class EventBufferTest {
   }
 
   @Test
-  public void checkGetEventsShouldReturnEmptyList() {
+  void checkGetEventsShouldReturnEmptyList() {
     EventBuffer testobject = new EventBuffer(i -> true);
 
     testobject.onEvent(new Object());
@@ -43,7 +43,7 @@ public class EventBufferTest {
   }
 
   @Test
-  public void checkSetEventFilterShouldChangeEventFilter() {
+  void checkSetEventFilterShouldChangeEventFilter() {
     EventBuffer testobject = new EventBuffer(i -> true);
 
     testobject.setEventFilter(i -> false);
@@ -56,7 +56,7 @@ public class EventBufferTest {
   }
 
   @Test
-  public void checkGetEventsShouldWorkWhenTimeoutGreaterThanZero() {
+  void checkGetEventsShouldWorkWhenTimeoutGreaterThanZero() {
     EventBuffer testobject = new EventBuffer(i -> true);
 
     testobject.onEvent(new Object());

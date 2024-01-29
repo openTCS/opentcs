@@ -28,20 +28,20 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
 /**
  * Unit tests for {@link CompositeOrderComparator}.
  */
-public class CompositeOrderComparatorTest {
+class CompositeOrderComparatorTest {
 
   private CompositeOrderComparator comparator;
   private DefaultDispatcherConfiguration configuration;
   private Map<String, Comparator<TransportOrder>> availableComparators;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     configuration = Mockito.mock(DefaultDispatcherConfiguration.class);
     availableComparators = new HashMap<>();
   }
 
   @Test
-  public void sortNamesUpForOtherwiseEqualInstances() {
+  void sortNamesUpForOtherwiseEqualInstances() {
 
     Mockito.when(configuration.orderPriorities())
         .thenReturn(List.of());
@@ -64,7 +64,7 @@ public class CompositeOrderComparatorTest {
   }
 
   @Test
-  public void sortsByAgeAndName() {
+  void sortsByAgeAndName() {
     Mockito.when(configuration.orderPriorities())
         .thenReturn(List.of());
     comparator = new CompositeOrderComparator(configuration, availableComparators);
@@ -90,7 +90,7 @@ public class CompositeOrderComparatorTest {
   }
 
   @Test
-  public void sortsByAgeAndNameAndDeadline() {
+  void sortsByAgeAndNameAndDeadline() {
     String deadlineKey = "BY_DEADLINE";
     Mockito.when(configuration.orderPriorities())
         .thenReturn(List.of(deadlineKey));

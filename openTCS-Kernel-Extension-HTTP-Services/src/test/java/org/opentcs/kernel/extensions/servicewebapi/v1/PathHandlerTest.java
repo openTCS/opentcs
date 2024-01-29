@@ -26,7 +26,7 @@ import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 /**
  * Tests for {@link PathHandler}.
  */
-public class PathHandlerTest {
+class PathHandlerTest {
 
   private TCSObjectService objectService;
   private RouterService routerService;
@@ -37,7 +37,7 @@ public class PathHandlerTest {
   private Path path;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     objectService = mock();
     routerService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
@@ -52,7 +52,7 @@ public class PathHandlerTest {
   }
 
   @Test
-  public void lockPath() {
+  void lockPath() {
     handler.updatePathLock("some-path", "true");
 
     then(routerService).should().updatePathLock(path.getReference(), true);
@@ -60,7 +60,7 @@ public class PathHandlerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"false", "flase", "some-value-that-is-not-true"})
-  public void unlockPathOnAnyNontrueValue(String value) {
+  void unlockPathOnAnyNontrueValue(String value) {
     handler.updatePathLock("some-path", value);
 
     then(routerService).should().updatePathLock(path.getReference(), false);
@@ -68,7 +68,7 @@ public class PathHandlerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"true", "false"})
-  public void throwOnLockUnknownPath(String value) {
+  void throwOnLockUnknownPath(String value) {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.updatePathLock("some-unknown-path", value));
   }

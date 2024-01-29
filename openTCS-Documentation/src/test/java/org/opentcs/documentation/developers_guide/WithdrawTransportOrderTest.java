@@ -23,17 +23,17 @@ import org.opentcs.data.order.TransportOrder;
  * This test has no meaning and it just exists for the documentation to refer to and to guarantee
  * an example that compiles.
  */
-public class WithdrawTransportOrderTest {
+class WithdrawTransportOrderTest {
 
   private DispatcherService dispService;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     dispService = mock(DispatcherService.class);
   }
 
   @Test
-  public void shouldWithdrawTransportOrder() {
+  void shouldWithdrawTransportOrder() {
     TransportOrder someOrder = getSomeTransportOrder();
 
     // tag::documentation_withdrawTransportOrder[]
@@ -43,7 +43,7 @@ public class WithdrawTransportOrderTest {
   }
 
   @Test
-  public void shouldWithdrawTransportOrderByVehicle() {
+  void shouldWithdrawTransportOrderByVehicle() {
     Vehicle curVehicle = getSomeVehicle();
 
     // tag::documentation_withdrawTransportOrderByVehicle[]

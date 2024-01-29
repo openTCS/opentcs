@@ -25,7 +25,7 @@ import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 /**
  * Tests for {@link LocationHandler}.
  */
-public class LocationHandlerTest {
+class LocationHandlerTest {
 
   private PlantModelService plantModelService;
   private KernelExecutorWrapper executorWrapper;
@@ -35,7 +35,7 @@ public class LocationHandlerTest {
   private Location location;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     plantModelService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
 
@@ -48,7 +48,7 @@ public class LocationHandlerTest {
   }
 
   @Test
-  public void lockLocation() {
+  void lockLocation() {
     handler.updateLocationLock("some-location", "true");
 
     then(plantModelService).should().updateLocationLock(location.getReference(), true);
@@ -56,7 +56,7 @@ public class LocationHandlerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"false", "flase", "some-value-that-is-not-true"})
-  public void unlockLocationOnAnyNontrueValue(String value) {
+  void unlockLocationOnAnyNontrueValue(String value) {
     handler.updateLocationLock("some-location", value);
 
     then(plantModelService).should().updateLocationLock(location.getReference(), false);
@@ -64,7 +64,7 @@ public class LocationHandlerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"true", "false"})
-  public void throwOnLockUnknownLocation(String value) {
+  void throwOnLockUnknownLocation(String value) {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.updateLocationLock("some-unknown-location", value));
   }

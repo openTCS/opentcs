@@ -25,7 +25,7 @@ import org.opentcs.data.model.Vehicle;
 /**
  * Unit tests for {@link PausedVehicleModule}.
  */
-public class PausedVehicleModuleTest {
+class PausedVehicleModuleTest {
 
   /**
    * The module to test.
@@ -35,13 +35,13 @@ public class PausedVehicleModuleTest {
   private TCSObjectService objectService;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     objectService = mock(TCSObjectService.class);
     module = new PausedVehicleModule(objectService, new Object());
   }
 
   @Test
-  public void allowAllocationForUnpausedVehicle() {
+  void allowAllocationForUnpausedVehicle() {
     Vehicle vehicle = new Vehicle("some-vehicle").withPaused(false);
     Scheduler.Client client = new SampleClient(vehicle.getName());
 
@@ -51,7 +51,7 @@ public class PausedVehicleModuleTest {
   }
 
   @Test
-  public void refuseAllocationForPausedVehicle() {
+  void refuseAllocationForPausedVehicle() {
     Vehicle vehicle = new Vehicle("some-vehicle").withPaused(true);
     Scheduler.Client client = new SampleClient(vehicle.getName());
 

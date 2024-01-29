@@ -17,17 +17,17 @@ import org.opentcs.data.model.Point;
 
 /**
  */
-public class ParkingPositionToPriorityFunctionTest {
+class ParkingPositionToPriorityFunctionTest {
 
   private ParkingPositionToPriorityFunction priorityFunction;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     priorityFunction = new ParkingPositionToPriorityFunction();
   }
 
   @Test
-  public void returnsNullForNonParkingPosition() {
+  void returnsNullForNonParkingPosition() {
     Point point = new Point("Some point")
         .withType(Point.Type.HALT_POSITION)
         .withProperty(Dispatcher.PROPKEY_PARKING_POSITION_PRIORITY, "1");
@@ -36,14 +36,14 @@ public class ParkingPositionToPriorityFunctionTest {
   }
 
   @Test
-  public void returnsNullForParkingPositionWithoutPriorityProperty() {
+  void returnsNullForParkingPositionWithoutPriorityProperty() {
     Point point = new Point("Some point").withType(Point.Type.PARK_POSITION);
 
     assertThat(priorityFunction.apply(point), is(nullValue()));
   }
 
   @Test
-  public void returnsNullForParkingPositionWithNonDecimalProperty() {
+  void returnsNullForParkingPositionWithNonDecimalProperty() {
     Point point = new Point("Some point")
         .withType(Point.Type.PARK_POSITION)
         .withProperty(Dispatcher.PROPKEY_PARKING_POSITION_PRIORITY, "abc");
@@ -52,7 +52,7 @@ public class ParkingPositionToPriorityFunctionTest {
   }
 
   @Test
-  public void returnsPriorityForParkingPositionWithDecimalProperty() {
+  void returnsPriorityForParkingPositionWithDecimalProperty() {
     Point point = new Point("Some point")
         .withType(Point.Type.PARK_POSITION)
         .withProperty(Dispatcher.PROPKEY_PARKING_POSITION_PRIORITY, "23");

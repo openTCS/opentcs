@@ -31,17 +31,17 @@ import org.opentcs.data.model.Vehicle;
 /**
  * Tests for {@link AbstractParkingPositionSupplier}.
  */
-public class AbstractParkingPositionSupplierTest {
+class AbstractParkingPositionSupplierTest {
 
   private InternalPlantModelService plantModelService;
   private Router router;
   private AbstractParkingPositionSupplierImpl supplier;
 
-  public AbstractParkingPositionSupplierTest() {
+  AbstractParkingPositionSupplierTest() {
   }
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
     supplier = new AbstractParkingPositionSupplierImpl(plantModelService, router);
@@ -49,7 +49,7 @@ public class AbstractParkingPositionSupplierTest {
   }
 
   @Test
-  public void returnsEmptyAllParkingPositionsOccupied() {
+  void returnsEmptyAllParkingPositionsOccupied() {
     Point point1 = new Point("vehicle's current position");
     Point point2 = new Point("parking position occupied by another vehicle")
         .withType(Point.Type.PARK_POSITION)
@@ -72,7 +72,7 @@ public class AbstractParkingPositionSupplierTest {
   }
 
   @Test
-  public void returnsUnoccupiedParkingPositions() {
+  void returnsUnoccupiedParkingPositions() {
     Point point1 = new Point("vehicle's current position");
     Point point2 = new Point("unoccupied parking position")
         .withType(Point.Type.PARK_POSITION);
@@ -94,7 +94,7 @@ public class AbstractParkingPositionSupplierTest {
   }
 
   @Test
-  public void returnsExpandedPoints() {
+  void returnsExpandedPoints() {
     Point[] points = new Point[5];
     Path[] paths = new Path[points.length];
     for (int i = 0; i < points.length; i++) {
@@ -121,11 +121,11 @@ public class AbstractParkingPositionSupplierTest {
     return new HashSet<>(Arrays.asList(resources));
   }
 
-  public class AbstractParkingPositionSupplierImpl
+  class AbstractParkingPositionSupplierImpl
       extends AbstractParkingPositionSupplier {
 
-    public AbstractParkingPositionSupplierImpl(InternalPlantModelService plantModelService,
-                                               Router router) {
+    AbstractParkingPositionSupplierImpl(InternalPlantModelService plantModelService,
+                                        Router router) {
       super(plantModelService, router);
     }
 

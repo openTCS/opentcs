@@ -20,7 +20,7 @@ import org.opentcs.data.model.TCSResource;
 /**
  * Tests for {@link ResourceMath}.
  */
-public class ResourceMathTest {
+class ResourceMathTest {
 
   private Point pointA;
   private Point pointB;
@@ -34,7 +34,7 @@ public class ResourceMathTest {
   private List<Set<TCSResource<?>>> allResources;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     pointA = new Point("A");
     pointB = new Point("B");
     pointC = new Point("C");
@@ -48,27 +48,27 @@ public class ResourceMathTest {
   }
 
   @Test
-  public void handleVehicleCoveringLastResourceSet() {
+  void handleVehicleCoveringLastResourceSet() {
     assertThat(ResourceMath.freeableResourceSetCount(allResources, 500), is(2));
   }
 
   @Test
-  public void handleVehicleCoveringLastResourceSetExactly() {
+  void handleVehicleCoveringLastResourceSetExactly() {
     assertThat(ResourceMath.freeableResourceSetCount(allResources, 1000), is(2));
   }
 
   @Test
-  public void handleVehicleCoveringLastTwoResourceSets() {
+  void handleVehicleCoveringLastTwoResourceSets() {
     assertThat(ResourceMath.freeableResourceSetCount(allResources, 1001), is(1));
   }
 
   @Test
-  public void handleVehicleCoveringLastThreeResourceSets() {
+  void handleVehicleCoveringLastThreeResourceSets() {
     assertThat(ResourceMath.freeableResourceSetCount(allResources, 3001), is(0));
   }
 
   @Test
-  public void handleVehicleCoveringMoreResourceSetsThanGiven() {
+  void handleVehicleCoveringMoreResourceSetsThanGiven() {
     assertThat(ResourceMath.freeableResourceSetCount(allResources, Integer.MAX_VALUE), is(0));
   }
 

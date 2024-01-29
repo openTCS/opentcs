@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Tests for the {@link AttachmentManager}.
  */
-public class AttachmentManagerTest {
+class AttachmentManagerTest {
 
   private static final String VEHICLE_1_NAME = "Vehicle1";
   private static final String VEHICLE_2_NAME = "Vehicle2";
@@ -62,7 +62,7 @@ public class AttachmentManagerTest {
   private final Vehicle vehicle2;
   private final Vehicle vehicle3;
 
-  public AttachmentManagerTest() {
+  AttachmentManagerTest() {
     objectService = mock(TCSObjectService.class);
     vehicleControllerPool = mock(LocalVehicleControllerPool.class);
     commAdapterRegistry = mock(VehicleCommAdapterRegistry.class);
@@ -86,7 +86,7 @@ public class AttachmentManagerTest {
   }
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     Set<Vehicle> vehicles = new HashSet<>();
     vehicles.add(vehicle1);
     vehicles.add(vehicle2);
@@ -99,12 +99,12 @@ public class AttachmentManagerTest {
   }
 
   @AfterEach
-  public void tearDown() {
+  void tearDown() {
     attachmentManager.terminate();
   }
 
   @Test
-  public void shouldNotAttachUnknownVehicle() {
+  void shouldNotAttachUnknownVehicle() {
     attachmentManager.attachAdapterToVehicle("UnknownVehicle", commAdapterFactory);
 
     verify(commAdapterFactory, times(0)).getAdapterFor(any(Vehicle.class));
@@ -113,7 +113,7 @@ public class AttachmentManagerTest {
   }
 
   @Test
-  public void shouldAttachAdapterToVehicle() {
+  void shouldAttachAdapterToVehicle() {
     VehicleCommAdapter commAdapter = new SimpleCommAdapter(vehicle1);
     when(commAdapterFactory.getAdapterFor(vehicle1)).thenReturn(commAdapter);
     when(commAdapterFactory.getDescription()).thenReturn(new SimpleVehicleCommAdapterDescription());
@@ -132,7 +132,7 @@ public class AttachmentManagerTest {
   }
 
   @Test
-  public void shouldAutoAttachAdapterToVehicle() {
+  void shouldAutoAttachAdapterToVehicle() {
     List<VehicleCommAdapterFactory> factories = Arrays.asList(new NullVehicleCommAdapterFactory(),
                                                               new SimpleCommAdapterFactory());
     when(commAdapterRegistry.getFactories()).thenReturn(factories);
@@ -143,7 +143,7 @@ public class AttachmentManagerTest {
   }
 
   @Test
-  public void shouldAutoAttachToFirstAvailableAdapter() {
+  void shouldAutoAttachToFirstAvailableAdapter() {
     List<VehicleCommAdapterFactory> factories = Arrays.asList(new SimpleCommAdapterFactory(),
                                                               new NullVehicleCommAdapterFactory());
     when(commAdapterRegistry.getFactories()).thenReturn(factories);
@@ -155,7 +155,7 @@ public class AttachmentManagerTest {
   }
 
   @Test
-  public void shouldFallBackToFirstAvailableAdapterIfPreferredAdapterIsNotProvided() {
+  void shouldFallBackToFirstAvailableAdapterIfPreferredAdapterIsNotProvided() {
     SimpleCommAdapterFactory simpleCommAdapterFactory = new SimpleCommAdapterFactory();
     when(commAdapterRegistry.getFactories())
         .thenReturn(Arrays.asList(new RefusingCommAdapterFactory(), simpleCommAdapterFactory));

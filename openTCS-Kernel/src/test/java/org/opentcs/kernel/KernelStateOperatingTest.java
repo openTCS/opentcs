@@ -44,7 +44,7 @@ import org.opentcs.util.event.SimpleEventBus;
 /**
  * Tests the operating state of the kernel.
  */
-public class KernelStateOperatingTest {
+class KernelStateOperatingTest {
 
   private final Set<Vehicle> vehicles = new HashSet<>();
 
@@ -71,7 +71,7 @@ public class KernelStateOperatingTest {
   private InternalVehicleService vehicleService;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     objectID = 0;
     objectPool = mock(TCSObjectRepository.class);
     configuration = mock(KernelApplicationConfiguration.class);
@@ -86,7 +86,7 @@ public class KernelStateOperatingTest {
   }
 
   @Test
-  public void shouldInitializeExtensionsAndComponents() {
+  void shouldInitializeExtensionsAndComponents() {
     KernelExtension extension = mock(KernelExtension.class);
     operating = createKernel(Collections.singleton(extension));
     operating.initialize();
@@ -99,7 +99,7 @@ public class KernelStateOperatingTest {
   }
 
   @Test
-  public void shouldTerminateExtensionsAndComponents() {
+  void shouldTerminateExtensionsAndComponents() {
     KernelExtension extension = mock(KernelExtension.class);
     operating = createKernel(Collections.singleton(extension));
     operating.initialize();
@@ -113,7 +113,7 @@ public class KernelStateOperatingTest {
   }
 
   @Test
-  public void initializeKernelWithVehiclesAsUnavailable() {
+  void initializeKernelWithVehiclesAsUnavailable() {
     Vehicle vehicle = new Vehicle("Vehicle-" + objectID++);
     vehicles.add(vehicle);
     operating = createKernel(new HashSet<>());
@@ -127,7 +127,7 @@ public class KernelStateOperatingTest {
   }
 
   @Test
-  public void terminateKernelWithVehiclesAsUnavailable() {
+  void terminateKernelWithVehiclesAsUnavailable() {
     Vehicle vehicle = new Vehicle("Vehicle-" + objectID++);
     vehicles.add(vehicle);
     operating = createKernel(new HashSet<>());

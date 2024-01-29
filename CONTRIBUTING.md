@@ -30,6 +30,11 @@ The release versions are tagged with their respective version.
 * Do not use tabs, use spaces only.
 * Indentation step size: 2 spaces.
 
+### Automatic tests
+
+* New or changed non-trivial code should be covered by tests.
+* JUnit test classes and methods should omit the `public` modifier unless there is a technical reason for adding it.
+
 ### IDE: NetBeans
 
 To build the project from NetBeans, register a Java platform named "JDK 13 - openTCS" (without the quotes) within NetBeans.

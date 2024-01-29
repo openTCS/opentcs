@@ -23,7 +23,7 @@ import org.opentcs.util.gui.dialog.ConnectToServerDialog;
 
 /**
  */
-public class ApplicationKernelProviderTest {
+class ApplicationKernelProviderTest {
 
   /**
    * A (mocked) portal manager.
@@ -43,7 +43,7 @@ public class ApplicationKernelProviderTest {
   private SharedKernelServicePortalProvider portalProvider;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     portalManager = mock(PortalManager.class);
     dialog = mock(ConnectToServerDialog.class);
     appConfig = mock(PlantOverviewApplicationConfiguration.class);
@@ -53,7 +53,7 @@ public class ApplicationKernelProviderTest {
 
   @Disabled
   @Test
-  public void shouldConnectOnClientRegistration() {
+  void shouldConnectOnClientRegistration() {
     when(portalManager.isConnected()).thenReturn(false, false, true);
     when(portalManager.getPortal()).thenReturn(mock(KernelServicePortal.class));
 
@@ -64,7 +64,7 @@ public class ApplicationKernelProviderTest {
 
   @Disabled
   @Test
-  public void shouldNotConnectIfAlreadyConnected() {
+  void shouldNotConnectIfAlreadyConnected() {
     when(portalManager.isConnected()).thenReturn(true);
     when(portalManager.getPortal()).thenReturn(mock(KernelServicePortal.class));
 

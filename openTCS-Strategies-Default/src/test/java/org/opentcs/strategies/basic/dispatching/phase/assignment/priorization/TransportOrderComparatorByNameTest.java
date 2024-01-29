@@ -20,17 +20,17 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
 
 /**
  */
-public class TransportOrderComparatorByNameTest {
+class TransportOrderComparatorByNameTest {
 
   private TransportOrderComparatorByName comparator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     comparator = new TransportOrderComparatorByName();
   }
 
   @Test
-  public void sortsAlphabeticallyByName() {
+  void sortsAlphabeticallyByName() {
     TransportOrder order1 = new TransportOrder("AA", List.of());
     TransportOrder order2 = new TransportOrder("CC", List.of());
     TransportOrder order3 = new TransportOrder("AB", List.of());

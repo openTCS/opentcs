@@ -39,7 +39,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 /**
  * Tests for {@link PathConverter}.
  */
-public class PathConverterTest {
+class PathConverterTest {
 
   private PathConverter pathConverter;
   private PropertyConverter propertyConverter;
@@ -56,7 +56,7 @@ public class PathConverterTest {
   private PeripheralOperationCreationTO peripheralOperationCreationTO;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     propertyConverter = mock();
     peripheralOpConverter = mock();
     envelopeConverter = mock();
@@ -95,7 +95,7 @@ public class PathConverterTest {
   }
 
   @Test
-  public void checkToPathTOs() {
+  void checkToPathTOs() {
     Path path1 = new Path("Path1", new Point("p1").getReference(), new Point("p2").getReference())
         .withLength(3)
         .withMaxVelocity(6)
@@ -135,7 +135,7 @@ public class PathConverterTest {
   }
 
   @Test
-  public void checkToPathCreationTOs() {
+  void checkToPathCreationTOs() {
     PathTO path1 = new PathTO("Path1", "srcP", "desP")
         .setLength(3)
         .setMaxVelocity(6)

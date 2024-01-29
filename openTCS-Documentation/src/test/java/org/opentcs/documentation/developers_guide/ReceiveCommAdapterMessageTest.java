@@ -15,10 +15,10 @@ import org.opentcs.data.order.TransportOrder;
 /**
  * Tests showing how to receive messages from communication adapters.
  */
-public class ReceiveCommAdapterMessageTest {
+class ReceiveCommAdapterMessageTest {
 
   @Test
-  public void receiveInformationViaVehicleProperty() {
+  void receiveInformationViaVehicleProperty() {
     // tag::documentation_receiveMessageFromVehicle[]
     Vehicle vehicle = getSomeVehicle();
     String value = vehicle.getProperty("someKey");
@@ -27,7 +27,7 @@ public class ReceiveCommAdapterMessageTest {
   }
 
   @Test
-  public void receiveInformationViaTransportOrderProperty() {
+  void receiveInformationViaTransportOrderProperty() {
     // tag::documentation_receiveMessageFromTransportOrder[]
     TransportOrder transportOrder = getSomeTransportOrder();
     String value = transportOrder.getProperty("someKey");

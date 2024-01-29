@@ -40,7 +40,7 @@ import org.opentcs.util.event.EventHandler;
 /**
  * Tests for the {@link PeripheralAttachmentManager}.
  */
-public class PeripheralAttachmentManagerTest {
+class PeripheralAttachmentManagerTest {
 
   private static final String LOCATION_NAME = "Location-01";
 
@@ -52,7 +52,7 @@ public class PeripheralAttachmentManagerTest {
 
   private final Location location;
 
-  public PeripheralAttachmentManagerTest() {
+  PeripheralAttachmentManagerTest() {
     peripheralService = mock(InternalPeripheralService.class);
     commAdapterRegistry = mock(PeripheralCommAdapterRegistry.class);
     commAdapterFactory = mock(PeripheralCommAdapterFactory.class);
@@ -70,7 +70,7 @@ public class PeripheralAttachmentManagerTest {
   }
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     Set<Location> locations = new HashSet<>();
     locations.add(location);
     when(peripheralService.fetchObjects(Location.class)).thenReturn(locations);
@@ -78,7 +78,7 @@ public class PeripheralAttachmentManagerTest {
   }
 
   @Test
-  public void shouldHaveInitializedPeripheralEntryPool() {
+  void shouldHaveInitializedPeripheralEntryPool() {
     attachmentManager.initialize();
 
     assertThat(peripheralEntryPool.getEntries().size(), is(1));
@@ -87,7 +87,7 @@ public class PeripheralAttachmentManagerTest {
   }
 
   @Test
-  public void shouldAttachAdapterToLocation() {
+  void shouldAttachAdapterToLocation() {
     PeripheralCommAdapter commAdapter = new SimpleCommAdapter(location);
     PeripheralCommAdapterDescription description = new SimpleCommAdapterDescription();
     when(commAdapterRegistry.findFactoryFor(description)).thenReturn(commAdapterFactory);
@@ -105,7 +105,7 @@ public class PeripheralAttachmentManagerTest {
   }
 
   @Test
-  public void shouldAutoAttachAdapterToLocation() {
+  void shouldAutoAttachAdapterToLocation() {
     PeripheralCommAdapterFactory factory = new SimpleCommAdapterFactory();
     when(commAdapterRegistry.findFactoriesFor(location)).thenReturn(Arrays.asList(factory));
 
@@ -119,7 +119,7 @@ public class PeripheralAttachmentManagerTest {
   }
 
   @Test
-  public void shouldGetAttachmentInformation() {
+  void shouldGetAttachmentInformation() {
     attachmentManager.initialize();
     PeripheralAttachmentInformation result
         = attachmentManager.getAttachmentInformation(location.getReference());

@@ -23,14 +23,14 @@ import org.opentcs.guing.common.persistence.ModelManager;
 /**
  * Tests the {@link ToolTipTextGenerator}.
  */
-public class ToolTipTextGeneratorTest {
+class ToolTipTextGeneratorTest {
 
   private ModelManager modelManager;
 
   private ToolTipTextGenerator toolTipTextGenerator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     SystemModel systemModel = mock(SystemModel.class);
     when(systemModel.getBlockModels()).thenReturn(new ArrayList<>());
 
@@ -40,7 +40,7 @@ public class ToolTipTextGeneratorTest {
   }
 
   @Test
-  public void sortsPropertiesLexicographically() {
+  void sortsPropertiesLexicographically() {
     final String propKey1 = "prop1";
     final String propKey2 = "prop2";
     final String propKey3 = "prop3";

@@ -30,12 +30,12 @@ import org.opentcs.data.order.TransportOrder;
  * This test has no meaning and it just exists for the documentation to refer to and to guarantee
  * an example that compiles.
  */
-public class CreateTransportOrderSequenceTest {
+class CreateTransportOrderSequenceTest {
 
   private TransportOrderService orderService;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     orderService = mock(InternalTransportOrderService.class);
     when(orderService.createOrderSequence(any(OrderSequenceCreationTO.class)))
         .thenReturn(new OrderSequence("OrderSequence"));
@@ -48,7 +48,7 @@ public class CreateTransportOrderSequenceTest {
   }
 
   @Test
-  public void demoCreateOrderSequence() {
+  void demoCreateOrderSequence() {
     // Note: Keep these lines to a maximum of 80 characters for the documentation!
 
     // tag::createOrderSequence_createOrderSequenceCreationTO[]

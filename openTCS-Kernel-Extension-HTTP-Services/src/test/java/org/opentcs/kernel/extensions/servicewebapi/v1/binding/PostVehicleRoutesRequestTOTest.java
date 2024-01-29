@@ -16,17 +16,17 @@ import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 /**
  * Unit tests for {@link PostVehicleRoutesRequestTO}.
  */
-public class PostVehicleRoutesRequestTOTest {
+class PostVehicleRoutesRequestTOTest {
 
   private JsonBinder jsonBinder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     jsonBinder = new JsonBinder();
   }
 
   @Test
-  public void jsonSample() {
+  void jsonSample() {
     Approvals.verify(
         jsonBinder.toJson(new PostVehicleRoutesRequestTO(List.of("C", "F")).setSourcePoint("A"))
     );

@@ -26,21 +26,21 @@ import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComp
 
 /**
  */
-public class CompositeVehicleComparatorTest {
+class CompositeVehicleComparatorTest {
 
   private CompositeVehicleComparator comparator;
   private DefaultDispatcherConfiguration configuration;
   private Map<String, Comparator<Vehicle>> availableComparators;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     configuration = Mockito.mock(DefaultDispatcherConfiguration.class);
     availableComparators = new HashMap<>();
 
   }
 
   @Test
-  public void sortNamesUpForOtherwiseEqualInstances() {
+  void sortNamesUpForOtherwiseEqualInstances() {
     Mockito.when(configuration.vehiclePriorities())
         .thenReturn(List.of());
     comparator = new CompositeVehicleComparator(configuration, availableComparators);
@@ -62,7 +62,7 @@ public class CompositeVehicleComparatorTest {
   }
 
   @Test
-  public void sortsByNameAndEnergylevel() {
+  void sortsByNameAndEnergylevel() {
     Mockito.when(configuration.vehiclePriorities())
         .thenReturn(List.of());
     comparator = new CompositeVehicleComparator(configuration, availableComparators);
@@ -84,7 +84,7 @@ public class CompositeVehicleComparatorTest {
   }
 
   @Test
-  public void sortsByNameEnergylevelRoutingCost() {
+  void sortsByNameEnergylevelRoutingCost() {
 
     Mockito.when(configuration.vehiclePriorities())
         .thenReturn(List.of("IDLE_FIRST"));

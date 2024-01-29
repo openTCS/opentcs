@@ -34,20 +34,20 @@ import org.opentcs.drivers.vehicle.MovementCommand;
 /**
  * Tests for {@link MovementCommandMapper}.
  */
-public class MovementCommandMapperTest {
+class MovementCommandMapperTest {
 
   private MovementCommandMapper mapper;
   private TCSObjectService objectService;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     objectService = mock(TCSObjectService.class);
     mapper = new MovementCommandMapper(objectService);
 
   }
 
   @Test
-  public void mapDriveOrderToMovementCommands() {
+  void mapDriveOrderToMovementCommands() {
     Point pointA = new Point("point-a");
     Point pointB = new Point("point-b");
     Point pointC = new Point("point-c");

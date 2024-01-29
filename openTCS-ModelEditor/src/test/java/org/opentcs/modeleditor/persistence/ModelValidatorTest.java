@@ -48,7 +48,7 @@ import org.opentcs.guing.common.model.SystemModel;
 /**
  * Unit tests for {@link ModelValidator}.
  */
-public class ModelValidatorTest {
+class ModelValidatorTest {
 
   private static final String LAYOUT_NAME = "VLayout-001";
 
@@ -91,7 +91,7 @@ public class ModelValidatorTest {
   private Map<String, ModelComponent> components;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     model = mock(SystemModel.class);
     validator = new ModelValidator();
     objectPropertiesMap = new HashMap<>();
@@ -108,19 +108,19 @@ public class ModelValidatorTest {
   }
 
   @Test
-  public void shouldInvalidateIfNull() {
+  void shouldInvalidateIfNull() {
     assertFalse(validator.isValidWith(model, null));
 
     assertFalse(validator.isValidWith(null, mock(ModelComponent.class)));
   }
 
   @Test
-  public void shouldInvalidateWhenEmptyName() {
+  void shouldInvalidateWhenEmptyName() {
     assertFalse(validator.isValidWith(model, createComponentWithName(ModelComponent.class, "")));
   }
 
   @Test
-  public void shouldInvalidateIfExists() {
+  void shouldInvalidateIfExists() {
     ModelComponent component = createComponentWithName(ModelComponent.class, POINT_NAME);
     components.put(POINT_NAME, component);
     when(model.getModelComponent(POINT_NAME)).thenReturn(component);
@@ -131,21 +131,21 @@ public class ModelValidatorTest {
   }
 
   @Test
-  public void testPointNegativeOrientationAngle() {
+  void testPointNegativeOrientationAngle() {
     PointModel point = createPointModel(POINT_NAME);
     addProperty(point, AngleProperty.class, PointModel.VEHICLE_ORIENTATION_ANGLE, -5d);
     assertTrue(validator.isValidWith(model, point));
   }
 
   @Test
-  public void testPathNegativeLength() {
+  void testPathNegativeLength() {
     PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     addProperty(path, LengthProperty.class, PathModel.LENGTH, -5d);
     assertFalse(validator.isValidWith(model, path));
   }
 
   @Test
-  public void testPathInvalidStartPoint() {
+  void testPathInvalidStartPoint() {
     PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     when(model.getModelComponent(POINT_NAME_2)).thenReturn(components.get(POINT_NAME_2));
     components.remove(POINT_NAME);
@@ -153,7 +153,7 @@ public class ModelValidatorTest {
   }
 
   @Test
-  public void testPathInvalidEndPoint() {
+  void testPathInvalidEndPoint() {
     PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
     components.remove(POINT_NAME_2);
@@ -161,7 +161,7 @@ public class ModelValidatorTest {
   }
 
   @Test
-  public void testPathValid() {
+  void testPathValid() {
     PathModel path = createPathModel(PATH_NAME, POINT_NAME, POINT_NAME_2);
     when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
     when(model.getModelComponent(POINT_NAME_2)).thenReturn(components.get(POINT_NAME_2));
@@ -169,34 +169,34 @@ public class ModelValidatorTest {
   }
 
   @Test
-  public void testLocationInvalidType() {
+  void testLocationInvalidType() {
     LocationModel location = createLocation(LOCATION_NAME);
     components.remove(LOCATION_TYPE_NAME);
     assertFalse(validator.isValidWith(model, location));
   }
 
   @Test
-  public void testLocationValid() {
+  void testLocationValid() {
     LocationModel location = createLocation(LOCATION_NAME);
     assertTrue(validator.isValidWith(model, location));
   }
 
   @Test
-  public void testLinkInvalidEndPoint() {
+  void testLinkInvalidEndPoint() {
     LinkModel link = createLink(LINK_NAME);
     when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
     assertFalse(validator.isValidWith(model, link));
   }
 
   @Test
-  public void testLinkInvalidStartPoint() {
+  void testLinkInvalidStartPoint() {
     LinkModel link = createLink(LINK_NAME);
     when(model.getModelComponent(LOCATION_NAME)).thenReturn(components.get(LOCATION_NAME));
     assertFalse(validator.isValidWith(model, link));
   }
 
   @Test
-  public void testLinkValid() {
+  void testLinkValid() {
     LinkModel link = createLink(LINK_NAME);
     when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
     when(model.getModelComponent(LOCATION_NAME)).thenReturn(components.get(LOCATION_NAME));
@@ -204,14 +204,14 @@ public class ModelValidatorTest {
   }
 
   @Test
-  public void testVehicleInvalidNextPosition() {
+  void testVehicleInvalidNextPosition() {
     VehicleModel vehicle = createVehicle(VEHICLE_NAME);
     when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
     assertFalse(validator.isValidWith(model, vehicle));
   }
 
   @Test
-  public void testVehicleValidWithNullPoints() {
+  void testVehicleValidWithNullPoints() {
     VehicleModel vehicle = createVehicle(VEHICLE_NAME);
     addProperty(vehicle, StringProperty.class, VehicleModel.POINT, "null");
     addProperty(vehicle, StringProperty.class, VehicleModel.NEXT_POINT, "null");
@@ -219,7 +219,7 @@ public class ModelValidatorTest {
   }
 
   @Test
-  public void testVehicleValid() {
+  void testVehicleValid() {
     VehicleModel vehicle = createVehicle(VEHICLE_NAME);
     when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
     when(model.getModelComponent(POINT_NAME_2)).thenReturn(components.get(POINT_NAME_2));

@@ -20,17 +20,17 @@ import org.opentcs.strategies.basic.dispatching.priorization.vehicle.VehicleComp
 
 /**
  */
-public class VehicleComparatorByEnergyLevelTest {
+class VehicleComparatorByEnergyLevelTest {
 
   private VehicleComparatorByEnergyLevel comparator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     comparator = new VehicleComparatorByEnergyLevel();
   }
 
   @Test
-  public void sortHighEnergyLevelsUp() {
+  void sortHighEnergyLevelsUp() {
     Vehicle vehicle1 = new Vehicle("Vehicle1").withEnergyLevel(99);
     Vehicle vehicle2 = vehicle1.withEnergyLevel(50);
     Vehicle vehicle3 = vehicle1.withEnergyLevel(98);

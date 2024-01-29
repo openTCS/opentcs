@@ -18,17 +18,17 @@ import org.opentcs.data.model.Point;
 
 /**
  */
-public class ParkingPositionPriorityComparatorTest {
+class ParkingPositionPriorityComparatorTest {
 
   private ParkingPositionPriorityComparator comparator;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     comparator = new ParkingPositionPriorityComparator(new ParkingPositionToPriorityFunction());
   }
 
   @Test
-  public void prefersPrioritizedParkingPositions() {
+  void prefersPrioritizedParkingPositions() {
     Point pointWithoutPrio
         = new Point("Point without prio")
             .withType(Point.Type.PARK_POSITION);
@@ -46,7 +46,7 @@ public class ParkingPositionPriorityComparatorTest {
   }
 
   @Test
-  public void prefersSmallerPriorityIntegers() {
+  void prefersSmallerPriorityIntegers() {
     Point pointWithLowerPrioValue
         = new Point("Point with lower prio value")
             .withType(Point.Type.PARK_POSITION)
@@ -65,7 +65,7 @@ public class ParkingPositionPriorityComparatorTest {
   }
 
   @Test
-  public void treatsSamePrioritiesEqually() {
+  void treatsSamePrioritiesEqually() {
     Point point1
         = new Point("Point 1, with prio 4")
             .withType(Point.Type.PARK_POSITION)

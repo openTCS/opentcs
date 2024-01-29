@@ -29,7 +29,7 @@ import org.opentcs.data.model.Vehicle;
 /**
  * Tests for {@link PrioritizedParkingPositionSupplier}.
  */
-public class PrioritizedParkingPositionSupplierTest {
+class PrioritizedParkingPositionSupplierTest {
 
   private PrioritizedParkingPositionSupplier supplier;
   private InternalPlantModelService plantModelService;
@@ -37,7 +37,7 @@ public class PrioritizedParkingPositionSupplierTest {
   private ParkingPositionToPriorityFunction priorityFunction;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
     priorityFunction = new ParkingPositionToPriorityFunction();
@@ -45,7 +45,7 @@ public class PrioritizedParkingPositionSupplierTest {
   }
 
   @Test
-  public void returnsPrioritizedParkingPosition() {
+  void returnsPrioritizedParkingPosition() {
     Point point1 = new Point("vehicle's current position");
     Point point2 = new Point("parking position without priority")
         .withType(Point.Type.PARK_POSITION);
@@ -66,7 +66,7 @@ public class PrioritizedParkingPositionSupplierTest {
   }
 
   @Test
-  public void returnsClosestPrioritizedParkingPositionForPositionsWithSamePriority() {
+  void returnsClosestPrioritizedParkingPositionForPositionsWithSamePriority() {
     Point point1 = new Point("vehicle's current position");
     Point point2 = new Point("parking position with some priority")
         .withType(Point.Type.PARK_POSITION)
@@ -89,7 +89,7 @@ public class PrioritizedParkingPositionSupplierTest {
   }
 
   @Test
-  public void returnsHigherPrioritizedParkingPositionThanCurrentlyOccupying() {
+  void returnsHigherPrioritizedParkingPositionThanCurrentlyOccupying() {
     Point point1 = new Point("vehicle's current parking position with some priority")
         .withType(Point.Type.PARK_POSITION)
         .withProperty(Dispatcher.PROPKEY_PARKING_POSITION_PRIORITY, "17");
@@ -113,7 +113,7 @@ public class PrioritizedParkingPositionSupplierTest {
   }
 
   @Test
-  public void returnsEmptyForOnlyPositionsAvailableWithSamePriorityAsCurrentlyOccupying() {
+  void returnsEmptyForOnlyPositionsAvailableWithSamePriorityAsCurrentlyOccupying() {
     Point point1 = new Point("vehicle's current parking position with some priority")
         .withType(Point.Type.PARK_POSITION)
         .withProperty(Dispatcher.PROPKEY_PARKING_POSITION_PRIORITY, "13");
@@ -135,7 +135,7 @@ public class PrioritizedParkingPositionSupplierTest {
   }
 
   @Test
-  public void returnsEmptyForNoHigherPrioritizedParkingPositionsAvailable() {
+  void returnsEmptyForNoHigherPrioritizedParkingPositionsAvailable() {
     Point point1 = new Point("vehicle's current parking position with some priority")
         .withType(Point.Type.PARK_POSITION)
         .withProperty(Dispatcher.PROPKEY_PARKING_POSITION_PRIORITY, "13");
@@ -157,7 +157,7 @@ public class PrioritizedParkingPositionSupplierTest {
   }
 
   @Test
-  public void returnsEmptyForNoPrioritizedParkingPositionAvailable() {
+  void returnsEmptyForNoPrioritizedParkingPositionAvailable() {
     Point point1 = new Point("vehicle's current position");
     Point point2 = new Point("parking position with without priority")
         .withType(Point.Type.PARK_POSITION);

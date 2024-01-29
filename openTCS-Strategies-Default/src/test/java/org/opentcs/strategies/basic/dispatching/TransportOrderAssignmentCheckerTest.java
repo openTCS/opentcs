@@ -26,7 +26,7 @@ import org.opentcs.data.order.TransportOrder;
 
 /**
  */
-public class TransportOrderAssignmentCheckerTest {
+class TransportOrderAssignmentCheckerTest {
 
   private TCSObjectService objectService;
   private OrderReservationPool orderReservationPool;
@@ -35,7 +35,7 @@ public class TransportOrderAssignmentCheckerTest {
   private TransportOrder transportOrder;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     objectService = mock(TCSObjectService.class);
     orderReservationPool = new OrderReservationPool();
     checker = new TransportOrderAssignmentChecker(objectService, orderReservationPool);
@@ -57,7 +57,7 @@ public class TransportOrderAssignmentCheckerTest {
       value = TransportOrder.State.class,
       names = {"RAW", "ACTIVE", "BEING_PROCESSED", "WITHDRAWN", "FINISHED", "FAILED", "UNROUTABLE"}
   )
-  public void onlyAcceptDispatchableOrders(TransportOrder.State orderState) {
+  void onlyAcceptDispatchableOrders(TransportOrder.State orderState) {
     transportOrder = transportOrder.withState(orderState);
 
     assertThat(checker.checkTransportOrderAssignment(transportOrder),
@@ -65,7 +65,7 @@ public class TransportOrderAssignmentCheckerTest {
   }
 
   @Test
-  public void onlyAcceptOrdersWithoutWrappingSequence() {
+  void onlyAcceptOrdersWithoutWrappingSequence() {
     transportOrder
         = transportOrder.withWrappingSequence(new OrderSequence("some-seq").getReference());
 
@@ -74,7 +74,7 @@ public class TransportOrderAssignmentCheckerTest {
   }
 
   @Test
-  public void onlyAcceptOrdersWithIntendedVehicle() {
+  void onlyAcceptOrdersWithIntendedVehicle() {
     transportOrder = transportOrder.withIntendedVehicle(null);
 
     assertThat(checker.checkTransportOrderAssignment(transportOrder),
@@ -86,7 +86,7 @@ public class TransportOrderAssignmentCheckerTest {
       value = Vehicle.ProcState.class,
       names = {"AWAITING_ORDER", "PROCESSING_ORDER"}
   )
-  public void onlyAcceptIntendedVehicleWithValidProcState(Vehicle.ProcState procState) {
+  void onlyAcceptIntendedVehicleWithValidProcState(Vehicle.ProcState procState) {
     vehicle = vehicle.withProcState(procState);
 
     when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
@@ -101,7 +101,7 @@ public class TransportOrderAssignmentCheckerTest {
       value = Vehicle.State.class,
       names = {"UNKNOWN", "UNAVAILABLE", "ERROR", "EXECUTING"}
   )
-  public void onlyAcceptIntendedVehicleWithValidState(Vehicle.State state) {
+  void onlyAcceptIntendedVehicleWithValidState(Vehicle.State state) {
     vehicle = vehicle.withState(state);
 
     when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
@@ -116,7 +116,7 @@ public class TransportOrderAssignmentCheckerTest {
       value = Vehicle.IntegrationLevel.class,
       names = {"TO_BE_IGNORED", "TO_BE_NOTICED", "TO_BE_RESPECTED"}
   )
-  public void onlyAcceptIntendedVehicleWithValidIntegrationLevel(Vehicle.IntegrationLevel level) {
+  void onlyAcceptIntendedVehicleWithValidIntegrationLevel(Vehicle.IntegrationLevel level) {
     vehicle = vehicle.withIntegrationLevel(level);
 
     when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
@@ -127,7 +127,7 @@ public class TransportOrderAssignmentCheckerTest {
   }
 
   @Test
-  public void onlyAcceptIntendedVehicleWithKnownPosition() {
+  void onlyAcceptIntendedVehicleWithKnownPosition() {
     vehicle = vehicle.withCurrentPosition(null);
 
     when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
@@ -138,7 +138,7 @@ public class TransportOrderAssignmentCheckerTest {
   }
 
   @Test
-  public void onlyAcceptIntendedVehicleWithoutOrderSequence() {
+  void onlyAcceptIntendedVehicleWithoutOrderSequence() {
     vehicle = vehicle.withOrderSequence(new OrderSequence("some-seq").getReference());
 
     when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
@@ -149,7 +149,7 @@ public class TransportOrderAssignmentCheckerTest {
   }
 
   @Test
-  public void onlyAcceptIntendedVehicleWithoutReservation() {
+  void onlyAcceptIntendedVehicleWithoutReservation() {
     orderReservationPool.addReservation(
         new TransportOrder("some-other-order", List.of()).getReference(),
         vehicle.getReference()
@@ -163,7 +163,7 @@ public class TransportOrderAssignmentCheckerTest {
   }
 
   @Test
-  public void acceptValidOrderAndVehicle() {
+  void acceptValidOrderAndVehicle() {
     // No changes to vehicle, transport order or reservation pool here.
     when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
         .thenReturn(vehicle);
