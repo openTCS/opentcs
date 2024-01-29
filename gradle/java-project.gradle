@@ -22,8 +22,8 @@ dependencies {
   testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.10.1'
 
   testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.8.0'
-  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.10.0'
+  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.2'
   testImplementation group: 'com.approvaltests', name: 'approvaltests', version: '22.3.3'
 
   testRuntimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.36'
