@@ -79,13 +79,4 @@ public interface GuiManager {
    * @param exporter The exporter.
    */
   void exportModel(PlantModelExporter exporter);
-
-  /**
-   * Creates a new model component instance that does not have a corresponding figure.
-   * (Like a block or a location type.)
-   *
-   * @param clazz The type of object to be created.
-   * @return The created object.
-   */
-  ModelComponent createModelComponent(Class<? extends ModelComponent> clazz);
 }

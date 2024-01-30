@@ -12,8 +12,7 @@ import javax.swing.AbstractAction;
 import static javax.swing.Action.LARGE_ICON_KEY;
 import static javax.swing.Action.SMALL_ICON;
 import javax.swing.ImageIcon;
-import org.opentcs.guing.base.model.elements.VehicleModel;
-import org.opentcs.guing.common.application.GuiManager;
+import org.opentcs.guing.common.application.GuiManagerModeling;
 import org.opentcs.guing.common.util.ImageDirectory;
 import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.TOOLBAR_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
@@ -33,14 +32,14 @@ public class CreateVehicleAction
   /**
    * The GUI manager instance we're working with.
    */
-  private final GuiManager guiManager;
+  private final GuiManagerModeling guiManager;
 
   /**
    * Creates a new instance.
    *
    * @param guiManager The GUI manager instance we're working with.
    */
-  public CreateVehicleAction(GuiManager guiManager) {
+  public CreateVehicleAction(GuiManagerModeling guiManager) {
     this.guiManager = guiManager;
 
     putValue(NAME, BUNDLE.getString("createVehicleAction.name"));
@@ -53,6 +52,6 @@ public class CreateVehicleAction
 
   @Override
   public void actionPerformed(ActionEvent evt) {
-    guiManager.createModelComponent(VehicleModel.class);
+    guiManager.createVehicleModel();
   }
 }

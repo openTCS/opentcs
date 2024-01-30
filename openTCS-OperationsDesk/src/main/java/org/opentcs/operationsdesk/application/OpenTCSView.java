@@ -1139,12 +1139,6 @@ public class OpenTCSView
   public void exportModel(PlantModelExporter exporter) {
   }
 
-  @Override  // GuiManager
-  public ModelComponent createModelComponent(Class<? extends ModelComponent> clazz) {
-    // This method is specific to modeling mode
-    return null;
-  }
-
   private OpenTCSDrawingView getActiveDrawingView() {
     return fDrawingEditor.getActiveView();
   }

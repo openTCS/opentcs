@@ -79,6 +79,7 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.application.ApplicationState;
 import org.opentcs.guing.common.application.ComponentsManager;
 import org.opentcs.guing.common.application.GuiManager;
+import org.opentcs.guing.common.application.GuiManagerModeling;
 import org.opentcs.guing.common.application.ModelRestorationProgressStatus;
 import org.opentcs.guing.common.application.OperationMode;
 import org.opentcs.guing.common.application.PluginPanelManager;
@@ -145,6 +146,7 @@ import org.slf4j.LoggerFactory;
 public class OpenTCSView
     extends AbstractView
     implements GuiManager,
+               GuiManagerModeling,
                ComponentsManager,
                PluginPanelManager,
                EventHandler {
@@ -1032,33 +1034,29 @@ public class OpenTCSView
     fModelManager.exportModel(exporter);
   }
 
-  @Override  // GuiManager
-  public ModelComponent createModelComponent(Class<? extends ModelComponent> clazz) {
-    requireNonNull(clazz, "clazz");
+  @Override
+  public VehicleModel createVehicleModel() {
+    VehicleModel vehicleModel = modelComponentFactory.createVehicleModel();
+    vehicleModel.getPropertyRouteColor()
+        .setColor(Colors.unusedVehicleColor(fModelManager.getModel().getVehicleModels()));
+    addModelComponent(fModelManager.getModel().getFolder(vehicleModel), vehicleModel);
+    return vehicleModel;
+  }
 
-    ModelComponent model;
-    if (clazz == VehicleModel.class) {
-      VehicleModel vehicleModel = modelComponentFactory.createVehicleModel();
-      vehicleModel.getPropertyRouteColor()
-          .setColor(Colors.unusedVehicleColor(fModelManager.getModel().getVehicleModels()));
-      model = vehicleModel;
-    }
-    else if (clazz == LocationTypeModel.class) {
-      model = modelComponentFactory.createLocationTypeModel();
-    }
-    else if (clazz == BlockModel.class) {
-      BlockModel blockModel = modelComponentFactory.createBlockModel();
-      blockModel.getPropertyColor()
-          .setColor(Colors.unusedBlockColor(fModelManager.getModel().getBlockModels()));
-      model = blockModel;
-    }
-    else {
-      throw new IllegalArgumentException("Unhandled component class: " + clazz);
-    }
+  @Override
+  public LocationTypeModel createLocationTypeModel() {
+    LocationTypeModel locationTypeModel = modelComponentFactory.createLocationTypeModel();
+    addModelComponent(fModelManager.getModel().getFolder(locationTypeModel), locationTypeModel);
+    return locationTypeModel;
+  }
 
-    addModelComponent(fModelManager.getModel().getFolder(model), model);
-
-    return model;
+  @Override
+  public BlockModel createBlockModel() {
+    BlockModel blockModel = modelComponentFactory.createBlockModel();
+    blockModel.getPropertyColor()
+        .setColor(Colors.unusedBlockColor(fModelManager.getModel().getBlockModels()));
+    addModelComponent(fModelManager.getModel().getFolder(blockModel), blockModel);
+    return blockModel;
   }
 
   private OpenTCSDrawingView getActiveDrawingView() {
@@ -1211,7 +1209,7 @@ public class OpenTCSView
         LocationTypeModel type;
 
         if (types.isEmpty()) {
-          type = (LocationTypeModel) createModelComponent(LocationTypeModel.class);
+          type = createLocationTypeModel();
         }
         else {
           type = types.get(0);
