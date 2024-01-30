@@ -166,6 +166,19 @@ public class LoopbackCommunicationAdapter
         getProcessModel().setVehicleLength(configuration.vehicleLengthUnloaded());
       }
     }
+    if (Objects.equals(evt.getPropertyName(),
+                       LoopbackVehicleModel.Attribute.SINGLE_STEP_MODE.name())) {
+      // When switching from single step mode to automatic mode and there are commands to be
+      // processed, ensure that we start/continue processing them.
+      if (!getProcessModel().isSingleStepModeEnabled()
+          && !getSentCommands().isEmpty()
+          && !isSimulationRunning) {
+        isSimulationRunning = true;
+        ((ExecutorService) getExecutor()).submit(
+            () -> startVehicleSimulation(getSentCommands().peek())
+        );
+      }
+    }
   }
 
   @Override
@@ -193,19 +206,18 @@ public class LoopbackCommunicationAdapter
   public synchronized void sendCommand(MovementCommand cmd) {
     requireNonNull(cmd, "cmd");
 
-    // Start the simulation task is the single step modus is not active.
-    if (!getProcessModel().isSingleStepModeEnabled()) {
+    // Start the simulation task if we're not in single step mode and not simulating already.
+    if (!getProcessModel().isSingleStepModeEnabled()
+        && !isSimulationRunning) {
       isSimulationRunning = true;
-      ((ExecutorService) getExecutor()).submit(() -> startVehicleSimulation(cmd));
+      if (getSentCommands().isEmpty()) {
+        ((ExecutorService) getExecutor()).submit(() -> startVehicleSimulation(cmd));
+      }
+      else {
+        ((ExecutorService) getExecutor()).submit(()
+            -> startVehicleSimulation(getSentCommands().peek()));
+      }
     }
-  }
-
-  @Override
-  protected synchronized boolean canSendNextCommand() {
-    // Considering the state of the simulation here ensures that not more than one movement command
-    // is sent to this adapter at any time (which is crucial for the current implementation of the
-    // simulation).
-    return !isSimulationRunning && super.canSendNextCommand();
   }
 
   @Override
@@ -421,7 +433,16 @@ public class LoopbackCommunicationAdapter
                command,
                getSentCommands().peek());
     }
-    isSimulationRunning = false;
+
+    if (getSentCommands().isEmpty() || getProcessModel().isSingleStepModeEnabled()) {
+      LOG.debug("Vehicle simulation is done.");
+      isSimulationRunning = false;
+    }
+    else {
+      LOG.debug("Triggering simulation for next command: {}", getSentCommands().peek());
+      ((ExecutorService) getExecutor()).submit(
+          () -> startVehicleSimulation(getSentCommands().peek()));
+    }
   }
 
   private int getSimulationTimeStep() {

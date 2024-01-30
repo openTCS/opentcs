@@ -16,6 +16,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * New features and enhancements:
 ** Improve handling of failed peripheral jobs (where the completion required flag is set to `true`) associated with a transport order and withdraw the respective transport order in such cases.
+* Bugs fixed:
+** The loopback adapter now properly resumes operation when switching from single step mode to automatic mode.
 * Changes affecting developers:
 ** Deprecate `MovementCommand.isWithoutOperation()` and introduce `MovementCommand.hasEmptyOperation()` as a replacement.
 ** Update JUnit to 5.10.1.

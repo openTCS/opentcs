@@ -996,7 +996,6 @@ public class LoopbackCommAdapterPanel
       triggerButton.setEnabled(false);
 
       sendCommAdapterCommand(new SetSingleStepModeEnabledCommand(false));
-      sendCommAdapterCommand(new TriggerCommand());
     }
   }//GEN-LAST:event_flowModeRadioButtonActionPerformed
 
