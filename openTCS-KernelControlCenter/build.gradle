@@ -15,6 +15,7 @@ dependencies {
   api project(':openTCS-Common')
   api project(':openTCS-CommAdapter-Loopback')
   api project(':openTCS-PeripheralCommAdapter-Loopback')
+  api project(':openTCS-Impl-Configuration-gestalt')
   api project(':openTCS-Impl-Configuration-cfg4j')
 
   runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.36'

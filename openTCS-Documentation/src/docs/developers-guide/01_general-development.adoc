@@ -49,6 +49,10 @@ This is required in integration projects customizing these applications, e.g. ad
 |No
 |An implementation of the base API's configuration interfaces based on cfg4j.
 
+|`opentcs-impl-configuration-gestalt`
+|No
+|An implementation of the base API's configuration interfaces based on gestalt.
+
 |`opentcs-kernel-extension-http-services`
 |No
 |A kernel extension providing the web API implementation.
@@ -124,6 +128,8 @@ The kernel and the client applications depend on the following external framewor
 * Google Guice (https://github.com/google/guice):
   A light-weight dependency injection framework.
 * Cfg4j (http://www.cfg4j.org/):
+  A configuration library supporting binding interfaces.
+* Gestalt (https://github.com/gestalt-config/gestalt):
   A configuration library supporting binding interfaces.
 * Google Guava (https://github.com/google/guava):
   A collection of small helper classes and methods.
