@@ -96,6 +96,13 @@ public class StandardDispatcherService
   }
 
   @Override
+  public void rerouteAll(ReroutingType reroutingType) {
+    synchronized (globalSyncObject) {
+      dispatcher.rerouteAll(reroutingType);
+    }
+  }
+
+  @Override
   public void assignNow(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException, TransportOrderAssignmentException {
     requireNonNull(ref, "ref");

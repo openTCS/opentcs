@@ -55,4 +55,18 @@ public interface KernelApplicationConfiguration {
       changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
       orderKey = "3_topologyUpdate")
   boolean updateRoutingTopologyOnPathLockChange();
+
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether vehicles should be rerouted immediately on topology changes.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
+      orderKey = "4_reroute_1")
+  boolean rerouteOnRoutingTopologyUpdate();
+
+  @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether vehicles should be rerouted as soon as they finish a drive order.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
+      orderKey = "4_reroute_2")
+  boolean rerouteOnDriveOrderFinished();
 }

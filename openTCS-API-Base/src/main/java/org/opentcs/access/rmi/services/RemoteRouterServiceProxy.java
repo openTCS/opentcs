@@ -34,6 +34,7 @@ class RemoteRouterServiceProxy
   }
 
   @Override
+  @Deprecated
   public void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
       throws ObjectUnknownException, KernelRuntimeException {
     checkServiceAvailability();

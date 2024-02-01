@@ -20,12 +20,10 @@ import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentException;
 import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentVeto;
 import org.opentcs.components.kernel.services.InternalVehicleService;
-import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.event.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,10 +50,6 @@ public class DefaultDispatcher
    */
   private final InternalVehicleService vehicleService;
   /**
-   * Where we register for application events.
-   */
-  private final EventSource eventSource;
-  /**
    * The kernel's executor.
    */
   private final ScheduledExecutorService kernelExecutor;
@@ -71,10 +65,6 @@ public class DefaultDispatcher
   private final OrderAssigner orderAssigner;
 
   private final TransportOrderAssignmentChecker transportOrderAssignmentChecker;
-  /**
-   *
-   */
-  private ImplicitDispatchTrigger implicitDispatchTrigger;
 
   private ScheduledFuture<?> periodicDispatchTaskFuture;
   /**
@@ -88,7 +78,6 @@ public class DefaultDispatcher
    * @param orderReservationPool Stores reservations of transport orders for vehicles.
    * @param transportOrderUtil Provides services for working with transport orders.
    * @param vehicleService The vehicle service.
-   * @param eventSource Where this instance registers for application events.
    * @param kernelExecutor Executes dispatching tasks.
    * @param fullDispatchTask The full dispatch task.
    * @param periodicDispatchTaskProvider Provides the periodic vehicle redospatching task.
@@ -102,7 +91,6 @@ public class DefaultDispatcher
   public DefaultDispatcher(OrderReservationPool orderReservationPool,
                            TransportOrderUtil transportOrderUtil,
                            InternalVehicleService vehicleService,
-                           @ApplicationEventBus EventSource eventSource,
                            @KernelExecutor ScheduledExecutorService kernelExecutor,
                            FullDispatchTask fullDispatchTask,
                            Provider<PeriodicVehicleRedispatchingTask> periodicDispatchTaskProvider,
@@ -113,7 +101,6 @@ public class DefaultDispatcher
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
-    this.eventSource = requireNonNull(eventSource, "eventSource");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.fullDispatchTask = requireNonNull(fullDispatchTask, "fullDispatchTask");
     this.periodicDispatchTaskProvider = requireNonNull(periodicDispatchTaskProvider,
@@ -138,9 +125,6 @@ public class DefaultDispatcher
 
     fullDispatchTask.initialize();
 
-    implicitDispatchTrigger = new ImplicitDispatchTrigger(this);
-    eventSource.subscribe(implicitDispatchTrigger);
-
     LOG.debug("Scheduling periodic dispatch task with interval of {} ms...",
               configuration.idleVehicleRedispatchingInterval());
     periodicDispatchTaskFuture = kernelExecutor.scheduleAtFixedRate(
@@ -163,9 +147,6 @@ public class DefaultDispatcher
 
     periodicDispatchTaskFuture.cancel(false);
     periodicDispatchTaskFuture = null;
-
-    eventSource.unsubscribe(implicitDispatchTrigger);
-    implicitDispatchTrigger = null;
 
     fullDispatchTask.terminate();
 
@@ -213,27 +194,30 @@ public class DefaultDispatcher
   }
 
   @Override
-  public void topologyChanged() {
-    if (configuration.rerouteOnTopologyChanges()) {
-      LOG.debug("Scheduling reroute task...");
-      kernelExecutor.submit(() -> {
-        LOG.info("Rerouting all vehicles due to topology change...");
-        rerouteUtil.reroute(vehicleService.fetchObjects(Vehicle.class), ReroutingType.REGULAR);
-      });
-    }
+  public void reroute(Vehicle vehicle, ReroutingType reroutingType) {
+    requireNonNull(vehicle, "vehicle");
+    requireNonNull(reroutingType, "reroutingType");
+
+    LOG.debug("Scheduling reroute task for vehicle '{}'...", vehicle.getName());
+    kernelExecutor.submit(() -> {
+      LOG.info(
+          "Rerouting vehicle '{}' from its current position '{}' using rerouting type '{}'...",
+          vehicle.getName(),
+          vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName(),
+          reroutingType
+      );
+      rerouteUtil.reroute(vehicle, reroutingType);
+    });
   }
 
   @Override
-  public void reroute(Vehicle vehicle, ReroutingType reroutingType) {
-    LOG.debug("Scheduling reroute task...");
+  public void rerouteAll(ReroutingType reroutingType) {
+    requireNonNull(reroutingType, "reroutingType");
+
+    LOG.debug("Scheduling reroute task for all vehicles...");
     kernelExecutor.submit(() -> {
-      LOG.info(
-          "Rerouting vehicle due to explicit request: {} ({}, current position {})...",
-          vehicle.getName(),
-          reroutingType,
-          vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName()
-      );
-      rerouteUtil.reroute(vehicle, reroutingType);
+      LOG.info("Rerouting all vehicles using rerouting type '{}'...", reroutingType);
+      rerouteUtil.reroute(vehicleService.fetchObjects(Vehicle.class), reroutingType);
     });
   }
 

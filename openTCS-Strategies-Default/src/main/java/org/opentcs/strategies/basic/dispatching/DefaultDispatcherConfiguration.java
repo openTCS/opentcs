@@ -94,20 +94,6 @@ public interface DefaultDispatcherConfiguration {
   boolean dismissUnroutableTransportOrders();
 
   @ConfigurationEntry(
-      type = "Boolean",
-      description = "Whether vehicles should be rerouted immediately on topology changes.",
-      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
-      orderKey = "1_orders_special_2")
-  boolean rerouteOnTopologyChanges();
-
-  @ConfigurationEntry(
-      type = "Boolean",
-      description = "Whether vehicles should be rerouted as soon as they finish a drive order.",
-      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
-      orderKey = "1_orders_special_3")
-  boolean rerouteOnDriveOrderFinished();
-
-  @ConfigurationEntry(
       type = "String",
       description = {
         "The strategy to use when rerouting of a vehicle results in no route at all.",
@@ -120,7 +106,7 @@ public interface DefaultDispatcherConfiguration {
         + "path; then wait for another rerouting opportunity."
       },
       changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
-      orderKey = "1_orders_special_4")
+      orderKey = "1_orders_special_2")
   ReroutingImpossibleStrategy reroutingImpossibleStrategy();
 
   @ConfigurationEntry(

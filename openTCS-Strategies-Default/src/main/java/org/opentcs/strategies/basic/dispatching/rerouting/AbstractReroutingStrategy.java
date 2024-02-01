@@ -132,9 +132,9 @@ public abstract class AbstractReroutingStrategy
                                                Vehicle vehicle,
                                                TransportOrder originalOrder,
                                                Point rerouteSource) {
-    // If the vehicle is currently not processing a (drive) order (or waiting to get the next
-    // drive order) there is nothing to be restored.
-    if (!vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)) {
+    // If the vehicle is currently not processing a (drive) order or waiting to get the next
+    // drive order (i.e. if it's idle) there is nothing to be restored.
+    if (vehicle.hasProcState(Vehicle.ProcState.IDLE)) {
       return;
     }
 

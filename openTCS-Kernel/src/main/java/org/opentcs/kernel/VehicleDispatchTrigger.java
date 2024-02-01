@@ -5,38 +5,86 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.strategies.basic.dispatching;
+package org.opentcs.kernel;
 
 import static java.util.Objects.requireNonNull;
-import org.opentcs.components.kernel.Dispatcher;
+import javax.inject.Inject;
+import org.opentcs.components.Lifecycle;
+import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.ReroutingType;
+import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An event listener that triggers dispatching of vehicles and transport orders on certain events.
+ * Triggers dispatching of vehicles and transport orders on certain events.
  */
-public class ImplicitDispatchTrigger
-    implements EventHandler {
+public class VehicleDispatchTrigger
+    implements EventHandler,
+               Lifecycle {
 
   /**
    * This class's Logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(ImplicitDispatchTrigger.class);
+  private static final Logger LOG = LoggerFactory.getLogger(VehicleDispatchTrigger.class);
   /**
    * The dispatcher in use.
    */
-  private final Dispatcher dispatcher;
+  private final DispatcherService dispatcher;
+  /**
+   * The event bus.
+   */
+  private final EventBus eventBus;
+  /**
+   * The app configuration.
+   */
+  private final KernelApplicationConfiguration configuration;
+  /**
+   * This instance's <em>initialized</em> flag.
+   */
+  private boolean initialized;
 
   /**
    * Creates a new instance.
    *
+   * @param eventBus The event bus.
    * @param dispatcher The dispatcher in use.
+   * @param configuration The application configuration.
    */
-  public ImplicitDispatchTrigger(Dispatcher dispatcher) {
+  @Inject
+  public VehicleDispatchTrigger(@ApplicationEventBus EventBus eventBus,
+                                DispatcherService dispatcher,
+                                KernelApplicationConfiguration configuration) {
+    this.eventBus = requireNonNull(eventBus, "eventBus");
     this.dispatcher = requireNonNull(dispatcher, "dispatcher");
+    this.configuration = requireNonNull(configuration, "configuration");
+  }
+
+  @Override
+  public void initialize() {
+    if (isInitialized()) {
+      return;
+    }
+    initialized = true;
+    eventBus.subscribe(this);
+  }
+
+  @Override
+  public boolean isInitialized() {
+    return initialized;
+  }
+
+  @Override
+  public void terminate() {
+    if (!isInitialized()) {
+      return;
+    }
+    initialized = false;
+    eventBus.unsubscribe(this);
   }
 
   @Override
@@ -52,6 +100,12 @@ public class ImplicitDispatchTrigger
   }
 
   private void checkVehicleChange(Vehicle oldVehicle, Vehicle newVehicle) {
+    if (driveOrderFinished(oldVehicle, newVehicle)
+        && configuration.rerouteOnDriveOrderFinished()) {
+      LOG.debug("Rerouting vehicle {}...", newVehicle);
+      dispatcher.reroute(newVehicle.getReference(), ReroutingType.REGULAR);
+    }
+
     if ((newVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
          || newVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_RESPECTED)
         && (idleAndEnergyLevelChanged(oldVehicle, newVehicle)
@@ -82,5 +136,12 @@ public class ImplicitDispatchTrigger
     // from an order sequence, so we may look for new assignments.
     return newVehicle.getOrderSequence() == null
         && oldVehicle.getOrderSequence() != null;
+  }
+
+  private boolean driveOrderFinished(Vehicle oldVehicle, Vehicle newVehicle) {
+    // If the vehicle's processing state changes to AWAITING_ORDER, it has finished its current
+    // drive order.
+    return newVehicle.getProcState() != oldVehicle.getProcState()
+        && newVehicle.hasProcState(Vehicle.ProcState.AWAITING_ORDER);
   }
 }

@@ -75,6 +75,15 @@ public interface DispatcherService {
   }
 
   /**
+   * Explicitly trigger a rerouting for all vehicles.
+   *
+   * @param reroutingType The type of rerouting.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void rerouteAll(@Nonnull ReroutingType reroutingType) {
+  }
+
+  /**
    * Assign the referenced transport order (to its intended vehicle) <em>now</em>.
    *
    * @param ref The transport order to be assigned.

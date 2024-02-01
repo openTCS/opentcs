@@ -16,7 +16,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
-import org.opentcs.components.kernel.services.RouterService;
+import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Path;
@@ -29,7 +29,7 @@ import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 class PathHandlerTest {
 
   private TCSObjectService objectService;
-  private RouterService routerService;
+  private PlantModelService plantModelService;
   private KernelExecutorWrapper executorWrapper;
 
   private PathHandler handler;
@@ -39,10 +39,10 @@ class PathHandlerTest {
   @BeforeEach
   void setUp() {
     objectService = mock();
-    routerService = mock();
+    plantModelService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
 
-    handler = new PathHandler(objectService, routerService, executorWrapper);
+    handler = new PathHandler(objectService, executorWrapper, plantModelService);
 
     path = new Path("some-path",
                     new Point("some-point-1").getReference(),
@@ -55,7 +55,7 @@ class PathHandlerTest {
   void lockPath() {
     handler.updatePathLock("some-path", "true");
 
-    then(routerService).should().updatePathLock(path.getReference(), true);
+    then(plantModelService).should().updatePathLock(path.getReference(), true);
   }
 
   @ParameterizedTest
@@ -63,7 +63,7 @@ class PathHandlerTest {
   void unlockPathOnAnyNontrueValue(String value) {
     handler.updatePathLock("some-path", value);
 
-    then(routerService).should().updatePathLock(path.getReference(), false);
+    then(plantModelService).should().updatePathLock(path.getReference(), false);
   }
 
   @ParameterizedTest

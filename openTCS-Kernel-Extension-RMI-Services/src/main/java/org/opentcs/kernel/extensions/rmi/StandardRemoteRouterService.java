@@ -155,6 +155,7 @@ public class StandardRemoteRouterService
   }
 
   @Override
+  @Deprecated
   public void updatePathLock(ClientID clientId, TCSObjectReference<Path> ref, boolean locked) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
 

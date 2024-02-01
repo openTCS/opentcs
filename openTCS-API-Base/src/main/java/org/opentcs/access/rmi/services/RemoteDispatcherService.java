@@ -56,6 +56,12 @@ public interface RemoteDispatcherService
   }
 
   @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void rerouteAll(ClientID clientId,
+                          ReroutingType reroutingType)
+      throws RemoteException {
+  }
+
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
   default void assignNow(ClientID clientId, TCSObjectReference<TransportOrder> ref)
       throws RemoteException {
   }

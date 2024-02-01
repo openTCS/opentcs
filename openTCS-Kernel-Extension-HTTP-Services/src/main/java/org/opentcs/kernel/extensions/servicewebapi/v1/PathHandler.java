@@ -10,7 +10,7 @@ package org.opentcs.kernel.extensions.servicewebapi.v1;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import org.opentcs.components.kernel.services.RouterService;
+import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Path;
@@ -22,23 +22,23 @@ import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 public class PathHandler {
 
   private final TCSObjectService objectService;
-  private final RouterService routerService;
   private final KernelExecutorWrapper executorWrapper;
+  private final PlantModelService plantModelService;
 
   /**
    * Creates a new instance.
    *
    * @param objectService Used to retrieve path instances.
-   * @param routerService Used to update path locks.
+   * @param plantModelService Used to update path locks.
    * @param executorWrapper Executes calls via the kernel executor and waits for the outcome.
    */
   @Inject
   public PathHandler(TCSObjectService objectService,
-                     RouterService routerService,
-                     KernelExecutorWrapper executorWrapper) {
+                     KernelExecutorWrapper executorWrapper,
+                     PlantModelService plantModelService) {
     this.objectService = requireNonNull(objectService, "objectService");
-    this.routerService = requireNonNull(routerService, "routerService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
+    this.plantModelService = requireNonNull(plantModelService, "plantModelService");
   }
 
   /**
@@ -55,8 +55,7 @@ public class PathHandler {
       if (path == null) {
         throw new ObjectUnknownException("Unknown path: " + pathName);
       }
-
-      routerService.updatePathLock(path.getReference(), Boolean.parseBoolean(lockedValue));
+      plantModelService.updatePathLock(path.getReference(), Boolean.parseBoolean(lockedValue));
     });
   }
 }

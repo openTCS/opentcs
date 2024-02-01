@@ -104,6 +104,14 @@ public class KernelStateOperating
    */
   private final InternalVehicleService vehicleService;
   /**
+   * Listens to path lock events and updates the routing topology.
+   */
+  private final PathLockEventListener pathLockListener;
+  /**
+   * Triggers dispatching of vehicles and transport orders on certain events.
+   */
+  private final VehicleDispatchTrigger vehicleDispatchTrigger;
+  /**
    * A handle for the cleaner task.
    */
   private ScheduledFuture<?> cleanerTaskFuture;
@@ -133,6 +141,9 @@ public class KernelStateOperating
    * @param attachmentManager The attachment manager to be used.
    * @param peripheralAttachmentManager The peripheral attachment manager to be used.
    * @param vehicleService The vehicle service to be used.
+   * @param pathLockListener Listens to path lock events and updates the routing topology.
+   * @param vehicleDispatchTrigger Triggers dispatching of vehicles and transport orders on certain
+   * events.
    */
   @Inject
   public KernelStateOperating(@GlobalSyncObject Object globalSyncObject,
@@ -152,7 +163,9 @@ public class KernelStateOperating
                               @ActiveInOperatingMode Set<KernelExtension> extensions,
                               AttachmentManager attachmentManager,
                               PeripheralAttachmentManager peripheralAttachmentManager,
-                              InternalVehicleService vehicleService) {
+                              InternalVehicleService vehicleService,
+                              PathLockEventListener pathLockListener,
+                              VehicleDispatchTrigger vehicleDispatchTrigger) {
     super(globalSyncObject,
           plantModelManager,
           modelPersister,
@@ -174,6 +187,8 @@ public class KernelStateOperating
     this.peripheralAttachmentManager = requireNonNull(peripheralAttachmentManager,
                                                       "peripheralAttachmentManager");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
+    this.pathLockListener = requireNonNull(pathLockListener, "pathLockListener");
+    this.vehicleDispatchTrigger = requireNonNull(vehicleDispatchTrigger, "vehicleDispatchTrigger");
   }
 
   // Implementation of interface Kernel starts here.
@@ -211,6 +226,9 @@ public class KernelStateOperating
     attachmentManager.initialize();
     LOG.debug("Initializing peripheral attachment manager '{}'...", peripheralAttachmentManager);
     peripheralAttachmentManager.initialize();
+
+    pathLockListener.initialize();
+    vehicleDispatchTrigger.initialize();
 
     // Start a task for cleaning up old orders periodically.
     cleanerTaskFuture = kernelExecutor.scheduleAtFixedRate(workingSetCleanupTask,
@@ -272,6 +290,10 @@ public class KernelStateOperating
     attachmentManager.terminate();
     LOG.debug("Terminating peripheral attachment manager '{}'...", peripheralAttachmentManager);
     peripheralAttachmentManager.terminate();
+
+    pathLockListener.terminate();
+    vehicleDispatchTrigger.terminate();
+
     // Grant communication adapters etc. some time to settle things.
     Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
 

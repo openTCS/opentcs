@@ -12,9 +12,7 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.inject.Inject;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
-import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -25,7 +23,6 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
-import org.opentcs.kernel.KernelApplicationConfiguration;
 import org.opentcs.kernel.workingset.PlantModelManager;
 
 /**
@@ -47,17 +44,9 @@ public class StandardRouterService
    */
   private final Router router;
   /**
-   * The dispatcher.
-   */
-  private final Dispatcher dispatcher;
-  /**
    * The plant model manager.
    */
   private final PlantModelManager plantModelManager;
-  /**
-   * The kernel application's configuration.
-   */
-  private final KernelApplicationConfiguration configuration;
   /**
    * The object service.
    */
@@ -69,47 +58,37 @@ public class StandardRouterService
    * @param globalSyncObject The kernel threads' global synchronization object.
    * @param kernel The kernel.
    * @param router The scheduler.
-   * @param dispatcher The dispatcher.
    * @param plantModelManager The plant model manager to be used.
-   * @param configuration The kernel application's configuration.
    * @param objectService The object service.
    */
   @Inject
   public StandardRouterService(@GlobalSyncObject Object globalSyncObject,
                                LocalKernel kernel,
                                Router router,
-                               Dispatcher dispatcher,
                                PlantModelManager plantModelManager,
-                               KernelApplicationConfiguration configuration,
                                TCSObjectService objectService) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.kernel = requireNonNull(kernel, "kernel");
     this.router = requireNonNull(router, "router");
-    this.dispatcher = requireNonNull(dispatcher, "dispatcher");
     this.plantModelManager = requireNonNull(plantModelManager, "plantModelManager");
-    this.configuration = requireNonNull(configuration, "configuration");
     this.objectService = requireNonNull(objectService, "objectService");
   }
 
   @Override
+  @Deprecated
   public void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 
     synchronized (globalSyncObject) {
       plantModelManager.setPathLocked(ref, locked);
-      if (kernel.getState() == Kernel.State.OPERATING
-          && configuration.updateRoutingTopologyOnPathLockChange()) {
-        updateRoutingTopology();
-      }
     }
   }
 
   @Override
   public void updateRoutingTopology() {
     synchronized (globalSyncObject) {
-      router.topologyChanged();
-      dispatcher.topologyChanged();
+      router.updateRoutingTopology();
     }
   }
 

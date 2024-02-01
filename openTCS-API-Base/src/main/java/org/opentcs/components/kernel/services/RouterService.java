@@ -17,6 +17,7 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides methods concerning the {@link Router}.
@@ -31,7 +32,11 @@ public interface RouterService {
    * ({@code false}).
    * @throws ObjectUnknownException If the referenced path does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
+   * @deprecated Use
+   * {@link PlantModelService#updatePathLock(org.opentcs.data.TCSObjectReference, boolean)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
       throws ObjectUnknownException, KernelRuntimeException;
 

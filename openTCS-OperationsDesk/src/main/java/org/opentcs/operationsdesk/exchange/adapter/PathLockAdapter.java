@@ -14,6 +14,7 @@ import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
 import org.opentcs.data.model.Path;
+import org.opentcs.data.order.ReroutingType;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.base.model.elements.PathModel;
@@ -83,8 +84,9 @@ public class PathLockAdapter
         // Update the path in the kernel if it exists and its locked state is different.
         Path path = portal.getPlantModelService().fetchObject(Path.class, model.getName());
         if (path != null && path.isLocked() != locked) {
-          portal.getRouterService().updatePathLock(path.getReference(), locked);
+          portal.getPlantModelService().updatePathLock(path.getReference(), locked);
           portal.getRouterService().updateRoutingTopology();
+          portal.getDispatcherService().rerouteAll(ReroutingType.REGULAR);
         }
       }
 

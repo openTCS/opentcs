@@ -210,6 +210,20 @@ public class StandardRemoteDispatcherService
   }
 
   @Override
+  public void rerouteAll(ClientID clientId, ReroutingType reroutingType)
+      throws RemoteException {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_ORDER);
+
+    try {
+      kernelExecutor.submit(() -> dispatcherService.rerouteAll(reroutingType))
+          .get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
+
+  @Override
   public void assignNow(ClientID clientId, TCSObjectReference<TransportOrder> ref) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_ORDER);
 

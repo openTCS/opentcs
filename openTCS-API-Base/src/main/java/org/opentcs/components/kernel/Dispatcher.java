@@ -93,18 +93,32 @@ public interface Dispatcher
 
   /**
    * Notifies the dispatcher of changes in the topology.
+   *
+   * @deprecated Use {@link #rerouteAll(org.opentcs.data.order.ReroutingType)} instead.
    */
-  void topologyChanged();
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
+  default void topologyChanged() {
+  }
 
   /**
    * Notifies the dispatcher of a request to reroute the given vehicle considering the given
-   * reoruting type.
+   * rerouting type.
    *
    * @param vehicle The vehicle to be rerouted.
    * @param reroutingType The type of the requested rerouting.
    */
   @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
   default void reroute(@Nonnull Vehicle vehicle, @Nonnull ReroutingType reroutingType) {
+  }
+
+  /**
+   * Notifies the dispatcher to reroute all vehicles considering the given rerouting type.
+   *
+   * @param reroutingType The type of the requested rerouting.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void rerouteAll(@Nonnull ReroutingType reroutingType){
   }
 
   /**

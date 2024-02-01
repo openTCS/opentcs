@@ -16,6 +16,7 @@ import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
+import org.opentcs.data.model.Path;
 import org.opentcs.data.model.PlantModel;
 
 /**
@@ -92,6 +93,19 @@ class RemotePlantModelServiceProxy
 
     try {
       getRemoteService().updateLocationLock(getClientId(), ref, locked);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
+      throws ObjectUnknownException, KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().updatePathLock(getClientId(), ref, locked);
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

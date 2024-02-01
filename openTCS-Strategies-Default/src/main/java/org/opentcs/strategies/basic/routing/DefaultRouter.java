@@ -125,7 +125,13 @@ public class DefaultRouter
   }
 
   @Override
+  @Deprecated
   public void topologyChanged() {
+    this.updateRoutingTopology();
+  }
+
+  @Override
+  public void updateRoutingTopology() {
     synchronized (this) {
       pointRoutersByVehicleGroup.clear();
     }

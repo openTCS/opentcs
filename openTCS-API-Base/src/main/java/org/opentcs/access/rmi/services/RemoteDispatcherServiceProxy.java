@@ -87,4 +87,16 @@ class RemoteDispatcherServiceProxy
       throw findSuitableExceptionFor(ex);
     }
   }
+
+  @Override
+  public void rerouteAll(ReroutingType reroutingType) {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().rerouteAll(getClientId(), reroutingType);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
 }

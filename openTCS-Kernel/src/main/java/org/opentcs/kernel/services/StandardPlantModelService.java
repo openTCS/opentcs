@@ -228,6 +228,14 @@ public class StandardPlantModelService
     }
   }
 
+  @Override
+  public void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
+      throws ObjectUnknownException, KernelRuntimeException {
+    synchronized (globalSyncObject) {
+      plantModelManager.setPathLocked(ref, locked);
+    }
+  }
+
   /**
    * Generates an event for a Model change.
    *

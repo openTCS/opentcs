@@ -176,7 +176,9 @@ class KernelStateOperatingTest {
             extensions,
             attachmentManager,
             mock(PeripheralAttachmentManager.class),
-            vehicleService
+            vehicleService,
+            mock(PathLockEventListener.class),
+            mock(VehicleDispatchTrigger.class)
         )
     );
   }

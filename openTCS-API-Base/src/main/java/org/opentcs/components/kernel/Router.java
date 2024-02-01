@@ -20,6 +20,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods a router module for the openTCS
@@ -58,8 +59,20 @@ public interface Router
 
   /**
    * Notifies the router of changes in the topology.
+   *
+   * @deprecated Use {@link #updateRoutingTopology()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   void topologyChanged();
+
+  /**
+   * Notifies the router to update its routing topology.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void updateRoutingTopology() {
+    this.topologyChanged();
+  }
 
   /**
    * Checks the general routability of a given transport order.

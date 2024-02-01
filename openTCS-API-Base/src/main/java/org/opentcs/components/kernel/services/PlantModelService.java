@@ -14,7 +14,9 @@ import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
+import org.opentcs.data.model.Path;
 import org.opentcs.data.model.PlantModel;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides methods concerning the plant model.
@@ -74,4 +76,18 @@ public interface PlantModelService
    */
   void updateLocationLock(TCSObjectReference<Location> ref, boolean locked)
       throws ObjectUnknownException, KernelRuntimeException;
+
+  /**
+   * Updates a path's lock state.
+   *
+   * @param ref A reference to the path to be updated.
+   * @param locked Indicates whether the path is to be locked ({@code true}) or unlocked
+   * ({@code false}).
+   * @throws ObjectUnknownException If the referenced path does not exist.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
+      throws ObjectUnknownException, KernelRuntimeException {
+  }
 }

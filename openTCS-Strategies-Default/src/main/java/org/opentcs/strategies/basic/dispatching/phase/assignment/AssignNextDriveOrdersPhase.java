@@ -13,12 +13,9 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
-import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.Phase;
-import org.opentcs.strategies.basic.dispatching.RerouteUtil;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,14 +43,6 @@ public class AssignNextDriveOrdersPhase
   private final VehicleControllerPool vehicleControllerPool;
   private final TransportOrderUtil transportOrderUtil;
   /**
-   * The utility class for rerouting vehicles.
-   */
-  private final RerouteUtil rerouteUtil;
-  /**
-   * The dispatcher configuration.
-   */
-  private final DefaultDispatcherConfiguration configuration;
-  /**
    * Indicates whether this component is initialized.
    */
   private boolean initialized;
@@ -63,16 +52,12 @@ public class AssignNextDriveOrdersPhase
                                     InternalVehicleService vehicleService,
                                     Router router,
                                     VehicleControllerPool vehicleControllerPool,
-                                    TransportOrderUtil transportOrderUtil,
-                                    RerouteUtil rerouteUtil,
-                                    DefaultDispatcherConfiguration configuration) {
+                                    TransportOrderUtil transportOrderUtil) {
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.router = requireNonNull(router, "router");
     this.vehicleControllerPool = requireNonNull(vehicleControllerPool, "vehicleControllerPool");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
-    this.rerouteUtil = requireNonNull(rerouteUtil, "rerouteUtil");
-    this.configuration = requireNonNull(configuration, "configuration");
   }
 
   @Override
@@ -128,12 +113,6 @@ public class AssignNextDriveOrdersPhase
     else {
       LOG.debug("Assigning next drive order to vehicle '{}'...", vehicle.getName());
       if (transportOrderUtil.mustAssign(vehicleOrder.getCurrentDriveOrder(), vehicle)) {
-        if (configuration.rerouteOnDriveOrderFinished()) {
-          LOG.debug("Trying to reroute vehicle '{}' before assigning the next drive order...",
-                    vehicle.getName());
-          rerouteUtil.reroute(vehicle, ReroutingType.REGULAR);
-        }
-
         // Get an up-to-date copy of the transport order in case the route changed.
         vehicleOrder = transportOrderService.fetchObject(TransportOrder.class,
                                                          vehicle.getTransportOrder());

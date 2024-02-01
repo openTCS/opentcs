@@ -18,6 +18,7 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods provided by the {@link RouterService} via RMI.
@@ -37,6 +38,8 @@ public interface RemoteRouterService
     extends Remote {
 
   // CHECKSTYLE:OFF
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public void updatePathLock(ClientID clientId, TCSObjectReference<Path> ref, boolean locked)
       throws RemoteException;
 
