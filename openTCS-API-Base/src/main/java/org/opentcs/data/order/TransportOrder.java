@@ -42,6 +42,10 @@ public class TransportOrder
     implements Serializable {
 
   /**
+   * A value indicating that no route steps have been travelled for a drive order, yet.
+   */
+  public static final int ROUTE_STEP_INDEX_DEFAULT = -1;
+  /**
    * The type of this transport order.
    */
   @Nonnull
@@ -66,6 +70,10 @@ public class TransportOrder
    * The index of the currently processed drive order.
    */
   private final int currentDriveOrderIndex;
+  /**
+   * The index of the last route step travelled for the currently processed drive order.
+   */
+  private final int currentRouteStepIndex;
   /**
    * This transport order's current state.
    */
@@ -123,6 +131,7 @@ public class TransportOrder
     this.driveOrders = requireNonNull(driveOrders, "driveOrders");
     this.peripheralReservationToken = null;
     this.currentDriveOrderIndex = -1;
+    this.currentRouteStepIndex = ROUTE_STEP_INDEX_DEFAULT;
     this.state = State.RAW;
     this.creationTime = Instant.EPOCH;
     this.intendedVehicle = null;
@@ -150,6 +159,7 @@ public class TransportOrder
                          List<DriveOrder> driveOrders,
                          String peripheralReservationToken,
                          int currentDriveOrderIndex,
+                         int currentRouteStepIndex,
                          Instant creationTime,
                          TCSObjectReference<Vehicle> intendedVehicle,
                          Instant deadline,
@@ -171,6 +181,7 @@ public class TransportOrder
 
     this.peripheralReservationToken = peripheralReservationToken;
     this.currentDriveOrderIndex = currentDriveOrderIndex;
+    this.currentRouteStepIndex = currentRouteStepIndex;
     this.creationTime = requireNonNull(creationTime, "creationTime");
     this.intendedVehicle = intendedVehicle;
     this.deadline = requireNonNull(deadline, "deadline");
@@ -191,6 +202,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -211,6 +223,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -231,6 +244,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -251,6 +265,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -285,6 +300,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -332,6 +348,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -366,6 +383,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -402,6 +420,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -438,6 +457,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -476,6 +496,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -515,6 +536,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -550,6 +572,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -604,6 +627,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -668,6 +692,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -702,6 +727,42 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
+                              creationTime,
+                              intendedVehicle,
+                              deadline,
+                              dispensable,
+                              wrappingSequence,
+                              dependencies,
+                              processingVehicle,
+                              state,
+                              finishedTime);
+  }
+
+  /**
+   * Returns the index of the last route step travelled for the currently processed drive order.
+   *
+   * @return The index of the last route step travelled for the currently processed drive order.
+   */
+  public int getCurrentRouteStepIndex() {
+    return currentRouteStepIndex;
+  }
+
+  /**
+   * Creates a copy of this object, with the given route step index.
+   *
+   * @param currentRouteStepIndex The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public TransportOrder withCurrentRouteStepIndex(int currentRouteStepIndex) {
+    return new TransportOrder(getName(),
+                              getProperties(),
+                              getHistory(),
+                              type,
+                              driveOrders,
+                              peripheralReservationToken,
+                              currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -733,6 +794,7 @@ public class TransportOrder
                               newDriveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -771,6 +833,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -805,6 +868,7 @@ public class TransportOrder
                               driveOrders,
                               peripheralReservationToken,
                               currentDriveOrderIndex,
+                              currentRouteStepIndex,
                               creationTime,
                               intendedVehicle,
                               deadline,
@@ -833,6 +897,7 @@ public class TransportOrder
         + ", dependencies=" + dependencies
         + ", driveOrders=" + driveOrders
         + ", currentDriveOrderIndex=" + currentDriveOrderIndex
+        + ", currentRouteStepIndex=" + currentRouteStepIndex
         + '}';
   }
 

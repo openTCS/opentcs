@@ -154,6 +154,17 @@ public class StandardTransportOrderService
   }
 
   @Override
+  public void updateTransportOrderCurrentRouteStepIndex(TCSObjectReference<TransportOrder> ref,
+                                                        int index)
+      throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+
+    synchronized (globalSyncObject) {
+      orderPoolManager.setTransportOrderCurrentRouteStepIndex(ref, index);
+    }
+  }
+
+  @Override
   public void updateTransportOrderState(TCSObjectReference<TransportOrder> ref,
                                         TransportOrder.State state)
       throws ObjectUnknownException {

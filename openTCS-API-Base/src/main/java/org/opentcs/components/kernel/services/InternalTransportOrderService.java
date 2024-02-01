@@ -14,6 +14,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods the transport order service must provide which are not accessible to remote
@@ -69,6 +70,8 @@ public interface InternalTransportOrderService
    * Marks the current drive order as finished, adds it to the list of past drive orders and sets
    * the current drive order to the next one of the list of future drive orders (or {@code null},
    * if that list is empty).
+   * Also implicitly sets the {@link TransportOrder#getCurrentRouteStepIndex() transport order's
+   * current route step index} to {@link TransportOrder#ROUTE_STEP_INDEX_DEFAULT}.
    * If the current drive order is {@code null} because all drive orders have been finished
    * already or none has been started, yet, nothing happens.
    *
@@ -77,6 +80,21 @@ public interface InternalTransportOrderService
    */
   void updateTransportOrderNextDriveOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException;
+
+  /**
+   * Updates a transport order's index of the last route step travelled for the currently processed
+   * drive order.
+   *
+   * @param ref A reference to the transport order to be modified.
+   * @param index The new index.
+   * @throws ObjectUnknownException If the referenced transport order does not exist.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void updateTransportOrderCurrentRouteStepIndex(TCSObjectReference<TransportOrder> ref,
+                                                         int index)
+      throws ObjectUnknownException {
+    throw new UnsupportedOperationException("Not supported, yet.");
+  }
 
   /**
    * Updates a transport order's processing vehicle.

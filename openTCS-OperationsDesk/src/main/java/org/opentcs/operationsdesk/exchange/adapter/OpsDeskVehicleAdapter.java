@@ -10,16 +10,20 @@ package org.opentcs.operationsdesk.exchange.adapter;
 import static java.util.Objects.requireNonNull;
 import static org.opentcs.data.order.TransportOrder.State.WITHDRAWN;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Path;
+import org.opentcs.data.model.Point;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
@@ -71,11 +75,7 @@ public class OpsDeskVehicleAdapter
     TransportOrder transportOrder = getTransportOrder(objectService, vehicle.getTransportOrder());
 
     if (transportOrder != null) {
-      vehicleModel.setCurrentDriveOrderPath(
-          getCurrentDriveOrderPath(transportOrder.getCurrentDriveOrder(),
-                                   vehicle.getRouteProgressIndex(),
-                                   systemModel)
-      );
+      vehicleModel.setCurrentDriveOrderPath(getCurrentDriveOrderPath(vehicle, systemModel));
       vehicleModel.setDriveOrderDestination(
           getCurrentDriveOrderDestination(transportOrder.getCurrentDriveOrder(),
                                           systemModel)
@@ -101,18 +101,35 @@ public class OpsDeskVehicleAdapter
     return transportOrdersContainer.getTransportOrder(ref.getName()).orElse(null);
   }
 
-  private PathModel getCurrentDriveOrderPath(@Nullable DriveOrder driveOrder,
-                                             int routeProgressIndex,
-                                             SystemModel systemModel) {
-    if (driveOrder == null) {
+  private PathModel getCurrentDriveOrderPath(Vehicle vehicle, SystemModel systemModel) {
+    if (!vehicle.isProcessingOrder()) {
       return null;
     }
-    return driveOrder.getRoute().getSteps().stream()
-        .skip(Math.max(0, routeProgressIndex + 1))
-        .map(step -> step.getPath())
-        .filter(path -> path != null)
+
+    return Stream.concat(vehicle.getAllocatedResources().stream(),
+                         vehicle.getClaimedResources().stream())
+        .dropWhile(
+            resources -> !containsPointWithName(resources, vehicle.getCurrentPosition().getName())
+        )
+        // Skip the resource set containing the vehicle's current position.
+        .skip(1)
+        // Get the resource set after the one containing the vehicle's current position.
         .findFirst()
+        .map(resourceSet -> extractPath(resourceSet))
         .map(path -> systemModel.getPathModel(path.getName()))
+        .orElse(null);
+  }
+
+  private boolean containsPointWithName(Set<TCSResourceReference<?>> resources, String pointName) {
+    return resources.stream()
+        .filter(resource -> resource.getReferentClass().isAssignableFrom(Point.class))
+        .anyMatch(resource -> Objects.equals(resource.getName(), pointName));
+  }
+
+  private TCSResourceReference<?> extractPath(Set<TCSResourceReference<?>> resources) {
+    return resources.stream()
+        .filter(resource -> resource.getReferentClass().isAssignableFrom(Path.class))
+        .findFirst()
         .orElse(null);
   }
 

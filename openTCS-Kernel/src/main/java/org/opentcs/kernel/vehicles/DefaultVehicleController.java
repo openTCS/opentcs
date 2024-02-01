@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import org.opentcs.components.kernel.ResourceAllocationException;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.customizations.ApplicationEventBus;
@@ -77,6 +78,10 @@ public class DefaultVehicleController
    * The kernel's vehicle service.
    */
   private final InternalVehicleService vehicleService;
+  /**
+   * The kernel's transport order service.
+   */
+  private final InternalTransportOrderService transportOrderService;
   /**
    * The kernel's notification service.
    */
@@ -162,6 +167,7 @@ public class DefaultVehicleController
    * @param vehicle The vehicle this vehicle controller will be associated with.
    * @param adapter The communication adapter of the associated vehicle.
    * @param vehicleService The kernel's vehicle service.
+   * @param transportOrderService The kernel's transport order service.
    * @param notificationService The kernel's notification service.
    * @param dispatcherService The kernel's dispatcher service.
    * @param scheduler The scheduler managing resource allocations.
@@ -173,6 +179,7 @@ public class DefaultVehicleController
   public DefaultVehicleController(@Assisted @Nonnull Vehicle vehicle,
                                   @Assisted @Nonnull VehicleCommAdapter adapter,
                                   @Nonnull InternalVehicleService vehicleService,
+                                  @Nonnull InternalTransportOrderService transportOrderService,
                                   @Nonnull NotificationService notificationService,
                                   @Nonnull DispatcherService dispatcherService,
                                   @Nonnull Scheduler scheduler,
@@ -182,6 +189,7 @@ public class DefaultVehicleController
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.commAdapter = requireNonNull(adapter, "adapter");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
+    this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.notificationService = requireNonNull(notificationService, "notificationService");
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.scheduler = requireNonNull(scheduler, "scheduler");
@@ -446,7 +454,7 @@ public class DefaultVehicleController
               vehicle.getName(), oldOrder, newOrder);
 
     int lastCommandExecutedRouteIndex = getLastCommandExecutedRouteIndex();
-    if (lastCommandExecutedRouteIndex == Vehicle.ROUTE_INDEX_DEFAULT) {
+    if (lastCommandExecutedRouteIndex == TransportOrder.ROUTE_STEP_INDEX_DEFAULT) {
       LOG.debug("{}: Drive orders continuous: No route progress, yet.", vehicle.getName());
       return true;
     }
@@ -516,7 +524,7 @@ public class DefaultVehicleController
 
   private int getLastCommandExecutedRouteIndex() {
     if (lastCommandExecuted == null) {
-      return Vehicle.ROUTE_INDEX_DEFAULT;
+      return TransportOrder.ROUTE_STEP_INDEX_DEFAULT;
     }
 
     return lastCommandExecuted.getStep().getRouteIndex();
@@ -987,13 +995,12 @@ public class DefaultVehicleController
     synchronized (commAdapter) {
       // Check if the executed command is the one we expect at this point.
       MovementCommand expectedCommand = commandsSent.peek();
-      if (!Objects.equals(expectedCommand, executedCommand)) {
-        LOG.warn("{}: Communication adapter executed unexpected command: {} != {}",
-                 vehicle.getName(),
-                 executedCommand,
-                 expectedCommand);
-        // XXX The communication adapter executed an unexpected command. Do something!
-      }
+      checkArgument(Objects.equals(expectedCommand, executedCommand),
+                    "%s: Communication adapter executed unexpected command: %s != %s",
+                    vehicle.getName(),
+                    executedCommand,
+                    expectedCommand);
+
       // Remove the command from the queue, since it has been processed successfully.
       lastCommandExecuted = commandsSent.remove();
 
@@ -1014,6 +1021,11 @@ public class DefaultVehicleController
       vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
                                                      toListOfResourceSets(allocatedResources));
 
+      transportOrderService.updateTransportOrderCurrentRouteStepIndex(
+          transportOrder.getReference(),
+          executedCommand.getStep().getRouteIndex()
+      );
+
       peripheralInteractor.startPostMovementInteractions(executedCommand,
                                                          this::checkForPendingCommands,
                                                          this::onPostMovementInteractionFailed);
@@ -1027,6 +1039,7 @@ public class DefaultVehicleController
     dispatcherService.withdrawByVehicle(vehicle.getReference(), true);
   }
 
+  @SuppressWarnings("deprecation")
   private void checkForPendingCommands() {
     // Check if there are more commands to be processed for the current drive order.
     if (interactionsPendingCommand == null
@@ -1197,6 +1210,7 @@ public class DefaultVehicleController
     updatePosition(toReference(point), null);
   }
 
+  @SuppressWarnings("deprecation")
   private void updatePositionWithOrder(String position, Point point) {
     // If a drive order is being processed, check if the reported position
     // is the one we expect.
@@ -1351,7 +1365,7 @@ public class DefaultVehicleController
 
   private boolean isForcedRerouting(DriveOrder newOrder) {
     int lastCommandExecutedRouteIndex = getLastCommandExecutedRouteIndex();
-    if (lastCommandExecutedRouteIndex == Vehicle.ROUTE_INDEX_DEFAULT) {
+    if (lastCommandExecutedRouteIndex == TransportOrder.ROUTE_STEP_INDEX_DEFAULT) {
       LOG.debug("{}: No route progress, yet. Not considering rerouting as forced.",
                 vehicle.getName());
       return false;

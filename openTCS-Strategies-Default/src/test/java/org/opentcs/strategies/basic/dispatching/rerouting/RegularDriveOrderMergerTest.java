@@ -24,6 +24,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
+import org.opentcs.data.order.TransportOrder;
 
 /**
  * Test cases for {@link RegularDriveOrderMerger}.
@@ -54,8 +55,12 @@ class RegularDriveOrderMergerTest {
     Route expected = createDriveOrder(20, "A", "B", "C", "D", "H", "I", "J").getRoute();
 
     // Act
-    Route actual
-        = driveOrderMerger.mergeDriveOrders(orderA, orderB, new Vehicle("Vehicle")).getRoute();
+    Route actual = driveOrderMerger.mergeDriveOrders(
+        orderA,
+        orderB,
+        TransportOrder.ROUTE_STEP_INDEX_DEFAULT,
+        new Vehicle("Vehicle")
+    ).getRoute();
 
     // Assert
     assertStepsEqualsIgnoringReroutingType(expected, actual);

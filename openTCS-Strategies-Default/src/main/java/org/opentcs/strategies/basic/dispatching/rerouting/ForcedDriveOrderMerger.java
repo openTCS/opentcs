@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.Router;
-import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route;
 import org.slf4j.Logger;
@@ -43,12 +42,12 @@ public class ForcedDriveOrderMerger
   @Override
   protected List<Route.Step> mergeSteps(List<Route.Step> stepsA,
                                         List<Route.Step> stepsB,
-                                        Vehicle vehicle) {
+                                        int currentRouteStepIndex) {
     LOG.debug("Merging steps {} with {}", stepsToPaths(stepsA), stepsToPaths(stepsB));
     List<Route.Step> mergedSteps = new ArrayList<>();
 
     // Get the steps that the vehicle has already travelled.
-    mergedSteps.addAll(stepsA.subList(0, vehicle.getRouteProgressIndex() + 1));
+    mergedSteps.addAll(stepsA.subList(0, currentRouteStepIndex + 1));
 
     // Set the rerouting type for the first step in the new route.
     Route.Step firstStepOfNewRoute = stepsB.get(0);

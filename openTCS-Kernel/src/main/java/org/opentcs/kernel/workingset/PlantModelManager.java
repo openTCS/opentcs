@@ -748,7 +748,10 @@ public class PlantModelManager
    * @param index The new index.
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Use {@link TransportOrderPoolManager#setTransportOrderCurrentRouteStepIndex(
+   * org.opentcs.data.TCSObjectReference, int)} instead.
    */
+  @Deprecated
   public Vehicle setVehicleRouteProgressIndex(TCSObjectReference<Vehicle> vehicleRef,
                                               int index)
       throws ObjectUnknownException {

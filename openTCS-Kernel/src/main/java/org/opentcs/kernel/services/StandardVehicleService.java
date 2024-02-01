@@ -203,6 +203,7 @@ public class StandardVehicleService
   }
 
   @Override
+  @Deprecated
   public void updateVehicleRouteProgressIndex(TCSObjectReference<Vehicle> ref, int index)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");

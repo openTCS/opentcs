@@ -24,6 +24,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** The loopback adapter now properly resumes operation when switching from single step mode to automatic mode.
 * Changes affecting developers:
 ** Deprecate `MovementCommand.isWithoutOperation()` and introduce `MovementCommand.hasEmptyOperation()` as a replacement.
+** Keep track of a vehicle's drive order route progress in the corresponding transport order the vehicle is processing.
+   Deprecate `Vehicle.getRouteProgressIndex()` because tracking this in the transport order is more consistent.
+   (Progress in the drive orders list is also tracked in the transport order.)
 ** Update JUnit to 5.10.1.
 ** Update ApprovalTests to 22.3.3.
 ** Update Mockito to 5.10.0.

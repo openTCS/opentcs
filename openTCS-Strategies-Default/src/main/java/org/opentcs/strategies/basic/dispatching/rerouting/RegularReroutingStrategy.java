@@ -72,8 +72,8 @@ public class RegularReroutingStrategy
       return false;
     }
 
-    int routeProgressIndex = vehicle.getRouteProgressIndex();
-    if (routeProgressIndex == Vehicle.ROUTE_INDEX_DEFAULT) {
+    int routeProgressIndex = currentTransportOrder.getCurrentRouteStepIndex();
+    if (routeProgressIndex == TransportOrder.ROUTE_STEP_INDEX_DEFAULT) {
       Route.Step step = currentDriveOrder.getRoute().getSteps().get(0);
       Point expectedVehiclePosition
           = step.getSourcePoint() != null ? step.getSourcePoint() : step.getDestinationPoint();

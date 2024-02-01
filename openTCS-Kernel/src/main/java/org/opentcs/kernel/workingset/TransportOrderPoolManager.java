@@ -281,7 +281,8 @@ public class TransportOrderPoolManager
                       previousState,
                       TCSObjectEvent.Type.OBJECT_MODIFIED);
       previousState = newState;
-      order = order.withCurrentDriveOrderIndex(order.getCurrentDriveOrderIndex() + 1);
+      order = order.withCurrentDriveOrderIndex(order.getCurrentDriveOrderIndex() + 1)
+          .withCurrentRouteStepIndex(TransportOrder.ROUTE_STEP_INDEX_DEFAULT);
       getObjectRepo().replaceObject(order);
       newState = order;
       emitObjectEvent(newState,
@@ -298,6 +299,28 @@ public class TransportOrderPoolManager
         previousState = newState;
       }
     }
+    emitObjectEvent(order,
+                    previousState,
+                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    return order;
+  }
+
+  /**
+   * Sets a transport order's index of the last route step travelled for the currently processed
+   * drive order.
+   *
+   * @param ref A reference to the transport order to be modified.
+   * @param index The new index.
+   * @return The modified transport order.
+   * @throws ObjectUnknownException If the referenced transport order does not exist.
+   */
+  public TransportOrder setTransportOrderCurrentRouteStepIndex(
+      TCSObjectReference<TransportOrder> ref,
+      int index)
+      throws ObjectUnknownException {
+    TransportOrder previousState = getObjectRepo().getObject(TransportOrder.class, ref);
+    TransportOrder order = previousState.withCurrentRouteStepIndex(index);
+    getObjectRepo().replaceObject(order);
     emitObjectEvent(order,
                     previousState,
                     TCSObjectEvent.Type.OBJECT_MODIFIED);

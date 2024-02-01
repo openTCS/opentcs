@@ -35,11 +35,16 @@ public abstract class AbstractDriveOrderMerger
   }
 
   @Override
-  public DriveOrder mergeDriveOrders(DriveOrder orderA, DriveOrder orderB, Vehicle vehicle) {
+  public DriveOrder mergeDriveOrders(DriveOrder orderA,
+                                     DriveOrder orderB,
+                                     int currentRouteStepIndex,
+                                     Vehicle vehicle) {
     return new DriveOrder(orderA.getDestination())
         .withState(orderA.getState())
         .withTransportOrder(orderA.getTransportOrder())
-        .withRoute(mergeRoutes(orderA.getRoute(), orderB.getRoute(), vehicle));
+        .withRoute(
+            mergeRoutes(orderA.getRoute(), orderB.getRoute(), currentRouteStepIndex, vehicle)
+        );
   }
 
   /**
@@ -47,12 +52,18 @@ public abstract class AbstractDriveOrderMerger
    *
    * @param routeA A route.
    * @param routeB A route to be merged with {@code routeA}.
+   * @param currentRouteStepIndex The index of the last route step travelled for {@code routeA}.
    * @param vehicle The {@link Vehicle} to merge the routes for.
    * @return The (new) merged route.
    */
-  protected Route mergeRoutes(Route routeA, Route routeB, Vehicle vehicle) {
+  protected Route mergeRoutes(Route routeA,
+                              Route routeB,
+                              int currentRouteStepIndex,
+                              Vehicle vehicle) {
     // Merge the route steps
-    List<Route.Step> mergedSteps = mergeSteps(routeA.getSteps(), routeB.getSteps(), vehicle);
+    List<Route.Step> mergedSteps = mergeSteps(routeA.getSteps(),
+                                              routeB.getSteps(),
+                                              currentRouteStepIndex);
 
     // Calculate the costs for merged route
     return new Route(
@@ -68,12 +79,12 @@ public abstract class AbstractDriveOrderMerger
    *
    * @param stepsA A list of steps.
    * @param stepsB A list of steps to be merged with {@code stepsA}.
-   * @param vehicle The {@link Vehicle} to merge the steps for.
+   * @param currentRouteStepIndex The index of the last route step travelled for {@code stepsA}.
    * @return The (new) merged list of steps.
    */
   protected abstract List<Route.Step> mergeSteps(List<Route.Step> stepsA,
                                                  List<Route.Step> stepsB,
-                                                 Vehicle vehicle);
+                                                 int currentRouteStepIndex);
 
   protected List<Route.Step> updateRouteIndices(List<Route.Step> steps) {
     List<Route.Step> updatedSteps = new ArrayList<>();

@@ -13,7 +13,6 @@ import java.util.Objects;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route;
 import org.slf4j.Logger;
@@ -44,7 +43,7 @@ public class RegularDriveOrderMerger
   @Override
   protected List<Route.Step> mergeSteps(List<Route.Step> stepsA,
                                         List<Route.Step> stepsB,
-                                        Vehicle vehicle) {
+                                        int currentRouteStepIndex) {
     LOG.debug("Merging steps {} with {}", stepsToPaths(stepsA), stepsToPaths(stepsB));
     List<Route.Step> mergedSteps = new ArrayList<>();
 

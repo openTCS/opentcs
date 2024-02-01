@@ -149,6 +149,7 @@ public abstract class AbstractReroutingStrategy
       DriveOrder newCurrentOrder
           = driveOrderMerger.mergeDriveOrders(originalOrder.getCurrentDriveOrder(),
                                               newDriveOrders.get(0),
+                                              originalOrder.getCurrentRouteStepIndex(),
                                               vehicle);
       newDriveOrders.set(0, newCurrentOrder);
     }
