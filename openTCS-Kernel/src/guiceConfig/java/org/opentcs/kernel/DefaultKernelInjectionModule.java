@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel;
 
+import org.opentcs.kernel.workingset.CreationTimeThreshold;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import java.io.File;
@@ -258,6 +259,9 @@ public class DefaultKernelInjectionModule
     bind(OrderPoolConfiguration.class)
         .toInstance(getConfigBindingProvider().get(OrderPoolConfiguration.PREFIX,
                                                    OrderPoolConfiguration.class));
+
+    bind(CreationTimeThreshold.class)
+        .in(Singleton.class);
 
     transportOrderCleanupApprovalBinder();
     orderSequenceCleanupApprovalBinder();

@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel;
 
+import org.opentcs.kernel.workingset.WorkingSetCleanupTask;
 import com.google.common.util.concurrent.Uninterruptibles;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -83,9 +84,9 @@ public class KernelStateOperating
    */
   private final ScheduledExecutorService kernelExecutor;
   /**
-   * A task for periodically getting rid of old orders.
+   * A task for periodically getting rid of old orders, order sequences and peripheral jobs.
    */
-  private final OrderCleanerTask orderCleanerTask;
+  private final WorkingSetCleanupTask workingSetCleanupTask;
   /**
    * This kernel state's local extensions.
    */
@@ -127,7 +128,7 @@ public class KernelStateOperating
    * @param controllerPool The vehicle controller pool to be used.
    * @param peripheralControllerPool The peripheral controller pool to be used.
    * @param kernelExecutor The kernel executer to be used.
-   * @param orderCleanerTask The order cleaner task to be used.
+   * @param workingSetCleanupTask The workingset cleanup task to be used.
    * @param extensions The kernel extensions to load.
    * @param attachmentManager The attachment manager to be used.
    * @param peripheralAttachmentManager The peripheral attachment manager to be used.
@@ -147,7 +148,7 @@ public class KernelStateOperating
                               LocalVehicleControllerPool controllerPool,
                               LocalPeripheralControllerPool peripheralControllerPool,
                               @KernelExecutor ScheduledExecutorService kernelExecutor,
-                              OrderCleanerTask orderCleanerTask,
+                              WorkingSetCleanupTask workingSetCleanupTask,
                               @ActiveInOperatingMode Set<KernelExtension> extensions,
                               AttachmentManager attachmentManager,
                               PeripheralAttachmentManager peripheralAttachmentManager,
@@ -167,7 +168,7 @@ public class KernelStateOperating
     this.peripheralControllerPool = requireNonNull(peripheralControllerPool,
                                                    "peripheralControllerPool");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
-    this.orderCleanerTask = requireNonNull(orderCleanerTask, "orderCleanerTask");
+    this.workingSetCleanupTask = requireNonNull(workingSetCleanupTask, "workingSetCleanupTask");
     this.extensions = requireNonNull(extensions, "extensions");
     this.attachmentManager = requireNonNull(attachmentManager, "attachmentManager");
     this.peripheralAttachmentManager = requireNonNull(peripheralAttachmentManager,
@@ -212,9 +213,9 @@ public class KernelStateOperating
     peripheralAttachmentManager.initialize();
 
     // Start a task for cleaning up old orders periodically.
-    cleanerTaskFuture = kernelExecutor.scheduleAtFixedRate(orderCleanerTask,
-                                                           orderCleanerTask.getSweepInterval(),
-                                                           orderCleanerTask.getSweepInterval(),
+    cleanerTaskFuture = kernelExecutor.scheduleAtFixedRate(workingSetCleanupTask,
+                                                           workingSetCleanupTask.getSweepInterval(),
+                                                           workingSetCleanupTask.getSweepInterval(),
                                                            TimeUnit.MILLISECONDS);
 
     // Start kernel extensions.

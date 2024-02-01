@@ -9,9 +9,10 @@ package org.opentcs.kernel;
 
 import org.opentcs.configuration.ConfigurationEntry;
 import org.opentcs.configuration.ConfigurationPrefix;
+import org.opentcs.kernel.workingset.WorkingSetCleanupTask;
 
 /**
- * Provides methods to configure the {@link OrderCleanerTask}.
+ * Provides methods to configure the {@link WorkingSetCleanupTask}.
  */
 @ConfigurationPrefix(OrderPoolConfiguration.PREFIX)
 public interface OrderPoolConfiguration {

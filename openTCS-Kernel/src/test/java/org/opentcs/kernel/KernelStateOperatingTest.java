@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel;
 
+import org.opentcs.kernel.workingset.WorkingSetCleanupTask;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -153,8 +154,7 @@ class KernelStateOperatingTest {
     when(executorMock.scheduleAtFixedRate(any(), anyLong(), anyLong(), any()))
         .thenReturn(mock(ScheduledFuture.class));
 
-    return spy(
-        new KernelStateOperating(
+    return spy(new KernelStateOperating(
             new Object(),
             mock(PlantModelManager.class),
             new TransportOrderPoolManager(objectPool,
@@ -172,7 +172,7 @@ class KernelStateOperatingTest {
             controllerPool,
             mock(LocalPeripheralControllerPool.class),
             executorMock,
-            mock(OrderCleanerTask.class),
+            mock(WorkingSetCleanupTask.class),
             extensions,
             attachmentManager,
             mock(PeripheralAttachmentManager.class),
