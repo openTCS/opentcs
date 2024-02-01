@@ -99,4 +99,16 @@ class RemoteDispatcherServiceProxy
       throw findSuitableExceptionFor(ex);
     }
   }
+
+  @Override
+  public void assignNow(TCSObjectReference<TransportOrder> ref)
+      throws KernelRuntimeException {
+    checkServiceAvailability();
+    try {
+      getRemoteService().assignNow(getClientId(), ref);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
 }
