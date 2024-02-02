@@ -24,9 +24,9 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
-import org.opentcs.drivers.vehicle.management.AttachmentEvent;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.ProcessModelEvent;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentEvent;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.kernel.KernelApplicationConfiguration;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
@@ -73,7 +73,7 @@ public class AttachmentManager
   /**
    * The pool of comm adapter attachments.
    */
-  private final Map<String, AttachmentInformation> attachmentPool = new HashMap<>();
+  private final Map<String, VehicleAttachmentInformation> attachmentPool = new HashMap<>();
   /**
    * Whether the attachment manager is initialized or not.
    */
@@ -250,7 +250,7 @@ public class AttachmentManager
    * @param vehicleName The name of the vehicle.
    * @return Attachment information about the vehicle.
    */
-  public AttachmentInformation getAttachmentInformation(String vehicleName) {
+  public VehicleAttachmentInformation getAttachmentInformation(String vehicleName) {
     requireNonNull(vehicleName, "vehicleName");
     Assertions.checkArgument(attachmentPool.get(vehicleName) != null,
                              "No attachment information for vehicle %s",
@@ -259,7 +259,7 @@ public class AttachmentManager
     return attachmentPool.get(vehicleName);
   }
 
-  public Map<String, AttachmentInformation> getAttachmentPool() {
+  public Map<String, VehicleAttachmentInformation> getAttachmentPool() {
     return attachmentPool;
   }
 
@@ -283,21 +283,21 @@ public class AttachmentManager
               .collect(Collectors.toList());
 
       attachmentPool.put(vehicleName,
-                         new AttachmentInformation(entry.getVehicle().getReference(),
-                                                   availableCommAdapters,
-                                                   new NullVehicleCommAdapterDescription()));
+                         new VehicleAttachmentInformation(entry.getVehicle().getReference(),
+                                                          availableCommAdapters,
+                                                          new NullVehicleCommAdapterDescription()));
     });
   }
 
   private void updateAttachmentInformation(VehicleEntry entry) {
     String vehicleName = entry.getVehicleName();
     VehicleCommAdapterFactory factory = entry.getCommAdapterFactory();
-    AttachmentInformation newAttachment = attachmentPool.get(vehicleName)
+    VehicleAttachmentInformation newAttachment = attachmentPool.get(vehicleName)
         .withAttachedCommAdapter(factory.getDescription());
 
     attachmentPool.put(vehicleName, newAttachment);
 
-    eventHandler.onEvent(new AttachmentEvent(vehicleName, newAttachment));
+    eventHandler.onEvent(new VehicleAttachmentEvent(vehicleName, newAttachment));
     if (entry.getCommAdapter() == null) {
       // In case we are detached
       eventHandler.onEvent(new ProcessModelEvent(vehicleName, new VehicleProcessModelTO()));

@@ -19,9 +19,9 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.drivers.vehicle.management.AttachmentEvent;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.ProcessModelEvent;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentEvent;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.CallWrapper;
 import org.opentcs.util.event.EventHandler;
@@ -92,7 +92,7 @@ public class LocalVehicleEntryPool
       Set<Vehicle> vehicles
           = callWrapper.call(() -> servicePortal.getVehicleService().fetchObjects(Vehicle.class));
       for (Vehicle vehicle : vehicles) {
-        AttachmentInformation ai = callWrapper.call(() -> {
+        VehicleAttachmentInformation ai = callWrapper.call(() -> {
           return servicePortal.getVehicleService()
               .fetchAttachmentInformation(vehicle.getReference());
         });
@@ -141,13 +141,13 @@ public class LocalVehicleEntryPool
       }
       entry.setProcessModel(e.getUpdatedProcessModel());
     }
-    else if (event instanceof AttachmentEvent) {
-      AttachmentEvent e = (AttachmentEvent) event;
+    else if (event instanceof VehicleAttachmentEvent) {
+      VehicleAttachmentEvent e = (VehicleAttachmentEvent) event;
       LocalVehicleEntry entry = getEntryFor(e.getVehicleName());
       if (entry == null) {
         return;
       }
-      entry.setAttachmentInformation(e.getUpdatedAttachmentInformation());
+      entry.setAttachmentInformation(e.getAttachmentInformation());
     }
   }
 

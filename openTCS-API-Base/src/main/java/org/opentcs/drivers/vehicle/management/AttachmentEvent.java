@@ -10,10 +10,15 @@ package org.opentcs.drivers.vehicle.management;
 import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Instances of this class represent events emitted by/for attaching comm adapters.
+ *
+ * @deprecated Use {@link VehicleAttachmentEvent} instead.
  */
+@Deprecated
+@ScheduledApiChange(details = "Will be removed.", when = "6.0")
 public class AttachmentEvent
     extends CommAdapterEvent
     implements Serializable {

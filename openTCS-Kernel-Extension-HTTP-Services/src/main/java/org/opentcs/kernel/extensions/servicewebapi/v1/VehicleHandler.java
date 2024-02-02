@@ -24,7 +24,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
@@ -160,7 +160,7 @@ public class VehicleHandler {
     });
   }
 
-  public AttachmentInformation getVehicleCommAdapterAttachmentInformation(String name)
+  public VehicleAttachmentInformation getVehicleCommAdapterAttachmentInformation(String name)
       throws ObjectUnknownException {
     requireNonNull(name, "name");
 

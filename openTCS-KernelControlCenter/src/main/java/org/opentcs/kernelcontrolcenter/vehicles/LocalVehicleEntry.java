@@ -12,7 +12,7 @@ import java.beans.PropertyChangeSupport;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 
 /**
@@ -28,7 +28,7 @@ public class LocalVehicleEntry {
   /**
    * Detailed information about the attachment state.
    */
-  private AttachmentInformation attachmentInformation;
+  private VehicleAttachmentInformation attachmentInformation;
   /**
    * The current process model to this entry.
    */
@@ -40,7 +40,7 @@ public class LocalVehicleEntry {
    * @param attachmentInformation Detailed information about the attachment state.
    * @param processModel The current process model to this entry.
    */
-  public LocalVehicleEntry(AttachmentInformation attachmentInformation,
+  public LocalVehicleEntry(VehicleAttachmentInformation attachmentInformation,
                            VehicleProcessModelTO processModel) {
     this.attachmentInformation = requireNonNull(attachmentInformation, "attachmentInformation");
     this.processModel = requireNonNull(processModel, "processModel");
@@ -55,7 +55,7 @@ public class LocalVehicleEntry {
   }
 
   @Nonnull
-  public AttachmentInformation getAttachmentInformation() {
+  public VehicleAttachmentInformation getAttachmentInformation() {
     return attachmentInformation;
   }
 
@@ -74,8 +74,9 @@ public class LocalVehicleEntry {
     return attachmentInformation.getAttachedCommAdapter();
   }
 
-  public void setAttachmentInformation(@Nonnull AttachmentInformation attachmentInformation) {
-    AttachmentInformation oldAttachmentInformation = this.attachmentInformation;
+  public void setAttachmentInformation(
+      @Nonnull VehicleAttachmentInformation attachmentInformation) {
+    VehicleAttachmentInformation oldAttachmentInformation = this.attachmentInformation;
     this.attachmentInformation = requireNonNull(attachmentInformation, "attachmentInformation");
 
     pcs.firePropertyChange(Attribute.ATTACHMENT_INFORMATION.name(),

@@ -34,7 +34,7 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
@@ -53,7 +53,7 @@ class VehicleHandlerTest {
 
   private Vehicle vehicle;
   private VehicleCommAdapterDescription adapterDescriptionMock;
-  private AttachmentInformation attachmentInfo;
+  private VehicleAttachmentInformation attachmentInfo;
 
   @BeforeEach
   void setUp() {
@@ -66,7 +66,7 @@ class VehicleHandlerTest {
     vehicle = new Vehicle("some-vehicle");
     adapterDescriptionMock = new MockVehicleCommAdapterDescription();
 
-    attachmentInfo = new AttachmentInformation(
+    attachmentInfo = new VehicleAttachmentInformation(
         vehicle.getReference(),
         List.of(adapterDescriptionMock),
         adapterDescriptionMock

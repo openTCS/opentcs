@@ -27,7 +27,7 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.AttachmentManager;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.VehicleEntry;
@@ -313,7 +313,7 @@ public class StandardVehicleService
   }
 
   @Override
-  public AttachmentInformation fetchAttachmentInformation(TCSObjectReference<Vehicle> ref)
+  public VehicleAttachmentInformation fetchAttachmentInformation(TCSObjectReference<Vehicle> ref)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 

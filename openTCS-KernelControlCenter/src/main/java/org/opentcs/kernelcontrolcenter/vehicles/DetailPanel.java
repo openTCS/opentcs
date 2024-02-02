@@ -30,9 +30,9 @@ import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
-import org.opentcs.drivers.vehicle.management.AttachmentEvent;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
 import org.opentcs.drivers.vehicle.management.ProcessModelEvent;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentEvent;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleCommAdapterPanel;
 import org.opentcs.drivers.vehicle.management.VehicleCommAdapterPanelFactory;
 import org.opentcs.util.CallWrapper;
@@ -95,7 +95,7 @@ public class DetailPanel
   /**
    * The comm adapter currently attached to the vehicle (model).
    */
-  private AttachmentInformation attachmentInfo;
+  private VehicleAttachmentInformation attachmentInfo;
   /**
    * Whether this panel is initialized or not.
    */
@@ -173,8 +173,8 @@ public class DetailPanel
       return;
     }
 
-    if (e instanceof AttachmentEvent) {
-      AttachmentEvent event = (AttachmentEvent) e;
+    if (e instanceof VehicleAttachmentEvent) {
+      VehicleAttachmentEvent event = (VehicleAttachmentEvent) e;
       if (Objects.equals(vehicleEntry.getVehicleName(),
                          event.getVehicleName())) {
         updateFromVehicleEntry(event);
@@ -256,8 +256,8 @@ public class DetailPanel
     updateVehicleState(vehicleEntry.getProcessModel().getVehicleState());
   }
 
-  private void updateFromVehicleEntry(AttachmentEvent evt) {
-    updateCommAdapter(evt.getUpdatedAttachmentInformation());
+  private void updateFromVehicleEntry(VehicleAttachmentEvent evt) {
+    updateCommAdapter(evt.getAttachmentInformation());
   }
 
   private void updateFromVehicleProcessModel(ProcessModelEvent evt) {
@@ -279,7 +279,7 @@ public class DetailPanel
     }
   }
 
-  private void updateCommAdapter(AttachmentInformation newAttachmentInfo) {
+  private void updateCommAdapter(VehicleAttachmentInformation newAttachmentInfo) {
     SwingUtilities.invokeLater(() -> {
       // If there was a comm adapter and it changed, we need to clean up a few things first.
       if (attachmentInfo != null) {

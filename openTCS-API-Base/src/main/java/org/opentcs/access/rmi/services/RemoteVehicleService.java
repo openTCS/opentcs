@@ -16,7 +16,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
@@ -49,8 +49,8 @@ public interface RemoteVehicleService
   void enableCommAdapter(ClientID clientId, TCSObjectReference<Vehicle> ref)
       throws RemoteException;
 
-  AttachmentInformation fetchAttachmentInformation(ClientID clientId,
-                                                   TCSObjectReference<Vehicle> ref)
+  VehicleAttachmentInformation fetchAttachmentInformation(ClientID clientId,
+                                                          TCSObjectReference<Vehicle> ref)
       throws RemoteException;
 
   VehicleProcessModelTO fetchProcessModel(ClientID clientId, TCSObjectReference<Vehicle> ref)

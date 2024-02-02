@@ -26,7 +26,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -194,8 +194,8 @@ public class StandardRemoteVehicleService
   }
 
   @Override
-  public AttachmentInformation fetchAttachmentInformation(ClientID clientId,
-                                                          TCSObjectReference<Vehicle> ref) {
+  public VehicleAttachmentInformation fetchAttachmentInformation(ClientID clientId,
+                                                                 TCSObjectReference<Vehicle> ref) {
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 
     return vehicleService.fetchAttachmentInformation(ref);

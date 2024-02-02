@@ -15,7 +15,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
@@ -65,7 +65,7 @@ public interface VehicleService
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
-  AttachmentInformation fetchAttachmentInformation(TCSObjectReference<Vehicle> ref)
+  VehicleAttachmentInformation fetchAttachmentInformation(TCSObjectReference<Vehicle> ref)
       throws ObjectUnknownException, KernelRuntimeException;
 
   /**

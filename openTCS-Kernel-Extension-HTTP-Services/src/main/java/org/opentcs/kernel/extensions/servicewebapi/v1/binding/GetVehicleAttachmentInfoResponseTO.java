@@ -10,7 +10,7 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 
 /**
  * Arranges the data from a vehicle's <code>AttachmentInformation</code> for transferring.
@@ -64,11 +64,12 @@ public class GetVehicleAttachmentInfoResponseTO {
   /**
    * Creates a new instance from <code>AttachmentInformation</code>.
    *
-   * @param attachmentInformation The <code>AttachmentInformation</code> to create an instance from.
+   * @param attachmentInformation The <code>AttachmentInformation</code> to create an
+   * instance from.
    * @return A new instance containing the data from the given <code>AttachmentInformation</code>.
    */
   public static GetVehicleAttachmentInfoResponseTO fromAttachmentInformation(
-      AttachmentInformation attachmentInformation) {
+      VehicleAttachmentInformation attachmentInformation) {
     if (attachmentInformation == null) {
       return null;
     }

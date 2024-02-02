@@ -18,7 +18,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 import org.opentcs.util.CallWrapper;
@@ -290,8 +290,8 @@ public class VehicleTableModel
   private boolean isRelevantUpdate(PropertyChangeEvent evt) {
     if (Objects.equals(evt.getPropertyName(),
                        LocalVehicleEntry.Attribute.ATTACHMENT_INFORMATION.name())) {
-      AttachmentInformation oldInfo = (AttachmentInformation) evt.getOldValue();
-      AttachmentInformation newInfo = (AttachmentInformation) evt.getNewValue();
+      VehicleAttachmentInformation oldInfo = (VehicleAttachmentInformation) evt.getOldValue();
+      VehicleAttachmentInformation newInfo = (VehicleAttachmentInformation) evt.getNewValue();
       return !oldInfo.getAttachedCommAdapter().equals(newInfo.getAttachedCommAdapter());
     }
     if (Objects.equals(evt.getPropertyName(),

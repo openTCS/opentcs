@@ -16,7 +16,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 
 /**
@@ -74,7 +74,7 @@ class RemoteVehicleServiceProxy
   }
 
   @Override
-  public AttachmentInformation fetchAttachmentInformation(TCSObjectReference<Vehicle> ref)
+  public VehicleAttachmentInformation fetchAttachmentInformation(TCSObjectReference<Vehicle> ref)
       throws ObjectUnknownException, KernelRuntimeException {
     checkServiceAvailability();
 

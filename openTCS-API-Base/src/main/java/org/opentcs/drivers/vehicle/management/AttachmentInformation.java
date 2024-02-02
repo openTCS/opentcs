@@ -14,11 +14,16 @@ import javax.annotation.Nonnull;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes which communication adapter a vehicle is currently associated with and which adapters
  * are available.
+ *
+ * @deprecated Use {@link VehicleAttachmentInformation} instead.
  */
+@Deprecated
+@ScheduledApiChange(details = "Will be removed.", when = "6.0")
 public class AttachmentInformation
     implements Serializable {
 

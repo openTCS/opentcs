@@ -35,7 +35,7 @@ import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.data.model.Point;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.commands.InitPositionCommand;
-import org.opentcs.drivers.vehicle.management.AttachmentInformation;
+import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 import org.opentcs.kernelcontrolcenter.util.SingleCellEditor;
@@ -192,7 +192,7 @@ public class DriverGUI
                                         int rowIndex,
                                         SingleCellEditor adapterCellEditor) {
     final CommAdapterComboBox comboBox = new CommAdapterComboBox();
-    AttachmentInformation ai;
+    VehicleAttachmentInformation ai;
     try {
       ai = callWrapper.call(() -> servicePortal.getVehicleService().fetchAttachmentInformation(
           vehicleEntry.getAttachmentInformation().getVehicleReference()));
