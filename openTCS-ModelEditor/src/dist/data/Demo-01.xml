@@ -1,36 +1,41 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model version="0.0.4" name="Demo-01">
-    <point name="Point-0001" xPosition="28000" yPosition="11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0001" xPosition="31000" yPosition="11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0001 --- Point-0002"/>
         <outgoingPath name="Point-0001 --- Point-0003"/>
-        <pointLayout xPosition="28000" yPosition="11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+        <pointLayout xPosition="31000" yPosition="11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
     <point name="Point-0002" xPosition="25000" yPosition="9000" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
+        <outgoingPath name="Point-0002 --- Point-0004"/>
         <outgoingPath name="Point-0002 --- Point-0014"/>
+        <property name="tcs:parkingPositionPriority" value="4"/>
         <pointLayout xPosition="25000" yPosition="9000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0003" xPosition="28000" yPosition="5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0003" xPosition="31000" yPosition="5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0003 --- Point-0004"/>
         <outgoingPath name="Point-0003 --- Point-0005"/>
-        <pointLayout xPosition="28000" yPosition="5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+        <pointLayout xPosition="31000" yPosition="5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
     <point name="Point-0004" xPosition="25000" yPosition="3000" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
+        <outgoingPath name="Point-0004 --- Point-0006"/>
         <outgoingPath name="Point-0004 --- Point-0008"/>
+        <property name="tcs:parkingPositionPriority" value="3"/>
         <pointLayout xPosition="25000" yPosition="3000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0005" xPosition="28000" yPosition="-1000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0005" xPosition="31000" yPosition="-1000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0005 --- Point-0006"/>
         <outgoingPath name="Point-0005 --- Point-0007"/>
-        <pointLayout xPosition="28000" yPosition="-1000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+        <pointLayout xPosition="31000" yPosition="-1000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
     <point name="Point-0006" xPosition="25000" yPosition="-3000" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
         <outgoingPath name="Point-0006 --- Point-0009"/>
+        <outgoingPath name="Point-0006 --- Point-0010"/>
+        <property name="tcs:parkingPositionPriority" value="2"/>
         <pointLayout xPosition="25000" yPosition="-3000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
-    <point name="Point-0007" xPosition="28000" yPosition="-7000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+    <point name="Point-0007" xPosition="31000" yPosition="-7000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0007 --- Point-0010"/>
-        <outgoingPath name="Point-0007 --- Point-0012"/>
-        <pointLayout xPosition="28000" yPosition="-7000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+        <pointLayout xPosition="31000" yPosition="-7000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
     <point name="Point-0008" xPosition="22000" yPosition="1000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0008 --- Point-0009"/>
@@ -42,15 +47,12 @@
     </point>
     <point name="Point-0010" xPosition="25000" yPosition="-9000" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
         <outgoingPath name="Point-0010 --- Point-0011"/>
+        <property name="tcs:parkingPositionPriority" value="1"/>
         <pointLayout xPosition="25000" yPosition="-9000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
     <point name="Point-0011" xPosition="22000" yPosition="-11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0011 --- Point-0013"/>
         <pointLayout xPosition="22000" yPosition="-11000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
-    </point>
-    <point name="Point-0012" xPosition="25000" yPosition="-15000" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
-        <outgoingPath name="Point-0012 --- Point-0013"/>
-        <pointLayout xPosition="25000" yPosition="-15000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
     <point name="Point-0013" xPosition="18000" yPosition="-15000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <outgoingPath name="Point-0013 --- Point-0015"/>
@@ -118,6 +120,7 @@
     </point>
     <point name="Point-0027" xPosition="-20000" yPosition="15000" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
         <outgoingPath name="Point-0027 --- Point-0032"/>
+        <property name="tcs:parkingPositionPriority" value="4"/>
         <pointLayout xPosition="-20000" yPosition="15000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
     </point>
     <point name="Point-0028" xPosition="-8000" yPosition="11000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
@@ -256,11 +259,14 @@
     </point>
     <path name="Point-0001 --- Point-0002" sourcePoint="Point-0001" destinationPoint="Point-0002" length="4383" maxVelocity="1000" maxReverseVelocity="0" locked="false">
         <pathLayout connectionType="BEZIER" layerId="0">
-            <controlPoint x="552" y="-183"/>
-            <controlPoint x="552" y="-183"/>
+            <controlPoint x="610" y="-180"/>
+            <controlPoint x="610" y="-180"/>
         </pathLayout>
     </path>
     <path name="Point-0001 --- Point-0003" sourcePoint="Point-0001" destinationPoint="Point-0003" length="5629" maxVelocity="1000" maxReverseVelocity="0" locked="false">
+        <pathLayout connectionType="DIRECT" layerId="0"/>
+    </path>
+    <path name="Point-0002 --- Point-0004" sourcePoint="Point-0002" destinationPoint="Point-0004" length="6000" maxVelocity="500" maxReverseVelocity="0" locked="false">
         <pathLayout connectionType="DIRECT" layerId="0"/>
     </path>
     <path name="Point-0002 --- Point-0014" sourcePoint="Point-0002" destinationPoint="Point-0014" length="4267" maxVelocity="1000" maxReverseVelocity="0" locked="false">
@@ -271,11 +277,14 @@
     </path>
     <path name="Point-0003 --- Point-0004" sourcePoint="Point-0003" destinationPoint="Point-0004" length="4336" maxVelocity="1000" maxReverseVelocity="0" locked="false">
         <pathLayout connectionType="BEZIER" layerId="0">
-            <controlPoint x="553" y="-65"/>
-            <controlPoint x="553" y="-65"/>
+            <controlPoint x="610" y="-60"/>
+            <controlPoint x="610" y="-60"/>
         </pathLayout>
     </path>
     <path name="Point-0003 --- Point-0005" sourcePoint="Point-0003" destinationPoint="Point-0005" length="5629" maxVelocity="1000" maxReverseVelocity="0" locked="false">
+        <pathLayout connectionType="DIRECT" layerId="0"/>
+    </path>
+    <path name="Point-0004 --- Point-0006" sourcePoint="Point-0004" destinationPoint="Point-0006" length="6000" maxVelocity="500" maxReverseVelocity="0" locked="false">
         <pathLayout connectionType="DIRECT" layerId="0"/>
     </path>
     <path name="Point-0004 --- Point-0008" sourcePoint="Point-0004" destinationPoint="Point-0008" length="4302" maxVelocity="1000" maxReverseVelocity="0" locked="false">
@@ -286,8 +295,8 @@
     </path>
     <path name="Point-0005 --- Point-0006" sourcePoint="Point-0005" destinationPoint="Point-0006" length="4423" maxVelocity="1000" maxReverseVelocity="0" locked="false">
         <pathLayout connectionType="BEZIER" layerId="0">
-            <controlPoint x="553" y="56"/>
-            <controlPoint x="553" y="56"/>
+            <controlPoint x="610" y="60"/>
+            <controlPoint x="610" y="60"/>
         </pathLayout>
     </path>
     <path name="Point-0005 --- Point-0007" sourcePoint="Point-0005" destinationPoint="Point-0007" length="5629" maxVelocity="1000" maxReverseVelocity="0" locked="false">
@@ -299,16 +308,13 @@
             <controlPoint x="449" y="65"/>
         </pathLayout>
     </path>
+    <path name="Point-0006 --- Point-0010" sourcePoint="Point-0006" destinationPoint="Point-0010" length="6000" maxVelocity="500" maxReverseVelocity="0" locked="false">
+        <pathLayout connectionType="DIRECT" layerId="0"/>
+    </path>
     <path name="Point-0007 --- Point-0010" sourcePoint="Point-0007" destinationPoint="Point-0010" length="4379" maxVelocity="1000" maxReverseVelocity="0" locked="false">
         <pathLayout connectionType="BEZIER" layerId="0">
-            <controlPoint x="553" y="175"/>
-            <controlPoint x="553" y="175"/>
-        </pathLayout>
-    </path>
-    <path name="Point-0007 --- Point-0012" sourcePoint="Point-0007" destinationPoint="Point-0012" length="9529" maxVelocity="1000" maxReverseVelocity="0" locked="false">
-        <pathLayout connectionType="BEZIER" layerId="0">
-            <controlPoint x="552" y="276"/>
-            <controlPoint x="552" y="276"/>
+            <controlPoint x="610" y="180"/>
+            <controlPoint x="610" y="180"/>
         </pathLayout>
     </path>
     <path name="Point-0008 --- Point-0009" sourcePoint="Point-0008" destinationPoint="Point-0009" length="5629" maxVelocity="1000" maxReverseVelocity="0" locked="false">
@@ -328,9 +334,6 @@
             <controlPoint x="429" y="289"/>
             <controlPoint x="429" y="289"/>
         </pathLayout>
-    </path>
-    <path name="Point-0012 --- Point-0013" sourcePoint="Point-0012" destinationPoint="Point-0013" length="6567" maxVelocity="1000" maxReverseVelocity="0" locked="false">
-        <pathLayout connectionType="DIRECT" layerId="0"/>
     </path>
     <path name="Point-0013 --- Point-0015" sourcePoint="Point-0013" destinationPoint="Point-0015" length="11449" maxVelocity="1000" maxReverseVelocity="0" locked="false">
         <pathLayout connectionType="BEZIER" layerId="0">
@@ -454,8 +457,8 @@
     </path>
     <path name="Point-0033 --- Point-0001" sourcePoint="Point-0033" destinationPoint="Point-0001" length="6922" maxVelocity="1000" maxReverseVelocity="0" locked="false">
         <pathLayout connectionType="BEZIER" layerId="0">
-            <controlPoint x="550" y="-287"/>
-            <controlPoint x="550" y="-287"/>
+            <controlPoint x="600" y="-300"/>
+            <controlPoint x="600" y="-300"/>
         </pathLayout>
     </path>
     <path name="Point-0034 --- Point-0014" sourcePoint="Point-0034" destinationPoint="Point-0014" length="8731" maxVelocity="1000" maxReverseVelocity="0" locked="false">
@@ -567,7 +570,7 @@
         </pathLayout>
     </path>
     <path name="Point-0057 --- Point-0058" sourcePoint="Point-0057" destinationPoint="Point-0058" length="10000" maxVelocity="1000" maxReverseVelocity="0" locked="false">
-        <peripheralOperation completionRequired="true" executionTrigger="BEFORE_MOVEMENT" locationName="Fire door 01" name="Open"/>
+        <peripheralOperation completionRequired="true" executionTrigger="AFTER_ALLOCATION" locationName="Fire door 01" name="Open"/>
         <peripheralOperation completionRequired="false" executionTrigger="AFTER_MOVEMENT" locationName="Fire door 01" name="Close"/>
         <pathLayout connectionType="DIRECT" layerId="0"/>
     </path>
@@ -670,25 +673,25 @@
         <property name="tcs:defaultLocationSymbol" value="DEFAULT"/>
         <locationLayout xPosition="-28000" yPosition="-8000" xLabelOffset="-10" yLabelOffset="-20" locationRepresentation="DEFAULT" layerId="0"/>
     </location>
-    <location name="Recharge 01" xPosition="25000" yPosition="6000" zPosition="0" locked="false" type="Recharge station">
+    <location name="Recharge 01" xPosition="27750" yPosition="6750" zPosition="0" locked="false" type="Recharge station">
         <link point="Point-0002"/>
         <property name="tcs:defaultLocationSymbol" value="DEFAULT"/>
-        <locationLayout xPosition="25000" yPosition="6000" xLabelOffset="-10" yLabelOffset="-20" locationRepresentation="DEFAULT" layerId="0"/>
+        <locationLayout xPosition="27750" yPosition="6250" xLabelOffset="-10" yLabelOffset="-20" locationRepresentation="DEFAULT" layerId="0"/>
     </location>
-    <location name="Recharge 02" xPosition="25000" yPosition="0" zPosition="0" locked="false" type="Recharge station">
+    <location name="Recharge 02" xPosition="27750" yPosition="750" zPosition="0" locked="false" type="Recharge station">
         <link point="Point-0004"/>
         <property name="tcs:defaultLocationSymbol" value="DEFAULT"/>
-        <locationLayout xPosition="25000" yPosition="0" xLabelOffset="-10" yLabelOffset="-20" locationRepresentation="DEFAULT" layerId="0"/>
+        <locationLayout xPosition="27750" yPosition="250" xLabelOffset="-10" yLabelOffset="-20" locationRepresentation="DEFAULT" layerId="0"/>
     </location>
-    <location name="Recharge 03" xPosition="25000" yPosition="-6000" zPosition="0" locked="false" type="Recharge station">
+    <location name="Recharge 03" xPosition="27750" yPosition="-5250" zPosition="0" locked="false" type="Recharge station">
         <link point="Point-0006"/>
         <property name="tcs:defaultLocationSymbol" value="DEFAULT"/>
-        <locationLayout xPosition="25000" yPosition="-6000" xLabelOffset="-10" yLabelOffset="-20" locationRepresentation="DEFAULT" layerId="0"/>
+        <locationLayout xPosition="27750" yPosition="-5750" xLabelOffset="-10" yLabelOffset="-20" locationRepresentation="DEFAULT" layerId="0"/>
     </location>
-    <location name="Recharge 04" xPosition="25000" yPosition="-12000" zPosition="0" locked="false" type="Recharge station">
+    <location name="Recharge 04" xPosition="27750" yPosition="-11250" zPosition="0" locked="false" type="Recharge station">
         <link point="Point-0010"/>
         <property name="tcs:defaultLocationSymbol" value="DEFAULT"/>
-        <locationLayout xPosition="25000" yPosition="-12000" xLabelOffset="-10" yLabelOffset="-20" locationRepresentation="DEFAULT" layerId="0"/>
+        <locationLayout xPosition="27750" yPosition="-11750" xLabelOffset="-10" yLabelOffset="-20" locationRepresentation="DEFAULT" layerId="0"/>
     </location>
     <location name="Storage 01" xPosition="-8000" yPosition="14000" zPosition="0" locked="false" type="Transfer station">
         <link point="Point-0028"/>
@@ -740,5 +743,5 @@
         <layer id="0" ordinal="0" visible="true" name="Default layer" groupId="0"/>
         <layerGroup id="0" name="Default layer group" visible="true"/>
     </visualLayout>
-    <property name="tcs:modelFileLastModified" value="2023-07-06T13:56:41Z"/>
+    <property name="tcs:modelFileLastModified" value="2024-02-07T08:32:44Z"/>
 </model>
