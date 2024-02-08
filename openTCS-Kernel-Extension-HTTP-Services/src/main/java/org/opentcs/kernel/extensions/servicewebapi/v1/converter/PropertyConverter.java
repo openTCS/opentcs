@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ public class PropertyConverter {
   public List<PropertyTO> toPropertyTOs(Map<String, String> properties) {
     return properties.entrySet().stream()
         .map(property -> new PropertyTO(property.getKey(), property.getValue()))
+        .sorted(Comparator.comparing(PropertyTO::getName))
         .collect(Collectors.toList());
   }
 

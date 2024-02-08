@@ -8,6 +8,7 @@
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -24,10 +25,10 @@ import org.opentcs.util.Colors;
 public class VehicleConverter {
 
   private final PropertyConverter pConverter;
-  
+
   @Inject
   public VehicleConverter(PropertyConverter pConverter) {
-    this.pConverter=requireNonNull(pConverter, "pConverter");
+    this.pConverter = requireNonNull(pConverter, "pConverter");
   }
 
   public List<VehicleCreationTO> toVehicleCreationTOs(List<VehicleTO> vehicles) {
@@ -63,6 +64,7 @@ public class VehicleConverter {
         .setLayout(new VehicleTO.Layout()
             .setRouteColor(Colors.encodeToHexRGB(vehicle.getLayout().getRouteColor())))
         .setProperties(pConverter.toPropertyTOs(vehicle.getProperties())))
+        .sorted(Comparator.comparing(VehicleTO::getName))
         .collect(Collectors.toList());
   }
 }

@@ -9,6 +9,7 @@ package org.opentcs.kernel.extensions.servicewebapi.v1;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -137,6 +138,7 @@ public class TransportOrderHandler {
       )
           .stream()
           .map(GetTransportOrderResponseTO::fromTransportOrder)
+          .sorted(Comparator.comparing(GetTransportOrderResponseTO::getName))
           .collect(Collectors.toList());
     });
   }
@@ -211,6 +213,7 @@ public class TransportOrderHandler {
       )
           .stream()
           .map(GetOrderSequenceResponseTO::fromOrderSequence)
+          .sorted(Comparator.comparing(GetOrderSequenceResponseTO::getName))
           .collect(Collectors.toList());
     });
   }

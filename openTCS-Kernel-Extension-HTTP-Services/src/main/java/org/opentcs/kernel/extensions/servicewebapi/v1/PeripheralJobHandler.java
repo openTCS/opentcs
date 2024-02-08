@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import java.util.Comparator;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
@@ -154,6 +155,7 @@ public class PeripheralJobHandler {
       )
           .stream()
           .map(GetPeripheralJobResponseTO::fromPeripheralJob)
+          .sorted(Comparator.comparing(GetPeripheralJobResponseTO::getName))
           .collect(Collectors.toList());
     });
   }

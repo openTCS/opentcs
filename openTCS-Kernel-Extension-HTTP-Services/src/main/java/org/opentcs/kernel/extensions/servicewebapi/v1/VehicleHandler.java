@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,7 @@ public class VehicleHandler {
       return vehicleService.fetchObjects(Vehicle.class, Filters.vehicleWithProcState(pState))
           .stream()
           .map(GetVehicleResponseTO::fromVehicle)
+          .sorted(Comparator.comparing(GetVehicleResponseTO::getName))
           .collect(Collectors.toList());
     });
   }

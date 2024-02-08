@@ -8,6 +8,7 @@
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -24,10 +25,10 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.Locatio
 public class LocationTypeConverter {
 
   private final PropertyConverter pConverter;
-  
+
   @Inject
   public LocationTypeConverter(PropertyConverter pConverter) {
-    this.pConverter=requireNonNull(pConverter, "pConverter");
+    this.pConverter = requireNonNull(pConverter, "pConverter");
   }
 
   public List<LocationTypeCreationTO> toLocationTypeCreationTOs(List<LocationTypeTO> locTypes) {
@@ -53,6 +54,7 @@ public class LocationTypeConverter {
         .setLayout(new LocationTypeTO.Layout()
             .setLocationRepresentation(
                 locationType.getLayout().getLocationRepresentation().name())))
+        .sorted(Comparator.comparing(LocationTypeTO::getName))
         .collect(Collectors.toList());
   }
 }

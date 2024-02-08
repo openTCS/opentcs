@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -44,6 +45,7 @@ public class EnvelopeConverter {
             .map(couple -> new CoupleTO(couple.getX(), couple.getY()))
             .collect(Collectors.toList()))
         )
+        .sorted(Comparator.comparing(EnvelopeTO::getKey))
         .collect(Collectors.toList());
   }
 }

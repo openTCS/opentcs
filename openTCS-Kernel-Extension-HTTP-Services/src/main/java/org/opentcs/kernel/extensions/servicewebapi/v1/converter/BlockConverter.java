@@ -8,6 +8,7 @@
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -51,6 +52,7 @@ public class BlockConverter {
         .setLayout(new BlockTO.Layout()
             .setColor(Colors.encodeToHexRGB(block.getLayout().getColor())))
         .setProperties(pConverter.toPropertyTOs(block.getProperties())))
+        .sorted(Comparator.comparing(BlockTO::getName))
         .collect(Collectors.toList());
   }
 

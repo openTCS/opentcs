@@ -8,6 +8,7 @@
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -27,13 +28,13 @@ public class PathConverter {
   private final PropertyConverter pConverter;
   private final PeripheralOperationConverter pOConverter;
   private final EnvelopeConverter envelopeConverter;
-  
+
   @Inject
-  public PathConverter(PropertyConverter pConverter,PeripheralOperationConverter pOConverter,
-                                                    EnvelopeConverter envelopeConverter) {
-    this.pConverter=requireNonNull(pConverter, "pConverter");
-    this.pOConverter=requireNonNull(pOConverter, "pOConverter");
-    this.envelopeConverter=requireNonNull(envelopeConverter,"envelopeConverter");
+  public PathConverter(PropertyConverter pConverter, PeripheralOperationConverter pOConverter,
+                       EnvelopeConverter envelopeConverter) {
+    this.pConverter = requireNonNull(pConverter, "pConverter");
+    this.pOConverter = requireNonNull(pOConverter, "pOConverter");
+    this.envelopeConverter = requireNonNull(envelopeConverter, "envelopeConverter");
   }
 
   public List<PathTO> toPathTOs(Set<Path> paths) {
@@ -53,6 +54,7 @@ public class PathConverter {
             .setLayerId(path.getLayout().getLayerId())
             .setConnectionType(path.getLayout().getConnectionType().name())
             .setControlPoints(toCoupleTOs(path.getLayout().getControlPoints()))))
+        .sorted(Comparator.comparing(PathTO::getName))
         .collect(Collectors.toList());
   }
 

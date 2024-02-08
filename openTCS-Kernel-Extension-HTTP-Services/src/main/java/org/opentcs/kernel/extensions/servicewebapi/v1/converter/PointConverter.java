@@ -8,6 +8,7 @@
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -29,11 +30,11 @@ public class PointConverter {
 
   private final PropertyConverter pConverter;
   private final EnvelopeConverter envelopeConverter;
-  
+
   @Inject
-  public PointConverter(PropertyConverter pConverter,EnvelopeConverter envelopeConverter) {
-    this.pConverter=requireNonNull(pConverter, "pConverter");
-    this.envelopeConverter=requireNonNull(envelopeConverter,"envelopeConverter");
+  public PointConverter(PropertyConverter pConverter, EnvelopeConverter envelopeConverter) {
+    this.pConverter = requireNonNull(pConverter, "pConverter");
+    this.envelopeConverter = requireNonNull(envelopeConverter, "envelopeConverter");
   }
 
   public List<PointTO> toPointTOs(Set<Point> points) {
@@ -53,6 +54,7 @@ public class PointConverter {
                                       point.getLayout().getPosition().getY()))
             .setLayerId(point.getLayout().getLayerId()))
         )
+        .sorted(Comparator.comparing(PointTO::getName))
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
