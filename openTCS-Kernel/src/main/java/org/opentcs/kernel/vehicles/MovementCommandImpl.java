@@ -8,6 +8,7 @@
 package org.opentcs.kernel.vehicles;
 
 import java.util.Map;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -173,6 +174,16 @@ public class MovementCommandImpl
     else {
       return false;
     }
+  }
+
+  @Override
+  public boolean equalsInMovement(MovementCommand command) {
+    if (command == null) {
+      return false;
+    }
+
+    return this.getStep().equalsInMovement(command.getStep())
+        && Objects.equals(this.getOperation(), command.getOperation());
   }
 
   @Override

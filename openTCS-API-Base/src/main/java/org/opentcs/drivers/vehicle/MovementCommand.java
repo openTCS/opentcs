@@ -78,7 +78,7 @@ public interface MovementCommand {
    */
   default boolean hasEmptyOperation() {
     return isWithoutOperation();
-  };
+  }
 
   /**
    * Returns the location at which the operation is to be executed. (May be
@@ -123,6 +123,18 @@ public interface MovementCommand {
    */
   @Nonnull
   String getFinalOperation();
+
+  /**
+   * Compares the given movement command to this movement command, ignoring rerouting-related
+   * properties.
+   *
+   * @param command The movement command to compare to.
+   * @return {@code true}, if the given movement command is equal to this movement command
+   * (ignoring rerouting-related properties), otherwise {@code false}.
+   */
+  default boolean equalsInMovement(MovementCommand command) {
+    return false;
+  }
 
   /**
    * Returns the properties of the order this command is part of.

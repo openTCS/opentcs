@@ -556,7 +556,7 @@ public class DefaultVehicleController
               lastCommandSent,
               futureCommands);
     // Discard commands up to lastCommandSent...
-    while (!equalsInMovement(futureCommands.peek(), lastCommandSent)) {
+    while (!lastCommandSent.equalsInMovement(futureCommands.peek())) {
       futureCommands.poll();
     }
     // ...and also discard lastCommandSent itself.
@@ -1352,7 +1352,7 @@ public class DefaultVehicleController
           .orElse(lastCommandExecuted);
 
       futureMovementCommands = futureMovementCommands.stream()
-          .dropWhile(command -> !equalsInMovement(command, lastCommandedCommand))
+          .dropWhile(command -> !command.equalsInMovement(lastCommandedCommand))
           .skip(1)
           .collect(Collectors.toCollection(ArrayList::new));
     }

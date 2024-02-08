@@ -292,6 +292,24 @@ public class Route
           && reroutingType == other.reroutingType;
     }
 
+    /**
+     * Compares the given step to this step, ignoring rerouting-related properties.
+     *
+     * @param step The step to compare to.
+     * @return {@code true}, if the given step is equal to this step (ignoring rerouting-related
+     * properties), otherwise {@code false}.
+     */
+    public boolean equalsInMovement(Step step) {
+      if (step == null) {
+        return false;
+      }
+      return Objects.equals(this.getSourcePoint(), step.getSourcePoint())
+          && Objects.equals(this.getDestinationPoint(), step.getDestinationPoint())
+          && Objects.equals(this.getPath(), step.getPath())
+          && Objects.equals(this.getVehicleOrientation(), step.getVehicleOrientation())
+          && Objects.equals(this.getRouteIndex(), step.getRouteIndex());
+    }
+
     @Override
     public int hashCode() {
       return Objects.hash(path, sourcePoint, destinationPoint, vehicleOrientation, routeIndex,

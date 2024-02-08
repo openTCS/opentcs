@@ -9,7 +9,6 @@ package org.opentcs.kernel.vehicles;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.drivers.vehicle.MovementCommand;
@@ -21,22 +20,6 @@ import org.opentcs.drivers.vehicle.MovementCommand;
 public class MovementComparisons {
 
   private MovementComparisons() {
-  }
-
-  /**
-   * Compares the two given movement commands, ignoring rerouting-related properties.
-   *
-   * @param commandA The first movement command.
-   * @param commandB The second movement command.
-   * @return {@code true}, if the given movement commands are equal (ignoring rerouting-related
-   * properties), otherwise {@code false}.
-   */
-  public static boolean equalsInMovement(MovementCommand commandA, MovementCommand commandB) {
-    requireNonNull(commandA, "commandA");
-    requireNonNull(commandB, "commandB");
-
-    return MovementComparisons.equalsInMovement(commandA.getStep(), commandB.getStep())
-        && Objects.equals(commandA.getOperation(), commandB.getOperation());
   }
 
   /**
@@ -59,19 +42,11 @@ public class MovementComparisons {
     Iterator<Step> itStepsB = stepsB.iterator();
 
     while (itStepsA.hasNext()) {
-      if (!MovementComparisons.equalsInMovement(itStepsA.next(), itStepsB.next())) {
+      if (!itStepsA.next().equalsInMovement(itStepsB.next())) {
         return false;
       }
     }
 
     return true;
-  }
-
-  private static boolean equalsInMovement(Step stepA, Step stepB) {
-    return Objects.equals(stepA.getSourcePoint(), stepB.getSourcePoint())
-        && Objects.equals(stepA.getDestinationPoint(), stepB.getDestinationPoint())
-        && Objects.equals(stepA.getPath(), stepB.getPath())
-        && Objects.equals(stepA.getVehicleOrientation(), stepB.getVehicleOrientation())
-        && Objects.equals(stepA.getRouteIndex(), stepB.getRouteIndex());
   }
 }

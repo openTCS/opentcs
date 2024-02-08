@@ -105,44 +105,6 @@ class MovementComparisonsTest {
     assertFalse(MovementComparisons.equalsInMovement(stepsA, stepsB));
   }
 
-  @Test
-  void considerIdenticalMovementCommandsEqual() {
-    MovementCommand command = new TestMovementCommand(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        "some-operation"
-    );
-
-    assertTrue(MovementComparisons.equalsInMovement(command, command));
-  }
-
-  @Test
-  void considerMovementCommandsWithDifferentStepsNotEqual() {
-    MovementCommand commandA = new TestMovementCommand(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        "some-operation"
-    );
-    MovementCommand commandB = new TestMovementCommand(
-        createStep("B", "C", Vehicle.Orientation.FORWARD, 0, true, null),
-        "some-operation"
-    );
-
-    assertFalse(MovementComparisons.equalsInMovement(commandA, commandB));
-  }
-
-  @Test
-  void considerMovementCommandsWithOperationNotEqual() {
-    MovementCommand commandA = new TestMovementCommand(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        "operation-a"
-    );
-    MovementCommand commandB = new TestMovementCommand(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        "operation-b"
-    );
-
-    assertFalse(MovementComparisons.equalsInMovement(commandA, commandB));
-  }
-
   private Step createStep(@Nonnull String srcPointName,
                           @Nonnull String destPointName,
                           @Nonnull Vehicle.Orientation orientation,
@@ -227,6 +189,11 @@ class MovementComparisonsTest {
 
     @Override
     public String getFinalOperation() {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public boolean equalsInMovement(MovementCommand command) {
       throw new UnsupportedOperationException("Not supported yet.");
     }
 

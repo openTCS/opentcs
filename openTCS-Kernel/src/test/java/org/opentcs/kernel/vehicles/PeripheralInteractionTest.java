@@ -237,6 +237,11 @@ class PeripheralInteractionTest {
     }
 
     @Override
+    public boolean equalsInMovement(MovementCommand command) {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
     public Map<String, String> getProperties() {
       throw new UnsupportedOperationException("Not supported yet.");
     }
