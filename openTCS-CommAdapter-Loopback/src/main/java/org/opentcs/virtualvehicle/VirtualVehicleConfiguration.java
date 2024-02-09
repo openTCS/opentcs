@@ -44,6 +44,13 @@ public interface VirtualVehicleConfiguration {
 
   @ConfigurationEntry(
       type = "Double",
+      description = "The rate at which the vehicle recharges in percent per second.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
+      orderKey = "1_attributes_3")
+  double rechargePercentagePerSecond();
+
+  @ConfigurationEntry(
+      type = "Double",
       description = {"The simulation time factor.",
                      "1.0 is real time, greater values speed up simulation."},
       changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,

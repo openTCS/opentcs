@@ -63,13 +63,9 @@ public class LoopbackCommunicationAdapter
    */
   private static final String UNLOAD_OPERATION_CONFLICT = "cannotUnloadWhenNotLoaded";
   /**
-   * The time by which to advance the velocity controller per step (in ms).
+   * The time (in ms) of a single simulation step.
    */
-  private static final int ADVANCE_TIME = 100;
-  /**
-   * The delay to use for scheduling the various simulation tasks (in ms).
-   */
-  private static final int SIMULATION_TASKS_DELAY = 100;
+  private static final int SIMULATION_PERIOD = 100;
   /**
    * This instance's configuration.
    */
@@ -90,10 +86,6 @@ public class LoopbackCommunicationAdapter
    * Whether the loopback adapter is initialized or not.
    */
   private boolean initialized;
-  /**
-   * The amount of time that passed during the simulation of an operation.
-   */
-  private int operationSimulationTimePassed;
 
   /**
    * Creates a new instance.
@@ -210,6 +202,8 @@ public class LoopbackCommunicationAdapter
     if (!getProcessModel().isSingleStepModeEnabled()
         && !isSimulationRunning) {
       isSimulationRunning = true;
+      // The command is added to the sent queue after this method returns. Therefore
+      // we have to explicitly start the simulation like this.
       if (getSentCommands().isEmpty()) {
         ((ExecutorService) getExecutor()).submit(() -> startVehicleSimulation(cmd));
       }
@@ -331,13 +325,13 @@ public class LoopbackCommunicationAdapter
     LOG.debug("Starting vehicle simulation for command: {}", command);
     Step step = command.getStep();
     getProcessModel().setVehicleState(Vehicle.State.EXECUTING);
-    operationSimulationTimePassed = 0;
 
     if (step.getPath() == null) {
       LOG.debug("Starting operation simulation...");
-      ((ScheduledExecutorService) getExecutor()).schedule(() -> operationSimulation(command),
-                                                          SIMULATION_TASKS_DELAY,
-                                                          TimeUnit.MILLISECONDS);
+      ((ScheduledExecutorService) getExecutor()).schedule(
+          () -> operationSimulation(command, 0),
+          SIMULATION_PERIOD,
+          TimeUnit.MILLISECONDS);
     }
     else {
       getProcessModel().getVelocityController().addWayEntry(
@@ -349,7 +343,7 @@ public class LoopbackCommunicationAdapter
 
       LOG.debug("Starting movement simulation...");
       ((ScheduledExecutorService) getExecutor()).schedule(() -> movementSimulation(command),
-                                                          SIMULATION_TASKS_DELAY,
+                                                          SIMULATION_PERIOD,
                                                           TimeUnit.MILLISECONDS);
     }
   }
@@ -360,6 +354,11 @@ public class LoopbackCommunicationAdapter
         : step.getPath().getMaxVelocity();
   }
 
+  /**
+   * Simulate the movement part of a MovementCommand.
+   *
+   * @param command The command to simulate.
+   */
   private void movementSimulation(MovementCommand command) {
     if (!getProcessModel().getVelocityController().hasWayEntries()) {
       return;
@@ -371,7 +370,7 @@ public class LoopbackCommunicationAdapter
     //if we are still on the same way entry then reschedule to do it again
     if (prevWayEntry == currentWayEntry) {
       ((ScheduledExecutorService) getExecutor()).schedule(() -> movementSimulation(command),
-                                                          SIMULATION_TASKS_DELAY,
+                                                          SIMULATION_PERIOD,
                                                           TimeUnit.MILLISECONDS);
     }
     else {
@@ -381,44 +380,113 @@ public class LoopbackCommunicationAdapter
       LOG.debug("Movement simulation finished.");
       if (!command.hasEmptyOperation()) {
         LOG.debug("Starting operation simulation...");
-        ((ScheduledExecutorService) getExecutor()).schedule(() -> operationSimulation(command),
-                                                            SIMULATION_TASKS_DELAY,
-                                                            TimeUnit.MILLISECONDS);
+        ((ScheduledExecutorService) getExecutor()).schedule(
+            () -> operationSimulation(command, 0),
+            SIMULATION_PERIOD,
+            TimeUnit.MILLISECONDS);
       }
       else {
-        finishVehicleSimulation(command);
+        finishMovementCommand(command);
+        simulateNextCommand();
       }
     }
   }
 
-  private void operationSimulation(MovementCommand command) {
-    operationSimulationTimePassed += getSimulationTimeStep();
-
-    if (operationSimulationTimePassed < getProcessModel().getOperatingTime()) {
+  /**
+   * Simulate the operation part of a movement command.
+   *
+   * @param command The command to simulate.
+   * @param timePassed The amount of time passed since starting the simulation.
+   */
+  private void operationSimulation(MovementCommand command,
+                                   int timePassed) {
+    if (timePassed < getProcessModel().getOperatingTime()) {
       getProcessModel().getVelocityController().advanceTime(getSimulationTimeStep());
-      ((ScheduledExecutorService) getExecutor()).schedule(() -> operationSimulation(command),
-                                                          SIMULATION_TASKS_DELAY,
-                                                          TimeUnit.MILLISECONDS);
+      ((ScheduledExecutorService) getExecutor()).schedule(
+          () -> operationSimulation(command, timePassed + getSimulationTimeStep()),
+          SIMULATION_PERIOD,
+          TimeUnit.MILLISECONDS);
     }
     else {
       LOG.debug("Operation simulation finished.");
+      finishMovementCommand(command);
       String operation = command.getOperation();
       if (operation.equals(getProcessModel().getLoadOperation())) {
         // Update load handling devices as defined by this operation
         getProcessModel().setVehicleLoadHandlingDevices(
             Arrays.asList(new LoadHandlingDevice(LHD_NAME, true))
         );
+        simulateNextCommand();
       }
       else if (operation.equals(getProcessModel().getUnloadOperation())) {
         getProcessModel().setVehicleLoadHandlingDevices(
             Arrays.asList(new LoadHandlingDevice(LHD_NAME, false))
         );
+        simulateNextCommand();
       }
-      finishVehicleSimulation(command);
+      else if (operation.equals(this.getRechargeOperation())) {
+        LOG.debug("Starting recharge simulation...");
+        finishMovementCommand(command);
+        getProcessModel().setVehicleState(Vehicle.State.CHARGING);
+        ((ScheduledExecutorService) getExecutor()).schedule(
+            () -> chargingSimulation(
+                getProcessModel().getVehiclePosition(),
+                getProcessModel().getVehicleEnergyLevel()
+            ),
+            SIMULATION_PERIOD,
+            TimeUnit.MILLISECONDS);
+      }
+      else {
+        simulateNextCommand();
+      }
     }
   }
 
-  private void finishVehicleSimulation(MovementCommand command) {
+  /**
+   * Simulate recharging the vehicle.
+   *
+   * @param rechargePosition The vehicle position where the recharge simulation was started.
+   * @param rechargePercentage The recharge percentage of the vehicle while it is charging.
+   */
+  private void chargingSimulation(String rechargePosition,
+                                  float rechargePercentage) {
+    if (!getSentCommands().isEmpty()) {
+      LOG.debug("Aborting recharge operation, vehicle has an order...");
+      simulateNextCommand();
+      return;
+    }
+
+    if (getProcessModel().getVehicleState() != Vehicle.State.CHARGING) {
+      LOG.debug("Aborting recharge operation, vehicle no longer charging state...");
+      simulateNextCommand();
+      return;
+    }
+
+    if (!Objects.equals(getProcessModel().getVehiclePosition(), rechargePosition)) {
+      LOG.debug("Aborting recharge operation, vehicle position changed...");
+      simulateNextCommand();
+      return;
+    }
+    if (nextChargePercentage(rechargePercentage) < 100.0) {
+      getProcessModel().setVehicleEnergyLevel((int) rechargePercentage);
+      ((ScheduledExecutorService) getExecutor()).schedule(
+          () -> chargingSimulation(rechargePosition, nextChargePercentage(rechargePercentage)),
+          SIMULATION_PERIOD,
+          TimeUnit.MILLISECONDS);
+    }
+    else {
+      LOG.debug("Finishing recharge operation, vehicle at 100%...");
+      getProcessModel().setVehicleEnergyLevel(100);
+      simulateNextCommand();
+    }
+  }
+
+  private float nextChargePercentage(float basePercentage) {
+    return basePercentage
+        + (float) (configuration.rechargePercentagePerSecond() / 1000.0) * SIMULATION_PERIOD;
+  }
+
+  private void finishMovementCommand(MovementCommand command) {
     //Set the vehicle state to idle
     if (getSentCommands().size() <= 1 && getUnsentCommands().isEmpty()) {
       getProcessModel().setVehicleState(Vehicle.State.IDLE);
@@ -433,9 +501,12 @@ public class LoopbackCommunicationAdapter
                command,
                getSentCommands().peek());
     }
+  }
 
+  void simulateNextCommand() {
     if (getSentCommands().isEmpty() || getProcessModel().isSingleStepModeEnabled()) {
       LOG.debug("Vehicle simulation is done.");
+      getProcessModel().setVehicleState(Vehicle.State.IDLE);
       isSimulationRunning = false;
     }
     else {
@@ -446,7 +517,7 @@ public class LoopbackCommunicationAdapter
   }
 
   private int getSimulationTimeStep() {
-    return (int) (ADVANCE_TIME * configuration.simulationTimeFactor());
+    return (int) (SIMULATION_PERIOD * configuration.simulationTimeFactor());
   }
 
   /**

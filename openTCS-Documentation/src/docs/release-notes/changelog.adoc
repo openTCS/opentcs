@@ -16,6 +16,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * New features and enhancements:
 ** Improve handling of failed peripheral jobs (where the completion required flag is set to `true`) associated with a transport order and withdraw the respective transport order in such cases.
+** Properly implement simulation of a recharging operation in the virtual vehicle driver.
 ** Add an alternative implementation for reading application configuration from properties files using the gestalt library.
    This implementation is intended to replace the one using the cfg4j library and is now used by default by the openTCS Kernel, Kernel Control Center, Model Editor and Operations Desk applications.
    (Note that, until openTCS 6, the cgf4j implementation can still be used by setting a system property.
