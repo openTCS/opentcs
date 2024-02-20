@@ -10,7 +10,6 @@ package org.opentcs.configuration.gestalt;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.ServiceLoader;
@@ -19,11 +18,10 @@ import org.github.gestalt.config.builder.GestaltBuilder;
 import org.github.gestalt.config.decoder.ProxyDecoderMode;
 import org.github.gestalt.config.entity.GestaltConfig;
 import org.github.gestalt.config.exceptions.GestaltException;
-import org.github.gestalt.config.reload.ConfigReloadStrategy;
 import org.github.gestalt.config.reload.TimedConfigReloadStrategy;
-import org.github.gestalt.config.source.ConfigSource;
 import org.github.gestalt.config.source.ConfigSourcePackage;
 import org.github.gestalt.config.source.FileConfigSourceBuilder;
+import org.github.gestalt.config.source.ConfigSource;
 import org.opentcs.configuration.ConfigurationBindingProvider;
 import org.opentcs.configuration.ConfigurationException;
 import org.opentcs.configuration.gestalt.decoders.ClassPathDecoder;
@@ -92,15 +90,15 @@ public class GestaltConfigurationBindingProvider
   private Gestalt buildGestalt() {
     GestaltConfig gestaltConfig = new GestaltConfig();
     gestaltConfig.setTreatMissingValuesAsErrors(true);
+    gestaltConfig.setProxyDecoderMode(ProxyDecoderMode.PASSTHROUGH);
 
     try {
       Gestalt provider = new GestaltBuilder()
           .setGestaltConfig(gestaltConfig)
-          .addSources(buildSources())
-          .setProxyDecoderMode(ProxyDecoderMode.PASSTHROUGH)
           .useCacheDecorator(true)
           .addDefaultDecoders()
           .addDecoder(new ClassPathDecoder())
+          .addSources(buildSources())
           .build();
       provider.loadConfigs();
 
@@ -115,7 +113,7 @@ public class GestaltConfigurationBindingProvider
 
   private List<ConfigSourcePackage> buildSources()
       throws GestaltException {
-    ConfigReloadStrategy timedReload = new TimedConfigReloadStrategy(reloadInterval());
+    Duration reloadInterval = reloadInterval();
     List<ConfigSourcePackage> sources = new ArrayList<>();
 
     // A file for baseline defaults MUST exist in the distribution.
@@ -127,7 +125,7 @@ public class GestaltConfigurationBindingProvider
     sources.add(
         FileConfigSourceBuilder.builder()
             .setPath(defaultsPath)
-            .addConfigReloadStrategy(timedReload)
+            .addConfigReloadStrategy(new TimedConfigReloadStrategy(reloadInterval))
             .build()
     );
 
@@ -139,7 +137,7 @@ public class GestaltConfigurationBindingProvider
         sources.add(
             FileConfigSourceBuilder.builder()
                 .setPath(supplementaryPath)
-                .addConfigReloadStrategy(timedReload)
+                .addConfigReloadStrategy(new TimedConfigReloadStrategy(reloadInterval))
                 .build()
         );
       }
@@ -154,10 +152,9 @@ public class GestaltConfigurationBindingProvider
                source.getClass());
       sources.add(new ConfigSourcePackage(
           source,
-          Arrays.asList(timedReload)
+          List.of(new TimedConfigReloadStrategy(reloadInterval))
       ));
     }
-
     return sources;
   }
 
