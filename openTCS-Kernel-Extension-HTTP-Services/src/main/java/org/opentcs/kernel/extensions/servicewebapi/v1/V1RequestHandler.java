@@ -163,6 +163,8 @@ public class V1RequestHandler
                 this::handlePutPlantModel);
     service.get("/plantModel",
                 this::handleGetPlantModel);
+    service.post("/plantModel/topologyUpdateRequest",
+                 this::handlePostUpdateTopology);
     service.put("/paths/:NAME/locked",
                 this::handlePutPathLocked);
     service.put("/locations/:NAME/locked",
@@ -374,6 +376,13 @@ public class V1RequestHandler
   private Object handleGetPlantModel(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(plantModelHandler.getPlantModel());
+  }
+
+  private Object handlePostUpdateTopology(Request request, Response response)
+      throws KernelRuntimeException {
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    plantModelHandler.requestTopologyUpdate();
+    return "";
   }
 
   private Object handlePutPathLocked(Request request, Response response) {

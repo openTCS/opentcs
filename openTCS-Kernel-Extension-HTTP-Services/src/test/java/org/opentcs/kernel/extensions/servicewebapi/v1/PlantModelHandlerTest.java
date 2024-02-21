@@ -21,6 +21,7 @@ import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 import static org.mockito.Mockito.mock;
 import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
@@ -58,6 +59,7 @@ class PlantModelHandlerTest {
   private PlantModelService orderService;
   private KernelExecutorWrapper executorWrapper;
   private PlantModelHandler handler;
+  private RouterService routerService;
 
   @BeforeEach
   void setUp() {
@@ -65,6 +67,7 @@ class PlantModelHandlerTest {
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
     EnvelopeConverter envelopeConverter = new EnvelopeConverter();
     PropertyConverter propertyConverter = new PropertyConverter();
+    routerService = mock();
 
     handler = new PlantModelHandler(orderService,
                                     executorWrapper,
@@ -77,7 +80,8 @@ class PlantModelHandlerTest {
                                     new BlockConverter(propertyConverter),
                                     new VehicleConverter(propertyConverter),
                                     new VisualLayoutConverter(propertyConverter),
-                                    propertyConverter);
+                                    propertyConverter,
+                                    routerService);
   }
 
   @Test
@@ -226,4 +230,9 @@ class PlantModelHandlerTest {
     assertThat(to.getProperties()).hasSize(1);
   }
 
+  @Test
+  void requestTopologyUpdate() {
+    handler.requestTopologyUpdate();
+    then(routerService).should().updateRoutingTopology();
+  }
 }

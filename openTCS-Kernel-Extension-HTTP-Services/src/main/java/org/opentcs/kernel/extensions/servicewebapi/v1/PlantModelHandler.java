@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.PlantModelService;
+import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.PlantModel;
 import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
@@ -46,6 +47,7 @@ public class PlantModelHandler {
   private final VehicleConverter vehicleConverter;
   private final VisualLayoutConverter visualLayoutConverter;
   private final PropertyConverter propertyConverter;
+  private final RouterService routerService;
 
   /**
    * Creates a new instance.
@@ -60,6 +62,7 @@ public class PlantModelHandler {
    * @param vehicleConverter Converts vehicle instances.
    * @param visualLayoutConverter Converts visual layout instances.
    * @param propertyConverter Converts property instances.
+   * @param routerService Provides methods concerning the router.
    */
   @Inject
   public PlantModelHandler(PlantModelService plantModelService,
@@ -71,7 +74,8 @@ public class PlantModelHandler {
                            BlockConverter blockConverter,
                            VehicleConverter vehicleConverter,
                            VisualLayoutConverter visualLayoutConverter,
-                           PropertyConverter propertyConverter) {
+                           PropertyConverter propertyConverter,
+                           RouterService routerService) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
     this.pointConverter = requireNonNull(pointConverter, "pointConverter");
@@ -82,6 +86,7 @@ public class PlantModelHandler {
     this.vehicleConverter = requireNonNull(vehicleConverter, "vehicleConverter");
     this.visualLayoutConverter = requireNonNull(visualLayoutConverter, "visualLayoutConverter");
     this.propertyConverter = requireNonNull(propertyConverter, "propertyConverter");
+    this.routerService = requireNonNull(routerService, "routerService");
   }
 
   public void putPlantModel(PlantModelTO putPlantModel)
@@ -117,5 +122,9 @@ public class PlantModelHandler {
         .setVehicles(vehicleConverter.toVehicleTOs(plantModel.getVehicles()))
         .setVisualLayout(visualLayoutConverter.toVisualLayoutTO(plantModel.getVisualLayouts()))
         .setProperties(propertyConverter.toPropertyTOs(plantModel.getProperties()));
+  }
+
+  public void requestTopologyUpdate() {
+    executorWrapper.callAndWait(() -> routerService.updateRoutingTopology());
   }
 }
