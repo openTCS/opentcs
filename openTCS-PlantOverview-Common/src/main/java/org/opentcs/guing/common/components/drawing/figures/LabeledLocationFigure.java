@@ -184,7 +184,7 @@ public class LabeledLocationFigure
       }
       int newX = (int) (zoomPoint.getX() * origin.getScaleX());
 
-      if (newX != oldX) {
+      if (newX != oldX || newX == 0) {
         lpx.setText(String.format("%d", newX));
         lpx.markChanged();
       }
@@ -198,7 +198,7 @@ public class LabeledLocationFigure
 
       int newY = (int) (-zoomPoint.getY() * origin.getScaleY());  // Vorzeichen!
 
-      if (newY != oldY) {
+      if (newY != oldY || newY == 0) {
         lpy.setText(String.format("%d", newY));
         lpy.markChanged();
       }
