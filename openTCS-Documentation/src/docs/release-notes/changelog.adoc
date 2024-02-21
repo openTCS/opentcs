@@ -36,7 +36,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update AssertJ to 3.25.3.
 ** Update Jackson to 2.16.1.
 ** Update JAXB Runtime to 2.3.9.
-** Update Gradle wrapper to 8.5.
+** Update Gradle wrapper to 8.6.
 * Other changes:
 ** Move/Rename a couple of kernel configuration entries:
 *** `kernelapp.rerouteOnRoutingTopologyUpdate` replaces `defaultdispatcher.rerouteOnTopologyChanges`.
