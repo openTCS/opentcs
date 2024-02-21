@@ -16,14 +16,14 @@ dependencies {
   compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
   testCompileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.1'
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.10.1'
-  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.1'
-  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.10.1'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.2'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.10.2'
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.2'
+  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.10.2'
 
   testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.10.0'
-  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.2'
+  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.3'
   testImplementation group: 'com.approvaltests', name: 'approvaltests', version: '22.3.3'
 
   testRuntimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.36'

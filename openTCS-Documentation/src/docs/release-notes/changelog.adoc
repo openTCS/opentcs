@@ -29,10 +29,11 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Keep track of a vehicle's drive order route progress in the corresponding transport order the vehicle is processing.
    Deprecate `Vehicle.getRouteProgressIndex()` because tracking this in the transport order is more consistent.
    (Progress in the drive orders list is also tracked in the transport order.)
-** Update JUnit to 5.10.1.
+** Update JUnit to 5.10.2.
+** Update JUnit platform launcher to 1.10.2.
 ** Update ApprovalTests to 22.3.3.
 ** Update Mockito to 5.10.0.
-** Update AssertJ to 3.25.2.
+** Update AssertJ to 3.25.3.
 ** Update Jackson to 2.16.1.
 ** Update JAXB Runtime to 2.3.9.
 ** Update Gradle wrapper to 8.5.
