@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
 import org.opentcs.data.ObjectHistory;
+import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.OrderSequenceHistoryCodes;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
