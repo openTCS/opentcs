@@ -78,6 +78,11 @@ public class DummyScheduler
   }
 
   @Override
+  public boolean mayAllocateNow(Client resourceUser, Set<TCSResource<?>> resources) {
+    return true;
+  }
+
+  @Override
   public void allocateNow(Client resourceUser, Set<TCSResource<?>> resources) {
   }
 

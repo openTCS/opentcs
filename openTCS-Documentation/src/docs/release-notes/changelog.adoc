@@ -21,6 +21,8 @@ This change log lists the most relevant changes for past releases in reverse chr
    This implementation is intended to replace the one using the cfg4j library and is now used by default by the openTCS Kernel, Kernel Control Center, Model Editor and Operations Desk applications.
    (Note that, until openTCS 6, the cgf4j implementation can still be used by setting a system property.
    For more details, refer to the developer's guide.)
+** Improve resource management on vehicle movement:
+   When a vehicle moves to a new position without having been ordered to move anywhere, allocating and freeing resources is now properly handled.
 ** Update web API specification and implementation to version 1.4.0:
 *** Add an endpoint for triggering updates of the routing topology.
 * Bugs fixed:

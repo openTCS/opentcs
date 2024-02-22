@@ -1185,27 +1185,41 @@ public class DefaultVehicleController
     return nextCommand;
   }
 
-  private void updatePositionWithoutOrder(Point point) {
-    // Allocate only the resources required for occupying the new position.
-    freeAllResources();
-    // If the vehicle is at an unknown position, it's impossible to say
-    // which resources it needs, so don't allocate any in that case.
-    if (point != null) {
+  private void updatePositionWithoutOrder(Point point)
+      throws IllegalArgumentException {
+    if (point == null) {
+      freeAllResources();
+    }
+    else {
+      Set<TCSResource<?>> requiredResource = Set.of(point);
+
+      // Before giving up the resources allocated, ensure that we will be able to allocate the
+      // newly required resources.
+      checkArgument(mayAllocateNow(requiredResource),
+                    "%s: Current position may not be allocated now: %s",
+                    vehicle.getName(),
+                    point.getName());
+      freeAllResources();
       try {
-        Set<TCSResource<?>> requiredResource = new HashSet<>();
-        requiredResource.add(point);
         scheduler.allocateNow(this, requiredResource);
         allocatedResources.add(requiredResource);
       }
       catch (ResourceAllocationException exc) {
-        LOG.warn("{}: Could not allocate required resources immediately, ignored.",
-                 vehicle.getName(),
-                 exc);
+        // May never happen. After a successful call to `mayAllocateNow` the allocation should
+        // always succeed.
+        LOG.error("{}: Could not allocate now although permission previously granted: {}",
+                  vehicle.getName(),
+                  point.getName(),
+                  exc);
+        throw new IllegalArgumentException(
+            vehicle.getName()
+            + ": Could not allocate now although permission previously granted: "
+            + point.getName()
+        );
       }
+      vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
+                                                     toListOfResourceSets(allocatedResources));
     }
-
-    vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
-                                                   toListOfResourceSets(allocatedResources));
 
     updatePosition(toReference(point), null);
   }

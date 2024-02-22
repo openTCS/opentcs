@@ -182,7 +182,10 @@ public class ReservationPool {
       // Check if the resource is available.
       ReservationEntry entry = getReservationEntry(curResource);
       if (!entry.isFree() && !entry.isAllocatedBy(client)) {
-        LOG.debug("{}: Resource unavailable: {}", client.getId(), entry.getResource());
+        LOG.debug("{}: Resource {} unavailable, reserved by {}",
+                  client.getId(),
+                  curResource.getName(),
+                  entry.getClient().getId());
         return false;
       }
     }

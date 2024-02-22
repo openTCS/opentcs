@@ -197,24 +197,12 @@ public class DefaultScheduler
   }
 
   @Override
-  public boolean mayAllocateNow(Client client,
-                                Set<TCSResource<?>> resources) {
+  public boolean mayAllocateNow(Client client, Set<TCSResource<?>> resources) {
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
     synchronized (globalSyncObject) {
-      for (TCSResource<?> curResource : resources) {
-        ReservationEntry entry = reservationPool.getReservationEntry(curResource);
-        if (!entry.isFree() && !entry.isAllocatedBy(client)) {
-          LOG.warn("{}: Resource {} unavailable, reserved by {}",
-                   client.getId(),
-                   curResource.getName(),
-                   entry.getClient().getId());
-          return false;
-        }
-      }
-
-      return true;
+      return reservationPool.resourcesAvailableForUser(resources, client);
     }
   }
 
@@ -225,25 +213,20 @@ public class DefaultScheduler
     requireNonNull(resources, "resources");
 
     synchronized (globalSyncObject) {
-      // Check if all resources are available.
-      final Set<TCSResource<?>> availableResources = new HashSet<>();
-      for (TCSResource<?> curResource : resources) {
-        ReservationEntry entry = reservationPool.getReservationEntry(curResource);
-        if (!entry.isFree() && !entry.isAllocatedBy(client)) {
-          LOG.warn("{}: Resource {} unavailable, reserved by {}",
-                   client.getId(),
-                   curResource.getName(),
-                   entry.getClient().getId());
-          // XXX DO something about it?!
-        }
-        else {
-          availableResources.add(curResource);
+      if (mayAllocateNow(client, resources)) {
+        LOG.debug("{}: Allocating immediately: {}", client.getId(), resources);
+        for (TCSResource<?> curResource : resources) {
+          reservationPool.getReservationEntry(curResource).allocate(client);
         }
       }
-      // Allocate all requested resources that are available.
-      LOG.debug("{}: Allocating immediately: {}", client.getId(), availableResources);
-      for (TCSResource<?> curResource : availableResources) {
-        reservationPool.getReservationEntry(curResource).allocate(client);
+      else {
+        throw new ResourceAllocationException(
+            String.format(
+                "%s: Requested resources not available for allocation: %s",
+                client.getId(),
+                resources
+            )
+        );
       }
     }
   }
@@ -418,7 +401,7 @@ public class DefaultScheduler
     public TCSObjectReference<Vehicle> getRelatedVehicle() {
       return null;
     }
-    
+
     @Override
     public boolean allocationSuccessful(Set<TCSResource<?>> resources) {
       return false;
