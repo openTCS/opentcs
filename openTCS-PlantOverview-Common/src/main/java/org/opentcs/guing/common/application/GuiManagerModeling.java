@@ -7,6 +7,7 @@
  */
 package org.opentcs.guing.common.application;
 
+import javax.annotation.Nonnull;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.LocationTypeModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
@@ -37,4 +38,15 @@ public interface GuiManagerModeling
    * @return The created block model.
    */
   BlockModel createBlockModel();
+
+  /**
+   * Removes a block model.
+   *
+   * <p>
+   * This method is primarily provided for use in plugin panels.
+   * </p>
+   *
+   * @param blockModel The block model to be removed.
+   */
+  void removeBlockModel(@Nonnull BlockModel blockModel);
 }

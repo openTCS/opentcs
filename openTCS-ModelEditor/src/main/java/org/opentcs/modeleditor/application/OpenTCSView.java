@@ -1059,6 +1059,13 @@ public class OpenTCSView
     return blockModel;
   }
 
+  @Override
+  public void removeBlockModel(BlockModel blockModel) {
+    requireNonNull(blockModel, "blockModel");
+
+    removeModelComponent(fModelManager.getModel().getFolder(blockModel), blockModel);
+  }
+
   private OpenTCSDrawingView getActiveDrawingView() {
     return fDrawingEditor.getActiveView();
   }
