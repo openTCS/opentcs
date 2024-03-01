@@ -14,8 +14,6 @@ import javax.annotation.Nonnull;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
 import org.opentcs.components.kernel.routing.Edge;
-import org.opentcs.components.kernel.services.TCSObjectService;
-import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.routing.PointRouter;
@@ -29,29 +27,16 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractPointRouterFactory
     implements PointRouterFactory {
 
-  /**
-   * This class's Logger.
-   */
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPointRouterFactory.class);
-  /**
-   * The object service providing the model data.
-   */
-  private final TCSObjectService objectService;
-  /**
-   * Maps the plant model to a graph.
-   */
-  private final ModelGraphMapper mapper;
+  private final GraphProvider graphProvider;
 
   /**
    * Creates a new instance.
    *
-   * @param objectService The object service providing model data.
-   * @param mapper Maps the plant model to a graph.
+   * @param graphProvider Provides routing graphs for vehicles.
    */
-  public AbstractPointRouterFactory(@Nonnull TCSObjectService objectService,
-                                    @Nonnull ModelGraphMapper mapper) {
-    this.objectService = requireNonNull(objectService, "objectService");
-    this.mapper = requireNonNull(mapper, "mapper");
+  public AbstractPointRouterFactory(@Nonnull GraphProvider graphProvider) {
+    this.graphProvider = requireNonNull(graphProvider, "graphProvider");
   }
 
   @Override
@@ -60,12 +45,13 @@ public abstract class AbstractPointRouterFactory
 
     long timeStampBefore = System.currentTimeMillis();
 
-    Set<Point> points = objectService.fetchObjects(Point.class);
-    Graph<String, Edge> graph = mapper.translateModel(points,
-                                                           objectService.fetchObjects(Path.class),
-                                                           vehicle);
+    GraphProvider.GraphResult graphResult = graphProvider.getGraphResult(vehicle);
+    Set<Point> points = graphResult.getPointBase();
 
-    PointRouter router = new ShortestPathPointRouter(createShortestPathAlgorithm(graph), points);
+    PointRouter router = new ShortestPathPointRouter(
+        createShortestPathAlgorithm(graphResult.getGraph()),
+        points
+    );
     // Make a single request for a route from one point to a different one to make sure the
     // point router is primed. (Some implementations are initialized lazily.)
     if (points.size() >= 2) {

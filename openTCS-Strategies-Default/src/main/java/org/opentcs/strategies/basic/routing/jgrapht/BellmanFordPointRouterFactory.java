@@ -13,7 +13,6 @@ import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.BellmanFordShortestPath;
 import org.opentcs.components.kernel.routing.Edge;
-import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.strategies.basic.routing.PointRouter;
 
 /**
@@ -25,13 +24,11 @@ public class BellmanFordPointRouterFactory
   /**
    * Creates a new instance.
    *
-   * @param objectService The object service providing model data.
-   * @param mapper Maps the plant model to a graph.
+   * @param graphProvider Provides routing graphs for vehicles.
    */
   @Inject
-  public BellmanFordPointRouterFactory(@Nonnull TCSObjectService objectService,
-                                       @Nonnull ModelGraphMapper mapper) {
-    super(objectService, mapper);
+  public BellmanFordPointRouterFactory(@Nonnull GraphProvider graphProvider) {
+    super(graphProvider);
   }
 
   @Override

@@ -28,6 +28,6 @@ public interface ModelGraphMapper {
    * @return A weighted graph representing the topology to be used for the given vehicle.
    */
   Graph<String, Edge> translateModel(Collection<Point> points,
-                                          Collection<Path> paths,
-                                          Vehicle vehicle);
+                                     Collection<Path> paths,
+                                     Vehicle vehicle);
 }

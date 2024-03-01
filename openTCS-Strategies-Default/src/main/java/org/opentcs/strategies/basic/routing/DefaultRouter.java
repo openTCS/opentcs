@@ -32,6 +32,7 @@ import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
 import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
+import org.opentcs.strategies.basic.routing.jgrapht.GraphProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,10 @@ public class DefaultRouter
    */
   private final GroupMapper routingGroupMapper;
   /**
+   * Provides routing graphs for vehicles.
+   */
+  private final GraphProvider graphProvider;
+  /**
    * The routes selected for each vehicle.
    */
   private final Map<Vehicle, List<DriveOrder>> routesByVehicle = new ConcurrentHashMap<>();
@@ -81,16 +86,19 @@ public class DefaultRouter
    * @param pointRouterFactory A factory for point routers.
    * @param routingGroupMapper Used to map vehicles to their routing groups.
    * @param configuration This class's configuration.
+   * @param graphProvider Provides routing graphs for vehicles.
    */
   @Inject
   public DefaultRouter(TCSObjectService objectService,
                        PointRouterFactory pointRouterFactory,
                        GroupMapper routingGroupMapper,
-                       DefaultRouterConfiguration configuration) {
+                       DefaultRouterConfiguration configuration,
+                       GraphProvider graphProvider) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.pointRouterFactory = requireNonNull(pointRouterFactory, "pointRouterFactory");
     this.routingGroupMapper = requireNonNull(routingGroupMapper, "routingGroupMapper");
     this.configuration = requireNonNull(configuration, "configuration");
+    this.graphProvider = requireNonNull(graphProvider, "graphProvider");
   }
 
   @Override
@@ -120,6 +128,7 @@ public class DefaultRouter
     synchronized (this) {
       routesByVehicle.clear();
       pointRoutersByVehicleGroup.clear();
+      graphProvider.invalidate();
       initialized = false;
     }
   }
@@ -134,6 +143,7 @@ public class DefaultRouter
   public void updateRoutingTopology() {
     synchronized (this) {
       pointRoutersByVehicleGroup.clear();
+      graphProvider.invalidate();
     }
   }
 

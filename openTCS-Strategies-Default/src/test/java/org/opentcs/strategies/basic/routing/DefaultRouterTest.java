@@ -26,6 +26,7 @@ import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.routing.jgrapht.GraphProvider;
 
 /**
  * Test cases for the {@link DefaultRouter}.
@@ -62,6 +63,8 @@ class DefaultRouterTest {
    */
   private DefaultRouterConfiguration configuration;
 
+  private GraphProvider graphProvider;
+
   @BeforeEach
   void setUp() {
     objectService = mock(TCSObjectService.class);
@@ -74,6 +77,7 @@ class DefaultRouterTest {
     routingGroupMapper = new DefaultRoutingGroupMapper();
     configuration = mock(DefaultRouterConfiguration.class);
     when(configuration.routeToCurrentPosition()).thenReturn(false);
+    graphProvider = mock(GraphProvider.class);
     router = spy(createRouter());
   }
 
@@ -157,7 +161,11 @@ class DefaultRouterTest {
   private Router createRouter() {
     when(builder.createPointRouter(any())).thenReturn(mock(PointRouter.class));
 
-    return new DefaultRouter(objectService, builder, routingGroupMapper, configuration);
+    return new DefaultRouter(objectService,
+                             builder,
+                             routingGroupMapper,
+                             configuration,
+                             graphProvider);
   }
 
   /**

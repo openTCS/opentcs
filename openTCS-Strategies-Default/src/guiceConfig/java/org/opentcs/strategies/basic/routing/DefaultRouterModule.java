@@ -7,6 +7,7 @@
  */
 package org.opentcs.strategies.basic.routing;
 
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import javax.inject.Singleton;
 import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
@@ -17,10 +18,10 @@ import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorHops;
 import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorTravelTime;
 import org.opentcs.strategies.basic.routing.edgeevaluator.ExplicitPropertiesConfiguration;
 import org.opentcs.strategies.basic.routing.jgrapht.BellmanFordPointRouterFactory;
-import org.opentcs.strategies.basic.routing.jgrapht.DefaultModelGraphMapper;
 import org.opentcs.strategies.basic.routing.jgrapht.DijkstraPointRouterFactory;
 import org.opentcs.strategies.basic.routing.jgrapht.FloydWarshallPointRouterFactory;
-import org.opentcs.strategies.basic.routing.jgrapht.ModelGraphMapper;
+import org.opentcs.strategies.basic.routing.jgrapht.GraphProvider;
+import org.opentcs.strategies.basic.routing.jgrapht.MapperComponentsFactory;
 import org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,8 +60,10 @@ public class DefaultRouterModule
     bind(ShortestPathConfiguration.class)
         .toInstance(spConfiguration);
 
-    bind(ModelGraphMapper.class)
-        .to(DefaultModelGraphMapper.class);
+    install(new FactoryModuleBuilder().build(MapperComponentsFactory.class));
+
+    bind(GraphProvider.class)
+        .in(Singleton.class);
 
     switch (spConfiguration.algorithm()) {
       case DIJKSTRA:
