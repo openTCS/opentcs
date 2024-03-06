@@ -80,6 +80,10 @@ public interface PeripheralService
   /**
    * Sends a {@link PeripheralAdapterCommand} to the comm adapter attached to the referenced
    * location.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @see PeripheralAdapterCommand#execute(PeripheralCommAdapter)
    * @param ref A reference to the location.

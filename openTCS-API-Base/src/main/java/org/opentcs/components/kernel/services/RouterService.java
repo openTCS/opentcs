@@ -26,6 +26,10 @@ public interface RouterService {
 
   /**
    * Updates a path's lock state.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @param ref A reference to the path to be updated.
    * @param locked Indicates whether the path is to be locked ({@code true}) or unlocked
@@ -43,6 +47,10 @@ public interface RouterService {
   /**
    * Notifies the router that the topology has changed in a significant way and needs to be
    * re-evaluated.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
@@ -51,6 +59,10 @@ public interface RouterService {
 
   /**
    * Computes routes for the given vehicle from a source point to a set of destination points.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @param vehicleRef A reference to the vehicle to calculate the routes for.
    * @param sourcePointRef A reference to the source point.

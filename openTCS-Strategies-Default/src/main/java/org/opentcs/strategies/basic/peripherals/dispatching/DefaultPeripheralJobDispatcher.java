@@ -181,7 +181,7 @@ public class DefaultPeripheralJobDispatcher
   @Override
   public void dispatch() {
     LOG.debug("Scheduling dispatch task...");
-    kernelExecutor.submit(fullDispatchTask);
+    fullDispatchTask.run();
   }
 
   @Override

@@ -8,10 +8,12 @@
 package org.opentcs.kernel;
 
 import static java.util.Objects.requireNonNull;
+import java.util.concurrent.Executor;
 import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.customizations.ApplicationEventBus;
+import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.ReroutingType;
@@ -44,6 +46,10 @@ public class VehicleDispatchTrigger
    */
   private final KernelApplicationConfiguration configuration;
   /**
+   * The kernel executor.
+   */
+  private final Executor kernelExecutor;
+  /**
    * This instance's <em>initialized</em> flag.
    */
   private boolean initialized;
@@ -51,14 +57,17 @@ public class VehicleDispatchTrigger
   /**
    * Creates a new instance.
    *
+   * @param kernelExecutor The kernel executor to use.
    * @param eventBus The event bus.
    * @param dispatcher The dispatcher in use.
    * @param configuration The application configuration.
    */
   @Inject
-  public VehicleDispatchTrigger(@ApplicationEventBus EventBus eventBus,
+  public VehicleDispatchTrigger(@KernelExecutor Executor kernelExecutor,
+                                @ApplicationEventBus EventBus eventBus,
                                 DispatcherService dispatcher,
                                 KernelApplicationConfiguration configuration) {
+    this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.dispatcher = requireNonNull(dispatcher, "dispatcher");
     this.configuration = requireNonNull(configuration, "configuration");
@@ -112,7 +121,11 @@ public class VehicleDispatchTrigger
             || awaitingNextOrder(oldVehicle, newVehicle)
             || orderSequenceNulled(oldVehicle, newVehicle))) {
       LOG.debug("Dispatching for {}...", newVehicle);
-      dispatcher.dispatch();
+      // Dispatching may result in changes to the vehicle and thus trigger this code, which would
+      // then lead to a second dispatch run before the first one is completed. To avoid this, we
+      // ensure dispatching is done at some later point by scheduling it to be executed on the
+      // kernel executor (so it does not trigger itself in a loop).
+      kernelExecutor.execute(() -> dispatcher.dispatch());
     }
   }
 

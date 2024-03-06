@@ -81,6 +81,10 @@ public interface VehicleService
 
   /**
    * Sends an {@link AdapterCommand} to the comm adapter attached to the referenced vehicle.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @see VehicleCommAdapter#execute(AdapterCommand)
    * @param ref A reference to the vehicle.

@@ -160,9 +160,8 @@ public class DefaultDispatcher
 
   @Override
   public void dispatch() {
-    LOG.debug("Scheduling dispatch task...");
-    // Schedule this to be executed by the kernel executor.
-    kernelExecutor.submit(fullDispatchTask);
+    LOG.debug("Executing dispatch task...");
+    fullDispatchTask.run();
   }
 
   @Override
@@ -170,13 +169,10 @@ public class DefaultDispatcher
     requireNonNull(order, "order");
     checkState(isInitialized(), "Not initialized");
 
-    // Schedule this to be executed by the kernel executor.
-    kernelExecutor.submit(() -> {
-      LOG.debug("Scheduling withdrawal for transport order '{}' (immediate={})...",
-                order.getName(),
-                immediateAbort);
-      transportOrderUtil.abortOrder(order, immediateAbort);
-    });
+    LOG.debug("Withdrawing transport order '{}' (immediate={})...",
+              order.getName(),
+              immediateAbort);
+    transportOrderUtil.abortOrder(order, immediateAbort);
   }
 
   @Override
@@ -184,13 +180,10 @@ public class DefaultDispatcher
     requireNonNull(vehicle, "vehicle");
     checkState(isInitialized(), "Not initialized");
 
-    // Schedule this to be executed by the kernel executor.
-    kernelExecutor.submit(() -> {
-      LOG.debug("Scheduling withdrawal for vehicle '{}' (immediate={})...",
-                vehicle.getName(),
-                immediateAbort);
-      transportOrderUtil.abortOrder(vehicle, immediateAbort);
-    });
+    LOG.debug("Withdrawing transport order for vehicle '{}' (immediate={})...",
+              vehicle.getName(),
+              immediateAbort);
+    transportOrderUtil.abortOrder(vehicle, immediateAbort);
   }
 
   @Override
@@ -198,27 +191,21 @@ public class DefaultDispatcher
     requireNonNull(vehicle, "vehicle");
     requireNonNull(reroutingType, "reroutingType");
 
-    LOG.debug("Scheduling reroute task for vehicle '{}'...", vehicle.getName());
-    kernelExecutor.submit(() -> {
-      LOG.info(
-          "Rerouting vehicle '{}' from its current position '{}' using rerouting type '{}'...",
-          vehicle.getName(),
-          vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName(),
-          reroutingType
-      );
-      rerouteUtil.reroute(vehicle, reroutingType);
-    });
+    LOG.info(
+        "Rerouting vehicle '{}' from its current position '{}' using rerouting type '{}'...",
+        vehicle.getName(),
+        vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName(),
+        reroutingType
+    );
+    rerouteUtil.reroute(vehicle, reroutingType);
   }
 
   @Override
   public void rerouteAll(ReroutingType reroutingType) {
     requireNonNull(reroutingType, "reroutingType");
 
-    LOG.debug("Scheduling reroute task for all vehicles...");
-    kernelExecutor.submit(() -> {
-      LOG.info("Rerouting all vehicles using rerouting type '{}'...", reroutingType);
-      rerouteUtil.reroute(vehicleService.fetchObjects(Vehicle.class), reroutingType);
-    });
+    LOG.info("Rerouting all vehicles using rerouting type '{}'...", reroutingType);
+    rerouteUtil.reroute(vehicleService.fetchObjects(Vehicle.class), reroutingType);
   }
 
   @Override

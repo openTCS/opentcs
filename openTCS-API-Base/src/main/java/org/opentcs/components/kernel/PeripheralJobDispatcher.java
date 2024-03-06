@@ -27,6 +27,9 @@ public interface PeripheralJobDispatcher
 
   /**
    * Notifies the dispatcher that it should start the dispatching process.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    */
   void dispatch();
 

@@ -59,6 +59,9 @@ public interface Router
 
   /**
    * Notifies the router of changes in the topology.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @deprecated Use {@link #updateRoutingTopology()} instead.
    */
@@ -68,6 +71,9 @@ public interface Router
 
   /**
    * Notifies the router to update its routing topology.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    */
   @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
   default void updateRoutingTopology() {
@@ -76,6 +82,9 @@ public interface Router
 
   /**
    * Checks the general routability of a given transport order.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param order The transport order to check for routability.
    * @return A set of vehicles for which a route for the given transport order
@@ -90,6 +99,9 @@ public interface Router
    * The route is encapsulated into drive orders which correspond to those drive
    * orders that the transport order is composed of. The transport order itself
    * is not modified.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param vehicle The vehicle for which the calculated route must be passable.
    * @param sourcePoint The position at which the vehicle would start processing
@@ -106,6 +118,9 @@ public interface Router
 
   /**
    * Returns a route from one point to another, passable for a given vehicle.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param vehicle The vehicle for which the route must be passable.
    * @param sourcePoint The starting point of the route to calculate.
@@ -121,6 +136,9 @@ public interface Router
   /**
    * Returns the costs for travelling a route from one point to another with a
    * given vehicle.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param vehicle The vehicle for which the route must be passable.
    * @param sourcePoint The starting point of the route.
@@ -135,6 +153,9 @@ public interface Router
   /**
    * Returns the costs for travelling a route from one point to another with a
    * given vehicle.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param vehicle The vehicle for which the route must be passable.
    * @param srcPointRef The starting point reference of the route.
@@ -148,6 +169,9 @@ public interface Router
 
   /**
    * Notifies the router of a route being selected for a vehicle.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param vehicle The vehicle for which a route is being selected.
    * @param driveOrders The drive orders encapsulating the route being selected,
@@ -160,6 +184,9 @@ public interface Router
    * Returns an unmodifiable view on the selected routes the router knows about.
    * The returned map contains an entry for each vehicle for which a selected
    * route is known.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @return An unmodifiable view on the selected routes the router knows about.
    */
@@ -168,6 +195,9 @@ public interface Router
 
   /**
    * Returns all points which are currently targeted by any vehicle.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @return A set of all points currently targeted by any vehicle.
    */

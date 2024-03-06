@@ -85,6 +85,9 @@ public interface Scheduler
    * This is different from allocations:
    * Only a single vehicle can allocate a resource at the same time.
    * </p>
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param client The client claiming the resources.
    * @param resourceSequence The sequence of resources claimed. May be empty to clear the client's
@@ -96,6 +99,9 @@ public interface Scheduler
    * Notifies the scheduler that the given client has now reached the given index in its claimed
    * resource sequence, and that the client does not need the resources preceding the index in the
    * sequence, any more.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param client The client.
    * @param index The new index in the client's claimed resource sequence.
@@ -115,6 +121,9 @@ public interface Scheduler
 
   /**
    * Unclaims a set of resources claimed by a vehicle.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param client The client unclaiming the resources.
    * @throws IllegalArgumentException If the given client does not hold a claim.
@@ -146,6 +155,9 @@ public interface Scheduler
    * As a result, a client may only allocate the set of resources at the head of its claim sequence.
    * </li>
    * </ul>
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param client The client requesting the resources.
    * @param resources The resources to be allocated.
@@ -160,6 +172,9 @@ public interface Scheduler
   /**
    * Checks if the resulting system state is safe if the given set of resources
    * would be allocated by the given client <em>immediately</em>.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param client The client requesting the resources.
    * @param resources The requested resources.
@@ -193,6 +208,9 @@ public interface Scheduler
    * client.
    * </li>
    * </ul>
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param client The client requesting the resources.
    * @param resources The resources requested.
@@ -204,6 +222,9 @@ public interface Scheduler
 
   /**
    * Releases a set of resources allocated by a client.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param client The client releasing the resources.
    * @param resources The resources released. Any resources in the given set not allocated by the
@@ -213,6 +234,9 @@ public interface Scheduler
 
   /**
    * Releases all resources allocated by the given client.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param client The client.
    */
@@ -220,6 +244,9 @@ public interface Scheduler
 
   /**
    * Releases all pending resource allocations for the given client.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param client The client.
    */
@@ -230,6 +257,9 @@ public interface Scheduler
   /**
    * Explicitly triggers a rescheduling run during which the scheduler tries to allocate resources
    * for all waiting clients.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    */
   @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
   default void reschedule() {
@@ -237,6 +267,9 @@ public interface Scheduler
 
   /**
    * Returns all resource allocations as a map of client IDs to resources.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @return All resource allocations as a map of client IDs to resources.
    */
@@ -246,6 +279,9 @@ public interface Scheduler
   /**
    * Informs the scheduler that a set of resources was successfully prepared in order of allocating
    * them to a client.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param module The module a preparation was necessary for.
    * @param client The client that requested the preparation/allocation.

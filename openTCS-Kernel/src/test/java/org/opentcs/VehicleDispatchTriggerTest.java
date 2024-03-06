@@ -7,6 +7,7 @@
  */
 package org.opentcs;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
@@ -39,7 +40,11 @@ public class VehicleDispatchTriggerTest {
     dispatcher = mock(DispatcherService.class);
     config = mock(KernelApplicationConfiguration.class);
     when(config.rerouteOnDriveOrderFinished()).thenReturn(false);
-    trigger = new VehicleDispatchTrigger(eventBus, dispatcher, config);
+    trigger = new VehicleDispatchTrigger(
+        MoreExecutors.directExecutor(),
+        eventBus,
+        dispatcher,
+        config);
   }
 
   @Test

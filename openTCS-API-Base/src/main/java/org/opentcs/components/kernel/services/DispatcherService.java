@@ -26,6 +26,10 @@ public interface DispatcherService {
 
   /**
    * Explicitly trigger the dispatching process.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
@@ -34,6 +38,10 @@ public interface DispatcherService {
 
   /**
    * Withdraw any order that a vehicle might be processing.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @param ref A reference to the vehicle to be modified.
    * @param immediateAbort If {@code false}, this method once will initiate the withdrawal, leaving
@@ -49,6 +57,10 @@ public interface DispatcherService {
 
   /**
    * Withdraw the referenced order.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @param ref A reference to the transport order to be withdrawn.
    * @param immediateAbort If {@code false}, this method once will initiate the withdrawal, leaving
@@ -64,6 +76,10 @@ public interface DispatcherService {
 
   /**
    * Explicitly trigger a rerouting for the given vehicles.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @param ref The vehicle to be rerouted.
    * @param reroutingType The type of the requested rerouting.
@@ -76,6 +92,10 @@ public interface DispatcherService {
 
   /**
    * Explicitly trigger a rerouting for all vehicles.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @param reroutingType The type of rerouting.
    */
@@ -85,6 +105,10 @@ public interface DispatcherService {
 
   /**
    * Assign the referenced transport order (to its intended vehicle) <em>now</em>.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @param ref The transport order to be assigned.
    * @throws ObjectUnknownException If the referenced transport order does not exist.

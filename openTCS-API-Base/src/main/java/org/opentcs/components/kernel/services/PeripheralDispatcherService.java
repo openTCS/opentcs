@@ -22,6 +22,10 @@ public interface PeripheralDispatcherService {
 
   /**
    * Explicitly trigger the dispatching process for peripheral jobs.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
@@ -31,6 +35,10 @@ public interface PeripheralDispatcherService {
   /**
    * Withdraw any job that a peripheral device (represented by the given location) might be
    * processing.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @param ref A reference to the location representing the peripheral device.
    * @throws ObjectUnknownException If the referenced location does not exist.
@@ -41,6 +49,10 @@ public interface PeripheralDispatcherService {
 
   /**
    * Withdraw the given peripheral job.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
    *
    * @param ref A reference to the peripheral job to be withdrawn.
    * @throws ObjectUnknownException If the referenced peripheral job does not exist.

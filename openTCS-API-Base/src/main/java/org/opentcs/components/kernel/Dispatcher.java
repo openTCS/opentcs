@@ -71,11 +71,17 @@ public interface Dispatcher
 
   /**
    * Notifies the dispatcher that it should start the dispatching process.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    */
   void dispatch();
 
   /**
    * Notifies the dispatcher that the given transport order is to be withdrawn/aborted.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param order The transport order to be withdrawn/aborted.
    * @param immediateAbort Whether the order should be aborted immediately instead of withdrawn.
@@ -84,6 +90,9 @@ public interface Dispatcher
 
   /**
    * Notifies the dispatcher that any order a given vehicle might be processing is to be withdrawn.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param vehicle The vehicle whose order is withdrawn.
    * @param immediateAbort Whether the vehicle's order should be aborted immediately instead of
@@ -93,6 +102,9 @@ public interface Dispatcher
 
   /**
    * Notifies the dispatcher of changes in the topology.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @deprecated Use {@link #rerouteAll(org.opentcs.data.order.ReroutingType)} instead.
    */
@@ -104,6 +116,9 @@ public interface Dispatcher
   /**
    * Notifies the dispatcher of a request to reroute the given vehicle considering the given
    * rerouting type.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param vehicle The vehicle to be rerouted.
    * @param reroutingType The type of the requested rerouting.
@@ -114,11 +129,14 @@ public interface Dispatcher
 
   /**
    * Notifies the dispatcher to reroute all vehicles considering the given rerouting type.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
    *
    * @param reroutingType The type of the requested rerouting.
    */
   @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void rerouteAll(@Nonnull ReroutingType reroutingType){
+  default void rerouteAll(@Nonnull ReroutingType reroutingType) {
   }
 
   /**
