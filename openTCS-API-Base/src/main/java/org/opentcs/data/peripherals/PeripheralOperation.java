@@ -108,6 +108,10 @@ public class PeripheralOperation
    */
   public enum ExecutionTrigger {
     /**
+     * The operation is to be triggered immediately.
+     */
+    IMMEDIATE,
+    /**
      * The operation is to be triggered before the movement.
      *
      * @deprecated Use {@link #AFTER_ALLOCATION} instead.

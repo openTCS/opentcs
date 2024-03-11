@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.LocationCreationTO;
@@ -21,6 +22,7 @@ import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.peripherals.PeripheralJob;
+import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.util.event.SimpleEventBus;
 
 /**
@@ -86,5 +88,21 @@ class PeripheralJobPoolManagerTest {
     jobPoolManager.clear();
 
     assertThat(objectRepo.getObjects(PeripheralJob.class), is(empty()));
+  }
+
+  @Test
+  public void doNotCreateJobWithCompletionRequiredAndExecutionTriggerImmediate() {
+    assertThrows(
+        IllegalArgumentException.class, () -> {
+          jobPoolManager.createPeripheralJob(
+              new PeripheralJobCreationTO(
+                  "some-job",
+                  "some-token",
+                  new PeripheralOperationCreationTO("some-operation", "some-location")
+                      .withExecutionTrigger(PeripheralOperation.ExecutionTrigger.IMMEDIATE)
+                      .withCompletionRequired(true)
+              )
+          );
+        });
   }
 }

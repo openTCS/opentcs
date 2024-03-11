@@ -79,14 +79,12 @@ public class PeripheralJobHandler {
         );
       }
 
+      // Peripheral jobs created via the web API are expected to be executed immediately and
+      // require no completion. Therefore, explicitly ignore the corresponding provided values.
       PeripheralOperationCreationTO operationCreationTO = new PeripheralOperationCreationTO(
           job.getPeripheralOperation().getOperation(),
-          job.getPeripheralOperation().getLocationName())
-          .withCompletionRequired(job.getPeripheralOperation().isCompletionRequired());
-      if (job.getPeripheralOperation().getExecutionTrigger() != null) {
-        operationCreationTO = operationCreationTO
-            .withExecutionTrigger(job.getPeripheralOperation().getExecutionTrigger());
-      }
+          job.getPeripheralOperation().getLocationName()
+      );
 
       PeripheralJobCreationTO jobCreationTO = new PeripheralJobCreationTO(
           name,

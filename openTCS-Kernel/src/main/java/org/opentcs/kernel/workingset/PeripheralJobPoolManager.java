@@ -82,9 +82,15 @@ public class PeripheralJobPoolManager
    * @return The newly created peripheral job.
    * @throws ObjectExistsException If an object with the new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
+   * @throws IllegalArgumentException If the transfer object's combination of parameters is invalid.
    */
   public PeripheralJob createPeripheralJob(PeripheralJobCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException {
+      throws ObjectUnknownException, ObjectExistsException, IllegalArgumentException {
+    checkArgument(
+        !hasCompletionRequiredAndExecutionTriggerImmediate(to),
+        "Peripheral job's operation has executionTrigger 'immediate' and completionRequired set."
+    );
+
     PeripheralJob job = new PeripheralJob(nameFor(to),
                                           to.getReservationToken(),
                                           toPeripheralOperation(to.getPeripheralOperation()))
@@ -195,5 +201,11 @@ public class PeripheralJobPoolManager
     else {
       return to.getName();
     }
+  }
+
+  private boolean hasCompletionRequiredAndExecutionTriggerImmediate(PeripheralJobCreationTO to) {
+    PeripheralOperationCreationTO opTo = to.getPeripheralOperation();
+    return opTo.isCompletionRequired()
+        && opTo.getExecutionTrigger() == PeripheralOperation.ExecutionTrigger.IMMEDIATE;
   }
 }

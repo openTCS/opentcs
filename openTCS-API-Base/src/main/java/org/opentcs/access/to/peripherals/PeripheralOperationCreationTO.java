@@ -42,7 +42,7 @@ public class PeripheralOperationCreationTO
 
   /**
    * Creates a new instance with {@code executionTrigger} set to
-   * {@link PeripheralOperation.ExecutionTrigger#AFTER_ALLOCATION} and {@code completionRequired}
+   * {@link PeripheralOperation.ExecutionTrigger#IMMEDIATE} and {@code completionRequired}
    * set to {@code false}.
    *
    * @param operation The operation to be performed by the peripheral device.
@@ -52,7 +52,7 @@ public class PeripheralOperationCreationTO
     super("");
     this.operation = requireNonNull(operation, "operation");
     this.locationName = requireNonNull(locationName, "locationName");
-    this.executionTrigger = PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION;
+    this.executionTrigger = PeripheralOperation.ExecutionTrigger.IMMEDIATE;
     this.completionRequired = false;
   }
 
@@ -168,6 +168,9 @@ public class PeripheralOperationCreationTO
 
   /**
    * Creates a copy of this object, with the given execution trigger.
+   * <p>
+   * This method should only be used by the vehicle controller component of the baseline project.
+   * </p>
    *
    * @param executionTrigger The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
@@ -195,6 +198,9 @@ public class PeripheralOperationCreationTO
 
   /**
    * Creates a copy of this object, with the given completion required flag.
+   * <p>
+   * This method should only be used by the vehicle controller component of the baseline project.
+   * </p>
    *
    * @param completionRequired The value to be set in the copy.
    * @return A copy of this object, differing in the given value.

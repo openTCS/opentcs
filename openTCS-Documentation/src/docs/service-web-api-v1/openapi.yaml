@@ -968,7 +968,9 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/PeripheralJob"
-        description: The details of the peripheral job to be created.
+        description: >-
+          The details of the peripheral job to be created.
+          Currently, values provided for `executionTrigger` and `completionRequired` are ignored.
       responses:
         "200":
           description: Successful operation
@@ -1192,7 +1194,7 @@ paths:
       description: ""
       responses:
         "200":
-          description: Successful response. 
+          description: Successful response.
   /paths/{NAME}/locked:
     put:
       tags:
@@ -2102,7 +2104,8 @@ components:
           enum:
             - AFTER_ALLOCATION
             - AFTER_MOVEMENT
-          default: AFTER_ALLOCATION
+            - IMMEDIATE
+          default: IMMEDIATE
         completionRequired:
           type: boolean
           description: Whether the completion of this operation is required to allow a vehicle to continue driving.
