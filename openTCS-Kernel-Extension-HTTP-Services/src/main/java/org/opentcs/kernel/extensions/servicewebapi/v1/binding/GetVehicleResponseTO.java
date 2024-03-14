@@ -50,6 +50,8 @@ public class GetVehicleResponseTO {
 
   private PrecisePosition precisePosition;
 
+  private double orientationAngle;
+
   private State state = State.UNKNOWN;
 
   private List<List<String>> allocatedResources = new ArrayList<>();
@@ -162,6 +164,15 @@ public class GetVehicleResponseTO {
     return this;
   }
 
+  public double getOrientationAngle() {
+    return orientationAngle;
+  }
+
+  public GetVehicleResponseTO setOrientationAngle(double orientationAngle) {
+    this.orientationAngle = orientationAngle;
+    return this;
+  }
+
   public State getState() {
     return state;
   }
@@ -245,6 +256,7 @@ public class GetVehicleResponseTO {
                                                           vehicle.getPrecisePosition().getY(),
                                                           vehicle.getPrecisePosition().getZ()));
     }
+    vehicleState.setOrientationAngle(vehicle.getOrientationAngle());
     vehicleState.setState(vehicle.getState());
     vehicleState.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
     vehicleState.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));

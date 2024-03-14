@@ -30,6 +30,8 @@ public class VehicleStatusMessage
 
   private PrecisePosition precisePosition;
 
+  private double orientationAngle;
+
   private boolean paused;
 
   private Vehicle.State state;
@@ -89,6 +91,15 @@ public class VehicleStatusMessage
 
   public VehicleStatusMessage setPrecisePosition(PrecisePosition precisePosition) {
     this.precisePosition = precisePosition;
+    return this;
+  }
+
+  public double getOrientationAngle() {
+    return orientationAngle;
+  }
+
+  public VehicleStatusMessage setOrientationAngle(double orientationAngle) {
+    this.orientationAngle = orientationAngle;
     return this;
   }
 
@@ -153,6 +164,7 @@ public class VehicleStatusMessage
         vehicle.getTransportOrder() == null ? null : vehicle.getTransportOrder().getName());
     vehicleMessage.setPosition(
         vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName());
+    vehicleMessage.setOrientationAngle(vehicle.getOrientationAngle());
     vehicleMessage.setPaused(vehicle.isPaused());
     vehicleMessage.setState(vehicle.getState());
     vehicleMessage.setProcState(vehicle.getProcState());

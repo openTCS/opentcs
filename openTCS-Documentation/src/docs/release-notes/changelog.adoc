@@ -17,6 +17,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 * New features and enhancements:
 ** The creation of ambiguous peripheral jobs (by kernel clients or via the web API) that have the `completionRequired` flag set to `true` is now prevented.
    (In those cases it is unclear what should happen to the job's `relatedTransportOrder` (if any) in case the job fails.)
+** Update web API specification and implementation to version 1.5.0:
+*** When retrieving vehicle information via the web API, include the vehicle's orientation angle.
 
 == Version 5.13 (2024-02-22)
 

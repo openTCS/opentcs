@@ -12,6 +12,7 @@
       "y" : 2,
       "z" : 3
     },
+    "orientationAngle" : "NaN",
     "paused" : false,
     "state" : "IDLE",
     "procState" : "IDLE",

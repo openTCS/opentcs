@@ -12,7 +12,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 
@@ -28,8 +29,9 @@ class GetVehicleResponseTOTest {
     jsonBinder = new JsonBinder();
   }
 
-  @Test
-  void jsonSample() {
+  @ParameterizedTest
+  @ValueSource(doubles = {Double.NaN, 90.0})
+  void jsonSample(double orientationAngle) {
     GetVehicleResponseTO to
         = new GetVehicleResponseTO()
             .setName("some-vehicle")
@@ -51,6 +53,7 @@ class GetVehicleResponseTOTest {
             .setTransportOrder("some-order")
             .setCurrentPosition("some-point")
             .setPrecisePosition(new GetVehicleResponseTO.PrecisePosition(1, 2, 3))
+            .setOrientationAngle(orientationAngle)
             .setState(Vehicle.State.EXECUTING)
             .setEnvelopeKey("envelopeType-01")
             .setAllocatedResources(
@@ -72,7 +75,8 @@ class GetVehicleResponseTOTest {
                 )
             );
 
-    Approvals.verify(jsonBinder.toJson(to));
+    Approvals.verify(jsonBinder.toJson(to),
+                     Approvals.NAMES.withParameters("orientationAngle-" + orientationAngle));
   }
 
 }

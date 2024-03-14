@@ -11,7 +11,8 @@ import java.time.Instant;
 import java.util.List;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralOperation;
@@ -35,20 +36,22 @@ class GetEventsResponseTOTest {
     jsonBinder = new JsonBinder();
   }
 
-  @Test
-  void jsonSample() {
+  @ParameterizedTest
+  @ValueSource(doubles = {Double.NaN, 90.0})
+  void jsonSample(double orientationAngle) {
     GetEventsResponseTO to
         = new GetEventsResponseTO()
             .setTimeStamp(Instant.EPOCH)
             .setStatusMessages(
                 List.of(
-                    createVehicleStatusMessage(0),
+                    createVehicleStatusMessage(0).setOrientationAngle(orientationAngle),
                     createOrderStatusMessage(1),
                     createPeripheralJobStatusMessage(2)
                 )
             );
 
-    Approvals.verify(jsonBinder.toJson(to));
+    Approvals.verify(jsonBinder.toJson(to),
+                     Approvals.NAMES.withParameters("orientationAngle-" + orientationAngle));
   }
 
   private VehicleStatusMessage createVehicleStatusMessage(long sequenceNo) {
