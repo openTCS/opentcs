@@ -25,6 +25,7 @@ import org.github.gestalt.config.source.ConfigSource;
 import org.opentcs.configuration.ConfigurationBindingProvider;
 import org.opentcs.configuration.ConfigurationException;
 import org.opentcs.configuration.gestalt.decoders.ClassPathDecoder;
+import org.opentcs.configuration.gestalt.decoders.MapLiteralDecoder;
 import static org.opentcs.util.Assertions.checkState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,6 +99,7 @@ public class GestaltConfigurationBindingProvider
           .useCacheDecorator(true)
           .addDefaultDecoders()
           .addDecoder(new ClassPathDecoder())
+          .addDecoder(new MapLiteralDecoder())
           .addSources(buildSources())
           .build();
       provider.loadConfigs();
