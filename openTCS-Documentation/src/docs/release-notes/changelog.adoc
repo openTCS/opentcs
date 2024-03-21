@@ -21,6 +21,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 *** When retrieving vehicle information via the web API, include the vehicle's orientation angle.
 * Bugs fixed:
 ** Correctly read configuration entries in the `<KEY_1>=<VALUE_1>,...,<KEY_N>=<VALUE_N>` format when using gestalt as the configuration provider.
+* Changes affecting developers:
+** Update Mockito to 5.11.0.
+** Update ApprovalTests to 23.0.0.
 
 == Version 5.13 (2024-02-22)
 
