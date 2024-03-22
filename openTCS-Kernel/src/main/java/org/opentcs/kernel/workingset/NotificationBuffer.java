@@ -98,7 +98,8 @@ public class NotificationBuffer {
     requireNonNull(notification, "notification");
 
     notifications.add(notification);
-    LOG.debug("New notification added: {}", notification.getText());
+    LOG.info("User notification added: {}", notification);
+
     // Make sure we don't have too many messages now.
     cutBackMessages();
     // Emit an event for this message.

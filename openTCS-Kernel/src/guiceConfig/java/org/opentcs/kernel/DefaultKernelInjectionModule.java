@@ -46,6 +46,8 @@ import org.opentcs.drivers.peripherals.PeripheralControllerPool;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.AttachmentManager;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.VehicleEntryPool;
+import org.opentcs.kernel.extensions.watchdog.Watchdog;
+import org.opentcs.kernel.extensions.watchdog.WatchdogConfiguration;
 import org.opentcs.kernel.peripherals.DefaultPeripheralControllerPool;
 import org.opentcs.kernel.peripherals.LocalPeripheralControllerPool;
 import org.opentcs.kernel.peripherals.PeripheralAttachmentManager;
@@ -160,6 +162,8 @@ public class DefaultKernelInjectionModule
     extensionsBinderOperating();
     vehicleCommAdaptersBinder();
     peripheralCommAdaptersBinder();
+
+    configureWatchdogExtension();
   }
 
   @SuppressWarnings("deprecation")
@@ -305,5 +309,16 @@ public class DefaultKernelInjectionModule
     bind(Executor.class)
         .annotatedWith(KernelExecutor.class)
         .toInstance(executor);
+  }
+
+  private void configureWatchdogExtension() {
+    extensionsBinderOperating().addBinding()
+        .to(Watchdog.class)
+        .in(Singleton.class);
+
+    bind(WatchdogConfiguration.class)
+        .toInstance(getConfigBindingProvider().get(WatchdogConfiguration.PREFIX,
+                                                   WatchdogConfiguration.class));
+
   }
 }
