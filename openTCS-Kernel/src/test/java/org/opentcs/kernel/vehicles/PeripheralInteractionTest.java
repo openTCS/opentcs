@@ -25,6 +25,7 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
@@ -186,7 +187,12 @@ class PeripheralInteractionTest {
     }
 
     @Override
-    public Route getRoute() {
+    public TransportOrder getTransportOrder() {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public DriveOrder getDriveOrder() {
       throw new UnsupportedOperationException("Not supported yet.");
     }
 

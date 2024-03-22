@@ -43,14 +43,13 @@ public class MovementCommandMapper {
    * Maps the given {@link DriveOrder} to a corresponding list of {@link MovementCommand}s.
    *
    * @param driveOrder The {@link DriveOrder} to map.
-   * @param transportOrderProperties The {@link TransportOrder} properties to include in every
-   * mapped {@link MovementCommand}.
+   * @param transportOrder The {@link TransportOrder} the drive order belongs to.
    * @return A list of {@link MovementCommand}s.
    */
   public List<MovementCommand> toMovementCommands(DriveOrder driveOrder,
-                                                  Map<String, String> transportOrderProperties) {
+                                                  TransportOrder transportOrder) {
     requireNonNull(driveOrder, "driveOrder");
-    requireNonNull(transportOrderProperties, "transportOrderProperties");
+    requireNonNull(transportOrder, "transportOrder");
 
     // Gather information from the drive order.
     String op = driveOrder.getDestination().getOperation();
@@ -74,7 +73,8 @@ public class MovementCommandMapper {
         Location location = isFinalMovement ? finalDestinationLocation : null;
 
         result.add(
-            new MovementCommandImpl(orderRoute,
+            new MovementCommandImpl(transportOrder,
+                                    driveOrder,
                                     curStep,
                                     operation,
                                     location,
@@ -82,7 +82,7 @@ public class MovementCommandMapper {
                                     finalDestinationLocation,
                                     finalDestination,
                                     op,
-                                    mergeProperties(transportOrderProperties, destProperties))
+                                    mergeProperties(transportOrder.getProperties(), destProperties))
         );
       }
     }

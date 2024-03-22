@@ -20,9 +20,10 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.ReroutingType;
-import org.opentcs.data.order.Route;
 import org.opentcs.data.order.Route.Step;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.MovementCommand;
 
 /**
@@ -142,7 +143,12 @@ class MovementComparisonsTest {
     }
 
     @Override
-    public Route getRoute() {
+    public TransportOrder getTransportOrder() {
+      throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public DriveOrder getDriveOrder() {
       throw new UnsupportedOperationException("Not supported yet.");
     }
 

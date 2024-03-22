@@ -14,7 +14,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.MovementCommand;
 
 /**
@@ -24,9 +26,13 @@ public class MovementCommandImpl
     implements MovementCommand {
 
   /**
-   * The route that this movement belongs to.
+   * The transport order this movement belongs to.
    */
-  private final Route route;
+  private final TransportOrder transportOrder;
+  /**
+   * The drive order this movement belongs to.
+   */
+  private final DriveOrder driveOrder;
   /**
    * The step describing the movement.
    */
@@ -64,7 +70,8 @@ public class MovementCommandImpl
   /**
    * Creates a new instance.
    *
-   * @param route The route that this movement belongs to.
+   * @param transportOrder The transport order this movement belongs to.
+   * @param driveOrder The drive order this movement belongs to.
    * @param step The step describing the movement.
    * @param operation The operation to be executed after moving.
    * @param opLocation The location at which the operation is to be executed.
@@ -78,7 +85,8 @@ public class MovementCommandImpl
    * @param properties Properties of the order this command is part of.
    */
   @SuppressWarnings("deprecation")
-  public MovementCommandImpl(Route route,
+  public MovementCommandImpl(TransportOrder transportOrder,
+                             DriveOrder driveOrder,
                              Route.Step step,
                              String operation,
                              Location opLocation,
@@ -87,6 +95,8 @@ public class MovementCommandImpl
                              Point finalDestination,
                              String finalOperation,
                              Map<String, String> properties) {
+    this.transportOrder = requireNonNull(transportOrder, "transportOrder");
+    this.driveOrder = requireNonNull(driveOrder, "driveOrder");
     this.step = requireNonNull(step, "step");
     this.operation = requireNonNull(operation, "operation");
     this.finalMovement = finalMovement;
@@ -98,13 +108,18 @@ public class MovementCommandImpl
       throw new NullPointerException("opLocation");
     }
     this.opLocation = opLocation;
-
-    this.route = requireNonNull(route, "route");
   }
 
+  @Nonnull
   @Override
-  public Route getRoute() {
-    return route;
+  public TransportOrder getTransportOrder() {
+    return transportOrder;
+  }
+
+  @Nonnull
+  @Override
+  public DriveOrder getDriveOrder() {
+    return driveOrder;
   }
 
   @Nonnull
@@ -194,7 +209,8 @@ public class MovementCommandImpl
   @Override
   public String toString() {
     return "MovementCommandImpl{"
-        + "route=" + getRoute()
+        + "transportOrder=" + getTransportOrder()
+        + ", driveOrder=" + getDriveOrder()
         + ", step=" + getStep()
         + ", operation=" + getOperation()
         + ", opLocation=" + getOpLocation()

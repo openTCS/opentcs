@@ -21,19 +21,23 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.Route.Step;
+import org.opentcs.data.order.TransportOrder;
 
 /**
  * Test for {@link MovementCommandImpl}.
  */
 public class MovementCommandImplTest {
 
+  private Point destinationPoint;
   private Location location;
 
   @BeforeEach
   public void setUp() {
+    destinationPoint = new Point("p1");
     location = new Location("L1", new LocationType("LT1").getReference());
   }
 
@@ -44,13 +48,19 @@ public class MovementCommandImplTest {
                              0, true, null);
     Route route = new Route(List.of(stepAB), 22);
 
-    MovementCommandImpl command = new MovementCommandImpl(route,
+    DriveOrder driveOrder
+        = new DriveOrder(new DriveOrder.Destination(destinationPoint.getReference()))
+            .withRoute(route);
+    TransportOrder transportOrder = new TransportOrder("some-order", List.of(driveOrder));
+
+    MovementCommandImpl command = new MovementCommandImpl(transportOrder,
+                                                          driveOrder,
                                                           stepAB,
                                                           "some-operation",
                                                           location,
                                                           false,
                                                           location,
-                                                          new Point("p1"),
+                                                          destinationPoint,
                                                           "final-operation",
                                                           Map.of());
 
@@ -63,13 +73,20 @@ public class MovementCommandImplTest {
                              Vehicle.Orientation.FORWARD,
                              0, true, null);
     Route route = new Route(List.of(stepAB), 22);
-    MovementCommandImpl commandA = new MovementCommandImpl(route,
+
+    DriveOrder driveOrder
+        = new DriveOrder(new DriveOrder.Destination(destinationPoint.getReference()))
+            .withRoute(route);
+    TransportOrder transportOrder = new TransportOrder("some-order", List.of(driveOrder));
+
+    MovementCommandImpl commandA = new MovementCommandImpl(transportOrder,
+                                                           driveOrder,
                                                            stepAB,
                                                            "some-operation",
                                                            location,
                                                            false,
                                                            location,
-                                                           new Point("p1"),
+                                                           destinationPoint,
                                                            "final-operation",
                                                            Map.of("a", "b"));
 
@@ -77,13 +94,20 @@ public class MovementCommandImplTest {
                              Vehicle.Orientation.FORWARD,
                              0, true, null);
     Route route2 = new Route(List.of(stepBC), 22);
-    MovementCommandImpl commandB = new MovementCommandImpl(route2,
+
+    driveOrder
+        = new DriveOrder(new DriveOrder.Destination(destinationPoint.getReference()))
+            .withRoute(route2);
+    transportOrder = new TransportOrder("some-order", List.of(driveOrder));
+
+    MovementCommandImpl commandB = new MovementCommandImpl(transportOrder,
+                                                           driveOrder,
                                                            stepBC,
                                                            "some-operation",
                                                            location,
                                                            false,
                                                            location,
-                                                           new Point("p1"),
+                                                           destinationPoint,
                                                            "final-operation",
                                                            Map.of("a", "b"));
 
@@ -96,23 +120,31 @@ public class MovementCommandImplTest {
                              Vehicle.Orientation.FORWARD,
                              0, true, null);
     Route route = new Route(List.of(stepAB), 22);
-    MovementCommandImpl commandA = new MovementCommandImpl(route,
+
+    DriveOrder driveOrder
+        = new DriveOrder(new DriveOrder.Destination(destinationPoint.getReference()))
+            .withRoute(route);
+    TransportOrder transportOrder = new TransportOrder("some-order", List.of(driveOrder));
+
+    MovementCommandImpl commandA = new MovementCommandImpl(transportOrder,
+                                                           driveOrder,
                                                            stepAB,
                                                            "operation-a",
                                                            location,
                                                            false,
                                                            location,
-                                                           new Point("p1"),
+                                                           destinationPoint,
                                                            "final-operation",
                                                            Map.of("a", "b"));
 
-    MovementCommandImpl commandB = new MovementCommandImpl(route,
+    MovementCommandImpl commandB = new MovementCommandImpl(transportOrder,
+                                                           driveOrder,
                                                            stepAB,
                                                            "operation-b",
                                                            location,
                                                            false,
                                                            location,
-                                                           new Point("p1"),
+                                                           destinationPoint,
                                                            "final-operation",
                                                            Map.of("a", "b"));
 

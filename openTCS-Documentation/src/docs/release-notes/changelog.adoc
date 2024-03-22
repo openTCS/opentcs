@@ -22,6 +22,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Bugs fixed:
 ** Correctly read configuration entries in the `<KEY_1>=<VALUE_1>,...,<KEY_N>=<VALUE_N>` format when using gestalt as the configuration provider.
 * Changes affecting developers:
+** Provide related `TransportOrder` and `DriveOrder` objects as part of every `MovementCommand`.
+   This way, vehicle drivers can easily look up a movement command's context without having to explicitly fetch the data via a kernel service call.
 ** Update Mockito to 5.11.0.
 ** Update ApprovalTests to 23.0.0.
 ** Update Jackson to 2.17.0.

@@ -394,7 +394,7 @@ public class DefaultVehicleController
       vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
                                                    toListOfResourceSets(claimedResources));
 
-      futureCommands.addAll(movementCommandMapper.toMovementCommands(newOrder, orderProperties));
+      futureCommands.addAll(movementCommandMapper.toMovementCommands(newOrder, transportOrder));
 
       if (canSendNextCommand()) {
         allocateForNextCommand();
@@ -431,7 +431,7 @@ public class DefaultVehicleController
       vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
                                                    toListOfResourceSets(claimedResources));
 
-      futureCommands.addAll(movementCommandMapper.toMovementCommands(newOrder, orderProperties));
+      futureCommands.addAll(movementCommandMapper.toMovementCommands(newOrder, transportOrder));
       // The current drive order got updated but our queue of future commands now contains commands
       // that have already been processed, so discard these
       discardSentFutureCommands();
@@ -1353,8 +1353,7 @@ public class DefaultVehicleController
   private List<Set<TCSResource<?>>> remainingRequiredClaim(@Nonnull TransportOrder order) {
     List<MovementCommand> futureMovementCommands = order.getAllDriveOrders().stream()
         .skip(order.getCurrentDriveOrderIndex())
-        .map(driveOrder -> movementCommandMapper.toMovementCommands(driveOrder,
-                                                                    order.getProperties()))
+        .map(driveOrder -> movementCommandMapper.toMovementCommands(driveOrder, order))
         .flatMap(movementCommandQueue -> movementCommandQueue.stream())
         .collect(Collectors.toList());
 

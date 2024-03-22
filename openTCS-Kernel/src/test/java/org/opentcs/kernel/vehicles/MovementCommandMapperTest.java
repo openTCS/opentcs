@@ -10,12 +10,13 @@ package org.opentcs.kernel.vehicles;
 import java.util.List;
 import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
-import org.hamcrest.Matchers;
+import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.theInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,6 +30,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.MovementCommand;
 
 /**
@@ -47,6 +49,7 @@ class MovementCommandMapperTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   void mapDriveOrderToMovementCommands() {
     Point pointA = new Point("point-a");
     Point pointB = new Point("point-b");
@@ -68,10 +71,16 @@ class MovementCommandMapperTest {
                 .withProperties(Map.of("key1", "value1"))
         ).withRoute(route);
 
-    List<MovementCommand> result
-        = mapper.toMovementCommands(driveOrder, Map.of("key2", "value2", "key3", "value3"));
+    TransportOrder transportOrder
+        = new TransportOrder("some-order", List.of(driveOrder))
+            .withProperties(Map.of("key2", "value2", "key3", "value3"));
+
+    List<MovementCommand> result = mapper.toMovementCommands(driveOrder, transportOrder);
 
     assertThat(result, hasSize(2));
+
+    assertThat(result.get(0).getTransportOrder(), is(theInstance(transportOrder)));
+    assertThat(result.get(0).getDriveOrder(), is(theInstance(driveOrder)));
     assertThat(result.get(0).getRoute(), is(equalTo(route)));
     assertThat(result.get(0).getStep(), is(equalTo(stepAB)));
     assertThat(result.get(0).getOperation(), is(MovementCommand.NO_OPERATION));
@@ -80,8 +89,11 @@ class MovementCommandMapperTest {
     assertThat(result.get(0).getFinalDestination(), is(pointC));
     assertThat(result.get(0).getFinalDestinationLocation(), is(destinationLocation));
     assertThat(result.get(0).getFinalOperation(), is("operation"));
-    assertThat(result.get(0).getProperties(), is(Matchers.aMapWithSize(3)));
+    assertThat(result.get(0).getProperties(), is(aMapWithSize(3)));
     assertThat(result.get(0).getProperties().keySet(), containsInAnyOrder("key1", "key2", "key3"));
+
+    assertThat(result.get(1).getTransportOrder(), is(theInstance(transportOrder)));
+    assertThat(result.get(1).getDriveOrder(), is(theInstance(driveOrder)));
     assertThat(result.get(1).getRoute(), is(equalTo(route)));
     assertThat(result.get(1).getStep(), is(equalTo(stepBC)));
     assertThat(result.get(1).getOperation(), is("operation"));
@@ -91,7 +103,7 @@ class MovementCommandMapperTest {
     assertThat(result.get(1).getFinalDestinationLocation(), is(destinationLocation));
     assertThat(result.get(1).getFinalOperation(), is("operation"));
     assertThat(result.get(1).getProperties().keySet(), containsInAnyOrder("key1", "key2", "key3"));
-    assertThat(result.get(1).getProperties(), is(Matchers.aMapWithSize(3)));
+    assertThat(result.get(1).getProperties(), is(aMapWithSize(3)));
     assertThat(result.get(1).getProperties().keySet(), containsInAnyOrder("key1", "key2", "key3"));
   }
 }

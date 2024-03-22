@@ -15,6 +15,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.Route.Step;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
@@ -38,12 +39,30 @@ public interface MovementCommand {
   String PARK_OPERATION = DriveOrder.Destination.OP_PARK;
 
   /**
+   * Returns the transport order this movement belongs to.
+   *
+   * @return The transport order this movement belongs to.
+   */
+  TransportOrder getTransportOrder();
+
+  /**
+   * Returns the drive order this movement belongs to.
+   *
+   * @return The drive order this movement belongs to.
+   */
+  DriveOrder getDriveOrder();
+
+  /**
    * Returns the route that this movement belongs to.
    *
    * @return The route that this movement belongs to.
+   * @deprecated Use the route provided as part of {@link #getDriveOrder()}, instead.
    */
+  @Deprecated
   @Nonnull
-  Route getRoute();
+  default Route getRoute() {
+    return getDriveOrder().getRoute();
+  }
 
   /**
    * Returns the step describing the movement.
