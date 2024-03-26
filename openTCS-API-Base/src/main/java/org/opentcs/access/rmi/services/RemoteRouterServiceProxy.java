@@ -48,12 +48,26 @@ class RemoteRouterServiceProxy
   }
 
   @Override
+  @Deprecated
   public void updateRoutingTopology()
       throws KernelRuntimeException {
     checkServiceAvailability();
 
     try {
       getRemoteService().updateRoutingTopology(getClientId());
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public void updateRoutingTopology(Set<TCSObjectReference<Path>> refs)
+      throws KernelRuntimeException {
+      checkServiceAvailability();
+
+    try {
+      getRemoteService().updateRoutingTopology(getClientId(), refs);
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

@@ -53,9 +53,30 @@ public interface RouterService {
    * </p>
    *
    * @throws KernelRuntimeException In case there is an exception executing this method.
+   * @deprecated Use {@link #updateRoutingTopology(java.util.Set)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   void updateRoutingTopology()
       throws KernelRuntimeException;
+
+  /**
+   * Notifies the router that the topology has changed with respect to the given paths and needs to
+   * be re-evaluated.
+   * <p>
+   * If called within the kernel application, this method is supposed to be called only on the
+   * kernel executor thread.
+   * </p>
+   *
+   * @param refs References to paths that have changed in the routing topology. An empty set of
+   * path references results in the router updating the entire routing topology.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default void updateRoutingTopology(Set<TCSObjectReference<Path>> refs)
+      throws KernelRuntimeException {
+    updateRoutingTopology();
+  }
 
   /**
    * Computes routes for the given vehicle from a source point to a set of destination points.

@@ -8,6 +8,7 @@
 package org.opentcs.kernel;
 
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
 import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.DispatcherService;
@@ -99,8 +100,11 @@ public class PathLockEventListener
       return;
     }
 
-    if (hasPathLockChanged((TCSObjectEvent) eventObject)) {
-      routerService.updateRoutingTopology();
+    TCSObjectEvent event = (TCSObjectEvent) eventObject;
+    if (hasPathLockChanged(event)) {
+      routerService.updateRoutingTopology(
+          Set.of(((Path) event.getCurrentObjectState()).getReference())
+      );
 
       if (configuration.rerouteOnRoutingTopologyUpdate()) {
         dispatcher.rerouteAll(ReroutingType.REGULAR);

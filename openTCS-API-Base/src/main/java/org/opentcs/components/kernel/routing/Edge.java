@@ -54,11 +54,35 @@ public class Edge {
     return travellingReverse;
   }
 
+  /**
+   * Returns the source vertex of this edge.
+   *
+   * @return The source vertex of this edge.
+   */
+  public String getSourceVertex() {
+    return isTravellingReverse()
+        ? path.getDestinationPoint().getName()
+        : path.getSourcePoint().getName();
+  }
+
+  /**
+   * Returns the target vertex of this edge.
+   *
+   * @return The target vertex of this edge.
+   */
+  public String getTargetVertex() {
+    return isTravellingReverse()
+        ? path.getSourcePoint().getName()
+        : path.getDestinationPoint().getName();
+  }
+
   @Override
   public String toString() {
     return "Edge{"
         + "path=" + path + ", "
-        + "travellingReverse=" + travellingReverse
+        + "travellingReverse=" + travellingReverse + ", "
+        + "sourceVertex=" + getSourceVertex() + ", "
+        + "targetVertex=" + getTargetVertex()
         + '}';
   }
 }

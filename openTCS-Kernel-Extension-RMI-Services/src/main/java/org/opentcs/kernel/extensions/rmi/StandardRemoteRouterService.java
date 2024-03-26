@@ -168,11 +168,25 @@ public class StandardRemoteRouterService
   }
 
   @Override
+  @Deprecated
   public void updateRoutingTopology(ClientID clientId) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
 
     try {
       kernelExecutor.submit(() -> routerService.updateRoutingTopology()).get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
+
+  @Override
+  public void updateRoutingTopology(ClientID clientId, Set<TCSObjectReference<Path>> refs)
+      throws RemoteException {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
+
+    try {
+      kernelExecutor.submit(() -> routerService.updateRoutingTopology(refs)).get();
     }
     catch (InterruptedException | ExecutionException exc) {
       throw findSuitableExceptionFor(exc);

@@ -25,6 +25,7 @@ import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
+import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
@@ -140,10 +141,27 @@ public class DefaultRouter
   }
 
   @Override
+  @Deprecated
   public void updateRoutingTopology() {
     synchronized (this) {
       pointRoutersByVehicleGroup.clear();
       graphProvider.invalidate();
+    }
+  }
+
+  @Override
+  public void updateRoutingTopology(Set<Path> paths) {
+    requireNonNull(paths, "paths");
+
+    synchronized (this) {
+      pointRoutersByVehicleGroup.clear();
+
+      if (paths.isEmpty()) {
+        graphProvider.invalidate();
+      }
+      else {
+        graphProvider.updateGraphResults(paths);
+      }
     }
   }
 

@@ -233,6 +233,6 @@ class PlantModelHandlerTest {
   @Test
   void requestTopologyUpdate() {
     handler.requestTopologyUpdate();
-    then(routerService).should().updateRoutingTopology();
+    then(routerService).should().updateRoutingTopology(Set.of());
   }
 }

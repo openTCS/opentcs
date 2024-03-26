@@ -8,6 +8,7 @@
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
 import javax.inject.Inject;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.PlantModelService;
@@ -125,6 +126,6 @@ public class PlantModelHandler {
   }
 
   public void requestTopologyUpdate() {
-    executorWrapper.callAndWait(() -> routerService.updateRoutingTopology());
+    executorWrapper.callAndWait(() -> routerService.updateRoutingTopology(Set.of()));
   }
 }

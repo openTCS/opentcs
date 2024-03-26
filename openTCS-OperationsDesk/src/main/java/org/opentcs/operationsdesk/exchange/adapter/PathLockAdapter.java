@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.exchange.adapter;
 
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortal;
@@ -85,7 +86,7 @@ public class PathLockAdapter
         Path path = portal.getPlantModelService().fetchObject(Path.class, model.getName());
         if (path != null && path.isLocked() != locked) {
           portal.getPlantModelService().updatePathLock(path.getReference(), locked);
-          portal.getRouterService().updateRoutingTopology();
+          portal.getRouterService().updateRoutingTopology(Set.of(path.getReference()));
           portal.getDispatcherService().rerouteAll(ReroutingType.REGULAR);
         }
       }

@@ -11,7 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
+import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.RouterService;
@@ -86,9 +88,22 @@ public class StandardRouterService
   }
 
   @Override
+  @Deprecated
   public void updateRoutingTopology() {
     synchronized (globalSyncObject) {
       router.updateRoutingTopology();
+    }
+  }
+
+  @Override
+  public void updateRoutingTopology(Set<TCSObjectReference<Path>> refs)
+      throws KernelRuntimeException {
+    synchronized (globalSyncObject) {
+      router.updateRoutingTopology(
+          refs.stream()
+              .map(ref -> plantModelManager.getObjectRepo().getObject(Path.class, ref))
+              .collect(Collectors.toSet())
+      );
     }
   }
 

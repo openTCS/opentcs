@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
@@ -74,9 +75,26 @@ public interface Router
    * <p>
    * This method is supposed to be called only from the kernel executor thread.
    * </p>
+   *
+   * @deprecated Use {@link #updateRoutingTopology(java.util.Set)} instead.
+   */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
+  default void updateRoutingTopology() {
+    this.topologyChanged();
+  }
+
+  /**
+   * Notifies the router to update its routing topology with respect to the given paths.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
+   *
+   * @param paths The paths to update in the routing topology. An empty set of paths results in the
+   * router updating the entire routing topology.
    */
   @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void updateRoutingTopology() {
+  default void updateRoutingTopology(@Nonnull Set<Path> paths) {
     this.topologyChanged();
   }
 

@@ -9,12 +9,11 @@ package org.opentcs.strategies.basic.routing.jgrapht;
 
 import com.google.inject.assistedinject.Assisted;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import org.jgrapht.Graph;
-import org.jgrapht.Graphs;
-import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
 import org.opentcs.data.model.Path;
@@ -49,23 +48,17 @@ public class PathEdgeMapper {
   }
 
   /**
-   * Translates the given {@link Path}s to weighted {@link Edge}s and adds them to a copy of the
-   * provided {@link Graph}.
+   * Translates the given {@link Path}s to weighted {@link Edge}s.
    *
    * @param paths The paths to translate to edges.
    * @param vehicle The vehicle for which the edge weights are to be evaluated.
-   * @param graph The graph to whose copy the translated edges are to be added.
-   * @return A copy of the provided graph extended by the translated edges.
+   * @return The translated edges mapped to their corresponding edge weights.
    */
-  public Graph<String, Edge> translatePaths(Collection<Path> paths,
-                                            Vehicle vehicle,
-                                            Graph<String, Edge> graph) {
+  public Map<Edge, Double> translatePaths(Collection<Path> paths, Vehicle vehicle) {
     requireNonNull(paths, "paths");
     requireNonNull(vehicle, "vehicle");
-    requireNonNull(graph, "graph");
 
-    Graph<String, Edge> extendedGraph = new DirectedWeightedMultigraph<>(Edge.class);
-    Graphs.addGraph(extendedGraph, graph);
+    Map<Edge, Double> weightedEdges = new HashMap<>();
 
     boolean allowNegativeEdgeWeights = configuration.algorithm().isHandlingNegativeCosts();
 
@@ -86,10 +79,7 @@ public class PathEdgeMapper {
           LOG.debug("Edge {} with infinite weight ignored.", edge);
         }
         else {
-          extendedGraph.addEdge(path.getSourcePoint().getName(),
-                                path.getDestinationPoint().getName(),
-                                edge);
-          extendedGraph.setEdgeWeight(edge, weight);
+          weightedEdges.put(edge, weight);
         }
       }
 
@@ -107,17 +97,14 @@ public class PathEdgeMapper {
           LOG.debug("Edge {} with infinite weight ignored.", edge);
         }
         else {
-          extendedGraph.addEdge(path.getDestinationPoint().getName(),
-                                path.getSourcePoint().getName(),
-                                edge);
-          extendedGraph.setEdgeWeight(edge, weight);
+          weightedEdges.put(edge, weight);
         }
       }
     }
 
     edgeEvaluator.onGraphComputationEnd(vehicle);
 
-    return extendedGraph;
+    return weightedEdges;
   }
 
   /**

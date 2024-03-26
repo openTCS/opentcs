@@ -43,8 +43,16 @@ public interface RemoteRouterService
   public void updatePathLock(ClientID clientId, TCSObjectReference<Path> ref, boolean locked)
       throws RemoteException;
 
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public void updateRoutingTopology(ClientID clientId)
       throws RemoteException;
+
+  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
+  default public void updateRoutingTopology(ClientID clientId, Set<TCSObjectReference<Path>> refs)
+      throws RemoteException {
+    updateRoutingTopology(clientId);
+  }
 
   public Map<TCSObjectReference<Point>, Route> computeRoutes(
       ClientID clientId,

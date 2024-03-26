@@ -9,13 +9,10 @@ package org.opentcs.strategies.basic.routing.jgrapht;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DirectedWeightedMultigraph;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.Set;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.data.model.Point;
 
 /**
@@ -28,8 +25,6 @@ class PointVertexMapperTest {
   private Point pointC;
   private Point pointD;
 
-  private Graph<String, Edge> emptyGraph;
-
   private PointVertexMapper mapper;
 
   @BeforeEach
@@ -39,30 +34,22 @@ class PointVertexMapperTest {
     pointC = new Point("C");
     pointD = new Point("D");
 
-    emptyGraph = new DirectedWeightedMultigraph<>(Edge.class);
-
     mapper = new PointVertexMapper();
   }
 
   @Test
-  void dontManipulateGraph() {
-    Graph<String, Edge> result = mapper.translatePoints(new HashSet<>(), emptyGraph);
+  void translateEmptyPointCollectionToEmptySet() {
+    Set<String> result = mapper.translatePoints(new HashSet<>());
 
-    assertEquals(0, result.vertexSet().size());
-    assertEquals(0, result.edgeSet().size());
+    assertThat(result).isEmpty();
   }
 
   @Test
-  void createGraphWithFourPointsAndNoPath() {
-    Graph<String, Edge> graph
-        = mapper.translatePoints(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)),
-                                 emptyGraph);
+  void translatePointsToPointNames() {
+    Set<String> result
+        = mapper.translatePoints(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)));
 
-    assertEquals(4, graph.vertexSet().size());
-    assertTrue(graph.vertexSet().contains(pointA.getName()));
-    assertTrue(graph.vertexSet().contains(pointB.getName()));
-    assertTrue(graph.vertexSet().contains(pointC.getName()));
-    assertTrue(graph.vertexSet().contains(pointD.getName()));
-    assertEquals(0, graph.edgeSet().size());
+    assertThat(result).hasSize(4);
+    assertThat(result).contains("A", "B", "C", "D");
   }
 }

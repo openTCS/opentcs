@@ -7,7 +7,9 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -73,7 +75,8 @@ public class GraphProvider {
         routingGroup -> {
           Set<Point> points = objectService.fetchObjects(Point.class);
           Set<Path> paths = objectService.fetchObjects(Path.class);
-          return new GraphResult(points,
+          return new GraphResult(vehicle,
+                                 points,
                                  paths,
                                  defaultModelGraphMapper.translateModel(points, paths, vehicle));
         }
@@ -81,10 +84,45 @@ public class GraphProvider {
   }
 
   /**
+   * Updates any {@link GraphResult}s that have already been calculated using the given paths.
+   *
+   * @param paths The paths to use for the update.
+   */
+  public void updateGraphResults(@Nonnull Collection<Path> paths) {
+    requireNonNull(paths, "paths");
+
+    if (paths.isEmpty() || graphResultsByRoutingGroup.isEmpty()) {
+      return;
+    }
+
+    for (String routingGroup : Set.copyOf(graphResultsByRoutingGroup.keySet())) {
+      GraphResult graphResult = graphResultsByRoutingGroup.get(routingGroup);
+
+      // Ensure the new graph result's path base is up-to-date.
+      Set<Path> updatedPathBase = new HashSet<>(graphResult.getPathBase());
+      updatedPathBase.removeAll(paths);
+      updatedPathBase.addAll(paths);
+
+      graphResultsByRoutingGroup.put(
+          routingGroup,
+          new GraphResult(
+              graphResult.getVehicle(),
+              graphResult.getPointBase(),
+              updatedPathBase,
+              defaultModelGraphMapper.updateGraph(paths,
+                                                  graphResult.getVehicle(),
+                                                  graphResult.getGraph())
+          )
+      );
+    }
+  }
+
+  /**
    * Contains the result of a graph computation.
    */
   public static class GraphResult {
 
+    private final Vehicle vehicle;
     private final Set<Point> pointBase;
     private final Set<Path> pathBase;
     private final Graph<String, Edge> graph;
@@ -92,14 +130,28 @@ public class GraphProvider {
     /**
      * Creates a new instance.
      *
+     * @param vehicle The vehicle for which the given graph was computed.
      * @param pointBase The set of points that was used to compute the given graph.
      * @param pathBase The set of paths that was used to compute the given graph.
      * @param graph The computed graph.
      */
-    public GraphResult(Set<Point> pointBase, Set<Path> pathBase, Graph<String, Edge> graph) {
+    public GraphResult(Vehicle vehicle,
+                       Set<Point> pointBase,
+                       Set<Path> pathBase,
+                       Graph<String, Edge> graph) {
       this.pointBase = requireNonNull(pointBase, "pointBase");
       this.pathBase = requireNonNull(pathBase, "pathBase");
       this.graph = requireNonNull(graph, "graph");
+      this.vehicle = requireNonNull(vehicle, "vehicle");
+    }
+
+    /**
+     * Returns the vehicle for which the graph was computed.
+     *
+     * @return The vehicle for which the graph was computed.
+     */
+    public Vehicle getVehicle() {
+      return vehicle;
     }
 
     /**
