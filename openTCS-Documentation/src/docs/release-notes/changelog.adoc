@@ -17,6 +17,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 * New features and enhancements:
 ** Improve performance of updates to the router's routing topology by allowing it to be updated selectively.
    (The routing topology can now be updated only for paths that have actually changed.)
+* Bugs fixed:
+** cleaning orders are duplicated when cleaning order sequence, causing ObjectUnknownException.
 
 == Version 5.14 (2024-03-22)
 
