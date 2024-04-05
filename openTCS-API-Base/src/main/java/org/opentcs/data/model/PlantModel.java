@@ -60,16 +60,32 @@ public class PlantModel
     this.visualLayouts = Set.copyOf(visualLayouts);
   }
 
+  /**
+   * Returns the name of the plant model.
+   *
+   * @return The name of the plant model.
+   */
   @Nonnull
   public String getName() {
     return name;
   }
 
+  /**
+   * Returns the plant model's properties.
+   *
+   * @return The plant model's properties.
+   */
   @Nonnull
   public Map<String, String> getProperties() {
     return properties;
   }
 
+  /**
+   * Returns a copy of this plant model, with its properties replaced by the given ones.
+   *
+   * @param properties The properties.
+   * @return A copy of this plant model, with its properties replaced by the given ones.
+   */
   public PlantModel withProperties(Map<String, String> properties) {
     return new PlantModel(name,
                           properties,
@@ -82,11 +98,22 @@ public class PlantModel
                           visualLayouts);
   }
 
+  /**
+   * Returns the points in this plant model.
+   *
+   * @return The points in this plant model.
+   */
   @Nonnull
   public Set<Point> getPoints() {
     return points;
   }
 
+  /**
+   * Returns a copy of this plant model, with its points replaced by the given ones.
+   *
+   * @param points The points.
+   * @return A copy of this plant model, with its points replaced by the given ones.
+   */
   public PlantModel withPoints(@Nonnull Set<Point> points) {
     return new PlantModel(name,
                           properties,
@@ -99,11 +126,22 @@ public class PlantModel
                           visualLayouts);
   }
 
+  /**
+   * Returns the paths in this plant model.
+   *
+   * @return The paths in this plant model.
+   */
   @Nonnull
   public Set<Path> getPaths() {
     return paths;
   }
 
+  /**
+   * Returns a copy of this plant model, with its paths replaced by the given ones.
+   *
+   * @param paths The paths.
+   * @return A copy of this plant model, with its paths replaced by the given ones.
+   */
   public PlantModel withPaths(@Nonnull Set<Path> paths) {
     return new PlantModel(name,
                           properties,
@@ -116,11 +154,22 @@ public class PlantModel
                           visualLayouts);
   }
 
+  /**
+   * Returns the location types in this plant model.
+   *
+   * @return The location types in this plant model.
+   */
   @Nonnull
   public Set<LocationType> getLocationTypes() {
     return locationTypes;
   }
 
+  /**
+   * Returns a copy of this plant model, with its location types replaced by the given ones.
+   *
+   * @param locationTypes The location types.
+   * @return A copy of this plant model, with its location types replaced by the given ones.
+   */
   public PlantModel withLocationTypes(@Nonnull Set<LocationType> locationTypes) {
     return new PlantModel(name,
                           properties,
@@ -133,11 +182,22 @@ public class PlantModel
                           visualLayouts);
   }
 
+  /**
+   * Returns the locations in this plant model.
+   *
+   * @return The locations in this plant model.
+   */
   @Nonnull
   public Set<Location> getLocations() {
     return locations;
   }
 
+  /**
+   * Returns a copy of this plant model, with its locations replaced by the given ones.
+   *
+   * @param locations The locations.
+   * @return A copy of this plant model, with its locations replaced by the given ones.
+   */
   public PlantModel withLocations(@Nonnull Set<Location> locations) {
     return new PlantModel(name,
                           properties,
@@ -150,11 +210,22 @@ public class PlantModel
                           visualLayouts);
   }
 
+  /**
+   * Returns the blocks in this plant model.
+   *
+   * @return The blocks in this plant model.
+   */
   @Nonnull
   public Set<Block> getBlocks() {
     return blocks;
   }
 
+  /**
+   * Returns a copy of this plant model, with its blocks replaced by the given ones.
+   *
+   * @param blocks The blocks.
+   * @return A copy of this plant model, with its blocks replaced by the given ones.
+   */
   public PlantModel withBlocks(@Nonnull Set<Block> blocks) {
     return new PlantModel(name,
                           properties,
@@ -167,11 +238,22 @@ public class PlantModel
                           visualLayouts);
   }
 
+  /**
+   * Returns the vehicles in this plant model.
+   *
+   * @return The vehicles in this plant model.
+   */
   @Nonnull
   public Set<Vehicle> getVehicles() {
     return vehicles;
   }
 
+  /**
+   * Returns a copy of this plant model, with its vehicles replaced by the given ones.
+   *
+   * @param vehicles The vehicles.
+   * @return A copy of this plant model, with its vehicles replaced by the given ones.
+   */
   public PlantModel withVehicles(@Nonnull Set<Vehicle> vehicles) {
     return new PlantModel(name,
                           properties,
@@ -184,16 +266,21 @@ public class PlantModel
                           visualLayouts);
   }
 
+  /**
+   * Returns the visual layouts in this plant model.
+   *
+   * @return The visual layouts in this plant model.
+   */
   @Nonnull
   public Set<VisualLayout> getVisualLayouts() {
     return visualLayouts;
   }
 
   /**
-   * Returns an instance with the visual layouts replaced by the given ones.
+   * Returns a copy of this plant model, with its visual layouts replaced by the given ones.
    *
    * @param visualLayouts The visual layouts to be set.
-   * @return The instance with the visual layouts replaced by the given ones.
+   * @return A copy of this plant model, with its visual layouts replaced by the given ones.
    * @deprecated Use {@link #withVisualLayouts(java.util.Set)} instead.
    */
   @Deprecated
@@ -202,6 +289,12 @@ public class PlantModel
     return withVisualLayouts(visualLayouts);
   }
 
+  /**
+   * Returns a copy of this plant model, with its visual layouts replaced by the given ones.
+   *
+   * @param visualLayouts The visual layouts to be set.
+   * @return A copy of this plant model, with its visual layouts replaced by the given ones.
+   */
   public PlantModel withVisualLayouts(@Nonnull Set<VisualLayout> visualLayouts) {
     return new PlantModel(name,
                           properties,

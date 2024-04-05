@@ -51,7 +51,7 @@ public class LocationCreationTO
   private final Layout layout;
 
   /**
-   * Creates a new instance
+   * Creates a new instance.
    *
    * @param name The name of this location.
    * @param typeName The name of this location's type.

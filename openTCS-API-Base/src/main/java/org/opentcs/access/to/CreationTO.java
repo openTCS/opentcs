@@ -89,6 +89,12 @@ public class CreationTO
     return properties;
   }
 
+  /**
+   * Creates a copy of this object with the given properties.
+   *
+   * @param properties The properties.
+   * @return A copy of this object with the given properties.
+   */
   public CreationTO withProperties(@Nonnull Map<String, String> properties) {
     return new CreationTO(name, properties);
   }

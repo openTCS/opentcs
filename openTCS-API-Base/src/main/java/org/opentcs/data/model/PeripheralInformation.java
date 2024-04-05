@@ -41,6 +41,9 @@ public class PeripheralInformation
   @Nullable
   private final TCSObjectReference<PeripheralJob> peripheralJob;
 
+  /**
+   * Creates a new instance.
+   */
   public PeripheralInformation() {
     this(null, State.NO_PERIPHERAL, ProcState.IDLE, null);
   }
