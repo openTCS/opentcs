@@ -17,6 +17,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 * New features and enhancements:
 ** Improve performance of updates to the router's routing topology by allowing it to be updated selectively.
    (The routing topology can now be updated only for paths that have actually changed.)
+** When computing a route for a transport order, it is now possible to define a set of resources (i.e., points, paths or locations) that should be avoided by vehicles processing the respective transport order.
+   For this, a property with the key `tcs:resourcesToAvoid` can be set on a transport order to a comma-separated list of resource names.
 
 == Version 5.14 (2024-03-22)
 

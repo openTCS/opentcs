@@ -11,11 +11,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -84,6 +87,48 @@ public class GraphProvider {
   }
 
   /**
+   * Returns a {@link GraphResult} that is derived from the given vehicle's "default" routing graph
+   * in such a way that the given set of points is not included.
+   *
+   * @param vehicle The vehicle.
+   * @param pointsToExclude The set of points to not include in the derived routing graph.
+   * @return The derived {@link GraphResult}.
+   */
+  public GraphResult getDerivedGraphResult(Vehicle vehicle,
+                                           Set<Point> pointsToExclude) {
+    GraphResult baseGraph = getGraphResult(vehicle);
+
+    // Determine the derived point base and path base.
+    Set<Point> derivedPointBase = new HashSet<>(baseGraph.getPointBase());
+    derivedPointBase.removeAll(pointsToExclude);
+    Set<Path> derivedPathBase = new HashSet<>(baseGraph.getPathBase());
+    derivedPathBase.removeIf(path -> isPathConnectedToPoints(path, pointsToExclude));
+
+    Graph<String, Edge> derivedGraph = new DirectedWeightedMultigraph<>(Edge.class);
+
+    // Determine the vertices that should be included and add them to the derived graph.
+    Set<String> pointsToIncludeByName = derivedPointBase.stream()
+        .map(Point::getName)
+        .collect(Collectors.toSet());
+    baseGraph.getGraph().vertexSet().stream()
+        .filter(vertex -> pointsToIncludeByName.contains(vertex))
+        .forEach(vertex -> derivedGraph.addVertex(vertex));
+
+    // Determine the edges that should be included and add them to the derived graph.
+    Set<String> pathsToIncludeByName = derivedPathBase.stream()
+        .map(Path::getName)
+        .collect(Collectors.toSet());
+    baseGraph.getGraph().edgeSet().stream()
+        .filter(edge -> pathsToIncludeByName.contains(edge.getPath().getName()))
+        .forEach(edge -> {
+          derivedGraph.addEdge(edge.getSourceVertex(), edge.getTargetVertex(), edge);
+          derivedGraph.setEdgeWeight(edge, baseGraph.getGraph().getEdgeWeight(edge));
+        });
+
+    return new GraphResult(vehicle, derivedPointBase, derivedPathBase, derivedGraph);
+  }
+
+  /**
    * Updates any {@link GraphResult}s that have already been calculated using the given paths.
    *
    * @param paths The paths to use for the update.
@@ -115,6 +160,14 @@ public class GraphProvider {
           )
       );
     }
+  }
+
+  private boolean isPathConnectedToPoints(Path path, Set<Point> points) {
+    return points.stream()
+        .anyMatch(
+            point -> Objects.equals(point.getReference(), path.getSourcePoint())
+            || Objects.equals(point.getReference(), path.getDestinationPoint())
+        );
   }
 
   /**

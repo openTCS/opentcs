@@ -5,17 +5,17 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.strategies.basic.routing;
+package org.opentcs.strategies.basic.routing.jgrapht;
 
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,113 +24,85 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
-import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.strategies.basic.routing.jgrapht.GraphProvider;
+import org.opentcs.strategies.basic.routing.DefaultRoutingGroupMapper;
+import org.opentcs.strategies.basic.routing.PointRouter;
+import org.opentcs.strategies.basic.routing.PointRouterFactory;
+import org.opentcs.strategies.basic.routing.ResourceAvoidanceExtractor;
 
 /**
- * Test cases for the {@link DefaultRouter}.
+ * Tests for {@link PointRouterProvider}.
  */
-class DefaultRouterTest {
+public class PointRouterProviderTest {
 
   /**
    * The vehicles which are returned when asking the kernel for vehicles.
    */
   private final Set<Vehicle> vehicles = new HashSet<>();
 
-  /**
-   * The class to test.
-   */
-  private Router router;
-
-  /**
-   * The mocked object service to use.
-   */
   private TCSObjectService objectService;
-
-  /**
-   * The builder for routing tables.
-   */
-  private PointRouterFactory builder;
-
-  /**
-   * The routing group mapper.
-   */
+  private ResourceAvoidanceExtractor resourceAvoidanceExtractor;
   private GroupMapper routingGroupMapper;
-
-  /**
-   * The configuration.
-   */
-  private DefaultRouterConfiguration configuration;
-
+  private PointRouterFactory pointRouterFactory;
   private GraphProvider graphProvider;
+  private PointRouterProvider pointRouterProvider;
 
   @BeforeEach
-  void setUp() {
-    objectService = mock(TCSObjectService.class);
-    builder = mock(PointRouterFactory.class);
+  public void setUp() {
+    objectService = mock();
     when(objectService.fetchObjects(Vehicle.class)).thenReturn(vehicles);
     when(objectService.fetchObject(eq(Vehicle.class), anyString()))
         .then(o -> vehicles.stream()
         .filter(t -> filterByName(o, t))
         .findFirst().orElse(null));
+    resourceAvoidanceExtractor = mock();
     routingGroupMapper = new DefaultRoutingGroupMapper();
-    configuration = mock(DefaultRouterConfiguration.class);
-    when(configuration.routeToCurrentPosition()).thenReturn(false);
-    graphProvider = mock(GraphProvider.class);
-    router = spy(createRouter());
+    pointRouterFactory = mock();
+    when(pointRouterFactory.createPointRouter(any(Vehicle.class), anySet()))
+        .thenReturn(mock(PointRouter.class));
+    graphProvider = mock();
+
+    pointRouterProvider = new PointRouterProvider(objectService,
+                                                  resourceAvoidanceExtractor,
+                                                  routingGroupMapper,
+                                                  pointRouterFactory,
+                                                  graphProvider);
   }
 
   @Test
-  void shouldUseDefaultRoutingGroup() {
-    Point sourcePoint = new Point("Some source point");
-    Point destinationPoint = new Point("Some destination point");
+  void shouldProvidePointRouterForDefaultRoutingGroup() {
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-000", -1), null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-001", -1), null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-002", -1), null);
 
-    router.initialize();
-    router.getCosts(createVehicle("Vehicle-000", -1), sourcePoint, destinationPoint);
-    router.getCosts(createVehicle("Vehicle-001", -1), sourcePoint, destinationPoint);
-    router.getCosts(createVehicle("Vehicle-002", -1), sourcePoint, destinationPoint);
-
-    verify(builder, times(1)).createPointRouter(any());
+    verify(pointRouterFactory, times(1)).createPointRouter(any(Vehicle.class), anySet());
   }
 
   @Test
-  void shouldUseDefinedRoutingGroup() {
-    Point sourcePoint = new Point("Some source point");
-    Point destinationPoint = new Point("Some destination point");
+  void shouldProvidePointRouterForDefinedRoutingGroup() {
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-000", 1), null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-001", 1), null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-002", 1), null);
 
-    router.initialize();
-    router.getCosts(createVehicle("Vehicle-000", 1), sourcePoint, destinationPoint);
-    router.getCosts(createVehicle("Vehicle-001", 1), sourcePoint, destinationPoint);
-    router.getCosts(createVehicle("Vehicle-002", 1), sourcePoint, destinationPoint);
-
-    verify(builder, times(1)).createPointRouter(any());
+    verify(pointRouterFactory, times(1)).createPointRouter(any(Vehicle.class), anySet());
   }
 
   @Test
-  void shouldUseDefaultAndSetRoutingGroups() {
-    Point sourcePoint = new Point("Some source point");
-    Point destinationPoint = new Point("Some destination point");
+  void shouldProvidePointRouterForDefaultAndDefinedRoutingGroups() {
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-000", 1), null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-001", 1), null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-002", -1), null);
 
-    router.initialize();
-    router.getCosts(createVehicle("Vehicle-000", 1), sourcePoint, destinationPoint);
-    router.getCosts(createVehicle("Vehicle-001", 1), sourcePoint, destinationPoint);
-    router.getCosts(createVehicle("Vehicle-002", -1), sourcePoint, destinationPoint);
-
-    verify(builder, times(2)).createPointRouter(any());
+    verify(pointRouterFactory, times(2)).createPointRouter(any(Vehicle.class), anySet());
   }
 
   @Test
-  void shouldUseSetRoutingGroups() {
-    Point sourcePoint = new Point("Some source point");
-    Point destinationPoint = new Point("Some destination point");
-
-    router.initialize();
+  void shouldProvideIndividualPointRouters() {
     for (int x = 0; x < 15; x++) {
-      router.getCosts(createVehicle("Vehicle-0" + x, x), sourcePoint, destinationPoint);
+      pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-0" + x, x), null);
     }
 
-    verify(builder, times(15)).createPointRouter(any());
+    verify(pointRouterFactory, times(15)).createPointRouter(any(Vehicle.class), anySet());
   }
 
   /**
@@ -150,22 +122,6 @@ class DefaultRouterTest {
     vehicles.add(vehicle);
 
     return vehicle;
-  }
-
-  /**
-   * Creates the router with mocked routing table builder to return a new routing table on each
-   * request.
-   *
-   * @return The router
-   */
-  private Router createRouter() {
-    when(builder.createPointRouter(any())).thenReturn(mock(PointRouter.class));
-
-    return new DefaultRouter(objectService,
-                             builder,
-                             routingGroupMapper,
-                             configuration,
-                             graphProvider);
   }
 
   /**

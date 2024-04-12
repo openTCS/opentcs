@@ -123,9 +123,14 @@ public abstract class AbstractReroutingStrategy
               vehicle.getName(),
               sourcePoint,
               driveOrders);
-    return router.getRoute(vehicle,
-                           sourcePoint,
-                           new TransportOrder("reroute-dummy", driveOrders));
+    TransportOrder vehicleOrder = objectService.fetchObject(TransportOrder.class,
+                                                            vehicle.getTransportOrder());
+    return router.getRoute(
+        vehicle,
+        sourcePoint,
+        new TransportOrder("reroute-dummy", driveOrders)
+            .withProperties(vehicleOrder.getProperties())
+    );
   }
 
   private void restoreCurrentDriveOrderHistory(List<DriveOrder> newDriveOrders,

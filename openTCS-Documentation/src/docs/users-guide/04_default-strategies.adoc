@@ -144,6 +144,11 @@ This isn't done by default -- the default router computes routes for all vehicle
 To let the router know that it should compute routes for a vehicle separately, set a property with the key `tcs:routingGroup` to an arbitrary string.
 (Vehicles that have the same value set share the same routing table, and the empty string is the default value for all vehicles.)
 
+==== Avoiding/Excluding resources when computing routes
+
+When computing a route for a transport order, it is possible to define a set of resources (i.e., points, paths or locations) that should be avoided by vehicles processing the respective transport order.
+For this, a property with the key `tcs:resourcesToAvoid` can be set on a transport order to a comma-separated list of resource names.
+
 === Default scheduler
 
 The default scheduler implements a simple strategy for traffic management.

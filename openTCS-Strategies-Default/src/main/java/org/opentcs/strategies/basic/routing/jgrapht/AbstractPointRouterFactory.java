@@ -40,12 +40,20 @@ public abstract class AbstractPointRouterFactory
   }
 
   @Override
-  public PointRouter createPointRouter(Vehicle vehicle) {
+  public PointRouter createPointRouter(Vehicle vehicle, Set<Point> pointsToExclude) {
     requireNonNull(vehicle, "vehicle");
+    requireNonNull(pointsToExclude, "pointsToExclude");
 
     long timeStampBefore = System.currentTimeMillis();
 
-    GraphProvider.GraphResult graphResult = graphProvider.getGraphResult(vehicle);
+    GraphProvider.GraphResult graphResult;
+    if (pointsToExclude.isEmpty()) {
+      graphResult = graphProvider.getGraphResult(vehicle);
+    }
+    else {
+      graphResult = graphProvider.getDerivedGraphResult(vehicle, pointsToExclude);
+    }
+
     Set<Point> points = graphResult.getPointBase();
 
     PointRouter router = new ShortestPathPointRouter(

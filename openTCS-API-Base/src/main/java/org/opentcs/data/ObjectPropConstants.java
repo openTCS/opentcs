@@ -10,6 +10,7 @@ package org.opentcs.data;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.visualization.LocationRepresentation;
+import org.opentcs.data.order.TransportOrder;
 
 /**
  * Defines some reserved/commonly used property keys and values.
@@ -39,4 +40,13 @@ public interface ObjectPropConstants {
    * </p>
    */
   String LOC_DEFAULT_REPRESENTATION = "tcs:defaultLocationSymbol";
+  /**
+   * A property key for {@link TransportOrder} instances used to define resources (i.e., points,
+   * paths or locations) that should be avoided by vehicles processing transport orders with such a
+   * property.
+   * <p>
+   * Type: String (a comma-separated list of resource names)
+   * </p>
+   */
+  String TRANSPORT_ORDER_RESOURCES_TO_AVOID = "tcs:resourcesToAvoid";
 }
