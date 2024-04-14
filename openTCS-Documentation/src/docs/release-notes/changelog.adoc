@@ -12,7 +12,7 @@ The openTCS developers
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
-== Unreleased
+== Version 5.15 (2024-04-14)
 
 * New features and enhancements:
 ** Improve performance of updates to the router's routing topology by allowing it to be updated selectively.
