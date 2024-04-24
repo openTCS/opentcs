@@ -542,7 +542,7 @@ public class VehicleModel
     setProperty(ENERGY_LEVEL_GOOD, pEnergyLevelGood);
 
     PercentProperty pEnergyLevelFullyRecharged = new PercentProperty(this,
-                                                                     30,
+                                                                     95,
                                                                      PercentProperty.Unit.PERCENT,
                                                                      true);
     pEnergyLevelFullyRecharged.setDescription(
@@ -555,7 +555,7 @@ public class VehicleModel
 
     PercentProperty pEnergyLevelSufficientlyRecharged
         = new PercentProperty(this,
-                              90,
+                              40,
                               PercentProperty.Unit.PERCENT,
                               true);
     pEnergyLevelSufficientlyRecharged.setDescription(
