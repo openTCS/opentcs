@@ -19,12 +19,12 @@ import javax.inject.Inject;
 import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Path;
-import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.routing.PointRouter;
 import org.opentcs.strategies.basic.routing.PointRouterFactory;
 import org.opentcs.strategies.basic.routing.ResourceAvoidanceExtractor;
+import org.opentcs.strategies.basic.routing.ResourceAvoidanceExtractor.ResourcesToAvoid;
 
 /**
  * Provides point routers for vehicles (more specifically for routing groups of vehicles).
@@ -106,17 +106,19 @@ public class PointRouterProvider {
                                               @Nullable TransportOrder order) {
     requireNonNull(vehicle, "vehicle");
 
-    Set<Point> pointsToExclude = resourceAvoidanceExtractor.extractPointsToAvoid(order);
-    // If there are points to be excluded, always create a new (individual) point router.
-    if (!pointsToExclude.isEmpty()) {
-      return pointRouterFactory.createPointRouter(vehicle, pointsToExclude);
+    ResourcesToAvoid resourcesToAvoid = resourceAvoidanceExtractor.extractResourcesToAvoid(order);
+    // If there are resources to be avoided, always create a new (individual) point router.
+    if (!resourcesToAvoid.isEmpty()) {
+      return pointRouterFactory.createPointRouter(vehicle,
+                                                  resourcesToAvoid.getPoints(),
+                                                  resourcesToAvoid.getPaths());
     }
 
     // In all other cases, create a point router if it does not yet exist for the vehicle's routing
     // group.
     return pointRoutersByVehicleGroup.computeIfAbsent(
         routingGroupMapper.apply(vehicle),
-        routingGroup -> pointRouterFactory.createPointRouter(vehicle, Set.of())
+        routingGroup -> pointRouterFactory.createPointRouter(vehicle, Set.of(), Set.of())
     );
   }
 

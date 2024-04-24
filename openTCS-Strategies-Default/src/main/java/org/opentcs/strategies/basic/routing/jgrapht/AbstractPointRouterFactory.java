@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
 import org.opentcs.components.kernel.routing.Edge;
+import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.routing.PointRouter;
@@ -40,18 +41,20 @@ public abstract class AbstractPointRouterFactory
   }
 
   @Override
-  public PointRouter createPointRouter(Vehicle vehicle, Set<Point> pointsToExclude) {
+  public PointRouter createPointRouter(Vehicle vehicle,
+                                       Set<Point> pointsToExclude,
+                                       Set<Path> pathsToExclude) {
     requireNonNull(vehicle, "vehicle");
     requireNonNull(pointsToExclude, "pointsToExclude");
 
     long timeStampBefore = System.currentTimeMillis();
 
     GraphProvider.GraphResult graphResult;
-    if (pointsToExclude.isEmpty()) {
+    if (pointsToExclude.isEmpty() && pathsToExclude.isEmpty()) {
       graphResult = graphProvider.getGraphResult(vehicle);
     }
     else {
-      graphResult = graphProvider.getDerivedGraphResult(vehicle, pointsToExclude);
+      graphResult = graphProvider.getDerivedGraphResult(vehicle, pointsToExclude, pathsToExclude);
     }
 
     Set<Point> points = graphResult.getPointBase();

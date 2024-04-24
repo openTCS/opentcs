@@ -43,31 +43,32 @@ public class ResourceAvoidanceExtractor {
   }
 
   /**
-   * Extracts the {@link Point}s that are explicitly or implicitly referenced in the
+   * Extracts resources that are referenced in the
    * {@link ObjectPropConstants#TRANSPORT_ORDER_RESOURCES_TO_AVOID} property of the given
    * {@link TransportOrder}.
    * <p>
-   * Explicit references are points whose name contained in the property's value. Implicit
-   * references are points that are source or destination of a path OR are linked to a location,
-   * whereby the name of the path/location is contained in the property's value.
+   * The extraction result will contain {@link Point}s and {@link Path}s that are referenced by
+   * their name in the property's value and also points that are linked to a {@link Location},
+   * whereby the name of the location is referenced in the property's value.
    * </p>
    *
    * @param order The transport order.
-   * @return The extract set of points.
+   * @return The extracted resources.
    */
   @Nonnull
-  public Set<Point> extractPointsToAvoid(@Nullable TransportOrder order) {
+  public ResourcesToAvoid extractResourcesToAvoid(@Nullable TransportOrder order) {
     if (order == null) {
-      return Set.of();
+      return ResourcesToAvoid.EMPTY;
     }
 
     String resourcesToAvoidString
         = order.getProperty(ObjectPropConstants.TRANSPORT_ORDER_RESOURCES_TO_AVOID);
     if (resourcesToAvoidString == null) {
-      return Set.of();
+      return ResourcesToAvoid.EMPTY;
     }
 
     Set<Point> pointsToAvoid = new HashSet<>();
+    Set<Path> pathsToAvoid = new HashSet<>();
     Set<String> resourcesToAvoidByName = Set.of(resourcesToAvoidString.split(","));
     for (String resourceToAvoid : resourcesToAvoidByName) {
       Point point = objectService.fetchObject(Point.class, resourceToAvoid);
@@ -78,8 +79,7 @@ public class ResourceAvoidanceExtractor {
 
       Path path = objectService.fetchObject(Path.class, resourceToAvoid);
       if (path != null) {
-        pointsToAvoid.add(objectService.fetchObject(Point.class, path.getSourcePoint()));
-        pointsToAvoid.add(objectService.fetchObject(Point.class, path.getDestinationPoint()));
+        pathsToAvoid.add(path);
         continue;
       }
 
@@ -94,6 +94,57 @@ public class ResourceAvoidanceExtractor {
       LOG.debug("Ignoring resource '{}' which is not a point, path or location.", resourceToAvoid);
     }
 
-    return pointsToAvoid;
+    return new ResourcesToAvoid(pointsToAvoid, pathsToAvoid);
+  }
+
+  /**
+   * A wrapper for resources to be avoided.
+   */
+  public static class ResourcesToAvoid {
+
+    /**
+     * An instance representing no resources to be avoided.
+     */
+    public static final ResourcesToAvoid EMPTY = new ResourcesToAvoid(Set.of(), Set.of());
+    private final Set<Point> points;
+    private final Set<Path> paths;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param points The set of points to be avoided.
+     * @param paths The set of paths to be avoided.
+     */
+    private ResourcesToAvoid(Set<Point> points, Set<Path> paths) {
+      this.points = requireNonNull(points, "points");
+      this.paths = requireNonNull(paths, "paths");
+    }
+
+    /**
+     * Returns the set of points to be avoided.
+     *
+     * @return The set of points to be avoided.
+     */
+    public Set<Point> getPoints() {
+      return points;
+    }
+
+    /**
+     * Returns the set of paths to avoid.
+     *
+     * @return The set of paths to avoid.
+     */
+    public Set<Path> getPaths() {
+      return paths;
+    }
+
+    /**
+     * Checks whether there are any resources to be avoided.
+     *
+     * @return {@code true}, if there are any resources to be avoided, otherwise {@code false}.
+     */
+    public boolean isEmpty() {
+      return points.isEmpty() && paths.isEmpty();
+    }
   }
 }

@@ -8,6 +8,7 @@
 package org.opentcs.strategies.basic.routing;
 
 import java.util.Set;
+import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 
@@ -17,11 +18,15 @@ import org.opentcs.data.model.Vehicle;
 public interface PointRouterFactory {
 
   /**
-   * Creates a point router for the given vehicle while excluding the given set of points from it.
+   * Creates a point router for the given vehicle while excluding the given set of points and paths
+   * from it.
    *
    * @param vehicle The vehicle.
    * @param pointsToExclude The set of points to be excluded.
+   * @param pathsToExclude The set of paths to be excluded.
    * @return The point router.
    */
-  PointRouter createPointRouter(Vehicle vehicle, Set<Point> pointsToExclude);
+  PointRouter createPointRouter(Vehicle vehicle,
+                                Set<Point> pointsToExclude,
+                                Set<Path> pathsToExclude);
 }

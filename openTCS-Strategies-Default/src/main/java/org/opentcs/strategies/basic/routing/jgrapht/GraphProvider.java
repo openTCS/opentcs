@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -92,17 +91,19 @@ public class GraphProvider {
    *
    * @param vehicle The vehicle.
    * @param pointsToExclude The set of points to not include in the derived routing graph.
+   * @param pathsToExclude The set of paths to not include in the derived routing graph.
    * @return The derived {@link GraphResult}.
    */
   public GraphResult getDerivedGraphResult(Vehicle vehicle,
-                                           Set<Point> pointsToExclude) {
+                                           Set<Point> pointsToExclude,
+                                           Set<Path> pathsToExclude) {
     GraphResult baseGraph = getGraphResult(vehicle);
 
     // Determine the derived point base and path base.
     Set<Point> derivedPointBase = new HashSet<>(baseGraph.getPointBase());
     derivedPointBase.removeAll(pointsToExclude);
     Set<Path> derivedPathBase = new HashSet<>(baseGraph.getPathBase());
-    derivedPathBase.removeIf(path -> isPathConnectedToPoints(path, pointsToExclude));
+    derivedPathBase.removeAll(pathsToExclude);
 
     Graph<String, Edge> derivedGraph = new DirectedWeightedMultigraph<>(Edge.class);
 
@@ -120,6 +121,14 @@ public class GraphProvider {
         .collect(Collectors.toSet());
     baseGraph.getGraph().edgeSet().stream()
         .filter(edge -> pathsToIncludeByName.contains(edge.getPath().getName()))
+        // Ensure that edges are only added if their source and target vertices are contained in the
+        // derived graph. This is relevant when there are points to be excluded from the derived
+        // graph, as adding an edge whose source or target vertex is not present in the graph will
+        // result in an IllegalArgumentException.
+        .filter(
+            edge -> pointsToIncludeByName.contains(edge.getSourceVertex())
+            && pointsToIncludeByName.contains(edge.getTargetVertex())
+        )
         .forEach(edge -> {
           derivedGraph.addEdge(edge.getSourceVertex(), edge.getTargetVertex(), edge);
           derivedGraph.setEdgeWeight(edge, baseGraph.getGraph().getEdgeWeight(edge));
@@ -160,14 +169,6 @@ public class GraphProvider {
           )
       );
     }
-  }
-
-  private boolean isPathConnectedToPoints(Path path, Set<Point> points) {
-    return points.stream()
-        .anyMatch(
-            point -> Objects.equals(point.getReference(), path.getSourcePoint())
-            || Objects.equals(point.getReference(), path.getDestinationPoint())
-        );
   }
 
   /**
