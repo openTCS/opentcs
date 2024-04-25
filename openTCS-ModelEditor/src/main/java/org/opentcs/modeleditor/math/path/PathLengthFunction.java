@@ -12,10 +12,7 @@ import org.opentcs.guing.base.model.elements.PathModel;
 
 /**
  * A function that computes the length of a path.
- *
- * @author Stefan Walter (Fraunhofer IML)
  */
 public interface PathLengthFunction
     extends ToDoubleFunction<PathModel> {
-
 }
