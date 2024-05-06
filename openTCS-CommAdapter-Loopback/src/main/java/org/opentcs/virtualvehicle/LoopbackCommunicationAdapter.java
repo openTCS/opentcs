@@ -118,8 +118,8 @@ public class LoopbackCommunicationAdapter
     if (initialPos != null) {
       initVehiclePosition(initialPos);
     }
-    getProcessModel().setVehicleState(Vehicle.State.IDLE);
-    getProcessModel().setVehicleLoadHandlingDevices(
+    getProcessModel().setState(Vehicle.State.IDLE);
+    getProcessModel().setLoadHandlingDevices(
         Arrays.asList(new LoadHandlingDevice(LHD_NAME, false))
     );
     initialized = true;
@@ -148,14 +148,14 @@ public class LoopbackCommunicationAdapter
     }
     if (Objects.equals(evt.getPropertyName(),
                        VehicleProcessModel.Attribute.LOAD_HANDLING_DEVICES.name())) {
-      if (!getProcessModel().getVehicleLoadHandlingDevices().isEmpty()
-          && getProcessModel().getVehicleLoadHandlingDevices().get(0).isFull()) {
+      if (!getProcessModel().getLoadHandlingDevices().isEmpty()
+          && getProcessModel().getLoadHandlingDevices().get(0).isFull()) {
         loadState = LoadState.FULL;
-        getProcessModel().setVehicleLength(configuration.vehicleLengthLoaded());
+        getProcessModel().setLength(configuration.vehicleLengthLoaded());
       }
       else {
         loadState = LoadState.EMPTY;
-        getProcessModel().setVehicleLength(configuration.vehicleLengthUnloaded());
+        getProcessModel().setLength(configuration.vehicleLengthUnloaded());
       }
     }
     if (Objects.equals(evt.getPropertyName(),
@@ -225,7 +225,7 @@ public class LoopbackCommunicationAdapter
 
   @Override
   public synchronized void initVehiclePosition(String newPos) {
-    ((ExecutorService) getExecutor()).submit(() -> getProcessModel().setVehiclePosition(newPos));
+    ((ExecutorService) getExecutor()).submit(() -> getProcessModel().setPosition(newPos));
   }
 
   @Override
@@ -324,7 +324,7 @@ public class LoopbackCommunicationAdapter
   private void startVehicleSimulation(MovementCommand command) {
     LOG.debug("Starting vehicle simulation for command: {}", command);
     Step step = command.getStep();
-    getProcessModel().setVehicleState(Vehicle.State.EXECUTING);
+    getProcessModel().setState(Vehicle.State.EXECUTING);
 
     if (step.getPath() == null) {
       LOG.debug("Starting operation simulation...");
@@ -376,7 +376,7 @@ public class LoopbackCommunicationAdapter
     else {
       //if the way enties are different then we have finished this step
       //and we can move on.
-      getProcessModel().setVehiclePosition(prevWayEntry.getDestPointName());
+      getProcessModel().setPosition(prevWayEntry.getDestPointName());
       LOG.debug("Movement simulation finished.");
       if (!command.hasEmptyOperation()) {
         LOG.debug("Starting operation simulation...");
@@ -413,13 +413,13 @@ public class LoopbackCommunicationAdapter
       String operation = command.getOperation();
       if (operation.equals(getProcessModel().getLoadOperation())) {
         // Update load handling devices as defined by this operation
-        getProcessModel().setVehicleLoadHandlingDevices(
+        getProcessModel().setLoadHandlingDevices(
             Arrays.asList(new LoadHandlingDevice(LHD_NAME, true))
         );
         simulateNextCommand();
       }
       else if (operation.equals(getProcessModel().getUnloadOperation())) {
-        getProcessModel().setVehicleLoadHandlingDevices(
+        getProcessModel().setLoadHandlingDevices(
             Arrays.asList(new LoadHandlingDevice(LHD_NAME, false))
         );
         simulateNextCommand();
@@ -427,11 +427,11 @@ public class LoopbackCommunicationAdapter
       else if (operation.equals(this.getRechargeOperation())) {
         LOG.debug("Starting recharge simulation...");
         finishMovementCommand(command);
-        getProcessModel().setVehicleState(Vehicle.State.CHARGING);
+        getProcessModel().setState(Vehicle.State.CHARGING);
         ((ScheduledExecutorService) getExecutor()).schedule(
             () -> chargingSimulation(
-                getProcessModel().getVehiclePosition(),
-                getProcessModel().getVehicleEnergyLevel()
+                getProcessModel().getPosition(),
+                getProcessModel().getEnergyLevel()
             ),
             SIMULATION_PERIOD,
             TimeUnit.MILLISECONDS);
@@ -456,19 +456,19 @@ public class LoopbackCommunicationAdapter
       return;
     }
 
-    if (getProcessModel().getVehicleState() != Vehicle.State.CHARGING) {
+    if (getProcessModel().getState() != Vehicle.State.CHARGING) {
       LOG.debug("Aborting recharge operation, vehicle no longer charging state...");
       simulateNextCommand();
       return;
     }
 
-    if (!Objects.equals(getProcessModel().getVehiclePosition(), rechargePosition)) {
+    if (!Objects.equals(getProcessModel().getPosition(), rechargePosition)) {
       LOG.debug("Aborting recharge operation, vehicle position changed...");
       simulateNextCommand();
       return;
     }
     if (nextChargePercentage(rechargePercentage) < 100.0) {
-      getProcessModel().setVehicleEnergyLevel((int) rechargePercentage);
+      getProcessModel().setEnergyLevel((int) rechargePercentage);
       ((ScheduledExecutorService) getExecutor()).schedule(
           () -> chargingSimulation(rechargePosition, nextChargePercentage(rechargePercentage)),
           SIMULATION_PERIOD,
@@ -476,7 +476,7 @@ public class LoopbackCommunicationAdapter
     }
     else {
       LOG.debug("Finishing recharge operation, vehicle at 100%...");
-      getProcessModel().setVehicleEnergyLevel(100);
+      getProcessModel().setEnergyLevel(100);
       simulateNextCommand();
     }
   }
@@ -489,7 +489,7 @@ public class LoopbackCommunicationAdapter
   private void finishMovementCommand(MovementCommand command) {
     //Set the vehicle state to idle
     if (getSentCommands().size() <= 1 && getUnsentCommands().isEmpty()) {
-      getProcessModel().setVehicleState(Vehicle.State.IDLE);
+      getProcessModel().setState(Vehicle.State.IDLE);
     }
     if (Objects.equals(getSentCommands().peek(), command)) {
       // Let the comm adapter know we have finished this command.
@@ -506,7 +506,7 @@ public class LoopbackCommunicationAdapter
   void simulateNextCommand() {
     if (getSentCommands().isEmpty() || getProcessModel().isSingleStepModeEnabled()) {
       LOG.debug("Vehicle simulation is done.");
-      getProcessModel().setVehicleState(Vehicle.State.IDLE);
+      getProcessModel().setState(Vehicle.State.IDLE);
       isSimulationRunning = false;
     }
     else {

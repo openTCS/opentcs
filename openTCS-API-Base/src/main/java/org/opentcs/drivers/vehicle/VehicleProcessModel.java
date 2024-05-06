@@ -23,6 +23,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * An observable model of a vehicle's and its comm adapter's attributes.
@@ -66,7 +67,7 @@ public class VehicleProcessModel {
   /**
    * The name of the vehicle's current position.
    */
-  private String vehiclePosition;
+  private String position;
   /**
    * User notifications published by the comm adapter.
    */
@@ -129,9 +130,22 @@ public class VehicleProcessModel {
    * Returns a reference to the vehicle.
    *
    * @return A reference to the vehicle.
+   * @deprecated Use {@link #getReference()} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   @Nonnull
   public TCSObjectReference<Vehicle> getVehicleReference() {
+    return getReference();
+  }
+
+  /**
+   * Returns a reference to the vehicle.
+   *
+   * @return A reference to the vehicle.
+   */
+  @Nonnull
+  public TCSObjectReference<Vehicle> getReference() {
     return vehicleReference;
   }
 
@@ -236,10 +250,35 @@ public class VehicleProcessModel {
    * Returns the vehicle's current position.
    *
    * @return The position.
+   * @deprecated Use {@link #getPosition()} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   @Nullable
   public String getVehiclePosition() {
-    return vehiclePosition;
+    return getPosition();
+  }
+
+  /**
+   * Returns the vehicle's current position.
+   *
+   * @return The position.
+   */
+  @Nullable
+  public String getPosition() {
+    return position;
+  }
+
+  /**
+   * Updates the vehicle's current position.
+   *
+   * @param position The new position
+   * @deprecated Use {@link #setPosition(java.lang.String)} instead.
+   */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
+  public void setVehiclePosition(@Nullable String position) {
+    setPosition(position);
   }
 
   /**
@@ -247,10 +286,10 @@ public class VehicleProcessModel {
    *
    * @param position The new position
    */
-  public void setVehiclePosition(@Nullable String position) {
+  public void setPosition(@Nullable String position) {
     // Otherwise update the position, notify listeners and let the kernel know.
-    String oldValue = this.vehiclePosition;
-    vehiclePosition = position;
+    String oldValue = this.position;
+    this.position = position;
 
     getPropertyChangeSupport().firePropertyChange(Attribute.POSITION.name(),
                                                   oldValue,
@@ -261,9 +300,22 @@ public class VehicleProcessModel {
    * Returns the vehicle's precise position.
    *
    * @return The vehicle's precise position.
+   * @deprecated Use {@link #getPrecisePosition()} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   @Nullable
   public Triple getVehiclePrecisePosition() {
+    return getPrecisePosition();
+  }
+
+  /**
+   * Returns the vehicle's precise position.
+   *
+   * @return The vehicle's precise position.
+   */
+  @Nullable
+  public Triple getPrecisePosition() {
     return precisePosition;
   }
 
@@ -271,8 +323,20 @@ public class VehicleProcessModel {
    * Sets the vehicle's precise position.
    *
    * @param position The new position.
+   * @deprecated Use {@link #setPrecisePosition(org.opentcs.data.model.Triple)} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public void setVehiclePrecisePosition(@Nullable Triple position) {
+    setPrecisePosition(position);
+  }
+
+  /**
+   * Sets the vehicle's precise position.
+   *
+   * @param position The new position.
+   */
+  public void setPrecisePosition(@Nullable Triple position) {
     // Otherwise update the position, notify listeners and let the kernel know.
     Triple oldValue = this.precisePosition;
     this.precisePosition = position;
@@ -287,8 +351,21 @@ public class VehicleProcessModel {
    *
    * @return The vehicle's current orientation angle.
    * @see Vehicle#getOrientationAngle()
+   * @deprecated Use {@link #getOrientationAngle()} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public double getVehicleOrientationAngle() {
+    return getOrientationAngle();
+  }
+
+  /**
+   * Returns the vehicle's current orientation angle.
+   *
+   * @return The vehicle's current orientation angle.
+   * @see Vehicle#getOrientationAngle()
+   */
+  public double getOrientationAngle() {
     return orientationAngle;
   }
 
@@ -296,8 +373,20 @@ public class VehicleProcessModel {
    * Sets the vehicle's current orientation angle.
    *
    * @param angle The new angle
+   * @deprecated Use {@link #setOrientationAngle(double)} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public void setVehicleOrientationAngle(double angle) {
+    setOrientationAngle(angle);
+  }
+
+  /**
+   * Sets the vehicle's current orientation angle.
+   *
+   * @param angle The new angle
+   */
+  public void setOrientationAngle(double angle) {
     double oldValue = this.orientationAngle;
     this.orientationAngle = angle;
 
@@ -310,8 +399,20 @@ public class VehicleProcessModel {
    * Returns the vehicle's current energy level.
    *
    * @return The vehicle's current energy level.
+   * @deprecated Use {@link #getEnergyLevel()} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public int getVehicleEnergyLevel() {
+    return getEnergyLevel();
+  }
+
+  /**
+   * Returns the vehicle's current energy level.
+   *
+   * @return The vehicle's current energy level.
+   */
+  public int getEnergyLevel() {
     return energyLevel;
   }
 
@@ -319,8 +420,20 @@ public class VehicleProcessModel {
    * Sets the vehicle's current energy level.
    *
    * @param newLevel The new level.
+   * @deprecated Use {@link #setEnergyLevel(int)} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public void setVehicleEnergyLevel(int newLevel) {
+    setEnergyLevel(newLevel);
+  }
+
+  /**
+   * Sets the vehicle's current energy level.
+   *
+   * @param newLevel The new level.
+   */
+  public void setEnergyLevel(int newLevel) {
     int oldValue = this.energyLevel;
     this.energyLevel = newLevel;
 
@@ -333,9 +446,22 @@ public class VehicleProcessModel {
    * Returns the vehicle's load handling devices.
    *
    * @return The vehicle's load handling devices.
+   * @deprecated Use {@link #getLoadHandlingDevices()} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   @Nonnull
   public List<LoadHandlingDevice> getVehicleLoadHandlingDevices() {
+    return getLoadHandlingDevices();
+  }
+
+  /**
+   * Returns the vehicle's load handling devices.
+   *
+   * @return The vehicle's load handling devices.
+   */
+  @Nonnull
+  public List<LoadHandlingDevice> getLoadHandlingDevices() {
     return loadHandlingDevices;
   }
 
@@ -343,8 +469,20 @@ public class VehicleProcessModel {
    * Sets the vehicle's load handling devices.
    *
    * @param devices The new devices
+   * @deprecated Use {@link #setLoadHandlingDevices(java.util.List)} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public void setVehicleLoadHandlingDevices(@Nonnull List<LoadHandlingDevice> devices) {
+    setLoadHandlingDevices(devices);
+  }
+
+  /**
+   * Sets the vehicle's load handling devices.
+   *
+   * @param devices The new devices
+   */
+  public void setLoadHandlingDevices(@Nonnull List<LoadHandlingDevice> devices) {
     List<LoadHandlingDevice> devs = new ArrayList<>(devices);
 
     List<LoadHandlingDevice> oldValue = this.loadHandlingDevices;
@@ -360,8 +498,21 @@ public class VehicleProcessModel {
    *
    * @param key The property's key.
    * @param value The property's new value.
+   * @deprecated Use {@link #setProperty(java.lang.String, java.lang.String)} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public void setVehicleProperty(@Nonnull String key, @Nullable String value) {
+    setProperty(key, value);
+  }
+
+  /**
+   * Sets a property of the vehicle.
+   *
+   * @param key The property's key.
+   * @param value The property's new value.
+   */
+  public void setProperty(@Nonnull String key, @Nullable String value) {
     requireNonNull(key, "key");
 
     // Check whether the new value is the same as the last one we set. If yes, ignore the update,
@@ -382,9 +533,22 @@ public class VehicleProcessModel {
    * Returns the vehicle's current state.
    *
    * @return The state
+   * @deprecated Use {@link #getState()} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   @Nonnull
   public Vehicle.State getVehicleState() {
+    return getState();
+  }
+
+  /**
+   * Returns the vehicle's current state.
+   *
+   * @return The state
+   */
+  @Nonnull
+  public Vehicle.State getState() {
     return state;
   }
 
@@ -392,8 +556,20 @@ public class VehicleProcessModel {
    * Sets the vehicle's current state.
    *
    * @param newState The new state
+   * @deprecated Use {@link #setState(org.opentcs.data.model.Vehicle.State)} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public void setVehicleState(@Nonnull Vehicle.State newState) {
+    setState(newState);
+  }
+
+  /**
+   * Sets the vehicle's current state.
+   *
+   * @param newState The new state
+   */
+  public void setState(@Nonnull Vehicle.State newState) {
     Vehicle.State oldState = this.state;
     this.state = newState;
 
@@ -415,8 +591,20 @@ public class VehicleProcessModel {
    * Returns the vehicle's current length.
    *
    * @return The vehicle's current length.
+   * @deprecated Use {@link #getLength()} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public int getVehicleLength() {
+    return getLength();
+  }
+
+  /**
+   * Returns the vehicle's current length.
+   *
+   * @return The vehicle's current length.
+   */
+  public int getLength() {
     return length;
   }
 
@@ -424,8 +612,20 @@ public class VehicleProcessModel {
    * Sets the vehicle's current length.
    *
    * @param length The new length.
+   * @deprecated Use {@link #setLength(int)} instead.
    */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public void setVehicleLength(int length) {
+    setLength(length);
+  }
+
+  /**
+   * Sets the vehicle's current length.
+   *
+   * @param length The new length.
+   */
+  public void setLength(int length) {
     int oldValue = this.length;
     this.length = length;
 

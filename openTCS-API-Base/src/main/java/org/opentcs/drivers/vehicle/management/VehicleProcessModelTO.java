@@ -20,56 +20,28 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A serializable representation of a {@link VehicleProcessModel}.
+ * <p>
+ * For documentation of methods in this class, see the API documentation of their corresponding
+ * counterparts in {@link VehicleProcessModel}.
+ * </p>
  */
 public class VehicleProcessModelTO
     implements Serializable {
 
-  /**
-   * The vehicle name to this process model.
-   */
-  private String vehicleName;
-  /**
-   * Whether the comm adapter is currently enabled.
-   */
+  private String name;
   private boolean commAdapterEnabled;
-  /**
-   * Whether the comm adapter is currently connected to the vehicle.
-   */
   private boolean commAdapterConnected;
-  /**
-   * The name of the vehicle's current position.
-   */
-  private String vehiclePosition;
-  /**
-   * User notifications published by the comm adapter.
-   */
+  private String position;
   private Queue<UserNotification> notifications = new ArrayDeque<>();
-  /**
-   * The percise position of the vehicle.
-   */
   private Triple precisePosition;
-  /**
-   * The vehicle's orentation angle.
-   */
   private double orientationAngle = Double.NaN;
-  /**
-   * The vehicle's energy level.
-   */
   private int energyLevel;
-  /**
-   * A list of load handling devices attached to the vehicle.
-   */
   private List<LoadHandlingDevice> loadHandlingDevices = new ArrayList<>();
-  /**
-   * The vehicle's state.
-   */
-  private Vehicle.State vehicleState = Vehicle.State.UNKNOWN;
-  /**
-   * The vehicle's length.
-   */
+  private Vehicle.State state = Vehicle.State.UNKNOWN;
   private int length;
 
   /**
@@ -78,12 +50,30 @@ public class VehicleProcessModelTO
   public VehicleProcessModelTO() {
   }
 
+  /**
+   * @deprecated Use {@link #getName()} instead.
+   */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public String getVehicleName() {
-    return vehicleName;
+    return getName();
   }
 
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * @deprecated Use {@link #setName(java.lang.String)} instead.
+   */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public VehicleProcessModelTO setVehicleName(@Nonnull String vehicleName) {
-    this.vehicleName = requireNonNull(vehicleName);
+    return setName(vehicleName);
+  }
+
+  public VehicleProcessModelTO setName(@Nonnull String name) {
+    this.name = requireNonNull(name);
     return this;
   }
 
@@ -105,13 +95,32 @@ public class VehicleProcessModelTO
     return this;
   }
 
+  /**
+   * @deprecated Use {@link #getPosition()} instead.
+   */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   @Nullable
   public String getVehiclePosition() {
-    return vehiclePosition;
+    return getPosition();
   }
 
+  @Nullable
+  public String getPosition() {
+    return position;
+  }
+
+  /**
+   * @deprecated Use {@link #setPosition(java.lang.String)} instead.
+   */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public VehicleProcessModelTO setVehiclePosition(@Nullable String vehiclePosition) {
-    this.vehiclePosition = vehiclePosition;
+    return setPosition(vehiclePosition);
+  }
+
+  public VehicleProcessModelTO setPosition(@Nullable String position) {
+    this.position = position;
     return this;
   }
 
@@ -164,13 +173,32 @@ public class VehicleProcessModelTO
     return this;
   }
 
+  /**
+   * @deprecated Use {@link #getState()} instead.
+   */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   @Nonnull
   public Vehicle.State getVehicleState() {
-    return vehicleState;
+    return getState();
   }
 
+  @Nonnull
+  public Vehicle.State getState() {
+    return state;
+  }
+
+  /**
+   * @deprecated Use {@link #setState(org.opentcs.data.model.Vehicle.State)} instead.
+   */
+  @Deprecated()
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   public VehicleProcessModelTO setVehicleState(@Nonnull Vehicle.State state) {
-    this.vehicleState = requireNonNull(state, "state");
+    return setState(state);
+  }
+
+  public VehicleProcessModelTO setState(@Nonnull Vehicle.State state) {
+    this.state = requireNonNull(state, "state");
     return this;
   }
 

@@ -34,6 +34,6 @@ public class SetPrecisePositionCommand
 
   @Override
   public void execute(VehicleCommAdapter adapter) {
-    adapter.getProcessModel().setVehiclePrecisePosition(position);
+    adapter.getProcessModel().setPrecisePosition(position);
   }
 }

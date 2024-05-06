@@ -142,7 +142,7 @@ class DefaultVehicleControllerTest {
     Point point = dataObjectFactory.createPoint();
     doReturn(point).when(vehicleService).fetchObject(Point.class, point.getName());
 
-    vehicleModel.setVehiclePosition(point.getName());
+    vehicleModel.setPosition(point.getName());
 
     verify(vehicleService).updateVehiclePosition(vehicle.getReference(),
                                                  point.getReference());
@@ -151,7 +151,7 @@ class DefaultVehicleControllerTest {
   @Test
   void shouldForwardPrecisePositionChangeToKernel() {
     Triple newPos = new Triple(211, 391, 0);
-    vehicleModel.setVehiclePrecisePosition(newPos);
+    vehicleModel.setPrecisePosition(newPos);
 
     verify(vehicleService).updateVehiclePrecisePosition(vehicle.getReference(),
                                                         newPos);
@@ -160,7 +160,7 @@ class DefaultVehicleControllerTest {
   @Test
   void shouldForwardAngleChangeToKernel() {
     double newAngle = 7.5;
-    vehicleModel.setVehicleOrientationAngle(newAngle);
+    vehicleModel.setOrientationAngle(newAngle);
 
     verify(vehicleService).updateVehicleOrientationAngle(vehicle.getReference(),
                                                          newAngle);
@@ -169,7 +169,7 @@ class DefaultVehicleControllerTest {
   @Test
   void shouldForwardEnergyLevelChangeToKernel() {
     int newLevel = 80;
-    vehicleModel.setVehicleEnergyLevel(newLevel);
+    vehicleModel.setEnergyLevel(newLevel);
     verify(vehicleService).updateVehicleEnergyLevel(vehicle.getReference(),
                                                     newLevel);
   }
@@ -178,7 +178,7 @@ class DefaultVehicleControllerTest {
   void shouldForwardLoadHandlingDevicesChangeToKernel() {
     List<LoadHandlingDevice> devices
         = List.of(new LoadHandlingDevice("MyLoadHandlingDevice", true));
-    vehicleModel.setVehicleLoadHandlingDevices(devices);
+    vehicleModel.setLoadHandlingDevices(devices);
 
     verify(vehicleService).updateVehicleLoadHandlingDevices(vehicle.getReference(),
                                                             devices);
@@ -186,7 +186,7 @@ class DefaultVehicleControllerTest {
 
   @Test
   void shouldForwardVehicleStateChangeToKernel() {
-    vehicleModel.setVehicleState(Vehicle.State.EXECUTING);
+    vehicleModel.setState(Vehicle.State.EXECUTING);
 
     verify(vehicleService).updateVehicleState(vehicle.getReference(),
                                               Vehicle.State.EXECUTING);

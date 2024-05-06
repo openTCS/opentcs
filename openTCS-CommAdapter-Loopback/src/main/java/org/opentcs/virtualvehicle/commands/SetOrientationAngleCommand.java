@@ -32,6 +32,6 @@ public class SetOrientationAngleCommand
 
   @Override
   public void execute(VehicleCommAdapter adapter) {
-    adapter.getProcessModel().setVehicleOrientationAngle(angle);
+    adapter.getProcessModel().setOrientationAngle(angle);
   }
 }

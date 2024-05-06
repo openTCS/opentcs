@@ -200,7 +200,7 @@ public class VehicleTableModel
       case ENABLED_COLUMN:
         return entry.getProcessModel().isCommAdapterEnabled();
       case POSITION_COLUMN:
-        return entry.getProcessModel().getVehiclePosition();
+        return entry.getProcessModel().getPosition();
       default:
         LOG.warn("Unhandled column index: {}", columnIndex);
         return "Invalid column index " + columnIndex;
@@ -284,7 +284,7 @@ public class VehicleTableModel
   }
 
   private String getVehicleState(LocalVehicleEntry entry) {
-    return entry.getProcessModel().getVehicleState().name();
+    return entry.getProcessModel().getState().name();
   }
 
   private boolean isRelevantUpdate(PropertyChangeEvent evt) {
@@ -299,8 +299,8 @@ public class VehicleTableModel
       VehicleProcessModelTO oldTo = (VehicleProcessModelTO) evt.getOldValue();
       VehicleProcessModelTO newTo = (VehicleProcessModelTO) evt.getNewValue();
       return oldTo.isCommAdapterEnabled() != newTo.isCommAdapterEnabled()
-          || oldTo.getVehicleState() != newTo.getVehicleState()
-          || !Objects.equals(oldTo.getVehiclePosition(), newTo.getVehiclePosition());
+          || oldTo.getState() != newTo.getState()
+          || !Objects.equals(oldTo.getPosition(), newTo.getPosition());
     }
     return false;
   }

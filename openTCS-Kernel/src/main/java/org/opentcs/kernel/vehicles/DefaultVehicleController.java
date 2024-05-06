@@ -218,23 +218,23 @@ public class DefaultVehicleController
     commAdapter.getProcessModel().addPropertyChangeListener(this);
 
     // Initialize standard attributes once.
-    setVehiclePosition(commAdapter.getProcessModel().getVehiclePosition());
+    setVehiclePosition(commAdapter.getProcessModel().getPosition());
     vehicleService.updateVehiclePrecisePosition(
         vehicle.getReference(),
-        commAdapter.getProcessModel().getVehiclePrecisePosition()
+        commAdapter.getProcessModel().getPrecisePosition()
     );
     vehicleService.updateVehicleOrientationAngle(
         vehicle.getReference(),
-        commAdapter.getProcessModel().getVehicleOrientationAngle()
+        commAdapter.getProcessModel().getOrientationAngle()
     );
     vehicleService.updateVehicleEnergyLevel(vehicle.getReference(),
-                                            commAdapter.getProcessModel().getVehicleEnergyLevel());
+                                            commAdapter.getProcessModel().getEnergyLevel());
     vehicleService.updateVehicleLoadHandlingDevices(
         vehicle.getReference(),
-        commAdapter.getProcessModel().getVehicleLoadHandlingDevices()
+        commAdapter.getProcessModel().getLoadHandlingDevices()
     );
-    updateVehicleState(commAdapter.getProcessModel().getVehicleState());
-    updateVehicleLength(commAdapter.getProcessModel().getVehicleLength());
+    updateVehicleState(commAdapter.getProcessModel().getState());
+    updateVehicleLength(commAdapter.getProcessModel().getLength());
 
     claimedResources.clear();
     allocatedResources.clear();
@@ -1001,7 +1001,7 @@ public class DefaultVehicleController
           = ResourceMath.freeableResourceSetCount(
               SplitResources.from(allocatedResources, getNeededResources(lastCommandExecuted))
                   .getResourcesPassed(),
-              commAdapter.getProcessModel().getVehicleLength()
+              commAdapter.getProcessModel().getLength()
           );
       for (int i = 0; i < freeableResourceSetCount; i++) {
         Set<TCSResource<?>> oldResources = allocatedResources.poll();
@@ -1263,12 +1263,12 @@ public class DefaultVehicleController
 
         // Update the vehicle's position in its model, but don't allocate any resources
         VehicleProcessModel processModel = commAdapter.getProcessModel();
-        if (processModel.getVehiclePosition() != null) {
-          Point point = vehicleService.fetchObject(Point.class, processModel.getVehiclePosition());
+        if (processModel.getPosition() != null) {
+          Point point = vehicleService.fetchObject(Point.class, processModel.getPosition());
           vehicleService.updateVehiclePosition(vehicle.getReference(), point.getReference());
         }
         vehicleService.updateVehiclePrecisePosition(vehicle.getReference(),
-                                                    processModel.getVehiclePrecisePosition());
+                                                    processModel.getPrecisePosition());
       }
       else if ((currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_RESPECTED
                 || currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_UTILIZED)
@@ -1297,11 +1297,11 @@ public class DefaultVehicleController
     // We don't want to set the vehicle position right away, since the vehicle's currently
     // allocated resources would be freed in the first place. We need to check, if the vehicle's
     // current position is already part of it's allocated resoruces.
-    if (!alreadyAllocated(processModel.getVehiclePosition())) {
+    if (!alreadyAllocated(processModel.getPosition())) {
       // Set vehicle's position to allocate the resources
-      setVehiclePosition(processModel.getVehiclePosition());
+      setVehiclePosition(processModel.getPosition());
       vehicleService.updateVehiclePrecisePosition(vehicle.getReference(),
-                                                  processModel.getVehiclePrecisePosition());
+                                                  processModel.getPrecisePosition());
     }
   }
 
