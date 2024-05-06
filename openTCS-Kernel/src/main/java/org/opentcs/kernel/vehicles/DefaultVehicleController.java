@@ -433,8 +433,8 @@ public class DefaultVehicleController
 
       futureCommands.addAll(movementCommandMapper.toMovementCommands(newOrder, transportOrder));
       // The current drive order got updated but our queue of future commands now contains commands
-      // that have already been processed, so discard these
-      discardSentFutureCommands();
+      // that have already been processed, so discard these.
+      discardProcessedFutureCommands();
 
       // Get an up-tp-date copy of the vehicle
       Vehicle updatedVehicle = vehicleService.fetchObject(Vehicle.class, vehicle.getReference());
@@ -535,28 +535,19 @@ public class DefaultVehicleController
     withdrawPendingResourceAllocations();
   }
 
-  private void discardSentFutureCommands() {
-    MovementCommand lastCommandSent;
-    if (commandsSent.isEmpty()) {
-      if (lastCommandExecuted == null) {
-        // There are no commands to be discarded.
-        return;
-      }
-      else {
-        // No commands in the 'sent queue', but the vehicle already executed some commands
-        lastCommandSent = lastCommandExecuted;
-      }
-    }
-    else {
-      lastCommandSent = commandsSent.getLast();
+  private void discardProcessedFutureCommands() {
+    MovementCommand lastCommandProcessed = lastCommandProcessed();
+    if (lastCommandProcessed == null) {
+      // There are no commands to be discarded.
+      return;
     }
 
     LOG.debug("{}: Discarding future commands up to '{}' (inclusively): {}",
               vehicle.getName(),
-              lastCommandSent,
+              lastCommandProcessed,
               futureCommands);
     // Discard commands up to lastCommandSent...
-    while (!lastCommandSent.equalsInMovement(futureCommands.peek())) {
+    while (!lastCommandProcessed.equalsInMovement(futureCommands.peek())) {
       futureCommands.poll();
     }
     // ...and also discard lastCommandSent itself.
@@ -1357,15 +1348,11 @@ public class DefaultVehicleController
         .flatMap(movementCommandQueue -> movementCommandQueue.stream())
         .collect(Collectors.toList());
 
-    // Commands that we have already sent to the vehicle or executed should not be included in the
-    // remaining claim.
-    if (!commandsSent.isEmpty() || lastCommandExecuted != null) {
-      MovementCommand lastCommandedCommand = commandsSent.stream()
-          .reduce((cmd1, cmd2) -> cmd2)
-          .orElse(lastCommandExecuted);
-
+    // Commands that we have already processed should not be included in the remaining claim.
+    MovementCommand lastCommandProcessed = lastCommandProcessed();
+    if (lastCommandProcessed != null) {
       futureMovementCommands = futureMovementCommands.stream()
-          .dropWhile(command -> !command.equalsInMovement(lastCommandedCommand))
+          .dropWhile(command -> !command.equalsInMovement(lastCommandProcessed))
           .skip(1)
           .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -1392,5 +1379,51 @@ public class DefaultVehicleController
     }
 
     return false;
+  }
+
+  /**
+   * Returns the last movement command that has been processed by this vehicle controller in a way
+   * that is relevant in the context of rerouting.
+   * <p>
+   * Generally, a movement command is processed in multiple stages. It is:
+   * <ol>
+   * <li>Added to the <code>futureCommands</code> queue (when a transport order for the vehicle
+   * associated with this controller is set or updated).</li>
+   * <li>Removed from the <code>futureCommands</code> queue and set as the
+   * <code>pendingCommand</code> (when allocating the resources needed for executing the next
+   * command).</li>
+   * <li>Unset as the <code>pendingCommand</code> and set as the
+   * <code>interactionPendingCommand</code> (when the resources have been allocated successfully).
+   * </li>
+   * <li>Unset as the <code>interactionPendingCommand</code> and added to the
+   * <code>commandsSent</code> queue (when interactions related to the command have been reported
+   * as finished and the command has been handed over to the vehicle driver).</li>
+   * <li>Removed from the <code>commandsSent</code> queue and set as the
+   * <code>lastCommandExecuted</code> (when the driver reports that the command has been executed)
+   * </li>
+   * </ol>
+   * </p>
+   * <p>
+   * The earliest stage a movement command can be in that is relevant in the context of rerouting is
+   * when it is set as the <code>interactionPendingCommand</code>. At this stage, the resources for
+   * the command have already been (successfully) allocated, and it will either be handed over to
+   * the vehicle driver if the associated peripheral interactions are successfully finished, or
+   * otherwise discarded. Rerouting should therefore take place from this command (or rather the
+   * respective step) at the earliest.
+   * </p>
+   * <p>
+   * <code>pendingCommand</code> (as well as everything prior to that) is not relevant here, as the
+   * allocation for corresponding resources is still pending at this stage, and all pending
+   * allocations are cleared upon rerouting.
+   * </p>
+   *
+   * @return A movement command or {@code null} if there is no movement command that has been
+   * processed by this vehicle controller in a way that is relevant in the context of rerouting.
+   */
+  @Nullable
+  private MovementCommand lastCommandProcessed() {
+    return Optional.ofNullable(interactionsPendingCommand)
+        .or(() -> Optional.ofNullable(commandsSent.peekLast()))
+        .orElse(lastCommandExecuted);
   }
 }
