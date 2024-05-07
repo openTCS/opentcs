@@ -13,6 +13,7 @@ import com.google.inject.multibindings.MapBinder;
 import javax.inject.Singleton;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 import org.opentcs.guing.base.components.properties.type.AbstractComplexProperty;
+import org.opentcs.guing.base.components.properties.type.EnvelopesProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.LinkActionsProperty;
@@ -23,6 +24,7 @@ import org.opentcs.guing.base.components.properties.type.SymbolProperty;
 import org.opentcs.guing.common.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.common.components.properties.PropertiesComponentsFactory;
 import org.opentcs.guing.common.components.properties.SelectionPropertiesComponent;
+import org.opentcs.guing.common.components.properties.panel.EnvelopesPropertyEditorPanel;
 import org.opentcs.guing.common.components.properties.panel.KeyValuePropertyEditorPanel;
 import org.opentcs.guing.common.components.properties.panel.KeyValueSetPropertyEditorPanel;
 import org.opentcs.guing.common.components.properties.panel.LinkActionsEditorPanel;
@@ -80,6 +82,9 @@ public class PropertiesInjectionModule
     dialogContentMapBinder
         .addBinding(PeripheralOperationsProperty.class)
         .to(PeripheralOperationsPropertyEditorPanel.class);
+    dialogContentMapBinder
+        .addBinding(EnvelopesProperty.class)
+        .to(EnvelopesPropertyEditorPanel.class);
 
     bind(SelectionPropertiesComponent.class)
         .in(Singleton.class);

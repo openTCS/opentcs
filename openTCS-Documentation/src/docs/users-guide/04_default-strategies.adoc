@@ -158,6 +158,7 @@ It does this by allowing only mutually exclusive use of resources in the plant m
 
 When an allocation of a set of resources for a vehicle is requested, the scheduler performs the following checks to determine whether the allocation can be granted immediately:
 
+. Check if the vehicle requesting the resources is _not_ paused.
 . Check if the requested resources are generally available for the vehicle.
 . Check if the requested resources are part of a block with the type `SINGLE_VEHICLE_ONLY`.
   If not, skip this check.
@@ -165,6 +166,7 @@ When an allocation of a set of resources for a vehicle is requested, the schedul
 . Check if the requested resources are part of a block with the type `SAME_DIRECTION_ONLY`.
   If not, skip this check.
   If yes, check if the direction in which the vehicle intends to traverse the block is the same the block is already being traversed by other vehicles.
+. Check if the areas related to the requested resources are available for the vehicle and not allocated by other vehicles (provided that the vehicle requesting the resources references an envelope key and the requested resources define vehicle envelopes with that key).
 
 If all checks succeed, the allocation is made.
 If any of the checks fail, the allocation is queued for later.

@@ -17,6 +17,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * New features and enhancements:
 ** Use more sensible defaults for newly created vehicles' recharge energy level threshold values.
 ** Add proper support for recalculating the length of "2-Bezier", "3-Bezier" and "Poly-Path" paths to the Model Editor.
+** Add support for defining vehicle envelopes at points and paths to the Model Editor.
 * Bugs fixed:
 ** When referencing paths via the `tcs:resourcesToAvoid` property in transport orders, don't implicitly avoid their start and end points, as points can have multiple incoming and outgoing paths.
 ** Don't create the same peripheral job a second time if the vehicle that triggered the job was rerouted before the job was completed.

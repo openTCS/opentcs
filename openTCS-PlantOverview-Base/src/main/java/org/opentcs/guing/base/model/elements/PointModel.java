@@ -218,7 +218,7 @@ public class PointModel
     EnvelopesProperty pEnvelope = new EnvelopesProperty(this, new ArrayList<>());
     pEnvelope.setDescription(bundle.getString("pointModel.property_vehicleEnvelopes.description"));
     pEnvelope.setHelptext(bundle.getString("pointModel.property_vehicleEnvelopes.helptext"));
-    pEnvelope.setModellingEditable(false);
+    pEnvelope.setModellingEditable(true);
     setProperty(VEHICLE_ENVELOPES, pEnvelope);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
