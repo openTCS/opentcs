@@ -152,7 +152,7 @@ For this, a property with the key `tcs:resourcesToAvoid` can be set on a transpo
 === Default scheduler
 
 The default scheduler implements a simple strategy for traffic management.
-It does this by allowing only mutually exclusive use of resources in the plant model (points and paths, primarily), as described below.
+It does this by allowing only mutually exclusive use of resources in the plant model (points, paths and locations), as described below.
 
 ==== Allocating resources
 
