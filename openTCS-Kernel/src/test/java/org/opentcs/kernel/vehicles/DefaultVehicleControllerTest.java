@@ -40,6 +40,7 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
+import org.opentcs.kernel.KernelApplicationConfiguration;
 import org.opentcs.strategies.basic.scheduling.DummyScheduler;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.SimpleEventBus;
@@ -126,7 +127,8 @@ class DefaultVehicleControllerTest {
                                                         scheduler,
                                                         eventBus,
                                                         componentsFactory,
-                                                        mock(MovementCommandMapper.class));
+                                                        mock(MovementCommandMapper.class),
+                                                        mock(KernelApplicationConfiguration.class));
     stdVehicleController.initialize();
   }
 

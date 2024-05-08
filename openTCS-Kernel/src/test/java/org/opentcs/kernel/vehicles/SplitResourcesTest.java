@@ -70,7 +70,7 @@ class SplitResourcesTest {
   }
 
   @Test
-  void treatDelimiterAsPassed() {
+  void treatResourcesAsPassedForCompleteDelimiterSet() {
     SplitResources result = SplitResources.from(allResources, Set.of(pathBC, pointC));
 
     assertThat(result, is(notNullValue()));
@@ -79,4 +79,13 @@ class SplitResourcesTest {
     assertThat(result.getResourcesAhead(), contains(Set.of(pathCD, pointD)));
   }
 
+  @Test
+  void treatResourcesAsPassedForPartialDelimiterSet() {
+    SplitResources result = SplitResources.from(allResources, Set.of(pointC));
+
+    assertThat(result, is(notNullValue()));
+    assertThat(result.getResourcesPassed(),
+               contains(Set.of(pathAB, pointB), Set.of(pathBC, pointC)));
+    assertThat(result.getResourcesAhead(), contains(Set.of(pathCD, pointD)));
+  }
 }
