@@ -18,6 +18,8 @@ import org.opentcs.data.model.ModelConstants;
 import org.opentcs.data.model.visualization.Layer;
 import org.opentcs.data.model.visualization.LayerGroup;
 import org.opentcs.util.annotations.ScheduledApiChange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A transfer object describing a plant model.
@@ -25,6 +27,11 @@ import org.opentcs.util.annotations.ScheduledApiChange;
 public class PlantModelCreationTO
     extends CreationTO
     implements Serializable {
+
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(PlantModelCreationTO.class);
 
   /**
    * The plant model's points.
@@ -508,7 +515,7 @@ public class PlantModelCreationTO
                                     blocks,
                                     groups,
                                     vehicles,
-                                    listWithAppendix(visualLayouts, visualLayout));
+                                    listWithAppendix(visualLayouts, ensureValidity(visualLayout)));
   }
 
   /**
@@ -581,5 +588,27 @@ public class PlantModelCreationTO
         .withLayerGroup(new LayerGroup(ModelConstants.DEFAULT_LAYER_GROUP_ID,
                                        ModelConstants.DEFAULT_LAYER_GROUP_NAME,
                                        true));
+  }
+
+  private VisualLayoutCreationTO ensureValidity(@Nonnull VisualLayoutCreationTO visualLayout) {
+    VisualLayoutCreationTO vLayout = visualLayout;
+
+    if (visualLayout.getLayers().isEmpty()) {
+      LOG.warn("Adding default layer to visual layout with no layers...");
+      vLayout = visualLayout.withLayer(new Layer(ModelConstants.DEFAULT_LAYER_ID,
+                                                 ModelConstants.DEFAULT_LAYER_ORDINAL,
+                                                 true,
+                                                 ModelConstants.DEFAULT_LAYER_NAME,
+                                                 ModelConstants.DEFAULT_LAYER_GROUP_ID));
+    }
+
+    if (visualLayout.getLayerGroups().isEmpty()) {
+      LOG.warn("Adding default layer group to visual layout with no layer groups...");
+      vLayout = vLayout.withLayerGroup(new LayerGroup(ModelConstants.DEFAULT_LAYER_GROUP_ID,
+                                                      ModelConstants.DEFAULT_LAYER_GROUP_NAME,
+                                                      true));
+    }
+
+    return vLayout;
   }
 }
