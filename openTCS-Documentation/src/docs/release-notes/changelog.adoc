@@ -14,7 +14,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
-...
+* Changes affecting developers:
+** Update Gradle wrapper to 8.7.
 
 == Version 5.16 (2024-05-09)
 
