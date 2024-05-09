@@ -18,7 +18,7 @@ info:
     Optionally, an access key can be set in the kernel configuration.
     The configured value is then expected to be sent by the client in an HTTP header named `X-Api-Access-Key`.
   # IMPORTANT: When updating this version number, remember to mention that in the changelog, too!
-  version: 1.5.0
+  version: 1.6.0
   title: openTCS web API specification
 servers:
   - url: http://localhost:55200/v1
@@ -806,7 +806,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/RoutesRequest"
-        description: The destination points and optional source point for the routes to be computed.
+        description: The destination points, optional source point and optional list of resources to avoid for the routes to be computed.
       responses:
         "200":
           description: Successful operation
@@ -2979,7 +2979,13 @@ components:
           example:
             - Point-C
             - Point-D
-            - Point-E
+            - Point-E   
+        resourcesToAvoid:
+          type: array
+          description: The resources to be avoided for each route.
+          example:
+            - Path-CA
+            - Point-B     
       required:
         - destinationPoints
     RoutesResponse:

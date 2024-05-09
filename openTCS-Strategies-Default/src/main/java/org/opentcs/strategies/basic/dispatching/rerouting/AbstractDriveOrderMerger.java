@@ -10,6 +10,7 @@ package org.opentcs.strategies.basic.dispatching.rerouting;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.data.model.Path;
@@ -70,7 +71,8 @@ public abstract class AbstractDriveOrderMerger
         mergedSteps,
         router.getCosts(vehicle,
                         mergedSteps.get(0).getSourcePoint(),
-                        mergedSteps.get(mergedSteps.size() - 1).getDestinationPoint())
+                        mergedSteps.get(mergedSteps.size() - 1).getDestinationPoint(),
+                        Set.of())
     );
   }
 

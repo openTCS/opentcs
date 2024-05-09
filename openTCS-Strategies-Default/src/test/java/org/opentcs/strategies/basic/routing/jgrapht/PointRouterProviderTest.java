@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,6 +26,7 @@ import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.routing.DefaultRoutingGroupMapper;
 import org.opentcs.strategies.basic.routing.PointRouter;
 import org.opentcs.strategies.basic.routing.PointRouterFactory;
@@ -57,7 +59,9 @@ public class PointRouterProviderTest {
         .filter(t -> filterByName(o, t))
         .findFirst().orElse(null));
     resourceAvoidanceExtractor = mock();
-    when(resourceAvoidanceExtractor.extractResourcesToAvoid(any()))
+    when(resourceAvoidanceExtractor.extractResourcesToAvoid(nullable(TransportOrder.class)))
+        .thenReturn(ResourcesToAvoid.EMPTY);
+    when(resourceAvoidanceExtractor.extractResourcesToAvoid(anySet()))
         .thenReturn(ResourcesToAvoid.EMPTY);
     routingGroupMapper = new DefaultRoutingGroupMapper();
     pointRouterFactory = mock();
@@ -74,27 +78,42 @@ public class PointRouterProviderTest {
 
   @Test
   void shouldProvidePointRouterForDefaultRoutingGroup() {
-    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-000", -1), null);
-    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-001", -1), null);
-    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-002", -1), null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-000", -1),
+                                                 (TransportOrder) null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-001", -1),
+                                                 (TransportOrder) null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-002", -1),
+                                                 (TransportOrder) null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-003", -1),
+                                                 Set.of());
 
     verify(pointRouterFactory, times(1)).createPointRouter(any(Vehicle.class), anySet(), anySet());
   }
 
   @Test
   void shouldProvidePointRouterForDefinedRoutingGroup() {
-    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-000", 1), null);
-    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-001", 1), null);
-    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-002", 1), null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-000", 1),
+                                                 (TransportOrder) null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-001", 1),
+                                                 (TransportOrder) null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-002", 1),
+                                                 (TransportOrder) null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-003", 1),
+                                                 Set.of());
 
     verify(pointRouterFactory, times(1)).createPointRouter(any(Vehicle.class), anySet(), anySet());
   }
 
   @Test
   void shouldProvidePointRouterForDefaultAndDefinedRoutingGroups() {
-    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-000", 1), null);
-    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-001", 1), null);
-    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-002", -1), null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-000", 1),
+                                                 (TransportOrder) null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-001", 1),
+                                                 (TransportOrder) null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-002", -1),
+                                                 (TransportOrder) null);
+    pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-003", 1),
+                                                 Set.of());
 
     verify(pointRouterFactory, times(2)).createPointRouter(any(Vehicle.class), anySet(), anySet());
   }
@@ -102,7 +121,8 @@ public class PointRouterProviderTest {
   @Test
   void shouldProvideIndividualPointRouters() {
     for (int x = 0; x < 15; x++) {
-      pointRouterProvider.getPointRouterForVehicle(createVehicle("Vehicle-0" + x, x), null);
+      pointRouterProvider.getPointRouterForVehicle(
+          createVehicle("Vehicle-0" + x, x), (TransportOrder) null);
     }
 
     verify(pointRouterFactory, times(15)).createPointRouter(any(Vehicle.class), anySet(), anySet());

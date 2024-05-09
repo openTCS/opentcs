@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Path;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.routing.PointRouter;
@@ -106,19 +107,32 @@ public class PointRouterProvider {
                                               @Nullable TransportOrder order) {
     requireNonNull(vehicle, "vehicle");
 
-    ResourcesToAvoid resourcesToAvoid = resourceAvoidanceExtractor.extractResourcesToAvoid(order);
-    // If there are resources to be avoided, always create a new (individual) point router.
-    if (!resourcesToAvoid.isEmpty()) {
-      return pointRouterFactory.createPointRouter(vehicle,
-                                                  resourcesToAvoid.getPoints(),
-                                                  resourcesToAvoid.getPaths());
-    }
+    return getPointRouterForVehicle(
+        vehicle,
+        resourceAvoidanceExtractor
+            .extractResourcesToAvoid(order)
+    );
+  }
 
-    // In all other cases, create a point router if it does not yet exist for the vehicle's routing
-    // group.
-    return pointRoutersByVehicleGroup.computeIfAbsent(
-        routingGroupMapper.apply(vehicle),
-        routingGroup -> pointRouterFactory.createPointRouter(vehicle, Set.of(), Set.of())
+  /**
+   * Returns the {@link PointRouter} for the given vehicle considering the vehicle's routing group
+   * and the given set of resources to avoid.
+   *
+   * @param vehicle The vehicle to get the point router for.
+   * @param resourcesToAvoid The resources to avoid when computing the route.
+   * @return The point router.
+   */
+  public PointRouter getPointRouterForVehicle(
+      @Nonnull Vehicle vehicle,
+      @Nonnull Set<TCSResourceReference<?>> resourcesToAvoid
+  ) {
+    requireNonNull(vehicle, "vehicle");
+    requireNonNull(resourcesToAvoid, "resourcesToAvoid");
+
+    return getPointRouterForVehicle(
+        vehicle,
+        resourceAvoidanceExtractor
+            .extractResourcesToAvoid(resourcesToAvoid)
     );
   }
 
@@ -143,7 +157,22 @@ public class PointRouterProvider {
 
     // Lazily create point routers if they don't exist.
     distinctRoutingGroups.forEach(
-        (routingGroup, vehicle) -> getPointRouterForVehicle(vehicle, null)
+        (routingGroup, vehicle) -> getPointRouterForVehicle(vehicle, (TransportOrder) null)
+    );
+  }
+
+  private PointRouter getPointRouterForVehicle(Vehicle vehicle, ResourcesToAvoid resourcesToAvoid) {
+    if (!resourcesToAvoid.isEmpty()) {
+      return pointRouterFactory.createPointRouter(vehicle,
+                                                  resourcesToAvoid.getPoints(),
+                                                  resourcesToAvoid.getPaths());
+    }
+
+    // In all other cases, create a point router if it does not yet exist for the vehicle's routing
+    // group.
+    return pointRoutersByVehicleGroup.computeIfAbsent(
+        routingGroupMapper.apply(vehicle),
+        routingGroup -> pointRouterFactory.createPointRouter(vehicle, Set.of(), Set.of())
     );
   }
 }

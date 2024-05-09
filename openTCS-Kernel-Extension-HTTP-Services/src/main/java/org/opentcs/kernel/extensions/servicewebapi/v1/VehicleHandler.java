@@ -21,7 +21,10 @@ import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Location;
+import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
@@ -255,10 +258,36 @@ public class VehicleHandler {
           })
           .collect(Collectors.toSet());
 
+      Set<TCSResourceReference<?>> resourcesToAvoid = new HashSet<>();
+
+      if (request.getResourcesToAvoid() != null) {
+        for (String resourceName : request.getResourcesToAvoid()) {
+          Point point = vehicleService.fetchObject(Point.class, resourceName);
+          if (point != null) {
+            resourcesToAvoid.add(point.getReference());
+            continue;
+          }
+
+          Path path = vehicleService.fetchObject(Path.class, resourceName);
+          if (path != null) {
+            resourcesToAvoid.add(path.getReference());
+            continue;
+          }
+
+          Location location = vehicleService.fetchObject(Location.class, resourceName);
+          if (location != null) {
+            resourcesToAvoid.add(location.getReference());
+            continue;
+          }
+
+          throw new ObjectUnknownException("Unknown resource: " + resourceName);
+        }
+      }
+
       return routerService.computeRoutes(vehicle.getReference(),
                                          sourcePointRef,
-                                         destinationPointRefs);
+                                         destinationPointRefs,
+                                         resourcesToAvoid);
     });
   }
-
 }

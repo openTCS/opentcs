@@ -18,6 +18,7 @@ import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.order.TransportOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +85,54 @@ public class ResourceAvoidanceExtractor {
       }
 
       Location location = objectService.fetchObject(Location.class, resourceToAvoid);
+      if (location != null) {
+        for (Location.Link link : location.getAttachedLinks()) {
+          pointsToAvoid.add(objectService.fetchObject(Point.class, link.getPoint()));
+        }
+        continue;
+      }
+
+      LOG.debug("Ignoring resource '{}' which is not a point, path or location.", resourceToAvoid);
+    }
+
+    return new ResourcesToAvoid(pointsToAvoid, pathsToAvoid);
+  }
+
+  /**
+   * Extracts resources in the given set of references.
+   * <p>
+   * The extraction result will contain {@link Point}s and {@link Path}s referenced in the given
+   * set, and also points that are linked to {@link Location}s referenced in the given set.
+   * </p>
+   *
+   * @param resourcesToAvoid The set of references.
+   * @return The extracted resources.
+   */
+  @Nonnull
+  public ResourcesToAvoid extractResourcesToAvoid(Set<TCSResourceReference<?>> resourcesToAvoid) {
+    requireNonNull(resourcesToAvoid, "resourcesToAvoid");
+
+    if (resourcesToAvoid.isEmpty()) {
+      return ResourcesToAvoid.EMPTY;
+    }
+
+    Set<Point> pointsToAvoid = new HashSet<>();
+    Set<Path> pathsToAvoid = new HashSet<>();
+
+    for (TCSResourceReference<?> resourceToAvoid : resourcesToAvoid) {
+      Point point = objectService.fetchObject(Point.class, resourceToAvoid.getName());
+      if (point != null) {
+        pointsToAvoid.add(point);
+        continue;
+      }
+
+      Path path = objectService.fetchObject(Path.class, resourceToAvoid.getName());
+      if (path != null) {
+        pathsToAvoid.add(path);
+        continue;
+      }
+
+      Location location = objectService.fetchObject(Location.class, resourceToAvoid.getName());
       if (location != null) {
         for (Location.Link link : location.getAttachedLinks()) {
           pointsToAvoid.add(objectService.fetchObject(Point.class, link.getPoint()));

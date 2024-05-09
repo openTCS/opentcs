@@ -61,6 +61,12 @@ class ResourceAvoidanceExtractorTest {
     when(objectService.fetchObject(Path.class, "Path-BC")).thenReturn(pathBC);
     when(objectService.fetchObject(Location.class, "Location-C")).thenReturn(locationC);
 
+    when(objectService.fetchObject(Point.class, pointA.getReference())).thenReturn(pointA);
+    when(objectService.fetchObject(Point.class, pointB.getReference())).thenReturn(pointB);
+    when(objectService.fetchObject(Path.class, pathAB.getReference())).thenReturn(pathAB);
+    when(objectService.fetchObject(Path.class, pathBC.getReference())).thenReturn(pathBC);
+    when(objectService.fetchObject(Location.class, locationC.getReference())).thenReturn(locationC);
+
     extractor = new ResourceAvoidanceExtractor(objectService);
   }
 
@@ -77,12 +83,38 @@ class ResourceAvoidanceExtractorTest {
   }
 
   @Test
-  void shouldExtractResources() {
+  void shouldReturnEmptyResultForEmptySet() {
+    ResourcesToAvoid result = extractor.extractResourcesToAvoid(Set.of());
+
+    assertThat(result.getPoints()).isEmpty();
+    assertThat(result.getPaths()).isEmpty();
+    assertTrue(result.isEmpty());
+  }
+
+  @Test
+  void shouldExtractResourcesTransportOrder() {
     TransportOrder order = new TransportOrder("some-order", List.of())
         .withProperty(ObjectPropConstants.TRANSPORT_ORDER_RESOURCES_TO_AVOID,
                       "Point-A,Path-AB,Location-C");
 
     ResourcesToAvoid result = extractor.extractResourcesToAvoid(order);
+
+    assertThat(result.getPoints())
+        .hasSize(2)
+        .contains(pointA, pointC);
+    assertThat(result.getPaths())
+        .hasSize(1)
+        .contains(pathAB);
+    assertFalse(result.isEmpty());
+  }
+
+  @Test
+  void shouldExtractResourcesSetOfResources() {
+    ResourcesToAvoid result = extractor.extractResourcesToAvoid(
+        Set.of(
+            pointA.getReference(),
+            pathAB.getReference(),
+            locationC.getReference()));
 
     assertThat(result.getPoints())
         .hasSize(2)

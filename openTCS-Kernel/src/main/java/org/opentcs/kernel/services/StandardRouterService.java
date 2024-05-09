@@ -23,6 +23,7 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
 import org.opentcs.kernel.workingset.PlantModelManager;
@@ -107,6 +108,44 @@ public class StandardRouterService
     }
   }
 
+  @Override
+  public Map<TCSObjectReference<Point>, Route> computeRoutes(
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<Point> sourcePointRef,
+      Set<TCSObjectReference<Point>> destinationPointRefs,
+      Set<TCSResourceReference<?>> resourcesToAvoid
+  ) {
+    requireNonNull(vehicleRef, "vehicleRef");
+    requireNonNull(sourcePointRef, "sourcePointRef");
+    requireNonNull(destinationPointRefs, "destinationPointRefs");
+    requireNonNull(resourcesToAvoid, "resourcesToAvoid");
+
+    synchronized (globalSyncObject) {
+      Map<TCSObjectReference<Point>, Route> result = new HashMap<>();
+      Vehicle vehicle = objectService.fetchObject(Vehicle.class, vehicleRef);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + vehicleRef.getName());
+      }
+      Point sourcePoint = objectService.fetchObject(Point.class, sourcePointRef);
+      if (sourcePoint == null) {
+        throw new ObjectUnknownException("Unknown source point: " + sourcePointRef.getName());
+      }
+      for (TCSObjectReference<Point> dest : destinationPointRefs) {
+        Point destinationPoint = objectService.fetchObject(Point.class, dest);
+        if (destinationPoint == null) {
+          throw new ObjectUnknownException("Unknown destination point: " + dest.getName());
+        }
+        result.put(
+            dest,
+            router.getRoute(vehicle, sourcePoint, destinationPoint, resourcesToAvoid)
+                .orElse(null)
+        );
+      }
+      return result;
+    }
+  }
+
+  @Deprecated
   @Override
   public Map<TCSObjectReference<Point>, Route> computeRoutes(
       TCSObjectReference<Vehicle> vehicleRef,

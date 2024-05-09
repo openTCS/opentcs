@@ -16,6 +16,7 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
 
@@ -74,6 +75,7 @@ class RemoteRouterServiceProxy
     }
   }
 
+  @Deprecated
   @Override
   public Map<TCSObjectReference<Point>, Route> computeRoutes(
       TCSObjectReference<Vehicle> vehicleRef,
@@ -87,6 +89,27 @@ class RemoteRouterServiceProxy
                                               vehicleRef,
                                               sourcePointRef,
                                               destinationPointRefs);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+  
+  @Override
+  public Map<TCSObjectReference<Point>, Route> computeRoutes(
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<Point> sourcePointRef,
+      Set<TCSObjectReference<Point>> destinationPointRefs,
+      Set<TCSResourceReference<?>> resourcesToAvoid)
+      throws KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      return getRemoteService().computeRoutes(getClientId(),
+                                              vehicleRef,
+                                              sourcePointRef,
+                                              destinationPointRefs,
+                                              resourcesToAvoid);
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

@@ -205,9 +205,10 @@ public class DefaultRechargePositionSupplier
                                                                Set<Point> destPositions) {
     return destPositions.stream()
         .map(point -> new LocationCandidate(location,
-                                            router.getCostsByPointRef(vehicle,
-                                                                      srcPosition.getReference(),
-                                                                      point.getReference())))
+                                            router.getCosts(vehicle,
+                                                            srcPosition,
+                                                            point,
+                                                            Set.of())))
         .min(Comparator.comparingLong(candidate -> candidate.costs));
   }
 

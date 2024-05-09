@@ -16,6 +16,7 @@ import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
 import org.opentcs.util.annotations.ScheduledApiChange;
@@ -54,11 +55,20 @@ public interface RemoteRouterService
     updateRoutingTopology(clientId);
   }
 
+  @Deprecated
   public Map<TCSObjectReference<Point>, Route> computeRoutes(
       ClientID clientId,
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<Point> sourcePointRef,
       Set<TCSObjectReference<Point>> destinationPointRefs)
+      throws RemoteException;
+
+  public Map<TCSObjectReference<Point>, Route> computeRoutes(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<Point> sourcePointRef,
+      Set<TCSObjectReference<Point>> destinationPointRefs,
+      Set<TCSResourceReference<?>> resourcesToAvoid)
       throws RemoteException;
   // CHECKSTYLE:ON
 }

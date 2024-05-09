@@ -28,7 +28,11 @@ class PostVehicleRoutesRequestTOTest {
   @Test
   void jsonSample() {
     Approvals.verify(
-        jsonBinder.toJson(new PostVehicleRoutesRequestTO(List.of("C", "F")).setSourcePoint("A"))
+        jsonBinder.toJson(
+            new PostVehicleRoutesRequestTO(List.of("C", "F"))
+                .setSourcePoint("A")
+                .setResourcesToAvoid(List.of("A", "B"))
+        )
     );
   }
 }
