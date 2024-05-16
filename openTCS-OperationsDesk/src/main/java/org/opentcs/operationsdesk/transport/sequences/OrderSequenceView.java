@@ -9,12 +9,12 @@ package org.opentcs.operationsdesk.transport.sequences;
 
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import java.awt.Component;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;

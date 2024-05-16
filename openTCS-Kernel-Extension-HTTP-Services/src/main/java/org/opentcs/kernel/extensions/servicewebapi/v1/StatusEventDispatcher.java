@@ -7,11 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import jakarta.inject.Inject;
 import java.util.Collection;
 import static java.util.Objects.requireNonNull;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelStateTransitionEvent;
 import org.opentcs.components.Lifecycle;

@@ -8,7 +8,7 @@
 package org.opentcs.modeleditor.application.menus;
 
 import com.google.inject.assistedinject.Assisted;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.common.components.properties.CoordinateUndoActivity;
 import org.opentcs.guing.common.persistence.ModelManager;

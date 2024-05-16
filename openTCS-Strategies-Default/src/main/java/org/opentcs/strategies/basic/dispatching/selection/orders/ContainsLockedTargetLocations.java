@@ -8,11 +8,11 @@
 package org.opentcs.strategies.basic.dispatching.selection.orders;
 
 import com.google.common.base.Objects;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;

@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernelcontrolcenter.peripherals;
 
+import jakarta.inject.Inject;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -14,7 +15,6 @@ import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.inject.Inject;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 import org.opentcs.components.Lifecycle;

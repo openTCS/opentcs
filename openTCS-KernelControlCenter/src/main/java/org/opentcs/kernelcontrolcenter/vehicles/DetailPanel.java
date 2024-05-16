@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernelcontrolcenter.vehicles;
 
+import jakarta.inject.Inject;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -17,7 +18,6 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
-import javax.inject.Inject;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;

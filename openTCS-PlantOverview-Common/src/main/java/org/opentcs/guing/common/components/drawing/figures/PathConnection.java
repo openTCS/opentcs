@@ -8,6 +8,7 @@
 package org.opentcs.guing.common.components.drawing.figures;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
@@ -23,7 +24,6 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.StringJoiner;
-import javax.inject.Inject;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.DrawingView;

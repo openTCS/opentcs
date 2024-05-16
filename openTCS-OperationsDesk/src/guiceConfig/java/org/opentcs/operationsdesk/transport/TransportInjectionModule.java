@@ -9,7 +9,7 @@ package org.opentcs.operationsdesk.transport;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.opentcs.operationsdesk.transport.orders.TransportOrdersContainer;
 import org.opentcs.operationsdesk.transport.orders.TransportViewFactory;
 import org.opentcs.operationsdesk.transport.sequences.OrderSequencesContainer;

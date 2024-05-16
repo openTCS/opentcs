@@ -9,7 +9,7 @@ package org.opentcs.modeleditor.components.dockable;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.opentcs.guing.common.components.dockable.DockableHandlerFactory;
 import org.opentcs.guing.common.components.dockable.DockingManager;
 

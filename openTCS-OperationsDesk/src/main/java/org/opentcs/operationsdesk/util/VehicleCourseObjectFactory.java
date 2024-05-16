@@ -7,8 +7,8 @@
  */
 package org.opentcs.operationsdesk.util;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.util.CourseObjectFactory;
 import org.opentcs.operationsdesk.components.drawing.figures.NamedVehicleFigure;

@@ -7,8 +7,8 @@
  */
 package org.opentcs.kernel.services;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.TCSObjectService;

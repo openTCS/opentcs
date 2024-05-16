@@ -7,9 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.priorization.candidate;
 
+import jakarta.inject.Inject;
 import java.util.Comparator;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorDeadlineAtRiskFirst;

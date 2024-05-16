@@ -8,9 +8,9 @@
 package org.opentcs.strategies.basic.dispatching.priorization;
 
 import com.google.common.collect.Lists;
+import jakarta.inject.Inject;
 import java.util.Comparator;
 import java.util.Map;
-import javax.inject.Inject;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByEnergyLevel;

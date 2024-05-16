@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import jakarta.inject.Inject;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
@@ -14,7 +15,6 @@ import java.rmi.server.UnicastRemoteObject;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import javax.inject.Inject;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.opentcs.access.rmi.services.RegistrationName;

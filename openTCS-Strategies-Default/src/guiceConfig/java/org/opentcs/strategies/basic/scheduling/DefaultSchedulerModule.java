@@ -8,7 +8,7 @@
 package org.opentcs.strategies.basic.scheduling;
 
 import com.google.inject.multibindings.Multibinder;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.strategies.basic.scheduling.modules.PausedVehicleModule;

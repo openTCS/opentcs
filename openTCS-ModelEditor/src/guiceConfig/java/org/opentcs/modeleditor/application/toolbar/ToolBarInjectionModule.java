@@ -9,7 +9,7 @@ package org.opentcs.modeleditor.application.toolbar;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.jhotdraw.draw.tool.DragTracker;
 import org.jhotdraw.draw.tool.SelectAreaTracker;
 import org.opentcs.modeleditor.application.action.ToolBarManager;

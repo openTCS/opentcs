@@ -9,7 +9,7 @@ package org.opentcs.operationsdesk.application.action;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 /**
  * An injection module for this package.

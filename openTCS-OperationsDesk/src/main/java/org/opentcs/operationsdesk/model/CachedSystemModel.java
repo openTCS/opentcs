@@ -7,9 +7,9 @@
  */
 package org.opentcs.operationsdesk.model;
 
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-import javax.inject.Inject;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.LocationModel;

@@ -7,12 +7,12 @@
  */
 package org.opentcs.guing.plugins.panels.allocation;
 
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelServicePortal;

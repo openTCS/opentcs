@@ -7,6 +7,7 @@
  */
 package org.opentcs.modeleditor.components.layer;
 
+import jakarta.inject.Inject;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -16,7 +17,6 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;

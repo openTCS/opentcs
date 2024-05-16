@@ -7,9 +7,9 @@
  */
 package org.opentcs.operationsdesk.components.drawing;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.swing.JToggleButton;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.application.StatusPanel;

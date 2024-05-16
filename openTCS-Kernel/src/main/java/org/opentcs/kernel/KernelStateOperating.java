@@ -8,12 +8,12 @@
 package org.opentcs.kernel;
 
 import com.google.common.util.concurrent.Uninterruptibles;
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.KernelExtension;

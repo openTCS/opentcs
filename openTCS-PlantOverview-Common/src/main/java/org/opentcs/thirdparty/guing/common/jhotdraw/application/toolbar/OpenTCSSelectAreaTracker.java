@@ -3,6 +3,7 @@
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar;
 
+import jakarta.inject.Inject;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Container;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.handle.Handle;

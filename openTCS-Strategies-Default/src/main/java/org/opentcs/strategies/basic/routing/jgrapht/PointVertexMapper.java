@@ -7,11 +7,11 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
+import jakarta.inject.Inject;
 import java.util.Collection;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.data.model.Point;
 
 /**

@@ -7,8 +7,8 @@
  */
 package org.opentcs.guing.common.components.tree.elements;
 
+import jakarta.inject.Inject;
 import java.util.Set;
-import javax.inject.Inject;
 import javax.swing.JPopupMenu;
 import org.opentcs.guing.base.model.elements.BlockModel;
 

@@ -8,10 +8,10 @@
 package org.opentcs.modeleditor;
 
 import com.google.inject.TypeLiteral;
+import jakarta.inject.Singleton;
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
-import javax.inject.Singleton;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;

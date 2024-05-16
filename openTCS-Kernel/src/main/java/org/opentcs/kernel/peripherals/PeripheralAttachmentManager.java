@@ -8,9 +8,9 @@
 package org.opentcs.kernel.peripherals;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.customizations.ApplicationEventBus;

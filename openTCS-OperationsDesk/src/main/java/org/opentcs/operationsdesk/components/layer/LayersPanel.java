@@ -7,10 +7,10 @@
  */
 package org.opentcs.operationsdesk.components.layer;
 
+import jakarta.inject.Inject;
 import java.awt.BorderLayout;
 import java.util.Arrays;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;

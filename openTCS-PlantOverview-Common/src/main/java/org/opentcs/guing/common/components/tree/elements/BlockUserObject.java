@@ -8,8 +8,8 @@
 package org.opentcs.guing.common.components.tree.elements;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 import org.opentcs.data.model.Block;

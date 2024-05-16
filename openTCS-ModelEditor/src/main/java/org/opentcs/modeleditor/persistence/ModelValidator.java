@@ -9,13 +9,13 @@ package org.opentcs.modeleditor.persistence;
 
 import com.google.common.base.Strings;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import jakarta.inject.Inject;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;

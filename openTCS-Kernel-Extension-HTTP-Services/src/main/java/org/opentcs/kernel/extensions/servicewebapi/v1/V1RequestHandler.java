@@ -7,9 +7,9 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
-import javax.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;

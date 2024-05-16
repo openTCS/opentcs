@@ -7,13 +7,13 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.assignment;
 
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.model.Vehicle;

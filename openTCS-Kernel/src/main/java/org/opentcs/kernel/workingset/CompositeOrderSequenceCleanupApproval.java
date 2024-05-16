@@ -7,9 +7,9 @@
  */
 package org.opentcs.kernel.workingset;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.OrderSequenceCleanupApproval;
 import org.opentcs.data.order.OrderSequence;
 

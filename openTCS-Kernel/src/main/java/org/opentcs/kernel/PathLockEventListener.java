@@ -7,9 +7,9 @@
  */
 package org.opentcs.kernel;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.RouterService;

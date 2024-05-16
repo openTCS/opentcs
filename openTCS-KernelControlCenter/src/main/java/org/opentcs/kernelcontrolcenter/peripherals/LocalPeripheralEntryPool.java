@@ -7,11 +7,11 @@
  */
 package org.opentcs.kernelcontrolcenter.peripherals;
 
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;

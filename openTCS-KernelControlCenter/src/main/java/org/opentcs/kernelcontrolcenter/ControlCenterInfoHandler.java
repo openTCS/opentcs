@@ -8,12 +8,12 @@
 package org.opentcs.kernelcontrolcenter;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;

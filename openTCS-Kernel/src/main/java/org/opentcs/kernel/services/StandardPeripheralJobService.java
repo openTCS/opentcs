@@ -7,8 +7,8 @@
  */
 package org.opentcs.kernel.services;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.components.kernel.services.InternalPeripheralJobService;

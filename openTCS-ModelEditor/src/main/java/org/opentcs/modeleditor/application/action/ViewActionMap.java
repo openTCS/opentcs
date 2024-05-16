@@ -7,8 +7,8 @@
  */
 package org.opentcs.modeleditor.application.action;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.ActionMap;
 import org.opentcs.guing.common.application.action.file.ModelPropertiesAction;
 import org.opentcs.guing.common.application.action.file.SaveModelAction;

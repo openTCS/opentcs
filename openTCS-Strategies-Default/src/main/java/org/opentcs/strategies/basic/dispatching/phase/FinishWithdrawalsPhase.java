@@ -7,8 +7,8 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;

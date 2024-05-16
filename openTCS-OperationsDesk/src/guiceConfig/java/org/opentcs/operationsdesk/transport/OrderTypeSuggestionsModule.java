@@ -7,7 +7,7 @@
  */
 package org.opentcs.operationsdesk.transport;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 import org.opentcs.guing.common.transport.OrderTypeSuggestionsPool;
 

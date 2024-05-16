@@ -8,11 +8,11 @@
 package org.opentcs.modeleditor.persistence;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.common.application.StatusPanel;

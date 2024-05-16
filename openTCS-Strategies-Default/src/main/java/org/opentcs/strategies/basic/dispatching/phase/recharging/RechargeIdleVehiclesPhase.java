@@ -7,11 +7,11 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.recharging;
 
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
-import javax.inject.Inject;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.Router;

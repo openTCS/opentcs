@@ -8,6 +8,7 @@
 package org.opentcs.commadapter.peripheral.loopback;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.time.Duration;
 import java.util.ArrayDeque;
 import static java.util.Objects.requireNonNull;
@@ -15,7 +16,6 @@ import java.util.Queue;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Location;

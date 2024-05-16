@@ -8,10 +8,10 @@
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
 import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
-import javax.inject.Inject;
 import static org.opentcs.components.kernel.Dispatcher.PROPKEY_ASSIGNED_PARKING_POSITION;
 import static org.opentcs.components.kernel.Dispatcher.PROPKEY_PREFERRED_PARKING_POSITION;
 import org.opentcs.components.kernel.Router;

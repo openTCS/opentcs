@@ -8,10 +8,10 @@
 package org.opentcs.operationsdesk.components.drawing.figures;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.components.plantoverview.VehicleTheme;

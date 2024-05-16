@@ -3,10 +3,10 @@
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit;
 
+import jakarta.inject.Inject;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import static javax.swing.Action.ACCELERATOR_KEY;

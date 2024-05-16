@@ -7,9 +7,9 @@
  */
 package org.opentcs.operationsdesk.application.menus.menubar;
 
+import jakarta.inject.Inject;
 import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;

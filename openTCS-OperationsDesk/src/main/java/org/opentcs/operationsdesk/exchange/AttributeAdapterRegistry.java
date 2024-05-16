@@ -7,8 +7,8 @@
  */
 package org.opentcs.operationsdesk.exchange;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;

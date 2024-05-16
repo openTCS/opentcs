@@ -7,8 +7,8 @@
  */
 package org.opentcs.strategies.basic.routing.edgeevaluator;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import static org.opentcs.components.kernel.Router.PROPKEY_ROUTING_COST_FORWARD;
 import static org.opentcs.components.kernel.Router.PROPKEY_ROUTING_COST_REVERSE;
 import static org.opentcs.components.kernel.Router.PROPKEY_ROUTING_GROUP;

@@ -7,6 +7,7 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
+import jakarta.inject.Inject;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import javax.inject.Inject;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;

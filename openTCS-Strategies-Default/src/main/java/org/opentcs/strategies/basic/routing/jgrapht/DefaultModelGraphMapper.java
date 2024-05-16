@@ -8,7 +8,7 @@
 package org.opentcs.strategies.basic.routing.jgrapht;
 
 import jakarta.annotation.Nonnull;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorComposite;
 
 /**

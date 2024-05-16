@@ -8,6 +8,7 @@
 package org.opentcs.guing.common.components.tree;
 
 import com.google.common.collect.Lists;
+import jakarta.inject.Inject;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.inject.Inject;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.jhotdraw.draw.DrawingEditor;

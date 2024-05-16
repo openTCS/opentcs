@@ -7,8 +7,8 @@
  */
 package org.opentcs.modeleditor.components.layer;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.base.model.DrawnModelComponent;
 import org.opentcs.guing.base.model.ModelComponent;

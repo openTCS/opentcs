@@ -7,6 +7,7 @@
  */
 package org.opentcs.operationsdesk.application.action.actions;
 
+import jakarta.inject.Inject;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -14,7 +15,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.LARGE_ICON_KEY;
 import static javax.swing.Action.MNEMONIC_KEY;

@@ -8,11 +8,11 @@
 package org.opentcs.commadapter.peripheral.loopback;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;

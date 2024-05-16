@@ -7,8 +7,8 @@
  */
 package org.opentcs.guing.common.event;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.util.event.EventHandler;

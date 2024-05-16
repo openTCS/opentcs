@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.components.drawing.figures;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -24,7 +25,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;

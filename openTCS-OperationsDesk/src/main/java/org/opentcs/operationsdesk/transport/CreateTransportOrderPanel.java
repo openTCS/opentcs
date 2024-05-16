@@ -7,6 +7,7 @@
  */
 package org.opentcs.operationsdesk.transport;
 
+import jakarta.inject.Inject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
@@ -22,7 +23,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;

@@ -7,8 +7,8 @@
  */
 package org.opentcs.kernel.extensions.adminwebapi;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.kernel.extensions.adminwebapi.v1.V1RequestHandler;
 import org.opentcs.kernel.extensions.servicewebapi.HttpConstants;

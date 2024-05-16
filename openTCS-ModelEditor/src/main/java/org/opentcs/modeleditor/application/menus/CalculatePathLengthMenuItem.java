@@ -7,10 +7,10 @@
  */
 package org.opentcs.modeleditor.application.menus;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import org.jhotdraw.draw.DrawingEditor;

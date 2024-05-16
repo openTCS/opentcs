@@ -3,6 +3,8 @@
  */
 package org.opentcs.thirdparty.operationsdesk.jhotdraw.application;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
@@ -11,8 +13,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.swing.JFrame;
 import org.jhotdraw.app.SDIApplication;
 import org.jhotdraw.app.View;

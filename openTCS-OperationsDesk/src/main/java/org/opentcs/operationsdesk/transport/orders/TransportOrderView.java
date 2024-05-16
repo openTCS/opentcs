@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.transport.orders;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.text.DateFormat;
@@ -16,7 +17,6 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Map.Entry;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;

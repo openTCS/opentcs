@@ -7,8 +7,8 @@
  */
 package org.opentcs.guing.common.components.tree;
 
+import jakarta.inject.Inject;
 import java.awt.event.MouseListener;
-import javax.inject.Inject;
 import javax.swing.tree.TreeSelectionModel;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.common.components.tree.elements.UserObjectContext;

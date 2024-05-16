@@ -7,6 +7,7 @@
  */
 package org.opentcs.guing.common.components.drawing;
 
+import jakarta.inject.Inject;
 import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.KeyStroke;

@@ -8,6 +8,7 @@
 package org.opentcs.kernel.workingset;
 
 import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.access.NotificationPublicationEvent;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.notification.UserNotification;

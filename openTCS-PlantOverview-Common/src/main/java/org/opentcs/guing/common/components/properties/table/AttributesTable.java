@@ -7,10 +7,10 @@
  */
 package org.opentcs.guing.common.components.properties.table;
 
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;

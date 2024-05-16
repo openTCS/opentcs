@@ -7,9 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.orders;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
 import java.util.function.Predicate;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.order.OrderSequence;

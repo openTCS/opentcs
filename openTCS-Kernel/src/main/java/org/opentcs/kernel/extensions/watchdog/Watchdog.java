@@ -7,8 +7,8 @@
  */
 package org.opentcs.kernel.extensions.watchdog;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.KernelExtension;
 
 /**

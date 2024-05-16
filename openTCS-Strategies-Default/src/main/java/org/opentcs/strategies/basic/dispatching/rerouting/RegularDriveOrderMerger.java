@@ -7,10 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.rerouting;
 
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.ReroutingType;

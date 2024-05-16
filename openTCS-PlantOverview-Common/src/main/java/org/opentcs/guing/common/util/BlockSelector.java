@@ -7,10 +7,10 @@
  */
 package org.opentcs.guing.common.util;
 
+import jakarta.inject.Inject;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingEditor;

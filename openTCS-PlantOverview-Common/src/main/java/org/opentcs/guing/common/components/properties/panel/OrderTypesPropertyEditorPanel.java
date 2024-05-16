@@ -7,11 +7,11 @@
  */
 package org.opentcs.guing.common.components.properties.panel;
 
+import jakarta.inject.Inject;
 import java.util.Enumeration;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.inject.Inject;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;

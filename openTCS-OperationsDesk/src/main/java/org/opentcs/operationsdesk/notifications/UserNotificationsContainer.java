@@ -7,13 +7,13 @@
  */
 package org.opentcs.operationsdesk.notifications;
 
+import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.NotificationPublicationEvent;
 import org.opentcs.access.SharedKernelServicePortal;

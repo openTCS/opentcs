@@ -7,11 +7,11 @@
  */
 package org.opentcs.guing.common.util;
 
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

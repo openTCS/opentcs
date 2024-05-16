@@ -7,10 +7,10 @@
  */
 package org.opentcs.modeleditor.application.menus.menubar;
 
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;

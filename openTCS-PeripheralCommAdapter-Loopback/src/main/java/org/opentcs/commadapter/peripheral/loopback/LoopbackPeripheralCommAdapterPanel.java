@@ -8,10 +8,10 @@
 package org.opentcs.commadapter.peripheral.loopback;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.awt.event.ItemEvent;
 import java.util.Arrays;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingUtilities;
 import org.opentcs.access.KernelServicePortal;

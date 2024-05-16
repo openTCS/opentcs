@@ -8,10 +8,10 @@
 package org.opentcs.strategies.basic.scheduling;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.Scheduler.Client;
 import org.opentcs.data.model.TCSResource;

@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.components.dialogs;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,7 +21,6 @@ import java.awt.geom.Point2D;
 import java.util.Arrays;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
-import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;

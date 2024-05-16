@@ -8,6 +8,7 @@
 package org.opentcs.kernel.vehicles;
 
 import static com.google.common.base.Preconditions.checkState;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.Vehicle;

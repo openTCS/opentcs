@@ -7,13 +7,13 @@
  */
 package org.opentcs.modeleditor.components.drawing;
 
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.jhotdraw.draw.AbstractFigure;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.base.event.BlockChangeEvent;

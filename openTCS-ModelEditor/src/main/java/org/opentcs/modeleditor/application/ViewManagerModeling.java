@@ -8,11 +8,11 @@
 package org.opentcs.modeleditor.application;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import jakarta.inject.Inject;
 import java.awt.event.FocusEvent;
 import java.io.File;
 import java.util.ArrayList;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.jhotdraw.draw.DrawingView;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.guing.common.application.AbstractViewManager;

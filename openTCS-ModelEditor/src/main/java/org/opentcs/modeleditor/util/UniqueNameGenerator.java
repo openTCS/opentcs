@@ -7,7 +7,7 @@
  */
 package org.opentcs.modeleditor.util;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.LayoutModel;

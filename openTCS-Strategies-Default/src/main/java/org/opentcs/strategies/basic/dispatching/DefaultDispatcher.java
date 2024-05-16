@@ -8,13 +8,13 @@
 package org.opentcs.strategies.basic.dispatching;
 
 import static com.google.common.base.Preconditions.checkState;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentException;
 import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentVeto;

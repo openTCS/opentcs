@@ -7,8 +7,8 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.data.model.Vehicle;

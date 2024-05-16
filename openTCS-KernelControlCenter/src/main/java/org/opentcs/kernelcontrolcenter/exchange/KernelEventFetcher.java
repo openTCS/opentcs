@@ -7,9 +7,9 @@
  */
 package org.opentcs.kernelcontrolcenter.exchange;
 
+import jakarta.inject.Inject;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.KernelStateTransitionEvent;

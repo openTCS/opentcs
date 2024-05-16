@@ -8,6 +8,7 @@
 package org.opentcs.kernel.workingset;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +20,6 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.access.to.model.BlockCreationTO;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;

@@ -7,8 +7,8 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Location;

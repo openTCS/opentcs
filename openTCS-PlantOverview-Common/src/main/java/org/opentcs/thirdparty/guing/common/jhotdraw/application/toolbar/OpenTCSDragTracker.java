@@ -3,6 +3,7 @@
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar;
 
+import jakarta.inject.Inject;
 import java.awt.Container;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -13,7 +14,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.inject.Inject;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.event.TransformEdit;

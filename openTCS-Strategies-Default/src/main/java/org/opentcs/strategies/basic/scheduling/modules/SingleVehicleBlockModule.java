@@ -8,12 +8,12 @@
 package org.opentcs.strategies.basic.scheduling.modules;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;

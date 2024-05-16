@@ -8,7 +8,7 @@
 package org.opentcs.guing.common.components.properties.table;
 
 import com.google.inject.assistedinject.Assisted;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;

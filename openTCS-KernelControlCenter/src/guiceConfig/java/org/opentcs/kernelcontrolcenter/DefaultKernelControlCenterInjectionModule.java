@@ -9,10 +9,10 @@ package org.opentcs.kernelcontrolcenter;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import jakarta.inject.Singleton;
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
-import javax.inject.Singleton;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;

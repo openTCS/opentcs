@@ -7,10 +7,10 @@
  */
 package org.opentcs.access.rmi.factories;
 
+import jakarta.inject.Inject;
 import java.rmi.registry.Registry;
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
-import javax.inject.Inject;
 
 /**
  * Provides {@code null} for both client and server socket factories.

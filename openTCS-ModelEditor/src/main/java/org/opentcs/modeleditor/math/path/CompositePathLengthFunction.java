@@ -8,9 +8,9 @@
 package org.opentcs.modeleditor.math.path;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.guing.base.model.elements.PathModel;
 
 /**

@@ -8,7 +8,7 @@
 package org.opentcs.modeleditor.components.tree.elements;
 
 import com.google.inject.assistedinject.Assisted;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.swing.JPopupMenu;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.application.GuiManager;

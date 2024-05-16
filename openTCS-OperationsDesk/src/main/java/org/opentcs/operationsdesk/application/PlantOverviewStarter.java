@@ -7,8 +7,8 @@
  */
 package org.opentcs.operationsdesk.application;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.jhotdraw.app.Application;
 import org.opentcs.guing.common.application.ProgressIndicator;
 import org.opentcs.guing.common.application.StartupProgressStatus;

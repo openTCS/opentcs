@@ -8,8 +8,8 @@
 package org.opentcs.kernel.workingset;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.components.kernel.ObjectNameProvider;

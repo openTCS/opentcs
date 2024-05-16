@@ -7,10 +7,10 @@
  */
 package org.opentcs.guing.common.application.menus.menubar;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import javax.inject.Inject;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;

@@ -7,6 +7,7 @@
  */
 package org.opentcs.operationsdesk.notifications;
 
+import jakarta.inject.Inject;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -18,7 +19,6 @@ import java.util.Arrays;
 import java.util.Date;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
-import javax.inject.Inject;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;

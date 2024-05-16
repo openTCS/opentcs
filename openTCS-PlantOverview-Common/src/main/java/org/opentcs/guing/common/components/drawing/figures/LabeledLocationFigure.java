@@ -9,13 +9,13 @@ package org.opentcs.guing.common.components.drawing.figures;
 
 import com.google.common.base.Strings;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.Action;
 import org.jhotdraw.draw.handle.Handle;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;

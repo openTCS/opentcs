@@ -9,6 +9,7 @@ package org.opentcs.strategies.basic.scheduling.modules;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,7 +19,6 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.Scheduler;
 import static org.opentcs.components.kernel.Scheduler.PROPKEY_BLOCK_ENTRY_DIRECTION;
 import org.opentcs.components.kernel.services.InternalPlantModelService;

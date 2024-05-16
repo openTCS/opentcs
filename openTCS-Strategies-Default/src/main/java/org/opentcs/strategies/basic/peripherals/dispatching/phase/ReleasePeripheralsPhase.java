@@ -7,9 +7,9 @@
  */
 package org.opentcs.strategies.basic.peripherals.dispatching.phase;
 
+import jakarta.inject.Inject;
 import java.util.Collection;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.data.model.Location;
 import org.opentcs.strategies.basic.peripherals.dispatching.PeripheralDispatcherPhase;

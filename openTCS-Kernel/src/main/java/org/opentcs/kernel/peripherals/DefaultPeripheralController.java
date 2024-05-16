@@ -9,9 +9,9 @@ package org.opentcs.kernel.peripherals;
 
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.model.Location;

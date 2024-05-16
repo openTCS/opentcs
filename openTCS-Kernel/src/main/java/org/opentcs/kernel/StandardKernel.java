@@ -9,6 +9,7 @@ package org.opentcs.kernel;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Provider;
+import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
@@ -16,7 +17,6 @@ import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.Kernel.State;
 import org.opentcs.access.KernelStateTransitionEvent;

@@ -7,8 +7,8 @@
  */
 package org.opentcs.modeleditor.application.menus.menubar;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.JMenu;
 import org.opentcs.modeleditor.application.action.ViewActionMap;
 import org.opentcs.modeleditor.util.I18nPlantOverviewModeling;

@@ -8,7 +8,7 @@
 package org.opentcs.strategies.basic.routing.jgrapht;
 
 import jakarta.annotation.Nonnull;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
 import org.jgrapht.alg.shortestpath.FloydWarshallShortestPaths;

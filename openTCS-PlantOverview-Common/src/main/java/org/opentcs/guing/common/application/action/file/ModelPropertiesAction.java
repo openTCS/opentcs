@@ -7,11 +7,11 @@
  */
 package org.opentcs.guing.common.application.action.file;
 
+import jakarta.inject.Inject;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;

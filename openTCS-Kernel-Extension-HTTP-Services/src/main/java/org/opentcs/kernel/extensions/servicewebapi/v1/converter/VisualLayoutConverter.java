@@ -7,11 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
+import jakarta.inject.Inject;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.model.visualization.Layer;
 import org.opentcs.data.model.visualization.LayerGroup;

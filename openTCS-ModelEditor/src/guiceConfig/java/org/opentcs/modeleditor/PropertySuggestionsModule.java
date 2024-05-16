@@ -7,7 +7,7 @@
  */
 package org.opentcs.modeleditor;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 
 /**

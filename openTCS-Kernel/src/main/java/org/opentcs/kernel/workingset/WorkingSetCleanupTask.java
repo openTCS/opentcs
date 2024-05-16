@@ -7,10 +7,10 @@
  */
 package org.opentcs.kernel.workingset;
 
+import jakarta.inject.Inject;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.function.Predicate;
-import javax.inject.Inject;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.OrderSequence;

@@ -7,8 +7,8 @@
  */
 package org.opentcs.guing.common.components.tree;
 
+import jakarta.inject.Inject;
 import java.util.HashSet;
-import javax.inject.Inject;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.common.application.ComponentsManager;
 import org.opentcs.guing.common.components.tree.elements.UserObject;

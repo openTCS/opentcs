@@ -7,10 +7,10 @@
  */
 package org.opentcs.kernel.services;
 
+import jakarta.inject.Inject;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.function.Predicate;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.notification.UserNotification;

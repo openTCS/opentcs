@@ -7,13 +7,13 @@
  */
 package org.opentcs.kernel.persistence;
 
+import jakarta.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.customizations.ApplicationHome;
 import static org.opentcs.util.Assertions.checkState;

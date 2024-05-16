@@ -7,6 +7,8 @@
  */
 package org.opentcs.operationsdesk.transport.orders;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -17,8 +19,6 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;

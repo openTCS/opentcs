@@ -8,9 +8,9 @@
 package org.opentcs.modeleditor.application.toolbar;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.awt.event.MouseEvent;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.tool.CreationTool;

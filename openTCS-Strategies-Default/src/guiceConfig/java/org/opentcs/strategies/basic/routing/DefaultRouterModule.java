@@ -8,7 +8,7 @@
 package org.opentcs.strategies.basic.routing;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorComposite;

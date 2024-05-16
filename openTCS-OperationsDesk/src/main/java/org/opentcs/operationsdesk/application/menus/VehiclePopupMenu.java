@@ -8,9 +8,9 @@
 package org.opentcs.operationsdesk.application.menus;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.util.Collection;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;

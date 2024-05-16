@@ -18,6 +18,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update Gradle wrapper to 8.7.
 ** Update slf4j to 2.0.13.
 *** Migration note: Integration projects need to update any use of slf4j providers to the same version, too, or the respective logging backend might not be used.
+** Update Guice to 7.0.0.
+*** Migration note: Integration projects now need to use injection-related annotations in the `jakarta.inject` namespace, e.g. `jakarta.inject.Inject` or `jakarta.inject.Provider`.
 ** Use annotations `jakarta.annotation.Nullable` and `jakarta.annotation.Nonnull` instead of `javax.annotation.Nullable` and `javax.annotation.Nonnull`.
    For the latter, use of the `javax` namespace was never officially approved, so the former may be considered more official.
 ** Remove code for reading configuration (interfaces) via cfg4j.

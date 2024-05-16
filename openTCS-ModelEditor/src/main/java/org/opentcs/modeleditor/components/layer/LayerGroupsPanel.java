@@ -7,6 +7,7 @@
  */
 package org.opentcs.modeleditor.components.layer;
 
+import jakarta.inject.Inject;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,7 +17,6 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;

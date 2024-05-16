@@ -8,10 +8,10 @@
 package org.opentcs.guing.common.components.properties.panel;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import org.opentcs.components.plantoverview.LocationTheme;

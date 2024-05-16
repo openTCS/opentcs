@@ -7,7 +7,7 @@
  */
 package org.opentcs.modeleditor.components.layer;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 import org.opentcs.guing.common.components.layer.LayerGroupManager;
 import org.opentcs.guing.common.components.layer.LayerManager;

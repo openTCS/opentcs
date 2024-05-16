@@ -8,11 +8,11 @@
 package org.opentcs.modeleditor.application.toolbar;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.Action;
 import javax.swing.JMenuItem;
 import org.jhotdraw.draw.tool.DragTracker;

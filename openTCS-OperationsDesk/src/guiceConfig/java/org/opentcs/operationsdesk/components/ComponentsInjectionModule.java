@@ -9,8 +9,8 @@ package org.opentcs.operationsdesk.components;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.PrivateModule;
+import jakarta.inject.Singleton;
 import java.awt.event.MouseListener;
-import javax.inject.Singleton;
 import org.opentcs.guing.common.components.tree.AbstractTreeViewPanel;
 import org.opentcs.guing.common.components.tree.BlockMouseListener;
 import org.opentcs.guing.common.components.tree.BlocksTreeViewManager;

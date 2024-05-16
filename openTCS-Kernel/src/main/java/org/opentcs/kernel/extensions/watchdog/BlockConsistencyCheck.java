@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel.extensions.watchdog;
 
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -16,7 +17,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.components.kernel.services.TCSObjectService;

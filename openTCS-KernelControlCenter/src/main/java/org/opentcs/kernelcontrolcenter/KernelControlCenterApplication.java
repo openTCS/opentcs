@@ -7,8 +7,8 @@
  */
 package org.opentcs.kernelcontrolcenter;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.common.ClientConnectionMode;
 import org.opentcs.common.KernelClientApplication;
 import org.opentcs.common.PortalManager;

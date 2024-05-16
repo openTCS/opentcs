@@ -7,11 +7,11 @@
  */
 package org.opentcs.kernel;
 
+import jakarta.inject.Inject;
 import java.io.IOException;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
-import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.KernelExtension;

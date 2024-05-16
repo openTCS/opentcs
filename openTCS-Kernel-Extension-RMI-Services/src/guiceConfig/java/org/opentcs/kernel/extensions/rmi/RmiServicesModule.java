@@ -8,7 +8,7 @@
 package org.opentcs.kernel.extensions.rmi;
 
 import com.google.inject.multibindings.Multibinder;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;
 import org.opentcs.access.rmi.factories.SecureSocketFactoryProvider;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;

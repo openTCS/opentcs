@@ -7,8 +7,8 @@
  */
 package org.opentcs.guing.common.util;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.guing.base.model.elements.LinkModel;
 import org.opentcs.guing.base.model.elements.LocationModel;
 import org.opentcs.guing.base.model.elements.PathModel;

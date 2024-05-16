@@ -9,12 +9,12 @@ package org.opentcs.kernel.extensions.servicewebapi.v1;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
 import java.util.Comparator;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;

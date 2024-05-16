@@ -9,13 +9,13 @@ package org.opentcs.guing.common.components.properties.table;
 
 import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTable;

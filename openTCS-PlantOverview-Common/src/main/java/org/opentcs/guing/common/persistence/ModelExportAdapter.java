@@ -8,10 +8,10 @@
 package org.opentcs.guing.common.persistence;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;

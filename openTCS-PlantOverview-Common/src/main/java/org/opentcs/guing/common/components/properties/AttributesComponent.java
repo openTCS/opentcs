@@ -7,9 +7,9 @@
  */
 package org.opentcs.guing.common.components.properties;
 
+import jakarta.inject.Inject;
 import java.awt.Component;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.JPanel;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.common.model.ComponentSelectionListener;

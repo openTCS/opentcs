@@ -7,10 +7,10 @@
  */
 package org.opentcs.guing.common.transport;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.inject.Inject;
 import org.opentcs.components.plantoverview.OrderTypeSuggestions;
 
 /**

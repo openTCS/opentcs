@@ -7,11 +7,11 @@
  */
 package org.opentcs.operationsdesk.transport;
 
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.operationsdesk.peripherals.jobs.PeripheralJobHistoryEntryFormatter;

@@ -7,10 +7,10 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.plantoverview.PluggablePanel;

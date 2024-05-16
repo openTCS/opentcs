@@ -4,11 +4,11 @@
 package org.opentcs.thirdparty.modeleditor.jhotdraw.application.toolbar;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;

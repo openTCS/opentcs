@@ -7,6 +7,7 @@
  */
 package org.opentcs.modeleditor.util;
 
+import jakarta.inject.Inject;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.ArrayList;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.TreeSet;
-import javax.inject.Inject;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.connector.Connector;
 import org.opentcs.guing.base.model.ConnectableModelComponent;

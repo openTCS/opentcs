@@ -7,10 +7,10 @@
  */
 package org.opentcs.strategies.basic.routing.edgeevaluator;
 
+import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
 import org.opentcs.data.model.Vehicle;

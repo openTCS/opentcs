@@ -7,10 +7,10 @@
  */
 package org.opentcs.strategies.basic.scheduling.modules.areaAllocation;
 
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import javax.inject.Inject;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;

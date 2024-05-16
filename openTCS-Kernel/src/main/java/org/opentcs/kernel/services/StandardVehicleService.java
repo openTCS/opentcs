@@ -7,10 +7,10 @@
  */
 package org.opentcs.kernel.services;
 
+import jakarta.inject.Inject;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.components.kernel.services.TCSObjectService;

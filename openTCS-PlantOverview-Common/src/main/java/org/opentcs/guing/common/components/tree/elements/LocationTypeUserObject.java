@@ -8,7 +8,7 @@
 package org.opentcs.guing.common.components.tree.elements;
 
 import com.google.inject.assistedinject.Assisted;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import javax.swing.ImageIcon;
 import org.opentcs.guing.base.model.elements.LocationTypeModel;
 import org.opentcs.guing.common.application.GuiManager;

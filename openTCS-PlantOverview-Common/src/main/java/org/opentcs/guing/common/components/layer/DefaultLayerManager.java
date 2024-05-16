@@ -7,6 +7,7 @@
  */
 package org.opentcs.guing.common.components.layer;
 
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +16,6 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.Drawing;
 import org.opentcs.customizations.ApplicationEventBus;

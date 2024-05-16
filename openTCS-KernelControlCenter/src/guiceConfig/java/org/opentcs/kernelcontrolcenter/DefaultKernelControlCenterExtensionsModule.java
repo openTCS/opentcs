@@ -9,7 +9,7 @@ package org.opentcs.kernelcontrolcenter;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.opentcs.components.kernelcontrolcenter.ControlCenterPanel;
 import org.opentcs.customizations.controlcenter.ControlCenterInjectionModule;
 import org.opentcs.kernelcontrolcenter.peripherals.PeripheralsPanel;

@@ -8,6 +8,7 @@
 package org.opentcs.kernel.peripherals;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,6 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.Location;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;

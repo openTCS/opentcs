@@ -7,9 +7,9 @@
  */
 package org.opentcs.modeleditor.application.action.file;
 
+import jakarta.inject.Inject;
 import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.ACCELERATOR_KEY;
 import static javax.swing.Action.MNEMONIC_KEY;

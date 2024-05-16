@@ -7,8 +7,8 @@
  */
 package org.opentcs.kernel.workingset;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.PeripheralJobCleanupApproval;
 import org.opentcs.data.peripherals.PeripheralJob;
 

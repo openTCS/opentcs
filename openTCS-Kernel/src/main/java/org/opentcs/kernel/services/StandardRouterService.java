@@ -7,12 +7,12 @@
  */
 package org.opentcs.kernel.services;
 
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.Router;

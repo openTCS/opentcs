@@ -7,9 +7,9 @@
  */
 package org.opentcs.operationsdesk.components.drawing;
 
+import jakarta.inject.Inject;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.event.NullAttributesChangeListener;

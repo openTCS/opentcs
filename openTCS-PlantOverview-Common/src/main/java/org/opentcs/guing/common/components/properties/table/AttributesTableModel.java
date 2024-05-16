@@ -7,8 +7,8 @@
  */
 package org.opentcs.guing.common.components.properties.table;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.guing.base.components.properties.type.ModelAttribute;
 import org.opentcs.guing.common.application.ApplicationState;
 import org.opentcs.guing.common.application.OperationMode;

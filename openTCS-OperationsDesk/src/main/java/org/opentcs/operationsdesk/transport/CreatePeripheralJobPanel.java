@@ -7,6 +7,7 @@
  */
 package org.opentcs.operationsdesk.transport;
 
+import jakarta.inject.Inject;
 import java.awt.event.ItemEvent;
 import java.util.Comparator;
 import java.util.List;
@@ -14,7 +15,6 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.model.PeripheralInformation;

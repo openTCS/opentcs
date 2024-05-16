@@ -8,11 +8,11 @@
 package org.opentcs.modeleditor.application.menus;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import org.jhotdraw.draw.DrawingEditor;

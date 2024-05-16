@@ -7,10 +7,10 @@
  */
 package org.opentcs.guing.common.exchange;
 
+import jakarta.inject.Inject;
 import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.common.PortalManager;

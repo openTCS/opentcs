@@ -8,9 +8,9 @@
 package org.opentcs.strategies.basic.scheduling.modules.areaAllocation;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.TCSResource;

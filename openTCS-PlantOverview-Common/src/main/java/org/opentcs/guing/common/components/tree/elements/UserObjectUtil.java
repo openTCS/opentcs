@@ -7,8 +7,8 @@
  */
 package org.opentcs.guing.common.components.tree.elements;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.guing.base.model.CompositeModelComponent;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.BlockModel;

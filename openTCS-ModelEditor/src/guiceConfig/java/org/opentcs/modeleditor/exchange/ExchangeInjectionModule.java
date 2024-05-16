@@ -8,7 +8,7 @@
 package org.opentcs.modeleditor.exchange;
 
 import com.google.inject.AbstractModule;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.common.DefaultPortalManager;
 import org.opentcs.common.PortalManager;

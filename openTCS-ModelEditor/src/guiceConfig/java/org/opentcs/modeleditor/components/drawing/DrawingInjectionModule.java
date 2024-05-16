@@ -9,7 +9,7 @@ package org.opentcs.modeleditor.components.drawing;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.jhotdraw.draw.DrawingEditor;
 import org.opentcs.guing.common.components.drawing.DrawingOptions;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingEditor;

@@ -8,11 +8,11 @@
 package org.opentcs.operationsdesk.application.action.course;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import org.opentcs.access.KernelRuntimeException;

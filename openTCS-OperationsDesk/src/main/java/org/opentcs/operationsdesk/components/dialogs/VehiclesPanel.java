@@ -7,13 +7,13 @@
  */
 package org.opentcs.operationsdesk.components.dialogs;
 
+import jakarta.inject.Inject;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.Collection;
 import static java.util.Objects.requireNonNull;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import javax.inject.Inject;
 import javax.swing.JPanel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.components.dialogs.ModifiedFlowLayout;

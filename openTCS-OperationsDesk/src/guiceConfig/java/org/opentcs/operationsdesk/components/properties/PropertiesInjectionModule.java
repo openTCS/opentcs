@@ -10,7 +10,7 @@ package org.opentcs.operationsdesk.components.properties;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 import org.opentcs.guing.base.components.properties.type.AbstractComplexProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;

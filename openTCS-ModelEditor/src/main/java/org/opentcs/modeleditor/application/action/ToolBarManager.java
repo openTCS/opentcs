@@ -7,13 +7,13 @@
  */
 package org.opentcs.modeleditor.application.action;
 
+import jakarta.inject.Inject;
 import java.awt.Rectangle;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;

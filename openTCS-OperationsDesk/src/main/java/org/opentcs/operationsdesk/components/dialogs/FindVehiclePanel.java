@@ -8,11 +8,11 @@
 package org.opentcs.operationsdesk.components.dialogs;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.JPanel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingView;

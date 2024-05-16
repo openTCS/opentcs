@@ -8,6 +8,7 @@
 package org.opentcs.virtualvehicle;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -18,7 +19,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.common.LoopbackAdapterConstants;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Vehicle;

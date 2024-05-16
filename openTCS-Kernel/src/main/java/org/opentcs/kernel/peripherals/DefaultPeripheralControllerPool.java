@@ -7,10 +7,10 @@
  */
 package org.opentcs.kernel.peripherals;
 
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;

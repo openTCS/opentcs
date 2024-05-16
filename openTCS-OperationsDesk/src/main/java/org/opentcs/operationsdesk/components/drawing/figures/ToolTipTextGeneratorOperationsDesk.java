@@ -7,13 +7,13 @@
  */
 package org.opentcs.operationsdesk.components.drawing.figures;
 
+import jakarta.inject.Inject;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.data.model.Vehicle;
 import static org.opentcs.data.model.Vehicle.State.ERROR;
 import static org.opentcs.data.model.Vehicle.State.UNAVAILABLE;

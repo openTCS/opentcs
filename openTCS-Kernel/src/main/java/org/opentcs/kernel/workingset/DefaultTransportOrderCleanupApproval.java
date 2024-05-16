@@ -7,9 +7,9 @@
  */
 package org.opentcs.kernel.workingset;
 
+import jakarta.inject.Inject;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.TransportOrderCleanupApproval;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;

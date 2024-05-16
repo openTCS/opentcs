@@ -7,12 +7,12 @@
  */
 package org.opentcs.guing.common.components.drawing.figures;
 
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.model.FigureDecorationDetails;

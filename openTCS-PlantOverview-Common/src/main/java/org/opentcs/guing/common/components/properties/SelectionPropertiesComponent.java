@@ -7,7 +7,7 @@
  */
 package org.opentcs.guing.common.components.properties;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.opentcs.guing.common.event.OperationModeChangeEvent;
 import org.opentcs.guing.common.event.SystemModelTransitionEvent;
 import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.UndoRedoManager;

@@ -9,6 +9,8 @@ package org.opentcs.guing.common.persistence;
 
 import com.google.common.base.Strings;
 import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.IOException;
@@ -19,8 +21,6 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.logging.Level;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import org.jhotdraw.draw.Figure;

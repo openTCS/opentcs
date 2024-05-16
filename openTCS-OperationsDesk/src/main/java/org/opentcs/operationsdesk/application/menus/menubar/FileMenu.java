@@ -7,8 +7,8 @@
  */
 package org.opentcs.operationsdesk.application.menus.menubar;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.opentcs.guing.common.application.action.file.ModelPropertiesAction;

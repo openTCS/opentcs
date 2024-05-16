@@ -7,9 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
+import jakarta.inject.Inject;
 import java.util.Comparator;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.data.model.Point;
 
 /**

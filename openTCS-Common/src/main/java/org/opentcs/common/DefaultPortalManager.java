@@ -7,10 +7,10 @@
  */
 package org.opentcs.common;
 
+import jakarta.inject.Inject;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
-import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.KernelServicePortal;

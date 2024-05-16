@@ -7,6 +7,7 @@
  */
 package org.opentcs.guing.common.components.properties.panel;
 
+import jakarta.inject.Inject;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +16,6 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.RowSorter;

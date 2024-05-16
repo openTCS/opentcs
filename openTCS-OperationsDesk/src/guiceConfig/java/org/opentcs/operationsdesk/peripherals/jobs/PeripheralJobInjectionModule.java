@@ -9,7 +9,7 @@ package org.opentcs.operationsdesk.peripherals.jobs;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 /**
  * A Guice module for this package.

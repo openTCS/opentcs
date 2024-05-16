@@ -8,10 +8,10 @@
 package org.opentcs.kernel.vehicles;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;

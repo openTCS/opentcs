@@ -7,6 +7,7 @@
  */
 package org.opentcs.guing.common.components.tree;
 
+import jakarta.inject.Inject;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -16,7 +17,6 @@ import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.function.Predicate;
-import javax.inject.Inject;
 import javax.swing.tree.TreeNode;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.common.components.tree.elements.UserObject;

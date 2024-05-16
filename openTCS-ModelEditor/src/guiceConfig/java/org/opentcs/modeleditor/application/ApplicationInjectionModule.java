@@ -8,8 +8,8 @@
 package org.opentcs.modeleditor.application;
 
 import com.google.inject.AbstractModule;
+import jakarta.inject.Singleton;
 import java.awt.Component;
-import javax.inject.Singleton;
 import javax.swing.JFrame;
 import org.jhotdraw.app.Application;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;

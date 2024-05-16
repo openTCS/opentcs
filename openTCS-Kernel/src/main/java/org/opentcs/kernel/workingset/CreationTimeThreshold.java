@@ -7,8 +7,8 @@
  */
 package org.opentcs.kernel.workingset;
 
+import jakarta.inject.Inject;
 import java.time.Instant;
-import javax.inject.Inject;
 
 /**
  * Keeps track of the time used to determine whether a working set item should be removed (according

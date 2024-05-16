@@ -7,12 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.customizations.kernel.KernelExecutor;
 

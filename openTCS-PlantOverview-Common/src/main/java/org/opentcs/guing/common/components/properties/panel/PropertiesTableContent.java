@@ -8,11 +8,11 @@
 package org.opentcs.guing.common.components.properties.panel;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;

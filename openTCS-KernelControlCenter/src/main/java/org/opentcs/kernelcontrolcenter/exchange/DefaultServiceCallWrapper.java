@@ -7,11 +7,11 @@
  */
 package org.opentcs.kernelcontrolcenter.exchange;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
-import javax.inject.Inject;
 import javax.swing.JOptionPane;
 import org.opentcs.common.KernelClientApplication;
 import org.opentcs.common.PortalManager;

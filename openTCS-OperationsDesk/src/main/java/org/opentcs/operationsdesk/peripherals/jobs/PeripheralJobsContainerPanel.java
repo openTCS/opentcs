@@ -7,6 +7,7 @@
  */
 package org.opentcs.operationsdesk.peripherals.jobs;
 
+import jakarta.inject.Inject;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -16,7 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
-import javax.inject.Inject;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;

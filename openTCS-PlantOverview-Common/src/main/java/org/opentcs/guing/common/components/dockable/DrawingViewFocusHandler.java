@@ -9,9 +9,9 @@ package org.opentcs.guing.common.components.dockable;
 
 import bibliothek.gui.dock.common.event.CFocusListener;
 import bibliothek.gui.dock.common.intern.CDockable;
+import jakarta.inject.Inject;
 import java.awt.event.FocusEvent;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.jhotdraw.draw.DrawingEditor;
 import org.opentcs.guing.common.application.ViewManager;
 import org.opentcs.guing.common.components.drawing.DrawingViewScrollPane;

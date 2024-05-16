@@ -8,6 +8,8 @@
 package org.opentcs.kernelcontrolcenter;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -18,8 +20,6 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.opentcs.access.Kernel;

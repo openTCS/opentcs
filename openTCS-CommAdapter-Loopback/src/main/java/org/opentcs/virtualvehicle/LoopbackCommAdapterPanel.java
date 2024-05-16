@@ -8,6 +8,7 @@
 package org.opentcs.virtualvehicle;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,7 +17,6 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
-import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.ServiceCallWrapper;

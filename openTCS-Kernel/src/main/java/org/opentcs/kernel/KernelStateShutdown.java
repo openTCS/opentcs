@@ -7,7 +7,7 @@
  */
 package org.opentcs.kernel;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.kernel.persistence.ModelPersister;

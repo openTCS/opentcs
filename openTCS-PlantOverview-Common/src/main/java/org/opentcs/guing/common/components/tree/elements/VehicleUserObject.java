@@ -8,9 +8,9 @@
 package org.opentcs.guing.common.components.tree.elements;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
-import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JTree;

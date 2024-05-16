@@ -7,6 +7,7 @@
  */
 package org.opentcs.operationsdesk.transport.sequences;
 
+import jakarta.inject.Inject;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Point;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
-import javax.inject.Inject;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;

@@ -7,10 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase;
 
+import jakarta.inject.Inject;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;

@@ -8,11 +8,11 @@
 package org.opentcs.kernel.extensions.rmi;
 
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.opentcs.components.Lifecycle;
 import org.slf4j.Logger;

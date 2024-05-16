@@ -8,9 +8,9 @@
 package org.opentcs.kernel.extensions.servicewebapi;
 
 import com.google.common.util.concurrent.Uninterruptibles;
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SslParameterSet;
 import org.opentcs.components.kernel.KernelExtension;

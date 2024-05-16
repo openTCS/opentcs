@@ -7,11 +7,11 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.candidates;
 
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.TransportOrder;

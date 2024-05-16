@@ -9,11 +9,11 @@ package org.opentcs.strategies.basic.routing.jgrapht;
 
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
 import org.opentcs.data.model.Path;

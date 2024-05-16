@@ -8,10 +8,10 @@
 package org.opentcs.kernel.services;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import jakarta.inject.Inject;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.LocalKernel;

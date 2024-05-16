@@ -8,9 +8,9 @@
 package org.opentcs.modeleditor.application.menus;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
-import javax.inject.Inject;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.base.components.properties.type.StringProperty;

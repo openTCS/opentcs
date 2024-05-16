@@ -7,8 +7,8 @@
  */
 package org.opentcs.commadapter.peripheral.loopback;
 
+import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import org.opentcs.data.model.Location;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapter;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;

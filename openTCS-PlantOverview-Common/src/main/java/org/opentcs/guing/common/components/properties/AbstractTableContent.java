@@ -7,12 +7,12 @@
  */
 package org.opentcs.guing.common.components.properties;
 
+import jakarta.inject.Provider;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;

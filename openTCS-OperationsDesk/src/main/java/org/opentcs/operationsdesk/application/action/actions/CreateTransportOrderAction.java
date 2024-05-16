@@ -7,11 +7,11 @@
  */
 package org.opentcs.operationsdesk.application.action.actions;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.swing.AbstractAction;
 import static javax.swing.Action.LARGE_ICON_KEY;
 import static javax.swing.Action.MNEMONIC_KEY;

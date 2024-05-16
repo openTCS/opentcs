@@ -7,11 +7,11 @@
  */
 package org.opentcs.customizations.controlcenter;
 
+import jakarta.inject.Qualifier;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import javax.inject.Qualifier;
 
 /**
  * Annotation type for binding injectable components meant to be used in modelling mode.

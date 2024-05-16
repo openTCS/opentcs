@@ -7,10 +7,10 @@
  */
 package org.opentcs.access.rmi.factories;
 
+import jakarta.inject.Inject;
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
 import javax.rmi.ssl.SslRMIServerSocketFactory;

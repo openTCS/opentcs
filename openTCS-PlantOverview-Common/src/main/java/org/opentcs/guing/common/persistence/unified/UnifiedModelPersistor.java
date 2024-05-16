@@ -7,10 +7,10 @@
  */
 package org.opentcs.guing.common.persistence.unified;
 
+import jakarta.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import static java.util.Objects.requireNonNull;
-import javax.inject.Inject;
 import javax.swing.filechooser.FileFilter;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.guing.common.persistence.ModelFilePersistor;
