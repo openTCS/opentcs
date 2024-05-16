@@ -19,21 +19,21 @@ public interface TransportOrderHistoryCodes {
    * The history entry's supplement is empty.
    * </p>
    */
-  String ORDER_CREATED = "tcsHistory:orderCreated";
+  String ORDER_CREATED = "tcs:history:orderCreated";
   /**
    * An event code indicating dispatching of a transport order to a vehicle has been deferred.
    * <p>
    * The history entry's supplement contains a list of reasons for the deferral.
    * </p>
    */
-  String ORDER_DISPATCHING_DEFERRED = "tcsHistory:orderDispatchingDeferred";
+  String ORDER_DISPATCHING_DEFERRED = "tcs:history:orderDispatchingDeferred";
   /**
    * An event code indicating dispatching of a transport order to a vehicle has been resumed.
    * <p>
    * The history entry's supplement is empty.
    * </p>
    */
-  String ORDER_DISPATCHING_RESUMED = "tcsHistory:orderDispatchingResumed";
+  String ORDER_DISPATCHING_RESUMED = "tcs:history:orderDispatchingResumed";
   /**
    * An event code indicating a transport order was assigned to a vehicle.
    * <p>
@@ -41,7 +41,7 @@ public interface TransportOrderHistoryCodes {
    * assigned to.
    * </p>
    */
-  String ORDER_ASSIGNED_TO_VEHICLE = "tcsHistory:orderAssignedToVehicle";
+  String ORDER_ASSIGNED_TO_VEHICLE = "tcs:history:orderAssignedToVehicle";
   /**
    * An event code indicating a transport order was reserved for a vehicle.
    * <p>
@@ -49,7 +49,7 @@ public interface TransportOrderHistoryCodes {
    * reserved for.
    * </p>
    */
-  String ORDER_RESERVED_FOR_VEHICLE = "tcsHistory:orderReservedForVehicle";
+  String ORDER_RESERVED_FOR_VEHICLE = "tcs:history:orderReservedForVehicle";
   /**
    * An event code indicating a transport order's processing vehicle changed.
    * <p>
@@ -57,19 +57,19 @@ public interface TransportOrderHistoryCodes {
    * string, if the processing vehicle was unset.
    * </p>
    */
-  String ORDER_PROCESSING_VEHICLE_CHANGED = "tcsHistory:orderProcVehicleChanged";
+  String ORDER_PROCESSING_VEHICLE_CHANGED = "tcs:history:orderProcVehicleChanged";
   /**
    * An event code indicating a transport order was marked as being in a final state.
    * <p>
    * The history entry's supplement is empty.
    * </p>
    */
-  String ORDER_REACHED_FINAL_STATE = "tcsHistory:orderReachedFinalState";
+  String ORDER_REACHED_FINAL_STATE = "tcs:history:orderReachedFinalState";
   /**
    * An event code indicating one of a transport order's drive orders has been finished.
    * <p>
    * The history entry's supplement is empty.
    * </p>
    */
-  String ORDER_DRIVE_ORDER_FINISHED = "tcsHistory:orderFinishedDriveOrder";
+  String ORDER_DRIVE_ORDER_FINISHED = "tcs:history:orderFinishedDriveOrder";
 }

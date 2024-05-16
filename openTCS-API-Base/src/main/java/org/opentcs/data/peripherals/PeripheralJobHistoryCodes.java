@@ -19,12 +19,12 @@ public interface PeripheralJobHistoryCodes {
    * The history entry's supplement is empty.
    * </p>
    */
-  String JOB_CREATED = "tcsHistory:jobCreated";
+  String JOB_CREATED = "tcs:history:jobCreated";
   /**
    * An event code indicating a peripheral job was marked as being in a final state.
    * <p>
    * The history entry's supplement is empty.
    * </p>
    */
-  String JOB_REACHED_FINAL_STATE = "tcsHistory:jobReachedFinalState";
+  String JOB_REACHED_FINAL_STATE = "tcs:history:jobReachedFinalState";
 }

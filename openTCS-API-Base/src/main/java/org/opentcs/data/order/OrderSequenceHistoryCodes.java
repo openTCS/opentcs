@@ -19,7 +19,7 @@ public interface OrderSequenceHistoryCodes {
    * The history entry's supplement is empty.
    * </p>
    */
-  String SEQUENCE_CREATED = "tcsHistory:sequenceCreated";
+  String SEQUENCE_CREATED = "tcs:history:sequenceCreated";
 
   /**
    * An event code indicating a transport order has been appended to an order sequence.
@@ -27,7 +27,7 @@ public interface OrderSequenceHistoryCodes {
    * The history entry's supplement contains the name of the transport order that was appended.
    * </p>
    */
-  String SEQUENCE_ORDER_APPENDED = "tcsHistory:sequenceOrderAppended";
+  String SEQUENCE_ORDER_APPENDED = "tcs:history:sequenceOrderAppended";
 
   /**
    * An event code indicating an order sequence's processing vehicle changed.
@@ -36,7 +36,7 @@ public interface OrderSequenceHistoryCodes {
    * string, if the processing vehicle was unset.
    * </p>
    */
-  String SEQUENCE_PROCESSING_VEHICLE_CHANGED = "tcsHistory:sequenceProcVehicleChanged";
+  String SEQUENCE_PROCESSING_VEHICLE_CHANGED = "tcs:history:sequenceProcVehicleChanged";
 
   /**
    * An event code indicating an order sequence has been completed and will not be extended by more
@@ -45,7 +45,7 @@ public interface OrderSequenceHistoryCodes {
    * The history entry's supplement is empty.
    * </p>
    */
-  String SEQUENCE_COMPLETED = "tcsHistory:sequenceCompleted";
+  String SEQUENCE_COMPLETED = "tcs:history:sequenceCompleted";
 
   /**
    * An event code indicating an order sequence has been processed completely.
@@ -53,6 +53,6 @@ public interface OrderSequenceHistoryCodes {
    * The history entry's supplement is empty.
    * </p>
    */
-  String SEQUENCE_FINISHED = "tcsHistory:sequenceFinished";
+  String SEQUENCE_FINISHED = "tcs:history:sequenceFinished";
 
 }
