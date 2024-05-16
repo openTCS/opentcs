@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ServiceLoader;
 import org.opentcs.configuration.ConfigurationBindingProvider;
-import org.opentcs.configuration.cfg4j.Cfg4jConfigurationBindingProvider;
 import org.opentcs.configuration.gestalt.GestaltConfigurationBindingProvider;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherModule;
@@ -106,9 +105,6 @@ public class RunKernel {
   private static ConfigurationBindingProvider configurationBindingProvider() {
     String chosenProvider = System.getProperty("opentcs.configuration.provider", "gestalt");
     switch (chosenProvider) {
-      case "cfg4j":
-        LOG.info("Using cfg4j as the configuration provider.");
-        return cgf4jConfigurationBindingProvider();
       case "gestalt":
       default:
         LOG.info("Using gestalt as the configuration provider.");
@@ -133,20 +129,4 @@ public class RunKernel {
     );
   }
 
-  private static ConfigurationBindingProvider cgf4jConfigurationBindingProvider() {
-    return new Cfg4jConfigurationBindingProvider(
-        Paths.get(System.getProperty("opentcs.base", "."),
-                  "config",
-                  "opentcs-kernel-defaults-baseline.properties")
-            .toAbsolutePath(),
-        Paths.get(System.getProperty("opentcs.base", "."),
-                  "config",
-                  "opentcs-kernel-defaults-custom.properties")
-            .toAbsolutePath(),
-        Paths.get(System.getProperty("opentcs.home", "."),
-                  "config",
-                  "opentcs-kernel.properties")
-            .toAbsolutePath()
-    );
-  }
 }

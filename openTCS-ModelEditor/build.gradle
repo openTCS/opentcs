@@ -13,7 +13,6 @@ ext.collectableDistDir = new File(buildDir, 'install')
 dependencies {
   api project(':openTCS-Common')
   api project(':openTCS-Impl-Configuration-gestalt')
-  api project(':openTCS-Impl-Configuration-cfg4j')
   api project(':openTCS-PlantOverview-Common')
   api project(':openTCS-PlantOverview-Themes-Default')
 
@@ -48,7 +47,6 @@ run {
                     'sun.java2d.d3d':'false',\
                     'opentcs.base':'.',\
                     'opentcs.home':'.',\
-                    'opentcs.cfg4j.reload.interval':'10000',\
                     'opentcs.configuration.reload.interval':'10000',\
                     'opentcs.configuration.provider':'gestalt'])
   jvmArgs('-XX:-OmitStackTraceInFastThrow',\

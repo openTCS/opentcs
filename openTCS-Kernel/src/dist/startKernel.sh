@@ -26,7 +26,6 @@ ${JAVA} -enableassertions \
     -Dopentcs.home="${OPENTCS_HOME}" \
     -Dopentcs.configuration.provider=gestalt \
     -Dopentcs.configuration.reload.interval=10000 \
-    -Dopentcs.cfg4j.reload.interval=10000 \
     -Djava.util.logging.config.file=${OPENTCS_CONFIGDIR}/logging.config \
     -XX:-OmitStackTraceInFastThrow \
     -classpath "${OPENTCS_CP}" \

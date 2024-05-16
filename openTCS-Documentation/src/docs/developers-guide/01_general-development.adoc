@@ -45,10 +45,6 @@ This is required in integration projects customizing these applications, e.g. ad
 |No
 |A collection of utility classes used by openTCS components.
 
-|`opentcs-impl-configuration-cfg4j`
-|No
-|An implementation of the base API's configuration interfaces based on cfg4j.
-
 |`opentcs-impl-configuration-gestalt`
 |No
 |An implementation of the base API's configuration interfaces based on gestalt.
@@ -127,8 +123,6 @@ The kernel and the client applications depend on the following external framewor
   A simple logging facade to keep the actual logging implementation replaceable.
 * Google Guice (https://github.com/google/guice):
   A light-weight dependency injection framework.
-* Cfg4j (http://www.cfg4j.org/):
-  A configuration library supporting binding interfaces.
 * Gestalt (https://github.com/gestalt-config/gestalt):
   A configuration library supporting binding interfaces.
 * Google Guava (https://github.com/google/guava):

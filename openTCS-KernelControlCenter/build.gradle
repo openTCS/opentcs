@@ -16,7 +16,6 @@ dependencies {
   api project(':openTCS-CommAdapter-Loopback')
   api project(':openTCS-PeripheralCommAdapter-Loopback')
   api project(':openTCS-Impl-Configuration-gestalt')
-  api project(':openTCS-Impl-Configuration-cfg4j')
 
   runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.36'
 }
@@ -49,7 +48,6 @@ run {
                     'sun.java2d.d3d':'false',\
                     'opentcs.base':'.',\
                     'opentcs.home':'.',\
-                    'opentcs.cfg4j.reload.interval':'10000',\
                     'opentcs.configuration.reload.interval':'10000',\
                     'opentcs.configuration.provider':'gestalt'])
   jvmArgs('-XX:-OmitStackTraceInFastThrow',\

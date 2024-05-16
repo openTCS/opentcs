@@ -16,7 +16,6 @@ dependencies {
   api project(':openTCS-CommAdapter-Loopback')
   api project(':openTCS-PeripheralCommAdapter-Loopback')
   api project(':openTCS-Strategies-Default')
-  api project(':openTCS-Impl-Configuration-cfg4j')
   api project(':openTCS-Impl-Configuration-gestalt')
   api project(':openTCS-Kernel-Extension-HTTP-Services')
   api project(':openTCS-Kernel-Extension-RMI-Services')
@@ -49,7 +48,6 @@ run {
   systemProperties(['java.util.logging.config.file':'./config/logging.config',\
                     'opentcs.base':'.',\
                     'opentcs.home':'.',\
-                    'opentcs.cfg4j.reload.interval':'10000',\
                     'opentcs.configuration.reload.interval':'10000',\
                     'opentcs.configuration.provider':'gestalt'])
   jvmArgs('-XX:-OmitStackTraceInFastThrow')
