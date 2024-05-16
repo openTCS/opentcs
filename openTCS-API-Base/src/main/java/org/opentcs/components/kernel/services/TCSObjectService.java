@@ -7,10 +7,10 @@
  */
 package org.opentcs.components.kernel.services;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.util.Set;
 import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.ObjectUnknownException;

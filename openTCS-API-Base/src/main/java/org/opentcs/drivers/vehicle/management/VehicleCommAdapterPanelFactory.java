@@ -7,8 +7,8 @@
  */
 package org.opentcs.drivers.vehicle.management;
 
+import jakarta.annotation.Nonnull;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;

@@ -7,10 +7,10 @@
  */
 package org.opentcs.kernel.services;
 
+import jakarta.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.Query;
 import org.opentcs.components.kernel.QueryResponder;

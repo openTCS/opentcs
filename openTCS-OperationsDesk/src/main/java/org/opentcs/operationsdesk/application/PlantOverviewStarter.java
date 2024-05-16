@@ -16,8 +16,8 @@ import org.opentcs.guing.common.event.EventLogger;
 import org.opentcs.operationsdesk.exchange.AttributeAdapterRegistry;
 import org.opentcs.operationsdesk.exchange.KernelEventFetcher;
 import org.opentcs.operationsdesk.exchange.OpenTCSEventDispatcher;
-import org.opentcs.operationsdesk.peripherals.jobs.PeripheralJobsContainer;
 import org.opentcs.operationsdesk.notifications.UserNotificationsContainer;
+import org.opentcs.operationsdesk.peripherals.jobs.PeripheralJobsContainer;
 import org.opentcs.operationsdesk.transport.orders.TransportOrdersContainer;
 import org.opentcs.operationsdesk.transport.sequences.OrderSequencesContainer;
 

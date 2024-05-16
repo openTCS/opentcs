@@ -7,8 +7,8 @@
  */
 package org.opentcs.drivers.vehicle.commands;
 
+import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.SimVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;

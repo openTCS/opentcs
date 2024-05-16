@@ -7,13 +7,13 @@
  */
 package org.opentcs.access.to.model;
 
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.model.Couple;

@@ -7,9 +7,9 @@
  */
 package org.opentcs.util;
 
+import jakarta.annotation.Nonnull;
 import java.awt.Color;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 
 /**
  * Provides utilty methods for working with colors.

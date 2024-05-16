@@ -7,11 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared;
 
+import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import org.opentcs.data.order.DriveOrder;
 
 /**

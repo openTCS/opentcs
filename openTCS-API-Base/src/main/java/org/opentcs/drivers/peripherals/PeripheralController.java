@@ -7,7 +7,7 @@
  */
 package org.opentcs.drivers.peripherals;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.util.ExplainedBoolean;

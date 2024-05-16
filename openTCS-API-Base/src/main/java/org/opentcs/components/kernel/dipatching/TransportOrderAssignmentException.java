@@ -7,9 +7,9 @@
  */
 package org.opentcs.components.kernel.dipatching;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;

@@ -7,8 +7,8 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
+import jakarta.annotation.Nonnull;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;

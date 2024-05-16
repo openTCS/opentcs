@@ -8,6 +8,8 @@
 package org.opentcs.kernel.vehicles;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayDeque;
@@ -22,8 +24,6 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.ResourceAllocationException;
 import org.opentcs.components.kernel.Scheduler;

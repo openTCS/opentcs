@@ -7,8 +7,8 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.recharging;
 
+import jakarta.annotation.Nonnull;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;

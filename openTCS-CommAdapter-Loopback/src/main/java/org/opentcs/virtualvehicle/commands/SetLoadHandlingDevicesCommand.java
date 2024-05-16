@@ -7,9 +7,9 @@
  */
 package org.opentcs.virtualvehicle.commands;
 
+import jakarta.annotation.Nonnull;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;

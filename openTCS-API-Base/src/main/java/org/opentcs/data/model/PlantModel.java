@@ -7,11 +7,11 @@
  */
 package org.opentcs.data.model;
 
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.util.annotations.ScheduledApiChange;
 

@@ -7,8 +7,8 @@
  */
 package org.opentcs.util;
 
+import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 
 /**
  * A boolean with an explanation/reason for its value.

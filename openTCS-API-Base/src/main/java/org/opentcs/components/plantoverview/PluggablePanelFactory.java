@@ -7,8 +7,8 @@
  */
 package org.opentcs.components.plantoverview;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.opentcs.access.Kernel;
 
 /**

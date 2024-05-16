@@ -7,9 +7,9 @@
  */
 package org.opentcs.access.rmi.factories;
 
+import jakarta.annotation.Nullable;
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
-import javax.annotation.Nullable;
 
 /**
  * A provider for instances of {@link RMIClientSocketFactory} and {@link RMIServerSocketFactory}.

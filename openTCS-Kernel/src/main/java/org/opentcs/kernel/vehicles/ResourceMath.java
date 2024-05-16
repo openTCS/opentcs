@@ -7,12 +7,12 @@
  */
 package org.opentcs.kernel.vehicles;
 
+import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.TCSResource;
 import static org.opentcs.util.Assertions.checkArgument;

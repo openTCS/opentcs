@@ -7,13 +7,13 @@
  */
 package org.opentcs.access.to.model;
 
+import jakarta.annotation.Nonnull;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.Block;
 

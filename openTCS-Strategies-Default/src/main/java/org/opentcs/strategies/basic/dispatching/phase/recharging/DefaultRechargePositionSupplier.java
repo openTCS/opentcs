@@ -7,6 +7,7 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.recharging;
 
+import jakarta.annotation.Nullable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import static org.opentcs.components.kernel.Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION;
 import static org.opentcs.components.kernel.Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION;

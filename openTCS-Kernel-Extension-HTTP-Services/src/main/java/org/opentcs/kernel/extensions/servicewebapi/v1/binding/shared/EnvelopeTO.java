@@ -9,9 +9,9 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nonnull;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 
 /**
  */

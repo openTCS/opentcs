@@ -7,7 +7,6 @@
  */
 package org.opentcs.kernel;
 
-import org.opentcs.kernel.workingset.CreationTimeThreshold;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import java.io.File;
@@ -72,9 +71,10 @@ import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
 import org.opentcs.kernel.vehicles.VehicleControllerComponentsFactory;
 import org.opentcs.kernel.vehicles.VehicleControllerFactory;
-import org.opentcs.kernel.workingset.PlantModelManager;
+import org.opentcs.kernel.workingset.CreationTimeThreshold;
 import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.PeripheralJobPoolManager;
+import org.opentcs.kernel.workingset.PlantModelManager;
 import org.opentcs.kernel.workingset.PrefixedUlidObjectNameProvider;
 import org.opentcs.kernel.workingset.TCSObjectManager;
 import org.opentcs.kernel.workingset.TCSObjectRepository;

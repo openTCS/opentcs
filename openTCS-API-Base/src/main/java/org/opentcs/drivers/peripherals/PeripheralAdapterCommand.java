@@ -7,8 +7,8 @@
  */
 package org.opentcs.drivers.peripherals;
 
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
-import javax.annotation.Nonnull;
 
 /**
  * A command a peripheral communication adapter may execute.

@@ -7,6 +7,7 @@
  */
 package org.opentcs.util.persistence.v003;
 
+import jakarta.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -14,7 +15,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

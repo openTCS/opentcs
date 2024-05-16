@@ -7,9 +7,9 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared;
 
+import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.annotation.Nonnull;
 
 /**
  */

@@ -7,10 +7,10 @@
  */
 package org.opentcs.strategies.basic.peripherals.dispatching.phase;
 
+import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.services.InternalPeripheralJobService;
 import org.opentcs.components.kernel.services.InternalPeripheralService;

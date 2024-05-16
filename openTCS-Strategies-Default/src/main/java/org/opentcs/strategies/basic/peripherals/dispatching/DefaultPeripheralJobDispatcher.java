@@ -8,11 +8,11 @@
 package org.opentcs.strategies.basic.peripherals.dispatching;
 
 import static com.google.common.base.Preconditions.checkState;
+import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.opentcs.components.kernel.PeripheralJobDispatcher;

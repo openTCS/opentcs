@@ -7,11 +7,11 @@
  */
 package org.opentcs.kernel.vehicles;
 
+import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.components.kernel.services.PeripheralJobService;

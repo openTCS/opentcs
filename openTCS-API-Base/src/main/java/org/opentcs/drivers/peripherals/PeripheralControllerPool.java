@@ -7,7 +7,7 @@
  */
 package org.opentcs.drivers.peripherals;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 

@@ -7,8 +7,8 @@
  */
 package org.opentcs.guing.common.components.tree.elements;
 
+import jakarta.annotation.Nullable;
 import java.util.Set;
-import javax.annotation.Nullable;
 import javax.swing.JPopupMenu;
 
 /**

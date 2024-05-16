@@ -7,6 +7,7 @@
  */
 package org.opentcs.access.rmi.services;
 
+import jakarta.annotation.Nonnull;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -14,7 +15,6 @@ import java.rmi.registry.Registry;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.function.Predicate;
-import javax.annotation.Nonnull;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;

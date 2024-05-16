@@ -7,7 +7,7 @@
  */
 package org.opentcs.guing.common.application;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.LocationTypeModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;

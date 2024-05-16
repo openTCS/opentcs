@@ -7,11 +7,11 @@
  */
 package org.opentcs.modeleditor.persistence;
 
+import jakarta.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.opentcs.access.to.model.BlockCreationTO;

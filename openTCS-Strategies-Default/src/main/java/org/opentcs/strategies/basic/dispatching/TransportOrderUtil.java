@@ -7,11 +7,11 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
+import jakarta.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.Router;

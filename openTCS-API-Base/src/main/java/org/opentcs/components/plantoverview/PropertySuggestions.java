@@ -7,9 +7,9 @@
  */
 package org.opentcs.components.plantoverview;
 
+import jakarta.annotation.Nonnull;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nonnull;
 
 /**
  * Objects implementing this interface provide a set for suggested property keys and values each.

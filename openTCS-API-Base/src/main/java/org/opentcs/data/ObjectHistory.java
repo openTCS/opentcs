@@ -7,13 +7,13 @@
  */
 package org.opentcs.data;
 
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import static org.opentcs.util.Assertions.checkArgument;
 
 /**

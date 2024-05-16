@@ -7,8 +7,8 @@
  */
 package org.opentcs.modeleditor.math.path;
 
+import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.model.elements.PathModel;

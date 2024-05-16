@@ -7,10 +7,10 @@
  */
 package org.opentcs.data.notification;
 
+import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
-import javax.annotation.Nullable;
 
 /**
  * A notification to be read by a user.

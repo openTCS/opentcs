@@ -7,12 +7,12 @@
  */
 package org.opentcs.kernel.services;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;

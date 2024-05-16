@@ -7,26 +7,26 @@
  */
 package org.opentcs.operationsdesk.exchange.adapter;
 
-import static java.util.Objects.requireNonNull;
-import static org.opentcs.data.order.TransportOrder.State.WITHDRAWN;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import org.opentcs.data.model.TCSResourceReference;
-import org.opentcs.data.model.Vehicle;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.TCSResourceReference;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
+import static org.opentcs.data.order.TransportOrder.State.WITHDRAWN;
 import org.opentcs.guing.base.AllocationState;
 import org.opentcs.guing.base.model.FigureDecorationDetails;
 import org.opentcs.guing.base.model.elements.PathModel;

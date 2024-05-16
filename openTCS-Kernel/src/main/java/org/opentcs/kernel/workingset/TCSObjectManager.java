@@ -7,9 +7,9 @@
  */
 package org.opentcs.kernel.workingset;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.ObjectHistory;

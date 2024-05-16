@@ -7,11 +7,11 @@
  */
 package org.opentcs.guing.common.exchange;
 
+import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.TCSResourceReference;
 

@@ -7,12 +7,12 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import jakarta.annotation.Nullable;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.access.rmi.services.RemoteTCSObjectService;
 import org.opentcs.components.kernel.services.TCSObjectService;

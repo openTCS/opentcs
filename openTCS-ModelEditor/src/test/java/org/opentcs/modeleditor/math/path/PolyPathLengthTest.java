@@ -17,8 +17,8 @@ import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.model.elements.LayoutModel;
 import org.opentcs.guing.base.model.elements.PathModel;
 import org.opentcs.guing.base.model.elements.PointModel;
-import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.guing.common.model.SystemModel;
+import org.opentcs.guing.common.persistence.ModelManager;
 
 /**
  * Test for {@link PolyPathLength}.

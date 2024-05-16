@@ -7,7 +7,7 @@
  */
 package org.opentcs.drivers.vehicle.management;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**

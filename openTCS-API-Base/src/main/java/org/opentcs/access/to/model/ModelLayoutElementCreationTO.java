@@ -7,9 +7,9 @@
  */
 package org.opentcs.access.to.model;
 
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.util.annotations.ScheduledApiChange;
 

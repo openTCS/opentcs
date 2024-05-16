@@ -7,9 +7,9 @@
  */
 package org.opentcs.util.persistence.v004;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;

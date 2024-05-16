@@ -7,6 +7,7 @@
  */
 package org.opentcs.data.model;
 
+import jakarta.annotation.Nullable;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;

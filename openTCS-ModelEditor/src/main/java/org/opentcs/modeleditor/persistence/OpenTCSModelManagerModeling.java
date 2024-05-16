@@ -7,12 +7,12 @@
  */
 package org.opentcs.modeleditor.persistence;
 
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.logging.Level;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.JFileChooser;

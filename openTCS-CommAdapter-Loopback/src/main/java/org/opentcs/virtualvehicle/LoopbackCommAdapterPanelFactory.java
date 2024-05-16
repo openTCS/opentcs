@@ -7,10 +7,10 @@
  */
 package org.opentcs.virtualvehicle;
 
+import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.data.TCSObjectReference;

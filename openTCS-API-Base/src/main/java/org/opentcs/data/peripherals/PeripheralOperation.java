@@ -7,9 +7,9 @@
  */
 package org.opentcs.data.peripherals;
 
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.util.annotations.ScheduledApiChange;

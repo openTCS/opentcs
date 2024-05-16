@@ -7,6 +7,7 @@
  */
 package org.opentcs.guing.base.model.elements;
 
+import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -16,7 +17,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import javax.annotation.Nonnull;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.base.AllocationState;
 import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;

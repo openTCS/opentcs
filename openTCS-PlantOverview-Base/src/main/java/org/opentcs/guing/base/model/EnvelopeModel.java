@@ -7,9 +7,9 @@
  */
 package org.opentcs.guing.base.model;
 
+import jakarta.annotation.Nonnull;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Envelope;
 

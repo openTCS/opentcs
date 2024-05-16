@@ -7,12 +7,12 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
+import jakarta.annotation.Nonnull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;

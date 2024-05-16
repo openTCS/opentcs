@@ -7,8 +7,8 @@
  */
 package org.opentcs.components.plantoverview;
 
+import jakarta.annotation.Nonnull;
 import java.io.IOException;
-import javax.annotation.Nonnull;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 
 /**

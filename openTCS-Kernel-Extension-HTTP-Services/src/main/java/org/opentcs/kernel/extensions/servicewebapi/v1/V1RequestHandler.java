@@ -7,7 +7,6 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
@@ -15,18 +14,19 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.kernel.extensions.servicewebapi.HttpConstants;
+import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.RequestHandler;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetOrderSequenceResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralAttachmentInfoResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetTransportOrderResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleAttachmentInfoResponseTO;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PlantModelTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostOrderSequenceRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PlantModelTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import spark.QueryParamsMap;
 import spark.Request;

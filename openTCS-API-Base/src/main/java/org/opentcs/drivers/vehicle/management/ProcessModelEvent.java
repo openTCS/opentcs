@@ -7,9 +7,9 @@
  */
 package org.opentcs.drivers.vehicle.management;
 
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 
 /**

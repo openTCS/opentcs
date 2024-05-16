@@ -7,10 +7,10 @@
  */
 package org.opentcs.access.rmi;
 
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
 import java.util.UUID;
-import javax.annotation.Nonnull;
 
 /**
  * Identifies a remote client unambiguously.

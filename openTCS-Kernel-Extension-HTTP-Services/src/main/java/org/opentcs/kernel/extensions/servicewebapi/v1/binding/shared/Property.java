@@ -8,9 +8,9 @@
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * A key-value property.

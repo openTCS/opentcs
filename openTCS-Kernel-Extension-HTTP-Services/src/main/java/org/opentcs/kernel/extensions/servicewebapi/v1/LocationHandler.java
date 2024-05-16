@@ -7,8 +7,8 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.data.ObjectUnknownException;

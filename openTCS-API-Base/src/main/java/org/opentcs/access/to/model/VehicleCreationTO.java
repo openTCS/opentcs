@@ -7,12 +7,12 @@
  */
 package org.opentcs.access.to.model;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentcs.access.to.CreationTO;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkInRange;

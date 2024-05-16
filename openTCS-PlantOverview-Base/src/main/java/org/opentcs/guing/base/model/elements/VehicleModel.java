@@ -7,11 +7,11 @@
  */
 package org.opentcs.guing.base.model.elements;
 
+import jakarta.annotation.Nonnull;
 import java.awt.Color;
 import java.util.Arrays;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
-import javax.annotation.Nonnull;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ElementPropKeys;

@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.BlockTO;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LayerGroupTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LayerTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationTO;
@@ -22,11 +21,12 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.Locatio
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PathTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PeripheralOperationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PointTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VisualLayoutTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.EnvelopeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.TripleTO;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VisualLayoutTO;
 
 /**
  */

@@ -7,13 +7,13 @@
  */
 package org.opentcs.guing.common.components.drawing;
 
+import jakarta.annotation.Nonnull;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.EventObject;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;

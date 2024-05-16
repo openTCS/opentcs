@@ -7,8 +7,8 @@
  */
 package org.opentcs.access;
 
+import jakarta.annotation.Nonnull;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;

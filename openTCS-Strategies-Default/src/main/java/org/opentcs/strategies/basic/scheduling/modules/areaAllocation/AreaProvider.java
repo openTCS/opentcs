@@ -7,8 +7,8 @@
  */
 package org.opentcs.strategies.basic.scheduling.modules.areaAllocation;
 
+import jakarta.annotation.Nonnull;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.TCSResource;

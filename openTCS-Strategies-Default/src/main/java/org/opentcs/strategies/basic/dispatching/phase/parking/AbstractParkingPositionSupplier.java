@@ -7,12 +7,12 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
+import jakarta.annotation.Nullable;
 import java.util.Collections;
 import java.util.Comparator;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Point;

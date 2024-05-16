@@ -7,11 +7,11 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.function.Predicate;
-import javax.annotation.Nonnull;
 import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.event.EventHandler;
 

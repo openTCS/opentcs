@@ -7,10 +7,10 @@
  */
 package org.opentcs.guing.common.components.properties.panel;
 
+import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;

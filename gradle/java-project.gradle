@@ -13,8 +13,8 @@ dependencies {
 
   compileOnly group: 'javax.inject', name: 'javax.inject', version: '1'
 
-  compileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
-  testCompileOnly group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
+  compileOnly group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '3.0.0'
+  testCompileOnly group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '3.0.0'
 
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.2'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.10.2'

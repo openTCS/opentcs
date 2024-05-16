@@ -7,8 +7,8 @@
  */
 package org.opentcs.guing.base.components.layer;
 
+import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import org.opentcs.data.model.visualization.Layer;
 import org.opentcs.data.model.visualization.LayerGroup;
 import org.opentcs.guing.base.model.ModelComponent;

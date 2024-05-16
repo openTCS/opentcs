@@ -7,11 +7,11 @@
  */
 package org.opentcs.kernel.extensions.controlcenter.vehicles;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.TreeMap;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.TCSObjectService;

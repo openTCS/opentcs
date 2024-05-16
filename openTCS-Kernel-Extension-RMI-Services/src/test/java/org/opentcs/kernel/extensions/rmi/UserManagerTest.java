@@ -9,16 +9,10 @@ package org.opentcs.kernel.extensions.rmi;
 
 import java.io.File;
 import java.util.EnumSet;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.BDDMockito.then;
-import org.opentcs.util.event.EventSource;
+import java.util.concurrent.ScheduledExecutorService;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.anEmptyMap;
@@ -26,12 +20,18 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import org.opentcs.access.rmi.ClientID;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
 import org.opentcs.access.CredentialsException;
+import org.opentcs.access.rmi.ClientID;
+import org.opentcs.util.event.EventSource;
 
 /**
  * Unit tests for {@link UserManager}.

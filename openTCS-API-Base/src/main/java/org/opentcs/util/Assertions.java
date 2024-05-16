@@ -7,7 +7,7 @@
  */
 package org.opentcs.util;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * Utility methods for checking preconditions, postconditions etc..

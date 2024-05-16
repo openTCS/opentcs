@@ -7,9 +7,9 @@
  */
 package org.opentcs.modeleditor.persistence;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.io.File;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.components.plantoverview.PlantModelExporter;
 import org.opentcs.components.plantoverview.PlantModelImporter;

@@ -15,6 +15,7 @@
  */
 package org.opentcs.thirdparty.operationsdesk.components.drawing;
 
+import jakarta.annotation.Nonnull;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.MultipleGradientPaint;
@@ -27,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.jhotdraw.draw.DefaultDrawingView;
 import org.jhotdraw.draw.Figure;

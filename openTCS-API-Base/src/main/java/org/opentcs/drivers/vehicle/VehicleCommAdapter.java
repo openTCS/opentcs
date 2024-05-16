@@ -7,11 +7,11 @@
  */
 package org.opentcs.drivers.vehicle;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.util.List;
 import java.util.Queue;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.order.TransportOrder;

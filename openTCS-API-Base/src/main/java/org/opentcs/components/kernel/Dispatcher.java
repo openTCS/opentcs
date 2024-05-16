@@ -7,7 +7,7 @@
  */
 package org.opentcs.components.kernel;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentException;
 import org.opentcs.data.model.Vehicle;

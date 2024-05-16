@@ -7,9 +7,9 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import jakarta.annotation.Nullable;
 import java.util.Objects;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;

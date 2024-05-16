@@ -7,7 +7,6 @@
  */
 package org.opentcs.kernel;
 
-import org.opentcs.kernel.workingset.WorkingSetCleanupTask;
 import com.google.common.util.concurrent.Uninterruptibles;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
@@ -31,9 +30,10 @@ import org.opentcs.kernel.peripherals.LocalPeripheralControllerPool;
 import org.opentcs.kernel.peripherals.PeripheralAttachmentManager;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
-import org.opentcs.kernel.workingset.PlantModelManager;
 import org.opentcs.kernel.workingset.PeripheralJobPoolManager;
+import org.opentcs.kernel.workingset.PlantModelManager;
 import org.opentcs.kernel.workingset.TransportOrderPoolManager;
+import org.opentcs.kernel.workingset.WorkingSetCleanupTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

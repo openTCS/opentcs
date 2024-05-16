@@ -7,10 +7,10 @@
  */
 package org.opentcs.guing.common.persistence;
 
+import jakarta.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import javax.swing.filechooser.FileFilter;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 

@@ -7,8 +7,8 @@
  */
 package org.opentcs.drivers.vehicle;
 
+import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 
 /**
  * The default implementation of {@link VehicleCommAdapterDescription}.

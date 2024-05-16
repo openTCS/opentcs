@@ -7,6 +7,8 @@
  */
 package org.opentcs.drivers.vehicle;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayDeque;
@@ -17,8 +19,6 @@ import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;

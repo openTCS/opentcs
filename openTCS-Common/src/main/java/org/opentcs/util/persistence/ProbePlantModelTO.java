@@ -7,10 +7,10 @@
  */
 package org.opentcs.util.persistence;
 
+import jakarta.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Reader;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;

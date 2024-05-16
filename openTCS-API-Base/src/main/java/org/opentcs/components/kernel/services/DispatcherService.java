@@ -7,7 +7,7 @@
  */
 package org.opentcs.components.kernel.services;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentException;

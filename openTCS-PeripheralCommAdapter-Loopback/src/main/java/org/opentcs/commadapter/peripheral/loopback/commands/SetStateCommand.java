@@ -7,8 +7,8 @@
  */
 package org.opentcs.commadapter.peripheral.loopback.commands;
 
+import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.peripheral.loopback.LoopbackPeripheralCommAdapter;
 import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.drivers.peripherals.PeripheralAdapterCommand;

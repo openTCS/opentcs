@@ -7,10 +7,10 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentcs.data.order.OrderConstants;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 

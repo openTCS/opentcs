@@ -7,10 +7,10 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
+import jakarta.annotation.Nonnull;
 import java.util.Iterator;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
 import org.opentcs.components.kernel.routing.Edge;

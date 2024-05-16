@@ -7,13 +7,12 @@
  */
 package org.opentcs.kernel;
 
-import org.opentcs.kernel.workingset.WorkingSetCleanupTask;
+import jakarta.annotation.Nonnull;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,11 +34,12 @@ import org.opentcs.kernel.peripherals.LocalPeripheralControllerPool;
 import org.opentcs.kernel.peripherals.PeripheralAttachmentManager;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
-import org.opentcs.kernel.workingset.PlantModelManager;
 import org.opentcs.kernel.workingset.PeripheralJobPoolManager;
+import org.opentcs.kernel.workingset.PlantModelManager;
 import org.opentcs.kernel.workingset.PrefixedUlidObjectNameProvider;
 import org.opentcs.kernel.workingset.TCSObjectRepository;
 import org.opentcs.kernel.workingset.TransportOrderPoolManager;
+import org.opentcs.kernel.workingset.WorkingSetCleanupTask;
 import org.opentcs.util.event.SimpleEventBus;
 
 /**

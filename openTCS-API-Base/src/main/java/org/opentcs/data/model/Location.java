@@ -7,6 +7,7 @@
  */
 package org.opentcs.data.model;
 
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
@@ -14,7 +15,6 @@ import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.annotation.Nonnull;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;

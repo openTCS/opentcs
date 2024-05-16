@@ -7,10 +7,10 @@
  */
 package org.opentcs.data;
 
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 
 /**
  * A transient reference to a {@link TCSObject}.

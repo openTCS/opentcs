@@ -7,12 +7,12 @@
  */
 package org.opentcs.kernelcontrolcenter.vehicles;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeMap;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.components.Lifecycle;

@@ -7,7 +7,7 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import javax.inject.Inject;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;

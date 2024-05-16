@@ -7,13 +7,13 @@
  */
 package org.opentcs.guing.plugins.themes;
 
+import jakarta.annotation.Nonnull;
 import java.awt.Image;
 import java.io.IOException;
 import java.net.URL;
 import java.util.EnumMap;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import javax.imageio.ImageIO;
 import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.data.model.Location;

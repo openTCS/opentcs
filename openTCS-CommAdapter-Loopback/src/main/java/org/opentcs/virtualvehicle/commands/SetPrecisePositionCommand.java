@@ -7,7 +7,7 @@
  */
 package org.opentcs.virtualvehicle.commands;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import org.opentcs.data.model.Triple;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;

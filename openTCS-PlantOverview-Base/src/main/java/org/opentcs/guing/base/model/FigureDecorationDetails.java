@@ -7,9 +7,9 @@
  */
 package org.opentcs.guing.base.model;
 
+import jakarta.annotation.Nonnull;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentcs.guing.base.AllocationState;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;

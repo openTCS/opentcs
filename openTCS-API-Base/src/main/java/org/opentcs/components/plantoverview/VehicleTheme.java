@@ -7,10 +7,10 @@
  */
 package org.opentcs.components.plantoverview;
 
+import jakarta.annotation.Nonnull;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
-import javax.annotation.Nonnull;
 import org.opentcs.data.model.Vehicle;
 
 /**

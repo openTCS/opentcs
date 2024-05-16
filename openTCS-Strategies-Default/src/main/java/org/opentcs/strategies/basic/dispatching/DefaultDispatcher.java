@@ -7,7 +7,6 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
-import org.opentcs.strategies.basic.dispatching.phase.assignment.OrderAssigner;
 import static com.google.common.base.Preconditions.checkState;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
@@ -24,6 +23,7 @@ import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.dispatching.phase.assignment.OrderAssigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

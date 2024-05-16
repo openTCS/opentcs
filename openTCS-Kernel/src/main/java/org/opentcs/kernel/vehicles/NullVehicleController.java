@@ -7,13 +7,13 @@
  */
 package org.opentcs.kernel.vehicles;
 
+import jakarta.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Vehicle;

@@ -7,10 +7,10 @@
  */
 package org.opentcs.guing.common.components.drawing;
 
+import jakarta.annotation.Nonnull;
 import java.awt.Point;
 import java.io.File;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.base.model.ModelComponent;

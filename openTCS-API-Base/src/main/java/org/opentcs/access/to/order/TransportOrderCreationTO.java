@@ -7,6 +7,8 @@
  */
 package org.opentcs.access.to.order;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collections;
@@ -14,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.order.OrderConstants;
 

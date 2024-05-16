@@ -7,9 +7,9 @@
  */
 package org.opentcs.access.rmi;
 
+import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
 import java.util.function.Predicate;
-import javax.annotation.Nonnull;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.rmi.factories.NullSocketFactoryProvider;

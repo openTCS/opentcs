@@ -7,6 +7,7 @@
  */
 package org.opentcs.guing.base.model.elements;
 
+import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -16,7 +17,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import javax.annotation.Nonnull;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.visualization.ElementPropKeys;

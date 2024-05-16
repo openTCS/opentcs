@@ -7,11 +7,11 @@
  */
 package org.opentcs.kernel.services;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.function.Predicate;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.TCSObjectService;

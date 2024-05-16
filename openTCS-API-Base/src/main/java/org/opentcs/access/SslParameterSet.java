@@ -7,11 +7,11 @@
  */
 package org.opentcs.access;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * A set of parameters to be used for SSL-encrypted socket connections.

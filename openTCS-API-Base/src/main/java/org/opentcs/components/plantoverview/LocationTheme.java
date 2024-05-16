@@ -7,8 +7,8 @@
  */
 package org.opentcs.components.plantoverview;
 
+import jakarta.annotation.Nonnull;
 import java.awt.Image;
-import javax.annotation.Nonnull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.visualization.LocationRepresentation;

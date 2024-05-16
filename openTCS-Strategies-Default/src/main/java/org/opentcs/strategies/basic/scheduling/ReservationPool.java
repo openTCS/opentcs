@@ -7,6 +7,7 @@
  */
 package org.opentcs.strategies.basic.scheduling;
 
+import jakarta.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,7 +18,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.data.model.TCSResource;

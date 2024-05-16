@@ -7,11 +7,11 @@
  */
 package org.opentcs.strategies.basic.scheduling;
 
+import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
-import javax.annotation.Nonnull;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.Scheduler.Client;
 import org.opentcs.customizations.kernel.GlobalSyncObject;

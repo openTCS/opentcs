@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernelcontrolcenter.vehicles;
 
+import jakarta.annotation.Nonnull;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -20,7 +21,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.swing.AbstractAction;
 import javax.swing.Action;

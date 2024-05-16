@@ -7,7 +7,7 @@
  */
 package org.opentcs.virtualvehicle;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import org.opentcs.common.LoopbackAdapterConstants;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;

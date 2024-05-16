@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernelcontrolcenter.peripherals;
 
+import jakarta.annotation.Nonnull;
 import java.awt.EventQueue;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
@@ -14,7 +15,6 @@ import java.util.List;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JOptionPane;

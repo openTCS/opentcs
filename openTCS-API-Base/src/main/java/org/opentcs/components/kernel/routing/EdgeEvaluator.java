@@ -7,7 +7,7 @@
  */
 package org.opentcs.components.kernel.routing;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.util.annotations.ScheduledApiChange;
 

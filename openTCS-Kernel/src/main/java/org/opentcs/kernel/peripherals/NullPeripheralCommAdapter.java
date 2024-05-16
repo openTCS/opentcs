@@ -7,7 +7,7 @@
  */
 package org.opentcs.kernel.peripherals;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.peripherals.PeripheralJob;

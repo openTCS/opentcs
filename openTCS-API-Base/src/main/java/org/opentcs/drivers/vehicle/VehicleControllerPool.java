@@ -7,7 +7,7 @@
  */
 package org.opentcs.drivers.vehicle;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * Maintains associations between vehicles and vehicle controllers.

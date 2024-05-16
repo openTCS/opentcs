@@ -7,7 +7,7 @@
  */
 package org.opentcs.drivers.vehicle;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * This interface declares methods that a vehicle driver intended for simulation

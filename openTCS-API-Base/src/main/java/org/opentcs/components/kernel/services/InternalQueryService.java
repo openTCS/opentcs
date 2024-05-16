@@ -7,7 +7,7 @@
  */
 package org.opentcs.components.kernel.services;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import org.opentcs.components.kernel.Query;
 import org.opentcs.components.kernel.QueryResponder;
 

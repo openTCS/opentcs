@@ -7,10 +7,10 @@
  */
 package org.opentcs.access.to.order;
 
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
 import org.opentcs.access.to.CreationTO;
 
 /**

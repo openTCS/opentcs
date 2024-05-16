@@ -8,7 +8,7 @@
 package org.opentcs.virtualvehicle;
 
 import com.google.common.primitives.Ints;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /**
  * This class provides methods for parsing.

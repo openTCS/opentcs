@@ -7,11 +7,11 @@
  */
 package org.opentcs.access.to.peripherals;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentcs.access.to.CreationTO;
 
 /**

@@ -7,8 +7,8 @@
  */
 package org.opentcs.components.kernel.services;
 
+import jakarta.annotation.Nullable;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
