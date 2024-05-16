@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-  implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
+  implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.13'
 
   compileOnly group: 'javax.inject', name: 'javax.inject', version: '1'
 
@@ -26,7 +26,7 @@ dependencies {
   testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.3'
   testImplementation group: 'com.approvaltests', name: 'approvaltests', version: '23.0.0'
 
-  testRuntimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.36'
+  testRuntimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.13'
 }
 
 compileJava {

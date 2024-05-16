@@ -16,7 +16,7 @@ dependencies {
   api project(':openTCS-PlantOverview-Common')
   api project(':openTCS-PlantOverview-Themes-Default')
 
-  runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.36'
+  runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.13'
 }
 
 compileJava {
