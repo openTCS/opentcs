@@ -133,7 +133,8 @@ public class WorkingSetCleanupTask
               TransportOrder.class,
               noWrappingSequence.and(compositeTransportOrderCleanupApproval)
           )) {
-        removeTransportOrderAndRelatedPeripheralJobs(transportOrder.getReference());
+        removeRelatedPeripheralJobs(transportOrder.getReference());
+        orderPoolManager.removeTransportOrder(transportOrder.getReference());
       }
 
       // Remove all order sequences that have been finished, including their transport orders and
@@ -144,15 +145,14 @@ public class WorkingSetCleanupTask
               compositeOrderSequenceCleanupApproval
           )) {
         for (TCSObjectReference<TransportOrder> transportOrderRef : orderSequence.getOrders()) {
-          removeTransportOrderAndRelatedPeripheralJobs(transportOrderRef);
+          removeRelatedPeripheralJobs(transportOrderRef);
         }
         orderPoolManager.removeFinishedOrderSequenceAndOrders(orderSequence.getReference());
       }
     }
   }
 
-  private void removeTransportOrderAndRelatedPeripheralJobs(
-      TCSObjectReference<TransportOrder> transportOrderRef) {
+  private void removeRelatedPeripheralJobs(TCSObjectReference<TransportOrder> transportOrderRef) {
     for (PeripheralJob peripheralJob
              : peripheralJobPoolManager.getObjectRepo().getObjects(
             PeripheralJob.class,
@@ -160,6 +160,5 @@ public class WorkingSetCleanupTask
         )) {
       peripheralJobPoolManager.removePeripheralJob(peripheralJob.getReference());
     }
-    orderPoolManager.removeTransportOrder(transportOrderRef);
   }
 }

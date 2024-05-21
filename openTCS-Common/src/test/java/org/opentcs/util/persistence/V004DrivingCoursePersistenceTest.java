@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.opentcs.util.persistence.v004.AllowedOperationTO;
 import org.opentcs.util.persistence.v004.AllowedPeripheralOperationTO;
 import org.opentcs.util.persistence.v004.BlockTO;
+import org.opentcs.util.persistence.v004.CoupleTO;
 import org.opentcs.util.persistence.v004.LocationTO;
 import org.opentcs.util.persistence.v004.LocationTypeTO;
 import org.opentcs.util.persistence.v004.MemberTO;
@@ -30,6 +31,7 @@ import org.opentcs.util.persistence.v004.PeripheralOperationTO;
 import org.opentcs.util.persistence.v004.PointTO;
 import org.opentcs.util.persistence.v004.PropertyTO;
 import org.opentcs.util.persistence.v004.V004PlantModelTO;
+import org.opentcs.util.persistence.v004.VehicleEnvelopeTO;
 import org.opentcs.util.persistence.v004.VehicleTO;
 import org.opentcs.util.persistence.v004.VisualLayoutTO;
 
@@ -106,6 +108,17 @@ class V004DrivingCoursePersistenceTest {
             .setExecutionTrigger("AFTER_ALLOCATION")
             .setCompletionRequired(true)
     );
+    plantModel.getPaths().get(0).getVehicleEnvelopes().add(
+        new VehicleEnvelopeTO()
+            .setKey("some-key")
+            .setVertices(
+                List.of(
+                    new CoupleTO()
+                        .setX(1234L)
+                        .setY(5678L)
+                )
+            )
+    );
 
     // Write to XML...
     String xmlOutput = toXml(plantModel);
@@ -128,6 +141,20 @@ class V004DrivingCoursePersistenceTest {
     assertThat(
         parsedModel.getPaths().get(0).getPeripheralOperations().get(0).isCompletionRequired(),
         is(true)
+    );
+    assertThat(parsedModel.getPaths().get(0).getVehicleEnvelopes(), hasSize(1));
+    assertThat(parsedModel.getPaths().get(0).getVehicleEnvelopes().get(0).getKey(), is("some-key"));
+    assertThat(
+        parsedModel.getPaths().get(0).getVehicleEnvelopes().get(0).getVertices(),
+        hasSize(1)
+    );
+    assertThat(
+        parsedModel.getPaths().get(0).getVehicleEnvelopes().get(0).getVertices().get(0).getX(),
+        is(1234L)
+    );
+    assertThat(
+        parsedModel.getPaths().get(0).getVehicleEnvelopes().get(0).getVertices().get(0).getY(),
+        is(5678L)
     );
   }
 
