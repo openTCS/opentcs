@@ -152,8 +152,7 @@ public class WorkingSetCleanupTask
     }
   }
 
-  private void removeRelatedPeripheralJobs(
-      TCSObjectReference<TransportOrder> transportOrderRef) {
+  private void removeRelatedPeripheralJobs(TCSObjectReference<TransportOrder> transportOrderRef) {
     for (PeripheralJob peripheralJob
              : peripheralJobPoolManager.getObjectRepo().getObjects(
             PeripheralJob.class,

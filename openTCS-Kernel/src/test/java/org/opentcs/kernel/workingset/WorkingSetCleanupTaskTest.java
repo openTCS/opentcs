@@ -21,6 +21,7 @@ import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.kernel.OrderPoolConfiguration;
 
 class WorkingSetCleanupTaskTest {
+
   private WorkingSetCleanupTask cleanupTask;
   private TCSObjectRepository objectRepository;
 
@@ -54,13 +55,16 @@ class WorkingSetCleanupTaskTest {
                                             configuration,
                                             new CompositeOrderSequenceCleanupApproval(
                                                 Set.of(),
-                                                orderSequenceCleanupApproval),
+                                                orderSequenceCleanupApproval
+                                            ),
                                             new CompositeTransportOrderCleanupApproval(
                                                 Set.of(),
-                                                orderCleanupApproval),
+                                                orderCleanupApproval
+                                            ),
                                             new CompositePeripheralJobCleanupApproval(
                                                 Set.of(),
-                                                peripheralJobCleanupApproval),
+                                                peripheralJobCleanupApproval
+                                            ),
                                             creationTimeThreshold);
   }
 
@@ -68,13 +72,17 @@ class WorkingSetCleanupTaskTest {
   void cleanExpiredTransportOrders() {
     when(configuration.sweepAge()).thenReturn(60000);
 
-    objectRepository.addObject(new TransportOrder("Order-1", List.of())
-                                   .withCreationTime(Instant.now().minusMillis(70000))
-                                   .withState(TransportOrder.State.FINISHED));
+    objectRepository.addObject(
+        new TransportOrder("Order-1", List.of())
+            .withCreationTime(Instant.now().minusMillis(70000))
+            .withState(TransportOrder.State.FINISHED)
+    );
 
-    objectRepository.addObject(new TransportOrder("Order-2", List.of())
-                                   .withCreationTime(Instant.now().minusMillis(50000))
-                                   .withState(TransportOrder.State.FINISHED));
+    objectRepository.addObject(
+        new TransportOrder("Order-2", List.of())
+            .withCreationTime(Instant.now().minusMillis(50000))
+            .withState(TransportOrder.State.FINISHED)
+    );
     assertEquals(2, objectRepository.getObjects(TransportOrder.class).size());
     cleanupTask.run();
     assertEquals(1, objectRepository.getObjects(TransportOrder.class).size());
@@ -88,14 +96,16 @@ class WorkingSetCleanupTaskTest {
     objectRepository.addObject(orderSequence);
 
     TransportOrder order = new TransportOrder("Order-1", List.of())
-                               .withCreationTime(Instant.now().minusMillis(70000))
-                               .withState(TransportOrder.State.FINISHED);
+        .withCreationTime(Instant.now().minusMillis(70000))
+        .withState(TransportOrder.State.FINISHED);
     objectRepository.addObject(order);
 
     objectRepository.replaceObject(order.withWrappingSequence(orderSequence.getReference()));
-    objectRepository.replaceObject(orderSequence.withOrder(order.getReference())
-                                       .withComplete(true)
-                                       .withFinished(true));
+    objectRepository.replaceObject(
+        orderSequence.withOrder(order.getReference())
+            .withComplete(true)
+            .withFinished(true)
+    );
 
     assertEquals(1, objectRepository.getObjects(TransportOrder.class).size());
     assertEquals(1, objectRepository.getObjects(OrderSequence.class).size());
@@ -109,14 +119,16 @@ class WorkingSetCleanupTaskTest {
     when(configuration.sweepAge()).thenReturn(60000);
 
     TransportOrder order = new TransportOrder("Order-1", List.of())
-                               .withCreationTime(Instant.now().minusMillis(70000))
-                               .withState(TransportOrder.State.FINISHED);
+        .withCreationTime(Instant.now().minusMillis(70000))
+        .withState(TransportOrder.State.FINISHED);
     objectRepository.addObject(order);
 
-    objectRepository.addObject(new PeripheralJob("Job-1", "Vehicle-1", mock())
-                                   .withCreationTime(Instant.now().minusMillis(65000))
-                                   .withState(PeripheralJob.State.FINISHED)
-                                   .withRelatedTransportOrder(order.getReference()));
+    objectRepository.addObject(
+        new PeripheralJob("Job-1", "Vehicle-1", mock())
+            .withCreationTime(Instant.now().minusMillis(65000))
+            .withState(PeripheralJob.State.FINISHED)
+            .withRelatedTransportOrder(order.getReference())
+    );
 
     assertEquals(1, objectRepository.getObjects(TransportOrder.class).size());
     assertEquals(1, objectRepository.getObjects(PeripheralJob.class).size());
