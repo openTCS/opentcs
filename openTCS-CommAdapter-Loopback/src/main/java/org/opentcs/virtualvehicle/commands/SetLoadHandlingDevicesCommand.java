@@ -36,6 +36,6 @@ public class SetLoadHandlingDevicesCommand
 
   @Override
   public void execute(VehicleCommAdapter adapter) {
-    adapter.getProcessModel().setVehicleLoadHandlingDevices(devices);
+    adapter.getProcessModel().setLoadHandlingDevices(devices);
   }
 }

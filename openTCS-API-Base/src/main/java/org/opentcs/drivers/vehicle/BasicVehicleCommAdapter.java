@@ -235,7 +235,7 @@ public abstract class BasicVehicleCommAdapter
     enabled = false;
     // Update the vehicle's state for the rest of the system.
     getProcessModel().setCommAdapterEnabled(false);
-    getProcessModel().setVehicleState(Vehicle.State.UNKNOWN);
+    getProcessModel().setState(Vehicle.State.UNKNOWN);
   }
 
   @Override
@@ -251,17 +251,17 @@ public abstract class BasicVehicleCommAdapter
   @Override
   public VehicleProcessModelTO createTransferableProcessModel() {
     return createCustomTransferableProcessModel()
-        .setVehicleName(getProcessModel().getName())
+        .setName(getProcessModel().getName())
         .setCommAdapterConnected(getProcessModel().isCommAdapterConnected())
         .setCommAdapterEnabled(getProcessModel().isCommAdapterEnabled())
-        .setEnergyLevel(getProcessModel().getVehicleEnergyLevel())
-        .setLoadHandlingDevices(getProcessModel().getVehicleLoadHandlingDevices())
+        .setEnergyLevel(getProcessModel().getEnergyLevel())
+        .setLoadHandlingDevices(getProcessModel().getLoadHandlingDevices())
         .setNotifications(getProcessModel().getNotifications())
-        .setOrientationAngle(getProcessModel().getVehicleOrientationAngle())
-        .setPrecisePosition(getProcessModel().getVehiclePrecisePosition())
-        .setVehiclePosition(getProcessModel().getVehiclePosition())
-        .setVehicleState(getProcessModel().getVehicleState())
-        .setLength(getProcessModel().getVehicleLength());
+        .setOrientationAngle(getProcessModel().getOrientationAngle())
+        .setPrecisePosition(getProcessModel().getPrecisePosition())
+        .setPosition(getProcessModel().getPosition())
+        .setState(getProcessModel().getState())
+        .setLength(getProcessModel().getLength());
   }
 
   @Override

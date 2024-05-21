@@ -209,6 +209,14 @@ public class OrderSequenceCreationTO
     return failureFatal;
   }
 
+  /**
+   * Creates a copy of this object with the given <em>failureFatal</em> flag.
+   *
+   * @param failureFatal Whether failure of one transport order in the sequence makes subsequent
+   * ones fail, too.
+   *
+   * @return A copy of this object, differing in the given value.
+   */
   public OrderSequenceCreationTO withFailureFatal(boolean failureFatal) {
     return new OrderSequenceCreationTO(getName(),
                                        getModifiableProperties(),

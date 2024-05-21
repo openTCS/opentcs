@@ -41,6 +41,6 @@ public class SetVehiclePropertyCommand
 
   @Override
   public void execute(VehicleCommAdapter adapter) {
-    adapter.getProcessModel().setVehicleProperty(key, value);
+    adapter.getProcessModel().setProperty(key, value);
   }
 }

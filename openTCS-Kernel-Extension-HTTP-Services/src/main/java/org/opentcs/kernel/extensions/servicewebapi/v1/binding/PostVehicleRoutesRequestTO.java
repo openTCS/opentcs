@@ -21,6 +21,7 @@ public class PostVehicleRoutesRequestTO {
 
   private String sourcePoint;
   private List<String> destinationPoints;
+  private List<String> resourcesToAvoid;
 
   @JsonCreator
   @SuppressWarnings("checkstyle:LineLength")
@@ -34,7 +35,7 @@ public class PostVehicleRoutesRequestTO {
     return sourcePoint;
   }
 
-  public PostVehicleRoutesRequestTO setSourcePoint(String sourcePoint) {
+  public PostVehicleRoutesRequestTO setSourcePoint(@Nullable String sourcePoint) {
     this.sourcePoint = sourcePoint;
     return this;
   }
@@ -44,8 +45,18 @@ public class PostVehicleRoutesRequestTO {
     return destinationPoints;
   }
 
-  public PostVehicleRoutesRequestTO setDestinationPoints(List<String> destinationPoints) {
+  public PostVehicleRoutesRequestTO setDestinationPoints(@Nonnull List<String> destinationPoints) {
     this.destinationPoints = requireNonNull(destinationPoints, "destinationPoints");
+    return this;
+  }
+
+  @Nullable
+  public List<String> getResourcesToAvoid() {
+    return resourcesToAvoid;
+  }
+
+  public PostVehicleRoutesRequestTO setResourcesToAvoid(@Nullable List<String> resourcesToAvoid) {
+    this.resourcesToAvoid = resourcesToAvoid;
     return this;
   }
 }

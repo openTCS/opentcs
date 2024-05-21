@@ -9,7 +9,6 @@ package org.opentcs.kernel.vehicles;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -58,13 +57,13 @@ public class SplitResources {
   }
 
   /**
-   * Returns a new instance created from the given iterable of resources, split at the given
-   * delimiter.
+   * Returns a new instance created from the given iterable of resources, split at the element that
+   * contains the given delimiter (resources).
    *
    * @param resourceSets The iterable of resources to be split, from oldest to youngest.
    * @param delimiter The delimiter / resources for the vehicle's current position.
-   * @return A new instance created from the given iterable of resources, plit at the given
-   * delimiter.
+   * @return A new instance created from the given iterable of resources, split at the element that
+   * contains the given delimiter (resources).
    */
   public static SplitResources from(@Nonnull Iterable<Set<TCSResource<?>>> resourceSets,
                                     @Nonnull Set<TCSResource<?>> delimiter) {
@@ -78,7 +77,7 @@ public class SplitResources {
     for (Set<TCSResource<?>> curSet : resourceSets) {
       resourcesToPutIn.add(curSet);
 
-      if (Objects.equals(curSet, delimiter)) {
+      if (!delimiter.isEmpty() && curSet.containsAll(delimiter)) {
         resourcesToPutIn = resourcesAhead;
       }
     }

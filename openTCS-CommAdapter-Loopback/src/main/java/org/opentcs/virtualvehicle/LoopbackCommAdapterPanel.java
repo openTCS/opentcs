@@ -162,11 +162,11 @@ public class LoopbackCommAdapterPanel
     }
     else if (Objects.equals(attributeChanged,
                             VehicleProcessModel.Attribute.POSITION.name())) {
-      updatePosition(processModel.getVehiclePosition());
+      updatePosition(processModel.getPosition());
     }
     else if (Objects.equals(attributeChanged,
                             VehicleProcessModel.Attribute.STATE.name())) {
-      updateVehicleState(processModel.getVehicleState());
+      updateVehicleState(processModel.getState());
     }
     else if (Objects.equals(attributeChanged,
                             VehicleProcessModel.Attribute.PRECISE_POSITION.name())) {
@@ -302,7 +302,7 @@ public class LoopbackCommAdapterPanel
   private TCSObjectReference<Vehicle> getVehicleReference()
       throws Exception {
     return callWrapper.call(() -> vehicleService.
-        fetchObject(Vehicle.class, processModel.getVehicleName())).getReference();
+        fetchObject(Vehicle.class, processModel.getName())).getReference();
   }
 
   private void sendCommAdapterCommand(AdapterCommand command) {
@@ -1005,7 +1005,7 @@ public class LoopbackCommAdapterPanel
 
 private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkBoxEnableActionPerformed
   try {
-    Vehicle vehicle = callWrapper.call(() -> vehicleService.fetchObject(Vehicle.class, processModel.getVehicleName()));
+    Vehicle vehicle = callWrapper.call(() -> vehicleService.fetchObject(Vehicle.class, processModel.getName()));
 
     if (chkBoxEnable.isSelected()) {
       callWrapper.call(() -> vehicleService.enableCommAdapter(vehicle.getReference()));
@@ -1070,7 +1070,7 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
       return;
     }
 
-    Vehicle.State currentState = processModel.getVehicleState();
+    Vehicle.State currentState = processModel.getState();
     // Create panel and dialog
     InputPanel panel = new DropdownListInputPanel.Builder<>(BUNDLE.getString("loopbackCommAdapterPanel.dialog_setState.title"),
                                                             Arrays.asList(Vehicle.State.values()))
@@ -1110,7 +1110,7 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     // Get currently selected point
     // TODO is there a better way to do this?
     Point currentPoint = null;
-    String currentPointName = processModel.getVehiclePosition();
+    String currentPointName = processModel.getPosition();
     for (Point p : pointList) {
       if (p != null && p.getName().equals(currentPointName)) {
         currentPoint = p;
@@ -1229,7 +1229,7 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
   private void dispatchEventButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dispatchEventButtonActionPerformed
     String appendix = includeAppendixCheckBox.isSelected() ? appendixTxt.getText() : null;
-    VehicleCommAdapterEvent event = new VehicleCommAdapterEvent(processModel.getVehicleName(),
+    VehicleCommAdapterEvent event = new VehicleCommAdapterEvent(processModel.getName(),
                                                                 appendix);
     sendCommAdapterCommand(new PublishEventCommand(event));
   }//GEN-LAST:event_dispatchEventButtonActionPerformed

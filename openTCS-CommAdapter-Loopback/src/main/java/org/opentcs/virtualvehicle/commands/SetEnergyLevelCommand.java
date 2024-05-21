@@ -32,6 +32,6 @@ public class SetEnergyLevelCommand
 
   @Override
   public void execute(VehicleCommAdapter adapter) {
-    adapter.getProcessModel().setVehicleEnergyLevel(level);
+    adapter.getProcessModel().setEnergyLevel(level);
   }
 }

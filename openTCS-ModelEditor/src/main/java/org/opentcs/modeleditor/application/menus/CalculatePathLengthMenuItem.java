@@ -10,6 +10,7 @@ package org.opentcs.modeleditor.application.menus;
 import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import org.jhotdraw.draw.DrawingEditor;
@@ -44,17 +45,18 @@ public class CalculatePathLengthMenuItem
   /**
    * The calculator to use to calculate the path length.
    */
-  private final PathLengthFunction pathLengthFunction;
+  private final Provider<PathLengthFunction> pathLengthFunctionProvider;
 
   @Inject
   public CalculatePathLengthMenuItem(OpenTCSDrawingEditor drawingEditor,
                                      UndoRedoManager undoRedoManager,
-                                     PathLengthFunction pathLengthFunction) {
+                                     Provider<PathLengthFunction> pathLengthFunctionProvider) {
     super(ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH)
         .getString("calculatePathLengthMenuItem.text"));
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.undoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
-    this.pathLengthFunction = requireNonNull(pathLengthFunction, "pathLengthFunction");
+    this.pathLengthFunctionProvider
+        = requireNonNull(pathLengthFunctionProvider, "pathLengthFunctionProvider");
 
     addActionListener(this::calculatePathLength);
   }
@@ -70,19 +72,21 @@ public class CalculatePathLengthMenuItem
       return;
     }
 
+    PathLengthFunction pathLengthFunction = pathLengthFunctionProvider.get();
+
     drawingEditor.getActiveView().getDrawing().getFiguresFrontToBack().stream()
         .map(figure -> figure.get(FigureConstants.MODEL))
         .filter(model -> model instanceof PathModel)
         .map(model -> (PathModel) model)
         .filter(path -> content.isPathTypeSelected(connectionType(path)))
-        .forEach(this::updatePath);
+        .forEach(path -> updatePath(path, pathLengthFunction));
   }
 
   private PathModel.Type connectionType(PathModel path) {
     return (PathModel.Type) path.getPropertyPathConnType().getValue();
   }
 
-  private void updatePath(PathModel path) {
+  private void updatePath(PathModel path, PathLengthFunction pathLengthFunction) {
     updatePathLength(path, Math.round(pathLengthFunction.applyAsDouble(path)));
     path.propertiesChanged(new NullAttributesChangeListener());
   }

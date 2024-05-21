@@ -17,6 +17,7 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
@@ -145,11 +146,34 @@ public interface Router
    * @param destinationPoint The end point of the route to calculate.
    * @return The calculated route, or the empty optional, if a route between the
    * given points does not exist.
+   * @deprecated Use {@link #getRoute(org.opentcs.data.model.Vehicle,
+   * org.opentcs.data.model.Point, org.opentcs.data.model.Point, java.util.Set)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   @Nonnull
   Optional<Route> getRoute(@Nonnull Vehicle vehicle,
                            @Nonnull Point sourcePoint,
                            @Nonnull Point destinationPoint);
+
+  /**
+   * Returns a route from one point to another, passable for a given vehicle.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
+   *
+   * @param vehicle The vehicle for which the route must be passable.
+   * @param sourcePoint The starting point of the route to calculate.
+   * @param destinationPoint The end point of the route to calculate.
+   * @param resourcesToAvoid Resources to avoid when calculating the route.
+   * @return The calculated route, or the empty optional, if a route between the
+   * given points does not exist.
+   */
+  @Nonnull
+  Optional<Route> getRoute(@Nonnull Vehicle vehicle,
+                           @Nonnull Point sourcePoint,
+                           @Nonnull Point destinationPoint,
+                           @Nonnull Set<TCSResourceReference<?>> resourcesToAvoid);
 
   /**
    * Returns the costs for travelling a route from one point to another with a
@@ -163,7 +187,12 @@ public interface Router
    * @param destinationPoint The end point of the route.
    * @return The costs of the route, or <code>Long.MAX_VALUE</code>, if no such
    * route exists.
+   * @deprecated Use {@link #getCosts(org.opentcs.data.model.Vehicle, org.opentcs.data.model.Point,
+   * org.opentcs.data.model.Point, java.util.Set)} instead.
+   *
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   long getCosts(@Nonnull Vehicle vehicle,
                 @Nonnull Point sourcePoint,
                 @Nonnull Point destinationPoint);
@@ -180,10 +209,33 @@ public interface Router
    * @param dstPointRef The end point reference of the route.
    * @return The costs of the route, or <code>Long.MAX_VALUE</code>, if no such
    * route exists.
+   * @deprecated Use {@link #getCosts(org.opentcs.data.model.Vehicle, org.opentcs.data.model.Point,
+   * org.opentcs.data.model.Point, java.util.Set)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
   long getCostsByPointRef(@Nonnull Vehicle vehicle,
                           @Nonnull TCSObjectReference<Point> srcPointRef,
                           @Nonnull TCSObjectReference<Point> dstPointRef);
+
+  /**
+   * Returns the costs for travelling a route from one point to another with a
+   * given vehicle.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
+   *
+   * @param vehicle The vehicle for which the route must be passable.
+   * @param sourcePoint The starting point of the route.
+   * @param destinationPoint The end point of the route.
+   * @param resourcesToAvoid Resources to avoid when calculating the route.
+   * @return The costs of the route, or <code>Long.MAX_VALUE</code>, if no such
+   * route exists.
+   */
+  long getCosts(@Nonnull Vehicle vehicle,
+                @Nonnull Point sourcePoint,
+                @Nonnull Point destinationPoint,
+                @Nonnull Set<TCSResourceReference<?>> resourcesToAvoid);
 
   /**
    * Notifies the router of a route being selected for a vehicle.

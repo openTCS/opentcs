@@ -69,4 +69,48 @@ public interface KernelApplicationConfiguration {
       changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
       orderKey = "4_reroute_2")
   boolean rerouteOnDriveOrderFinished();
+
+  @ConfigurationEntry(
+      type = "String",
+      description = {
+        "The type of how vehicle resources (i.e., paths, points and locations allocated by "
+        + "vehicles) are managed.",
+        "Possible values:",
+        "LENGTH_IGNORED: Resources are _always_ released up to (excluding) a vehicle's current"
+        + "position. This type can be useful when you primarily want to utilize vehicle "
+        + "envelopes for traffic management.",
+        "LENGTH_RESPECTED: Only resources that are no longer \"covered\" by a vehicle (according "
+        + "to the length of the vehicle and the length of the paths behind it) are released. This "
+        + "is the \"classic\" way resources were managed before vehicle envelopes were introduced."
+      },
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
+      orderKey = "5_resource_management_1")
+  VehicleResourceManagementType vehicleResourceManagementType();
+
+  /**
+   * Defines the different types of how vehicle resources (i.e., paths, points and locations
+   * allocated by vehicles) are managed.
+   */
+  enum VehicleResourceManagementType {
+    /**
+     * When releasing resources, the length of a vehicle is ignored.
+     * <p>
+     * Resources are <em>always</em> released up to (excluding) a vehicle's current position.
+     * </p>
+     * <p>
+     * This type can be useful when you primarily want to utilize vehicle envelopes for traffic
+     * management.
+     * </p>
+     */
+    LENGTH_IGNORED,
+    /**
+     * When releasing resources, the length of a vehicle is respected.
+     * <p>
+     * Only resources that are no longer "covered" by a vehicle (according to the length of the
+     * vehicle and the length of the paths behind it) are released. This is the "classic" way
+     * resources were managed before vehicle envelopes were introduced.
+     * </p>
+     */
+    LENGTH_RESPECTED;
+  }
 }

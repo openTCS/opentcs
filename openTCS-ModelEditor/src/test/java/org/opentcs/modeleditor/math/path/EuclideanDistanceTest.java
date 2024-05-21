@@ -7,11 +7,10 @@
  */
 package org.opentcs.modeleditor.math.path;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.model.elements.PathModel;
 import org.opentcs.guing.base.model.elements.PointModel;
@@ -24,7 +23,8 @@ class EuclideanDistanceTest {
   private PointModel startPoint;
   private PointModel endPoint;
   private PathModel pathModel;
-  private EuclideanDistance euclideanDistance;
+  private EuclideanDistance function;
+  private PathLengthMath pathLengthMath;
 
   @BeforeEach
   void setUp() {
@@ -33,46 +33,20 @@ class EuclideanDistanceTest {
     pathModel = new PathModel();
     pathModel.setConnectedComponents(startPoint, endPoint);
 
-    euclideanDistance = new EuclideanDistance();
+    pathLengthMath = mock();
+    function = new EuclideanDistance(pathLengthMath);
   }
 
   @Test
-  void returnZeroForSamePosition() {
+  void verifyEuclideanDistanceIsUsed() {
     startPoint.getPropertyModelPositionX().setValueAndUnit(1000, LengthProperty.Unit.MM);
     startPoint.getPropertyModelPositionY().setValueAndUnit(1000, LengthProperty.Unit.MM);
     endPoint.getPropertyModelPositionX().setValueAndUnit(1000, LengthProperty.Unit.MM);
     endPoint.getPropertyModelPositionY().setValueAndUnit(1000, LengthProperty.Unit.MM);
 
-    assertThat(euclideanDistance.applyAsDouble(pathModel), is(0.0));
-  }
+    function.applyAsDouble(pathModel);
 
-  @Test
-  void returnDistanceXForSameY() {
-    startPoint.getPropertyModelPositionX().setValueAndUnit(2000, LengthProperty.Unit.MM);
-    startPoint.getPropertyModelPositionY().setValueAndUnit(1000, LengthProperty.Unit.MM);
-    endPoint.getPropertyModelPositionX().setValueAndUnit(4500, LengthProperty.Unit.MM);
-    endPoint.getPropertyModelPositionY().setValueAndUnit(1000, LengthProperty.Unit.MM);
-
-    assertThat(euclideanDistance.applyAsDouble(pathModel), is(2500.0));
-  }
-
-  @Test
-  void returnDistanceYForSameX() {
-    startPoint.getPropertyModelPositionX().setValueAndUnit(1000, LengthProperty.Unit.MM);
-    startPoint.getPropertyModelPositionY().setValueAndUnit(3000, LengthProperty.Unit.MM);
-    endPoint.getPropertyModelPositionX().setValueAndUnit(1000, LengthProperty.Unit.MM);
-    endPoint.getPropertyModelPositionY().setValueAndUnit(7654, LengthProperty.Unit.MM);
-
-    assertThat(euclideanDistance.applyAsDouble(pathModel), is(4654.0));
-  }
-
-  @Test
-  void returnEuclideanDistance() {
-    startPoint.getPropertyModelPositionX().setValueAndUnit(2000, LengthProperty.Unit.MM);
-    startPoint.getPropertyModelPositionY().setValueAndUnit(1000, LengthProperty.Unit.MM);
-    endPoint.getPropertyModelPositionX().setValueAndUnit(4000, LengthProperty.Unit.MM);
-    endPoint.getPropertyModelPositionY().setValueAndUnit(5000, LengthProperty.Unit.MM);
-
-    assertThat(euclideanDistance.applyAsDouble(pathModel), is(closeTo(4472.0, 0.2)));
+    verify(pathLengthMath).euclideanDistance(new Coordinate(1000, 1000),
+                                             new Coordinate(1000, 1000));
   }
 }

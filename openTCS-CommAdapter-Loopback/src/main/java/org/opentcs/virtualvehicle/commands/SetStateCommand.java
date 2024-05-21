@@ -35,6 +35,6 @@ public class SetStateCommand
 
   @Override
   public void execute(VehicleCommAdapter adapter) {
-    adapter.getProcessModel().setVehicleState(state);
+    adapter.getProcessModel().setState(state);
   }
 }

@@ -68,6 +68,21 @@ Unlike vehicles, which don't require any additional configuration for the loopba
 
 IMPORTANT: You will not be able to create any peripheral jobs and assign them to peripheral devices when operating the system unless you create locations in your plant model, associate these locations with peripheral devices and define the operations that peripheral devices may execute with the respective location types.
 
+==== Working with vehicle envelopes
+
+As described in <<Plant model elements>>, vehicle envelopes can be defined at points and paths.
+A vehicle envelope is a sequence of vertices (i.e., points with x and y coordinates) that, when connected in their defined order, represent the area that may be occupied by a vehicle.
+In addition to the sequence of vertices, an _envelope key_ is always assigned to a vehicle envelope.
+By referencing an envelope key, a vehicle indicates which envelopes (that may be defined at points or paths) should be considered when it allocates resources.
+(For more details on this, see <<Default scheduler>>.)
+With this, it is possible to prevent vehicles from allocating areas intersecting with areas already allocated by other vehicles.
+
+.Defining and editing vehicle envelopes for points and paths
+image::screenshot_envelope_editing.drawio.png[]
+
+.Setting an envelope key for vehicles
+image::screenshot_vehicle_envelope_key.drawio.png[]
+
 ==== Working with layers and layer groups
 
 In addition to adding elements to the plant model, the Model Editor allows plant models to be created with different layers and layer groups.

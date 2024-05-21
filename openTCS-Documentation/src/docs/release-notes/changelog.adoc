@@ -14,11 +14,35 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
+* Bugs fixed:
+** cleaning orders are duplicated when cleaning order sequence, causing ObjectUnknownException.
+* Changes affecting developers:
+** Update Gradle wrapper to 8.7.
+
+== Version 5.16 (2024-05-09)
+
+* New features and enhancements:
+** Use more sensible defaults for newly created vehicles' recharge energy level threshold values.
+** Add proper support for recalculating the length of "2-Bezier", "3-Bezier" and "Poly-Path" paths to the Model Editor.
+** Add support for defining vehicle envelopes at points and paths to the Model Editor.
+** Make vehicle resource management configurable.
+   For more details, see the documentation of the `KernelApplicationConfiguration.vehicleResourceManagementType` configuration entry.
+** When computing a route / costs of a route not related to a transport order, it is now possible to define a set of resources (i.e., points, paths or locations) that should be avoided by vehicles.
+** Update web API specification and implementation to version 1.6.0:
+*** The endpoint `POST /vehicles/{NAME}/routeComputationQuery` now also accepts an optional list of names of resources to avoid.
+* Bugs fixed:
+** When referencing paths via the `tcs:resourcesToAvoid` property in transport orders, don't implicitly avoid their start and end points, as points can have multiple incoming and outgoing paths.
+** Don't create the same peripheral job a second time if the vehicle that triggered the job was rerouted before the job was completed.
+* Changes affecting developers:
+** Adjust the names of some methods in `VehicleProcessModel` and `VehicleProcessModelTO` by removing the redundant "Vehicle" prefix.
+
+== Version 5.15 (2024-04-14)
+
 * New features and enhancements:
 ** Improve performance of updates to the router's routing topology by allowing it to be updated selectively.
    (The routing topology can now be updated only for paths that have actually changed.)
-* Bugs fixed:
-** cleaning orders are duplicated when cleaning order sequence, causing ObjectUnknownException.
+** When computing a route for a transport order, it is now possible to define a set of resources (i.e., points, paths or locations) that should be avoided by vehicles processing the respective transport order.
+   For this, a property with the key `tcs:resourcesToAvoid` can be set on a transport order to a comma-separated list of resource names.
 
 == Version 5.14 (2024-03-22)
 

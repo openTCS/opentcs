@@ -26,6 +26,7 @@ import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
 import org.slf4j.Logger;
@@ -193,6 +194,7 @@ public class StandardRemoteRouterService
     }
   }
 
+  @Deprecated
   @Override
   public Map<TCSObjectReference<Point>, Route> computeRoutes(
       ClientID clientId,
@@ -205,6 +207,27 @@ public class StandardRemoteRouterService
       return kernelExecutor.submit(() -> routerService.computeRoutes(vehicleRef,
                                                                      sourcePointRef,
                                                                      destinationPointRefs))
+          .get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
+
+  @Override
+  public Map<TCSObjectReference<Point>, Route> computeRoutes(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<Point> sourcePointRef,
+      Set<TCSObjectReference<Point>> destinationPointRefs,
+      Set<TCSResourceReference<?>> resourcesToAvoid) {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
+
+    try {
+      return kernelExecutor.submit(() -> routerService.computeRoutes(vehicleRef,
+                                                                     sourcePointRef,
+                                                                     destinationPointRefs,
+                                                                     resourcesToAvoid))
           .get();
     }
     catch (InterruptedException | ExecutionException exc) {

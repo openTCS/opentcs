@@ -135,7 +135,7 @@ public class LocalVehicleEntryPool
   public void onEvent(Object event) {
     if (event instanceof ProcessModelEvent) {
       ProcessModelEvent e = (ProcessModelEvent) event;
-      LocalVehicleEntry entry = getEntryFor(e.getUpdatedProcessModel().getVehicleName());
+      LocalVehicleEntry entry = getEntryFor(e.getUpdatedProcessModel().getName());
       if (entry == null) {
         return;
       }

@@ -186,7 +186,8 @@ public abstract class AbstractParkingPositionSupplier
   private PointCandidate parkingPositionCandidate(Vehicle vehicle,
                                                   Point srcPosition,
                                                   Point destPosition) {
-    return new PointCandidate(destPosition, router.getCosts(vehicle, srcPosition, destPosition));
+    return new PointCandidate(destPosition,
+                              router.getCosts(vehicle, srcPosition, destPosition, Set.of()));
   }
 
   private static class PointCandidate {

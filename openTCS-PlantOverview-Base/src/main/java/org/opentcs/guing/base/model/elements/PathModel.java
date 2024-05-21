@@ -260,7 +260,7 @@ public class PathModel
     EnvelopesProperty pEnvelope = new EnvelopesProperty(this, new ArrayList<>());
     pEnvelope.setDescription(bundle.getString("pathModel.property_vehicleEnvelopes.description"));
     pEnvelope.setHelptext(bundle.getString("pathModel.property_vehicleEnvelopes.helptext"));
-    pEnvelope.setModellingEditable(false);
+    pEnvelope.setModellingEditable(true);
     setProperty(VEHICLE_ENVELOPES, pEnvelope);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);

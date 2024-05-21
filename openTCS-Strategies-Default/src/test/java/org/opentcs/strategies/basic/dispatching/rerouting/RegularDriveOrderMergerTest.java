@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.Router;
@@ -51,7 +52,8 @@ class RegularDriveOrderMergerTest {
     // Arrange
     DriveOrder orderA = createDriveOrder(10, "A", "B", "C", "D", "E", "F", "G");
     DriveOrder orderB = createDriveOrder(10, "D", "H", "I", "J");
-    when(router.getCosts(any(Vehicle.class), any(Point.class), any(Point.class))).thenReturn(20L);
+    when(router.getCosts(any(Vehicle.class), any(Point.class), any(Point.class), anySet()))
+        .thenReturn(20L);
     Route expected = createDriveOrder(20, "A", "B", "C", "D", "H", "I", "J").getRoute();
 
     // Act

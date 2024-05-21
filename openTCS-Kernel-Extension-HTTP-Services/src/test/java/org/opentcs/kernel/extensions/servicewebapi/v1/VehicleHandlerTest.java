@@ -31,6 +31,9 @@ import static org.mockito.Mockito.mock;
 import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.model.Location;
+import org.opentcs.data.model.LocationType;
+import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
@@ -91,7 +94,6 @@ class VehicleHandlerTest {
         .should()
         .attachCommAdapter(vehicle.getReference(), adapterDescriptionMock);
   }
-
 
   @Test
   void throwOnAttachAdapterForUnknownVehicle() {
@@ -304,7 +306,8 @@ class VehicleHandlerTest {
         .computeRoutes(
             vehicle.getReference(),
             vehiclePosition.getReference(),
-            Set.of(destinationPoint1.getReference(), destinationPoint2.getReference())
+            Set.of(destinationPoint1.getReference(), destinationPoint2.getReference()),
+            Set.of()
         );
 
     // Act & Assert: nonexistent vehicle
@@ -363,7 +366,8 @@ class VehicleHandlerTest {
         .computeRoutes(
             vehicle.getReference(),
             sourcePoint.getReference(),
-            Set.of(destinationPoint1.getReference(), destinationPoint2.getReference())
+            Set.of(destinationPoint1.getReference(), destinationPoint2.getReference()),
+            Set.of()
         );
 
     // Act & Assert: nonexistent source point
@@ -373,6 +377,65 @@ class VehicleHandlerTest {
                 "some-vehicle",
                 new PostVehicleRoutesRequestTO(List.of("some-destination-point"))
                     .setSourcePoint("some-unknown-source-point")
+            )
+        );
+  }
+
+  @Test
+  void retrieveVehicleRoutesForResourcesToAvoid() {
+    // Arrange
+    Point sourcePoint = new Point("some-source-point");
+    Point destinationPoint1 = new Point("some-destination-point");
+    Point destinationPoint2 = new Point("some-destination-point-2");
+    Point pointToAvoid = new Point("some-point-to-avoid");
+    Path pathToAvoid = new Path("some-path",
+                                sourcePoint.getReference(),
+                                destinationPoint1.getReference());
+    Location locationToAvoid = new Location("some-location",
+                                            new LocationType("some-locType").getReference());
+    given(vehicleService.fetchObject(Point.class, "some-source-point"))
+        .willReturn(sourcePoint);
+    given(vehicleService.fetchObject(Point.class, "some-destination-point"))
+        .willReturn(destinationPoint1);
+    given(vehicleService.fetchObject(Point.class, "some-destination-point-2"))
+        .willReturn(destinationPoint2);
+    given(vehicleService.fetchObject(Point.class, "some-point-to-avoid"))
+        .willReturn(pointToAvoid);
+    given(vehicleService.fetchObject(Path.class, "some-path"))
+        .willReturn(pathToAvoid);
+    given(vehicleService.fetchObject(Location.class, "some-location"))
+        .willReturn(locationToAvoid);
+
+    // Act & Assert: happy path
+    handler.getVehicleRoutes(
+        "some-vehicle",
+        new PostVehicleRoutesRequestTO(
+            List.of("some-destination-point", "some-destination-point-2"))
+            .setSourcePoint("some-source-point")
+            .setResourcesToAvoid(
+                List.of("some-point-to-avoid", "some-path", "some-location"))
+    );
+
+    then(routerService)
+        .should()
+        .computeRoutes(
+            vehicle.getReference(),
+            sourcePoint.getReference(),
+            Set.of(destinationPoint1.getReference(), destinationPoint2.getReference()),
+            Set.of(
+                pointToAvoid.getReference(),
+                pathToAvoid.getReference(),
+                locationToAvoid.getReference())
+        );
+
+    // Act & Assert: nonexistent resource to avoid
+    assertThatExceptionOfType(ObjectUnknownException.class)
+        .isThrownBy(
+            () -> handler.getVehicleRoutes(
+                "some-vehicle",
+                new PostVehicleRoutesRequestTO(List.of("some-destination-point"))
+                    .setSourcePoint("some-source-point")
+                    .setResourcesToAvoid(List.of("some-unknown-resource"))
             )
         );
   }

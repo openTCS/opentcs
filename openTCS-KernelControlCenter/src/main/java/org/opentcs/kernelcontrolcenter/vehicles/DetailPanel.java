@@ -183,7 +183,7 @@ public class DetailPanel
     if (e instanceof ProcessModelEvent) {
       ProcessModelEvent event = (ProcessModelEvent) e;
       if (Objects.equals(vehicleEntry.getVehicleName(),
-                         event.getUpdatedProcessModel().getVehicleName())) {
+                         event.getUpdatedProcessModel().getName())) {
         updateFromVehicleProcessModel(event);
 
         // Forward event to the comm adapter panels
@@ -252,8 +252,8 @@ public class DetailPanel
   private void initVehicleEntryAttributes() {
     updateCommAdapter(vehicleEntry.getAttachmentInformation());
     updateCommAdapterEnabled(vehicleEntry.getProcessModel().isCommAdapterEnabled());
-    updateVehiclePosition(vehicleEntry.getProcessModel().getVehiclePosition());
-    updateVehicleState(vehicleEntry.getProcessModel().getVehicleState());
+    updateVehiclePosition(vehicleEntry.getProcessModel().getPosition());
+    updateVehicleState(vehicleEntry.getProcessModel().getState());
   }
 
   private void updateFromVehicleEntry(VehicleAttachmentEvent evt) {
@@ -267,11 +267,11 @@ public class DetailPanel
     }
     else if (Objects.equals(evt.getAttributeChanged(),
                             VehicleProcessModel.Attribute.POSITION.name())) {
-      updateVehiclePosition(evt.getUpdatedProcessModel().getVehiclePosition());
+      updateVehiclePosition(evt.getUpdatedProcessModel().getPosition());
     }
     else if (Objects.equals(evt.getAttributeChanged(),
                             VehicleProcessModel.Attribute.STATE.name())) {
-      updateVehicleState(evt.getUpdatedProcessModel().getVehicleState());
+      updateVehicleState(evt.getUpdatedProcessModel().getState());
     }
     else if (Objects.equals(evt.getAttributeChanged(),
                             VehicleProcessModel.Attribute.USER_NOTIFICATION.name())) {

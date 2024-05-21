@@ -58,7 +58,7 @@ class PrioritizedParkingPositionSupplierTest {
     when(router.getTargetedPoints()).thenReturn(new HashSet<>());
     when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
-    when(router.getCosts(vehicle, point1, point3)).thenReturn(1L);
+    when(router.getCosts(vehicle, point1, point3, Set.of())).thenReturn(1L);
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
     assertTrue(result.isPresent());
@@ -80,8 +80,8 @@ class PrioritizedParkingPositionSupplierTest {
     when(router.getTargetedPoints()).thenReturn(new HashSet<>());
     when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
-    when(router.getCosts(vehicle, point1, point2)).thenReturn(10L);
-    when(router.getCosts(vehicle, point1, point3)).thenReturn(1L);
+    when(router.getCosts(vehicle, point1, point2, Set.of())).thenReturn(10L);
+    when(router.getCosts(vehicle, point1, point3, Set.of())).thenReturn(1L);
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
     assertTrue(result.isPresent());
@@ -105,7 +105,7 @@ class PrioritizedParkingPositionSupplierTest {
     when(router.getTargetedPoints()).thenReturn(new HashSet<>());
     when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
-    when(router.getCosts(vehicle, point1, point3)).thenReturn(1L);
+    when(router.getCosts(vehicle, point1, point3, Set.of())).thenReturn(1L);
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
     assertTrue(result.isPresent());

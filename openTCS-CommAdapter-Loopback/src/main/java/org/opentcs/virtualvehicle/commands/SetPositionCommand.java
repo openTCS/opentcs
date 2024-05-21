@@ -33,6 +33,6 @@ public class SetPositionCommand
 
   @Override
   public void execute(VehicleCommAdapter adapter) {
-    adapter.getProcessModel().setVehiclePosition(position);
+    adapter.getProcessModel().setPosition(position);
   }
 }

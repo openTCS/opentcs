@@ -27,13 +27,14 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
 import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
-import org.opentcs.strategies.basic.routing.jgrapht.GraphProvider;
+import org.opentcs.strategies.basic.routing.jgrapht.PointRouterProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,25 +57,17 @@ public class DefaultRouter
    */
   private final TCSObjectService objectService;
   /**
-   * A builder for constructing our routing tables.
+   * Provides point routers for vehicles.
    */
-  private final PointRouterFactory pointRouterFactory;
+  private final PointRouterProvider pointRouterProvider;
   /**
    * Used to map vehicles to their routing groups.
    */
   private final GroupMapper routingGroupMapper;
   /**
-   * Provides routing graphs for vehicles.
-   */
-  private final GraphProvider graphProvider;
-  /**
    * The routes selected for each vehicle.
    */
   private final Map<Vehicle, List<DriveOrder>> routesByVehicle = new ConcurrentHashMap<>();
-  /**
-   * The point routers by vehicle routing group.
-   */
-  private final Map<String, PointRouter> pointRoutersByVehicleGroup = new ConcurrentHashMap<>();
   /**
    * Indicates whether this component is enabled.
    */
@@ -84,22 +77,19 @@ public class DefaultRouter
    * Creates a new instance.
    *
    * @param objectService The object service providing the model data.
-   * @param pointRouterFactory A factory for point routers.
+   * @param pointRouterProvider Provides point routers for vehicles.
    * @param routingGroupMapper Used to map vehicles to their routing groups.
    * @param configuration This class's configuration.
-   * @param graphProvider Provides routing graphs for vehicles.
    */
   @Inject
   public DefaultRouter(TCSObjectService objectService,
-                       PointRouterFactory pointRouterFactory,
+                       PointRouterProvider pointRouterProvider,
                        GroupMapper routingGroupMapper,
-                       DefaultRouterConfiguration configuration,
-                       GraphProvider graphProvider) {
+                       DefaultRouterConfiguration configuration) {
     this.objectService = requireNonNull(objectService, "objectService");
-    this.pointRouterFactory = requireNonNull(pointRouterFactory, "pointRouterFactory");
+    this.pointRouterProvider = requireNonNull(pointRouterProvider, "pointRouterProvider");
     this.routingGroupMapper = requireNonNull(routingGroupMapper, "routingGroupMapper");
     this.configuration = requireNonNull(configuration, "configuration");
-    this.graphProvider = requireNonNull(graphProvider, "graphProvider");
   }
 
   @Override
@@ -128,8 +118,7 @@ public class DefaultRouter
 
     synchronized (this) {
       routesByVehicle.clear();
-      pointRoutersByVehicleGroup.clear();
-      graphProvider.invalidate();
+      pointRouterProvider.invalidate();
       initialized = false;
     }
   }
@@ -144,8 +133,7 @@ public class DefaultRouter
   @Deprecated
   public void updateRoutingTopology() {
     synchronized (this) {
-      pointRoutersByVehicleGroup.clear();
-      graphProvider.invalidate();
+      pointRouterProvider.invalidate();
     }
   }
 
@@ -154,14 +142,7 @@ public class DefaultRouter
     requireNonNull(paths, "paths");
 
     synchronized (this) {
-      pointRoutersByVehicleGroup.clear();
-
-      if (paths.isEmpty()) {
-        graphProvider.invalidate();
-      }
-      else {
-        graphProvider.updateGraphResults(paths);
-      }
+      pointRouterProvider.updateRoutingTopology(paths);
     }
   }
 
@@ -175,11 +156,8 @@ public class DefaultRouter
       DriveOrder[] driveOrders
           = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
 
-      // Since point routers get reset on topology changes, make sure there are point routers for
-      // all routing groups.
-      createMissingPointRouters();
-
-      for (Map.Entry<String, PointRouter> curEntry : pointRoutersByVehicleGroup.entrySet()) {
+      for (Map.Entry<String, PointRouter> curEntry
+               : pointRouterProvider.getPointRoutersByVehicleGroup().entrySet()) {
         // Get all points at the first location at which a vehicle of the current
         // type can execute the desired operation and check if an acceptable route
         // originating in one of them exists.
@@ -205,7 +183,8 @@ public class DefaultRouter
     synchronized (this) {
       List<DriveOrder> driveOrderList = transportOrder.getFutureDriveOrders();
       DriveOrder[] driveOrders = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
-      PointRouter pointRouter = getPointRouterForVehicle(vehicle);
+      PointRouter pointRouter = pointRouterProvider.getPointRouterForVehicle(vehicle,
+                                                                             transportOrder);
       OrderRouteParameterStruct params = new OrderRouteParameterStruct(driveOrders, pointRouter);
       OrderRouteResultStruct resultStruct = new OrderRouteResultStruct(driveOrderList.size());
       computeCheapestOrderRoute(sourcePoint, params, 0, resultStruct);
@@ -215,6 +194,7 @@ public class DefaultRouter
     }
   }
 
+  @Deprecated
   @Override
   public Optional<Route> getRoute(Vehicle vehicle,
                                   Point sourcePoint,
@@ -224,7 +204,8 @@ public class DefaultRouter
     requireNonNull(destinationPoint, "destinationPoint");
 
     synchronized (this) {
-      PointRouter pointRouter = getPointRouterForVehicle(vehicle);
+      PointRouter pointRouter = pointRouterProvider
+          .getPointRouterForVehicle(vehicle, (TransportOrder) null);
       long costs = pointRouter.getCosts(sourcePoint, destinationPoint);
       if (costs == INFINITE_COSTS) {
         return Optional.empty();
@@ -240,6 +221,34 @@ public class DefaultRouter
   }
 
   @Override
+  public Optional<Route> getRoute(Vehicle vehicle,
+                                  Point sourcePoint,
+                                  Point destinationPoint,
+                                  Set<TCSResourceReference<?>> resourcesToAvoid) {
+    requireNonNull(vehicle, "vehicle");
+    requireNonNull(sourcePoint, "sourcePoint");
+    requireNonNull(destinationPoint, "destinationPoint");
+    requireNonNull(resourcesToAvoid, "resourcesToAvoid");
+
+    synchronized (this) {
+      PointRouter pointRouter = pointRouterProvider
+          .getPointRouterForVehicle(vehicle, resourcesToAvoid);
+      long costs = pointRouter.getCosts(sourcePoint, destinationPoint);
+      if (costs == INFINITE_COSTS) {
+        return Optional.empty();
+      }
+      List<Route.Step> steps = pointRouter.getRouteSteps(sourcePoint, destinationPoint);
+      if (steps.isEmpty()) {
+        // If the list of steps is empty, we're already at the destination point
+        // Create a single step without a path.
+        steps.add(new Route.Step(null, null, sourcePoint, Vehicle.Orientation.UNDEFINED, 0));
+      }
+      return Optional.of(new Route(steps, costs));
+    }
+  }
+
+  @Deprecated
+  @Override
   public long getCosts(Vehicle vehicle,
                        Point sourcePoint,
                        Point destinationPoint) {
@@ -248,10 +257,13 @@ public class DefaultRouter
     requireNonNull(destinationPoint, "destinationPoint");
 
     synchronized (this) {
-      return getPointRouterForVehicle(vehicle).getCosts(sourcePoint, destinationPoint);
+      return pointRouterProvider
+          .getPointRouterForVehicle(vehicle, (TransportOrder) null)
+          .getCosts(sourcePoint, destinationPoint);
     }
   }
 
+  @Deprecated
   @Override
   public long getCostsByPointRef(Vehicle vehicle,
                                  TCSObjectReference<Point> srcPointRef,
@@ -261,7 +273,26 @@ public class DefaultRouter
     requireNonNull(dstPointRef, "dstPointRef");
 
     synchronized (this) {
-      return getPointRouterForVehicle(vehicle).getCosts(srcPointRef, dstPointRef);
+      return pointRouterProvider
+          .getPointRouterForVehicle(vehicle, (TransportOrder) null)
+          .getCosts(srcPointRef, dstPointRef);
+    }
+  }
+
+  @Override
+  public long getCosts(Vehicle vehicle,
+                       Point sourcePoint,
+                       Point destinationPoint,
+                       Set<TCSResourceReference<?>> resourcesToAvoid) {
+    requireNonNull(vehicle, "vehicle");
+    requireNonNull(sourcePoint, "sourcePoint");
+    requireNonNull(destinationPoint, "destinationPoint");
+    requireNonNull(resourcesToAvoid, "resourcesToAvoid");
+
+    synchronized (this) {
+      return pointRouterProvider
+          .getPointRouterForVehicle(vehicle, resourcesToAvoid)
+          .getCosts(sourcePoint, destinationPoint);
     }
   }
 
@@ -297,32 +328,6 @@ public class DefaultRouter
       }
       return result;
     }
-  }
-
-  private void createMissingPointRouters() {
-    Map<String, Vehicle> distinctRoutingGroups = new HashMap<>();
-    for (Vehicle vehicle : objectService.fetchObjects(Vehicle.class)) {
-      distinctRoutingGroups.putIfAbsent(routingGroupMapper.apply(vehicle), vehicle);
-    }
-
-    // Lazily create point routers if they don't exist.
-    distinctRoutingGroups.forEach((routingGroup, vehicle) -> getPointRouterForVehicle(vehicle));
-  }
-
-  /**
-   * Returns the {@link PointRouter} for the given vehicle considering the vehicle's routing group.
-   *
-   * @param vehicle The vehicle to get the point router for.
-   * @return The point router.
-   */
-  private PointRouter getPointRouterForVehicle(Vehicle vehicle) {
-    String routingGroup = routingGroupMapper.apply(vehicle);
-    if (!pointRoutersByVehicleGroup.containsKey(routingGroup)) {
-      pointRoutersByVehicleGroup.put(routingGroup,
-                                     pointRouterFactory.createPointRouter(vehicle));
-    }
-
-    return pointRoutersByVehicleGroup.get(routingGroup);
   }
 
   /**
