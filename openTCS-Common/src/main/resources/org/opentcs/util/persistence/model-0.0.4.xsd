@@ -128,10 +128,6 @@
   <!-- Data type for path elements -->
   <xsd:complexType name="pathType">
     <xsd:sequence>
-      <xsd:element name="vehicleEnvelope"
-                   type="vehicleEnvelopeType"
-                   minOccurs="0"
-                   maxOccurs="unbounded"/>
       <xsd:element name="peripheralOperation"
                    minOccurs="0"
                    maxOccurs="unbounded">
@@ -150,6 +146,10 @@
                          use="required"/>
         </xsd:complexType>
       </xsd:element>
+      <xsd:element name="vehicleEnvelope"
+                   type="vehicleEnvelopeType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="property"
                    type="propertyType"
                    minOccurs="0"
