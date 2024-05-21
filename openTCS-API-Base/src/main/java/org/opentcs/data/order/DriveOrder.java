@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -138,6 +139,22 @@ public class DriveOrder
    */
   public DriveOrder withState(@Nonnull State state) {
     return new DriveOrder(destination, transportOrder, route, state);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof DriveOrder)) {
+      return false;
+    }
+
+    final DriveOrder other = (DriveOrder) obj;
+    return Objects.equals(destination, other.destination)
+        && Objects.equals(transportOrder, other.transportOrder);
+  }
+
+  @Override
+  public int hashCode() {
+    return destination.hashCode() ^ transportOrder.hashCode();
   }
 
   @Override

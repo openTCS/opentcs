@@ -1394,7 +1394,7 @@ public class DefaultVehicleController
     // Commands that we have already processed should not be included in the remaining claim.
     MovementCommand lastCommandProcessed = lastCommandProcessed();
     if (lastCommandProcessed != null
-        && Objects.equals(order, lastCommandProcessed.getTransportOrder())) {
+        && Objects.equals(order.getCurrentDriveOrder(), lastCommandProcessed.getDriveOrder())) {
       futureMovementCommands = futureMovementCommands.stream()
           .dropWhile(command -> !command.equalsInMovement(lastCommandProcessed))
           .skip(1)

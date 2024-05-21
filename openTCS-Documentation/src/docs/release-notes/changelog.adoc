@@ -16,6 +16,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * Bugs fixed:
 ** Avoid `ObjectUnknownException` by cleaning orders related to order sequences only once.
+** Correctly claim resources for transport orders with multiple drive orders.
+   This fixes an issue where allocating the first set of resources for the second drive order in a transport order would fail.
 * Changes affecting developers:
 ** Update Gradle wrapper to 8.7.
 
