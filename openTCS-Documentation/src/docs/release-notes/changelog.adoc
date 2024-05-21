@@ -15,7 +15,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 == Unreleased
 
 * Bugs fixed:
-** cleaning orders are duplicated when cleaning order sequence, causing ObjectUnknownException.
+** Avoid `ObjectUnknownException` by cleaning orders related to peripheral jobs and order sequences only once.
 * Changes affecting developers:
 ** Update Gradle wrapper to 8.7.
 
