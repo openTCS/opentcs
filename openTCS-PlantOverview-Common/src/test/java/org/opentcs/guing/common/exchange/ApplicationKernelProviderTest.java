@@ -18,7 +18,6 @@ import static org.mockito.Mockito.when;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.common.PortalManager;
-import org.opentcs.guing.common.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.util.gui.dialog.ConnectToServerDialog;
 
 /**
@@ -36,7 +35,7 @@ class ApplicationKernelProviderTest {
   /**
    * A (mocked) configuration.
    */
-  private PlantOverviewApplicationConfiguration appConfig;
+  private ApplicationPortalProviderConfiguration appConfig;
   /**
    * The portal provider to be tested.
    */
@@ -46,7 +45,7 @@ class ApplicationKernelProviderTest {
   void setUp() {
     portalManager = mock(PortalManager.class);
     dialog = mock(ConnectToServerDialog.class);
-    appConfig = mock(PlantOverviewApplicationConfiguration.class);
+    appConfig = mock(ApplicationPortalProviderConfiguration.class);
     portalProvider = new ApplicationPortalProvider(portalManager,
                                                    appConfig);
   }

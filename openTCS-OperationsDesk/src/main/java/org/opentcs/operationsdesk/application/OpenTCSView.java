@@ -129,7 +129,6 @@ import org.opentcs.operationsdesk.transport.orders.TransportOrdersContainerPanel
 import org.opentcs.operationsdesk.transport.sequences.OrderSequencesContainerPanel;
 import org.opentcs.operationsdesk.util.Cursors;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
-import org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfiguration;
 import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.UndoRedoManager;
 import org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar.PaletteToolBarBorder;
 import org.opentcs.thirdparty.guing.common.jhotdraw.components.drawing.AbstractOpenTCSDrawingView;
@@ -139,6 +138,7 @@ import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 
 /**
  * Visualizes the driving course and other kernel objects as well as messages
@@ -303,7 +303,7 @@ public class OpenTCSView
   /**
    * The operations desk application's configuration.
    */
-  private final PlantOverviewOperatingApplicationConfiguration configuration;
+  private final OperationsDeskConfiguration configuration;
   /**
    * Provides the application's tool bars.
    */
@@ -373,7 +373,7 @@ public class OpenTCSView
                      DrawingViewFocusHandler drawingViewFocusHandler,
                      DockableHandlerFactory dockableHandlerFactory,
                      LayerManager layerManager,
-                     PlantOverviewOperatingApplicationConfiguration configuration) {
+                     OperationsDeskConfiguration configuration) {
     this.appState = requireNonNull(appState, "appState");
     this.fFrame = requireNonNull(appFrame, "appFrame");
     this.progressIndicator = requireNonNull(progressIndicator, "progressIndicator");

@@ -56,7 +56,7 @@ import org.opentcs.operationsdesk.application.menus.MenuFactory;
 import org.opentcs.operationsdesk.application.menus.VehiclePopupMenu;
 import org.opentcs.operationsdesk.components.dialogs.SingleVehicleView;
 import org.opentcs.operationsdesk.components.drawing.figures.decoration.VehicleOutlineHandle;
-import org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfiguration;
+import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 
 /**
  * The graphical representation of a vehicle.
@@ -133,7 +133,7 @@ public class VehicleFigure
   @Inject
   public VehicleFigure(VehicleTheme vehicleTheme,
                        MenuFactory menuFactory,
-                       PlantOverviewOperatingApplicationConfiguration appConfig,
+                       OperationsDeskConfiguration appConfig,
                        @Assisted VehicleModel model,
                        ToolTipTextGenerator textGenerator,
                        ModelManager modelManager,

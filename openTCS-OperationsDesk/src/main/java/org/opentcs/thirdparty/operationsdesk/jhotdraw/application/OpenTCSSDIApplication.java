@@ -25,11 +25,11 @@ import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.operationsdesk.application.OpenTCSView;
 import org.opentcs.operationsdesk.application.menus.menubar.ApplicationMenuBar;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
-import org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfiguration;
 import org.opentcs.thirdparty.operationsdesk.jhotdraw.application.action.file.CloseFileAction;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;
 import org.opentcs.util.gui.Icons;
+import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 
 /**
  * The enclosing SDI application.
@@ -55,7 +55,7 @@ public class OpenTCSSDIApplication
   /**
    * The application's configuration.
    */
-  private final PlantOverviewOperatingApplicationConfiguration appConfig;
+  private final OperationsDeskConfiguration appConfig;
   /**
    * Where we register for application events.
    */
@@ -79,7 +79,7 @@ public class OpenTCSSDIApplication
   public OpenTCSSDIApplication(@ApplicationFrame JFrame frame,
                                Provider<ApplicationMenuBar> menuBarProvider,
                                ModelManager modelManager,
-                               PlantOverviewOperatingApplicationConfiguration appConfig,
+                               OperationsDeskConfiguration appConfig,
                                @ApplicationEventBus EventSource eventSource,
                                PortalManager portalManager) {
     this.contentFrame = requireNonNull(frame, "frame");

@@ -24,11 +24,11 @@ import org.opentcs.data.notification.UserNotification;
 import org.opentcs.guing.common.event.OperationModeChangeEvent;
 import org.opentcs.guing.common.event.SystemModelTransitionEvent;
 import org.opentcs.operationsdesk.event.KernelStateChangeEvent;
-import org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfiguration;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 
 /**
  * Maintains a list of the most recent user notifications.
@@ -77,7 +77,7 @@ public class UserNotificationsContainer
   @Inject
   public UserNotificationsContainer(@ApplicationEventBus EventBus eventBus,
                                     SharedKernelServicePortalProvider portalProvider,
-                                    PlantOverviewOperatingApplicationConfiguration configuration) {
+                                    OperationsDeskConfiguration configuration) {
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.capacity = requireNonNull(configuration, "configuration").userNotificationDisplayCount();

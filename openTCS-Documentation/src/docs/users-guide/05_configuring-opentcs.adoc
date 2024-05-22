@@ -141,15 +141,11 @@ The model editor application reads its configuration data from the following fil
 The files are read in this order, and configuration values set in one file can be overridden in any subsequent one.
 For users, it is recommended to leave the first two files untouched and set overriding values and project-specific configuration data in `opentcs-modeleditor.properties` only.
 
-NOTE: Some of the following configuration entries still use the prefix 'plantoverviewapp', which is reminiscent of the old plant overview application.
-With openTCS 6.0, the prefix 'plantoverviewapp' will be replaced with one more suitable for the new model editor application.
-
 ==== Model Editor application configuration entries
 
 The model editor application itself can be configured using the following configuration entries:
 
-include::{configdoc}/PlantOverviewApplicationConfigurationEntries.adoc[]
-include::{configdoc}/PlantOverviewModelingApplicationConfigurationEntries.adoc[]
+include::{configdoc}/ModelEditorConfigurationEntries.adoc[]
 
 ==== SSL model editor-side application configuration entries
 
@@ -174,15 +170,11 @@ The operations desk application reads its configuration data from the following 
 The files are read in this order, and configuration values set in one file can be overridden in any subsequent one.
 For users, it is recommended to leave the first two files untouched and set overriding values and project-specific configuration data in `opentcs-operationsdesk.properties` only.
 
-NOTE: Some of the following configuration entries still use the prefix 'plantoverviewapp', which is reminiscent of the old plant overview application.
-With openTCS 6.0, the prefix 'plantoverviewapp' will be replaced with one more suitable for the new operations desk application.
-
 ==== Operations Desk application configuration entries
 
 The operations desk application itself can be configured using the following configuration entries:
 
-include::{configdoc}/PlantOverviewApplicationConfigurationEntries.adoc[]
-include::{configdoc}/PlantOverviewOperatingApplicationConfigurationEntries.adoc[]
+include::{configdoc}/OperationsDeskConfigurationEntries.adoc[]
 
 ==== SSL operation desk-side application configuration entries
 

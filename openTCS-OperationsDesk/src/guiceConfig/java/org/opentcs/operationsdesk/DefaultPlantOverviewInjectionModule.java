@@ -27,8 +27,8 @@ import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 import org.opentcs.drivers.LowLevelCommunicationEvent;
+import org.opentcs.guing.common.exchange.ApplicationPortalProviderConfiguration;
 import org.opentcs.guing.common.exchange.SslConfiguration;
-import org.opentcs.guing.common.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.operationsdesk.application.ApplicationInjectionModule;
 import org.opentcs.operationsdesk.components.ComponentsInjectionModule;
 import org.opentcs.operationsdesk.exchange.ExchangeInjectionModule;
@@ -37,12 +37,12 @@ import org.opentcs.operationsdesk.notifications.NotificationInjectionModule;
 import org.opentcs.operationsdesk.peripherals.jobs.PeripheralJobInjectionModule;
 import org.opentcs.operationsdesk.persistence.DefaultPersistenceInjectionModule;
 import org.opentcs.operationsdesk.transport.TransportInjectionModule;
-import org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfiguration;
 import org.opentcs.operationsdesk.util.UtilInjectionModule;
 import org.opentcs.util.ClassMatcher;
 import org.opentcs.util.gui.dialog.ConnectionParamSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 
 /**
  * A Guice module for the openTCS plant overview application.
@@ -87,15 +87,12 @@ public class DefaultPlantOverviewInjectionModule
   }
 
   private void configurePlantOverviewDependencies() {
-    PlantOverviewApplicationConfiguration baseConfiguration
-        = getConfigBindingProvider().get(PlantOverviewApplicationConfiguration.PREFIX,
-                                         PlantOverviewApplicationConfiguration.class);
-    PlantOverviewOperatingApplicationConfiguration configuration
-        = getConfigBindingProvider().get(PlantOverviewApplicationConfiguration.PREFIX,
-                                         PlantOverviewOperatingApplicationConfiguration.class);
-    bind(PlantOverviewApplicationConfiguration.class)
-        .toInstance(baseConfiguration);
-    bind(PlantOverviewOperatingApplicationConfiguration.class)
+    OperationsDeskConfiguration configuration
+        = getConfigBindingProvider().get(OperationsDeskConfiguration.PREFIX,
+                                         OperationsDeskConfiguration.class);
+    bind(ApplicationPortalProviderConfiguration.class)
+        .toInstance(configuration);
+    bind(OperationsDeskConfiguration.class)
         .toInstance(configuration);
     configurePlantOverview(configuration);
     configureThemes(configuration);
@@ -103,7 +100,7 @@ public class DefaultPlantOverviewInjectionModule
 
     bind(new TypeLiteral<List<ConnectionParamSet>>() {
     })
-        .toInstance(baseConfiguration.connectionBookmarks());
+        .toInstance(configuration.connectionBookmarks());
   }
 
   private void configureSocketConnections() {
@@ -136,7 +133,7 @@ public class DefaultPlantOverviewInjectionModule
             .build());
   }
 
-  private void configureThemes(PlantOverviewOperatingApplicationConfiguration configuration) {
+  private void configureThemes(OperationsDeskConfiguration configuration) {
     bind(LocationTheme.class)
         .to(configuration.locationThemeClass())
         .in(Singleton.class);
@@ -146,7 +143,7 @@ public class DefaultPlantOverviewInjectionModule
   }
 
   private void configurePlantOverview(
-      PlantOverviewOperatingApplicationConfiguration configuration
+      OperationsDeskConfiguration configuration
   ) {
     Locale.setDefault(Locale.forLanguageTag(configuration.locale()));
 

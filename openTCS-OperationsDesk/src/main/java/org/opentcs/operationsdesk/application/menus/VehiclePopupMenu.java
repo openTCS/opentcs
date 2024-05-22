@@ -22,8 +22,8 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.operationsdesk.application.action.ActionFactory;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
-import org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfiguration;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
+import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 
 /**
  * A popup menu for actions for multiple selected vehicles.
@@ -42,7 +42,7 @@ public class VehiclePopupMenu
   @Inject
   public VehiclePopupMenu(ModelManager modelManager,
                           ActionFactory actionFactory,
-                          PlantOverviewOperatingApplicationConfiguration configuration,
+                          OperationsDeskConfiguration configuration,
                           @Assisted Collection<VehicleModel> vehicles) {
     requireNonNull(modelManager, "modelManager");
     requireNonNull(actionFactory, "actionFactory");

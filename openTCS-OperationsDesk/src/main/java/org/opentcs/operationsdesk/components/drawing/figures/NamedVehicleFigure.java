@@ -23,7 +23,7 @@ import org.opentcs.guing.common.components.drawing.figures.FigureOrdinals;
 import org.opentcs.guing.common.components.drawing.figures.ToolTipTextGenerator;
 import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.operationsdesk.application.menus.MenuFactory;
-import org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfiguration;
+import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 
 /**
  * A vehicle figure that adds the name of the vehicle into the image.
@@ -34,7 +34,7 @@ public class NamedVehicleFigure
   @Inject
   public NamedVehicleFigure(VehicleTheme vehicleTheme,
                             MenuFactory menuFactory,
-                            PlantOverviewOperatingApplicationConfiguration appConfig,
+                            OperationsDeskConfiguration appConfig,
                             @Assisted VehicleModel model,
                             ToolTipTextGenerator textGenerator,
                             ModelManager modelManager,

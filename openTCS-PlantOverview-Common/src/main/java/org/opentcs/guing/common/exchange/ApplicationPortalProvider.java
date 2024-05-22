@@ -15,7 +15,6 @@ import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.common.PortalManager;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
-import org.opentcs.guing.common.util.PlantOverviewApplicationConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +39,7 @@ public class ApplicationPortalProvider
   /**
    * The application's configuration.
    */
-  private final PlantOverviewApplicationConfiguration configuration;
+  private final ApplicationPortalProviderConfiguration configuration;
 
   /**
    * Creates a new instance.
@@ -50,7 +49,7 @@ public class ApplicationPortalProvider
    */
   @Inject
   public ApplicationPortalProvider(PortalManager portalManager,
-                                   PlantOverviewApplicationConfiguration configuration) {
+                                   ApplicationPortalProviderConfiguration configuration) {
     this.portalManager = requireNonNull(portalManager, "ortalManager");
     this.configuration = requireNonNull(configuration, "configuration");
   }

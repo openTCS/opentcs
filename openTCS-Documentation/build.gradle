@@ -278,20 +278,17 @@ task configdocgen {
         "org.opentcs.kernelcontrolcenter.exchange.SslConfiguration",
         "${configDocDir}/KccSslConfigurationEntries.adoc",
 
-        "org.opentcs.guing.common.util.PlantOverviewApplicationConfiguration",
-        "${configDocDir}/PlantOverviewApplicationConfigurationEntries.adoc",
-
         "org.opentcs.guing.common.exchange.SslConfiguration",
         "${configDocDir}/PoSslConfigurationEntries.adoc",
 
-        "org.opentcs.modeleditor.util.PlantOverviewModelingApplicationConfiguration",
-        "${configDocDir}/PlantOverviewModelingApplicationConfigurationEntries.adoc",
+        "org.opentcs.modeleditor.util.ModelEditorConfiguration",
+        "${configDocDir}/ModelEditorConfigurationEntries.adoc",
 
         "org.opentcs.modeleditor.util.ElementNamingSchemeConfiguration",
         "${configDocDir}/PO_ElementNamingSchemeConfigurationEntries.adoc",
 
-        "org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfiguration",
-        "${configDocDir}/PlantOverviewOperatingApplicationConfigurationEntries.adoc"
+        "org.opentcs.operationsdesk.util.OperationsDeskConfiguration",
+        "${configDocDir}/OperationsDeskConfigurationEntries.adoc"
       ]
     }
   }

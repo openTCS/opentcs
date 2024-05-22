@@ -23,6 +23,8 @@ This change log lists the most relevant changes for past releases in reverse chr
    For the latter, use of the `javax` namespace was never officially approved, so the former may be considered more official.
 ** Remove code for reading configuration (interfaces) via cfg4j.
    Reading configuration (interfaces) via gestalt, which had already been made the default previously, is now the only integrated variant.
+* Other changes:
+** Replace the configuration prefix 'plantoverviewapp' in the Model Editor and Operations Desk applications (which is reminiscent of the old Plant Overview application) with prefixes that are more suitable for the respective applications.
 
 == Version 5.17 (2024-05-21)
 

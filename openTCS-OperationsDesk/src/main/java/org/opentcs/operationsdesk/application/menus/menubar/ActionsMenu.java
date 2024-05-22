@@ -22,8 +22,8 @@ import org.opentcs.operationsdesk.application.action.actions.FindVehicleAction;
 import org.opentcs.operationsdesk.application.menus.MenuFactory;
 import org.opentcs.operationsdesk.components.drawing.figures.VehicleFigure;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
-import org.opentcs.operationsdesk.util.PlantOverviewOperatingApplicationConfiguration;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
+import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 
 /**
  * The application's menu for run-time actions.
@@ -64,7 +64,7 @@ public class ActionsMenu
   public ActionsMenu(ViewActionMap actionMap,
                      OpenTCSDrawingEditor drawingEditor,
                      MenuFactory menuFactory,
-                     PlantOverviewOperatingApplicationConfiguration appConfig) {
+                     OperationsDeskConfiguration appConfig) {
     requireNonNull(actionMap, "actionMap");
     requireNonNull(drawingEditor, "drawingEditor");
     requireNonNull(menuFactory, "menuFactory");

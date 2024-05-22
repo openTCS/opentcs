@@ -5,29 +5,22 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.guing.common.util;
+package org.opentcs.guing.common.exchange;
 
 import java.util.List;
 import org.opentcs.configuration.ConfigurationEntry;
-import org.opentcs.configuration.ConfigurationPrefix;
 import org.opentcs.util.gui.dialog.ConnectionParamSet;
 
 /**
- * Provides methods to configure the PlantOverview application.
+ * Provides methods to configure the Model Editor and Operations Desk applications.
  */
-@ConfigurationPrefix(PlantOverviewApplicationConfiguration.PREFIX)
-public interface PlantOverviewApplicationConfiguration {
-
-  /**
-   * This configuration's prefix.
-   */
-  String PREFIX = "plantoverviewapp";
+public interface ApplicationPortalProviderConfiguration {
 
   @ConfigurationEntry(
       type = "Comma-separated list of <description>\\|<hostname>\\|<port>",
       description = "Kernel connection bookmarks to be used.",
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
-      orderKey = "2_connection_0")
+      orderKey = "1_connection_0")
   List<ConnectionParamSet> connectionBookmarks();
 
   @ConfigurationEntry(
@@ -37,6 +30,6 @@ public interface PlantOverviewApplicationConfiguration {
         "If 'true', the first connection bookmark will be used for the connection attempt.",
         "If 'false', a dialog will be shown to enter connection parameters."},
       changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
-      orderKey = "2_connection_1")
+      orderKey = "1_connection_1")
   boolean useBookmarksWhenConnecting();
 }

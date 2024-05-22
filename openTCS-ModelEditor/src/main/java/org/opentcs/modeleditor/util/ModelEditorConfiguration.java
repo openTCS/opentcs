@@ -10,17 +10,19 @@ package org.opentcs.modeleditor.util;
 import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.configuration.ConfigurationEntry;
 import org.opentcs.configuration.ConfigurationPrefix;
+import org.opentcs.guing.common.exchange.ApplicationPortalProviderConfiguration;
 
 /**
- * Provides methods to configure the PlantOverview application (in modeling mode).
+ * Provides methods to configure the Model Editor application.
  */
-@ConfigurationPrefix(PlantOverviewModelingApplicationConfiguration.PREFIX)
-public interface PlantOverviewModelingApplicationConfiguration {
+@ConfigurationPrefix(ModelEditorConfiguration.PREFIX)
+public interface ModelEditorConfiguration
+    extends ApplicationPortalProviderConfiguration {
 
   /**
    * This configuration's prefix.
    */
-  String PREFIX = "plantoverviewapp";
+  String PREFIX = "modeleditor";
 
   @ConfigurationEntry(
       type = "String",

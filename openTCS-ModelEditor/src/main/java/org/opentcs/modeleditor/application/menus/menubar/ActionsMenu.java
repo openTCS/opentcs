@@ -12,7 +12,6 @@ import static java.util.Objects.requireNonNull;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingEditor;
-import org.opentcs.guing.common.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.modeleditor.application.action.ViewActionMap;
 import org.opentcs.modeleditor.application.menus.MenuFactory;
 import org.opentcs.modeleditor.util.I18nPlantOverviewModeling;
@@ -43,17 +42,14 @@ public class ActionsMenu
    * @param actionMap The application's action map.
    * @param drawingEditor The application's drawing editor.
    * @param menuFactory A factory for menu items.
-   * @param appConfig The application's configuration.
    */
   @Inject
   public ActionsMenu(ViewActionMap actionMap,
                      OpenTCSDrawingEditor drawingEditor,
-                     MenuFactory menuFactory,
-                     PlantOverviewApplicationConfiguration appConfig) {
+                     MenuFactory menuFactory) {
     requireNonNull(actionMap, "actionMap");
     requireNonNull(drawingEditor, "drawingEditor");
     requireNonNull(menuFactory, "menuFactory");
-    requireNonNull(appConfig, "appConfig");
 
     final ResourceBundleUtil labels
         = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);

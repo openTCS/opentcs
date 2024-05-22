@@ -11,17 +11,19 @@ import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.configuration.ConfigurationEntry;
 import org.opentcs.configuration.ConfigurationPrefix;
+import org.opentcs.guing.common.exchange.ApplicationPortalProviderConfiguration;
 
 /**
- * Provides methods to configure the PlantOverview application (in operating mode).
+ * Provides methods to configure the Operations Desk application.
  */
-@ConfigurationPrefix(PlantOverviewOperatingApplicationConfiguration.PREFIX)
-public interface PlantOverviewOperatingApplicationConfiguration {
+@ConfigurationPrefix(OperationsDeskConfiguration.PREFIX)
+public interface OperationsDeskConfiguration
+    extends ApplicationPortalProviderConfiguration {
 
   /**
    * This configuration's prefix.
    */
-  String PREFIX = "plantoverviewapp";
+  String PREFIX = "operationsdesk";
 
   @ConfigurationEntry(
       type = "String",
@@ -35,35 +37,35 @@ public interface PlantOverviewOperatingApplicationConfiguration {
       type = "Boolean",
       description = "Whether the GUI window should be maximized on startup.",
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
-      orderKey = "1_size_0")
+      orderKey = "2_size_0")
   boolean frameMaximized();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The GUI window's configured width in pixels.",
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
-      orderKey = "1_size_1")
+      orderKey = "2_size_1")
   int frameBoundsWidth();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The GUI window's configured height in pixels.",
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
-      orderKey = "1_size_2")
+      orderKey = "2_size_2")
   int frameBoundsHeight();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The GUI window's configured x-coordinate on screen in pixels.",
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
-      orderKey = "1_size_3")
+      orderKey = "2_size_3")
   int frameBoundsX();
 
   @ConfigurationEntry(
       type = "Integer",
       description = "The GUI window's configured y-coordinate on screen in pixels.",
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
-      orderKey = "1_size_4")
+      orderKey = "2_size_4")
   int frameBoundsY();
 
   @ConfigurationEntry(
@@ -104,13 +106,13 @@ public interface PlantOverviewOperatingApplicationConfiguration {
       type = "Integer",
       description = "The maximum number of most recent user notifications to be displayed.",
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
-      orderKey = "9_misc")
+      orderKey = "9_misc_1")
   int userNotificationDisplayCount();
 
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether the forced withdrawal context menu entry should be enabled.",
       changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
-      orderKey = "10_misc")
+      orderKey = "9_misc_2")
   boolean allowForcedWithdrawal();
 }

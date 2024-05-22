@@ -26,8 +26,8 @@ import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 import org.opentcs.drivers.LowLevelCommunicationEvent;
+import org.opentcs.guing.common.exchange.ApplicationPortalProviderConfiguration;
 import org.opentcs.guing.common.exchange.SslConfiguration;
-import org.opentcs.guing.common.util.PlantOverviewApplicationConfiguration;
 import org.opentcs.modeleditor.application.ApplicationInjectionModule;
 import org.opentcs.modeleditor.components.ComponentsInjectionModule;
 import org.opentcs.modeleditor.exchange.ExchangeInjectionModule;
@@ -36,12 +36,12 @@ import org.opentcs.modeleditor.model.ModelInjectionModule;
 import org.opentcs.modeleditor.persistence.DefaultPersistenceInjectionModule;
 import org.opentcs.modeleditor.transport.TransportInjectionModule;
 import org.opentcs.modeleditor.util.ElementNamingSchemeConfiguration;
-import org.opentcs.modeleditor.util.PlantOverviewModelingApplicationConfiguration;
 import org.opentcs.modeleditor.util.UtilInjectionModule;
 import org.opentcs.util.ClassMatcher;
 import org.opentcs.util.gui.dialog.ConnectionParamSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.opentcs.modeleditor.util.ModelEditorConfiguration;
 
 /**
  * A Guice module for the openTCS plant overview application.
@@ -85,15 +85,12 @@ public class DefaultPlantOverviewInjectionModule
   }
 
   private void configurePlantOverviewDependencies() {
-    PlantOverviewApplicationConfiguration baseConfiguration
-        = getConfigBindingProvider().get(PlantOverviewApplicationConfiguration.PREFIX,
-                                         PlantOverviewApplicationConfiguration.class);
-    PlantOverviewModelingApplicationConfiguration configuration
-        = getConfigBindingProvider().get(PlantOverviewApplicationConfiguration.PREFIX,
-                                         PlantOverviewModelingApplicationConfiguration.class);
-    bind(PlantOverviewApplicationConfiguration.class)
-        .toInstance(baseConfiguration);
-    bind(PlantOverviewModelingApplicationConfiguration.class)
+    ModelEditorConfiguration configuration
+        = getConfigBindingProvider().get(ModelEditorConfiguration.PREFIX,
+                                         ModelEditorConfiguration.class);
+    bind(ApplicationPortalProviderConfiguration.class)
+        .toInstance(configuration);
+    bind(ModelEditorConfiguration.class)
         .toInstance(configuration);
     configurePlantOverview(configuration);
     configureThemes(configuration);
@@ -102,7 +99,7 @@ public class DefaultPlantOverviewInjectionModule
 
     bind(new TypeLiteral<List<ConnectionParamSet>>() {
     })
-        .toInstance(baseConfiguration.connectionBookmarks());
+        .toInstance(configuration.connectionBookmarks());
   }
 
   private void configureNamingConfiguration() {
@@ -143,13 +140,13 @@ public class DefaultPlantOverviewInjectionModule
             .build());
   }
 
-  private void configureThemes(PlantOverviewModelingApplicationConfiguration configuration) {
+  private void configureThemes(ModelEditorConfiguration configuration) {
     bind(LocationTheme.class)
         .to(configuration.locationThemeClass())
         .in(Singleton.class);
   }
 
-  private void configurePlantOverview(PlantOverviewModelingApplicationConfiguration configuration) {
+  private void configurePlantOverview(ModelEditorConfiguration configuration) {
     Locale.setDefault(Locale.forLanguageTag(configuration.locale()));
 
     try {
