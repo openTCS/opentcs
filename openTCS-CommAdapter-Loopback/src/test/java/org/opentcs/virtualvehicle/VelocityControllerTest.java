@@ -74,7 +74,7 @@ class VelocityControllerTest {
     controller.addWayEntry(wayEntry);
     controller.setVehiclePaused(true);
 
-    int posBefore = controller.getCurrentPosition();
+    long posBefore = controller.getCurrentPosition();
 
     controller.advanceTime(5);
 

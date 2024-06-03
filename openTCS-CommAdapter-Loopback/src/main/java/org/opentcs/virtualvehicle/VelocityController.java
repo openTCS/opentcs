@@ -53,7 +53,7 @@ public class VelocityController {
   /**
    * The current position (in mm from the beginning of the current way entry).
    */
-  private int currentPosition;
+  private long currentPosition;
   /**
    * The current time, relative to the point of time at which this velocity
    * controller was created.
@@ -196,7 +196,7 @@ public class VelocityController {
    * @return The vehicle's current position (in mm from the beginning of the
    * current way entry.
    */
-  public int getCurrentPosition() {
+  public long getCurrentPosition() {
     return currentPosition;
   }
 
@@ -253,7 +253,7 @@ public class VelocityController {
   public void advanceTime(int dt) {
     checkArgument(dt >= 1, "dt is less than 1: %d", dt);
 
-    final int oldPosition = currentPosition;
+    final long oldPosition = currentPosition;
     final int oldVelocity = currentVelocity;
     final WayEntry curWayEntry = wayEntries.peek();
     if (curWayEntry == null || paused) {

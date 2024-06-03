@@ -98,10 +98,10 @@ public class OriginFigure
   public boolean contains(Point2D.Double p) {
     Rectangle r = (Rectangle) fDisplayBox.clone();
     double grow = AttributeKeys.getPerpendicularHitGrowth(this);
-    r.x -= grow;
-    r.y -= grow;
-    r.width += grow * 2;
-    r.height += grow * 2;
+    r.x = (int) (r.x - grow);
+    r.y = (int) (r.y - grow);
+    r.width = (int) (r.width + grow * 2);
+    r.height = (int) (r.height + grow * 2);
 
     return r.contains(p);
   }

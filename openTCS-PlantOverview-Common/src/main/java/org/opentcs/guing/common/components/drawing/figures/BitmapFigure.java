@@ -176,9 +176,7 @@ public class BitmapFigure
   }
 
   public void setScaleFactor(double oldValue, double newValue) {
-    fDisplayBox.width /= oldValue;
-    fDisplayBox.width *= newValue;
-    fDisplayBox.height /= oldValue;
-    fDisplayBox.height *= newValue;
+    fDisplayBox.width = (int) (fDisplayBox.width / oldValue * newValue);
+    fDisplayBox.height = (int) (fDisplayBox.height / oldValue * newValue);
   }
 }
