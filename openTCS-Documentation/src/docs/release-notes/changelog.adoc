@@ -15,6 +15,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 == Unreleased
 
 * Changes affecting developers:
+** Update project to Java 21.
 ** Update slf4j to 2.0.13.
 *** Migration note: Integration projects need to update any use of slf4j providers to the same version, too, or the respective logging backend might not be used.
 ** Update Guice to 7.0.0.

@@ -37,7 +37,7 @@ The release versions are tagged with their respective version.
 
 ### IDE: NetBeans
 
-To build the project from NetBeans, register a Java platform named "JDK 13 - openTCS" (without the quotes) within NetBeans.
+To build the project from NetBeans, register a Java platform named "JDK 21 - openTCS" (without the quotes) within NetBeans.
 This JDK will be used by NetBeans for running the build process.
 
 The NetBeans settings contained in this project include formatting rules.

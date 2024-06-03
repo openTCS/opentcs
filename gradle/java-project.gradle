@@ -30,13 +30,13 @@ dependencies {
 }
 
 compileJava {
-  options.release = 13
+  options.release = 21
   options.compilerArgs << "-Xlint:all"
   options.compilerArgs << "-Xlint:-serial"
 }
 
 compileTestJava {
-  options.release = 13
+  options.release = 21
   options.compilerArgs << "-Xlint:all"
   options.compilerArgs << "-Xlint:-serial"
 }

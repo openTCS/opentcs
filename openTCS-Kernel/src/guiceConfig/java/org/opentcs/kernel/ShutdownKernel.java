@@ -9,6 +9,8 @@ package org.opentcs.kernel;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -34,14 +36,14 @@ public class ShutdownKernel {
     int port = args.length > 1 ? Integer.parseInt(args[1]) : 55001;
 
     try {
-      URL url = new URL("http", hostName, port, "/v1/kernel");
+      URL url = new URI("http://" + hostName + ":" + port + "/v1/kernel").toURL();
       System.err.println("Calling to " + url + "...");
       HttpURLConnection httpCon = (HttpURLConnection) url.openConnection();
       httpCon.setRequestMethod("DELETE");
       httpCon.connect();
       httpCon.getInputStream();
     }
-    catch (IOException exc) {
+    catch (IOException | URISyntaxException exc) {
       System.err.println("Exception accessing admin interface:");
       exc.printStackTrace();
     }

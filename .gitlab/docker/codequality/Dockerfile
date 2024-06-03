@@ -1,7 +1,7 @@
 #
 # Remember to update version.yml when you change the image contents here!
 #
-FROM adoptopenjdk:13-jdk-hotspot
+FROM eclipse-temurin:21-jdk-jammy
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
   bash \

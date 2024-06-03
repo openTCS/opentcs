@@ -1,5 +1,5 @@
 default:
-  image: adoptopenjdk:13-jdk-hotspot
+  image: eclipse-temurin:21-jdk-jammy
   tags:
     - opentcs-runner
   before_script:

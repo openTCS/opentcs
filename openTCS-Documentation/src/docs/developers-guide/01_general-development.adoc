@@ -3,8 +3,8 @@
 === System requirements
 
 The openTCS source code is written in Java.
-To compile it, you need a Java Development Kit (JDK) 13.
-To run the resulting binaries, you need a Java Runtime Environment (JRE) 13.
+To compile it, you need a Java Development Kit (JDK) 21.
+To run the resulting binaries, you need a Java Runtime Environment (JRE) 21.
 All other required libraries are included in the openTCS distribution or will be downloaded automatically when building it from source code.
 
 === Available artifacts and API compatibility
