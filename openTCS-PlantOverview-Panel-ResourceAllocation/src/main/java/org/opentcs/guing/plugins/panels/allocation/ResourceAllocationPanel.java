@@ -70,6 +70,7 @@ public class ResourceAllocationPanel
    * @param eventSource Where this instance registers for events.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public ResourceAllocationPanel(SharedKernelServicePortalProvider kernelProvider,
                                  @ApplicationEventBus EventSource eventSource) {
     this.portalProvider = requireNonNull(kernelProvider, "kernelProvider");

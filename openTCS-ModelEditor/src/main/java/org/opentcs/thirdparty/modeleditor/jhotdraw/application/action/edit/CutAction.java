@@ -50,6 +50,7 @@ public class CutAction
    * @param target The target of the action. Specify null for the currently
    * focused component.
    */
+  @SuppressWarnings("this-escape")
   public CutAction(JComponent target) {
     super(target);
 

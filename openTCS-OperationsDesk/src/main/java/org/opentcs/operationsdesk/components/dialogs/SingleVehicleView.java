@@ -106,6 +106,7 @@ public class SingleVehicleView
    * @param modelManager The model manager.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public SingleVehicleView(@Assisted VehicleModel vehicle,
                            ComponentsTreeViewManager treeViewManager,
                            SelectionPropertiesComponent propertiesComponent,

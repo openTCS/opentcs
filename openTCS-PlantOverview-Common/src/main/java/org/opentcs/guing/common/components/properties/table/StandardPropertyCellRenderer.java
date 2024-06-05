@@ -31,6 +31,7 @@ public class StandardPropertyCellRenderer
   /**
    * Creates a new instance.
    */
+  @SuppressWarnings("this-escape")
   public StandardPropertyCellRenderer() {
     super();
     setStyle();

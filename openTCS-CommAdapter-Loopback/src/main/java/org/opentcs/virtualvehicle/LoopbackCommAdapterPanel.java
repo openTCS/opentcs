@@ -90,6 +90,7 @@ public class LoopbackCommAdapterPanel
    * @param callWrapper The call wrapper to use for service calls.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public LoopbackCommAdapterPanel(@Assisted LoopbackVehicleModelTO processModel,
                                   @Assisted VehicleService vehicleService,
                                   @ServiceCallWrapper CallWrapper callWrapper) {

@@ -59,6 +59,7 @@ public class BitmapFigure
    */
   private String imagePath;
 
+  @SuppressWarnings("this-escape")
   public BitmapFigure(File file) {
     try {
       image = ImageIO.read(file);

@@ -46,6 +46,7 @@ public class StandardDetailsDialog
    * @param content Details dialog content.
    * @param modal Whether or not the dialog is modal.
    */
+  @SuppressWarnings("this-escape")
   public StandardDetailsDialog(JPanel parent, boolean modal, DetailsDialogContent content) {
     super(JOptionPane.getFrameForComponent(parent), modal);
     fContent = content;
@@ -60,6 +61,7 @@ public class StandardDetailsDialog
    * @param modal Whether or not the dialog is modal.
    * @param content Details dialog content.
    */
+  @SuppressWarnings("this-escape")
   public StandardDetailsDialog(JDialog parent, boolean modal, DetailsDialogContent content) {
     super(parent, modal);
     fContent = content;

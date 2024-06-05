@@ -89,6 +89,7 @@ public class PeripheralJobsContainerPanel
    * @param peripheralJobViewFactory The factory for creating peripheral job views.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public PeripheralJobsContainerPanel(SharedKernelServicePortalProvider portalProvider,
                                       PeripheralJobsContainer peripheralJobsContainer,
                                       PeripheralJobViewFactory peripheralJobViewFactory) {

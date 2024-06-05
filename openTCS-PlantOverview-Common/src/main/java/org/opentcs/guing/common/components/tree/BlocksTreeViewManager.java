@@ -23,6 +23,7 @@ public class BlocksTreeViewManager
     extends TreeViewManager {
 
   @Inject
+  @SuppressWarnings("this-escape")
   public BlocksTreeViewManager(TreeView treeView,
                                UserObjectUtil userObjectUtil,
                                MouseListener mouseListener) {

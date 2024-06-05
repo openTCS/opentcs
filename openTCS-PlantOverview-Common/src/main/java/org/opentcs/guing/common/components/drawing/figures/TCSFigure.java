@@ -37,6 +37,7 @@ public abstract class TCSFigure
    *
    * @param modelComponent The model corresponding to this graphical object.
    */
+  @SuppressWarnings("this-escape")
   public TCSFigure(ModelComponent modelComponent) {
     super();
     set(FigureConstants.MODEL, modelComponent);

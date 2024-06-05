@@ -181,6 +181,7 @@ public class VehicleModel
   /**
    * Creates a new instance.
    */
+  @SuppressWarnings("this-escape")
   public VehicleModel() {
     createProperties();
   }

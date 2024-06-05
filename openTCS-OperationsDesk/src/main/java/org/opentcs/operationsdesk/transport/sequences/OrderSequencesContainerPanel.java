@@ -86,6 +86,7 @@ public class OrderSequencesContainerPanel
    * @param orderSequencesContainer Maintains a set of order sequences on the kernel side.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public OrderSequencesContainerPanel(TransportViewFactory transportViewFactory,
                                       @ApplicationFrame Component dialogParent,
                                       OrderSequencesContainer orderSequencesContainer) {

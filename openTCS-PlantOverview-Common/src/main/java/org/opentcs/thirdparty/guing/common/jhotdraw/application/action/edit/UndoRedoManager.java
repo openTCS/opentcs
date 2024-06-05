@@ -55,6 +55,7 @@ public class UndoRedoManager
    */
   private static final Logger LOG = LoggerFactory.getLogger(UndoRedoManager.class);
 
+  @SuppressWarnings("this-escape")
   protected PropertyChangeSupport propertySupport = new PropertyChangeSupport(this);
   /**
    * This flag is set to true when at least one significant UndoableEdit

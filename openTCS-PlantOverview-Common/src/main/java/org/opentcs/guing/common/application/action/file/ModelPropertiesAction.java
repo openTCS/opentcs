@@ -43,6 +43,7 @@ public class ModelPropertiesAction
   private final ModelManager modelManager;
 
   @Inject
+  @SuppressWarnings("this-escape")
   public ModelPropertiesAction(@ApplicationFrame Component dialogParent,
                                ModelManager modelManager) {
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");

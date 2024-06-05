@@ -37,6 +37,7 @@ public class StringPanel
    * @param labelText The text of the label.
    * @param text The text.
    */
+  @SuppressWarnings("this-escape")
   public StringPanel(String title, String labelText, String text) {
     initComponents();
     label.setText(labelText + ":");

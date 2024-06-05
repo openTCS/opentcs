@@ -51,6 +51,7 @@ public class ViewActionMap
    * @param createPeripheralJobAction The action to create peripheral jobs.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public ViewActionMap(OpenTCSView view,
                        UndoRedoManager undoRedoManager,
                        ActionFactory actionFactory,

@@ -42,6 +42,7 @@ public class LinkConnection
    * @param textGenerator The tool tip text generator.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public LinkConnection(@Assisted LinkModel model,
                         ToolTipTextGenerator textGenerator) {
     super(model);

@@ -64,6 +64,7 @@ public class SendVehicleToLocationAction
    * @param orderUtil A helper for creating transport orders with the kernel.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public SendVehicleToLocationAction(@Assisted VehicleModel vehicle,
                                      @ApplicationFrame JFrame applicationFrame,
                                      ModelManager modelManager,

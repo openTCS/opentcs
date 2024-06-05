@@ -109,6 +109,7 @@ public class ContinuousLoadPanel
    * @param eventSource Where components can register for events.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public ContinuousLoadPanel(SharedKernelServicePortalProvider portalProvider,
                              @ApplicationEventBus EventSource eventSource) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");

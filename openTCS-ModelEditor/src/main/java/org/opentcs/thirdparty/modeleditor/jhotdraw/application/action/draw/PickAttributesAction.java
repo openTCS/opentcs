@@ -52,6 +52,7 @@ public class PickAttributesAction
    *
    * @param editor The drawing editor
    */
+  @SuppressWarnings("this-escape")
   public PickAttributesAction(DrawingEditor editor) {
     super(editor);
     putValue(NAME, BUNDLE.getString("pickAttributesAction.name"));

@@ -70,6 +70,7 @@ public class FindVehicleAction
    * @param panelFactory The panel factory.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public FindVehicleAction(ModelManager modelManager,
                            OpenTCSDrawingEditor drawingEditor,
                            @ApplicationFrame Component dialogParent,

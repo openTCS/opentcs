@@ -58,6 +58,7 @@ public abstract class AbstractPropertyCellEditor
    * @param textField
    * @param umh
    */
+  @SuppressWarnings("this-escape")
   public AbstractPropertyCellEditor(JTextField textField, UserMessageHelper umh) {
     super(textField);
     fComponent = createComponent();
@@ -70,6 +71,7 @@ public abstract class AbstractPropertyCellEditor
    * @param checkBox
    * @param umh
    */
+  @SuppressWarnings("this-escape")
   public AbstractPropertyCellEditor(JCheckBox checkBox, UserMessageHelper umh) {
     super(checkBox);
     fComponent = createComponent();
@@ -82,6 +84,7 @@ public abstract class AbstractPropertyCellEditor
    * @param comboBox
    * @param umh
    */
+  @SuppressWarnings("this-escape")
   public AbstractPropertyCellEditor(JComboBox<?> comboBox, UserMessageHelper umh) {
     super(comboBox);
     fComponent = createComponent();

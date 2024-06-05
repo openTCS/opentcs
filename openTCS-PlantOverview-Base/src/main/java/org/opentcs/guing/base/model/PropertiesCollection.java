@@ -33,6 +33,7 @@ public class PropertiesCollection
    *
    * @param models The model components.
    */
+  @SuppressWarnings("this-escape")
   public PropertiesCollection(Collection<ModelComponent> models) {
     Objects.requireNonNull(models, "models is null");
 

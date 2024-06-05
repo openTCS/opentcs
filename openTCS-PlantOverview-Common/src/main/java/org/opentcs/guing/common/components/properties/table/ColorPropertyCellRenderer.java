@@ -24,6 +24,7 @@ public class ColorPropertyCellRenderer
   /**
    * Creates a new instance of ColorPropertyCellRenderer.
    */
+  @SuppressWarnings("this-escape")
   public ColorPropertyCellRenderer() {
     super();
     setOpaque(true);

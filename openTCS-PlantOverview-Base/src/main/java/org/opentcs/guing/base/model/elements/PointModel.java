@@ -79,6 +79,7 @@ public class PointModel
   /**
    * Creates a new instance.
    */
+  @SuppressWarnings("this-escape")
   public PointModel() {
     createProperties();
   }

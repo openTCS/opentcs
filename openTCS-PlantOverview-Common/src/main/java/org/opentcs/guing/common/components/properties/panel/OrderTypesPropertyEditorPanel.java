@@ -51,6 +51,7 @@ public class OrderTypesPropertyEditorPanel
    * @param typeSuggestionsPool The pool of types to suggest.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public OrderTypesPropertyEditorPanel(OrderTypeSuggestionsPool typeSuggestionsPool) {
     this.typeSuggestionsPool = requireNonNull(typeSuggestionsPool, "typeSuggestionsPool");
     initComponents();

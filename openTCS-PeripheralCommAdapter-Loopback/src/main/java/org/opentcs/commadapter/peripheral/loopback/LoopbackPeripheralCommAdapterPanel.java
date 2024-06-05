@@ -52,6 +52,7 @@ public class LoopbackPeripheralCommAdapterPanel
   private LoopbackPeripheralProcessModel processModel;
 
   @Inject
+  @SuppressWarnings("this-escape")
   public LoopbackPeripheralCommAdapterPanel(@Assisted LoopbackPeripheralProcessModel processModel,
                                             KernelServicePortal servicePortal,
                                             @ServiceCallWrapper CallWrapper callWrapper) {

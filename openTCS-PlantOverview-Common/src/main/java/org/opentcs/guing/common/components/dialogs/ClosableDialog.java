@@ -28,6 +28,7 @@ public class ClosableDialog
    * @param content The dialog's actual content.
    * @param title The dialog's title.
    */
+  @SuppressWarnings("this-escape")
   public ClosableDialog(Component parent, boolean modal, JComponent content, String title) {
     super(JOptionPane.getFrameForComponent(parent), title, modal);
     initComponents();

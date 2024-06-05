@@ -29,6 +29,7 @@ public class IntegerPropertyCellEditor
    * @param textField
    * @param umh
    */
+  @SuppressWarnings("this-escape")
   public IntegerPropertyCellEditor(JFormattedTextField textField, UserMessageHelper umh) {
     super(textField, umh);
     setStyle(textField);

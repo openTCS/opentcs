@@ -28,6 +28,7 @@ public abstract class TCSResource<E extends TCSResource<E>>
    *
    * @param name The new resource's name.
    */
+  @SuppressWarnings("this-escape")
   protected TCSResource(String name) {
     super(name);
     reference = new TCSResourceReference<>(this);
@@ -40,6 +41,7 @@ public abstract class TCSResource<E extends TCSResource<E>>
    * @param properties A set of properties (key-value pairs) associated with this object.
    * @param history A history of events related to this object.
    */
+  @SuppressWarnings("this-escape")
   protected TCSResource(String name, Map<String, String> properties, ObjectHistory history) {
     super(name, properties, history);
     reference = new TCSResourceReference<>(this);

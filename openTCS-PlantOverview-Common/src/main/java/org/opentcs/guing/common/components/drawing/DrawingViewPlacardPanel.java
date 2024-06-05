@@ -53,6 +53,7 @@ public class DrawingViewPlacardPanel
    * @param drawingView The drawing view.
    * @param drawingOptions The drawing options.
    */
+  @SuppressWarnings("this-escape")
   public DrawingViewPlacardPanel(OpenTCSDrawingView drawingView,
                                  DrawingOptions drawingOptions) {
     requireNonNull(drawingView, "drawingView");

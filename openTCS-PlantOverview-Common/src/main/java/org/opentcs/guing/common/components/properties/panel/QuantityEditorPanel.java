@@ -36,6 +36,7 @@ public class QuantityEditorPanel
   /**
    * Creates new form QuantityEditorPanel
    */
+  @SuppressWarnings("this-escape")
   public QuantityEditorPanel() {
     initComponents();
   }

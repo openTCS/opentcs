@@ -31,6 +31,7 @@ public class VehicleEntry
   /**
    * Used for implementing property change events.
    */
+  @SuppressWarnings("this-escape")
   private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
   /**
    * The process model for the vehicle.

@@ -71,6 +71,7 @@ public class StandardContentDialog
    * @param modal whether or not this dialog is modal.
    * @param options Which user interface options to use.
    */
+  @SuppressWarnings("this-escape")
   public StandardContentDialog(Component parent,
                                DialogContent content,
                                boolean modal,

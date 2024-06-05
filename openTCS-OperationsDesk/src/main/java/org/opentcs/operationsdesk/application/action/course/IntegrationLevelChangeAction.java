@@ -57,6 +57,7 @@ public class IntegrationLevelChangeAction
    * @param portalProvider Provides access to a shared portal.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public IntegrationLevelChangeAction(@Assisted Collection<VehicleModel> vehicles,
                                       @Assisted Vehicle.IntegrationLevel level,
                                       SharedKernelServicePortalProvider portalProvider) {

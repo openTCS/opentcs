@@ -84,6 +84,7 @@ public class PeripheralsPanel
    * @param detailPanel The details panel.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public PeripheralsPanel(@Nonnull KernelServicePortal servicePortal,
                           @Nonnull @ServiceCallWrapper CallWrapper callWrapper,
                           @Nonnull LocalPeripheralEntryPool peripheralEntryPool,

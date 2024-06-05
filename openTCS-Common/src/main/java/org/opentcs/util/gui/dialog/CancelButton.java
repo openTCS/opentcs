@@ -31,6 +31,7 @@ public class CancelButton
    *
    * @param text Label of this button.
    */
+  @SuppressWarnings("this-escape")
   public CancelButton(String text) {
     super(text);
 

@@ -43,6 +43,7 @@ public class LabeledLocationFigure
    * @param textGenerator The tool tip text generator.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public LabeledLocationFigure(@Assisted LocationFigure figure,
                                ToolTipTextGenerator textGenerator) {
     requireNonNull(figure, "figure");

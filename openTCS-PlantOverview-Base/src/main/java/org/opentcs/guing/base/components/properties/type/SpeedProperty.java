@@ -33,6 +33,7 @@ public class SpeedProperty
    * @param value The value.
    * @param unit The unit.
    */
+  @SuppressWarnings("this-escape")
   public SpeedProperty(ModelComponent model, double value, Unit unit) {
     super(model, value, unit, Unit.class, relations());
     setUnsigned(true);

@@ -41,6 +41,7 @@ public class DeleteAction
   /**
    * Creates a new instance which acts on the currently focused component.
    */
+  @SuppressWarnings("this-escape")
   public DeleteAction() {
     super(ID);
 

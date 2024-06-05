@@ -39,6 +39,7 @@ public class UserNotificationView
    * @param notification The user notification.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public UserNotificationView(@Assisted UserNotification notification) {
     this.fUserNotification = requireNonNull(notification, "notification");
 

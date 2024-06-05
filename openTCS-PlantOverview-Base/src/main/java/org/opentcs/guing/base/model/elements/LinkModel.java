@@ -33,6 +33,7 @@ public class LinkModel
   /**
    * Creates a new instance.
    */
+  @SuppressWarnings("this-escape")
   public LinkModel() {
     createProperties();
   }

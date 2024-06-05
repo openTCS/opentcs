@@ -50,6 +50,7 @@ public class BringToFrontAction
    *
    * @param editor The drawing editor
    */
+  @SuppressWarnings("this-escape")
   public BringToFrontAction(DrawingEditor editor) {
     super(editor);
 

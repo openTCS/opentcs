@@ -70,6 +70,7 @@ public class FileMenu
    * @param menuExport The sub-menu for the selectable plant model exporters.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public FileMenu(ViewActionMap actionMap,
                   FileImportMenu menuImport,
                   FileExportMenu menuExport) {

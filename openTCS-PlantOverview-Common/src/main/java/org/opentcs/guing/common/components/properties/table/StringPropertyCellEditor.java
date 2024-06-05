@@ -28,6 +28,7 @@ public class StringPropertyCellEditor
    * @param textField
    * @param umh
    */
+  @SuppressWarnings("this-escape")
   public StringPropertyCellEditor(JTextField textField, UserMessageHelper umh) {
     super(textField, umh);
     setStyle(textField);

@@ -99,6 +99,7 @@ public abstract class AbstractTreeViewPanel
    * @param componentsManager The components manager.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public AbstractTreeViewPanel(UndoRedoManager undoRedoManager,
                                ModelManager modelManager,
                                ComponentsManager componentsManager) {

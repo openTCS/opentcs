@@ -50,6 +50,7 @@ public class LayerGroupsPanel
   private LayerGroupsTableModel tableModel;
 
   @Inject
+  @SuppressWarnings("this-escape")
   public LayerGroupsPanel(ModelManager modelManager,
                           LayerGroupManager layerGroupManager,
                           LayerGroupEditor layerGroupEditor) {

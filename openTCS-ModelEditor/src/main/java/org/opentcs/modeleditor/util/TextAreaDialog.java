@@ -29,6 +29,7 @@ public class TextAreaDialog
    * @param modal specifies whether dialog blocks user input to other top-level windows when shown
    * @param description the description of the text area content
    */
+  @SuppressWarnings("this-escape")
   public TextAreaDialog(java.awt.Component parent, boolean modal, String description) {
     super(JOptionPane.getFrameForComponent(parent), modal);
     initComponents();

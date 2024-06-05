@@ -41,6 +41,7 @@ public class DownloadModelFromKernelAction
    * @param openTCSView The openTCS view.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public DownloadModelFromKernelAction(OpenTCSView openTCSView) {
     this.openTCSView = requireNonNull(openTCSView);
 

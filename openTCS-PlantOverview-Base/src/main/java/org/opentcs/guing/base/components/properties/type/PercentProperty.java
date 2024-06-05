@@ -43,6 +43,7 @@ public class PercentProperty
    * @param unit The unit in which the value is measured.
    * @param isInteger Whether only the integer part of the value is relevant.
    */
+  @SuppressWarnings("this-escape")
   public PercentProperty(ModelComponent model, double value, Unit unit, boolean isInteger) {
     super(model, value, unit, Unit.class, new ArrayList<Relation<Unit>>());
     setInteger(isInteger);

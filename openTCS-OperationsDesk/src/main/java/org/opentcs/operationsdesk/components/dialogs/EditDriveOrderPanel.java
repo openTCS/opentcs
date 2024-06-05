@@ -47,6 +47,7 @@ public class EditDriveOrderPanel
    *
    * @param locations available locations.
    */
+  @SuppressWarnings("this-escape")
   public EditDriveOrderPanel(List<LocationModel> locations) {
     initComponents();
     fLocations = sortLocations(locations);
@@ -61,6 +62,7 @@ public class EditDriveOrderPanel
    * @param location selected location
    * @param action selected action.
    */
+  @SuppressWarnings("this-escape")
   public EditDriveOrderPanel(List<LocationModel> locations,
                              AbstractConnectableModelComponent location, String action) {
     checkArgument(location instanceof PointModel || location instanceof LocationModel,

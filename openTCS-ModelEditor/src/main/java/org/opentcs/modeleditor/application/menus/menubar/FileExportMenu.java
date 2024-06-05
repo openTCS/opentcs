@@ -27,6 +27,7 @@ public class FileExportMenu
       = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
 
   @Inject
+  @SuppressWarnings("this-escape")
   public FileExportMenu(Set<PlantModelExporter> exporters,
                         GuiManager guiManager) {
     super(LABELS.getString("fileExportMenu.text"));

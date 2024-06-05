@@ -81,6 +81,7 @@ public class StandardSystemModel
    * Creates a new instance with a default drawing method.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public StandardSystemModel(ModelComponentFactory modelComponentFactory) {
     super("Model");
     this.modelComponentFactory = requireNonNull(modelComponentFactory, "modelComponentFactory");

@@ -29,6 +29,7 @@ public class StringPropertyEditorPanel
   /**
    * Creates new form StringPropertyPanel
    */
+  @SuppressWarnings("this-escape")
   public StringPropertyEditorPanel() {
     initComponents();
   }

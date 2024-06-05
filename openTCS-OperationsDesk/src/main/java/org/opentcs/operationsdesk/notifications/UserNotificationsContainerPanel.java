@@ -75,6 +75,7 @@ public class UserNotificationsContainerPanel
    * @param userNotificationsContainer Maintains a list of the most recent user notifications.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public UserNotificationsContainerPanel(UserNotificationViewFactory notificationViewFactory,
                                          UserNotificationsContainer userNotificationsContainer) {
     this.notificationViewFactory = requireNonNull(notificationViewFactory,

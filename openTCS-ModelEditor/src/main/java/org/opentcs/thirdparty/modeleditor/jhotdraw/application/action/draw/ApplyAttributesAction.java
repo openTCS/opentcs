@@ -55,6 +55,7 @@ public class ApplyAttributesAction
    *
    * @param editor The editor.
    */
+  @SuppressWarnings("this-escape")
   public ApplyAttributesAction(DrawingEditor editor) {
     super(editor);
 

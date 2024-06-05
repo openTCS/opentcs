@@ -60,6 +60,7 @@ public class ResumeAllVehiclesAction
    * @param portalProvider Provides access to a portal.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public ResumeAllVehiclesAction(ModelManager modelManager,
                                  SharedKernelServicePortalProvider portalProvider) {
     this.modelManager = requireNonNull(modelManager, "modelManager");

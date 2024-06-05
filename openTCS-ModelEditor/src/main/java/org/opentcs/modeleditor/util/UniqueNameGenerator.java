@@ -25,6 +25,7 @@ public class UniqueNameGenerator
     extends UniqueStringGenerator<Class<? extends ModelComponent>> {
 
   @Inject
+  @SuppressWarnings("this-escape")
   public UniqueNameGenerator(ElementNamingSchemeConfiguration config) {
     registerNamePattern(PointModel.class, config.pointPrefix(), config.pointNumberPattern());
     registerNamePattern(PathModel.class, config.pathPrefix(), config.pathNumberPattern());

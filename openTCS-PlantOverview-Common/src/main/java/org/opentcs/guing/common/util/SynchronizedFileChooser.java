@@ -31,6 +31,7 @@ public class SynchronizedFileChooser
    *
    * @param currentDirectory The current directory of the file chooser
    */
+  @SuppressWarnings("this-escape")
   public SynchronizedFileChooser(File currentDirectory) {
     super(currentDirectory);
     initComponents();

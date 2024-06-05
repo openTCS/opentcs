@@ -52,6 +52,7 @@ public class KeyValueSetPropertyEditorPanel
    * @param editorProvider a guice injected provider of KeyValuePropertyEditorPanel Instances
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public KeyValueSetPropertyEditorPanel(Provider<KeyValuePropertyEditorPanel> editorProvider) {
     this.editorProvider = requireNonNull(editorProvider, "editorProvider");
 

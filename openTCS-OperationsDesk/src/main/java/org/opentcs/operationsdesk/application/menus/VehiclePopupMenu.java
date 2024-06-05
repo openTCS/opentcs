@@ -40,6 +40,7 @@ public class VehiclePopupMenu
    * @param vehicles a set of all currently selected Vehicles.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public VehiclePopupMenu(ModelManager modelManager,
                           ActionFactory actionFactory,
                           OperationsDeskConfiguration configuration,

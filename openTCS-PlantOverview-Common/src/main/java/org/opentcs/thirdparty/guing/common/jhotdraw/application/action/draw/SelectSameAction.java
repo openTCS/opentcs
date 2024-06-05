@@ -45,6 +45,7 @@ public class SelectSameAction
    *
    * @param editor The drawing editor
    */
+  @SuppressWarnings("this-escape")
   public SelectSameAction(DrawingEditor editor) {
     super(editor);
 

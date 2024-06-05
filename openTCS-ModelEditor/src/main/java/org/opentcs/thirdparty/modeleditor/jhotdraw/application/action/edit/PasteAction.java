@@ -49,6 +49,7 @@ public class PasteAction
    * @param target The target of the action. Specify null for the currently
    * focused component.
    */
+  @SuppressWarnings("this-escape")
   public PasteAction(JComponent target) {
     super(target);
 

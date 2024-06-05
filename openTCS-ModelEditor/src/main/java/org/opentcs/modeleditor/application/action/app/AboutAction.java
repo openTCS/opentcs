@@ -59,6 +59,7 @@ public class AboutAction
    * @param dialogParent The parent component for dialogs shown by this action.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public AboutAction(ApplicationState appState,
                      SharedKernelServicePortalProvider portalProvider,
                      @ApplicationFrame Component dialogParent) {

@@ -39,6 +39,7 @@ public class CreateVehicleAction
    *
    * @param guiManager The GUI manager instance we're working with.
    */
+  @SuppressWarnings("this-escape")
   public CreateVehicleAction(GuiManagerModeling guiManager) {
     this.guiManager = guiManager;
 

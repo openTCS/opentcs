@@ -61,6 +61,7 @@ public class ActionsMenu
    * @param appConfig The application's configuration.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public ActionsMenu(ViewActionMap actionMap,
                      OpenTCSDrawingEditor drawingEditor,
                      MenuFactory menuFactory,

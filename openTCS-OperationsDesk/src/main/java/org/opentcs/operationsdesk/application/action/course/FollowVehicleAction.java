@@ -46,6 +46,7 @@ public class FollowVehicleAction
    * @param drawingEditor The application's drawing editor.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public FollowVehicleAction(@Assisted VehicleModel vehicle,
                              OpenTCSDrawingEditor drawingEditor) {
     this.vehicleModel = requireNonNull(vehicle, "vehicle");

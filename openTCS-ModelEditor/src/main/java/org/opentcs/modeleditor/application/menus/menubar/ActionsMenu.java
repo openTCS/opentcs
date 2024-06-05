@@ -44,6 +44,7 @@ public class ActionsMenu
    * @param menuFactory A factory for menu items.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public ActionsMenu(ViewActionMap actionMap,
                      OpenTCSDrawingEditor drawingEditor,
                      MenuFactory menuFactory) {

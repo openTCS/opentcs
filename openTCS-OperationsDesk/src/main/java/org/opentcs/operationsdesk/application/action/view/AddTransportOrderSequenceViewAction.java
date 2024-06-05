@@ -33,6 +33,7 @@ public class AddTransportOrderSequenceViewAction
    *
    * @param view The openTCS view
    */
+  @SuppressWarnings("this-escape")
   public AddTransportOrderSequenceViewAction(OpenTCSView view) {
     this.view = view;
 

@@ -68,6 +68,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
    * @param properties A set of properties (key-value pairs) associated with this object.
    * @param history A history of events related to this object.
    */
+  @SuppressWarnings("this-escape")
   protected TCSObject(@Nonnull String objectName,
                       @Nonnull Map<String, String> properties,
                       @Nonnull ObjectHistory history) {

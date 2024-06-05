@@ -63,6 +63,7 @@ public class ConnectToServerDialog
    *
    * @param paramSets The list of connection param sets.
    */
+  @SuppressWarnings("this-escape")
   public ConnectToServerDialog(List<ConnectionParamSet> paramSets) {
     super((JFrame) null, true);
     this.paramSets = requireNonNull(paramSets, "paramSets");

@@ -127,6 +127,7 @@ public class KernelControlCenter
    * @param panelProvidersOperating Providers for panels in operating mode.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public KernelControlCenter(
       @Nonnull KernelClientApplication application,
       @Nonnull KernelServicePortal servicePortal,

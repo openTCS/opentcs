@@ -25,6 +25,7 @@ public class ViewToolBarsMenu
   private static final ResourceBundleUtil LABELS_TOOLBAR
       = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH);
 
+  @SuppressWarnings("this-escape")
   public ViewToolBarsMenu(Collection<Action> viewActions) {
     super(LABELS_MENU.getString("viewToolBarsMenu.text"));
     requireNonNull(viewActions, "viewActions");

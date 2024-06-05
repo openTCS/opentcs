@@ -40,6 +40,7 @@ public class AttributesComponent
    * @param undoManager The undo manager to use.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public AttributesComponent(UndoRedoManager undoManager) {
     fUndoRedoManager = requireNonNull(undoManager, "undoManager");
     initComponents();

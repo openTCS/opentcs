@@ -71,6 +71,7 @@ public abstract class AbstractMultipleSelectionTool
    * @param drawingActions Drawing-related actions for the popup menus created by this tool.
    * @param selectionActions Selection-related actions for the popup menus created by this tool.
    */
+  @SuppressWarnings("this-escape")
   public AbstractMultipleSelectionTool(ApplicationState appState,
                                        SelectAreaTracker selectAreaTracker,
                                        DragTracker dragTracker,

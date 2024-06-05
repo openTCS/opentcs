@@ -46,6 +46,7 @@ public class FindVehiclePanel
    * @param modelManager The model manager.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public FindVehiclePanel(@Assisted Collection<VehicleModel> vehicles,
                           @Assisted OpenTCSDrawingView drawingView,
                           ModelManager modelManager) {

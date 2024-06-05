@@ -31,6 +31,7 @@ public class CStack
     extends AbstractDockableCStation<CStackDockStation>
     implements CNormalModeArea {
 
+  @SuppressWarnings("this-escape")
   public CStack(String id) {
     CStackDockStation delegate = new CStackDockStation(this);
 

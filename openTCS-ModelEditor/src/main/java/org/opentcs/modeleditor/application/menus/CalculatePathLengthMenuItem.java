@@ -48,6 +48,7 @@ public class CalculatePathLengthMenuItem
   private final Provider<PathLengthFunction> pathLengthFunctionProvider;
 
   @Inject
+  @SuppressWarnings("this-escape")
   public CalculatePathLengthMenuItem(OpenTCSDrawingEditor drawingEditor,
                                      UndoRedoManager undoRedoManager,
                                      Provider<PathLengthFunction> pathLengthFunctionProvider) {

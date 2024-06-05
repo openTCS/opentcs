@@ -51,6 +51,7 @@ public class LabeledPointFigure
    * @param textGenerator The tool tip text generator.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public LabeledPointFigure(@Assisted PointFigure figure,
                             ToolTipTextGenerator textGenerator) {
     requireNonNull(figure, "figure");

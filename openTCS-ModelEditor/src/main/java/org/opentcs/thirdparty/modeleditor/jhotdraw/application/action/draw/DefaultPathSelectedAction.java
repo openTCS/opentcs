@@ -71,6 +71,7 @@ public class DefaultPathSelectedAction
    * @param popupButton The popup button
    * @param group The button group
    */
+  @SuppressWarnings("this-escape")
   public DefaultPathSelectedAction(
       DrawingEditor editor,
       Tool tool,

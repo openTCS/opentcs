@@ -52,6 +52,7 @@ public class ScrollToVehicleAction
    * @param modelManager The model manager.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public ScrollToVehicleAction(@Assisted VehicleModel vehicle,
                                OpenTCSDrawingEditor drawingEditor,
                                ModelManager modelManager) {

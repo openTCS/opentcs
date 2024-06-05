@@ -33,6 +33,7 @@ public abstract class StringSetPropertyEditorPanel
   /**
    * Creates new form StringSetPropertyEditorPanel.
    */
+  @SuppressWarnings("this-escape")
   public StringSetPropertyEditorPanel() {
     initComponents();
     setPreferredSize(new Dimension(350, 250));

@@ -73,6 +73,7 @@ public class EnvelopesPropertyEditorPanel
    * @param modelManager Manages the system model.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public EnvelopesPropertyEditorPanel(ModelManager modelManager) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
 

@@ -51,6 +51,7 @@ public class DrawingViewScrollPane
    * @param drawingView The drawing view.
    * @param placardPanel The view's placard panel.
    */
+  @SuppressWarnings("this-escape")
   public DrawingViewScrollPane(OpenTCSDrawingView drawingView,
                                DrawingViewPlacardPanel placardPanel) {
     this.drawingView = requireNonNull(drawingView, "drawingView");

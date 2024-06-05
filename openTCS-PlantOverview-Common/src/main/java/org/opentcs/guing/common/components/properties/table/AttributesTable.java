@@ -48,6 +48,7 @@ public class AttributesTable
    * @param appState Stores the application's current state.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public AttributesTable(ApplicationState appState) {
     this.appState = requireNonNull(appState, "appState");
     setStyle();

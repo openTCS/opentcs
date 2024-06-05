@@ -131,6 +131,7 @@ public abstract class AbstractOpenTCSDrawingView
    * @param appState Stores the application's current state.
    * @param modelManager Provides the current system model.
    */
+  @SuppressWarnings("this-escape")
   public AbstractOpenTCSDrawingView(ApplicationState appState, ModelManager modelManager) {
     this.appState = requireNonNull(appState, "appState");
     this.modelManager = requireNonNull(modelManager, "modelManager");

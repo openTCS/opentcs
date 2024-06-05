@@ -56,6 +56,7 @@ public class SymbolPropertyEditorPanel
    * @param locationTheme The location theme to be used.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public SymbolPropertyEditorPanel(@Nonnull LocationTheme locationTheme) {
     this.locationTheme = requireNonNull(locationTheme, "locationTheme");
 

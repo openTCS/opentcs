@@ -157,6 +157,7 @@ public class OpenTCSModelManager
    * @param progressIndicator The progress indicator to be used.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public OpenTCSModelManager(CourseObjectFactory crsObjFactory,
                              ModelComponentFactory modelComponentFactory,
                              ProcessAdapterUtil procAdapterUtil,

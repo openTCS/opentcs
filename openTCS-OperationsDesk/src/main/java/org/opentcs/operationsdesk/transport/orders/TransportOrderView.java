@@ -61,6 +61,7 @@ public class TransportOrderView
    * @param historyEntryFormatter A formatter for history entries.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public TransportOrderView(@Assisted TransportOrder order,
                             CompositeObjectHistoryEntryFormatter historyEntryFormatter) {
     this.fTransportOrder = requireNonNull(order, "order");

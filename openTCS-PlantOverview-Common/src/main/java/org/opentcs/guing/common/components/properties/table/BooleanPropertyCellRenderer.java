@@ -23,6 +23,7 @@ public class BooleanPropertyCellRenderer
   /**
    * Creates a new instance of BooleanCellRenderer.
    */
+  @SuppressWarnings("this-escape")
   public BooleanPropertyCellRenderer() {
     super();
     setHorizontalAlignment(JCheckBox.LEFT);

@@ -37,6 +37,7 @@ public class UploadModelToKernelAction
    *
    * @param openTCSView The openTCS view
    */
+  @SuppressWarnings("this-escape")
   public UploadModelToKernelAction(OpenTCSView openTCSView) {
     this.openTCSView = Objects.requireNonNull(openTCSView);
 

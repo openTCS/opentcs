@@ -30,6 +30,7 @@ public class SplashFrame
   /**
    * Creates new form SplashFrame
    */
+  @SuppressWarnings("this-escape")
   public SplashFrame() {
     initComponents();
   }

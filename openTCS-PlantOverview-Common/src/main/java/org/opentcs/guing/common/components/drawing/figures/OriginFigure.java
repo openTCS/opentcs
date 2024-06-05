@@ -48,6 +48,7 @@ public class OriginFigure
   /**
    * Creates a new instance.
    */
+  @SuppressWarnings("this-escape")
   public OriginFigure() {
     super();
     fSideLength = 20;

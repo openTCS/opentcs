@@ -60,6 +60,7 @@ public class ViewMenu
    * @param menuPluginPanels A menu for showing/hiding plugin panels.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public ViewMenu(ViewActionMap actionMap,
                   ToolBarManager toolBarManager,
                   ViewPluginPanelsMenu menuPluginPanels) {

@@ -39,6 +39,7 @@ public class CreateLocationTypeAction
    *
    * @param guiManager The GUI manager instance we're working with.
    */
+  @SuppressWarnings("this-escape")
   public CreateLocationTypeAction(GuiManagerModeling guiManager) {
     this.guiManager = guiManager;
 

@@ -60,6 +60,7 @@ public class PauseAllVehiclesAction
    * @param portalProvider Provides access to a portal.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public PauseAllVehiclesAction(ModelManager modelManager,
                                 SharedKernelServicePortalProvider portalProvider) {
     this.modelManager = requireNonNull(modelManager, "modelManager");

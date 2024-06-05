@@ -46,6 +46,7 @@ public abstract class AlignAction
    *
    * @param editor The drawing editor
    */
+  @SuppressWarnings("this-escape")
   public AlignAction(DrawingEditor editor) {
     super(editor);
     updateEnabledState();
@@ -96,6 +97,7 @@ public abstract class AlignAction
   public static class North
       extends AlignAction {
 
+    @SuppressWarnings("this-escape")
     public North(DrawingEditor editor) {
       super(editor);
 
@@ -124,6 +126,7 @@ public abstract class AlignAction
   public static class East
       extends AlignAction {
 
+    @SuppressWarnings("this-escape")
     public East(DrawingEditor editor) {
       super(editor);
 
@@ -152,6 +155,7 @@ public abstract class AlignAction
   public static class West
       extends AlignAction {
 
+    @SuppressWarnings("this-escape")
     public West(DrawingEditor editor) {
       super(editor);
 
@@ -180,6 +184,7 @@ public abstract class AlignAction
   public static class South
       extends AlignAction {
 
+    @SuppressWarnings("this-escape")
     public South(DrawingEditor editor) {
       super(editor);
 
@@ -208,6 +213,7 @@ public abstract class AlignAction
   public static class Vertical
       extends AlignAction {
 
+    @SuppressWarnings("this-escape")
     public Vertical(DrawingEditor editor) {
       super(editor);
 
@@ -236,6 +242,7 @@ public abstract class AlignAction
   public static class Horizontal
       extends AlignAction {
 
+    @SuppressWarnings("this-escape")
     public Horizontal(DrawingEditor editor) {
       super(editor);
 

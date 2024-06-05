@@ -52,6 +52,7 @@ public class SelectionPanel
    * @param items The selectable values.
    * @param item The value that is initially selected.
    */
+  @SuppressWarnings("this-escape")
   public SelectionPanel(String title, String text, List<?> items, Object item) {
     initComponents();
     label.setText(text + ":");

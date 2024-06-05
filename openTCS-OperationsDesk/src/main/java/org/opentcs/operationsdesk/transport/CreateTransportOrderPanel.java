@@ -90,6 +90,7 @@ public class CreateTransportOrderPanel
    * @param orderTypeSuggestionsPool The transport order types to suggest.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public CreateTransportOrderPanel(ModelManager modelManager,
                                    OrderTypeSuggestionsPool orderTypeSuggestionsPool) {
     this.fModelManager = requireNonNull(modelManager, "modelManager");

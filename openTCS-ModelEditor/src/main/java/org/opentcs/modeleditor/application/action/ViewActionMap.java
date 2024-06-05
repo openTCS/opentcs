@@ -50,6 +50,7 @@ public class ViewActionMap
    * @param loadModelFromKernelAction The action to load the current kernel model.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public ViewActionMap(OpenTCSView view,
                        UndoRedoManager undoRedoManager,
                        AboutAction aboutAction,

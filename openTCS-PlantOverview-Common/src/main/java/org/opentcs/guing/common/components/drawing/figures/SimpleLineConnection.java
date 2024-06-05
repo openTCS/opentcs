@@ -49,6 +49,7 @@ public abstract class SimpleLineConnection
    *
    * @param model The model corresponding to this graphical object.
    */
+  @SuppressWarnings("this-escape")
   public SimpleLineConnection(AbstractConnection model) {
     set(FigureConstants.MODEL, model);
     initConnectionFigure();

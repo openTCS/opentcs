@@ -24,6 +24,7 @@ public class LocalVehicleEntry {
   /**
    * Used for implementing property change events.
    */
+  @SuppressWarnings("this-escape")
   private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
   /**
    * Detailed information about the attachment state.

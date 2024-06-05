@@ -33,6 +33,7 @@ public class HelpMenu
    * @param actionMap The application's action map.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public HelpMenu(ViewActionMap actionMap) {
     requireNonNull(actionMap, "actionMap");
 

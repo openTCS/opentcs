@@ -80,6 +80,7 @@ public class DefaultPointSelectedAction
    * @param popupButton The popup button
    * @param group The button group
    */
+  @SuppressWarnings("this-escape")
   public DefaultPointSelectedAction(DrawingEditor editor,
                                     Tool tool,
                                     PointModel.Type pointType,

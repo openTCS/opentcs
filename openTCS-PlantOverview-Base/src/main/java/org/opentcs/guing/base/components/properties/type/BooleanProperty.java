@@ -30,6 +30,7 @@ public class BooleanProperty
    * @param model The model component.
    * @param value The value.
    */
+  @SuppressWarnings("this-escape")
   public BooleanProperty(ModelComponent model, boolean value) {
     super(model);
     setValue(value);

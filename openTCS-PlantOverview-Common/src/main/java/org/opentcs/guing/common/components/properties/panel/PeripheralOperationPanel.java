@@ -41,6 +41,7 @@ public class PeripheralOperationPanel
    *
    * @param model The current system model.
    */
+  @SuppressWarnings("this-escape")
   public PeripheralOperationPanel(SystemModel model) {
     initComponents();
 

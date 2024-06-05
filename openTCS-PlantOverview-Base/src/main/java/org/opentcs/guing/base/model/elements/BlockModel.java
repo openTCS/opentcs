@@ -54,6 +54,7 @@ public class BlockModel
   /**
    * Creates a new instance.
    */
+  @SuppressWarnings("this-escape")
   public BlockModel() {
     super("");
     createProperties();

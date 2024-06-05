@@ -35,6 +35,7 @@ public class FilterButton
    * @param filter The Filter to apply.
    * @param sorter The row sorter to apply the filter to.
    */
+  @SuppressWarnings("this-escape")
   public FilterButton(ImageIcon icon,
                       RowFilter<Object, Object> filter,
                       FilteredRowSorter<? extends TableModel> sorter) {

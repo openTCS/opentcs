@@ -23,6 +23,7 @@ public class OrdersTable
    *
    * @param tableModel das Tabellenmodell
    */
+  @SuppressWarnings("this-escape")
   public OrdersTable(TableModel tableModel) {
     super(tableModel);
 

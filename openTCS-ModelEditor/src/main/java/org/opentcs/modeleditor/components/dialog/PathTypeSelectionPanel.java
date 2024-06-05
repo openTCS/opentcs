@@ -27,6 +27,7 @@ public class PathTypeSelectionPanel
   /**
    * Creates new form PathTypeSelection.
    */
+  @SuppressWarnings("this-escape")
   public PathTypeSelectionPanel() {
     setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MISC_PATH)
         .getString("pathTypeSelection.title"));

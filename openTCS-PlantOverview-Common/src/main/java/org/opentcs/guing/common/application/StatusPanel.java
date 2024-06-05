@@ -40,6 +40,7 @@ public class StatusPanel
   /**
    * Creates a new instance.
    */
+  @SuppressWarnings("this-escape")
   public StatusPanel() {
     initComponents();
   }

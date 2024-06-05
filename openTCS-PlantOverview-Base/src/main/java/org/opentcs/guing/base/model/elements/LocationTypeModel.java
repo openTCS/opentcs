@@ -45,6 +45,7 @@ public class LocationTypeModel
   /**
    * Creates a new instance.
    */
+  @SuppressWarnings("this-escape")
   public LocationTypeModel() {
     createProperties();
   }

@@ -33,6 +33,7 @@ public class LoadModelAction
    *
    * @param view The gui manager
    */
+  @SuppressWarnings("this-escape")
   public LoadModelAction(GuiManager view) {
     this.view = view;
 

@@ -114,6 +114,7 @@ public class PathConnection
    * @param drawingOptions The drawing options.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public PathConnection(@Assisted PathModel model,
                         ToolTipTextGenerator textGenerator,
                         DrawingOptions drawingOptions) {

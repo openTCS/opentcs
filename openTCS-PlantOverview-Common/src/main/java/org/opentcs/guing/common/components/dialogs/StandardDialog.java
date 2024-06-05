@@ -44,6 +44,7 @@ public class StandardDialog
    * @param content The content component.
    * @param title The title of the dialog.
    */
+  @SuppressWarnings("this-escape")
   public StandardDialog(Component parent, boolean modal, JComponent content, String title) {
     super(JOptionPane.getFrameForComponent(parent), title, modal);
     initComponents();

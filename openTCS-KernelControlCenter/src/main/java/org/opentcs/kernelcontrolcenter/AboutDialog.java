@@ -23,6 +23,7 @@ public class AboutDialog
    * @param parent The parent frame.
    * @param modal Whether the dialog blocks user input to other top-level windows when shown.
    */
+  @SuppressWarnings("this-escape")
   public AboutDialog(Frame parent, boolean modal) {
     super(parent, modal);
     initComponents();

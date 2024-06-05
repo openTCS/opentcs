@@ -56,6 +56,7 @@ public class PauseAction
    * @param portalProvider Provides access to a shared portal.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public PauseAction(@Assisted Collection<VehicleModel> vehicles,
                      @Assisted boolean pause,
                      SharedKernelServicePortalProvider portalProvider) {

@@ -48,6 +48,7 @@ public class RerouteAction
    * @param dialogParent The parent component for dialogs shown by this action.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public RerouteAction(@Assisted Collection<VehicleModel> vehicles,
                        @Assisted ReroutingType reroutingType,
                        SharedKernelServicePortalProvider portalProvider,

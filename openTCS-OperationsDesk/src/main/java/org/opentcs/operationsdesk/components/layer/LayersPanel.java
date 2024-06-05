@@ -57,6 +57,7 @@ public class LayersPanel
   private LayersTableModel tableModel;
 
   @Inject
+  @SuppressWarnings("this-escape")
   public LayersPanel(ModelManager modelManager,
                      LayerManager layerManager,
                      LayerGroupManager layerGroupManager,

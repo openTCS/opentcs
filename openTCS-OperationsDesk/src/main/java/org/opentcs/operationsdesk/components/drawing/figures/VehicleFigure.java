@@ -131,6 +131,7 @@ public class VehicleFigure
    * @param applicationState The application's current state.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public VehicleFigure(VehicleTheme vehicleTheme,
                        MenuFactory menuFactory,
                        OperationsDeskConfiguration appConfig,

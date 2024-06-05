@@ -66,6 +66,7 @@ public class CreatePeripheralJobAction
    * @param portalProvider Provides access to the kernel service portal.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public CreatePeripheralJobAction(@ApplicationFrame Component dialogParent,
                                    Provider<CreatePeripheralJobPanel> peripheralJobPanel,
                                    SharedKernelServicePortalProvider portalProvider) {

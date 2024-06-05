@@ -27,6 +27,7 @@ public class FileImportMenu
       = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
 
   @Inject
+  @SuppressWarnings("this-escape")
   public FileImportMenu(Set<PlantModelImporter> importers,
                         GuiManager guiManager) {
     super(LABELS.getString("fileImportMenu.text"));

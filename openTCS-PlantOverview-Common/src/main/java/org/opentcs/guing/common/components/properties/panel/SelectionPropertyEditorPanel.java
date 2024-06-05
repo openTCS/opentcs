@@ -36,7 +36,7 @@ public class SelectionPropertyEditorPanel
   /**
    * Creates new form SelectionPropertyEditorPanel
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "this-escape"})
   public SelectionPropertyEditorPanel(ListCellRenderer<?> listCellRenderer) {
     requireNonNull(listCellRenderer, "listCellRenderer");
 

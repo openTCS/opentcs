@@ -39,6 +39,7 @@ public class CreateBlockAction
    *
    * @param guiManager The GUI manager instance we're working with.
    */
+  @SuppressWarnings("this-escape")
   public CreateBlockAction(GuiManagerModeling guiManager) {
     this.guiManager = guiManager;
 

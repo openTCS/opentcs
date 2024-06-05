@@ -47,6 +47,7 @@ public class LayoutModel
   /**
    * Creates a new instance.
    */
+  @SuppressWarnings("this-escape")
   public LayoutModel() {
     super(ResourceBundle.getBundle(BUNDLE_PATH).getString("layoutModel.treeViewName"));
     createProperties();

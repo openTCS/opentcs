@@ -41,6 +41,7 @@ public class ColorPropertyCellEditor
   /**
    * Creates a new instance of ColorPropertyCellEditor.
    */
+  @SuppressWarnings("this-escape")
   public ColorPropertyCellEditor() {
     super();
     fButton = new JButton();

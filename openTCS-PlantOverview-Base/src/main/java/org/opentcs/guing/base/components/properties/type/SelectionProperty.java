@@ -42,6 +42,7 @@ public class SelectionProperty<E extends Enum<E>>
    * @param possibleValues The possible values.
    * @param value The value.
    */
+  @SuppressWarnings("this-escape")
   public SelectionProperty(ModelComponent model, List<E> possibleValues,
                            Object value) {
     super(model);

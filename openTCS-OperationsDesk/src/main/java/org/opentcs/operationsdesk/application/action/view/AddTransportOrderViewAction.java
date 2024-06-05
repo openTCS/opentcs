@@ -34,6 +34,7 @@ public class AddTransportOrderViewAction
    *
    * @param view The openTCS view
    */
+  @SuppressWarnings("this-escape")
   public AddTransportOrderViewAction(OpenTCSView view) {
     this.view = requireNonNull(view, "view");
 

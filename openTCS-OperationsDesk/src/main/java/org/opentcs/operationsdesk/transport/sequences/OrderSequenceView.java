@@ -73,6 +73,7 @@ public class OrderSequenceView
    * @param portalProvider Provides access to a portal.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public OrderSequenceView(@Assisted OrderSequence sequence,
                            @Nonnull CompositeObjectHistoryEntryFormatter historyEntryFormatter,
                            SharedKernelServicePortalProvider portalProvider) {

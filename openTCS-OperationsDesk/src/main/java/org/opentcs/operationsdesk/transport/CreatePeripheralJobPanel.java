@@ -47,6 +47,7 @@ public class CreatePeripheralJobPanel
    * @param modelManager The model manager.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public CreatePeripheralJobPanel(ModelManager modelManager) {
     requireNonNull(modelManager, "modelManager");
     locations = modelManager.getModel().getLocationModels().stream()

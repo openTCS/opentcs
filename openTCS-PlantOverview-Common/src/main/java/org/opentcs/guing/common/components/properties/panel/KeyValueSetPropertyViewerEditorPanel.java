@@ -43,6 +43,7 @@ public class KeyValueSetPropertyViewerEditorPanel
    * Creates a new instance.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public KeyValueSetPropertyViewerEditorPanel() {
     initComponents();
 

@@ -62,6 +62,7 @@ public class PeripheralDetailPanel
    * @param panelFactories The factories to create adapter specific panels with.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public PeripheralDetailPanel(Set<PeripheralCommAdapterPanelFactory> panelFactories) {
     this.panelFactories = requireNonNull(panelFactories, "panelFactories");
 

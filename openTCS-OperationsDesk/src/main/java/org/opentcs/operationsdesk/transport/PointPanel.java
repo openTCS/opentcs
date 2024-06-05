@@ -42,6 +42,7 @@ public class PointPanel
    *
    * @param items possible destination points
    */
+  @SuppressWarnings("this-escape")
   public PointPanel(List<PointModel> items) {
     initComponents();
     fItems = items;

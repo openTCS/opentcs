@@ -38,6 +38,7 @@ public class EditMenu
    * @param actionMap The application's action map.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public EditMenu(ViewActionMap actionMap) {
     requireNonNull(actionMap, "actionMap");
 

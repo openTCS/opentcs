@@ -110,6 +110,7 @@ public class DetailPanel
    * @param panelFactories The factories to create adapter specific panels.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public DetailPanel(KernelServicePortal servicePortal,
                      @ServiceCallWrapper CallWrapper callWrapper,
                      @ApplicationEventBus EventSource eventSource,

@@ -35,6 +35,7 @@ public class NewModelAction
    *
    * @param view The gui manager
    */
+  @SuppressWarnings("this-escape")
   public NewModelAction(GuiManager view) {
     this.view = view;
 

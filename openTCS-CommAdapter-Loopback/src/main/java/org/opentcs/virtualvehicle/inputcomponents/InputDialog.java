@@ -52,6 +52,7 @@ public class InputDialog
    * Create a new instance of <code>InputDialog</code>.
    * @param panel the panel to be displayed in the dialog.
    */
+  @SuppressWarnings("this-escape")
   public InputDialog(InputPanel panel) {
     super();
     initComponents();

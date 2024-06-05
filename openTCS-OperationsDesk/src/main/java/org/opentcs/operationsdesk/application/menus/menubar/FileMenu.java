@@ -48,6 +48,7 @@ public class FileMenu
    * @param actionMap The application's action map.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public FileMenu(ViewActionMap actionMap) {
     requireNonNull(actionMap, "actionMap");
 

@@ -31,6 +31,7 @@ public class ApplicationMenuBar
    * @param menuHelp The "Help menu.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public ApplicationMenuBar(FileMenu menuFile,
                             ActionsMenu menuActions,
                             ViewMenu menuView,

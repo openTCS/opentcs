@@ -43,6 +43,7 @@ public class AttributeAction
 
   protected Map<AttributeKey, Object> attributes;
 
+  @SuppressWarnings("this-escape")
   public AttributeAction(DrawingEditor editor,
                          AttributeKey key,
                          Object value,
@@ -58,6 +59,7 @@ public class AttributeAction
     updateEnabledState();
   }
 
+  @SuppressWarnings("this-escape")
   public AttributeAction(DrawingEditor editor,
                          Map<AttributeKey, Object> attributes,
                          String name,

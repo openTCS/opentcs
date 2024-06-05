@@ -39,6 +39,7 @@ public class AddBitmapAction
    *
    * @param view The openTCS view
    */
+  @SuppressWarnings("this-escape")
   public AddBitmapAction(OpenTCSView view) {
     this.view = Objects.requireNonNull(view, "view");
 

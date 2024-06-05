@@ -53,6 +53,7 @@ public class EditorColorChooserAction
    * @param icon The icon
    * @param fixedAttributes The fixed attributes
    */
+  @SuppressWarnings("this-escape")
   public EditorColorChooserAction(DrawingEditor editor,
                                   AttributeKey<Color> key,
                                   String name,

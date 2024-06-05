@@ -21,6 +21,7 @@ import org.opentcs.guing.common.components.drawing.course.Origin;
 public class OffsetFigure
     extends OriginFigure {
 
+  @SuppressWarnings("this-escape")
   public OffsetFigure() {
     super();
     setModel(new Origin()); // The figure needs a model to work

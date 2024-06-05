@@ -55,6 +55,7 @@ public class KeyValuePropertyEditorPanel
    * @param propertySuggestions The properties that are suggested.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public KeyValuePropertyEditorPanel(MergedPropertySuggestions propertySuggestions) {
     this.propertySuggestions = requireNonNull(propertySuggestions, "propertySuggestions");
     initComponents();

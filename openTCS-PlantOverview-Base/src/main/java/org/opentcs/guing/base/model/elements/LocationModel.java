@@ -99,6 +99,7 @@ public class LocationModel
   /**
    * Creates a new instance.
    */
+  @SuppressWarnings("this-escape")
   public LocationModel() {
     createProperties();
   }

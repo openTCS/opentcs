@@ -47,6 +47,7 @@ public class ResourcePropertyViewerEditorPanel
    * Creates a new instance.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public ResourcePropertyViewerEditorPanel() {
     initComponents();
 

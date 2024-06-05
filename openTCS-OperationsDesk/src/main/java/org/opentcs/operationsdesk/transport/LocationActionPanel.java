@@ -43,6 +43,7 @@ public class LocationActionPanel
    *
    * @param locations The location models.
    */
+  @SuppressWarnings("this-escape")
   public LocationActionPanel(List<LocationModel> locations) {
     this.fLocations = requireNonNull(locations, "locations");
 

@@ -86,6 +86,7 @@ public class CloseFileAction
    *
    * @param view The openTCS view
    */
+  @SuppressWarnings("this-escape")
   public CloseFileAction(OpenTCSView view) {
     this.view = requireNonNull(view, "view");
 

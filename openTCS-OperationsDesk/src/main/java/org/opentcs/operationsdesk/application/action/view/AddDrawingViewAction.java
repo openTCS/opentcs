@@ -33,6 +33,7 @@ public class AddDrawingViewAction
    *
    * @param view The openTCS view
    */
+  @SuppressWarnings("this-escape")
   public AddDrawingViewAction(OpenTCSView view) {
     this.view = view;
 

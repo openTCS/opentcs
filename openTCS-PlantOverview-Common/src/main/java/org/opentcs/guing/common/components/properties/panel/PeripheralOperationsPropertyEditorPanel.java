@@ -51,6 +51,7 @@ public class PeripheralOperationsPropertyEditorPanel
    * @param modelManager Manages the system model.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public PeripheralOperationsPropertyEditorPanel(ModelManager modelManager) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
 

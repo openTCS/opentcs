@@ -103,6 +103,7 @@ public class DefaultAttributeAction
     this(editor, keys, name, icon, new HashMap<AttributeKey, Object>());
   }
 
+  @SuppressWarnings("this-escape")
   public DefaultAttributeAction(
       DrawingEditor editor,
       AttributeKey[] keys,

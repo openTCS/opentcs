@@ -27,6 +27,7 @@ public class ExportPlantModelAction
    * @param exporter The importer.
    * @param guiManager The gui manager
    */
+  @SuppressWarnings("this-escape")
   public ExportPlantModelAction(PlantModelExporter exporter, GuiManager guiManager) {
     this.exporter = requireNonNull(exporter, "exporter");
     this.guiManager = requireNonNull(guiManager, "guiManager");

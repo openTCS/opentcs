@@ -61,6 +61,7 @@ public class SendVehicleToPointAction
    * @param orderUtil A helper for creating transport orders with the kernel.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public SendVehicleToPointAction(@Assisted VehicleModel vehicle,
                                   @ApplicationFrame JFrame applicationFrame,
                                   ModelManager modelManager,

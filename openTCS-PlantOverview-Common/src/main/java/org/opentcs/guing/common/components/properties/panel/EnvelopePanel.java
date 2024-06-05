@@ -76,6 +76,7 @@ public class EnvelopePanel
    * {@link EnvelopesProperty} to which the envelope being edited in this panel belongs.
    * @param systemModel The current system model.
    */
+  @SuppressWarnings("this-escape")
   public EnvelopePanel(EnvelopeModel envelopeTemplate,
                        Mode mode,
                        Set<String> propertyEnvelopeKeys,

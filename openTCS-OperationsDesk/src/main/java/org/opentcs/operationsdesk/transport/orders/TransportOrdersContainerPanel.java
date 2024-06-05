@@ -116,6 +116,7 @@ public class TransportOrdersContainerPanel
    * @param transportOrderContainer Maintains a set of transport order on the kernel side.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public TransportOrdersContainerPanel(SharedKernelServicePortalProvider portalProvider,
                                        TransportOrderUtil orderUtil,
                                        Provider<CreateTransportOrderPanel> orderPanelProvider,

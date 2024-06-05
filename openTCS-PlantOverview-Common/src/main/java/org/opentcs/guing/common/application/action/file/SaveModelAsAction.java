@@ -37,6 +37,7 @@ public class SaveModelAsAction
    *
    * @param manager The gui manager
    */
+  @SuppressWarnings("this-escape")
   public SaveModelAsAction(final GuiManager manager) {
     this.guiManager = manager;
 

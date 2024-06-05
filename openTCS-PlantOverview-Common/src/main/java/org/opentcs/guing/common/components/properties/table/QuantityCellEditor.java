@@ -29,6 +29,7 @@ public class QuantityCellEditor
    * @param textField
    * @param umh
    */
+  @SuppressWarnings("this-escape")
   public QuantityCellEditor(JTextField textField, UserMessageHelper umh) {
     super(textField, umh);
     setStyle(textField);

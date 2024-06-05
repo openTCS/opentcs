@@ -80,6 +80,7 @@ public class ModelToLayoutMenuItem
    * figures will be considered.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public ModelToLayoutMenuItem(OpenTCSDrawingEditor drawingEditor,
                                UndoRedoManager undoRedoManager,
                                @ApplicationEventBus EventHandler eventHandler,

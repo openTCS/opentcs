@@ -83,6 +83,7 @@ public class PathModel
   /**
    * Creates a new instance.
    */
+  @SuppressWarnings("this-escape")
   public PathModel() {
     createProperties();
   }

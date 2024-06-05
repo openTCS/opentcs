@@ -45,6 +45,7 @@ public class VehicleProcessModel {
   /**
    * Used for implementing property change events.
    */
+  @SuppressWarnings("this-escape")
   private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
   /**
    * The vehicle properties set by the driver.

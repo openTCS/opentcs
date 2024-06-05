@@ -64,6 +64,7 @@ public class CreateTransportOrderAction
    * @param typeSuggestionsPool The pool of suggested transport order types.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public CreateTransportOrderAction(TransportOrderUtil orderUtil,
                                     @ApplicationFrame Component dialogParent,
                                     Provider<CreateTransportOrderPanel> orderPanelProvider,

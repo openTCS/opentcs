@@ -91,6 +91,7 @@ public class DriverGUI
    * @param detailPanel The detail panel to display.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public DriverGUI(@Nonnull KernelServicePortal servicePortal,
                    @Nonnull @ServiceCallWrapper CallWrapper callWrapper,
                    @Nonnull LocalVehicleEntryPool vehicleEntryPool,

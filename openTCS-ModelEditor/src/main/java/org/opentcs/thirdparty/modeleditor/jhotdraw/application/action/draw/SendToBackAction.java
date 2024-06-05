@@ -50,6 +50,7 @@ public class SendToBackAction
    *
    * @param editor The drawing editor
    */
+  @SuppressWarnings("this-escape")
   public SendToBackAction(DrawingEditor editor) {
     super(editor);
 

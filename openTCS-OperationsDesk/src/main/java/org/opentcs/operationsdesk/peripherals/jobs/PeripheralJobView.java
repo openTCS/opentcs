@@ -56,6 +56,7 @@ public class PeripheralJobView
    * @param historyEntryFormatter A formatter for history entries.
    */
   @Inject
+  @SuppressWarnings("this-escape")
   public PeripheralJobView(@Nonnull @Assisted PeripheralJob job,
                            @Nonnull CompositeObjectHistoryEntryFormatter historyEntryFormatter) {
     this.peripheralJob = requireNonNull(job, "job");

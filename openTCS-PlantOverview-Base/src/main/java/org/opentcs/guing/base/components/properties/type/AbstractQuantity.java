@@ -69,6 +69,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
    * @param unitClass The unit class.
    * @param relations The relations.
    */
+  @SuppressWarnings("this-escape")
   public AbstractQuantity(ModelComponent model, double value, U unit, Class<U> unitClass,
                           List<Relation<U>> relations) {
     super(model);

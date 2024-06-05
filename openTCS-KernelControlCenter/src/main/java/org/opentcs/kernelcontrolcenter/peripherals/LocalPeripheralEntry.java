@@ -24,6 +24,7 @@ public class LocalPeripheralEntry {
   /**
    * Used for implementing property change events.
    */
+  @SuppressWarnings("this-escape")
   private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
   /**
    * The location representing the peripheral device.

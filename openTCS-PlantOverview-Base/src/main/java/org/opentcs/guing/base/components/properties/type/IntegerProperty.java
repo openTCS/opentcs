@@ -30,6 +30,7 @@ public class IntegerProperty
    * @param model The model component.
    * @param value The value.
    */
+  @SuppressWarnings("this-escape")
   public IntegerProperty(ModelComponent model, int value) {
     super(model);
     setValue(value);

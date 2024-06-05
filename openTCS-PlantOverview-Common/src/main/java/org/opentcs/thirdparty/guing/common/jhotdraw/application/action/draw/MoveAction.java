@@ -53,6 +53,7 @@ public abstract class MoveAction
    * @param dx The X offset by which to move.
    * @param dy The Y offset by which to move.
    */
+  @SuppressWarnings("this-escape")
   public MoveAction(DrawingEditor editor, int dx, int dy) {
     super(editor);
     this.dx = dx;
@@ -105,6 +106,7 @@ public abstract class MoveAction
      *
      * @param editor The application's drawing editor.
      */
+    @SuppressWarnings("this-escape")
     public East(DrawingEditor editor) {
       super(editor, 1, 0);
 
@@ -129,6 +131,7 @@ public abstract class MoveAction
      *
      * @param editor The application's drawing editor.
      */
+    @SuppressWarnings("this-escape")
     public West(DrawingEditor editor) {
       super(editor, -1, 0);
 
@@ -153,6 +156,7 @@ public abstract class MoveAction
      *
      * @param editor The application's drawing editor.
      */
+    @SuppressWarnings("this-escape")
     public North(DrawingEditor editor) {
       super(editor, 0, -1);
 
@@ -177,6 +181,7 @@ public abstract class MoveAction
      *
      * @param editor The application's drawing editor.
      */
+    @SuppressWarnings("this-escape")
     public South(DrawingEditor editor) {
       super(editor, 0, 1);
 

@@ -49,6 +49,7 @@ public class IntendedVehiclesPanel
    *
    * @param items possible vehicles
    */
+  @SuppressWarnings("this-escape")
   public IntendedVehiclesPanel(Set<Vehicle> items) {
     requireNonNull(items, "items");
 
