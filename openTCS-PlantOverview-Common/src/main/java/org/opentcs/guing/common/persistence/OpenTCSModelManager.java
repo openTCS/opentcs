@@ -307,7 +307,6 @@ public class OpenTCSModelManager
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public void restoreModel(KernelServicePortal portal) {
     requireNonNull(portal, "portal");
 

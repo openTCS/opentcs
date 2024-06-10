@@ -10,58 +10,173 @@ package org.opentcs.drivers.vehicle;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.Map;
+import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
-import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A command for moving a step.
  */
-@ScheduledApiChange(when = "6.0", details = "Will become a class with 'with' methods.")
-public interface MovementCommand {
+public class MovementCommand {
 
   /**
    * A constant indicating there is no operation to be executed after moving.
    */
-  String NO_OPERATION = DriveOrder.Destination.OP_NOP;
+  public static final String NO_OPERATION = DriveOrder.Destination.OP_NOP;
   /**
-   * A constant indicating the vehicle should basically just move to a point
-   * without a location associated to it.
+   * A constant indicating the vehicle should basically just move to a point without a location
+   * associated to it.
    */
-  String MOVE_OPERATION = DriveOrder.Destination.OP_MOVE;
+  public static final String MOVE_OPERATION = DriveOrder.Destination.OP_MOVE;
   /**
    * A constant for parking the vehicle. (Again, basically doing nothing at the destination.)
    */
-  String PARK_OPERATION = DriveOrder.Destination.OP_PARK;
+  public static final String PARK_OPERATION = DriveOrder.Destination.OP_PARK;
+  /**
+   * The transport order this movement belongs to.
+   */
+  private final TransportOrder transportOrder;
+  /**
+   * The drive order this movement belongs to.
+   */
+  private final DriveOrder driveOrder;
+  /**
+   * The step describing the movement.
+   */
+  private final Route.Step step;
+  /**
+   * The operation to be executed after moving.
+   */
+  private final String operation;
+  /**
+   * The location at which the operation is to be executed.
+   * May be <code>null</code> if the movement command's <em>operation</em> is considred an empty
+   * operation (i.e. is {@link #NO_OPERATION}, {@link #MOVE_OPERATION} or {@link #PARK_OPERATION}).
+   */
+  private final Location opLocation;
+  /**
+   * Indicates whether this movement is the final one for the drive order it belongs to.
+   */
+  private final boolean finalMovement;
+  /**
+   * The destination position of the whole drive order.
+   */
+  private final Point finalDestination;
+  /**
+   * The destination location of the whole drive order.
+   */
+  private final Location finalDestinationLocation;
+  /**
+   * The operation to be executed at the destination position.
+   */
+  private final String finalOperation;
+  /**
+   * Properties of the order this command is part of.
+   */
+  private final Map<String, String> properties;
+
+  /**
+   * Creates a new instance.
+   *
+   * @param transportOrder The transport order this movement belongs to.
+   * @param driveOrder The drive order this movement belongs to.
+   * @param step The step describing the movement.
+   * @param operation The operation to be executed after moving.
+   * @param opLocation The location at which the operation is to be executed.
+   * May be <code>null</code> if the movement command's <em>operation</em> is considred an empty
+   * operation (i.e. is {@link #NO_OPERATION}, {@link #MOVE_OPERATION} or {@link #PARK_OPERATION}).
+   * @param finalMovement Indicates whether this movement is the final one in the drive order it
+   * belongs to.
+   * @param finalDestinationLocation The destination location of the whole drive order.
+   * @param finalDestination The destination position of the whole drive order.
+   * @param finalOperation The operation to be executed at the destination position.
+   * @param properties Properties of the order this command is part of.
+   */
+  public MovementCommand(@Nonnull TransportOrder transportOrder,
+                         @Nonnull DriveOrder driveOrder,
+                         @Nonnull Route.Step step,
+                         @Nonnull String operation,
+                         @Nullable Location opLocation,
+                         boolean finalMovement,
+                         @Nullable Location finalDestinationLocation,
+                         @Nonnull Point finalDestination,
+                         @Nonnull String finalOperation,
+                         @Nonnull Map<String, String> properties) {
+    this.transportOrder = requireNonNull(transportOrder, "transportOrder");
+    this.driveOrder = requireNonNull(driveOrder, "driveOrder");
+    this.step = requireNonNull(step, "step");
+    this.operation = requireNonNull(operation, "operation");
+    this.finalMovement = finalMovement;
+    this.finalDestinationLocation = finalDestinationLocation;
+    this.finalDestination = requireNonNull(finalDestination, "finalDestination");
+    this.finalOperation = requireNonNull(finalOperation, "finalOperation");
+    this.properties = requireNonNull(properties, "properties");
+    if (opLocation == null && !isEmptyOperation(operation)) {
+      throw new NullPointerException("opLocation is null while operation is not considered empty");
+    }
+    this.opLocation = opLocation;
+  }
 
   /**
    * Returns the transport order this movement belongs to.
    *
    * @return The transport order this movement belongs to.
    */
-  TransportOrder getTransportOrder();
+  @Nonnull
+  public TransportOrder getTransportOrder() {
+    return transportOrder;
+  }
+
+  /**
+   * Creates a copy of this object, with the given transport order.
+   *
+   * @param transportOrder The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public MovementCommand withTransportOrder(@Nonnull TransportOrder transportOrder) {
+    return new MovementCommand(transportOrder,
+                               driveOrder,
+                               step,
+                               operation,
+                               opLocation,
+                               finalMovement,
+                               finalDestinationLocation,
+                               finalDestination,
+                               finalOperation,
+                               properties);
+  }
 
   /**
    * Returns the drive order this movement belongs to.
    *
    * @return The drive order this movement belongs to.
    */
-  DriveOrder getDriveOrder();
+  @Nonnull
+  public DriveOrder getDriveOrder() {
+    return driveOrder;
+  }
 
   /**
-   * Returns the route that this movement belongs to.
+   * Creates a copy of this object, with the given drive order.
    *
-   * @return The route that this movement belongs to.
-   * @deprecated Use the route provided as part of {@link #getDriveOrder()}, instead.
+   * @param driveOrder The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
    */
-  @Deprecated
-  @Nonnull
-  default Route getRoute() {
-    return getDriveOrder().getRoute();
+  public MovementCommand withDriveOrder(@Nonnull DriveOrder driveOrder) {
+    return new MovementCommand(transportOrder,
+                               driveOrder,
+                               step,
+                               operation,
+                               opLocation,
+                               finalMovement,
+                               finalDestinationLocation,
+                               finalDestination,
+                               finalOperation,
+                               properties);
   }
 
   /**
@@ -70,7 +185,28 @@ public interface MovementCommand {
    * @return The step describing the movement.
    */
   @Nonnull
-  Step getStep();
+  public Route.Step getStep() {
+    return step;
+  }
+
+  /**
+   * Creates a copy of this object, with the given step.
+   *
+   * @param step The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public MovementCommand withStep(@Nonnull Route.Step step) {
+    return new MovementCommand(transportOrder,
+                               driveOrder,
+                               step,
+                               operation,
+                               opLocation,
+                               finalMovement,
+                               finalDestinationLocation,
+                               finalDestination,
+                               finalOperation,
+                               properties);
+  }
 
   /**
    * Returns the operation to be executed after moving.
@@ -78,52 +214,132 @@ public interface MovementCommand {
    * @return The operation to be executed after moving.
    */
   @Nonnull
-  String getOperation();
+  public String getOperation() {
+    return operation;
+  }
 
   /**
-   * Checks whether an operation is to be executed in addition to moving or not.
+   * Creates a copy of this object, with the given operation.
    *
-   * @return <code>true</code> if, and only if, no operation is to be executed.
-   * @deprecated Use {@link #hasEmptyOperation()} instead.
+   * @param operation The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
    */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  boolean isWithoutOperation();
+  public MovementCommand withOperation(@Nonnull String operation) {
+    return new MovementCommand(transportOrder,
+                               driveOrder,
+                               step,
+                               operation,
+                               opLocation,
+                               finalMovement,
+                               finalDestinationLocation,
+                               finalDestination,
+                               finalOperation,
+                               properties);
+  }
 
   /**
    * Indicates whether an operation is to be executed in addition to moving or not.
    *
    * @return <code>true</code> if, and only if, no operation is to be executed.
    */
-  default boolean hasEmptyOperation() {
-    return isWithoutOperation();
+  public boolean hasEmptyOperation() {
+    return isEmptyOperation(operation);
   }
 
   /**
-   * Returns the location at which the operation is to be executed. (May be
-   * <code>null</code> if <em>operation</em> is <code>NO_OPERATION</code>.)
+   * Returns the location at which the operation is to be executed.
+   * <p>
+   * May be <code>null</code> if the movement command's <em>operation</em> is considred an empty
+   * operation (i.e. is {@link #NO_OPERATION}, {@link #MOVE_OPERATION} or {@link #PARK_OPERATION}).
+   * </p>
    *
    * @return The location at which the operation is to be executed.
    */
   @Nullable
-  Location getOpLocation();
+  public Location getOpLocation() {
+    return opLocation;
+  }
+
+  /**
+   * Creates a copy of this object, with the given location at which the operation is to be
+   * executed.
+   * <p>
+   * May be <code>null</code> if the movement command's <em>operation</em> is considred an empty
+   * operation (i.e. is {@link #NO_OPERATION}, {@link #MOVE_OPERATION} or {@link #PARK_OPERATION}).
+   * </p>
+   *
+   * @param opLocation The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public MovementCommand withOpLocation(@Nullable Location opLocation) {
+    return new MovementCommand(transportOrder,
+                               driveOrder,
+                               step,
+                               operation,
+                               opLocation,
+                               finalMovement,
+                               finalDestinationLocation,
+                               finalDestination,
+                               finalOperation,
+                               properties);
+  }
 
   /**
    * Indicates whether this movement is the final one in the driver order it belongs to.
    *
    * @return <code>true</code> if, and only if, this movement is the final one.
    */
-  boolean isFinalMovement();
+  public boolean isFinalMovement() {
+    return finalMovement;
+  }
 
   /**
-   * Returns the final destination of the drive order this MovementCommand was
-   * created for.
+   * Creates a copy of this object, with the given final movement flag.
    *
-   * @return The final destination of the drive order this MovementCommand was
-   * created for.
+   * @param finalMovement The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public MovementCommand withFinalMovement(boolean finalMovement) {
+    return new MovementCommand(transportOrder,
+                               driveOrder,
+                               step,
+                               operation,
+                               opLocation,
+                               finalMovement,
+                               finalDestinationLocation,
+                               finalDestination,
+                               finalOperation,
+                               properties);
+  }
+
+  /**
+   * Returns the final destination of the drive order this MovementCommand was created for.
+   *
+   * @return The final destination of the drive order this MovementCommand was created for.
    */
   @Nonnull
-  Point getFinalDestination();
+  public Point getFinalDestination() {
+    return finalDestination;
+  }
+
+  /**
+   * Creates a copy of this object, with the given final destination.
+   *
+   * @param finalDestination The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public MovementCommand withFinalDestination(@Nonnull Point finalDestination) {
+    return new MovementCommand(transportOrder,
+                               driveOrder,
+                               step,
+                               operation,
+                               opLocation,
+                               finalMovement,
+                               finalDestinationLocation,
+                               finalDestination,
+                               finalOperation,
+                               properties);
+  }
 
   /**
    * Returns the destination location of the whole drive order.
@@ -131,17 +347,96 @@ public interface MovementCommand {
    * @return The destination location of the whole drive order.
    */
   @Nullable
-  Location getFinalDestinationLocation();
+  public Location getFinalDestinationLocation() {
+    return finalDestinationLocation;
+  }
 
   /**
-   * Returns the operation to be executed at the <em>final</em> destination
-   * position.
+   * Creates a copy of this object, with the given final destination location.
    *
-   * @return The operation to be executed at the <em>final</em> destination
-   * position.
+   * @param finalDestinationLocation The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public MovementCommand withFinalDestinationLocation(@Nullable Location finalDestinationLocation) {
+    return new MovementCommand(transportOrder,
+                               driveOrder,
+                               step,
+                               operation,
+                               opLocation,
+                               finalMovement,
+                               finalDestinationLocation,
+                               finalDestination,
+                               finalOperation,
+                               properties);
+  }
+
+  /**
+   * Returns the operation to be executed at the <em>final</em> destination position.
+   *
+   * @return The operation to be executed at the <em>final</em> destination position.
    */
   @Nonnull
-  String getFinalOperation();
+  public String getFinalOperation() {
+    return finalOperation;
+  }
+
+  /**
+   * Creates a copy of this object, with the given final operation.
+   *
+   * @param finalOperation The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public MovementCommand withFinalOperation(@Nonnull String finalOperation) {
+    return new MovementCommand(transportOrder,
+                               driveOrder,
+                               step,
+                               operation,
+                               opLocation,
+                               finalMovement,
+                               finalDestinationLocation,
+                               finalDestination,
+                               finalOperation,
+                               properties);
+  }
+
+  /**
+   * Returns the properties of the order this command is part of.
+   *
+   * @return The properties of the order this command is part of.
+   */
+  @Nonnull
+  public Map<String, String> getProperties() {
+    return properties;
+  }
+
+  /**
+   * Creates a copy of this object, with the given properties.
+   *
+   * @param properties The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public MovementCommand withProperties(@Nonnull Map<String, String> properties) {
+    return new MovementCommand(transportOrder,
+                               driveOrder,
+                               step,
+                               operation,
+                               opLocation,
+                               finalMovement,
+                               finalDestinationLocation,
+                               finalDestination,
+                               finalOperation,
+                               properties);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof MovementCommand)) {
+      return false;
+    }
+
+    MovementCommand other = (MovementCommand) o;
+    return step.equals(other.getStep()) && operation.equals(other.getOperation());
+  }
 
   /**
    * Compares the given movement command to this movement command, ignoring rerouting-related
@@ -151,15 +446,46 @@ public interface MovementCommand {
    * @return {@code true}, if the given movement command is equal to this movement command
    * (ignoring rerouting-related properties), otherwise {@code false}.
    */
-  default boolean equalsInMovement(MovementCommand command) {
-    return false;
+  public boolean equalsInMovement(MovementCommand command) {
+    if (command == null) {
+      return false;
+    }
+
+    return this.getStep().equalsInMovement(command.getStep())
+        && Objects.equals(this.getOperation(), command.getOperation());
+  }
+
+  @Override
+  public int hashCode() {
+    return step.hashCode() ^ operation.hashCode();
+  }
+
+  @Override
+  public String toString() {
+    return "MovementCommand{"
+        + "transportOrder=" + getTransportOrder()
+        + ", driveOrder=" + getDriveOrder()
+        + ", step=" + getStep()
+        + ", operation=" + getOperation()
+        + ", opLocation=" + getOpLocation()
+        + ", finalMovement=" + isFinalMovement()
+        + ", finalDestination=" + getFinalDestination()
+        + ", finalDestinationLocation=" + getFinalDestinationLocation()
+        + ", finalOperation=" + getFinalOperation()
+        + ", properties=" + getProperties()
+        + '}';
   }
 
   /**
-   * Returns the properties of the order this command is part of.
+   * Checks whether an operation means something is to be done in addition to moving or not.
    *
-   * @return The properties of the order this command is part of.
+   * @param operation The operation to be checked.
+   * @return <code>true</code> if, and only if, the vehicle should only move with the given
+   * operation.
    */
-  @Nonnull
-  Map<String, String> getProperties();
+  private boolean isEmptyOperation(String operation) {
+    return NO_OPERATION.equals(operation)
+        || MOVE_OPERATION.equals(operation)
+        || PARK_OPERATION.equals(operation);
+  }
 }

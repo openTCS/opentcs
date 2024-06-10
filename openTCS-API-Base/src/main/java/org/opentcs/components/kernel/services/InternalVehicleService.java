@@ -18,7 +18,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods the vehicle service must provide which are not accessible to remote peers.
@@ -119,21 +118,6 @@ public interface InternalVehicleService
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
   void updateVehicleRechargeOperation(TCSObjectReference<Vehicle> ref, String rechargeOperation)
-      throws ObjectUnknownException;
-
-  /**
-   * Updates a vehicle's index of the last route step travelled for the current drive order of its
-   * current transport order.
-   *
-   * @param ref A reference to the vehicle to be modified.
-   * @param index The new index.
-   * @throws ObjectUnknownException If the referenced vehicle does not exist.
-   * @deprecated Use {@link InternalTransportOrderService#updateTransportOrderCurrentRouteStepIndex(
-   * org.opentcs.data.TCSObjectReference, int)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  void updateVehicleRouteProgressIndex(TCSObjectReference<Vehicle> ref, int index)
       throws ObjectUnknownException;
 
   /**

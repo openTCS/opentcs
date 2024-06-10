@@ -9,15 +9,11 @@ package org.opentcs.kernel.vehicles;
 
 import jakarta.annotation.Nonnull;
 import java.util.ArrayDeque;
-import java.util.List;
-import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.TCSResource;
-import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.MovementCommand;
@@ -69,53 +65,12 @@ public class NullVehicleController
   }
 
   @Override
-  @Deprecated
-  public void setDriveOrder(DriveOrder newOrder, Map<String, String> orderProperties) {
-    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
-  }
-
-  @Override
-  @Deprecated
-  public void updateDriveOrder(DriveOrder newOrder, Map<String, String> orderProperties) {
-    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
-  }
-
-  @Override
   public void abortTransportOrder(boolean immediate) {
-    if (immediate) {
-      clearDriveOrder();
-    }
-    else {
-      abortDriveOrder();
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void clearDriveOrder() {
-    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
-  }
-
-  @Override
-  @Deprecated
-  public void abortDriveOrder() {
-    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
-  }
-
-  @Override
-  @Deprecated
-  public void clearCommandQueue() {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
   }
 
   @Override
   public ExplainedBoolean canProcess(TransportOrder order) {
-    return new ExplainedBoolean(false, "NullVehicleController");
-  }
-
-  @Override
-  @Deprecated
-  public ExplainedBoolean canProcess(List<String> operations) {
     return new ExplainedBoolean(false, "NullVehicleController");
   }
 
@@ -130,30 +85,23 @@ public class NullVehicleController
   }
 
   @Override
-  public String getId() {
-    return vehicleName;
-  }
-
-  @Override
-  public TCSObjectReference<Vehicle> getRelatedVehicle() {
-    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
-    return null;
-  }
-  
-  @Override
-  public boolean allocationSuccessful(Set<TCSResource<?>> resources) {
-    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
-    return false;
-  }
-
-  @Override
-  public void allocationFailed(Set<TCSResource<?>> resources) {
-    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
-  }
-
-  @Override
   public Queue<MovementCommand> getCommandsSent() {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
     return new ArrayDeque<>();
   }
+
+  @Override
+  public void onVehiclePaused(boolean paused) {
+  }
+
+  @Override
+  public Optional<MovementCommand> getInteractionsPendingCommand() {
+    return Optional.empty();
+  }
+
+  @Override
+  public boolean mayAllocateNow(Set<TCSResource<?>> resources) {
+    return false;
+  }
+
 }

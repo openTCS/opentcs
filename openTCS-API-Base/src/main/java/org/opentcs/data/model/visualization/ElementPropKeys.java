@@ -8,8 +8,7 @@
 package org.opentcs.data.model.visualization;
 
 /**
- * Defines some reserved/commonly used property keys of
- * {@link LayoutElement LayoutElements}.
+ * Defines some reserved/commonly used property keys of elements in a {@link VisualLayout}.
  */
 public interface ElementPropKeys {
 

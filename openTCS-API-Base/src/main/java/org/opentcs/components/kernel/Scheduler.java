@@ -16,7 +16,6 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Manages resources used by clients (vehicles) to help prevent both collisions and deadlocks.
@@ -96,48 +95,6 @@ public interface Scheduler
   void claim(@Nonnull Client client, @Nonnull List<Set<TCSResource<?>>> resourceSequence);
 
   /**
-   * Notifies the scheduler that the given client has now reached the given index in its claimed
-   * resource sequence, and that the client does not need the resources preceding the index in the
-   * sequence, any more.
-   * <p>
-   * This method is supposed to be called only from the kernel executor thread.
-   * </p>
-   *
-   * @param client The client.
-   * @param index The new index in the client's claimed resource sequence.
-   * @throws IllegalArgumentException If the client does not hold a claim, or if the new index is
-   * larger than a valid index in its claim's resource sequence, or if the new index is not larger
-   * than the current index.
-   * @deprecated Stick to
-   * {@link #claim(org.opentcs.components.kernel.Scheduler.Client, java.util.List) claim()} and
-   * {@link #allocate(org.opentcs.components.kernel.Scheduler.Client, java.util.Set) allocate()}.
-   * They implicitly update both the set of claimed and the set of allocated resources.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  default void updateProgressIndex(@Nonnull Client client, int index)
-      throws IllegalArgumentException {
-  }
-
-  /**
-   * Unclaims a set of resources claimed by a vehicle.
-   * <p>
-   * This method is supposed to be called only from the kernel executor thread.
-   * </p>
-   *
-   * @param client The client unclaiming the resources.
-   * @throws IllegalArgumentException If the given client does not hold a claim.
-   * @deprecated Use {@link #claim(org.opentcs.components.kernel.Scheduler.Client, java.util.List)}
-   * with an empty list, instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  default void unclaim(@Nonnull Client client)
-      throws IllegalArgumentException {
-    claim(client, List.of());
-  }
-
-  /**
    * Requests allocation of the given resources.
    * The client will be informed via a callback to
    * {@link Client#allocationSuccessful(java.util.Set)} or
@@ -181,10 +138,7 @@ public interface Scheduler
    * @return {@code true} if the given resources are safe to be allocated by the given client,
    * otherwise {@code false}.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default boolean mayAllocateNow(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources) {
-    return false;
-  }
+  boolean mayAllocateNow(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources);
 
   /**
    * Informs the scheduler that a set of resources are to be allocated for the given client
@@ -250,9 +204,7 @@ public interface Scheduler
    *
    * @param client The client.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void clearPendingAllocations(@Nonnull Client client) {
-  }
+  void clearPendingAllocations(@Nonnull Client client);
 
   /**
    * Explicitly triggers a rescheduling run during which the scheduler tries to allocate resources
@@ -261,9 +213,7 @@ public interface Scheduler
    * This method is supposed to be called only from the kernel executor thread.
    * </p>
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void reschedule() {
-  }
+  void reschedule();
 
   /**
    * Returns all resource allocations as a map of client IDs to resources.
@@ -312,10 +262,7 @@ public interface Scheduler
      * this client is not related to any {@link Vehicle}.
      */
     @Nullable
-    @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-    default TCSObjectReference<Vehicle> getRelatedVehicle() {
-      return null;
-    }
+    TCSObjectReference<Vehicle> getRelatedVehicle();
 
     /**
      * Called when resources have been reserved for this client.
@@ -340,32 +287,6 @@ public interface Scheduler
    */
   interface Module
       extends Lifecycle {
-
-    /**
-     * Sets a client's <i>total claim</i>.
-     * With vehicles, this is equivalent to the route a vehicle plans to take.
-     *
-     * @param client The client the resource sequence is claimed by.
-     * @param claim The resource sequence, i.e. total claim.
-     * @deprecated Redundant - use {@link #setAllocationState(Client, Set, List)}
-     * instead/exclusively.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-    default void claim(@Nonnull Client client, @Nonnull List<Set<TCSResource<?>>> claim) {
-    }
-
-    /**
-     * Resets a client's <i>total claim</i>.
-     *
-     * @param client The client for which to reset the claim.
-     * @deprecated Redundant - use {@link #setAllocationState(Client, Set, List)}
-     * instead/exclusively.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-    default void unclaim(@Nonnull Client client) {
-    }
 
     /**
      * Informs this module about a client's current allocation state.

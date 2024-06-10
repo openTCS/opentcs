@@ -34,7 +34,6 @@ public class ProcessAdapterUtil {
   private final VehicleAdapter vehicleAdapter;
 
   @Inject
-  @SuppressWarnings("deprecation")
   public ProcessAdapterUtil(BlockAdapter blockAdapter,
                             LayoutAdapter layoutAdapter,
                             LinkAdapter linkAdapter,

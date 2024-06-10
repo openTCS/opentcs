@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.opentcs.components.Lifecycle;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResourceReference;
@@ -22,7 +21,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods a router module for the openTCS
@@ -60,32 +58,6 @@ public interface Router
   String PROPKEY_ROUTING_COST_REVERSE = "tcs:routingCostReverse";
 
   /**
-   * Notifies the router of changes in the topology.
-   * <p>
-   * This method is supposed to be called only from the kernel executor thread.
-   * </p>
-   *
-   * @deprecated Use {@link #updateRoutingTopology()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  void topologyChanged();
-
-  /**
-   * Notifies the router to update its routing topology.
-   * <p>
-   * This method is supposed to be called only from the kernel executor thread.
-   * </p>
-   *
-   * @deprecated Use {@link #updateRoutingTopology(java.util.Set)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  default void updateRoutingTopology() {
-    this.topologyChanged();
-  }
-
-  /**
    * Notifies the router to update its routing topology with respect to the given paths.
    * <p>
    * This method is supposed to be called only from the kernel executor thread.
@@ -94,10 +66,7 @@ public interface Router
    * @param paths The paths to update in the routing topology. An empty set of paths results in the
    * router updating the entire routing topology.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void updateRoutingTopology(@Nonnull Set<Path> paths) {
-    this.topologyChanged();
-  }
+  void updateRoutingTopology(@Nonnull Set<Path> paths);
 
   /**
    * Checks the general routability of a given transport order.
@@ -144,27 +113,6 @@ public interface Router
    * @param vehicle The vehicle for which the route must be passable.
    * @param sourcePoint The starting point of the route to calculate.
    * @param destinationPoint The end point of the route to calculate.
-   * @return The calculated route, or the empty optional, if a route between the
-   * given points does not exist.
-   * @deprecated Use {@link #getRoute(org.opentcs.data.model.Vehicle,
-   * org.opentcs.data.model.Point, org.opentcs.data.model.Point, java.util.Set)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  @Nonnull
-  Optional<Route> getRoute(@Nonnull Vehicle vehicle,
-                           @Nonnull Point sourcePoint,
-                           @Nonnull Point destinationPoint);
-
-  /**
-   * Returns a route from one point to another, passable for a given vehicle.
-   * <p>
-   * This method is supposed to be called only from the kernel executor thread.
-   * </p>
-   *
-   * @param vehicle The vehicle for which the route must be passable.
-   * @param sourcePoint The starting point of the route to calculate.
-   * @param destinationPoint The end point of the route to calculate.
    * @param resourcesToAvoid Resources to avoid when calculating the route.
    * @return The calculated route, or the empty optional, if a route between the
    * given points does not exist.
@@ -174,49 +122,6 @@ public interface Router
                            @Nonnull Point sourcePoint,
                            @Nonnull Point destinationPoint,
                            @Nonnull Set<TCSResourceReference<?>> resourcesToAvoid);
-
-  /**
-   * Returns the costs for travelling a route from one point to another with a
-   * given vehicle.
-   * <p>
-   * This method is supposed to be called only from the kernel executor thread.
-   * </p>
-   *
-   * @param vehicle The vehicle for which the route must be passable.
-   * @param sourcePoint The starting point of the route.
-   * @param destinationPoint The end point of the route.
-   * @return The costs of the route, or <code>Long.MAX_VALUE</code>, if no such
-   * route exists.
-   * @deprecated Use {@link #getCosts(org.opentcs.data.model.Vehicle, org.opentcs.data.model.Point,
-   * org.opentcs.data.model.Point, java.util.Set)} instead.
-   *
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  long getCosts(@Nonnull Vehicle vehicle,
-                @Nonnull Point sourcePoint,
-                @Nonnull Point destinationPoint);
-
-  /**
-   * Returns the costs for travelling a route from one point to another with a
-   * given vehicle.
-   * <p>
-   * This method is supposed to be called only from the kernel executor thread.
-   * </p>
-   *
-   * @param vehicle The vehicle for which the route must be passable.
-   * @param srcPointRef The starting point reference of the route.
-   * @param dstPointRef The end point reference of the route.
-   * @return The costs of the route, or <code>Long.MAX_VALUE</code>, if no such
-   * route exists.
-   * @deprecated Use {@link #getCosts(org.opentcs.data.model.Vehicle, org.opentcs.data.model.Point,
-   * org.opentcs.data.model.Point, java.util.Set)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  long getCostsByPointRef(@Nonnull Vehicle vehicle,
-                          @Nonnull TCSObjectReference<Point> srcPointRef,
-                          @Nonnull TCSObjectReference<Point> dstPointRef);
 
   /**
    * Returns the costs for travelling a route from one point to another with a

@@ -14,7 +14,6 @@ import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes which communication adapter a location is currently associated with.
@@ -53,21 +52,6 @@ public class PeripheralAttachmentInformation
   }
 
   /**
-   * Creates a new instance.
-   *
-   * @param locationReference The location this attachment information belongs to.
-   * @param attachedCommAdapter The comm adapter attached to the referenced location.
-   * @deprecated Use three-parameter constructor, instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed")
-  public PeripheralAttachmentInformation(
-      @Nonnull TCSResourceReference<Location> locationReference,
-      @Nonnull PeripheralCommAdapterDescription attachedCommAdapter) {
-    this(locationReference, List.of(), attachedCommAdapter);
-  }
-
-  /**
    * Returns the location this attachment information belongs to.
    *
    * @return The location this attachment information belongs to.
@@ -85,7 +69,11 @@ public class PeripheralAttachmentInformation
    */
   public PeripheralAttachmentInformation withLocationReference(
       TCSResourceReference<Location> locationReference) {
-    return new PeripheralAttachmentInformation(locationReference, attachedCommAdapter);
+    return new PeripheralAttachmentInformation(
+        locationReference,
+        availableCommAdapters,
+        attachedCommAdapter
+    );
   }
 
   /**
@@ -129,7 +117,11 @@ public class PeripheralAttachmentInformation
    */
   public PeripheralAttachmentInformation withAttachedCommAdapter(
       @Nonnull PeripheralCommAdapterDescription attachedCommAdapter) {
-    return new PeripheralAttachmentInformation(locationReference, attachedCommAdapter);
+    return new PeripheralAttachmentInformation(
+        locationReference,
+        availableCommAdapters,
+        attachedCommAdapter
+    );
   }
 
   @Override

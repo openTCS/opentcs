@@ -21,7 +21,6 @@ import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.components.kernel.services.QueryService;
 import org.opentcs.components.kernel.services.RouterService;
-import org.opentcs.components.kernel.services.SchedulerService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.components.kernel.services.VehicleService;
@@ -39,7 +38,6 @@ class RemoteServicesTest {
   private static final Logger LOG = LoggerFactory.getLogger(RemoteServicesTest.class);
 
   @Test
-  @SuppressWarnings("deprecation")
   void shouldMapAllMethodsInServiceInterfaces() {
     checkMapping(DispatcherService.class, RemoteDispatcherService.class);
     checkMapping(NotificationService.class, RemoteNotificationService.class);
@@ -49,7 +47,6 @@ class RemoteServicesTest {
     checkMapping(PlantModelService.class, RemotePlantModelService.class);
     checkMapping(QueryService.class, RemoteQueryService.class);
     checkMapping(RouterService.class, RemoteRouterService.class);
-    checkMapping(SchedulerService.class, RemoteSchedulerService.class);
     checkMapping(TCSObjectService.class, RemoteTCSObjectService.class);
     checkMapping(TransportOrderService.class, RemoteTransportOrderService.class);
     checkMapping(VehicleService.class, RemoteVehicleService.class);

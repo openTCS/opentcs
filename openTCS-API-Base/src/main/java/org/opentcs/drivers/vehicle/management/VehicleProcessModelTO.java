@@ -20,7 +20,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A serializable representation of a {@link VehicleProcessModel}.
@@ -50,26 +49,8 @@ public class VehicleProcessModelTO
   public VehicleProcessModelTO() {
   }
 
-  /**
-   * @deprecated Use {@link #getName()} instead.
-   */
-  @Deprecated()
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public String getVehicleName() {
-    return getName();
-  }
-
   public String getName() {
     return name;
-  }
-
-  /**
-   * @deprecated Use {@link #setName(java.lang.String)} instead.
-   */
-  @Deprecated()
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public VehicleProcessModelTO setVehicleName(@Nonnull String vehicleName) {
-    return setName(vehicleName);
   }
 
   public VehicleProcessModelTO setName(@Nonnull String name) {
@@ -95,28 +76,9 @@ public class VehicleProcessModelTO
     return this;
   }
 
-  /**
-   * @deprecated Use {@link #getPosition()} instead.
-   */
-  @Deprecated()
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  @Nullable
-  public String getVehiclePosition() {
-    return getPosition();
-  }
-
   @Nullable
   public String getPosition() {
     return position;
-  }
-
-  /**
-   * @deprecated Use {@link #setPosition(java.lang.String)} instead.
-   */
-  @Deprecated()
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public VehicleProcessModelTO setVehiclePosition(@Nullable String vehiclePosition) {
-    return setPosition(vehiclePosition);
   }
 
   public VehicleProcessModelTO setPosition(@Nullable String position) {
@@ -173,28 +135,9 @@ public class VehicleProcessModelTO
     return this;
   }
 
-  /**
-   * @deprecated Use {@link #getState()} instead.
-   */
-  @Deprecated()
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  @Nonnull
-  public Vehicle.State getVehicleState() {
-    return getState();
-  }
-
   @Nonnull
   public Vehicle.State getState() {
     return state;
-  }
-
-  /**
-   * @deprecated Use {@link #setState(org.opentcs.data.model.Vehicle.State)} instead.
-   */
-  @Deprecated()
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public VehicleProcessModelTO setVehicleState(@Nonnull Vehicle.State state) {
-    return setState(state);
   }
 
   public VehicleProcessModelTO setState(@Nonnull Vehicle.State state) {

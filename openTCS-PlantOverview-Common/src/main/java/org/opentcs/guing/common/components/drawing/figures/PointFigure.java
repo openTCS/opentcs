@@ -46,10 +46,6 @@ public class PointFigure
    */
   private static final Color C_PARK = Color.BLUE;
   /**
-   * A color for report positions.
-   */
-  private static final Color C_REPORT = Color.WHITE;
-  /**
    * A color for halt positions.
    */
   private static final Color C_HALT = Color.LIGHT_GRAY;
@@ -187,16 +183,12 @@ public class PointFigure
     g.draw(this.getShape());
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   protected void drawFill(Graphics2D g) {
     Rectangle rect = fDisplayBox;
 
     if (getModel().getPropertyType().getValue() == PointModel.Type.PARK) {
       g.setColor(C_PARK);
-    }
-    else if (getModel().getPropertyType().getValue() == PointModel.Type.REPORT) {
-      g.setColor(C_REPORT);
     }
     else {
       g.setColor(C_HALT);

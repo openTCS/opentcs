@@ -17,7 +17,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides methods concerning {@link Vehicle}s.
@@ -160,9 +159,6 @@ public interface VehicleService
    * is currently claiming/allocating resources.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void updateVehicleEnvelopeKey(TCSObjectReference<Vehicle> ref, String envelopeKey)
-      throws ObjectUnknownException, IllegalArgumentException, KernelRuntimeException {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
+  void updateVehicleEnvelopeKey(TCSObjectReference<Vehicle> ref, String envelopeKey)
+      throws ObjectUnknownException, IllegalArgumentException, KernelRuntimeException;
 }

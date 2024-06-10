@@ -11,7 +11,6 @@ import jakarta.annotation.Nonnull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.util.ExplainedBoolean;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods that a driver communicating with and controlling a
@@ -75,9 +74,7 @@ public interface PeripheralCommAdapter
    * The kernel will ignore calls to the callback after calling this method.
    * </p>
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed")
-  default void abortJob() {
-  }
+  void abortJob();
 
   /**
    * Executes the given {@link PeripheralAdapterCommand}.

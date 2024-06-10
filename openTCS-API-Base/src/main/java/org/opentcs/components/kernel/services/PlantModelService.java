@@ -16,7 +16,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.PlantModel;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides methods concerning the plant model.
@@ -86,8 +85,6 @@ public interface PlantModelService
    * @throws ObjectUnknownException If the referenced path does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
-      throws ObjectUnknownException, KernelRuntimeException {
-  }
+  void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
+      throws ObjectUnknownException, KernelRuntimeException;
 }

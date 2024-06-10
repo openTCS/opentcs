@@ -12,7 +12,6 @@ import java.beans.PropertyChangeListener;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
-import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opentcs.data.model.Vehicle;
@@ -20,7 +19,6 @@ import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_
 import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_EXECUTED;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import static org.opentcs.util.Assertions.checkInRange;
-import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,13 +47,9 @@ public abstract class BasicVehicleCommAdapter
    */
   private final VehicleProcessModel vehicleModel;
   /**
-   * The number of commands this adapter's command queue accepts.
+   * The number of commands this comm adapter accepts. Must be at least 1.
    */
-  private final int commandQueueCapacity;
-  /**
-   * The maximum number of orders to be sent to a vehicle.
-   */
-  private final int sentQueueCapacity;
+  private final int commandsCapacity;
   /**
    * The string to recognize as a recharge operation.
    */
@@ -63,7 +57,7 @@ public abstract class BasicVehicleCommAdapter
   /**
    * The executor to run tasks on.
    */
-  private final Executor executor;
+  private final ScheduledExecutorService executor;
   /**
    * Indicates whether this adapter is initialized.
    */
@@ -90,64 +84,6 @@ public abstract class BasicVehicleCommAdapter
    * Creates a new instance.
    *
    * @param vehicleModel An observable model of the vehicle's and its comm adapter's attributes.
-   * @param commandQueueCapacity The number of commands this comm adapter's command queue accepts.
-   * Must be at least 1.
-   * @param sentQueueCapacity The maximum number of orders to be sent to a vehicle.
-   * Must be at least 1.
-   * @param rechargeOperation The string to recognize as a recharge operation.
-   * @param executor The executor to run tasks on.
-   * @deprecated Use more specific constructor instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed")
-  public BasicVehicleCommAdapter(VehicleProcessModel vehicleModel,
-                                 int commandQueueCapacity,
-                                 int sentQueueCapacity,
-                                 String rechargeOperation,
-                                 Executor executor) {
-    this.vehicleModel = requireNonNull(vehicleModel, "vehicleModel");
-    this.commandQueueCapacity = checkInRange(commandQueueCapacity,
-                                             1,
-                                             Integer.MAX_VALUE,
-                                             "commandQueueCapacity");
-    this.sentQueueCapacity = checkInRange(sentQueueCapacity,
-                                          1,
-                                          Integer.MAX_VALUE,
-                                          "sentQueueCapacity");
-    this.rechargeOperation = requireNonNull(rechargeOperation, "rechargeOperation");
-    this.executor = requireNonNull(executor, "executor");
-  }
-
-  /**
-   * Creates a new instance.
-   *
-   * @param vehicleModel An observable model of the vehicle's and its comm adapter's attributes.
-   * @param commandQueueCapacity The number of commands this comm adapter's command queue accepts.
-   * Must be at least 1.
-   * @param sentQueueCapacity The maximum number of orders to be sent to a vehicle.
-   * Must be at least 1.
-   * @param rechargeOperation The string to recognize as a recharge operation.
-   * @param executor The executor to run tasks on.
-   * @deprecated Use constructor with {@code commandsCapacity} parameter instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed")
-  public BasicVehicleCommAdapter(VehicleProcessModel vehicleModel,
-                                 int commandQueueCapacity,
-                                 int sentQueueCapacity,
-                                 String rechargeOperation,
-                                 ScheduledExecutorService executor) {
-    this(vehicleModel,
-         commandQueueCapacity,
-         sentQueueCapacity,
-         rechargeOperation,
-         (Executor) executor);
-  }
-
-  /**
-   * Creates a new instance.
-   *
-   * @param vehicleModel An observable model of the vehicle's and its comm adapter's attributes.
    * @param commandsCapacity The number of commands this comm adapter accepts. Must be at least 1.
    * @param rechargeOperation The string to recognize as a recharge operation.
    * @param executor The executor to run tasks on.
@@ -156,11 +92,13 @@ public abstract class BasicVehicleCommAdapter
                                  int commandsCapacity,
                                  String rechargeOperation,
                                  ScheduledExecutorService executor) {
-    this(vehicleModel,
-         commandsCapacity,
-         commandsCapacity,
-         rechargeOperation,
-         (Executor) executor);
+    this.vehicleModel = requireNonNull(vehicleModel, "vehicleModel");
+    this.commandsCapacity = checkInRange(commandsCapacity,
+                                         1,
+                                         Integer.MAX_VALUE,
+                                         "commandsCapacity");
+    this.rechargeOperation = requireNonNull(rechargeOperation, "rechargeOperation");
+    this.executor = requireNonNull(executor, "executor");
   }
 
   /**
@@ -266,46 +204,22 @@ public abstract class BasicVehicleCommAdapter
 
   @Override
   public synchronized Queue<MovementCommand> getUnsentCommands() {
-    return getCommandQueue();
+    return commandQueue;
   }
 
   @Override
   public synchronized Queue<MovementCommand> getSentCommands() {
-    return getSentQueue();
+    return sentQueue;
   }
 
   @Override
   public int getCommandsCapacity() {
-    return getCommandQueueCapacity();
-  }
-
-  @Override
-  @Deprecated
-  public int getCommandQueueCapacity() {
-    return commandQueueCapacity;
-  }
-
-  @Override
-  @Deprecated
-  public synchronized Queue<MovementCommand> getCommandQueue() {
-    return commandQueue;
+    return commandsCapacity;
   }
 
   @Override
   public boolean canAcceptNextCommand() {
     return (getUnsentCommands().size() + getSentCommands().size()) < getCommandsCapacity();
-  }
-
-  @Override
-  @Deprecated
-  public int getSentQueueCapacity() {
-    return sentQueueCapacity;
-  }
-
-  @Override
-  @Deprecated
-  public synchronized Queue<MovementCommand> getSentQueue() {
-    return sentQueue;
   }
 
   @Override
@@ -369,8 +283,7 @@ public abstract class BasicVehicleCommAdapter
    *
    * @return The executor to run tasks on.
    */
-  @ScheduledApiChange(when = "6.0", details = "Will return ScheduledExectorService instead")
-  public Executor getExecutor() {
+  public ScheduledExecutorService getExecutor() {
     return executor;
   }
 

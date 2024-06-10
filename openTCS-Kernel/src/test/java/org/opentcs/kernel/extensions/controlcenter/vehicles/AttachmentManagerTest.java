@@ -202,13 +202,11 @@ class AttachmentManagerTest {
     }
 
     @Override
-    @Deprecated
-    public ExplainedBoolean canProcess(List<String> list) {
-      return new ExplainedBoolean(true, "");
+    public void processMessage(Object o) {
     }
 
     @Override
-    public void processMessage(Object o) {
+    public void onVehiclePaused(boolean paused) {
     }
   }
 

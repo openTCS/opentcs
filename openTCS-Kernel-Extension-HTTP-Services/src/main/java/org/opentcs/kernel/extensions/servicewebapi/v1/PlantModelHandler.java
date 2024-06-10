@@ -121,7 +121,7 @@ public class PlantModelHandler {
         .setLocations(locationConverter.toLocationTOs(plantModel.getLocations()))
         .setBlocks(blockConverter.toBlockTOs(plantModel.getBlocks()))
         .setVehicles(vehicleConverter.toVehicleTOs(plantModel.getVehicles()))
-        .setVisualLayout(visualLayoutConverter.toVisualLayoutTO(plantModel.getVisualLayouts()))
+        .setVisualLayout(visualLayoutConverter.toVisualLayoutTO(plantModel.getVisualLayout()))
         .setProperties(propertyConverter.toPropertyTOs(plantModel.getProperties()));
   }
 

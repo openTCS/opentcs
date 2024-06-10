@@ -156,58 +156,12 @@ public class StandardRemoteRouterService
   }
 
   @Override
-  @Deprecated
-  public void updatePathLock(ClientID clientId, TCSObjectReference<Path> ref, boolean locked) {
-    userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
-
-    try {
-      kernelExecutor.submit(() -> routerService.updatePathLock(ref, locked)).get();
-    }
-    catch (InterruptedException | ExecutionException exc) {
-      throw findSuitableExceptionFor(exc);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void updateRoutingTopology(ClientID clientId) {
-    userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
-
-    try {
-      kernelExecutor.submit(() -> routerService.updateRoutingTopology()).get();
-    }
-    catch (InterruptedException | ExecutionException exc) {
-      throw findSuitableExceptionFor(exc);
-    }
-  }
-
-  @Override
   public void updateRoutingTopology(ClientID clientId, Set<TCSObjectReference<Path>> refs)
       throws RemoteException {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
 
     try {
       kernelExecutor.submit(() -> routerService.updateRoutingTopology(refs)).get();
-    }
-    catch (InterruptedException | ExecutionException exc) {
-      throw findSuitableExceptionFor(exc);
-    }
-  }
-
-  @Deprecated
-  @Override
-  public Map<TCSObjectReference<Point>, Route> computeRoutes(
-      ClientID clientId,
-      TCSObjectReference<Vehicle> vehicleRef,
-      TCSObjectReference<Point> sourcePointRef,
-      Set<TCSObjectReference<Point>> destinationPointRefs) {
-    userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
-
-    try {
-      return kernelExecutor.submit(() -> routerService.computeRoutes(vehicleRef,
-                                                                     sourcePointRef,
-                                                                     destinationPointRefs))
-          .get();
     }
     catch (InterruptedException | ExecutionException exc) {
       throw findSuitableExceptionFor(exc);

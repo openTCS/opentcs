@@ -17,7 +17,6 @@ import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a point in the plant model.
@@ -106,71 +105,6 @@ public class PointCreationTO
     return new PointCreationTO(getName(),
                                getModifiableProperties(),
                                pose,
-                               type,
-                               vehicleEnvelopes,
-                               layout);
-  }
-
-  /**
-   * Returns the position of this point (in mm).
-   *
-   * @return The position of this point (in mm).
-   * @deprecated Use {@link #getPose()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  @Nonnull
-  public Triple getPosition() {
-    return pose.getPosition();
-  }
-
-  /**
-   * Creates a copy of this object with the given position (in mm).
-   *
-   * @param position The new position.
-   * @return A copy of this object, differing in the given position.
-   * @deprecated Use {@link #withPose(org.opentcs.data.model.Pose)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public PointCreationTO withPosition(@Nonnull Triple position) {
-    return new PointCreationTO(getName(),
-                               getModifiableProperties(),
-                               pose.withPosition(position),
-                               type,
-                               vehicleEnvelopes,
-                               layout);
-  }
-
-  /**
-   * Returns a vehicle's orientation angle at this position.
-   * (-360..360, or {@code Double.NaN}, if an orientation angle is not specified for this point.)
-   *
-   * @return The vehicle's orientation angle when it's at this position.
-   * @deprecated Use {@link #getPose()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public double getVehicleOrientationAngle() {
-    return pose.getOrientationAngle();
-  }
-
-  /**
-   * Creates a copy of this object with the vehicle's (assumed) orientation angle when it's at this
-   * position.
-   * Allowed value range: [-360..360], or {@code Double.NaN} to indicate that there is no specific
-   * orientation angle for this point.
-   *
-   * @param vehicleOrientationAngle The new angle.
-   * @return A copy of this object, differing in the given angle.
-   * @deprecated Use {@link #withPose(org.opentcs.data.model.Pose)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public PointCreationTO withVehicleOrientationAngle(double vehicleOrientationAngle) {
-    return new PointCreationTO(getName(),
-                               getModifiableProperties(),
-                               pose.withOrientationAngle(vehicleOrientationAngle),
                                type,
                                vehicleEnvelopes,
                                layout);

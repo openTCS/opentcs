@@ -125,8 +125,6 @@ public class DefaultPointSelectedAction
     switch (pointType) {
       case HALT:
         return ImageDirectory.getImageIcon("/toolbar/point-halt.22.png");
-      case REPORT:
-        return ImageDirectory.getImageIcon("/toolbar/point-report.22.png");
       case PARK:
         return ImageDirectory.getImageIcon("/toolbar/point-park.22.png");
       default:
@@ -138,8 +136,6 @@ public class DefaultPointSelectedAction
     switch (pointType) {
       case HALT:
         return ImageDirectory.getImageIcon("/toolbar/point-halt-arrow.22.png");
-      case REPORT:
-        return ImageDirectory.getImageIcon("/toolbar/point-report-arrow.22.png");
       case PARK:
         return ImageDirectory.getImageIcon("/toolbar/point-park-arrow.22.png");
       default:

@@ -12,7 +12,6 @@ import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes an operation that is to be executed by a peripheral device.
@@ -55,10 +54,7 @@ public class PeripheralOperation
                              boolean completionRequired) {
     this.location = requireNonNull(location, "location");
     this.operation = requireNonNull(operation, "operation");
-    requireNonNull(executionTrigger, "executionTrigger");
-    this.executionTrigger = (executionTrigger == ExecutionTrigger.BEFORE_MOVEMENT)
-        ? ExecutionTrigger.AFTER_ALLOCATION
-        : executionTrigger;
+    this.executionTrigger = requireNonNull(executionTrigger, "executionTrigger");
     this.completionRequired = completionRequired;
   }
 
@@ -111,14 +107,6 @@ public class PeripheralOperation
      * The operation is to be triggered immediately.
      */
     IMMEDIATE,
-    /**
-     * The operation is to be triggered before the movement.
-     *
-     * @deprecated Use {@link #AFTER_ALLOCATION} instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "6.0", details = "Will be removed")
-    BEFORE_MOVEMENT,
     /**
      * The operation is to be triggered after the allocation of the path / before the movement.
      */

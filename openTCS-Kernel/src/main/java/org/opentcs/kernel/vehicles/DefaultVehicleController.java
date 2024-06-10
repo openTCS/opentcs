@@ -70,6 +70,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultVehicleController
     implements VehicleController,
+               Scheduler.Client,
                PropertyChangeListener,
                EventHandler {
 
@@ -385,10 +386,8 @@ public class DefaultVehicleController
     }
   }
 
-  @Override
-  @Deprecated
-  public void setDriveOrder(@Nonnull DriveOrder newOrder,
-                            @Nonnull Map<String, String> orderProperties)
+  private void setDriveOrder(@Nonnull DriveOrder newOrder,
+                             @Nonnull Map<String, String> orderProperties)
       throws IllegalArgumentException {
     synchronized (commAdapter) {
       requireNonNull(newOrder, "newOrder");
@@ -405,9 +404,6 @@ public class DefaultVehicleController
 
       currentDriveOrder = newOrder;
       lastCommandExecutedRouteIndex = TransportOrder.ROUTE_STEP_INDEX_DEFAULT;
-
-      vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
-                                                     Vehicle.ROUTE_INDEX_DEFAULT);
 
       // Set the claim for (the remainder of) this transport order.
       List<Set<TCSResource<?>>> claim = remainingRequiredClaim(transportOrder);
@@ -431,10 +427,8 @@ public class DefaultVehicleController
     }
   }
 
-  @Override
-  @Deprecated
-  public void updateDriveOrder(@Nonnull DriveOrder newOrder,
-                               @Nonnull Map<String, String> orderProperties)
+  private void updateDriveOrder(@Nonnull DriveOrder newOrder,
+                                @Nonnull Map<String, String> orderProperties)
       throws IllegalArgumentException {
     synchronized (commAdapter) {
       requireNonNull(newOrder, "newOrder");
@@ -459,12 +453,6 @@ public class DefaultVehicleController
       // The current drive order got updated but our queue of future commands now contains commands
       // that have already been processed, so discard these.
       discardProcessedFutureCommands();
-
-      // Get an up-tp-date copy of the vehicle
-      Vehicle updatedVehicle = vehicleService.fetchObject(Vehicle.class, vehicle.getReference());
-      // Trigger the vehicle's route to be re-drawn
-      vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
-                                                     updatedVehicle.getRouteProgressIndex());
 
       // The vehicle may now process previously restricted steps.
       if (canSendNextCommand()) {
@@ -604,9 +592,7 @@ public class DefaultVehicleController
     }
   }
 
-  @Override
-  @Deprecated
-  public void clearDriveOrder() {
+  private void clearDriveOrder() {
     synchronized (commAdapter) {
       currentDriveOrder = null;
 
@@ -614,16 +600,11 @@ public class DefaultVehicleController
       // abortTransportOrder().
       resetPendingResourceAllocations();
 
-      vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
-                                                     Vehicle.ROUTE_INDEX_DEFAULT);
-
       clearCommandQueue();
     }
   }
 
-  @Override
-  @Deprecated
-  public void abortDriveOrder() {
+  private void abortDriveOrder() {
     synchronized (commAdapter) {
       if (currentDriveOrder == null) {
         LOG.debug("{}: No drive order to be aborted", vehicle.getName());
@@ -633,9 +614,7 @@ public class DefaultVehicleController
     }
   }
 
-  @Override
-  @Deprecated
-  public void clearCommandQueue() {
+  private void clearCommandQueue() {
     synchronized (commAdapter) {
       commAdapter.clearCommandQueue();
       commandsSent.clear();
@@ -682,17 +661,6 @@ public class DefaultVehicleController
 
     synchronized (commAdapter) {
       return commAdapter.canProcess(order);
-    }
-  }
-
-  @Override
-  @Deprecated
-  @Nonnull
-  public ExplainedBoolean canProcess(@Nonnull List<String> operations) {
-    requireNonNull(operations, "operations");
-
-    synchronized (commAdapter) {
-      return commAdapter.canProcess(operations);
     }
   }
 
@@ -1073,7 +1041,6 @@ public class DefaultVehicleController
     dispatcherService.withdrawByVehicle(vehicle.getReference(), true);
   }
 
-  @SuppressWarnings("deprecation")
   private void checkForPendingCommands() {
     // Check if there are more commands to be processed for the current drive order.
     if (interactionsPendingCommand == null
@@ -1088,8 +1055,6 @@ public class DefaultVehicleController
         currentDriveOrder = null;
         // Let the kernel/dispatcher know that the drive order has been processed completely (by
         // setting its state to AWAITING_ORDER).
-        vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
-                                                       Vehicle.ROUTE_INDEX_DEFAULT);
         vehicleService.updateVehicleProcState(vehicle.getReference(),
                                               Vehicle.ProcState.AWAITING_ORDER);
       }
@@ -1258,26 +1223,22 @@ public class DefaultVehicleController
     updatePosition(toReference(point), null);
   }
 
-  @SuppressWarnings("deprecation")
   private void updatePositionWithOrder(String position, Point point) {
     // If a drive order is being processed, check if the reported position
     // is the one we expect.
     MovementCommand moveCommand = commandsSent.getFirst();
 
-    Point dstPoint = moveCommand.getStep().getDestinationPoint();
-    if (dstPoint.getName().equals(position)) {
-      // Update the vehicle's progress index.
-      vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
-                                                     moveCommand.getStep().getRouteIndex());
-    }
-    else if (position == null) {
+    if (position == null) {
       LOG.info("{}: Resetting position for vehicle", vehicle.getName());
     }
     else {
-      LOG.warn("{}: Reported position: {}, expected: {}",
-               vehicle.getName(),
-               position,
-               dstPoint.getName());
+      Point dstPoint = moveCommand.getStep().getDestinationPoint();
+      if (!dstPoint.getName().equals(position)) {
+        LOG.warn("{}: Reported position: {}, expected: {}",
+                 vehicle.getName(),
+                 position,
+                 dstPoint.getName());
+      }
     }
 
     updatePosition(toReference(point), extractNextPosition(findNextCommand()));

@@ -9,14 +9,11 @@ package org.opentcs.data.model.visualization;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import java.util.Set;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes the visual attributes of a model.
@@ -33,12 +30,6 @@ public class VisualLayout
    * This layout's scale on the Y axis (in mm/pixel).
    */
   private final double scaleY;
-  /**
-   * VisualLayout elements describing the visualization of a model and additional
-   * elements that need to be displayed.
-   */
-  @Deprecated
-  private final Set<LayoutElement> layoutElements;
   /**
    * The layers in this model.
    */
@@ -57,7 +48,6 @@ public class VisualLayout
     super(name);
     this.scaleX = 50.0;
     this.scaleY = 50.0;
-    this.layoutElements = Set.of();
     this.layers = List.of();
     this.layerGroups = List.of();
   }
@@ -67,19 +57,16 @@ public class VisualLayout
    *
    * @param name This visual layout's name.
    */
-  @SuppressWarnings("deprecation")
   private VisualLayout(String name,
                        Map<String, String> properties,
                        ObjectHistory history,
                        double scaleX,
                        double scaleY,
-                       Set<LayoutElement> layoutElements,
                        List<Layer> layers,
                        List<LayerGroup> layerGroups) {
     super(name, properties, history);
     this.scaleX = scaleX;
     this.scaleY = scaleY;
-    this.layoutElements = new HashSet<>(requireNonNull(layoutElements, "layoutElements"));
     this.layers = new ArrayList<>(requireNonNull(layers, "layers"));
     this.layerGroups = new ArrayList<>(requireNonNull(layerGroups, "layerGroups"));
   }
@@ -91,7 +78,6 @@ public class VisualLayout
                             getHistory(),
                             scaleX,
                             scaleY,
-                            layoutElements,
                             layers,
                             layerGroups);
   }
@@ -103,7 +89,6 @@ public class VisualLayout
                             getHistory(),
                             scaleX,
                             scaleY,
-                            layoutElements,
                             layers,
                             layerGroups);
   }
@@ -115,7 +100,6 @@ public class VisualLayout
                             getHistory().withEntryAppended(entry),
                             scaleX,
                             scaleY,
-                            layoutElements,
                             layers,
                             layerGroups);
   }
@@ -127,7 +111,6 @@ public class VisualLayout
                             history,
                             scaleX,
                             scaleY,
-                            layoutElements,
                             layers,
                             layerGroups);
   }
@@ -153,7 +136,6 @@ public class VisualLayout
                             getHistory(),
                             scaleX,
                             scaleY,
-                            layoutElements,
                             layers,
                             layerGroups);
   }
@@ -179,37 +161,6 @@ public class VisualLayout
                             getHistory(),
                             scaleX,
                             scaleY,
-                            layoutElements,
-                            layers,
-                            layerGroups);
-  }
-
-  /**
-   * Returns the layout elements describing the visualization of a model.
-   *
-   * @return The layout elements describing the visualization of a model.
-   */
-  @Deprecated
-  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  public Set<LayoutElement> getLayoutElements() {
-    return layoutElements;
-  }
-
-  /**
-   * Creates a copy of this object, with the given layoutElements.
-   *
-   * @param layoutElements The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   */
-  @Deprecated
-  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  public VisualLayout withLayoutElements(Set<LayoutElement> layoutElements) {
-    return new VisualLayout(getName(),
-                            getProperties(),
-                            getHistory(),
-                            scaleX,
-                            scaleY,
-                            layoutElements,
                             layers,
                             layerGroups);
   }
@@ -235,7 +186,6 @@ public class VisualLayout
                             getHistory(),
                             scaleX,
                             scaleY,
-                            layoutElements,
                             layers,
                             layerGroups);
   }
@@ -261,7 +211,6 @@ public class VisualLayout
                             getHistory(),
                             scaleX,
                             scaleY,
-                            layoutElements,
                             layers,
                             layerGroups);
   }

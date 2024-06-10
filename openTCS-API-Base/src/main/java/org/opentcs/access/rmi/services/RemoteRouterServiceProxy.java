@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.RouterService;
-import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
@@ -35,37 +34,9 @@ class RemoteRouterServiceProxy
   }
 
   @Override
-  @Deprecated
-  public void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
-      throws ObjectUnknownException, KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      getRemoteService().updatePathLock(getClientId(), ref, locked);
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void updateRoutingTopology()
-      throws KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      getRemoteService().updateRoutingTopology(getClientId());
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
-  @Override
   public void updateRoutingTopology(Set<TCSObjectReference<Path>> refs)
       throws KernelRuntimeException {
-      checkServiceAvailability();
+    checkServiceAvailability();
 
     try {
       getRemoteService().updateRoutingTopology(getClientId(), refs);
@@ -75,26 +46,6 @@ class RemoteRouterServiceProxy
     }
   }
 
-  @Deprecated
-  @Override
-  public Map<TCSObjectReference<Point>, Route> computeRoutes(
-      TCSObjectReference<Vehicle> vehicleRef,
-      TCSObjectReference<Point> sourcePointRef,
-      Set<TCSObjectReference<Point>> destinationPointRefs)
-      throws KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      return getRemoteService().computeRoutes(getClientId(),
-                                              vehicleRef,
-                                              sourcePointRef,
-                                              destinationPointRefs);
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-  
   @Override
   public Map<TCSObjectReference<Point>, Route> computeRoutes(
       TCSObjectReference<Vehicle> vehicleRef,

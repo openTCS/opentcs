@@ -14,7 +14,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods the transport order service must provide which are not accessible to remote
@@ -89,12 +88,9 @@ public interface InternalTransportOrderService
    * @param index The new index.
    * @throws ObjectUnknownException If the referenced transport order does not exist.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void updateTransportOrderCurrentRouteStepIndex(TCSObjectReference<TransportOrder> ref,
-                                                         int index)
-      throws ObjectUnknownException {
-    throw new UnsupportedOperationException("Not supported, yet.");
-  }
+  void updateTransportOrderCurrentRouteStepIndex(TCSObjectReference<TransportOrder> ref,
+                                                 int index)
+      throws ObjectUnknownException;
 
   /**
    * Updates a transport order's processing vehicle.

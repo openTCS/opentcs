@@ -9,11 +9,13 @@ package org.opentcs.data.model;
 
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import java.util.Set;
+import org.opentcs.data.model.visualization.Layer;
+import org.opentcs.data.model.visualization.LayerGroup;
 import org.opentcs.data.model.visualization.VisualLayout;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * An immutable representation of a complete plant model's state.
@@ -29,7 +31,7 @@ public class PlantModel
   private final Set<Location> locations;
   private final Set<Block> blocks;
   private final Set<Vehicle> vehicles;
-  private final Set<VisualLayout> visualLayouts;
+  private final VisualLayout visualLayout;
 
   /**
    * Creates a new instance.
@@ -37,7 +39,8 @@ public class PlantModel
    * @param name The model's name.
    */
   public PlantModel(@Nonnull String name) {
-    this(name, Map.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of());
+    this(name, Map.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(),
+         defaultVisualLayout());
   }
 
   private PlantModel(@Nonnull String name,
@@ -48,7 +51,7 @@ public class PlantModel
                      @Nonnull Set<Location> locations,
                      @Nonnull Set<Block> blocks,
                      @Nonnull Set<Vehicle> vehicles,
-                     @Nonnull Set<VisualLayout> visualLayouts) {
+                     @Nonnull VisualLayout visualLayout) {
     this.name = requireNonNull(name, "name");
     this.properties = Map.copyOf(properties);
     this.points = Set.copyOf(points);
@@ -57,7 +60,7 @@ public class PlantModel
     this.locations = Set.copyOf(locations);
     this.blocks = Set.copyOf(blocks);
     this.vehicles = Set.copyOf(vehicles);
-    this.visualLayouts = Set.copyOf(visualLayouts);
+    this.visualLayout = requireNonNull(visualLayout, "visualLayout");
   }
 
   /**
@@ -95,7 +98,7 @@ public class PlantModel
                           locations,
                           blocks,
                           vehicles,
-                          visualLayouts);
+                          visualLayout);
   }
 
   /**
@@ -123,7 +126,7 @@ public class PlantModel
                           locations,
                           blocks,
                           vehicles,
-                          visualLayouts);
+                          visualLayout);
   }
 
   /**
@@ -151,7 +154,7 @@ public class PlantModel
                           locations,
                           blocks,
                           vehicles,
-                          visualLayouts);
+                          visualLayout);
   }
 
   /**
@@ -179,7 +182,7 @@ public class PlantModel
                           locations,
                           blocks,
                           vehicles,
-                          visualLayouts);
+                          visualLayout);
   }
 
   /**
@@ -207,7 +210,7 @@ public class PlantModel
                           locations,
                           blocks,
                           vehicles,
-                          visualLayouts);
+                          visualLayout);
   }
 
   /**
@@ -235,7 +238,7 @@ public class PlantModel
                           locations,
                           blocks,
                           vehicles,
-                          visualLayouts);
+                          visualLayout);
   }
 
   /**
@@ -263,39 +266,26 @@ public class PlantModel
                           locations,
                           blocks,
                           vehicles,
-                          visualLayouts);
+                          visualLayout);
   }
 
   /**
-   * Returns the visual layouts in this plant model.
+   * Returns the visual layout in this plant model.
    *
-   * @return The visual layouts in this plant model.
+   * @return The visual layout in this plant model.
    */
   @Nonnull
-  public Set<VisualLayout> getVisualLayouts() {
-    return visualLayouts;
+  public VisualLayout getVisualLayout() {
+    return visualLayout;
   }
 
   /**
-   * Returns a copy of this plant model, with its visual layouts replaced by the given ones.
+   * Returns a copy of this plant model, with its visual layout replaced by the given one.
    *
-   * @param visualLayouts The visual layouts to be set.
-   * @return A copy of this plant model, with its visual layouts replaced by the given ones.
-   * @deprecated Use {@link #withVisualLayouts(java.util.Set)} instead.
+   * @param visualLayout The visual layout to be set.
+   * @return A copy of this plant model, with its visual layout replaced by the given one.
    */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public PlantModel withVisuaLayouts(@Nonnull Set<VisualLayout> visualLayouts) {
-    return withVisualLayouts(visualLayouts);
-  }
-
-  /**
-   * Returns a copy of this plant model, with its visual layouts replaced by the given ones.
-   *
-   * @param visualLayouts The visual layouts to be set.
-   * @return A copy of this plant model, with its visual layouts replaced by the given ones.
-   */
-  public PlantModel withVisualLayouts(@Nonnull Set<VisualLayout> visualLayouts) {
+  public PlantModel withVisualLayout(@Nonnull VisualLayout visualLayout) {
     return new PlantModel(name,
                           properties,
                           points,
@@ -304,7 +294,7 @@ public class PlantModel
                           locations,
                           blocks,
                           vehicles,
-                          visualLayouts);
+                          visualLayout);
   }
 
   @Override
@@ -318,7 +308,32 @@ public class PlantModel
         + ", locations=" + locations
         + ", blocks=" + blocks
         + ", vehicles=" + vehicles
-        + ", visualLayouts=" + visualLayouts
+        + ", visualLayout=" + visualLayout
         + '}';
   }
+
+  private static VisualLayout defaultVisualLayout() {
+    return new VisualLayout(ModelConstants.DEFAULT_VISUAL_LAYOUT_NAME)
+        .withLayers(
+            List.of(
+                new Layer(
+                    ModelConstants.DEFAULT_LAYER_ID,
+                    ModelConstants.DEFAULT_LAYER_ORDINAL,
+                    true,
+                    ModelConstants.DEFAULT_LAYER_NAME,
+                    ModelConstants.DEFAULT_LAYER_GROUP_ID
+                )
+            )
+        )
+        .withLayerGroups(
+            List.of(
+                new LayerGroup(
+                    ModelConstants.DEFAULT_LAYER_GROUP_ID,
+                    ModelConstants.DEFAULT_LAYER_GROUP_NAME,
+                    true
+                )
+            )
+        );
+  }
+
 }

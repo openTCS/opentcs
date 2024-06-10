@@ -49,7 +49,6 @@ class MovementCommandMapperTest {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
   void mapDriveOrderToMovementCommands() {
     Point pointA = new Point("point-a");
     Point pointB = new Point("point-b");
@@ -81,7 +80,6 @@ class MovementCommandMapperTest {
 
     assertThat(result.get(0).getTransportOrder(), is(theInstance(transportOrder)));
     assertThat(result.get(0).getDriveOrder(), is(theInstance(driveOrder)));
-    assertThat(result.get(0).getRoute(), is(equalTo(route)));
     assertThat(result.get(0).getStep(), is(equalTo(stepAB)));
     assertThat(result.get(0).getOperation(), is(MovementCommand.NO_OPERATION));
     assertThat(result.get(0).getOpLocation(), is(nullValue()));
@@ -94,7 +92,6 @@ class MovementCommandMapperTest {
 
     assertThat(result.get(1).getTransportOrder(), is(theInstance(transportOrder)));
     assertThat(result.get(1).getDriveOrder(), is(theInstance(driveOrder)));
-    assertThat(result.get(1).getRoute(), is(equalTo(route)));
     assertThat(result.get(1).getStep(), is(equalTo(stepBC)));
     assertThat(result.get(1).getOperation(), is("operation"));
     assertThat(result.get(1).getOpLocation(), is(destinationLocation));

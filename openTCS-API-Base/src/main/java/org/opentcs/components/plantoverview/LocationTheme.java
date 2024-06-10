@@ -12,7 +12,6 @@ import java.awt.Image;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.visualization.LocationRepresentation;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides a location theme.
@@ -36,8 +35,5 @@ public interface LocationTheme {
    * @return The image for the give location.
    */
   @Nonnull
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default Image getImageFor(@Nonnull Location location, @Nonnull LocationType locationType) {
-    return getImageFor(LocationRepresentation.NONE);
-  }
+  Image getImageFor(@Nonnull Location location, @Nonnull LocationType locationType);
 }

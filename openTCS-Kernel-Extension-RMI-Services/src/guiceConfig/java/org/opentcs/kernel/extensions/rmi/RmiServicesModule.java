@@ -34,7 +34,6 @@ public class RmiServicesModule
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   protected void configure() {
     RmiKernelInterfaceConfiguration configuration
         = getConfigBindingProvider().get(RmiKernelInterfaceConfiguration.PREFIX,
@@ -74,7 +73,6 @@ public class RmiServicesModule
     remoteServices.addBinding().to(StandardRemoteNotificationService.class);
     remoteServices.addBinding().to(StandardRemoteRouterService.class);
     remoteServices.addBinding().to(StandardRemoteDispatcherService.class);
-    remoteServices.addBinding().to(StandardRemoteSchedulerService.class);
     remoteServices.addBinding().to(StandardRemoteQueryService.class);
     remoteServices.addBinding().to(StandardRemotePeripheralService.class);
     remoteServices.addBinding().to(StandardRemotePeripheralJobService.class);

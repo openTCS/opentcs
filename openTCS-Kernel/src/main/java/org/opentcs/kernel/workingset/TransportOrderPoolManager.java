@@ -564,7 +564,6 @@ public class TransportOrderPoolManager
     return result;
   }
 
-  @SuppressWarnings("deprecation")
   private TCSObjectReference<OrderSequence> getWrappingSequence(TransportOrderCreationTO to)
       throws ObjectUnknownException, IllegalArgumentException {
     if (to.getWrappingSequence() == null) {

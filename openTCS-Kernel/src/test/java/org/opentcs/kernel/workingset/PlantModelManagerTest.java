@@ -19,7 +19,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.BlockCreationTO;
-import org.opentcs.access.to.model.GroupCreationTO;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
@@ -29,7 +28,6 @@ import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.model.Block;
-import org.opentcs.data.model.Group;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -49,7 +47,6 @@ class PlantModelManagerTest {
   private PlantModelCreationTO plantModelCreationTo;
 
   @BeforeEach
-  @SuppressWarnings("deprecation")
   void setUp() {
     objectRepo = new TCSObjectRepository();
     plantModelManager = new PlantModelManager(objectRepo, new SimpleEventBus());
@@ -73,14 +70,12 @@ class PlantModelManagerTest {
                 .withLink("point1", Set.of("some-op"))
         )
         .withBlock(new BlockCreationTO("some-block"))
-        .withGroup(new GroupCreationTO("some-group"))
         .withVehicle(new VehicleCreationTO("some-vehicle"))
         .withVisualLayout(new VisualLayoutCreationTO("some-visual-layout"))
         .withProperty("some-prop-key", "some-prop-value");
   }
 
   @Test
-  @SuppressWarnings("deprecation")
   void importPlantModel() {
     plantModelManager.createPlantModelObjects(plantModelCreationTo);
 
@@ -97,8 +92,6 @@ class PlantModelManagerTest {
     assertThat(objectRepo.getObject(Location.class, "some-location"), is(notNullValue()));
     assertThat(objectRepo.getObjects(Block.class), hasSize(1));
     assertThat(objectRepo.getObject(Block.class, "some-block"), is(notNullValue()));
-    assertThat(objectRepo.getObjects(Group.class), hasSize(1));
-    assertThat(objectRepo.getObject(Group.class, "some-group"), is(notNullValue()));
     assertThat(objectRepo.getObjects(Vehicle.class), hasSize(1));
     assertThat(objectRepo.getObject(Vehicle.class, "some-vehicle"), is(notNullValue()));
     assertThat(objectRepo.getObjects(VisualLayout.class), hasSize(1));
@@ -106,7 +99,6 @@ class PlantModelManagerTest {
   }
 
   @Test
-  @SuppressWarnings("deprecation")
   void exportPlantModel() {
     plantModelManager.createPlantModelObjects(plantModelCreationTo);
 
@@ -118,12 +110,10 @@ class PlantModelManagerTest {
     assertThat(exportedModel.getLocationTypes(), hasSize(1));
     assertThat(exportedModel.getLocations(), hasSize(1));
     assertThat(exportedModel.getBlocks(), hasSize(1));
-    assertThat(exportedModel.getGroups(), hasSize(1));
     assertThat(exportedModel.getVehicles(), hasSize(1));
   }
 
   @Test
-  @SuppressWarnings("deprecation")
   void clearPlantModel() {
     plantModelManager.createPlantModelObjects(plantModelCreationTo);
 
@@ -134,7 +124,6 @@ class PlantModelManagerTest {
     assertThat(objectRepo.getObjects(LocationType.class), is(empty()));
     assertThat(objectRepo.getObjects(Location.class), is(empty()));
     assertThat(objectRepo.getObjects(Block.class), is(empty()));
-    assertThat(objectRepo.getObjects(Group.class), is(empty()));
     assertThat(objectRepo.getObjects(Vehicle.class), is(empty()));
     assertThat(objectRepo.getObjects(VisualLayout.class), is(empty()));
   }

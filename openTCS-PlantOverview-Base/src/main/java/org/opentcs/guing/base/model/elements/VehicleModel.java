@@ -606,7 +606,6 @@ public class VehicleModel
     pState.setModellingEditable(false);
     setProperty(STATE, pState);
 
-    @SuppressWarnings("deprecation")
     SelectionProperty<Vehicle.ProcState> pProcState
         = new SelectionProperty<>(this,
                                   Arrays.asList(Vehicle.ProcState.values()),

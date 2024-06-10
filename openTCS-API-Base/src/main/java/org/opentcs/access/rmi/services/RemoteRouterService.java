@@ -19,7 +19,6 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods provided by the {@link RouterService} via RMI.
@@ -39,28 +38,7 @@ public interface RemoteRouterService
     extends Remote {
 
   // CHECKSTYLE:OFF
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public void updatePathLock(ClientID clientId, TCSObjectReference<Path> ref, boolean locked)
-      throws RemoteException;
-
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public void updateRoutingTopology(ClientID clientId)
-      throws RemoteException;
-
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default public void updateRoutingTopology(ClientID clientId, Set<TCSObjectReference<Path>> refs)
-      throws RemoteException {
-    updateRoutingTopology(clientId);
-  }
-
-  @Deprecated
-  public Map<TCSObjectReference<Point>, Route> computeRoutes(
-      ClientID clientId,
-      TCSObjectReference<Vehicle> vehicleRef,
-      TCSObjectReference<Point> sourcePointRef,
-      Set<TCSObjectReference<Point>> destinationPointRefs)
+  public void updateRoutingTopology(ClientID clientId, Set<TCSObjectReference<Path>> refs)
       throws RemoteException;
 
   public Map<TCSObjectReference<Point>, Route> computeRoutes(

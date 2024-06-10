@@ -236,22 +236,6 @@ public class DefaultPeripheralJobDispatcher
   }
 
   @Override
-  @Deprecated
-  public void peripheralJobFinished(@Nonnull PeripheralJob job) {
-    requireNonNull(job, "job");
-
-    peripheralJobFinished(job.getReference());
-  }
-
-  @Override
-  @Deprecated
-  public void peripheralJobFailed(@Nonnull PeripheralJob job) {
-    requireNonNull(job, "job");
-
-    peripheralJobFailed(job.getReference());
-  }
-
-  @Override
   public void peripheralJobFinished(@Nonnull TCSObjectReference<PeripheralJob> ref) {
     requireNonNull(ref, "ref");
 

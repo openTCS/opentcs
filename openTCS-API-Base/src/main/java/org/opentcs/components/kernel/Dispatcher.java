@@ -13,7 +13,6 @@ import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentExceptio
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods a dispatcher module for the openTCS
@@ -101,19 +100,6 @@ public interface Dispatcher
   void withdrawOrder(@Nonnull Vehicle vehicle, boolean immediateAbort);
 
   /**
-   * Notifies the dispatcher of changes in the topology.
-   * <p>
-   * This method is supposed to be called only from the kernel executor thread.
-   * </p>
-   *
-   * @deprecated Use {@link #rerouteAll(org.opentcs.data.order.ReroutingType)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  default void topologyChanged() {
-  }
-
-  /**
    * Notifies the dispatcher of a request to reroute the given vehicle considering the given
    * rerouting type.
    * <p>
@@ -123,9 +109,7 @@ public interface Dispatcher
    * @param vehicle The vehicle to be rerouted.
    * @param reroutingType The type of the requested rerouting.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void reroute(@Nonnull Vehicle vehicle, @Nonnull ReroutingType reroutingType) {
-  }
+  void reroute(@Nonnull Vehicle vehicle, @Nonnull ReroutingType reroutingType);
 
   /**
    * Notifies the dispatcher to reroute all vehicles considering the given rerouting type.
@@ -135,9 +119,7 @@ public interface Dispatcher
    *
    * @param reroutingType The type of the requested rerouting.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void rerouteAll(@Nonnull ReroutingType reroutingType) {
-  }
+  void rerouteAll(@Nonnull ReroutingType reroutingType);
 
   /**
    * Notifies the dispatcher that it should assign the given transport order (to its intended
@@ -150,9 +132,6 @@ public interface Dispatcher
    * @throws TransportOrderAssignmentException If the given transport order could not be assigned
    * to its intended vehicle.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void assignNow(@Nonnull TransportOrder transportOrder)
-      throws TransportOrderAssignmentException {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
+  void assignNow(@Nonnull TransportOrder transportOrder)
+      throws TransportOrderAssignmentException;
 }

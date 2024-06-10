@@ -15,7 +15,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods provided by the {@link DispatcherService} via RMI.
@@ -48,22 +47,13 @@ public interface RemoteDispatcherService
                                 boolean immediateAbort)
       throws RemoteException;
 
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void reroute(ClientID clientId,
-                       TCSObjectReference<Vehicle> ref,
-                       ReroutingType reroutingType)
-      throws RemoteException {
-  }
+  void reroute(ClientID clientId, TCSObjectReference<Vehicle> ref, ReroutingType reroutingType)
+      throws RemoteException;
 
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void rerouteAll(ClientID clientId,
-                          ReroutingType reroutingType)
-      throws RemoteException {
-  }
+  void rerouteAll(ClientID clientId, ReroutingType reroutingType)
+      throws RemoteException;
 
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void assignNow(ClientID clientId, TCSObjectReference<TransportOrder> ref)
-      throws RemoteException {
-  }
+  void assignNow(ClientID clientId, TCSObjectReference<TransportOrder> ref)
+      throws RemoteException;
   // CHECKSTYLE:ON
 }

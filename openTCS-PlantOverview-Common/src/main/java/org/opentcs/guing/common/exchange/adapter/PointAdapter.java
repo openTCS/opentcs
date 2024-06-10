@@ -108,16 +108,12 @@ public class PointAdapter
     model.getPropertyLayerWrapper().setValue(layerWrapper);
   }
 
-  @SuppressWarnings("deprecation")
   private void updateModelType(PointModel model, Point point) {
     PointModel.Type value;
 
     switch (point.getType()) {
       case PARK_POSITION:
         value = PointModel.Type.PARK;
-        break;
-      case REPORT_POSITION:
-        value = PointModel.Type.REPORT;
         break;
       case HALT_POSITION:
       default:
@@ -158,14 +154,11 @@ public class PointAdapter
     );
   }
 
-  @SuppressWarnings("deprecation")
   private Point.Type convertPointType(PointModel.Type type) {
     requireNonNull(type, "type");
     switch (type) {
       case PARK:
         return Point.Type.PARK_POSITION;
-      case REPORT:
-        return Point.Type.REPORT_POSITION;
       case HALT:
         return Point.Type.HALT_POSITION;
       default:

@@ -17,7 +17,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.order.TransportOrder.State;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides methods concerning the {@link Dispatcher}.
@@ -84,11 +83,9 @@ public interface DispatcherService {
    * @param ref The vehicle to be rerouted.
    * @param reroutingType The type of the requested rerouting.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void reroute(@Nonnull TCSObjectReference<Vehicle> ref,
-                       @Nonnull ReroutingType reroutingType)
-      throws ObjectUnknownException, KernelRuntimeException {
-  }
+  void reroute(@Nonnull TCSObjectReference<Vehicle> ref,
+               @Nonnull ReroutingType reroutingType)
+      throws ObjectUnknownException, KernelRuntimeException;
 
   /**
    * Explicitly trigger a rerouting for all vehicles.
@@ -99,9 +96,7 @@ public interface DispatcherService {
    *
    * @param reroutingType The type of rerouting.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void rerouteAll(@Nonnull ReroutingType reroutingType) {
-  }
+  void rerouteAll(@Nonnull ReroutingType reroutingType);
 
   /**
    * Assign the referenced transport order (to its intended vehicle) <em>now</em>.
@@ -116,9 +111,6 @@ public interface DispatcherService {
    * to its intended vehicle.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void assignNow(TCSObjectReference<TransportOrder> ref)
-      throws ObjectUnknownException, TransportOrderAssignmentException, KernelRuntimeException {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
+  void assignNow(TCSObjectReference<TransportOrder> ref)
+      throws ObjectUnknownException, TransportOrderAssignmentException, KernelRuntimeException;
 }

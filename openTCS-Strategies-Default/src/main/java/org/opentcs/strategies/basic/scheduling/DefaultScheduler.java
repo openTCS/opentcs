@@ -154,20 +154,6 @@ public class DefaultScheduler
   }
 
   @Override
-  @Deprecated
-  public void unclaim(Client client) {
-    requireNonNull(client, "client");
-
-    synchronized (globalSyncObject) {
-      reservationPool.setClaim(client, new ArrayList<>());
-
-      allocationAdvisor.setAllocationState(client,
-                                           reservationPool.allocatedResources(client),
-                                           new ArrayList<>());
-    }
-  }
-
-  @Override
   public void allocate(Client client, Set<TCSResource<?>> resources) {
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");

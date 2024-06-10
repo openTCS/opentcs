@@ -166,7 +166,6 @@ public class DefaultKernelInjectionModule
     configureWatchdogExtension();
   }
 
-  @SuppressWarnings("deprecation")
   private void configureKernelServicesDependencies() {
     bind(StandardPlantModelService.class).in(Singleton.class);
     bind(PlantModelService.class).to(StandardPlantModelService.class);
@@ -191,10 +190,6 @@ public class DefaultKernelInjectionModule
 
     bind(StandardDispatcherService.class).in(Singleton.class);
     bind(DispatcherService.class).to(StandardDispatcherService.class);
-
-    bind(org.opentcs.kernel.services.StandardSchedulerService.class).in(Singleton.class);
-    bind(org.opentcs.components.kernel.services.SchedulerService.class)
-        .to(org.opentcs.kernel.services.StandardSchedulerService.class);
 
     bind(StandardQueryService.class).in(Singleton.class);
     bind(QueryService.class).to(StandardQueryService.class);

@@ -322,15 +322,12 @@ public class PlantModelElementConverter {
     return model;
   }
 
-  @SuppressWarnings("deprecation")
   private PointModel.Type mapPointType(Point.Type type) {
     switch (type) {
       case HALT_POSITION:
         return PointModel.Type.HALT;
       case PARK_POSITION:
         return PointModel.Type.PARK;
-      case REPORT_POSITION:
-        return PointModel.Type.REPORT;
       default:
         throw new IllegalArgumentException("Unhandled point type: " + type);
     }

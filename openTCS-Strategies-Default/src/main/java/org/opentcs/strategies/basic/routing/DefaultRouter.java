@@ -22,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.components.kernel.services.TCSObjectService;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -100,7 +99,7 @@ public class DefaultRouter
 
     synchronized (this) {
       routesByVehicle.clear();
-      topologyChanged();
+      pointRouterProvider.invalidate();
       initialized = true;
     }
   }
@@ -120,20 +119,6 @@ public class DefaultRouter
       routesByVehicle.clear();
       pointRouterProvider.invalidate();
       initialized = false;
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void topologyChanged() {
-    this.updateRoutingTopology();
-  }
-
-  @Override
-  @Deprecated
-  public void updateRoutingTopology() {
-    synchronized (this) {
-      pointRouterProvider.invalidate();
     }
   }
 
@@ -194,32 +179,6 @@ public class DefaultRouter
     }
   }
 
-  @Deprecated
-  @Override
-  public Optional<Route> getRoute(Vehicle vehicle,
-                                  Point sourcePoint,
-                                  Point destinationPoint) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(sourcePoint, "sourcePoint");
-    requireNonNull(destinationPoint, "destinationPoint");
-
-    synchronized (this) {
-      PointRouter pointRouter = pointRouterProvider
-          .getPointRouterForVehicle(vehicle, (TransportOrder) null);
-      long costs = pointRouter.getCosts(sourcePoint, destinationPoint);
-      if (costs == INFINITE_COSTS) {
-        return Optional.empty();
-      }
-      List<Route.Step> steps = pointRouter.getRouteSteps(sourcePoint, destinationPoint);
-      if (steps.isEmpty()) {
-        // If the list of steps is empty, we're already at the destination point
-        // Create a single step without a path.
-        steps.add(new Route.Step(null, null, sourcePoint, Vehicle.Orientation.UNDEFINED, 0));
-      }
-      return Optional.of(new Route(steps, costs));
-    }
-  }
-
   @Override
   public Optional<Route> getRoute(Vehicle vehicle,
                                   Point sourcePoint,
@@ -244,38 +203,6 @@ public class DefaultRouter
         steps.add(new Route.Step(null, null, sourcePoint, Vehicle.Orientation.UNDEFINED, 0));
       }
       return Optional.of(new Route(steps, costs));
-    }
-  }
-
-  @Deprecated
-  @Override
-  public long getCosts(Vehicle vehicle,
-                       Point sourcePoint,
-                       Point destinationPoint) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(sourcePoint, "sourcePoint");
-    requireNonNull(destinationPoint, "destinationPoint");
-
-    synchronized (this) {
-      return pointRouterProvider
-          .getPointRouterForVehicle(vehicle, (TransportOrder) null)
-          .getCosts(sourcePoint, destinationPoint);
-    }
-  }
-
-  @Deprecated
-  @Override
-  public long getCostsByPointRef(Vehicle vehicle,
-                                 TCSObjectReference<Point> srcPointRef,
-                                 TCSObjectReference<Point> dstPointRef) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(srcPointRef, "srcPointRef");
-    requireNonNull(dstPointRef, "dstPointRef");
-
-    synchronized (this) {
-      return pointRouterProvider
-          .getPointRouterForVehicle(vehicle, (TransportOrder) null)
-          .getCosts(srcPointRef, dstPointRef);
     }
   }
 

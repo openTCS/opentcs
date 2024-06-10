@@ -11,20 +11,15 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
-import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route.Step;
-import org.opentcs.data.order.TransportOrder;
-import org.opentcs.drivers.vehicle.MovementCommand;
 
 /**
  * Tests for {@link MovementComparisons}.
@@ -129,84 +124,5 @@ class MovementComparisonsTest {
                     routeIndex,
                     executionAllowed,
                     reroutingType);
-  }
-
-  private static class TestMovementCommand
-      implements MovementCommand {
-
-    private final Step step;
-    private final String operation;
-
-    TestMovementCommand(Step step, String operation) {
-      this.step = requireNonNull(step, "step");
-      this.operation = requireNonNull(operation, "operation");
-    }
-
-    @Override
-    public TransportOrder getTransportOrder() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public DriveOrder getDriveOrder() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Step getStep() {
-      return step;
-    }
-
-    @Override
-    public String getOperation() {
-      return operation;
-    }
-
-    @Override
-    @Deprecated
-    public boolean isWithoutOperation() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean hasEmptyOperation() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Location getOpLocation() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean isFinalMovement() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Point getFinalDestination() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Location getFinalDestinationLocation() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String getFinalOperation() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean equalsInMovement(MovementCommand command) {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Map<String, String> getProperties() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
   }
 }

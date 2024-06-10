@@ -81,28 +81,6 @@ public class AllocationAdvisor
   }
 
   @Override
-  @Deprecated
-  public void claim(Scheduler.Client client, List<Set<TCSResource<?>>> resources) {
-    requireNonNull(client, "client");
-    requireNonNull(resources, "resources");
-
-    for (Scheduler.Module module : modules) {
-      LOG.debug("Module {}: Claiming resources {} for client{}.", module, resources, client);
-      module.claim(client, resources);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void unclaim(Scheduler.Client client) {
-    requireNonNull(client, "client");
-
-    for (Scheduler.Module module : modules) {
-      module.unclaim(client);
-    }
-  }
-
-  @Override
   public void setAllocationState(@Nonnull Scheduler.Client client,
                                  @Nonnull Set<TCSResource<?>> alloc,
                                  @Nonnull List<Set<TCSResource<?>>> remainingClaim) {

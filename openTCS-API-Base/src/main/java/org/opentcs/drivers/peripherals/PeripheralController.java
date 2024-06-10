@@ -11,7 +11,6 @@ import jakarta.annotation.Nonnull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.util.ExplainedBoolean;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides high-level methods for the system to control a peripheral device.
@@ -40,9 +39,7 @@ public interface PeripheralController
    * The kernel will ignore calls to the callback after calling this method.
    * </p>
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed")
-  default void abortJob() {
-  }
+  void abortJob();
 
   /**
    * Checks if the peripheral device would be able to process the given job, taking into account

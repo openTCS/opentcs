@@ -202,11 +202,7 @@ class PlantModelHandlerTest {
                     new Vehicle("some-other-vehicle")
                 )
             )
-            .withVisualLayouts(
-                Set.of(
-                    new VisualLayout("some-layout")
-                )
-            )
+            .withVisualLayout(new VisualLayout("some-layout"))
             .withProperties(
                 Map.of("some-key", "some-value")
             );

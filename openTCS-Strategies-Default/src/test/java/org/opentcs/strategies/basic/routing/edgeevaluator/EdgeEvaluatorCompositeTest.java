@@ -55,9 +55,9 @@ class EdgeEvaluatorCompositeTest {
     evaluatorMock = mock(EdgeEvaluator.class);
 
     evaluators.put(EVALUATOR_MOCK, evaluatorMock);
-    evaluators.put(EVALUATOR_1, (someEdge, someVehicle) -> 1.0);
-    evaluators.put(EVALUATOR_2, (someEdge, someVehicle) -> 0.9);
-    evaluators.put(EVALUATOR_3, (someEdge, someVehicle) -> Double.POSITIVE_INFINITY);
+    evaluators.put(EVALUATOR_1, new FixedValueEdgeEvaluator(1.0));
+    evaluators.put(EVALUATOR_2, new FixedValueEdgeEvaluator(0.9));
+    evaluators.put(EVALUATOR_3, new FixedValueEdgeEvaluator(Double.POSITIVE_INFINITY));
   }
 
   @Test
@@ -110,5 +110,28 @@ class EdgeEvaluatorCompositeTest {
 
     verifyNoInteractions(evaluatorMock);
     assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(Double.POSITIVE_INFINITY));
+  }
+
+  private static class FixedValueEdgeEvaluator
+      implements EdgeEvaluator {
+
+    private final double value;
+
+    FixedValueEdgeEvaluator(double value) {
+      this.value = value;
+    }
+
+    @Override
+    public void onGraphComputationStart(Vehicle vehicle) {
+    }
+
+    @Override
+    public void onGraphComputationEnd(Vehicle vehicle) {
+    }
+
+    @Override
+    public double computeWeight(Edge edge, Vehicle vehicle) {
+      return value;
+    }
   }
 }

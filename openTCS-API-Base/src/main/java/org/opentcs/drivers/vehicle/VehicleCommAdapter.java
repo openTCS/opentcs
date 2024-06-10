@@ -9,15 +9,12 @@ package org.opentcs.drivers.vehicle;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import java.util.List;
 import java.util.Queue;
-import java.util.stream.Collectors;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.ExplainedBoolean;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods that a driver communicating with and
@@ -76,10 +73,7 @@ public interface VehicleCommAdapter
    * @return This adapter's queue of unsent commands.
    * @see #getCommandsCapacity()
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default Queue<MovementCommand> getUnsentCommands() {
-    return getCommandQueue();
-  }
+  Queue<MovementCommand> getUnsentCommands();
 
   /**
    * Returns this adapter's queue of sent commands.
@@ -89,12 +83,9 @@ public interface VehicleCommAdapter
    * </p>
    *
    * @return This adapter's queue of sent commands.
-   * @see #getCommandQueueCapacity()
+   * @see #getCommandsCapacity()
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default Queue<MovementCommand> getSentCommands() {
-    return getSentQueue();
-  }
+  Queue<MovementCommand> getSentCommands();
 
   /**
    * Indicates how many commands this comm adapter accepts.
@@ -110,42 +101,7 @@ public interface VehicleCommAdapter
    *
    * @return The number of commands this comm adapter accepts.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default int getCommandsCapacity() {
-    return getCommandQueueCapacity();
-  }
-
-  /**
-   * Indicates how many commands this comm adapter accepts.
-   * <p>
-   * This capacity considers both the {@link #getCommandQueue() command queue} and the
-   * {@link #getSentQueue() sent queue}. This means that the number of elements in both queues
-   * combined must not exceed this number.
-   * </p>
-   *
-   * @return The number of commands this comm adapter accepts.
-   * @deprecated Use {@link #getCommandsCapacity()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  int getCommandQueueCapacity();
-
-  /**
-   * Returns this adapter's command queue.
-   * <p>
-   * This queue contains {@link MovementCommand}s that the comm adapter received from the
-   * {@link VehicleController} it's associated with. When a command is sent to the vehicle, the
-   * command is removed from this queue and added to the {@link #getSentQueue() sent queue}.
-   * </p>
-   *
-   * @return This adapter's command queue.
-   * @see #getCommandQueueCapacity()
-   * @deprecated Use {@link #getUnsentCommands()} instead.
-   */
-  @Nonnull
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  Queue<MovementCommand> getCommandQueue();
+  int getCommandsCapacity();
 
   /**
    * Checks whether this comm adapter can accept the next (i.e. one more)
@@ -153,36 +109,7 @@ public interface VehicleCommAdapter
    *
    * @return {@code true}, if this adapter can accept another command, otherwise {@code false}.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default boolean canAcceptNextCommand() {
-    return (getCommandQueue().size() + getSentQueue().size()) < getCommandQueueCapacity();
-  }
-
-  /**
-   * Returns the capacity of this adapter's {@link #getSentQueue() <em>sent queue</em>}.
-   *
-   * @return The capacity of this adapter's <em>sent queue</em>.
-   * @deprecated Will be removed without a replacement, as this method no longer seems to serve any
-   * purpose.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  int getSentQueueCapacity();
-
-  /**
-   * Returns a queue containing the commands that this adapter has sent to the vehicle already but
-   * which have not yet been processed by it.
-   *
-   * @return A queue containing the commands that this adapter has sent to the vehicle already but
-   * which have not yet been processed by it.
-   * @see #getSentQueueCapacity()
-   * @see #getCommandQueueCapacity()
-   * @deprecated Use {@link #getSentCommands()} instead.
-   */
-  @Nonnull
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  Queue<MovementCommand> getSentQueue();
+  boolean canAcceptNextCommand();
 
   /**
    * Returns the string the comm adapter recognizes as a recharge operation.
@@ -226,31 +153,7 @@ public interface VehicleCommAdapter
    * process the given order.
    */
   @Nonnull
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default ExplainedBoolean canProcess(@Nonnull TransportOrder order) {
-    return canProcess(
-        order.getFutureDriveOrders().stream()
-            .map(driveOrder -> driveOrder.getDestination().getOperation())
-            .collect(Collectors.toList())
-    );
-  }
-
-  /**
-   * Checks if the vehicle would be able to process the given sequence of operations, taking into
-   * account its current state.
-   *
-   * @param operations A sequence of operations that might have to be processed as part of a
-   * transport order.
-   * @return An <code>ExplainedBoolean</code> indicating whether the vehicle would be able to
-   * process every single operation in the list (in the given order).
-   * @deprecated Use {@link #canProcess(org.opentcs.data.order.TransportOrder)} instead.
-   */
-  @Nonnull
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  default ExplainedBoolean canProcess(@Nonnull List<String> operations) {
-    return new ExplainedBoolean(false, "VehicleCommAdapter default implementation");
-  }
+  ExplainedBoolean canProcess(@Nonnull TransportOrder order);
 
   /**
    * Notifies the implementation that the vehicle's <em>paused</em> state in the kernel has changed.
@@ -259,9 +162,7 @@ public interface VehicleCommAdapter
    *
    * @param paused The vehicle's new paused state.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void onVehiclePaused(boolean paused) {
-  }
+  void onVehiclePaused(boolean paused);
 
   /**
    * Processes a generic message to the communication adapter.

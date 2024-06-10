@@ -73,16 +73,16 @@ public class MovementCommandMapper {
         Location location = isFinalMovement ? finalDestinationLocation : null;
 
         result.add(
-            new MovementCommandImpl(transportOrder,
-                                    driveOrder,
-                                    curStep,
-                                    operation,
-                                    location,
-                                    isFinalMovement,
-                                    finalDestinationLocation,
-                                    finalDestination,
-                                    op,
-                                    mergeProperties(transportOrder.getProperties(), destProperties))
+            new MovementCommand(transportOrder,
+                                driveOrder,
+                                curStep,
+                                operation,
+                                location,
+                                isFinalMovement,
+                                finalDestinationLocation,
+                                finalDestination,
+                                op,
+                                mergeProperties(transportOrder.getProperties(), destProperties))
         );
       }
     }

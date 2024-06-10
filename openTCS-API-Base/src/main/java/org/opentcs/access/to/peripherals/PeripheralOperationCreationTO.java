@@ -56,7 +56,6 @@ public class PeripheralOperationCreationTO
     this.completionRequired = false;
   }
 
-  @SuppressWarnings("deprecation")
   private PeripheralOperationCreationTO(
       @Nonnull String name,
       @Nonnull Map<String, String> properties,
@@ -67,12 +66,7 @@ public class PeripheralOperationCreationTO
     super(name, properties);
     this.operation = requireNonNull(operation, "operation");
     this.locationName = requireNonNull(locationName, "locationName");
-    requireNonNull(executionTrigger, "executionTrigger");
-    this.executionTrigger
-        = (executionTrigger == PeripheralOperation.ExecutionTrigger.BEFORE_MOVEMENT)
-            ? PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION
-            : executionTrigger;
-
+    this.executionTrigger = requireNonNull(executionTrigger, "executionTrigger");
     this.completionRequired = completionRequired;
   }
 

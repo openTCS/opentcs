@@ -17,7 +17,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.PlantModel;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods provided by the {@link PlantModelService} via RMI.
@@ -53,9 +52,7 @@ public interface RemotePlantModelService
   void updateLocationLock(ClientID clientId, TCSObjectReference<Location> ref, boolean locked)
       throws RemoteException;
 
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void updatePathLock(ClientID clientId, TCSObjectReference<Path> ref, boolean locked)
-      throws RemoteException {
-  }
+  void updatePathLock(ClientID clientId, TCSObjectReference<Path> ref, boolean locked)
+      throws RemoteException;
   // CHECKSTYLE:ON
 }

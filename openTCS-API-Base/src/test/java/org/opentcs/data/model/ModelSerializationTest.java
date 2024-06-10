@@ -23,24 +23,11 @@ import org.opentcs.data.TCSObjectReference;
  */
 class ModelSerializationTest {
 
-  ModelSerializationTest() {
-  }
-
   @Test
   void shouldSerializeAndDeserializeBlock()
       throws Exception {
     Block originalObject = new Block("Block1");
     Block deserializedObject = (Block) deserializeTCSObject(serializeTCSObject(originalObject));
-
-    assertEquals(originalObject, deserializedObject);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  void shouldSerializeAndDeserializeGroup()
-      throws Exception {
-    Group originalObject = new Group("Group1");
-    Group deserializedObject = (Group) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
   }

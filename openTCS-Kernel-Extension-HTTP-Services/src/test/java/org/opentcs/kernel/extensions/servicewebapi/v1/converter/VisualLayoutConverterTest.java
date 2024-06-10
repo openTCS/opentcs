@@ -9,7 +9,6 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.hasSize;
@@ -82,7 +81,7 @@ class VisualLayoutConverterTest {
         .withLayerGroups(List.of(new LayerGroup(3, "G1", true)))
         .withProperties(propertyMap);
     
-    VisualLayoutTO result = visualLayoutConverter.toVisualLayoutTO(Set.of(vLayout));
+    VisualLayoutTO result = visualLayoutConverter.toVisualLayoutTO(vLayout);
     
     assertThat(result.getName(), is("V1"));
     assertThat(result.getScaleX(), is(50.00));
@@ -93,12 +92,5 @@ class VisualLayoutConverterTest {
     assertThat(result.getLayerGroups().get(0),
                samePropertyValuesAs(new LayerGroupTO(3, "G1", true)));
     assertThat(result.getProperties(), is(propertyList));
-  }
-  
-  @Test
-  void checkToVisualLayoutTOShouldCreateDefault() {
-    VisualLayoutTO result = visualLayoutConverter.toVisualLayoutTO(Set.of());
-    
-    assertThat(result.getName(), is("default visual layout"));
   }
 }

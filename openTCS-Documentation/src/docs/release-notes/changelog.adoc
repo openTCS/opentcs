@@ -24,8 +24,14 @@ This change log lists the most relevant changes for past releases in reverse chr
    For the latter, use of the `javax` namespace was never officially approved, so the former may be considered more official.
 ** Remove code for reading configuration (interfaces) via cfg4j.
    Reading configuration (interfaces) via gestalt, which had already been made the default previously, is now the only integrated variant.
+** Remove deprecated code.
 * Other changes:
 ** Replace the configuration prefix 'plantoverviewapp' in the Model Editor and Operations Desk applications (which is reminiscent of the old Plant Overview application) with prefixes that are more suitable for the respective applications.
+
+=== Migration notes
+
+* When a plant model that was created with an earlier version is intended to be used with openTCS 6.0, it is recommended to first load and save the plant model with the Model Editor of the latest openTCS 5 release, which is openTCS 5.17 at the time of this writing.
+  Otherwise, loading such a plant model with openTCS 6 might fail.
 
 == Version 5.17 (2024-05-21)
 

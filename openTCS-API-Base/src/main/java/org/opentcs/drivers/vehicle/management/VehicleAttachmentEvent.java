@@ -8,14 +8,24 @@
 package org.opentcs.drivers.vehicle.management;
 
 import jakarta.annotation.Nonnull;
-import org.opentcs.util.annotations.ScheduledApiChange;
+import java.io.Serializable;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Instances of this class represent events emitted by/for attaching comm adapters.
  */
-@SuppressWarnings("deprecation")
 public class VehicleAttachmentEvent
-    extends AttachmentEvent {
+    extends CommAdapterEvent
+    implements Serializable {
+
+  /**
+   * The vehicle's name a comm adapter has been attached to.
+   */
+  private final String vehicleName;
+  /**
+   * The {@link VehicleAttachmentInformation} to the actual attachment.
+   */
+  private final VehicleAttachmentInformation attachmentInformation;
 
   /**
    * Creates a new instance.
@@ -25,19 +35,17 @@ public class VehicleAttachmentEvent
    */
   public VehicleAttachmentEvent(@Nonnull String vehicleName,
                                 @Nonnull VehicleAttachmentInformation attachmentInformation) {
-    super(vehicleName, attachmentInformation);
+    this.vehicleName = requireNonNull(vehicleName, "vehicleName");
+    this.attachmentInformation = requireNonNull(attachmentInformation, "attachmentInformation");
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the vehicle's name a comm adapter has been attached to.
    *
-   * @deprecated Use {@link #getAttachmentInformation()} instead.
+   * @return The vehicle's name a comm adapter has been attached to.
    */
-  @Override
-  @Deprecated
-  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  public VehicleAttachmentInformation getUpdatedAttachmentInformation() {
-    return (VehicleAttachmentInformation) super.getUpdatedAttachmentInformation();
+  public String getVehicleName() {
+    return vehicleName;
   }
 
   /**
@@ -46,6 +54,6 @@ public class VehicleAttachmentEvent
    * @return The {@link VehicleAttachmentInformation} to the actual attachment.
    */
   public VehicleAttachmentInformation getAttachmentInformation() {
-    return getUpdatedAttachmentInformation();
+    return attachmentInformation;
   }
 }

@@ -239,9 +239,7 @@ public class LoopbackCommunicationAdapter
     );
   }
 
-  @Override
-  @Deprecated
-  public synchronized ExplainedBoolean canProcess(List<String> operations) {
+  private ExplainedBoolean canProcess(List<String> operations) {
     requireNonNull(operations, "operations");
 
     LOG.debug("{}: Checking processability of {}...", getName(), operations);
@@ -328,7 +326,7 @@ public class LoopbackCommunicationAdapter
 
     if (step.getPath() == null) {
       LOG.debug("Starting operation simulation...");
-      ((ScheduledExecutorService) getExecutor()).schedule(
+      getExecutor().schedule(
           () -> operationSimulation(command, 0),
           SIMULATION_PERIOD,
           TimeUnit.MILLISECONDS);
@@ -342,9 +340,9 @@ public class LoopbackCommunicationAdapter
       );
 
       LOG.debug("Starting movement simulation...");
-      ((ScheduledExecutorService) getExecutor()).schedule(() -> movementSimulation(command),
-                                                          SIMULATION_PERIOD,
-                                                          TimeUnit.MILLISECONDS);
+      getExecutor().schedule(() -> movementSimulation(command),
+                             SIMULATION_PERIOD,
+                             TimeUnit.MILLISECONDS);
     }
   }
 
@@ -369,9 +367,9 @@ public class LoopbackCommunicationAdapter
     WayEntry currentWayEntry = getProcessModel().getVelocityController().getCurrentWayEntry();
     //if we are still on the same way entry then reschedule to do it again
     if (prevWayEntry == currentWayEntry) {
-      ((ScheduledExecutorService) getExecutor()).schedule(() -> movementSimulation(command),
-                                                          SIMULATION_PERIOD,
-                                                          TimeUnit.MILLISECONDS);
+      getExecutor().schedule(() -> movementSimulation(command),
+                             SIMULATION_PERIOD,
+                             TimeUnit.MILLISECONDS);
     }
     else {
       //if the way enties are different then we have finished this step
@@ -380,10 +378,11 @@ public class LoopbackCommunicationAdapter
       LOG.debug("Movement simulation finished.");
       if (!command.hasEmptyOperation()) {
         LOG.debug("Starting operation simulation...");
-        ((ScheduledExecutorService) getExecutor()).schedule(
+        getExecutor().schedule(
             () -> operationSimulation(command, 0),
             SIMULATION_PERIOD,
-            TimeUnit.MILLISECONDS);
+            TimeUnit.MILLISECONDS
+        );
       }
       else {
         finishMovementCommand(command);
@@ -402,10 +401,11 @@ public class LoopbackCommunicationAdapter
                                    int timePassed) {
     if (timePassed < getProcessModel().getOperatingTime()) {
       getProcessModel().getVelocityController().advanceTime(getSimulationTimeStep());
-      ((ScheduledExecutorService) getExecutor()).schedule(
+      getExecutor().schedule(
           () -> operationSimulation(command, timePassed + getSimulationTimeStep()),
           SIMULATION_PERIOD,
-          TimeUnit.MILLISECONDS);
+          TimeUnit.MILLISECONDS
+      );
     }
     else {
       LOG.debug("Operation simulation finished.");
@@ -428,13 +428,14 @@ public class LoopbackCommunicationAdapter
         LOG.debug("Starting recharge simulation...");
         finishMovementCommand(command);
         getProcessModel().setState(Vehicle.State.CHARGING);
-        ((ScheduledExecutorService) getExecutor()).schedule(
+        getExecutor().schedule(
             () -> chargingSimulation(
                 getProcessModel().getPosition(),
                 getProcessModel().getEnergyLevel()
             ),
             SIMULATION_PERIOD,
-            TimeUnit.MILLISECONDS);
+            TimeUnit.MILLISECONDS
+        );
       }
       else {
         simulateNextCommand();
@@ -469,10 +470,11 @@ public class LoopbackCommunicationAdapter
     }
     if (nextChargePercentage(rechargePercentage) < 100.0) {
       getProcessModel().setEnergyLevel((int) rechargePercentage);
-      ((ScheduledExecutorService) getExecutor()).schedule(
+      getExecutor().schedule(
           () -> chargingSimulation(rechargePosition, nextChargePercentage(rechargePercentage)),
           SIMULATION_PERIOD,
-          TimeUnit.MILLISECONDS);
+          TimeUnit.MILLISECONDS
+      );
     }
     else {
       LOG.debug("Finishing recharge operation, vehicle at 100%...");

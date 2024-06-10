@@ -12,7 +12,6 @@ import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Some commonly used comparator implementations.
@@ -73,22 +72,5 @@ public final class Comparators {
    */
   public static Comparator<PeripheralJob> jobsByAge() {
     return Comparator.comparing(PeripheralJob::getCreationTime).thenComparing(objectsByName());
-  }
-
-  /**
-   * A comparator for ordering ModelLayoutElements by the names of their
-   * visualized objects.
-   *
-   * @return A comparator for ordering ModelLayoutElements by the names of their
-   * visualized objects.
-   */
-  @Deprecated
-  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  public static Comparator<org.opentcs.data.model.visualization.ModelLayoutElement>
-      modelLayoutElementsByName() {
-    return (org.opentcs.data.model.visualization.ModelLayoutElement o1,
-        org.opentcs.data.model.visualization.ModelLayoutElement o2)
-        -> o1.getVisualizedObject().getName().compareTo(
-            o2.getVisualizedObject().getName());
   }
 }

@@ -16,7 +16,6 @@ import java.util.Set;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A point in the driving course at which a {@link Vehicle} may be located.
@@ -179,78 +178,6 @@ public class Point
                      getProperties(),
                      getHistory(),
                      pose,
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
-  }
-
-  /**
-   * Returns the physical coordinates of this point in mm.
-   *
-   * @return The physical coordinates of this point in mm.
-   * @deprecated Use {@link #getPose()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public Triple getPosition() {
-    return pose.getPosition();
-  }
-
-  /**
-   * Creates a copy of this object, with the given position.
-   *
-   * @param position The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withPose(org.opentcs.data.model.Pose)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public Point withPosition(Triple position) {
-    return new Point(getName(),
-                     getProperties(),
-                     getHistory(),
-                     pose.withPosition(position),
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
-  }
-
-  /**
-   * Returns a vehicle's orientation angle at this position.
-   * (-360..360, or <code>Double.NaN</code>, if an orientation angle is not
-   * specified for this point.)
-   *
-   * @return The vehicle's orientation angle when it's at this position.
-   * @deprecated Use {@link #getPose()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public double getVehicleOrientationAngle() {
-    return pose.getOrientationAngle();
-  }
-
-  /**
-   * Creates a copy of this object, with the given vehicle orientation angle.
-   *
-   * @param vehicleOrientationAngle The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withPose(org.opentcs.data.model.Pose)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public Point withVehicleOrientationAngle(double vehicleOrientationAngle) {
-    return new Point(getName(),
-                     getProperties(),
-                     getHistory(),
-                     pose.withOrientationAngle(vehicleOrientationAngle),
                      type,
                      incomingPaths,
                      outgoingPaths,
@@ -498,15 +425,6 @@ public class Point
    */
   public enum Type {
 
-    /**
-     * Indicates a position at which a vehicle is expected to report in.
-     * Halting or even parking at such a position is not allowed.
-     *
-     * @deprecated Support for report points will be removed.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "6.0", details = "Will be removed")
-    REPORT_POSITION,
     /**
      * Indicates a position at which a vehicle may halt temporarily, e.g. for executing an
      * operation.

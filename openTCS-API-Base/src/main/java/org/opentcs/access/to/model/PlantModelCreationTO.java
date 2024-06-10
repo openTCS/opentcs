@@ -17,7 +17,6 @@ import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.ModelConstants;
 import org.opentcs.data.model.visualization.Layer;
 import org.opentcs.data.model.visualization.LayerGroup;
-import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,18 +53,13 @@ public class PlantModelCreationTO
    */
   private final List<BlockCreationTO> blocks;
   /**
-   * The plant model's groups.
-   */
-  @Deprecated
-  private final List<GroupCreationTO> groups;
-  /**
    * The plant model's vehicles.
    */
   private final List<VehicleCreationTO> vehicles;
   /**
-   * The plant model's visual layouts.
+   * The plant model's visual layout.
    */
-  private final List<VisualLayoutCreationTO> visualLayouts;
+  private final VisualLayoutCreationTO visualLayout;
 
   /**
    * Creates a new instance.
@@ -79,12 +73,10 @@ public class PlantModelCreationTO
     this.locationTypes = List.of();
     this.locations = List.of();
     this.blocks = List.of();
-    this.groups = List.of();
     this.vehicles = List.of();
-    this.visualLayouts = List.of(defaultVisualLayout());
+    this.visualLayout = defaultVisualLayout();
   }
 
-  @SuppressWarnings("deprecation")
   private PlantModelCreationTO(@Nonnull String name,
                                @Nonnull Map<String, String> properties,
                                @Nonnull List<PointCreationTO> points,
@@ -92,18 +84,16 @@ public class PlantModelCreationTO
                                @Nonnull List<LocationTypeCreationTO> locationTypes,
                                @Nonnull List<LocationCreationTO> locations,
                                @Nonnull List<BlockCreationTO> blocks,
-                               @Nonnull List<GroupCreationTO> groups,
                                @Nonnull List<VehicleCreationTO> vehicles,
-                               @Nonnull List<VisualLayoutCreationTO> visualLayouts) {
+                               @Nonnull VisualLayoutCreationTO visualLayout) {
     super(name, properties);
     this.points = requireNonNull(points, "points");
     this.paths = requireNonNull(paths, "paths");
     this.locationTypes = requireNonNull(locationTypes, "locationTypes");
     this.locations = requireNonNull(locations, "locations");
     this.blocks = requireNonNull(blocks, "blocks");
-    this.groups = requireNonNull(groups, "groups");
     this.vehicles = requireNonNull(vehicles, "vehicles");
-    this.visualLayouts = requireNonNull(visualLayouts, "visualLayouts");
+    this.visualLayout = requireNonNull(visualLayout, "visualLayout");
   }
 
   /**
@@ -129,9 +119,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations,
                                     blocks,
-                                    groups,
                                     vehicles,
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   /**
@@ -149,9 +138,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations,
                                     blocks,
-                                    groups,
                                     vehicles,
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   /**
@@ -177,9 +165,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations,
                                     blocks,
-                                    groups,
                                     vehicles,
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   /**
@@ -197,9 +184,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations,
                                     blocks,
-                                    groups,
                                     vehicles,
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   /**
@@ -227,9 +213,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations,
                                     blocks,
-                                    groups,
                                     vehicles,
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   /**
@@ -247,9 +232,8 @@ public class PlantModelCreationTO
                                     listWithAppendix(locationTypes, locationType),
                                     locations,
                                     blocks,
-                                    groups,
                                     vehicles,
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   /**
@@ -275,9 +259,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations,
                                     blocks,
-                                    groups,
                                     vehicles,
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   /**
@@ -295,9 +278,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     listWithAppendix(locations, location),
                                     blocks,
-                                    groups,
                                     vehicles,
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   /**
@@ -323,9 +305,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations,
                                     blocks,
-                                    groups,
                                     vehicles,
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   /**
@@ -343,62 +324,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations,
                                     CreationTO.listWithAppendix(blocks, block),
-                                    groups,
                                     vehicles,
-                                    visualLayouts);
-  }
-
-  /**
-   * Returns this plant model's groups.
-   *
-   * @return This plant model's groups.
-   */
-  @Deprecated
-  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  public List<GroupCreationTO> getGroups() {
-    return Collections.unmodifiableList(groups);
-  }
-
-  /**
-   * Creates a copy of this object with the given groups.
-   *
-   * @param groups The new groups.
-   * @return A copy of this model, differing in the given groups.
-   */
-  @Deprecated
-  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  public PlantModelCreationTO withGroups(@Nonnull List<GroupCreationTO> groups) {
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    groups,
-                                    vehicles,
-                                    visualLayouts);
-  }
-
-  /**
-   * Creates a copy of this object that includes the given group in the list of groups.
-   *
-   * @param group the new group.
-   * @return A copy of this model that also includes the given group.
-   */
-  @Deprecated
-  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  public PlantModelCreationTO withGroup(@Nonnull GroupCreationTO group) {
-    requireNonNull(group, "group");
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations, blocks,
-                                    listWithAppendix(groups, group),
-                                    vehicles,
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   /**
@@ -424,9 +351,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations,
                                     blocks,
-                                    groups,
                                     vehicles,
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   /**
@@ -444,9 +370,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations,
                                     blocks,
-                                    groups,
                                     listWithAppendix(vehicles, vehicle),
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   /**
@@ -455,55 +380,15 @@ public class PlantModelCreationTO
    * @return This plant model's visual layout.
    */
   public VisualLayoutCreationTO getVisualLayout() {
-    return visualLayouts.get(visualLayouts.size() - 1);
+    return visualLayout;
   }
 
   /**
-   * Returns this plant model's visual layouts.
-   *
-   * @return This plant model's visual layouts.
-   * @deprecated Use{@link #getVisualLayout()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  public List<VisualLayoutCreationTO> getVisualLayouts() {
-    return Collections.unmodifiableList(visualLayouts);
-  }
-
-  /**
-   * Creates a copy of this object with the given visual layouts.
-   *
-   * @param visualLayouts The new visual layouts.
-   * @return A copy of this model, differing in the given visual layouts.
-   * @deprecated Use {@link #withVisualLayout(org.opentcs.access.to.model.VisualLayoutCreationTO)}
-   * instead
-   */
-  @Deprecated
-  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  public PlantModelCreationTO withVisualLayouts(
-      @Nonnull List<VisualLayoutCreationTO> visualLayouts
-  ) {
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    groups,
-                                    vehicles,
-                                    visualLayouts);
-  }
-
-  /**
-   * Creates a copy of this object that includes the given visual layout in the list of
-   * visual layout elements.
+   * Creates a copy of this object with the given visual layout.
    *
    * @param visualLayout the new visual layout.
-   * @return A copy of this model that also includes the given visual layout.
+   * @return A copy of this model with the given visual layout.
    */
-  @ScheduledApiChange(details = "A plant model will contain only a single visual layout.",
-                      when = "6.0")
   public PlantModelCreationTO withVisualLayout(@Nonnull VisualLayoutCreationTO visualLayout) {
     requireNonNull(visualLayout, "visualLayout");
     return new PlantModelCreationTO(getName(),
@@ -513,9 +398,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations,
                                     blocks,
-                                    groups,
                                     vehicles,
-                                    listWithAppendix(visualLayouts, ensureValidity(visualLayout)));
+                                    ensureValidity(visualLayout));
   }
 
   /**
@@ -533,9 +417,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations,
                                     blocks,
-                                    groups,
                                     vehicles,
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   /**
@@ -557,9 +440,8 @@ public class PlantModelCreationTO
                                     locationTypes,
                                     locations,
                                     blocks,
-                                    groups,
                                     vehicles,
-                                    visualLayouts);
+                                    visualLayout);
   }
 
   @Override
@@ -571,9 +453,8 @@ public class PlantModelCreationTO
         + ", locationTypes=" + locationTypes
         + ", locations=" + locations
         + ", blocks=" + blocks
-        + ", groups=" + groups
         + ", vehicles=" + vehicles
-        + ", visualLayouts=" + visualLayouts
+        + ", visualLayout=" + visualLayout
         + ", properties=" + getProperties()
         + '}';
   }

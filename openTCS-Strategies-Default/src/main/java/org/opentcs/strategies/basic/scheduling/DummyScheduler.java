@@ -87,6 +87,10 @@ public class DummyScheduler
   }
 
   @Override
+  public void clearPendingAllocations(Client client) {
+  }
+
+  @Override
   public void reschedule() {
   }
 

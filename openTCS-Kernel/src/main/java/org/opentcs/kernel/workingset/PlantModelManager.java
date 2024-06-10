@@ -9,9 +9,7 @@ package org.opentcs.kernel.workingset;
 
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +34,6 @@ import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
-import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -47,7 +44,6 @@ import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
@@ -55,8 +51,6 @@ import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import static org.opentcs.util.Assertions.checkState;
-import org.opentcs.util.Colors;
-import org.opentcs.util.annotations.ScheduledApiChange;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,12 +130,10 @@ public class PlantModelManager
   /**
    * Removes all model objects from this model and the object pool by which it is backed.
    */
-  @SuppressWarnings("deprecation")
   public void clear() {
     List<TCSObject<?>> objects = new ArrayList<>();
     objects.addAll(getObjectRepo().getObjects(VisualLayout.class));
     objects.addAll(getObjectRepo().getObjects(Vehicle.class));
-    objects.addAll(getObjectRepo().getObjects(org.opentcs.data.model.Group.class));
     objects.addAll(getObjectRepo().getObjects(Block.class));
     objects.addAll(getObjectRepo().getObjects(Path.class));
     objects.addAll(getObjectRepo().getObjects(Location.class));
@@ -164,7 +156,6 @@ public class PlantModelManager
    * @throws ObjectExistsException If an object with a new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    */
-  @SuppressWarnings("deprecation")
   public void createPlantModelObjects(PlantModelCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
     LOG.info("Plant model is being created: {}", to.getName());
@@ -189,15 +180,11 @@ public class PlantModelManager
     for (BlockCreationTO block : to.getBlocks()) {
       createBlock(block);
     }
-    for (org.opentcs.access.to.model.GroupCreationTO group : to.getGroups()) {
-      createGroup(group);
-    }
     for (VehicleCreationTO vehicle : to.getVehicles()) {
       createVehicle(vehicle);
     }
 
     createVisualLayout(to.getVisualLayout());
-    overrideLayoutData(to.getVisualLayout());
   }
 
   /**
@@ -741,30 +728,6 @@ public class PlantModelManager
   }
 
   /**
-   * Sets a vehicle's index of the last route step travelled for the current
-   * drive order of its current transport order.
-   *
-   * @param vehicleRef A reference to the vehicle to be modified.
-   * @param index The new index.
-   * @return The modified vehicle.
-   * @throws ObjectUnknownException If the referenced vehicle does not exist.
-   * @deprecated Use {@link TransportOrderPoolManager#setTransportOrderCurrentRouteStepIndex(
-   * org.opentcs.data.TCSObjectReference, int)} instead.
-   */
-  @Deprecated
-  public Vehicle setVehicleRouteProgressIndex(TCSObjectReference<Vehicle> vehicleRef,
-                                              int index)
-      throws ObjectUnknownException {
-    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, vehicleRef);
-    Vehicle vehicle = previousState.withRouteProgressIndex(index);
-    getObjectRepo().replaceObject(vehicle);
-    emitObjectEvent(vehicle,
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
-    return vehicle;
-  }
-
-  /**
    * Sets a vehicle's claimed resources.
    *
    * @param vehicleRef A reference to the vehicle to be modified.
@@ -809,7 +772,6 @@ public class PlantModelManager
    *
    * @return A PlantModelCreationTO for this model.
    */
-  @SuppressWarnings("deprecation")
   public PlantModelCreationTO createPlantModelCreationTO() {
     return new PlantModelCreationTO(name)
         .withProperties(getProperties())
@@ -819,7 +781,6 @@ public class PlantModelManager
         .withLocationTypes(getLocationTypes())
         .withLocations(getLocations())
         .withBlocks(getBlocks())
-        .withGroups(getGroups())
         .withVisualLayout(getVisualLayout());
   }
 
@@ -910,7 +871,6 @@ public class PlantModelManager
    * @param model The model data.
    * @return A list of {@link PathCreationTO Paths} for all paths in a model.
    */
-  @SuppressWarnings("deprecation")
   private List<PathCreationTO> getPaths() {
     Set<Path> paths = getObjectRepo().getObjects(Path.class);
     List<PathCreationTO> result = new ArrayList<>();
@@ -1053,31 +1013,6 @@ public class PlantModelManager
               .withType(curBlock.getType())
               .withProperties(curBlock.getProperties())
               .withLayout(new BlockCreationTO.Layout(curBlock.getLayout().getColor()))
-      );
-    }
-
-    return result;
-  }
-
-  /**
-   * Returns a list of GroupCreationTOs for all groups in a model.
-   *
-   * @param model The model data.
-   * @return A list of GroupCreationTOs for all groups in a model.
-   */
-  @Deprecated
-  private List<org.opentcs.access.to.model.GroupCreationTO> getGroups() {
-    Set<org.opentcs.data.model.Group> groups
-        = getObjectRepo().getObjects(org.opentcs.data.model.Group.class);
-    List<org.opentcs.access.to.model.GroupCreationTO> result = new ArrayList<>();
-
-    for (org.opentcs.data.model.Group curGroup : groups) {
-      result.add(
-          new org.opentcs.access.to.model.GroupCreationTO(curGroup.getName())
-              .withMemberNames(curGroup.getMembers().stream()
-                  .map(member -> member.getName())
-                  .collect(Collectors.toSet()))
-              .withProperties(curGroup.getProperties())
       );
     }
 
@@ -1329,181 +1264,6 @@ public class PlantModelManager
                     TCSObjectEvent.Type.OBJECT_CREATED);
     // Return the newly created block.
     return newBlock;
-  }
-
-  /**
-   * Creates a new group with a unique name and all other attributes set to
-   * default values.
-   *
-   * @param to The transfer object from which to create the new group.
-   * @return The newly created group.
-   * @throws ObjectExistsException If an object with the new object's name already exists.
-   * @throws ObjectUnknownException If any object referenced in the TO does not exist.
-   */
-  @Deprecated
-  private org.opentcs.data.model.Group createGroup(org.opentcs.access.to.model.GroupCreationTO to)
-      throws ObjectExistsException, ObjectUnknownException {
-    Set<TCSObjectReference<?>> members = new HashSet<>();
-    for (String memberName : to.getMemberNames()) {
-      members.add(getObjectRepo().getObject(memberName).getReference());
-    }
-    org.opentcs.data.model.Group newGroup = new org.opentcs.data.model.Group(to.getName())
-        .withMembers(members)
-        .withProperties(to.getProperties());
-    getObjectRepo().addObject(newGroup);
-    emitObjectEvent(newGroup,
-                    null,
-                    TCSObjectEvent.Type.OBJECT_CREATED);
-    // Return the newly created group.
-    return newGroup;
-  }
-
-  /**
-   * Overrides the layout data in {@code TCSObject}s with the data stored in their respective
-   * model layout element.
-   *
-   * @param layout The visual layout to get the layout data from.
-   */
-  @Deprecated
-  @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  private void overrideLayoutData(VisualLayoutCreationTO layout) {
-    for (org.opentcs.access.to.model.ModelLayoutElementCreationTO mleTO
-             : layout.getModelElements()) {
-      TCSObject<?> object = getObjectRepo().getObject(mleTO.getName());
-      Map<String, String> props = mleTO.getProperties();
-
-      if (object instanceof Point) {
-        overridePointLayoutData((Point) object, props);
-      }
-      else if (object instanceof Path) {
-        overridePathLayoutData((Path) object, props);
-      }
-      else if (object instanceof Location) {
-        overrideLocationLayoutData((Location) object, props);
-      }
-      else if (object instanceof Block) {
-        overrideBlockLayoutData((Block) object, props);
-      }
-      else if (object instanceof Vehicle) {
-        overrideVehicleLayoutData((Vehicle) object, props);
-      }
-    }
-  }
-
-  private void overridePointLayoutData(Point oldPoint, Map<String, String> properties)
-      throws NumberFormatException {
-    long positionX = properties.get(ElementPropKeys.POINT_POS_X) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_POS_X))
-        : oldPoint.getLayout().getPosition().getX();
-    long positionY = properties.get(ElementPropKeys.POINT_POS_Y) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_POS_Y))
-        : oldPoint.getLayout().getPosition().getY();
-    long labelOffsetX = properties.get(ElementPropKeys.POINT_LABEL_OFFSET_X) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_LABEL_OFFSET_X))
-        : oldPoint.getLayout().getLabelOffset().getX();
-    long labelOffsetY = properties.get(ElementPropKeys.POINT_LABEL_OFFSET_Y) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.POINT_LABEL_OFFSET_Y))
-        : oldPoint.getLayout().getLabelOffset().getY();
-    Point newPoint = oldPoint.withLayout(
-        new Point.Layout(new Couple(positionX, positionY),
-                         new Couple(labelOffsetX, labelOffsetY),
-                         oldPoint.getLayout().getLayerId())
-    );
-    getObjectRepo().replaceObject(newPoint);
-    emitObjectEvent(newPoint, oldPoint, TCSObjectEvent.Type.OBJECT_MODIFIED);
-  }
-
-  private void overridePathLayoutData(Path oldPath, Map<String, String> properties)
-      throws IllegalArgumentException {
-    String connectionTypeString
-        = properties.getOrDefault(ElementPropKeys.PATH_CONN_TYPE,
-                                  oldPath.getLayout().getConnectionType().name());
-    Path.Layout.ConnectionType connectionType;
-    switch (connectionTypeString) {
-      case "DIRECT":
-        connectionType = Path.Layout.ConnectionType.DIRECT;
-        break;
-      case "ELBOW":
-        connectionType = Path.Layout.ConnectionType.ELBOW;
-        break;
-      case "SLANTED":
-        connectionType = Path.Layout.ConnectionType.SLANTED;
-        break;
-      case "POLYPATH":
-        connectionType = Path.Layout.ConnectionType.POLYPATH;
-        break;
-      case "BEZIER":
-        connectionType = Path.Layout.ConnectionType.BEZIER;
-        break;
-      case "BEZIER_3":
-        connectionType = Path.Layout.ConnectionType.BEZIER_3;
-        break;
-      default:
-        throw new IllegalArgumentException("Unhandled connection type: " + connectionTypeString);
-    }
-
-    List<Couple> controlPoints = oldPath.getLayout().getControlPoints();
-    String controlPointsString = properties.get(ElementPropKeys.PATH_CONTROL_POINTS);
-    if (controlPointsString != null) {
-      controlPoints = Arrays.asList(controlPointsString.split(";")).stream()
-          .map(controlPointString -> {
-            String[] coordinateStrings = controlPointString.split(",");
-            return new Couple(Long.parseLong(coordinateStrings[0]),
-                              Long.parseLong(coordinateStrings[1]));
-          })
-          .collect(Collectors.toList());
-    }
-
-    Path newPath = oldPath.withLayout(new Path.Layout(connectionType,
-                                                      controlPoints,
-                                                      oldPath.getLayout().getLayerId()));
-
-    getObjectRepo().replaceObject(newPath);
-    emitObjectEvent(newPath, oldPath, TCSObjectEvent.Type.OBJECT_MODIFIED);
-  }
-
-  private void overrideLocationLayoutData(Location oldLocation, Map<String, String> properties)
-      throws NumberFormatException {
-    long positionX = properties.get(ElementPropKeys.LOC_POS_X) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_POS_X))
-        : oldLocation.getLayout().getPosition().getX();
-    long positionY = properties.get(ElementPropKeys.LOC_POS_Y) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_POS_Y))
-        : oldLocation.getLayout().getPosition().getY();
-    long labelOffsetX = properties.get(ElementPropKeys.LOC_LABEL_OFFSET_X) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_LABEL_OFFSET_X))
-        : oldLocation.getLayout().getLabelOffset().getX();
-    long labelOffsetY = properties.get(ElementPropKeys.LOC_LABEL_OFFSET_Y) != null
-        ? Integer.parseInt(properties.get(ElementPropKeys.LOC_LABEL_OFFSET_Y))
-        : oldLocation.getLayout().getLabelOffset().getY();
-    Location newLocation = oldLocation.withLayout(
-        new Location.Layout(new Couple(positionX, positionY),
-                            new Couple(labelOffsetX, labelOffsetY),
-                            oldLocation.getLayout().getLocationRepresentation(),
-                            oldLocation.getLayout().getLayerId())
-    );
-    getObjectRepo().replaceObject(newLocation);
-    emitObjectEvent(newLocation, oldLocation, TCSObjectEvent.Type.OBJECT_MODIFIED);
-  }
-
-  private void overrideBlockLayoutData(Block oldBlock, Map<String, String> properties)
-      throws NumberFormatException {
-    Color color = properties.get(ElementPropKeys.BLOCK_COLOR) != null
-        ? Colors.decodeFromHexRGB(properties.get(ElementPropKeys.BLOCK_COLOR))
-        : oldBlock.getLayout().getColor();
-    Block newBlock = oldBlock.withLayout(new Block.Layout(color));
-    getObjectRepo().replaceObject(newBlock);
-    emitObjectEvent(newBlock, oldBlock, TCSObjectEvent.Type.OBJECT_MODIFIED);
-  }
-
-  private void overrideVehicleLayoutData(Vehicle oldVehicle, Map<String, String> properties)
-      throws NumberFormatException {
-    Color routeColor = properties.get(ElementPropKeys.VEHICLE_ROUTE_COLOR) != null
-        ? Colors.decodeFromHexRGB(properties.get(ElementPropKeys.VEHICLE_ROUTE_COLOR))
-        : oldVehicle.getLayout().getRouteColor();
-    Vehicle newVehicle = oldVehicle.withLayout(new Vehicle.Layout(routeColor));
-    getObjectRepo().replaceObject(newVehicle);
-    emitObjectEvent(newVehicle, oldVehicle, TCSObjectEvent.Type.OBJECT_MODIFIED);
   }
 
   /**

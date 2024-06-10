@@ -17,7 +17,6 @@ import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.components.kernel.services.QueryService;
 import org.opentcs.components.kernel.services.RouterService;
-import org.opentcs.components.kernel.services.SchedulerService;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.components.kernel.services.VehicleService;
 
@@ -122,15 +121,6 @@ public interface KernelServicePortal {
    */
   @Nonnull
   RouterService getRouterService();
-
-  /**
-   * Returns the service a client can use to access methods regarding the scheduler.
-   *
-   * @return The service a client can use to access methods regarding the scheduler.
-   */
-  @Nonnull
-  @Deprecated
-  SchedulerService getSchedulerService();
 
   /**
    * Returns the service a client can use to access methods for generic queries.

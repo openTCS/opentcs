@@ -10,7 +10,6 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 import jakarta.inject.Inject;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.model.visualization.Layer;
@@ -26,10 +25,10 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VisualL
 public class VisualLayoutConverter {
 
   private final PropertyConverter pConverter;
-  
+
   @Inject
   public VisualLayoutConverter(PropertyConverter pConverter) {
-    this.pConverter=requireNonNull(pConverter, "pConverter");
+    this.pConverter = requireNonNull(pConverter, "pConverter");
   }
 
   public VisualLayoutCreationTO toVisualLayoutCreationTO(VisualLayoutTO vLayout) {
@@ -41,17 +40,13 @@ public class VisualLayoutConverter {
         .withLayerGroups(convertLayerGroups(vLayout.getLayerGroups()));
   }
 
-  public VisualLayoutTO toVisualLayoutTO(Set<VisualLayout> visualLayouts) {
-    return visualLayouts.stream()
-        .findFirst()
-        .map(
-            visualLayout -> new VisualLayoutTO(visualLayout.getName())
-                .setProperties(pConverter.toPropertyTOs(visualLayout.getProperties()))
-                .setScaleX(visualLayout.getScaleX())
-                .setScaleY(visualLayout.getScaleY())
-                .setLayers(toLayerTOs(visualLayout.getLayers()))
-                .setLayerGroups(toLayerGroupTOs(visualLayout.getLayerGroups())))
-        .orElse(new VisualLayoutTO("default visual layout"));
+  public VisualLayoutTO toVisualLayoutTO(VisualLayout visualLayout) {
+    return new VisualLayoutTO(visualLayout.getName())
+        .setProperties(pConverter.toPropertyTOs(visualLayout.getProperties()))
+        .setScaleX(visualLayout.getScaleX())
+        .setScaleY(visualLayout.getScaleY())
+        .setLayers(toLayerTOs(visualLayout.getLayers()))
+        .setLayerGroups(toLayerGroupTOs(visualLayout.getLayerGroups()));
   }
 
   private List<LayerGroup> convertLayerGroups(List<LayerGroupTO> layerGroups) {

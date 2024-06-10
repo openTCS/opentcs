@@ -9,31 +9,20 @@ package org.opentcs.drivers.vehicle;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentcs.components.Lifecycle;
-import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.util.ExplainedBoolean;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides high-level methods for the kernel to control a vehicle.
  */
-@ScheduledApiChange(
-    when = "6.0",
-    details = "Will not extend Scheduler.Client any more; should be done by implementations."
-)
 public interface VehicleController
-    extends Lifecycle,
-            Scheduler.Client {
+    extends Lifecycle {
 
   /**
    * Sets/Updates the current transport order for the vehicle associated with this controller.
@@ -59,49 +48,8 @@ public interface VehicleController
    * vehicle's current position is unknown or the resources for the vehicle's current position may
    * not be allocated (in case of forced rerouting).
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void setTransportOrder(@Nonnull TransportOrder newOrder)
-      throws IllegalArgumentException {
-  }
-
-  /**
-   * Sets the current drive order for the vehicle associated with this
-   * controller.
-   *
-   * @param newOrder The new drive order.
-   * @param orderProperties Properties of the transport order the new drive
-   * order is part of.
-   * @throws IllegalStateException If this controller already has a drive order.
-   * @deprecated Use {@link #setTransportOrder(org.opentcs.data.order.TransportOrder)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  default void setDriveOrder(@Nonnull DriveOrder newOrder,
-                             @Nonnull Map<String, String> orderProperties)
-      throws IllegalStateException {
-  }
-
-  /**
-   * Updates the current drive order for the vehicle associated with this controller.
-   * <p>
-   * An update is only allowed, if the continuity of the current drive order is guaranteed.
-   * The continuity of the current drive order is guaranteed, if the routes of both the current
-   * drive order and the {@code newOrder} match to the point where the vehicle associated with this
-   * controller is currently reported at. Beyond that point the routes may diverge.
-   * </p>
-   *
-   * @param newOrder The new drive order.
-   * @param orderProperties Properties of the transport order the new drive order is part of.
-   * @throws IllegalStateException If the {@code newOrder} would not guarantee the current drive
-   * order's continuity.
-   * @deprecated Use {@link #setTransportOrder(org.opentcs.data.order.TransportOrder)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  default void updateDriveOrder(@Nonnull DriveOrder newOrder,
-                                @Nonnull Map<String, String> orderProperties)
-      throws IllegalStateException {
-  }
+  void setTransportOrder(@Nonnull TransportOrder newOrder)
+      throws IllegalArgumentException;
 
   /**
    * Notifies the controller that the current transport order is to be aborted.
@@ -114,49 +62,7 @@ public interface VehicleController
    * (Note that this is unsafe, as the vehicle might be moving and clearing the command queue might
    * overlap with the vehicle's movement/progress.)
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void abortTransportOrder(boolean immediate) {
-    if (immediate) {
-      clearDriveOrder();
-    }
-    else {
-      abortDriveOrder();
-    }
-  }
-
-  /**
-   * Resets the current drive order for the vehicle associated with this controller.
-   * At the end of this method, {@link #clearCommandQueue()} is called implicitly.
-   *
-   * @deprecated Use {@link #abortTransportOrder(boolean)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  default void clearDriveOrder() {
-  }
-
-  /**
-   * Notifies the controller that the current drive order is to be aborted.
-   * After receiving this notification, the controller should not send any
-   * further movement commands to the vehicle.
-   *
-   * @deprecated Use {@link #abortTransportOrder(boolean)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  default void abortDriveOrder() {
-  }
-
-  /**
-   * Clears the associated vehicle's command queue and frees all resources reserved for the removed
-   * commands/movements.
-   *
-   * @deprecated Use {@link #abortTransportOrder(boolean)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  default void clearCommandQueue() {
-  }
+  void abortTransportOrder(boolean immediate);
 
   /**
    * Checks if the vehicle would be able to process the given transport order, taking into account
@@ -167,30 +73,7 @@ public interface VehicleController
    * process given order.
    */
   @Nonnull
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default ExplainedBoolean canProcess(@Nonnull TransportOrder order) {
-    return canProcess(
-        order.getFutureDriveOrders().stream()
-            .map(driveOrder -> driveOrder.getDestination().getOperation())
-            .collect(Collectors.toList())
-    );
-  }
-
-  /**
-   * Checks if the vehicle would be able to process the given sequence of operations, taking into
-   * account its current state.
-   *
-   * @param operations A sequence of operations that might appear in future commands.
-   * @return An <code>ExplainedBoolean</code> indicating whether the vehicle would be able to
-   * process every single operation in the list (in the given order).
-   * @deprecated Use {@link #canProcess(org.opentcs.data.order.TransportOrder)} instead.
-   */
-  @Nonnull
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  default ExplainedBoolean canProcess(@Nonnull List<String> operations) {
-    return new ExplainedBoolean(false, "VehicleController default implementation");
-  }
+  ExplainedBoolean canProcess(@Nonnull TransportOrder order);
 
   /**
    * Notifies the implementation that the vehicle's <em>paused</em> state in the kernel has changed.
@@ -199,9 +82,7 @@ public interface VehicleController
    *
    * @param paused The vehicle's new paused state.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default void onVehiclePaused(boolean paused) {
-  }
+  void onVehiclePaused(boolean paused);
 
   /**
    * Delivers a generic message to the communication adapter.
@@ -234,10 +115,7 @@ public interface VehicleController
    * {@link Optional#empty()} if there's no such command.
    */
   @Nonnull
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default Optional<MovementCommand> getInteractionsPendingCommand() {
-    return Optional.empty();
-  }
+  Optional<MovementCommand> getInteractionsPendingCommand();
 
   /**
    * Checks if the given set of resources are safe to be allocated <em>immediately</em> by this
@@ -247,8 +125,5 @@ public interface VehicleController
    * @return {@code true} if the given resources are safe to be allocated by this controller,
    * otherwise {@code false}.
    */
-  @ScheduledApiChange(when = "6.0", details = "Default implementation will be removed.")
-  default boolean mayAllocateNow(@Nonnull Set<TCSResource<?>> resources) {
-    return false;
-  }
+  boolean mayAllocateNow(@Nonnull Set<TCSResource<?>> resources);
 }

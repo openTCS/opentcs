@@ -78,6 +78,10 @@ public class NullPeripheralCommAdapter
   }
 
   @Override
+  public void abortJob() {
+  }
+
+  @Override
   public void execute(PeripheralAdapterCommand command) {
   }
 }

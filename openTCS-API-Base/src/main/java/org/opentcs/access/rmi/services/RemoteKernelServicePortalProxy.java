@@ -29,7 +29,6 @@ import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_PERIPHERAL
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_PLANT_MODEL_SERVICE;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_QUERY_SERVICE;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_ROUTER_SERVICE;
-import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_SCHEDULER_SERVICE;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_TRANSPORT_ORDER_SERVICE;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_VEHICLE_SERVICE;
 import org.opentcs.components.kernel.services.DispatcherService;
@@ -40,7 +39,6 @@ import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.components.kernel.services.QueryService;
 import org.opentcs.components.kernel.services.RouterService;
-import org.opentcs.components.kernel.services.SchedulerService;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.components.kernel.services.VehicleService;
@@ -103,11 +101,6 @@ public class RemoteKernelServicePortalProxy
    * The router service.
    */
   private final RemoteRouterServiceProxy routerService = new RemoteRouterServiceProxy();
-  /**
-   * The scheduler service.
-   */
-  @SuppressWarnings("deprecation")
-  private final RemoteSchedulerServiceProxy schedulerService = new RemoteSchedulerServiceProxy();
   /**
    * The query service.
    */
@@ -289,13 +282,6 @@ public class RemoteKernelServicePortalProxy
 
   @Override
   @Nonnull
-  @Deprecated
-  public SchedulerService getSchedulerService() {
-    return schedulerService;
-  }
-
-  @Override
-  @Nonnull
   public PeripheralService getPeripheralService() {
     return peripheralService;
   }
@@ -312,7 +298,6 @@ public class RemoteKernelServicePortalProxy
     return peripheralDispatcherService;
   }
 
-  @SuppressWarnings("deprecation")
   private void updateServiceLogins(Registry registry)
       throws RemoteException, NotBoundException {
     plantModelService
@@ -345,11 +330,6 @@ public class RemoteKernelServicePortalProxy
     routerService
         .setClientId(getClientId())
         .setRemoteService((RemoteRouterService) registry.lookup(REMOTE_ROUTER_SERVICE))
-        .setServiceListener(this);
-
-    schedulerService
-        .setClientId(getClientId())
-        .setRemoteService((RemoteSchedulerService) registry.lookup(REMOTE_SCHEDULER_SERVICE))
         .setServiceListener(this);
 
     queryService
@@ -387,7 +367,6 @@ public class RemoteKernelServicePortalProxy
     notificationService.setClientId(null).setRemoteService(null).setServiceListener(null);
     dispatcherService.setClientId(null).setRemoteService(null).setServiceListener(null);
     routerService.setClientId(null).setRemoteService(null).setServiceListener(null);
-    schedulerService.setClientId(null).setRemoteService(null).setServiceListener(null);
     queryService.setClientId(null).setRemoteService(null).setServiceListener(null);
     peripheralService.setClientId(null).setRemoteService(null).setServiceListener(null);
     peripheralJobService.setClientId(null).setRemoteService(null).setServiceListener(null);

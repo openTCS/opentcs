@@ -203,17 +203,6 @@ public class StandardVehicleService
   }
 
   @Override
-  @Deprecated
-  public void updateVehicleRouteProgressIndex(TCSObjectReference<Vehicle> ref, int index)
-      throws ObjectUnknownException {
-    requireNonNull(ref, "ref");
-
-    synchronized (globalSyncObject) {
-      plantModelManager.setVehicleRouteProgressIndex(ref, index);
-    }
-  }
-
-  @Override
   public void updateVehicleClaimedResources(TCSObjectReference<Vehicle> ref,
                                             List<Set<TCSResourceReference<?>>> resources)
       throws ObjectUnknownException {

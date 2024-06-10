@@ -25,7 +25,6 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkInRange;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes a vehicle's current state.
@@ -34,14 +33,6 @@ public class Vehicle
     extends TCSObject<Vehicle>
     implements Serializable {
 
-  /**
-   * A value indicating that no route steps have been travelled for the current drive order, yet.
-   *
-   * @deprecated Use {@link TransportOrder#ROUTE_STEP_INDEX_DEFAULT} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public static final int ROUTE_INDEX_DEFAULT = -1;
   /**
    * The key for a property to store the class name of the preferred communication adapter (factory)
    * for this vehicle.
@@ -117,11 +108,6 @@ public class Vehicle
    */
   private final Set<String> allowedOrderTypes;
   /**
-   * The index of the last route step travelled for the current drive order of the current transport
-   * order.
-   */
-  private final int routeProgressIndex;
-  /**
    * The resources this vehicle has claimed for future allocation.
    */
   private final List<Set<TCSResourceReference<?>>> claimedResources;
@@ -176,7 +162,6 @@ public class Vehicle
     this.transportOrder = null;
     this.orderSequence = null;
     this.allowedOrderTypes = new HashSet<>(Arrays.asList(OrderConstants.TYPE_ANY));
-    this.routeProgressIndex = ROUTE_INDEX_DEFAULT;
     this.claimedResources = List.of();
     this.allocatedResources = List.of();
     this.state = State.UNKNOWN;
@@ -207,7 +192,6 @@ public class Vehicle
                   TCSObjectReference<TransportOrder> transportOrder,
                   TCSObjectReference<OrderSequence> orderSequence,
                   Set<String> allowedOrderTypes,
-                  int routeProgressIndex,
                   List<Set<TCSResourceReference<?>>> claimedResources,
                   List<Set<TCSResourceReference<?>>> allocatedResources,
                   State state,
@@ -243,7 +227,6 @@ public class Vehicle
     this.transportOrder = transportOrder;
     this.orderSequence = orderSequence;
     this.allowedOrderTypes = requireNonNull(allowedOrderTypes, "allowedOrderTypes");
-    this.routeProgressIndex = routeProgressIndex;
     this.claimedResources = requireNonNull(claimedResources, "claimedResources");
     this.allocatedResources = requireNonNull(allocatedResources, "allocatedResources");
     this.state = requireNonNull(state, "state");
@@ -282,7 +265,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -315,7 +297,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -348,7 +329,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -381,7 +361,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -428,7 +407,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -528,7 +506,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -577,7 +554,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -624,7 +600,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -672,7 +647,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -721,7 +695,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -768,7 +741,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -815,7 +787,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -862,7 +833,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -920,7 +890,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -976,7 +945,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1023,7 +991,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1073,7 +1040,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1121,7 +1087,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1171,7 +1136,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1221,7 +1185,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1268,62 +1231,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
-                       claimedResources,
-                       allocatedResources,
-                       state,
-                       integrationLevel,
-                       paused,
-                       currentPosition,
-                       nextPosition,
-                       precisePosition,
-                       orientationAngle,
-                       energyLevel,
-                       loadHandlingDevices,
-                       envelopeKey,
-                       layout);
-  }
-
-  /**
-   * Returns the index of the last route step travelled for the current drive
-   * order of the current transport order.
-   *
-   * @return The index of the last route step travelled for the current drive
-   * order of the current transport order.
-   * @deprecated Use {@link TransportOrder#getCurrentRouteStepIndex()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public int getRouteProgressIndex() {
-    return routeProgressIndex;
-  }
-
-  /**
-   * Creates a copy of this object, with the given route progress index.
-   *
-   * @param routeProgressIndex The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link TransportOrder#withCurrentRouteStepIndex(int)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "6.0", details = "Will be removed.")
-  public Vehicle withRouteProgressIndex(int routeProgressIndex) {
-    return new Vehicle(getName(),
-                       getProperties(),
-                       getHistory(),
-                       length,
-                       energyLevelGood,
-                       energyLevelCritical,
-                       energyLevelFullyRecharged,
-                       energyLevelSufficientlyRecharged,
-                       maxVelocity,
-                       maxReverseVelocity,
-                       rechargeOperation,
-                       procState,
-                       transportOrder,
-                       orderSequence,
-                       allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1370,7 +1277,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1417,7 +1323,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1466,7 +1371,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1515,7 +1419,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1564,7 +1467,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1613,7 +1515,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1661,7 +1562,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1708,7 +1608,6 @@ public class Vehicle
                        transportOrder,
                        orderSequence,
                        allowedOrderTypes,
-                       routeProgressIndex,
                        claimedResources,
                        allocatedResources,
                        state,
@@ -1750,7 +1649,6 @@ public class Vehicle
         + ", loadHandlingDevices=" + loadHandlingDevices
         + ", length=" + length
         + ", transportOrder=" + transportOrder
-        + ", routeProgressIndex=" + routeProgressIndex
         + ", claimedResources=" + claimedResources
         + ", allocatedResources=" + allocatedResources
         + ", orderSequence=" + orderSequence

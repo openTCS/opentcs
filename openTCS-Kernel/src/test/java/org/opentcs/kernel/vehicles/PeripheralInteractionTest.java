@@ -86,7 +86,7 @@ class PeripheralInteractionTest {
 
     peripheralInteraction = new PeripheralInteraction(VEHICLE.getReference(),
                                                       ORDER.getReference(),
-                                                      new DummyMovementCommand(),
+                                                      createDummyMovementCommand(),
                                                       Arrays.asList(operation),
                                                       peripheralJobService,
                                                       RESERVATION_TOKEN);
@@ -115,7 +115,7 @@ class PeripheralInteractionTest {
 
     peripheralInteraction = new PeripheralInteraction(VEHICLE.getReference(),
                                                       ORDER.getReference(),
-                                                      new DummyMovementCommand(),
+                                                      createDummyMovementCommand(),
                                                       Arrays.asList(operation),
                                                       peripheralJobService,
                                                       RESERVATION_TOKEN);
@@ -147,7 +147,7 @@ class PeripheralInteractionTest {
 
     peripheralInteraction = new PeripheralInteraction(VEHICLE.getReference(),
                                                       ORDER.getReference(),
-                                                      new DummyMovementCommand(),
+                                                      createDummyMovementCommand(),
                                                       Arrays.asList(operation),
                                                       peripheralJobService,
                                                       RESERVATION_TOKEN);
@@ -172,84 +172,23 @@ class PeripheralInteractionTest {
     return new Location("Location-01", locationType.getReference());
   }
 
-  private class DummyMovementCommand
-      implements MovementCommand {
+  private MovementCommand createDummyMovementCommand() {
+    Point srcPoint = new Point("Point-01");
+    Point destPoint = new Point("Point-02");
+    Path path = new Path("Point-01 --- Point-02",
+                         srcPoint.getReference(),
+                         destPoint.getReference());
+    Route.Step step = new Route.Step(path, srcPoint, destPoint, Vehicle.Orientation.FORWARD, 0);
 
-    private final Route.Step dummyStep;
-
-    DummyMovementCommand() {
-      Point srcPoint = new Point("Point-01");
-      Point destPoint = new Point("Point-02");
-      Path path = new Path("Point-01 --- Point-02",
-                           srcPoint.getReference(),
-                           destPoint.getReference());
-      dummyStep = new Route.Step(path, srcPoint, destPoint, Vehicle.Orientation.FORWARD, 0);
-    }
-
-    @Override
-    public TransportOrder getTransportOrder() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public DriveOrder getDriveOrder() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Route.Step getStep() {
-      return dummyStep;
-    }
-
-    @Override
-    public String getOperation() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    @Deprecated
-    public boolean isWithoutOperation() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean hasEmptyOperation() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Location getOpLocation() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean isFinalMovement() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Point getFinalDestination() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Location getFinalDestinationLocation() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String getFinalOperation() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean equalsInMovement(MovementCommand command) {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public Map<String, String> getProperties() {
-      throw new UnsupportedOperationException("Not supported yet.");
-    }
+    return new MovementCommand(new TransportOrder("dummy-transport-order", List.of()),
+                               new DriveOrder(new DriveOrder.Destination(destPoint.getReference())),
+                               step,
+                               MovementCommand.MOVE_OPERATION,
+                               null,
+                               true,
+                               null,
+                               destPoint,
+                               MovementCommand.MOVE_OPERATION,
+                               Map.of());
   }
 }
