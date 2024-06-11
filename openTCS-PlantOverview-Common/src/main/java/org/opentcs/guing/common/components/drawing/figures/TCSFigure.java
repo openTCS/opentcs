@@ -20,8 +20,10 @@ import org.opentcs.guing.common.components.drawing.ZoomPoint;
  * Base implementation for figures.
  */
 public abstract class TCSFigure
-    extends AbstractAttributedDecoratedFigure
-    implements ModelBasedFigure {
+    extends
+      AbstractAttributedDecoratedFigure
+    implements
+      ModelBasedFigure {
 
   /**
    * The enclosing rectangle.

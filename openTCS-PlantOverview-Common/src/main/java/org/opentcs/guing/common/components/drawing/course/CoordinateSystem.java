@@ -15,7 +15,8 @@ import java.io.Serializable;
  * A strategy that can translate pixel coordinates to real coordinates.
  */
 public interface CoordinateSystem
-    extends Serializable {
+    extends
+      Serializable {
 
   /**
    * Translates the real coordinate into a pixel coordinate.

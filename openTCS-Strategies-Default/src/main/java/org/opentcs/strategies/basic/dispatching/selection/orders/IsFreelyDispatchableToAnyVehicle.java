@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.orders;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.function.Predicate;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectHistory;
@@ -26,7 +27,8 @@ import org.opentcs.strategies.basic.dispatching.selection.TransportOrderSelectio
  * </p>
  */
 public class IsFreelyDispatchableToAnyVehicle
-    implements Predicate<TransportOrder> {
+    implements
+      Predicate<TransportOrder> {
 
   /**
    * The order service.
@@ -44,8 +46,10 @@ public class IsFreelyDispatchableToAnyVehicle
    * @param orderReservationPool Stores reservations of orders for vehicles.
    */
   @Inject
-  public IsFreelyDispatchableToAnyVehicle(TCSObjectService objectService,
-                                          OrderReservationPool orderReservationPool) {
+  public IsFreelyDispatchableToAnyVehicle(
+      TCSObjectService objectService,
+      OrderReservationPool orderReservationPool
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
   }
@@ -65,8 +69,10 @@ public class IsFreelyDispatchableToAnyVehicle
     if (order.getWrappingSequence() == null) {
       return false;
     }
-    OrderSequence seq = objectService.fetchObject(OrderSequence.class,
-                                                  order.getWrappingSequence());
+    OrderSequence seq = objectService.fetchObject(
+        OrderSequence.class,
+        order.getWrappingSequence()
+    );
     return seq != null && seq.getProcessingVehicle() != null;
   }
 }

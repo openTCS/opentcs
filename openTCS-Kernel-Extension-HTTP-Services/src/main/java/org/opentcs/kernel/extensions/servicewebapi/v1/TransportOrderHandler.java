@@ -7,6 +7,8 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.time.Instant;
@@ -16,7 +18,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -55,17 +56,19 @@ public class TransportOrderHandler {
    * @param executorWrapper Executes calls via the kernel executor and waits for the outcome.
    */
   @Inject
-  public TransportOrderHandler(TransportOrderService orderService,
-                               KernelExecutorWrapper executorWrapper) {
+  public TransportOrderHandler(
+      TransportOrderService orderService,
+      KernelExecutorWrapper executorWrapper
+  ) {
     this.orderService = requireNonNull(orderService, "orderService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
   }
 
   public TransportOrder createOrder(String name, PostTransportOrderRequestTO order)
       throws ObjectUnknownException,
-             ObjectExistsException,
-             KernelRuntimeException,
-             IllegalStateException {
+        ObjectExistsException,
+        KernelRuntimeException,
+        IllegalStateException {
     requireNonNull(name, "name");
     requireNonNull(order, "order");
 
@@ -86,7 +89,11 @@ public class TransportOrderHandler {
     });
   }
 
-  public void updateTransportOrderIntendedVehicle(String orderName, @Nullable String vehicleName)
+  public void updateTransportOrderIntendedVehicle(
+      String orderName,
+      @Nullable
+      String vehicleName
+  )
       throws ObjectUnknownException {
     requireNonNull(orderName, "orderName");
 
@@ -119,7 +126,8 @@ public class TransportOrderHandler {
    * @return A list of transport orders that match the filter.
    */
   public List<GetTransportOrderResponseTO> getTransportOrders(
-      @Nullable String intendedVehicle
+      @Nullable
+      String intendedVehicle
   ) {
     return executorWrapper.callAndWait(() -> {
       TCSObjectReference<Vehicle> intendedVehicleRef
@@ -163,9 +171,9 @@ public class TransportOrderHandler {
 
   public OrderSequence createOrderSequence(String name, PostOrderSequenceRequestTO sequence)
       throws ObjectUnknownException,
-             ObjectExistsException,
-             KernelRuntimeException,
-             IllegalStateException {
+        ObjectExistsException,
+        KernelRuntimeException,
+        IllegalStateException {
     requireNonNull(name, "name");
     requireNonNull(sequence, "sequence");
 
@@ -183,7 +191,7 @@ public class TransportOrderHandler {
 
   public void putOrderSequenceComplete(String name)
       throws ObjectUnknownException,
-             IllegalStateException {
+        IllegalStateException {
     requireNonNull(name, "name");
 
     executorWrapper.callAndWait(() -> {
@@ -195,7 +203,10 @@ public class TransportOrderHandler {
     });
   }
 
-  public List<GetOrderSequenceResponseTO> getOrderSequences(@Nullable String intendedVehicle) {
+  public List<GetOrderSequenceResponseTO> getOrderSequences(
+      @Nullable
+      String intendedVehicle
+  ) {
     return executorWrapper.callAndWait(() -> {
       TCSObjectReference<Vehicle> intendedVehicleRef
           = Optional.ofNullable(intendedVehicle)
@@ -233,8 +244,10 @@ public class TransportOrderHandler {
     List<DestinationCreationTO> result = new ArrayList<>(order.getDestinations().size());
 
     for (Destination dest : order.getDestinations()) {
-      DestinationCreationTO to = new DestinationCreationTO(dest.getLocationName(),
-                                                           dest.getOperation());
+      DestinationCreationTO to = new DestinationCreationTO(
+          dest.getLocationName(),
+          dest.getOperation()
+      );
 
       if (dest.getProperties() != null) {
         for (Property prop : dest.getProperties()) {

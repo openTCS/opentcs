@@ -13,7 +13,8 @@ import java.io.Serializable;
  * Emitted when the kernel loads a model.
  */
 public class ModelTransitionEvent
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The old model the kernel is leaving.
@@ -42,10 +43,12 @@ public class ModelTransitionEvent
    * @param transitionFinished Whether the transition to the new model is
    * finished, yet.
    */
-  public ModelTransitionEvent(String oldModelName,
-                              String newModelName,
-                              boolean modelContentChanged,
-                              boolean transitionFinished) {
+  public ModelTransitionEvent(
+      String oldModelName,
+      String newModelName,
+      boolean modelContentChanged,
+      boolean transitionFinished
+  ) {
     this.oldModelName = oldModelName;
     this.newModelName = newModelName;
     this.modelContentChanged = modelContentChanged;

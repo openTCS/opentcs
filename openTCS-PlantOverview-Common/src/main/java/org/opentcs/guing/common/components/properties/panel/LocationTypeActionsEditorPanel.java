@@ -17,7 +17,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * Allows editing of actions that a vehicle can execute at stations with the location type.
  */
 public class LocationTypeActionsEditorPanel
-    extends StringSetPropertyEditorPanel {
+    extends
+      StringSetPropertyEditorPanel {
 
   /**
    * The bundle to be used.
@@ -51,7 +52,8 @@ public class LocationTypeActionsEditorPanel
         bundle.getString(
             "locationTypeActionsEditorPanel.dialog_actionDefinition.label_action.text"
         ),
-        value);
+        value
+    );
     StandardDetailsDialog dialog = new StandardDetailsDialog(parent, true, content);
     dialog.setLocationRelativeTo(parent);
     dialog.setVisible(true);
@@ -70,7 +72,8 @@ public class LocationTypeActionsEditorPanel
         bundle.getString(
             "locationTypeActionsEditorPanel.dialog_actionDefinition.label_action.text"
         ),
-        "");
+        ""
+    );
     StandardDetailsDialog dialog = new StandardDetailsDialog(parent, true, content);
     dialog.setLocationRelativeTo(parent);
     dialog.setVisible(true);

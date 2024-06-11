@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.peripherals;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapter;
@@ -41,8 +42,12 @@ public class PeripheralEntry {
    * @param location The location representing the peripheral device.
    * @param availableCommAdapters The available comm adapters for this entry.
    */
-  public PeripheralEntry(@Nonnull Location location,
-                         @Nonnull List<PeripheralCommAdapterDescription> availableCommAdapters) {
+  public PeripheralEntry(
+      @Nonnull
+      Location location,
+      @Nonnull
+      List<PeripheralCommAdapterDescription> availableCommAdapters
+  ) {
     requireNonNull(location, "location");
     this.availableCommAdapters = requireNonNull(availableCommAdapters, "availableCommAdapters");
     this.commAdapter = commAdapterFactory.getAdapterFor(location);
@@ -68,7 +73,10 @@ public class PeripheralEntry {
     return commAdapterFactory;
   }
 
-  public void setCommAdapterFactory(@Nonnull PeripheralCommAdapterFactory commAdapterFactory) {
+  public void setCommAdapterFactory(
+      @Nonnull
+      PeripheralCommAdapterFactory commAdapterFactory
+  ) {
     this.commAdapterFactory = requireNonNull(commAdapterFactory, "commAdapterFactory");
   }
 
@@ -77,7 +85,10 @@ public class PeripheralEntry {
     return commAdapter;
   }
 
-  public void setCommAdapter(@Nonnull PeripheralCommAdapter commAdapter) {
+  public void setCommAdapter(
+      @Nonnull
+      PeripheralCommAdapter commAdapter
+  ) {
     this.commAdapter = requireNonNull(commAdapter, "commAdapter");
   }
 

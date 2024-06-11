@@ -7,6 +7,9 @@
  */
 package org.opentcs.data.order;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.Serializable;
@@ -14,18 +17,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A route for a {@link Vehicle}, consisting of a sequence of steps (pairs of {@link Path}s and
  * {@link Point}s) that need to be processed in their given order.
  */
 public class Route
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The sequence of steps this route consists of, in the order they are to be processed.
@@ -42,7 +44,11 @@ public class Route
    * @param routeSteps The sequence of steps this route consists of.
    * @param routeCosts The costs for travelling this route.
    */
-  public Route(@Nonnull List<Step> routeSteps, long routeCosts) {
+  public Route(
+      @Nonnull
+      List<Step> routeSteps,
+      long routeCosts
+  ) {
     requireNonNull(routeSteps, "routeSteps");
     checkArgument(!routeSteps.isEmpty(), "routeSteps may not be empty");
     steps = Collections.unmodifiableList(new ArrayList<>(routeSteps));
@@ -105,7 +111,8 @@ public class Route
    * A single step in a route.
    */
   public static class Step
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The path to travel.
@@ -150,13 +157,20 @@ public class Route
      * @param executionAllowed Whether execution of this step is allowed.
      * @param reroutingType Marks this step as the origin of a recalculated route.
      */
-    public Step(@Nullable Path path,
-                @Nullable Point srcPoint,
-                @Nonnull Point destPoint,
-                @Nonnull Vehicle.Orientation orientation,
-                int routeIndex,
-                boolean executionAllowed,
-                @Nullable ReroutingType reroutingType) {
+    public Step(
+        @Nullable
+        Path path,
+        @Nullable
+        Point srcPoint,
+        @Nonnull
+        Point destPoint,
+        @Nonnull
+        Vehicle.Orientation orientation,
+        int routeIndex,
+        boolean executionAllowed,
+        @Nullable
+        ReroutingType reroutingType
+    ) {
       this.path = path;
       this.sourcePoint = srcPoint;
       this.destinationPoint = requireNonNull(destPoint, "destPoint");
@@ -176,12 +190,18 @@ public class Route
      * @param routeIndex This step's index in the vehicle's route.
      * @param executionAllowed Whether execution of this step is allowed.
      */
-    public Step(@Nullable Path path,
-                @Nullable Point srcPoint,
-                @Nonnull Point destPoint,
-                @Nonnull Vehicle.Orientation orientation,
-                int routeIndex,
-                boolean executionAllowed) {
+    public Step(
+        @Nullable
+        Path path,
+        @Nullable
+        Point srcPoint,
+        @Nonnull
+        Point destPoint,
+        @Nonnull
+        Vehicle.Orientation orientation,
+        int routeIndex,
+        boolean executionAllowed
+    ) {
       this(path, srcPoint, destPoint, orientation, routeIndex, executionAllowed, null);
     }
 
@@ -194,11 +214,17 @@ public class Route
      * @param orientation The vehicle's orientation on this step.
      * @param routeIndex This step's index in the vehicle's route.
      */
-    public Step(@Nullable Path path,
-                @Nullable Point srcPoint,
-                @Nonnull Point destPoint,
-                @Nonnull Vehicle.Orientation orientation,
-                int routeIndex) {
+    public Step(
+        @Nullable
+        Path path,
+        @Nullable
+        Point srcPoint,
+        @Nonnull
+        Point destPoint,
+        @Nonnull
+        Vehicle.Orientation orientation,
+        int routeIndex
+    ) {
       this(path, srcPoint, destPoint, orientation, routeIndex, true, null);
     }
 
@@ -312,8 +338,10 @@ public class Route
 
     @Override
     public int hashCode() {
-      return Objects.hash(path, sourcePoint, destinationPoint, vehicleOrientation, routeIndex,
-                          executionAllowed, reroutingType);
+      return Objects.hash(
+          path, sourcePoint, destinationPoint, vehicleOrientation, routeIndex,
+          executionAllowed, reroutingType
+      );
     }
 
     @Override

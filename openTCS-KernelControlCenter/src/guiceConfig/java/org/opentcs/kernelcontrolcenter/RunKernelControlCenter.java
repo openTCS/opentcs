@@ -75,13 +75,17 @@ public class RunKernelControlCenter {
    * @return The registered/found modules.
    */
   private static List<ControlCenterInjectionModule> findRegisteredModules(
-      ConfigurationBindingProvider bindingProvider) {
+      ConfigurationBindingProvider bindingProvider
+  ) {
     List<ControlCenterInjectionModule> registeredModules = new ArrayList<>();
-    for (ControlCenterInjectionModule module
-             : ServiceLoader.load(ControlCenterInjectionModule.class)) {
-      LOG.info("Integrating injection module {} (source: {})",
-               module.getClass().getName(),
-               module.getClass().getProtectionDomain().getCodeSource());
+    for (ControlCenterInjectionModule module : ServiceLoader.load(
+        ControlCenterInjectionModule.class
+    )) {
+      LOG.info(
+          "Integrating injection module {} (source: {})",
+          module.getClass().getName(),
+          module.getClass().getProtectionDomain().getCodeSource()
+      );
       module.setConfigBindingProvider(bindingProvider);
       registeredModules.add(module);
     }
@@ -100,17 +104,23 @@ public class RunKernelControlCenter {
 
   private static ConfigurationBindingProvider gestaltConfigurationBindingProvider() {
     return new GestaltConfigurationBindingProvider(
-        Paths.get(System.getProperty("opentcs.base", "."),
-                  "config",
-                  "opentcs-kernelcontrolcenter-defaults-baseline.properties")
+        Paths.get(
+            System.getProperty("opentcs.base", "."),
+            "config",
+            "opentcs-kernelcontrolcenter-defaults-baseline.properties"
+        )
             .toAbsolutePath(),
-        Paths.get(System.getProperty("opentcs.base", "."),
-                  "config",
-                  "opentcs-kernelcontrolcenter-defaults-custom.properties")
+        Paths.get(
+            System.getProperty("opentcs.base", "."),
+            "config",
+            "opentcs-kernelcontrolcenter-defaults-custom.properties"
+        )
             .toAbsolutePath(),
-        Paths.get(System.getProperty("opentcs.home", "."),
-                  "config",
-                  "opentcs-kernelcontrolcenter.properties")
+        Paths.get(
+            System.getProperty("opentcs.home", "."),
+            "config",
+            "opentcs-kernelcontrolcenter.properties"
+        )
             .toAbsolutePath()
     );
   }

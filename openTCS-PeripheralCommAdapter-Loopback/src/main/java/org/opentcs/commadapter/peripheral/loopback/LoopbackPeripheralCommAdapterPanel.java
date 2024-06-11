@@ -7,11 +7,12 @@
  */
 package org.opentcs.commadapter.peripheral.loopback;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.event.ItemEvent;
 import java.util.Arrays;
-import static java.util.Objects.requireNonNull;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingUtilities;
 import org.opentcs.access.KernelServicePortal;
@@ -31,7 +32,8 @@ import org.slf4j.LoggerFactory;
  * The panel for the loopback peripheral communication adapter.
  */
 public class LoopbackPeripheralCommAdapterPanel
-    extends PeripheralCommAdapterPanel {
+    extends
+      PeripheralCommAdapterPanel {
 
   /**
    * This class's logger.
@@ -53,9 +55,13 @@ public class LoopbackPeripheralCommAdapterPanel
 
   @Inject
   @SuppressWarnings("this-escape")
-  public LoopbackPeripheralCommAdapterPanel(@Assisted LoopbackPeripheralProcessModel processModel,
-                                            KernelServicePortal servicePortal,
-                                            @ServiceCallWrapper CallWrapper callWrapper) {
+  public LoopbackPeripheralCommAdapterPanel(
+      @Assisted
+      LoopbackPeripheralProcessModel processModel,
+      KernelServicePortal servicePortal,
+      @ServiceCallWrapper
+      CallWrapper callWrapper
+  ) {
     this.processModel = requireNonNull(processModel, "processModel");
     this.servicePortal = requireNonNull(servicePortal, "servicePortal");
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");
@@ -94,14 +100,17 @@ public class LoopbackPeripheralCommAdapterPanel
 
   private void sendCommAdapterCommand(PeripheralAdapterCommand command) {
     try {
-      callWrapper.call(() -> servicePortal.getPeripheralService()
-          .sendCommAdapterCommand(processModel.getLocation(), command));
+      callWrapper.call(
+          () -> servicePortal.getPeripheralService()
+              .sendCommAdapterCommand(processModel.getLocation(), command)
+      );
     }
     catch (Exception ex) {
       LOG.warn("Error sending comm adapter command '{}'", command, ex);
     }
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -242,6 +251,7 @@ public class LoopbackPeripheralCommAdapterPanel
     getAccessibleContext().setAccessibleName(bundle.getString("loopbackPeripheralCommAdapterPanel.accessibleName")); // NOI18N
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void manualModeRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualModeRadioButtonActionPerformed
     sendCommAdapterCommand(new EnableManualModeCommand(manualModeRadioButton.isSelected()));
@@ -277,6 +287,7 @@ public class LoopbackPeripheralCommAdapterPanel
     sendCommAdapterCommand(new FinishJobProcessingCommand(true));
   }//GEN-LAST:event_failCurrentJobButtonActionPerformed
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JRadioButton automaticModeRadioButton;
@@ -289,4 +300,5 @@ public class LoopbackPeripheralCommAdapterPanel
   private javax.swing.JPanel statePanel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

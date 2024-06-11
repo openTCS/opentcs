@@ -7,6 +7,12 @@
  */
 package org.opentcs.data.order;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_CREATED;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DRIVE_ORDER_FINISHED;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_PROCESSING_VEHICLE_CHANGED;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_REACHED_FINAL_STATE;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.Serializable;
@@ -16,16 +22,11 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
-import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_CREATED;
-import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DRIVE_ORDER_FINISHED;
-import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_PROCESSING_VEHICLE_CHANGED;
-import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_REACHED_FINAL_STATE;
 
 /**
  * Represents a sequence of movements and operations that are to be executed by a {@link Vehicle}.
@@ -38,8 +39,10 @@ import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_REACHED_FI
  * </p>
  */
 public class TransportOrder
-    extends TCSObject<TransportOrder>
-    implements Serializable {
+    extends
+      TCSObject<TransportOrder>
+    implements
+      Serializable {
 
   /**
    * A value indicating that no route steps have been travelled for a drive order, yet.
@@ -124,9 +127,11 @@ public class TransportOrder
    * order.
    */
   public TransportOrder(String name, List<DriveOrder> driveOrders) {
-    super(name,
-          new HashMap<>(),
-          new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(ORDER_CREATED)));
+    super(
+        name,
+        new HashMap<>(),
+        new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(ORDER_CREATED))
+    );
     this.type = OrderConstants.TYPE_NONE;
     this.driveOrders = requireNonNull(driveOrders, "driveOrders");
     this.peripheralReservationToken = null;
@@ -152,23 +157,25 @@ public class TransportOrder
    * when processing this transport order.
    * @param creationTime The creation time stamp to be set.
    */
-  private TransportOrder(String name,
-                         Map<String, String> properties,
-                         ObjectHistory history,
-                         String type,
-                         List<DriveOrder> driveOrders,
-                         String peripheralReservationToken,
-                         int currentDriveOrderIndex,
-                         int currentRouteStepIndex,
-                         Instant creationTime,
-                         TCSObjectReference<Vehicle> intendedVehicle,
-                         Instant deadline,
-                         boolean dispensable,
-                         TCSObjectReference<OrderSequence> wrappingSequence,
-                         Set<TCSObjectReference<TransportOrder>> dependencies,
-                         TCSObjectReference<Vehicle> processingVehicle,
-                         State state,
-                         Instant finishedTime) {
+  private TransportOrder(
+      String name,
+      Map<String, String> properties,
+      ObjectHistory history,
+      String type,
+      List<DriveOrder> driveOrders,
+      String peripheralReservationToken,
+      int currentDriveOrderIndex,
+      int currentRouteStepIndex,
+      Instant creationTime,
+      TCSObjectReference<Vehicle> intendedVehicle,
+      Instant deadline,
+      boolean dispensable,
+      TCSObjectReference<OrderSequence> wrappingSequence,
+      Set<TCSObjectReference<TransportOrder>> dependencies,
+      TCSObjectReference<Vehicle> processingVehicle,
+      State state,
+      Instant finishedTime
+  ) {
     super(name, properties, history);
 
     this.type = requireNonNull(type, "type");
@@ -195,86 +202,94 @@ public class TransportOrder
 
   @Override
   public TransportOrder withProperty(String key, String value) {
-    return new TransportOrder(getName(),
-                              propertiesWith(key, value),
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+    return new TransportOrder(
+        getName(),
+        propertiesWith(key, value),
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   @Override
   public TransportOrder withProperties(Map<String, String> properties) {
-    return new TransportOrder(getName(),
-                              properties,
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+    return new TransportOrder(
+        getName(),
+        properties,
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   @Override
   public TransportOrder withHistoryEntry(ObjectHistory.Entry entry) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              getHistory().withEntryAppended(entry),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        getHistory().withEntryAppended(entry),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   @Override
   public TransportOrder withHistory(ObjectHistory history) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              history,
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        history,
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -293,23 +308,25 @@ public class TransportOrder
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrder withType(String type) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -339,25 +356,30 @@ public class TransportOrder
    * @param state The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public TransportOrder withState(@Nonnull State state) {
+  public TransportOrder withState(
+      @Nonnull
+      State state
+  ) {
     // XXX Finished time should probably not be set implicitly.
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              historyForNewState(state),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              state == State.FINISHED ? Instant.now() : finishedTime);
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        historyForNewState(state),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        state == State.FINISHED ? Instant.now() : finishedTime
+    );
   }
 
   /**
@@ -376,23 +398,25 @@ public class TransportOrder
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrder withCreationTime(Instant creationTime) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -413,23 +437,25 @@ public class TransportOrder
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrder withDeadline(Instant deadline) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -450,23 +476,25 @@ public class TransportOrder
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrder withFinishedTime(Instant finishedTime) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -488,24 +516,29 @@ public class TransportOrder
    * @param intendedVehicle The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public TransportOrder withIntendedVehicle(@Nullable TCSObjectReference<Vehicle> intendedVehicle) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+  public TransportOrder withIntendedVehicle(
+      @Nullable
+      TCSObjectReference<Vehicle> intendedVehicle
+  ) {
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -528,24 +561,28 @@ public class TransportOrder
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrder withProcessingVehicle(
-      @Nullable TCSObjectReference<Vehicle> processingVehicle) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              historyForNewProcessingVehicle(processingVehicle),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+      @Nullable
+      TCSObjectReference<Vehicle> processingVehicle
+  ) {
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        historyForNewProcessingVehicle(processingVehicle),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -564,24 +601,28 @@ public class TransportOrder
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrder withDependencies(
-      @Nonnull Set<TCSObjectReference<TransportOrder>> dependencies) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+      @Nonnull
+      Set<TCSObjectReference<TransportOrder>> dependencies
+  ) {
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -618,25 +659,30 @@ public class TransportOrder
    * @param driveOrders The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public TransportOrder withDriveOrders(@Nonnull List<DriveOrder> driveOrders) {
+  public TransportOrder withDriveOrders(
+      @Nonnull
+      List<DriveOrder> driveOrders
+  ) {
     requireNonNull(driveOrders, "driveOrders");
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -684,24 +730,28 @@ public class TransportOrder
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrder withPeripheralReservationToken(
-      @Nullable String peripheralReservationToken) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+      @Nullable
+      String peripheralReservationToken
+  ) {
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -720,23 +770,25 @@ public class TransportOrder
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrder withCurrentDriveOrderIndex(int currentDriveOrderIndex) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -755,23 +807,25 @@ public class TransportOrder
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrder withCurrentRouteStepIndex(int currentRouteStepIndex) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -780,30 +834,37 @@ public class TransportOrder
    * @param driveOrderState The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public TransportOrder withCurrentDriveOrderState(@Nonnull DriveOrder.State driveOrderState) {
+  public TransportOrder withCurrentDriveOrderState(
+      @Nonnull
+      DriveOrder.State driveOrderState
+  ) {
     requireNonNull(driveOrderState, "driveOrderState");
 
     List<DriveOrder> newDriveOrders = new ArrayList<>(this.driveOrders);
-    newDriveOrders.set(currentDriveOrderIndex,
-                       newDriveOrders.get(currentDriveOrderIndex).withState(driveOrderState));
+    newDriveOrders.set(
+        currentDriveOrderIndex,
+        newDriveOrders.get(currentDriveOrderIndex).withState(driveOrderState)
+    );
 
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              historyForNewDriveOrderState(driveOrderState),
-                              type,
-                              newDriveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        historyForNewDriveOrderState(driveOrderState),
+        type,
+        newDriveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -825,24 +886,28 @@ public class TransportOrder
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrder withWrappingSequence(
-      @Nullable TCSObjectReference<OrderSequence> wrappingSequence) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+      @Nullable
+      TCSObjectReference<OrderSequence> wrappingSequence
+  ) {
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   /**
@@ -861,23 +926,25 @@ public class TransportOrder
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrder withDispensable(boolean dispensable) {
-    return new TransportOrder(getName(),
-                              getProperties(),
-                              getHistory(),
-                              type,
-                              driveOrders,
-                              peripheralReservationToken,
-                              currentDriveOrderIndex,
-                              currentRouteStepIndex,
-                              creationTime,
-                              intendedVehicle,
-                              deadline,
-                              dispensable,
-                              wrappingSequence,
-                              dependencies,
-                              processingVehicle,
-                              state,
-                              finishedTime);
+    return new TransportOrder(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        driveOrders,
+        peripheralReservationToken,
+        currentDriveOrderIndex,
+        currentRouteStepIndex,
+        creationTime,
+        intendedVehicle,
+        deadline,
+        dispensable,
+        wrappingSequence,
+        dependencies,
+        processingVehicle,
+        state,
+        finishedTime
+    );
   }
 
   @Override
@@ -915,8 +982,10 @@ public class TransportOrder
 
   private ObjectHistory historyForNewProcessingVehicle(TCSObjectReference<Vehicle> ref) {
     return getHistory().withEntryAppended(
-        new ObjectHistory.Entry(ORDER_PROCESSING_VEHICLE_CHANGED,
-                                ref == null ? "" : ref.getName())
+        new ObjectHistory.Entry(
+            ORDER_PROCESSING_VEHICLE_CHANGED,
+            ref == null ? "" : ref.getName()
+        )
     );
   }
 

@@ -7,22 +7,24 @@
  */
 package org.opentcs.modeleditor.application.action.file;
 
-import jakarta.inject.Inject;
-import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
-import javax.swing.AbstractAction;
 import static javax.swing.Action.ACCELERATOR_KEY;
 import static javax.swing.Action.MNEMONIC_KEY;
+import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.MENU_PATH;
+
+import jakarta.inject.Inject;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 import org.opentcs.modeleditor.application.OpenTCSView;
-import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.MENU_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action to load the current kernel model in the plant overview.
  */
 public class DownloadModelFromKernelAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action's ID.

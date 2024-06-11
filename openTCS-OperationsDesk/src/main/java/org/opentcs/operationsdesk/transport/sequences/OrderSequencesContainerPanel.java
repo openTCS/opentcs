@@ -7,6 +7,8 @@
  */
 package org.opentcs.operationsdesk.transport.sequences;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -16,7 +18,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -43,7 +44,8 @@ import org.slf4j.LoggerFactory;
  * Shows a table of the kernel's order sequences.
  */
 public class OrderSequencesContainerPanel
-    extends JPanel {
+    extends
+      JPanel {
 
   /**
    * The path to the icons.
@@ -87,13 +89,18 @@ public class OrderSequencesContainerPanel
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public OrderSequencesContainerPanel(TransportViewFactory transportViewFactory,
-                                      @ApplicationFrame Component dialogParent,
-                                      OrderSequencesContainer orderSequencesContainer) {
+  public OrderSequencesContainerPanel(
+      TransportViewFactory transportViewFactory,
+      @ApplicationFrame
+      Component dialogParent,
+      OrderSequencesContainer orderSequencesContainer
+  ) {
     this.transportViewFactory = requireNonNull(transportViewFactory, "transportViewFactory");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
-    this.orderSequencesContainer = requireNonNull(orderSequencesContainer,
-                                                  "orderSequencesContainer");
+    this.orderSequencesContainer = requireNonNull(
+        orderSequencesContainer,
+        "orderSequencesContainer"
+    );
 
     initComponents();
   }
@@ -187,8 +194,12 @@ public class OrderSequencesContainerPanel
         sorter
     );
     buttons.add(b1);
-    b1.setToolTipText(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TO_SEQUENCE_PATH)
-        .getString("orderSequencesContainerPanel.button_filterFinishedOrderSequences.tooltipText"));
+    b1.setToolTipText(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TO_SEQUENCE_PATH)
+            .getString(
+                "orderSequencesContainerPanel.button_filterFinishedOrderSequences.tooltipText"
+            )
+    );
 
     return buttons;
   }

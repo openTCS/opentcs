@@ -17,7 +17,8 @@ import org.opentcs.guing.base.model.elements.BlockModel.Type;
  * A cell renderer for a {@link BlockTypeProperty}.
  */
 public class BlockTypePropertyCellRenderer
-    extends StandardPropertyCellRenderer {
+    extends
+      StandardPropertyCellRenderer {
 
   public BlockTypePropertyCellRenderer() {
     super();
@@ -25,10 +26,13 @@ public class BlockTypePropertyCellRenderer
 
   @Override
   public Component getTableCellRendererComponent(
-      JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column
+  ) {
 
-    JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected,
-                                                                hasFocus, row, column);
+    JLabel label = (JLabel) super.getTableCellRendererComponent(
+        table, value, isSelected,
+        hasFocus, row, column
+    );
 
     if (value instanceof BlockTypeProperty
         && ((BlockTypeProperty) value).getValue() instanceof Type) {

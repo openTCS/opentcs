@@ -7,10 +7,11 @@
  */
 package org.opentcs.guing.plugins.panels.allocation;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.SwingUtilities;
@@ -35,8 +36,10 @@ import org.slf4j.LoggerFactory;
  * A panel to display the allocated resources of each vehicle with atleast one allocation.
  */
 public class ResourceAllocationPanel
-    extends PluggablePanel
-    implements EventHandler {
+    extends
+      PluggablePanel
+    implements
+      EventHandler {
 
   /**
    * This class' logger.
@@ -71,8 +74,11 @@ public class ResourceAllocationPanel
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public ResourceAllocationPanel(SharedKernelServicePortalProvider kernelProvider,
-                                 @ApplicationEventBus EventSource eventSource) {
+  public ResourceAllocationPanel(
+      SharedKernelServicePortalProvider kernelProvider,
+      @ApplicationEventBus
+      EventSource eventSource
+  ) {
     this.portalProvider = requireNonNull(kernelProvider, "kernelProvider");
     this.eventSource = requireNonNull(eventSource, "eventSource");
     initComponents();
@@ -149,14 +155,14 @@ public class ResourceAllocationPanel
       LOG.debug("Kernel is not in operating mode - skipping.");
       return;
     }
-    SwingUtilities.invokeLater(()
-        -> handleVehicleStateChange((Vehicle) tcsObjectEvent.getCurrentOrPreviousObjectState())
+    SwingUtilities.invokeLater(
+        () -> handleVehicleStateChange((Vehicle) tcsObjectEvent.getCurrentOrPreviousObjectState())
     );
   }
 
   private void updateAllVehicleAllocations() {
-    SwingUtilities.invokeLater(()
-        -> sharedPortal.getPortal().getVehicleService().fetchObjects(Vehicle.class).stream()
+    SwingUtilities.invokeLater(
+        () -> sharedPortal.getPortal().getVehicleService().fetchObjects(Vehicle.class).stream()
             .forEach(this::handleVehicleStateChange)
     );
   }
@@ -196,6 +202,7 @@ public class ResourceAllocationPanel
     return result;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
@@ -234,11 +241,13 @@ public class ResourceAllocationPanel
         add(allocationScrollPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void enableUpdatesCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableUpdatesCheckboxActionPerformed
     enableUpdates = enableUpdatesCheckbox.isSelected();
   }//GEN-LAST:event_enableUpdatesCheckboxActionPerformed
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane allocationScrollPane;
@@ -247,4 +256,5 @@ public class ResourceAllocationPanel
     private javax.swing.JPanel optionsPanel;
     // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

@@ -16,11 +16,12 @@
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.util;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,8 @@ import org.slf4j.LoggerFactory;
  * @author Werner Randelshofer, Hausmatt 10, CH-6405 Immensee, Switzerland
  */
 public class ResourceBundleUtil
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * This class's Logger.

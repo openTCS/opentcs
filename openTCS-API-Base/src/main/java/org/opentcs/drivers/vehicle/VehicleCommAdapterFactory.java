@@ -16,7 +16,8 @@ import org.opentcs.data.model.Vehicle;
  * Provides communication adapter instances for vehicles to be controlled.
  */
 public interface VehicleCommAdapterFactory
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * Returns a {@link VehicleCommAdapterDescription} for the factory/the adapters provided.
@@ -33,7 +34,10 @@ public interface VehicleCommAdapterFactory
    * @return <code>true</code> if, and only if, this factory can provide a
    * communication adapter to control the given vehicle.
    */
-  boolean providesAdapterFor(@Nonnull Vehicle vehicle);
+  boolean providesAdapterFor(
+      @Nonnull
+      Vehicle vehicle
+  );
 
   /**
    * Returns a communication adapter for controlling the given vehicle.
@@ -43,5 +47,8 @@ public interface VehicleCommAdapterFactory
    * <code>null</code>, if this factory cannot provide an adapter for it.
    */
   @Nullable
-  VehicleCommAdapter getAdapterFor(@Nonnull Vehicle vehicle);
+  VehicleCommAdapter getAdapterFor(
+      @Nonnull
+      Vehicle vehicle
+  );
 }

@@ -18,11 +18,15 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 /**
  */
 public class LayoutToModelCoordinateUndoActivity
-    extends CoordinateUndoActivity {
+    extends
+      CoordinateUndoActivity {
 
   @Inject
-  public LayoutToModelCoordinateUndoActivity(@Assisted CoordinateProperty property,
-                                             ModelManager modelManager) {
+  public LayoutToModelCoordinateUndoActivity(
+      @Assisted
+      CoordinateProperty property,
+      ModelManager modelManager
+  ) {
     super(property, modelManager);
   }
 

@@ -13,7 +13,8 @@ import javax.swing.JPanel;
  * A base class for panels associated with comm adapters.
  */
 public abstract class VehicleCommAdapterPanel
-    extends JPanel {
+    extends
+      JPanel {
 
   /**
    * Returns the title for this comm adapter panel.
@@ -32,6 +33,8 @@ public abstract class VehicleCommAdapterPanel
    * @param attributeChanged The attribute name that chagend.
    * @param processModel The process model.
    */
-  public abstract void processModelChange(String attributeChanged,
-                                          VehicleProcessModelTO processModel);
+  public abstract void processModelChange(
+      String attributeChanged,
+      VehicleProcessModelTO processModel
+  );
 }

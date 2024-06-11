@@ -14,6 +14,7 @@ import org.opentcs.data.order.TransportOrder;
  * Implementations of this interface check whether a transport order may be removed.
  */
 public interface TransportOrderCleanupApproval
-    extends Predicate<TransportOrder> {
+    extends
+      Predicate<TransportOrder> {
 
 }

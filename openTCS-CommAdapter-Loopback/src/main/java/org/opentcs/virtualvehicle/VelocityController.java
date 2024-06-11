@@ -8,9 +8,10 @@
 package org.opentcs.virtualvehicle;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import java.io.Serializable;
 import java.util.ArrayDeque;
-import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import org.opentcs.data.model.Vehicle;
 import org.slf4j.Logger;
@@ -79,10 +80,12 @@ public class VelocityController {
    * @param maxRevVelo The maximum reverse velocity of the vehicle (in mm/s).
    * @param maxFwdVelo The maximum forward velocity of the vehicle (in mm/s).
    */
-  public VelocityController(int maxDecel,
-                            int maxAccel,
-                            int maxRevVelo,
-                            int maxFwdVelo) {
+  public VelocityController(
+      int maxDecel,
+      int maxAccel,
+      int maxRevVelo,
+      int maxFwdVelo
+  ) {
     maxDeceleration = maxDecel;
     maxAcceleration = maxAccel;
     maxRevVelocity = maxRevVelo;
@@ -317,10 +320,12 @@ public class VelocityController {
     // Compute travelling time.
     // XXX Divide by zero if (v_current == -v_target), especially if both are 0!
     final double t = s / (v_current + (v_target - v_current) / 2);
-    LOG.debug("t = " + t
-        + "; s = " + s
-        + "; v_current = " + v_current
-        + "; v_target = " + v_target);
+    LOG.debug(
+        "t = " + t
+            + "; s = " + s
+            + "; v_current = " + v_current
+            + "; v_target = " + v_target
+    );
     // Compute acceleration.
     int result = (int) ((v_target - v_current) / t);
     LOG.debug("result = " + result);
@@ -337,7 +342,8 @@ public class VelocityController {
    * An entry in a vehicle controller's processing queue.
    */
   public static class WayEntry
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The length of the way to drive (in mm).
@@ -364,10 +370,12 @@ public class VelocityController {
      * @param destPointName The name of the destination point.
      * @param orientation The vehicle's orientation on this way.
      */
-    public WayEntry(long length,
-                    int maxVelocity,
-                    String destPointName,
-                    Vehicle.Orientation orientation) {
+    public WayEntry(
+        long length,
+        int maxVelocity,
+        String destPointName,
+        Vehicle.Orientation orientation
+    ) {
       checkArgument(length > 0, "length is not > 0 but %s", length);
       this.length = length;
       if (maxVelocity < 1) {

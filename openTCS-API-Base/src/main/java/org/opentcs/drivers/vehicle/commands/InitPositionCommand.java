@@ -7,8 +7,9 @@
  */
 package org.opentcs.drivers.vehicle.commands;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.SimVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -19,7 +20,8 @@ import org.slf4j.LoggerFactory;
  * A command for initializing the comm adapter's position.
  */
 public class InitPositionCommand
-    implements AdapterCommand {
+    implements
+      AdapterCommand {
 
   /**
    * This class's logger.
@@ -35,7 +37,10 @@ public class InitPositionCommand
    *
    * @param position The position to set.
    */
-  public InitPositionCommand(@Nonnull String position) {
+  public InitPositionCommand(
+      @Nonnull
+      String position
+  ) {
     this.position = requireNonNull(position, "position");
   }
 

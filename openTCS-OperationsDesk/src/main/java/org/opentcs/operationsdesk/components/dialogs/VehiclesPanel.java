@@ -7,11 +7,12 @@
  */
 package org.opentcs.operationsdesk.components.dialogs;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.swing.JPanel;
@@ -26,8 +27,10 @@ import org.opentcs.util.event.EventHandler;
  * Shows every vehicle available in the system in a panel.
  */
 public class VehiclesPanel
-    extends JPanel
-    implements EventHandler {
+    extends
+      JPanel
+    implements
+      EventHandler {
 
   /**
    * Provides the current system model.
@@ -49,11 +52,15 @@ public class VehiclesPanel
    * @param vehicleViewFactory A factory for vehicle views.
    */
   @Inject
-  VehiclesPanel(ModelManager modelManager,
-                SingleVehicleViewFactory vehicleViewFactory) {
+  VehiclesPanel(
+      ModelManager modelManager,
+      SingleVehicleViewFactory vehicleViewFactory
+  ) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
-    this.vehicleViewFactory = requireNonNull(vehicleViewFactory,
-                                             "vehicleViewFactory");
+    this.vehicleViewFactory = requireNonNull(
+        vehicleViewFactory,
+        "vehicleViewFactory"
+    );
 
     initComponents();
     setPreferredSize(new Dimension(0, 97));
@@ -139,10 +146,11 @@ public class VehiclesPanel
         setVehicleModels(modelManager.getModel().getVehicleModels());
         break;
       default:
-      // Do nada.
+        // Do nada.
     }
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
@@ -173,4 +181,5 @@ public class VehiclesPanel
   private javax.swing.JScrollPane scrollPaneVehicles;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

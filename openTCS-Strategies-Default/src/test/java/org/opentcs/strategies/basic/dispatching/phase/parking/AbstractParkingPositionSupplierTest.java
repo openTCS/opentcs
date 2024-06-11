@@ -7,20 +7,21 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Path;
@@ -99,13 +100,17 @@ class AbstractParkingPositionSupplierTest {
     Path[] paths = new Path[points.length];
     for (int i = 0; i < points.length; i++) {
       points[i] = new Point("Point" + i);
-      paths[i] = new Path("Path" + i,
-                          new Point("some point").getReference(),
-                          new Point("some other point").getReference());
+      paths[i] = new Path(
+          "Path" + i,
+          new Point("some point").getReference(),
+          new Point("some other point").getReference()
+      );
     }
 
-    Set<TCSResource<?>> blockMembers = setOf(points[1], points[2], points[3],
-                                             paths[0], paths[4]);
+    Set<TCSResource<?>> blockMembers = setOf(
+        points[1], points[2], points[3],
+        paths[0], paths[4]
+    );
 
     when(plantModelService.fetchObjects(Point.class)).thenReturn(setOf(points));
     when(plantModelService.expandResources(Collections.singleton(points[2].getReference())))
@@ -122,10 +127,13 @@ class AbstractParkingPositionSupplierTest {
   }
 
   class AbstractParkingPositionSupplierImpl
-      extends AbstractParkingPositionSupplier {
+      extends
+        AbstractParkingPositionSupplier {
 
-    AbstractParkingPositionSupplierImpl(InternalPlantModelService plantModelService,
-                                        Router router) {
+    AbstractParkingPositionSupplierImpl(
+        InternalPlantModelService plantModelService,
+        Router router
+    ) {
       super(plantModelService, router);
     }
 

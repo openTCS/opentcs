@@ -7,13 +7,14 @@
  */
 package org.opentcs.kernel.vehicles;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
@@ -46,8 +47,10 @@ public class MovementCommandMapper {
    * @param transportOrder The {@link TransportOrder} the drive order belongs to.
    * @return A list of {@link MovementCommand}s.
    */
-  public List<MovementCommand> toMovementCommands(DriveOrder driveOrder,
-                                                  TransportOrder transportOrder) {
+  public List<MovementCommand> toMovementCommands(
+      DriveOrder driveOrder,
+      TransportOrder transportOrder
+  ) {
     requireNonNull(driveOrder, "driveOrder");
     requireNonNull(transportOrder, "transportOrder");
 
@@ -56,8 +59,10 @@ public class MovementCommandMapper {
     Route orderRoute = driveOrder.getRoute();
     Point finalDestination = orderRoute.getFinalDestinationPoint();
     Location finalDestinationLocation
-        = objectService.fetchObject(Location.class,
-                                    driveOrder.getDestination().getDestination().getName());
+        = objectService.fetchObject(
+            Location.class,
+            driveOrder.getDestination().getDestination().getName()
+        );
     Map<String, String> destProperties = driveOrder.getDestination().getProperties();
 
     List<MovementCommand> result = new ArrayList<>(orderRoute.getSteps().size());
@@ -73,16 +78,18 @@ public class MovementCommandMapper {
         Location location = isFinalMovement ? finalDestinationLocation : null;
 
         result.add(
-            new MovementCommand(transportOrder,
-                                driveOrder,
-                                curStep,
-                                operation,
-                                location,
-                                isFinalMovement,
-                                finalDestinationLocation,
-                                finalDestination,
-                                op,
-                                mergeProperties(transportOrder.getProperties(), destProperties))
+            new MovementCommand(
+                transportOrder,
+                driveOrder,
+                curStep,
+                operation,
+                location,
+                isFinalMovement,
+                finalDestinationLocation,
+                finalDestination,
+                op,
+                mergeProperties(transportOrder.getProperties(), destProperties)
+            )
         );
       }
     }
@@ -97,8 +104,10 @@ public class MovementCommandMapper {
    * @param destProps The properties of a drive order destination.
    * @return The merged properties.
    */
-  private Map<String, String> mergeProperties(Map<String, String> orderProps,
-                                              Map<String, String> destProps) {
+  private Map<String, String> mergeProperties(
+      Map<String, String> orderProps,
+      Map<String, String> destProps
+  ) {
     requireNonNull(orderProps, "orderProps");
     requireNonNull(destProps, "destProps");
 

@@ -7,13 +7,14 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
+import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
-import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
 import org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding.TransportOrderEntry;
 import org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding.TransportOrdersDocument;
 
@@ -21,7 +22,8 @@ import org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding.TransportOrders
  * A table model for transport orders.
  */
 class TransportOrderTableModel
-    extends AbstractTableModel {
+    extends
+      AbstractTableModel {
 
   /**
    * This classe's bundle.
@@ -30,17 +32,25 @@ class TransportOrderTableModel
   /**
    * The column names.
    */
-  private static final String[] COLUMN_NAMES = new String[]{
-    "#",
-    BUNDLE.getString("transportOrderTableModel.column_deadline.headerText"),
-    BUNDLE.getString("transportOrderTableModel.column_vehicle.headerText")};
+  private static final String[] COLUMN_NAMES
+      = new String[]{
+          "#",
+          BUNDLE.getString(
+              "transportOrderTableModel.column_deadline.headerText"
+          ),
+          BUNDLE.getString(
+              "transportOrderTableModel.column_vehicle.headerText"
+          )
+      };
   /**
    * The column classes.
    */
-  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
-    Integer.class,
-    TransportOrderData.Deadline.class,
-    TCSObjectReference.class,};
+  private static final Class<?>[] COLUMN_CLASSES
+      = new Class<?>[]{
+          Integer.class,
+          TransportOrderData.Deadline.class,
+          TCSObjectReference.class
+      };
   /**
    * The actual content.
    */
@@ -158,11 +168,13 @@ class TransportOrderTableModel
     TransportOrdersDocument result = new TransportOrdersDocument();
 
     for (TransportOrderData curData : transportOrderDataList) {
-      result.getTransportOrders().add(new TransportOrderEntry(
-          curData.getDeadline(),
-          curData.getDriveOrders(),
-          curData.getIntendedVehicle() == null ? null : curData.getIntendedVehicle().getName(),
-          curData.getProperties())
+      result.getTransportOrders().add(
+          new TransportOrderEntry(
+              curData.getDeadline(),
+              curData.getDriveOrders(),
+              curData.getIntendedVehicle() == null ? null : curData.getIntendedVehicle().getName(),
+              curData.getProperties()
+          )
       );
     }
 

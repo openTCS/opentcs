@@ -7,8 +7,9 @@
  */
 package org.opentcs.util.gui;
 
-import java.awt.Component;
 import static java.util.Objects.requireNonNull;
+
+import java.awt.Component;
 import java.util.function.Function;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
@@ -21,7 +22,8 @@ import javax.swing.ListCellRenderer;
  * @param <E> The type of the values to be rendered.
  */
 public class StringListCellRenderer<E>
-    implements ListCellRenderer<E> {
+    implements
+      ListCellRenderer<E> {
 
   /**
    * A default renderer for creating the label.
@@ -44,16 +46,20 @@ public class StringListCellRenderer<E>
   }
 
   @Override
-  public Component getListCellRendererComponent(JList<? extends E> list,
-                                                E value,
-                                                int index,
-                                                boolean isSelected,
-                                                boolean cellHasFocus) {
-    JLabel label = (JLabel) defaultRenderer.getListCellRendererComponent(list,
-                                                                         value,
-                                                                         index,
-                                                                         isSelected,
-                                                                         cellHasFocus);
+  public Component getListCellRendererComponent(
+      JList<? extends E> list,
+      E value,
+      int index,
+      boolean isSelected,
+      boolean cellHasFocus
+  ) {
+    JLabel label = (JLabel) defaultRenderer.getListCellRendererComponent(
+        list,
+        value,
+        index,
+        isSelected,
+        cellHasFocus
+    );
     label.setText(representer.apply(value));
     return label;
   }

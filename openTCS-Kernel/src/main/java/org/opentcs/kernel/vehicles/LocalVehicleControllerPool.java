@@ -15,8 +15,9 @@ import org.opentcs.drivers.vehicle.VehicleControllerPool;
  * Manages the attachment of vehicle controllers to vehicles and comm adapters.
  */
 public interface LocalVehicleControllerPool
-    extends VehicleControllerPool,
-            Lifecycle{
+    extends
+      VehicleControllerPool,
+      Lifecycle {
 
   /**
    * Associates a vehicle controller with a named vehicle and a comm adapter.

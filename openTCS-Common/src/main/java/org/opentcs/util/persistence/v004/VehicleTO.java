@@ -7,9 +7,10 @@
  */
 package org.opentcs.util.persistence.v004;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -22,10 +23,12 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(
     propOrder = {"name", "length", "energyLevelCritical", "energyLevelGood",
-                 "energyLevelFullyRecharged", "energyLevelSufficientlyRecharged",
-                 "maxVelocity", "maxReverseVelocity", "properties", "vehicleLayout"})
+        "energyLevelFullyRecharged", "energyLevelSufficientlyRecharged",
+        "maxVelocity", "maxReverseVelocity", "properties", "vehicleLayout"}
+)
 public class VehicleTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   //max velocity in mm/s.
   private int maxVelocity;
@@ -51,7 +54,10 @@ public class VehicleTO
     return length;
   }
 
-  public VehicleTO setLength(@Nonnull Long length) {
+  public VehicleTO setLength(
+      @Nonnull
+      Long length
+  ) {
     requireNonNull(length, "length");
     this.length = length;
     return this;
@@ -63,7 +69,10 @@ public class VehicleTO
     return energyLevelCritical;
   }
 
-  public VehicleTO setEnergyLevelCritical(@Nonnull Long energyLevelCritical) {
+  public VehicleTO setEnergyLevelCritical(
+      @Nonnull
+      Long energyLevelCritical
+  ) {
     requireNonNull(energyLevelCritical, "energyLevelCritical");
     this.energyLevelCritical = energyLevelCritical;
     return this;
@@ -75,7 +84,10 @@ public class VehicleTO
     return energyLevelGood;
   }
 
-  public VehicleTO setEnergyLevelGood(@Nonnull Long energyLevelGood) {
+  public VehicleTO setEnergyLevelGood(
+      @Nonnull
+      Long energyLevelGood
+  ) {
     requireNonNull(energyLevelGood, "energyLevelGood");
     this.energyLevelGood = energyLevelGood;
     return this;
@@ -87,7 +99,10 @@ public class VehicleTO
     return energyLevelFullyRecharged;
   }
 
-  public VehicleTO setEnergyLevelFullyRecharged(@Nonnull Long energyLevelFullyRecharged) {
+  public VehicleTO setEnergyLevelFullyRecharged(
+      @Nonnull
+      Long energyLevelFullyRecharged
+  ) {
     requireNonNull(energyLevelFullyRecharged, "energyLevelFullyRecharged");
     this.energyLevelFullyRecharged = energyLevelFullyRecharged;
     return this;
@@ -100,7 +115,9 @@ public class VehicleTO
   }
 
   public VehicleTO setEnergyLevelSufficientlyRecharged(
-      @Nonnull Long energyLevelSufficientlyRecharged) {
+      @Nonnull
+      Long energyLevelSufficientlyRecharged
+  ) {
     requireNonNull(energyLevelSufficientlyRecharged, "energyLevelSufficientlyRecharged");
     this.energyLevelSufficientlyRecharged = energyLevelSufficientlyRecharged;
     return this;
@@ -112,7 +129,10 @@ public class VehicleTO
     return maxVelocity;
   }
 
-  public VehicleTO setMaxVelocity(@Nonnull int maxVelocity) {
+  public VehicleTO setMaxVelocity(
+      @Nonnull
+      int maxVelocity
+  ) {
     this.maxVelocity = maxVelocity;
     return this;
   }
@@ -123,18 +143,24 @@ public class VehicleTO
     return maxReverseVelocity;
   }
 
-  public VehicleTO setMaxReverseVelocity(@Nonnull int maxReverseVelocity) {
+  public VehicleTO setMaxReverseVelocity(
+      @Nonnull
+      int maxReverseVelocity
+  ) {
     this.maxReverseVelocity = maxReverseVelocity;
     return this;
   }
-  
+
   @XmlAttribute
   @Nullable
   public String getEnvelopeKey() {
     return envelopeKey;
   }
 
-  public VehicleTO setEnvelopeKey(@Nullable String envelopeKey) {
+  public VehicleTO setEnvelopeKey(
+      @Nullable
+      String envelopeKey
+  ) {
     this.envelopeKey = envelopeKey;
     return this;
   }
@@ -144,7 +170,10 @@ public class VehicleTO
     return vehicleLayout;
   }
 
-  public VehicleTO setVehicleLayout(@Nonnull VehicleLayout vehicleLayout) {
+  public VehicleTO setVehicleLayout(
+      @Nonnull
+      VehicleLayout vehicleLayout
+  ) {
     this.vehicleLayout = requireNonNull(vehicleLayout, "vehicleLayout");
     return this;
   }
@@ -165,7 +194,10 @@ public class VehicleTO
       return color;
     }
 
-    public VehicleLayout setColor(@Nonnull String color) {
+    public VehicleLayout setColor(
+        @Nonnull
+        String color
+    ) {
       this.color = requireNonNull(color, "color");
       return this;
     }

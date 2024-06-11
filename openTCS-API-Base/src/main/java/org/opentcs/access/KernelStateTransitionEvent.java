@@ -13,7 +13,8 @@ import java.io.Serializable;
  * Emitted by/for kernel state changes.
  */
 public class KernelStateTransitionEvent
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The old state the kernel is leaving.
@@ -35,9 +36,11 @@ public class KernelStateTransitionEvent
    * @param enteredState The new state of the kernel.
    * @param transitionFinished Whether the transistion is finished, yet.
    */
-  public KernelStateTransitionEvent(Kernel.State leftState,
-                                    Kernel.State enteredState,
-                                    boolean transitionFinished) {
+  public KernelStateTransitionEvent(
+      Kernel.State leftState,
+      Kernel.State enteredState,
+      boolean transitionFinished
+  ) {
     this.leftState = leftState;
     this.enteredState = enteredState;
     this.transitionFinished = transitionFinished;

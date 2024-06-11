@@ -16,7 +16,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * An attribute which contains a quantity of key-value pairs.
  */
 public class KeyValueSetProperty
-    extends AbstractComplexProperty {
+    extends
+      AbstractComplexProperty {
 
   /**
    * The quantity of key-value-pairs.

@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.workingset;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.TransportOrderCleanupApproval;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
@@ -18,7 +19,8 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * Checks whether a transport order may be removed.
  */
 public class DefaultTransportOrderCleanupApproval
-    implements TransportOrderCleanupApproval {
+    implements
+      TransportOrderCleanupApproval {
 
   private final PeripheralJobPoolManager peripheralJobPoolManager;
   private final DefaultPeripheralJobCleanupApproval defaultPeripheralJobCleanupApproval;
@@ -36,12 +38,17 @@ public class DefaultTransportOrderCleanupApproval
   public DefaultTransportOrderCleanupApproval(
       PeripheralJobPoolManager peripheralJobPoolManager,
       DefaultPeripheralJobCleanupApproval defaultPeripheralJobCleanupApproval,
-      CreationTimeThreshold creationTimeThreshold) {
-    this.peripheralJobPoolManager = requireNonNull(peripheralJobPoolManager,
-                                                   "peripheralJobPoolManager");
+      CreationTimeThreshold creationTimeThreshold
+  ) {
+    this.peripheralJobPoolManager = requireNonNull(
+        peripheralJobPoolManager,
+        "peripheralJobPoolManager"
+    );
     this.defaultPeripheralJobCleanupApproval
-        = requireNonNull(defaultPeripheralJobCleanupApproval,
-                         "defaultPeripheralJobCleanupApproval");
+        = requireNonNull(
+            defaultPeripheralJobCleanupApproval,
+            "defaultPeripheralJobCleanupApproval"
+        );
     this.creationTimeThreshold = requireNonNull(creationTimeThreshold, "creationTimeThreshold");
   }
 
@@ -76,9 +83,10 @@ public class DefaultTransportOrderCleanupApproval
 
   private boolean isRelatedToUnapprovedJob(TransportOrder order) {
     return !(peripheralJobPoolManager.getObjectRepo().getObjects(
-             PeripheralJob.class,
-             job -> Objects.equals(job.getRelatedTransportOrder(), order.getReference()))
-             .stream()
-             .allMatch(defaultPeripheralJobCleanupApproval));
+        PeripheralJob.class,
+        job -> Objects.equals(job.getRelatedTransportOrder(), order.getReference())
+    )
+        .stream()
+        .allMatch(defaultPeripheralJobCleanupApproval));
   }
 }

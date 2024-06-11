@@ -20,13 +20,16 @@ import org.opentcs.guing.common.components.tree.elements.UserObjectUtil;
  * A tree view manager for blocks.
  */
 public class BlocksTreeViewManager
-    extends TreeViewManager {
+    extends
+      TreeViewManager {
 
   @Inject
   @SuppressWarnings("this-escape")
-  public BlocksTreeViewManager(TreeView treeView,
-                               UserObjectUtil userObjectUtil,
-                               MouseListener mouseListener) {
+  public BlocksTreeViewManager(
+      TreeView treeView,
+      UserObjectUtil userObjectUtil,
+      MouseListener mouseListener
+  ) {
     super(treeView, userObjectUtil, mouseListener);
 
     // If the user clicks on an element in the tree view that is contained in several blocks,

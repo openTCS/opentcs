@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.workingset;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.ObjectUnknownException;
@@ -50,8 +51,13 @@ public class TCSObjectManager {
    * @param eventHandler The event handler to publish events to.
    */
   @Inject
-  public TCSObjectManager(@Nonnull TCSObjectRepository objectRepo,
-                          @Nonnull @ApplicationEventBus EventHandler eventHandler) {
+  public TCSObjectManager(
+      @Nonnull
+      TCSObjectRepository objectRepo,
+      @Nonnull
+      @ApplicationEventBus
+      EventHandler eventHandler
+  ) {
     this.objectRepo = requireNonNull(objectRepo, "objectRepo");
     this.eventHandler = requireNonNull(eventHandler, "eventHandler");
   }
@@ -75,19 +81,26 @@ public class TCSObjectManager {
    * property from the object.
    * @throws ObjectUnknownException If the referenced object does not exist.
    */
-  public void setObjectProperty(@Nonnull TCSObjectReference<?> ref,
-                                @Nonnull String key,
-                                @Nullable String value)
+  public void setObjectProperty(
+      @Nonnull
+      TCSObjectReference<?> ref,
+      @Nonnull
+      String key,
+      @Nullable
+      String value
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(key, "key");
 
     TCSObject<?> object = objectRepo.getObject(ref);
     TCSObject<?> previousState = object;
-    LOG.debug("Setting property on object named '{}': key='{}', value='{}'",
-              ref.getName(),
-              key,
-              value);
+    LOG.debug(
+        "Setting property on object named '{}': key='{}', value='{}'",
+        ref.getName(),
+        key,
+        value
+    );
     object = object.withProperty(key, value);
     objectRepo.replaceObject(object);
     emitObjectEvent(object, previousState, TCSObjectEvent.Type.OBJECT_MODIFIED);
@@ -100,8 +113,12 @@ public class TCSObjectManager {
    * @param entry The history entry to be appended.
    * @throws ObjectUnknownException If the referenced object does not exist.
    */
-  public void appendObjectHistoryEntry(@Nonnull TCSObjectReference<?> ref,
-                                       @Nonnull ObjectHistory.Entry entry)
+  public void appendObjectHistoryEntry(
+      @Nonnull
+      TCSObjectReference<?> ref,
+      @Nonnull
+      ObjectHistory.Entry entry
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(entry, "entry");
@@ -123,9 +140,11 @@ public class TCSObjectManager {
    * event for.
    * @param evtType The type of event to emit.
    */
-  public void emitObjectEvent(TCSObject<?> currentObjectState,
-                              TCSObject<?> previousObjectState,
-                              TCSObjectEvent.Type evtType) {
+  public void emitObjectEvent(
+      TCSObject<?> currentObjectState,
+      TCSObject<?> previousObjectState,
+      TCSObjectEvent.Type evtType
+  ) {
     eventHandler.onEvent(new TCSObjectEvent(currentObjectState, previousObjectState, evtType));
   }
 

@@ -22,14 +22,17 @@ import org.slf4j.LoggerFactory;
  * TextInputValidator}.
  */
 public abstract class TextInputPanel
-    extends InputPanel {
+    extends
+      InputPanel {
 
   /**
    * This class's logger.
    */
   private static final Logger LOG = LoggerFactory.getLogger(TextInputPanel.class);
+
   /**
    * Create a new instance of <code>TextInputPanel</code>.
+   *
    * @param title The title of this panel.
    */
   public TextInputPanel(String title) {
@@ -53,6 +56,7 @@ public abstract class TextInputPanel
    * fields are valid and then decide if
    * {@link InputPanel#setInputValid(boolean)} should be called or not.
    * </p>
+   *
    * @param valid true, if the content of the <code>Document</code> is valid
    * @param doc the <code>Document</code>
    */
@@ -79,10 +83,12 @@ public abstract class TextInputPanel
    * NOT check whether the given number really fits into the range of the
    * corresponding data type (e.g. <code>int</code> for <code>REGEX_INT</code>).
    * </p>
+   *
    * @see TextInputPanel#setInputValid(boolean, javax.swing.text.Document)
    */
   public class TextInputValidator
-      implements DocumentListener {
+      implements
+        DocumentListener {
 
     /**
      * Regular expression that accepts a floating point number of arbitary length.
@@ -133,6 +139,7 @@ public abstract class TextInputPanel
 
     /**
      * Create an instance of <code>TextInputValidator</code>.
+     *
      * @param format The regular expression to use for validation.
      */
     protected TextInputValidator(String format) {
@@ -156,6 +163,7 @@ public abstract class TextInputPanel
     /**
      * Validate the specified <code>Document</code> and set the validation
      * state in the {@link InputPanel} accordingly.
+     *
      * @param doc The <code>Document</code> to validate.
      */
     private void validate(Document doc) {

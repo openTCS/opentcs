@@ -7,11 +7,12 @@
  */
 package org.opentcs.guing.base.model;
 
+import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
-import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.base.components.properties.type.AbstractProperty;
 import org.opentcs.guing.base.components.properties.type.MultipleDifferentValues;
@@ -21,7 +22,8 @@ import org.opentcs.guing.base.components.properties.type.Property;
  * Allows to change properties with the same name of multiple model components at the same time.
  */
 public class PropertiesCollection
-    extends CompositeModelComponent {
+    extends
+      CompositeModelComponent {
 
   /**
    * This class's resource bundle.

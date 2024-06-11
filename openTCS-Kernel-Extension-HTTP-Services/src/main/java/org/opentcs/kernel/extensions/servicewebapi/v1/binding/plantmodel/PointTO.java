@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Point;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.EnvelopeTO;
@@ -31,7 +32,11 @@ public class PointTO {
   private List<PropertyTO> properties = List.of();
 
   @JsonCreator
-  public PointTO(@Nonnull @JsonProperty(value = "name", required = true) String name) {
+  public PointTO(
+      @Nonnull
+      @JsonProperty(value = "name", required = true)
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
   }
 
@@ -40,7 +45,10 @@ public class PointTO {
     return name;
   }
 
-  public PointTO setName(@Nonnull String name) {
+  public PointTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     return this;
   }
@@ -50,7 +58,10 @@ public class PointTO {
     return properties;
   }
 
-  public PointTO setProperties(@Nonnull List<PropertyTO> properties) {
+  public PointTO setProperties(
+      @Nonnull
+      List<PropertyTO> properties
+  ) {
     this.properties = requireNonNull(properties, "properties");
     return this;
   }
@@ -60,7 +71,10 @@ public class PointTO {
     return position;
   }
 
-  public PointTO setPosition(@Nonnull TripleTO position) {
+  public PointTO setPosition(
+      @Nonnull
+      TripleTO position
+  ) {
     this.position = requireNonNull(position, "position");
     return this;
   }
@@ -79,7 +93,10 @@ public class PointTO {
     return type;
   }
 
-  public PointTO setType(@Nonnull String type) {
+  public PointTO setType(
+      @Nonnull
+      String type
+  ) {
     this.type = requireNonNull(type, "type");
     return this;
   }
@@ -89,7 +106,10 @@ public class PointTO {
     return layout;
   }
 
-  public PointTO setLayout(@Nonnull Layout pointLayout) {
+  public PointTO setLayout(
+      @Nonnull
+      Layout pointLayout
+  ) {
     this.layout = requireNonNull(pointLayout, "pointLayout");
     return this;
   }
@@ -99,7 +119,10 @@ public class PointTO {
     return vehicleEnvelopes;
   }
 
-  public PointTO setVehicleEnvelopes(@Nonnull List<EnvelopeTO> vehicleEnvelopes) {
+  public PointTO setVehicleEnvelopes(
+      @Nonnull
+      List<EnvelopeTO> vehicleEnvelopes
+  ) {
     this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     return this;
   }
@@ -119,7 +142,10 @@ public class PointTO {
       return position;
     }
 
-    public Layout setPosition(@Nonnull CoupleTO position) {
+    public Layout setPosition(
+        @Nonnull
+        CoupleTO position
+    ) {
       this.position = requireNonNull(position, "position");
       return this;
     }
@@ -129,7 +155,10 @@ public class PointTO {
       return labelOffset;
     }
 
-    public Layout setLabelOffset(@Nonnull CoupleTO labelOffset) {
+    public Layout setLabelOffset(
+        @Nonnull
+        CoupleTO labelOffset
+    ) {
       this.labelOffset = requireNonNull(labelOffset, "labelOffset");
       return this;
     }

@@ -7,9 +7,10 @@
  */
 package org.opentcs.guing.common.components.properties;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import java.awt.geom.AffineTransform;
-import static java.util.Objects.requireNonNull;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -24,7 +25,8 @@ import org.opentcs.guing.common.persistence.ModelManager;
  * An undo for the modification of a coordinate property.
  */
 public abstract class CoordinateUndoActivity
-    extends AbstractUndoableEdit {
+    extends
+      AbstractUndoableEdit {
 
   protected final CoordinateProperty property;
   protected final CoordinateProperty pxModel;
@@ -42,8 +44,11 @@ public abstract class CoordinateUndoActivity
    * @param property The affected property.
    * @param modelManager The model manager to be used.
    */
-  public CoordinateUndoActivity(@Assisted CoordinateProperty property,
-                                ModelManager modelManager) {
+  public CoordinateUndoActivity(
+      @Assisted
+      CoordinateProperty property,
+      ModelManager modelManager
+  ) {
     this.property = requireNonNull(property, "property");
 
     ModelComponent model = property.getModel();

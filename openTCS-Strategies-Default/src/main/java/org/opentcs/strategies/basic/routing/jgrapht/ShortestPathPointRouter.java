@@ -7,13 +7,14 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
 import org.opentcs.components.kernel.routing.Edge;
@@ -32,7 +33,8 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class ShortestPathPointRouter
-    implements PointRouter {
+    implements
+      PointRouter {
 
   /**
    * This class's logger.
@@ -43,8 +45,10 @@ public class ShortestPathPointRouter
 
   private final Map<String, Point> points = new HashMap<>();
 
-  public ShortestPathPointRouter(ShortestPathAlgorithm<String, Edge> algo,
-                                 Collection<Point> points) {
+  public ShortestPathPointRouter(
+      ShortestPathAlgorithm<String, Edge> algo,
+      Collection<Point> points
+  ) {
     this.algo = requireNonNull(algo, "algo");
     requireNonNull(points, "points");
 
@@ -71,17 +75,21 @@ public class ShortestPathPointRouter
 
     List<Route.Step> result = translateToSteps(graphPath);
 
-    LOG.debug("Looking up route from {} to {} took {} milliseconds.",
-              srcPoint.getName(),
-              destPoint.getName(),
-              System.currentTimeMillis() - timeBefore);
+    LOG.debug(
+        "Looking up route from {} to {} took {} milliseconds.",
+        srcPoint.getName(),
+        destPoint.getName(),
+        System.currentTimeMillis() - timeBefore
+    );
 
     return result;
   }
 
   @Override
-  public long getCosts(TCSObjectReference<Point> srcPointRef,
-                       TCSObjectReference<Point> destPointRef) {
+  public long getCosts(
+      TCSObjectReference<Point> srcPointRef,
+      TCSObjectReference<Point> destPointRef
+  ) {
     requireNonNull(srcPointRef, "srcPointRef");
     requireNonNull(destPointRef, "destPointRef");
 
@@ -89,8 +97,10 @@ public class ShortestPathPointRouter
       return 0;
     }
 
-    GraphPath<String, Edge> graphPath = algo.getPath(srcPointRef.getName(),
-                                                          destPointRef.getName());
+    GraphPath<String, Edge> graphPath = algo.getPath(
+        srcPointRef.getName(),
+        destPointRef.getName()
+    );
     if (graphPath == null) {
       return INFINITE_COSTS;
     }
@@ -107,11 +117,15 @@ public class ShortestPathPointRouter
       Point sourcePoint = points.get(graphPath.getGraph().getEdgeSource(edge));
       Point destPoint = points.get(graphPath.getGraph().getEdgeTarget(edge));
 
-      result.add(new Route.Step(edge.getPath(),
-                                sourcePoint,
-                                destPoint,
-                                orientation(edge, sourcePoint),
-                                routeIndex));
+      result.add(
+          new Route.Step(
+              edge.getPath(),
+              sourcePoint,
+              destPoint,
+              orientation(edge, sourcePoint),
+              routeIndex
+          )
+      );
       routeIndex++;
     }
 

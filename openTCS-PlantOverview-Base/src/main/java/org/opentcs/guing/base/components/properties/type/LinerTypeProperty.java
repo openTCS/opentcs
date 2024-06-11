@@ -15,11 +15,14 @@ import org.opentcs.guing.base.model.elements.PathModel.Type;
  * Subclass for a {@link Type} selection property.
  */
 public class LinerTypeProperty
-    extends SelectionProperty<Type> {
+    extends
+      SelectionProperty<Type> {
 
-  public LinerTypeProperty(ModelComponent model,
-                           List<Type> possibleValues,
-                           Object value) {
+  public LinerTypeProperty(
+      ModelComponent model,
+      List<Type> possibleValues,
+      Object value
+  ) {
     super(model, possibleValues, value);
   }
 }

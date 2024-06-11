@@ -32,8 +32,10 @@ public class DriveOrderStructure {
    * @param referenceToLocation The reference to the drive order's location.
    * @param newVehicleOperation The available operation type at the location.
    */
-  public DriveOrderStructure(TCSObjectReference<Location> referenceToLocation,
-                             String newVehicleOperation) {
+  public DriveOrderStructure(
+      TCSObjectReference<Location> referenceToLocation,
+      String newVehicleOperation
+  ) {
     if (referenceToLocation == null) {
       throw new IllegalArgumentException("location argument is null!");
     }

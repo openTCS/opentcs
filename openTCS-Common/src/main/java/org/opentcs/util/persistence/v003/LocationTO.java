@@ -7,10 +7,11 @@
  */
 package org.opentcs.util.persistence.v003;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -20,10 +21,13 @@ import javax.xml.bind.annotation.XmlType;
 /**
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(propOrder = {"name", "xPosition", "yPosition", "zPosition", "links", "locked",
-                      "properties"})
+@XmlType(
+    propOrder = {"name", "xPosition", "yPosition", "zPosition", "links", "locked",
+        "properties"}
+)
 public class LocationTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   private Long xPosition = 0L;
   private Long yPosition = 0L;
@@ -43,7 +47,10 @@ public class LocationTO
     return xPosition;
   }
 
-  public LocationTO setxPosition(@Nonnull Long xPosition) {
+  public LocationTO setxPosition(
+      @Nonnull
+      Long xPosition
+  ) {
     requireNonNull(xPosition, "xPosition");
     this.xPosition = xPosition;
     return this;
@@ -54,7 +61,10 @@ public class LocationTO
     return yPosition;
   }
 
-  public LocationTO setyPosition(@Nonnull Long yPosition) {
+  public LocationTO setyPosition(
+      @Nonnull
+      Long yPosition
+  ) {
     requireNonNull(yPosition, "yPosition");
     this.yPosition = yPosition;
     return this;
@@ -65,7 +75,10 @@ public class LocationTO
     return zPosition;
   }
 
-  public LocationTO setzPosition(@Nonnull Long zPosition) {
+  public LocationTO setzPosition(
+      @Nonnull
+      Long zPosition
+  ) {
     requireNonNull(zPosition, "zPosition");
     this.zPosition = zPosition;
     return this;
@@ -76,7 +89,10 @@ public class LocationTO
     return type;
   }
 
-  public LocationTO setType(@Nonnull String type) {
+  public LocationTO setType(
+      @Nonnull
+      String type
+  ) {
     requireNonNull(type, "type");
     this.type = type;
     return this;
@@ -87,7 +103,10 @@ public class LocationTO
     return links;
   }
 
-  public LocationTO setLinks(@Nonnull List<Link> links) {
+  public LocationTO setLinks(
+      @Nonnull
+      List<Link> links
+  ) {
     requireNonNull(links, "links");
     this.links = links;
     return this;
@@ -121,7 +140,10 @@ public class LocationTO
       return point;
     }
 
-    public Link setPoint(@Nonnull String point) {
+    public Link setPoint(
+        @Nonnull
+        String point
+    ) {
       requireNonNull(point, "point");
       this.point = point;
       return this;
@@ -132,7 +154,10 @@ public class LocationTO
       return allowedOperations;
     }
 
-    public Link setAllowedOperations(@Nonnull List<AllowedOperationTO> allowedOperations) {
+    public Link setAllowedOperations(
+        @Nonnull
+        List<AllowedOperationTO> allowedOperations
+    ) {
       requireNonNull(allowedOperations, "allowedOperations");
       this.allowedOperations = allowedOperations;
       return this;

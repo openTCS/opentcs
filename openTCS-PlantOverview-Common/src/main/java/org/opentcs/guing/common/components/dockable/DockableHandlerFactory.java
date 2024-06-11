@@ -21,5 +21,6 @@ public interface DockableHandlerFactory {
    * @return A new handler for closing the given dockable.
    */
   DockableClosingHandler createDockableClosingHandler(
-      DefaultSingleCDockable dockable);
+      DefaultSingleCDockable dockable
+  );
 }

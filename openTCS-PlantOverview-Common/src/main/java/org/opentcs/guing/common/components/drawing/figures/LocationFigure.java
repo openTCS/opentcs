@@ -7,6 +7,10 @@
  */
 package org.opentcs.guing.common.components.drawing.figures;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.base.AllocationState.ALLOCATED;
+import static org.opentcs.guing.base.AllocationState.CLAIMED;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.Color;
@@ -23,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.ConnectionFigure;
@@ -34,8 +37,6 @@ import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.base.AllocationState;
-import static org.opentcs.guing.base.AllocationState.ALLOCATED;
-import static org.opentcs.guing.base.AllocationState.CLAIMED;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.type.SymbolProperty;
 import org.opentcs.guing.base.model.elements.BlockModel;
@@ -50,8 +51,10 @@ import org.opentcs.guing.common.components.drawing.ZoomPoint;
  * A figure for locations.
  */
 public class LocationFigure
-    extends TCSFigure
-    implements ImageObserver {
+    extends
+      TCSFigure
+    implements
+      ImageObserver {
 
   /**
    * The fill color for locked locations.
@@ -74,9 +77,12 @@ public class LocationFigure
    * @param drawingOptions The drawing options.
    */
   @Inject
-  public LocationFigure(LocationTheme locationTheme,
-                        @Assisted LocationModel model,
-                        DrawingOptions drawingOptions) {
+  public LocationFigure(
+      LocationTheme locationTheme,
+      @Assisted
+      LocationModel model,
+      DrawingOptions drawingOptions
+  ) {
     super(model);
     this.locationTheme = requireNonNull(locationTheme, "locationTheme");
     this.drawingOptions = requireNonNull(drawingOptions, "drawingOptions");
@@ -168,14 +174,16 @@ public class LocationFigure
   }
 
   private void drawRouteDecoration(Graphics2D g) {
-    for (Map.Entry<VehicleModel, AllocationState> entry
-        : getModel().getAllocationStates().entrySet()) {
+    for (Map.Entry<VehicleModel, AllocationState> entry : getModel().getAllocationStates()
+        .entrySet()) {
       VehicleModel vehicleModel = entry.getKey();
       switch (entry.getValue()) {
         case CLAIMED:
-          drawDecoration(g,
-                         Strokes.PATH_ON_ROUTE,
-                         transparentColor(vehicleModel.getDriveOrderColor(), 70));
+          drawDecoration(
+              g,
+              Strokes.PATH_ON_ROUTE,
+              transparentColor(vehicleModel.getDriveOrderColor(), 70)
+          );
           break;
         case ALLOCATED:
           drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
@@ -184,7 +192,7 @@ public class LocationFigure
           drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
           break;
         default:
-        // Don't draw any decoration.
+          // Don't draw any decoration.
       }
     }
   }
@@ -275,8 +283,10 @@ public class LocationFigure
   }
 
   private void handleLocationLockChanged() {
-    set(AttributeKeys.FILL_COLOR,
-        (Boolean) getModel().getPropertyLocked().getValue() ? LOCKED_COLOR : Color.WHITE);
+    set(
+        AttributeKeys.FILL_COLOR,
+        (Boolean) getModel().getPropertyLocked().getValue() ? LOCKED_COLOR : Color.WHITE
+    );
   }
 
   private List<Set<TCSResourceReference<?>>> getCurrentDriveOrderClaim(VehicleModel vehicle) {
@@ -302,14 +312,20 @@ public class LocationFigure
     }
   }
 
-  private boolean containsDriveOrderDestination(Set<TCSResourceReference<?>> resources,
-                                                VehicleModel vehicle) {
+  private boolean containsDriveOrderDestination(
+      Set<TCSResourceReference<?>> resources,
+      VehicleModel vehicle
+  ) {
     if (vehicle.getDriveOrderDestination() == null) {
       return false;
     }
 
     return resources.stream()
-        .anyMatch(resource -> Objects.equals(resource.getName(),
-                                             vehicle.getDriveOrderDestination().getName()));
+        .anyMatch(
+            resource -> Objects.equals(
+                resource.getName(),
+                vehicle.getDriveOrderDestination().getName()
+            )
+        );
   }
 }

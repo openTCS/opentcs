@@ -7,19 +7,20 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
-import org.jgrapht.Graph;
-import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
-import org.jgrapht.graph.DirectedWeightedMultigraph;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import org.jgrapht.Graph;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
+import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.routing.Edge;
@@ -61,8 +62,10 @@ class ShortestPathPointRouterTest {
     graph.addEdge(pointA.getName(), pointC.getName(), edgeAC);
     graph.setEdgeWeight(edgeAC, 1234);
 
-    pointRouter = new ShortestPathPointRouter(new DijkstraShortestPath<>(graph),
-                                              new HashSet<>(Arrays.asList(pointA, pointB, pointC)));
+    pointRouter = new ShortestPathPointRouter(
+        new DijkstraShortestPath<>(graph),
+        new HashSet<>(Arrays.asList(pointA, pointB, pointC))
+    );
   }
 
   @Test
@@ -79,8 +82,10 @@ class ShortestPathPointRouterTest {
 
   @Test
   void returnInfiniteCostsIfNoRouteExists() {
-    assertEquals(PointRouter.INFINITE_COSTS,
-                 pointRouter.getCosts(pointA.getReference(), pointB.getReference()));
+    assertEquals(
+        PointRouter.INFINITE_COSTS,
+        pointRouter.getCosts(pointA.getReference(), pointB.getReference())
+    );
   }
 
   @Test
@@ -90,8 +95,10 @@ class ShortestPathPointRouterTest {
 
   @Test
   void returnGraphPathCostsForExistingRoute() {
-    assertEquals(1234,
-                 pointRouter.getCosts(pointA.getReference(), pointC.getReference()));
+    assertEquals(
+        1234,
+        pointRouter.getCosts(pointA.getReference(), pointC.getReference())
+    );
   }
 
   @Test

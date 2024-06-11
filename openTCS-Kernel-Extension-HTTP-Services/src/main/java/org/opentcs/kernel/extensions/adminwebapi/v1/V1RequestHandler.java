@@ -7,13 +7,14 @@
  */
 package org.opentcs.kernel.extensions.adminwebapi.v1;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.inject.Inject;
 import java.io.IOException;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.opentcs.access.Kernel;
@@ -29,7 +30,8 @@ import spark.Response;
  * Handles requests and produces responses for version 1 of the admin web API.
  */
 public class V1RequestHandler
-    implements Lifecycle {
+    implements
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -62,8 +64,11 @@ public class V1RequestHandler
    * @param kernelExecutor Use to schedule kernel shutdowns.
    */
   @Inject
-  public V1RequestHandler(LocalKernel kernel,
-                          @KernelExecutor ScheduledExecutorService kernelExecutor) {
+  public V1RequestHandler(
+      LocalKernel kernel,
+      @KernelExecutor
+      ScheduledExecutorService kernelExecutor
+  ) {
     this.kernel = requireNonNull(kernel, "kernel");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }

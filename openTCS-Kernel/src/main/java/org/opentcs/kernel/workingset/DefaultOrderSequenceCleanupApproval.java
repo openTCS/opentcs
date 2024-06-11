@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.workingset;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.OrderSequenceCleanupApproval;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
@@ -17,7 +18,8 @@ import org.opentcs.data.order.TransportOrder;
  * Checks whether an order sequence may be removed.
  */
 public class DefaultOrderSequenceCleanupApproval
-    implements OrderSequenceCleanupApproval {
+    implements
+      OrderSequenceCleanupApproval {
 
   private final TransportOrderPoolManager orderPoolManager;
   private final DefaultTransportOrderCleanupApproval defaultTransportOrderCleanupApproval;
@@ -31,11 +33,14 @@ public class DefaultOrderSequenceCleanupApproval
   @Inject
   public DefaultOrderSequenceCleanupApproval(
       TransportOrderPoolManager orderPoolManager,
-      DefaultTransportOrderCleanupApproval defaultTransportOrderCleanupApproval) {
+      DefaultTransportOrderCleanupApproval defaultTransportOrderCleanupApproval
+  ) {
     this.orderPoolManager = requireNonNull(orderPoolManager, "orderPoolManager");
     this.defaultTransportOrderCleanupApproval
-        = requireNonNull(defaultTransportOrderCleanupApproval,
-                         "defaultTransportOrderCleanupApproval");
+        = requireNonNull(
+            defaultTransportOrderCleanupApproval,
+            "defaultTransportOrderCleanupApproval"
+        );
   }
 
   @Override
@@ -51,9 +56,11 @@ public class DefaultOrderSequenceCleanupApproval
 
   private boolean hasUnapprovedOrder(OrderSequence seq) {
     return !(seq.getOrders()
-             .stream()
-             .map(reference -> orderPoolManager.getObjectRepo()
-             .getObject(TransportOrder.class, reference))
-             .allMatch(defaultTransportOrderCleanupApproval));
+        .stream()
+        .map(
+            reference -> orderPoolManager.getObjectRepo()
+                .getObject(TransportOrder.class, reference)
+        )
+        .allMatch(defaultTransportOrderCleanupApproval));
   }
 }

@@ -115,10 +115,14 @@ public class V005TOMapper {
               .withProperties(convertProperties(point.getProperties()))
               .withLayout(
                   new PointCreationTO.Layout(
-                      new Couple(point.getPointLayout().getxPosition(),
-                                 point.getPointLayout().getyPosition()),
-                      new Couple(point.getPointLayout().getxLabelOffset(),
-                                 point.getPointLayout().getyLabelOffset()),
+                      new Couple(
+                          point.getPointLayout().getxPosition(),
+                          point.getPointLayout().getyPosition()
+                      ),
+                      new Couple(
+                          point.getPointLayout().getxLabelOffset(),
+                          point.getPointLayout().getyLabelOffset()
+                      ),
                       point.getPointLayout().getLayerId()
                   )
               )
@@ -145,9 +149,11 @@ public class V005TOMapper {
               .withMaxVelocity(vehicle.getMaxVelocity())
               .withEnvelopeKey(vehicle.getEnvelopeKey())
               .withProperties(convertProperties(vehicle.getProperties()))
-              .withLayout(new VehicleCreationTO.Layout(
-                  Colors.decodeFromHexRGB(vehicle.getVehicleLayout().getColor())
-              ))
+              .withLayout(
+                  new VehicleCreationTO.Layout(
+                      Colors.decodeFromHexRGB(vehicle.getVehicleLayout().getColor())
+                  )
+              )
       );
     }
 
@@ -159,9 +165,11 @@ public class V005TOMapper {
 
     for (PathTO path : paths) {
       result.add(
-          new PathCreationTO(path.getName(),
-                             path.getSourcePoint(),
-                             path.getDestinationPoint())
+          new PathCreationTO(
+              path.getName(),
+              path.getSourcePoint(),
+              path.getDestinationPoint()
+          )
               .withLength(path.getLength())
               .withLocked(path.isLocked())
               .withMaxVelocity(path.getMaxVelocity().intValue())
@@ -171,13 +179,15 @@ public class V005TOMapper {
               )
               .withVehicleEnvelopes(toEnvelopeMap(path.getVehicleEnvelopes()))
               .withProperties(convertProperties(path.getProperties()))
-              .withLayout(new PathCreationTO.Layout(
-                  Path.Layout.ConnectionType.valueOf(path.getPathLayout().getConnectionType()),
-                  path.getPathLayout().getControlPoints().stream()
-                      .map(controlPoint -> new Couple(controlPoint.getX(), controlPoint.getY()))
-                      .toList(),
-                  path.getPathLayout().getLayerId()
-              ))
+              .withLayout(
+                  new PathCreationTO.Layout(
+                      Path.Layout.ConnectionType.valueOf(path.getPathLayout().getConnectionType()),
+                      path.getPathLayout().getControlPoints().stream()
+                          .map(controlPoint -> new Couple(controlPoint.getX(), controlPoint.getY()))
+                          .toList(),
+                      path.getPathLayout().getLayerId()
+                  )
+              )
       );
     }
 
@@ -185,7 +195,8 @@ public class V005TOMapper {
   }
 
   private List<PeripheralOperationCreationTO> toPeripheralOperationCreationTOs(
-      List<PeripheralOperationTO> tos) {
+      List<PeripheralOperationTO> tos
+  ) {
     return tos.stream()
         .map(
             to -> new PeripheralOperationCreationTO(to.getName(), to.getLocationName())
@@ -198,15 +209,18 @@ public class V005TOMapper {
   }
 
   private List<LocationTypeCreationTO> toLocationTypeCreationTO(
-      List<LocationTypeTO> locationTypes) {
+      List<LocationTypeTO> locationTypes
+  ) {
     List<LocationTypeCreationTO> result = new ArrayList<>();
 
     for (LocationTypeTO locationType : locationTypes) {
       result.add(
           new LocationTypeCreationTO(locationType.getName())
               .withAllowedOperations(getOperationNames(locationType.getAllowedOperations()))
-              .withAllowedPeripheralOperations(getPeripheralOperationNames(
-                  locationType.getAllowedPeripheralOperations())
+              .withAllowedPeripheralOperations(
+                  getPeripheralOperationNames(
+                      locationType.getAllowedPeripheralOperations()
+                  )
               )
               .withProperties(convertProperties(locationType.getProperties()))
               .withLayout(
@@ -227,20 +241,28 @@ public class V005TOMapper {
 
     for (LocationTO location : locations) {
       result.add(
-          new LocationCreationTO(location.getName(),
-                                 location.getType(),
-                                 new Triple(location.getxPosition(),
-                                            location.getyPosition(),
-                                            location.getzPosition()))
+          new LocationCreationTO(
+              location.getName(),
+              location.getType(),
+              new Triple(
+                  location.getxPosition(),
+                  location.getyPosition(),
+                  location.getzPosition()
+              )
+          )
               .withLinks(getLinks(location))
               .withLocked(location.isLocked())
               .withProperties(convertProperties(location.getProperties()))
               .withLayout(
                   new LocationCreationTO.Layout(
-                      new Couple(location.getLocationLayout().getxPosition(),
-                                 location.getLocationLayout().getyPosition()),
-                      new Couple(location.getLocationLayout().getxLabelOffset(),
-                                 location.getLocationLayout().getyLabelOffset()),
+                      new Couple(
+                          location.getLocationLayout().getxPosition(),
+                          location.getLocationLayout().getyPosition()
+                      ),
+                      new Couple(
+                          location.getLocationLayout().getxLabelOffset(),
+                          location.getLocationLayout().getyLabelOffset()
+                      ),
                       LocationRepresentation.valueOf(
                           location.getLocationLayout().getLocationRepresentation()
                       ),
@@ -260,13 +282,17 @@ public class V005TOMapper {
       result.add(
           new BlockCreationTO(block.getName())
               .withType(Block.Type.valueOf(block.getType()))
-              .withMemberNames(block.getMembers().stream()
-                  .map(member -> member.getName())
-                  .collect(Collectors.toSet()))
+              .withMemberNames(
+                  block.getMembers().stream()
+                      .map(member -> member.getName())
+                      .collect(Collectors.toSet())
+              )
               .withProperties(convertProperties(block.getProperties()))
-              .withLayout(new BlockCreationTO.Layout(
-                  Colors.decodeFromHexRGB(block.getBlockLayout().getColor())
-              ))
+              .withLayout(
+                  new BlockCreationTO.Layout(
+                      Colors.decodeFromHexRGB(block.getBlockLayout().getColor())
+                  )
+              )
       );
     }
 
@@ -286,11 +312,15 @@ public class V005TOMapper {
     List<Layer> result = new ArrayList<>();
 
     for (VisualLayoutTO.Layer layer : layers) {
-      result.add(new Layer(layer.getId(),
-                           layer.getOrdinal(),
-                           layer.isVisible(),
-                           layer.getName(),
-                           layer.getGroupId()));
+      result.add(
+          new Layer(
+              layer.getId(),
+              layer.getOrdinal(),
+              layer.isVisible(),
+              layer.getName(),
+              layer.getGroupId()
+          )
+      );
     }
 
     return result;
@@ -300,9 +330,13 @@ public class V005TOMapper {
     List<LayerGroup> result = new ArrayList<>();
 
     for (VisualLayoutTO.LayerGroup layerGroup : layerGroups) {
-      result.add(new LayerGroup(layerGroup.getId(),
-                                layerGroup.getName(),
-                                layerGroup.isVisible()));
+      result.add(
+          new LayerGroup(
+              layerGroup.getId(),
+              layerGroup.getName(),
+              layerGroup.isVisible()
+          )
+      );
     }
 
     return result;
@@ -341,8 +375,10 @@ public class V005TOMapper {
   private Map<String, Set<String>> getLinks(LocationTO to) {
     Map<String, Set<String>> result = new HashMap<>();
     for (LocationTO.Link linkTO : to.getLinks()) {
-      result.put(linkTO.getPoint(),
-                 new HashSet<>(getOperationNames(linkTO.getAllowedOperations())));
+      result.put(
+          linkTO.getPoint(),
+          new HashSet<>(getOperationNames(linkTO.getAllowedOperations()))
+      );
     }
 
     return result;
@@ -361,12 +397,14 @@ public class V005TOMapper {
           .setType(point.getType().name())
           .setOutgoingPaths(getOutgoingPaths(point, paths))
           .setVehicleEnvelopes(toVehicleEnvelopeTOs(point.getVehicleEnvelopes()))
-          .setPointLayout(new PointTO.PointLayout()
-              .setxPosition(point.getLayout().getPosition().getX())
-              .setyPosition(point.getLayout().getPosition().getY())
-              .setxLabelOffset(point.getLayout().getLabelOffset().getX())
-              .setyLabelOffset(point.getLayout().getLabelOffset().getY())
-              .setLayerId(point.getLayout().getLayerId()))
+          .setPointLayout(
+              new PointTO.PointLayout()
+                  .setxPosition(point.getLayout().getPosition().getX())
+                  .setyPosition(point.getLayout().getPosition().getY())
+                  .setxLabelOffset(point.getLayout().getLabelOffset().getX())
+                  .setyLabelOffset(point.getLayout().getLabelOffset().getY())
+                  .setLayerId(point.getLayout().getLayerId())
+          )
           .setProperties(convertProperties(point.getProperties()));
 
       result.add(pointTO);
@@ -391,8 +429,10 @@ public class V005TOMapper {
           .setEnergyLevelFullyRecharged((long) vehicle.getEnergyLevelFullyRecharged())
           .setEnergyLevelSufficientlyRecharged((long) vehicle.getEnergyLevelSufficientlyRecharged())
           .setEnvelopeKey(vehicle.getEnvelopeKey())
-          .setVehicleLayout(new VehicleTO.VehicleLayout()
-              .setColor(Colors.encodeToHexRGB(vehicle.getLayout().getRouteColor())))
+          .setVehicleLayout(
+              new VehicleTO.VehicleLayout()
+                  .setColor(Colors.encodeToHexRGB(vehicle.getLayout().getRouteColor()))
+          )
           .setProperties(convertProperties(vehicle.getProperties()));
 
       result.add(vehicleTO);
@@ -417,16 +457,20 @@ public class V005TOMapper {
           .setPeripheralOperations(toPeripheralOperationTOs(path.getPeripheralOperations()))
           .setLocked(path.isLocked())
           .setVehicleEnvelopes(toVehicleEnvelopeTOs(path.getVehicleEnvelopes()))
-          .setPathLayout(new PathTO.PathLayout()
-              .setConnectionType(path.getLayout().getConnectionType().name())
-              .setControlPoints(path.getLayout().getControlPoints().stream()
-                  .map(controlPoint -> {
-                    return new PathTO.ControlPoint()
-                        .setX(controlPoint.getX())
-                        .setY(controlPoint.getY());
-                  })
-                  .toList())
-              .setLayerId(path.getLayout().getLayerId()))
+          .setPathLayout(
+              new PathTO.PathLayout()
+                  .setConnectionType(path.getLayout().getConnectionType().name())
+                  .setControlPoints(
+                      path.getLayout().getControlPoints().stream()
+                          .map(controlPoint -> {
+                            return new PathTO.ControlPoint()
+                                .setX(controlPoint.getX())
+                                .setY(controlPoint.getY());
+                          })
+                          .toList()
+                  )
+                  .setLayerId(path.getLayout().getLayerId())
+          )
           .setProperties(convertProperties(path.getProperties()));
 
       result.add(pathTO);
@@ -438,7 +482,8 @@ public class V005TOMapper {
   }
 
   private List<PeripheralOperationTO> toPeripheralOperationTOs(
-      List<PeripheralOperationCreationTO> tos) {
+      List<PeripheralOperationCreationTO> tos
+  ) {
     return tos.stream()
         .map(
             to -> (PeripheralOperationTO) new PeripheralOperationTO()
@@ -451,7 +496,8 @@ public class V005TOMapper {
   }
 
   private List<LocationTypeTO> toLocationTypeTO(
-      List<LocationTypeCreationTO> locationTypes) {
+      List<LocationTypeCreationTO> locationTypes
+  ) {
     List<LocationTypeTO> result = new ArrayList<>();
 
     for (LocationTypeCreationTO locationType : locationTypes) {
@@ -466,7 +512,8 @@ public class V005TOMapper {
           .setLocationTypeLayout(
               new LocationTypeTO.LocationTypeLayout()
                   .setLocationRepresentation(
-                      locationType.getLayout().getLocationRepresentation().name())
+                      locationType.getLayout().getLocationRepresentation().name()
+                  )
           )
           .setProperties(convertProperties(locationType.getProperties()));
 
@@ -489,13 +536,17 @@ public class V005TOMapper {
           .setType(location.getTypeName())
           .setLinks(toLocationTOLinks(location.getLinks()))
           .setLocked(location.isLocked())
-          .setLocationLayout(new LocationTO.LocationLayout()
-              .setxPosition(location.getLayout().getPosition().getX())
-              .setyPosition(location.getLayout().getPosition().getY())
-              .setxLabelOffset(location.getLayout().getLabelOffset().getX())
-              .setyLabelOffset(location.getLayout().getLabelOffset().getY())
-              .setLocationRepresentation(location.getLayout().getLocationRepresentation().name())
-              .setLayerId(location.getLayout().getLayerId()))
+          .setLocationLayout(
+              new LocationTO.LocationLayout()
+                  .setxPosition(location.getLayout().getPosition().getX())
+                  .setyPosition(location.getLayout().getPosition().getY())
+                  .setxLabelOffset(location.getLayout().getLabelOffset().getX())
+                  .setyLabelOffset(location.getLayout().getLabelOffset().getY())
+                  .setLocationRepresentation(
+                      location.getLayout().getLocationRepresentation().name()
+                  )
+                  .setLayerId(location.getLayout().getLayerId())
+          )
           .setProperties(convertProperties(location.getProperties()));
 
       result.add(locationTO);
@@ -514,8 +565,10 @@ public class V005TOMapper {
       blockTO.setName(block.getName());
       blockTO.setType(block.getType().name())
           .setMembers(toMemberTOs(block.getMemberNames()))
-          .setBlockLayout(new BlockTO.BlockLayout()
-              .setColor(Colors.encodeToHexRGB(block.getLayout().getColor())))
+          .setBlockLayout(
+              new BlockTO.BlockLayout()
+                  .setColor(Colors.encodeToHexRGB(block.getLayout().getColor()))
+          )
           .setProperties(convertProperties(block.getProperties()));
 
       result.add(blockTO);
@@ -543,12 +596,14 @@ public class V005TOMapper {
     List<VisualLayoutTO.Layer> result = new ArrayList<>();
 
     for (Layer layer : layers) {
-      result.add(new VisualLayoutTO.Layer()
-          .setId(layer.getId())
-          .setOrdinal(layer.getOrdinal())
-          .setVisible(layer.isVisible())
-          .setName(layer.getName())
-          .setGroupId(layer.getGroupId()));
+      result.add(
+          new VisualLayoutTO.Layer()
+              .setId(layer.getId())
+              .setOrdinal(layer.getOrdinal())
+              .setVisible(layer.isVisible())
+              .setName(layer.getName())
+              .setGroupId(layer.getGroupId())
+      );
     }
 
     return result;
@@ -558,17 +613,21 @@ public class V005TOMapper {
     List<VisualLayoutTO.LayerGroup> result = new ArrayList<>();
 
     for (LayerGroup layerGroup : layerGroups) {
-      result.add(new VisualLayoutTO.LayerGroup()
-          .setId(layerGroup.getId())
-          .setName(layerGroup.getName())
-          .setVisible(layerGroup.isVisible()));
+      result.add(
+          new VisualLayoutTO.LayerGroup()
+              .setId(layerGroup.getId())
+              .setName(layerGroup.getName())
+              .setVisible(layerGroup.isVisible())
+      );
     }
 
     return result;
   }
 
-  private List<PointTO.OutgoingPath> getOutgoingPaths(PointCreationTO point,
-                                                      List<PathCreationTO> paths) {
+  private List<PointTO.OutgoingPath> getOutgoingPaths(
+      PointCreationTO point,
+      List<PathCreationTO> paths
+  ) {
     List<PointTO.OutgoingPath> result = new ArrayList<>();
 
     for (PathCreationTO path : paths) {
@@ -592,7 +651,8 @@ public class V005TOMapper {
   }
 
   private List<AllowedPeripheralOperationTO> toAllowedPeripheralOperationTOs(
-      Collection<String> allowedOperations) {
+      Collection<String> allowedOperations
+  ) {
     return allowedOperations.stream()
         .sorted()
         .map(allowedOperation -> {
@@ -644,8 +704,10 @@ public class V005TOMapper {
   private Map<String, Envelope> toEnvelopeMap(List<VehicleEnvelopeTO> envelopeTOs) {
     return envelopeTOs.stream()
         .collect(
-            Collectors.toMap(VehicleEnvelopeTO::getKey,
-                             vehicleEnvelopeTO -> toEnvelope(vehicleEnvelopeTO))
+            Collectors.toMap(
+                VehicleEnvelopeTO::getKey,
+                vehicleEnvelopeTO -> toEnvelope(vehicleEnvelopeTO)
+            )
         );
   }
 

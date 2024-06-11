@@ -15,7 +15,8 @@ import org.opentcs.guing.common.model.SystemModel;
  * A Guice module for the model package.
  */
 public class ModelInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.

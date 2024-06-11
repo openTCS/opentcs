@@ -21,7 +21,8 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.components.drawing.OpenTCSDra
  * A Guice module for this package.
  */
 public class DrawingInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.

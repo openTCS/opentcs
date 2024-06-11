@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.exchange.adapter;
 
-import java.util.Map;
 import static java.util.Objects.requireNonNull;
+
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
@@ -33,7 +34,8 @@ import org.opentcs.guing.common.model.SystemModel;
  * An adapter for points.
  */
 public class PointAdapter
-    extends AbstractProcessAdapter {
+    extends
+      AbstractProcessAdapter {
 
   /**
    * Creates a new instance.
@@ -42,10 +44,12 @@ public class PointAdapter
   }
 
   @Override  // OpenTCSProcessAdapter
-  public void updateModelProperties(TCSObject<?> tcsObject,
-                                    ModelComponent modelComponent,
-                                    SystemModel systemModel,
-                                    TCSObjectService objectService) {
+  public void updateModelProperties(
+      TCSObject<?> tcsObject,
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      TCSObjectService objectService
+  ) {
     Point point = requireNonNull((Point) tcsObject, "tcsObject");
     PointModel model = (PointModel) modelComponent;
 
@@ -53,10 +57,14 @@ public class PointAdapter
     model.getPropertyName().setText(point.getName());
 
     // Position in model
-    model.getPropertyModelPositionX().setValueAndUnit(point.getPose().getPosition().getX(),
-                                                      LengthProperty.Unit.MM);
-    model.getPropertyModelPositionY().setValueAndUnit(point.getPose().getPosition().getY(),
-                                                      LengthProperty.Unit.MM);
+    model.getPropertyModelPositionX().setValueAndUnit(
+        point.getPose().getPosition().getX(),
+        LengthProperty.Unit.MM
+    );
+    model.getPropertyModelPositionY().setValueAndUnit(
+        point.getPose().getPosition().getY(),
+        LengthProperty.Unit.MM
+    );
     model.getPropertyVehicleOrientationAngle()
         .setValueAndUnit(point.getPose().getOrientationAngle(), AngleProperty.Unit.DEG);
 
@@ -73,9 +81,11 @@ public class PointAdapter
   }
 
   @Override
-  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
-                                                SystemModel systemModel,
-                                                PlantModelCreationTO plantModel) {
+  public PlantModelCreationTO storeToPlantModel(
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      PlantModelCreationTO plantModel
+  ) {
     PlantModelCreationTO result = plantModel
         .withPoint(
             new PointCreationTO(modelComponent.getName())
@@ -128,8 +138,10 @@ public class PointAdapter
   }
 
   private Triple getKernelCoordinates(PointModel model) {
-    return convertToTriple(model.getPropertyModelPositionX(),
-                           model.getPropertyModelPositionY());
+    return convertToTriple(
+        model.getPropertyModelPositionX(),
+        model.getPropertyModelPositionY()
+    );
   }
 
   private double getKernelVehicleAngle(PointModel model) {
@@ -139,17 +151,23 @@ public class PointAdapter
   private Map<String, Envelope> getKernelVehicleEnvelopes(PointModel model) {
     return model.getPropertyVehicleEnvelopes().getValue().stream()
         .collect(
-            Collectors.toMap(EnvelopeModel::getKey,
-                             envelopeModel -> new Envelope(envelopeModel.getVertices()))
+            Collectors.toMap(
+                EnvelopeModel::getKey,
+                envelopeModel -> new Envelope(envelopeModel.getVertices())
+            )
         );
   }
 
   private PointCreationTO.Layout getLayout(PointModel model) {
     return new PointCreationTO.Layout(
-        new Couple(Long.parseLong(model.getPropertyLayoutPosX().getText()),
-                   Long.parseLong(model.getPropertyLayoutPosY().getText())),
-        new Couple(Long.parseLong(model.getPropertyPointLabelOffsetX().getText()),
-                   Long.parseLong(model.getPropertyPointLabelOffsetY().getText())),
+        new Couple(
+            Long.parseLong(model.getPropertyLayoutPosX().getText()),
+            Long.parseLong(model.getPropertyLayoutPosY().getText())
+        ),
+        new Couple(
+            Long.parseLong(model.getPropertyPointLabelOffsetX().getText()),
+            Long.parseLong(model.getPropertyPointLabelOffsetY().getText())
+        ),
         model.getPropertyLayerWrapper().getValue().getLayer().getId()
     );
   }
@@ -167,9 +185,11 @@ public class PointAdapter
   }
 
   private Triple convertToTriple(CoordinateProperty cpx, CoordinateProperty cpy) {
-    Triple result = new Triple((int) cpx.getValueByUnit(LengthProperty.Unit.MM),
-                               (int) cpy.getValueByUnit(LengthProperty.Unit.MM),
-                               0);
+    Triple result = new Triple(
+        (int) cpx.getValueByUnit(LengthProperty.Unit.MM),
+        (int) cpy.getValueByUnit(LengthProperty.Unit.MM),
+        0
+    );
 
     return result;
   }

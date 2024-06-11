@@ -7,15 +7,16 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.assignment.priorization;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.theInstance;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.theInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -67,19 +68,23 @@ class CandidateComparatorDeadlineAtRiskFirstTest {
   private AssignmentCandidate candidateWithDeadline(Instant time) {
     TransportOrder deadlinedOrder
         = new TransportOrder("Some order", new ArrayList<>()).withDeadline(time);
-    Route.Step dummyStep = new Route.Step(null,
-                                          null,
-                                          new Point("Point1"),
-                                          Vehicle.Orientation.FORWARD,
-                                          1);
+    Route.Step dummyStep = new Route.Step(
+        null,
+        null,
+        new Point("Point1"),
+        Vehicle.Orientation.FORWARD,
+        1
+    );
     Route route = new Route(Arrays.asList(dummyStep), 10);
     List<DriveOrder> driveOrders = Arrays.asList(
         new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))
             .withRoute(route)
     );
 
-    return new AssignmentCandidate(new Vehicle("Vehicle1"),
-                                   deadlinedOrder,
-                                   driveOrders);
+    return new AssignmentCandidate(
+        new Vehicle("Vehicle1"),
+        deadlinedOrder,
+        driveOrders
+    );
   }
 }

@@ -7,17 +7,20 @@
  */
 package org.opentcs.guing.base.components.properties.type;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property that can take a value from a given set of location types.
  */
 public class LocationTypeProperty
-    extends AbstractProperty
-    implements Selectable<String> {
+    extends
+      AbstractProperty
+    implements
+      Selectable<String> {
 
   private List<String> fPossibleValues;
 

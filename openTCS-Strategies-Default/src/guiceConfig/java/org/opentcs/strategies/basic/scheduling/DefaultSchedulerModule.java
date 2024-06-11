@@ -23,7 +23,8 @@ import org.opentcs.strategies.basic.scheduling.modules.areaAllocation.CachingAre
  * Guice configuration for the default scheduler.
  */
 public class DefaultSchedulerModule
-    extends KernelInjectionModule {
+    extends
+      KernelInjectionModule {
 
   /**
    * Creates a new instance.

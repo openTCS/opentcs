@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.vehicles;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.function.Predicate;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectHistory;
@@ -27,7 +28,8 @@ import org.opentcs.strategies.basic.dispatching.selection.VehicleSelectionFilter
  * </p>
  */
 public class IsAvailableForAnyOrder
-    implements Predicate<Vehicle> {
+    implements
+      Predicate<Vehicle> {
 
   /**
    * The object service.
@@ -50,9 +52,11 @@ public class IsAvailableForAnyOrder
    * @param configuration The default dispatcher configuration.
    */
   @Inject
-  public IsAvailableForAnyOrder(TCSObjectService objectService,
-                                OrderReservationPool orderReservationPool,
-                                DefaultDispatcherConfiguration configuration) {
+  public IsAvailableForAnyOrder(
+      TCSObjectService objectService,
+      OrderReservationPool orderReservationPool,
+      DefaultDispatcherConfiguration configuration
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
     this.configuration = requireNonNull(configuration, "configuration");

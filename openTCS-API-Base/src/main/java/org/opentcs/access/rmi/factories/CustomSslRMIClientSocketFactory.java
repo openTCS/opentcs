@@ -7,11 +7,12 @@
  */
 package org.opentcs.access.rmi.factories;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.Socket;
 import java.rmi.server.RMIClientSocketFactory;
-import static java.util.Objects.requireNonNull;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
@@ -23,8 +24,9 @@ import javax.rmi.ssl.SslRMIClientSocketFactory;
  * custom SSLConext.
  */
 class CustomSslRMIClientSocketFactory
-    implements RMIClientSocketFactory,
-               Serializable {
+    implements
+      RMIClientSocketFactory,
+      Serializable {
 
   /**
    * Provides an instance of {@link SSLContext} used to get the actual socket factory.
@@ -38,8 +40,10 @@ class CustomSslRMIClientSocketFactory
    * actual socket factory.
    */
   CustomSslRMIClientSocketFactory(SecureSslContextFactory secureSslContextFactory) {
-    this.secureSslContextFactory = requireNonNull(secureSslContextFactory,
-                                                  "secureSslContextFactory");
+    this.secureSslContextFactory = requireNonNull(
+        secureSslContextFactory,
+        "secureSslContextFactory"
+    );
   }
 
   @Override

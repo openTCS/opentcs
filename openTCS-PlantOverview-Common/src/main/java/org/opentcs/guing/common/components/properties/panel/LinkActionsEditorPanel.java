@@ -22,7 +22,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * Which actions are possible is determined by the station type.
  */
 public class LinkActionsEditorPanel
-    extends StringSetPropertyEditorPanel {
+    extends
+      StringSetPropertyEditorPanel {
 
   /**
    * The bundle to be used.
@@ -55,7 +56,8 @@ public class LinkActionsEditorPanel
         bundle.getString("linkActionsEditorPanel.dialog_actionSelectionEdit.title"),
         bundle.getString("linkActionsEditorPanel.dialog_actionSelection.label_action.text"),
         getPossibleItems(),
-        value);
+        value
+    );
     StandardDetailsDialog dialog = new StandardDetailsDialog(parent, true, content);
     dialog.setLocationRelativeTo(parent);
     dialog.setVisible(true);
@@ -72,7 +74,8 @@ public class LinkActionsEditorPanel
     SelectionPanel content = new SelectionPanel(
         bundle.getString("linkActionsEditorPanel.dialog_actionSelectionAdd.title"),
         bundle.getString("linkActionsEditorPanel.dialog_actionSelection.label_action.text"),
-        getPossibleItems());
+        getPossibleItems()
+    );
     StandardDetailsDialog dialog = new StandardDetailsDialog(parent, true, content);
     dialog.setLocationRelativeTo(parent);
     dialog.setVisible(true);

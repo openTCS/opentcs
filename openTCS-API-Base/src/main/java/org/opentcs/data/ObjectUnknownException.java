@@ -14,7 +14,8 @@ import org.opentcs.access.KernelRuntimeException;
  * not be found.
  */
 public class ObjectUnknownException
-    extends KernelRuntimeException {
+    extends
+      KernelRuntimeException {
 
   /**
    * Creates a new ObjectExistsException with the given detail message.

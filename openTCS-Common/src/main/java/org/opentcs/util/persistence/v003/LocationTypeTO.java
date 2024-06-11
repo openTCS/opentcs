@@ -7,10 +7,11 @@
  */
 package org.opentcs.util.persistence.v003;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -22,7 +23,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(propOrder = {"name", "locationNamePrefix", "allowedOperations", "properties"})
 public class LocationTypeTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   private String locationNamePrefix;
   private List<AllowedOperationTO> allowedOperations = new ArrayList<>();
@@ -48,7 +50,10 @@ public class LocationTypeTO
     return allowedOperations;
   }
 
-  public LocationTypeTO setAllowedOperations(@Nonnull List<AllowedOperationTO> allowedOperations) {
+  public LocationTypeTO setAllowedOperations(
+      @Nonnull
+      List<AllowedOperationTO> allowedOperations
+  ) {
     requireNonNull(allowedOperations, "allowedOperations");
     this.allowedOperations = allowedOperations;
     return this;

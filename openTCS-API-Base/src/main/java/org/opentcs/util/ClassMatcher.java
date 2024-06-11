@@ -17,8 +17,9 @@ import java.util.function.Predicate;
  * Checks whether the input argument is assignable to any of a given set of classes.
  */
 public class ClassMatcher
-    implements Predicate<Object>,
-               Serializable {
+    implements
+      Predicate<Object>,
+      Serializable {
 
   /**
    * The set of classes to evaluate incoming events to.

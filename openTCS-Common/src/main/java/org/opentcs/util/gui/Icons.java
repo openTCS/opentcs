@@ -32,10 +32,10 @@ public final class Icons {
    * File names of the openTCS window icons.
    */
   private static final String[] ICON_FILES = {"opentcs_icon_016.png",
-                                              "opentcs_icon_032.png",
-                                              "opentcs_icon_064.png",
-                                              "opentcs_icon_128.png",
-                                              "opentcs_icon_256.png"};
+      "opentcs_icon_032.png",
+      "opentcs_icon_064.png",
+      "opentcs_icon_128.png",
+      "opentcs_icon_256.png"};
 
   /**
    * Prevents instantiation.

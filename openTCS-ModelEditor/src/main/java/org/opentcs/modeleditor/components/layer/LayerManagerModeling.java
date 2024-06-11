@@ -7,6 +7,8 @@
  */
 package org.opentcs.modeleditor.components.layer;
 
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.inject.Inject;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -26,17 +28,18 @@ import org.opentcs.guing.common.application.ViewManager;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.common.components.layer.DefaultLayerManager;
 import org.opentcs.guing.common.components.layer.LayerManager;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.event.EventBus;
 
 /**
  * The {@link LayerManager} implementation for the model editor application.
  */
 public class LayerManagerModeling
-    extends DefaultLayerManager
-    implements LayerEditorModeling,
-               LayerGroupEditorModeling,
-               ActiveLayerProvider {
+    extends
+      DefaultLayerManager
+    implements
+      LayerEditorModeling,
+      LayerGroupEditorModeling,
+      ActiveLayerProvider {
 
   /**
    * The currently active layer.
@@ -44,7 +47,11 @@ public class LayerManagerModeling
   private LayerWrapper activeLayerWrapper;
 
   @Inject
-  public LayerManagerModeling(ViewManager viewManager, @ApplicationEventBus EventBus eventBus) {
+  public LayerManagerModeling(
+      ViewManager viewManager,
+      @ApplicationEventBus
+      EventBus eventBus
+  ) {
     super(viewManager, eventBus);
   }
 
@@ -59,9 +66,11 @@ public class LayerManagerModeling
   @Override
   public void deleteLayer(int layerId)
       throws IllegalArgumentException {
-    checkArgument(getLayerWrapper(layerId) != null,
-                  "A layer with layer ID '%d' doesn't exist.",
-                  layerId);
+    checkArgument(
+        getLayerWrapper(layerId) != null,
+        "A layer with layer ID '%d' doesn't exist.",
+        layerId
+    );
 
     deleteLayerWrapper(layerId);
     getLayerChangeListener().layerRemoved();
@@ -74,9 +83,11 @@ public class LayerManagerModeling
   @Override
   public void add(DrawnModelComponent modelComponent) {
     int layerId = modelComponent.getPropertyLayerWrapper().getValue().getLayer().getId();
-    checkArgument(getLayerWrapper(layerId) != null,
-                  "A layer with layer ID '%d' doesn't exist.",
-                  layerId);
+    checkArgument(
+        getLayerWrapper(layerId) != null,
+        "A layer with layer ID '%d' doesn't exist.",
+        layerId
+    );
 
     addComponent(modelComponent, layerId);
   }
@@ -88,9 +99,11 @@ public class LayerManagerModeling
 
   @Override
   public void moveLayerDown(int layerId) {
-    checkArgument(getLayerWrapper(layerId) != null,
-                  "A layer with layer ID '%d' doesn't exist.",
-                  layerId);
+    checkArgument(
+        getLayerWrapper(layerId) != null,
+        "A layer with layer ID '%d' doesn't exist.",
+        layerId
+    );
 
     List<LayerWrapper> layerWrappersByOrdinal = getLayerWrappers().values().stream()
         .sorted(Comparator.comparing(wrapper -> wrapper.getLayer().getOrdinal()))
@@ -108,13 +121,19 @@ public class LayerManagerModeling
 
   @Override
   public void moveLayerUp(int layerId) {
-    checkArgument(getLayerWrapper(layerId) != null,
-                  "A layer with layer ID '%d' doesn't exist.",
-                  layerId);
+    checkArgument(
+        getLayerWrapper(layerId) != null,
+        "A layer with layer ID '%d' doesn't exist.",
+        layerId
+    );
 
     List<LayerWrapper> layerWrappersByReverseOrdinal = getLayerWrappers().values().stream()
-        .sorted(Comparator.comparing(wrapper -> wrapper.getLayer().getOrdinal(),
-                                     Comparator.reverseOrder()))
+        .sorted(
+            Comparator.comparing(
+                wrapper -> wrapper.getLayer().getOrdinal(),
+                Comparator.reverseOrder()
+            )
+        )
         .collect(Collectors.toList());
 
     if (layerId == layerWrappersByReverseOrdinal.get(0).getLayer().getId()) {
@@ -129,9 +148,11 @@ public class LayerManagerModeling
 
   @Override
   public void setLayerActive(int layerId) {
-    checkArgument(getLayerWrapper(layerId) != null,
-                  "A layer with layer ID '%d' doesn't exist.",
-                  layerId);
+    checkArgument(
+        getLayerWrapper(layerId) != null,
+        "A layer with layer ID '%d' doesn't exist.",
+        layerId
+    );
 
     activeLayerWrapper = getLayerWrapper(layerId);
 
@@ -151,9 +172,11 @@ public class LayerManagerModeling
   @Override
   public void deleteLayerGroup(int groupId)
       throws IllegalArgumentException {
-    checkArgument(getLayerGroup(groupId) != null,
-                  "A layer group with layer group ID '%d' doesn't exist.",
-                  groupId);
+    checkArgument(
+        getLayerGroup(groupId) != null,
+        "A layer group with layer group ID '%d' doesn't exist.",
+        groupId
+    );
 
     // Delete the layers that are assigned to the group.
     Set<Integer> layerAssignedToGroup = getLayerWrappers().values().stream()
@@ -169,12 +192,16 @@ public class LayerManagerModeling
 
   @Override
   public void setLayerGroupId(int layerId, int groupId) {
-    checkArgument(getLayerWrapper(layerId) != null,
-                  "A layer with layer ID '%d' doesn't exist.",
-                  layerId);
-    checkArgument(getLayerGroup(groupId) != null,
-                  "A layer group with layer group ID '%d' doesn't exist.",
-                  groupId);
+    checkArgument(
+        getLayerWrapper(layerId) != null,
+        "A layer with layer ID '%d' doesn't exist.",
+        layerId
+    );
+    checkArgument(
+        getLayerGroup(groupId) != null,
+        "A layer group with layer group ID '%d' doesn't exist.",
+        groupId
+    );
 
     LayerWrapper wrapper = getLayerWrapper(layerId);
 
@@ -204,8 +231,12 @@ public class LayerManagerModeling
   protected void restoreLayers() {
     // Make sure there will be one layer set as the active layer. Do it for the highest layer.
     activeLayerWrapper = getLayerWrappers().values().stream()
-        .sorted(Comparator.comparing(wrapper -> wrapper.getLayer().getOrdinal(),
-                                     Comparator.reverseOrder()))
+        .sorted(
+            Comparator.comparing(
+                wrapper -> wrapper.getLayer().getOrdinal(),
+                Comparator.reverseOrder()
+            )
+        )
         .findFirst()
         .get();
 
@@ -347,9 +378,11 @@ public class LayerManagerModeling
   private void addLayerGroup(LayerGroup layerGroup)
       throws IllegalArgumentException {
     int groupId = layerGroup.getId();
-    checkArgument(getLayerGroup(groupId) == null,
-                  "A layer group for group ID '%d' already exists in the model.",
-                  groupId);
+    checkArgument(
+        getLayerGroup(groupId) == null,
+        "A layer group for group ID '%d' already exists in the model.",
+        groupId
+    );
 
     getLayerGroups().put(groupId, layerGroup);
   }
@@ -373,9 +406,11 @@ public class LayerManagerModeling
   private void addLayerWrapper(LayerWrapper layerWrapper)
       throws IllegalArgumentException {
     int layerId = layerWrapper.getLayer().getId();
-    checkArgument(getLayerWrapper(layerId) == null,
-                  "A layer wrapper for layer ID '%d' already exists in the model.",
-                  layerId);
+    checkArgument(
+        getLayerWrapper(layerId) == null,
+        "A layer wrapper for layer ID '%d' already exists in the model.",
+        layerId
+    );
 
     getLayerWrappers().put(layerId, layerWrapper);
   }

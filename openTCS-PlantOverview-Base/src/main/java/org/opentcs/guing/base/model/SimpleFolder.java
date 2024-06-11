@@ -12,7 +12,8 @@ package org.opentcs.guing.base.model;
  * SimpleFolder is used for plain folders.
  */
 public class SimpleFolder
-    extends CompositeModelComponent {
+    extends
+      CompositeModelComponent {
 
   /**
    * Creates a new instance.

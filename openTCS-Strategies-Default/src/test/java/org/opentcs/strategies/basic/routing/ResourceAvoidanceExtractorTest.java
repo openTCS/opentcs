@@ -7,15 +7,16 @@
  */
 package org.opentcs.strategies.basic.routing;
 
-import java.util.List;
-import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.Location;
@@ -94,8 +95,10 @@ class ResourceAvoidanceExtractorTest {
   @Test
   void shouldExtractResourcesTransportOrder() {
     TransportOrder order = new TransportOrder("some-order", List.of())
-        .withProperty(ObjectPropConstants.TRANSPORT_ORDER_RESOURCES_TO_AVOID,
-                      "Point-A,Path-AB,Location-C");
+        .withProperty(
+            ObjectPropConstants.TRANSPORT_ORDER_RESOURCES_TO_AVOID,
+            "Point-A,Path-AB,Location-C"
+        );
 
     ResourcesToAvoid result = extractor.extractResourcesToAvoid(order);
 
@@ -114,7 +117,9 @@ class ResourceAvoidanceExtractorTest {
         Set.of(
             pointA.getReference(),
             pathAB.getReference(),
-            locationC.getReference()));
+            locationC.getReference()
+        )
+    );
 
     assertThat(result.getPoints())
         .hasSize(2)
@@ -128,8 +133,10 @@ class ResourceAvoidanceExtractorTest {
   @Test
   void shouldNotIgnoreLeadingAndTrailingWhitespace() {
     TransportOrder order = new TransportOrder("some-order", List.of())
-        .withProperty(ObjectPropConstants.TRANSPORT_ORDER_RESOURCES_TO_AVOID,
-                      "Point-A ,Point-B, Path-AB,Path-BC");
+        .withProperty(
+            ObjectPropConstants.TRANSPORT_ORDER_RESOURCES_TO_AVOID,
+            "Point-A ,Point-B, Path-AB,Path-BC"
+        );
 
     ResourcesToAvoid result = extractor.extractResourcesToAvoid(order);
 

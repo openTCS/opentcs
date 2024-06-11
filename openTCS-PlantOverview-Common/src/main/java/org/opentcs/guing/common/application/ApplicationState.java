@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.application;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 
 /**
  * Keeps and provides information about the current state of the application as

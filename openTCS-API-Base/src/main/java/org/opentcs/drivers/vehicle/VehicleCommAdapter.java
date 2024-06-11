@@ -25,7 +25,8 @@ import org.opentcs.util.ExplainedBoolean;
  * </p>
  */
 public interface VehicleCommAdapter
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * Enables this comm adapter, i.e. turns it on.
@@ -131,7 +132,10 @@ public interface VehicleCommAdapter
    * {@link #getUnsentCommands() unsent commands}.
    * @return <code>true</code> if, and only if, the new command was added to the queue.
    */
-  boolean enqueueCommand(@Nonnull MovementCommand newCommand);
+  boolean enqueueCommand(
+      @Nonnull
+      MovementCommand newCommand
+  );
 
   /**
    * Clears this communication adapter's command queues (i.e. the queues of
@@ -153,7 +157,10 @@ public interface VehicleCommAdapter
    * process the given order.
    */
   @Nonnull
-  ExplainedBoolean canProcess(@Nonnull TransportOrder order);
+  ExplainedBoolean canProcess(
+      @Nonnull
+      TransportOrder order
+  );
 
   /**
    * Notifies the implementation that the vehicle's <em>paused</em> state in the kernel has changed.
@@ -184,12 +191,18 @@ public interface VehicleCommAdapter
    *
    * @param message The message to be processed.
    */
-  void processMessage(@Nullable Object message);
+  void processMessage(
+      @Nullable
+      Object message
+  );
 
   /**
    * Executes the given {@link AdapterCommand}.
    *
    * @param command The command to execute.
    */
-  void execute(@Nonnull AdapterCommand command);
+  void execute(
+      @Nonnull
+      AdapterCommand command
+  );
 }

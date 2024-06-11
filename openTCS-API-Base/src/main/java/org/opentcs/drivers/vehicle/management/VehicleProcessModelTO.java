@@ -7,13 +7,14 @@
  */
 package org.opentcs.drivers.vehicle.management;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
@@ -29,7 +30,8 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
  * </p>
  */
 public class VehicleProcessModelTO
-    implements Serializable {
+    implements
+      Serializable {
 
   private String name;
   private boolean commAdapterEnabled;
@@ -53,7 +55,10 @@ public class VehicleProcessModelTO
     return name;
   }
 
-  public VehicleProcessModelTO setName(@Nonnull String name) {
+  public VehicleProcessModelTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name);
     return this;
   }
@@ -81,7 +86,10 @@ public class VehicleProcessModelTO
     return position;
   }
 
-  public VehicleProcessModelTO setPosition(@Nullable String position) {
+  public VehicleProcessModelTO setPosition(
+      @Nullable
+      String position
+  ) {
     this.position = position;
     return this;
   }
@@ -91,7 +99,10 @@ public class VehicleProcessModelTO
     return notifications;
   }
 
-  public VehicleProcessModelTO setNotifications(@Nonnull Queue<UserNotification> notifications) {
+  public VehicleProcessModelTO setNotifications(
+      @Nonnull
+      Queue<UserNotification> notifications
+  ) {
     this.notifications = requireNonNull(notifications, "notifications");
     return this;
   }
@@ -101,7 +112,10 @@ public class VehicleProcessModelTO
     return precisePosition;
   }
 
-  public VehicleProcessModelTO setPrecisePosition(@Nullable Triple precisePosition) {
+  public VehicleProcessModelTO setPrecisePosition(
+      @Nullable
+      Triple precisePosition
+  ) {
     this.precisePosition = precisePosition;
     return this;
   }
@@ -130,7 +144,9 @@ public class VehicleProcessModelTO
   }
 
   public VehicleProcessModelTO setLoadHandlingDevices(
-      @Nonnull List<LoadHandlingDevice> loadHandlingDevices) {
+      @Nonnull
+      List<LoadHandlingDevice> loadHandlingDevices
+  ) {
     this.loadHandlingDevices = requireNonNull(loadHandlingDevices, "loadHandlingDevices");
     return this;
   }
@@ -140,7 +156,10 @@ public class VehicleProcessModelTO
     return state;
   }
 
-  public VehicleProcessModelTO setState(@Nonnull Vehicle.State state) {
+  public VehicleProcessModelTO setState(
+      @Nonnull
+      Vehicle.State state
+  ) {
     this.state = requireNonNull(state, "state");
     return this;
   }

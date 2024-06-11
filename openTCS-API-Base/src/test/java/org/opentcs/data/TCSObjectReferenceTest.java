@@ -7,8 +7,9 @@
  */
 package org.opentcs.data;
 
-import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -48,7 +49,8 @@ class TCSObjectReferenceTest {
   }
 
   private static class TestType1
-      extends TCSObject<TestType1> {
+      extends
+        TCSObject<TestType1> {
 
     TestType1(String objectName) {
       super(objectName);
@@ -80,7 +82,8 @@ class TCSObjectReferenceTest {
   }
 
   private static class TestType2
-      extends TCSObject<TestType2> {
+      extends
+        TCSObject<TestType2> {
 
     TestType2(String objectName) {
       super(objectName);

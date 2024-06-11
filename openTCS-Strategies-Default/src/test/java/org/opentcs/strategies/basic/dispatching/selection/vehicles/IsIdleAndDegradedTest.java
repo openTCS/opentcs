@@ -7,9 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.vehicles;
 
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -49,8 +50,10 @@ class IsIdleAndDegradedTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = Vehicle.IntegrationLevel.class,
-              names = {"TO_BE_IGNORED", "TO_BE_NOTICED", "TO_BE_RESPECTED"})
+  @EnumSource(
+      value = Vehicle.IntegrationLevel.class,
+      names = {"TO_BE_IGNORED", "TO_BE_NOTICED", "TO_BE_RESPECTED"}
+  )
   void checkVehicleIsNotFullyIntegrated(Vehicle.IntegrationLevel integrationLevel) {
     Vehicle vehicle = idleAndDegradedVehicle.withIntegrationLevel(integrationLevel);
 
@@ -65,8 +68,10 @@ class IsIdleAndDegradedTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = Vehicle.State.class,
-              names = {"UNKNOWN", "UNAVAILABLE", "ERROR", "EXECUTING", "CHARGING"})
+  @EnumSource(
+      value = Vehicle.State.class,
+      names = {"UNKNOWN", "UNAVAILABLE", "ERROR", "EXECUTING", "CHARGING"}
+  )
   void checkVehicleHasIncorrectState(Vehicle.State state) {
     Vehicle vehicle = idleAndDegradedVehicle.withState(state);
 
@@ -74,8 +79,10 @@ class IsIdleAndDegradedTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = Vehicle.ProcState.class,
-              names = {"AWAITING_ORDER", "PROCESSING_ORDER"})
+  @EnumSource(
+      value = Vehicle.ProcState.class,
+      names = {"AWAITING_ORDER", "PROCESSING_ORDER"}
+  )
   void checkVehicleHasIncorrectProcState(Vehicle.ProcState procState) {
     Vehicle vehicle = idleAndDegradedVehicle.withProcState(procState);
 

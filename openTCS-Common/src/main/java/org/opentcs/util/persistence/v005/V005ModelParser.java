@@ -7,6 +7,9 @@
  */
 package org.opentcs.util.persistence.v005;
 
+import static org.opentcs.data.ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION;
+import static org.opentcs.data.ObjectPropConstants.LOC_DEFAULT_REPRESENTATION;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
@@ -14,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.opentcs.access.to.model.PlantModelCreationTO;
-import static org.opentcs.data.ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION;
-import static org.opentcs.data.ObjectPropConstants.LOC_DEFAULT_REPRESENTATION;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.util.persistence.v004.V004ModelParser;
 import org.opentcs.util.persistence.v004.V004PlantModelTO;
@@ -76,7 +77,8 @@ public class V005ModelParser {
   }
 
   private List<PropertyTO> convertProperties(
-      List<org.opentcs.util.persistence.v004.PropertyTO> tos) {
+      List<org.opentcs.util.persistence.v004.PropertyTO> tos
+  ) {
     return tos.stream()
         .map(property -> new PropertyTO().setName(property.getName()).setValue(property.getValue()))
         .toList();
@@ -94,18 +96,21 @@ public class V005ModelParser {
               .setVehicleOrientationAngle(point.getVehicleOrientationAngle())
               .setType(point.getType())
               .setOutgoingPaths(convertOutgoingPaths(point))
-              .setPointLayout(new PointTO.PointLayout()
-                  .setxPosition(point.getPointLayout().getxPosition())
-                  .setyPosition(point.getPointLayout().getyPosition())
-                  .setxLabelOffset(point.getPointLayout().getxLabelOffset())
-                  .setyLabelOffset(point.getPointLayout().getyLabelOffset()));
+              .setPointLayout(
+                  new PointTO.PointLayout()
+                      .setxPosition(point.getPointLayout().getxPosition())
+                      .setyPosition(point.getPointLayout().getyPosition())
+                      .setxLabelOffset(point.getPointLayout().getxLabelOffset())
+                      .setyLabelOffset(point.getPointLayout().getyLabelOffset())
+              );
           return result;
         })
         .toList();
   }
 
   private Map<String, String> toPropertiesMap(
-      List<org.opentcs.util.persistence.v004.PropertyTO> properties) {
+      List<org.opentcs.util.persistence.v004.PropertyTO> properties
+  ) {
     Map<String, String> result = new HashMap<>();
     for (org.opentcs.util.persistence.v004.PropertyTO property : properties) {
       result.put(property.getName(), property.getValue());
@@ -114,7 +119,8 @@ public class V005ModelParser {
   }
 
   private List<PointTO.OutgoingPath> convertOutgoingPaths(
-      org.opentcs.util.persistence.v004.PointTO to) {
+      org.opentcs.util.persistence.v004.PointTO to
+  ) {
     return to.getOutgoingPaths().stream()
         .map(path -> new PointTO.OutgoingPath().setName(path.getName()))
         .toList();
@@ -132,17 +138,18 @@ public class V005ModelParser {
               .setMaxVelocity(path.getMaxVelocity())
               .setMaxReverseVelocity(path.getMaxReverseVelocity())
               .setLocked(path.isLocked())
-              .setPathLayout(new PathTO.PathLayout()
-                  .setConnectionType(path.getPathLayout().getConnectionType())
-                  .setControlPoints(
-                      path.getPathLayout().getControlPoints().stream()
-                          .map(
-                              controlPoint -> new PathTO.ControlPoint()
-                                  .setX(controlPoint.getX())
-                                  .setY(controlPoint.getY())
-                          )
-                          .toList()
-                  )
+              .setPathLayout(
+                  new PathTO.PathLayout()
+                      .setConnectionType(path.getPathLayout().getConnectionType())
+                      .setControlPoints(
+                          path.getPathLayout().getControlPoints().stream()
+                              .map(
+                                  controlPoint -> new PathTO.ControlPoint()
+                                      .setX(controlPoint.getX())
+                                      .setY(controlPoint.getY())
+                              )
+                              .toList()
+                      )
               );
           return result;
         })
@@ -181,15 +188,18 @@ public class V005ModelParser {
           result.setName(locationType.getName())
               .setProperties(convertProperties(locationType.getProperties()));
           result.setAllowedOperations(convertAllowedOperations(locationType.getAllowedOperations()))
-              .setLocationTypeLayout(new LocationTypeTO.LocationTypeLayout()
-                  .setLocationRepresentation(locationRepresentation));
+              .setLocationTypeLayout(
+                  new LocationTypeTO.LocationTypeLayout()
+                      .setLocationRepresentation(locationRepresentation)
+              );
           return result;
         })
         .toList();
   }
 
   private List<AllowedOperationTO> convertAllowedOperations(
-      List<org.opentcs.util.persistence.v004.AllowedOperationTO> tos) {
+      List<org.opentcs.util.persistence.v004.AllowedOperationTO> tos
+  ) {
     return tos.stream()
         .map(allowedOperation -> {
           AllowedOperationTO result = new AllowedOperationTO();
@@ -215,12 +225,14 @@ public class V005ModelParser {
               .setType(location.getType())
               .setLinks(convertLinks(location))
               .setLocked(location.isLocked())
-              .setLocationLayout(new LocationTO.LocationLayout()
-                  .setxPosition(location.getLocationLayout().getxPosition())
-                  .setyPosition(location.getLocationLayout().getyPosition())
-                  .setxLabelOffset(location.getLocationLayout().getxLabelOffset())
-                  .setyLabelOffset(location.getLocationLayout().getyLabelOffset())
-                  .setLocationRepresentation(locationRepresentation));
+              .setLocationLayout(
+                  new LocationTO.LocationLayout()
+                      .setxPosition(location.getLocationLayout().getxPosition())
+                      .setyPosition(location.getLocationLayout().getyPosition())
+                      .setxLabelOffset(location.getLocationLayout().getxLabelOffset())
+                      .setyLabelOffset(location.getLocationLayout().getyLabelOffset())
+                      .setLocationRepresentation(locationRepresentation)
+              );
           return result;
         })
         .toList();

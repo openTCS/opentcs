@@ -21,7 +21,8 @@ public interface MenuItemComponentsFactory {
    * @return The {@link LayoutToModelCoordinateUndoActivity}.
    */
   LayoutToModelCoordinateUndoActivity createLayoutToModelCoordinateUndoActivity(
-      CoordinateProperty property);
+      CoordinateProperty property
+  );
 
   /**
    * Creates a {@link ModelToLayoutCoordinateUndoActivity} for the given coordinate property.
@@ -30,5 +31,6 @@ public interface MenuItemComponentsFactory {
    * @return The {@link ModelToLayoutCoordinateUndoActivity}.
    */
   ModelToLayoutCoordinateUndoActivity createModelToLayoutCoordinateUndoActivity(
-      CoordinateProperty property);
+      CoordinateProperty property
+  );
 }

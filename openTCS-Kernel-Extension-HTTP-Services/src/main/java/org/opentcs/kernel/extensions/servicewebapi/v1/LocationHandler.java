@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Location;
@@ -30,8 +31,10 @@ public class LocationHandler {
    * @param executorWrapper Executes calls via the kernel executor and waits for the outcome.
    */
   @Inject
-  public LocationHandler(PlantModelService plantModelService,
-                         KernelExecutorWrapper executorWrapper) {
+  public LocationHandler(
+      PlantModelService plantModelService,
+      KernelExecutorWrapper executorWrapper
+  ) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
   }
@@ -43,7 +46,11 @@ public class LocationHandler {
    * @param lockedValue The location's new locked state (a boolean as a string).
    * @throws ObjectUnknownException If a location with the given name could not be found.
    */
-  public void updateLocationLock(@Nonnull String locationName, String lockedValue)
+  public void updateLocationLock(
+      @Nonnull
+      String locationName,
+      String lockedValue
+  )
       throws ObjectUnknownException {
     executorWrapper.callAndWait(() -> {
       Location location = plantModelService.fetchObject(Location.class, locationName);
@@ -51,8 +58,10 @@ public class LocationHandler {
         throw new ObjectUnknownException("Unknown location: " + locationName);
       }
 
-      plantModelService.updateLocationLock(location.getReference(),
-                                           Boolean.parseBoolean(lockedValue));
+      plantModelService.updateLocationLock(
+          location.getReference(),
+          Boolean.parseBoolean(lockedValue)
+      );
     });
   }
 }

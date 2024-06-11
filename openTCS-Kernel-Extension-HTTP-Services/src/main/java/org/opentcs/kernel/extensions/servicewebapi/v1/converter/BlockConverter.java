@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.BlockCreationTO;
@@ -39,19 +40,27 @@ public class BlockConverter {
                 .withProperties(pConverter.toPropertyMap(block.getProperties()))
                 .withMemberNames(block.getMemberNames())
                 .withType(Block.Type.valueOf(block.getType()))
-                .withLayout(new BlockCreationTO.Layout(
-                    Colors.decodeFromHexRGB(block.getLayout().getColor()))))
+                .withLayout(
+                    new BlockCreationTO.Layout(
+                        Colors.decodeFromHexRGB(block.getLayout().getColor())
+                    )
+                )
+        )
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
   public List<BlockTO> toBlockTOs(Set<Block> blocks) {
     return blocks.stream()
-        .map(block -> new BlockTO(block.getName())
-        .setType(block.getType().name())
-        .setMemberNames(convertMemberNames(block.getMembers()))
-        .setLayout(new BlockTO.Layout()
-            .setColor(Colors.encodeToHexRGB(block.getLayout().getColor())))
-        .setProperties(pConverter.toPropertyTOs(block.getProperties())))
+        .map(
+            block -> new BlockTO(block.getName())
+                .setType(block.getType().name())
+                .setMemberNames(convertMemberNames(block.getMembers()))
+                .setLayout(
+                    new BlockTO.Layout()
+                        .setColor(Colors.encodeToHexRGB(block.getLayout().getColor()))
+                )
+                .setProperties(pConverter.toPropertyTOs(block.getProperties()))
+        )
         .sorted(Comparator.comparing(BlockTO::getName))
         .collect(Collectors.toList());
   }

@@ -15,8 +15,10 @@ import org.opentcs.guing.common.components.dialogs.DetailsDialogContent;
  * User interface for a single line text.
  */
 public class StringPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   /**
    * The title of the dialog.
@@ -72,6 +74,7 @@ public class StringPanel
     return null;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -105,4 +108,5 @@ public class StringPanel
   private javax.swing.JTextField textField;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

@@ -10,7 +10,8 @@ package org.opentcs.guing.common.components;
 /**
  */
 public interface EditableComponent
-    extends org.jhotdraw.gui.EditableComponent {
+    extends
+      org.jhotdraw.gui.EditableComponent {
 
   /**
    * Delete the components that are currently selected in the tree and save

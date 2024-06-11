@@ -7,10 +7,11 @@
  */
 package org.opentcs.util.persistence.v002;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -22,7 +23,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(propOrder = {"name", "id", "hops", "properties"})
 public class StaticRouteTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   private List<Hop> hops = new ArrayList<>();
 
@@ -37,7 +39,10 @@ public class StaticRouteTO
     return hops;
   }
 
-  public StaticRouteTO setHops(@Nonnull List<Hop> hops) {
+  public StaticRouteTO setHops(
+      @Nonnull
+      List<Hop> hops
+  ) {
     requireNonNull(hops, "hops");
     this.hops = hops;
     return this;
@@ -59,7 +64,10 @@ public class StaticRouteTO
       return name;
     }
 
-    public Hop setName(@Nonnull String name) {
+    public Hop setName(
+        @Nonnull
+        String name
+    ) {
       requireNonNull(name, "name");
       this.name = name;
       return this;

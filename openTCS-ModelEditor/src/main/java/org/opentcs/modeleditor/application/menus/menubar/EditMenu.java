@@ -7,8 +7,9 @@
  */
 package org.opentcs.modeleditor.application.menus.menubar;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import javax.swing.JMenu;
 import org.opentcs.modeleditor.application.action.ViewActionMap;
 import org.opentcs.modeleditor.util.I18nPlantOverviewModeling;
@@ -26,7 +27,8 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.application.action.edit.Paste
  * The application's "Edit" menu.
  */
 public class EditMenu
-    extends JMenu {
+    extends
+      JMenu {
 
 //  private final JMenuItem menuItemCopy;
 //  private final JMenuItem menuItemCut;

@@ -7,13 +7,14 @@
  */
 package org.opentcs.guing.common.components.properties.panel;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.JDialog;
@@ -38,17 +39,21 @@ import org.opentcs.util.gui.StringTableCellRenderer;
  * User interface to edit the envelope property of points and paths.
  */
 public class EnvelopesPropertyEditorPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   private static final EnvelopeModel DEFAULT_ENVELOPE
-      = new EnvelopeModel(EnvelopePanel.DEFAULT_ENVELOPE_KEY,
-                          List.of(
-                              new Couple(0, 0),
-                              new Couple(0, 0),
-                              new Couple(0, 0),
-                              new Couple(0, 0)
-                          ));
+      = new EnvelopeModel(
+          EnvelopePanel.DEFAULT_ENVELOPE_KEY,
+          List.of(
+              new Couple(0, 0),
+              new Couple(0, 0),
+              new Couple(0, 0),
+              new Couple(0, 0)
+          )
+      );
   /**
    * The bundle to be used.
    */
@@ -111,9 +116,11 @@ public class EnvelopesPropertyEditorPanel
 
     sorter = new TableRowSorter<>(getTableModel());
     // Sort the table by envelope keys.
-    sorter.setSortKeys(Arrays.asList(
-        new RowSorter.SortKey(EnvelopeTableModel.COLUMN_KEY, SortOrder.ASCENDING)
-    ));
+    sorter.setSortKeys(
+        Arrays.asList(
+            new RowSorter.SortKey(EnvelopeTableModel.COLUMN_KEY, SortOrder.ASCENDING)
+        )
+    );
     // ...but prevent manual sorting.
     for (int i = 0; i < envelopesTable.getColumnCount(); i++) {
       sorter.setSortable(i, false);
@@ -132,6 +139,7 @@ public class EnvelopesPropertyEditorPanel
         .collect(Collectors.toSet());
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
@@ -207,13 +215,16 @@ public class EnvelopesPropertyEditorPanel
     add(controlPanel, java.awt.BorderLayout.EAST);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
     JDialog parent = (JDialog) getTopLevelAncestor();
-    EnvelopePanel content = new EnvelopePanel(DEFAULT_ENVELOPE,
-                                              EnvelopePanel.Mode.CREATE,
-                                              definedEnvelopeKeys(),
-                                              modelManager.getModel());
+    EnvelopePanel content = new EnvelopePanel(
+        DEFAULT_ENVELOPE,
+        EnvelopePanel.Mode.CREATE,
+        definedEnvelopeKeys(),
+        modelManager.getModel()
+    );
     StandardContentDialog dialog = new StandardContentDialog(parent, content);
     content.addInputValidationListener(dialog);
     dialog.setLocationRelativeTo(parent);
@@ -234,10 +245,12 @@ public class EnvelopesPropertyEditorPanel
     );
 
     JDialog parent = (JDialog) getTopLevelAncestor();
-    EnvelopePanel content = new EnvelopePanel(selectedModel,
-                                              EnvelopePanel.Mode.EDIT,
-                                              definedEnvelopeKeys(),
-                                              modelManager.getModel());
+    EnvelopePanel content = new EnvelopePanel(
+        selectedModel,
+        EnvelopePanel.Mode.EDIT,
+        definedEnvelopeKeys(),
+        modelManager.getModel()
+    );
     StandardContentDialog dialog = new StandardContentDialog(parent, content);
     content.addInputValidationListener(dialog);
     dialog.setLocationRelativeTo(parent);
@@ -261,6 +274,7 @@ public class EnvelopesPropertyEditorPanel
     getTableModel().remove(envelopesTable.convertRowIndexToModel(selectedRow));
   }//GEN-LAST:event_removeButtonActionPerformed
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
@@ -272,9 +286,11 @@ public class EnvelopesPropertyEditorPanel
   private javax.swing.JButton removeButton;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private class EnvelopeTableModel
-      extends AbstractTableModel {
+      extends
+        AbstractTableModel {
 
     /**
      * The number of the "Key" column.
@@ -287,21 +303,23 @@ public class EnvelopesPropertyEditorPanel
     /**
      * The column names.
      */
-    private final String[] columnNames = new String[]{
-      bundle.getString(
-      "envelopesPropertyEditorPanel.table_envelopes.column_key.headerText"
-      ),
-      bundle.getString(
-      "envelopesPropertyEditorPanel.table_envelopes.column_coordinates.headerText"
-      )
-    };
+    private final String[] columnNames
+        = new String[]{
+            bundle.getString(
+                "envelopesPropertyEditorPanel.table_envelopes.column_key.headerText"
+            ),
+            bundle.getString(
+                "envelopesPropertyEditorPanel.table_envelopes.column_coordinates.headerText"
+            )
+        };
     /**
      * Column classes.
      */
-    private final Class<?>[] columnClasses = new Class<?>[]{
-      String.class,
-      EnvelopeModel.class
-    };
+    private final Class<?>[] columnClasses
+        = new Class<?>[]{
+            String.class,
+            EnvelopeModel.class
+        };
     /**
      * The values in this model.
      */
@@ -407,12 +425,15 @@ public class EnvelopesPropertyEditorPanel
   }
 
   private class CoupleListCellRenderer
-      extends StringTableCellRenderer<List<Couple>> {
+      extends
+        StringTableCellRenderer<List<Couple>> {
 
     CoupleListCellRenderer() {
-      super(couples -> couples.stream()
-          .map(couple -> "(" + couple.getX() + "," + couple.getY() + ")")
-          .collect(Collectors.joining(";")));
+      super(
+          couples -> couples.stream()
+              .map(couple -> "(" + couple.getX() + "," + couple.getY() + ")")
+              .collect(Collectors.joining(";"))
+      );
     }
   }
 }

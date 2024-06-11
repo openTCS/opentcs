@@ -7,6 +7,12 @@
  */
 package org.opentcs.operationsdesk.application.action.actions;
 
+import static java.util.Objects.requireNonNull;
+import static javax.swing.Action.LARGE_ICON_KEY;
+import static javax.swing.Action.MNEMONIC_KEY;
+import static javax.swing.Action.SMALL_ICON;
+import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.MENU_PATH;
+
 import jakarta.inject.Inject;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -14,11 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
-import static javax.swing.Action.LARGE_ICON_KEY;
-import static javax.swing.Action.MNEMONIC_KEY;
-import static javax.swing.Action.SMALL_ICON;
 import javax.swing.ImageIcon;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.base.model.elements.VehicleModel;
@@ -29,14 +31,14 @@ import org.opentcs.guing.common.util.ImageDirectory;
 import org.opentcs.operationsdesk.components.dialogs.FindVehiclePanel;
 import org.opentcs.operationsdesk.components.dialogs.FindVehiclePanelFactory;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
-import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.MENU_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action to find a vehicle on the drawing.
  */
 public class FindVehicleAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action's ID.
@@ -71,10 +73,13 @@ public class FindVehicleAction
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public FindVehicleAction(ModelManager modelManager,
-                           OpenTCSDrawingEditor drawingEditor,
-                           @ApplicationFrame Component dialogParent,
-                           FindVehiclePanelFactory panelFactory) {
+  public FindVehicleAction(
+      ModelManager modelManager,
+      OpenTCSDrawingEditor drawingEditor,
+      @ApplicationFrame
+      Component dialogParent,
+      FindVehiclePanelFactory panelFactory
+  ) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
@@ -100,8 +105,10 @@ public class FindVehicleAction
     }
 
     Collections.sort(vehicles, Comparator.comparing(VehicleModel::getName));
-    FindVehiclePanel content = panelFactory.createFindVehiclesPanel(vehicles,
-                                                                    drawingEditor.getActiveView());
+    FindVehiclePanel content = panelFactory.createFindVehiclesPanel(
+        vehicles,
+        drawingEditor.getActiveView()
+    );
     String title = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.FINDVEHICLE_PATH)
         .getString("findVehicleAction.dialog_findVehicle.title");
     ClosableDialog dialog = new ClosableDialog(dialogParent, true, content, title);

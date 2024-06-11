@@ -19,9 +19,14 @@ public class TripleTO {
   private long z;
 
   @JsonCreator
-  public TripleTO(@JsonProperty(value = "x", required = true) long x,
-                  @JsonProperty(value = "y", required = true) long y,
-                  @JsonProperty(value = "z", required = true) long z) {
+  public TripleTO(
+      @JsonProperty(value = "x", required = true)
+      long x,
+      @JsonProperty(value = "y", required = true)
+      long y,
+      @JsonProperty(value = "z", required = true)
+      long z
+  ) {
     this.x = x;
     this.y = y;
     this.z = z;

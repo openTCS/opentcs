@@ -15,7 +15,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
  * A command to set a vehicle's position.
  */
 public class SetPositionCommand
-    implements AdapterCommand {
+    implements
+      AdapterCommand {
 
   /**
    * The position to set.
@@ -27,7 +28,10 @@ public class SetPositionCommand
    *
    * @param position The position to set.
    */
-  public SetPositionCommand(@Nullable String position) {
+  public SetPositionCommand(
+      @Nullable
+      String position
+  ) {
     this.position = position;
   }
 

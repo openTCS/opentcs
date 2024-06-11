@@ -16,7 +16,8 @@ import java.util.Objects;
  * A notification to be read by a user.
  */
 public class UserNotification
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * An identifier of the notification's source.
@@ -43,7 +44,12 @@ public class UserNotification
    * @param text The actual message text.
    * @param level The new message's level.
    */
-  public UserNotification(@Nullable String source, String text, Level level) {
+  public UserNotification(
+      @Nullable
+      String source,
+      String text,
+      Level level
+  ) {
     this.source = source;
     this.text = Objects.requireNonNull(text, "text");
     this.level = Objects.requireNonNull(level, "level");

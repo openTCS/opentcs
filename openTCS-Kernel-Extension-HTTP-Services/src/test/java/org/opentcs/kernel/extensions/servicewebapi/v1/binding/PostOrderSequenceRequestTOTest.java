@@ -32,8 +32,12 @@ class PostOrderSequenceRequestTOTest {
         .setType("Transport")
         .setIntendedVehicle("some-vehicle")
         .setFailureFatal(true)
-        .setProperties(List.of(new Property("some-key", "some-value"),
-                               new Property("another-key", "another-value")));
+        .setProperties(
+            List.of(
+                new Property("some-key", "some-value"),
+                new Property("another-key", "another-value")
+            )
+        );
 
     Approvals.verify(jsonBinder.toJson(to));
   }

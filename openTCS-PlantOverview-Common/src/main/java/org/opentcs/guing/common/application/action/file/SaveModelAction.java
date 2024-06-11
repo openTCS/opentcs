@@ -7,19 +7,21 @@
  */
 package org.opentcs.guing.common.application.action.file;
 
+import static org.opentcs.guing.common.util.I18nPlantOverview.MENU_PATH;
+
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import org.opentcs.guing.common.application.GuiManager;
-import static org.opentcs.guing.common.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.common.util.ImageDirectory;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  */
 public class SaveModelAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action's ID.

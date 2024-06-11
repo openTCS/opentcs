@@ -18,7 +18,8 @@ import org.opentcs.operationsdesk.transport.sequences.OrderSequencesContainer;
  * A Guice module for this package.
  */
 public class TransportInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.

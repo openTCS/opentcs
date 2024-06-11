@@ -7,15 +7,17 @@
  */
 package org.opentcs.operationsdesk.application.action.actions;
 
+import static java.util.Objects.requireNonNull;
+import static javax.swing.Action.LARGE_ICON_KEY;
+import static javax.swing.Action.MNEMONIC_KEY;
+import static javax.swing.Action.SMALL_ICON;
+import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.MENU_PATH;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
-import static javax.swing.Action.LARGE_ICON_KEY;
-import static javax.swing.Action.MNEMONIC_KEY;
-import static javax.swing.Action.SMALL_ICON;
 import javax.swing.ImageIcon;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.common.components.dialogs.StandardContentDialog;
@@ -23,14 +25,14 @@ import org.opentcs.guing.common.transport.OrderTypeSuggestionsPool;
 import org.opentcs.guing.common.util.ImageDirectory;
 import org.opentcs.operationsdesk.exchange.TransportOrderUtil;
 import org.opentcs.operationsdesk.transport.CreateTransportOrderPanel;
-import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.MENU_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action to trigger the creation of a transport order.
  */
 public class CreateTransportOrderAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action class's ID.
@@ -65,10 +67,13 @@ public class CreateTransportOrderAction
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public CreateTransportOrderAction(TransportOrderUtil orderUtil,
-                                    @ApplicationFrame Component dialogParent,
-                                    Provider<CreateTransportOrderPanel> orderPanelProvider,
-                                    OrderTypeSuggestionsPool typeSuggestionsPool) {
+  public CreateTransportOrderAction(
+      TransportOrderUtil orderUtil,
+      @ApplicationFrame
+      Component dialogParent,
+      Provider<CreateTransportOrderPanel> orderPanelProvider,
+      OrderTypeSuggestionsPool typeSuggestionsPool
+  ) {
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
     this.orderPanelProvider = requireNonNull(orderPanelProvider, "orderPanelProvider");
@@ -95,11 +100,13 @@ public class CreateTransportOrderAction
     if (dialog.getReturnStatus() != StandardContentDialog.RET_OK) {
       return;
     }
-    orderUtil.createTransportOrder(contentPanel.getDestinationModels(),
-                                   contentPanel.getActions(),
-                                   contentPanel.getSelectedDeadline(),
-                                   contentPanel.getSelectedVehicle(),
-                                   contentPanel.getSelectedType());
+    orderUtil.createTransportOrder(
+        contentPanel.getDestinationModels(),
+        contentPanel.getActions(),
+        contentPanel.getSelectedDeadline(),
+        contentPanel.getSelectedVehicle(),
+        contentPanel.getSelectedType()
+    );
 
     typeSuggestionsPool.addTypeSuggestion(contentPanel.getSelectedType());
   }

@@ -7,11 +7,12 @@
  */
 package org.opentcs.util;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -31,28 +32,46 @@ class ComparatorsTest {
   void compareObjectsByName() {
     Comparator<TCSObject<?>> comparator = Comparators.objectsByName();
 
-    assertThat(comparator.compare(new Point("1"), new Point("1")),
-               is(0));
+    assertThat(
+        comparator.compare(new Point("1"), new Point("1")),
+        is(0)
+    );
 
-    assertThat(comparator.compare(new Point("1"), new Point("2")),
-               is(-1));
-    assertThat(comparator.compare(new Point("2"), new Point("1")),
-               is(1));
+    assertThat(
+        comparator.compare(new Point("1"), new Point("2")),
+        is(-1)
+    );
+    assertThat(
+        comparator.compare(new Point("2"), new Point("1")),
+        is(1)
+    );
 
-    assertThat(comparator.compare(new Point("01"), new Point("02")),
-               is(-1));
-    assertThat(comparator.compare(new Point("02"), new Point("01")),
-               is(1));
+    assertThat(
+        comparator.compare(new Point("01"), new Point("02")),
+        is(-1)
+    );
+    assertThat(
+        comparator.compare(new Point("02"), new Point("01")),
+        is(1)
+    );
 
-    assertThat(comparator.compare(new Point("point01"), new Point("point02")),
-               is(-1));
-    assertThat(comparator.compare(new Point("point02"), new Point("point01")),
-               is(1));
+    assertThat(
+        comparator.compare(new Point("point01"), new Point("point02")),
+        is(-1)
+    );
+    assertThat(
+        comparator.compare(new Point("point02"), new Point("point01")),
+        is(1)
+    );
 
-    assertThat(comparator.compare(new Point("point-01"), new Point("point-02")),
-               is(-1));
-    assertThat(comparator.compare(new Point("point-02"), new Point("point-01")),
-               is(1));
+    assertThat(
+        comparator.compare(new Point("point-01"), new Point("point-02")),
+        is(-1)
+    );
+    assertThat(
+        comparator.compare(new Point("point-02"), new Point("point-01")),
+        is(1)
+    );
   }
 
   @Test

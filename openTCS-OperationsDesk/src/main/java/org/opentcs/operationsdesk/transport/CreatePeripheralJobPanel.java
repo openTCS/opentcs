@@ -7,12 +7,13 @@
  */
 package org.opentcs.operationsdesk.transport;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.event.ItemEvent;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
@@ -27,7 +28,8 @@ import org.opentcs.util.gui.StringListCellRenderer;
 /**
  */
 public class CreatePeripheralJobPanel
-    extends DialogContent {
+    extends
+      DialogContent {
 
   private static final Comparator<LocationModel> BY_NAME
       = (o1, o2) -> o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
@@ -51,8 +53,12 @@ public class CreatePeripheralJobPanel
   public CreatePeripheralJobPanel(ModelManager modelManager) {
     requireNonNull(modelManager, "modelManager");
     locations = modelManager.getModel().getLocationModels().stream()
-        .filter(location -> !Objects.equals(location.getPropertyPeripheralState().getText(),
-                                            PeripheralInformation.State.NO_PERIPHERAL.name()))
+        .filter(
+            location -> !Objects.equals(
+                location.getPropertyPeripheralState().getText(),
+                PeripheralInformation.State.NO_PERIPHERAL.name()
+            )
+        )
         .sorted(BY_NAME)
         .collect(Collectors.toList());
 
@@ -98,8 +104,8 @@ public class CreatePeripheralJobPanel
     }
 
     operationCombobox.removeAllItems();
-    for (String op
-             : location.getLocationType().getPropertyAllowedPeripheralOperations().getItems()) {
+    for (String op : location.getLocationType().getPropertyAllowedPeripheralOperations()
+        .getItems()) {
       operationCombobox.addItem(op);
     }
   }
@@ -115,6 +121,7 @@ public class CreatePeripheralJobPanel
     );
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
@@ -187,6 +194,7 @@ public class CreatePeripheralJobPanel
         add(operationCombobox, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void locationComboboxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_locationComboboxItemStateChanged
     if (evt.getStateChange() == ItemEvent.SELECTED) {
@@ -194,6 +202,7 @@ public class CreatePeripheralJobPanel
     }
   }//GEN-LAST:event_locationComboboxItemStateChanged
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<LocationModel> locationCombobox;
@@ -204,4 +213,5 @@ public class CreatePeripheralJobPanel
     private javax.swing.JTextField reservationTokenTextField;
     // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

@@ -20,7 +20,8 @@ import org.jhotdraw.geom.BezierPath;
  * line.
  */
 public class TupelBezierLiner
-    implements org.jhotdraw.draw.liner.Liner {
+    implements
+      org.jhotdraw.draw.liner.Liner {
 
   /**
    * Creates a new instance.

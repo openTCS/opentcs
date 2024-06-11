@@ -7,11 +7,13 @@
  */
 package org.opentcs.configuration.gestalt;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkState;
+
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ServiceLoader;
 import org.github.gestalt.config.Gestalt;
 import org.github.gestalt.config.builder.GestaltBuilder;
@@ -26,7 +28,6 @@ import org.opentcs.configuration.ConfigurationBindingProvider;
 import org.opentcs.configuration.ConfigurationException;
 import org.opentcs.configuration.gestalt.decoders.ClassPathDecoder;
 import org.opentcs.configuration.gestalt.decoders.MapLiteralDecoder;
-import static org.opentcs.util.Assertions.checkState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,8 @@ import org.slf4j.LoggerFactory;
  * A configuration binding provider implementation using gestalt.
  */
 public class GestaltConfigurationBindingProvider
-    implements ConfigurationBindingProvider {
+    implements
+      ConfigurationBindingProvider {
 
   /**
    * This class's logger.
@@ -109,7 +111,8 @@ public class GestaltConfigurationBindingProvider
     catch (GestaltException e) {
       throw new ConfigurationException(
           "An error occured while creating gestalt configuration binding provider",
-          e);
+          e
+      );
     }
   }
 
@@ -119,11 +122,15 @@ public class GestaltConfigurationBindingProvider
     List<ConfigSourcePackage> sources = new ArrayList<>();
 
     // A file for baseline defaults MUST exist in the distribution.
-    checkState(defaultsPath.toFile().isFile(),
-               "Required default configuration file {} does not exist.",
-               defaultsPath.toFile().getAbsolutePath());
-    LOG.info("Using default configuration file {}...",
-             defaultsPath.toFile().getAbsolutePath());
+    checkState(
+        defaultsPath.toFile().isFile(),
+        "Required default configuration file {} does not exist.",
+        defaultsPath.toFile().getAbsolutePath()
+    );
+    LOG.info(
+        "Using default configuration file {}...",
+        defaultsPath.toFile().getAbsolutePath()
+    );
     sources.add(
         FileConfigSourceBuilder.builder()
             .setPath(defaultsPath)
@@ -134,8 +141,10 @@ public class GestaltConfigurationBindingProvider
     // Files with supplementary configuration MAY exist in the distribution.
     for (Path supplementaryPath : supplementaryPaths) {
       if (supplementaryPath.toFile().isFile()) {
-        LOG.info("Using overrides from supplementary configuration file {}...",
-                 supplementaryPath.toFile().getAbsolutePath());
+        LOG.info(
+            "Using overrides from supplementary configuration file {}...",
+            supplementaryPath.toFile().getAbsolutePath()
+        );
         sources.add(
             FileConfigSourceBuilder.builder()
                 .setPath(supplementaryPath)
@@ -144,18 +153,24 @@ public class GestaltConfigurationBindingProvider
         );
       }
       else {
-        LOG.warn("Supplementary configuration file {} not found, skipped.",
-                 supplementaryPath.toFile().getAbsolutePath());
+        LOG.warn(
+            "Supplementary configuration file {} not found, skipped.",
+            supplementaryPath.toFile().getAbsolutePath()
+        );
       }
     }
 
     for (ConfigSource source : ServiceLoader.load(SupplementaryConfigSource.class)) {
-      LOG.info("Using overrides from additional configuration source implementation {}...",
-               source.getClass());
-      sources.add(new ConfigSourcePackage(
-          source,
-          List.of(new TimedConfigReloadStrategy(reloadInterval))
-      ));
+      LOG.info(
+          "Using overrides from additional configuration source implementation {}...",
+          source.getClass()
+      );
+      sources.add(
+          new ConfigSourcePackage(
+              source,
+              List.of(new TimedConfigReloadStrategy(reloadInterval))
+          )
+      );
     }
     return sources;
   }
@@ -174,10 +189,12 @@ public class GestaltConfigurationBindingProvider
       return Duration.ofMillis(value);
     }
     catch (NumberFormatException exc) {
-      LOG.warn("Could not parse '{}', using default configuration reload interval ({} ms).",
-               valueString,
-               DEFAULT_RELOAD_INTERVAL,
-               exc);
+      LOG.warn(
+          "Could not parse '{}', using default configuration reload interval ({} ms).",
+          valueString,
+          DEFAULT_RELOAD_INTERVAL,
+          exc
+      );
       return Duration.ofMillis(DEFAULT_RELOAD_INTERVAL);
     }
   }

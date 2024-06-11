@@ -23,22 +23,26 @@ public class Strokes {
    * Decoration of paths that are part of a transport order.
    */
   public static final Stroke PATH_ON_ROUTE
-      = new BasicStroke(6.0f,
-                        BasicStroke.CAP_BUTT,
-                        BasicStroke.JOIN_MITER,
-                        10.0f,
-                        new float[]{10.0f, 5.0f},
-                        0.0f);
+      = new BasicStroke(
+          6.0f,
+          BasicStroke.CAP_BUTT,
+          BasicStroke.JOIN_MITER,
+          10.0f,
+          new float[]{10.0f, 5.0f},
+          0.0f
+      );
   /**
    * Decoration of paths that are part of a withdrawn transport order.
    */
   public static final Stroke PATH_ON_WITHDRAWN_ROUTE
-      = new BasicStroke(6.0f,
-                        BasicStroke.CAP_BUTT,
-                        BasicStroke.JOIN_MITER,
-                        10.0f,
-                        new float[]{8.0f, 4.0f, 2.0f, 4.0f},
-                        0.0f);
+      = new BasicStroke(
+          6.0f,
+          BasicStroke.CAP_BUTT,
+          BasicStroke.JOIN_MITER,
+          10.0f,
+          new float[]{8.0f, 4.0f, 2.0f, 4.0f},
+          0.0f
+      );
 
   /**
    * Prevents instantiation of this utility class.

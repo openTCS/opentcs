@@ -22,7 +22,8 @@ import java.util.logging.LogRecord;
  * associated with the <code>LogRecord</code>.
  */
 public class SingleLineFormatter
-    extends Formatter {
+    extends
+      Formatter {
 
   /**
    * A <code>DateFormat</code> instance for formatting timestamps.

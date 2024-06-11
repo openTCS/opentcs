@@ -29,23 +29,29 @@ import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
  * A vehicle figure that adds the name of the vehicle into the image.
  */
 public class NamedVehicleFigure
-    extends VehicleFigure {
+    extends
+      VehicleFigure {
 
   @Inject
-  public NamedVehicleFigure(VehicleTheme vehicleTheme,
-                            MenuFactory menuFactory,
-                            OperationsDeskConfiguration appConfig,
-                            @Assisted VehicleModel model,
-                            ToolTipTextGenerator textGenerator,
-                            ModelManager modelManager,
-                            ApplicationState applicationState) {
-    super(vehicleTheme,
-          menuFactory,
-          appConfig,
-          model,
-          textGenerator,
-          modelManager,
-          applicationState);
+  public NamedVehicleFigure(
+      VehicleTheme vehicleTheme,
+      MenuFactory menuFactory,
+      OperationsDeskConfiguration appConfig,
+      @Assisted
+      VehicleModel model,
+      ToolTipTextGenerator textGenerator,
+      ModelManager modelManager,
+      ApplicationState applicationState
+  ) {
+    super(
+        vehicleTheme,
+        menuFactory,
+        appConfig,
+        model,
+        textGenerator,
+        modelManager,
+        applicationState
+    );
   }
 
   @Override
@@ -53,9 +59,11 @@ public class NamedVehicleFigure
     super.drawFill(g2d);
     g2d.setFont(getVehicleTheme().labelFont());
     g2d.setPaint(getVehicleTheme().labelColor());
-    g2d.drawString(getVehicleTheme().label(getModel().getVehicle()),
-                   (int) displayBox().getCenterX() + getVehicleTheme().labelOffsetX(),
-                   (int) displayBox().getCenterY() + getVehicleTheme().labelOffsetY());
+    g2d.drawString(
+        getVehicleTheme().label(getModel().getVehicle()),
+        (int) displayBox().getCenterX() + getVehicleTheme().labelOffsetX(),
+        (int) displayBox().getCenterY() + getVehicleTheme().labelOffsetY()
+    );
   }
 
   @Override

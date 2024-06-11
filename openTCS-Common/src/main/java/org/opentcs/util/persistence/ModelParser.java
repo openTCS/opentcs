@@ -59,8 +59,12 @@ public class ModelParser {
 
     LOG.debug("File '{}' contains a model version '{}'.", file.getAbsolutePath(), modelVersion);
 
-    try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
-                                                                  CHARSET))) {
+    try (Reader reader = new BufferedReader(
+        new InputStreamReader(
+            new FileInputStream(file),
+            CHARSET
+        )
+    )) {
       return new V005ModelParser().read(reader, modelVersion);
     }
   }
@@ -74,8 +78,12 @@ public class ModelParser {
    */
   public void writeModel(PlantModelCreationTO model, File file)
       throws IOException {
-    try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),
-                                                                   CHARSET))) {
+    try (Writer writer = new BufferedWriter(
+        new OutputStreamWriter(
+            new FileOutputStream(file),
+            CHARSET
+        )
+    )) {
       V005TOMapper mapper = new V005TOMapper();
       V005PlantModelTO mappedModel = mapper.map(model);
       mappedModel.toXml(writer);
@@ -84,8 +92,12 @@ public class ModelParser {
 
   private String peekModelVersion(File file)
       throws IOException {
-    try (Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
-                                                                  CHARSET))) {
+    try (Reader reader = new BufferedReader(
+        new InputStreamReader(
+            new FileInputStream(file),
+            CHARSET
+        )
+    )) {
       return ProbePlantModelTO.fromXml(reader).getVersion();
     }
   }

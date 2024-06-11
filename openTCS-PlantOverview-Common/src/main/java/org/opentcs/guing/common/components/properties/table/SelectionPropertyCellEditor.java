@@ -21,7 +21,8 @@ import org.opentcs.guing.common.util.UserMessageHelper;
  * A cell editor for a selection property.
  */
 public class SelectionPropertyCellEditor
-    extends AbstractPropertyCellEditor {
+    extends
+      AbstractPropertyCellEditor {
 
   /**
    * Creates a new instance.
@@ -42,7 +43,8 @@ public class SelectionPropertyCellEditor
 
   @Override
   public Component getTableCellEditorComponent(
-      JTable table, Object value, boolean isSelected, int row, int column) {
+      JTable table, Object value, boolean isSelected, int row, int column
+  ) {
 
     setValue(value);
     JComboBox<Object> comboBox = getComponent();

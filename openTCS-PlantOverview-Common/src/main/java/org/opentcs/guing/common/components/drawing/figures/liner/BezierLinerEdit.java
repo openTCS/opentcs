@@ -20,7 +20,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 /**
  */
 public class BezierLinerEdit
-    extends javax.swing.undo.AbstractUndoableEdit {
+    extends
+      javax.swing.undo.AbstractUndoableEdit {
 
   private final BezierFigure fOwner;
   private final BezierNodeEdit fNodeEdit;
@@ -54,13 +55,15 @@ public class BezierLinerEdit
   }
 
   @Override // AbstractUndoableEdit
-  public void redo() throws CannotRedoException {
+  public void redo()
+      throws CannotRedoException {
     fNodeEdit.redo();
     updateProperties();
   }
 
   @Override // AbstractUndoableEdit
-  public void undo() throws CannotUndoException {
+  public void undo()
+      throws CannotUndoException {
     fNodeEdit.undo();
     updateProperties();
   }

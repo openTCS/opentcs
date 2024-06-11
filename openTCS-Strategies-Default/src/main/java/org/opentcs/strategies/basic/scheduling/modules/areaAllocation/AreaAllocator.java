@@ -7,9 +7,10 @@
  */
 package org.opentcs.strategies.basic.scheduling.modules.areaAllocation;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.TCSObjectReference;
@@ -20,7 +21,8 @@ import org.opentcs.data.model.Vehicle;
  * Responsible for managing allocated areas.
  */
 public class AreaAllocator
-    implements Lifecycle {
+    implements
+      Lifecycle {
 
   private final AreaProvider areaProvider;
   private final AreaAllocations areaAllocations;
@@ -76,9 +78,14 @@ public class AreaAllocator
    * @return {@code true}, if the areas realted to the given envelope key and the given set of
    * resources are not allocated by any vehicle other than the given one, otherwise {@code false}.
    */
-  public boolean mayAllocateAreas(@Nonnull TCSObjectReference<Vehicle> vehicleRef,
-                                  @Nonnull String envelopeKey,
-                                  @Nonnull Set<TCSResource<?>> resources) {
+  public boolean mayAllocateAreas(
+      @Nonnull
+      TCSObjectReference<Vehicle> vehicleRef,
+      @Nonnull
+      String envelopeKey,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  ) {
     requireNonNull(vehicleRef, "vehicleRef");
     requireNonNull(envelopeKey, "envelopeKey");
     requireNonNull(resources, "resources");
@@ -87,8 +94,10 @@ public class AreaAllocator
       return true;
     }
 
-    return areaAllocations.isAreaAllocationAllowed(vehicleRef,
-                                                   areaProvider.getAreas(envelopeKey, resources));
+    return areaAllocations.isAreaAllocationAllowed(
+        vehicleRef,
+        areaProvider.getAreas(envelopeKey, resources)
+    );
   }
 
   /**
@@ -99,9 +108,14 @@ public class AreaAllocator
    * @param envelopeKey The envelope key.
    * @param resources The set of resources.
    */
-  public void updateAllocatedAreas(@Nonnull TCSObjectReference<Vehicle> vehicleRef,
-                                   @Nonnull String envelopeKey,
-                                   @Nonnull Set<TCSResource<?>> resources) {
+  public void updateAllocatedAreas(
+      @Nonnull
+      TCSObjectReference<Vehicle> vehicleRef,
+      @Nonnull
+      String envelopeKey,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  ) {
     requireNonNull(vehicleRef, "vehicleRef");
     requireNonNull(envelopeKey, "envelopeKey");
     requireNonNull(resources, "resources");

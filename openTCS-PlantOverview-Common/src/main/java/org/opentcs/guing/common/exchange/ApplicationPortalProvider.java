@@ -7,9 +7,10 @@
  */
 package org.opentcs.guing.common.exchange;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.HashSet;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
@@ -22,7 +23,8 @@ import org.slf4j.LoggerFactory;
  * Provides an {@link ApplicationPortal} for clients in the kernel control center application.
  */
 public class ApplicationPortalProvider
-    implements SharedKernelServicePortalProvider {
+    implements
+      SharedKernelServicePortalProvider {
 
   /**
    * This class's logger.
@@ -48,8 +50,10 @@ public class ApplicationPortalProvider
    * @param configuration The application's configuration.
    */
   @Inject
-  public ApplicationPortalProvider(PortalManager portalManager,
-                                   ApplicationPortalProviderConfiguration configuration) {
+  public ApplicationPortalProvider(
+      PortalManager portalManager,
+      ApplicationPortalProviderConfiguration configuration
+  ) {
     this.portalManager = requireNonNull(portalManager, "ortalManager");
     this.configuration = requireNonNull(configuration, "configuration");
   }
@@ -68,9 +72,11 @@ public class ApplicationPortalProvider
       unregister(token);
       throw new ServiceUnavailableException("Could not connect to portal");
     }
-    return new ApplicationPortal(portalManager.getPortal(),
-                                 this,
-                                 token);
+    return new ApplicationPortal(
+        portalManager.getPortal(),
+        this,
+        token
+    );
   }
 
   public synchronized boolean unregister(Object client) {

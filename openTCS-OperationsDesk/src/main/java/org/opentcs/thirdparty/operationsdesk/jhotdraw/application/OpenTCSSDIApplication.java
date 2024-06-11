@@ -3,6 +3,9 @@
  */
 package org.opentcs.thirdparty.operationsdesk.jhotdraw.application;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.common.PortalManager.ConnectionState.CONNECTED;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import java.awt.Frame;
@@ -11,13 +14,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.JFrame;
 import org.jhotdraw.app.SDIApplication;
 import org.jhotdraw.app.View;
 import org.opentcs.common.PortalManager;
-import static org.opentcs.common.PortalManager.ConnectionState.CONNECTED;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.common.event.ModelNameChangeEvent;
@@ -25,18 +26,20 @@ import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.operationsdesk.application.OpenTCSView;
 import org.opentcs.operationsdesk.application.menus.menubar.ApplicationMenuBar;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
+import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 import org.opentcs.thirdparty.operationsdesk.jhotdraw.application.action.file.CloseFileAction;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;
 import org.opentcs.util.gui.Icons;
-import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 
 /**
  * The enclosing SDI application.
  */
 public class OpenTCSSDIApplication
-    extends SDIApplication
-    implements EventHandler {
+    extends
+      SDIApplication
+    implements
+      EventHandler {
 
   private static final ResourceBundle BUNDLE
       = ResourceBundle.getBundle(I18nPlantOverviewOperating.SYSTEM_PATH);
@@ -76,12 +79,16 @@ public class OpenTCSSDIApplication
    * @param portalManager The portal manager.
    */
   @Inject
-  public OpenTCSSDIApplication(@ApplicationFrame JFrame frame,
-                               Provider<ApplicationMenuBar> menuBarProvider,
-                               ModelManager modelManager,
-                               OperationsDeskConfiguration appConfig,
-                               @ApplicationEventBus EventSource eventSource,
-                               PortalManager portalManager) {
+  public OpenTCSSDIApplication(
+      @ApplicationFrame
+      JFrame frame,
+      Provider<ApplicationMenuBar> menuBarProvider,
+      ModelManager modelManager,
+      OperationsDeskConfiguration appConfig,
+      @ApplicationEventBus
+      EventSource eventSource,
+      PortalManager portalManager
+  ) {
     this.contentFrame = requireNonNull(frame, "frame");
     this.menuBarProvider = requireNonNull(menuBarProvider, "menuBarProvider");
     this.modelManager = requireNonNull(modelManager, "modelManager");
@@ -136,11 +143,13 @@ public class OpenTCSSDIApplication
     }
 
     if (frame != null) {
-      frame.setTitle(OpenTCSView.NAME + " - \""
-          + modelName + "\" - "
-          + BUNDLE.getString("openTcsSdiApplication.frameTitle_connectedTo.text")
-          + portalManager.getDescription()
-          + " (" + portalManager.getHost() + ":" + portalManager.getPort() + ")");
+      frame.setTitle(
+          OpenTCSView.NAME + " - \""
+              + modelName + "\" - "
+              + BUNDLE.getString("openTcsSdiApplication.frameTitle_connectedTo.text")
+              + portalManager.getDescription()
+              + " (" + portalManager.getHost() + ":" + portalManager.getPort() + ")"
+      );
     }
   }
 
@@ -154,10 +163,12 @@ public class OpenTCSSDIApplication
     contentFrame.setExtendedState(appConfig.frameMaximized() ? Frame.MAXIMIZED_BOTH : Frame.NORMAL);
 
     if (contentFrame.getExtendedState() != Frame.MAXIMIZED_BOTH) {
-      contentFrame.setBounds(appConfig.frameBoundsX(),
-                             appConfig.frameBoundsY(),
-                             appConfig.frameBoundsWidth(),
-                             appConfig.frameBoundsHeight());
+      contentFrame.setBounds(
+          appConfig.frameBoundsX(),
+          appConfig.frameBoundsY(),
+          appConfig.frameBoundsWidth(),
+          appConfig.frameBoundsHeight()
+      );
     }
 
     contentFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -165,8 +176,9 @@ public class OpenTCSSDIApplication
   }
 
   private class TitleUpdater
-      implements PropertyChangeListener,
-                 EventHandler {
+      implements
+        PropertyChangeListener,
+        EventHandler {
 
     private final OpenTCSView opentcsView;
 
@@ -200,7 +212,8 @@ public class OpenTCSSDIApplication
   }
 
   private class WindowStatusUpdater
-      extends WindowAdapter {
+      extends
+        WindowAdapter {
 
     private final OpenTCSView opentcsView;
 
@@ -212,9 +225,12 @@ public class OpenTCSSDIApplication
     public void windowClosing(WindowEvent e) {
       // Check if changes to the model still need to be saved.
       getAction(opentcsView, CloseFileAction.ID).actionPerformed(
-          new ActionEvent(contentFrame,
-                          ActionEvent.ACTION_PERFORMED,
-                          CloseFileAction.ID_WINDOW_CLOSING));
+          new ActionEvent(
+              contentFrame,
+              ActionEvent.ACTION_PERFORMED,
+              CloseFileAction.ID_WINDOW_CLOSING
+          )
+      );
     }
 
     @Override

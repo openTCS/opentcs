@@ -14,7 +14,8 @@ import javax.swing.JPanel;
  * Base implementation for a dialog and tab content.
  */
 public abstract class DialogContent
-    extends JPanel {
+    extends
+      JPanel {
 
   /**
    * Title of the component in a dialog.

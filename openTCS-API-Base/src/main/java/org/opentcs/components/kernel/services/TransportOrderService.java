@@ -21,7 +21,8 @@ import org.opentcs.data.order.TransportOrder;
  * Provides methods concerning {@link TransportOrder}s and {@link OrderSequence}s.
  */
 public interface TransportOrderService
-    extends TCSObjectService {
+    extends
+      TCSObjectService {
 
   /**
    * Creates a new order sequence.
@@ -36,7 +37,9 @@ public interface TransportOrderService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   OrderSequence createOrderSequence(OrderSequenceCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        ObjectExistsException,
+        KernelRuntimeException;
 
   /**
    * Creates a new transport order.
@@ -52,7 +55,9 @@ public interface TransportOrderService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   TransportOrder createTransportOrder(TransportOrderCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        ObjectExistsException,
+        KernelRuntimeException;
 
   /**
    * Marks an order sequence as complete by setting its complete flag.
@@ -62,7 +67,8 @@ public interface TransportOrderService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void markOrderSequenceComplete(TCSObjectReference<OrderSequence> ref)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Updates a transport order's intended vehicle.
@@ -74,7 +80,10 @@ public interface TransportOrderService
    * @throws IllegalArgumentException If the transport order has already being assigned to
    * a vehicle.
    */
-  void updateTransportOrderIntendedVehicle(TCSObjectReference<TransportOrder> orderRef,
-                                           TCSObjectReference<Vehicle> vehicleRef)
-      throws ObjectUnknownException, IllegalArgumentException;
+  void updateTransportOrderIntendedVehicle(
+      TCSObjectReference<TransportOrder> orderRef,
+      TCSObjectReference<Vehicle> vehicleRef
+  )
+      throws ObjectUnknownException,
+        IllegalArgumentException;
 }

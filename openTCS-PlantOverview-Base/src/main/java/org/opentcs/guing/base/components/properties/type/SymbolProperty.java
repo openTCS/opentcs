@@ -14,7 +14,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property for a graphical symbol.
  */
 public class SymbolProperty
-    extends AbstractComplexProperty {
+    extends
+      AbstractComplexProperty {
 
   /**
    * The location representation.

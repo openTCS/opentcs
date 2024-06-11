@@ -13,7 +13,8 @@ import org.opentcs.access.KernelRuntimeException;
  * Thrown when a (remote) service is not available for processing a request.
  */
 public class ServiceUnavailableException
-    extends KernelRuntimeException {
+    extends
+      KernelRuntimeException {
 
   /**
    * Creates a new ServiceUnavailableException with the given detail message.

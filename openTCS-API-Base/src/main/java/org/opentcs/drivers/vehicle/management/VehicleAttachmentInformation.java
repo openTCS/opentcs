@@ -7,9 +7,10 @@
  */
 package org.opentcs.drivers.vehicle.management;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
@@ -42,9 +43,13 @@ public class VehicleAttachmentInformation {
    * @param attachedCommAdapter The comm adapter attached to the referenced vehicle.
    */
   public VehicleAttachmentInformation(
-      @Nonnull TCSObjectReference<Vehicle> vehicleReference,
-      @Nonnull List<VehicleCommAdapterDescription> availableCommAdapters,
-      @Nonnull VehicleCommAdapterDescription attachedCommAdapter) {
+      @Nonnull
+      TCSObjectReference<Vehicle> vehicleReference,
+      @Nonnull
+      List<VehicleCommAdapterDescription> availableCommAdapters,
+      @Nonnull
+      VehicleCommAdapterDescription attachedCommAdapter
+  ) {
     this.vehicleReference = requireNonNull(vehicleReference, "vehicleReference");
     this.availableCommAdapters = requireNonNull(availableCommAdapters, "availableCommAdapters");
     this.attachedCommAdapter = requireNonNull(attachedCommAdapter, "attachedCommAdapter");
@@ -67,10 +72,13 @@ public class VehicleAttachmentInformation {
    * @return A copy of this object, differing in the given vehicle reference.
    */
   public VehicleAttachmentInformation withVehicleReference(
-      TCSObjectReference<Vehicle> vehicleReference) {
-    return new VehicleAttachmentInformation(vehicleReference,
-                                            getAvailableCommAdapters(),
-                                            getAttachedCommAdapter());
+      TCSObjectReference<Vehicle> vehicleReference
+  ) {
+    return new VehicleAttachmentInformation(
+        vehicleReference,
+        getAvailableCommAdapters(),
+        getAttachedCommAdapter()
+    );
   }
 
   /**
@@ -90,10 +98,14 @@ public class VehicleAttachmentInformation {
    * @return A copy of this object, differing in the given available comm adapters.
    */
   public VehicleAttachmentInformation withAvailableCommAdapters(
-      @Nonnull List<VehicleCommAdapterDescription> availableCommAdapters) {
-    return new VehicleAttachmentInformation(getVehicleReference(),
-                                            availableCommAdapters,
-                                            getAttachedCommAdapter());
+      @Nonnull
+      List<VehicleCommAdapterDescription> availableCommAdapters
+  ) {
+    return new VehicleAttachmentInformation(
+        getVehicleReference(),
+        availableCommAdapters,
+        getAttachedCommAdapter()
+    );
   }
 
   /**
@@ -113,9 +125,13 @@ public class VehicleAttachmentInformation {
    * @return A copy of this object, differing in the given attached comm adapter.
    */
   public VehicleAttachmentInformation withAttachedCommAdapter(
-      @Nonnull VehicleCommAdapterDescription attachedCommAdapter) {
-    return new VehicleAttachmentInformation(getVehicleReference(),
-                                            getAvailableCommAdapters(),
-                                            attachedCommAdapter);
+      @Nonnull
+      VehicleCommAdapterDescription attachedCommAdapter
+  ) {
+    return new VehicleAttachmentInformation(
+        getVehicleReference(),
+        getAvailableCommAdapters(),
+        attachedCommAdapter
+    );
   }
 }

@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.transport;
 
 import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
 import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
 import org.opentcs.data.ObjectHistory;
@@ -20,7 +21,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A formatter for history events/entries related to {@link TransportOrder}s.
  */
 public class TransportOrderHistoryEntryFormatter
-    implements ObjectHistoryEntryFormatter {
+    implements
+      ObjectHistoryEntryFormatter {
 
   /**
    * A bundle providing localized strings.
@@ -49,7 +51,7 @@ public class TransportOrderHistoryEntryFormatter
             bundle.getString(
                 "transportOrderHistoryEntryFormatter.code_orderDispatchingDeferred.text"
             )
-            + " " + entry.getSupplement().toString()
+                + " " + entry.getSupplement().toString()
         );
 
       case TransportOrderHistoryCodes.ORDER_DISPATCHING_RESUMED:
@@ -62,7 +64,7 @@ public class TransportOrderHistoryEntryFormatter
       case TransportOrderHistoryCodes.ORDER_ASSIGNED_TO_VEHICLE:
         return Optional.of(
             bundle.getString("transportOrderHistoryEntryFormatter.code_orderAssignedToVehicle.text")
-            + " '" + entry.getSupplement().toString() + "'"
+                + " '" + entry.getSupplement().toString() + "'"
         );
 
       case TransportOrderHistoryCodes.ORDER_RESERVED_FOR_VEHICLE:
@@ -70,7 +72,7 @@ public class TransportOrderHistoryEntryFormatter
             bundle.getString(
                 "transportOrderHistoryEntryFormatter.code_orderReservedForVehicle.text"
             )
-            + " '" + entry.getSupplement().toString() + "'"
+                + " '" + entry.getSupplement().toString() + "'"
         );
 
       case TransportOrderHistoryCodes.ORDER_PROCESSING_VEHICLE_CHANGED:
@@ -78,7 +80,7 @@ public class TransportOrderHistoryEntryFormatter
             bundle.getString(
                 "transportOrderHistoryEntryFormatter.code_orderProcVehicleChanged.text"
             )
-            + " '" + entry.getSupplement().toString() + "'"
+                + " '" + entry.getSupplement().toString() + "'"
         );
 
       case TransportOrderHistoryCodes.ORDER_DRIVE_ORDER_FINISHED:

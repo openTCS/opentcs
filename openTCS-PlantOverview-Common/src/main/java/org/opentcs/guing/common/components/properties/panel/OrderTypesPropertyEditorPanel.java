@@ -7,9 +7,10 @@
  */
 package org.opentcs.guing.common.components.properties.panel;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Enumeration;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.DefaultListModel;
@@ -28,8 +29,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * User interface to edit a set of order type strings.
  */
 public class OrderTypesPropertyEditorPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   /**
    * The bundle to be used.
@@ -138,6 +141,7 @@ public class OrderTypesPropertyEditorPanel
     }
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -206,22 +210,24 @@ public class OrderTypesPropertyEditorPanel
     add(removeButton, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
-    private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-      String value = itemsList.getSelectedValue();
+  private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
+    String value = itemsList.getSelectedValue();
 
-      if (value == null) {
-        return;
-      }
+    if (value == null) {
+      return;
+    }
 
-      DefaultListModel<String> model = (DefaultListModel<String>) itemsList.getModel();
-      model.removeElement(value);
-    }//GEN-LAST:event_removeButtonActionPerformed
+    DefaultListModel<String> model = (DefaultListModel<String>) itemsList.getModel();
+    model.removeElement(value);
+  }//GEN-LAST:event_removeButtonActionPerformed
 
-    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-      add();
-    }//GEN-LAST:event_addButtonActionPerformed
+  private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+    add();
+  }//GEN-LAST:event_addButtonActionPerformed
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
@@ -231,4 +237,5 @@ public class OrderTypesPropertyEditorPanel
   private javax.swing.JComboBox<String> typeComboBox;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

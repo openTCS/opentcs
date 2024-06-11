@@ -7,11 +7,6 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.from;
@@ -20,14 +15,20 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.theInstance;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
@@ -133,13 +134,17 @@ class TransportOrderHandlerTest {
 
     // Act & Assert: set to vehicle
     handler.updateTransportOrderIntendedVehicle("some-order", "some-vehicle");
-    then(orderService).should().updateTransportOrderIntendedVehicle(transportOrder.getReference(),
-                                                                    vehicle.getReference());
+    then(orderService).should().updateTransportOrderIntendedVehicle(
+        transportOrder.getReference(),
+        vehicle.getReference()
+    );
 
     // Act & Assert: set to null
     handler.updateTransportOrderIntendedVehicle("some-order", null);
-    then(orderService).should().updateTransportOrderIntendedVehicle(transportOrder.getReference(),
-                                                                    null);
+    then(orderService).should().updateTransportOrderIntendedVehicle(
+        transportOrder.getReference(),
+        null
+    );
 
     // Act & Assert: nonexistent transport order
     assertThatExceptionOfType(ObjectUnknownException.class)

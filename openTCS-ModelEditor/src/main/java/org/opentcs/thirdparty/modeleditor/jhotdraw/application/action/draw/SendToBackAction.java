@@ -15,9 +15,11 @@
  */
 package org.opentcs.thirdparty.modeleditor.jhotdraw.application.action.draw;
 
+import static javax.swing.Action.SMALL_ICON;
+import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.TOOLBAR_PATH;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import static javax.swing.Action.SMALL_ICON;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -27,7 +29,6 @@ import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
 import org.opentcs.guing.common.util.ImageDirectory;
-import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.TOOLBAR_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
@@ -36,7 +37,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * @author Werner Randelshofer
  */
 public class SendToBackAction
-    extends AbstractSelectedAction {
+    extends
+      AbstractSelectedAction {
 
   /**
    * This action's ID.

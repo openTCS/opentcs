@@ -7,8 +7,9 @@
  */
 package org.opentcs.virtualvehicle.commands;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -17,7 +18,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
  * A command to set a vehicle's state.
  */
 public class SetStateCommand
-    implements AdapterCommand {
+    implements
+      AdapterCommand {
 
   /**
    * The vehicle state to set.
@@ -29,7 +31,10 @@ public class SetStateCommand
    *
    * @param state The vehicle state to set.
    */
-  public SetStateCommand(@Nonnull Vehicle.State state) {
+  public SetStateCommand(
+      @Nonnull
+      Vehicle.State state
+  ) {
     this.state = requireNonNull(state, "state");
   }
 

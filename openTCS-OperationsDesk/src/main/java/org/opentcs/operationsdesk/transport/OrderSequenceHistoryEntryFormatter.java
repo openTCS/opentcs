@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.transport;
 
 import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
 import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
 import org.opentcs.data.ObjectHistory;
@@ -20,7 +21,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A formatter for history events/entries related to {@link OrderSequence}s.
  */
 public class OrderSequenceHistoryEntryFormatter
-    implements ObjectHistoryEntryFormatter {
+    implements
+      ObjectHistoryEntryFormatter {
 
   /**
    * A bundle providing localized strings.
@@ -49,7 +51,7 @@ public class OrderSequenceHistoryEntryFormatter
             bundle.getString(
                 "orderSequenceHistoryEntryFormatter.code_sequenceOrderAppended.text"
             )
-            + " '" + entry.getSupplement().toString() + "'"
+                + " '" + entry.getSupplement().toString() + "'"
         );
 
       case OrderSequenceHistoryCodes.SEQUENCE_PROCESSING_VEHICLE_CHANGED:
@@ -57,7 +59,7 @@ public class OrderSequenceHistoryEntryFormatter
             bundle.getString(
                 "orderSequenceHistoryEntryFormatter.code_sequenceProcVehicleChanged.text"
             )
-            + " '" + entry.getSupplement().toString() + "'"
+                + " '" + entry.getSupplement().toString() + "'"
         );
 
       case OrderSequenceHistoryCodes.SEQUENCE_COMPLETED:

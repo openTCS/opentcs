@@ -7,10 +7,11 @@
  */
 package org.opentcs.operationsdesk.transport;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Vector;
@@ -29,7 +30,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A UI to select an intended vehicle for a transport order.
  */
 public class IntendedVehiclesPanel
-    extends DialogContent {
+    extends
+      DialogContent {
 
   /**
    * Entry for the automatic intended vehicle.
@@ -124,7 +126,7 @@ public class IntendedVehiclesPanel
 
     inputValidationSuccessful(
         automaticEntry.equals(inputText)
-        || vehicles.stream().anyMatch(v -> v.getName().equals(inputText))
+            || vehicles.stream().anyMatch(v -> v.getName().equals(inputText))
     );
   }
 
@@ -134,6 +136,7 @@ public class IntendedVehiclesPanel
     }
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -158,11 +161,14 @@ public class IntendedVehiclesPanel
     add(itemsComboBox);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox<String> itemsComboBox;
   private javax.swing.JLabel itemsLabel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

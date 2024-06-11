@@ -7,15 +7,16 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.assignment.priorization;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.theInstance;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.theInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -88,8 +89,10 @@ class CompositeVehicleComparatorTest {
 
     Mockito.when(configuration.vehiclePriorities())
         .thenReturn(List.of("IDLE_FIRST"));
-    availableComparators.put("IDLE_FIRST",
-                             new VehicleComparatorIdleFirst());
+    availableComparators.put(
+        "IDLE_FIRST",
+        new VehicleComparatorIdleFirst()
+    );
 
     comparator = new CompositeVehicleComparator(configuration, availableComparators);
 

@@ -7,13 +7,14 @@
  */
 package org.opentcs.documentation.developers_guide;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
@@ -40,11 +41,17 @@ class CreateTransportOrderSequenceTest {
     when(orderService.createOrderSequence(any(OrderSequenceCreationTO.class)))
         .thenReturn(new OrderSequence("OrderSequence"));
     when(orderService.createTransportOrder(any(TransportOrderCreationTO.class)))
-        .thenReturn(new TransportOrder(
-            "Transportorder",
-            Collections.singletonList(new DriveOrder(
-                new DriveOrder.Destination(getSampleDestinationLocation().getReference())
-                    .withOperation("some operation")))));
+        .thenReturn(
+            new TransportOrder(
+                "Transportorder",
+                Collections.singletonList(
+                    new DriveOrder(
+                        new DriveOrder.Destination(getSampleDestinationLocation().getReference())
+                            .withOperation("some operation")
+                    )
+                )
+            )
+        );
   }
 
   @Test
@@ -92,8 +99,10 @@ class CreateTransportOrderSequenceTest {
   }
 
   private Location getSampleDestinationLocation() {
-    return new Location("Location",
-                        new LocationType("LocationType").getReference());
+    return new Location(
+        "Location",
+        new LocationType("LocationType").getReference()
+    );
   }
 
   private TransportOrderService getATransportOrderService() {

@@ -7,10 +7,11 @@
  */
 package org.opentcs.modeleditor.application.menus.menubar;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -29,7 +30,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * The application's menu for view-related operations.
  */
 public class ViewMenu
-    extends JMenu {
+    extends
+      JMenu {
 
   /**
    * The toolbar manager.
@@ -61,9 +63,11 @@ public class ViewMenu
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public ViewMenu(ViewActionMap actionMap,
-                  ToolBarManager toolBarManager,
-                  ViewPluginPanelsMenu menuPluginPanels) {
+  public ViewMenu(
+      ViewActionMap actionMap,
+      ToolBarManager toolBarManager,
+      ViewPluginPanelsMenu menuPluginPanels
+  ) {
     requireNonNull(actionMap, "actionMap");
     this.toolBarManager = requireNonNull(toolBarManager, "toolBarManager");
     requireNonNull(menuPluginPanels, "menuPluginPanels");

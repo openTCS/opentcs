@@ -7,12 +7,13 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
-import java.util.List;
 import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
+import java.util.List;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * Contains information for a potential assignment of a transport order to a vehicle.
@@ -44,15 +45,21 @@ public class AssignmentCandidate {
    * @param driveOrders The drive orders containing the computed route the vehicle would take.
    * May not be empty and the route of each drive order may not be null.
    */
-  public AssignmentCandidate(Vehicle vehicle,
-                             TransportOrder transportOrder,
-                             List<DriveOrder> driveOrders) {
+  public AssignmentCandidate(
+      Vehicle vehicle,
+      TransportOrder transportOrder,
+      List<DriveOrder> driveOrders
+  ) {
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.transportOrder = requireNonNull(transportOrder, "transportOrder");
     this.driveOrders = requireNonNull(driveOrders, "driveOrders");
     checkArgument(!driveOrders.isEmpty(), "driveOrders is empty");
-    driveOrders.forEach(driveOrder -> checkArgument(driveOrder.getRoute() != null,
-                                                    "a drive order's route is null"));
+    driveOrders.forEach(
+        driveOrder -> checkArgument(
+            driveOrder.getRoute() != null,
+            "a drive order's route is null"
+        )
+    );
     this.completeRoutingCosts = cumulatedCosts(driveOrders);
   }
 

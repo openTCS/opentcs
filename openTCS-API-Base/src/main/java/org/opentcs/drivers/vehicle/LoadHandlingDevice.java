@@ -7,15 +7,17 @@
  */
 package org.opentcs.drivers.vehicle;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.Serializable;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Describes a single load handling device on a vehicle.
  */
 public class LoadHandlingDevice
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * A name/label for this device.

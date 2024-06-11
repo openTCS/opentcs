@@ -7,9 +7,10 @@
  */
 package org.opentcs.guing.base.model.elements;
 
+import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
+
 import java.util.HashMap;
 import java.util.ResourceBundle;
-import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.LayerGroupsProperty;
 import org.opentcs.guing.base.components.properties.type.LayerWrappersProperty;
@@ -21,7 +22,8 @@ import org.opentcs.guing.base.model.CompositeModelComponent;
  * Basic implementation of a layout.
  */
 public class LayoutModel
-    extends CompositeModelComponent {
+    extends
+      CompositeModelComponent {
 
   /**
    * The key/name of the 'scale X' property.

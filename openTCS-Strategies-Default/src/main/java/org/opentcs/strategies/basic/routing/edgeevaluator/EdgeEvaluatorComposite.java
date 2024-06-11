@@ -7,6 +7,8 @@
  */
 package org.opentcs.strategies.basic.routing.edgeevaluator;
 
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,7 +17,6 @@ import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +25,8 @@ import org.slf4j.LoggerFactory;
  * evaluators.
  */
 public class EdgeEvaluatorComposite
-    implements EdgeEvaluator {
+    implements
+      EdgeEvaluator {
 
   /**
    * This class's logger.
@@ -42,17 +44,21 @@ public class EdgeEvaluatorComposite
    * @param availableEvaluators The configured evaluators to use.
    */
   @Inject
-  public EdgeEvaluatorComposite(ShortestPathConfiguration configuration,
-                                Map<String, EdgeEvaluator> availableEvaluators) {
+  public EdgeEvaluatorComposite(
+      ShortestPathConfiguration configuration,
+      Map<String, EdgeEvaluator> availableEvaluators
+  ) {
     if (availableEvaluators.isEmpty()) {
       LOG.warn("No edge evaluator enabled, falling back to distance-based evaluation.");
       evaluators.add(new EdgeEvaluatorDistance());
     }
     else {
       for (String evaluatorKey : configuration.edgeEvaluators()) {
-        checkArgument(availableEvaluators.containsKey(evaluatorKey),
-                      "Unknown edge evaluator key: %s",
-                      evaluatorKey);
+        checkArgument(
+            availableEvaluators.containsKey(evaluatorKey),
+            "Unknown edge evaluator key: %s",
+            evaluatorKey
+        );
         evaluators.add(availableEvaluators.get(evaluatorKey));
       }
     }

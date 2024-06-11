@@ -16,7 +16,8 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
  * Provides services concerning model editing.
  */
 public interface GuiManagerModeling
-    extends GuiManager {
+    extends
+      GuiManager {
 
   /**
    * Creates a new vehicle model.
@@ -48,5 +49,8 @@ public interface GuiManagerModeling
    *
    * @param blockModel The block model to be removed.
    */
-  void removeBlockModel(@Nonnull BlockModel blockModel);
+  void removeBlockModel(
+      @Nonnull
+      BlockModel blockModel
+  );
 }

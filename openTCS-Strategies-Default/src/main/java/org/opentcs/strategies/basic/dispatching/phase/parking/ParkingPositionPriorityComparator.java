@@ -7,16 +7,18 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Comparator;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Point;
 
 /**
  * Compares parking positions by their priorities.
  */
 public class ParkingPositionPriorityComparator
-    implements Comparator<Point> {
+    implements
+      Comparator<Point> {
 
   /**
    * A function computing the priority of a parking position.

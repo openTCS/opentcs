@@ -7,20 +7,21 @@
  */
 package org.opentcs.kernel.peripherals;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.common.peripherals.NullPeripheralCommAdapterDescription;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.data.model.Location;
@@ -58,12 +59,14 @@ class PeripheralAttachmentManagerTest {
     commAdapterFactory = mock(PeripheralCommAdapterFactory.class);
     peripheralEntryPool = new PeripheralEntryPool(peripheralService, commAdapterRegistry);
     attachmentManager = spy(
-        new PeripheralAttachmentManager(peripheralService,
-                                        mock(LocalPeripheralControllerPool.class),
-                                        commAdapterRegistry,
-                                        peripheralEntryPool,
-                                        mock(EventHandler.class),
-                                        mock(KernelApplicationConfiguration.class))
+        new PeripheralAttachmentManager(
+            peripheralService,
+            mock(LocalPeripheralControllerPool.class),
+            commAdapterRegistry,
+            peripheralEntryPool,
+            mock(EventHandler.class),
+            mock(KernelApplicationConfiguration.class)
+        )
     );
 
     location = createLocation(LOCATION_NAME);
@@ -82,8 +85,10 @@ class PeripheralAttachmentManagerTest {
     attachmentManager.initialize();
 
     assertThat(peripheralEntryPool.getEntries().size(), is(1));
-    assertThat(peripheralEntryPool.getEntryFor(location.getReference()).getCommAdapter(),
-               is(instanceOf(NullPeripheralCommAdapter.class)));
+    assertThat(
+        peripheralEntryPool.getEntryFor(location.getReference()).getCommAdapter(),
+        is(instanceOf(NullPeripheralCommAdapter.class))
+    );
   }
 
   @Test
@@ -98,10 +103,14 @@ class PeripheralAttachmentManagerTest {
     attachmentManager.attachAdapterToLocation(location.getReference(), description);
 
     assertNotNull(peripheralEntryPool.getEntryFor(location.getReference()));
-    assertThat(peripheralEntryPool.getEntryFor(location.getReference()).getCommAdapter(),
-               is(commAdapter));
-    assertThat(peripheralEntryPool.getEntryFor(location.getReference()).getCommAdapterFactory(),
-               is(commAdapterFactory));
+    assertThat(
+        peripheralEntryPool.getEntryFor(location.getReference()).getCommAdapter(),
+        is(commAdapter)
+    );
+    assertThat(
+        peripheralEntryPool.getEntryFor(location.getReference()).getCommAdapterFactory(),
+        is(commAdapterFactory)
+    );
   }
 
   @Test
@@ -112,10 +121,14 @@ class PeripheralAttachmentManagerTest {
     attachmentManager.initialize();
 
     assertNotNull(peripheralEntryPool.getEntryFor(location.getReference()));
-    assertThat(peripheralEntryPool.getEntryFor(location.getReference()).getCommAdapter(),
-               is(instanceOf(SimpleCommAdapter.class)));
-    assertThat(peripheralEntryPool.getEntryFor(location.getReference()).getCommAdapterFactory(),
-               is(factory));
+    assertThat(
+        peripheralEntryPool.getEntryFor(location.getReference()).getCommAdapter(),
+        is(instanceOf(SimpleCommAdapter.class))
+    );
+    assertThat(
+        peripheralEntryPool.getEntryFor(location.getReference()).getCommAdapterFactory(),
+        is(factory)
+    );
   }
 
   @Test
@@ -125,8 +138,10 @@ class PeripheralAttachmentManagerTest {
         = attachmentManager.getAttachmentInformation(location.getReference());
 
     assertThat(result.getLocationReference(), is(location.getReference()));
-    assertThat(result.getAttachedCommAdapter(),
-               is(instanceOf(NullPeripheralCommAdapterDescription.class)));
+    assertThat(
+        result.getAttachedCommAdapter(),
+        is(instanceOf(NullPeripheralCommAdapterDescription.class))
+    );
   }
 
   private Location createLocation(String locationName) {
@@ -135,7 +150,8 @@ class PeripheralAttachmentManagerTest {
   }
 
   private class SimpleCommAdapter
-      implements PeripheralCommAdapter {
+      implements
+        PeripheralCommAdapter {
 
     private final PeripheralProcessModel processModel;
 
@@ -193,7 +209,8 @@ class PeripheralAttachmentManagerTest {
   }
 
   private class SimpleCommAdapterFactory
-      implements PeripheralCommAdapterFactory {
+      implements
+        PeripheralCommAdapterFactory {
 
     @Override
     public void initialize() {
@@ -226,7 +243,8 @@ class PeripheralAttachmentManagerTest {
   }
 
   private class SimpleCommAdapterDescription
-      extends PeripheralCommAdapterDescription {
+      extends
+        PeripheralCommAdapterDescription {
 
     @Override
     public String getDescription() {

@@ -13,6 +13,7 @@ import org.github.gestalt.config.source.ConfigSource;
  * A supplementary source providing configuration overrides.
  */
 public interface SupplementaryConfigSource
-    extends ConfigSource {
+    extends
+      ConfigSource {
 
 }

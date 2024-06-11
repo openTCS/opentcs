@@ -7,8 +7,9 @@
  */
 package org.opentcs.modeleditor.application.action.draw;
 
-import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
+
+import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -26,7 +27,8 @@ import org.opentcs.guing.common.util.ImageDirectory;
  * This action manages the behaviour when the user selects the point button.
  */
 public class DefaultPointSelectedAction
-    extends AbstractSelectedAction {
+    extends
+      AbstractSelectedAction {
 
   /**
    * The SelectionProperty contains all point types in the model.
@@ -58,10 +60,12 @@ public class DefaultPointSelectedAction
    * @param popupButton The popup button
    * @param group The button group
    */
-  public DefaultPointSelectedAction(DrawingEditor editor,
-                                    Tool tool,
-                                    JPopupButton popupButton,
-                                    ButtonGroup group) {
+  public DefaultPointSelectedAction(
+      DrawingEditor editor,
+      Tool tool,
+      JPopupButton popupButton,
+      ButtonGroup group
+  ) {
     super(editor);
     this.tool = requireNonNull(tool);
     this.popupButton = requireNonNull(popupButton);
@@ -81,11 +85,13 @@ public class DefaultPointSelectedAction
    * @param group The button group
    */
   @SuppressWarnings("this-escape")
-  public DefaultPointSelectedAction(DrawingEditor editor,
-                                    Tool tool,
-                                    PointModel.Type pointType,
-                                    JPopupButton popupButton,
-                                    ButtonGroup group) {
+  public DefaultPointSelectedAction(
+      DrawingEditor editor,
+      Tool tool,
+      PointModel.Type pointType,
+      JPopupButton popupButton,
+      ButtonGroup group
+  ) {
     super(editor);
     this.pointType = requireNonNull(pointType);
     this.tool = requireNonNull(tool);

@@ -49,25 +49,40 @@ public class OrderReservationPool {
    * @param orderRef A reference to the transport order.
    * @return <code>true</code> if, and only if, there is a reservation.
    */
-  public boolean isReserved(@Nonnull TCSObjectReference<TransportOrder> orderRef) {
+  public boolean isReserved(
+      @Nonnull
+      TCSObjectReference<TransportOrder> orderRef
+  ) {
     return reservations.containsKey(orderRef);
   }
 
-  public void addReservation(@Nonnull TCSObjectReference<TransportOrder> orderRef,
-                             @Nonnull TCSObjectReference<Vehicle> vehicleRef) {
+  public void addReservation(
+      @Nonnull
+      TCSObjectReference<TransportOrder> orderRef,
+      @Nonnull
+      TCSObjectReference<Vehicle> vehicleRef
+  ) {
     reservations.put(orderRef, vehicleRef);
   }
 
-  public void removeReservation(@Nonnull TCSObjectReference<TransportOrder> orderRef) {
+  public void removeReservation(
+      @Nonnull
+      TCSObjectReference<TransportOrder> orderRef
+  ) {
     reservations.remove(orderRef);
   }
 
-  public void removeReservations(@Nonnull TCSObjectReference<Vehicle> vehicleRef) {
+  public void removeReservations(
+      @Nonnull
+      TCSObjectReference<Vehicle> vehicleRef
+  ) {
     reservations.values().removeIf(value -> vehicleRef.equals(value));
   }
 
   public List<TCSObjectReference<TransportOrder>> findReservations(
-      @Nonnull TCSObjectReference<Vehicle> vehicleRef) {
+      @Nonnull
+      TCSObjectReference<Vehicle> vehicleRef
+  ) {
     return reservations.entrySet().stream()
         .filter(entry -> vehicleRef.equals(entry.getValue()))
         .map(entry -> entry.getKey())

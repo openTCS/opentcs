@@ -7,18 +7,7 @@
  */
 package org.opentcs.data.order;
 
-import jakarta.annotation.Nonnull;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import static java.util.Objects.requireNonNull;
-import org.opentcs.data.ObjectHistory;
-import org.opentcs.data.TCSObject;
-import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Vehicle;
 import static org.opentcs.data.order.OrderSequenceHistoryCodes.SEQUENCE_COMPLETED;
 import static org.opentcs.data.order.OrderSequenceHistoryCodes.SEQUENCE_CREATED;
 import static org.opentcs.data.order.OrderSequenceHistoryCodes.SEQUENCE_FINISHED;
@@ -26,6 +15,18 @@ import static org.opentcs.data.order.OrderSequenceHistoryCodes.SEQUENCE_ORDER_AP
 import static org.opentcs.data.order.OrderSequenceHistoryCodes.SEQUENCE_PROCESSING_VEHICLE_CHANGED;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkInRange;
+
+import jakarta.annotation.Nonnull;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.opentcs.data.ObjectHistory;
+import org.opentcs.data.TCSObject;
+import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Vehicle;
 
 /**
  * Describes a process spanning multiple {@link TransportOrder}s which are to be executed
@@ -53,8 +54,10 @@ import static org.opentcs.util.Assertions.checkInRange;
  * </ul>
  */
 public class OrderSequence
-    extends TCSObject<OrderSequence>
-    implements Serializable {
+    extends
+      TCSObject<OrderSequence>
+    implements
+      Serializable {
 
   /**
    * The type of this order sequence.
@@ -100,9 +103,11 @@ public class OrderSequence
    * @param name This sequence's name.
    */
   public OrderSequence(String name) {
-    super(name,
-          new HashMap<>(),
-          new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(SEQUENCE_CREATED)));
+    super(
+        name,
+        new HashMap<>(),
+        new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(SEQUENCE_CREATED))
+    );
     this.type = OrderConstants.TYPE_NONE;
     this.orders = List.of();
     this.finishedIndex = -1;
@@ -113,17 +118,19 @@ public class OrderSequence
     this.processingVehicle = null;
   }
 
-  private OrderSequence(String name,
-                        Map<String, String> properties,
-                        ObjectHistory history,
-                        String type,
-                        TCSObjectReference<Vehicle> intendedVehicle,
-                        List<TCSObjectReference<TransportOrder>> orders,
-                        int finishedIndex,
-                        boolean complete,
-                        boolean failureFatal,
-                        boolean finished,
-                        TCSObjectReference<Vehicle> processingVehicle) {
+  private OrderSequence(
+      String name,
+      Map<String, String> properties,
+      ObjectHistory history,
+      String type,
+      TCSObjectReference<Vehicle> intendedVehicle,
+      List<TCSObjectReference<TransportOrder>> orders,
+      int finishedIndex,
+      boolean complete,
+      boolean failureFatal,
+      boolean finished,
+      TCSObjectReference<Vehicle> processingVehicle
+  ) {
     super(name, properties, history);
     this.type = requireNonNull(type, "type");
     this.intendedVehicle = intendedVehicle;
@@ -137,62 +144,70 @@ public class OrderSequence
 
   @Override
   public OrderSequence withProperty(String key, String value) {
-    return new OrderSequence(getName(),
-                             propertiesWith(key, value),
-                             getHistory(),
-                             type,
-                             intendedVehicle,
-                             orders,
-                             finishedIndex,
-                             complete,
-                             failureFatal,
-                             finished,
-                             processingVehicle);
+    return new OrderSequence(
+        getName(),
+        propertiesWith(key, value),
+        getHistory(),
+        type,
+        intendedVehicle,
+        orders,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        processingVehicle
+    );
   }
 
   @Override
   public OrderSequence withProperties(Map<String, String> properties) {
-    return new OrderSequence(getName(),
-                             properties,
-                             getHistory(),
-                             type,
-                             intendedVehicle,
-                             orders,
-                             finishedIndex,
-                             complete,
-                             failureFatal,
-                             finished,
-                             processingVehicle);
+    return new OrderSequence(
+        getName(),
+        properties,
+        getHistory(),
+        type,
+        intendedVehicle,
+        orders,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        processingVehicle
+    );
   }
 
   @Override
   public TCSObject<OrderSequence> withHistoryEntry(ObjectHistory.Entry entry) {
-    return new OrderSequence(getName(),
-                             getProperties(),
-                             getHistory().withEntryAppended(entry),
-                             type,
-                             intendedVehicle,
-                             orders,
-                             finishedIndex,
-                             complete,
-                             failureFatal,
-                             finished,
-                             processingVehicle);
+    return new OrderSequence(
+        getName(),
+        getProperties(),
+        getHistory().withEntryAppended(entry),
+        type,
+        intendedVehicle,
+        orders,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        processingVehicle
+    );
   }
 
   @Override
   public TCSObject<OrderSequence> withHistory(ObjectHistory history) {
-    return new OrderSequence(getName(),
-                             getProperties(),
-                             history,
-                             type,
-                             intendedVehicle,
-                             orders,
-                             finishedIndex,
-                             complete,
-                             failureFatal,
-                             finished,
-                             processingVehicle);
+    return new OrderSequence(
+        getName(),
+        getProperties(),
+        history,
+        type,
+        intendedVehicle,
+        orders,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        processingVehicle
+    );
   }
 
   /**
@@ -212,17 +227,19 @@ public class OrderSequence
    * @return A copy of this object, differing in the given value.
    */
   public OrderSequence withType(String type) {
-    return new OrderSequence(getName(),
-                             getProperties(),
-                             getHistory(),
-                             type,
-                             intendedVehicle,
-                             orders,
-                             finishedIndex,
-                             complete,
-                             failureFatal,
-                             finished,
-                             processingVehicle);
+    return new OrderSequence(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        intendedVehicle,
+        orders,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        processingVehicle
+    );
   }
 
   /**
@@ -244,17 +261,19 @@ public class OrderSequence
     checkArgument(!complete, "Sequence complete, cannot add order");
     checkArgument(!orders.contains(order), "Sequence already contains order %s", order);
 
-    return new OrderSequence(getName(),
-                             getProperties(),
-                             historyForAppendedOrder(order),
-                             type,
-                             intendedVehicle,
-                             ordersWithAppended(order),
-                             finishedIndex,
-                             complete,
-                             failureFatal,
-                             finished,
-                             processingVehicle);
+    return new OrderSequence(
+        getName(),
+        getProperties(),
+        historyForAppendedOrder(order),
+        type,
+        intendedVehicle,
+        ordersWithAppended(order),
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        processingVehicle
+    );
   }
 
   /**
@@ -299,17 +318,19 @@ public class OrderSequence
   public OrderSequence withFinishedIndex(int finishedIndex) {
     checkInRange(finishedIndex, 0, orders.size() - 1, "finishedIndex");
 
-    return new OrderSequence(getName(),
-                             getProperties(),
-                             getHistory(),
-                             type,
-                             intendedVehicle,
-                             orders,
-                             finishedIndex,
-                             complete,
-                             failureFatal,
-                             finished,
-                             processingVehicle);
+    return new OrderSequence(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        intendedVehicle,
+        orders,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        processingVehicle
+    );
   }
 
   /**
@@ -330,17 +351,19 @@ public class OrderSequence
    * @return A copy of this object, differing in the given value.
    */
   public OrderSequence withComplete(boolean complete) {
-    return new OrderSequence(getName(),
-                             getProperties(),
-                             historyForComplete(complete),
-                             type,
-                             intendedVehicle,
-                             orders,
-                             finishedIndex,
-                             complete,
-                             failureFatal,
-                             finished,
-                             processingVehicle);
+    return new OrderSequence(
+        getName(),
+        getProperties(),
+        historyForComplete(complete),
+        type,
+        intendedVehicle,
+        orders,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        processingVehicle
+    );
   }
 
   /**
@@ -363,17 +386,19 @@ public class OrderSequence
    * @return A copy of this object, differing in the given value.
    */
   public OrderSequence withFinished(boolean finished) {
-    return new OrderSequence(getName(),
-                             getProperties(),
-                             historyForFinished(finished),
-                             type,
-                             intendedVehicle,
-                             orders,
-                             finishedIndex,
-                             complete,
-                             failureFatal,
-                             finished,
-                             processingVehicle);
+    return new OrderSequence(
+        getName(),
+        getProperties(),
+        historyForFinished(finished),
+        type,
+        intendedVehicle,
+        orders,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        processingVehicle
+    );
   }
 
   /**
@@ -395,17 +420,19 @@ public class OrderSequence
    * @return A copy of this object, differing in the given value.
    */
   public OrderSequence withFailureFatal(boolean failureFatal) {
-    return new OrderSequence(getName(),
-                             getProperties(),
-                             getHistory(),
-                             type,
-                             intendedVehicle,
-                             orders,
-                             finishedIndex,
-                             complete,
-                             failureFatal,
-                             finished,
-                             processingVehicle);
+    return new OrderSequence(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        intendedVehicle,
+        orders,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        processingVehicle
+    );
   }
 
   /**
@@ -427,17 +454,19 @@ public class OrderSequence
    * @return A copy of this object, differing in the given value.
    */
   public OrderSequence withIntendedVehicle(TCSObjectReference<Vehicle> intendedVehicle) {
-    return new OrderSequence(getName(),
-                             getProperties(),
-                             getHistory(),
-                             type,
-                             intendedVehicle,
-                             orders,
-                             finishedIndex,
-                             complete,
-                             failureFatal,
-                             finished,
-                             processingVehicle);
+    return new OrderSequence(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        intendedVehicle,
+        orders,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        processingVehicle
+    );
   }
 
   /**
@@ -458,21 +487,25 @@ public class OrderSequence
    * @return A copy of this object, differing in the given value.
    */
   public OrderSequence withProcessingVehicle(TCSObjectReference<Vehicle> processingVehicle) {
-    return new OrderSequence(getName(),
-                             getProperties(),
-                             historyForNewProcessingVehicle(processingVehicle),
-                             type,
-                             intendedVehicle,
-                             orders,
-                             finishedIndex,
-                             complete,
-                             failureFatal,
-                             finished,
-                             processingVehicle);
+    return new OrderSequence(
+        getName(),
+        getProperties(),
+        historyForNewProcessingVehicle(processingVehicle),
+        type,
+        intendedVehicle,
+        orders,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        processingVehicle
+    );
   }
 
   private List<TCSObjectReference<TransportOrder>> ordersWithAppended(
-      @Nonnull TCSObjectReference<TransportOrder> order) {
+      @Nonnull
+      TCSObjectReference<TransportOrder> order
+  ) {
     List<TCSObjectReference<TransportOrder>> result = new ArrayList<>(orders.size() + 1);
     result.addAll(orders);
     result.add(order);
@@ -481,29 +514,35 @@ public class OrderSequence
 
   private ObjectHistory historyForNewProcessingVehicle(TCSObjectReference<Vehicle> ref) {
     return getHistory().withEntryAppended(
-        new ObjectHistory.Entry(SEQUENCE_PROCESSING_VEHICLE_CHANGED,
-                                ref == null ? "" : ref.getName())
+        new ObjectHistory.Entry(
+            SEQUENCE_PROCESSING_VEHICLE_CHANGED,
+            ref == null ? "" : ref.getName()
+        )
     );
   }
 
   private ObjectHistory historyForAppendedOrder(TCSObjectReference<TransportOrder> ref) {
     return getHistory().withEntryAppended(
-        new ObjectHistory.Entry(SEQUENCE_ORDER_APPENDED,
-                                ref == null ? "" : ref.getName())
+        new ObjectHistory.Entry(
+            SEQUENCE_ORDER_APPENDED,
+            ref == null ? "" : ref.getName()
+        )
     );
   }
 
   private ObjectHistory historyForFinished(boolean finished) {
     return finished
         ? getHistory().withEntryAppended(
-            new ObjectHistory.Entry(SEQUENCE_FINISHED))
+            new ObjectHistory.Entry(SEQUENCE_FINISHED)
+        )
         : getHistory();
   }
 
   private ObjectHistory historyForComplete(boolean complete) {
     return complete
         ? getHistory().withEntryAppended(
-            new ObjectHistory.Entry(SEQUENCE_COMPLETED))
+            new ObjectHistory.Entry(SEQUENCE_COMPLETED)
+        )
         : getHistory();
   }
 }

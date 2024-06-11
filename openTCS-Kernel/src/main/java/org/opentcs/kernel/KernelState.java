@@ -8,6 +8,7 @@
 package org.opentcs.kernel;
 
 import static java.util.Objects.requireNonNull;
+
 import org.opentcs.access.Kernel.State;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.kernel.persistence.ModelPersister;
@@ -18,7 +19,8 @@ import org.opentcs.kernel.workingset.PlantModelManager;
  * behaviour.
  */
 public abstract class KernelState
-    implements Lifecycle {
+    implements
+      Lifecycle {
 
   /**
    * A global object to be used for synchronization within the kernel.
@@ -40,9 +42,11 @@ public abstract class KernelState
    * @param plantModelManager The plant model manager to be used.
    * @param modelPersister The model persister to be used.
    */
-  public KernelState(Object globalSyncObject,
-                     PlantModelManager plantModelManager,
-                     ModelPersister modelPersister) {
+  public KernelState(
+      Object globalSyncObject,
+      PlantModelManager plantModelManager,
+      ModelPersister modelPersister
+  ) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.plantModelManager = requireNonNull(plantModelManager, "plantModelManager");
     this.modelPersister = requireNonNull(modelPersister, "modelPersister");

@@ -7,9 +7,10 @@
  */
 package org.opentcs.strategies.basic.peripherals.dispatching.phase;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.components.kernel.services.InternalPeripheralJobService;
@@ -26,7 +27,8 @@ import org.opentcs.strategies.basic.peripherals.dispatching.PeripheralDispatcher
  * Finishes withdrawals of peripheral jobs after their related transport order has failed.
  */
 public class FinishWithdrawalsPhase
-    implements PeripheralDispatcherPhase {
+    implements
+      PeripheralDispatcherPhase {
 
   /**
    * The object service.
@@ -46,10 +48,16 @@ public class FinishWithdrawalsPhase
   private boolean initialized;
 
   @Inject
-  public FinishWithdrawalsPhase(@Nonnull TCSObjectService objectService,
-                                @Nonnull InternalPeripheralService peripheralService,
-                                @Nonnull InternalPeripheralJobService peripheralJobService,
-                                @Nonnull PeripheralControllerPool controllerPool) {
+  public FinishWithdrawalsPhase(
+      @Nonnull
+      TCSObjectService objectService,
+      @Nonnull
+      InternalPeripheralService peripheralService,
+      @Nonnull
+      InternalPeripheralJobService peripheralJobService,
+      @Nonnull
+      PeripheralControllerPool controllerPool
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.peripheralService = requireNonNull(peripheralService, "peripheralService");
     this.peripheralJobService = requireNonNull(peripheralJobService, "peripheralJobService");
@@ -82,8 +90,10 @@ public class FinishWithdrawalsPhase
     // Get all non-final peripheral jobs that are related to a transport order, and if their
     // transport order is marked as FAILED, abort them.
     Set<PeripheralJob> jobs
-        = objectService.fetchObjects(PeripheralJob.class,
-                                     this::isRelatedToTransportOrderAndNotInFinalState);
+        = objectService.fetchObjects(
+            PeripheralJob.class,
+            this::isRelatedToTransportOrderAndNotInFinalState
+        );
 
     Set<TCSObjectReference<TransportOrder>> failedOrderRefs
         = jobs.stream()
@@ -106,8 +116,10 @@ public class FinishWithdrawalsPhase
   private void abortJob(PeripheralJob job) {
     if (job.getState() == PeripheralJob.State.BEING_PROCESSED) {
       controllerPool.getPeripheralController(job.getPeripheralOperation().getLocation()).abortJob();
-      peripheralService.updatePeripheralProcState(job.getPeripheralOperation().getLocation(),
-                                                  PeripheralInformation.ProcState.IDLE);
+      peripheralService.updatePeripheralProcState(
+          job.getPeripheralOperation().getLocation(),
+          PeripheralInformation.ProcState.IDLE
+      );
       peripheralService.updatePeripheralJob(job.getPeripheralOperation().getLocation(), null);
     }
 

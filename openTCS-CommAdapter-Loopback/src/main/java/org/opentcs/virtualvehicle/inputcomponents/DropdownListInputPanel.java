@@ -7,9 +7,10 @@
  */
 package org.opentcs.virtualvehicle.inputcomponents;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collections;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.function.Function;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ListCellRenderer;
@@ -24,7 +25,8 @@ import javax.swing.ListCellRenderer;
  * @param <E> Type of the elements in the dropdown list
  */
 public final class DropdownListInputPanel<E>
-    extends InputPanel {
+    extends
+      InputPanel {
 
   /**
    * Create a new panel.
@@ -45,6 +47,7 @@ public final class DropdownListInputPanel<E>
     input = comboBox.isEditable() ? comboBox.getEditor().getItem() : comboBox.getSelectedItem();
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
@@ -96,6 +99,7 @@ public final class DropdownListInputPanel<E>
   private javax.swing.JLabel messageLabel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   /**
    * See {@link InputPanel.Builder}.
@@ -103,7 +107,8 @@ public final class DropdownListInputPanel<E>
    * @param <E> Type of the elements in the dropdown list
    */
   public static class Builder<E>
-      implements InputPanel.Builder {
+      implements
+        InputPanel.Builder {
 
     /**
      * The panel's title.
@@ -163,7 +168,8 @@ public final class DropdownListInputPanel<E>
       if (editable) {
         EditableComboBoxEditor<E> editor = new EditableComboBoxEditor<>(
             Collections.unmodifiableList(panel.getValidationListeners()),
-            panel.comboBox, selectionRepresenter);
+            panel.comboBox, selectionRepresenter
+        );
         panel.comboBox.setEditor(editor);
         model.addListDataListener(editor);
       }

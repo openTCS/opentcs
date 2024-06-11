@@ -19,7 +19,8 @@ import org.opentcs.guing.common.model.SystemModel;
  * equivalent and delegates them to the respective other one.
  */
 public interface ProcessAdapter
-    extends Serializable {
+    extends
+      Serializable {
 
   /**
    * Reads the current properties from the kernel and adopts these for the model object.
@@ -31,10 +32,12 @@ public interface ProcessAdapter
    * other model components as well.
    * @param tcsObject The kernel's object.
    */
-  void updateModelProperties(TCSObject<?> tcsObject,
-                             ModelComponent modelComponent,
-                             SystemModel systemModel,
-                             TCSObjectService objectService);
+  void updateModelProperties(
+      TCSObject<?> tcsObject,
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      TCSObjectService objectService
+  );
 
   /**
    * Reads the current properties from the model component and adopts these for the kernel object.
@@ -46,7 +49,9 @@ public interface ProcessAdapter
    * @return A new transfer object, describing the plant model data with the model component's data
    * merged.
    */
-  PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
-                                         SystemModel systemModel,
-                                         PlantModelCreationTO plantModel);
+  PlantModelCreationTO storeToPlantModel(
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      PlantModelCreationTO plantModel
+  );
 }

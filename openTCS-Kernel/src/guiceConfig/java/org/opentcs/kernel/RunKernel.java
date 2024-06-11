@@ -69,11 +69,13 @@ public class RunKernel {
    */
   private static Module customConfigurationModule() {
     List<KernelInjectionModule> defaultModules
-        = Arrays.asList(new DefaultKernelInjectionModule(),
-                        new DefaultDispatcherModule(),
-                        new DefaultRouterModule(),
-                        new DefaultSchedulerModule(),
-                        new DefaultPeripheralJobDispatcherModule());
+        = Arrays.asList(
+            new DefaultKernelInjectionModule(),
+            new DefaultDispatcherModule(),
+            new DefaultRouterModule(),
+            new DefaultSchedulerModule(),
+            new DefaultPeripheralJobDispatcherModule()
+        );
 
     ConfigurationBindingProvider bindingProvider = configurationBindingProvider();
     for (KernelInjectionModule defaultModule : defaultModules) {
@@ -90,12 +92,15 @@ public class RunKernel {
    * @return The registered/found modules.
    */
   private static List<KernelInjectionModule> findRegisteredModules(
-      ConfigurationBindingProvider bindingProvider) {
+      ConfigurationBindingProvider bindingProvider
+  ) {
     List<KernelInjectionModule> registeredModules = new ArrayList<>();
     for (KernelInjectionModule module : ServiceLoader.load(KernelInjectionModule.class)) {
-      LOG.info("Integrating injection module {} (source: {})",
-               module.getClass().getName(),
-               module.getClass().getProtectionDomain().getCodeSource());
+      LOG.info(
+          "Integrating injection module {} (source: {})",
+          module.getClass().getName(),
+          module.getClass().getProtectionDomain().getCodeSource()
+      );
       module.setConfigBindingProvider(bindingProvider);
       registeredModules.add(module);
     }
@@ -114,17 +119,23 @@ public class RunKernel {
 
   private static ConfigurationBindingProvider gestaltConfigurationBindingProvider() {
     return new GestaltConfigurationBindingProvider(
-        Paths.get(System.getProperty("opentcs.base", "."),
-                  "config",
-                  "opentcs-kernel-defaults-baseline.properties")
+        Paths.get(
+            System.getProperty("opentcs.base", "."),
+            "config",
+            "opentcs-kernel-defaults-baseline.properties"
+        )
             .toAbsolutePath(),
-        Paths.get(System.getProperty("opentcs.base", "."),
-                  "config",
-                  "opentcs-kernel-defaults-custom.properties")
+        Paths.get(
+            System.getProperty("opentcs.base", "."),
+            "config",
+            "opentcs-kernel-defaults-custom.properties"
+        )
             .toAbsolutePath(),
-        Paths.get(System.getProperty("opentcs.home", "."),
-                  "config",
-                  "opentcs-kernel.properties")
+        Paths.get(
+            System.getProperty("opentcs.home", "."),
+            "config",
+            "opentcs-kernel.properties"
+        )
             .toAbsolutePath()
     );
   }

@@ -29,6 +29,9 @@ public interface MapperComponentsFactory {
    * @param excludeLockedPaths Whether locked paths should be excluded from mapping.
    * @return A {@link PathEdgeMapper}.
    */
-  PathEdgeMapper createPathEdgeMapper(@Nonnull EdgeEvaluator edgeEvaluator,
-                                      boolean excludeLockedPaths);
+  PathEdgeMapper createPathEdgeMapper(
+      @Nonnull
+      EdgeEvaluator edgeEvaluator,
+      boolean excludeLockedPaths
+  );
 }

@@ -23,7 +23,8 @@ import org.opentcs.util.event.SimpleEventBus;
  * A Guice configuration module for this package.
  */
 public class ExchangeInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.

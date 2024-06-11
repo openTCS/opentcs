@@ -13,7 +13,8 @@ import com.google.inject.AbstractModule;
  * A Guice module for this package.
  */
 public class DialogsInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.

@@ -7,6 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.assignment.priorization;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.theInstance;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,9 +19,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.theInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -96,8 +97,10 @@ class CompositeOrderCandidateComparatorTest {
     String deadlineKey = "BY_DEADLINE";
     Mockito.when(configuration.orderCandidatePriorities())
         .thenReturn(List.of(deadlineKey));
-    availableComparators.put(deadlineKey,
-                             new CandidateComparatorByDeadline());
+    availableComparators.put(
+        deadlineKey,
+        new CandidateComparatorByDeadline()
+    );
     comparator = new CompositeOrderCandidateComparator(configuration, availableComparators);
 
     AssignmentCandidate candidate1 = candidateWithNameCreationtimeAndDeadline("AA", 3, 20);
@@ -124,22 +127,28 @@ class CompositeOrderCandidateComparatorTest {
     return new AssignmentCandidate(new Vehicle("Vehicle1"), trasportOrder, buildPlainDriveOrders());
   }
 
-  private AssignmentCandidate candidateWithNameAndCreationtime(String ordername,
-                                                               long creationTime) {
+  private AssignmentCandidate candidateWithNameAndCreationtime(
+      String ordername,
+      long creationTime
+  ) {
     TransportOrder trasportOrder = new TransportOrder(ordername, new ArrayList<>())
         .withCreationTime(Instant.ofEpochMilli(creationTime));
     return new AssignmentCandidate(new Vehicle("Vehicle1"), trasportOrder, buildPlainDriveOrders());
   }
 
-  private AssignmentCandidate candidateWithNameCreationtimeAndDeadline(String ordername,
-                                                                       long creationTime,
-                                                                       long deadline) {
+  private AssignmentCandidate candidateWithNameCreationtimeAndDeadline(
+      String ordername,
+      long creationTime,
+      long deadline
+  ) {
     TransportOrder trasportOrder = new TransportOrder(ordername, new ArrayList<>())
         .withCreationTime(Instant.ofEpochMilli(creationTime))
         .withDeadline(Instant.ofEpochMilli(deadline));
-    return new AssignmentCandidate(new Vehicle("Vehicle1"),
-                                   trasportOrder,
-                                   buildPlainDriveOrders());
+    return new AssignmentCandidate(
+        new Vehicle("Vehicle1"),
+        trasportOrder,
+        buildPlainDriveOrders()
+    );
   }
 
   private List<DriveOrder> buildPlainDriveOrders() {

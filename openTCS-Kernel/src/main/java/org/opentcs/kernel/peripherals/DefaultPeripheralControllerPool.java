@@ -7,16 +7,17 @@
  */
 package org.opentcs.kernel.peripherals;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapter;
 import org.opentcs.drivers.peripherals.PeripheralController;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,8 @@ import org.slf4j.LoggerFactory;
  * {@link PeripheralCommAdapter}.
  */
 public class DefaultPeripheralControllerPool
-    implements LocalPeripheralControllerPool {
+    implements
+      LocalPeripheralControllerPool {
 
   /**
    * This class's logger.
@@ -55,8 +57,10 @@ public class DefaultPeripheralControllerPool
    * @param controllerFactory The controller factory to be used.
    */
   @Inject
-  public DefaultPeripheralControllerPool(TCSObjectService objectService,
-                                         PeripheralControllerFactory controllerFactory) {
+  public DefaultPeripheralControllerPool(
+      TCSObjectService objectService,
+      PeripheralControllerFactory controllerFactory
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.controllerFactory = requireNonNull(controllerFactory, "controllerFactory");
   }
@@ -95,16 +99,20 @@ public class DefaultPeripheralControllerPool
   public PeripheralController getPeripheralController(TCSResourceReference<Location> locationRef)
       throws IllegalArgumentException {
     requireNonNull(locationRef, "locationRef");
-    checkArgument(poolEntries.containsKey(locationRef),
-                  "No controller present for %s",
-                  locationRef.getName());
+    checkArgument(
+        poolEntries.containsKey(locationRef),
+        "No controller present for %s",
+        locationRef.getName()
+    );
 
     return poolEntries.get(locationRef).getController();
   }
 
   @Override
-  public void attachPeripheralController(TCSResourceReference<Location> locationRef,
-                                         PeripheralCommAdapter commAdapter)
+  public void attachPeripheralController(
+      TCSResourceReference<Location> locationRef,
+      PeripheralCommAdapter commAdapter
+  )
       throws IllegalArgumentException {
     requireNonNull(locationRef, "locationRef");
     requireNonNull(commAdapter, "commAdapter");
@@ -118,8 +126,10 @@ public class DefaultPeripheralControllerPool
     checkArgument(location != null, "No such location: %s", locationRef.getName());
 
     LOG.debug("{}: Attaching controller...", locationRef.getName());
-    PeripheralController controller = controllerFactory.createPeripheralController(locationRef,
-                                                                                   commAdapter);
+    PeripheralController controller = controllerFactory.createPeripheralController(
+        locationRef,
+        commAdapter
+    );
     poolEntries.put(locationRef, new PoolEntry(locationRef, controller, commAdapter));
     controller.initialize();
   }
@@ -162,9 +172,11 @@ public class DefaultPeripheralControllerPool
      * @param controller The peripheral controller associated with the location.
      * @param cmmmAdapter The comm adapter associated with the location.
      */
-    private PoolEntry(TCSResourceReference<Location> location,
-                      PeripheralController controller,
-                      PeripheralCommAdapter cmmmAdapter) {
+    private PoolEntry(
+        TCSResourceReference<Location> location,
+        PeripheralController controller,
+        PeripheralCommAdapter cmmmAdapter
+    ) {
       this.location = requireNonNull(location, "location");
       this.controller = requireNonNull(controller, "controller");
       this.commAdapter = requireNonNull(cmmmAdapter, "cmmmAdapter");

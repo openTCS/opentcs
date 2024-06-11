@@ -30,7 +30,8 @@ import javax.swing.plaf.basic.BasicComboPopup;
  * </p>
  */
 public class BoundsPopupMenuListener
-    implements PopupMenuListener {
+    implements
+      PopupMenuListener {
 
   /**
    * The scrollpane of the combobox.

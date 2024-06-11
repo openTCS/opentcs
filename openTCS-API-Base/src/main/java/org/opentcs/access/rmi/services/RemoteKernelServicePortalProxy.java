@@ -7,19 +7,7 @@
  */
 package org.opentcs.access.rmi.services;
 
-import jakarta.annotation.Nonnull;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.util.List;
 import static java.util.Objects.requireNonNull;
-import java.util.function.Predicate;
-import org.opentcs.access.CredentialsException;
-import org.opentcs.access.Kernel;
-import org.opentcs.access.KernelRuntimeException;
-import org.opentcs.access.KernelServicePortal;
-import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_DISPATCHER_SERVICE;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_KERNEL_CLIENT_PORTAL;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_NOTIFICATION_SERVICE;
@@ -31,6 +19,19 @@ import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_QUERY_SERV
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_ROUTER_SERVICE;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_TRANSPORT_ORDER_SERVICE;
 import static org.opentcs.access.rmi.services.RegistrationName.REMOTE_VEHICLE_SERVICE;
+
+import jakarta.annotation.Nonnull;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.List;
+import java.util.function.Predicate;
+import org.opentcs.access.CredentialsException;
+import org.opentcs.access.Kernel;
+import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.KernelServicePortal;
+import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
@@ -49,9 +50,11 @@ import org.slf4j.LoggerFactory;
  * The default implementation for the {@link KernelServicePortal}.
  */
 public class RemoteKernelServicePortalProxy
-    extends AbstractRemoteServiceProxy<RemoteKernelServicePortal>
-    implements KernelServicePortal,
-               ServiceListener {
+    extends
+      AbstractRemoteServiceProxy<RemoteKernelServicePortal>
+    implements
+      KernelServicePortal,
+      ServiceListener {
 
   /**
    * This class' logger.
@@ -129,10 +132,15 @@ public class RemoteKernelServicePortalProxy
    * @param eventFilter The event filter to be applied to events on the server side.
    */
   public RemoteKernelServicePortalProxy(
-      @Nonnull String userName,
-      @Nonnull String password,
-      @Nonnull SocketFactoryProvider socketFactoryProvider,
-      @Nonnull Predicate<Object> eventFilter) {
+      @Nonnull
+      String userName,
+      @Nonnull
+      String password,
+      @Nonnull
+      SocketFactoryProvider socketFactoryProvider,
+      @Nonnull
+      Predicate<Object> eventFilter
+  ) {
     this.userName = requireNonNull(userName, "userName");
     this.password = requireNonNull(password, "password");
     this.socketFactoryProvider = requireNonNull(socketFactoryProvider, "socketFactoryProvider");
@@ -150,8 +158,13 @@ public class RemoteKernelServicePortalProxy
   }
 
   @Override
-  public void login(@Nonnull String hostName, int port)
-      throws CredentialsException, ServiceUnavailableException {
+  public void login(
+      @Nonnull
+      String hostName,
+      int port
+  )
+      throws CredentialsException,
+        ServiceUnavailableException {
     requireNonNull(hostName, "hostName");
 
     if (isLoggedIn()) {
@@ -162,9 +175,11 @@ public class RemoteKernelServicePortalProxy
     try {
       // Look up the remote portal with the RMI registry.
       Registry registry
-          = LocateRegistry.getRegistry(hostName,
-                                       port,
-                                       socketFactoryProvider.getClientSocketFactory());
+          = LocateRegistry.getRegistry(
+              hostName,
+              port,
+              socketFactoryProvider.getClientSocketFactory()
+          );
 
       setRemoteService((RemoteKernelServicePortal) registry.lookup(REMOTE_KERNEL_CLIENT_PORTAL));
       // Login and save the client ID.
@@ -177,8 +192,10 @@ public class RemoteKernelServicePortalProxy
     }
     catch (RemoteException | NotBoundException exc) {
       resetServiceLogins();
-      throw new ServiceUnavailableException("Exception logging in with remote kernel client portal",
-                                            exc);
+      throw new ServiceUnavailableException(
+          "Exception logging in with remote kernel client portal",
+          exc
+      );
     }
   }
 
@@ -299,7 +316,8 @@ public class RemoteKernelServicePortalProxy
   }
 
   private void updateServiceLogins(Registry registry)
-      throws RemoteException, NotBoundException {
+      throws RemoteException,
+        NotBoundException {
     plantModelService
         .setClientId(getClientId())
         .setRemoteService((RemotePlantModelService) registry.lookup(REMOTE_PLANT_MODEL_SERVICE))

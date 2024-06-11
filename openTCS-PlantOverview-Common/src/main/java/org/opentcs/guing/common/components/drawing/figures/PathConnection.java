@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.common.components.drawing.figures;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.Color;
@@ -21,7 +23,6 @@ import java.util.EventObject;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.StringJoiner;
 import org.jhotdraw.draw.AttributeKey;
@@ -61,7 +62,8 @@ import org.slf4j.LoggerFactory;
  * A connection between two points.
  */
 public class PathConnection
-    extends SimpleLineConnection {
+    extends
+      SimpleLineConnection {
 
   /**
    * This class's logger.
@@ -115,9 +117,12 @@ public class PathConnection
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public PathConnection(@Assisted PathModel model,
-                        ToolTipTextGenerator textGenerator,
-                        DrawingOptions drawingOptions) {
+  public PathConnection(
+      @Assisted
+      PathModel model,
+      ToolTipTextGenerator textGenerator,
+      DrawingOptions drawingOptions
+  ) {
     super(model);
     this.textGenerator = requireNonNull(textGenerator, "textGenerator");
     this.drawingOptions = requireNonNull(drawingOptions, "drawingOptions");
@@ -172,20 +177,32 @@ public class PathConnection
         cp3 = new Point2D.Double(sp.x + (ep.x - sp.x) * 3 / 6, sp.y + (ep.y - sp.y) * 3 / 6);
         cp4 = new Point2D.Double(sp.x + (ep.x - sp.x) * 4 / 6, sp.y + (ep.y - sp.y) * 4 / 6);
         cp5 = new Point2D.Double(sp.x + (ep.x - sp.x) * 5 / 6, sp.y + (ep.y - sp.y) * 5 / 6);
-        path.add(new BezierPath.Node(BezierPath.C2_MASK,
-                                     sp.x, sp.y, //Current point
-                                     sp.x, sp.y, //Previous point - not in use because of C2_MASK
-                                     cp1.x, cp1.y)); //Next point
+        path.add(
+            new BezierPath.Node(
+                BezierPath.C2_MASK,
+                sp.x, sp.y, //Current point
+                sp.x, sp.y, //Previous point - not in use because of C2_MASK
+                cp1.x, cp1.y
+            )
+        ); //Next point
         //Use cp1 and cp2 to draw between sp and cp3
-        path.add(new BezierPath.Node(BezierPath.C1C2_MASK,
-                                     cp3.x, cp3.y, //Current point
-                                     cp2.x, cp2.y, //Previous point
-                                     cp4.x, cp4.y)); //Next point
+        path.add(
+            new BezierPath.Node(
+                BezierPath.C1C2_MASK,
+                cp3.x, cp3.y, //Current point
+                cp2.x, cp2.y, //Previous point
+                cp4.x, cp4.y
+            )
+        ); //Next point
         //Use cp4 and cp5 to draw between cp3 and ep
-        path.add(new BezierPath.Node(BezierPath.C1_MASK,
-                                     ep.x, ep.y, //Current point
-                                     cp5.x, cp5.y, //Previous point
-                                     ep.x, ep.y)); //Next point - not in use because of C1_MASK
+        path.add(
+            new BezierPath.Node(
+                BezierPath.C1_MASK,
+                ep.x, ep.y, //Current point
+                cp5.x, cp5.y, //Previous point
+                ep.x, ep.y
+            )
+        ); //Next point - not in use because of C1_MASK
       }
       else {
         cp1 = new Point2D.Double(sp.x + (ep.x - sp.x) / 3, sp.y + (ep.y - sp.y) / 3); //point at 1/3
@@ -193,14 +210,22 @@ public class PathConnection
         cp3 = null;
         cp4 = null;
         cp5 = null;
-        path.add(new BezierPath.Node(BezierPath.C2_MASK,
-                                     sp.x, sp.y, //Current point
-                                     sp.x, sp.y, //Previous point - not in use because of C2_MASK
-                                     cp1.x, cp1.y)); //Next point
-        path.add(new BezierPath.Node(BezierPath.C1_MASK,
-                                     ep.x, ep.y, //Current point
-                                     cp2.x, cp2.y, //Previous point
-                                     ep.x, ep.y)); //Next point - not in use because of C1_MASK
+        path.add(
+            new BezierPath.Node(
+                BezierPath.C2_MASK,
+                sp.x, sp.y, //Current point
+                sp.x, sp.y, //Previous point - not in use because of C2_MASK
+                cp1.x, cp1.y
+            )
+        ); //Next point
+        path.add(
+            new BezierPath.Node(
+                BezierPath.C1_MASK,
+                ep.x, ep.y, //Current point
+                cp2.x, cp2.y, //Previous point
+                ep.x, ep.y
+            )
+        ); //Next point - not in use because of C1_MASK
       }
 
       getModel().getPropertyPathControlPoints().markChanged();
@@ -221,14 +246,22 @@ public class PathConnection
     Point2D.Double sp = path.get(0, BezierPath.C0_MASK);
     Point2D.Double ep = path.get(1, BezierPath.C0_MASK);
     path.clear();
-    path.add(new BezierPath.Node(BezierPath.C2_MASK,
-                                 sp.x, sp.y, //Current point
-                                 sp.x, sp.y, //Previous point
-                                 cp1.x, cp1.y)); //Next point
-    path.add(new BezierPath.Node(BezierPath.C1_MASK,
-                                 ep.x, ep.y, //Current point
-                                 cp2.x, cp2.y, //Previous point
-                                 ep.x, ep.y)); //Next point
+    path.add(
+        new BezierPath.Node(
+            BezierPath.C2_MASK,
+            sp.x, sp.y, //Current point
+            sp.x, sp.y, //Previous point
+            cp1.x, cp1.y
+        )
+    ); //Next point
+    path.add(
+        new BezierPath.Node(
+            BezierPath.C1_MASK,
+            ep.x, ep.y, //Current point
+            cp2.x, cp2.y, //Previous point
+            ep.x, ep.y
+        )
+    ); //Next point
   }
 
   /**
@@ -240,11 +273,13 @@ public class PathConnection
    * @param cp4 Control point 4
    * @param cp5 Control point 5
    */
-  public void addControlPoints(Point2D.Double cp1,
-                               Point2D.Double cp2,
-                               Point2D.Double cp3,
-                               Point2D.Double cp4,
-                               Point2D.Double cp5) {
+  public void addControlPoints(
+      Point2D.Double cp1,
+      Point2D.Double cp2,
+      Point2D.Double cp3,
+      Point2D.Double cp4,
+      Point2D.Double cp5
+  ) {
     this.cp1 = cp1;
     this.cp2 = cp2;
     this.cp3 = cp3;
@@ -253,27 +288,43 @@ public class PathConnection
     Point2D.Double sp = path.get(0, BezierPath.C0_MASK);
     Point2D.Double ep = path.get(path.size() - 1, BezierPath.C0_MASK);
     path.clear();
-    path.add(new BezierPath.Node(BezierPath.C2_MASK,
-                                 sp.x, sp.y, //Current point
-                                 sp.x, sp.y, //Previous point
-                                 cp1.x, cp1.y)); //Next point
+    path.add(
+        new BezierPath.Node(
+            BezierPath.C2_MASK,
+            sp.x, sp.y, //Current point
+            sp.x, sp.y, //Previous point
+            cp1.x, cp1.y
+        )
+    ); //Next point
     //Use cp1 and cp2 to draw between sp and cp3
-    path.add(new BezierPath.Node(BezierPath.C1C2_MASK,
-                                 cp3.x, cp3.y, //Current point
-                                 cp2.x, cp2.y, //Previous point
-                                 cp4.x, cp4.y)); //Next point
+    path.add(
+        new BezierPath.Node(
+            BezierPath.C1C2_MASK,
+            cp3.x, cp3.y, //Current point
+            cp2.x, cp2.y, //Previous point
+            cp4.x, cp4.y
+        )
+    ); //Next point
     //Use cp4 and cp5 to draw between cp3 and ep
-    path.add(new BezierPath.Node(BezierPath.C1_MASK,
-                                 ep.x, ep.y, //Current point
-                                 cp5.x, cp5.y, //Previous point
-                                 cp4.x, cp4.y)); //Next point
+    path.add(
+        new BezierPath.Node(
+            BezierPath.C1_MASK,
+            ep.x, ep.y, //Current point
+            cp5.x, cp5.y, //Previous point
+            cp4.x, cp4.y
+        )
+    ); //Next point
     StringProperty sProp = getModel().getPropertyPathControlPoints();
-    sProp.setText(String.format("%d,%d;%d,%d;%d,%d;%d,%d;%d,%d;",
-                                (int) cp1.x, (int) cp1.y,
-                                (int) cp2.x, (int) cp2.y,
-                                (int) cp3.x, (int) cp3.y,
-                                (int) cp4.x, (int) cp4.y,
-                                (int) cp5.x, (int) cp5.y));
+    sProp.setText(
+        String.format(
+            "%d,%d;%d,%d;%d,%d;%d,%d;%d,%d;",
+            (int) cp1.x, (int) cp1.y,
+            (int) cp2.x, (int) cp2.y,
+            (int) cp3.x, (int) cp3.y,
+            (int) cp4.x, (int) cp4.y,
+            (int) cp5.x, (int) cp5.y
+        )
+    );
     sProp.markChanged();
     getModel().propertiesChanged(this);
   }
@@ -389,23 +440,27 @@ public class PathConnection
       if (cp2 != null) {
         if (cp3 != null) {
           // Format: x1,y1;x2,y2;x3,y3;x4,y4;x5,y5
-          sControlPoints = String.format("%d,%d;%d,%d;%d,%d;%d,%d;%d,%d",
-                                         (int) (cp1.x),
-                                         (int) (cp1.y),
-                                         (int) (cp2.x),
-                                         (int) (cp2.y),
-                                         (int) (cp3.x),
-                                         (int) (cp3.y),
-                                         (int) (cp4.x),
-                                         (int) (cp4.y),
-                                         (int) (cp5.x),
-                                         (int) (cp5.y));
+          sControlPoints = String.format(
+              "%d,%d;%d,%d;%d,%d;%d,%d;%d,%d",
+              (int) (cp1.x),
+              (int) (cp1.y),
+              (int) (cp2.x),
+              (int) (cp2.y),
+              (int) (cp3.x),
+              (int) (cp3.y),
+              (int) (cp4.x),
+              (int) (cp4.y),
+              (int) (cp5.x),
+              (int) (cp5.y)
+          );
         }
         else {
           // Format: x1,y1;x2,y2
-          sControlPoints = String.format("%d,%d;%d,%d", (int) (cp1.x),
-                                         (int) (cp1.y), (int) (cp2.x),
-                                         (int) (cp2.y));
+          sControlPoints = String.format(
+              "%d,%d;%d,%d", (int) (cp1.x),
+              (int) (cp1.y), (int) (cp2.x),
+              (int) (cp2.y)
+          );
         }
       }
       else {
@@ -434,8 +489,10 @@ public class PathConnection
     setStartConnector(startConnector);
     setEndConnector(endConnector);
 
-    getModel().setConnectedComponents(start.get(FigureConstants.MODEL),
-                                      end.get(FigureConstants.MODEL));
+    getModel().setConnectedComponents(
+        start.get(FigureConstants.MODEL),
+        end.get(FigureConstants.MODEL)
+    );
   }
 
   /**
@@ -634,14 +691,16 @@ public class PathConnection
   }
 
   private void drawRouteDecoration(Graphics2D g) {
-    for (Map.Entry<VehicleModel, AllocationState> entry
-             : getModel().getAllocationStates().entrySet()) {
+    for (Map.Entry<VehicleModel, AllocationState> entry : getModel().getAllocationStates()
+        .entrySet()) {
       VehicleModel vehicleModel = entry.getKey();
       switch (entry.getValue()) {
         case CLAIMED:
-          drawDecoration(g,
-                         Strokes.PATH_ON_ROUTE,
-                         transparentColor(vehicleModel.getDriveOrderColor(), 70));
+          drawDecoration(
+              g,
+              Strokes.PATH_ON_ROUTE,
+              transparentColor(vehicleModel.getDriveOrderColor(), 70)
+          );
           break;
         case ALLOCATED:
           drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
@@ -650,7 +709,7 @@ public class PathConnection
           drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
           break;
         default:
-        // Don't draw any decoration.
+          // Don't draw any decoration.
       }
     }
   }
@@ -759,8 +818,10 @@ public class PathConnection
   }
 
   private Point2D.Double scaleControlPoint(Point2D.Double p, Origin newScale) {
-    return new Double((p.x * previousOrigin.getScaleX()) / newScale.getScaleX(),
-                      (p.y * previousOrigin.getScaleY()) / newScale.getScaleY());
+    return new Double(
+        (p.x * previousOrigin.getScaleX()) / newScale.getScaleX(),
+        (p.y * previousOrigin.getScaleY()) / newScale.getScaleY()
+    );
   }
 
   private boolean isTupelBezier() {
@@ -870,14 +931,20 @@ public class PathConnection
     }
   }
 
-  private boolean containsDriveOrderDestination(Set<TCSResourceReference<?>> resources,
-                                                VehicleModel vehicle) {
+  private boolean containsDriveOrderDestination(
+      Set<TCSResourceReference<?>> resources,
+      VehicleModel vehicle
+  ) {
     if (vehicle.getDriveOrderDestination() == null) {
       return false;
     }
 
     return resources.stream()
-        .anyMatch(resource -> Objects.equals(resource.getName(),
-                                             vehicle.getDriveOrderDestination().getName()));
+        .anyMatch(
+            resource -> Objects.equals(
+                resource.getName(),
+                vehicle.getDriveOrderDestination().getName()
+            )
+        );
   }
 }

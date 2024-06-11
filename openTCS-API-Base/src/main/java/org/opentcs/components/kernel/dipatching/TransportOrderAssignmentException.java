@@ -7,20 +7,22 @@
  */
 package org.opentcs.components.kernel.dipatching;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * Thrown when a {@link TransportOrder} could not be assigned to a {@link Vehicle}.
  */
 public class TransportOrderAssignmentException
-    extends KernelRuntimeException {
+    extends
+      KernelRuntimeException {
 
   private final TCSObjectReference<TransportOrder> transportOrder;
   private final TCSObjectReference<Vehicle> vehicle;
@@ -35,19 +37,29 @@ public class TransportOrderAssignmentException
    * to the vehicle.
    */
   public TransportOrderAssignmentException(
-      @Nonnull TCSObjectReference<TransportOrder> transportOrder,
-      @Nullable TCSObjectReference<Vehicle> vehicle,
-      @Nonnull TransportOrderAssignmentVeto transportOrderAssignmentVeto) {
-    super("Could not assign transport order '" + transportOrder.getName() + "' to vehicle '"
-        + (vehicle != null ? vehicle.getName() : "null") + "': "
-        + transportOrderAssignmentVeto.name());
+      @Nonnull
+      TCSObjectReference<TransportOrder> transportOrder,
+      @Nullable
+      TCSObjectReference<Vehicle> vehicle,
+      @Nonnull
+      TransportOrderAssignmentVeto transportOrderAssignmentVeto
+  ) {
+    super(
+        "Could not assign transport order '" + transportOrder.getName() + "' to vehicle '"
+            + (vehicle != null ? vehicle.getName() : "null") + "': "
+            + transportOrderAssignmentVeto.name()
+    );
     // This exception is reasonable only for actual assignment vetos.
-    checkArgument(transportOrderAssignmentVeto != TransportOrderAssignmentVeto.NO_VETO,
-                  "Invalid assignment veto for exception: " + transportOrderAssignmentVeto);
+    checkArgument(
+        transportOrderAssignmentVeto != TransportOrderAssignmentVeto.NO_VETO,
+        "Invalid assignment veto for exception: " + transportOrderAssignmentVeto
+    );
     this.transportOrder = requireNonNull(transportOrder, "transportOrder");
     this.vehicle = vehicle;
-    this.transportOrderAssignmentVeto = requireNonNull(transportOrderAssignmentVeto,
-                                                       "transportOrderAssignmentVeto");
+    this.transportOrderAssignmentVeto = requireNonNull(
+        transportOrderAssignmentVeto,
+        "transportOrderAssignmentVeto"
+    );
   }
 
   /**

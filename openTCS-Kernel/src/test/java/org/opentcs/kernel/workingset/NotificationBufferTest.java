@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.notification.UserNotification;
@@ -47,8 +48,10 @@ class NotificationBufferTest {
     notificationBuffer.addNotification(notification2);
     notificationBuffer.addNotification(notification3);
 
-    assertThat(notificationBuffer.getNotifications(null),
-               contains(notification1, notification2, notification3));
+    assertThat(
+        notificationBuffer.getNotifications(null),
+        contains(notification1, notification2, notification3)
+    );
   }
 
   @Test
@@ -60,8 +63,10 @@ class NotificationBufferTest {
     notificationBuffer.addNotification(notification3);
     notificationBuffer.addNotification(notification4);
 
-    assertThat(notificationBuffer.getNotifications(null),
-               contains(notification2, notification3, notification4));
+    assertThat(
+        notificationBuffer.getNotifications(null),
+        contains(notification2, notification3, notification4)
+    );
   }
 
   @Test
@@ -74,8 +79,10 @@ class NotificationBufferTest {
     notificationBuffer.addNotification(notification4);
 
     assertThat(notificationBuffer.getNotifications(null), hasSize(4));
-    assertThat(notificationBuffer.getNotifications(null),
-               contains(notification1, notification2, notification3, notification4));
+    assertThat(
+        notificationBuffer.getNotifications(null),
+        contains(notification1, notification2, notification3, notification4)
+    );
 
     notificationBuffer.setCapacity(2);
 

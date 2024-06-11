@@ -7,18 +7,19 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.visualization.LocationRepresentation;
@@ -67,8 +68,10 @@ class LocationTypeConverterTest {
     assertThat(result.get(0).getAllowedOperations(), contains("O1"));
     assertThat(result.get(0).getAllowedPeripheralOperations(), hasSize(1));
     assertThat(result.get(0).getAllowedPeripheralOperations(), contains("PO1"));
-    assertThat(result.get(0).getLayout().getLocationRepresentation(),
-               is(LocationRepresentation.RECHARGE_ALT_1));
+    assertThat(
+        result.get(0).getLayout().getLocationRepresentation(),
+        is(LocationRepresentation.RECHARGE_ALT_1)
+    );
     assertThat(result.get(0).getProperties(), is(aMapWithSize(1)));
     assertThat(result.get(0).getProperties(), is(propertyMap));
   }
@@ -92,8 +95,10 @@ class LocationTypeConverterTest {
     assertThat(result.get(0).getAllowedOperations(), contains("O1"));
     assertThat(result.get(0).getAllowedPeripheralOperations(), hasSize(1));
     assertThat(result.get(0).getAllowedPeripheralOperations(), contains("PO1"));
-    assertThat(result.get(0).getLayout().getLocationRepresentation(),
-               is(LocationRepresentation.LOAD_TRANSFER_GENERIC.name()));
+    assertThat(
+        result.get(0).getLayout().getLocationRepresentation(),
+        is(LocationRepresentation.LOAD_TRANSFER_GENERIC.name())
+    );
     assertThat(result.get(0).getProperties(), hasSize(1));
     assertThat(result.get(0).getProperties(), is(propertyList));
   }

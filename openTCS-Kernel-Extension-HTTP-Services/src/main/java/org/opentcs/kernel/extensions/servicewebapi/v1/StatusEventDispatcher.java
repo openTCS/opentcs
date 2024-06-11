@@ -7,9 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkInRange;
+
 import jakarta.inject.Inject;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.opentcs.access.Kernel;
@@ -27,7 +29,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.OrderSta
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.PeripheralJobStatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.StatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.VehicleStatusMessage;
-import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;
 import org.slf4j.Logger;
@@ -37,8 +38,9 @@ import org.slf4j.LoggerFactory;
  * Provides descriptions of recent events.
  */
 public class StatusEventDispatcher
-    implements Lifecycle,
-               EventHandler {
+    implements
+      Lifecycle,
+      EventHandler {
 
   /**
    * This class's logger.
@@ -70,8 +72,11 @@ public class StatusEventDispatcher
   private boolean eventCollectingOn;
 
   @Inject
-  public StatusEventDispatcher(ServiceWebApiConfiguration configuration,
-                               @ApplicationEventBus EventSource eventSource) {
+  public StatusEventDispatcher(
+      ServiceWebApiConfiguration configuration,
+      @ApplicationEventBus
+      EventSource eventSource
+  ) {
     this.configuration = requireNonNull(configuration, "configuration");
     this.eventSource = requireNonNull(eventSource, "eventSource");
   }

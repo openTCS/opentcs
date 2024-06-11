@@ -7,6 +7,8 @@
  */
 package org.opentcs.documentation;
 
+import static org.opentcs.util.Assertions.checkArgument;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,7 +18,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import org.opentcs.configuration.ConfigurationEntry;
 import org.opentcs.configuration.ConfigurationPrefix;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,9 +64,11 @@ public class ConfigDocGenerator {
       configurationEntries.add(extractEntry(method, prefix));
     }
 
-    checkArgument(!configurationEntries.isEmpty(),
-                  "No configuration keys in {}.",
-                  clazz.getName());
+    checkArgument(
+        !configurationEntries.isEmpty(),
+        "No configuration keys in {}.",
+        clazz.getName()
+    );
 
     generateFile(outputFilePath, configurationEntries);
   }
@@ -79,12 +82,14 @@ public class ConfigDocGenerator {
   private static Entry extractEntry(Method method, String prefix) {
     ConfigurationEntry annotation = method.getAnnotation(ConfigurationEntry.class);
     checkArgument(annotation != null, "Missing entry annotation at method %s", method.getName());
-    return new Entry(prefix,
-                     method.getName(),
-                     annotation.type(),
-                     changesAppliedWhen(annotation.changesApplied()),
-                     annotation.description(),
-                     annotation.orderKey());
+    return new Entry(
+        prefix,
+        method.getName(),
+        annotation.type(),
+        changesAppliedWhen(annotation.changesApplied()),
+        annotation.description(),
+        annotation.orderKey()
+    );
   }
 
   /**
@@ -93,8 +98,10 @@ public class ConfigDocGenerator {
    * @param outputFilePath The output file path to write to.
    * @param configurationEntries The configuration entries.
    */
-  private static void generateFile(String outputFilePath,
-                                   Collection<Entry> configurationEntries) {
+  private static void generateFile(
+      String outputFilePath,
+      Collection<Entry> configurationEntries
+  ) {
     try (PrintWriter writer = new PrintWriter(new FileWriter(outputFilePath, true))) {
       for (Entry entry : configurationEntries) {
         writeEntry(writer, entry);
@@ -142,7 +149,8 @@ public class ConfigDocGenerator {
    * Describes a configuration entry.
    */
   private static class Entry
-      implements Comparable<Entry> {
+      implements
+        Comparable<Entry> {
 
     /**
      * The prefix of this configuration entry.
@@ -169,12 +177,14 @@ public class ConfigDocGenerator {
      */
     private final String orderKey;
 
-    Entry(String prefix,
-          String name,
-          String type,
-          String changesApplied,
-          String[] description,
-          String orderKey) {
+    Entry(
+        String prefix,
+        String name,
+        String type,
+        String changesApplied,
+        String[] description,
+        String orderKey
+    ) {
       this.prefix = prefix;
       this.name = name;
       this.type = type;

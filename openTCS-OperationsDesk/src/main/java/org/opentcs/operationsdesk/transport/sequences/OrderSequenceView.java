@@ -7,6 +7,8 @@
  */
 package org.opentcs.operationsdesk.transport.sequences;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -14,7 +16,6 @@ import java.awt.Component;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -42,7 +43,8 @@ import org.slf4j.LoggerFactory;
  * Displays an order sequence.
  */
 public class OrderSequenceView
-    extends DialogContent {
+    extends
+      DialogContent {
 
   /**
    * This class's logger.
@@ -74,9 +76,13 @@ public class OrderSequenceView
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public OrderSequenceView(@Assisted OrderSequence sequence,
-                           @Nonnull CompositeObjectHistoryEntryFormatter historyEntryFormatter,
-                           SharedKernelServicePortalProvider portalProvider) {
+  public OrderSequenceView(
+      @Assisted
+      OrderSequence sequence,
+      @Nonnull
+      CompositeObjectHistoryEntryFormatter historyEntryFormatter,
+      SharedKernelServicePortalProvider portalProvider
+  ) {
     this.fOrderSequence = requireNonNull(sequence, "sequence");
     this.historyEntryFormatter = requireNonNull(historyEntryFormatter, "historyEntryFormatter");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
@@ -100,8 +106,10 @@ public class OrderSequenceView
 
   @Override
   public final void initFields() {
-    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
-        .getString("orderSequenceView.title"));
+    setDialogTitle(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
+            .getString("orderSequenceView.title")
+    );
     // Name
     String name = getOrderSequence().getName();
     textFieldName.setText(name);
@@ -157,14 +165,14 @@ public class OrderSequenceView
 
     tableModel.setColumnIdentifiers(
         new String[]{
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
-              .getString(
-                  "orderSequenceView.table_properties.column_propertiesKey.headerText"
-              ),
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
-              .getString(
-                  "orderSequenceView.table_properties.column_propertiesValue.headerText"
-              )
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
+                .getString(
+                    "orderSequenceView.table_properties.column_propertiesKey.headerText"
+                ),
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
+                .getString(
+                    "orderSequenceView.table_properties.column_propertiesValue.headerText"
+                )
         }
     );
     fOrderSequence.getProperties().entrySet().stream()
@@ -181,23 +189,26 @@ public class OrderSequenceView
 
     tableModel.setColumnIdentifiers(
         new String[]{
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
-              .getString("orderSequenceView.table_history.column_timestamp.headerText"),
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
-              .getString("orderSequenceView.table_history.column_event.headerText")
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
+                .getString("orderSequenceView.table_history.column_timestamp.headerText"),
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.OSDETAIL_PATH)
+                .getString("orderSequenceView.table_history.column_event.headerText")
         }
     );
 
     for (ObjectHistory.Entry entry : fOrderSequence.getHistory().getEntries()) {
-      tableModel.addRow(new String[]{
-        TIMESTAMP_FORMAT.format(Date.from(entry.getTimestamp())),
-        historyEntryFormatter.apply(entry).get()
-      });
+      tableModel.addRow(
+          new String[]{
+              TIMESTAMP_FORMAT.format(Date.from(entry.getTimestamp())),
+              historyEntryFormatter.apply(entry).get()
+          }
+      );
     }
 
     return tableModel;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -472,6 +483,7 @@ public class OrderSequenceView
     add(historyPanel, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void checkBoxCompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxCompleteActionPerformed
     ResourceBundleUtil bundle
@@ -498,6 +510,7 @@ public class OrderSequenceView
     }
   }//GEN-LAST:event_checkBoxCompleteActionPerformed
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox checkBoxComplete;
@@ -527,12 +540,14 @@ public class OrderSequenceView
   private javax.swing.JTable transportOrdersTable;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   /**
    * A cell renderer that adds a tool tip with the cell's value.
    */
   private static class ToolTipCellRenderer
-      extends DefaultTableCellRenderer {
+      extends
+        DefaultTableCellRenderer {
 
     /**
      * Creates a new instance.
@@ -541,18 +556,22 @@ public class OrderSequenceView
     }
 
     @Override
-    public Component getTableCellRendererComponent(JTable table,
-                                                   Object value,
-                                                   boolean isSelected,
-                                                   boolean hasFocus,
-                                                   int row,
-                                                   int column) {
-      Component component = super.getTableCellRendererComponent(table,
-                                                                value,
-                                                                isSelected,
-                                                                hasFocus,
-                                                                row,
-                                                                column);
+    public Component getTableCellRendererComponent(
+        JTable table,
+        Object value,
+        boolean isSelected,
+        boolean hasFocus,
+        int row,
+        int column
+    ) {
+      Component component = super.getTableCellRendererComponent(
+          table,
+          value,
+          isSelected,
+          hasFocus,
+          row,
+          column
+      );
 
       ((JComponent) component).setToolTipText(value.toString());
 

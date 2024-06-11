@@ -25,7 +25,8 @@ import org.opentcs.guing.common.util.ModelComponentFactory;
  * to provide a more efficient lookup of components by name.
  */
 public class CachedSystemModel
-    extends StandardSystemModel {
+    extends
+      StandardSystemModel {
 
   /**
    * A map from component name to the actual component.

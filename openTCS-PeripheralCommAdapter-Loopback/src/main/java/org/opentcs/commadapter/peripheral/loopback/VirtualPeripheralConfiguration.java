@@ -25,6 +25,7 @@ public interface VirtualPeripheralConfiguration {
       type = "Boolean",
       description = "Whether to enable to register/enable the peripheral loopback driver.",
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
-      orderKey = "0_enable")
+      orderKey = "0_enable"
+  )
   boolean enable();
 }

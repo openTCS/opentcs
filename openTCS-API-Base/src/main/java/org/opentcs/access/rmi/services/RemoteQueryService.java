@@ -28,7 +28,8 @@ import org.opentcs.components.kernel.services.QueryService;
  * </p>
  */
 public interface RemoteQueryService
-    extends Remote {
+    extends
+      Remote {
 
   // CHECKSTYLE:OFF
   <T> T query(ClientID clientId, Query<T> query)

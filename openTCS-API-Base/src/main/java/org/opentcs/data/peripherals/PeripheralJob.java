@@ -7,27 +7,30 @@
  */
 package org.opentcs.data.peripherals;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.data.peripherals.PeripheralJobHistoryCodes.JOB_CREATED;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
-import static org.opentcs.data.peripherals.PeripheralJobHistoryCodes.JOB_CREATED;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * Represents a job that is to be processed by a peripheral device.
  */
 public class PeripheralJob
-    extends TCSObject<PeripheralJob>
-    implements Serializable {
+    extends
+      TCSObject<PeripheralJob>
+    implements
+      Serializable {
 
   /**
    * A token that may be used to reserve a peripheral device.
@@ -79,31 +82,40 @@ public class PeripheralJob
    * @param reservationToken The reservation token to be used.
    * @param peripheralOperation The operation to be performed.
    */
-  public PeripheralJob(@Nonnull String name,
-                       @Nonnull String reservationToken,
-                       @Nonnull PeripheralOperation peripheralOperation) {
-    this(name,
-         new HashMap<>(),
-         new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(JOB_CREATED)),
-         reservationToken,
-         null,
-         null,
-         peripheralOperation,
-         State.TO_BE_PROCESSED,
-         Instant.now(),
-         Instant.MAX);
+  public PeripheralJob(
+      @Nonnull
+      String name,
+      @Nonnull
+      String reservationToken,
+      @Nonnull
+      PeripheralOperation peripheralOperation
+  ) {
+    this(
+        name,
+        new HashMap<>(),
+        new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(JOB_CREATED)),
+        reservationToken,
+        null,
+        null,
+        peripheralOperation,
+        State.TO_BE_PROCESSED,
+        Instant.now(),
+        Instant.MAX
+    );
   }
 
-  private PeripheralJob(String objectName,
-                        Map<String, String> properties,
-                        ObjectHistory history,
-                        String reservationToken,
-                        TCSObjectReference<Vehicle> relatedVehicle,
-                        TCSObjectReference<TransportOrder> transportOrder,
-                        PeripheralOperation peripheralOperation,
-                        State state,
-                        Instant creationTime,
-                        Instant finishedTime) {
+  private PeripheralJob(
+      String objectName,
+      Map<String, String> properties,
+      ObjectHistory history,
+      String reservationToken,
+      TCSObjectReference<Vehicle> relatedVehicle,
+      TCSObjectReference<TransportOrder> transportOrder,
+      PeripheralOperation peripheralOperation,
+      State state,
+      Instant creationTime,
+      Instant finishedTime
+  ) {
     super(objectName, properties, history);
     this.reservationToken = requireNonNull(reservationToken, "reservationToken");
     checkArgument(!reservationToken.isEmpty(), "reservationToken may not be empty.");
@@ -117,58 +129,66 @@ public class PeripheralJob
 
   @Override
   public PeripheralJob withProperty(String key, String value) {
-    return new PeripheralJob(getName(),
-                             propertiesWith(key, value),
-                             getHistory(),
-                             reservationToken,
-                             relatedVehicle,
-                             relatedTransportOrder,
-                             peripheralOperation,
-                             state,
-                             creationTime,
-                             finishedTime);
+    return new PeripheralJob(
+        getName(),
+        propertiesWith(key, value),
+        getHistory(),
+        reservationToken,
+        relatedVehicle,
+        relatedTransportOrder,
+        peripheralOperation,
+        state,
+        creationTime,
+        finishedTime
+    );
   }
 
   @Override
   public PeripheralJob withProperties(Map<String, String> properties) {
-    return new PeripheralJob(getName(),
-                             properties,
-                             getHistory(),
-                             reservationToken,
-                             relatedVehicle,
-                             relatedTransportOrder,
-                             peripheralOperation,
-                             state,
-                             creationTime,
-                             finishedTime);
+    return new PeripheralJob(
+        getName(),
+        properties,
+        getHistory(),
+        reservationToken,
+        relatedVehicle,
+        relatedTransportOrder,
+        peripheralOperation,
+        state,
+        creationTime,
+        finishedTime
+    );
   }
 
   @Override
   public PeripheralJob withHistoryEntry(ObjectHistory.Entry entry) {
-    return new PeripheralJob(getName(),
-                             getProperties(),
-                             getHistory().withEntryAppended(entry),
-                             reservationToken,
-                             relatedVehicle,
-                             relatedTransportOrder,
-                             peripheralOperation,
-                             state,
-                             creationTime,
-                             finishedTime);
+    return new PeripheralJob(
+        getName(),
+        getProperties(),
+        getHistory().withEntryAppended(entry),
+        reservationToken,
+        relatedVehicle,
+        relatedTransportOrder,
+        peripheralOperation,
+        state,
+        creationTime,
+        finishedTime
+    );
   }
 
   @Override
   public PeripheralJob withHistory(ObjectHistory history) {
-    return new PeripheralJob(getName(),
-                             getProperties(),
-                             history,
-                             reservationToken,
-                             relatedVehicle,
-                             relatedTransportOrder,
-                             peripheralOperation,
-                             state,
-                             creationTime,
-                             finishedTime);
+    return new PeripheralJob(
+        getName(),
+        getProperties(),
+        history,
+        reservationToken,
+        relatedVehicle,
+        relatedTransportOrder,
+        peripheralOperation,
+        state,
+        creationTime,
+        finishedTime
+    );
   }
 
   /**
@@ -187,16 +207,18 @@ public class PeripheralJob
    * @return A copy of this object, differing in the given value.
    */
   public PeripheralJob withReservationToken(String reservationToken) {
-    return new PeripheralJob(getName(),
-                             getProperties(),
-                             getHistory(),
-                             reservationToken,
-                             relatedVehicle,
-                             relatedTransportOrder,
-                             peripheralOperation,
-                             state,
-                             creationTime,
-                             finishedTime);
+    return new PeripheralJob(
+        getName(),
+        getProperties(),
+        getHistory(),
+        reservationToken,
+        relatedVehicle,
+        relatedTransportOrder,
+        peripheralOperation,
+        state,
+        creationTime,
+        finishedTime
+    );
   }
 
   /**
@@ -215,16 +237,18 @@ public class PeripheralJob
    * @return A copy of this object, differing in the given value.
    */
   public PeripheralJob withRelatedVehicle(TCSObjectReference<Vehicle> relatedVehicle) {
-    return new PeripheralJob(getName(),
-                             getProperties(),
-                             getHistory(),
-                             reservationToken,
-                             relatedVehicle,
-                             relatedTransportOrder,
-                             peripheralOperation,
-                             state,
-                             creationTime,
-                             finishedTime);
+    return new PeripheralJob(
+        getName(),
+        getProperties(),
+        getHistory(),
+        reservationToken,
+        relatedVehicle,
+        relatedTransportOrder,
+        peripheralOperation,
+        state,
+        creationTime,
+        finishedTime
+    );
   }
 
   /**
@@ -243,17 +267,20 @@ public class PeripheralJob
    * @return A copy of this object, differing in the given value.
    */
   public PeripheralJob withRelatedTransportOrder(
-      TCSObjectReference<TransportOrder> relatedTransportOrder) {
-    return new PeripheralJob(getName(),
-                             getProperties(),
-                             getHistory(),
-                             reservationToken,
-                             relatedVehicle,
-                             relatedTransportOrder,
-                             peripheralOperation,
-                             state,
-                             creationTime,
-                             finishedTime);
+      TCSObjectReference<TransportOrder> relatedTransportOrder
+  ) {
+    return new PeripheralJob(
+        getName(),
+        getProperties(),
+        getHistory(),
+        reservationToken,
+        relatedVehicle,
+        relatedTransportOrder,
+        peripheralOperation,
+        state,
+        creationTime,
+        finishedTime
+    );
   }
 
   /**
@@ -272,16 +299,18 @@ public class PeripheralJob
    * @return A copy of this object, differing in the given value.
    */
   public PeripheralJob withPeripheralOperation(PeripheralOperation peripheralOperation) {
-    return new PeripheralJob(getName(),
-                             getProperties(),
-                             getHistory(),
-                             reservationToken,
-                             relatedVehicle,
-                             relatedTransportOrder,
-                             peripheralOperation,
-                             state,
-                             creationTime,
-                             finishedTime);
+    return new PeripheralJob(
+        getName(),
+        getProperties(),
+        getHistory(),
+        reservationToken,
+        relatedVehicle,
+        relatedTransportOrder,
+        peripheralOperation,
+        state,
+        creationTime,
+        finishedTime
+    );
   }
 
   /**
@@ -301,16 +330,18 @@ public class PeripheralJob
    */
   public PeripheralJob withState(State state) {
     // XXX Finished time should probably not be set implicitly.
-    return new PeripheralJob(getName(),
-                             getProperties(),
-                             getHistory(),
-                             reservationToken,
-                             relatedVehicle,
-                             relatedTransportOrder,
-                             peripheralOperation,
-                             state,
-                             creationTime,
-                             state == State.FINISHED ? Instant.now() : finishedTime);
+    return new PeripheralJob(
+        getName(),
+        getProperties(),
+        getHistory(),
+        reservationToken,
+        relatedVehicle,
+        relatedTransportOrder,
+        peripheralOperation,
+        state,
+        creationTime,
+        state == State.FINISHED ? Instant.now() : finishedTime
+    );
   }
 
   /**
@@ -329,16 +360,18 @@ public class PeripheralJob
    * @return A copy of this object, differing in the given value.
    */
   public PeripheralJob withCreationTime(Instant creationTime) {
-    return new PeripheralJob(getName(),
-                             getProperties(),
-                             getHistory(),
-                             reservationToken,
-                             relatedVehicle,
-                             relatedTransportOrder,
-                             peripheralOperation,
-                             state,
-                             creationTime,
-                             finishedTime);
+    return new PeripheralJob(
+        getName(),
+        getProperties(),
+        getHistory(),
+        reservationToken,
+        relatedVehicle,
+        relatedTransportOrder,
+        peripheralOperation,
+        state,
+        creationTime,
+        finishedTime
+    );
   }
 
   /**
@@ -357,16 +390,18 @@ public class PeripheralJob
    * @return A copy of this object, differing in the given value.
    */
   public PeripheralJob withFinishedTime(Instant finishedTime) {
-    return new PeripheralJob(getName(),
-                             getProperties(),
-                             getHistory(),
-                             reservationToken,
-                             relatedVehicle,
-                             relatedTransportOrder,
-                             peripheralOperation,
-                             state,
-                             creationTime,
-                             finishedTime);
+    return new PeripheralJob(
+        getName(),
+        getProperties(),
+        getHistory(),
+        reservationToken,
+        relatedVehicle,
+        relatedTransportOrder,
+        peripheralOperation,
+        state,
+        creationTime,
+        finishedTime
+    );
   }
 
   @Override

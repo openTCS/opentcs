@@ -62,7 +62,8 @@ import org.opentcs.data.model.Vehicle;
  * </p>
  */
 public interface Scheduler
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * The key of a path property defining the direction in which a vehicle is entering a block when
@@ -92,7 +93,12 @@ public interface Scheduler
    * @param resourceSequence The sequence of resources claimed. May be empty to clear the client's
    * claim.
    */
-  void claim(@Nonnull Client client, @Nonnull List<Set<TCSResource<?>>> resourceSequence);
+  void claim(
+      @Nonnull
+      Client client,
+      @Nonnull
+      List<Set<TCSResource<?>>> resourceSequence
+  );
 
   /**
    * Requests allocation of the given resources.
@@ -123,7 +129,12 @@ public interface Scheduler
    * requested resources that have not yet been granted.
    * @see #claim(org.opentcs.components.kernel.Scheduler.Client, java.util.List)
    */
-  void allocate(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources)
+  void allocate(
+      @Nonnull
+      Client client,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  )
       throws IllegalArgumentException;
 
   /**
@@ -138,7 +149,12 @@ public interface Scheduler
    * @return {@code true} if the given resources are safe to be allocated by the given client,
    * otherwise {@code false}.
    */
-  boolean mayAllocateNow(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources);
+  boolean mayAllocateNow(
+      @Nonnull
+      Client client,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  );
 
   /**
    * Informs the scheduler that a set of resources are to be allocated for the given client
@@ -171,7 +187,12 @@ public interface Scheduler
    * @throws ResourceAllocationException If it's impossible to allocate the given set of resources
    * for the given client.
    */
-  void allocateNow(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources)
+  void allocateNow(
+      @Nonnull
+      Client client,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  )
       throws ResourceAllocationException;
 
   /**
@@ -184,7 +205,12 @@ public interface Scheduler
    * @param resources The resources released. Any resources in the given set not allocated by the
    * given client are ignored.
    */
-  void free(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources);
+  void free(
+      @Nonnull
+      Client client,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  );
 
   /**
    * Releases all resources allocated by the given client.
@@ -194,7 +220,10 @@ public interface Scheduler
    *
    * @param client The client.
    */
-  void freeAll(@Nonnull Client client);
+  void freeAll(
+      @Nonnull
+      Client client
+  );
 
   /**
    * Releases all pending resource allocations for the given client.
@@ -204,7 +233,10 @@ public interface Scheduler
    *
    * @param client The client.
    */
-  void clearPendingAllocations(@Nonnull Client client);
+  void clearPendingAllocations(
+      @Nonnull
+      Client client
+  );
 
   /**
    * Explicitly triggers a rescheduling run during which the scheduler tries to allocate resources
@@ -237,9 +269,14 @@ public interface Scheduler
    * @param client The client that requested the preparation/allocation.
    * @param resources The resources that are now prepared for the client.
    */
-  void preparationSuccessful(@Nonnull Module module,
-                             @Nonnull Client client,
-                             @Nonnull Set<TCSResource<?>> resources);
+  void preparationSuccessful(
+      @Nonnull
+      Module module,
+      @Nonnull
+      Client client,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  );
 
   /**
    * Defines callback methods for clients of the resource scheduler.
@@ -272,21 +309,28 @@ public interface Scheduler
      * return value of <code>false</code> indicates this client does not need the given resources
      * (any more), freeing them implicitly, but not restoring any previous claim.
      */
-    boolean allocationSuccessful(@Nonnull Set<TCSResource<?>> resources);
+    boolean allocationSuccessful(
+        @Nonnull
+        Set<TCSResource<?>> resources
+    );
 
     /**
      * Called if it was impossible to allocate a requested set of resources for this client.
      *
      * @param resources The resources which could not be reserved.
      */
-    void allocationFailed(@Nonnull Set<TCSResource<?>> resources);
+    void allocationFailed(
+        @Nonnull
+        Set<TCSResource<?>> resources
+    );
   }
 
   /**
    * A scheduler module.
    */
   interface Module
-      extends Lifecycle {
+      extends
+        Lifecycle {
 
     /**
      * Informs this module about a client's current allocation state.
@@ -295,9 +339,14 @@ public interface Scheduler
      * @param alloc The client's currently allocated resources.
      * @param remainingClaim The client's remaining claim.
      */
-    void setAllocationState(@Nonnull Client client,
-                            @Nonnull Set<TCSResource<?>> alloc,
-                            @Nonnull List<Set<TCSResource<?>>> remainingClaim);
+    void setAllocationState(
+        @Nonnull
+        Client client,
+        @Nonnull
+        Set<TCSResource<?>> alloc,
+        @Nonnull
+        List<Set<TCSResource<?>>> remainingClaim
+    );
 
     /**
      * Checks if the resulting system state is safe if the given set of resources
@@ -308,7 +357,12 @@ public interface Scheduler
      * @return <code>true</code> if this module thinks the given resources may be allocated for the
      * given client.
      */
-    boolean mayAllocate(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources);
+    boolean mayAllocate(
+        @Nonnull
+        Client client,
+        @Nonnull
+        Set<TCSResource<?>> resources
+    );
 
     /**
      * Lets this module prepare the given resources so they can be allocated to a client.
@@ -316,7 +370,12 @@ public interface Scheduler
      * @param client The client the resources are being prepared for.
      * @param resources The resources to be prepared.
      */
-    void prepareAllocation(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources);
+    void prepareAllocation(
+        @Nonnull
+        Client client,
+        @Nonnull
+        Set<TCSResource<?>> resources
+    );
 
     /**
      * Checks if this module is done preparing the given resources for a client.
@@ -325,7 +384,12 @@ public interface Scheduler
      * @param resources The resources to be checked.
      * @return <code>true</code> if the resoruces are prepared for a client.
      */
-    boolean hasPreparedAllocation(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources);
+    boolean hasPreparedAllocation(
+        @Nonnull
+        Client client,
+        @Nonnull
+        Set<TCSResource<?>> resources
+    );
 
     /**
      * Informs this module about resources being fully released by a client.
@@ -333,6 +397,11 @@ public interface Scheduler
      * @param client The client releasing the resources.
      * @param resources The resources being released.
      */
-    void allocationReleased(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources);
+    void allocationReleased(
+        @Nonnull
+        Client client,
+        @Nonnull
+        Set<TCSResource<?>> resources
+    );
   }
 }

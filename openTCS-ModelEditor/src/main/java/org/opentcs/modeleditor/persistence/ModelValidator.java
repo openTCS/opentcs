@@ -7,8 +7,9 @@
  */
 package org.opentcs.modeleditor.persistence;
 
-import com.google.common.base.Strings;
 import static com.google.common.base.Strings.isNullOrEmpty;
+
+import com.google.common.base.Strings;
 import jakarta.inject.Inject;
 import java.awt.Component;
 import java.util.ArrayList;
@@ -102,25 +103,31 @@ public class ModelValidator {
     }
     //Validate the name of the component
     if (Strings.isNullOrEmpty(component.getName())) {
-      errorOccurred(component,
-                    "modelValidator.error_componentNameInvalid.text",
-                    component.getName());
+      errorOccurred(
+          component,
+          "modelValidator.error_componentNameInvalid.text",
+          component.getName()
+      );
       return false;
     }
     if (nameExists(model, component)) {
-      errorOccurred(component,
-                    "modelValidator.error_componentNameExists.text",
-                    component.getName());
+      errorOccurred(
+          component,
+          "modelValidator.error_componentNameExists.text",
+          component.getName()
+      );
       return false;
     }
     //Validate the miscellaneous property of the component
     //TODO: Seems to be optional in some models?!
     KeyValueSetProperty miscellaneous
         = (KeyValueSetProperty) component.getProperty(ModelComponent.MISCELLANEOUS);
-    /*if (miscellaneous == null) {
-     errorOccurred(component, "Miscellaneous key-value-set does not exist.");
-     return false;
-     }*/
+    /*
+     * if (miscellaneous == null) {
+     * errorOccurred(component, "Miscellaneous key-value-set does not exist.");
+     * return false;
+     * }
+     */
     boolean valid = true;
     if (component instanceof LayoutModel) {
     }
@@ -178,9 +185,11 @@ public class ModelValidator {
 
   public String formatDeserializationErrors(ModelComponent component, Collection<String> errors) {
     return ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.VALIDATOR_PATH)
-        .getFormatted("modelValidator.error_deserialization.text",
-                      component.getName(),
-                      errors);
+        .getFormatted(
+            "modelValidator.error_deserialization.text",
+            component.getName(),
+            errors
+        );
   }
 
   /**
@@ -211,18 +220,22 @@ public class ModelValidator {
     AngleProperty orientationProperty
         = (AngleProperty) point.getProperty(PointModel.VEHICLE_ORIENTATION_ANGLE);
     if (!(orientationProperty.getValue() instanceof Double)) {
-      LOG.warn("{}: Orientation angle property ('{}') is not a number. Setting it to 0.",
-               point.getName(),
-               orientationProperty.getValue());
+      LOG.warn(
+          "{}: Orientation angle property ('{}') is not a number. Setting it to 0.",
+          point.getName(),
+          orientationProperty.getValue()
+      );
       orientationProperty.setValueAndUnit(0, AngleProperty.Unit.DEG);
     }
     else {
       Double angle = (Double) orientationProperty.getValue();
       if (angle < 0) {
-        LOG.warn("{}: Orientation angle property is {} but has to be > 0."
-            + " Transforming to positive angle.",
-                 point.getName(),
-                 orientationProperty.getValue());
+        LOG.warn(
+            "{}: Orientation angle property is {} but has to be > 0."
+                + " Transforming to positive angle.",
+            point.getName(),
+            orientationProperty.getValue()
+        );
         orientationProperty.setValueAndUnit(360 + angle % 360, AngleProperty.Unit.DEG);
       }
     }
@@ -244,27 +257,33 @@ public class ModelValidator {
     //Validate the start component of this path
     StringProperty startProperty = (StringProperty) path.getProperty(PathModel.START_COMPONENT);
     if (!nameExists(model, startProperty.getText())) {
-      errorOccurred(model,
-                    "modelValidator.error_pathStartComponentNotExisting.text",
-                    startProperty.getText());
+      errorOccurred(
+          model,
+          "modelValidator.error_pathStartComponentNotExisting.text",
+          startProperty.getText()
+      );
       valid = false;
     }
 
     //Validate the end component of this path
     StringProperty endProperty = (StringProperty) path.getProperty(PathModel.END_COMPONENT);
     if (!nameExists(model, endProperty.getText())) {
-      errorOccurred(model,
-                    "modelValidator.error_pathEndComponentNotExisting.text",
-                    endProperty.getText());
+      errorOccurred(
+          model,
+          "modelValidator.error_pathEndComponentNotExisting.text",
+          endProperty.getText()
+      );
       valid = false;
     }
 
     //Validate the length of the path
     LengthProperty lengthProperty = (LengthProperty) path.getProperty(PathModel.LENGTH);
     if (((Double) lengthProperty.getValue()) < 1) {
-      LOG.warn("{}: Length property is {} but has to be > 0. Setting it to 1.",
-               path.getName(),
-               lengthProperty.getValue());
+      LOG.warn(
+          "{}: Length property is {} but has to be > 0. Setting it to 1.",
+          path.getName(),
+          lengthProperty.getValue()
+      );
       lengthProperty.setValueAndUnit(1, LengthProperty.Unit.MM);
       path.setProperty(PathModel.LENGTH, lengthProperty);
     }
@@ -272,9 +291,11 @@ public class ModelValidator {
     //Validate the max velocity
     SpeedProperty maxVelocityProperty = (SpeedProperty) path.getProperty(PathModel.MAX_VELOCITY);
     if (((Double) maxVelocityProperty.getValue()) < 0) {
-      LOG.warn("{}: Max. velocity property is {} but has to be >= 0. Setting it to 0.",
-               path.getName(),
-               maxVelocityProperty.getValue());
+      LOG.warn(
+          "{}: Max. velocity property is {} but has to be >= 0. Setting it to 0.",
+          path.getName(),
+          maxVelocityProperty.getValue()
+      );
       maxVelocityProperty.setValueAndUnit(0, SpeedProperty.Unit.MM_S);
       path.setProperty(PathModel.MAX_VELOCITY, maxVelocityProperty);
     }
@@ -283,9 +304,11 @@ public class ModelValidator {
     SpeedProperty maxRevVelocityProperty
         = (SpeedProperty) path.getProperty(PathModel.MAX_REVERSE_VELOCITY);
     if (((Double) maxRevVelocityProperty.getValue()) < 0) {
-      LOG.warn("{}: Max. reverse velocity property is {} but has to be >= 0. Setting it to 0.",
-               path.getName(),
-               maxRevVelocityProperty.getValue());
+      LOG.warn(
+          "{}: Max. reverse velocity property is {} but has to be >= 0. Setting it to 0.",
+          path.getName(),
+          maxRevVelocityProperty.getValue()
+      );
       maxRevVelocityProperty.setValueAndUnit(0, SpeedProperty.Unit.MM_S);
       path.setProperty(PathModel.MAX_VELOCITY, maxRevVelocityProperty);
     }
@@ -310,8 +333,10 @@ public class ModelValidator {
         .map(type -> type.getName())
         .anyMatch(typeName -> typeName.equals(locTypeProperty.getValue()));
     if (!locTypeExists) {
-      errorOccurred(location, "modelValidator.error_locationTypeInvalid.text",
-                    locTypeProperty.getValue());
+      errorOccurred(
+          location, "modelValidator.error_locationTypeInvalid.text",
+          locTypeProperty.getValue()
+      );
       valid = false;
     }
 
@@ -331,15 +356,19 @@ public class ModelValidator {
     //Validate whether the start component exists
     StringProperty startProperty = (StringProperty) link.getProperty(LinkModel.START_COMPONENT);
     if (!nameExists(model, startProperty.getText())) {
-      errorOccurred(link, "modelValidator.error_linkStartComponentNotExisting.text",
-                    startProperty.getText());
+      errorOccurred(
+          link, "modelValidator.error_linkStartComponentNotExisting.text",
+          startProperty.getText()
+      );
       valid = false;
     }
     //Validate whether the point exists
     StringProperty endProperty = (StringProperty) link.getProperty(LinkModel.END_COMPONENT);
     if (!nameExists(model, endProperty.getText())) {
-      errorOccurred(link, "modelValidator.error_linkEndComponentNotExisting.text",
-                    endProperty.getText());
+      errorOccurred(
+          link, "modelValidator.error_linkEndComponentNotExisting.text",
+          endProperty.getText()
+      );
       valid = false;
     }
     return valid;
@@ -386,9 +415,11 @@ public class ModelValidator {
     //Validate that all properties needed exist
     LengthProperty lengthProperty = (LengthProperty) vehicle.getProperty(VehicleModel.LENGTH);
     if (((Double) lengthProperty.getValue()) < 1) {
-      LOG.warn("{}: Length property is {} but has to be > 0. Setting it to 1.",
-               vehicle.getName(),
-               lengthProperty.getValue());
+      LOG.warn(
+          "{}: Length property is {} but has to be > 0. Setting it to 1.",
+          vehicle.getName(),
+          lengthProperty.getValue()
+      );
       lengthProperty.setValueAndUnit(1, LengthProperty.Unit.MM);
       vehicle.setProperty(VehicleModel.LENGTH, lengthProperty);
     }
@@ -398,9 +429,11 @@ public class ModelValidator {
         = (PercentProperty) vehicle.getProperty(VehicleModel.ENERGY_LEVEL_CRITICAL);
     if (((int) energyCriticalProperty.getValue()) < 0
         || ((int) energyCriticalProperty.getValue()) > 100) {
-      LOG.warn("{}: Energy level critical is {}, should be in [0..100]. Setting to 0.",
-               vehicle.getName(),
-               energyCriticalProperty.getValue());
+      LOG.warn(
+          "{}: Energy level critical is {}, should be in [0..100]. Setting to 0.",
+          vehicle.getName(),
+          energyCriticalProperty.getValue()
+      );
       energyCriticalProperty.setValueAndUnit(0, PercentProperty.Unit.PERCENT);
       vehicle.setProperty(VehicleModel.ENERGY_LEVEL_CRITICAL, energyCriticalProperty);
     }
@@ -409,23 +442,29 @@ public class ModelValidator {
     PercentProperty energyGoodProperty
         = (PercentProperty) vehicle.getProperty(VehicleModel.ENERGY_LEVEL_GOOD);
     if (((int) energyGoodProperty.getValue()) < 0 || ((int) energyGoodProperty.getValue()) > 100) {
-      LOG.warn("{}: Energy level good is {}, should be in [0..100]. Setting to 100.",
-               vehicle.getName(),
-               energyGoodProperty.getValue());
+      LOG.warn(
+          "{}: Energy level good is {}, should be in [0..100]. Setting to 100.",
+          vehicle.getName(),
+          energyGoodProperty.getValue()
+      );
       energyGoodProperty.setValueAndUnit(100, PercentProperty.Unit.PERCENT);
       vehicle.setProperty(VehicleModel.ENERGY_LEVEL_GOOD, energyGoodProperty);
     }
 
     //Validate that the good energy level is greater equals than the critical energy level
     if (((int) energyGoodProperty.getValue()) < ((int) energyCriticalProperty.getValue())) {
-      LOG.warn("{}: Energy level good ('{}') not >= energy level critical ('{}'). Setting to {}.",
-               vehicle.getName(),
-               energyGoodProperty.getValue(),
-               energyCriticalProperty.getValue(),
-               energyCriticalProperty.getValue());
+      LOG.warn(
+          "{}: Energy level good ('{}') not >= energy level critical ('{}'). Setting to {}.",
+          vehicle.getName(),
+          energyGoodProperty.getValue(),
+          energyCriticalProperty.getValue(),
+          energyCriticalProperty.getValue()
+      );
       energyGoodProperty
-          .setValueAndUnit(energyCriticalProperty.getValueByUnit(PercentProperty.Unit.PERCENT),
-                           PercentProperty.Unit.PERCENT);
+          .setValueAndUnit(
+              energyCriticalProperty.getValueByUnit(PercentProperty.Unit.PERCENT),
+              PercentProperty.Unit.PERCENT
+          );
       vehicle.setProperty(VehicleModel.ENERGY_LEVEL_GOOD, energyGoodProperty);
     }
 
@@ -452,8 +491,10 @@ public class ModelValidator {
     StringProperty currentPointProperty = (StringProperty) vehicle.getProperty(VehicleModel.POINT);
     String currentPoint = currentPointProperty.getText();
     if (!isNullOrEmptyPoint(currentPoint) && !nameExists(model, currentPoint)) {
-      errorOccurred(vehicle, "modelValidator.error_vehicleCurrentPointNotExisting.text",
-                    currentPointProperty.getText());
+      errorOccurred(
+          vehicle, "modelValidator.error_vehicleCurrentPointNotExisting.text",
+          currentPointProperty.getText()
+      );
       valid = false;
     }
     //Validate whether the next point exists
@@ -461,8 +502,10 @@ public class ModelValidator {
         = (StringProperty) vehicle.getProperty(VehicleModel.NEXT_POINT);
     String nextPoint = nextPointProperty.getText();
     if (!isNullOrEmptyPoint(nextPoint) && !nameExists(model, nextPoint)) {
-      errorOccurred(vehicle, "modelValidator.error_vehicleNextPointNotExisting.text",
-                    nextPointProperty.getText());
+      errorOccurred(
+          vehicle, "modelValidator.error_vehicleNextPointNotExisting.text",
+          nextPointProperty.getText()
+      );
       valid = false;
     }
     return valid;

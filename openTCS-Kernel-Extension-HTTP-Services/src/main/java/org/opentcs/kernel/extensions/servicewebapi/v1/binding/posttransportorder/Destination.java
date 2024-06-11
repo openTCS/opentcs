@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.posttransportorder;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
@@ -28,9 +29,16 @@ public class Destination {
 
   @JsonCreator
   public Destination(
-      @Nonnull @JsonProperty(required = true, value = "locationName") String locationName,
-      @Nonnull @JsonProperty(required = true, value = "operation") String operation,
-      @Nullable @JsonProperty(required = false, value = "properties") List<Property> properties) {
+      @Nonnull
+      @JsonProperty(required = true, value = "locationName")
+      String locationName,
+      @Nonnull
+      @JsonProperty(required = true, value = "operation")
+      String operation,
+      @Nullable
+      @JsonProperty(required = false, value = "properties")
+      List<Property> properties
+  ) {
     this.locationName = requireNonNull(locationName, "locationName");
     this.operation = requireNonNull(operation, "operation");
     this.properties = properties;
@@ -44,7 +52,10 @@ public class Destination {
     return locationName;
   }
 
-  public Destination setLocationName(@Nonnull String locationName) {
+  public Destination setLocationName(
+      @Nonnull
+      String locationName
+  ) {
     this.locationName = requireNonNull(locationName, "locationName");
     return this;
   }
@@ -54,7 +65,10 @@ public class Destination {
     return operation;
   }
 
-  public Destination setOperation(@Nonnull String operation) {
+  public Destination setOperation(
+      @Nonnull
+      String operation
+  ) {
     this.operation = requireNonNull(operation, "operation");
     return this;
   }
@@ -64,7 +78,10 @@ public class Destination {
     return properties;
   }
 
-  public Destination setProperties(@Nullable List<Property> properties) {
+  public Destination setProperties(
+      @Nullable
+      List<Property> properties
+  ) {
     this.properties = properties;
     return this;
   }

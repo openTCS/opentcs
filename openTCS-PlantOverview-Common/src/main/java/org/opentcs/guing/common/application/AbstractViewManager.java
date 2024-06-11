@@ -7,11 +7,12 @@
  */
 package org.opentcs.guing.common.application;
 
+import static java.util.Objects.requireNonNull;
+
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.intern.DefaultCommonDockable;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -26,7 +27,8 @@ import org.opentcs.util.event.EventSource;
  * order sequence views.
  */
 public abstract class AbstractViewManager
-    implements ViewManager {
+    implements
+      ViewManager {
 
   /**
    * Where we register event listeners.
@@ -96,8 +98,10 @@ public abstract class AbstractViewManager
    * @param dockable The dockable the scrollPane is wrapped into. Used as the key.
    * @param scrollPane The scroll pane containing the drawing view and rulers.
    */
-  public void addDrawingView(DefaultSingleCDockable dockable,
-                             DrawingViewScrollPane scrollPane) {
+  public void addDrawingView(
+      DefaultSingleCDockable dockable,
+      DrawingViewScrollPane scrollPane
+  ) {
     requireNonNull(dockable, "dockable");
     requireNonNull(scrollPane, "scrollPane");
 

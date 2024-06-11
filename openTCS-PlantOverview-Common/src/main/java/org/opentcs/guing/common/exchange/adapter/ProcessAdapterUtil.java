@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.exchange.adapter;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.LayoutModel;
@@ -34,14 +35,16 @@ public class ProcessAdapterUtil {
   private final VehicleAdapter vehicleAdapter;
 
   @Inject
-  public ProcessAdapterUtil(BlockAdapter blockAdapter,
-                            LayoutAdapter layoutAdapter,
-                            LinkAdapter linkAdapter,
-                            LocationAdapter locationAdapter,
-                            LocationTypeAdapter locationTypeAdapter,
-                            PathAdapter pathAdapter,
-                            PointAdapter pointAdapter,
-                            VehicleAdapter vehicleAdapter) {
+  public ProcessAdapterUtil(
+      BlockAdapter blockAdapter,
+      LayoutAdapter layoutAdapter,
+      LinkAdapter linkAdapter,
+      LocationAdapter locationAdapter,
+      LocationTypeAdapter locationTypeAdapter,
+      PathAdapter pathAdapter,
+      PointAdapter pointAdapter,
+      VehicleAdapter vehicleAdapter
+  ) {
     this.blockAdapter = requireNonNull(blockAdapter, "blockAdapter");
     this.layoutAdapter = requireNonNull(layoutAdapter, "layoutAdapter");
     this.linkAdapter = requireNonNull(linkAdapter, "linkAdapter");

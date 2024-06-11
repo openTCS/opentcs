@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.event;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.util.event.EventHandler;
@@ -19,8 +20,9 @@ import org.slf4j.LoggerFactory;
 /**
  */
 public class EventLogger
-    implements EventHandler,
-               Lifecycle {
+    implements
+      EventHandler,
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -36,7 +38,10 @@ public class EventLogger
   private boolean initialized;
 
   @Inject
-  public EventLogger(@ApplicationEventBus EventSource eventSource) {
+  public EventLogger(
+      @ApplicationEventBus
+      EventSource eventSource
+  ) {
     this.eventSource = requireNonNull(eventSource, "eventSource");
   }
 

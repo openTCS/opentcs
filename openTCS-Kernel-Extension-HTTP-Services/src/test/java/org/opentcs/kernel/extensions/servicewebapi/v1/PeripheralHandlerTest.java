@@ -7,17 +7,18 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import java.util.List;
-import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
+
+import java.util.List;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.mock;
 import org.opentcs.common.peripherals.NullPeripheralCommAdapterDescription;
 import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.data.ObjectUnknownException;
@@ -150,7 +151,8 @@ class PeripheralHandlerTest {
   }
 
   static class MockPeripheralCommAdapterDescription
-      extends PeripheralCommAdapterDescription {
+      extends
+        PeripheralCommAdapterDescription {
 
     @Override
     public String getDescription() {

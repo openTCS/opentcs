@@ -32,7 +32,11 @@ public interface KernelServicePortal {
    * @param port The port at which we can reach the remote RMI registry.
    * @throws KernelRuntimeException If there was a problem logging in with the remote portal.
    */
-  void login(@Nonnull String hostName, int port)
+  void login(
+      @Nonnull
+      String hostName,
+      int port
+  )
       throws KernelRuntimeException;
 
   /**

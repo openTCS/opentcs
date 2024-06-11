@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 import java.util.Set;
 
 /**
@@ -26,7 +27,10 @@ public class LinkTO {
     return pointName;
   }
 
-  public LinkTO setPointName(@Nonnull String pointName) {
+  public LinkTO setPointName(
+      @Nonnull
+      String pointName
+  ) {
     this.pointName = requireNonNull(pointName, "pointName");
     return this;
   }
@@ -36,7 +40,10 @@ public class LinkTO {
     return allowedOperations;
   }
 
-  public LinkTO setAllowedOperations(@Nonnull Set<String> allowedOperations) {
+  public LinkTO setAllowedOperations(
+      @Nonnull
+      Set<String> allowedOperations
+  ) {
     this.allowedOperations = requireNonNull(allowedOperations, "allowedOperations");
     return this;
   }

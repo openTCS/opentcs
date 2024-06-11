@@ -7,12 +7,13 @@
  */
 package org.opentcs.access.to.model;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.Block;
@@ -21,8 +22,10 @@ import org.opentcs.data.model.Block;
  * A transfer object describing a block in the plant model.
  */
 public class BlockCreationTO
-    extends CreationTO
-    implements Serializable {
+    extends
+      CreationTO
+    implements
+      Serializable {
 
   /**
    * This block's type.
@@ -58,11 +61,18 @@ public class BlockCreationTO
    * @param memberNames the names of the block's members.
    * @param properties the properties.
    */
-  private BlockCreationTO(@Nonnull String name,
-                          @Nonnull Map<String, String> properties,
-                          @Nonnull Block.Type type,
-                          @Nonnull Set<String> memberNames,
-                          @Nonnull Layout layout) {
+  private BlockCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      Map<String, String> properties,
+      @Nonnull
+      Block.Type type,
+      @Nonnull
+      Set<String> memberNames,
+      @Nonnull
+      Layout layout
+  ) {
     super(name, properties);
     this.type = requireNonNull(type, "type");
     this.memberNames = requireNonNull(memberNames, "memberNames");
@@ -76,12 +86,17 @@ public class BlockCreationTO
    * @return A copy of this object, differing in the given name.
    */
   @Override
-  public BlockCreationTO withName(@Nonnull String name) {
-    return new BlockCreationTO(name,
-                               getModifiableProperties(),
-                               type,
-                               memberNames,
-                               layout);
+  public BlockCreationTO withName(
+      @Nonnull
+      String name
+  ) {
+    return new BlockCreationTO(
+        name,
+        getModifiableProperties(),
+        type,
+        memberNames,
+        layout
+    );
   }
 
   /**
@@ -91,12 +106,17 @@ public class BlockCreationTO
    * @return A copy of this object, differing in the given properties.
    */
   @Override
-  public BlockCreationTO withProperties(@Nonnull Map<String, String> properties) {
-    return new BlockCreationTO(getName(),
-                               properties,
-                               type,
-                               memberNames,
-                               layout);
+  public BlockCreationTO withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
+    return new BlockCreationTO(
+        getName(),
+        properties,
+        type,
+        memberNames,
+        layout
+    );
   }
 
   /**
@@ -110,12 +130,19 @@ public class BlockCreationTO
    * excludes the entry otherwise.
    */
   @Override
-  public BlockCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new BlockCreationTO(getName(),
-                               propertiesWith(key, value),
-                               type,
-                               memberNames,
-                               layout);
+  public BlockCreationTO withProperty(
+      @Nonnull
+      String key,
+      @Nonnull
+      String value
+  ) {
+    return new BlockCreationTO(
+        getName(),
+        propertiesWith(key, value),
+        type,
+        memberNames,
+        layout
+    );
   }
 
   /**
@@ -134,12 +161,17 @@ public class BlockCreationTO
    * @param type The new type.
    * @return A copy of this object, differing in the given type.
    */
-  public BlockCreationTO withType(@Nonnull Block.Type type) {
-    return new BlockCreationTO(getName(),
-                               getModifiableProperties(),
-                               type,
-                               memberNames,
-                               layout);
+  public BlockCreationTO withType(
+      @Nonnull
+      Block.Type type
+  ) {
+    return new BlockCreationTO(
+        getName(),
+        getModifiableProperties(),
+        type,
+        memberNames,
+        layout
+    );
   }
 
   /**
@@ -158,12 +190,17 @@ public class BlockCreationTO
    * @param memberNames The names of the block's members.
    * @return A copy of this object, differing in the given value.
    */
-  public BlockCreationTO withMemberNames(@Nonnull Set<String> memberNames) {
-    return new BlockCreationTO(getName(),
-                               getModifiableProperties(),
-                               type,
-                               memberNames,
-                               layout);
+  public BlockCreationTO withMemberNames(
+      @Nonnull
+      Set<String> memberNames
+  ) {
+    return new BlockCreationTO(
+        getName(),
+        getModifiableProperties(),
+        type,
+        memberNames,
+        layout
+    );
   }
 
   /**
@@ -182,11 +219,13 @@ public class BlockCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public BlockCreationTO withLayout(Layout layout) {
-    return new BlockCreationTO(getName(),
-                               getModifiableProperties(),
-                               type,
-                               memberNames,
-                               layout);
+    return new BlockCreationTO(
+        getName(),
+        getModifiableProperties(),
+        type,
+        memberNames,
+        layout
+    );
   }
 
   @Override
@@ -204,7 +243,8 @@ public class BlockCreationTO
    * Contains information regarding the grahical representation of a block.
    */
   public static class Layout
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The color in which block elements are to be emphasized.

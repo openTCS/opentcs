@@ -7,18 +7,19 @@
  */
 package org.opentcs.operationsdesk.peripherals.jobs;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +27,10 @@ import org.slf4j.LoggerFactory;
  * A table model for peripheral jobs.
  */
 class PeripheralJobTableModel
-    extends AbstractTableModel
-    implements PeripheralJobsContainerListener {
+    extends
+      AbstractTableModel
+    implements
+      PeripheralJobsContainerListener {
 
   /**
    * The ID for the 'name' column.
@@ -69,25 +72,25 @@ class PeripheralJobTableModel
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[]{
-    BUNDLE.getString("peripheralJobTableModel.column_name.headerText"),
-    BUNDLE.getString("peripheralJobTableModel.column_location.headerText"),
-    BUNDLE.getString("peripheralJobTableModel.column_operation.headerText"),
-    BUNDLE.getString("peripheralJobTableModel.column_relatedVehicle.headerText"),
-    BUNDLE.getString("peripheralJobTableModel.column_relatedTransportOrder.headerText"),
-    BUNDLE.getString("peripheralJobTableModel.column_state.headerText"),
-    BUNDLE.getString("peripheralJobTableModel.column_creationTime.headerText")
+      BUNDLE.getString("peripheralJobTableModel.column_name.headerText"),
+      BUNDLE.getString("peripheralJobTableModel.column_location.headerText"),
+      BUNDLE.getString("peripheralJobTableModel.column_operation.headerText"),
+      BUNDLE.getString("peripheralJobTableModel.column_relatedVehicle.headerText"),
+      BUNDLE.getString("peripheralJobTableModel.column_relatedTransportOrder.headerText"),
+      BUNDLE.getString("peripheralJobTableModel.column_state.headerText"),
+      BUNDLE.getString("peripheralJobTableModel.column_creationTime.headerText")
   };
   /**
    * The column classes.
    */
   private static final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
-    String.class,
-    String.class,
-    String.class,
-    TCSObjectReference.class,
-    TCSObjectReference.class,
-    String.class,
-    Instant.class
+      String.class,
+      String.class,
+      String.class,
+      TCSObjectReference.class,
+      TCSObjectReference.class,
+      String.class,
+      Instant.class
   };
   /**
    * The entries in the table.
@@ -204,10 +207,12 @@ class PeripheralJobTableModel
   }
 
   public PeripheralJob getEntryAt(int index) {
-    checkArgument(index >= 0 && index < entries.size(),
-                  "index must be in 0..%d: %d",
-                  entries.size(),
-                  index);
+    checkArgument(
+        index >= 0 && index < entries.size(),
+        "index must be in 0..%d: %d",
+        entries.size(),
+        index
+    );
     return entries.get(index);
   }
 }

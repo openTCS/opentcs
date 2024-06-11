@@ -7,6 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.assignment.priorization;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.theInstance;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,9 +18,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.theInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -70,12 +71,18 @@ class CompositeOrderComparatorTest {
     comparator = new CompositeOrderComparator(configuration, availableComparators);
 
     Instant creationTime = Instant.now();
-    TransportOrder candidate1 = candidateWithNameAndCreationtime("AA",
-                                                                 creationTime.minusSeconds(1));
-    TransportOrder candidate2 = candidateWithNameAndCreationtime("CC",
-                                                                 creationTime.minusSeconds(2));
-    TransportOrder candidate3 = candidateWithNameAndCreationtime("BB",
-                                                                 creationTime.minusSeconds(2));
+    TransportOrder candidate1 = candidateWithNameAndCreationtime(
+        "AA",
+        creationTime.minusSeconds(1)
+    );
+    TransportOrder candidate2 = candidateWithNameAndCreationtime(
+        "CC",
+        creationTime.minusSeconds(2)
+    );
+    TransportOrder candidate3 = candidateWithNameAndCreationtime(
+        "BB",
+        creationTime.minusSeconds(2)
+    );
 
     List<TransportOrder> list = new ArrayList<>();
     list.add(candidate1);
@@ -94,28 +101,38 @@ class CompositeOrderComparatorTest {
     String deadlineKey = "BY_DEADLINE";
     Mockito.when(configuration.orderPriorities())
         .thenReturn(List.of(deadlineKey));
-    availableComparators.put(deadlineKey,
-                             new TransportOrderComparatorByDeadline());
+    availableComparators.put(
+        deadlineKey,
+        new TransportOrderComparatorByDeadline()
+    );
 
     comparator = new CompositeOrderComparator(configuration, availableComparators);
 
     Instant currentTime = Instant.now();
     TransportOrder candidate1
-        = candidateWithNameCreationtimeAndDeadline("AA",
-                                                   currentTime.minusSeconds(2),//Creation
-                                                   currentTime.plusSeconds(2));//Deadline
+        = candidateWithNameCreationtimeAndDeadline(
+            "AA",
+            currentTime.minusSeconds(2),//Creation
+            currentTime.plusSeconds(2)
+        );//Deadline
     TransportOrder candidate2
-        = candidateWithNameCreationtimeAndDeadline("CC",
-                                                   currentTime.minusSeconds(2),//Creation
-                                                   currentTime.plusSeconds(1));//Deadline
+        = candidateWithNameCreationtimeAndDeadline(
+            "CC",
+            currentTime.minusSeconds(2),//Creation
+            currentTime.plusSeconds(1)
+        );//Deadline
     TransportOrder candidate3
-        = candidateWithNameCreationtimeAndDeadline("BB",
-                                                   currentTime.minusSeconds(2),//Creation
-                                                   currentTime.plusSeconds(2));//Deadline
+        = candidateWithNameCreationtimeAndDeadline(
+            "BB",
+            currentTime.minusSeconds(2),//Creation
+            currentTime.plusSeconds(2)
+        );//Deadline
     TransportOrder candidate4
-        = candidateWithNameCreationtimeAndDeadline("DD",
-                                                   currentTime.minusSeconds(1),//Creation
-                                                   currentTime.plusSeconds(5));//Deadline
+        = candidateWithNameCreationtimeAndDeadline(
+            "DD",
+            currentTime.minusSeconds(1),//Creation
+            currentTime.plusSeconds(5)
+        );//Deadline
 
     List<TransportOrder> list = new ArrayList<>();
     list.add(candidate1);
@@ -131,15 +148,19 @@ class CompositeOrderComparatorTest {
     assertThat(list.get(3), is(theInstance(candidate4)));
   }
 
-  private TransportOrder candidateWithNameAndCreationtime(String ordername,
-                                                          Instant creationTime) {
+  private TransportOrder candidateWithNameAndCreationtime(
+      String ordername,
+      Instant creationTime
+  ) {
     return new TransportOrder(ordername, new ArrayList<>())
         .withCreationTime(creationTime);
   }
 
-  private TransportOrder candidateWithNameCreationtimeAndDeadline(String ordername,
-                                                                  Instant creationTime,
-                                                                  Instant deadline) {
+  private TransportOrder candidateWithNameCreationtimeAndDeadline(
+      String ordername,
+      Instant creationTime,
+      Instant deadline
+  ) {
     return new TransportOrder(ordername, new ArrayList<>())
         .withCreationTime(creationTime)
         .withDeadline(deadline);

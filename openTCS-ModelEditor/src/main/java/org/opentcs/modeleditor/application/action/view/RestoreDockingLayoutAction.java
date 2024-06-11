@@ -15,7 +15,8 @@ import org.opentcs.modeleditor.application.OpenTCSView;
  * Action for resetting the docking layout.
  */
 public class RestoreDockingLayoutAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action's ID.

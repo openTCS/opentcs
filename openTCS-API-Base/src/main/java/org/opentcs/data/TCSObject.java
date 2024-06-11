@@ -7,6 +7,8 @@
  */
 package org.opentcs.data;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.Serializable;
@@ -15,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,8 @@ import java.util.stream.Collectors;
  * @param <E> The actual object class.
  */
 public abstract class TCSObject<E extends TCSObject<E>>
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * A transient reference to this business object.
@@ -57,7 +59,10 @@ public abstract class TCSObject<E extends TCSObject<E>>
    *
    * @param objectName The new object's name.
    */
-  protected TCSObject(@Nonnull String objectName) {
+  protected TCSObject(
+      @Nonnull
+      String objectName
+  ) {
     this(objectName, new HashMap<>(), new ObjectHistory());
   }
 
@@ -69,9 +74,14 @@ public abstract class TCSObject<E extends TCSObject<E>>
    * @param history A history of events related to this object.
    */
   @SuppressWarnings("this-escape")
-  protected TCSObject(@Nonnull String objectName,
-                      @Nonnull Map<String, String> properties,
-                      @Nonnull ObjectHistory history) {
+  protected TCSObject(
+      @Nonnull
+      String objectName,
+      @Nonnull
+      Map<String, String> properties,
+      @Nonnull
+      ObjectHistory history
+  ) {
     this.name = requireNonNull(objectName, "objectName");
     this.properties = mapWithoutNullValues(properties);
     this.propertiesReadOnly = Collections.unmodifiableMap(this.properties);

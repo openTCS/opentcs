@@ -20,15 +20,22 @@ import org.opentcs.common.GuestUserCredentials;
  * @see GuestUserCredentials
  */
 public class DefaultUserAccountProvider
-    implements UserAccountProvider {
+    implements
+      UserAccountProvider {
 
   public DefaultUserAccountProvider() {
   }
 
   @Override
   public Set<UserAccount> getUserAccounts() {
-    return new HashSet<>(Arrays.asList(new UserAccount(GuestUserCredentials.USER,
-                                                       GuestUserCredentials.PASSWORD,
-                                                       EnumSet.allOf(UserPermission.class))));
+    return new HashSet<>(
+        Arrays.asList(
+            new UserAccount(
+                GuestUserCredentials.USER,
+                GuestUserCredentials.PASSWORD,
+                EnumSet.allOf(UserPermission.class)
+            )
+        )
+    );
   }
 }

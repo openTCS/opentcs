@@ -20,14 +20,20 @@ public interface EdgeEvaluator {
    *
    * @param vehicle The vehicle for which the routing graph is computed.
    */
-  void onGraphComputationStart(@Nonnull Vehicle vehicle);
+  void onGraphComputationStart(
+      @Nonnull
+      Vehicle vehicle
+  );
 
   /**
    * Called when/after a computation of a routing graph is done.
    *
    * @param vehicle The vehicle for which the routing graph is computed.
    */
-  void onGraphComputationEnd(@Nonnull Vehicle vehicle);
+  void onGraphComputationEnd(
+      @Nonnull
+      Vehicle vehicle
+  );
 
   /**
    * Computes the weight of an edge in the routing graph.
@@ -39,5 +45,10 @@ public interface EdgeEvaluator {
    * routing.
    * Note that negative weights might not be handled well by the respective routing algorithm used.
    */
-  double computeWeight(@Nonnull Edge edge, @Nonnull Vehicle vehicle);
+  double computeWeight(
+      @Nonnull
+      Edge edge,
+      @Nonnull
+      Vehicle vehicle
+  );
 }

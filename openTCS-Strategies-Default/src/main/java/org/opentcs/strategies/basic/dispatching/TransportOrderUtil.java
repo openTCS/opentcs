@@ -7,11 +7,13 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.Collections;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.Router;
@@ -25,7 +27,6 @@ import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,8 @@ import org.slf4j.LoggerFactory;
  * Provides service functions for working with transport orders and their states.
  */
 public class TransportOrderUtil
-    implements Lifecycle {
+    implements
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -65,11 +67,18 @@ public class TransportOrderUtil
   private boolean initialized;
 
   @Inject
-  public TransportOrderUtil(@Nonnull InternalTransportOrderService transportOrderService,
-                            @Nonnull InternalVehicleService vehicleService,
-                            @Nonnull DefaultDispatcherConfiguration configuration,
-                            @Nonnull Router router,
-                            @Nonnull VehicleControllerPool vehicleControllerPool) {
+  public TransportOrderUtil(
+      @Nonnull
+      InternalTransportOrderService transportOrderService,
+      @Nonnull
+      InternalVehicleService vehicleService,
+      @Nonnull
+      DefaultDispatcherConfiguration configuration,
+      @Nonnull
+      Router router,
+      @Nonnull
+      VehicleControllerPool vehicleControllerPool
+  ) {
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.router = requireNonNull(router, "router");
@@ -125,8 +134,10 @@ public class TransportOrderUtil
     // Check if the transport order is part of an order sequence and if yes,
     // if it's the next unfinished order in the sequence.
     if (order.getWrappingSequence() != null) {
-      OrderSequence seq = transportOrderService.fetchObject(OrderSequence.class,
-                                                            order.getWrappingSequence());
+      OrderSequence seq = transportOrderService.fetchObject(
+          OrderSequence.class,
+          order.getWrappingSequence()
+      );
       if (!order.getReference().equals(seq.getNextUnfinishedOrder())) {
         return true;
       }
@@ -144,12 +155,20 @@ public class TransportOrderUtil
     transportOrderService.fetchObjects(TransportOrder.class).stream()
         .filter(order -> order.hasState(TransportOrder.State.ACTIVE))
         .filter(order -> !hasUnfinishedDependencies(order))
-        .forEach(order -> updateTransportOrderState(order.getReference(),
-                                                    TransportOrder.State.DISPATCHABLE));
+        .forEach(
+            order -> updateTransportOrderState(
+                order.getReference(),
+                TransportOrder.State.DISPATCHABLE
+            )
+        );
   }
 
-  public void updateTransportOrderState(@Nonnull TCSObjectReference<TransportOrder> ref,
-                                        @Nonnull TransportOrder.State newState) {
+  public void updateTransportOrderState(
+      @Nonnull
+      TCSObjectReference<TransportOrder> ref,
+      @Nonnull
+      TransportOrder.State newState
+  ) {
     requireNonNull(ref, "ref");
     requireNonNull(newState, "newState");
 
@@ -176,9 +195,11 @@ public class TransportOrderUtil
    * @param transportOrder The transport order to be processed.
    * @param driveOrders The list of drive orders describing the route for the vehicle.
    */
-  public void assignTransportOrder(Vehicle vehicle,
-                                   TransportOrder transportOrder,
-                                   List<DriveOrder> driveOrders) {
+  public void assignTransportOrder(
+      Vehicle vehicle,
+      TransportOrder transportOrder,
+      List<DriveOrder> driveOrders
+  ) {
     requireNonNull(vehicle, "vehicle");
     requireNonNull(transportOrder, "transportOrder");
     requireNonNull(driveOrders, "driveOrders");
@@ -272,9 +293,11 @@ public class TransportOrderUtil
     requireNonNull(order, "order");
 
     if (order.getState().isFinalState()) {
-      LOG.info("Transport order '{}' already in final state '{}', skipping withdrawal.",
-               order.getName(),
-               order.getState());
+      LOG.info(
+          "Transport order '{}' already in final state '{}', skipping withdrawal.",
+          order.getName(),
+          order.getState()
+      );
       return;
     }
 
@@ -282,9 +305,11 @@ public class TransportOrderUtil
       updateTransportOrderState(order.getReference(), TransportOrder.State.FAILED);
     }
     else {
-      abortAssignedOrder(order,
-                         vehicleService.fetchObject(Vehicle.class, order.getProcessingVehicle()),
-                         immediateAbort);
+      abortAssignedOrder(
+          order,
+          vehicleService.fetchObject(Vehicle.class, order.getProcessingVehicle()),
+          immediateAbort
+      );
     }
   }
 
@@ -317,15 +342,19 @@ public class TransportOrderUtil
    * @param immediateAbort Whether to abort the order immediately instead of
    * just withdrawing it for a smooth abortion.
    */
-  private void abortAssignedOrder(TransportOrder order,
-                                  Vehicle vehicle,
-                                  boolean immediateAbort) {
+  private void abortAssignedOrder(
+      TransportOrder order,
+      Vehicle vehicle,
+      boolean immediateAbort
+  ) {
     requireNonNull(order, "order");
     requireNonNull(vehicle, "vehicle");
-    checkArgument(!order.getState().isFinalState(),
-                  "%s: Order already in final state: %s",
-                  vehicle.getName(),
-                  order.getName());
+    checkArgument(
+        !order.getState().isFinalState(),
+        "%s: Order already in final state: %s",
+        vehicle.getName(),
+        order.getName()
+    );
 
     // Mark the order as withdrawn so we can react appropriately when the
     // vehicle reports the remaining movements as finished.
@@ -357,22 +386,30 @@ public class TransportOrderUtil
 
     // Sanity check: The finished order must be the next one in the sequence.
     osOpt.ifPresent(
-        seq -> checkArgument(ref.equals(seq.getNextUnfinishedOrder()),
-                             "TO %s != next unfinished TO %s in sequence %s",
-                             ref,
-                             seq.getNextUnfinishedOrder(),
-                             seq)
+        seq -> checkArgument(
+            ref.equals(seq.getNextUnfinishedOrder()),
+            "TO %s != next unfinished TO %s in sequence %s",
+            ref,
+            seq.getNextUnfinishedOrder(),
+            seq
+        )
     );
 
     transportOrderService.updateTransportOrderState(ref, TransportOrder.State.FINISHED);
 
     osOpt.ifPresent(seq -> {
-      transportOrderService.updateOrderSequenceFinishedIndex(seq.getReference(),
-                                                             seq.getFinishedIndex() + 1);
+      transportOrderService.updateOrderSequenceFinishedIndex(
+          seq.getReference(),
+          seq.getFinishedIndex() + 1
+      );
 
       // Finish the order sequence, using an up-to-date copy.
-      finishOrderSequence(transportOrderService.fetchObject(OrderSequence.class,
-                                                            seq.getReference()));
+      finishOrderSequence(
+          transportOrderService.fetchObject(
+              OrderSequence.class,
+              seq.getReference()
+          )
+      );
     });
   }
 
@@ -397,23 +434,33 @@ public class TransportOrderUtil
             .map(curRef -> transportOrderService.fetchObject(TransportOrder.class, curRef))
             .filter(o -> !o.getState().isFinalState())
             .forEach(
-                o -> transportOrderService.updateTransportOrderState(o.getReference(),
-                                                                     TransportOrder.State.FAILED)
+                o -> transportOrderService.updateTransportOrderState(
+                    o.getReference(),
+                    TransportOrder.State.FAILED
+                )
             );
         // Move the finished index of the sequence to its end.
-        transportOrderService.updateOrderSequenceFinishedIndex(seq.getReference(),
-                                                               seq.getOrders().size() - 1);
+        transportOrderService.updateOrderSequenceFinishedIndex(
+            seq.getReference(),
+            seq.getOrders().size() - 1
+        );
       }
       else {
         // Since failure of an order in the sequence is not fatal, increment the
         // finished index of the sequence by one to move to the next order.
-        transportOrderService.updateOrderSequenceFinishedIndex(seq.getReference(),
-                                                               seq.getFinishedIndex() + 1);
+        transportOrderService.updateOrderSequenceFinishedIndex(
+            seq.getReference(),
+            seq.getFinishedIndex() + 1
+        );
       }
 
       // Finish the order sequence, using an up-to-date copy.
-      finishOrderSequence(transportOrderService.fetchObject(OrderSequence.class,
-                                                            failedOrder.getWrappingSequence()));
+      finishOrderSequence(
+          transportOrderService.fetchObject(
+              OrderSequence.class,
+              failedOrder.getWrappingSequence()
+          )
+      );
     });
   }
 
@@ -432,7 +479,11 @@ public class TransportOrderUtil
   private Optional<OrderSequence> extractWrappingSequence(TransportOrder order) {
     return order.getWrappingSequence() == null
         ? Optional.empty()
-        : Optional.of(transportOrderService.fetchObject(OrderSequence.class,
-                                                        order.getWrappingSequence()));
+        : Optional.of(
+            transportOrderService.fetchObject(
+                OrderSequence.class,
+                order.getWrappingSequence()
+            )
+        );
   }
 }

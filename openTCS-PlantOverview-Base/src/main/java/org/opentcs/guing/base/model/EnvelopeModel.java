@@ -7,9 +7,10 @@
  */
 package org.opentcs.guing.base.model;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Envelope;
 
@@ -27,7 +28,12 @@ public class EnvelopeModel {
    * @param key The key to be used for referencing the envelope.
    * @param vertices The sequence of vertices the envelope consists of.
    */
-  public EnvelopeModel(@Nonnull String key, @Nonnull List<Couple> vertices) {
+  public EnvelopeModel(
+      @Nonnull
+      String key,
+      @Nonnull
+      List<Couple> vertices
+  ) {
     this.key = requireNonNull(key, "key");
     this.vertices = requireNonNull(vertices, "vertices");
   }

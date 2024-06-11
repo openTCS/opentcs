@@ -7,18 +7,19 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Envelope;
@@ -81,8 +82,10 @@ class PointConverterTest {
     assertThat(result.get(0).getVehicleEnvelopes(), hasSize(1));
     assertThat(result.get(0).getVehicleEnvelopes(), is(envelopeList));
     assertThat(result.get(0).getLayout().getPosition(), samePropertyValuesAs(new CoupleTO(3, 3)));
-    assertThat(result.get(0).getLayout().getLabelOffset(),
-               samePropertyValuesAs(new CoupleTO(4, 4)));
+    assertThat(
+        result.get(0).getLayout().getLabelOffset(),
+        samePropertyValuesAs(new CoupleTO(4, 4))
+    );
     assertThat(result.get(0).getLayout().getLayerId(), is(7));
     assertThat(result.get(0).getProperties(), hasSize(1));
     assertThat(result.get(0).getProperties(), is(propertyList));

@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
-import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
+
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -16,7 +17,8 @@ import java.util.Set;
  * and granted permissions of the user.
  */
 public class UserAccount
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The user's name.

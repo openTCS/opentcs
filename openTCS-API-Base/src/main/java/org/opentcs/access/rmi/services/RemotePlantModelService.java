@@ -33,8 +33,9 @@ import org.opentcs.data.model.PlantModel;
  * </p>
  */
 public interface RemotePlantModelService
-    extends RemoteTCSObjectService,
-            Remote {
+    extends
+      RemoteTCSObjectService,
+      Remote {
 
   // CHECKSTYLE:OFF
   PlantModel getPlantModel(ClientID clientId)

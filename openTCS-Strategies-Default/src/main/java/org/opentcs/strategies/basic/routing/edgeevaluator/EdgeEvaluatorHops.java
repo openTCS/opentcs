@@ -15,7 +15,8 @@ import org.opentcs.data.model.Vehicle;
  * Uses a weight of 1 for every edge.
  */
 public class EdgeEvaluatorHops
-    implements EdgeEvaluator {
+    implements
+      EdgeEvaluator {
 
   /**
    * A key used for selecting this evaluator in a configuration setting.

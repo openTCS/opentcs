@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.exchange.adapter;
 
 import static java.util.Objects.requireNonNull;
+
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortal;
@@ -24,7 +25,8 @@ import org.slf4j.LoggerFactory;
  * Updates a location's lock state with the kernel when it changes.
  */
 public class LocationLockAdapter
-    implements AttributesChangeListener {
+    implements
+      AttributesChangeListener {
 
   /**
    * This class's logger.
@@ -49,8 +51,10 @@ public class LocationLockAdapter
    * @param portalProvider A portal provider.
    * @param model The location model.
    */
-  public LocationLockAdapter(SharedKernelServicePortalProvider portalProvider,
-                             LocationModel model) {
+  public LocationLockAdapter(
+      SharedKernelServicePortalProvider portalProvider,
+      LocationModel model
+  ) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.model = requireNonNull(model, "model");
     this.lockedPreviously = isLocationLocked();
@@ -81,8 +85,10 @@ public class LocationLockAdapter
       // Check if the kernel is in operating mode, too.
       if (portal.getState() == Kernel.State.OPERATING) {
         // Update the path in the kernel if it exists and its locked state is different.
-        Location location = portal.getPlantModelService().fetchObject(Location.class,
-                                                                      model.getName());
+        Location location = portal.getPlantModelService().fetchObject(
+            Location.class,
+            model.getName()
+        );
         if (location != null && location.isLocked() != locked) {
           portal.getPlantModelService().updateLocationLock(location.getReference(), locked);
         }

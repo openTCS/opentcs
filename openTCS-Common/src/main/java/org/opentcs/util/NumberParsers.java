@@ -54,8 +54,11 @@ public final class NumberParsers {
    * @throws NumberFormatException If the parsed sequence of characters does not
    * represent a decimal number.
    */
-  public static long parsePureDecimalLong(CharSequence source, int startIndex,
-                                          int length)
+  public static long parsePureDecimalLong(
+      CharSequence source,
+      int startIndex,
+      int length
+  )
       throws NumberFormatException {
     requireNonNull(source, "source");
     checkInRange(startIndex, 0, source.length() - 1, "startIndex");
@@ -86,13 +89,15 @@ public final class NumberParsers {
       // If we've just read something other than a digit, throw an exception.
       if (digit < 0 || digit > 9) {
         throw new NumberFormatException(
-            "not a decimal digit: " + source.charAt(startIndex + index));
+            "not a decimal digit: " + source.charAt(startIndex + index)
+        );
       }
       result *= 10;
       // Check if the next operation would overflow the result.
       if (result < limit + digit) {
         throw new NumberFormatException(
-            "parsed number exceeds value boundaries");
+            "parsed number exceeds value boundaries"
+        );
       }
       result -= digit;
       index++;

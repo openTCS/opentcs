@@ -7,12 +7,13 @@
  */
 package org.opentcs.access.to.model;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 
@@ -20,8 +21,10 @@ import org.opentcs.data.model.visualization.LocationRepresentation;
  * A transfer object describing a location type in the plant model.
  */
 public class LocationTypeCreationTO
-    extends CreationTO
-    implements Serializable {
+    extends
+      CreationTO
+    implements
+      Serializable {
 
   /**
    * The allowed operations for this location type.
@@ -41,22 +44,34 @@ public class LocationTypeCreationTO
    *
    * @param name The name of this location type.
    */
-  public LocationTypeCreationTO(@Nonnull String name) {
+  public LocationTypeCreationTO(
+      @Nonnull
+      String name
+  ) {
     super(name);
     this.allowedOperations = List.of();
     this.allowedPeripheralOperations = List.of();
     this.layout = new Layout();
   }
 
-  private LocationTypeCreationTO(@Nonnull String name,
-                                 @Nonnull Map<String, String> properties,
-                                 @Nonnull List<String> allowedOperations,
-                                 @Nonnull List<String> allowedPeripheralOperations,
-                                 @Nonnull Layout layout) {
+  private LocationTypeCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      Map<String, String> properties,
+      @Nonnull
+      List<String> allowedOperations,
+      @Nonnull
+      List<String> allowedPeripheralOperations,
+      @Nonnull
+      Layout layout
+  ) {
     super(name, properties);
     this.allowedOperations = requireNonNull(allowedOperations, "allowedOperations");
-    this.allowedPeripheralOperations = requireNonNull(allowedPeripheralOperations,
-                                                      "allowedPeripheralOperations");
+    this.allowedPeripheralOperations = requireNonNull(
+        allowedPeripheralOperations,
+        "allowedPeripheralOperations"
+    );
     this.layout = requireNonNull(layout, "layout");
   }
 
@@ -76,12 +91,17 @@ public class LocationTypeCreationTO
    * @param allowedOperations the new allowed operations.
    * @return A copy of this object, differing in the given value.
    */
-  public LocationTypeCreationTO withAllowedOperations(@Nonnull List<String> allowedOperations) {
-    return new LocationTypeCreationTO(getName(),
-                                      getModifiableProperties(),
-                                      allowedOperations,
-                                      allowedPeripheralOperations,
-                                      layout);
+  public LocationTypeCreationTO withAllowedOperations(
+      @Nonnull
+      List<String> allowedOperations
+  ) {
+    return new LocationTypeCreationTO(
+        getName(),
+        getModifiableProperties(),
+        allowedOperations,
+        allowedPeripheralOperations,
+        layout
+    );
   }
 
   /**
@@ -101,12 +121,16 @@ public class LocationTypeCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public LocationTypeCreationTO withAllowedPeripheralOperations(
-      @Nonnull List<String> allowedPeripheralOperations) {
-    return new LocationTypeCreationTO(getName(),
-                                      getModifiableProperties(),
-                                      allowedOperations,
-                                      allowedPeripheralOperations,
-                                      layout);
+      @Nonnull
+      List<String> allowedPeripheralOperations
+  ) {
+    return new LocationTypeCreationTO(
+        getName(),
+        getModifiableProperties(),
+        allowedOperations,
+        allowedPeripheralOperations,
+        layout
+    );
   }
 
   /**
@@ -116,12 +140,17 @@ public class LocationTypeCreationTO
    * @return A copy of this object, differing in the given name.
    */
   @Override
-  public LocationTypeCreationTO withName(@Nonnull String name) {
-    return new LocationTypeCreationTO(name,
-                                      getProperties(),
-                                      allowedOperations,
-                                      allowedPeripheralOperations,
-                                      layout);
+  public LocationTypeCreationTO withName(
+      @Nonnull
+      String name
+  ) {
+    return new LocationTypeCreationTO(
+        name,
+        getProperties(),
+        allowedOperations,
+        allowedPeripheralOperations,
+        layout
+    );
   }
 
   /**
@@ -131,12 +160,17 @@ public class LocationTypeCreationTO
    * @return A copy of this object, differing in the given properties.
    */
   @Override
-  public LocationTypeCreationTO withProperties(@Nonnull Map<String, String> properties) {
-    return new LocationTypeCreationTO(getName(),
-                                      properties,
-                                      allowedOperations,
-                                      allowedPeripheralOperations,
-                                      layout);
+  public LocationTypeCreationTO withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
+    return new LocationTypeCreationTO(
+        getName(),
+        properties,
+        allowedOperations,
+        allowedPeripheralOperations,
+        layout
+    );
   }
 
   /**
@@ -150,12 +184,19 @@ public class LocationTypeCreationTO
    * excludes the entry otherwise.
    */
   @Override
-  public LocationTypeCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new LocationTypeCreationTO(getName(),
-                                      propertiesWith(key, value),
-                                      allowedOperations,
-                                      allowedPeripheralOperations,
-                                      layout);
+  public LocationTypeCreationTO withProperty(
+      @Nonnull
+      String key,
+      @Nonnull
+      String value
+  ) {
+    return new LocationTypeCreationTO(
+        getName(),
+        propertiesWith(key, value),
+        allowedOperations,
+        allowedPeripheralOperations,
+        layout
+    );
   }
 
   /**
@@ -174,11 +215,13 @@ public class LocationTypeCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public LocationTypeCreationTO withLayout(Layout layout) {
-    return new LocationTypeCreationTO(getName(),
-                                      getModifiableProperties(),
-                                      allowedOperations,
-                                      allowedPeripheralOperations,
-                                      layout);
+    return new LocationTypeCreationTO(
+        getName(),
+        getModifiableProperties(),
+        allowedOperations,
+        allowedPeripheralOperations,
+        layout
+    );
   }
 
   @Override
@@ -196,7 +239,8 @@ public class LocationTypeCreationTO
    * Contains information regarding the grahical representation of a location type.
    */
   public static class Layout
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The location representation to use for locations with this location type.
@@ -217,8 +261,10 @@ public class LocationTypeCreationTO
      * location type.
      */
     public Layout(LocationRepresentation locationRepresentation) {
-      this.locationRepresentation = requireNonNull(locationRepresentation,
-                                                   "locationRepresentation");
+      this.locationRepresentation = requireNonNull(
+          locationRepresentation,
+          "locationRepresentation"
+      );
     }
 
     /**

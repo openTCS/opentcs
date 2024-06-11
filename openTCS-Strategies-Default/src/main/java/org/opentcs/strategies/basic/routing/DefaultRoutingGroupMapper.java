@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.routing;
 
-import org.opentcs.components.kernel.Router;
 import static org.opentcs.components.kernel.Router.PROPKEY_ROUTING_GROUP;
+
+import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.data.model.Vehicle;
 
@@ -17,7 +18,8 @@ import org.opentcs.data.model.Vehicle;
  * property. Returns {@link #DEFAULT_ROUTING_GROUP} if the property does not exist or is invalid.
  */
 public class DefaultRoutingGroupMapper
-    implements GroupMapper {
+    implements
+      GroupMapper {
 
   /**
    * The default value of a vehicle's routing group.

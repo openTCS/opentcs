@@ -7,13 +7,14 @@
  */
 package org.opentcs.operationsdesk.transport.orders;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
@@ -35,8 +36,9 @@ import org.slf4j.LoggerFactory;
  * Maintains a set of all transport orders existing on the kernel side.
  */
 public class TransportOrdersContainer
-    implements EventHandler,
-               Lifecycle {
+    implements
+      EventHandler,
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -70,8 +72,11 @@ public class TransportOrdersContainer
    * @param portalProvider Provides a access to a portal.
    */
   @Inject
-  public TransportOrdersContainer(@ApplicationEventBus EventBus eventBus,
-                                  SharedKernelServicePortalProvider portalProvider) {
+  public TransportOrdersContainer(
+      @ApplicationEventBus
+      EventBus eventBus,
+      SharedKernelServicePortalProvider portalProvider
+  ) {
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
   }
@@ -133,7 +138,10 @@ public class TransportOrdersContainer
    * @param name The name of the transport order.
    * @return The transport order with the given name, if it exists.
    */
-  public Optional<TransportOrder> getTransportOrder(@Nonnull String name) {
+  public Optional<TransportOrder> getTransportOrder(
+      @Nonnull
+      String name
+  ) {
     requireNonNull(name, "name");
 
     return Optional.ofNullable(transportOrders.get(name));

@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.common.components.properties.table;
 
+import static org.opentcs.guing.common.util.I18nPlantOverview.PROPERTIES_PATH;
+
 import java.awt.Color;
 import java.awt.Frame;
 import javax.swing.JButton;
@@ -14,16 +16,17 @@ import javax.swing.JColorChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import org.opentcs.guing.base.components.properties.type.ColorProperty;
-import static org.opentcs.guing.common.util.I18nPlantOverview.PROPERTIES_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A cell editor for a color property.
  */
 public class ColorPropertyCellEditor
-    extends javax.swing.AbstractCellEditor
-    implements javax.swing.table.TableCellEditor,
-               java.awt.event.ActionListener {
+    extends
+      javax.swing.AbstractCellEditor
+    implements
+      javax.swing.table.TableCellEditor,
+      java.awt.event.ActionListener {
 
   /**
    * The button to use for the editor.
@@ -51,7 +54,8 @@ public class ColorPropertyCellEditor
 
   @Override
   public java.awt.Component getTableCellEditorComponent(
-      JTable table, Object value, boolean isSelected, int row, int column) {
+      JTable table, Object value, boolean isSelected, int row, int column
+  ) {
     fTable = table;
     fColorProperty = (ColorProperty) value;
     fButton.setBackground(fColorProperty.getColor());

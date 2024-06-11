@@ -14,7 +14,8 @@ import java.io.Serializable;
  * reset currently active errors if possible.
  */
 public class ClearError
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * Creates a new instance.

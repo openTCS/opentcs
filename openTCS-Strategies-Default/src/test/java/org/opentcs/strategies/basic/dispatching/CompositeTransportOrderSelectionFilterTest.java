@@ -7,6 +7,8 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.order.TransportOrder;
@@ -53,9 +54,13 @@ class CompositeTransportOrderSelectionFilterTest {
   @Test
   void shouldFilterNoTransportOrders() {
     Set<TransportOrderSelectionFilter> filters
-        = new HashSet<>(Arrays.asList(new RefuseAllFilter(),
-                                      new FilterIfTransportOrderNameContainsTransport(),
-                                      new FilterIfTransportOrderNameContainsOrder()));
+        = new HashSet<>(
+            Arrays.asList(
+                new RefuseAllFilter(),
+                new FilterIfTransportOrderNameContainsTransport(),
+                new FilterIfTransportOrderNameContainsOrder()
+            )
+        );
     transportOrderSelectionFilter = new CompositeTransportOrderSelectionFilter(filters);
 
     long remainingTransportOrders = transportOrders.stream()
@@ -94,8 +99,12 @@ class CompositeTransportOrderSelectionFilterTest {
   @Test
   void shouldFilterTransportOrdersContainingTransportOrOrder() {
     Set<TransportOrderSelectionFilter> filters
-        = new HashSet<>(Arrays.asList(new FilterIfTransportOrderNameContainsTransport(),
-                                      new FilterIfTransportOrderNameContainsOrder()));
+        = new HashSet<>(
+            Arrays.asList(
+                new FilterIfTransportOrderNameContainsTransport(),
+                new FilterIfTransportOrderNameContainsOrder()
+            )
+        );
     transportOrderSelectionFilter = new CompositeTransportOrderSelectionFilter(filters);
 
     List<TransportOrder> remainingTransportOrders = transportOrders.stream()
@@ -110,7 +119,8 @@ class CompositeTransportOrderSelectionFilterTest {
   }
 
   private class RefuseAllFilter
-      implements TransportOrderSelectionFilter {
+      implements
+        TransportOrderSelectionFilter {
 
     @Override
     public Collection<String> apply(TransportOrder t) {
@@ -119,7 +129,8 @@ class CompositeTransportOrderSelectionFilterTest {
   }
 
   private class FilterIfTransportOrderNameContainsTransport
-      implements TransportOrderSelectionFilter {
+      implements
+        TransportOrderSelectionFilter {
 
     @Override
     public Collection<String> apply(TransportOrder t) {
@@ -130,7 +141,8 @@ class CompositeTransportOrderSelectionFilterTest {
   }
 
   private class FilterIfTransportOrderNameContainsOrder
-      implements TransportOrderSelectionFilter {
+      implements
+        TransportOrderSelectionFilter {
 
     @Override
     public Collection<String> apply(TransportOrder t) {

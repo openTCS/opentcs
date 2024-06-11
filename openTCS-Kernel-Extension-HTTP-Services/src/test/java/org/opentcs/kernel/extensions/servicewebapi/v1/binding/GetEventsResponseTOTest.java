@@ -50,8 +50,10 @@ class GetEventsResponseTOTest {
                 )
             );
 
-    Approvals.verify(jsonBinder.toJson(to),
-                     Approvals.NAMES.withParameters("orientationAngle-" + orientationAngle));
+    Approvals.verify(
+        jsonBinder.toJson(to),
+        Approvals.NAMES.withParameters("orientationAngle-" + orientationAngle)
+    );
   }
 
   private VehicleStatusMessage createVehicleStatusMessage(long sequenceNo) {

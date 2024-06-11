@@ -7,9 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -27,7 +28,8 @@ import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAs
  * ones.
  */
 public class AssignReservedOrdersPhase
-    implements Phase {
+    implements
+      Phase {
 
   /**
    * The object service
@@ -58,11 +60,14 @@ public class AssignReservedOrdersPhase
       Router router,
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       OrderReservationPool orderReservationPool,
-      TransportOrderUtil transportOrderUtil) {
+      TransportOrderUtil transportOrderUtil
+  ) {
     this.router = requireNonNull(router, "router");
     this.objectService = requireNonNull(objectService, "objectService");
-    this.assignmentCandidateSelectionFilter = requireNonNull(assignmentCandidateSelectionFilter,
-                                                             "assignmentCandidateSelectionFilter");
+    this.assignmentCandidateSelectionFilter = requireNonNull(
+        assignmentCandidateSelectionFilter,
+        "assignmentCandidateSelectionFilter"
+    );
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
   }
@@ -112,18 +117,26 @@ public class AssignReservedOrdersPhase
         // reservation. Only handle orders where the intended vehicle (still) fits the reservation.
         .filter(order -> hasNoOrMatchingIntendedVehicle(order, vehicle))
         .limit(1)
-        .map(order -> computeCandidate(vehicle,
-                                       objectService.fetchObject(Point.class,
-                                                                 vehicle.getCurrentPosition()),
-                                       order))
+        .map(
+            order -> computeCandidate(
+                vehicle,
+                objectService.fetchObject(
+                    Point.class,
+                    vehicle.getCurrentPosition()
+                ),
+                order
+            )
+        )
         .filter(optCandidate -> optCandidate.isPresent())
         .map(optCandidate -> optCandidate.get())
         .filter(candidate -> assignmentCandidateSelectionFilter.apply(candidate).isEmpty())
         .findFirst()
         .ifPresent(
-            candidate -> transportOrderUtil.assignTransportOrder(vehicle,
-                                                                 candidate.getTransportOrder(),
-                                                                 candidate.getDriveOrders())
+            candidate -> transportOrderUtil.assignTransportOrder(
+                vehicle,
+                candidate.getTransportOrder(),
+                candidate.getDriveOrders()
+            )
         );
 
     // Regardless of whether a reserved order could be assigned to the vehicle or not, remove any
@@ -149,9 +162,11 @@ public class AssignReservedOrdersPhase
         || Objects.equals(order.getIntendedVehicle(), vehicle.getReference());
   }
 
-  private Optional<AssignmentCandidate> computeCandidate(Vehicle vehicle,
-                                                         Point vehiclePosition,
-                                                         TransportOrder order) {
+  private Optional<AssignmentCandidate> computeCandidate(
+      Vehicle vehicle,
+      Point vehiclePosition,
+      TransportOrder order
+  ) {
     return router.getRoute(vehicle, vehiclePosition, order)
         .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders));
   }

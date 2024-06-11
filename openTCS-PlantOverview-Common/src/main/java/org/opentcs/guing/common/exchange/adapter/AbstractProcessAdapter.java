@@ -25,13 +25,15 @@ import org.opentcs.guing.common.model.SystemModel;
  * corresponding kernel object.
  */
 public abstract class AbstractProcessAdapter
-    implements ProcessAdapter {
+    implements
+      ProcessAdapter {
 
   protected Map<String, String> getKernelProperties(ModelComponent model) {
     Map<String, String> result = new HashMap<>();
 
     KeyValueSetProperty misc = (KeyValueSetProperty) model.getProperty(
-        ModelComponent.MISCELLANEOUS);
+        ModelComponent.MISCELLANEOUS
+    );
 
     if (misc != null) {
       for (KeyValueProperty p : misc.getItems()) {
@@ -68,9 +70,11 @@ public abstract class AbstractProcessAdapter
     miscellaneous.setItems(items);
   }
 
-  protected List<VisualLayoutCreationTO> updatedLayouts(ModelComponent model,
-                                                        List<VisualLayoutCreationTO> layouts,
-                                                        SystemModel systemModel) {
+  protected List<VisualLayoutCreationTO> updatedLayouts(
+      ModelComponent model,
+      List<VisualLayoutCreationTO> layouts,
+      SystemModel systemModel
+  ) {
     List<VisualLayoutCreationTO> result = new ArrayList<>(layouts.size());
 
     for (VisualLayoutCreationTO layout : layouts) {
@@ -80,9 +84,11 @@ public abstract class AbstractProcessAdapter
     return result;
   }
 
-  protected VisualLayoutCreationTO updatedLayout(ModelComponent model,
-                                                 VisualLayoutCreationTO layout,
-                                                 SystemModel systemModel) {
+  protected VisualLayoutCreationTO updatedLayout(
+      ModelComponent model,
+      VisualLayoutCreationTO layout,
+      SystemModel systemModel
+  ) {
     return layout;
   }
 }

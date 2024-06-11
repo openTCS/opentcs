@@ -14,6 +14,7 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * Implementations of this interface check whether a peripheral job may be removed.
  */
 public interface PeripheralJobCleanupApproval
-    extends Predicate<PeripheralJob> {
+    extends
+      Predicate<PeripheralJob> {
 
 }

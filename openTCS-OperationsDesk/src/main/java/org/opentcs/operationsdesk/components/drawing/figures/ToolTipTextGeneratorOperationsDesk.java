@@ -7,17 +7,18 @@
  */
 package org.opentcs.operationsdesk.components.drawing.figures;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.data.model.Vehicle.State.ERROR;
+import static org.opentcs.data.model.Vehicle.State.UNAVAILABLE;
+import static org.opentcs.data.model.Vehicle.State.UNKNOWN;
+
 import jakarta.inject.Inject;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.data.model.Vehicle;
-import static org.opentcs.data.model.Vehicle.State.ERROR;
-import static org.opentcs.data.model.Vehicle.State.UNAVAILABLE;
-import static org.opentcs.data.model.Vehicle.State.UNKNOWN;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.guing.base.AllocationState;
 import org.opentcs.guing.base.model.FigureDecorationDetails;
@@ -32,7 +33,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A tool tip generator integrating information about a vehicle's state.
  */
 public class ToolTipTextGeneratorOperationsDesk
-    extends ToolTipTextGenerator {
+    extends
+      ToolTipTextGenerator {
 
   /**
    * A unicode play symbol.
@@ -55,8 +57,10 @@ public class ToolTipTextGeneratorOperationsDesk
    * @param peripheralJobContainer The peripheral job container to use.
    */
   @Inject
-  public ToolTipTextGeneratorOperationsDesk(ModelManager modelManager,
-                                            PeripheralJobsContainer peripheralJobContainer) {
+  public ToolTipTextGeneratorOperationsDesk(
+      ModelManager modelManager,
+      PeripheralJobsContainer peripheralJobContainer
+  ) {
     super(modelManager);
     this.peripheralJobContainer = requireNonNull(peripheralJobContainer, "peripheralJobContainer");
   }
@@ -119,14 +123,18 @@ public class ToolTipTextGeneratorOperationsDesk
   @SuppressWarnings("checkstyle:LineLength")
   private String getRelatedPeripheralJobHeadingText() {
     return ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MISC_PATH)
-        .getString("toolTipTextGeneratorOperationsDesk.vehicleModel.awaitPeripheralJobCompletion.text");
+        .getString(
+            "toolTipTextGeneratorOperationsDesk.vehicleModel.awaitPeripheralJobCompletion.text"
+        );
   }
 
   private void appendPeripheralJobListItem(StringBuilder sb, PeripheralJob job) {
     sb.append("<li>")
-        .append(job.getState() == PeripheralJob.State.BEING_PROCESSED
-            ? PLAY_SYMBOL
-            : HOURGLASS_SYMBOL)
+        .append(
+            job.getState() == PeripheralJob.State.BEING_PROCESSED
+                ? PLAY_SYMBOL
+                : HOURGLASS_SYMBOL
+        )
         .append(job.getPeripheralOperation().getLocation().getName())
         .append(": ")
         .append(job.getPeripheralOperation().getOperation())
@@ -197,6 +205,8 @@ public class ToolTipTextGeneratorOperationsDesk
   @SuppressWarnings("checkstyle:LineLength")
   private String getResourceAllocatedByText() {
     return ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MISC_PATH)
-        .getString("toolTipTextGeneratorOperationsDesk.figureDecorationDetails.resourceAllocatedBy.text");
+        .getString(
+            "toolTipTextGeneratorOperationsDesk.figureDecorationDetails.resourceAllocatedBy.text"
+        );
   }
 }

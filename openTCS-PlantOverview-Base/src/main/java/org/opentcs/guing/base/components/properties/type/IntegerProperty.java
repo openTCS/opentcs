@@ -13,7 +13,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property for an integer value.
  */
 public class IntegerProperty
-    extends AbstractProperty {
+    extends
+      AbstractProperty {
 
   /**
    * Creates a new instance.

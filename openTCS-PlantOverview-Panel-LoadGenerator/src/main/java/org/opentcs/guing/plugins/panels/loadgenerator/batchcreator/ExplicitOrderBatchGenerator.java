@@ -7,11 +7,12 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator.batchcreator;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.order.DestinationCreationTO;
@@ -28,7 +29,8 @@ import org.slf4j.LoggerFactory;
  * A batch generator for creating explicit transport orders.
  */
 public class ExplicitOrderBatchGenerator
-    implements OrderBatchCreator {
+    implements
+      OrderBatchCreator {
 
   /**
    * This class's Logger.
@@ -54,9 +56,11 @@ public class ExplicitOrderBatchGenerator
    * @param dispatcherService The dispatcher service.
    * @param data The transport order data.
    */
-  public ExplicitOrderBatchGenerator(TransportOrderService transportOrderService,
-                                     DispatcherService dispatcherService,
-                                     List<TransportOrderData> data) {
+  public ExplicitOrderBatchGenerator(
+      TransportOrderService transportOrderService,
+      DispatcherService dispatcherService,
+      List<TransportOrderData> data
+  ) {
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.data = requireNonNull(data, "data");
@@ -78,14 +82,19 @@ public class ExplicitOrderBatchGenerator
   private TransportOrder createSingleOrder(TransportOrderData curData)
       throws KernelRuntimeException {
     TransportOrder newOrder = transportOrderService.createTransportOrder(
-        new TransportOrderCreationTO("TOrder-",
-                                     createDestinations(curData.getDriveOrders()))
+        new TransportOrderCreationTO(
+            "TOrder-",
+            createDestinations(curData.getDriveOrders())
+        )
             .withIncompleteName(true)
             .withDeadline(Instant.now().plusSeconds(curData.getDeadline().getTime() / 1000))
-            .withIntendedVehicleName(curData.getIntendedVehicle() == null
-                ? null
-                : curData.getIntendedVehicle().getName())
-            .withProperties(curData.getProperties()));
+            .withIntendedVehicleName(
+                curData.getIntendedVehicle() == null
+                    ? null
+                    : curData.getIntendedVehicle().getName()
+            )
+            .withProperties(curData.getProperties())
+    );
 
     return newOrder;
   }
@@ -93,8 +102,12 @@ public class ExplicitOrderBatchGenerator
   private List<DestinationCreationTO> createDestinations(List<DriveOrderStructure> structures) {
     List<DestinationCreationTO> result = new ArrayList<>();
     for (DriveOrderStructure currentOrder : structures) {
-      result.add(new DestinationCreationTO(currentOrder.getDriveOrderLocation().getName(),
-                                           currentOrder.getDriveOrderVehicleOperation()));
+      result.add(
+          new DestinationCreationTO(
+              currentOrder.getDriveOrderLocation().getName(),
+              currentOrder.getDriveOrderVehicleOperation()
+          )
+      );
     }
     return result;
   }

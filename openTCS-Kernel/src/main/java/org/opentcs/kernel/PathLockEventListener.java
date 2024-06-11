@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.Set;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.DispatcherService;
@@ -24,8 +25,9 @@ import org.opentcs.util.event.EventHandler;
  * Listens to path lock events and updates the routing topology.
  */
 public class PathLockEventListener
-    implements EventHandler,
-               Lifecycle {
+    implements
+      EventHandler,
+      Lifecycle {
 
   /**
    * The kernel configuration.
@@ -57,10 +59,13 @@ public class PathLockEventListener
    * @param dispatcher The dispatcher.
    */
   @Inject
-  public PathLockEventListener(KernelApplicationConfiguration configuration,
-                               RouterService routerService,
-                               @ApplicationEventBus EventBus eventBus,
-                               DispatcherService dispatcher) {
+  public PathLockEventListener(
+      KernelApplicationConfiguration configuration,
+      RouterService routerService,
+      @ApplicationEventBus
+      EventBus eventBus,
+      DispatcherService dispatcher
+  ) {
     this.configuration = requireNonNull(configuration, "configuration");
     this.routerService = requireNonNull(routerService, "routerService");
     this.eventBus = requireNonNull(eventBus, "eventBus");
@@ -115,7 +120,7 @@ public class PathLockEventListener
   private boolean hasPathLockChanged(TCSObjectEvent event) {
     return event.getCurrentObjectState() instanceof Path
         && event.getType() == TCSObjectEvent.Type.OBJECT_MODIFIED
-        && ((Path) event.getCurrentObjectState()).isLocked()
-        != ((Path) event.getPreviousObjectState()).isLocked();
+        && ((Path) event.getCurrentObjectState()).isLocked() != ((Path) event
+            .getPreviousObjectState()).isLocked();
   }
 }

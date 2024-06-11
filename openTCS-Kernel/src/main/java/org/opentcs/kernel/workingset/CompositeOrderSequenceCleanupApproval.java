@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.workingset;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.Set;
 import org.opentcs.components.kernel.OrderSequenceCleanupApproval;
 import org.opentcs.data.order.OrderSequence;
@@ -17,7 +18,8 @@ import org.opentcs.data.order.OrderSequence;
  * A collection of {@link OrderSequenceCleanupApproval}s.
  */
 public class CompositeOrderSequenceCleanupApproval
-    implements OrderSequenceCleanupApproval {
+    implements
+      OrderSequenceCleanupApproval {
 
   private final Set<OrderSequenceCleanupApproval> sequenceCleanupApprovals;
   private final DefaultOrderSequenceCleanupApproval defaultOrderSequenceCleanupApproval;
@@ -32,12 +34,17 @@ public class CompositeOrderSequenceCleanupApproval
   @Inject
   public CompositeOrderSequenceCleanupApproval(
       Set<OrderSequenceCleanupApproval> sequenceCleanupApprovals,
-      DefaultOrderSequenceCleanupApproval defaultOrderSequenceCleanupApproval) {
-    this.sequenceCleanupApprovals = requireNonNull(sequenceCleanupApprovals,
-                                                   "sequenceCleanupApprovals");
+      DefaultOrderSequenceCleanupApproval defaultOrderSequenceCleanupApproval
+  ) {
+    this.sequenceCleanupApprovals = requireNonNull(
+        sequenceCleanupApprovals,
+        "sequenceCleanupApprovals"
+    );
     this.defaultOrderSequenceCleanupApproval
-        = requireNonNull(defaultOrderSequenceCleanupApproval,
-                         "defaultOrderSequenceCleanupApproval");
+        = requireNonNull(
+            defaultOrderSequenceCleanupApproval,
+            "defaultOrderSequenceCleanupApproval"
+        );
   }
 
   @Override

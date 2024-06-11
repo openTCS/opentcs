@@ -7,11 +7,12 @@
  */
 package org.opentcs.guing.common.components.dockable;
 
+import static java.util.Objects.requireNonNull;
+
 import bibliothek.gui.dock.common.event.CFocusListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import jakarta.inject.Inject;
 import java.awt.event.FocusEvent;
-import static java.util.Objects.requireNonNull;
 import org.jhotdraw.draw.DrawingEditor;
 import org.opentcs.guing.common.application.ViewManager;
 import org.opentcs.guing.common.components.drawing.DrawingViewScrollPane;
@@ -21,7 +22,8 @@ import org.opentcs.guing.common.components.drawing.OpenTCSDrawingView;
  * Handles focussing of dockable drawing views.
  */
 public class DrawingViewFocusHandler
-    implements CFocusListener {
+    implements
+      CFocusListener {
 
   /**
    * Manages the application's views.
@@ -39,8 +41,10 @@ public class DrawingViewFocusHandler
    * @param drawingEditor The drawing editor.
    */
   @Inject
-  public DrawingViewFocusHandler(ViewManager viewManager,
-                                 DrawingEditor drawingEditor) {
+  public DrawingViewFocusHandler(
+      ViewManager viewManager,
+      DrawingEditor drawingEditor
+  ) {
     this.viewManager = requireNonNull(viewManager, "viewManager");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
   }

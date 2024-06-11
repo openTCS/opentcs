@@ -25,7 +25,8 @@ import org.opentcs.guing.common.util.IconToolkit;
  * Represents a vehicle object in the TreeView.
  */
 public class VehicleUserObject
-    extends AbstractUserObject {
+    extends
+      AbstractUserObject {
 
   /**
    * All selected vehicles.
@@ -40,9 +41,12 @@ public class VehicleUserObject
    * @param modelManager Provides the current system model.
    */
   @Inject
-  public VehicleUserObject(@Assisted VehicleModel model,
-                           GuiManager guiManager,
-                           ModelManager modelManager) {
+  public VehicleUserObject(
+      @Assisted
+      VehicleModel model,
+      GuiManager guiManager,
+      ModelManager modelManager
+  ) {
     super(model, guiManager, modelManager);
   }
 

@@ -7,11 +7,12 @@
  */
 package org.opentcs.operationsdesk.transport;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTextField;
@@ -26,7 +27,8 @@ import org.opentcs.guing.common.components.dialogs.InputValidationListener;
  * A UI to select a location or a point as a vehicle destination.
  */
 public class PointPanel
-    extends DialogContent {
+    extends
+      DialogContent {
 
   /**
    * Available locations.
@@ -139,6 +141,7 @@ public class PointPanel
     }
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -163,11 +166,14 @@ public class PointPanel
     add(itemsComboBox);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox<String> itemsComboBox;
   private javax.swing.JLabel itemsLabel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

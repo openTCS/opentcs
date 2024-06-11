@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectUnknownException;
@@ -33,9 +34,11 @@ public class PathHandler {
    * @param executorWrapper Executes calls via the kernel executor and waits for the outcome.
    */
   @Inject
-  public PathHandler(TCSObjectService objectService,
-                     KernelExecutorWrapper executorWrapper,
-                     PlantModelService plantModelService) {
+  public PathHandler(
+      TCSObjectService objectService,
+      KernelExecutorWrapper executorWrapper,
+      PlantModelService plantModelService
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
@@ -48,7 +51,11 @@ public class PathHandler {
    * @param lockedValue The path's new locked state (a boolean as a string).
    * @throws ObjectUnknownException If a path with the given name could not be found.
    */
-  public void updatePathLock(@Nonnull String pathName, String lockedValue)
+  public void updatePathLock(
+      @Nonnull
+      String pathName,
+      String lockedValue
+  )
       throws ObjectUnknownException {
     executorWrapper.callAndWait(() -> {
       Path path = objectService.fetchObject(Path.class, pathName);

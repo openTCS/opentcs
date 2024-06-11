@@ -7,9 +7,10 @@
  */
 package org.opentcs.operationsdesk.components.drawing;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.SwingUtilities;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.event.NullAttributesChangeListener;
@@ -28,7 +29,8 @@ import org.opentcs.operationsdesk.util.VehicleCourseObjectFactory;
  * <code>Drawing</code>.
  */
 public class OpenTCSDrawingEditorOperating
-    extends OpenTCSDrawingEditor {
+    extends
+      OpenTCSDrawingEditor {
 
   /**
    * Provides the current system model.
@@ -46,8 +48,10 @@ public class OpenTCSDrawingEditorOperating
    * @param modelManager Provides the current system model.
    */
   @Inject
-  public OpenTCSDrawingEditorOperating(VehicleCourseObjectFactory courseObjectFactory,
-                                       ModelManager modelManager) {
+  public OpenTCSDrawingEditorOperating(
+      VehicleCourseObjectFactory courseObjectFactory,
+      ModelManager modelManager
+  ) {
     super(courseObjectFactory);
     this.courseObjectFactory = requireNonNull(courseObjectFactory, "courseObjectFactory");
     this.modelManager = requireNonNull(modelManager, "modelManager");
@@ -70,7 +74,7 @@ public class OpenTCSDrawingEditorOperating
 //        initializeOffsetFigures();
         break;
       default:
-      // Do nada.
+        // Do nada.
     }
   }
 

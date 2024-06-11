@@ -14,7 +14,8 @@ import com.google.inject.AbstractModule;
  * plant overview application.
  */
 public abstract class ConfigurableInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * A provider for configuration bindings.
@@ -36,7 +37,8 @@ public abstract class ConfigurableInjectionModule
    * @param configBindingProvider The new configuration binding provider.
    */
   public void setConfigBindingProvider(
-      org.opentcs.configuration.ConfigurationBindingProvider configBindingProvider) {
+      org.opentcs.configuration.ConfigurationBindingProvider configBindingProvider
+  ) {
     this.configBindingProvider = configBindingProvider;
   }
 }

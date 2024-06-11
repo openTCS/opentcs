@@ -7,14 +7,15 @@
  */
 package org.opentcs.kernel.workingset;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
@@ -34,38 +35,46 @@ class WorkingSetCleanupTaskTest {
     CreationTimeThreshold creationTimeThreshold = new CreationTimeThreshold();
 
     PeripheralJobPoolManager peripheralJobPoolManager
-        = new PeripheralJobPoolManager(objectRepository,
-                                       mock(),
-                                       new PrefixedUlidObjectNameProvider());
+        = new PeripheralJobPoolManager(
+            objectRepository,
+            mock(),
+            new PrefixedUlidObjectNameProvider()
+        );
     TransportOrderPoolManager orderPoolManager
-        = new TransportOrderPoolManager(objectRepository,
-                                        mock(),
-                                        new PrefixedUlidObjectNameProvider());
+        = new TransportOrderPoolManager(
+            objectRepository,
+            mock(),
+            new PrefixedUlidObjectNameProvider()
+        );
     DefaultPeripheralJobCleanupApproval peripheralJobCleanupApproval
         = new DefaultPeripheralJobCleanupApproval(creationTimeThreshold);
     DefaultTransportOrderCleanupApproval orderCleanupApproval
-        = new DefaultTransportOrderCleanupApproval(peripheralJobPoolManager,
-                                                   peripheralJobCleanupApproval,
-                                                   creationTimeThreshold);
+        = new DefaultTransportOrderCleanupApproval(
+            peripheralJobPoolManager,
+            peripheralJobCleanupApproval,
+            creationTimeThreshold
+        );
     DefaultOrderSequenceCleanupApproval orderSequenceCleanupApproval
         = new DefaultOrderSequenceCleanupApproval(orderPoolManager, orderCleanupApproval);
-    cleanupTask = new WorkingSetCleanupTask(new Object(),
-                                            orderPoolManager,
-                                            peripheralJobPoolManager,
-                                            configuration,
-                                            new CompositeOrderSequenceCleanupApproval(
-                                                Set.of(),
-                                                orderSequenceCleanupApproval
-                                            ),
-                                            new CompositeTransportOrderCleanupApproval(
-                                                Set.of(),
-                                                orderCleanupApproval
-                                            ),
-                                            new CompositePeripheralJobCleanupApproval(
-                                                Set.of(),
-                                                peripheralJobCleanupApproval
-                                            ),
-                                            creationTimeThreshold);
+    cleanupTask = new WorkingSetCleanupTask(
+        new Object(),
+        orderPoolManager,
+        peripheralJobPoolManager,
+        configuration,
+        new CompositeOrderSequenceCleanupApproval(
+            Set.of(),
+            orderSequenceCleanupApproval
+        ),
+        new CompositeTransportOrderCleanupApproval(
+            Set.of(),
+            orderCleanupApproval
+        ),
+        new CompositePeripheralJobCleanupApproval(
+            Set.of(),
+            peripheralJobCleanupApproval
+        ),
+        creationTimeThreshold
+    );
   }
 
   @Test

@@ -14,8 +14,10 @@ import org.opentcs.components.Lifecycle;
  * A panel that can be plugged into the kernel control center.
  */
 public abstract class ControlCenterPanel
-    extends JPanel
-    implements Lifecycle {
+    extends
+      JPanel
+    implements
+      Lifecycle {
 
   /**
    * Returns a title for this panel.

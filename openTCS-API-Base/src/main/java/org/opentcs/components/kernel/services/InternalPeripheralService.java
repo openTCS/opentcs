@@ -19,7 +19,8 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * peers.
  */
 public interface InternalPeripheralService
-    extends PeripheralService {
+    extends
+      PeripheralService {
 
   /**
    * Updates a peripheral's processing state.
@@ -28,8 +29,10 @@ public interface InternalPeripheralService
    * @param state The peripheral's new processing state.
    * @throws ObjectUnknownException If the referenced location does not exist.
    */
-  void updatePeripheralProcState(TCSResourceReference<Location> ref,
-                                 PeripheralInformation.ProcState state)
+  void updatePeripheralProcState(
+      TCSResourceReference<Location> ref,
+      PeripheralInformation.ProcState state
+  )
       throws ObjectUnknownException;
 
   /**
@@ -39,8 +42,10 @@ public interface InternalPeripheralService
    * @param reservationToken The peripheral's new reservation token.
    * @throws ObjectUnknownException If the referenced location does not exist.
    */
-  void updatePeripheralReservationToken(TCSResourceReference<Location> ref,
-                                        String reservationToken)
+  void updatePeripheralReservationToken(
+      TCSResourceReference<Location> ref,
+      String reservationToken
+  )
       throws ObjectUnknownException;
 
   /**
@@ -50,8 +55,10 @@ public interface InternalPeripheralService
    * @param state The peripheral's new state.
    * @throws ObjectUnknownException If the referenced location does not exist.
    */
-  void updatePeripheralState(TCSResourceReference<Location> ref,
-                             PeripheralInformation.State state)
+  void updatePeripheralState(
+      TCSResourceReference<Location> ref,
+      PeripheralInformation.State state
+  )
       throws ObjectUnknownException;
 
   /**
@@ -61,7 +68,9 @@ public interface InternalPeripheralService
    * @param peripheralJob A reference to the peripheral job the peripheral device processes.
    * @throws ObjectUnknownException If the referenced location does not exist.
    */
-  void updatePeripheralJob(TCSResourceReference<Location> ref,
-                           TCSObjectReference<PeripheralJob> peripheralJob)
+  void updatePeripheralJob(
+      TCSResourceReference<Location> ref,
+      TCSObjectReference<PeripheralJob> peripheralJob
+  )
       throws ObjectUnknownException;
 }

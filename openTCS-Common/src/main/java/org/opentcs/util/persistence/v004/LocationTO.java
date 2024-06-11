@@ -7,10 +7,11 @@
  */
 package org.opentcs.util.persistence.v004;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -20,10 +21,13 @@ import javax.xml.bind.annotation.XmlType;
 /**
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(propOrder = {"name", "xPosition", "yPosition", "zPosition", "links", "locked",
-                      "properties", "locationLayout"})
+@XmlType(
+    propOrder = {"name", "xPosition", "yPosition", "zPosition", "links", "locked",
+        "properties", "locationLayout"}
+)
 public class LocationTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   private Long xPosition = 0L;
   private Long yPosition = 0L;
@@ -44,7 +48,10 @@ public class LocationTO
     return xPosition;
   }
 
-  public LocationTO setxPosition(@Nonnull Long xPosition) {
+  public LocationTO setxPosition(
+      @Nonnull
+      Long xPosition
+  ) {
     requireNonNull(xPosition, "xPosition");
     this.xPosition = xPosition;
     return this;
@@ -55,7 +62,10 @@ public class LocationTO
     return yPosition;
   }
 
-  public LocationTO setyPosition(@Nonnull Long yPosition) {
+  public LocationTO setyPosition(
+      @Nonnull
+      Long yPosition
+  ) {
     requireNonNull(yPosition, "yPosition");
     this.yPosition = yPosition;
     return this;
@@ -66,7 +76,10 @@ public class LocationTO
     return zPosition;
   }
 
-  public LocationTO setzPosition(@Nonnull Long zPosition) {
+  public LocationTO setzPosition(
+      @Nonnull
+      Long zPosition
+  ) {
     requireNonNull(zPosition, "zPosition");
     this.zPosition = zPosition;
     return this;
@@ -77,7 +90,10 @@ public class LocationTO
     return type;
   }
 
-  public LocationTO setType(@Nonnull String type) {
+  public LocationTO setType(
+      @Nonnull
+      String type
+  ) {
     requireNonNull(type, "type");
     this.type = type;
     return this;
@@ -88,7 +104,10 @@ public class LocationTO
     return links;
   }
 
-  public LocationTO setLinks(@Nonnull List<Link> links) {
+  public LocationTO setLinks(
+      @Nonnull
+      List<Link> links
+  ) {
     requireNonNull(links, "links");
     this.links = links;
     return this;
@@ -109,7 +128,10 @@ public class LocationTO
     return locationLayout;
   }
 
-  public LocationTO setLocationLayout(@Nonnull LocationLayout locationLayout) {
+  public LocationTO setLocationLayout(
+      @Nonnull
+      LocationLayout locationLayout
+  ) {
     this.locationLayout = requireNonNull(locationLayout, "locationLayout");
     return this;
   }
@@ -132,7 +154,10 @@ public class LocationTO
       return point;
     }
 
-    public Link setPoint(@Nonnull String point) {
+    public Link setPoint(
+        @Nonnull
+        String point
+    ) {
       requireNonNull(point, "point");
       this.point = point;
       return this;
@@ -143,7 +168,10 @@ public class LocationTO
       return allowedOperations;
     }
 
-    public Link setAllowedOperations(@Nonnull List<AllowedOperationTO> allowedOperations) {
+    public Link setAllowedOperations(
+        @Nonnull
+        List<AllowedOperationTO> allowedOperations
+    ) {
       requireNonNull(allowedOperations, "allowedOperations");
       this.allowedOperations = allowedOperations;
       return this;
@@ -151,8 +179,10 @@ public class LocationTO
   }
 
   @XmlAccessorType(XmlAccessType.PROPERTY)
-  @XmlType(propOrder = {"xPosition", "yPosition", "xLabelOffset", "yLabelOffset",
-                        "locationRepresentation", "layerId"})
+  @XmlType(
+      propOrder = {"xPosition", "yPosition", "xLabelOffset", "yLabelOffset",
+          "locationRepresentation", "layerId"}
+  )
   public static class LocationLayout {
 
     private Long xPosition = 0L;
@@ -214,8 +244,10 @@ public class LocationTO
     }
 
     public LocationLayout setLocationRepresentation(String locationRepresentation) {
-      this.locationRepresentation = requireNonNull(locationRepresentation,
-                                                   "locationRepresentation");
+      this.locationRepresentation = requireNonNull(
+          locationRepresentation,
+          "locationRepresentation"
+      );
       return this;
     }
 

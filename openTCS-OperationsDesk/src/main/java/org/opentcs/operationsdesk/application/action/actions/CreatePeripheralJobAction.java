@@ -7,14 +7,16 @@
  */
 package org.opentcs.operationsdesk.application.action.actions;
 
+import static java.util.Objects.requireNonNull;
+import static javax.swing.Action.MNEMONIC_KEY;
+import static javax.swing.Action.NAME;
+import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.MENU_PATH;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
-import static javax.swing.Action.MNEMONIC_KEY;
-import static javax.swing.Action.NAME;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
@@ -22,7 +24,6 @@ import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.common.components.dialogs.StandardContentDialog;
 import org.opentcs.operationsdesk.transport.CreatePeripheralJobPanel;
-import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.MENU_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,8 @@ import org.slf4j.LoggerFactory;
  * An action to trigger the creation of a peripheral job.
  */
 public class CreatePeripheralJobAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action class's ID.
@@ -67,9 +69,12 @@ public class CreatePeripheralJobAction
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public CreatePeripheralJobAction(@ApplicationFrame Component dialogParent,
-                                   Provider<CreatePeripheralJobPanel> peripheralJobPanel,
-                                   SharedKernelServicePortalProvider portalProvider) {
+  public CreatePeripheralJobAction(
+      @ApplicationFrame
+      Component dialogParent,
+      Provider<CreatePeripheralJobPanel> peripheralJobPanel,
+      SharedKernelServicePortalProvider portalProvider
+  ) {
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
     this.jobPanelProvider = requireNonNull(peripheralJobPanel, "peripheralJobPanel");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
@@ -89,9 +94,11 @@ public class CreatePeripheralJobAction
     }
 
     PeripheralJobCreationTO job
-        = new PeripheralJobCreationTO("Job-",
-                                      contentPanel.getReservationToken(),
-                                      contentPanel.getPeripheralOperation())
+        = new PeripheralJobCreationTO(
+            "Job-",
+            contentPanel.getReservationToken(),
+            contentPanel.getPeripheralOperation()
+        )
             .withIncompleteName(true);
 
     try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {

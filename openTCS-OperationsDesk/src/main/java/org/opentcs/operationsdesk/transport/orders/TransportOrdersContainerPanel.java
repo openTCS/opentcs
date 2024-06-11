@@ -7,6 +7,14 @@
  */
 package org.opentcs.operationsdesk.transport.orders;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.data.order.TransportOrder.State.ACTIVE;
+import static org.opentcs.data.order.TransportOrder.State.BEING_PROCESSED;
+import static org.opentcs.data.order.TransportOrder.State.DISPATCHABLE;
+import static org.opentcs.data.order.TransportOrder.State.FAILED;
+import static org.opentcs.data.order.TransportOrder.State.FINISHED;
+import static org.opentcs.data.order.TransportOrder.State.RAW;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import java.awt.BorderLayout;
@@ -16,7 +24,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import javax.swing.JButton;
@@ -39,12 +46,6 @@ import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentException;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
-import static org.opentcs.data.order.TransportOrder.State.ACTIVE;
-import static org.opentcs.data.order.TransportOrder.State.BEING_PROCESSED;
-import static org.opentcs.data.order.TransportOrder.State.DISPATCHABLE;
-import static org.opentcs.data.order.TransportOrder.State.FAILED;
-import static org.opentcs.data.order.TransportOrder.State.FINISHED;
-import static org.opentcs.data.order.TransportOrder.State.RAW;
 import org.opentcs.guing.common.components.dialogs.DialogContent;
 import org.opentcs.guing.common.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.common.util.IconToolkit;
@@ -63,7 +64,8 @@ import org.slf4j.LoggerFactory;
  * Shows a table of the kernel's transport orders.
  */
 public class TransportOrdersContainerPanel
-    extends JPanel {
+    extends
+      JPanel {
 
   /**
    * This class's logger.
@@ -117,17 +119,21 @@ public class TransportOrdersContainerPanel
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public TransportOrdersContainerPanel(SharedKernelServicePortalProvider portalProvider,
-                                       TransportOrderUtil orderUtil,
-                                       Provider<CreateTransportOrderPanel> orderPanelProvider,
-                                       TransportViewFactory transportViewFactory,
-                                       TransportOrdersContainer transportOrderContainer) {
+  public TransportOrdersContainerPanel(
+      SharedKernelServicePortalProvider portalProvider,
+      TransportOrderUtil orderUtil,
+      Provider<CreateTransportOrderPanel> orderPanelProvider,
+      TransportViewFactory transportViewFactory,
+      TransportOrdersContainer transportOrderContainer
+  ) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
     this.orderPanelProvider = requireNonNull(orderPanelProvider, "orderPanelProvider");
     this.transportViewFactory = requireNonNull(transportViewFactory, "transportViewFactory");
-    this.transportOrdersContainer = requireNonNull(transportOrderContainer,
-                                                   "transportOrderContainer");
+    this.transportOrdersContainer = requireNonNull(
+        transportOrderContainer,
+        "transportOrderContainer"
+    );
 
     initComponents();
   }
@@ -149,9 +155,13 @@ public class TransportOrdersContainerPanel
 
     sorter = new FilteredRowSorter<>(tableModel);
     // Sort the table by the creation instant.
-    sorter.setSortKeys(Arrays.asList(
-        new RowSorter.SortKey(TransportOrderTableModel.COLUMN_CREATION_TIME, SortOrder.DESCENDING)
-    ));
+    sorter.setSortKeys(
+        Arrays.asList(
+            new RowSorter.SortKey(
+                TransportOrderTableModel.COLUMN_CREATION_TIME, SortOrder.DESCENDING
+            )
+        )
+    );
     // ...but prevent manual sorting.
     for (int i = 0; i < fTable.getColumnCount(); i++) {
       sorter.setSortable(i, false);
@@ -160,8 +170,12 @@ public class TransportOrdersContainerPanel
     fTable.setRowSorter(sorter);
 
     // Hide the column that shows the creation time.
-    fTable.removeColumn(fTable.getColumnModel()
-        .getColumn(fTable.convertColumnIndexToView(TransportOrderTableModel.COLUMN_CREATION_TIME)));
+    fTable.removeColumn(
+        fTable.getColumnModel()
+            .getColumn(
+                fTable.convertColumnIndexToView(TransportOrderTableModel.COLUMN_CREATION_TIME)
+            )
+    );
 
     JScrollPane scrollPane = new JScrollPane(fTable);
     add(scrollPane, BorderLayout.CENTER);
@@ -193,12 +207,16 @@ public class TransportOrdersContainerPanel
     getSelectedTransportOrder().ifPresent(transportOrder -> {
       DialogContent content = transportViewFactory.createTransportOrderView(transportOrder);
       StandardContentDialog dialog
-          = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
-                                      content,
-                                      true,
-                                      StandardContentDialog.CLOSE);
-      dialog.setTitle(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
-          .getString("transportOrdersContainerPanel.dialog_createTransportOrder.title"));
+          = new StandardContentDialog(
+              JOptionPane.getFrameForComponent(this),
+              content,
+              true,
+              StandardContentDialog.CLOSE
+          );
+      dialog.setTitle(
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+              .getString("transportOrdersContainerPanel.dialog_createTransportOrder.title")
+      );
       dialog.setVisible(true);
     });
   }
@@ -208,17 +226,21 @@ public class TransportOrdersContainerPanel
       CreateTransportOrderPanel content = orderPanelProvider.get();
       content.setPattern(transportOrder);
       StandardContentDialog dialog
-          = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
-                                      content);
+          = new StandardContentDialog(
+              JOptionPane.getFrameForComponent(this),
+              content
+          );
       dialog.setVisible(true);
 
       if (dialog.getReturnStatus() == StandardContentDialog.RET_OK) {
-        orderUtil.createTransportOrder(content.getDestinationModels(),
-                                       content.getActions(),
-                                       content.getPropertiesList(),
-                                       content.getSelectedDeadline(),
-                                       content.getSelectedVehicle(),
-                                       content.getSelectedType());
+        orderUtil.createTransportOrder(
+            content.getDestinationModels(),
+            content.getActions(),
+            content.getPropertiesList(),
+            content.getSelectedDeadline(),
+            content.getSelectedVehicle(),
+            content.getSelectedType()
+        );
       }
     });
   }
@@ -242,20 +264,27 @@ public class TransportOrdersContainerPanel
         LOG.warn("Exception retrieving vehicles", exc);
         JOptionPane.showMessageDialog(
             this,
-            bundle.getString("transportOrdersContainerPanel.table_orders."
-                + "popupMenuItem_setIntendedVehicle.error.message"),
-            bundle.getString("transportOrdersContainerPanel.table_orders."
-                + "popupMenuItem_setIntendedVehicle.error.title"),
-            ERROR);
+            bundle.getString(
+                "transportOrdersContainerPanel.table_orders."
+                    + "popupMenuItem_setIntendedVehicle.error.message"
+            ),
+            bundle.getString(
+                "transportOrdersContainerPanel.table_orders."
+                    + "popupMenuItem_setIntendedVehicle.error.title"
+            ),
+            ERROR
+        );
         return;
       }
 
       IntendedVehiclesPanel panel = new IntendedVehiclesPanel(vehicles);
       StandardContentDialog dialog = new StandardContentDialog(this, panel);
       panel.addInputValidationListener(dialog);
-      dialog.setTitle(bundle.getString(
-          "transportOrdersContainerPanel.table_orders.popupMenuItem_setIntendedVehicle.text"
-      ));
+      dialog.setTitle(
+          bundle.getString(
+              "transportOrdersContainerPanel.table_orders.popupMenuItem_setIntendedVehicle.text"
+          )
+      );
       dialog.setVisible(true);
 
       if (dialog.getReturnStatus() != StandardContentDialog.RET_OK) {
@@ -270,19 +299,26 @@ public class TransportOrdersContainerPanel
         );
       }
       catch (KernelRuntimeException exc) {
-        LOG.warn("Exception setting intended vehicle {} on transport order {}",
-                 panel.getSelectedVehicle()
-                     .map(v -> v.getName())
-                     .orElse("null"),
-                 transportOrder.getName(),
-                 exc);
+        LOG.warn(
+            "Exception setting intended vehicle {} on transport order {}",
+            panel.getSelectedVehicle()
+                .map(v -> v.getName())
+                .orElse("null"),
+            transportOrder.getName(),
+            exc
+        );
         JOptionPane.showMessageDialog(
             this,
-            bundle.getString("transportOrdersContainerPanel.table_orders."
-                + "popupMenuItem_setIntendedVehicle.error.message"),
-            bundle.getString("transportOrdersContainerPanel.table_orders."
-                + "popupMenuItem_setIntendedVehicle.error.title"),
-            ERROR);
+            bundle.getString(
+                "transportOrdersContainerPanel.table_orders."
+                    + "popupMenuItem_setIntendedVehicle.error.message"
+            ),
+            bundle.getString(
+                "transportOrdersContainerPanel.table_orders."
+                    + "popupMenuItem_setIntendedVehicle.error.title"
+            ),
+            ERROR
+        );
       }
     });
   }
@@ -299,9 +335,12 @@ public class TransportOrdersContainerPanel
         JOptionPane.showMessageDialog(
             this,
             mapOrderAssignmentVetoToReason(exc),
-            bundle.getString("transportOrdersContainerPanel.table_orders."
-                + "popupMenuItem_assignToVehicle.error.title"),
-            ERROR);
+            bundle.getString(
+                "transportOrdersContainerPanel.table_orders."
+                    + "popupMenuItem_assignToVehicle.error.title"
+            ),
+            ERROR
+        );
       }
       catch (KernelRuntimeException exc) {
         LOG.warn("Exception assigning transport order: {}", transportOrder.getName(), exc);
@@ -309,11 +348,16 @@ public class TransportOrdersContainerPanel
             = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
         JOptionPane.showMessageDialog(
             this,
-            bundle.getString("transportOrdersContainerPanel.table_orders."
-                + "popupMenuItem_assignToVehicle.error.genericMessage"),
-            bundle.getString("transportOrdersContainerPanel.table_orders."
-                + "popupMenuItem_assignToVehicle.error.title"),
-            ERROR);
+            bundle.getString(
+                "transportOrdersContainerPanel.table_orders."
+                    + "popupMenuItem_assignToVehicle.error.genericMessage"
+            ),
+            bundle.getString(
+                "transportOrdersContainerPanel.table_orders."
+                    + "popupMenuItem_assignToVehicle.error.title"
+            ),
+            ERROR
+        );
       }
     });
   }
@@ -323,37 +367,57 @@ public class TransportOrdersContainerPanel
         = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
     switch (exc.getTransportOrderAssignmentVeto()) {
       case TRANSPORT_ORDER_STATE_INVALID:
-        return bundle.getString("transportOrdersContainerPanel.table_orders."
-            + "popupMenuItem_assignToVehicle.error.transportOrderStateInvalid");
+        return bundle.getString(
+            "transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_assignToVehicle.error.transportOrderStateInvalid"
+        );
       case TRANSPORT_ORDER_PART_OF_ORDER_SEQUENCE:
-        return bundle.getString("transportOrdersContainerPanel.table_orders."
-            + "popupMenuItem_assignToVehicle.error.transportOrderIsPartOfSequence");
+        return bundle.getString(
+            "transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_assignToVehicle.error.transportOrderIsPartOfSequence"
+        );
       case TRANSPORT_ORDER_INTENDED_VEHICLE_NOT_SET:
-        return bundle.getString("transportOrdersContainerPanel.table_orders."
-            + "popupMenuItem_assignToVehicle.error.transportOrderIntendedVehicleNotSet");
+        return bundle.getString(
+            "transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_assignToVehicle.error.transportOrderIntendedVehicleNotSet"
+        );
       case VEHICLE_PROCESSING_STATE_INVALID:
-        return bundle.getString("transportOrdersContainerPanel.table_orders."
-            + "popupMenuItem_assignToVehicle.error.vehicleProcessingStateInvalid");
+        return bundle.getString(
+            "transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_assignToVehicle.error.vehicleProcessingStateInvalid"
+        );
       case VEHICLE_STATE_INVALID:
-        return bundle.getString("transportOrdersContainerPanel.table_orders."
-            + "popupMenuItem_assignToVehicle.error.vehicleStateInvalid");
+        return bundle.getString(
+            "transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_assignToVehicle.error.vehicleStateInvalid"
+        );
       case VEHICLE_INTEGRATION_LEVEL_INVALID:
-        return bundle.getString("transportOrdersContainerPanel.table_orders."
-            + "popupMenuItem_assignToVehicle.error.vehicleIntegrationLevelInvalid");
+        return bundle.getString(
+            "transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_assignToVehicle.error.vehicleIntegrationLevelInvalid"
+        );
       case VEHICLE_CURRENT_POSITION_UNKNOWN:
-        return bundle.getString("transportOrdersContainerPanel.table_orders."
-            + "popupMenuItem_assignToVehicle.error.vehiclePositionUnknown");
+        return bundle.getString(
+            "transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_assignToVehicle.error.vehiclePositionUnknown"
+        );
       case VEHICLE_PROCESSING_ORDER_SEQUENCE:
-        return bundle.getString("transportOrdersContainerPanel.table_orders."
-            + "popupMenuItem_assignToVehicle.error.vehicleIsProcessingOrderSequence");
+        return bundle.getString(
+            "transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_assignToVehicle.error.vehicleIsProcessingOrderSequence"
+        );
       case GENERIC_VETO:
-        return bundle.getString("transportOrdersContainerPanel.table_orders."
-            + "popupMenuItem_assignToVehicle.error.genericMessage");
+        return bundle.getString(
+            "transportOrdersContainerPanel.table_orders."
+                + "popupMenuItem_assignToVehicle.error.genericMessage"
+        );
       case NO_VETO:
       default:
-        LOG.warn("TransportOrderAssignmentException with unmapped veto: {}, caused by: {}",
-                 exc.getTransportOrderAssignmentVeto().name(),
-                 exc);
+        LOG.warn(
+            "TransportOrderAssignmentException with unmapped veto: {}, caused by: {}",
+            exc.getTransportOrderAssignmentVeto().name(),
+            exc
+        );
         return exc.getTransportOrderAssignmentVeto().name();
     }
   }
@@ -373,14 +437,18 @@ public class TransportOrdersContainerPanel
 
     menu.add(new JSeparator());
 
-    item = menu.add(bundle.getString(
-        "transportOrdersContainerPanel.table_orders.popupMenuItem_orderAsTemplate.text")
+    item = menu.add(
+        bundle.getString(
+            "transportOrdersContainerPanel.table_orders.popupMenuItem_orderAsTemplate.text"
+        )
     );
     item.setEnabled(singleRowSelected);
     item.addActionListener((ActionEvent evt) -> createTransportOrderWithPattern());
 
-    item = menu.add(bundle.getString(
-        "transportOrdersContainerPanel.table_orders.popupMenuItem_copyOrder.text")
+    item = menu.add(
+        bundle.getString(
+            "transportOrdersContainerPanel.table_orders.popupMenuItem_copyOrder.text"
+        )
     );
     item.setEnabled(singleRowSelected);
     item.addActionListener((ActionEvent evt) -> createCopyOfSelectedTransportOrder());
@@ -393,18 +461,24 @@ public class TransportOrdersContainerPanel
           || transportOrder.getState() == ACTIVE
           || transportOrder.getState() == DISPATCHABLE);
 
-      JMenuItem menuItem = menu.add(bundle.getString(
-          "transportOrdersContainerPanel.table_orders.popupMenuItem_setIntendedVehicle.text")
+      JMenuItem menuItem = menu.add(
+          bundle.getString(
+              "transportOrdersContainerPanel.table_orders.popupMenuItem_setIntendedVehicle.text"
+          )
       );
       menuItem.setEnabled(singleRowSelected && statePreparing);
       menuItem.addActionListener((ActionEvent evt) -> setIntendedVehicle());
 
-      menuItem = menu.add(bundle.getString(
-          "transportOrdersContainerPanel.table_orders.popupMenuItem_assignToVehicle.text")
+      menuItem = menu.add(
+          bundle.getString(
+              "transportOrdersContainerPanel.table_orders.popupMenuItem_assignToVehicle.text"
+          )
       );
-      menuItem.setEnabled(singleRowSelected
-          && statePreparing
-          && transportOrder.getIntendedVehicle() != null);
+      menuItem.setEnabled(
+          singleRowSelected
+              && statePreparing
+              && transportOrder.getIntendedVehicle() != null
+      );
       menuItem.addActionListener((ActionEvent evt) -> assignTransportOrderToVehicle());
     });
 
@@ -443,9 +517,11 @@ public class TransportOrdersContainerPanel
     List<JToggleButton> buttons = new ArrayList<>();
     IconToolkit iconkit = IconToolkit.instance();
 
-    button = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterRaw.16x16.gif"),
-                              createFilterForState(RAW),
-                              sorter);
+    button = new FilterButton(
+        iconkit.getImageIconByFullPath(ICON_PATH + "filterRaw.16x16.gif"),
+        createFilterForState(RAW),
+        sorter
+    );
 
     button.setToolTipText(
         bundle.getString("transportOrdersContainerPanel.button_filterRawOrders.tooltipText")
@@ -453,9 +529,11 @@ public class TransportOrdersContainerPanel
     buttons.add(button);
 
     button
-        = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterActivated.16x16.gif"),
-                           createFilterForState(DISPATCHABLE),
-                           sorter);
+        = new FilterButton(
+            iconkit.getImageIconByFullPath(ICON_PATH + "filterActivated.16x16.gif"),
+            createFilterForState(DISPATCHABLE),
+            sorter
+        );
     button.setToolTipText(
         bundle.getString(
             "transportOrdersContainerPanel.button_filterDispatchableOrders.tooltipText"
@@ -464,26 +542,32 @@ public class TransportOrdersContainerPanel
     buttons.add(button);
 
     button
-        = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterProcessing.16x16.gif"),
-                           createFilterForState(BEING_PROCESSED),
-                           sorter);
+        = new FilterButton(
+            iconkit.getImageIconByFullPath(ICON_PATH + "filterProcessing.16x16.gif"),
+            createFilterForState(BEING_PROCESSED),
+            sorter
+        );
     button.setToolTipText(
         bundle.getString("transportOrdersContainerPanel.button_filterProcessedOrders.tooltipText")
     );
     buttons.add(button);
 
     button
-        = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterFinished.16x16.gif"),
-                           createFilterForState(FINISHED),
-                           sorter);
+        = new FilterButton(
+            iconkit.getImageIconByFullPath(ICON_PATH + "filterFinished.16x16.gif"),
+            createFilterForState(FINISHED),
+            sorter
+        );
     button.setToolTipText(
         bundle.getString("transportOrdersContainerPanel.button_filterFinishedOrders.tooltipText")
     );
     buttons.add(button);
 
-    button = new FilterButton(iconkit.getImageIconByFullPath(ICON_PATH + "filterFailed.16x16.gif"),
-                              createFilterForState(FAILED),
-                              sorter);
+    button = new FilterButton(
+        iconkit.getImageIconByFullPath(ICON_PATH + "filterFailed.16x16.gif"),
+        createFilterForState(FAILED),
+        sorter
+    );
     button.setToolTipText(
         bundle.getString("transportOrdersContainerPanel.button_filterFailedOrders.tooltipText")
     );

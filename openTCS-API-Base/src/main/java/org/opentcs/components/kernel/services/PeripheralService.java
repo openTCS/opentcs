@@ -21,7 +21,8 @@ import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformatio
  * Provides methods concerning peripheral devices represented by {@link Location}s.
  */
 public interface PeripheralService
-    extends TCSObjectService {
+    extends
+      TCSObjectService {
 
   /**
    * Attaches the described comm adapter to the referenced location.
@@ -31,9 +32,12 @@ public interface PeripheralService
    * @throws ObjectUnknownException If the referenced location does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
-  void attachCommAdapter(TCSResourceReference<Location> ref,
-                         PeripheralCommAdapterDescription description)
-      throws ObjectUnknownException, KernelRuntimeException;
+  void attachCommAdapter(
+      TCSResourceReference<Location> ref,
+      PeripheralCommAdapterDescription description
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Disables the comm adapter attached to the referenced location.
@@ -43,7 +47,8 @@ public interface PeripheralService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void disableCommAdapter(TCSResourceReference<Location> ref)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Enables the comm adapter attached to the referenced location.
@@ -53,7 +58,8 @@ public interface PeripheralService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void enableCommAdapter(TCSResourceReference<Location> ref)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Returns attachment information for the referenced location.
@@ -64,7 +70,8 @@ public interface PeripheralService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   PeripheralAttachmentInformation fetchAttachmentInformation(TCSResourceReference<Location> ref)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Returns the process model for the referenced location.
@@ -75,7 +82,8 @@ public interface PeripheralService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   PeripheralProcessModel fetchProcessModel(TCSResourceReference<Location> ref)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Sends a {@link PeripheralAdapterCommand} to the comm adapter attached to the referenced
@@ -92,5 +100,6 @@ public interface PeripheralService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void sendCommAdapterCommand(TCSResourceReference<Location> ref, PeripheralAdapterCommand command)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 }

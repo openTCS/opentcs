@@ -15,7 +15,8 @@ import org.opentcs.util.Environment;
  * An about dialog.
  */
 public class AboutDialog
-    extends JDialog {
+    extends
+      JDialog {
 
   /**
    * Creates new AboutDialog.
@@ -29,6 +30,7 @@ public class AboutDialog
     initComponents();
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
@@ -220,10 +222,15 @@ public class AboutDialog
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
     this.setVisible(false);
   }//GEN-LAST:event_closeButtonActionPerformed
+
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton closeButton;
   private javax.swing.JPanel contactPanel;
@@ -247,4 +254,5 @@ public class AboutDialog
   private javax.swing.JLabel versionTxtLbl;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

@@ -7,11 +7,12 @@
  */
 package org.opentcs.data.model;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.visualization.LocationRepresentation;
@@ -20,8 +21,10 @@ import org.opentcs.data.model.visualization.LocationRepresentation;
  * Describes the type of a {@link Location}.
  */
 public class LocationType
-    extends TCSObject<LocationType>
-    implements Serializable {
+    extends
+      TCSObject<LocationType>
+    implements
+      Serializable {
 
   /**
    * The operations allowed at locations of this type.
@@ -48,59 +51,77 @@ public class LocationType
     this.layout = new Layout();
   }
 
-  private LocationType(String name,
-                       Map<String, String> properties,
-                       ObjectHistory history,
-                       List<String> allowedOperations,
-                       List<String> allowedPeripheralOperations,
-                       Layout layout) {
+  private LocationType(
+      String name,
+      Map<String, String> properties,
+      ObjectHistory history,
+      List<String> allowedOperations,
+      List<String> allowedPeripheralOperations,
+      Layout layout
+  ) {
     super(name, properties, history);
-    this.allowedOperations = listWithoutNullValues(requireNonNull(allowedOperations,
-                                                                  "allowedOperations"));
+    this.allowedOperations = listWithoutNullValues(
+        requireNonNull(
+            allowedOperations,
+            "allowedOperations"
+        )
+    );
     this.allowedPeripheralOperations
-        = listWithoutNullValues(requireNonNull(allowedPeripheralOperations,
-                                               "allowedPeripheralOperations"));
+        = listWithoutNullValues(
+            requireNonNull(
+                allowedPeripheralOperations,
+                "allowedPeripheralOperations"
+            )
+        );
     this.layout = requireNonNull(layout, "layout");
   }
 
   @Override
   public LocationType withProperty(String key, String value) {
-    return new LocationType(getName(),
-                            propertiesWith(key, value),
-                            getHistory(),
-                            allowedOperations,
-                            allowedPeripheralOperations,
-                            layout);
+    return new LocationType(
+        getName(),
+        propertiesWith(key, value),
+        getHistory(),
+        allowedOperations,
+        allowedPeripheralOperations,
+        layout
+    );
   }
 
   @Override
   public LocationType withProperties(Map<String, String> properties) {
-    return new LocationType(getName(),
-                            properties,
-                            getHistory(),
-                            allowedOperations,
-                            allowedPeripheralOperations,
-                            layout);
+    return new LocationType(
+        getName(),
+        properties,
+        getHistory(),
+        allowedOperations,
+        allowedPeripheralOperations,
+        layout
+    );
   }
 
   @Override
   public TCSObject<LocationType> withHistoryEntry(ObjectHistory.Entry entry) {
-    return new LocationType(getName(),
-                            getProperties(),
-                            getHistory().withEntryAppended(entry),
-                            allowedOperations,
-                            allowedPeripheralOperations,
-                            layout);
+    return new LocationType(
+        getName(),
+        getProperties(),
+        getHistory().withEntryAppended(entry),
+        allowedOperations,
+        allowedPeripheralOperations,
+        layout
+    );
   }
 
   @Override
   public TCSObject<LocationType> withHistory(ObjectHistory history) {
-    return new LocationType(getName(),
-                            getProperties(),
-                            history,
-                            allowedOperations,
-                            allowedPeripheralOperations,
-                            layout);
+    return new LocationType(
+        getName(),
+        getProperties(),
+        history,
+        allowedOperations,
+        allowedPeripheralOperations,
+        layout
+    );
   }
 
   /**
@@ -131,12 +152,14 @@ public class LocationType
    * @return A copy of this object, differing in the given value.
    */
   public LocationType withAllowedOperations(List<String> allowedOperations) {
-    return new LocationType(getName(),
-                            getProperties(),
-                            getHistory(),
-                            allowedOperations,
-                            allowedPeripheralOperations,
-                            layout);
+    return new LocationType(
+        getName(),
+        getProperties(),
+        getHistory(),
+        allowedOperations,
+        allowedPeripheralOperations,
+        layout
+    );
   }
 
   /**
@@ -155,12 +178,14 @@ public class LocationType
    * @return A copy of this object, differing in the given value.
    */
   public LocationType withAllowedPeripheralOperations(List<String> allowedPeripheralOperations) {
-    return new LocationType(getName(),
-                            getProperties(),
-                            getHistory(),
-                            allowedOperations,
-                            allowedPeripheralOperations,
-                            layout);
+    return new LocationType(
+        getName(),
+        getProperties(),
+        getHistory(),
+        allowedOperations,
+        allowedPeripheralOperations,
+        layout
+    );
   }
 
   /**
@@ -179,19 +204,22 @@ public class LocationType
    * @return A copy of this object, differing in the given value.
    */
   public LocationType withLayout(Layout layout) {
-    return new LocationType(getName(),
-                            getProperties(),
-                            getHistory(),
-                            allowedOperations,
-                            allowedPeripheralOperations,
-                            layout);
+    return new LocationType(
+        getName(),
+        getProperties(),
+        getHistory(),
+        allowedOperations,
+        allowedPeripheralOperations,
+        layout
+    );
   }
 
   /**
    * Contains information regarding the grahical representation of a location type.
    */
   public static class Layout
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The location representation to use for locations with this location type.
@@ -212,8 +240,10 @@ public class LocationType
      * location type.
      */
     public Layout(LocationRepresentation locationRepresentation) {
-      this.locationRepresentation = requireNonNull(locationRepresentation,
-                                                   "locationRepresentation");
+      this.locationRepresentation = requireNonNull(
+          locationRepresentation,
+          "locationRepresentation"
+      );
     }
 
     /**

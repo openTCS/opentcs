@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.common.components.drawing.figures;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.Color;
@@ -23,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.jhotdraw.geom.Geom;
 import org.opentcs.data.model.TCSResourceReference;
@@ -39,7 +40,8 @@ import org.opentcs.guing.common.components.drawing.ZoomPoint;
  * A figure that represents a decision point.
  */
 public class PointFigure
-    extends TCSFigure {
+    extends
+      TCSFigure {
 
   /**
    * A color for parking positions.
@@ -65,8 +67,11 @@ public class PointFigure
    * @param drawingOptions The drawing options.
    */
   @Inject
-  public PointFigure(@Assisted PointModel model,
-                     DrawingOptions drawingOptions) {
+  public PointFigure(
+      @Assisted
+      PointModel model,
+      DrawingOptions drawingOptions
+  ) {
     super(model);
     this.drawingOptions = requireNonNull(drawingOptions, "drawingOptions");
 
@@ -124,7 +129,8 @@ public class PointFigure
     Point2D lead = new Point2D.Double();  // not used
     setBounds(
         (Point2D.Double) tx.transform(center, center),
-        (Point2D.Double) tx.transform(lead, lead));
+        (Point2D.Double) tx.transform(lead, lead)
+    );
   }
 
   @Override  // AbstractFigure
@@ -146,14 +152,16 @@ public class PointFigure
   }
 
   private void drawRouteDecoration(Graphics2D g) {
-    for (Map.Entry<VehicleModel, AllocationState> entry
-             : getModel().getAllocationStates().entrySet()) {
+    for (Map.Entry<VehicleModel, AllocationState> entry : getModel().getAllocationStates()
+        .entrySet()) {
       VehicleModel vehicleModel = entry.getKey();
       switch (entry.getValue()) {
         case CLAIMED:
-          drawDecoration(g,
-                         Strokes.PATH_ON_ROUTE,
-                         transparentColor(vehicleModel.getDriveOrderColor(), 70));
+          drawDecoration(
+              g,
+              Strokes.PATH_ON_ROUTE,
+              transparentColor(vehicleModel.getDriveOrderColor(), 70)
+          );
           break;
         case ALLOCATED:
           drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
@@ -162,7 +170,7 @@ public class PointFigure
           drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
           break;
         default:
-        // Don't draw any decoration.
+          // Don't draw any decoration.
       }
     }
   }
@@ -260,14 +268,20 @@ public class PointFigure
     }
   }
 
-  private boolean containsDriveOrderDestination(Set<TCSResourceReference<?>> resources,
-                                                VehicleModel vehicle) {
+  private boolean containsDriveOrderDestination(
+      Set<TCSResourceReference<?>> resources,
+      VehicleModel vehicle
+  ) {
     if (vehicle.getDriveOrderDestination() == null) {
       return false;
     }
 
     return resources.stream()
-        .anyMatch(resource -> Objects.equals(resource.getName(),
-                                             vehicle.getDriveOrderDestination().getName()));
+        .anyMatch(
+            resource -> Objects.equals(
+                resource.getName(),
+                vehicle.getDriveOrderDestination().getName()
+            )
+        );
   }
 }

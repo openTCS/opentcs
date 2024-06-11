@@ -7,19 +7,20 @@
  */
 package org.opentcs.strategies.basic.scheduling.modules.areaAllocation;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.GeometryCollection;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.GeometryCollection;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Envelope;
@@ -74,11 +75,13 @@ class CachingAreaProviderTest {
         Map.of(
             "some-envelope-key",
             new Envelope(
-                List.of(new Couple(100, 0),
-                        new Couple(100, 10),
-                        new Couple(110, 10),
-                        new Couple(110, 0),
-                        new Couple(100, 0))
+                List.of(
+                    new Couple(100, 0),
+                    new Couple(100, 10),
+                    new Couple(110, 10),
+                    new Couple(110, 0),
+                    new Couple(100, 0)
+                )
             )
         )
     );
@@ -86,11 +89,13 @@ class CachingAreaProviderTest {
         Map.of(
             "some-envelope-key",
             new Envelope(
-                List.of(new Couple(110, 0),
-                        new Couple(110, 10),
-                        new Couple(120, 10),
-                        new Couple(120, 0),
-                        new Couple(110, 0))
+                List.of(
+                    new Couple(110, 0),
+                    new Couple(110, 10),
+                    new Couple(120, 10),
+                    new Couple(120, 0),
+                    new Couple(110, 0)
+                )
             )
         )
     );
@@ -98,11 +103,13 @@ class CachingAreaProviderTest {
         Map.of(
             "some-envelope-key",
             new Envelope(
-                List.of(new Couple(0, 0),
-                        new Couple(0, 10),
-                        new Couple(110, 10),
-                        new Couple(110, 0),
-                        new Couple(0, 0))
+                List.of(
+                    new Couple(0, 0),
+                    new Couple(0, 10),
+                    new Couple(110, 10),
+                    new Couple(110, 0),
+                    new Couple(0, 0)
+                )
             )
         )
     );
@@ -132,11 +139,13 @@ class CachingAreaProviderTest {
         Map.of(
             "some-envelope-key",
             new Envelope(
-                List.of(new Couple(100, 0),
-                        new Couple(100, 10),
-                        new Couple(110, 10),
-                        new Couple(110, 0),
-                        new Couple(100, 0))
+                List.of(
+                    new Couple(100, 0),
+                    new Couple(100, 10),
+                    new Couple(110, 10),
+                    new Couple(110, 0),
+                    new Couple(100, 0)
+                )
             )
         )
     );
@@ -144,11 +153,13 @@ class CachingAreaProviderTest {
         Map.of(
             "some-envelope-key",
             new Envelope(
-                List.of(new Couple(110, 0),
-                        new Couple(110, 10),
-                        new Couple(120, 10),
-                        new Couple(120, 0),
-                        new Couple(110, 0))
+                List.of(
+                    new Couple(110, 0),
+                    new Couple(110, 10),
+                    new Couple(120, 10),
+                    new Couple(120, 0),
+                    new Couple(110, 0)
+                )
             )
         )
     );
@@ -156,11 +167,13 @@ class CachingAreaProviderTest {
         Map.of(
             "some-envelope-key",
             new Envelope(
-                List.of(new Couple(0, 0),
-                        new Couple(0, 10),
-                        new Couple(110, 10),
-                        new Couple(110, 0),
-                        new Couple(0, 0))
+                List.of(
+                    new Couple(0, 0),
+                    new Couple(0, 10),
+                    new Couple(110, 10),
+                    new Couple(110, 0),
+                    new Couple(0, 0)
+                )
             )
         )
     );

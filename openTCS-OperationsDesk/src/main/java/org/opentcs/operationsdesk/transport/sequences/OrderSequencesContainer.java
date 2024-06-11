@@ -7,12 +7,13 @@
  */
 package org.opentcs.operationsdesk.transport.sequences;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
@@ -33,8 +34,9 @@ import org.slf4j.LoggerFactory;
  * Maintains a set of all order sequences existing on the kernel.
  */
 public class OrderSequencesContainer
-    implements Lifecycle,
-               EventHandler {
+    implements
+      Lifecycle,
+      EventHandler {
 
   /**
    * This class's logger.
@@ -62,8 +64,11 @@ public class OrderSequencesContainer
   private boolean initialized;
 
   @Inject
-  public OrderSequencesContainer(@ApplicationEventBus EventBus eventBus,
-                                 SharedKernelServicePortalProvider portalProvider) {
+  public OrderSequencesContainer(
+      @ApplicationEventBus
+      EventBus eventBus,
+      SharedKernelServicePortalProvider portalProvider
+  ) {
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
   }
@@ -116,7 +121,7 @@ public class OrderSequencesContainer
 
   private Set<OrderSequence> fetchSequencesIfOnline() {
     if (portalProvider.portalShared()) {
-      try ( SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+      try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
         return sharedPortal.getPortal().getTransportOrderService()
             .fetchObjects(OrderSequence.class);
       }

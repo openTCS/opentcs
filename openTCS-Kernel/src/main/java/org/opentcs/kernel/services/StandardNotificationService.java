@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.services;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.function.Predicate;
 import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
@@ -20,7 +21,8 @@ import org.opentcs.kernel.workingset.NotificationBuffer;
  * This class is the standard implementation of the {@link NotificationService} interface.
  */
 public class StandardNotificationService
-    implements NotificationService {
+    implements
+      NotificationService {
 
   /**
    * A global object to be used for synchronization within the kernel.
@@ -38,8 +40,11 @@ public class StandardNotificationService
    * @param notificationBuffer The notification buffer to be used.
    */
   @Inject
-  public StandardNotificationService(@GlobalSyncObject Object globalSyncObject,
-                                     NotificationBuffer notificationBuffer) {
+  public StandardNotificationService(
+      @GlobalSyncObject
+      Object globalSyncObject,
+      NotificationBuffer notificationBuffer
+  ) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.notificationBuffer = requireNonNull(notificationBuffer, "notificationBuffer");
   }

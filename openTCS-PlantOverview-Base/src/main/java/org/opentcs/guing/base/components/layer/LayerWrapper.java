@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.base.components.layer;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 import org.opentcs.data.model.visualization.Layer;
 import org.opentcs.data.model.visualization.LayerGroup;
 import org.opentcs.guing.base.model.ModelComponent;
@@ -35,7 +36,12 @@ public class LayerWrapper {
    * @param layer The layer.
    * @param layerGroup The layer group the layer is assigned to.
    */
-  public LayerWrapper(@Nonnull Layer layer, @Nonnull LayerGroup layerGroup) {
+  public LayerWrapper(
+      @Nonnull
+      Layer layer,
+      @Nonnull
+      LayerGroup layerGroup
+  ) {
     this.layer = requireNonNull(layer, "layer");
     this.layerGroup = requireNonNull(layerGroup, "layerGroup");
   }
@@ -55,7 +61,10 @@ public class LayerWrapper {
    *
    * @param layer The layer.
    */
-  public void setLayer(@Nonnull Layer layer) {
+  public void setLayer(
+      @Nonnull
+      Layer layer
+  ) {
     this.layer = requireNonNull(layer, "layer");
   }
 

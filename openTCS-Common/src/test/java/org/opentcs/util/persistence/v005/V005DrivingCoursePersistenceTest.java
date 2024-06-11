@@ -7,16 +7,17 @@
  */
 package org.opentcs.util.persistence.v005;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -73,8 +74,10 @@ class V005DrivingCoursePersistenceTest {
     assertThat(parsedModel.getPoints().get(0).getVehicleOrientationAngle(), is(12.34f));
     assertThat(parsedModel.getPoints().get(0).getType(), is(equalTo("PARK_POSITION")));
     assertThat(parsedModel.getPoints().get(0).getOutgoingPaths(), hasSize(1));
-    assertThat(parsedModel.getPoints().get(0).getOutgoingPaths().get(0).getName(),
-               is(equalTo("some-path")));
+    assertThat(
+        parsedModel.getPoints().get(0).getOutgoingPaths().get(0).getName(),
+        is(equalTo("some-path"))
+    );
   }
 
   @Test
@@ -119,10 +122,14 @@ class V005DrivingCoursePersistenceTest {
     assertThat(parsedModel.getPaths().get(0).getSourcePoint(), is(equalTo("some-source-point")));
     assertThat(parsedModel.getPaths().get(0).getDestinationPoint(), is(equalTo("some-dest-point")));
     assertThat(parsedModel.getPaths().get(0).getPeripheralOperations(), hasSize(1));
-    assertThat(parsedModel.getPaths().get(0).getPeripheralOperations().get(0).getLocationName(),
-               is(equalTo("some-loc-name")));
-    assertThat(parsedModel.getPaths().get(0).getPeripheralOperations().get(0).getExecutionTrigger(),
-               is(equalTo("AFTER_ALLOCATION")));
+    assertThat(
+        parsedModel.getPaths().get(0).getPeripheralOperations().get(0).getLocationName(),
+        is(equalTo("some-loc-name"))
+    );
+    assertThat(
+        parsedModel.getPaths().get(0).getPeripheralOperations().get(0).getExecutionTrigger(),
+        is(equalTo("AFTER_ALLOCATION"))
+    );
     assertThat(
         parsedModel.getPaths().get(0).getPeripheralOperations().get(0).isCompletionRequired(),
         is(true)
@@ -177,9 +184,13 @@ class V005DrivingCoursePersistenceTest {
     plantModel.getLocations().get(0).getLinks().add(
         new LocationTO.Link()
             .setPoint("some-point")
-            .setAllowedOperations(new ArrayList<>(List.of(
-                (AllowedOperationTO) new AllowedOperationTO().setName("some-op")
-            )))
+            .setAllowedOperations(
+                new ArrayList<>(
+                    List.of(
+                        (AllowedOperationTO) new AllowedOperationTO().setName("some-op")
+                    )
+                )
+            )
     );
 
     // Write to XML...
@@ -195,10 +206,14 @@ class V005DrivingCoursePersistenceTest {
     assertThat(parsedModel.getLocations().get(0).getyPosition(), is(2L));
     assertThat(parsedModel.getLocations().get(0).getzPosition(), is(3L));
     assertThat(parsedModel.getLocations().get(0).getLinks(), hasSize(1));
-    assertThat(parsedModel.getLocations().get(0).getLinks().get(0).getPoint(),
-               is(equalTo("some-point")));
-    assertThat(parsedModel.getLocations().get(0).getLinks().get(0).getAllowedOperations(),
-               hasSize(1));
+    assertThat(
+        parsedModel.getLocations().get(0).getLinks().get(0).getPoint(),
+        is(equalTo("some-point"))
+    );
+    assertThat(
+        parsedModel.getLocations().get(0).getLinks().get(0).getAllowedOperations(),
+        hasSize(1)
+    );
     assertThat(
         parsedModel.getLocations().get(0).getLinks().get(0).getAllowedOperations().get(0).getName(),
         is(equalTo("some-op"))
@@ -223,8 +238,10 @@ class V005DrivingCoursePersistenceTest {
     assertThat(parsedModel.getBlocks().get(0).getName(), is(equalTo("my-block")));
     assertThat(parsedModel.getBlocks().get(0).getType(), is(equalTo("SAME_DIRECTION_ONLY")));
     assertThat(parsedModel.getBlocks().get(0).getMembers(), hasSize(1));
-    assertThat(parsedModel.getBlocks().get(0).getMembers().get(0).getName(),
-               is(equalTo("some-member")));
+    assertThat(
+        parsedModel.getBlocks().get(0).getMembers().get(0).getName(),
+        is(equalTo("some-member"))
+    );
   }
 
   @Test
@@ -265,79 +282,114 @@ class V005DrivingCoursePersistenceTest {
   private V005PlantModelTO createPlantModel() {
     return (V005PlantModelTO) new V005PlantModelTO()
         .setName(UUID.randomUUID().toString())
-        .setPoints(new ArrayList<>(List.of(
-            (PointTO) new PointTO()
-                .setPointLayout(new PointTO.PointLayout()
-                    .setxPosition(1L)
-                    .setyPosition(2L)
-                    .setxLabelOffset(20L)
-                    .setyLabelOffset(20L)
-                    .setLayerId(0))
-                .setName(UUID.randomUUID().toString()),
-            (PointTO) new PointTO()
-                .setPointLayout(new PointTO.PointLayout()
-                    .setxPosition(4L)
-                    .setyPosition(5L)
-                    .setxLabelOffset(20L)
-                    .setyLabelOffset(20L)
-                    .setLayerId(0))
-                .setName(UUID.randomUUID().toString())
-        )))
-        .setPaths(new ArrayList<>(List.of(
-            (PathTO) new PathTO()
-                .setPathLayout(new PathTO.PathLayout()
-                    .setConnectionType("DIRECT")
-                    .setLayerId(0))
-                .setName(UUID.randomUUID().toString())
-        )))
-        .setLocationTypes(new ArrayList<>(List.of(
-            (LocationTypeTO) new LocationTypeTO()
-                .setLocationTypeLayout(new LocationTypeTO.LocationTypeLayout()
-                    .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
+        .setPoints(
+            new ArrayList<>(
+                List.of(
+                    (PointTO) new PointTO()
+                        .setPointLayout(
+                            new PointTO.PointLayout()
+                                .setxPosition(1L)
+                                .setyPosition(2L)
+                                .setxLabelOffset(20L)
+                                .setyLabelOffset(20L)
+                                .setLayerId(0)
+                        )
+                        .setName(UUID.randomUUID().toString()),
+                    (PointTO) new PointTO()
+                        .setPointLayout(
+                            new PointTO.PointLayout()
+                                .setxPosition(4L)
+                                .setyPosition(5L)
+                                .setxLabelOffset(20L)
+                                .setyLabelOffset(20L)
+                                .setLayerId(0)
+                        )
+                        .setName(UUID.randomUUID().toString())
                 )
-                .setName(UUID.randomUUID().toString())
-        )))
-        .setLocations(List.of(
-            (LocationTO) new LocationTO()
-                .setLocationLayout(new LocationTO.LocationLayout()
-                    .setxPosition(100L)
-                    .setyPosition(200L)
-                    .setxLabelOffset(20L)
-                    .setyLabelOffset(20L)
-                    .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
-                    .setLayerId(0))
-                .setName(UUID.randomUUID().toString())
-        ))
-        .setBlocks(List.of(
-            (BlockTO) new BlockTO()
-                .setBlockLayout(
-                    new BlockTO.BlockLayout()
-                        .setColor("#FF0000")
+            )
+        )
+        .setPaths(
+            new ArrayList<>(
+                List.of(
+                    (PathTO) new PathTO()
+                        .setPathLayout(
+                            new PathTO.PathLayout()
+                                .setConnectionType("DIRECT")
+                                .setLayerId(0)
+                        )
+                        .setName(UUID.randomUUID().toString())
                 )
-                .setName(UUID.randomUUID().toString())
-        ))
-        .setVehicles(List.of(
-            (VehicleTO) new VehicleTO()
-                .setVehicleLayout(
-                    new VehicleTO.VehicleLayout()
-                        .setColor("#FF0000")
+            )
+        )
+        .setLocationTypes(
+            new ArrayList<>(
+                List.of(
+                    (LocationTypeTO) new LocationTypeTO()
+                        .setLocationTypeLayout(
+                            new LocationTypeTO.LocationTypeLayout()
+                                .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
+                        )
+                        .setName(UUID.randomUUID().toString())
                 )
-                .setName(UUID.randomUUID().toString())
-        ))
+            )
+        )
+        .setLocations(
+            List.of(
+                (LocationTO) new LocationTO()
+                    .setLocationLayout(
+                        new LocationTO.LocationLayout()
+                            .setxPosition(100L)
+                            .setyPosition(200L)
+                            .setxLabelOffset(20L)
+                            .setyLabelOffset(20L)
+                            .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
+                            .setLayerId(0)
+                    )
+                    .setName(UUID.randomUUID().toString())
+            )
+        )
+        .setBlocks(
+            List.of(
+                (BlockTO) new BlockTO()
+                    .setBlockLayout(
+                        new BlockTO.BlockLayout()
+                            .setColor("#FF0000")
+                    )
+                    .setName(UUID.randomUUID().toString())
+            )
+        )
+        .setVehicles(
+            List.of(
+                (VehicleTO) new VehicleTO()
+                    .setVehicleLayout(
+                        new VehicleTO.VehicleLayout()
+                            .setColor("#FF0000")
+                    )
+                    .setName(UUID.randomUUID().toString())
+            )
+        )
         .setVisualLayout(
             (VisualLayoutTO) new VisualLayoutTO()
                 .setScaleX(50.0f)
                 .setScaleY(50.0f)
-                .setLayers(List.of(new VisualLayoutTO.Layer()
-                    .setId(0)
-                    .setOrdinal(0)
-                    .setVisible(Boolean.TRUE)
-                    .setName(UUID.randomUUID().toString())
-                    .setGroupId(0)))
-                .setLayerGroups(List.of(new VisualLayoutTO.LayerGroup()
-                    .setId(0)
-                    .setName(UUID.randomUUID().toString())
-                    .setVisible(Boolean.TRUE)))
+                .setLayers(
+                    List.of(
+                        new VisualLayoutTO.Layer()
+                            .setId(0)
+                            .setOrdinal(0)
+                            .setVisible(Boolean.TRUE)
+                            .setName(UUID.randomUUID().toString())
+                            .setGroupId(0)
+                    )
+                )
+                .setLayerGroups(
+                    List.of(
+                        new VisualLayoutTO.LayerGroup()
+                            .setId(0)
+                            .setName(UUID.randomUUID().toString())
+                            .setVisible(Boolean.TRUE)
+                    )
+                )
                 .setName(UUID.randomUUID().toString())
         )
         .setVersion("0.0.5");

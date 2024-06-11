@@ -29,11 +29,13 @@ public class PathLengthMath {
    *
    * @return The approximated length of the Bezier curve.
    */
-  public double approximateCubicBezierCurveLength(Coordinate cp0,
-                                                  Coordinate cp1,
-                                                  Coordinate cp2,
-                                                  Coordinate cp3,
-                                                  double granularity) {
+  public double approximateCubicBezierCurveLength(
+      Coordinate cp0,
+      Coordinate cp1,
+      Coordinate cp2,
+      Coordinate cp3,
+      double granularity
+  ) {
     double length = 0.0;
 
     for (int i = 0; i < granularity; i++) {
@@ -59,11 +61,13 @@ public class PathLengthMath {
    * @param cp3 The control point with index 3 (i.e. the end point of the Bezier curve).
    * @return A point's position on a cubic Bezier curve.
    */
-  public Coordinate evaluatePointOnCubicBezierCurve(double t,
-                                                    Coordinate cp0,
-                                                    Coordinate cp1,
-                                                    Coordinate cp2,
-                                                    Coordinate cp3) {
+  public Coordinate evaluatePointOnCubicBezierCurve(
+      double t,
+      Coordinate cp0,
+      Coordinate cp1,
+      Coordinate cp2,
+      Coordinate cp3
+  ) {
     return new Coordinate(
         bernsteinPolynomialOfDegree3(t, cp0.getX(), cp1.getX(), cp2.getX(), cp3.getX()),
         bernsteinPolynomialOfDegree3(t, cp0.getY(), cp1.getY(), cp2.getY(), cp3.getY())
@@ -81,11 +85,13 @@ public class PathLengthMath {
     return Math.sqrt(Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2));
   }
 
-  private double bernsteinPolynomialOfDegree3(double t,
-                                              double cp0,
-                                              double cp1,
-                                              double cp2,
-                                              double cp3) {
+  private double bernsteinPolynomialOfDegree3(
+      double t,
+      double cp0,
+      double cp1,
+      double cp2,
+      double cp3
+  ) {
     double u = 1.0 - t;
     return Math.pow(u, 3) * cp0
         + 3 * Math.pow(u, 2) * t * cp1

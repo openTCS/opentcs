@@ -18,8 +18,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A panel that can edit a string property.
  */
 public class StringPropertyEditorPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   /**
    * The property that is being edited.
@@ -64,6 +66,7 @@ public class StringPropertyEditorPanel
     return fProperty;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -90,4 +93,5 @@ public class StringPropertyEditorPanel
   private javax.swing.JTextArea textArea;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

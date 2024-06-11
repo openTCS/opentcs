@@ -7,15 +7,17 @@
  */
 package org.opentcs.drivers.vehicle.messages;
 
-import java.io.Serializable;
 import static org.opentcs.util.Assertions.checkInRange;
+
+import java.io.Serializable;
 
 /**
  * A message that informs a communication adapter about a speed multiplier it/the vehicle should
  * apply.
  */
 public class SetSpeedMultiplier
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The speed multiplier in percent.

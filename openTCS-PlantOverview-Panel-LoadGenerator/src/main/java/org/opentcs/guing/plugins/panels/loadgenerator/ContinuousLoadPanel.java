@@ -7,13 +7,15 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
+
 import jakarta.inject.Inject;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
@@ -40,7 +42,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Vehicle;
-import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
 import org.opentcs.guing.plugins.panels.loadgenerator.PropertyTableModel.PropEntry;
 import org.opentcs.guing.plugins.panels.loadgenerator.batchcreator.ExplicitOrderBatchGenerator;
 import org.opentcs.guing.plugins.panels.loadgenerator.batchcreator.OrderBatchCreator;
@@ -63,7 +64,8 @@ import org.slf4j.LoggerFactory;
  * A panel for continously creating transport orders.
  */
 public class ContinuousLoadPanel
-    extends PluggablePanel {
+    extends
+      PluggablePanel {
 
   /**
    * This class' logger.
@@ -110,8 +112,11 @@ public class ContinuousLoadPanel
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public ContinuousLoadPanel(SharedKernelServicePortalProvider portalProvider,
-                             @ApplicationEventBus EventSource eventSource) {
+  public ContinuousLoadPanel(
+      SharedKernelServicePortalProvider portalProvider,
+      @ApplicationEventBus
+      EventSource eventSource
+  ) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.eventSource = requireNonNull(eventSource, "eventSource");
 
@@ -158,7 +163,8 @@ public class ContinuousLoadPanel
     toTable.setDefaultEditor(TCSObjectReference.class, vehicleEditor);
     toTable.setDefaultRenderer(
         TCSObjectReference.class,
-        new StringTableCellRenderer<TCSObjectReference<?>>(x -> x == null ? "" : x.getName()));
+        new StringTableCellRenderer<TCSObjectReference<?>>(x -> x == null ? "" : x.getName())
+    );
 
     doTable.getSelectionModel().addListSelectionListener(event -> updateElementStates());
     propertyTable.getSelectionModel().addListSelectionListener(event -> updateElementStates());
@@ -258,10 +264,12 @@ public class ContinuousLoadPanel
     if (randomOrderSpecButton.isSelected()) {
       int orderCount = (Integer) randomOrderCountSpinner.getValue();
       int orderSize = (Integer) randomOrderSizeSpinner.getValue();
-      return new RandomOrderBatchCreator(sharedPortal.getPortal().getTransportOrderService(),
-                                         sharedPortal.getPortal().getDispatcherService(),
-                                         orderCount,
-                                         orderSize);
+      return new RandomOrderBatchCreator(
+          sharedPortal.getPortal().getTransportOrderService(),
+          sharedPortal.getPortal().getDispatcherService(),
+          orderCount,
+          orderSize
+      );
     }
     else if (explicitOrderSpecButton.isSelected()) {
       saveCurrentTableData();
@@ -292,9 +300,11 @@ public class ContinuousLoadPanel
           }
         }
       }
-      return new ExplicitOrderBatchGenerator(sharedPortal.getPortal().getTransportOrderService(),
-                                             sharedPortal.getPortal().getDispatcherService(),
-                                             tableModel.getList());
+      return new ExplicitOrderBatchGenerator(
+          sharedPortal.getPortal().getTransportOrderService(),
+          sharedPortal.getPortal().getDispatcherService(),
+          tableModel.getList()
+      );
     }
     else {
       throw new UnsupportedOperationException("Unsupported order spec.");
@@ -312,14 +322,18 @@ public class ContinuousLoadPanel
       return null;
     }
     if (thresholdTriggerRadioButton.isSelected()) {
-      return new ThresholdOrderGenTrigger(eventSource,
-                                          objectService,
-                                          (Integer) thresholdSpinner.getValue(),
-                                          batchCreator);
+      return new ThresholdOrderGenTrigger(
+          eventSource,
+          objectService,
+          (Integer) thresholdSpinner.getValue(),
+          batchCreator
+      );
     }
     else if (timerTriggerRadioButton.isSelected()) {
-      return new TimeoutOrderGenTrigger((Integer) timerSpinner.getValue() * 1000,
-                                        batchCreator);
+      return new TimeoutOrderGenTrigger(
+          (Integer) timerSpinner.getValue() * 1000,
+          batchCreator
+      );
     }
     else if (singleTriggerRadioButton.isSelected()) {
       return new SingleOrderGenTrigger(batchCreator);
@@ -390,6 +404,7 @@ public class ContinuousLoadPanel
     propertyTable.setModel(new PropertyTableModel(transportOrder.getProperties()));
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
@@ -863,6 +878,8 @@ toTable.getSelectionModel().addListSelectionListener(listener);
 
     getAccessibleContext().setAccessibleName(bundle.getString("continuousLoadPanel.accessibleName")); // NOI18N
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void randomOrderSpecButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_randomOrderSpecButtonActionPerformed
     updateElementStates();
@@ -1016,7 +1033,8 @@ toTable.getSelectionModel().addListSelectionListener(listener);
           bundle.getString("continuousLoadPanel.optionPane_overwriteFileConfirmation.message"),
           bundle.getString("continuousLoadPanel.optionPane_overwriteFileConfirmation.title"),
           JOptionPane.YES_NO_OPTION,
-          JOptionPane.WARNING_MESSAGE);
+          JOptionPane.WARNING_MESSAGE
+      );
       if (dialogResult != JOptionPane.YES_OPTION) {
         return;
       }
@@ -1026,9 +1044,11 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     }
     catch (IOException exc) {
       LOG.warn("Exception saving to " + targetFile.getPath(), exc);
-      JOptionPane.showMessageDialog(this,
-                                    "Exception saving property set: " + exc.getMessage(),
-                                    "Exception saving property set", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(
+          this,
+          "Exception saving property set: " + exc.getMessage(),
+          "Exception saving property set", JOptionPane.ERROR_MESSAGE
+      );
     }
   }//GEN-LAST:event_saveButtonActionPerformed
 
@@ -1040,10 +1060,12 @@ toTable.getSelectionModel().addListSelectionListener(listener);
 
     File targetFile = fileChooser.getSelectedFile();
     if (!targetFile.exists()) {
-      JOptionPane.showMessageDialog(this,
-                                    bundle.getString("continuousLoadPanel.optionPane_fileDoesNotExist.message"),
-                                    bundle.getString("continuousLoadPanel.optionPane_fileDoesNotExist.title"),
-                                    JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(
+          this,
+          bundle.getString("continuousLoadPanel.optionPane_fileDoesNotExist.message"),
+          bundle.getString("continuousLoadPanel.optionPane_fileDoesNotExist.title"),
+          JOptionPane.ERROR_MESSAGE
+      );
       return;
     }
     try {
@@ -1073,17 +1095,24 @@ toTable.getSelectionModel().addListSelectionListener(listener);
             data.setDeadline(TransportOrderData.Deadline.PLUS_TWO_HOURS);
             break;
         }
-        data.setIntendedVehicle(curStruc.getIntendedVehicle() == null ? null
-            : objectService.fetchObject(Vehicle.class,
-                                        curStruc.getIntendedVehicle()).getReference());
+        data.setIntendedVehicle(
+            curStruc.getIntendedVehicle() == null ? null
+                : objectService.fetchObject(
+                    Vehicle.class,
+                    curStruc.getIntendedVehicle()
+                ).getReference()
+        );
         for (TransportOrderEntry.XMLMapEntry curEntry : curStruc.getProperties()) {
           data.addProperty(curEntry.getKey(), curEntry.getValue());
         }
         for (DriveOrderEntry curDOXMLS : curStruc.getDriveOrders()) {
           DriveOrderStructure newDOS
-              = new DriveOrderStructure(objectService.fetchObject(
-                  Location.class, curDOXMLS.getLocationName()).getReference(),
-                                        curDOXMLS.getVehicleOperation());
+              = new DriveOrderStructure(
+                  objectService.fetchObject(
+                      Location.class, curDOXMLS.getLocationName()
+                  ).getReference(),
+                  curDOXMLS.getVehicleOperation()
+              );
           data.addDriveOrder(newDOS);
         }
         newOrders.add(data);
@@ -1099,22 +1128,28 @@ toTable.getSelectionModel().addListSelectionListener(listener);
     }
     catch (IOException | CredentialsException exc) {
       LOG.warn("Exception reading property set from " + targetFile.getPath(), exc);
-      JOptionPane.showMessageDialog(this,
-                                    "Exception reading property set:\n" + exc.getMessage(),
-                                    "Exception reading property set",
-                                    JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(
+          this,
+          "Exception reading property set:\n" + exc.getMessage(),
+          "Exception reading property set",
+          JOptionPane.ERROR_MESSAGE
+      );
     }
     catch (NullPointerException e) {
-      JOptionPane.showMessageDialog(this,
-                                    "Objects in this file seem not to "
-                                    + "appear in this model, please check your model.",
-                                    "Error",
-                                    JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(
+          this,
+          "Objects in this file seem not to "
+              + "appear in this model, please check your model.",
+          "Error",
+          JOptionPane.ERROR_MESSAGE
+      );
     }
 
     updateElementStates();
   }//GEN-LAST:event_openButtonActionPerformed
 
+  // CHECKSTYLE:OFF
+  // FORMATTER:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addDOButton;
   private javax.swing.JButton addPropertyButton;
@@ -1167,12 +1202,14 @@ toTable.getSelectionModel().addListSelectionListener(listener);
   private javax.swing.JPanel triggerPanel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   /**
    * Creates a new selection listener for the transport order table.
    */
   private class TOTableSelectionListener
-      implements ListSelectionListener {
+      implements
+        ListSelectionListener {
 
     /**
      * The transport order table.

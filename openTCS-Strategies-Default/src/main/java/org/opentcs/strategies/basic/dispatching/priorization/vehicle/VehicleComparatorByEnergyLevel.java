@@ -15,7 +15,8 @@ import org.opentcs.data.model.Vehicle;
  * Note: this comparator imposes orderings that are inconsistent with equals.
  */
 public class VehicleComparatorByEnergyLevel
-    implements Comparator<Vehicle> {
+    implements
+      Comparator<Vehicle> {
 
   /**
    * A key used for selecting this comparator in a configuration setting.

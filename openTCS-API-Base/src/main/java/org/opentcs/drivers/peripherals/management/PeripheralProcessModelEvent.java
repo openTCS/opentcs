@@ -7,9 +7,10 @@
  */
 package org.opentcs.drivers.peripherals.management;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.drivers.peripherals.PeripheralProcessModel;
@@ -19,8 +20,10 @@ import org.opentcs.drivers.peripherals.PeripheralProcessModel;
  * {@link PeripheralProcessModel}s.
  */
 public class PeripheralProcessModelEvent
-    extends PeripheralCommAdapterEvent
-    implements Serializable {
+    extends
+      PeripheralCommAdapterEvent
+    implements
+      Serializable {
 
   /**
    * The location assiciated with the peripheral device.
@@ -42,9 +45,14 @@ public class PeripheralProcessModelEvent
    * @param attributeChanged The name of the attribute that has changed in the process model.
    * @param processModel The process model with its current/changed state.
    */
-  public PeripheralProcessModelEvent(@Nonnull TCSResourceReference<Location> location,
-                                     @Nonnull String attributeChanged,
-                                     @Nonnull PeripheralProcessModel processModel) {
+  public PeripheralProcessModelEvent(
+      @Nonnull
+      TCSResourceReference<Location> location,
+      @Nonnull
+      String attributeChanged,
+      @Nonnull
+      PeripheralProcessModel processModel
+  ) {
     this.location = requireNonNull(location, "location");
     this.attributeChanged = requireNonNull(attributeChanged, "attributeChanged");
     this.processModel = requireNonNull(processModel, "processModel");

@@ -7,10 +7,11 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator.batchcreator;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,7 +35,8 @@ import org.slf4j.LoggerFactory;
  * a real plant.
  */
 public class RandomOrderBatchCreator
-    implements OrderBatchCreator {
+    implements
+      OrderBatchCreator {
 
   /**
    * This class's logger.
@@ -73,10 +75,12 @@ public class RandomOrderBatchCreator
    * @param batchSize The number of transport orders per batch.
    * @param orderSize The number of drive orders per transport order.
    */
-  public RandomOrderBatchCreator(TransportOrderService transportOrderService,
-                                 DispatcherService dispatcherService,
-                                 int batchSize,
-                                 int orderSize) {
+  public RandomOrderBatchCreator(
+      TransportOrderService transportOrderService,
+      DispatcherService dispatcherService,
+      int batchSize,
+      int orderSize
+  ) {
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.batchSize = batchSize;
@@ -115,17 +119,17 @@ public class RandomOrderBatchCreator
   }
 
   private List<Location> initializeLocations() {
-    Set<TCSObjectReference<LocationType>> suitableLocationTypeRefs =
-        transportOrderService.fetchObjects(LocationType.class)
+    Set<TCSObjectReference<LocationType>> suitableLocationTypeRefs
+        = transportOrderService.fetchObjects(LocationType.class)
             .stream()
             .filter(locationType -> locationType.isAllowedOperation(Destination.OP_NOP))
             .map(TCSObject::getReference)
             .collect(Collectors.toSet());
 
     return transportOrderService.fetchObjects(Location.class)
-               .stream()
-               .filter(location -> !location.getAttachedLinks().isEmpty())
-               .filter(location -> suitableLocationTypeRefs.contains(location.getType()))
-               .collect(Collectors.toList());
+        .stream()
+        .filter(location -> !location.getAttachedLinks().isEmpty())
+        .filter(location -> suitableLocationTypeRefs.contains(location.getType()))
+        .collect(Collectors.toList());
   }
 }

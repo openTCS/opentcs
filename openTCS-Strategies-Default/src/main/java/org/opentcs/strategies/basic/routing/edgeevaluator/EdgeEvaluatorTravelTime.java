@@ -7,16 +7,18 @@
  */
 package org.opentcs.strategies.basic.routing.edgeevaluator;
 
+import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
+
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
 import org.opentcs.data.model.Vehicle;
-import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
 
 /**
  * Uses the estimated travel time (length/maximum velocity) for an edge as its weight.
  */
 public class EdgeEvaluatorTravelTime
-    implements EdgeEvaluator {
+    implements
+      EdgeEvaluator {
 
   /**
    * A key used for selecting this evaluator in a configuration setting.
@@ -39,8 +41,10 @@ public class EdgeEvaluatorTravelTime
   public double computeWeight(Edge edge, Vehicle vehicle) {
     int maxVelocity;
     if (edge.isTravellingReverse()) {
-      maxVelocity = Math.min(vehicle.getMaxReverseVelocity(),
-                             edge.getPath().getMaxReverseVelocity());
+      maxVelocity = Math.min(
+          vehicle.getMaxReverseVelocity(),
+          edge.getPath().getMaxReverseVelocity()
+      );
     }
     else {
       maxVelocity = Math.min(vehicle.getMaxVelocity(), edge.getPath().getMaxVelocity());

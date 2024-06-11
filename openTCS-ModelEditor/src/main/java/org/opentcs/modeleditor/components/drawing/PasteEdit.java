@@ -7,9 +7,10 @@
  */
 package org.opentcs.modeleditor.components.drawing;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -22,7 +23,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * Undoes or redoes a "paste" action.
  */
 public class PasteEdit
-    extends AbstractUndoableEdit {
+    extends
+      AbstractUndoableEdit {
 
   /**
    * The drawing view we're working with.

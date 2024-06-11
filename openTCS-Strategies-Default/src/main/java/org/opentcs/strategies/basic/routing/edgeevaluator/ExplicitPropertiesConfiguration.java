@@ -24,10 +24,9 @@ public interface ExplicitPropertiesConfiguration {
   @ConfigurationEntry(
       type = "String",
       description = {
-        "The default value used as the routing cost of an edge if no property is set on the "
-        + "corresponding path.",
-        "The value should be an integer. "
-        + "If it is not, the edge is excluded from routing."},
+          "The default value used as the routing cost of an edge if no property is set on the "
+              + "corresponding path.",
+          "The value should be an integer. If it is not, the edge is excluded from routing."},
       changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY
   )
   String defaultValue();

@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.peripherals;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.customizations.ApplicationEventBus;
@@ -32,7 +33,8 @@ import org.slf4j.LoggerFactory;
  * Manages attachment and detachment of peripheral communication adapters to location.
  */
 public class PeripheralAttachmentManager
-    implements Lifecycle {
+    implements
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -78,12 +80,21 @@ public class PeripheralAttachmentManager
    * @param configuration This class's configuration.
    */
   @Inject
-  public PeripheralAttachmentManager(@Nonnull InternalPeripheralService peripheralService,
-                                     @Nonnull LocalPeripheralControllerPool controllerPool,
-                                     @Nonnull PeripheralCommAdapterRegistry commAdapterRegistry,
-                                     @Nonnull PeripheralEntryPool peripheralEntryPool,
-                                     @Nonnull @ApplicationEventBus EventHandler eventHandler,
-                                     @Nonnull KernelApplicationConfiguration configuration) {
+  public PeripheralAttachmentManager(
+      @Nonnull
+      InternalPeripheralService peripheralService,
+      @Nonnull
+      LocalPeripheralControllerPool controllerPool,
+      @Nonnull
+      PeripheralCommAdapterRegistry commAdapterRegistry,
+      @Nonnull
+      PeripheralEntryPool peripheralEntryPool,
+      @Nonnull
+      @ApplicationEventBus
+      EventHandler eventHandler,
+      @Nonnull
+      KernelApplicationConfiguration configuration
+  ) {
     this.peripheralService = requireNonNull(peripheralService, "peripheralService");
     this.controllerPool = requireNonNull(controllerPool, "controllerPool");
     this.commAdapterRegistry = requireNonNull(commAdapterRegistry, "commAdapterRegistry");
@@ -137,13 +148,19 @@ public class PeripheralAttachmentManager
    * @param location The location to attach to.
    * @param description The description of the comm adapter to attach.
    */
-  public void attachAdapterToLocation(@Nonnull TCSResourceReference<Location> location,
-                                      @Nonnull PeripheralCommAdapterDescription description) {
+  public void attachAdapterToLocation(
+      @Nonnull
+      TCSResourceReference<Location> location,
+      @Nonnull
+      PeripheralCommAdapterDescription description
+  ) {
     requireNonNull(location, "location");
     requireNonNull(description, "description");
 
-    attachAdapterToLocation(peripheralEntryPool.getEntryFor(location),
-                            commAdapterRegistry.findFactoryFor(description));
+    attachAdapterToLocation(
+        peripheralEntryPool.getEntryFor(location),
+        commAdapterRegistry.findFactoryFor(description)
+    );
   }
 
   /**
@@ -154,30 +171,40 @@ public class PeripheralAttachmentManager
    */
   @Nonnull
   public PeripheralAttachmentInformation getAttachmentInformation(
-      @Nonnull TCSResourceReference<Location> location) {
+      @Nonnull
+      TCSResourceReference<Location> location
+  ) {
     requireNonNull(location, "location");
 
     PeripheralEntry entry = peripheralEntryPool.getEntryFor(location);
-    return new PeripheralAttachmentInformation(entry.getLocation(),
-                                               entry.getAvailableCommAdapters(),
-                                               entry.getCommAdapterFactory().getDescription());
+    return new PeripheralAttachmentInformation(
+        entry.getLocation(),
+        entry.getAvailableCommAdapters(),
+        entry.getCommAdapterFactory().getDescription()
+    );
   }
 
-  private void attachAdapterToLocation(PeripheralEntry entry,
-                                       PeripheralCommAdapterFactory factory) {
+  private void attachAdapterToLocation(
+      PeripheralEntry entry,
+      PeripheralCommAdapterFactory factory
+  ) {
     requireNonNull(entry, "entry");
     requireNonNull(factory, "factory");
 
-    LOG.info("Attaching peripheral comm adapter: '{}' -- '{}'...",
-             entry.getLocation().getName(),
-             factory.getClass().getName());
+    LOG.info(
+        "Attaching peripheral comm adapter: '{}' -- '{}'...",
+        entry.getLocation().getName(),
+        factory.getClass().getName()
+    );
 
     Location location = peripheralService.fetchObject(Location.class, entry.getLocation());
     PeripheralCommAdapter commAdapter = factory.getAdapterFor(location);
     if (commAdapter == null) {
-      LOG.warn("Factory {} did not provide adapter for location {}, ignoring.",
-               factory,
-               entry.getLocation().getName());
+      LOG.warn(
+          "Factory {} did not provide adapter for location {}, ignoring.",
+          factory,
+          entry.getLocation().getName()
+      );
       return;
     }
 
@@ -192,17 +219,23 @@ public class PeripheralAttachmentManager
     entry.setCommAdapter(commAdapter);
 
     // Publish events about the new attached adapter.
-    eventHandler.onEvent(new PeripheralAttachmentEvent(
-        entry.getLocation(),
-        new PeripheralAttachmentInformation(entry.getLocation(),
-                                            entry.getAvailableCommAdapters(),
-                                            entry.getCommAdapterFactory().getDescription()))
+    eventHandler.onEvent(
+        new PeripheralAttachmentEvent(
+            entry.getLocation(),
+            new PeripheralAttachmentInformation(
+                entry.getLocation(),
+                entry.getAvailableCommAdapters(),
+                entry.getCommAdapterFactory().getDescription()
+            )
+        )
     );
-    eventHandler.onEvent(new PeripheralProcessModelEvent(
-        entry.getLocation(),
-        PeripheralProcessModel.Attribute.LOCATION.name(),
-        entry.getProcessModel()
-    ));
+    eventHandler.onEvent(
+        new PeripheralProcessModelEvent(
+            entry.getLocation(),
+            PeripheralProcessModel.Attribute.LOCATION.name(),
+            entry.getProcessModel()
+        )
+    );
   }
 
   private void autoAttachAdapterToLocation(PeripheralEntry peripheralEntry) {
@@ -211,13 +244,17 @@ public class PeripheralAttachmentManager
       return;
     }
 
-    Location location = peripheralService.fetchObject(Location.class,
-                                                      peripheralEntry.getLocation());
+    Location location = peripheralService.fetchObject(
+        Location.class,
+        peripheralEntry.getLocation()
+    );
     List<PeripheralCommAdapterFactory> factories = commAdapterRegistry.findFactoriesFor(location);
     if (!factories.isEmpty()) {
-      LOG.debug("Attaching {} to first available adapter: {}.",
-                peripheralEntry.getLocation().getName(),
-                factories.get(0).getDescription().getDescription());
+      LOG.debug(
+          "Attaching {} to first available adapter: {}.",
+          peripheralEntry.getLocation().getName(),
+          factories.get(0).getDescription().getDescription()
+      );
       attachAdapterToLocation(peripheralEntry, factories.get(0));
     }
   }

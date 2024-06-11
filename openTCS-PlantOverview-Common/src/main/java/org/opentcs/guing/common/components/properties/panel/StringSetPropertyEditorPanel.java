@@ -22,8 +22,10 @@ import org.opentcs.guing.common.components.dialogs.DetailsDialogContent;
  * User interface to edit a string set.
  */
 public abstract class StringSetPropertyEditorPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   /**
    * The property to edit.
@@ -88,6 +90,7 @@ public abstract class StringSetPropertyEditorPanel
     return itemsList;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -193,6 +196,8 @@ public abstract class StringSetPropertyEditorPanel
 
     add(controlPanel, java.awt.BorderLayout.EAST);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void moveDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownButtonActionPerformed
     int index = itemsList.getSelectedIndex();
@@ -249,6 +254,9 @@ public abstract class StringSetPropertyEditorPanel
   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
     add();
   }//GEN-LAST:event_addButtonActionPerformed
+
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
   private javax.swing.JPanel controlPanel;
@@ -261,4 +269,5 @@ public abstract class StringSetPropertyEditorPanel
   private javax.swing.JPanel rigidArea;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

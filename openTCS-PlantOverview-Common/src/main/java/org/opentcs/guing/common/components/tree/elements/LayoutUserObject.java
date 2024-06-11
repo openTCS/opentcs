@@ -17,7 +17,8 @@ import org.opentcs.guing.common.persistence.ModelManager;
  * Represents a point object in the TreeView.
  */
 public class LayoutUserObject
-    extends FigureUserObject {
+    extends
+      FigureUserObject {
 
   /**
    * Creates a new instance.
@@ -27,9 +28,12 @@ public class LayoutUserObject
    * @param modelManager The model manager
    */
   @Inject
-  public LayoutUserObject(@Assisted LayoutModel model,
-                          GuiManager guiManager,
-                          ModelManager modelManager) {
+  public LayoutUserObject(
+      @Assisted
+      LayoutModel model,
+      GuiManager guiManager,
+      ModelManager modelManager
+  ) {
     super(model, guiManager, modelManager);
   }
 

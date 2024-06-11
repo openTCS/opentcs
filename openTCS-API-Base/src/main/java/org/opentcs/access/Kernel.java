@@ -40,7 +40,8 @@ public interface Kernel {
    * execute this method.
    */
   void setState(State newState)
-      throws IllegalArgumentException, CredentialsException;
+      throws IllegalArgumentException,
+        CredentialsException;
 
   /**
    * The various states a kernel instance may be running in.

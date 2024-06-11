@@ -8,10 +8,11 @@
 package org.opentcs.strategies.basic.dispatching;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +32,8 @@ import org.slf4j.LoggerFactory;
  * Dispatches transport orders and vehicles.
  */
 public class DefaultDispatcher
-    implements Dispatcher {
+    implements
+      Dispatcher {
 
   /**
    * This class's Logger.
@@ -88,28 +90,35 @@ public class DefaultDispatcher
    * vehicles is possible.
    */
   @Inject
-  public DefaultDispatcher(OrderReservationPool orderReservationPool,
-                           TransportOrderUtil transportOrderUtil,
-                           InternalVehicleService vehicleService,
-                           @KernelExecutor ScheduledExecutorService kernelExecutor,
-                           FullDispatchTask fullDispatchTask,
-                           Provider<PeriodicVehicleRedispatchingTask> periodicDispatchTaskProvider,
-                           DefaultDispatcherConfiguration configuration,
-                           RerouteUtil rerouteUtil,
-                           OrderAssigner orderAssigner,
-                           TransportOrderAssignmentChecker transportOrderAssignmentChecker) {
+  public DefaultDispatcher(
+      OrderReservationPool orderReservationPool,
+      TransportOrderUtil transportOrderUtil,
+      InternalVehicleService vehicleService,
+      @KernelExecutor
+      ScheduledExecutorService kernelExecutor,
+      FullDispatchTask fullDispatchTask,
+      Provider<PeriodicVehicleRedispatchingTask> periodicDispatchTaskProvider,
+      DefaultDispatcherConfiguration configuration,
+      RerouteUtil rerouteUtil,
+      OrderAssigner orderAssigner,
+      TransportOrderAssignmentChecker transportOrderAssignmentChecker
+  ) {
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.fullDispatchTask = requireNonNull(fullDispatchTask, "fullDispatchTask");
-    this.periodicDispatchTaskProvider = requireNonNull(periodicDispatchTaskProvider,
-                                                       "periodicDispatchTaskProvider");
+    this.periodicDispatchTaskProvider = requireNonNull(
+        periodicDispatchTaskProvider,
+        "periodicDispatchTaskProvider"
+    );
     this.configuration = requireNonNull(configuration, "configuration");
     this.rerouteUtil = requireNonNull(rerouteUtil, "rerouteUtil");
     this.orderAssigner = requireNonNull(orderAssigner, "orderAssigner");
-    this.transportOrderAssignmentChecker = requireNonNull(transportOrderAssignmentChecker,
-                                                          "transportOrderAssignmentChecker");
+    this.transportOrderAssignmentChecker = requireNonNull(
+        transportOrderAssignmentChecker,
+        "transportOrderAssignmentChecker"
+    );
   }
 
   @Override
@@ -125,8 +134,10 @@ public class DefaultDispatcher
 
     fullDispatchTask.initialize();
 
-    LOG.debug("Scheduling periodic dispatch task with interval of {} ms...",
-              configuration.idleVehicleRedispatchingInterval());
+    LOG.debug(
+        "Scheduling periodic dispatch task with interval of {} ms...",
+        configuration.idleVehicleRedispatchingInterval()
+    );
     periodicDispatchTaskFuture = kernelExecutor.scheduleAtFixedRate(
         periodicDispatchTaskProvider.get(),
         configuration.idleVehicleRedispatchingInterval(),
@@ -169,9 +180,11 @@ public class DefaultDispatcher
     requireNonNull(order, "order");
     checkState(isInitialized(), "Not initialized");
 
-    LOG.debug("Withdrawing transport order '{}' (immediate={})...",
-              order.getName(),
-              immediateAbort);
+    LOG.debug(
+        "Withdrawing transport order '{}' (immediate={})...",
+        order.getName(),
+        immediateAbort
+    );
     transportOrderUtil.abortOrder(order, immediateAbort);
   }
 
@@ -180,9 +193,11 @@ public class DefaultDispatcher
     requireNonNull(vehicle, "vehicle");
     checkState(isInitialized(), "Not initialized");
 
-    LOG.debug("Withdrawing transport order for vehicle '{}' (immediate={})...",
-              vehicle.getName(),
-              immediateAbort);
+    LOG.debug(
+        "Withdrawing transport order for vehicle '{}' (immediate={})...",
+        vehicle.getName(),
+        immediateAbort
+    );
     transportOrderUtil.abortOrder(vehicle, immediateAbort);
   }
 

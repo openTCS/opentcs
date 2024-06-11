@@ -21,7 +21,8 @@ import org.slf4j.LoggerFactory;
  * A cell editor for an integer property.
  */
 public class IntegerPropertyCellEditor
-    extends AbstractPropertyCellEditor {
+    extends
+      AbstractPropertyCellEditor {
 
   /**
    * Creates a new instance of IntegerPropertyCellEditor
@@ -57,7 +58,8 @@ public class IntegerPropertyCellEditor
 
   @Override
   public Component getTableCellEditorComponent(
-      JTable table, Object value, boolean isSelected, int row, int column) {
+      JTable table, Object value, boolean isSelected, int row, int column
+  ) {
 
     JFormattedTextField textField = (JFormattedTextField) getComponent();
     setValue(value);
@@ -77,8 +79,10 @@ public class IntegerPropertyCellEditor
       textField.commitEdit();
     }
     catch (ParseException ex) {
-      LoggerFactory.getLogger(IntegerPropertyCellEditor.class).error("ParseException: {0}",
-                                                                     textField.getText());
+      LoggerFactory.getLogger(IntegerPropertyCellEditor.class).error(
+          "ParseException: {0}",
+          textField.getText()
+      );
     }
 
     try {

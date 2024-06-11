@@ -31,7 +31,8 @@ import org.jhotdraw.draw.GridConstrainer;
  * @author Werner Randelshofer
  */
 public class ExtendedGridConstrainer
-    extends GridConstrainer {
+    extends
+      GridConstrainer {
 
   private static final int MIN_GRID_SPACING = 4;
   /**
@@ -107,10 +108,12 @@ public class ExtendedGridConstrainer
             g.setColor(MINOR_COLOR);
           }
 
-          g.drawLine((int) viewPoint.x,
-                     viewBounds.y,
-                     (int) viewPoint.x,
-                     viewBounds.y + viewBounds.height);
+          g.drawLine(
+              (int) viewPoint.x,
+              viewBounds.y,
+              (int) viewPoint.x,
+              viewBounds.y + viewBounds.height
+          );
         }
       }
       else if (width * majorGridSpacing * view.getScaleFactor() > 2) {
@@ -121,10 +124,12 @@ public class ExtendedGridConstrainer
           if (i % majorGridSpacing == 0) {
             point.x = width * i;
             t.transform(point, viewPoint);
-            g.drawLine((int) viewPoint.x,
-                       viewBounds.y,
-                       (int) viewPoint.x,
-                       viewBounds.y + viewBounds.height);
+            g.drawLine(
+                (int) viewPoint.x,
+                viewBounds.y,
+                (int) viewPoint.x,
+                viewBounds.y + viewBounds.height
+            );
           }
         }
       }
@@ -150,10 +155,12 @@ public class ExtendedGridConstrainer
             g.setColor(MINOR_COLOR);
           }
 
-          g.drawLine(viewBounds.x,
-                     (int) viewPoint.y,
-                     viewBounds.x + viewBounds.width,
-                     (int) viewPoint.y);
+          g.drawLine(
+              viewBounds.x,
+              (int) viewPoint.y,
+              viewBounds.x + viewBounds.width,
+              (int) viewPoint.y
+          );
         }
       }
       else if (height * majorGridSpacing * view.getScaleFactor() > 2) {
@@ -164,10 +171,12 @@ public class ExtendedGridConstrainer
           if (i % majorGridSpacing == 0) {
             point.y = height * i;
             t.transform(point, viewPoint);
-            g.drawLine(viewBounds.x,
-                       (int) viewPoint.y,
-                       viewBounds.x + viewBounds.width,
-                       (int) viewPoint.y);
+            g.drawLine(
+                viewBounds.x,
+                (int) viewPoint.y,
+                viewBounds.x + viewBounds.width,
+                (int) viewPoint.y
+            );
           }
         }
       }

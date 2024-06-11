@@ -25,7 +25,8 @@ import org.opentcs.data.order.TransportOrder;
  * </p>
  */
 public interface Dispatcher
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * The key of a parking position property defining its priority.
@@ -85,7 +86,11 @@ public interface Dispatcher
    * @param order The transport order to be withdrawn/aborted.
    * @param immediateAbort Whether the order should be aborted immediately instead of withdrawn.
    */
-  void withdrawOrder(@Nonnull TransportOrder order, boolean immediateAbort);
+  void withdrawOrder(
+      @Nonnull
+      TransportOrder order,
+      boolean immediateAbort
+  );
 
   /**
    * Notifies the dispatcher that any order a given vehicle might be processing is to be withdrawn.
@@ -97,7 +102,11 @@ public interface Dispatcher
    * @param immediateAbort Whether the vehicle's order should be aborted immediately instead of
    * withdrawn.
    */
-  void withdrawOrder(@Nonnull Vehicle vehicle, boolean immediateAbort);
+  void withdrawOrder(
+      @Nonnull
+      Vehicle vehicle,
+      boolean immediateAbort
+  );
 
   /**
    * Notifies the dispatcher of a request to reroute the given vehicle considering the given
@@ -109,7 +118,12 @@ public interface Dispatcher
    * @param vehicle The vehicle to be rerouted.
    * @param reroutingType The type of the requested rerouting.
    */
-  void reroute(@Nonnull Vehicle vehicle, @Nonnull ReroutingType reroutingType);
+  void reroute(
+      @Nonnull
+      Vehicle vehicle,
+      @Nonnull
+      ReroutingType reroutingType
+  );
 
   /**
    * Notifies the dispatcher to reroute all vehicles considering the given rerouting type.
@@ -119,7 +133,10 @@ public interface Dispatcher
    *
    * @param reroutingType The type of the requested rerouting.
    */
-  void rerouteAll(@Nonnull ReroutingType reroutingType);
+  void rerouteAll(
+      @Nonnull
+      ReroutingType reroutingType
+  );
 
   /**
    * Notifies the dispatcher that it should assign the given transport order (to its intended
@@ -132,6 +149,9 @@ public interface Dispatcher
    * @throws TransportOrderAssignmentException If the given transport order could not be assigned
    * to its intended vehicle.
    */
-  void assignNow(@Nonnull TransportOrder transportOrder)
+  void assignNow(
+      @Nonnull
+      TransportOrder transportOrder
+  )
       throws TransportOrderAssignmentException;
 }

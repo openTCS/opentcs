@@ -7,19 +7,21 @@
  */
 package org.opentcs.modeleditor.application.action.file;
 
+import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.MENU_PATH;
+
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import org.opentcs.guing.common.application.GuiManager;
 import org.opentcs.guing.common.util.ImageDirectory;
-import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.MENU_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  */
 public class LoadModelAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action's ID.

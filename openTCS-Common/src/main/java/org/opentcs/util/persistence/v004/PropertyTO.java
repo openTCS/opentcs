@@ -7,8 +7,9 @@
  */
 package org.opentcs.util.persistence.v004;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -34,7 +35,10 @@ public class PropertyTO {
     return name;
   }
 
-  public PropertyTO setName(@Nonnull String name) {
+  public PropertyTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     return this;
   }
@@ -44,7 +48,10 @@ public class PropertyTO {
     return value;
   }
 
-  public PropertyTO setValue(@Nonnull String value) {
+  public PropertyTO setValue(
+      @Nonnull
+      String value
+  ) {
     requireNonNull(value, "value");
     this.value = value;
     return this;

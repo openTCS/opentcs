@@ -7,11 +7,12 @@
  */
 package org.opentcs.modeleditor.persistence;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import java.util.HashSet;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.guing.base.model.ModelComponent;
@@ -49,9 +50,13 @@ public class ModelKernelPersistor {
    * @param modelExportAdapter Converts model data on export.
    */
   @Inject
-  public ModelKernelPersistor(@Nonnull StatusPanel statusPanel,
-                              @Nonnull Provider<ModelValidator> validatorProvider,
-                              ModelExportAdapter modelExportAdapter) {
+  public ModelKernelPersistor(
+      @Nonnull
+      StatusPanel statusPanel,
+      @Nonnull
+      Provider<ModelValidator> validatorProvider,
+      ModelExportAdapter modelExportAdapter
+  ) {
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
     this.validatorProvider = requireNonNull(validatorProvider, "validatorProvider");
     this.modelExportAdapter = requireNonNull(modelExportAdapter, "modelExportAdapter");
@@ -67,9 +72,11 @@ public class ModelKernelPersistor {
    * ignored.
    * @throws IllegalStateException If there was a problem persisting the model on the kernel side.
    */
-  public boolean persist(SystemModel systemModel,
-                         KernelServicePortal portal,
-                         boolean ignoreValidationErrors)
+  public boolean persist(
+      SystemModel systemModel,
+      KernelServicePortal portal,
+      boolean ignoreValidationErrors
+  )
       throws IllegalStateException {
     requireNonNull(systemModel, "systemModel");
     requireNonNull(portal, "plantModelService");
@@ -84,8 +91,10 @@ public class ModelKernelPersistor {
     LOG.debug("Persisting model...");
     timeBefore = System.currentTimeMillis();
     portal.getPlantModelService().createPlantModel(modelExportAdapter.convert(systemModel));
-    LOG.debug("Persisting to kernel took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
+    LOG.debug(
+        "Persisting to kernel took {} milliseconds.",
+        System.currentTimeMillis() - timeBefore
+    );
 
     return true;
   }

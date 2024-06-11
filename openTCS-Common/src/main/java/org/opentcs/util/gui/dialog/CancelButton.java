@@ -17,7 +17,8 @@ import javax.swing.KeyStroke;
  * Cancel Button which closes a dialog by pressing ESC.
  */
 public class CancelButton
-    extends JButton {
+    extends
+      JButton {
 
   /**
    * Creates a new instance.
@@ -47,8 +48,10 @@ public class CancelButton
       }
     };
 
-    registerKeyboardAction(al, "PressedESCAPE",
-                           KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                           JButton.WHEN_IN_FOCUSED_WINDOW);
+    registerKeyboardAction(
+        al, "PressedESCAPE",
+        KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+        JButton.WHEN_IN_FOCUSED_WINDOW
+    );
   }
 }

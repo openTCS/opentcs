@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernelcontrolcenter.vehicles;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
@@ -41,8 +42,10 @@ public class LocalVehicleEntry {
    * @param attachmentInformation Detailed information about the attachment state.
    * @param processModel The current process model to this entry.
    */
-  public LocalVehicleEntry(VehicleAttachmentInformation attachmentInformation,
-                           VehicleProcessModelTO processModel) {
+  public LocalVehicleEntry(
+      VehicleAttachmentInformation attachmentInformation,
+      VehicleProcessModelTO processModel
+  ) {
     this.attachmentInformation = requireNonNull(attachmentInformation, "attachmentInformation");
     this.processModel = requireNonNull(processModel, "processModel");
   }
@@ -76,22 +79,31 @@ public class LocalVehicleEntry {
   }
 
   public void setAttachmentInformation(
-      @Nonnull VehicleAttachmentInformation attachmentInformation) {
+      @Nonnull
+      VehicleAttachmentInformation attachmentInformation
+  ) {
     VehicleAttachmentInformation oldAttachmentInformation = this.attachmentInformation;
     this.attachmentInformation = requireNonNull(attachmentInformation, "attachmentInformation");
 
-    pcs.firePropertyChange(Attribute.ATTACHMENT_INFORMATION.name(),
-                           oldAttachmentInformation,
-                           attachmentInformation);
+    pcs.firePropertyChange(
+        Attribute.ATTACHMENT_INFORMATION.name(),
+        oldAttachmentInformation,
+        attachmentInformation
+    );
   }
 
-  public void setProcessModel(@Nonnull VehicleProcessModelTO processModel) {
+  public void setProcessModel(
+      @Nonnull
+      VehicleProcessModelTO processModel
+  ) {
     VehicleProcessModelTO oldProcessModel = this.processModel;
     this.processModel = requireNonNull(processModel, "processModel");
 
-    pcs.firePropertyChange(Attribute.PROCESS_MODEL.name(),
-                           oldProcessModel,
-                           processModel);
+    pcs.firePropertyChange(
+        Attribute.PROCESS_MODEL.name(),
+        oldProcessModel,
+        processModel
+    );
   }
 
   /**

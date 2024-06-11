@@ -7,12 +7,13 @@
  */
 package org.opentcs.guing.common.components.drawing;
 
+import static java.util.Objects.requireNonNull;
+
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
-import static java.util.Objects.requireNonNull;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -27,7 +28,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A placard panel for drawing views.
  */
 public class DrawingViewPlacardPanel
-    extends JPanel {
+    extends
+      JPanel {
 
   /**
    * This instance's resource bundle.
@@ -54,8 +56,10 @@ public class DrawingViewPlacardPanel
    * @param drawingOptions The drawing options.
    */
   @SuppressWarnings("this-escape")
-  public DrawingViewPlacardPanel(OpenTCSDrawingView drawingView,
-                                 DrawingOptions drawingOptions) {
+  public DrawingViewPlacardPanel(
+      OpenTCSDrawingView drawingView,
+      DrawingOptions drawingOptions
+  ) {
     requireNonNull(drawingView, "drawingView");
     this.drawingOptions = requireNonNull(drawingOptions, "drawingOptions");
 
@@ -112,7 +116,7 @@ public class DrawingViewPlacardPanel
     comboBox.setFocusable(true);
 
     final double[] scaleFactors = {
-      5.00, 4.00, 3.00, 2.00, 1.50, 1.25, 1.00, 0.75, 0.50, 0.25, 0.10
+        5.00, 4.00, 3.00, 2.00, 1.50, 1.25, 1.00, 0.75, 0.50, 0.25, 0.10
     };
     for (int i = 0; i < scaleFactors.length; i++) {
       comboBox.addItem(new ZoomItem(scaleFactors[i]));

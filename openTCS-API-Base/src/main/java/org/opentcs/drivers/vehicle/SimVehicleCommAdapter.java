@@ -14,7 +14,8 @@ import jakarta.annotation.Nullable;
  * must implement.
  */
 public interface SimVehicleCommAdapter
-    extends VehicleCommAdapter {
+    extends
+      VehicleCommAdapter {
 
   /**
    * Sets an initial vehicle position.
@@ -24,5 +25,8 @@ public interface SimVehicleCommAdapter
    *
    * @param newPos The new position.
    */
-  void initVehiclePosition(@Nullable String newPos);
+  void initVehiclePosition(
+      @Nullable
+      String newPos
+  );
 }

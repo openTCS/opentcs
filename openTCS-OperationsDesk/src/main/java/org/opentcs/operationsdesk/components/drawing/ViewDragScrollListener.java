@@ -7,6 +7,8 @@
  */
 package org.opentcs.operationsdesk.components.drawing;
 
+import static java.util.Objects.requireNonNull;
+
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Point;
@@ -16,7 +18,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
@@ -49,7 +50,8 @@ import org.slf4j.LoggerFactory;
  * view.
  */
 public class ViewDragScrollListener
-    extends MouseAdapter {
+    extends
+      MouseAdapter {
 
   /**
    * This class's logger.
@@ -120,13 +122,15 @@ public class ViewDragScrollListener
    * @param modelManager The manager keeping/providing the currently loaded model.
    * @param orderUtil A helper for creating transport orders.
    */
-  public ViewDragScrollListener(DrawingViewScrollPane scrollPane,
-                                JComboBox<ZoomItem> zoomComboBox,
-                                JToggleButton selectionTool,
-                                JToggleButton dragTool,
-                                StatusPanel statusPanel,
-                                ModelManager modelManager,
-                                TransportOrderUtil orderUtil) {
+  public ViewDragScrollListener(
+      DrawingViewScrollPane scrollPane,
+      JComboBox<ZoomItem> zoomComboBox,
+      JToggleButton selectionTool,
+      JToggleButton dragTool,
+      StatusPanel statusPanel,
+      ModelManager modelManager,
+      TransportOrderUtil orderUtil
+  ) {
     this.scrollPane = requireNonNull(scrollPane, "scrollPane");
     this.zoomComboBox = requireNonNull(zoomComboBox, "zoomComboBox");
     this.selectionTool = requireNonNull(selectionTool, "selectionTool");
@@ -191,9 +195,11 @@ public class ViewDragScrollListener
             && (((PathConnection) figure).getLiner() instanceof TripleBezierLiner));
   }
 
-  private boolean isFigureCompletelyInView(Figure figure,
-                                           JViewport viewport,
-                                           DrawingView drawingView) {
+  private boolean isFigureCompletelyInView(
+      Figure figure,
+      JViewport viewport,
+      DrawingView drawingView
+  ) {
     Rectangle viewPortBounds = viewport.getViewRect();
     Rectangle figureBounds = drawingView.drawingToView(figure.getDrawingArea());
 
@@ -337,7 +343,8 @@ public class ViewDragScrollListener
       double w = Math.abs(fMouseEndPoint.x - fMouseStartPoint.x);
       double h = Math.abs(fMouseEndPoint.y - fMouseStartPoint.y);
       statusPanel.setPositionText(
-          String.format("X %.0f Y %.0f W %.0f H %.0f", x, y, w, h));
+          String.format("X %.0f Y %.0f W %.0f H %.0f", x, y, w, h)
+      );
     }
     else {
       LayoutModel layout = modelManager.getModel().getLayoutModel();
@@ -347,7 +354,8 @@ public class ViewDragScrollListener
       double xmm = x * scaleX;
       double ymm = y * scaleY;
       statusPanel.setPositionText(
-          String.format("X %.0f (%.0fmm) Y %.0f (%.0fmm)", x, xmm, y, ymm));
+          String.format("X %.0f (%.0fmm) Y %.0f (%.0fmm)", x, xmm, y, ymm)
+      );
     }
   }
 
@@ -356,8 +364,10 @@ public class ViewDragScrollListener
    *
    * @param figure A point figure.
    */
-  private void createPossibleTransportOrder(LabeledPointFigure figure,
-                                            Set<Figure> selectedFigures) {
+  private void createPossibleTransportOrder(
+      LabeledPointFigure figure,
+      Set<Figure> selectedFigures
+  ) {
     if (selectedFigures.size() != 1) {
       LOG.debug("More than one figure selected, skipping.");
       return;
@@ -377,8 +387,8 @@ public class ViewDragScrollListener
       LOG.warn("Selected VehicleFigure does not have a model, skipping.");
       return;
     }
-    if ((Vehicle.ProcState) vehicleModel.getPropertyProcState().getValue()
-        != Vehicle.ProcState.IDLE) {
+    if ((Vehicle.ProcState) vehicleModel.getPropertyProcState()
+        .getValue() != Vehicle.ProcState.IDLE) {
       LOG.debug("Selected vehicle already has an order, skipping.");
       return;
     }

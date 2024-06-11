@@ -22,8 +22,9 @@ import org.opentcs.util.event.EventHandler;
 /**
  */
 public interface OpenTCSDrawingView
-    extends DrawingView,
-            EventHandler {
+    extends
+      DrawingView,
+      EventHandler {
 
   boolean isLabelsVisible();
 
@@ -96,7 +97,10 @@ public interface OpenTCSDrawingView
    *
    * @param model The vehicle model.
    */
-  void followVehicle(@Nonnull VehicleModel model);
+  void followVehicle(
+      @Nonnull
+      VehicleModel model
+  );
 
   /**
    * Releases the view and stops following the current vehicle.

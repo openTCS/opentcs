@@ -7,9 +7,10 @@
  */
 package org.opentcs.operationsdesk.transport;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.RowFilter;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -20,7 +21,8 @@ import javax.swing.table.TableRowSorter;
  * @param <T> The table model class
  */
 public class FilteredRowSorter<T extends TableModel>
-    extends TableRowSorter<T> {
+    extends
+      TableRowSorter<T> {
 
   /**
    * Keeps all the active filters.

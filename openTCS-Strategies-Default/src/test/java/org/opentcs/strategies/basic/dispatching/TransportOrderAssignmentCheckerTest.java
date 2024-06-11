@@ -7,16 +7,17 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
-import java.util.ArrayList;
-import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentVeto;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;
@@ -60,8 +61,10 @@ class TransportOrderAssignmentCheckerTest {
   void onlyAcceptDispatchableOrders(TransportOrder.State orderState) {
     transportOrder = transportOrder.withState(orderState);
 
-    assertThat(checker.checkTransportOrderAssignment(transportOrder),
-               is(TransportOrderAssignmentVeto.TRANSPORT_ORDER_STATE_INVALID));
+    assertThat(
+        checker.checkTransportOrderAssignment(transportOrder),
+        is(TransportOrderAssignmentVeto.TRANSPORT_ORDER_STATE_INVALID)
+    );
   }
 
   @Test
@@ -69,16 +72,20 @@ class TransportOrderAssignmentCheckerTest {
     transportOrder
         = transportOrder.withWrappingSequence(new OrderSequence("some-seq").getReference());
 
-    assertThat(checker.checkTransportOrderAssignment(transportOrder),
-               is(TransportOrderAssignmentVeto.TRANSPORT_ORDER_PART_OF_ORDER_SEQUENCE));
+    assertThat(
+        checker.checkTransportOrderAssignment(transportOrder),
+        is(TransportOrderAssignmentVeto.TRANSPORT_ORDER_PART_OF_ORDER_SEQUENCE)
+    );
   }
 
   @Test
   void onlyAcceptOrdersWithIntendedVehicle() {
     transportOrder = transportOrder.withIntendedVehicle(null);
 
-    assertThat(checker.checkTransportOrderAssignment(transportOrder),
-               is(TransportOrderAssignmentVeto.TRANSPORT_ORDER_INTENDED_VEHICLE_NOT_SET));
+    assertThat(
+        checker.checkTransportOrderAssignment(transportOrder),
+        is(TransportOrderAssignmentVeto.TRANSPORT_ORDER_INTENDED_VEHICLE_NOT_SET)
+    );
   }
 
   @ParameterizedTest
@@ -92,8 +99,10 @@ class TransportOrderAssignmentCheckerTest {
     when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
         .thenReturn(vehicle);
 
-    assertThat(checker.checkTransportOrderAssignment(transportOrder),
-               is(TransportOrderAssignmentVeto.VEHICLE_PROCESSING_STATE_INVALID));
+    assertThat(
+        checker.checkTransportOrderAssignment(transportOrder),
+        is(TransportOrderAssignmentVeto.VEHICLE_PROCESSING_STATE_INVALID)
+    );
   }
 
   @ParameterizedTest
@@ -107,8 +116,10 @@ class TransportOrderAssignmentCheckerTest {
     when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
         .thenReturn(vehicle);
 
-    assertThat(checker.checkTransportOrderAssignment(transportOrder),
-               is(TransportOrderAssignmentVeto.VEHICLE_STATE_INVALID));
+    assertThat(
+        checker.checkTransportOrderAssignment(transportOrder),
+        is(TransportOrderAssignmentVeto.VEHICLE_STATE_INVALID)
+    );
   }
 
   @ParameterizedTest
@@ -122,8 +133,10 @@ class TransportOrderAssignmentCheckerTest {
     when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
         .thenReturn(vehicle);
 
-    assertThat(checker.checkTransportOrderAssignment(transportOrder),
-               is(TransportOrderAssignmentVeto.VEHICLE_INTEGRATION_LEVEL_INVALID));
+    assertThat(
+        checker.checkTransportOrderAssignment(transportOrder),
+        is(TransportOrderAssignmentVeto.VEHICLE_INTEGRATION_LEVEL_INVALID)
+    );
   }
 
   @Test
@@ -133,8 +146,10 @@ class TransportOrderAssignmentCheckerTest {
     when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
         .thenReturn(vehicle);
 
-    assertThat(checker.checkTransportOrderAssignment(transportOrder),
-               is(TransportOrderAssignmentVeto.VEHICLE_CURRENT_POSITION_UNKNOWN));
+    assertThat(
+        checker.checkTransportOrderAssignment(transportOrder),
+        is(TransportOrderAssignmentVeto.VEHICLE_CURRENT_POSITION_UNKNOWN)
+    );
   }
 
   @Test
@@ -144,8 +159,10 @@ class TransportOrderAssignmentCheckerTest {
     when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
         .thenReturn(vehicle);
 
-    assertThat(checker.checkTransportOrderAssignment(transportOrder),
-               is(TransportOrderAssignmentVeto.VEHICLE_PROCESSING_ORDER_SEQUENCE));
+    assertThat(
+        checker.checkTransportOrderAssignment(transportOrder),
+        is(TransportOrderAssignmentVeto.VEHICLE_PROCESSING_ORDER_SEQUENCE)
+    );
   }
 
   @Test
@@ -158,8 +175,10 @@ class TransportOrderAssignmentCheckerTest {
     when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
         .thenReturn(vehicle);
 
-    assertThat(checker.checkTransportOrderAssignment(transportOrder),
-               is(TransportOrderAssignmentVeto.GENERIC_VETO));
+    assertThat(
+        checker.checkTransportOrderAssignment(transportOrder),
+        is(TransportOrderAssignmentVeto.GENERIC_VETO)
+    );
   }
 
   @Test

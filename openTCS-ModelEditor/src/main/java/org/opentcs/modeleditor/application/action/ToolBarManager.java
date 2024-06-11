@@ -7,13 +7,14 @@
  */
 package org.opentcs.modeleditor.application.action;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.Rectangle;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -58,7 +59,8 @@ import org.opentcs.util.event.EventHandler;
  * Sets up and manages a list of tool bars in the graphical user interface.
  */
 public class ToolBarManager
-    implements EventHandler {
+    implements
+      EventHandler {
 
   /**
    * A factory for selectiont tools.
@@ -127,11 +129,13 @@ public class ToolBarManager
    * @param selectionToolFactory The selection tool factory
    */
   @Inject
-  public ToolBarManager(ViewActionMap actionMap,
-                        CourseObjectFactory crsObjFactory,
-                        OpenTCSDrawingEditor editor,
-                        CreationToolFactory creationToolFactory,
-                        SelectionToolFactory selectionToolFactory) {
+  public ToolBarManager(
+      ViewActionMap actionMap,
+      CourseObjectFactory crsObjFactory,
+      OpenTCSDrawingEditor editor,
+      CreationToolFactory creationToolFactory,
+      SelectionToolFactory selectionToolFactory
+  ) {
     requireNonNull(actionMap, "actionMap");
     requireNonNull(crsObjFactory, "crsObjFactory");
     requireNonNull(editor, "editor");
@@ -163,11 +167,13 @@ public class ToolBarManager
     LabeledLocationFigure llf = crsObjFactory.createLocationFigure();
     creationTool = creationToolFactory.createCreationTool(llf);
     buttonCreateLocation
-        = addToolButton(toolBarCreation,
-                        editor,
-                        creationTool,
-                        labels.getString("toolBarManager.button_createLocation.tooltipText"),
-                        ImageDirectory.getImageIcon("/toolbar/location.22.png"));
+        = addToolButton(
+            toolBarCreation,
+            editor,
+            creationTool,
+            labels.getString("toolBarManager.button_createLocation.tooltipText"),
+            ImageDirectory.getImageIcon("/toolbar/location.22.png")
+        );
     creationTool.setToolDoneAfterCreation(false);
 
     // --- Create Path Figure ---
@@ -180,11 +186,13 @@ public class ToolBarManager
     LinkConnection lc = crsObjFactory.createLinkConnection();
     connectionTool = creationToolFactory.createConnectionTool(lc);
     buttonCreateLink
-        = addToolButton(toolBarCreation,
-                        editor,
-                        connectionTool,
-                        labels.getString("toolBarManager.button_createLink.tooltipText"),
-                        ImageDirectory.getImageIcon("/toolbar/link.22.png"));
+        = addToolButton(
+            toolBarCreation,
+            editor,
+            connectionTool,
+            labels.getString("toolBarManager.button_createLink.tooltipText"),
+            ImageDirectory.getImageIcon("/toolbar/link.22.png")
+        );
     connectionTool.setToolDoneAfterCreation(false);
 
     toolBarCreation.addSeparator();
@@ -259,8 +267,10 @@ public class ToolBarManager
    * @param toolBar The toolbar to add to.
    * @param editor The DrawingEditor.
    */
-  private JToggleButton addSelectionToolButton(JToolBar toolBar,
-                                               DrawingEditor editor) {
+  private JToggleButton addSelectionToolButton(
+      JToolBar toolBar,
+      DrawingEditor editor
+  ) {
     List<Action> drawingActions = new ArrayList<>();
     // Drawing Actions
     drawingActions.add(new SelectSameAction(editor));
@@ -295,8 +305,10 @@ public class ToolBarManager
 
     toggleButton.setIcon(ImageDirectory.getImageIcon("/toolbar/select-2.png"));
     toggleButton.setText(null);
-    toggleButton.setToolTipText(ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH)
-        .getString("toolBarManager.button_selectionTool.tooltipText"));
+    toggleButton.setToolTipText(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH)
+            .getString("toolBarManager.button_selectionTool.tooltipText")
+    );
 
     toggleButton.setSelected(true);
     toggleButton.addItemListener(new ToolButtonListener(selectionTool, editor));
@@ -329,8 +341,10 @@ public class ToolBarManager
     URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/cursor-opened-hand.png");
     button.setIcon(new ImageIcon(url));
     button.setText(null);
-    button.setToolTipText(ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH)
-        .getString("toolBarManager.button_dragTool.tooltipText"));
+    button.setToolTipText(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH)
+            .getString("toolBarManager.button_dragTool.tooltipText")
+    );
 
     button.setSelected(false);
     button.addItemListener(new ToolButtonListener(dragTool, editor));
@@ -351,13 +365,17 @@ public class ToolBarManager
    * @param labels
    * @return
    */
-  private JPopupButton pointToolButton(JToolBar toolBar,
-                                       DrawingEditor editor,
-                                       Tool tool) {
+  private JPopupButton pointToolButton(
+      JToolBar toolBar,
+      DrawingEditor editor,
+      Tool tool
+  ) {
     JPopupButton popupButton = new JPopupButton();
     ButtonGroup group = (ButtonGroup) toolBar.getClientProperty("toolButtonGroup");
-    popupButton.setAction(new DefaultPointSelectedAction(editor, tool, popupButton, group),
-                          new Rectangle(0, 0, 16, 16));
+    popupButton.setAction(
+        new DefaultPointSelectedAction(editor, tool, popupButton, group),
+        new Rectangle(0, 0, 16, 16)
+    );
     ToolListener toolHandler = (ToolListener) toolBar.getClientProperty("toolHandler");
     tool.addToolListener(toolHandler);
 
@@ -390,11 +408,13 @@ public class ToolBarManager
    * @param labels
    * @return
    */
-  private JToggleButton addToolButton(JToolBar toolBar,
-                                      DrawingEditor editor,
-                                      Tool tool,
-                                      String toolTipText,
-                                      ImageIcon iconBase) {
+  private JToggleButton addToolButton(
+      JToolBar toolBar,
+      DrawingEditor editor,
+      Tool tool,
+      String toolTipText,
+      ImageIcon iconBase
+  ) {
     JToggleButton toggleButton = new JToggleButton();
 
     toggleButton.setIcon(iconBase);
@@ -422,13 +442,17 @@ public class ToolBarManager
    * @param types
    * @return
    */
-  private JPopupButton pathToolButton(JToolBar toolBar,
-                                      DrawingEditor editor,
-                                      Tool tool) {
+  private JPopupButton pathToolButton(
+      JToolBar toolBar,
+      DrawingEditor editor,
+      Tool tool
+  ) {
     JPopupButton popupButton = new JPopupButton();
     ButtonGroup group = (ButtonGroup) toolBar.getClientProperty("toolButtonGroup");
-    popupButton.setAction(new DefaultPathSelectedAction(editor, tool, popupButton, group),
-                          new Rectangle(0, 0, 16, 16));
+    popupButton.setAction(
+        new DefaultPathSelectedAction(editor, tool, popupButton, group),
+        new Rectangle(0, 0, 16, 16)
+    );
     ToolListener toolHandler = (ToolListener) toolBar.getClientProperty("toolHandler");
     tool.addToolListener(toolHandler);
 

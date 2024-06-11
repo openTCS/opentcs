@@ -7,8 +7,9 @@
  */
 package org.opentcs.modeleditor.application.menus.menubar;
 
-import java.util.Collection;
 import static java.util.Objects.requireNonNull;
+
+import java.util.Collection;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -18,7 +19,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 /**
  */
 public class ViewToolBarsMenu
-    extends JMenu {
+    extends
+      JMenu {
 
   private static final ResourceBundleUtil LABELS_MENU
       = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);

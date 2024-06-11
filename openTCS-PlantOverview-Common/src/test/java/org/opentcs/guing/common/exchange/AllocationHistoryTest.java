@@ -7,9 +7,10 @@
  */
 package org.opentcs.guing.common.exchange;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 import java.util.Set;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.model.Path;
@@ -93,11 +94,13 @@ class AllocationHistoryTest {
     vehicle = vehicle
         .withCurrentPosition(point2.getReference())
         .withNextPosition(point3.getReference())
-        .withAllocatedResources(List.of(
-            Set.of(point1.getReference()),
-            Set.of(point2.getReference(), path1.getReference()),
-            Set.of(point3.getReference(), path2.getReference())
-        ));
+        .withAllocatedResources(
+            List.of(
+                Set.of(point1.getReference()),
+                Set.of(point2.getReference(), path1.getReference()),
+                Set.of(point3.getReference(), path2.getReference())
+            )
+        );
 
     allocationHistory.updateHistory(vehicle);
 

@@ -7,18 +7,19 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
-import java.awt.Color;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.awt.Color;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;

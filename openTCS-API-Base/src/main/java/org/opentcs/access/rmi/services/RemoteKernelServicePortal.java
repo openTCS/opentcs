@@ -20,7 +20,8 @@ import org.opentcs.access.rmi.ClientID;
  * Declares the methods provided by the {@link KernelServicePortal} via RMI.
  */
 public interface RemoteKernelServicePortal
-    extends Remote {
+    extends
+      Remote {
 
   /**
    * Introduce the calling client to the server and authenticate for operations.
@@ -33,7 +34,8 @@ public interface RemoteKernelServicePortal
    * @throws RemoteException If there was an RMI-related problem.
    */
   ClientID login(String userName, String password, Predicate<Object> eventFilter)
-      throws CredentialsException, RemoteException;
+      throws CredentialsException,
+        RemoteException;
 
   void logout(ClientID clientId)
       throws RemoteException;

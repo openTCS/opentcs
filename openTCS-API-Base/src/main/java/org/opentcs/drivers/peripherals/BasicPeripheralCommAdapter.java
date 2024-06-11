@@ -8,6 +8,7 @@
 package org.opentcs.drivers.peripherals;
 
 import static java.util.Objects.requireNonNull;
+
 import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.drivers.peripherals.management.PeripheralProcessModelEvent;
 import org.opentcs.util.event.EventHandler;
@@ -18,7 +19,8 @@ import org.slf4j.LoggerFactory;
  * A base class for peripheral communication adapters mainly providing command queue processing.
  */
 public abstract class BasicPeripheralCommAdapter
-    implements PeripheralCommAdapter {
+    implements
+      PeripheralCommAdapter {
 
   /**
    * This class's Logger.
@@ -44,8 +46,10 @@ public abstract class BasicPeripheralCommAdapter
    * attributes.
    * @param eventHandler The handler used to send events to.
    */
-  public BasicPeripheralCommAdapter(PeripheralProcessModel processModel,
-                                    EventHandler eventHandler) {
+  public BasicPeripheralCommAdapter(
+      PeripheralProcessModel processModel,
+      EventHandler eventHandler
+  ) {
     this.processModel = requireNonNull(processModel, "processModel");
     this.eventHandler = requireNonNull(eventHandler, "eventHandler");
   }
@@ -125,8 +129,10 @@ public abstract class BasicPeripheralCommAdapter
 
     LOG.info("Peripheral comm adapter is being disabled: {}", processModel.getLocation().getName());
     disconnectPeripheral();
-    setProcessModel(getProcessModel().withCommAdapterEnabled(false)
-        .withState(PeripheralInformation.State.UNKNOWN));
+    setProcessModel(
+        getProcessModel().withCommAdapterEnabled(false)
+            .withState(PeripheralInformation.State.UNKNOWN)
+    );
     sendProcessModelChangedEvent(PeripheralProcessModel.Attribute.COMM_ADAPTER_ENABLED);
     sendProcessModelChangedEvent(PeripheralProcessModel.Attribute.STATE);
   }
@@ -145,9 +151,13 @@ public abstract class BasicPeripheralCommAdapter
   }
 
   protected void sendProcessModelChangedEvent(PeripheralProcessModel.Attribute attributeChanged) {
-    eventHandler.onEvent(new PeripheralProcessModelEvent(processModel.getLocation(),
-                                                         attributeChanged.name(),
-                                                         processModel));
+    eventHandler.onEvent(
+        new PeripheralProcessModelEvent(
+            processModel.getLocation(),
+            attributeChanged.name(),
+            processModel
+        )
+    );
   }
 
   /**

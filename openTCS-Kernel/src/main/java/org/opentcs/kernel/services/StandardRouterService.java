@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.services;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.KernelRuntimeException;
@@ -31,7 +32,8 @@ import org.opentcs.kernel.workingset.PlantModelManager;
  * This class is the standard implementation of the {@link RouterService} interface.
  */
 public class StandardRouterService
-    implements RouterService {
+    implements
+      RouterService {
 
   /**
    * A global object to be used for synchronization within the kernel.
@@ -59,10 +61,13 @@ public class StandardRouterService
    * @param objectService The object service.
    */
   @Inject
-  public StandardRouterService(@GlobalSyncObject Object globalSyncObject,
-                               Router router,
-                               PlantModelManager plantModelManager,
-                               TCSObjectService objectService) {
+  public StandardRouterService(
+      @GlobalSyncObject
+      Object globalSyncObject,
+      Router router,
+      PlantModelManager plantModelManager,
+      TCSObjectService objectService
+  ) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.router = requireNonNull(router, "router");
     this.plantModelManager = requireNonNull(plantModelManager, "plantModelManager");

@@ -26,7 +26,8 @@ import org.github.gestalt.config.utils.ValidateOf;
  * the specified class cannot be assigned to the type that is expected to be returned.
  */
 public class ClassPathDecoder
-    implements Decoder<Class<?>> {
+    implements
+      Decoder<Class<?>> {
 
   /**
    * Creates a new instance.
@@ -50,11 +51,13 @@ public class ClassPathDecoder
   }
 
   @Override
-  public ValidateOf<Class<?>> decode(String path,
-                                     Tags tags,
-                                     ConfigNode node,
-                                     TypeCapture<?> type,
-                                     DecoderContext context) {
+  public ValidateOf<Class<?>> decode(
+      String path,
+      Tags tags,
+      ConfigNode node,
+      TypeCapture<?> type,
+      DecoderContext context
+  ) {
     // This decoder only decodes nodes of type leaf. For other types the default decoders
     // `ArrayDecoder` and `ObjectDecoder` will eventually call this decoder if necessary.
     if (node.getNodeType() != NodeType.LEAF) {
@@ -79,16 +82,19 @@ public class ClassPathDecoder
       catch (ClassNotFoundException e) {
         return ValidateOf.<Class<?>>inValid(new ClassNotFound(className));
       }
-    }).orElse(ValidateOf.<Class<?>>inValid(
-        new ValidationError.DecodingLeafMissingValue(path, this.name())
-    ));
+    }).orElse(
+        ValidateOf.<Class<?>>inValid(
+            new ValidationError.DecodingLeafMissingValue(path, this.name())
+        )
+    );
   }
 
   /**
    * The configured class cannot be cast to the class expected by the decoder.
    */
   public static class CannotCast
-      extends ValidationError {
+      extends
+        ValidationError {
 
     private final String from;
     private final String to;
@@ -109,7 +115,8 @@ public class ClassPathDecoder
    * The configured class cannot be found in the class path.
    */
   public static class ClassNotFound
-      extends ValidationError {
+      extends
+        ValidationError {
 
     private final String className;
 

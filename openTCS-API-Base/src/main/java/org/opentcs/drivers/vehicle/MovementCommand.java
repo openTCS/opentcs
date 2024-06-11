@@ -7,11 +7,12 @@
  */
 package org.opentcs.drivers.vehicle;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.DriveOrder;
@@ -96,16 +97,27 @@ public class MovementCommand {
    * @param finalOperation The operation to be executed at the destination position.
    * @param properties Properties of the order this command is part of.
    */
-  public MovementCommand(@Nonnull TransportOrder transportOrder,
-                         @Nonnull DriveOrder driveOrder,
-                         @Nonnull Route.Step step,
-                         @Nonnull String operation,
-                         @Nullable Location opLocation,
-                         boolean finalMovement,
-                         @Nullable Location finalDestinationLocation,
-                         @Nonnull Point finalDestination,
-                         @Nonnull String finalOperation,
-                         @Nonnull Map<String, String> properties) {
+  public MovementCommand(
+      @Nonnull
+      TransportOrder transportOrder,
+      @Nonnull
+      DriveOrder driveOrder,
+      @Nonnull
+      Route.Step step,
+      @Nonnull
+      String operation,
+      @Nullable
+      Location opLocation,
+      boolean finalMovement,
+      @Nullable
+      Location finalDestinationLocation,
+      @Nonnull
+      Point finalDestination,
+      @Nonnull
+      String finalOperation,
+      @Nonnull
+      Map<String, String> properties
+  ) {
     this.transportOrder = requireNonNull(transportOrder, "transportOrder");
     this.driveOrder = requireNonNull(driveOrder, "driveOrder");
     this.step = requireNonNull(step, "step");
@@ -137,17 +149,22 @@ public class MovementCommand {
    * @param transportOrder The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public MovementCommand withTransportOrder(@Nonnull TransportOrder transportOrder) {
-    return new MovementCommand(transportOrder,
-                               driveOrder,
-                               step,
-                               operation,
-                               opLocation,
-                               finalMovement,
-                               finalDestinationLocation,
-                               finalDestination,
-                               finalOperation,
-                               properties);
+  public MovementCommand withTransportOrder(
+      @Nonnull
+      TransportOrder transportOrder
+  ) {
+    return new MovementCommand(
+        transportOrder,
+        driveOrder,
+        step,
+        operation,
+        opLocation,
+        finalMovement,
+        finalDestinationLocation,
+        finalDestination,
+        finalOperation,
+        properties
+    );
   }
 
   /**
@@ -166,17 +183,22 @@ public class MovementCommand {
    * @param driveOrder The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public MovementCommand withDriveOrder(@Nonnull DriveOrder driveOrder) {
-    return new MovementCommand(transportOrder,
-                               driveOrder,
-                               step,
-                               operation,
-                               opLocation,
-                               finalMovement,
-                               finalDestinationLocation,
-                               finalDestination,
-                               finalOperation,
-                               properties);
+  public MovementCommand withDriveOrder(
+      @Nonnull
+      DriveOrder driveOrder
+  ) {
+    return new MovementCommand(
+        transportOrder,
+        driveOrder,
+        step,
+        operation,
+        opLocation,
+        finalMovement,
+        finalDestinationLocation,
+        finalDestination,
+        finalOperation,
+        properties
+    );
   }
 
   /**
@@ -195,17 +217,22 @@ public class MovementCommand {
    * @param step The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public MovementCommand withStep(@Nonnull Route.Step step) {
-    return new MovementCommand(transportOrder,
-                               driveOrder,
-                               step,
-                               operation,
-                               opLocation,
-                               finalMovement,
-                               finalDestinationLocation,
-                               finalDestination,
-                               finalOperation,
-                               properties);
+  public MovementCommand withStep(
+      @Nonnull
+      Route.Step step
+  ) {
+    return new MovementCommand(
+        transportOrder,
+        driveOrder,
+        step,
+        operation,
+        opLocation,
+        finalMovement,
+        finalDestinationLocation,
+        finalDestination,
+        finalOperation,
+        properties
+    );
   }
 
   /**
@@ -224,17 +251,22 @@ public class MovementCommand {
    * @param operation The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public MovementCommand withOperation(@Nonnull String operation) {
-    return new MovementCommand(transportOrder,
-                               driveOrder,
-                               step,
-                               operation,
-                               opLocation,
-                               finalMovement,
-                               finalDestinationLocation,
-                               finalDestination,
-                               finalOperation,
-                               properties);
+  public MovementCommand withOperation(
+      @Nonnull
+      String operation
+  ) {
+    return new MovementCommand(
+        transportOrder,
+        driveOrder,
+        step,
+        operation,
+        opLocation,
+        finalMovement,
+        finalDestinationLocation,
+        finalDestination,
+        finalOperation,
+        properties
+    );
   }
 
   /**
@@ -271,17 +303,22 @@ public class MovementCommand {
    * @param opLocation The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public MovementCommand withOpLocation(@Nullable Location opLocation) {
-    return new MovementCommand(transportOrder,
-                               driveOrder,
-                               step,
-                               operation,
-                               opLocation,
-                               finalMovement,
-                               finalDestinationLocation,
-                               finalDestination,
-                               finalOperation,
-                               properties);
+  public MovementCommand withOpLocation(
+      @Nullable
+      Location opLocation
+  ) {
+    return new MovementCommand(
+        transportOrder,
+        driveOrder,
+        step,
+        operation,
+        opLocation,
+        finalMovement,
+        finalDestinationLocation,
+        finalDestination,
+        finalOperation,
+        properties
+    );
   }
 
   /**
@@ -300,16 +337,18 @@ public class MovementCommand {
    * @return A copy of this object, differing in the given value.
    */
   public MovementCommand withFinalMovement(boolean finalMovement) {
-    return new MovementCommand(transportOrder,
-                               driveOrder,
-                               step,
-                               operation,
-                               opLocation,
-                               finalMovement,
-                               finalDestinationLocation,
-                               finalDestination,
-                               finalOperation,
-                               properties);
+    return new MovementCommand(
+        transportOrder,
+        driveOrder,
+        step,
+        operation,
+        opLocation,
+        finalMovement,
+        finalDestinationLocation,
+        finalDestination,
+        finalOperation,
+        properties
+    );
   }
 
   /**
@@ -328,17 +367,22 @@ public class MovementCommand {
    * @param finalDestination The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public MovementCommand withFinalDestination(@Nonnull Point finalDestination) {
-    return new MovementCommand(transportOrder,
-                               driveOrder,
-                               step,
-                               operation,
-                               opLocation,
-                               finalMovement,
-                               finalDestinationLocation,
-                               finalDestination,
-                               finalOperation,
-                               properties);
+  public MovementCommand withFinalDestination(
+      @Nonnull
+      Point finalDestination
+  ) {
+    return new MovementCommand(
+        transportOrder,
+        driveOrder,
+        step,
+        operation,
+        opLocation,
+        finalMovement,
+        finalDestinationLocation,
+        finalDestination,
+        finalOperation,
+        properties
+    );
   }
 
   /**
@@ -357,17 +401,22 @@ public class MovementCommand {
    * @param finalDestinationLocation The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public MovementCommand withFinalDestinationLocation(@Nullable Location finalDestinationLocation) {
-    return new MovementCommand(transportOrder,
-                               driveOrder,
-                               step,
-                               operation,
-                               opLocation,
-                               finalMovement,
-                               finalDestinationLocation,
-                               finalDestination,
-                               finalOperation,
-                               properties);
+  public MovementCommand withFinalDestinationLocation(
+      @Nullable
+      Location finalDestinationLocation
+  ) {
+    return new MovementCommand(
+        transportOrder,
+        driveOrder,
+        step,
+        operation,
+        opLocation,
+        finalMovement,
+        finalDestinationLocation,
+        finalDestination,
+        finalOperation,
+        properties
+    );
   }
 
   /**
@@ -386,17 +435,22 @@ public class MovementCommand {
    * @param finalOperation The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public MovementCommand withFinalOperation(@Nonnull String finalOperation) {
-    return new MovementCommand(transportOrder,
-                               driveOrder,
-                               step,
-                               operation,
-                               opLocation,
-                               finalMovement,
-                               finalDestinationLocation,
-                               finalDestination,
-                               finalOperation,
-                               properties);
+  public MovementCommand withFinalOperation(
+      @Nonnull
+      String finalOperation
+  ) {
+    return new MovementCommand(
+        transportOrder,
+        driveOrder,
+        step,
+        operation,
+        opLocation,
+        finalMovement,
+        finalDestinationLocation,
+        finalDestination,
+        finalOperation,
+        properties
+    );
   }
 
   /**
@@ -415,17 +469,22 @@ public class MovementCommand {
    * @param properties The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public MovementCommand withProperties(@Nonnull Map<String, String> properties) {
-    return new MovementCommand(transportOrder,
-                               driveOrder,
-                               step,
-                               operation,
-                               opLocation,
-                               finalMovement,
-                               finalDestinationLocation,
-                               finalDestination,
-                               finalOperation,
-                               properties);
+  public MovementCommand withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
+    return new MovementCommand(
+        transportOrder,
+        driveOrder,
+        step,
+        operation,
+        opLocation,
+        finalMovement,
+        finalDestinationLocation,
+        finalDestination,
+        finalOperation,
+        properties
+    );
   }
 
   @Override

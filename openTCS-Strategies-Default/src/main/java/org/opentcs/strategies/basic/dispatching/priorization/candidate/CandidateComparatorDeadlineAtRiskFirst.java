@@ -7,9 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.priorization.candidate;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Comparator;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorDeadlineAtRiskFirst;
@@ -20,7 +21,8 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
  * Note: this comparator imposes orderings that are inconsistent with equals.
  */
 public class CandidateComparatorDeadlineAtRiskFirst
-    implements Comparator<AssignmentCandidate> {
+    implements
+      Comparator<AssignmentCandidate> {
 
   /**
    * A key used for selecting this comparator in a configuration setting.
@@ -36,7 +38,8 @@ public class CandidateComparatorDeadlineAtRiskFirst
 
   @Inject
   public CandidateComparatorDeadlineAtRiskFirst(
-      TransportOrderComparatorDeadlineAtRiskFirst delegate) {
+      TransportOrderComparatorDeadlineAtRiskFirst delegate
+  ) {
     this.delegate = requireNonNull(delegate, "delegate");
   }
 

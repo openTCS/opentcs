@@ -7,9 +7,11 @@
  */
 package org.opentcs.operationsdesk.exchange;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkInRange;
+
 import jakarta.inject.Inject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.KernelServicePortal;
@@ -21,7 +23,6 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.guing.common.application.OperationMode;
 import org.opentcs.guing.common.event.OperationModeChangeEvent;
-import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.CyclicTask;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
@@ -33,8 +34,9 @@ import org.slf4j.LoggerFactory;
  * bus.
  */
 public class KernelEventFetcher
-    implements Lifecycle,
-               EventHandler {
+    implements
+      Lifecycle,
+      EventHandler {
 
   /**
    * This class' logger.
@@ -80,8 +82,11 @@ public class KernelEventFetcher
    * @param servicePortalProvider Provides a shared portal instance.
    */
   @Inject
-  public KernelEventFetcher(@ApplicationEventBus EventBus eventBus,
-                            SharedKernelServicePortalProvider servicePortalProvider) {
+  public KernelEventFetcher(
+      @ApplicationEventBus
+      EventBus eventBus,
+      SharedKernelServicePortalProvider servicePortalProvider
+  ) {
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.servicePortalProvider = requireNonNull(servicePortalProvider, "servicePortalProvider");
   }
@@ -159,7 +164,8 @@ public class KernelEventFetcher
    * A task fetching the service portal for events in regular intervals.
    */
   private class EventFetcherTask
-      extends CyclicTask {
+      extends
+        CyclicTask {
 
     /**
      * The poll timeout.

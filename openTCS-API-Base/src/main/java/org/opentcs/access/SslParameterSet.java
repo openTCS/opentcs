@@ -7,17 +7,19 @@
  */
 package org.opentcs.access;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.File;
 import java.io.Serializable;
-import static java.util.Objects.requireNonNull;
 
 /**
  * A set of parameters to be used for SSL-encrypted socket connections.
  */
 public class SslParameterSet
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The default type used for truststore and keystore files.
@@ -54,11 +56,18 @@ public class SslParameterSet
    * @param keystorePassword The keystore file password
    * @param truststorePassword The truststore file password
    */
-  public SslParameterSet(@Nonnull String keystoreType,
-                         @Nullable File keystoreFile,
-                         @Nullable String keystorePassword,
-                         @Nullable File truststoreFile,
-                         @Nullable String truststorePassword) {
+  public SslParameterSet(
+      @Nonnull
+      String keystoreType,
+      @Nullable
+      File keystoreFile,
+      @Nullable
+      String keystorePassword,
+      @Nullable
+      File truststoreFile,
+      @Nullable
+      String truststorePassword
+  ) {
     this.keystoreType = requireNonNull(keystoreType, "keystoreType");
     this.keystoreFile = keystoreFile;
     this.keystorePassword = keystorePassword;

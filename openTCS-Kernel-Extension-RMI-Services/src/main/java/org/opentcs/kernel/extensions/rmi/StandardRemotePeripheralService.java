@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import org.opentcs.access.rmi.ClientID;
@@ -38,8 +39,10 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class StandardRemotePeripheralService
-    extends StandardRemoteTCSObjectService
-    implements RemotePeripheralService {
+    extends
+      StandardRemoteTCSObjectService
+    implements
+      RemotePeripheralService {
 
   /**
    * This class's logger.
@@ -89,12 +92,15 @@ public class StandardRemotePeripheralService
    * @param kernelExecutor Executes tasks modifying kernel data.
    */
   @Inject
-  public StandardRemotePeripheralService(PeripheralService peripheralService,
-                                         UserManager userManager,
-                                         RmiKernelInterfaceConfiguration configuration,
-                                         SocketFactoryProvider socketFactoryProvider,
-                                         RegistryProvider registryProvider,
-                                         @KernelExecutor ExecutorService kernelExecutor) {
+  public StandardRemotePeripheralService(
+      PeripheralService peripheralService,
+      UserManager userManager,
+      RmiKernelInterfaceConfiguration configuration,
+      SocketFactoryProvider socketFactoryProvider,
+      RegistryProvider registryProvider,
+      @KernelExecutor
+      ExecutorService kernelExecutor
+  ) {
     super(peripheralService, userManager, kernelExecutor);
     this.peripheralService = requireNonNull(peripheralService, "peripheralService");
     this.userManager = requireNonNull(userManager, "userManager");
@@ -115,10 +121,12 @@ public class StandardRemotePeripheralService
     // Export this instance via RMI.
     try {
       LOG.debug("Exporting proxy...");
-      UnicastRemoteObject.exportObject(this,
-                                       configuration.remotePeripheralServicePort(),
-                                       socketFactoryProvider.getClientSocketFactory(),
-                                       socketFactoryProvider.getServerSocketFactory());
+      UnicastRemoteObject.exportObject(
+          this,
+          configuration.remotePeripheralServicePort(),
+          socketFactoryProvider.getClientSocketFactory(),
+          socketFactoryProvider.getServerSocketFactory()
+      );
       LOG.debug("Binding instance with RMI registry...");
       rmiRegistry.rebind(RegistrationName.REMOTE_PERIPHERAL_SERVICE, this);
     }
@@ -155,9 +163,11 @@ public class StandardRemotePeripheralService
   }
 
   @Override
-  public void attachCommAdapter(ClientID clientId,
-                                TCSResourceReference<Location> ref,
-                                PeripheralCommAdapterDescription description) {
+  public void attachCommAdapter(
+      ClientID clientId,
+      TCSResourceReference<Location> ref,
+      PeripheralCommAdapterDescription description
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_PERIPHERALS);
 
     try {
@@ -195,24 +205,29 @@ public class StandardRemotePeripheralService
   @Override
   public PeripheralAttachmentInformation fetchAttachmentInformation(
       ClientID clientId,
-      TCSResourceReference<Location> ref) {
+      TCSResourceReference<Location> ref
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 
     return peripheralService.fetchAttachmentInformation(ref);
   }
 
   @Override
-  public PeripheralProcessModel fetchProcessModel(ClientID clientId,
-                                                  TCSResourceReference<Location> ref) {
+  public PeripheralProcessModel fetchProcessModel(
+      ClientID clientId,
+      TCSResourceReference<Location> ref
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 
     return peripheralService.fetchProcessModel(ref);
   }
 
   @Override
-  public void sendCommAdapterCommand(ClientID clientId,
-                                     TCSResourceReference<Location> ref,
-                                     PeripheralAdapterCommand command) {
+  public void sendCommAdapterCommand(
+      ClientID clientId,
+      TCSResourceReference<Location> ref,
+      PeripheralAdapterCommand command
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_PERIPHERALS);
 
     try {

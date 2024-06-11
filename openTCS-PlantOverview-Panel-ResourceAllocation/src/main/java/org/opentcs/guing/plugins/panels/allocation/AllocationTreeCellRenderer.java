@@ -7,9 +7,10 @@
  */
 package org.opentcs.guing.plugins.panels.allocation;
 
+import static java.util.Objects.requireNonNull;
+
 import java.awt.Component;
 import java.net.URL;
-import static java.util.Objects.requireNonNull;
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -22,7 +23,8 @@ import org.opentcs.data.model.TCSResourceReference;
  * Renders the tree nodes with vehicle, point and path icons.
  */
 public class AllocationTreeCellRenderer
-    extends DefaultTreeCellRenderer {
+    extends
+      DefaultTreeCellRenderer {
 
   /**
    * The icon for vehicles in the tree view.
@@ -53,9 +55,11 @@ public class AllocationTreeCellRenderer
   }
 
   @Override
-  public Component getTreeCellRendererComponent(JTree tree, Object node, boolean selected,
-                                                boolean expanded, boolean isLeaf, int row,
-                                                boolean hasFocus) {
+  public Component getTreeCellRendererComponent(
+      JTree tree, Object node, boolean selected,
+      boolean expanded, boolean isLeaf, int row,
+      boolean hasFocus
+  ) {
     //Let the superclass handle all its stuff related to rendering
     super.getTreeCellRendererComponent(tree, node, selected, expanded, isLeaf, row, hasFocus);
     if (node instanceof DefaultMutableTreeNode) {

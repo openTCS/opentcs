@@ -7,9 +7,10 @@
  */
 package org.opentcs.strategies.basic.peripherals.dispatching.phase;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.data.model.Location;
 import org.opentcs.strategies.basic.peripherals.dispatching.PeripheralDispatcherPhase;
@@ -21,7 +22,8 @@ import org.slf4j.LoggerFactory;
  * Releases the reservations of peripherals.
  */
 public class ReleasePeripheralsPhase
-    implements PeripheralDispatcherPhase {
+    implements
+      PeripheralDispatcherPhase {
 
   /**
    * This class's Logger.
@@ -41,8 +43,10 @@ public class ReleasePeripheralsPhase
   private boolean initialized;
 
   @Inject
-  public ReleasePeripheralsPhase(InternalPeripheralService peripheralService,
-                                 PeripheralReleaseStrategy releaseStrategy) {
+  public ReleasePeripheralsPhase(
+      InternalPeripheralService peripheralService,
+      PeripheralReleaseStrategy releaseStrategy
+  ) {
     this.peripheralService = requireNonNull(peripheralService, "peripheralService");
     this.releaseStrategy = requireNonNull(releaseStrategy, "releaseStrategy");
   }

@@ -26,7 +26,8 @@ import org.opentcs.guing.common.components.drawing.course.Origin;
  * A Figure for the coordinate system's origin.
  */
 public class OriginFigure
-    extends AbstractAttributedFigure {
+    extends
+      AbstractAttributedFigure {
 
   /**
    * The enclosing rectangle.
@@ -53,8 +54,10 @@ public class OriginFigure
     super();
     fSideLength = 20;
     fZoomPoint = new ZoomPoint(0.0, 0.0);
-    fDisplayBox = new Rectangle(-fSideLength / 2, -fSideLength / 2,
-                                fSideLength, fSideLength);
+    fDisplayBox = new Rectangle(
+        -fSideLength / 2, -fSideLength / 2,
+        fSideLength, fSideLength
+    );
     set(AttributeKeys.STROKE_COLOR, Color.blue);
     setSelectable(false);
   }
@@ -129,7 +132,8 @@ public class OriginFigure
     Point2D lead = new Point2D.Double();  // not used
     setBounds(
         (Point2D.Double) tx.transform(center, center),
-        (Point2D.Double) tx.transform(lead, lead));
+        (Point2D.Double) tx.transform(lead, lead)
+    );
   }
 
   @Override

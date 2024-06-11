@@ -7,12 +7,13 @@
  */
 package org.opentcs.guing.plugins.themes;
 
+import static java.util.Objects.requireNonNull;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
 import java.io.IOException;
 import java.net.URL;
-import static java.util.Objects.requireNonNull;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
@@ -24,7 +25,8 @@ import org.opentcs.data.model.Vehicle;
  * states.
  */
 public class StatelessImageVehicleTheme
-    implements VehicleTheme {
+    implements
+      VehicleTheme {
 
   /**
    * The path containing the images.

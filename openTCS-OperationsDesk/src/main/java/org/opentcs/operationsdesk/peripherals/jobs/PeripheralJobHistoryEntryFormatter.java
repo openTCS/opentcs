@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.peripherals.jobs;
 
 import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
 import org.opentcs.components.plantoverview.ObjectHistoryEntryFormatter;
 import org.opentcs.data.ObjectHistory;
@@ -20,7 +21,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A formatter for history events/entries related to {@link PeripheralJob}s.
  */
 public class PeripheralJobHistoryEntryFormatter
-    implements ObjectHistoryEntryFormatter {
+    implements
+      ObjectHistoryEntryFormatter {
 
   /**
    * A bundle providing localized strings.

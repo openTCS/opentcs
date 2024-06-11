@@ -7,6 +7,9 @@
  */
 package org.opentcs.util.persistence.v004;
 
+import static org.opentcs.data.ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION;
+import static org.opentcs.data.ObjectPropConstants.LOC_DEFAULT_REPRESENTATION;
+
 import java.awt.Color;
 import java.io.IOException;
 import java.io.Reader;
@@ -18,8 +21,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.PlantModelCreationTO;
-import static org.opentcs.data.ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION;
-import static org.opentcs.data.ObjectPropConstants.LOC_DEFAULT_REPRESENTATION;
 import org.opentcs.data.model.ModelConstants;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.LocationRepresentation;
@@ -88,7 +89,8 @@ public class V004ModelParser {
   }
 
   private Map<String, ModelLayoutElement> getModelLayoutElementMap(
-      V003PlantModelTO to) {
+      V003PlantModelTO to
+  ) {
     Map<String, ModelLayoutElement> result = new HashMap<>();
     for (ModelLayoutElement mle : to.getVisualLayouts().get(0).getModelLayoutElements()) {
       result.put(mle.getVisualizedObjectName(), mle);
@@ -97,7 +99,8 @@ public class V004ModelParser {
   }
 
   private List<PropertyTO> convertProperties(
-      List<org.opentcs.util.persistence.v003.PropertyTO> tos) {
+      List<org.opentcs.util.persistence.v003.PropertyTO> tos
+  ) {
     return tos.stream()
         .map(property -> new PropertyTO().setName(property.getName()).setValue(property.getValue()))
         .collect(Collectors.toList());
@@ -132,8 +135,10 @@ public class V004ModelParser {
         .setLocations(locationsAssignedToDefaultLayer);
   }
 
-  private List<PointTO> convertPoints(V003PlantModelTO to,
-                                      Map<String, ModelLayoutElement> modelLayoutElementMap) {
+  private List<PointTO> convertPoints(
+      V003PlantModelTO to,
+      Map<String, ModelLayoutElement> modelLayoutElementMap
+  ) {
     return to.getPoints().stream()
         .map(point -> {
           Map<String, String> layoutProperties
@@ -160,18 +165,21 @@ public class V004ModelParser {
               .setVehicleOrientationAngle(point.getVehicleOrientationAngle())
               .setType(point.getType())
               .setOutgoingPaths(convertOutgoingPaths(point))
-              .setPointLayout(new PointTO.PointLayout()
-                  .setxPosition(positionX)
-                  .setyPosition(positionY)
-                  .setxLabelOffset(labelOffsetX)
-                  .setyLabelOffset(labelOffsetY));
+              .setPointLayout(
+                  new PointTO.PointLayout()
+                      .setxPosition(positionX)
+                      .setyPosition(positionY)
+                      .setxLabelOffset(labelOffsetX)
+                      .setyLabelOffset(labelOffsetY)
+              );
           return result;
         })
         .collect(Collectors.toList());
   }
 
   private Map<String, String> toPropertiesMap(
-      List<org.opentcs.util.persistence.v003.PropertyTO> properties) {
+      List<org.opentcs.util.persistence.v003.PropertyTO> properties
+  ) {
     Map<String, String> result = new HashMap<>();
     for (org.opentcs.util.persistence.v003.PropertyTO property : properties) {
       result.put(property.getName(), property.getValue());
@@ -180,20 +188,25 @@ public class V004ModelParser {
   }
 
   private List<PointTO.OutgoingPath> convertOutgoingPaths(
-      org.opentcs.util.persistence.v003.PointTO to) {
+      org.opentcs.util.persistence.v003.PointTO to
+  ) {
     return to.getOutgoingPaths().stream()
         .map(path -> new PointTO.OutgoingPath().setName(path.getName()))
         .collect(Collectors.toList());
   }
 
-  private List<PathTO> convertPaths(V003PlantModelTO to,
-                                    Map<String, ModelLayoutElement> modelLayoutElementMap) {
+  private List<PathTO> convertPaths(
+      V003PlantModelTO to,
+      Map<String, ModelLayoutElement> modelLayoutElementMap
+  ) {
     return to.getPaths().stream()
         .map(path -> {
           Map<String, String> layoutProperties
               = toPropertiesMap(modelLayoutElementMap.get(path.getName()).getProperties());
-          String connectionType = layoutProperties.getOrDefault(ElementPropKeys.PATH_CONN_TYPE,
-                                                                "DIRECT");
+          String connectionType = layoutProperties.getOrDefault(
+              ElementPropKeys.PATH_CONN_TYPE,
+              "DIRECT"
+          );
 
           List<PathTO.ControlPoint> controlPoints = new ArrayList<>();
           String controlPointsString = layoutProperties.get(ElementPropKeys.PATH_CONTROL_POINTS);
@@ -217,16 +230,20 @@ public class V004ModelParser {
               .setMaxVelocity(path.getMaxVelocity())
               .setMaxReverseVelocity(path.getMaxReverseVelocity())
               .setLocked(path.isLocked())
-              .setPathLayout(new PathTO.PathLayout()
-                  .setConnectionType(connectionType)
-                  .setControlPoints(controlPoints));
+              .setPathLayout(
+                  new PathTO.PathLayout()
+                      .setConnectionType(connectionType)
+                      .setControlPoints(controlPoints)
+              );
           return result;
         })
         .collect(Collectors.toList());
   }
 
-  private List<VehicleTO> convertVehicles(V003PlantModelTO to,
-                                          Map<String, ModelLayoutElement> modelLayoutElementMap) {
+  private List<VehicleTO> convertVehicles(
+      V003PlantModelTO to,
+      Map<String, ModelLayoutElement> modelLayoutElementMap
+  ) {
     return to.getVehicles().stream()
         .map(vehicle -> {
           Map<String, String> layoutProperties
@@ -245,8 +262,10 @@ public class V004ModelParser {
               .setEnergyLevelSufficientlyRecharged(vehicle.getEnergyLevelSufficientlyRecharged())
               .setMaxVelocity(vehicle.getMaxVelocity())
               .setMaxReverseVelocity(vehicle.getMaxReverseVelocity())
-              .setVehicleLayout(new VehicleTO.VehicleLayout()
-                  .setColor(color));
+              .setVehicleLayout(
+                  new VehicleTO.VehicleLayout()
+                      .setColor(color)
+              );
           return result;
         })
         .collect(Collectors.toList());
@@ -262,15 +281,18 @@ public class V004ModelParser {
           result.setName(locationType.getName())
               .setProperties(convertProperties(locationType.getProperties()));
           result.setAllowedOperations(convertAllowedOperations(locationType.getAllowedOperations()))
-              .setLocationTypeLayout(new LocationTypeTO.LocationTypeLayout()
-                  .setLocationRepresentation(locationRepresentation));
+              .setLocationTypeLayout(
+                  new LocationTypeTO.LocationTypeLayout()
+                      .setLocationRepresentation(locationRepresentation)
+              );
           return result;
         })
         .collect(Collectors.toList());
   }
 
   private List<AllowedOperationTO> convertAllowedOperations(
-      List<org.opentcs.util.persistence.v003.AllowedOperationTO> tos) {
+      List<org.opentcs.util.persistence.v003.AllowedOperationTO> tos
+  ) {
     return tos.stream()
         .map(allowedOperation -> {
           AllowedOperationTO result = new AllowedOperationTO();
@@ -281,8 +303,10 @@ public class V004ModelParser {
         .collect(Collectors.toList());
   }
 
-  private List<LocationTO> convertLocations(V003PlantModelTO to,
-                                            Map<String, ModelLayoutElement> modelLayoutElementMap) {
+  private List<LocationTO> convertLocations(
+      V003PlantModelTO to,
+      Map<String, ModelLayoutElement> modelLayoutElementMap
+  ) {
     return to.getLocations().stream()
         .map(location -> {
           Map<String, String> layoutProperties
@@ -311,12 +335,14 @@ public class V004ModelParser {
               .setType(location.getType())
               .setLinks(convertLinks(location))
               .setLocked(location.isLocked())
-              .setLocationLayout(new LocationTO.LocationLayout()
-                  .setxPosition(positionX)
-                  .setyPosition(positionY)
-                  .setxLabelOffset(labelOffsetX)
-                  .setyLabelOffset(labelOffsetY)
-                  .setLocationRepresentation(locationRepresentation));
+              .setLocationLayout(
+                  new LocationTO.LocationLayout()
+                      .setxPosition(positionX)
+                      .setyPosition(positionY)
+                      .setxLabelOffset(labelOffsetX)
+                      .setyLabelOffset(labelOffsetY)
+                      .setLocationRepresentation(locationRepresentation)
+              );
           return result;
         })
         .collect(Collectors.toList());
@@ -332,8 +358,10 @@ public class V004ModelParser {
         .collect(Collectors.toList());
   }
 
-  private List<BlockTO> convertBlocks(V003PlantModelTO to,
-                                      Map<String, ModelLayoutElement> modelLayoutElementMap) {
+  private List<BlockTO> convertBlocks(
+      V003PlantModelTO to,
+      Map<String, ModelLayoutElement> modelLayoutElementMap
+  ) {
     return to.getBlocks().stream()
         .map(block -> {
           Map<String, String> layoutProperties
@@ -347,8 +375,10 @@ public class V004ModelParser {
               .setProperties(convertProperties(block.getProperties()));
           result.setType(block.getType())
               .setMembers(convertMembers(block.getMembers()))
-              .setBlockLayout(new BlockTO.BlockLayout()
-                  .setColor(color));
+              .setBlockLayout(
+                  new BlockTO.BlockLayout()
+                      .setColor(color)
+              );
           return result;
         })
         .collect(Collectors.toList());

@@ -7,15 +7,17 @@
  */
 package org.opentcs.commadapter.peripheral.loopback;
 
-import java.util.ResourceBundle;
 import static org.opentcs.commadapter.peripheral.loopback.I18nLoopbackPeripheralCommAdapter.BUNDLE_PATH;
+
+import java.util.ResourceBundle;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
 
 /**
  * A {@link PeripheralCommAdapterDescription} for no comm adapter.
  */
 public class LoopbackPeripheralCommAdapterDescription
-    extends PeripheralCommAdapterDescription {
+    extends
+      PeripheralCommAdapterDescription {
 
   /**
    * Creates a new instance.

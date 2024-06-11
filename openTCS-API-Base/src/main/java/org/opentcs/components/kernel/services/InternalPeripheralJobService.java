@@ -16,7 +16,8 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * peers.
  */
 public interface InternalPeripheralJobService
-    extends PeripheralJobService {
+    extends
+      PeripheralJobService {
 
   /**
    * Updates a peripheral job's state.

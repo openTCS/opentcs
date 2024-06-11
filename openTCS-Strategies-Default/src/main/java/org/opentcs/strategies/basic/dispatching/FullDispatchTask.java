@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.strategies.basic.dispatching.phase.AssignReservedOrdersPhase;
 import org.opentcs.strategies.basic.dispatching.phase.AssignSequenceSuccessorsPhase;
@@ -27,8 +28,9 @@ import org.slf4j.LoggerFactory;
  * Performs a full dispatch run.
  */
 public class FullDispatchTask
-    implements Runnable,
-               Lifecycle {
+    implements
+      Runnable,
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -51,30 +53,42 @@ public class FullDispatchTask
   private boolean initialized;
 
   @Inject
-  public FullDispatchTask(CheckNewOrdersPhase checkNewOrdersPhase,
-                          FinishWithdrawalsPhase finishWithdrawalsPhase,
-                          AssignNextDriveOrdersPhase assignNextDriveOrdersPhase,
-                          AssignReservedOrdersPhase assignReservedOrdersPhase,
-                          AssignSequenceSuccessorsPhase assignSequenceSuccessorsPhase,
-                          AssignFreeOrdersPhase assignFreeOrdersPhase,
-                          RechargeIdleVehiclesPhase rechargeIdleVehiclesPhase,
-                          PrioritizedReparkPhase prioritizedReparkPhase,
-                          PrioritizedParkingPhase prioritizedParkingPhase,
-                          ParkIdleVehiclesPhase parkIdleVehiclesPhase) {
+  public FullDispatchTask(
+      CheckNewOrdersPhase checkNewOrdersPhase,
+      FinishWithdrawalsPhase finishWithdrawalsPhase,
+      AssignNextDriveOrdersPhase assignNextDriveOrdersPhase,
+      AssignReservedOrdersPhase assignReservedOrdersPhase,
+      AssignSequenceSuccessorsPhase assignSequenceSuccessorsPhase,
+      AssignFreeOrdersPhase assignFreeOrdersPhase,
+      RechargeIdleVehiclesPhase rechargeIdleVehiclesPhase,
+      PrioritizedReparkPhase prioritizedReparkPhase,
+      PrioritizedParkingPhase prioritizedParkingPhase,
+      ParkIdleVehiclesPhase parkIdleVehiclesPhase
+  ) {
     this.checkNewOrdersPhase = requireNonNull(checkNewOrdersPhase, "checkNewOrdersPhase");
     this.finishWithdrawalsPhase = requireNonNull(finishWithdrawalsPhase, "finishWithdrawalsPhase");
-    this.assignNextDriveOrdersPhase = requireNonNull(assignNextDriveOrdersPhase,
-                                                     "assignNextDriveOrdersPhase");
-    this.assignReservedOrdersPhase = requireNonNull(assignReservedOrdersPhase,
-                                                    "assignReservedOrdersPhase");
-    this.assignSequenceSuccessorsPhase = requireNonNull(assignSequenceSuccessorsPhase,
-                                                        "assignSequenceSuccessorsPhase");
+    this.assignNextDriveOrdersPhase = requireNonNull(
+        assignNextDriveOrdersPhase,
+        "assignNextDriveOrdersPhase"
+    );
+    this.assignReservedOrdersPhase = requireNonNull(
+        assignReservedOrdersPhase,
+        "assignReservedOrdersPhase"
+    );
+    this.assignSequenceSuccessorsPhase = requireNonNull(
+        assignSequenceSuccessorsPhase,
+        "assignSequenceSuccessorsPhase"
+    );
     this.assignFreeOrdersPhase = requireNonNull(assignFreeOrdersPhase, "assignFreeOrdersPhase");
-    this.rechargeIdleVehiclesPhase = requireNonNull(rechargeIdleVehiclesPhase,
-                                                    "rechargeIdleVehiclesPhase");
+    this.rechargeIdleVehiclesPhase = requireNonNull(
+        rechargeIdleVehiclesPhase,
+        "rechargeIdleVehiclesPhase"
+    );
     this.prioritizedReparkPhase = requireNonNull(prioritizedReparkPhase, "prioritizedReparkPhase");
-    this.prioritizedParkingPhase = requireNonNull(prioritizedParkingPhase,
-                                                  "prioritizedParkingPhase");
+    this.prioritizedParkingPhase = requireNonNull(
+        prioritizedParkingPhase,
+        "prioritizedParkingPhase"
+    );
     this.parkIdleVehiclesPhase = requireNonNull(parkIdleVehiclesPhase, "parkIdleVehiclesPhase");
   }
 

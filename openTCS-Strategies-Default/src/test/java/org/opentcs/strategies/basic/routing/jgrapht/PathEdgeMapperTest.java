@@ -7,17 +7,18 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
 import org.opentcs.data.model.Path;
@@ -79,9 +80,11 @@ class PathEdgeMapperTest {
 
     assertThat(result).hasSize(1);
     assertThat(result)
-        .extractingFromEntries(entry -> entry.getKey().getPath(),
-                               entry -> entry.getKey().isTravellingReverse(),
-                               entry -> entry.getValue())
+        .extractingFromEntries(
+            entry -> entry.getKey().getPath(),
+            entry -> entry.getKey().isTravellingReverse(),
+            entry -> entry.getValue()
+        )
         .contains(tuple(pathAB, false, 42.0));
     verify(edgeEvaluator).onGraphComputationStart(vehicle);
     verify(edgeEvaluator).onGraphComputationEnd(vehicle);
@@ -93,11 +96,15 @@ class PathEdgeMapperTest {
 
     assertThat(result).hasSize(2);
     assertThat(result)
-        .extractingFromEntries(entry -> entry.getKey().getPath(),
-                               entry -> entry.getKey().isTravellingReverse(),
-                               entry -> entry.getValue())
-        .contains(tuple(pathBC, false, 42.0),
-                  tuple(pathBC, true, 42.0));
+        .extractingFromEntries(
+            entry -> entry.getKey().getPath(),
+            entry -> entry.getKey().isTravellingReverse(),
+            entry -> entry.getValue()
+        )
+        .contains(
+            tuple(pathBC, false, 42.0),
+            tuple(pathBC, true, 42.0)
+        );
     verify(edgeEvaluator).onGraphComputationStart(vehicle);
     verify(edgeEvaluator).onGraphComputationEnd(vehicle);
   }
@@ -108,12 +115,16 @@ class PathEdgeMapperTest {
 
     assertThat(result).hasSize(3);
     assertThat(result)
-        .extractingFromEntries(entry -> entry.getKey().getPath(),
-                               entry -> entry.getKey().isTravellingReverse(),
-                               entry -> entry.getValue())
-        .contains(tuple(pathAB, false, 42.0),
-                  tuple(pathBC, false, 42.0),
-                  tuple(pathBC, true, 42.0));
+        .extractingFromEntries(
+            entry -> entry.getKey().getPath(),
+            entry -> entry.getKey().isTravellingReverse(),
+            entry -> entry.getValue()
+        )
+        .contains(
+            tuple(pathAB, false, 42.0),
+            tuple(pathBC, false, 42.0),
+            tuple(pathBC, true, 42.0)
+        );
     verify(edgeEvaluator).onGraphComputationStart(vehicle);
     verify(edgeEvaluator).onGraphComputationEnd(vehicle);
   }
@@ -135,9 +146,11 @@ class PathEdgeMapperTest {
 
     assertThat(result).hasSize(1);
     assertThat(result)
-        .extractingFromEntries(entry -> entry.getKey().getPath(),
-                               entry -> entry.getKey().isTravellingReverse(),
-                               entry -> entry.getValue())
+        .extractingFromEntries(
+            entry -> entry.getKey().getPath(),
+            entry -> entry.getKey().isTravellingReverse(),
+            entry -> entry.getValue()
+        )
         .contains(tuple(pathAB, false, 42.0));
     verify(edgeEvaluator).onGraphComputationStart(vehicle);
     verify(edgeEvaluator).onGraphComputationEnd(vehicle);

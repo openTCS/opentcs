@@ -7,11 +7,13 @@
  */
 package org.opentcs.kernel.peripherals;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkState;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.model.Location;
@@ -24,7 +26,6 @@ import org.opentcs.drivers.peripherals.PeripheralController;
 import org.opentcs.drivers.peripherals.PeripheralJobCallback;
 import org.opentcs.drivers.peripherals.PeripheralProcessModel;
 import org.opentcs.drivers.peripherals.management.PeripheralProcessModelEvent;
-import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.ExplainedBoolean;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
@@ -36,8 +37,9 @@ import org.slf4j.LoggerFactory;
  * peripheral device.
  */
 public class DefaultPeripheralController
-    implements PeripheralController,
-               EventHandler {
+    implements
+      PeripheralController,
+      EventHandler {
 
   /**
    * This class's Logger.
@@ -73,10 +75,19 @@ public class DefaultPeripheralController
    * @param eventBus The event bus to be used.
    */
   @Inject
-  public DefaultPeripheralController(@Assisted @Nonnull TCSResourceReference<Location> location,
-                                     @Assisted @Nonnull PeripheralCommAdapter commAdapter,
-                                     @Nonnull InternalPeripheralService peripheralService,
-                                     @Nonnull @ApplicationEventBus EventBus eventBus) {
+  public DefaultPeripheralController(
+      @Assisted
+      @Nonnull
+      TCSResourceReference<Location> location,
+      @Assisted
+      @Nonnull
+      PeripheralCommAdapter commAdapter,
+      @Nonnull
+      InternalPeripheralService peripheralService,
+      @Nonnull
+      @ApplicationEventBus
+      EventBus eventBus
+  ) {
     this.location = requireNonNull(location, "location");
     this.commAdapter = requireNonNull(commAdapter, "commAdapter");
     this.peripheralService = requireNonNull(peripheralService, "peripheralService");
@@ -121,8 +132,10 @@ public class DefaultPeripheralController
     }
 
     PeripheralProcessModelEvent processModelEvent = (PeripheralProcessModelEvent) event;
-    if (Objects.equals(processModelEvent.getAttributeChanged(),
-                       PeripheralProcessModel.Attribute.STATE.name())
+    if (Objects.equals(
+        processModelEvent.getAttributeChanged(),
+        PeripheralProcessModel.Attribute.STATE.name()
+    )
         && Objects.equals(processModelEvent.getLocation(), location)) {
       updatePeripheralState(processModelEvent.getProcessModel().getState());
     }
@@ -135,10 +148,12 @@ public class DefaultPeripheralController
     requireNonNull(callback, "callback");
 
     ExplainedBoolean canProcess = canProcess(job);
-    checkState(canProcess.getValue(),
-               "%s: Can't process job: %s",
-               location.getName(),
-               canProcess.getReason());
+    checkState(
+        canProcess.getValue(),
+        "%s: Can't process job: %s",
+        location.getName(),
+        canProcess.getReason()
+    );
 
     LOG.debug("{}: Handing job to comm adapter: {}", location.getName(), job);
     commAdapter.process(job, callback);

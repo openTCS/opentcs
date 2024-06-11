@@ -7,13 +7,14 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelStateTransitionEvent;
 import org.opentcs.data.TCSObjectEvent;

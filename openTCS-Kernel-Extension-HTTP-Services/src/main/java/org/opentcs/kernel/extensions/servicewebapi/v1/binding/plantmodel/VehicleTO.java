@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 
 /**
@@ -30,7 +31,11 @@ public class VehicleTO {
   private List<PropertyTO> properties = List.of();
 
   @JsonCreator
-  public VehicleTO(@Nonnull @JsonProperty(value = "name", required = true) String name) {
+  public VehicleTO(
+      @Nonnull
+      @JsonProperty(value = "name", required = true)
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
   }
 
@@ -39,7 +44,10 @@ public class VehicleTO {
     return name;
   }
 
-  public VehicleTO setName(@Nonnull String name) {
+  public VehicleTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     return this;
   }
@@ -49,7 +57,10 @@ public class VehicleTO {
     return properties;
   }
 
-  public VehicleTO setProperties(@Nonnull List<PropertyTO> properties) {
+  public VehicleTO setProperties(
+      @Nonnull
+      List<PropertyTO> properties
+  ) {
     this.properties = requireNonNull(properties, "properties");
     return this;
   }
@@ -122,7 +133,10 @@ public class VehicleTO {
     return layout;
   }
 
-  public VehicleTO setLayout(@Nonnull Layout layout) {
+  public VehicleTO setLayout(
+      @Nonnull
+      Layout layout
+  ) {
     this.layout = requireNonNull(layout, "layout");
     return this;
   }
@@ -140,7 +154,10 @@ public class VehicleTO {
       return routeColor;
     }
 
-    public Layout setRouteColor(@Nonnull String routeColor) {
+    public Layout setRouteColor(
+        @Nonnull
+        String routeColor
+    ) {
       this.routeColor = requireNonNull(routeColor, "routeColor");
       return this;
     }

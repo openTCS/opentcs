@@ -129,19 +129,21 @@ public final class Environment {
    * the running Java VM to the log.
    */
   public static void logSystemInfo() {
-    LOG.info("openTCS baseline version: {} (build date: {}), "
-        + "customization '{}' version {} (build date: {}), "
-        + "Java: {}, {}; JVM: {}, {}; OS: {}, {}",
-             BASELINE_VERSION,
-             BASELINE_BUILD_DATE,
-             CUSTOMIZATION_NAME,
-             CUSTOMIZATION_VERSION,
-             CUSTOMIZATION_BUILD_DATE,
-             System.getProperty("java.version"),
-             System.getProperty("java.vendor"),
-             System.getProperty("java.vm.version"),
-             System.getProperty("java.vm.vendor"),
-             System.getProperty("os.name"),
-             System.getProperty("os.arch"));
+    LOG.info(
+        "openTCS baseline version: {} (build date: {}), "
+            + "customization '{}' version {} (build date: {}), "
+            + "Java: {}, {}; JVM: {}, {}; OS: {}, {}",
+        BASELINE_VERSION,
+        BASELINE_BUILD_DATE,
+        CUSTOMIZATION_NAME,
+        CUSTOMIZATION_VERSION,
+        CUSTOMIZATION_BUILD_DATE,
+        System.getProperty("java.version"),
+        System.getProperty("java.vendor"),
+        System.getProperty("java.vm.version"),
+        System.getProperty("java.vm.vendor"),
+        System.getProperty("os.name"),
+        System.getProperty("os.arch")
+    );
   }
 }

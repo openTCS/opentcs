@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.Comparator;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
@@ -46,9 +47,11 @@ public class PeripheralJobHandler {
    * @param executorWrapper Executes calls via the kernel executor and waits for the outcome.
    */
   @Inject
-  public PeripheralJobHandler(PeripheralJobService jobService,
-                              PeripheralDispatcherService jobDispatcherService,
-                              KernelExecutorWrapper executorWrapper) {
+  public PeripheralJobHandler(
+      PeripheralJobService jobService,
+      PeripheralDispatcherService jobDispatcherService,
+      KernelExecutorWrapper executorWrapper
+  ) {
     this.jobService = requireNonNull(jobService, "jobService");
     this.jobDispatcherService = requireNonNull(jobDispatcherService, "jobDispatcherService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
@@ -65,15 +68,19 @@ public class PeripheralJobHandler {
         throw new ObjectUnknownException("Unknown vehicle: " + job.getRelatedVehicle());
       }
       if (job.getRelatedTransportOrder() != null
-          && jobService.fetchObject(TransportOrder.class,
-                                    job.getRelatedTransportOrder()) == null) {
+          && jobService.fetchObject(
+              TransportOrder.class,
+              job.getRelatedTransportOrder()
+          ) == null) {
         throw new ObjectUnknownException(
             "Unknown transport order: " + job.getRelatedTransportOrder()
         );
       }
       if (job.getPeripheralOperation().getLocationName() != null
-          && jobService.fetchObject(Location.class,
-                                    job.getPeripheralOperation().getLocationName()) == null) {
+          && jobService.fetchObject(
+              Location.class,
+              job.getPeripheralOperation().getLocationName()
+          ) == null) {
         throw new ObjectUnknownException(
             "Unknown location: " + job.getPeripheralOperation().getLocationName()
         );
@@ -89,14 +96,18 @@ public class PeripheralJobHandler {
       PeripheralJobCreationTO jobCreationTO = new PeripheralJobCreationTO(
           name,
           job.getReservationToken(),
-          operationCreationTO)
+          operationCreationTO
+      )
           .withIncompleteName(job.isIncompleteName());
       if (job.getProperties() != null) {
-        jobCreationTO = jobCreationTO.withProperties(job.getProperties().stream()
-            .collect(Collectors.toMap(
-                property -> property.getKey(),
-                property -> property.getValue()
-            ))
+        jobCreationTO = jobCreationTO.withProperties(
+            job.getProperties().stream()
+                .collect(
+                    Collectors.toMap(
+                        property -> property.getKey(),
+                        property -> property.getValue()
+                    )
+                )
         );
       }
       if (job.getRelatedTransportOrder() != null) {
@@ -120,8 +131,10 @@ public class PeripheralJobHandler {
    * @return List of peripheral job states.
    */
   public List<GetPeripheralJobResponseTO> getPeripheralJobs(
-      @Nullable String relatedVehicle,
-      @Nullable String relatedTransportOrder
+      @Nullable
+      String relatedVehicle,
+      @Nullable
+      String relatedTransportOrder
   ) {
     return executorWrapper.callAndWait(() -> {
       // If a related vehicle is set, make sure it exists.
@@ -164,7 +177,10 @@ public class PeripheralJobHandler {
    * @param name The name of the peripheral job.
    * @return The peripheral job state.
    */
-  public GetPeripheralJobResponseTO getPeripheralJobByName(@Nonnull String name) {
+  public GetPeripheralJobResponseTO getPeripheralJobByName(
+      @Nonnull
+      String name
+  ) {
     requireNonNull(name, "name");
 
     return executorWrapper.callAndWait(() -> {

@@ -82,7 +82,8 @@ public class GetPeripheralJobResponseTO {
   }
 
   public GetPeripheralJobResponseTO setPeripheralOperation(
-      PeripheralOperationDescription peripheralOperation) {
+      PeripheralOperationDescription peripheralOperation
+  ) {
     this.peripheralOperation = peripheralOperation;
     return this;
   }

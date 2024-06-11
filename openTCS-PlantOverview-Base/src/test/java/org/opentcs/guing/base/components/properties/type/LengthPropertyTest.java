@@ -9,6 +9,7 @@ package org.opentcs.guing.base.components.properties.type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -47,13 +48,14 @@ class LengthPropertyTest {
   }
 
   static Object[][] paramsFactory() {
-    return new Object[][] {{Unit.MM, 100.0},
-                           {Unit.CM, 10.0},
-                           {Unit.M, 0.1},
-                           {Unit.KM, 0.0001}};
+    return new Object[][]{{Unit.MM, 100.0},
+        {Unit.CM, 10.0},
+        {Unit.M, 0.1},
+        {Unit.KM, 0.0001}};
   }
 
   private class DummyComponent
-      extends AbstractModelComponent {
+      extends
+        AbstractModelComponent {
   }
 }

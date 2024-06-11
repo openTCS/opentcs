@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.Set;
 import org.opentcs.access.Kernel;
 import org.opentcs.components.kernel.KernelExtension;
@@ -23,7 +24,8 @@ import org.slf4j.LoggerFactory;
  * This class implements the standard openTCS kernel in modelling mode.
  */
 public class KernelStateModelling
-    extends KernelStateOnline {
+    extends
+      KernelStateOnline {
 
   /**
    * This class's Logger.
@@ -48,15 +50,21 @@ public class KernelStateModelling
    * @param extensions The kernel extensions to be used.
    */
   @Inject
-  public KernelStateModelling(@GlobalSyncObject Object globalSyncObject,
-                              PlantModelManager plantModelManager,
-                              ModelPersister modelPersister,
-                              KernelApplicationConfiguration configuration,
-                              @ActiveInModellingMode Set<KernelExtension> extensions) {
-    super(globalSyncObject,
-          plantModelManager,
-          modelPersister,
-          configuration.saveModelOnTerminateModelling());
+  public KernelStateModelling(
+      @GlobalSyncObject
+      Object globalSyncObject,
+      PlantModelManager plantModelManager,
+      ModelPersister modelPersister,
+      KernelApplicationConfiguration configuration,
+      @ActiveInModellingMode
+      Set<KernelExtension> extensions
+  ) {
+    super(
+        globalSyncObject,
+        plantModelManager,
+        modelPersister,
+        configuration.saveModelOnTerminateModelling()
+    );
     this.extensions = requireNonNull(extensions, "extensions");
   }
 

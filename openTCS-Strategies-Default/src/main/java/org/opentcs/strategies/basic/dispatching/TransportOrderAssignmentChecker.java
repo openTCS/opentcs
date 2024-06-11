@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentVeto;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Vehicle;
@@ -30,8 +31,10 @@ public class TransportOrderAssignmentChecker {
    * @param orderReservationPool The pool of order reservations.
    */
   @Inject
-  public TransportOrderAssignmentChecker(TCSObjectService objectService,
-                                         OrderReservationPool orderReservationPool) {
+  public TransportOrderAssignmentChecker(
+      TCSObjectService objectService,
+      OrderReservationPool orderReservationPool
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
   }
@@ -57,8 +60,10 @@ public class TransportOrderAssignmentChecker {
       return TransportOrderAssignmentVeto.TRANSPORT_ORDER_INTENDED_VEHICLE_NOT_SET;
     }
 
-    Vehicle intendedVehicle = objectService.fetchObject(Vehicle.class,
-                                                        transportOrder.getIntendedVehicle());
+    Vehicle intendedVehicle = objectService.fetchObject(
+        Vehicle.class,
+        transportOrder.getIntendedVehicle()
+    );
     if (!intendedVehicle.hasProcState(Vehicle.ProcState.IDLE)) {
       return TransportOrderAssignmentVeto.VEHICLE_PROCESSING_STATE_INVALID;
     }

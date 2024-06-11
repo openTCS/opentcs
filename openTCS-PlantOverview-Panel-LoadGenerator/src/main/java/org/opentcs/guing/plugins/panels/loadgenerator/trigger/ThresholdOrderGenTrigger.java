@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator.trigger;
 
-import java.util.LinkedHashSet;
 import static java.util.Objects.requireNonNull;
+
+import java.util.LinkedHashSet;
 import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -26,8 +27,9 @@ import org.slf4j.LoggerFactory;
  * in progress drop to or below a given threshold.
  */
 public class ThresholdOrderGenTrigger
-    implements EventHandler,
-               OrderGenerationTrigger {
+    implements
+      EventHandler,
+      OrderGenerationTrigger {
 
   /**
    * This class's Logger.
@@ -63,10 +65,12 @@ public class ThresholdOrderGenTrigger
    * @param threshold The threshold when new order are being created
    * @param orderBatchCreator The order batch creator
    */
-  public ThresholdOrderGenTrigger(final @ApplicationEventBus EventSource eventSource,
-                                  final TCSObjectService objectService,
-                                  final int threshold,
-                                  final OrderBatchCreator orderBatchCreator) {
+  public ThresholdOrderGenTrigger(
+      final @ApplicationEventBus EventSource eventSource,
+      final TCSObjectService objectService,
+      final int threshold,
+      final OrderBatchCreator orderBatchCreator
+  ) {
     this.eventSource = requireNonNull(eventSource, "eventSource");
     this.objectService = requireNonNull(objectService, "objectService");
     this.threshold = threshold;

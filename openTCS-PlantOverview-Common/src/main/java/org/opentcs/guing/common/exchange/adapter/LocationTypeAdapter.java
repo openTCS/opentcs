@@ -7,15 +7,16 @@
  */
 package org.opentcs.guing.common.exchange.adapter;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.data.ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectPropConstants;
-import static org.opentcs.data.ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.visualization.LocationRepresentation;
@@ -28,7 +29,8 @@ import org.opentcs.guing.common.model.SystemModel;
  * An adapter for location types.
  */
 public class LocationTypeAdapter
-    extends AbstractProcessAdapter {
+    extends
+      AbstractProcessAdapter {
 
   /**
    * Creates a new instance.
@@ -37,10 +39,12 @@ public class LocationTypeAdapter
   }
 
   @Override // OpenTCSProcessAdapter
-  public void updateModelProperties(TCSObject<?> tcsObject,
-                                    ModelComponent modelComponent,
-                                    SystemModel systemModel,
-                                    TCSObjectService objectService) {
+  public void updateModelProperties(
+      TCSObject<?> tcsObject,
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      TCSObjectService objectService
+  ) {
     LocationType locationType = requireNonNull((LocationType) tcsObject, "tcsObject");
     LocationTypeModel model = (LocationTypeModel) modelComponent;
 
@@ -65,9 +69,11 @@ public class LocationTypeAdapter
   }
 
   @Override
-  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
-                                                SystemModel systemModel,
-                                                PlantModelCreationTO plantModel) {
+  public PlantModelCreationTO storeToPlantModel(
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      PlantModelCreationTO plantModel
+  ) {
     PlantModelCreationTO result = plantModel
         .withLocationType(
             new LocationTypeCreationTO(modelComponent.getName())

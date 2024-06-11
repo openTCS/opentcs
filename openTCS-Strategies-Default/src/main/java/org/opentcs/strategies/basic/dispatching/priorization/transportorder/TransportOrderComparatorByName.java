@@ -14,7 +14,8 @@ import org.opentcs.data.order.TransportOrder;
  * Compares {@link TransportOrder}s by their names.
  */
 public class TransportOrderComparatorByName
-    implements Comparator<TransportOrder> {
+    implements
+      Comparator<TransportOrder> {
 
   /**
    * A key used for selecting this comparator in a configuration setting.

@@ -17,7 +17,8 @@ import org.opentcs.data.order.DriveOrder;
  * A strategy for finding locations suitable for recharging vehicles.
  */
 public interface RechargePositionSupplier
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * Returns a sequence of destinations for recharging the given vehicle.
@@ -30,5 +31,8 @@ public interface RechargePositionSupplier
    * no suitable sequence was found, the returned sequence will be empty.
    */
   @Nonnull
-  List<DriveOrder.Destination> findRechargeSequence(@Nonnull Vehicle vehicle);
+  List<DriveOrder.Destination> findRechargeSequence(
+      @Nonnull
+      Vehicle vehicle
+  );
 }

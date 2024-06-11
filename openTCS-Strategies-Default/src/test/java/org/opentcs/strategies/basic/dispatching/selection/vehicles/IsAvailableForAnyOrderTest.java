@@ -7,17 +7,18 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.vehicles;
 
-import java.util.ArrayList;
-import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
@@ -44,9 +45,11 @@ class IsAvailableForAnyOrderTest {
     DefaultDispatcherConfiguration configuration = mock();
     orderReservationPool = mock();
 
-    isAvailableForAnyOrder = new IsAvailableForAnyOrder(objectService,
-                                                        orderReservationPool,
-                                                        configuration);
+    isAvailableForAnyOrder = new IsAvailableForAnyOrder(
+        objectService,
+        orderReservationPool,
+        configuration
+    );
 
     transportOrder = new TransportOrder("T1", List.of())
         .withDispensable(false);
@@ -80,8 +83,10 @@ class IsAvailableForAnyOrderTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = Vehicle.IntegrationLevel.class,
-              names = {"TO_BE_IGNORED", "TO_BE_NOTICED", "TO_BE_RESPECTED"})
+  @EnumSource(
+      value = Vehicle.IntegrationLevel.class,
+      names = {"TO_BE_IGNORED", "TO_BE_NOTICED", "TO_BE_RESPECTED"}
+  )
   void checkVehicleIsNotFullyIntegrated(Vehicle.IntegrationLevel integrationLevel) {
     Vehicle vehicle = vehicleAvailableForAnyOrder.withIntegrationLevel(integrationLevel);
 

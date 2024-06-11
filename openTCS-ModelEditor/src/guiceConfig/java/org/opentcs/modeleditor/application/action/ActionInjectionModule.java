@@ -14,7 +14,8 @@ import jakarta.inject.Singleton;
  * An injection module for this package.
  */
 public class ActionInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.

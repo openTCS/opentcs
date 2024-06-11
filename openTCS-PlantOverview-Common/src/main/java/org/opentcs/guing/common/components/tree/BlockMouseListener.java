@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.common.components.tree;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.Lists;
 import jakarta.inject.Inject;
 import java.awt.event.ActionEvent;
@@ -14,7 +16,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -37,7 +38,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 /**
  */
 public class BlockMouseListener
-    extends TreeMouseAdapter {
+    extends
+      TreeMouseAdapter {
 
   /**
    * Stores the application's current state.
@@ -65,10 +67,12 @@ public class BlockMouseListener
    * @param blockSelector A helper for selecting blocks/block elements.
    */
   @Inject
-  public BlockMouseListener(ApplicationState appState,
-                            DrawingEditor drawingEditor,
-                            TreeView treeView,
-                            BlockSelector blockSelector) {
+  public BlockMouseListener(
+      ApplicationState appState,
+      DrawingEditor drawingEditor,
+      TreeView treeView,
+      BlockSelector blockSelector
+  ) {
     super(treeView);
     this.appState = requireNonNull(appState, "appState");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
@@ -76,9 +80,11 @@ public class BlockMouseListener
   }
 
   @Override
-  protected void evaluateRightClick(MouseEvent e,
-                                    UserObject userObject,
-                                    Set<UserObject> oldSelection) {
+  protected void evaluateRightClick(
+      MouseEvent e,
+      UserObject userObject,
+      Set<UserObject> oldSelection
+  ) {
     JPopupMenu menu = new JPopupMenu();
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle(I18nPlantOverview.TREEVIEW_PATH);
 
@@ -183,9 +189,9 @@ public class BlockMouseListener
    */
   private static boolean isModelOk(ModelComponent model) {
     return (model != null
-            && (model instanceof PointModel
-                || model instanceof LocationModel
-                || model instanceof PathModel
-                || model instanceof LinkModel));
+        && (model instanceof PointModel
+            || model instanceof LocationModel
+            || model instanceof PathModel
+            || model instanceof LinkModel));
   }
 }

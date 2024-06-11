@@ -7,17 +7,18 @@
  */
 package org.opentcs.strategies.basic.scheduling.modules;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.TCSObjectReference;
@@ -130,7 +131,8 @@ class SingleVehicleBlockModuleTest {
   }
 
   private class SampleClient
-      implements Scheduler.Client {
+      implements
+        Scheduler.Client {
 
     @Override
     public String getId() {
@@ -144,13 +146,15 @@ class SingleVehicleBlockModuleTest {
 
     @Override
     public boolean allocationSuccessful(
-        Set<TCSResource<?>> resources) {
+        Set<TCSResource<?>> resources
+    ) {
       return true;
     }
 
     @Override
     public void allocationFailed(
-        Set<TCSResource<?>> resources) {
+        Set<TCSResource<?>> resources
+    ) {
     }
   }
 }

@@ -7,11 +7,12 @@
  */
 package org.opentcs.guing.base.model.elements;
 
+import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
+
 import java.util.ResourceBundle;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.visualization.LocationRepresentation;
-import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.LocationTypeActionsProperty;
 import org.opentcs.guing.base.components.properties.type.StringProperty;
@@ -23,7 +24,8 @@ import org.opentcs.guing.base.model.AbstractModelComponent;
  * Basic implementation of a location type.
  */
 public class LocationTypeModel
-    extends AbstractModelComponent {
+    extends
+      AbstractModelComponent {
 
   /**
    * The key for the possible actions on this type.

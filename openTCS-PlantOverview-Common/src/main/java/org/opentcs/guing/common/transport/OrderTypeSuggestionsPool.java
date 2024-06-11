@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.transport;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.Set;
 import java.util.TreeSet;
 import org.opentcs.components.plantoverview.OrderTypeSuggestions;
@@ -17,7 +18,8 @@ import org.opentcs.components.plantoverview.OrderTypeSuggestions;
  * A collection of all transport order types suggested.
  */
 public class OrderTypeSuggestionsPool
-    implements OrderTypeSuggestions {
+    implements
+      OrderTypeSuggestions {
 
   /**
    * The transport order type suggestions.

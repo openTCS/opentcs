@@ -19,7 +19,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.Undo
  * The TreeViewPanel for components.
  */
 public class ComponentsTreeViewPanel
-    extends AbstractTreeViewPanel {
+    extends
+      AbstractTreeViewPanel {
 
   /**
    * Creates a new instance.
@@ -27,9 +28,11 @@ public class ComponentsTreeViewPanel
    * @param undoRedoManager The undo redo manager
    */
   @Inject
-  public ComponentsTreeViewPanel(UndoRedoManager undoRedoManager,
-                                 ModelManager modelManager,
-                                 ComponentsManager componentsManager) {
+  public ComponentsTreeViewPanel(
+      UndoRedoManager undoRedoManager,
+      ModelManager modelManager,
+      ComponentsManager componentsManager
+  ) {
     super(undoRedoManager, modelManager, componentsManager);
   }
 

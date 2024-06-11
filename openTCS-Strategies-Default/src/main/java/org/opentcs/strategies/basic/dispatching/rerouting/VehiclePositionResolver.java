@@ -7,10 +7,11 @@
  */
 package org.opentcs.strategies.basic.dispatching.rerouting;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -37,8 +38,10 @@ public class VehiclePositionResolver {
    * @param objectService The object service to use.
    */
   @Inject
-  public VehiclePositionResolver(VehicleControllerPool vehicleControllerPool,
-                                 TCSObjectService objectService) {
+  public VehiclePositionResolver(
+      VehicleControllerPool vehicleControllerPool,
+      TCSObjectService objectService
+  ) {
     this.vehicleControllerPool = requireNonNull(vehicleControllerPool, "vehicleControllerPool");
     this.objectService = requireNonNull(objectService, "objectService");
   }
@@ -55,9 +58,11 @@ public class VehiclePositionResolver {
     VehicleController controller = vehicleControllerPool.getVehicleController(vehicle.getName());
     if (controller.getCommandsSent().isEmpty()
         && controller.getInteractionsPendingCommand().isEmpty()) {
-      LOG.debug("{}: No commands expected to be executed. Using current position: {}",
-                vehicle.getName(),
-                vehicle.getCurrentPosition());
+      LOG.debug(
+          "{}: No commands expected to be executed. Using current position: {}",
+          vehicle.getName(),
+          vehicle.getCurrentPosition()
+      );
       return objectService.fetchObject(Point.class, vehicle.getCurrentPosition());
     }
 
@@ -72,9 +77,11 @@ public class VehiclePositionResolver {
 
     List<MovementCommand> commandsSent = new ArrayList<>(controller.getCommandsSent());
     MovementCommand lastCommandSent = commandsSent.get(commandsSent.size() - 1);
-    LOG.debug("{}: Using the last command sent to the communication adapter: {}",
-              vehicle.getName(),
-              lastCommandSent);
+    LOG.debug(
+        "{}: Using the last command sent to the communication adapter: {}",
+        vehicle.getName(),
+        lastCommandSent
+    );
     return lastCommandSent.getStep().getDestinationPoint();
   }
 }

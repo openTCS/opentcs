@@ -7,6 +7,8 @@
  */
 package org.opentcs.strategies.basic.dispatching.priorization;
 
+import static org.opentcs.util.Assertions.checkArgument;
+
 import com.google.common.collect.Lists;
 import jakarta.inject.Inject;
 import java.util.Comparator;
@@ -15,13 +17,13 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByOrderAge;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByOrderName;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A composite of all configured transport order candidate comparators.
  */
 public class CompositeOrderCandidateComparator
-    implements Comparator<AssignmentCandidate> {
+    implements
+      Comparator<AssignmentCandidate> {
 
   /**
    * A comparator composed of all configured comparators, in the configured order.
@@ -31,7 +33,8 @@ public class CompositeOrderCandidateComparator
   @Inject
   public CompositeOrderCandidateComparator(
       DefaultDispatcherConfiguration configuration,
-      Map<String, Comparator<AssignmentCandidate>> availableComparators) {
+      Map<String, Comparator<AssignmentCandidate>> availableComparators
+  ) {
     // At the end, if all other comparators failed to see a difference, compare by age.
     // As the age of two distinct transport orders may still be the same, finally compare by name.
     // Add configured comparators before these two.
@@ -40,9 +43,11 @@ public class CompositeOrderCandidateComparator
 
     for (String priorityKey : Lists.reverse(configuration.orderCandidatePriorities())) {
       Comparator<AssignmentCandidate> configuredComparator = availableComparators.get(priorityKey);
-      checkArgument(configuredComparator != null,
-                    "Unknown order candidate priority key: '%s'",
-                    priorityKey);
+      checkArgument(
+          configuredComparator != null,
+          "Unknown order candidate priority key: '%s'",
+          priorityKey
+      );
       composite = configuredComparator.thenComparing(composite);
     }
     this.compositeComparator = composite;

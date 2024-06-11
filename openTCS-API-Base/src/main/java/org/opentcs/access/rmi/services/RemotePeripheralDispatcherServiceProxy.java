@@ -21,8 +21,10 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * Delegates method invocations to the corresponding remote service.
  */
 class RemotePeripheralDispatcherServiceProxy
-    extends AbstractRemoteServiceProxy<RemotePeripheralDispatcherService>
-    implements PeripheralDispatcherService {
+    extends
+      AbstractRemoteServiceProxy<RemotePeripheralDispatcherService>
+    implements
+      PeripheralDispatcherService {
 
   /**
    * Creates a new instance.
@@ -45,7 +47,8 @@ class RemotePeripheralDispatcherServiceProxy
 
   @Override
   public void withdrawByLocation(TCSResourceReference<Location> locationRef)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -58,7 +61,8 @@ class RemotePeripheralDispatcherServiceProxy
 
   @Override
   public void withdrawByPeripheralJob(TCSObjectReference<PeripheralJob> jobRef)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {

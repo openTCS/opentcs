@@ -7,10 +7,11 @@
  */
 package org.opentcs.operationsdesk.components.layer;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.BorderLayout;
 import java.util.Arrays;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -26,7 +27,8 @@ import org.opentcs.guing.common.persistence.ModelManager;
  * A panel to display and edit layer groups.
  */
 public class LayerGroupsPanel
-    extends JPanel {
+    extends
+      JPanel {
 
   /**
    * The model manager.
@@ -51,9 +53,11 @@ public class LayerGroupsPanel
 
   @Inject
   @SuppressWarnings("this-escape")
-  public LayerGroupsPanel(ModelManager modelManager,
-                          LayerGroupManager layerGroupManager,
-                          LayerGroupEditor layerGroupEditor) {
+  public LayerGroupsPanel(
+      ModelManager modelManager,
+      LayerGroupManager layerGroupManager,
+      LayerGroupEditor layerGroupEditor
+  ) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.layerGroupManager = requireNonNull(layerGroupManager, "layerGroupManager");
     this.layerGroupEditor = requireNonNull(layerGroupEditor, "layerGroupEditor");
@@ -77,9 +81,11 @@ public class LayerGroupsPanel
 
     TableRowSorter<LayerGroupsTableModel> sorter = new TableRowSorter<>(tableModel);
     // Sort the table by the layer ordinals...
-    sorter.setSortKeys(Arrays.asList(
-        new RowSorter.SortKey(LayerGroupsTableModel.COLUMN_ID, SortOrder.DESCENDING)
-    ));
+    sorter.setSortKeys(
+        Arrays.asList(
+            new RowSorter.SortKey(LayerGroupsTableModel.COLUMN_ID, SortOrder.DESCENDING)
+        )
+    );
     // ...but prevent manual sorting.
     for (int i = 0; i < table.getColumnCount(); i++) {
       sorter.setSortable(i, false);
@@ -88,7 +94,9 @@ public class LayerGroupsPanel
     table.setRowSorter(sorter);
 
     // Hide the column that shows the layer group IDs.
-    table.removeColumn(table.getColumnModel()
-        .getColumn(table.convertColumnIndexToView(LayerGroupsTableModel.COLUMN_ID)));
+    table.removeColumn(
+        table.getColumnModel()
+            .getColumn(table.convertColumnIndexToView(LayerGroupsTableModel.COLUMN_ID))
+    );
   }
 }

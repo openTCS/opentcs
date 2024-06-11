@@ -7,17 +7,18 @@
  */
 package org.opentcs.guing.common.components.drawing.figures;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.base.model.ModelComponent.MISCELLANEOUS;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.model.FigureDecorationDetails;
 import org.opentcs.guing.base.model.ModelComponent;
-import static org.opentcs.guing.base.model.ModelComponent.MISCELLANEOUS;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.LinkModel;
 import org.opentcs.guing.base.model.elements.LocationModel;

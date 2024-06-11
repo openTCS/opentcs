@@ -144,7 +144,8 @@ public final class Origin {
   public Point2D calculatePixelPositionExactly(LengthProperty xReal, LengthProperty yReal) {
     Point2D realPosition = new Point2D.Double(
         xReal.getValueByUnit(LengthProperty.Unit.MM),
-        yReal.getValueByUnit(LengthProperty.Unit.MM));
+        yReal.getValueByUnit(LengthProperty.Unit.MM)
+    );
 
     Point2D pixelPosition = fCoordinateSystem.toPixel(fPosition, realPosition, fScaleX, fScaleY);
 
@@ -183,8 +184,10 @@ public final class Origin {
    * @param yReal The length property to write the y position to.
    * @return A point with the pixel position with double precision.
    */
-  public Point2D calculateRealPosition(Point pixelPosition, LengthProperty xReal,
-                                       LengthProperty yReal) {
+  public Point2D calculateRealPosition(
+      Point pixelPosition, LengthProperty xReal,
+      LengthProperty yReal
+  ) {
     Point2D realPosition = fCoordinateSystem.toReal(fPosition, pixelPosition, fScaleX, fScaleY);
 
     LengthProperty.Unit unitX = xReal.getUnit();

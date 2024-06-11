@@ -7,6 +7,14 @@
  */
 package org.opentcs.kernel;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import jakarta.annotation.Nonnull;
 import java.util.Collections;
 import java.util.HashSet;
@@ -15,13 +23,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.components.kernel.PeripheralJobDispatcher;
@@ -119,10 +120,14 @@ class KernelStateOperatingTest {
     vehicles.add(vehicle);
     operating = createKernel(new HashSet<>());
     operating.initialize();
-    verify(vehicleService, times(1)).updateVehicleProcState(vehicle.getReference(),
-                                                            Vehicle.ProcState.IDLE);
-    verify(vehicleService, times(1)).updateVehicleState(vehicle.getReference(),
-                                                        Vehicle.State.UNKNOWN);
+    verify(vehicleService, times(1)).updateVehicleProcState(
+        vehicle.getReference(),
+        Vehicle.ProcState.IDLE
+    );
+    verify(vehicleService, times(1)).updateVehicleState(
+        vehicle.getReference(),
+        Vehicle.State.UNKNOWN
+    );
     verify(vehicleService, times(1)).updateVehicleTransportOrder(vehicle.getReference(), null);
     verify(vehicleService, times(1)).updateVehicleOrderSequence(vehicle.getReference(), null);
   }
@@ -134,10 +139,14 @@ class KernelStateOperatingTest {
     operating = createKernel(new HashSet<>());
     operating.initialize();
     operating.terminate();
-    verify(vehicleService, times(2)).updateVehicleProcState(vehicle.getReference(),
-                                                            Vehicle.ProcState.IDLE);
-    verify(vehicleService, times(2)).updateVehicleState(vehicle.getReference(),
-                                                        Vehicle.State.UNKNOWN);
+    verify(vehicleService, times(2)).updateVehicleProcState(
+        vehicle.getReference(),
+        Vehicle.ProcState.IDLE
+    );
+    verify(vehicleService, times(2)).updateVehicleState(
+        vehicle.getReference(),
+        Vehicle.State.UNKNOWN
+    );
     verify(vehicleService, times(2)).updateVehicleTransportOrder(vehicle.getReference(), null);
     verify(vehicleService, times(2)).updateVehicleOrderSequence(vehicle.getReference(), null);
   }
@@ -149,20 +158,28 @@ class KernelStateOperatingTest {
    * @return The kernel to test
    */
   @SuppressWarnings("unchecked")
-  private KernelStateOperating createKernel(@Nonnull Set<KernelExtension> extensions) {
+  private KernelStateOperating createKernel(
+      @Nonnull
+      Set<KernelExtension> extensions
+  ) {
     ScheduledExecutorService executorMock = mock(ScheduledExecutorService.class);
     when(executorMock.scheduleAtFixedRate(any(), anyLong(), anyLong(), any()))
         .thenReturn(mock(ScheduledFuture.class));
 
-    return spy(new KernelStateOperating(
+    return spy(
+        new KernelStateOperating(
             new Object(),
             mock(PlantModelManager.class),
-            new TransportOrderPoolManager(objectPool,
-                                          new SimpleEventBus(),
-                                          new PrefixedUlidObjectNameProvider()),
-            new PeripheralJobPoolManager(objectPool,
-                                         new SimpleEventBus(),
-                                         new PrefixedUlidObjectNameProvider()),
+            new TransportOrderPoolManager(
+                objectPool,
+                new SimpleEventBus(),
+                new PrefixedUlidObjectNameProvider()
+            ),
+            new PeripheralJobPoolManager(
+                objectPool,
+                new SimpleEventBus(),
+                new PrefixedUlidObjectNameProvider()
+            ),
             mock(ModelPersister.class),
             configuration,
             router,

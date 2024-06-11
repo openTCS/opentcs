@@ -7,6 +7,9 @@
  */
 package org.opentcs.data.model;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkInRange;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,19 +17,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.peripherals.PeripheralOperation;
-import static org.opentcs.util.Assertions.checkInRange;
 
 /**
  * Describes a connection between two {@link Point}s which a {@link Vehicle} may traverse.
  */
 public class Path
-    extends TCSResource<Path>
-    implements Serializable {
+    extends
+      TCSResource<Path>
+    implements
+      Serializable {
 
   /**
    * A reference to the point which this point originates in.
@@ -74,9 +77,11 @@ public class Path
    * @param sourcePoint A reference to this path's starting point.
    * @param destinationPoint A reference to this path's destination point.
    */
-  public Path(String name,
-              TCSObjectReference<Point> sourcePoint,
-              TCSObjectReference<Point> destinationPoint) {
+  public Path(
+      String name,
+      TCSObjectReference<Point> sourcePoint,
+      TCSObjectReference<Point> destinationPoint
+  ) {
     super(name);
     this.sourcePoint = requireNonNull(sourcePoint, "sourcePoint");
     this.destinationPoint = requireNonNull(destinationPoint, "destinationPoint");
@@ -89,29 +94,37 @@ public class Path
     this.layout = new Layout();
   }
 
-  private Path(String name,
-               Map<String, String> properties,
-               ObjectHistory history,
-               TCSObjectReference<Point> sourcePoint,
-               TCSObjectReference<Point> destinationPoint,
-               long length,
-               int maxVelocity,
-               int maxReverseVelocity,
-               List<PeripheralOperation> peripheralOperations,
-               boolean locked,
-               Map<String, Envelope> vehicleEnvelopes,
-               Layout layout) {
+  private Path(
+      String name,
+      Map<String, String> properties,
+      ObjectHistory history,
+      TCSObjectReference<Point> sourcePoint,
+      TCSObjectReference<Point> destinationPoint,
+      long length,
+      int maxVelocity,
+      int maxReverseVelocity,
+      List<PeripheralOperation> peripheralOperations,
+      boolean locked,
+      Map<String, Envelope> vehicleEnvelopes,
+      Layout layout
+  ) {
     super(name, properties, history);
     this.sourcePoint = requireNonNull(sourcePoint, "sourcePoint");
     this.destinationPoint = requireNonNull(destinationPoint, "destinationPoint");
     this.length = checkInRange(length, 1, Long.MAX_VALUE, "length");
     this.maxVelocity = checkInRange(maxVelocity, 0, Integer.MAX_VALUE, "maxVelocity");
-    this.maxReverseVelocity = checkInRange(maxReverseVelocity,
-                                           0,
-                                           Integer.MAX_VALUE,
-                                           "maxReverseVelocity");
-    this.peripheralOperations = new ArrayList<>(requireNonNull(peripheralOperations,
-                                                               "peripheralOperations"));
+    this.maxReverseVelocity = checkInRange(
+        maxReverseVelocity,
+        0,
+        Integer.MAX_VALUE,
+        "maxReverseVelocity"
+    );
+    this.peripheralOperations = new ArrayList<>(
+        requireNonNull(
+            peripheralOperations,
+            "peripheralOperations"
+        )
+    );
     this.locked = locked;
     this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     this.layout = requireNonNull(layout, "layout");
@@ -119,66 +132,74 @@ public class Path
 
   @Override
   public Path withProperty(String key, String value) {
-    return new Path(getName(),
-                    propertiesWith(key, value),
-                    getHistory(),
-                    sourcePoint,
-                    destinationPoint,
-                    length,
-                    maxVelocity,
-                    maxReverseVelocity,
-                    peripheralOperations,
-                    locked,
-                    vehicleEnvelopes,
-                    layout);
+    return new Path(
+        getName(),
+        propertiesWith(key, value),
+        getHistory(),
+        sourcePoint,
+        destinationPoint,
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   @Override
   public Path withProperties(Map<String, String> properties) {
-    return new Path(getName(),
-                    properties,
-                    getHistory(),
-                    sourcePoint,
-                    destinationPoint,
-                    length,
-                    maxVelocity,
-                    maxReverseVelocity,
-                    peripheralOperations,
-                    locked,
-                    vehicleEnvelopes,
-                    layout);
+    return new Path(
+        getName(),
+        properties,
+        getHistory(),
+        sourcePoint,
+        destinationPoint,
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   @Override
   public TCSObject<Path> withHistoryEntry(ObjectHistory.Entry entry) {
-    return new Path(getName(),
-                    getProperties(),
-                    getHistory().withEntryAppended(entry),
-                    sourcePoint,
-                    destinationPoint,
-                    length,
-                    maxVelocity,
-                    maxReverseVelocity,
-                    peripheralOperations,
-                    locked,
-                    vehicleEnvelopes,
-                    layout);
+    return new Path(
+        getName(),
+        getProperties(),
+        getHistory().withEntryAppended(entry),
+        sourcePoint,
+        destinationPoint,
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   @Override
   public TCSObject<Path> withHistory(ObjectHistory history) {
-    return new Path(getName(),
-                    getProperties(),
-                    history,
-                    sourcePoint,
-                    destinationPoint,
-                    length,
-                    maxVelocity,
-                    maxReverseVelocity,
-                    peripheralOperations,
-                    locked,
-                    vehicleEnvelopes,
-                    layout);
+    return new Path(
+        getName(),
+        getProperties(),
+        history,
+        sourcePoint,
+        destinationPoint,
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -197,18 +218,20 @@ public class Path
    * @return A copy of this object, differing in the given value.
    */
   public Path withLength(long length) {
-    return new Path(getName(),
-                    getProperties(),
-                    getHistory(),
-                    sourcePoint,
-                    destinationPoint,
-                    length,
-                    maxVelocity,
-                    maxReverseVelocity,
-                    peripheralOperations,
-                    locked,
-                    vehicleEnvelopes,
-                    layout);
+    return new Path(
+        getName(),
+        getProperties(),
+        getHistory(),
+        sourcePoint,
+        destinationPoint,
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -246,18 +269,20 @@ public class Path
    * @return A copy of this object, differing in the given value.
    */
   public Path withMaxVelocity(int maxVelocity) {
-    return new Path(getName(),
-                    getProperties(),
-                    getHistory(),
-                    sourcePoint,
-                    destinationPoint,
-                    length,
-                    maxVelocity,
-                    maxReverseVelocity,
-                    peripheralOperations,
-                    locked,
-                    vehicleEnvelopes,
-                    layout);
+    return new Path(
+        getName(),
+        getProperties(),
+        getHistory(),
+        sourcePoint,
+        destinationPoint,
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -277,18 +302,20 @@ public class Path
    * @return A copy of this object, differing in the given value.
    */
   public Path withMaxReverseVelocity(int maxReverseVelocity) {
-    return new Path(getName(),
-                    getProperties(),
-                    getHistory(),
-                    sourcePoint,
-                    destinationPoint,
-                    length,
-                    maxVelocity,
-                    maxReverseVelocity,
-                    peripheralOperations,
-                    locked,
-                    vehicleEnvelopes,
-                    layout);
+    return new Path(
+        getName(),
+        getProperties(),
+        getHistory(),
+        sourcePoint,
+        destinationPoint,
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -306,19 +333,24 @@ public class Path
    * @param peripheralOperations The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public Path withPeripheralOperations(@Nonnull List<PeripheralOperation> peripheralOperations) {
-    return new Path(getName(),
-                    getProperties(),
-                    getHistory(),
-                    sourcePoint,
-                    destinationPoint,
-                    length,
-                    maxVelocity,
-                    maxReverseVelocity,
-                    peripheralOperations,
-                    locked,
-                    vehicleEnvelopes,
-                    layout);
+  public Path withPeripheralOperations(
+      @Nonnull
+      List<PeripheralOperation> peripheralOperations
+  ) {
+    return new Path(
+        getName(),
+        getProperties(),
+        getHistory(),
+        sourcePoint,
+        destinationPoint,
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -339,18 +371,20 @@ public class Path
    * @return A copy of this object, differing in the given value.
    */
   public Path withLocked(boolean locked) {
-    return new Path(getName(),
-                    getProperties(),
-                    getHistory(),
-                    sourcePoint,
-                    destinationPoint,
-                    length,
-                    maxVelocity,
-                    maxReverseVelocity,
-                    peripheralOperations,
-                    locked,
-                    vehicleEnvelopes,
-                    layout);
+    return new Path(
+        getName(),
+        getProperties(),
+        getHistory(),
+        sourcePoint,
+        destinationPoint,
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -370,18 +404,20 @@ public class Path
    * @return A copy of this object, differing in the given value.
    */
   public Path withVehicleEnvelopes(Map<String, Envelope> vehicleEnvelopes) {
-    return new Path(getName(),
-                    getProperties(),
-                    getHistory(),
-                    sourcePoint,
-                    destinationPoint,
-                    length,
-                    maxVelocity,
-                    maxReverseVelocity,
-                    peripheralOperations,
-                    locked,
-                    vehicleEnvelopes,
-                    layout);
+    return new Path(
+        getName(),
+        getProperties(),
+        getHistory(),
+        sourcePoint,
+        destinationPoint,
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -400,18 +436,20 @@ public class Path
    * @return A copy of this object, differing in the given value.
    */
   public Path withLayout(Layout layout) {
-    return new Path(getName(),
-                    getProperties(),
-                    getHistory(),
-                    sourcePoint,
-                    destinationPoint,
-                    length,
-                    maxVelocity,
-                    maxReverseVelocity,
-                    peripheralOperations,
-                    locked,
-                    vehicleEnvelopes,
-                    layout);
+    return new Path(
+        getName(),
+        getProperties(),
+        getHistory(),
+        sourcePoint,
+        destinationPoint,
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -461,7 +499,8 @@ public class Path
    * Contains information regarding the grahical representation of a path.
    */
   public static class Layout
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The connection type the path is represented as.

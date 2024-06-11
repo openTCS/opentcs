@@ -37,7 +37,8 @@ public class Filters {
    * one.
    */
   public static Predicate<TransportOrder> transportOrderWithIntendedVehicle(
-      @Nullable TCSObjectReference<Vehicle> vehicleRef
+      @Nullable
+      TCSObjectReference<Vehicle> vehicleRef
   ) {
     return vehicleRef == null
         ? order -> true
@@ -54,7 +55,8 @@ public class Filters {
    * one.
    */
   public static Predicate<OrderSequence> orderSequenceWithIntendedVehicle(
-      @Nullable TCSObjectReference<Vehicle> vehicleRef
+      @Nullable
+      TCSObjectReference<Vehicle> vehicleRef
   ) {
     return vehicleRef == null
         ? sequence -> true
@@ -71,7 +73,8 @@ public class Filters {
    * one.
    */
   public static Predicate<PeripheralJob> peripheralJobWithRelatedVehicle(
-      @Nullable TCSObjectReference<Vehicle> vehicleRef
+      @Nullable
+      TCSObjectReference<Vehicle> vehicleRef
   ) {
     return vehicleRef == null
         ? job -> true
@@ -88,7 +91,8 @@ public class Filters {
    * given one.
    */
   public static Predicate<PeripheralJob> peripheralJobWithRelatedTransportOrder(
-      @Nullable TCSObjectReference<TransportOrder> orderRef
+      @Nullable
+      TCSObjectReference<TransportOrder> orderRef
   ) {
     return orderRef == null
         ? job -> true
@@ -102,7 +106,10 @@ public class Filters {
    * @param procState The processing state.
    * @return A predicate that is true only for vehicles whose processing state is the given one.
    */
-  public static Predicate<Vehicle> vehicleWithProcState(@Nullable Vehicle.ProcState procState) {
+  public static Predicate<Vehicle> vehicleWithProcState(
+      @Nullable
+      Vehicle.ProcState procState
+  ) {
     return procState == null
         ? vehicle -> true
         : vehicle -> Objects.equals(procState, vehicle.getProcState());

@@ -9,10 +9,11 @@ package org.opentcs.modeleditor.math.path;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.model.elements.LayoutModel;
 import org.opentcs.guing.base.model.elements.PathModel;

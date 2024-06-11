@@ -7,13 +7,14 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import org.opentcs.access.rmi.ClientID;
@@ -38,8 +39,10 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class StandardRemotePlantModelService
-    extends StandardRemoteTCSObjectService
-    implements RemotePlantModelService {
+    extends
+      StandardRemoteTCSObjectService
+    implements
+      RemotePlantModelService {
 
   /**
    * This class's logger.
@@ -89,12 +92,15 @@ public class StandardRemotePlantModelService
    * @param kernelExecutor Executes tasks modifying kernel data.
    */
   @Inject
-  public StandardRemotePlantModelService(PlantModelService plantModelService,
-                                         UserManager userManager,
-                                         RmiKernelInterfaceConfiguration configuration,
-                                         SocketFactoryProvider socketFactoryProvider,
-                                         RegistryProvider registryProvider,
-                                         @KernelExecutor ExecutorService kernelExecutor) {
+  public StandardRemotePlantModelService(
+      PlantModelService plantModelService,
+      UserManager userManager,
+      RmiKernelInterfaceConfiguration configuration,
+      SocketFactoryProvider socketFactoryProvider,
+      RegistryProvider registryProvider,
+      @KernelExecutor
+      ExecutorService kernelExecutor
+  ) {
     super(plantModelService, userManager, kernelExecutor);
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.userManager = requireNonNull(userManager, "userManager");
@@ -115,10 +121,12 @@ public class StandardRemotePlantModelService
     // Export this instance via RMI.
     try {
       LOG.debug("Exporting proxy...");
-      UnicastRemoteObject.exportObject(this,
-                                       configuration.remotePlantModelServicePort(),
-                                       socketFactoryProvider.getClientSocketFactory(),
-                                       socketFactoryProvider.getServerSocketFactory());
+      UnicastRemoteObject.exportObject(
+          this,
+          configuration.remotePlantModelServicePort(),
+          socketFactoryProvider.getClientSocketFactory(),
+          socketFactoryProvider.getServerSocketFactory()
+      );
       LOG.debug("Binding instance with RMI registry...");
       rmiRegistry.rebind(RegistrationName.REMOTE_PLANT_MODEL_SERVICE, this);
     }
@@ -193,9 +201,11 @@ public class StandardRemotePlantModelService
   }
 
   @Override
-  public void updateLocationLock(ClientID clientId,
-                                 TCSObjectReference<Location> ref,
-                                 boolean locked)
+  public void updateLocationLock(
+      ClientID clientId,
+      TCSObjectReference<Location> ref,
+      boolean locked
+  )
       throws RemoteException {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
 

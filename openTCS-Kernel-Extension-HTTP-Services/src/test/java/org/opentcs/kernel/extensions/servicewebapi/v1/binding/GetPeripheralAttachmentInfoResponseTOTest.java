@@ -31,8 +31,9 @@ class GetPeripheralAttachmentInfoResponseTOTest {
         = new GetPeripheralAttachmentInfoResponseTO(
             "Location001",
             "com.example.someperipheraldriver.descriptionclass",
-            List.of("com.example.someperipheraldriver.descriptionclass",
-                    "com.example.someotherperipheraldriver.descriptionclass2"
+            List.of(
+                "com.example.someperipheraldriver.descriptionclass",
+                "com.example.someotherperipheraldriver.descriptionclass2"
             )
         );
 

@@ -14,7 +14,8 @@ import org.opentcs.kernel.workingset.PlantModelManager;
  * The base class for the kernel's online states.
  */
 public abstract class KernelStateOnline
-    extends KernelState {
+    extends
+      KernelState {
 
   /**
    * Whether to save the model when this state is terminated.
@@ -29,10 +30,12 @@ public abstract class KernelStateOnline
    * @param modelPersister The model persister to be used.
    * @param saveModelOnTerminate Whether to save the model when this state is terminated.
    */
-  public KernelStateOnline(Object globalSyncObject,
-                           PlantModelManager plantModelManager,
-                           ModelPersister modelPersister,
-                           boolean saveModelOnTerminate) {
+  public KernelStateOnline(
+      Object globalSyncObject,
+      PlantModelManager plantModelManager,
+      ModelPersister modelPersister,
+      boolean saveModelOnTerminate
+  ) {
     super(globalSyncObject, plantModelManager, modelPersister);
     this.saveModelOnTerminate = saveModelOnTerminate;
   }

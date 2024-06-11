@@ -7,15 +7,16 @@
  */
 package org.opentcs.kernel.vehicles;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.TCSResource;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * Utility methods for resource-related computations.
@@ -38,8 +39,11 @@ public class ResourceMath {
    * @return The number of resource sets from {@code resourcesPassed} that could be freed because
    * they are not covered by the vehicle's length any more.
    */
-  public static int freeableResourceSetCount(@Nonnull List<Set<TCSResource<?>>> resourcesPassed,
-                                             int vehicleLength) {
+  public static int freeableResourceSetCount(
+      @Nonnull
+      List<Set<TCSResource<?>>> resourcesPassed,
+      int vehicleLength
+  ) {
     requireNonNull(resourcesPassed, "resourcesPassed");
     checkArgument(vehicleLength > 0, "vehicleLength <= 0");
 

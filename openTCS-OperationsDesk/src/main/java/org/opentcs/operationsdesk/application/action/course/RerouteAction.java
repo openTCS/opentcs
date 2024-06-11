@@ -7,12 +7,14 @@
  */
 package org.opentcs.operationsdesk.application.action.course;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import org.opentcs.access.KernelRuntimeException;
@@ -21,7 +23,6 @@ import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.guing.base.model.elements.VehicleModel;
-import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,8 @@ import org.slf4j.LoggerFactory;
  * An action for triggering a rerouting of a selected set of vehicles.
  */
 public class RerouteAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(VEHICLEPOPUP_PATH);
   private static final Logger LOG = LoggerFactory.getLogger(RerouteAction.class);
@@ -49,10 +51,15 @@ public class RerouteAction
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public RerouteAction(@Assisted Collection<VehicleModel> vehicles,
-                       @Assisted ReroutingType reroutingType,
-                       SharedKernelServicePortalProvider portalProvider,
-                       @ApplicationFrame Component dialogParent) {
+  public RerouteAction(
+      @Assisted
+      Collection<VehicleModel> vehicles,
+      @Assisted
+      ReroutingType reroutingType,
+      SharedKernelServicePortalProvider portalProvider,
+      @ApplicationFrame
+      Component dialogParent
+  ) {
     this.vehicles = requireNonNull(vehicles, "vehicles");
     this.reroutingType = requireNonNull(reroutingType, "reroutingType");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
@@ -86,7 +93,7 @@ public class RerouteAction
       }
     }
 
-    try ( SharedKernelServicePortal sharedPortal = portalProvider.register()) {
+    try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
       for (VehicleModel vehicle : vehicles) {
         sharedPortal.getPortal().getDispatcherService().reroute(
             vehicle.getVehicle().getReference(),

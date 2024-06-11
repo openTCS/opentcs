@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.exchange.adapter;
 
 import static java.util.Objects.requireNonNull;
+
 import java.util.Set;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelServicePortal;
@@ -26,7 +27,8 @@ import org.slf4j.LoggerFactory;
  * Updates a path's lock state with the kernel when it changes.
  */
 public class PathLockAdapter
-    implements AttributesChangeListener {
+    implements
+      AttributesChangeListener {
 
   /**
    * This class's logger.
@@ -51,8 +53,10 @@ public class PathLockAdapter
    * @param portalProvider A portal provider.
    * @param model The path model.
    */
-  public PathLockAdapter(SharedKernelServicePortalProvider portalProvider,
-                         PathModel model) {
+  public PathLockAdapter(
+      SharedKernelServicePortalProvider portalProvider,
+      PathModel model
+  ) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.model = requireNonNull(model, "model");
     this.lockedPreviously = isPathLocked();

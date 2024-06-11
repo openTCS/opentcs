@@ -37,14 +37,22 @@ public interface FigureDecorationDetails {
    * @param model The vehicle model.
    * @param allocationState The vehicle's new allocation state.
    */
-  void updateAllocationState(@Nonnull VehicleModel model, @Nonnull AllocationState allocationState);
+  void updateAllocationState(
+      @Nonnull
+      VehicleModel model,
+      @Nonnull
+      AllocationState allocationState
+  );
 
   /**
    * Clears the allocation state for the given vehicle.
    *
    * @param model The vehicle model.
    */
-  void clearAllocationState(@Nonnull VehicleModel model);
+  void clearAllocationState(
+      @Nonnull
+      VehicleModel model
+  );
 
   /**
    * Adds a block model.

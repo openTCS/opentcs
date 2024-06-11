@@ -15,6 +15,7 @@ import java.io.Serializable;
  * and that are irrelevant for high-level UI visualization.
  */
 public interface LowLevelCommunicationEvent
-    extends Serializable {
+    extends
+      Serializable {
 
 }

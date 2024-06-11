@@ -19,7 +19,8 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
  * A status message containing information about a peripheral job.
  */
 public class PeripheralJobStatusMessage
-    extends StatusMessage {
+    extends
+      StatusMessage {
 
   private String name;
 
@@ -96,7 +97,8 @@ public class PeripheralJobStatusMessage
   }
 
   public PeripheralJobStatusMessage setPeripheralOperation(
-      PeripheralOperationDescription peripheralOperation) {
+      PeripheralOperationDescription peripheralOperation
+  ) {
     this.peripheralOperation = peripheralOperation;
     return this;
   }
@@ -137,14 +139,18 @@ public class PeripheralJobStatusMessage
     return this;
   }
 
-  public static PeripheralJobStatusMessage fromPeripheralJob(PeripheralJob job,
-                                                             long sequenceNumber) {
+  public static PeripheralJobStatusMessage fromPeripheralJob(
+      PeripheralJob job,
+      long sequenceNumber
+  ) {
     return fromPeripheralJob(job, sequenceNumber, Instant.now());
   }
 
-  public static PeripheralJobStatusMessage fromPeripheralJob(PeripheralJob job,
-                                                             long sequenceNumber,
-                                                             Instant creationTimestamp) {
+  public static PeripheralJobStatusMessage fromPeripheralJob(
+      PeripheralJob job,
+      long sequenceNumber,
+      Instant creationTimestamp
+  ) {
     PeripheralJobStatusMessage message = new PeripheralJobStatusMessage();
     message.setSequenceNumber(sequenceNumber);
     message.setCreationTimeStamp(creationTimestamp);
@@ -163,9 +169,11 @@ public class PeripheralJobStatusMessage
     message.setState(job.getState());
     message.setCreationTime(job.getCreationTime());
     message.setFinishedTime(job.getFinishedTime());
-    message.setProperties(job.getProperties().entrySet().stream()
-        .map(entry -> new Property(entry.getKey(), entry.getValue()))
-        .collect(Collectors.toList()));
+    message.setProperties(
+        job.getProperties().entrySet().stream()
+            .map(entry -> new Property(entry.getKey(), entry.getValue()))
+            .collect(Collectors.toList())
+    );
 
     return message;
   }

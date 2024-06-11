@@ -20,8 +20,10 @@ import org.opentcs.guing.common.util.IconToolkit;
  * Represents a path in the TreeView.
  */
 public class PathUserObject
-    extends FigureUserObject
-    implements ContextObject {
+    extends
+      FigureUserObject
+    implements
+      ContextObject {
 
   private final UserObjectContext context;
 
@@ -34,10 +36,14 @@ public class PathUserObject
    * @param modelManager The model manager
    */
   @Inject
-  public PathUserObject(@Assisted PathModel model,
-                        @Assisted UserObjectContext context,
-                        GuiManager guiManager,
-                        ModelManager modelManager) {
+  public PathUserObject(
+      @Assisted
+      PathModel model,
+      @Assisted
+      UserObjectContext context,
+      GuiManager guiManager,
+      ModelManager modelManager
+  ) {
     super(model, guiManager, modelManager);
     this.context = context;
   }

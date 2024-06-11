@@ -14,7 +14,8 @@ import org.opentcs.data.model.Vehicle;
  * Compares {@link Vehicle}s by their names.
  */
 public class VehicleComparatorByName
-    implements Comparator<Vehicle> {
+    implements
+      Comparator<Vehicle> {
 
   /**
    * A key used for selecting this comparator in a configuration setting.

@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.vehicles;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.data.model.TCSResource;
 
@@ -30,8 +31,12 @@ public class SplitResources {
    * position.
    * @param resourcesAhead The resources ahead of the vehicle.
    */
-  public SplitResources(@Nonnull List<Set<TCSResource<?>>> resourcesPassed,
-                        @Nonnull List<Set<TCSResource<?>>> resourcesAhead) {
+  public SplitResources(
+      @Nonnull
+      List<Set<TCSResource<?>>> resourcesPassed,
+      @Nonnull
+      List<Set<TCSResource<?>>> resourcesAhead
+  ) {
     this.resourcesPassed = requireNonNull(resourcesPassed, "resourcesPassed");
     this.resourcesAhead = requireNonNull(resourcesAhead, "resourcesAhead");
   }
@@ -65,8 +70,12 @@ public class SplitResources {
    * @return A new instance created from the given iterable of resources, split at the element that
    * contains the given delimiter (resources).
    */
-  public static SplitResources from(@Nonnull Iterable<Set<TCSResource<?>>> resourceSets,
-                                    @Nonnull Set<TCSResource<?>> delimiter) {
+  public static SplitResources from(
+      @Nonnull
+      Iterable<Set<TCSResource<?>>> resourceSets,
+      @Nonnull
+      Set<TCSResource<?>> delimiter
+  ) {
     requireNonNull(resourceSets, "resourceSets");
     requireNonNull(delimiter, "delimiter");
 

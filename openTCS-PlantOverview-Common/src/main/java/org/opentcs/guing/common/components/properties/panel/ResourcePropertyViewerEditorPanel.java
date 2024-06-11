@@ -30,8 +30,10 @@ import org.opentcs.util.gui.StringTableCellRenderer;
  * UI for viewing a resource property without being able to edit the property.
  */
 public class ResourcePropertyViewerEditorPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   /**
    * A resource bundle.
@@ -102,6 +104,8 @@ public class ResourcePropertyViewerEditorPanel
     return fProperty;
   }
 
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -131,7 +135,10 @@ public class ResourcePropertyViewerEditorPanel
     controlPanel.setLayout(new java.awt.GridBagLayout());
     add(controlPanel, java.awt.BorderLayout.EAST);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel controlPanel;
@@ -139,26 +146,34 @@ public class ResourcePropertyViewerEditorPanel
   private javax.swing.JTable itemsTable;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private class ItemsTableModel
-      extends AbstractTableModel {
+      extends
+        AbstractTableModel {
 
-    private final Class<?>[] columnClasses = new Class<?>[]{
-      TCSResourceReference.class,
-      TCSResourceReference.class,
-      TCSResourceReference.class
-    };
+    private final Class<?>[] columnClasses
+        = new Class<?>[]{
+            TCSResourceReference.class,
+            TCSResourceReference.class,
+            TCSResourceReference.class
+        };
 
     /**
      * The column names.
      */
-    private final String[] columnNames = new String[]{
-      BUNDLE.getString("resourcePropertyViewerEditorPanel.table_resources.column_path.headerText"),
-      BUNDLE.getString("resourcePropertyViewerEditorPanel.table_resources.column_point.headerText"),
-      BUNDLE.getString(
-      "resourcePropertyViewerEditorPanel.table_resources.column_location.headerText"
-      )
-    };
+    private final String[] columnNames
+        = new String[]{
+            BUNDLE.getString(
+                "resourcePropertyViewerEditorPanel.table_resources.column_path.headerText"
+            ),
+            BUNDLE.getString(
+                "resourcePropertyViewerEditorPanel.table_resources.column_point.headerText"
+            ),
+            BUNDLE.getString(
+                "resourcePropertyViewerEditorPanel.table_resources.column_location.headerText"
+            )
+        };
 
     private final int columnPath = 0;
     private final int columnPoint = 1;

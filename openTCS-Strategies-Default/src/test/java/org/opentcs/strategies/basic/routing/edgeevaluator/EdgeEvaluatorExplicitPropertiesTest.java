@@ -9,10 +9,11 @@ package org.opentcs.strategies.basic.routing.edgeevaluator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.data.model.Path;
@@ -36,9 +37,11 @@ class EdgeEvaluatorExplicitPropertiesTest {
   @Test
   void extractCorrectProperties() {
     Edge edge = new Edge(
-        new Path("pathName",
-                 new Point("srcPoint").getReference(),
-                 new Point("dstPoint").getReference())
+        new Path(
+            "pathName",
+            new Point("srcPoint").getReference(),
+            new Point("dstPoint").getReference()
+        )
             .withProperty(Router.PROPKEY_ROUTING_COST_FORWARD + "XYZ", "1234")
             .withProperty(Router.PROPKEY_ROUTING_COST_REVERSE + "XYZ", "5678"),
         false

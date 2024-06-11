@@ -7,6 +7,8 @@
  */
 package org.opentcs.modeleditor.application.action.view;
 
+import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.MENU_PATH;
+
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Objects;
@@ -14,14 +16,14 @@ import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.opentcs.modeleditor.application.OpenTCSView;
-import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.MENU_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * Actions for adding background bitmaps to the drawing view.
  */
 public class AddBitmapAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action's ID.
@@ -44,11 +46,15 @@ public class AddBitmapAction
     this.view = Objects.requireNonNull(view, "view");
 
     this.fc = new JFileChooser(System.getProperty("opentcs.home"));
-    this.fc.setFileFilter(new FileNameExtensionFilter("Bitmaps (PNG, JPG, BMP, GIF)",
-                                                      "png",
-                                                      "jpg",
-                                                      "bmp",
-                                                      "gif"));
+    this.fc.setFileFilter(
+        new FileNameExtensionFilter(
+            "Bitmaps (PNG, JPG, BMP, GIF)",
+            "png",
+            "jpg",
+            "bmp",
+            "gif"
+        )
+    );
     this.fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
     putValue(NAME, BUNDLE.getString("addBitmapAction.name"));

@@ -13,7 +13,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property containing a key-value pair.
  */
 public class KeyValueProperty
-    extends AbstractComplexProperty {
+    extends
+      AbstractComplexProperty {
 
   /**
    * The key.

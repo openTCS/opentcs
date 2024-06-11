@@ -8,6 +8,7 @@
 package org.opentcs.util.persistence.v005;
 
 import static java.util.Objects.requireNonNull;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -16,7 +17,8 @@ import javax.xml.bind.annotation.XmlAttribute;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class PeripheralOperationTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   private String locationName = "";
   private String executionTrigger = "";

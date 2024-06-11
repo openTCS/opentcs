@@ -7,12 +7,14 @@
  */
 package org.opentcs.operationsdesk.application.action.actions;
 
-import jakarta.inject.Inject;
-import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
-import javax.swing.AbstractAction;
 import static javax.swing.Action.LARGE_ICON_KEY;
 import static javax.swing.Action.SMALL_ICON;
+import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.TOOLBAR_PATH;
+
+import jakarta.inject.Inject;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortal;
@@ -23,7 +25,6 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.model.SystemModel;
 import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.guing.common.util.ImageDirectory;
-import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.TOOLBAR_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,8 @@ import org.slf4j.LoggerFactory;
  * Action for resuming all vehicles.
  */
 public class ResumeAllVehiclesAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action's ID.
@@ -61,8 +63,10 @@ public class ResumeAllVehiclesAction
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public ResumeAllVehiclesAction(ModelManager modelManager,
-                                 SharedKernelServicePortalProvider portalProvider) {
+  public ResumeAllVehiclesAction(
+      ModelManager modelManager,
+      SharedKernelServicePortalProvider portalProvider
+  ) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
 

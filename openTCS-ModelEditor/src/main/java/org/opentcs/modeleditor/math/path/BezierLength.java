@@ -7,20 +7,22 @@
  */
 package org.opentcs.modeleditor.math.path;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.model.elements.PathModel;
 import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.common.persistence.ModelManager;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * Calculates the length of {@link PathModel.Type#BEZIER} paths.
  */
 public class BezierLength
-    implements PathLengthFunction {
+    implements
+      PathLengthFunction {
 
   private final double scaleX;
   private final double scaleY;
@@ -33,8 +35,12 @@ public class BezierLength
    * @param pathLengthMath Provides methods to evaluate the position of a point of a Bezier curve.
    */
   @Inject
-  public BezierLength(@Nonnull ModelManager manager,
-                      @Nonnull PathLengthMath pathLengthMath) {
+  public BezierLength(
+      @Nonnull
+      ModelManager manager,
+      @Nonnull
+      PathLengthMath pathLengthMath
+  ) {
     requireNonNull(manager, "manager");
     this.pathLengthMath = requireNonNull(pathLengthMath, "pathLengthMath");
     scaleX = manager.getModel().getLayoutModel().getPropertyScaleX()
@@ -44,7 +50,10 @@ public class BezierLength
   }
 
   @Override
-  public double applyAsDouble(@Nonnull PathModel path) {
+  public double applyAsDouble(
+      @Nonnull
+      PathModel path
+  ) {
     requireNonNull(path, "path");
 
     String[] cps = path.getPropertyPathControlPoints().getText().split(";");
@@ -57,14 +66,22 @@ public class BezierLength
     PointModel end = (PointModel) path.getEndComponent();
 
     return pathLengthMath.approximateCubicBezierCurveLength(
-        new Coordinate(start.getPropertyModelPositionX().getValueByUnit(LengthProperty.Unit.MM),
-                       start.getPropertyModelPositionY().getValueByUnit(LengthProperty.Unit.MM)),
-        new Coordinate(Double.parseDouble(cps[0].split(",")[0]) * scaleX,
-                       Double.parseDouble(cps[0].split(",")[1]) * scaleY * (-1)),
-        new Coordinate(Double.parseDouble(cps[1].split(",")[0]) * scaleX,
-                       Double.parseDouble(cps[1].split(",")[1]) * scaleY * (-1)),
-        new Coordinate(end.getPropertyModelPositionX().getValueByUnit(LengthProperty.Unit.MM),
-                       end.getPropertyModelPositionY().getValueByUnit(LengthProperty.Unit.MM)),
+        new Coordinate(
+            start.getPropertyModelPositionX().getValueByUnit(LengthProperty.Unit.MM),
+            start.getPropertyModelPositionY().getValueByUnit(LengthProperty.Unit.MM)
+        ),
+        new Coordinate(
+            Double.parseDouble(cps[0].split(",")[0]) * scaleX,
+            Double.parseDouble(cps[0].split(",")[1]) * scaleY * (-1)
+        ),
+        new Coordinate(
+            Double.parseDouble(cps[1].split(",")[0]) * scaleX,
+            Double.parseDouble(cps[1].split(",")[1]) * scaleY * (-1)
+        ),
+        new Coordinate(
+            end.getPropertyModelPositionX().getValueByUnit(LengthProperty.Unit.MM),
+            end.getPropertyModelPositionY().getValueByUnit(LengthProperty.Unit.MM)
+        ),
         1000
     );
   }

@@ -7,8 +7,9 @@
  */
 package org.opentcs.commadapter.peripheral.loopback.commands;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 import org.opentcs.commadapter.peripheral.loopback.LoopbackPeripheralCommAdapter;
 import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.drivers.peripherals.PeripheralAdapterCommand;
@@ -18,7 +19,8 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapter;
  * A command to set the peripheral device's state.
  */
 public class SetStateCommand
-    implements PeripheralAdapterCommand {
+    implements
+      PeripheralAdapterCommand {
 
   /**
    * The peripheral device state to set.
@@ -30,7 +32,10 @@ public class SetStateCommand
    *
    * @param state The peripheral device state to set.
    */
-  public SetStateCommand(@Nonnull PeripheralInformation.State state) {
+  public SetStateCommand(
+      @Nonnull
+      PeripheralInformation.State state
+  ) {
     this.state = requireNonNull(state, "state");
   }
 

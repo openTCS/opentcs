@@ -7,16 +7,17 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.vehicles;
 
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -50,7 +51,7 @@ class IsReparkableTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings={OrderConstants.TYPE_ANY,OrderConstants.TYPE_PARK})
+  @ValueSource(strings = {OrderConstants.TYPE_ANY, OrderConstants.TYPE_PARK})
   void checkVehicleIsReparkable(String type) {
     Vehicle vehicle = reparkableVehicle
         .withAllowedOrderTypes(Set.of(type));
@@ -58,8 +59,10 @@ class IsReparkableTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = Vehicle.IntegrationLevel.class,
-              names = {"TO_BE_IGNORED", "TO_BE_NOTICED", "TO_BE_RESPECTED"})
+  @EnumSource(
+      value = Vehicle.IntegrationLevel.class,
+      names = {"TO_BE_IGNORED", "TO_BE_NOTICED", "TO_BE_RESPECTED"}
+  )
   void checkVehicleIsNotFullyIntegrated(Vehicle.IntegrationLevel integrationLevel) {
     Vehicle vehicle = reparkableVehicle.withIntegrationLevel(integrationLevel);
 
@@ -78,8 +81,10 @@ class IsReparkableTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = Vehicle.State.class,
-              names = {"UNKNOWN", "UNAVAILABLE", "ERROR", "EXECUTING", "CHARGING"})
+  @EnumSource(
+      value = Vehicle.State.class,
+      names = {"UNKNOWN", "UNAVAILABLE", "ERROR", "EXECUTING", "CHARGING"}
+  )
   void checkVehicleHasIncorrectState(Vehicle.State state) {
     Vehicle vehicle = reparkableVehicle.withState(state);
 
@@ -87,8 +92,10 @@ class IsReparkableTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = Vehicle.ProcState.class,
-              names = {"AWAITING_ORDER", "PROCESSING_ORDER"})
+  @EnumSource(
+      value = Vehicle.ProcState.class,
+      names = {"AWAITING_ORDER", "PROCESSING_ORDER"}
+  )
   void checkVehicleHasIncorrectProcState(Vehicle.ProcState procState) {
     Vehicle vehicle = reparkableVehicle.withProcState(procState);
 

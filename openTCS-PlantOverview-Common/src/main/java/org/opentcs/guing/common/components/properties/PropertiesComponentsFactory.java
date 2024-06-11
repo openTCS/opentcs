@@ -23,6 +23,8 @@ public interface PropertiesComponentsFactory {
    * @param userMessageHelper The user message helper.
    * @return The {@link CoordinateCellEditor}.
    */
-  CoordinateCellEditor createCoordinateCellEditor(JTextField textField,
-                                                  UserMessageHelper userMessageHelper);
+  CoordinateCellEditor createCoordinateCellEditor(
+      JTextField textField,
+      UserMessageHelper userMessageHelper
+  );
 }

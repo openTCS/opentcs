@@ -7,9 +7,10 @@
  */
 package org.opentcs.common;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.JOptionPane;
 import org.opentcs.access.KernelRuntimeException;
@@ -28,7 +29,8 @@ import org.slf4j.LoggerFactory;
  * {@link KernelServicePortal}.
  */
 public class DefaultPortalManager
-    implements PortalManager {
+    implements
+      PortalManager {
 
   /**
    * This class's logger.
@@ -69,9 +71,12 @@ public class DefaultPortalManager
    * @param connectionBookmarks The connection bookmarks to use.
    */
   @Inject
-  public DefaultPortalManager(KernelServicePortal servicePortal,
-                              @ApplicationEventBus EventHandler eventHandler,
-                              List<ConnectionParamSet> connectionBookmarks) {
+  public DefaultPortalManager(
+      KernelServicePortal servicePortal,
+      @ApplicationEventBus
+      EventHandler eventHandler,
+      List<ConnectionParamSet> connectionBookmarks
+  ) {
     this.eventHandler = requireNonNull(eventHandler, "eventHandler");
     this.servicePortal = requireNonNull(servicePortal, "servicePortal");
     this.connectionBookmarks = requireNonNull(connectionBookmarks, "connectionBookmarks");
@@ -98,9 +103,11 @@ public class DefaultPortalManager
           LOG.info("Cannot reconnect. No portal we were previously connected to.");
           return false;
         }
-        return connect(lastConnection.getDescription(),
-                       lastConnection.getHost(),
-                       lastConnection.getPort());
+        return connect(
+            lastConnection.getDescription(),
+            lastConnection.getHost(),
+            lastConnection.getPort()
+        );
       default:
         LOG.warn("Unhandled connection mode '{}'. Not connecting.", mode.name());
         return false;

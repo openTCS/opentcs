@@ -15,7 +15,8 @@ import org.opentcs.data.model.Vehicle;
  * Uses an edge's length as its weight.
  */
 public class EdgeEvaluatorDistance
-    implements EdgeEvaluator {
+    implements
+      EdgeEvaluator {
 
   /**
    * A key used for selecting this evaluator in a configuration setting.

@@ -7,6 +7,9 @@
  */
 package org.opentcs.operationsdesk.peripherals.jobs;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.PERIPHERALJOB_PATH;
+
 import jakarta.inject.Inject;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -15,7 +18,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
@@ -38,7 +40,6 @@ import org.opentcs.guing.common.components.dialogs.DialogContent;
 import org.opentcs.guing.common.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.common.util.IconToolkit;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
-import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.PERIPHERALJOB_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 import org.opentcs.util.gui.StringTableCellRenderer;
 import org.slf4j.Logger;
@@ -48,7 +49,8 @@ import org.slf4j.LoggerFactory;
  * Shows a table of the kernel's peripheral jobs.
  */
 public class PeripheralJobsContainerPanel
-    extends JPanel {
+    extends
+      JPanel {
 
   /**
    * This class's logger.
@@ -90,14 +92,20 @@ public class PeripheralJobsContainerPanel
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public PeripheralJobsContainerPanel(SharedKernelServicePortalProvider portalProvider,
-                                      PeripheralJobsContainer peripheralJobsContainer,
-                                      PeripheralJobViewFactory peripheralJobViewFactory) {
+  public PeripheralJobsContainerPanel(
+      SharedKernelServicePortalProvider portalProvider,
+      PeripheralJobsContainer peripheralJobsContainer,
+      PeripheralJobViewFactory peripheralJobViewFactory
+  ) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
-    this.peripheralJobsContainer = requireNonNull(peripheralJobsContainer,
-                                                  "peripheralJobsContainer");
-    this.peripheralJobViewFactory = requireNonNull(peripheralJobViewFactory,
-                                                   "peripheralJobViewFactory");
+    this.peripheralJobsContainer = requireNonNull(
+        peripheralJobsContainer,
+        "peripheralJobsContainer"
+    );
+    this.peripheralJobViewFactory = requireNonNull(
+        peripheralJobViewFactory,
+        "peripheralJobViewFactory"
+    );
 
     initComponents();
   }
@@ -124,9 +132,13 @@ public class PeripheralJobsContainerPanel
 
     TableRowSorter<PeripheralJobTableModel> sorter = new TableRowSorter<>(tableModel);
     // Sort the table by the creation instant.
-    sorter.setSortKeys(Arrays.asList(
-        new RowSorter.SortKey(PeripheralJobTableModel.COLUMN_CREATION_TIME, SortOrder.DESCENDING)
-    ));
+    sorter.setSortKeys(
+        Arrays.asList(
+            new RowSorter.SortKey(
+                PeripheralJobTableModel.COLUMN_CREATION_TIME, SortOrder.DESCENDING
+            )
+        )
+    );
     // ...but prevent manual sorting.
     for (int i = 0; i < table.getColumnCount(); i++) {
       sorter.setSortable(i, false);
@@ -135,8 +147,10 @@ public class PeripheralJobsContainerPanel
     table.setRowSorter(sorter);
 
     // Hide the column that shows the creation time.
-    table.removeColumn(table.getColumnModel()
-        .getColumn(table.convertColumnIndexToView(PeripheralJobTableModel.COLUMN_CREATION_TIME)));
+    table.removeColumn(
+        table.getColumnModel()
+            .getColumn(table.convertColumnIndexToView(PeripheralJobTableModel.COLUMN_CREATION_TIME))
+    );
 
     TableCellRenderer renderer = new StringTableCellRenderer<TCSObjectReference>(reference -> {
       if (reference == null) {
@@ -188,10 +202,12 @@ public class PeripheralJobsContainerPanel
     getSelectedJob().ifPresent(job -> {
       DialogContent content = peripheralJobViewFactory.createPeripheralJobView(job);
       StandardContentDialog dialog
-          = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
-                                      content,
-                                      true,
-                                      StandardContentDialog.CLOSE);
+          = new StandardContentDialog(
+              JOptionPane.getFrameForComponent(this),
+              content,
+              true,
+              StandardContentDialog.CLOSE
+          );
       dialog.setVisible(true);
     });
   }

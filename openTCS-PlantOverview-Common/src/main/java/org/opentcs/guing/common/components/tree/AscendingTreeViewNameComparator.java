@@ -14,7 +14,8 @@ import java.util.Comparator;
  * Sorts based on their name in descending order.
  */
 public class AscendingTreeViewNameComparator
-    implements Comparator<Object> {
+    implements
+      Comparator<Object> {
 
   /**
    * Creates a new instance.

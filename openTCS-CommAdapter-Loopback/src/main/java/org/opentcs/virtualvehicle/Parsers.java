@@ -30,7 +30,11 @@ public class Parsers {
    * @return if the <code>String</code> could be parsed then the int value of the
    * <code>String</code> is returned, else retOnFail
    */
-  public static int tryParseString(@Nullable String toParse, int retOnFail) {
+  public static int tryParseString(
+      @Nullable
+      String toParse,
+      int retOnFail
+  ) {
 
     if (toParse == null) {
       return retOnFail;

@@ -7,12 +7,13 @@
  */
 package org.opentcs.guing.common.components.properties.panel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import java.util.HashMap;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
@@ -84,10 +85,12 @@ import org.slf4j.LoggerFactory;
  * Shows the attributes of a model component in a table.
  */
 public class PropertiesTableContent
-    extends AbstractTableContent
-    implements AttributesChangeListener,
-               ConnectionChangeListener,
-               CellEditorListener {
+    extends
+      AbstractTableContent
+    implements
+      AttributesChangeListener,
+      ConnectionChangeListener,
+      CellEditorListener {
 
   /**
    * This class's logger.
@@ -125,17 +128,25 @@ public class PropertiesTableContent
    * @param componentsFactory The components factory.
    */
   @Inject
-  public PropertiesTableContent(CellEditorFactory cellEditorFactory,
-                                Provider<AttributesTable> tableProvider,
-                                Provider<AttributesTableModel> tableModelProvider,
-                                @ApplicationEventBus EventBus eventBus,
-                                @Assisted JPanel dialogParent,
-                                PropertiesComponentsFactory componentsFactory) {
+  public PropertiesTableContent(
+      CellEditorFactory cellEditorFactory,
+      Provider<AttributesTable> tableProvider,
+      Provider<AttributesTableModel> tableModelProvider,
+      @ApplicationEventBus
+      EventBus eventBus,
+      @Assisted
+      JPanel dialogParent,
+      PropertiesComponentsFactory componentsFactory
+  ) {
     super(tableProvider);
-    this.cellEditorFactory = requireNonNull(cellEditorFactory,
-                                            "cellEditorFactory");
-    this.tableModelProvider = requireNonNull(tableModelProvider,
-                                             "tableModelProvider");
+    this.cellEditorFactory = requireNonNull(
+        cellEditorFactory,
+        "cellEditorFactory"
+    );
+    this.tableModelProvider = requireNonNull(
+        tableModelProvider,
+        "tableModelProvider"
+    );
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
     this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
@@ -375,7 +386,8 @@ public class PropertiesTableContent
 
     // Abstract complex property:
     undoableEditor = new UndoableCellEditor(
-        cellEditorFactory.createComplexPropertyCellEditor(dialogParent));
+        cellEditorFactory.createComplexPropertyCellEditor(dialogParent)
+    );
     undoableEditor.setUndoManager(fUndoRedoManager);
     fCellEditors.add(undoableEditor);
     fTable.setDefaultEditor(AbstractComplexProperty.class, undoableEditor);

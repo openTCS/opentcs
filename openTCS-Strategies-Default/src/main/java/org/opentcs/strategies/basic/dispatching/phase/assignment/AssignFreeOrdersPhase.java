@@ -7,11 +7,12 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.assignment;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Vehicle;
@@ -31,7 +32,8 @@ import org.slf4j.LoggerFactory;
  * any order sequences.
  */
 public class AssignFreeOrdersPhase
-    implements Phase {
+    implements
+      Phase {
 
   /**
    * This class's Logger.
@@ -74,17 +76,24 @@ public class AssignFreeOrdersPhase
       IsFreelyDispatchableToAnyVehicle isFreelyDispatchableToAnyVehicle,
       CompositeTransportOrderSelectionFilter transportOrderSelectionFilter,
       OrderAssigner orderAssigner,
-      DispatchingStatusMarker dispatchingStatusMarker) {
+      DispatchingStatusMarker dispatchingStatusMarker
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.vehicleSelectionFilter = requireNonNull(vehicleSelectionFilter, "vehicleSelectionFilter");
     this.isAvailableForAnyOrder = requireNonNull(isAvailableForAnyOrder, "isAvailableForAnyOrder");
-    this.isFreelyDispatchableToAnyVehicle = requireNonNull(isFreelyDispatchableToAnyVehicle,
-                                                           "isFreelyDispatchableToAnyVehicle");
-    this.transportOrderSelectionFilter = requireNonNull(transportOrderSelectionFilter,
-                                                        "transportOrderSelectionFilter");
+    this.isFreelyDispatchableToAnyVehicle = requireNonNull(
+        isFreelyDispatchableToAnyVehicle,
+        "isFreelyDispatchableToAnyVehicle"
+    );
+    this.transportOrderSelectionFilter = requireNonNull(
+        transportOrderSelectionFilter,
+        "transportOrderSelectionFilter"
+    );
     this.orderAssigner = requireNonNull(orderAssigner, "orderAssigner");
-    this.dispatchingStatusMarker = requireNonNull(dispatchingStatusMarker,
-                                                  "dispatchingStatusMarker");
+    this.dispatchingStatusMarker = requireNonNull(
+        dispatchingStatusMarker,
+        "dispatchingStatusMarker"
+    );
   }
 
   @Override
@@ -135,17 +144,22 @@ public class AssignFreeOrdersPhase
 
     markNewlyFilteredOrders(ordersSplitByFilter.get(Boolean.FALSE));
 
-    orderAssigner.tryAssignments(availableVehicles,
-                                 ordersSplitByFilter.get(Boolean.TRUE).stream()
-                                     .map(OrderFilterResult::getOrder)
-                                     .collect(Collectors.toList()));
+    orderAssigner.tryAssignments(
+        availableVehicles,
+        ordersSplitByFilter.get(Boolean.TRUE).stream()
+            .map(OrderFilterResult::getOrder)
+            .collect(Collectors.toList())
+    );
   }
 
   private void markNewlyFilteredOrders(Collection<OrderFilterResult> filterResults) {
     filterResults.stream()
-        .filter(filterResult
-            -> (!dispatchingStatusMarker.isOrderMarkedAsDeferred(filterResult.getOrder())
-                || dispatchingStatusMarker.haveDeferralReasonsForOrderChanged(filterResult)))
+        .filter(
+            filterResult -> (!dispatchingStatusMarker.isOrderMarkedAsDeferred(
+                filterResult.getOrder()
+            )
+                || dispatchingStatusMarker.haveDeferralReasonsForOrderChanged(filterResult))
+        )
         .forEach(dispatchingStatusMarker::markOrderAsDeferred);
   }
 }

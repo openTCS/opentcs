@@ -7,9 +7,10 @@
  */
 package org.opentcs.modeleditor.util;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -18,7 +19,8 @@ import javax.swing.UIManager;
  * Shows a dialog with a text area and a label to describe the content of it.
  */
 public class TextAreaDialog
-    extends JDialog {
+    extends
+      JDialog {
 
   private Collection<String> contents;
 
@@ -57,6 +59,8 @@ public class TextAreaDialog
     contents.stream().map(o -> o + "\n").forEach(contentTextArea::append);
   }
 
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
    * initialize the form.
@@ -122,11 +126,14 @@ public class TextAreaDialog
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
     setVisible(false);
   }//GEN-LAST:event_okButtonActionPerformed
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel buttonPane;
@@ -139,4 +146,5 @@ public class TextAreaDialog
   private javax.swing.JLabel textAreaLabel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

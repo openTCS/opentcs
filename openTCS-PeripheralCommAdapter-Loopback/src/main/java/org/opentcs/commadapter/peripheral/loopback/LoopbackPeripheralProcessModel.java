@@ -17,8 +17,10 @@ import org.opentcs.drivers.peripherals.PeripheralProcessModel;
  * The process model for the loopback peripheral communication adapter.
  */
 public class LoopbackPeripheralProcessModel
-    extends PeripheralProcessModel
-    implements Serializable {
+    extends
+      PeripheralProcessModel
+    implements
+      Serializable {
 
   /**
    * Whether the peripheral device is manual mode (i.e. the user triggers the job execution).
@@ -29,49 +31,59 @@ public class LoopbackPeripheralProcessModel
     this(location, false, false, PeripheralInformation.State.UNKNOWN, false);
   }
 
-  private LoopbackPeripheralProcessModel(TCSResourceReference<Location> location,
-                                         boolean commAdapterEnabled,
-                                         boolean commAdapterConnected,
-                                         PeripheralInformation.State state,
-                                         boolean manualModeEnabled) {
+  private LoopbackPeripheralProcessModel(
+      TCSResourceReference<Location> location,
+      boolean commAdapterEnabled,
+      boolean commAdapterConnected,
+      PeripheralInformation.State state,
+      boolean manualModeEnabled
+  ) {
     super(location, commAdapterEnabled, commAdapterConnected, state);
     this.manualModeEnabled = manualModeEnabled;
   }
 
   @Override
   public LoopbackPeripheralProcessModel withLocation(TCSResourceReference<Location> location) {
-    return new LoopbackPeripheralProcessModel(location,
-                                              isCommAdapterEnabled(),
-                                              isCommAdapterConnected(),
-                                              getState(),
-                                              manualModeEnabled);
+    return new LoopbackPeripheralProcessModel(
+        location,
+        isCommAdapterEnabled(),
+        isCommAdapterConnected(),
+        getState(),
+        manualModeEnabled
+    );
   }
 
   @Override
   public LoopbackPeripheralProcessModel withCommAdapterEnabled(boolean commAdapterEnabled) {
-    return new LoopbackPeripheralProcessModel(getLocation(),
-                                              commAdapterEnabled,
-                                              isCommAdapterConnected(),
-                                              getState(),
-                                              manualModeEnabled);
+    return new LoopbackPeripheralProcessModel(
+        getLocation(),
+        commAdapterEnabled,
+        isCommAdapterConnected(),
+        getState(),
+        manualModeEnabled
+    );
   }
 
   @Override
   public LoopbackPeripheralProcessModel withCommAdapterConnected(boolean commAdapterConnected) {
-    return new LoopbackPeripheralProcessModel(getLocation(),
-                                              isCommAdapterEnabled(),
-                                              commAdapterConnected,
-                                              getState(),
-                                              manualModeEnabled);
+    return new LoopbackPeripheralProcessModel(
+        getLocation(),
+        isCommAdapterEnabled(),
+        commAdapterConnected,
+        getState(),
+        manualModeEnabled
+    );
   }
 
   @Override
   public LoopbackPeripheralProcessModel withState(PeripheralInformation.State state) {
-    return new LoopbackPeripheralProcessModel(getLocation(),
-                                              isCommAdapterEnabled(),
-                                              isCommAdapterConnected(),
-                                              state,
-                                              manualModeEnabled);
+    return new LoopbackPeripheralProcessModel(
+        getLocation(),
+        isCommAdapterEnabled(),
+        isCommAdapterConnected(),
+        state,
+        manualModeEnabled
+    );
   }
 
   /**
@@ -91,11 +103,13 @@ public class LoopbackPeripheralProcessModel
    * @return A copy of this object, differing in the given value.
    */
   public LoopbackPeripheralProcessModel withManualModeEnabled(boolean manualModeEnabled) {
-    return new LoopbackPeripheralProcessModel(getLocation(),
-                                              isCommAdapterEnabled(),
-                                              isCommAdapterConnected(),
-                                              getState(),
-                                              manualModeEnabled);
+    return new LoopbackPeripheralProcessModel(
+        getLocation(),
+        isCommAdapterEnabled(),
+        isCommAdapterConnected(),
+        getState(),
+        manualModeEnabled
+    );
   }
 
   /**

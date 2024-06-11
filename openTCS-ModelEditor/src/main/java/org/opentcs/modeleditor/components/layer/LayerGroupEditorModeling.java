@@ -13,7 +13,8 @@ import org.opentcs.guing.common.components.layer.LayerGroupEditor;
  * Provides methods to edit layer groups.
  */
 public interface LayerGroupEditorModeling
-    extends LayerGroupEditor {
+    extends
+      LayerGroupEditor {
 
   /**
    * Creates a new layer group.

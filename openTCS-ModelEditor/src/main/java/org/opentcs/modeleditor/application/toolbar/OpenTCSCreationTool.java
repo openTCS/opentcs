@@ -7,24 +7,26 @@
  */
 package org.opentcs.modeleditor.application.toolbar;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.TOOLBAR_PATH;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.event.MouseEvent;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JOptionPane;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.tool.CreationTool;
 import org.opentcs.guing.common.components.drawing.figures.LabeledFigure;
 import org.opentcs.guing.common.components.drawing.figures.ModelBasedFigure;
 import org.opentcs.modeleditor.components.layer.ActiveLayerProvider;
-import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.TOOLBAR_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A custom tool used to create {@code PointFigure}s and {@code LocationFigure}s.
  */
 public class OpenTCSCreationTool
-    extends CreationTool {
+    extends
+      CreationTool {
 
   /**
    * The resource bundle to use.
@@ -42,8 +44,11 @@ public class OpenTCSCreationTool
    * @param prototype The figure to be used as a prototype.
    */
   @Inject
-  public OpenTCSCreationTool(ActiveLayerProvider activeLayerProvider,
-                             @Assisted Figure prototype) {
+  public OpenTCSCreationTool(
+      ActiveLayerProvider activeLayerProvider,
+      @Assisted
+      Figure prototype
+  ) {
     super(prototype);
     this.activeLayerProvider = requireNonNull(activeLayerProvider, "activeLayerProvider");
   }

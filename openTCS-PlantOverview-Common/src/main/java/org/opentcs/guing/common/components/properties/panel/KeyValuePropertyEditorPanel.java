@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.components.properties.panel;
 
-import com.google.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import com.google.inject.Inject;
 import java.util.Set;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -29,8 +30,10 @@ import org.opentcs.util.gui.BoundsPopupMenuListener;
  * @see KeyValueProperty
  */
 public class KeyValuePropertyEditorPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   /**
    * The property to be edited.
@@ -89,6 +92,7 @@ public class KeyValuePropertyEditorPanel
     return fProperty;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -140,11 +144,13 @@ public class KeyValuePropertyEditorPanel
     add(valueComboBox, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void keyValueChangedListener(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_keyValueChangedListener
 
     Set<String> specSuggestions = propertySuggestions.getValueSuggestionsFor(
-        String.valueOf(keyComboBox.getSelectedItem()));
+        String.valueOf(keyComboBox.getSelectedItem())
+    );
     if (specSuggestions.isEmpty()) {
       specSuggestions = propertySuggestions.getValueSuggestions();
     }
@@ -156,6 +162,7 @@ public class KeyValuePropertyEditorPanel
     valueComboBox.getEditor().setItem(currentSuggestion);
   }//GEN-LAST:event_keyValueChangedListener
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox<String> keyComboBox;
@@ -164,4 +171,5 @@ public class KeyValuePropertyEditorPanel
   private javax.swing.JLabel valueLabel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

@@ -7,19 +7,20 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.assignment;
 
-import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DISPATCHING_DEFERRED;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DISPATCHING_RESUMED;
+
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import static org.mockito.Mockito.mock;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.order.TransportOrder;
-import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DISPATCHING_DEFERRED;
-import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DISPATCHING_RESUMED;
 import org.opentcs.strategies.basic.dispatching.phase.OrderFilterResult;
 
 /**

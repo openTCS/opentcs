@@ -7,20 +7,21 @@
  */
 package org.opentcs.kernelcontrolcenter.peripherals;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
 import org.opentcs.drivers.peripherals.PeripheralProcessModel;
-import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.CallWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +30,10 @@ import org.slf4j.LoggerFactory;
  * A model for displaying a table of peripherals.
  */
 public class PeripheralTableModel
-    extends AbstractTableModel
-    implements PropertyChangeListener {
+    extends
+      AbstractTableModel
+    implements
+      PropertyChangeListener {
 
   /**
    * The index of the column showing the peripheral device's name.
@@ -55,19 +58,21 @@ public class PeripheralTableModel
   /**
    * The collumn names for the table header.
    */
-  private static final String[] COLUMN_NAMES = new String[]{
-    BUNDLE.getString("peripheralTableModel.column_location.headerText"),
-    BUNDLE.getString("peripheralTableModel.column_adapter.headerText"),
-    BUNDLE.getString("peripheralTableModel.column_enabled.headerText")
-  };
+  private static final String[] COLUMN_NAMES
+      = new String[]{
+          BUNDLE.getString("peripheralTableModel.column_location.headerText"),
+          BUNDLE.getString("peripheralTableModel.column_adapter.headerText"),
+          BUNDLE.getString("peripheralTableModel.column_enabled.headerText")
+      };
   /**
    * The column classes.
    */
-  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
-    String.class,
-    PeripheralCommAdapterDescription.class,
-    Boolean.class
-  };
+  private static final Class<?>[] COLUMN_CLASSES
+      = new Class<?>[]{
+          String.class,
+          PeripheralCommAdapterDescription.class,
+          Boolean.class
+      };
   /**
    * The service portal to use for kernel interaction.
    */
@@ -81,8 +86,10 @@ public class PeripheralTableModel
    */
   private final List<LocalPeripheralEntry> entries = new ArrayList<>();
 
-  public PeripheralTableModel(KernelServicePortal servicePortal,
-                              CallWrapper callWrapper) {
+  public PeripheralTableModel(
+      KernelServicePortal servicePortal,
+      CallWrapper callWrapper
+  ) {
     this.servicePortal = requireNonNull(servicePortal, "servicePortal");
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");
   }
@@ -102,10 +109,12 @@ public class PeripheralTableModel
   }
 
   public LocalPeripheralEntry getDataAt(int index) {
-    checkArgument(index >= 0 && index < entries.size(),
-                  "index must be in 0..%d: %d",
-                  entries.size(),
-                  index);
+    checkArgument(
+        index >= 0 && index < entries.size(),
+        "index must be in 0..%d: %d",
+        entries.size(),
+        index
+    );
     return entries.get(index);
   }
 
@@ -151,23 +160,25 @@ public class PeripheralTableModel
         break;
       case COLUMN_ENABLED:
         try {
-        if ((boolean) aValue) {
-          callWrapper.call(
-              () -> servicePortal.getPeripheralService().enableCommAdapter(entry.getLocation())
+          if ((boolean) aValue) {
+            callWrapper.call(
+                () -> servicePortal.getPeripheralService().enableCommAdapter(entry.getLocation())
+            );
+          }
+          else {
+            callWrapper.call(
+                () -> servicePortal.getPeripheralService().disableCommAdapter(entry.getLocation())
+            );
+          }
+        }
+        catch (Exception ex) {
+          LOG.warn(
+              "Error enabling/disabling peripheral comm adapter for {}",
+              entry.getLocation().getName(),
+              ex
           );
         }
-        else {
-          callWrapper.call(
-              () -> servicePortal.getPeripheralService().disableCommAdapter(entry.getLocation())
-          );
-        }
-      }
-      catch (Exception ex) {
-        LOG.warn("Error enabling/disabling peripheral comm adapter for {}",
-                 entry.getLocation().getName(),
-                 ex);
-      }
-      break;
+        break;
       default:
         throw new IllegalArgumentException("Invalid column index: " + columnIndex);
     }
@@ -214,16 +225,20 @@ public class PeripheralTableModel
       return false;
     }
 
-    if (Objects.equals(evt.getPropertyName(),
-                       LocalPeripheralEntry.Attribute.ATTACHED_COMM_ADAPTER.name())) {
+    if (Objects.equals(
+        evt.getPropertyName(),
+        LocalPeripheralEntry.Attribute.ATTACHED_COMM_ADAPTER.name()
+    )) {
       PeripheralCommAdapterDescription oldInfo
           = (PeripheralCommAdapterDescription) evt.getOldValue();
       PeripheralCommAdapterDescription newInfo
           = (PeripheralCommAdapterDescription) evt.getNewValue();
       return !oldInfo.equals(newInfo);
     }
-    if (Objects.equals(evt.getPropertyName(),
-                       LocalPeripheralEntry.Attribute.PROCESS_MODEL.name())) {
+    if (Objects.equals(
+        evt.getPropertyName(),
+        LocalPeripheralEntry.Attribute.PROCESS_MODEL.name()
+    )) {
       PeripheralProcessModel oldTo = (PeripheralProcessModel) evt.getOldValue();
       PeripheralProcessModel newTo = (PeripheralProcessModel) evt.getNewValue();
       return oldTo.isCommAdapterEnabled() != newTo.isCommAdapterEnabled();

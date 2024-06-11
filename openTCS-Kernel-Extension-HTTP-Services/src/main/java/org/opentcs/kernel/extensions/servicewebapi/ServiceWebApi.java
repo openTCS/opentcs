@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.Uninterruptibles;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.TimeUnit;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SslParameterSet;
@@ -25,7 +26,8 @@ import spark.Service;
  * Provides an HTTP interface for basic administration needs.
  */
 public class ServiceWebApi
-    implements KernelExtension {
+    implements
+      KernelExtension {
 
   /**
    * This class's logger.
@@ -70,11 +72,13 @@ public class ServiceWebApi
    * @param v1RequestHandler Handles requests for API version 1.
    */
   @Inject
-  public ServiceWebApi(ServiceWebApiConfiguration configuration,
-                       SslParameterSet sslParamSet,
-                       Authenticator authenticator,
-                       JsonBinder jsonBinder,
-                       V1RequestHandler v1RequestHandler) {
+  public ServiceWebApi(
+      ServiceWebApiConfiguration configuration,
+      SslParameterSet sslParamSet,
+      Authenticator authenticator,
+      JsonBinder jsonBinder,
+      V1RequestHandler v1RequestHandler
+  ) {
     this.configuration = requireNonNull(configuration, "configuration");
     this.sslParamSet = requireNonNull(sslParamSet, "sslParamSet");
     this.authenticator = requireNonNull(authenticator, "authenticator");
@@ -95,10 +99,12 @@ public class ServiceWebApi
         .port(configuration.bindPort());
 
     if (configuration.useSsl()) {
-      service.secure(sslParamSet.getKeystoreFile().getAbsolutePath(),
-                     sslParamSet.getKeystorePassword(),
-                     null,
-                     null);
+      service.secure(
+          sslParamSet.getKeystoreFile().getAbsolutePath(),
+          sslParamSet.getKeystorePassword(),
+          null,
+          null
+      );
     }
     else {
       LOG.warn("Encryption disabled, connections will not be secured!");
@@ -131,36 +137,37 @@ public class ServiceWebApi
           }
 
           return "OK";
-        });
+        }
+    );
 
     // Register routes for API versions here.
     service.path("/v1", () -> v1RequestHandler.addRoutes(service));
 
     service.exception(IllegalArgumentException.class, (exception, request, response) -> {
-                    response.status(400);
-                    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-                    response.body(jsonBinder.toJson(exception));
-                  });
+      response.status(400);
+      response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+      response.body(jsonBinder.toJson(exception));
+    });
     service.exception(ObjectUnknownException.class, (exception, request, response) -> {
-                    response.status(404);
-                    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-                    response.body(jsonBinder.toJson(exception));
-                  });
+      response.status(404);
+      response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+      response.body(jsonBinder.toJson(exception));
+    });
     service.exception(ObjectExistsException.class, (exception, request, response) -> {
-                    response.status(409);
-                    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-                    response.body(jsonBinder.toJson(exception));
-                  });
+      response.status(409);
+      response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+      response.body(jsonBinder.toJson(exception));
+    });
     service.exception(KernelRuntimeException.class, (exception, request, response) -> {
-                    response.status(500);
-                    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-                    response.body(jsonBinder.toJson(exception));
-                  });
+      response.status(500);
+      response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+      response.body(jsonBinder.toJson(exception));
+    });
     service.exception(IllegalStateException.class, (exception, request, response) -> {
-                    response.status(500);
-                    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-                    response.body(jsonBinder.toJson(exception));
-                  });
+      response.status(500);
+      response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+      response.body(jsonBinder.toJson(exception));
+    });
 
     initialized = true;
   }

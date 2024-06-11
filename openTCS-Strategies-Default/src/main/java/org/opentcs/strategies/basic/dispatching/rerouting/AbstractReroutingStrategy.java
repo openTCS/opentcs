@@ -7,10 +7,11 @@
  */
 package org.opentcs.strategies.basic.dispatching.rerouting;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -25,7 +26,8 @@ import org.slf4j.LoggerFactory;
  * An abstract implementation of {@link ReroutingStrategy} defining the basic rerouting algorithm.
  */
 public abstract class AbstractReroutingStrategy
-    implements ReroutingStrategy {
+    implements
+      ReroutingStrategy {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractReroutingStrategy.class);
   private final Router router;
@@ -39,9 +41,11 @@ public abstract class AbstractReroutingStrategy
    * @param objectService The object service to use.
    * @param driveOrderMerger Used to restore drive order history for a newly computed route.
    */
-  protected AbstractReroutingStrategy(Router router,
-                                      TCSObjectService objectService,
-                                      DriveOrderMerger driveOrderMerger) {
+  protected AbstractReroutingStrategy(
+      Router router,
+      TCSObjectService objectService,
+      DriveOrderMerger driveOrderMerger
+  ) {
     this.router = requireNonNull(router, "router");
     this.objectService = requireNonNull(objectService, "objectService");
     this.driveOrderMerger = requireNonNull(driveOrderMerger, "driveOrderMerger");
@@ -49,14 +53,18 @@ public abstract class AbstractReroutingStrategy
 
   @Override
   public Optional<List<DriveOrder>> reroute(Vehicle vehicle) {
-    TransportOrder currentTransportOrder = objectService.fetchObject(TransportOrder.class,
-                                                                     vehicle.getTransportOrder());
+    TransportOrder currentTransportOrder = objectService.fetchObject(
+        TransportOrder.class,
+        vehicle.getTransportOrder()
+    );
 
     LOG.debug("{}: Determining the reroute source...", vehicle.getName());
     Optional<Point> optRerouteSource = determineRerouteSource(vehicle);
     if (optRerouteSource.isEmpty()) {
-      LOG.warn("{}: Could not determine the reroute source. Not trying to reroute.",
-               vehicle.getName());
+      LOG.warn(
+          "{}: Could not determine the reroute source. Not trying to reroute.",
+          vehicle.getName()
+      );
       return Optional.empty();
     }
     Point rerouteSource = optRerouteSource.get();
@@ -72,10 +80,12 @@ public abstract class AbstractReroutingStrategy
     }
 
     List<DriveOrder> newDriveOrders = optOrders.get();
-    LOG.debug("Found a new route for {} from point {}: {}",
-              vehicle.getName(),
-              rerouteSource.getName(),
-              newDriveOrders);
+    LOG.debug(
+        "Found a new route for {} from point {}: {}",
+        vehicle.getName(),
+        rerouteSource.getName(),
+        newDriveOrders
+    );
     restoreCurrentDriveOrderHistory(newDriveOrders, vehicle, currentTransportOrder, rerouteSource);
 
     return Optional.of(newDriveOrders);
@@ -116,15 +126,21 @@ public abstract class AbstractReroutingStrategy
    * @return If rerouting is possible, an {@link Optional} containing the rerouted list of drive
    * orders, otherwise {@link Optional#EMPTY}.
    */
-  private Optional<List<DriveOrder>> tryReroute(Vehicle vehicle,
-                                                List<DriveOrder> driveOrders,
-                                                Point sourcePoint) {
-    LOG.debug("Trying to reroute drive orders for {} from {}. Current drive orders: {}",
-              vehicle.getName(),
-              sourcePoint,
-              driveOrders);
-    TransportOrder vehicleOrder = objectService.fetchObject(TransportOrder.class,
-                                                            vehicle.getTransportOrder());
+  private Optional<List<DriveOrder>> tryReroute(
+      Vehicle vehicle,
+      List<DriveOrder> driveOrders,
+      Point sourcePoint
+  ) {
+    LOG.debug(
+        "Trying to reroute drive orders for {} from {}. Current drive orders: {}",
+        vehicle.getName(),
+        sourcePoint,
+        driveOrders
+    );
+    TransportOrder vehicleOrder = objectService.fetchObject(
+        TransportOrder.class,
+        vehicle.getTransportOrder()
+    );
     return router.getRoute(
         vehicle,
         sourcePoint,
@@ -133,10 +149,12 @@ public abstract class AbstractReroutingStrategy
     );
   }
 
-  private void restoreCurrentDriveOrderHistory(List<DriveOrder> newDriveOrders,
-                                               Vehicle vehicle,
-                                               TransportOrder originalOrder,
-                                               Point rerouteSource) {
+  private void restoreCurrentDriveOrderHistory(
+      List<DriveOrder> newDriveOrders,
+      Vehicle vehicle,
+      TransportOrder originalOrder,
+      Point rerouteSource
+  ) {
     // If the vehicle is currently not processing a (drive) order or waiting to get the next
     // drive order (i.e. if it's idle) there is nothing to be restored.
     if (vehicle.hasProcState(Vehicle.ProcState.IDLE)) {
@@ -152,10 +170,12 @@ public abstract class AbstractReroutingStrategy
     else {
       // Restore the current drive order's history
       DriveOrder newCurrentOrder
-          = driveOrderMerger.mergeDriveOrders(originalOrder.getCurrentDriveOrder(),
-                                              newDriveOrders.get(0),
-                                              originalOrder.getCurrentRouteStepIndex(),
-                                              vehicle);
+          = driveOrderMerger.mergeDriveOrders(
+              originalOrder.getCurrentDriveOrder(),
+              newDriveOrders.get(0),
+              originalOrder.getCurrentRouteStepIndex(),
+              vehicle
+          );
       newDriveOrders.set(0, newCurrentOrder);
     }
   }

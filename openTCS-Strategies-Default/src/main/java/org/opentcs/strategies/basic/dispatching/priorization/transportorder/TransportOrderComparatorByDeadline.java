@@ -15,7 +15,8 @@ import org.opentcs.data.order.TransportOrder;
  * Note: this comparator imposes orderings that are inconsistent with equals.
  */
 public class TransportOrderComparatorByDeadline
-    implements Comparator<TransportOrder> {
+    implements
+      Comparator<TransportOrder> {
 
   /**
    * A key used for selecting this comparator in a configuration setting.

@@ -16,7 +16,8 @@ import javax.swing.table.TableModel;
  * A table for transport orders.
  */
 public class OrdersTable
-    extends JTable {
+    extends
+      JTable {
 
   /**
    * Creates a new instance of OrdersTable.

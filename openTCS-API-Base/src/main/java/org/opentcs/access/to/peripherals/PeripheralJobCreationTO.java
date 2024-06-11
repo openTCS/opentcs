@@ -7,19 +7,22 @@
  */
 package org.opentcs.access.to.peripherals;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.to.CreationTO;
 
 /**
  * A transfer object describing a peripheral job.
  */
 public class PeripheralJobCreationTO
-    extends CreationTO
-    implements Serializable {
+    extends
+      CreationTO
+    implements
+      Serializable {
 
   /**
    * Indicates whether the name is incomplete and requires to be completed when creating the actual
@@ -58,9 +61,14 @@ public class PeripheralJobCreationTO
    * @param reservationToken The reservation token to be used.
    * @param peripheralOperation The peripheral operation to be performed.
    */
-  public PeripheralJobCreationTO(@Nonnull String name,
-                                 @Nonnull String reservationToken,
-                                 @Nonnull PeripheralOperationCreationTO peripheralOperation) {
+  public PeripheralJobCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      String reservationToken,
+      @Nonnull
+      PeripheralOperationCreationTO peripheralOperation
+  ) {
     super(name);
     this.incompleteName = false;
     this.reservationToken = requireNonNull(reservationToken, "reservationToken");
@@ -69,13 +77,21 @@ public class PeripheralJobCreationTO
     this.peripheralOperation = requireNonNull(peripheralOperation, "peripheralOperation");
   }
 
-  private PeripheralJobCreationTO(@Nonnull String name,
-                                  @Nonnull Map<String, String> properties,
-                                  boolean incompleteName,
-                                  @Nonnull String reservationToken,
-                                  @Nullable String relatedVehicleName,
-                                  @Nullable String relatedTransportOrderName,
-                                  @Nonnull PeripheralOperationCreationTO peripheralOperation) {
+  private PeripheralJobCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      Map<String, String> properties,
+      boolean incompleteName,
+      @Nonnull
+      String reservationToken,
+      @Nullable
+      String relatedVehicleName,
+      @Nullable
+      String relatedTransportOrderName,
+      @Nonnull
+      PeripheralOperationCreationTO peripheralOperation
+  ) {
     super(name, properties);
     this.incompleteName = incompleteName;
     this.reservationToken = requireNonNull(reservationToken, "reservationToken");
@@ -85,36 +101,53 @@ public class PeripheralJobCreationTO
   }
 
   @Override
-  public PeripheralJobCreationTO withName(@Nonnull String name) {
-    return new PeripheralJobCreationTO(name,
-                                       getModifiableProperties(),
-                                       incompleteName,
-                                       reservationToken,
-                                       relatedVehicleName,
-                                       relatedTransportOrderName,
-                                       peripheralOperation);
+  public PeripheralJobCreationTO withName(
+      @Nonnull
+      String name
+  ) {
+    return new PeripheralJobCreationTO(
+        name,
+        getModifiableProperties(),
+        incompleteName,
+        reservationToken,
+        relatedVehicleName,
+        relatedTransportOrderName,
+        peripheralOperation
+    );
   }
 
   @Override
-  public PeripheralJobCreationTO withProperties(@Nonnull Map<String, String> properties) {
-    return new PeripheralJobCreationTO(getName(),
-                                       properties,
-                                       incompleteName,
-                                       reservationToken,
-                                       relatedVehicleName,
-                                       relatedTransportOrderName,
-                                       peripheralOperation);
+  public PeripheralJobCreationTO withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
+    return new PeripheralJobCreationTO(
+        getName(),
+        properties,
+        incompleteName,
+        reservationToken,
+        relatedVehicleName,
+        relatedTransportOrderName,
+        peripheralOperation
+    );
   }
 
   @Override
-  public PeripheralJobCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new PeripheralJobCreationTO(getName(),
-                                       propertiesWith(key, value),
-                                       incompleteName,
-                                       reservationToken,
-                                       relatedVehicleName,
-                                       relatedTransportOrderName,
-                                       peripheralOperation);
+  public PeripheralJobCreationTO withProperty(
+      @Nonnull
+      String key,
+      @Nonnull
+      String value
+  ) {
+    return new PeripheralJobCreationTO(
+        getName(),
+        propertiesWith(key, value),
+        incompleteName,
+        reservationToken,
+        relatedVehicleName,
+        relatedTransportOrderName,
+        peripheralOperation
+    );
   }
 
   /**
@@ -136,13 +169,15 @@ public class PeripheralJobCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public PeripheralJobCreationTO withIncompleteName(boolean incompleteName) {
-    return new PeripheralJobCreationTO(getName(),
-                                       getModifiableProperties(),
-                                       incompleteName,
-                                       reservationToken,
-                                       relatedVehicleName,
-                                       relatedTransportOrderName,
-                                       peripheralOperation);
+    return new PeripheralJobCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        reservationToken,
+        relatedVehicleName,
+        relatedTransportOrderName,
+        peripheralOperation
+    );
   }
 
   /**
@@ -161,13 +196,15 @@ public class PeripheralJobCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public PeripheralJobCreationTO withReservationToken(String reservationToken) {
-    return new PeripheralJobCreationTO(getName(),
-                                       getModifiableProperties(),
-                                       incompleteName,
-                                       reservationToken,
-                                       relatedVehicleName,
-                                       relatedTransportOrderName,
-                                       peripheralOperation);
+    return new PeripheralJobCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        reservationToken,
+        relatedVehicleName,
+        relatedTransportOrderName,
+        peripheralOperation
+    );
   }
 
   /**
@@ -186,14 +223,19 @@ public class PeripheralJobCreationTO
    * @param relatedVehicleName The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public PeripheralJobCreationTO withRelatedVehicleName(@Nullable String relatedVehicleName) {
-    return new PeripheralJobCreationTO(getName(),
-                                       getModifiableProperties(),
-                                       incompleteName,
-                                       reservationToken,
-                                       relatedVehicleName,
-                                       relatedTransportOrderName,
-                                       peripheralOperation);
+  public PeripheralJobCreationTO withRelatedVehicleName(
+      @Nullable
+      String relatedVehicleName
+  ) {
+    return new PeripheralJobCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        reservationToken,
+        relatedVehicleName,
+        relatedTransportOrderName,
+        peripheralOperation
+    );
   }
 
   /**
@@ -213,14 +255,18 @@ public class PeripheralJobCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public PeripheralJobCreationTO withRelatedTransportOrderName(
-      @Nullable String relatedTransportOrderName) {
-    return new PeripheralJobCreationTO(getName(),
-                                       getModifiableProperties(),
-                                       incompleteName,
-                                       reservationToken,
-                                       relatedVehicleName,
-                                       relatedTransportOrderName,
-                                       peripheralOperation);
+      @Nullable
+      String relatedTransportOrderName
+  ) {
+    return new PeripheralJobCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        reservationToken,
+        relatedVehicleName,
+        relatedTransportOrderName,
+        peripheralOperation
+    );
   }
 
   /**
@@ -239,13 +285,16 @@ public class PeripheralJobCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public PeripheralJobCreationTO withPeripheralOperation(
-      PeripheralOperationCreationTO peripheralOperation) {
-    return new PeripheralJobCreationTO(getName(),
-                                       getModifiableProperties(),
-                                       incompleteName,
-                                       reservationToken,
-                                       relatedVehicleName,
-                                       relatedTransportOrderName,
-                                       peripheralOperation);
+      PeripheralOperationCreationTO peripheralOperation
+  ) {
+    return new PeripheralJobCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        reservationToken,
+        relatedVehicleName,
+        relatedTransportOrderName,
+        peripheralOperation
+    );
   }
 }

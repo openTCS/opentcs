@@ -28,7 +28,8 @@ import org.slf4j.LoggerFactory;
 /**
  */
 public class ModelToLayoutCoordinateUndoActivity
-    extends CoordinateUndoActivity {
+    extends
+      CoordinateUndoActivity {
 
   /**
    * This class's logger.
@@ -37,8 +38,11 @@ public class ModelToLayoutCoordinateUndoActivity
       = LoggerFactory.getLogger(ModelToLayoutCoordinateUndoActivity.class);
 
   @Inject
-  public ModelToLayoutCoordinateUndoActivity(@Assisted CoordinateProperty property,
-                                             ModelManager modelManager) {
+  public ModelToLayoutCoordinateUndoActivity(
+      @Assisted
+      CoordinateProperty property,
+      ModelManager modelManager
+  ) {
     super(property, modelManager);
   }
 

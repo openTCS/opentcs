@@ -17,10 +17,13 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property that contains a list of envelopes.
  */
 public class EnvelopesProperty
-    extends AbstractComplexProperty {
+    extends
+      AbstractComplexProperty {
 
-  public EnvelopesProperty(ModelComponent model,
-                           List<EnvelopeModel> envelopes) {
+  public EnvelopesProperty(
+      ModelComponent model,
+      List<EnvelopeModel> envelopes
+  ) {
     super(model);
     fValue = envelopes;
   }

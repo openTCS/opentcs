@@ -13,6 +13,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.LocationCreationTO;
@@ -47,17 +48,23 @@ class PeripheralJobPoolManagerTest {
   void setUp() {
     objectRepo = new TCSObjectRepository();
     plantModelManager = new PlantModelManager(objectRepo, new SimpleEventBus());
-    jobPoolManager = new PeripheralJobPoolManager(objectRepo,
-                                                  new SimpleEventBus(),
-                                                  new PrefixedUlidObjectNameProvider());
+    jobPoolManager = new PeripheralJobPoolManager(
+        objectRepo,
+        new SimpleEventBus(),
+        new PrefixedUlidObjectNameProvider()
+    );
 
     // Set up a minimal plant model.
     plantModelManager.createPlantModelObjects(
         new PlantModelCreationTO("some-plant-model")
             .withLocationType(new LocationTypeCreationTO("some-location-type"))
-            .withLocation(new LocationCreationTO("some-location",
-                                                 "some-location-type",
-                                                 new Triple(1, 2, 3)))
+            .withLocation(
+                new LocationCreationTO(
+                    "some-location",
+                    "some-location-type",
+                    new Triple(1, 2, 3)
+                )
+            )
     );
   }
 
@@ -103,6 +110,7 @@ class PeripheralJobPoolManagerTest {
                       .withCompletionRequired(true)
               )
           );
-        });
+        }
+    );
   }
 }

@@ -7,9 +7,12 @@
  */
 package org.opentcs.common;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+import static org.opentcs.util.Assertions.checkState;
+
 import java.util.Collection;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -18,14 +21,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
-import static org.opentcs.util.Assertions.checkArgument;
-import static org.opentcs.util.Assertions.checkState;
 
 /**
  * An executor service that executes all task directly on the same thread.
  */
 public class SameThreadExecutorService
-    implements ExecutorService {
+    implements
+      ExecutorService {
 
   private boolean shutdown;
 
@@ -108,7 +110,8 @@ public class SameThreadExecutorService
 
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> tasks)
-      throws InterruptedException, ExecutionException {
+      throws InterruptedException,
+        ExecutionException {
     requireNonNull(tasks, "tasks");
     checkArgument(tasks.isEmpty(), "tasks is empty");
     if (tasks.stream().anyMatch(task -> task == null)) {
@@ -138,7 +141,9 @@ public class SameThreadExecutorService
 
   @Override
   public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
-      throws InterruptedException, ExecutionException, TimeoutException {
+      throws InterruptedException,
+        ExecutionException,
+        TimeoutException {
     return invokeAny(tasks);
   }
 

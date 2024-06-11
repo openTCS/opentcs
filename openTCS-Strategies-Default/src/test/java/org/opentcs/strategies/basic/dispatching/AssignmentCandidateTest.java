@@ -7,11 +7,12 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
-import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.comparesEqualTo;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.model.Point;
@@ -45,10 +46,13 @@ class AssignmentCandidateTest {
 
     Exception exception = assertThrows(
         IllegalArgumentException.class, () -> {
-          AssignmentCandidate assignmentCandidate = new AssignmentCandidate(vehicle,
-                                                                            transportOrder,
-                                                                            driveOrders);
-        });
+          AssignmentCandidate assignmentCandidate = new AssignmentCandidate(
+              vehicle,
+              transportOrder,
+              driveOrders
+          );
+        }
+    );
 
     assertThat(exception.getMessage(), containsString("driveOrders is empty"));
   }
@@ -57,10 +61,13 @@ class AssignmentCandidateTest {
   void exceptionWhenRouteEmpty() {
     Exception exception = assertThrows(
         IllegalArgumentException.class, () -> {
-          AssignmentCandidate assignmentCandidate = new AssignmentCandidate(vehicle,
-                                                                            transportOrder,
-                                                                            driveOrders);
-        });
+          AssignmentCandidate assignmentCandidate = new AssignmentCandidate(
+              vehicle,
+              transportOrder,
+              driveOrders
+          );
+        }
+    );
 
     assertThat(exception.getMessage(), containsString("a drive order's route is null"));
   }
@@ -83,9 +90,11 @@ class AssignmentCandidateTest {
     driveOrder2 = driveOrder2.withRoute(route2);
     driveOrders = List.of(driveOrder1, driveOrder2);
 
-    AssignmentCandidate assignmentCandidate = new AssignmentCandidate(vehicle,
-                                                                      transportOrder,
-                                                                      driveOrders);
+    AssignmentCandidate assignmentCandidate = new AssignmentCandidate(
+        vehicle,
+        transportOrder,
+        driveOrders
+    );
 
     assertThat(assignmentCandidate.getCompleteRoutingCosts(), comparesEqualTo(6912L));
   }

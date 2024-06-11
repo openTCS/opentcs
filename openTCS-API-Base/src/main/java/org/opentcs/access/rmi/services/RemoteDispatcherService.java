@@ -31,20 +31,25 @@ import org.opentcs.data.order.TransportOrder;
  * </p>
  */
 public interface RemoteDispatcherService
-    extends Remote {
+    extends
+      Remote {
 
   // CHECKSTYLE:OFF
   void dispatch(ClientID clientId)
       throws RemoteException;
 
-  void withdrawByVehicle(ClientID clientId,
-                         TCSObjectReference<Vehicle> ref,
-                         boolean immediateAbort)
+  void withdrawByVehicle(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      boolean immediateAbort
+  )
       throws RemoteException;
 
-  void withdrawByTransportOrder(ClientID clientId,
-                                TCSObjectReference<TransportOrder> ref,
-                                boolean immediateAbort)
+  void withdrawByTransportOrder(
+      ClientID clientId,
+      TCSObjectReference<TransportOrder> ref,
+      boolean immediateAbort
+  )
       throws RemoteException;
 
   void reroute(ClientID clientId, TCSObjectReference<Vehicle> ref, ReroutingType reroutingType)

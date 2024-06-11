@@ -20,7 +20,8 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
  * A status message containing details about a transport order.
  */
 public class OrderStatusMessage
-    extends StatusMessage {
+    extends
+      StatusMessage {
 
   private String orderName;
 
@@ -93,20 +94,25 @@ public class OrderStatusMessage
     return this;
   }
 
-  public static OrderStatusMessage fromTransportOrder(TransportOrder order,
-                                                      long sequenceNumber) {
+  public static OrderStatusMessage fromTransportOrder(
+      TransportOrder order,
+      long sequenceNumber
+  ) {
     return fromTransportOrder(order, sequenceNumber, Instant.now());
   }
 
-  public static OrderStatusMessage fromTransportOrder(TransportOrder order,
-                                                      long sequenceNumber,
-                                                      Instant creationTimeStamp) {
+  public static OrderStatusMessage fromTransportOrder(
+      TransportOrder order,
+      long sequenceNumber,
+      Instant creationTimeStamp
+  ) {
     OrderStatusMessage orderMessage = new OrderStatusMessage();
     orderMessage.setSequenceNumber(sequenceNumber);
     orderMessage.setCreationTimeStamp(creationTimeStamp);
     orderMessage.setOrderName(order.getName());
     orderMessage.setProcessingVehicleName(
-        order.getProcessingVehicle() == null ? null : order.getProcessingVehicle().getName());
+        order.getProcessingVehicle() == null ? null : order.getProcessingVehicle().getName()
+    );
     orderMessage.setOrderState(OrderState.fromTransportOrderState(order.getState()));
     for (DriveOrder curDriveOrder : order.getAllDriveOrders()) {
       orderMessage.getDestinations().add(DestinationState.fromDriveOrder(curDriveOrder));

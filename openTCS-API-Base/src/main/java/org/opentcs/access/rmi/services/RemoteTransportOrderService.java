@@ -33,8 +33,9 @@ import org.opentcs.data.order.TransportOrder;
  * </p>
  */
 public interface RemoteTransportOrderService
-    extends RemoteTCSObjectService,
-            Remote {
+    extends
+      RemoteTCSObjectService,
+      Remote {
 
   // CHECKSTYLE:OFF
   OrderSequence createOrderSequence(ClientID clientId, OrderSequenceCreationTO to)
@@ -46,9 +47,11 @@ public interface RemoteTransportOrderService
   void markOrderSequenceComplete(ClientID clientId, TCSObjectReference<OrderSequence> ref)
       throws RemoteException;
 
-  void updateTransportOrderIntendedVehicle(ClientID clientId,
-                                           TCSObjectReference<TransportOrder> orderRef,
-                                           TCSObjectReference<Vehicle> vehicleRef)
+  void updateTransportOrderIntendedVehicle(
+      ClientID clientId,
+      TCSObjectReference<TransportOrder> orderRef,
+      TCSObjectReference<Vehicle> vehicleRef
+  )
       throws RemoteException;
   // CHECKSTYLE:ON
 }

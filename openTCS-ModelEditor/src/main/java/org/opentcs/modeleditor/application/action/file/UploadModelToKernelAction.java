@@ -7,21 +7,23 @@
  */
 package org.opentcs.modeleditor.application.action.file;
 
+import static javax.swing.Action.ACCELERATOR_KEY;
+import static javax.swing.Action.MNEMONIC_KEY;
+import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.MENU_PATH;
+
 import java.awt.event.ActionEvent;
 import java.util.Objects;
 import javax.swing.AbstractAction;
-import static javax.swing.Action.ACCELERATOR_KEY;
-import static javax.swing.Action.MNEMONIC_KEY;
 import javax.swing.KeyStroke;
 import org.opentcs.modeleditor.application.OpenTCSView;
-import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.MENU_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action to upload the (local) model to the kernel.
  */
 public class UploadModelToKernelAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action's ID.

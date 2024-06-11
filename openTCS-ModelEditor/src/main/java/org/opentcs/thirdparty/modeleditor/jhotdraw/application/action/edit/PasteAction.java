@@ -3,18 +3,19 @@
  */
 package org.opentcs.thirdparty.modeleditor.jhotdraw.application.action.edit;
 
-import java.awt.Component;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.ActionEvent;
 import static javax.swing.Action.ACCELERATOR_KEY;
 import static javax.swing.Action.LARGE_ICON_KEY;
 import static javax.swing.Action.SMALL_ICON;
+import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.MENU_PATH;
+
+import java.awt.Component;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import org.opentcs.guing.common.components.EditableComponent;
 import org.opentcs.guing.common.util.ImageDirectory;
-import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.MENU_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
@@ -27,7 +28,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * @author Werner Randelshofer
  */
 public class PasteAction
-    extends org.jhotdraw.app.action.edit.AbstractSelectionAction {
+    extends
+      org.jhotdraw.app.action.edit.AbstractSelectionAction {
 
   /**
    * This action's ID.

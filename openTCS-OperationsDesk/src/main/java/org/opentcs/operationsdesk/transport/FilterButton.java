@@ -17,7 +17,8 @@ import javax.swing.table.TableModel;
  * A button for filtering table entries.
  */
 public class FilterButton
-    extends JToggleButton {
+    extends
+      JToggleButton {
 
   /**
    * The sorter to apply the filter to.
@@ -36,9 +37,11 @@ public class FilterButton
    * @param sorter The row sorter to apply the filter to.
    */
   @SuppressWarnings("this-escape")
-  public FilterButton(ImageIcon icon,
-                      RowFilter<Object, Object> filter,
-                      FilteredRowSorter<? extends TableModel> sorter) {
+  public FilterButton(
+      ImageIcon icon,
+      RowFilter<Object, Object> filter,
+      FilteredRowSorter<? extends TableModel> sorter
+  ) {
     super(icon);
     this.sorter = sorter;
     this.filter = filter;

@@ -7,13 +7,14 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
-import jakarta.annotation.Nullable;
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
-import java.util.Set;
 import static org.opentcs.components.kernel.Dispatcher.PROPKEY_ASSIGNED_PARKING_POSITION;
 import static org.opentcs.components.kernel.Dispatcher.PROPKEY_PREFERRED_PARKING_POSITION;
+
+import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
+import java.util.Optional;
+import java.util.Set;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Point;
@@ -27,7 +28,8 @@ import org.slf4j.LoggerFactory;
  * parked vehicle's current position.
  */
 public class DefaultParkingPositionSupplier
-    extends AbstractParkingPositionSupplier {
+    extends
+      AbstractParkingPositionSupplier {
 
   /**
    * This class's Logger.
@@ -41,8 +43,10 @@ public class DefaultParkingPositionSupplier
    * @param router A router for computing travel costs to parking positions.
    */
   @Inject
-  public DefaultParkingPositionSupplier(InternalPlantModelService plantModelService,
-                                        Router router) {
+  public DefaultParkingPositionSupplier(
+      InternalPlantModelService plantModelService,
+      Router router
+  ) {
     super(plantModelService, router);
   }
 
@@ -79,10 +83,12 @@ public class DefaultParkingPositionSupplier
     }
 
     Point nearestPoint = nearestPoint(vehicle, parkingPosCandidates);
-    LOG.debug("Selected parking position {} for vehicle {} from candidates {}.",
-              nearestPoint,
-              vehicle.getName(),
-              parkingPosCandidates);
+    LOG.debug(
+        "Selected parking position {} for vehicle {} from candidates {}.",
+        nearestPoint,
+        vehicle.getName(),
+        parkingPosCandidates
+    );
     return Optional.ofNullable(nearestPoint);
   }
 

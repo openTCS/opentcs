@@ -7,11 +7,12 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.candidates;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.TransportOrder;
@@ -27,7 +28,8 @@ import org.slf4j.LoggerFactory;
  * vehicle.
  */
 public class IsProcessable
-    implements AssignmentCandidateSelectionFilter {
+    implements
+      AssignmentCandidateSelectionFilter {
 
   /**
    * An error code indicating that there's a conflict between the type of a transport order and
@@ -55,8 +57,10 @@ public class IsProcessable
 
   @Override
   public Collection<String> apply(AssignmentCandidate candidate) {
-    ExplainedBoolean result = checkProcessability(candidate.getVehicle(),
-                                                  candidate.getTransportOrder());
+    ExplainedBoolean result = checkProcessability(
+        candidate.getVehicle(),
+        candidate.getTransportOrder()
+    );
     return result.getValue()
         ? new ArrayList<>()
         : Arrays.asList(candidate.getVehicle().getName() + "(" + result.getReason() + ")");
@@ -76,11 +80,13 @@ public class IsProcessable
     // Check for matching order types
     if (!vehicle.getAllowedOrderTypes().contains(OrderConstants.TYPE_ANY)
         && !vehicle.getAllowedOrderTypes().contains(order.getType())) {
-      LOG.debug("Type '{}' of order '{}' not in allowed types '{}' of vehicle '{}'.",
-                order.getType(),
-                order.getName(),
-                vehicle.getAllowedOrderTypes(),
-                vehicle.getName());
+      LOG.debug(
+          "Type '{}' of order '{}' not in allowed types '{}' of vehicle '{}'.",
+          order.getType(),
+          order.getName(),
+          vehicle.getAllowedOrderTypes(),
+          vehicle.getName()
+      );
       return new ExplainedBoolean(false, ORDER_TYPE_CONFLICT);
     }
 

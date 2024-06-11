@@ -7,6 +7,8 @@
  */
 package org.opentcs.access.to.order;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.Serializable;
@@ -14,7 +16,6 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.order.OrderConstants;
@@ -23,8 +24,10 @@ import org.opentcs.data.order.OrderConstants;
  * A transfer object describing a transport order.
  */
 public class TransportOrderCreationTO
-    extends CreationTO
-    implements Serializable {
+    extends
+      CreationTO
+    implements
+      Serializable {
 
   /**
    * Indicates whether the name is incomplete and requires to be completed when creating the actual
@@ -78,8 +81,12 @@ public class TransportOrderCreationTO
    * @param name The name of this transport order.
    * @param destinations The destinations that need to be travelled to.
    */
-  public TransportOrderCreationTO(@Nonnull String name,
-                                  @Nonnull List<DestinationCreationTO> destinations) {
+  public TransportOrderCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      List<DestinationCreationTO> destinations
+  ) {
     super(name);
     this.incompleteName = false;
     this.destinations = requireNonNull(destinations, "destinations");
@@ -92,17 +99,28 @@ public class TransportOrderCreationTO
     this.dispensable = false;
   }
 
-  private TransportOrderCreationTO(@Nonnull String name,
-                                   @Nonnull Map<String, String> properties,
-                                   boolean incompleteName,
-                                   @Nonnull List<DestinationCreationTO> destinations,
-                                   @Nullable String peripheralReservationToken,
-                                   @Nullable String wrappingSequence,
-                                   @Nonnull Set<String> dependencyNames,
-                                   @Nullable String intendedVehicleName,
-                                   @Nonnull String type,
-                                   @Nonnull Instant deadline,
-                                   boolean dispensable) {
+  private TransportOrderCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      Map<String, String> properties,
+      boolean incompleteName,
+      @Nonnull
+      List<DestinationCreationTO> destinations,
+      @Nullable
+      String peripheralReservationToken,
+      @Nullable
+      String wrappingSequence,
+      @Nonnull
+      Set<String> dependencyNames,
+      @Nullable
+      String intendedVehicleName,
+      @Nonnull
+      String type,
+      @Nonnull
+      Instant deadline,
+      boolean dispensable
+  ) {
     super(name, properties);
     this.incompleteName = incompleteName;
     this.destinations = requireNonNull(destinations, "destinations");
@@ -122,18 +140,23 @@ public class TransportOrderCreationTO
    * @return A copy of this object, differing in the given name.
    */
   @Override
-  public TransportOrderCreationTO withName(@Nonnull String name) {
-    return new TransportOrderCreationTO(name,
-                                        getModifiableProperties(),
-                                        incompleteName,
-                                        destinations,
-                                        peripheralReservationToken,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        type,
-                                        deadline,
-                                        dispensable);
+  public TransportOrderCreationTO withName(
+      @Nonnull
+      String name
+  ) {
+    return new TransportOrderCreationTO(
+        name,
+        getModifiableProperties(),
+        incompleteName,
+        destinations,
+        peripheralReservationToken,
+        wrappingSequence,
+        dependencyNames,
+        intendedVehicleName,
+        type,
+        deadline,
+        dispensable
+    );
   }
 
   /**
@@ -143,18 +166,23 @@ public class TransportOrderCreationTO
    * @return A copy of this object, differing in the given value.
    */
   @Override
-  public TransportOrderCreationTO withProperties(@Nonnull Map<String, String> properties) {
-    return new TransportOrderCreationTO(getName(),
-                                        properties,
-                                        incompleteName,
-                                        destinations,
-                                        peripheralReservationToken,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        type,
-                                        deadline,
-                                        dispensable);
+  public TransportOrderCreationTO withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
+    return new TransportOrderCreationTO(
+        getName(),
+        properties,
+        incompleteName,
+        destinations,
+        peripheralReservationToken,
+        wrappingSequence,
+        dependencyNames,
+        intendedVehicleName,
+        type,
+        deadline,
+        dispensable
+    );
   }
 
   /**
@@ -168,18 +196,25 @@ public class TransportOrderCreationTO
    * excludes the entry otherwise.
    */
   @Override
-  public TransportOrderCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new TransportOrderCreationTO(getName(),
-                                        propertiesWith(key, value),
-                                        incompleteName,
-                                        destinations,
-                                        peripheralReservationToken,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        type,
-                                        deadline,
-                                        dispensable);
+  public TransportOrderCreationTO withProperty(
+      @Nonnull
+      String key,
+      @Nonnull
+      String value
+  ) {
+    return new TransportOrderCreationTO(
+        getName(),
+        propertiesWith(key, value),
+        incompleteName,
+        destinations,
+        peripheralReservationToken,
+        wrappingSequence,
+        dependencyNames,
+        intendedVehicleName,
+        type,
+        deadline,
+        dispensable
+    );
   }
 
   /**
@@ -203,17 +238,19 @@ public class TransportOrderCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrderCreationTO withIncompleteName(boolean incompleteName) {
-    return new TransportOrderCreationTO(getName(),
-                                        getModifiableProperties(),
-                                        incompleteName,
-                                        destinations,
-                                        peripheralReservationToken,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        type,
-                                        deadline,
-                                        dispensable);
+    return new TransportOrderCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        destinations,
+        peripheralReservationToken,
+        wrappingSequence,
+        dependencyNames,
+        intendedVehicleName,
+        type,
+        deadline,
+        dispensable
+    );
   }
 
   /**
@@ -233,19 +270,22 @@ public class TransportOrderCreationTO
    * @return A copy of this object, differing in the given derstinations.
    */
   public TransportOrderCreationTO withDestinations(
-      @Nonnull List<DestinationCreationTO> destinations
+      @Nonnull
+      List<DestinationCreationTO> destinations
   ) {
-    return new TransportOrderCreationTO(getName(),
-                                        getModifiableProperties(),
-                                        incompleteName,
-                                        destinations,
-                                        peripheralReservationToken,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        type,
-                                        deadline,
-                                        dispensable);
+    return new TransportOrderCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        destinations,
+        peripheralReservationToken,
+        wrappingSequence,
+        dependencyNames,
+        intendedVehicleName,
+        type,
+        deadline,
+        dispensable
+    );
   }
 
   /**
@@ -267,18 +307,22 @@ public class TransportOrderCreationTO
    * @return A copy of this object, differing in the given peripheral reservation token.
    */
   public TransportOrderCreationTO withPeripheralReservationToken(
-      @Nullable String peripheralReservationToken) {
-    return new TransportOrderCreationTO(getName(),
-                                        getModifiableProperties(),
-                                        incompleteName,
-                                        destinations,
-                                        peripheralReservationToken,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        type,
-                                        deadline,
-                                        dispensable);
+      @Nullable
+      String peripheralReservationToken
+  ) {
+    return new TransportOrderCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        destinations,
+        peripheralReservationToken,
+        wrappingSequence,
+        dependencyNames,
+        intendedVehicleName,
+        type,
+        deadline,
+        dispensable
+    );
   }
 
   /**
@@ -298,18 +342,23 @@ public class TransportOrderCreationTO
    * @param wrappingSequence The name of the sequence.
    * @return A copy of this object, differing in the given name of the sequence.
    */
-  public TransportOrderCreationTO withWrappingSequence(@Nullable String wrappingSequence) {
-    return new TransportOrderCreationTO(getName(),
-                                        getModifiableProperties(),
-                                        incompleteName,
-                                        destinations,
-                                        peripheralReservationToken,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        type,
-                                        deadline,
-                                        dispensable);
+  public TransportOrderCreationTO withWrappingSequence(
+      @Nullable
+      String wrappingSequence
+  ) {
+    return new TransportOrderCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        destinations,
+        peripheralReservationToken,
+        wrappingSequence,
+        dependencyNames,
+        intendedVehicleName,
+        type,
+        deadline,
+        dispensable
+    );
   }
 
   /**
@@ -329,18 +378,23 @@ public class TransportOrderCreationTO
    * @param dependencyNames The dependency names.
    * @return A copy of this object, differing in the given dependency names.
    */
-  public TransportOrderCreationTO withDependencyNames(@Nonnull Set<String> dependencyNames) {
-    return new TransportOrderCreationTO(getName(),
-                                        getModifiableProperties(),
-                                        incompleteName,
-                                        destinations,
-                                        peripheralReservationToken,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        type,
-                                        deadline,
-                                        dispensable);
+  public TransportOrderCreationTO withDependencyNames(
+      @Nonnull
+      Set<String> dependencyNames
+  ) {
+    return new TransportOrderCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        destinations,
+        peripheralReservationToken,
+        wrappingSequence,
+        dependencyNames,
+        intendedVehicleName,
+        type,
+        deadline,
+        dispensable
+    );
   }
 
   /**
@@ -360,18 +414,23 @@ public class TransportOrderCreationTO
    * @param intendedVehicleName The vehicle name.
    * @return A copy of this object, differing in the given vehicle's name.
    */
-  public TransportOrderCreationTO withIntendedVehicleName(@Nullable String intendedVehicleName) {
-    return new TransportOrderCreationTO(getName(),
-                                        getModifiableProperties(),
-                                        incompleteName,
-                                        destinations,
-                                        peripheralReservationToken,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        type,
-                                        deadline,
-                                        dispensable);
+  public TransportOrderCreationTO withIntendedVehicleName(
+      @Nullable
+      String intendedVehicleName
+  ) {
+    return new TransportOrderCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        destinations,
+        peripheralReservationToken,
+        wrappingSequence,
+        dependencyNames,
+        intendedVehicleName,
+        type,
+        deadline,
+        dispensable
+    );
   }
 
   /**
@@ -390,18 +449,23 @@ public class TransportOrderCreationTO
    * @param type The type.
    * @return A copy of this object, differing in the given type.
    */
-  public TransportOrderCreationTO withType(@Nonnull String type) {
-    return new TransportOrderCreationTO(getName(),
-                                        getModifiableProperties(),
-                                        incompleteName,
-                                        destinations,
-                                        peripheralReservationToken,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        type,
-                                        deadline,
-                                        dispensable);
+  public TransportOrderCreationTO withType(
+      @Nonnull
+      String type
+  ) {
+    return new TransportOrderCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        destinations,
+        peripheralReservationToken,
+        wrappingSequence,
+        dependencyNames,
+        intendedVehicleName,
+        type,
+        deadline,
+        dispensable
+    );
   }
 
   /**
@@ -421,18 +485,23 @@ public class TransportOrderCreationTO
    * @param deadline The deadline.
    * @return A copy of this object, differing in the given deadline.
    */
-  public TransportOrderCreationTO withDeadline(@Nonnull Instant deadline) {
-    return new TransportOrderCreationTO(getName(),
-                                        getModifiableProperties(),
-                                        incompleteName,
-                                        destinations,
-                                        peripheralReservationToken,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        type,
-                                        deadline,
-                                        dispensable);
+  public TransportOrderCreationTO withDeadline(
+      @Nonnull
+      Instant deadline
+  ) {
+    return new TransportOrderCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        destinations,
+        peripheralReservationToken,
+        wrappingSequence,
+        dependencyNames,
+        intendedVehicleName,
+        type,
+        deadline,
+        dispensable
+    );
   }
 
   /**
@@ -452,16 +521,18 @@ public class TransportOrderCreationTO
    * @return A copy of this object, differing in the given dispensable flag.
    */
   public TransportOrderCreationTO withDispensable(boolean dispensable) {
-    return new TransportOrderCreationTO(getName(),
-                                        getModifiableProperties(),
-                                        incompleteName,
-                                        destinations,
-                                        peripheralReservationToken,
-                                        wrappingSequence,
-                                        dependencyNames,
-                                        intendedVehicleName,
-                                        type,
-                                        deadline,
-                                        dispensable);
+    return new TransportOrderCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        destinations,
+        peripheralReservationToken,
+        wrappingSequence,
+        dependencyNames,
+        intendedVehicleName,
+        type,
+        deadline,
+        dispensable
+    );
   }
 }

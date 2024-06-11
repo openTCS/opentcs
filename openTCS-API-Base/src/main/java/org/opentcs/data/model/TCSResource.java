@@ -20,8 +20,10 @@ import org.opentcs.data.TCSObject;
  * @param <E> The actual resource class.
  */
 public abstract class TCSResource<E extends TCSResource<E>>
-    extends TCSObject<E>
-    implements Serializable {
+    extends
+      TCSObject<E>
+    implements
+      Serializable {
 
   /**
    * Creates a new TCSResource.

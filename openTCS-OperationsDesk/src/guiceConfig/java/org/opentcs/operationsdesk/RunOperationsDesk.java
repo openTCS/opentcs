@@ -87,13 +87,17 @@ public class RunOperationsDesk {
    * @return The registered/found modules.
    */
   private static List<PlantOverviewInjectionModule> findRegisteredModules(
-      ConfigurationBindingProvider bindingProvider) {
+      ConfigurationBindingProvider bindingProvider
+  ) {
     List<PlantOverviewInjectionModule> registeredModules = new ArrayList<>();
-    for (PlantOverviewInjectionModule module
-             : ServiceLoader.load(PlantOverviewInjectionModule.class)) {
-      LOG.info("Integrating injection module {} (source: {})",
-               module.getClass().getName(),
-               module.getClass().getProtectionDomain().getCodeSource());
+    for (PlantOverviewInjectionModule module : ServiceLoader.load(
+        PlantOverviewInjectionModule.class
+    )) {
+      LOG.info(
+          "Integrating injection module {} (source: {})",
+          module.getClass().getName(),
+          module.getClass().getProtectionDomain().getCodeSource()
+      );
       module.setConfigBindingProvider(bindingProvider);
       registeredModules.add(module);
     }
@@ -112,17 +116,23 @@ public class RunOperationsDesk {
 
   private static ConfigurationBindingProvider gestaltConfigurationBindingProvider() {
     return new GestaltConfigurationBindingProvider(
-        Paths.get(System.getProperty("opentcs.base", "."),
-                  "config",
-                  "opentcs-operationsdesk-defaults-baseline.properties")
+        Paths.get(
+            System.getProperty("opentcs.base", "."),
+            "config",
+            "opentcs-operationsdesk-defaults-baseline.properties"
+        )
             .toAbsolutePath(),
-        Paths.get(System.getProperty("opentcs.base", "."),
-                  "config",
-                  "opentcs-operationsdesk-defaults-custom.properties")
+        Paths.get(
+            System.getProperty("opentcs.base", "."),
+            "config",
+            "opentcs-operationsdesk-defaults-custom.properties"
+        )
             .toAbsolutePath(),
-        Paths.get(System.getProperty("opentcs.home", "."),
-                  "config",
-                  "opentcs-operationsdesk.properties")
+        Paths.get(
+            System.getProperty("opentcs.home", "."),
+            "config",
+            "opentcs-operationsdesk.properties"
+        )
             .toAbsolutePath()
     );
   }

@@ -18,7 +18,8 @@ import javax.swing.border.EmptyBorder;
  * A dialog that has a close button.
  */
 public class ClosableDialog
-    extends JDialog {
+    extends
+      JDialog {
 
   /**
    * Creates new instance.
@@ -46,6 +47,7 @@ public class ClosableDialog
     dispose();
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -78,21 +80,26 @@ public class ClosableDialog
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
-    private void buttonCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCloseActionPerformed
-      doClose();
-    }//GEN-LAST:event_buttonCloseActionPerformed
+  private void buttonCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCloseActionPerformed
+    doClose();
+  }//GEN-LAST:event_buttonCloseActionPerformed
 
   /**
    * Closes the dialog
    */
-    private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-      doClose();
-    }//GEN-LAST:event_closeDialog
+  private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
+    doClose();
+  }//GEN-LAST:event_closeDialog
 
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonClose;
     private javax.swing.JPanel panelButton;
     // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

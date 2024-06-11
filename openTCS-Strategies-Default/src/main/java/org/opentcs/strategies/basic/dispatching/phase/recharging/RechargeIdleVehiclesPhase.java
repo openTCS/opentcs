@@ -7,10 +7,11 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.recharging;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
@@ -34,7 +35,8 @@ import org.slf4j.LoggerFactory;
  * Creates recharging orders for any vehicles with a degraded energy level.
  */
 public class RechargeIdleVehiclesPhase
-    implements Phase {
+    implements
+      Phase {
 
   /**
    * This class's Logger.
@@ -77,12 +79,15 @@ public class RechargeIdleVehiclesPhase
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       CompositeRechargeVehicleSelectionFilter vehicleSelectionFilter,
       TransportOrderUtil transportOrderUtil,
-      DefaultDispatcherConfiguration configuration) {
+      DefaultDispatcherConfiguration configuration
+  ) {
     this.router = requireNonNull(router, "router");
     this.orderService = requireNonNull(orderService, "orderService");
     this.rechargePosSupplier = requireNonNull(rechargePosSupplier, "rechargePosSupplier");
-    this.assignmentCandidateSelectionFilter = requireNonNull(assignmentCandidateSelectionFilter,
-                                                             "assignmentCandidateSelectionFilter");
+    this.assignmentCandidateSelectionFilter = requireNonNull(
+        assignmentCandidateSelectionFilter,
+        "assignmentCandidateSelectionFilter"
+    );
     this.vehicleSelectionFilter = requireNonNull(vehicleSelectionFilter, "vehicleSelectionFilter");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
     this.configuration = requireNonNull(configuration, "configuration");
@@ -153,26 +158,34 @@ public class RechargeIdleVehiclesPhase
     );
 
     Point vehiclePosition = orderService.fetchObject(Point.class, vehicle.getCurrentPosition());
-    Optional<AssignmentCandidate> candidate = computeCandidate(vehicle,
-                                                               vehiclePosition,
-                                                               rechargeOrder)
+    Optional<AssignmentCandidate> candidate = computeCandidate(
+        vehicle,
+        vehiclePosition,
+        rechargeOrder
+    )
         .filter(c -> assignmentCandidateSelectionFilter.apply(c).isEmpty());
     // XXX Change this to Optional.ifPresentOrElse() once we're at Java 9+.
     if (candidate.isPresent()) {
-      transportOrderUtil.assignTransportOrder(candidate.get().getVehicle(),
-                                              candidate.get().getTransportOrder(),
-                                              candidate.get().getDriveOrders());
+      transportOrderUtil.assignTransportOrder(
+          candidate.get().getVehicle(),
+          candidate.get().getTransportOrder(),
+          candidate.get().getDriveOrders()
+      );
     }
     else {
       // Mark the order as failed, since the vehicle cannot execute it.
-      orderService.updateTransportOrderState(rechargeOrder.getReference(),
-                                             TransportOrder.State.FAILED);
+      orderService.updateTransportOrderState(
+          rechargeOrder.getReference(),
+          TransportOrder.State.FAILED
+      );
     }
   }
 
-  private Optional<AssignmentCandidate> computeCandidate(Vehicle vehicle,
-                                                         Point vehiclePosition,
-                                                         TransportOrder order) {
+  private Optional<AssignmentCandidate> computeCandidate(
+      Vehicle vehicle,
+      Point vehiclePosition,
+      TransportOrder order
+  ) {
     return router.getRoute(vehicle, vehiclePosition, order)
         .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders));
   }

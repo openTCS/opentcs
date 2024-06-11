@@ -7,10 +7,11 @@
  */
 package org.opentcs.util.persistence;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Reader;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -26,7 +27,8 @@ import org.xml.sax.SAXException;
 @XmlRootElement(name = "model")
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class ProbePlantModelTO
-    extends BasePlantModelTO {
+    extends
+      BasePlantModelTO {
 
   /**
    * Creates a new instance.
@@ -41,7 +43,10 @@ public class ProbePlantModelTO
    * @return The instance unmarshalled from the given reader.
    * @throws IOException If there was a problem unmarshalling the given string.
    */
-  public static ProbePlantModelTO fromXml(@Nonnull Reader reader)
+  public static ProbePlantModelTO fromXml(
+      @Nonnull
+      Reader reader
+  )
       throws IOException {
     requireNonNull(reader, "reader");
 
@@ -54,7 +59,8 @@ public class ProbePlantModelTO
   }
 
   private static Unmarshaller createUnmarshaller()
-      throws JAXBException, SAXException {
+      throws JAXBException,
+        SAXException {
     return createContext().createUnmarshaller();
   }
 

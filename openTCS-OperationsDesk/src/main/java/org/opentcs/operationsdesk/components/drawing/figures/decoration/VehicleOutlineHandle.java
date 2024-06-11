@@ -20,7 +20,8 @@ import org.opentcs.operationsdesk.components.drawing.figures.VehicleFigure;
 /**
  */
 public class VehicleOutlineHandle
-    extends BoundsOutlineHandle {
+    extends
+      BoundsOutlineHandle {
 
   public VehicleOutlineHandle(Figure owner) {
     super(owner);

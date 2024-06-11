@@ -15,7 +15,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property for a length.
  */
 public class LengthProperty
-    extends AbstractQuantity<LengthProperty.Unit> {
+    extends
+      AbstractQuantity<LengthProperty.Unit> {
 
   /**
    * Creates a new instance.

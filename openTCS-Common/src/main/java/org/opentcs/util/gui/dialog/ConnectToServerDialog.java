@@ -7,9 +7,10 @@
  */
 package org.opentcs.util.gui.dialog;
 
+import static java.util.Objects.requireNonNull;
+
 import java.rmi.registry.Registry;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
@@ -22,7 +23,8 @@ import org.opentcs.util.gui.Icons;
  * A dialog that lets the user enter parameters for a connection to the portal.
  */
 public class ConnectToServerDialog
-    extends JDialog {
+    extends
+      JDialog {
 
   /**
    * A return status code - returned if Cancel button has been pressed.
@@ -131,6 +133,7 @@ public class ConnectToServerDialog
     }
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -277,24 +280,28 @@ public class ConnectToServerDialog
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
     description = textFieldDescription.getText();
     if (description.isEmpty()) {
-      JOptionPane.showMessageDialog(this,
-                                    BUNDLE.getString("connectToServerDialog.optionPane_invalidDescription.message"),
-                                    BUNDLE.getString("connectToServerDialog.optionPane_invalidDescription.title"),
-                                    JOptionPane.ERROR_MESSAGE
+      JOptionPane.showMessageDialog(
+          this,
+          BUNDLE.getString("connectToServerDialog.optionPane_invalidDescription.message"),
+          BUNDLE.getString("connectToServerDialog.optionPane_invalidDescription.title"),
+          JOptionPane.ERROR_MESSAGE
       );
       return;
     }
 
     host = textFieldServer.getText();
     if (host.isEmpty()) {
-      JOptionPane.showMessageDialog(this,
-                                    BUNDLE.getString("connectToServerDialog.optionPane_invalidHost.message"),
-                                    BUNDLE.getString("connectToServerDialog.optionPane_invalidHost.title"),
-                                    JOptionPane.ERROR_MESSAGE
+      JOptionPane.showMessageDialog(
+          this,
+          BUNDLE.getString("connectToServerDialog.optionPane_invalidHost.message"),
+          BUNDLE.getString("connectToServerDialog.optionPane_invalidHost.title"),
+          JOptionPane.ERROR_MESSAGE
       );
       return;
     }
@@ -306,10 +313,11 @@ public class ConnectToServerDialog
       }
     }
     catch (NumberFormatException e) {
-      JOptionPane.showMessageDialog(this,
-                                    BUNDLE.getString("connectToServerDialog.optionPane_invalidPort.message"),
-                                    BUNDLE.getString("connectToServerDialog.optionPane_invalidPort.title"),
-                                    JOptionPane.ERROR_MESSAGE
+      JOptionPane.showMessageDialog(
+          this,
+          BUNDLE.getString("connectToServerDialog.optionPane_invalidPort.message"),
+          BUNDLE.getString("connectToServerDialog.optionPane_invalidPort.title"),
+          JOptionPane.ERROR_MESSAGE
       );
       return;
     }
@@ -332,6 +340,9 @@ public class ConnectToServerDialog
       textFieldPort.setText(String.valueOf(cb.getPort()));
     }
   }//GEN-LAST:event_cbComboBoxActionPerformed
+
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton cancelButton;
   private javax.swing.JComboBox<ConnectionParamSet> cbComboBox;
@@ -345,4 +356,5 @@ public class ConnectToServerDialog
   private javax.swing.JTextField textFieldServer;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:OFF
 }

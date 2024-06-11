@@ -3,6 +3,8 @@
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.Container;
 import java.awt.Point;
@@ -12,7 +14,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
@@ -26,7 +27,8 @@ import org.opentcs.guing.common.components.drawing.figures.liner.BezierLinerEdit
  * Utility to follow the drags made by the user.
  */
 public class OpenTCSDragTracker
-    extends DefaultDragTracker {
+    extends
+      DefaultDragTracker {
 
   /**
    * Stores the application's current state.
@@ -107,8 +109,10 @@ public class OpenTCSDragTracker
         if (!transformedFigures.isEmpty()) {
           if (!isDragging) {
             isDragging = true;
-            updateCursor(editor.findView((Container) evt.getSource()),
-                         new Point(evt.getX(), evt.getY()));
+            updateCursor(
+                editor.findView((Container) evt.getSource()),
+                new Point(evt.getX(), evt.getY())
+            );
           }
 
           Point2D.Double currentPoint
@@ -126,7 +130,8 @@ public class OpenTCSDragTracker
           AffineTransform tx = new AffineTransform();
           tx.translate(
               constrainedRect.x - previousOrigin.x,
-              constrainedRect.y - previousOrigin.y);
+              constrainedRect.y - previousOrigin.y
+          );
 
           for (Figure f : transformedFigures) {
             f.willChange();
@@ -165,7 +170,8 @@ public class OpenTCSDragTracker
           AffineTransform tx = new AffineTransform();
           tx.translate(
               anchorOrigin.x - previousOrigin.x,
-              anchorOrigin.y - previousOrigin.y);
+              anchorOrigin.y - previousOrigin.y
+          );
 
           for (Figure f : transformedFigures) {
             f.willChange();
@@ -185,11 +191,13 @@ public class OpenTCSDragTracker
       AffineTransform tx = new AffineTransform();
       tx.translate(
           -anchorOrigin.x + previousOrigin.x,
-          -anchorOrigin.y + previousOrigin.y);
+          -anchorOrigin.y + previousOrigin.y
+      );
 
       if (!tx.isIdentity()) {
         getDrawing().fireUndoableEditHappened(
-            new TransformEdit(transformedFigures, tx));
+            new TransformEdit(transformedFigures, tx)
+        );
       }
 
       // On changes on a path

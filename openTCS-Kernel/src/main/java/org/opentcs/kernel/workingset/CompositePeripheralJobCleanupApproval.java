@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.workingset;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.Set;
 import org.opentcs.components.kernel.PeripheralJobCleanupApproval;
 import org.opentcs.data.peripherals.PeripheralJob;
@@ -17,7 +18,8 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * A collection of {@link PeripheralJobCleanupApproval}s.
  */
 public class CompositePeripheralJobCleanupApproval
-    implements PeripheralJobCleanupApproval {
+    implements
+      PeripheralJobCleanupApproval {
 
   private final Set<PeripheralJobCleanupApproval> peripheralJobCleanupApprovals;
   private final DefaultPeripheralJobCleanupApproval defaultPeripheralJobCleanupApproval;
@@ -32,12 +34,17 @@ public class CompositePeripheralJobCleanupApproval
   @Inject
   public CompositePeripheralJobCleanupApproval(
       Set<PeripheralJobCleanupApproval> peripheralJobCleanupApprovals,
-      DefaultPeripheralJobCleanupApproval defaultPeripheralJobCleanupApproval) {
-    this.peripheralJobCleanupApprovals = requireNonNull(peripheralJobCleanupApprovals,
-                                                        "peripheralJobCleanupApprovals");
+      DefaultPeripheralJobCleanupApproval defaultPeripheralJobCleanupApproval
+  ) {
+    this.peripheralJobCleanupApprovals = requireNonNull(
+        peripheralJobCleanupApprovals,
+        "peripheralJobCleanupApprovals"
+    );
     this.defaultPeripheralJobCleanupApproval
-        = requireNonNull(defaultPeripheralJobCleanupApproval,
-                         "defaultPeripheralJobCleanupApproval");
+        = requireNonNull(
+            defaultPeripheralJobCleanupApproval,
+            "defaultPeripheralJobCleanupApproval"
+        );
   }
 
   @Override

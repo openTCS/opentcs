@@ -15,13 +15,14 @@
  */
 package org.opentcs.thirdparty.modeleditor.jhotdraw.components.drawing;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.jhotdraw.draw.DefaultDrawingView;
@@ -50,7 +51,8 @@ import org.slf4j.LoggerFactory;
  * A DrawingView implementation for the openTCS plant overview.
  */
 public class OpenTCSDrawingViewModeling
-    extends AbstractOpenTCSDrawingView {
+    extends
+      AbstractOpenTCSDrawingView {
 
   /**
    * This class's logger.
@@ -83,11 +85,13 @@ public class OpenTCSDrawingViewModeling
    * @param blockChangeHandler The handler for block changes.
    */
   @Inject
-  public OpenTCSDrawingViewModeling(ApplicationState appState,
-                                    ModelManager modelManager,
-                                    FigureCloner figureCloner,
-                                    ActiveLayerProvider activeLayerProvider,
-                                    BlockChangeHandler blockChangeHandler) {
+  public OpenTCSDrawingViewModeling(
+      ApplicationState appState,
+      ModelManager modelManager,
+      FigureCloner figureCloner,
+      ActiveLayerProvider activeLayerProvider,
+      BlockChangeHandler blockChangeHandler
+  ) {
     super(appState, modelManager);
     this.figureCloner = requireNonNull(figureCloner, "figureCloner");
     this.activeLayerProvider = requireNonNull(activeLayerProvider, "activeLayerProvider");
@@ -118,8 +122,10 @@ public class OpenTCSDrawingViewModeling
     else {
       // The list of buffered figures contains a mix of figures contained in the drawing and
       // figures not contained in the drawing. This should never happen.
-      throw new IllegalStateException("Some figures to be pasted are already in the drawing, some "
-          + "are not.");
+      throw new IllegalStateException(
+          "Some figures to be pasted are already in the drawing, some "
+              + "are not."
+      );
     }
 
     placeFiguresOnActiveLayer(pastedFigures);
@@ -146,7 +152,10 @@ public class OpenTCSDrawingViewModeling
   }
 
   @Override
-  public void followVehicle(@Nonnull final VehicleModel model) {
+  public void followVehicle(
+      @Nonnull
+      final VehicleModel model
+  ) {
     // Follwing a vehicle is not possible in modeling mode
   }
 
@@ -274,7 +283,8 @@ public class OpenTCSDrawingViewModeling
   }
 
   private class ExtendedEventHandler
-      extends AbstractExtendedEventHandler {
+      extends
+        AbstractExtendedEventHandler {
 
     /**
      * Creates a new instance.

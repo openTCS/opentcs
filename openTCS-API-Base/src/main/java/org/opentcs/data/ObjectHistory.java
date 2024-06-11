@@ -7,20 +7,22 @@
  */
 package org.opentcs.data;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A history of events related to an object.
  */
 public class ObjectHistory
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The actual history entries.
@@ -86,7 +88,8 @@ public class ObjectHistory
    * An entry/event in a history.
    */
   public static class Entry
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The point of time at which the event occured.

@@ -18,8 +18,12 @@ public class CoupleTO {
   private long y;
 
   @JsonCreator
-  public CoupleTO(@JsonProperty(value = "x", required = true) long x,
-                  @JsonProperty(value = "y", required = true) long y) {
+  public CoupleTO(
+      @JsonProperty(value = "x", required = true)
+      long x,
+      @JsonProperty(value = "y", required = true)
+      long y
+  ) {
     this.x = x;
     this.y = y;
   }

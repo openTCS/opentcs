@@ -7,14 +7,16 @@
  */
 package org.opentcs.data.model.visualization;
 
-import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
+
+import java.io.Serializable;
 
 /**
  * Describes a layer group in a plant model.
  */
 public class LayerGroup
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The unique ID of this layer group.

@@ -26,8 +26,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * @see KeyValueSetProperty
  */
 public class KeyValueSetPropertyViewerEditorPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   /**
    * A resource bundle.
@@ -62,8 +64,10 @@ public class KeyValueSetPropertyViewerEditorPanel
 
     getProperty().getItems().stream()
         .sorted((p1, p2) -> p1.getKey().compareTo(p2.getKey()))
-        .forEach(keyValueProperty
-            -> model.addRow(new String[]{keyValueProperty.getKey(), keyValueProperty.getValue()})
+        .forEach(
+            keyValueProperty -> model.addRow(
+                new String[]{keyValueProperty.getKey(), keyValueProperty.getValue()}
+            )
         );
 
     sortItems();
@@ -105,6 +109,8 @@ public class KeyValueSetPropertyViewerEditorPanel
     }
   }
 
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -134,7 +140,10 @@ public class KeyValueSetPropertyViewerEditorPanel
     controlPanel.setLayout(new java.awt.GridBagLayout());
     add(controlPanel, java.awt.BorderLayout.EAST);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel controlPanel;
@@ -142,24 +151,26 @@ public class KeyValueSetPropertyViewerEditorPanel
   private javax.swing.JTable itemsTable;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   protected class ItemsTableModel
-      extends DefaultTableModel {
+      extends
+        DefaultTableModel {
 
     private final Class<?>[] types = new Class<?>[]{
-      String.class, String.class
+        String.class, String.class
     };
 
     public ItemsTableModel() {
       super(
           new Object[][]{},
           new String[]{
-            resBundle.getString(
-                "keyValueSetPropertyViewerEditorPanel.table_properties.column_key.headerText"
-            ),
-            resBundle.getString(
-                "keyValueSetPropertyViewerEditorPanel.table_properties.column_value.headerText"
-            )
+              resBundle.getString(
+                  "keyValueSetPropertyViewerEditorPanel.table_properties.column_key.headerText"
+              ),
+              resBundle.getString(
+                  "keyValueSetPropertyViewerEditorPanel.table_properties.column_value.headerText"
+              )
           }
       );
     }

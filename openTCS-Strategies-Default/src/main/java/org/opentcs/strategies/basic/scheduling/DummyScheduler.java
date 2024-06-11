@@ -7,10 +7,11 @@
  */
 package org.opentcs.strategies.basic.scheduling;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,7 +23,8 @@ import org.opentcs.data.model.TCSResource;
  * allocations are granted immediately without checking.
  */
 public class DummyScheduler
-    implements Scheduler {
+    implements
+      Scheduler {
 
   /**
    * Executes our <code>CallbackTask</code>s.
@@ -107,7 +109,8 @@ public class DummyScheduler
    * A task that merely calls back <code>ResourceUser</code>s.
    */
   private static class CallbackTask
-      implements Runnable {
+      implements
+        Runnable {
 
     /**
      * The client to call back.

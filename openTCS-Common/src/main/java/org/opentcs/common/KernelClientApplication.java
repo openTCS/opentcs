@@ -13,7 +13,8 @@ import org.opentcs.components.Lifecycle;
  * Provides methods used in a kernel client application's context.
  */
 public interface KernelClientApplication
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * Tells the application to switch its state to online.

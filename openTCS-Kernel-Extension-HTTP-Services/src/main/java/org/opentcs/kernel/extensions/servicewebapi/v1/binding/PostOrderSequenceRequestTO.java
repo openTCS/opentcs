@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.order.OrderConstants;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
@@ -50,7 +51,10 @@ public class PostOrderSequenceRequestTO {
     return type;
   }
 
-  public PostOrderSequenceRequestTO setType(@Nonnull String type) {
+  public PostOrderSequenceRequestTO setType(
+      @Nonnull
+      String type
+  ) {
     this.type = requireNonNull(type, "type");
     return this;
   }
@@ -60,7 +64,10 @@ public class PostOrderSequenceRequestTO {
     return intendedVehicle;
   }
 
-  public PostOrderSequenceRequestTO setIntendedVehicle(@Nullable String intendedVehicle) {
+  public PostOrderSequenceRequestTO setIntendedVehicle(
+      @Nullable
+      String intendedVehicle
+  ) {
     this.intendedVehicle = intendedVehicle;
     return this;
   }
@@ -79,7 +86,10 @@ public class PostOrderSequenceRequestTO {
     return properties;
   }
 
-  public PostOrderSequenceRequestTO setProperties(@Nonnull List<Property> properties) {
+  public PostOrderSequenceRequestTO setProperties(
+      @Nonnull
+      List<Property> properties
+  ) {
     this.properties = requireNonNull(properties, "properties");
     return this;
   }

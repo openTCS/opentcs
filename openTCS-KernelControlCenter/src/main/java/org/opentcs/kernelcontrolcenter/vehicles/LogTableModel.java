@@ -7,6 +7,9 @@
  */
 package org.opentcs.kernelcontrolcenter.vehicles;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
+
 import java.text.DateFormat;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -14,7 +17,6 @@ import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
@@ -22,30 +24,32 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.data.notification.UserNotification;
-import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 
 /**
  * A table model for holding {@link UserNotification} instances in rows.
  */
 final class LogTableModel
-    extends AbstractTableModel {
+    extends
+      AbstractTableModel {
 
   /**
    * The column names.
    */
-  private static final String[] COLUMN_NAMES = new String[] {
-    ResourceBundle.getBundle(BUNDLE_PATH)
-    .getString("logTableModel.column_timeStamp.headerText"),
-    ResourceBundle.getBundle(BUNDLE_PATH)
-    .getString("logTableModel.column_message.headerText")
-  };
+  private static final String[] COLUMN_NAMES
+      = new String[]{
+          ResourceBundle.getBundle(BUNDLE_PATH)
+              .getString("logTableModel.column_timeStamp.headerText"),
+          ResourceBundle.getBundle(BUNDLE_PATH)
+              .getString("logTableModel.column_message.headerText")
+      };
   /**
    * The column classes.
    */
-  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[] {
-    String.class,
-    String.class
-  };
+  private static final Class<?>[] COLUMN_CLASSES
+      = new Class<?>[]{
+          String.class,
+          String.class
+      };
   /**
    * A {@link DateFormat} instance for formatting notifications' time stamps.
    */

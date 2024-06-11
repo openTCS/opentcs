@@ -13,7 +13,8 @@ import org.opentcs.access.KernelException;
  * Thrown when allocating resources for a {@link Scheduler.Client Scheduler.Client} is impossible.
  */
 public class ResourceAllocationException
-    extends KernelException {
+    extends
+      KernelException {
 
   /**
    * Creates a new ResourceAllocationException with the given detail message.

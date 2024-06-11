@@ -29,7 +29,10 @@ public class CompatibilityChecker {
    * @param version The version string.
    * @return Whether the version string is compatible with the Docking Frames library.
    */
-  public static boolean versionCompatibleWithDockingFrames(@Nullable String version) {
+  public static boolean versionCompatibleWithDockingFrames(
+      @Nullable
+      String version
+  ) {
     return version != null && version.matches(".*\\.[0-9]+\\..*");
   }
 
@@ -40,7 +43,7 @@ public class CompatibilityChecker {
     JOptionPane.showMessageDialog(
         null,
         "Your Java Runtime Environment is incompatible with this application.\n"
-        + "Please use a different JRE. Recommended: Adoptium (see https://adoptium.net/)",
+            + "Please use a different JRE. Recommended: Adoptium (see https://adoptium.net/)",
         "Incompatible Java version",
         JOptionPane.ERROR_MESSAGE
     );

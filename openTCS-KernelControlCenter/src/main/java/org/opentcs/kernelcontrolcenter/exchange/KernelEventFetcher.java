@@ -7,9 +7,11 @@
  */
 package org.opentcs.kernelcontrolcenter.exchange;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkInRange;
+
 import jakarta.inject.Inject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.KernelStateTransitionEvent;
@@ -19,7 +21,6 @@ import org.opentcs.common.PortalManager;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.ServiceCallWrapper;
-import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.CallWrapper;
 import org.opentcs.util.CyclicTask;
 import org.opentcs.util.event.EventBus;
@@ -31,8 +32,9 @@ import org.slf4j.LoggerFactory;
  * Controls a task that periodically fetches for kernel events.
  */
 public class KernelEventFetcher
-    implements EventHandler,
-               Lifecycle {
+    implements
+      EventHandler,
+      Lifecycle {
 
   /**
    * This class' logger.
@@ -80,10 +82,14 @@ public class KernelEventFetcher
    * @param eventBus The application's event bus.
    */
   @Inject
-  public KernelEventFetcher(KernelClientApplication application,
-                            KernelServicePortal servicePortal,
-                            @ServiceCallWrapper CallWrapper callWrapper,
-                            @ApplicationEventBus EventBus eventBus) {
+  public KernelEventFetcher(
+      KernelClientApplication application,
+      KernelServicePortal servicePortal,
+      @ServiceCallWrapper
+      CallWrapper callWrapper,
+      @ApplicationEventBus
+      EventBus eventBus
+  ) {
     this.application = requireNonNull(application, "application");
     this.servicePortal = requireNonNull(servicePortal, "servicePortal");
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");
@@ -161,7 +167,8 @@ public class KernelEventFetcher
    * A task fetching the service portal for events in regular intervals.
    */
   private class EventFetcherTask
-      extends CyclicTask {
+      extends
+        CyclicTask {
 
     /**
      * The poll timeout.

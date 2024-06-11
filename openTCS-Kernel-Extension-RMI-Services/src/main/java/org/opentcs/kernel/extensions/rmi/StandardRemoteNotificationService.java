@@ -7,13 +7,14 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Predicate;
@@ -35,8 +36,10 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class StandardRemoteNotificationService
-    extends KernelRemoteService
-    implements RemoteNotificationService {
+    extends
+      KernelRemoteService
+    implements
+      RemoteNotificationService {
 
   /**
    * This class's logger.
@@ -87,12 +90,15 @@ public class StandardRemoteNotificationService
    * @param kernelExecutor Executes tasks modifying kernel data.
    */
   @Inject
-  public StandardRemoteNotificationService(NotificationService notificationService,
-                                           UserManager userManager,
-                                           RmiKernelInterfaceConfiguration configuration,
-                                           SocketFactoryProvider socketFactoryProvider,
-                                           RegistryProvider registryProvider,
-                                           @KernelExecutor ExecutorService kernelExecutor) {
+  public StandardRemoteNotificationService(
+      NotificationService notificationService,
+      UserManager userManager,
+      RmiKernelInterfaceConfiguration configuration,
+      SocketFactoryProvider socketFactoryProvider,
+      RegistryProvider registryProvider,
+      @KernelExecutor
+      ExecutorService kernelExecutor
+  ) {
     this.notificationService = requireNonNull(notificationService, "plantModelService");
     this.userManager = requireNonNull(userManager, "userManager");
     this.configuration = requireNonNull(configuration, "configuration");
@@ -112,10 +118,12 @@ public class StandardRemoteNotificationService
     // Export this instance via RMI.
     try {
       LOG.debug("Exporting proxy...");
-      UnicastRemoteObject.exportObject(this,
-                                       configuration.remoteNotificationServicePort(),
-                                       socketFactoryProvider.getClientSocketFactory(),
-                                       socketFactoryProvider.getServerSocketFactory());
+      UnicastRemoteObject.exportObject(
+          this,
+          configuration.remoteNotificationServicePort(),
+          socketFactoryProvider.getClientSocketFactory(),
+          socketFactoryProvider.getServerSocketFactory()
+      );
       LOG.debug("Binding instance with RMI registry...");
       rmiRegistry.rebind(RegistrationName.REMOTE_NOTIFICATION_SERVICE, this);
     }
@@ -152,8 +160,10 @@ public class StandardRemoteNotificationService
   }
 
   @Override
-  public List<UserNotification> fetchUserNotifications(ClientID clientId,
-                                                       Predicate<UserNotification> predicate) {
+  public List<UserNotification> fetchUserNotifications(
+      ClientID clientId,
+      Predicate<UserNotification> predicate
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 
     return notificationService.fetchUserNotifications(predicate);

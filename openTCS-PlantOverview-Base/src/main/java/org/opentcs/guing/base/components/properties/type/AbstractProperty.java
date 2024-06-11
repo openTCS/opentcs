@@ -13,8 +13,10 @@ import org.opentcs.guing.base.model.ModelComponent;
  * Base implementation for a property.
  */
 public abstract class AbstractProperty
-    extends AbstractModelAttribute
-    implements Property {
+    extends
+      AbstractModelAttribute
+    implements
+      Property {
 
   /**
    * The value of this property.

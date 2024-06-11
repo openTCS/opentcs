@@ -7,22 +7,24 @@
  */
 package org.opentcs.operationsdesk.application.action.course;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.event.ActionEvent;
-import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingView;
-import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  */
 public class FollowVehicleAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * Automatically moves the drawing so a vehicle is always visible.
@@ -47,8 +49,11 @@ public class FollowVehicleAction
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public FollowVehicleAction(@Assisted VehicleModel vehicle,
-                             OpenTCSDrawingEditor drawingEditor) {
+  public FollowVehicleAction(
+      @Assisted
+      VehicleModel vehicle,
+      OpenTCSDrawingEditor drawingEditor
+  ) {
     this.vehicleModel = requireNonNull(vehicle, "vehicle");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
 

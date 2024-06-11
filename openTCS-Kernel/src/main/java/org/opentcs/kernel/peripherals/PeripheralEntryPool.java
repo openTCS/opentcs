@@ -7,17 +7,18 @@
  */
 package org.opentcs.kernel.peripherals;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,8 @@ import org.slf4j.LoggerFactory;
  * the kernel.
  */
 public class PeripheralEntryPool
-    implements Lifecycle {
+    implements
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -56,8 +58,12 @@ public class PeripheralEntryPool
    * @param commAdapterRegistry The peripheral comm adapter registry.
    */
   @Inject
-  public PeripheralEntryPool(@Nonnull TCSObjectService objectService,
-                             @Nonnull PeripheralCommAdapterRegistry commAdapterRegistry) {
+  public PeripheralEntryPool(
+      @Nonnull
+      TCSObjectService objectService,
+      @Nonnull
+      PeripheralCommAdapterRegistry commAdapterRegistry
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.commAdapterRegistry = requireNonNull(commAdapterRegistry, "commAdapterRegistry");
   }
@@ -112,12 +118,17 @@ public class PeripheralEntryPool
    * @throws IllegalArgumentException If no entry is present for the given location.
    */
   @Nonnull
-  public PeripheralEntry getEntryFor(@Nonnull TCSResourceReference<Location> location)
+  public PeripheralEntry getEntryFor(
+      @Nonnull
+      TCSResourceReference<Location> location
+  )
       throws IllegalArgumentException {
     requireNonNull(location, "location");
-    checkArgument(entries.containsKey(location),
-                  "No peripheral entry present for %s",
-                  location.getName());
+    checkArgument(
+        entries.containsKey(location),
+        "No peripheral entry present for %s",
+        location.getName()
+    );
     return entries.get(location);
   }
 }

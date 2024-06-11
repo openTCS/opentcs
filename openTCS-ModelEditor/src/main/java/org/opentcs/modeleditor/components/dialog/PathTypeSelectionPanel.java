@@ -7,13 +7,14 @@
  */
 package org.opentcs.modeleditor.components.dialog;
 
-import org.opentcs.guing.base.model.elements.PathModel;
 import static org.opentcs.guing.base.model.elements.PathModel.Type.BEZIER;
 import static org.opentcs.guing.base.model.elements.PathModel.Type.BEZIER_3;
 import static org.opentcs.guing.base.model.elements.PathModel.Type.DIRECT;
 import static org.opentcs.guing.base.model.elements.PathModel.Type.ELBOW;
 import static org.opentcs.guing.base.model.elements.PathModel.Type.POLYPATH;
 import static org.opentcs.guing.base.model.elements.PathModel.Type.SLANTED;
+
+import org.opentcs.guing.base.model.elements.PathModel;
 import org.opentcs.guing.common.components.dialogs.DialogContent;
 import org.opentcs.modeleditor.util.I18nPlantOverviewModeling;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
@@ -22,15 +23,18 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A dialog content to select a set of path types.
  */
 public class PathTypeSelectionPanel
-    extends DialogContent {
+    extends
+      DialogContent {
 
   /**
    * Creates new form PathTypeSelection.
    */
   @SuppressWarnings("this-escape")
   public PathTypeSelectionPanel() {
-    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MISC_PATH)
-        .getString("pathTypeSelection.title"));
+    setDialogTitle(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MISC_PATH)
+            .getString("pathTypeSelection.title")
+    );
     initComponents();
   }
 
@@ -70,14 +74,15 @@ public class PathTypeSelectionPanel
   private void updateAllTypesCheckBox() {
     allTypesCheckBox.setSelected(
         directCheckBox.isSelected()
-        && elbowCheckBox.isSelected()
-        && slantedCheckBox.isSelected()
-        && polypathCheckBox.isSelected()
-        && bezierCheckBox.isSelected()
-        && bezier3CheckBox.isSelected()
+            && elbowCheckBox.isSelected()
+            && slantedCheckBox.isSelected()
+            && polypathCheckBox.isSelected()
+            && bezierCheckBox.isSelected()
+            && bezier3CheckBox.isSelected()
     );
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
@@ -213,6 +218,7 @@ public class PathTypeSelectionPanel
     add(bezier3CheckBox, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void allTypesCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allTypesCheckBoxActionPerformed
     directCheckBox.setSelected(allTypesCheckBox.isSelected());
@@ -247,6 +253,7 @@ public class PathTypeSelectionPanel
     updateAllTypesCheckBox();
   }//GEN-LAST:event_bezier3CheckBoxActionPerformed
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox allTypesCheckBox;
@@ -258,4 +265,5 @@ public class PathTypeSelectionPanel
   private javax.swing.JCheckBox slantedCheckBox;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

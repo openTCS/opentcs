@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Provider;
 import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Semaphore;
@@ -34,8 +35,9 @@ import org.slf4j.LoggerFactory;
  * This class implements the standard openTCS kernel.
  */
 public class StandardKernel
-    implements LocalKernel,
-               Runnable {
+    implements
+      LocalKernel,
+      Runnable {
 
   /**
    * This class's Logger.
@@ -83,10 +85,14 @@ public class StandardKernel
    * @param notificationService The notification service to be used.
    */
   @Inject
-  public StandardKernel(@ApplicationEventBus EventBus eventBus,
-                        @KernelExecutor ScheduledExecutorService kernelExecutor,
-                        Map<Kernel.State, Provider<KernelState>> stateProviders,
-                        NotificationService notificationService) {
+  public StandardKernel(
+      @ApplicationEventBus
+      EventBus eventBus,
+      @KernelExecutor
+      ScheduledExecutorService kernelExecutor,
+      Map<Kernel.State, Provider<KernelState>> stateProviders,
+      NotificationService notificationService
+  ) {
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.stateProviders = requireNonNull(stateProviders, "stateProviders");
@@ -193,8 +199,10 @@ public class StandardKernel
     }
     emitStateEvent(oldState, newState, true);
     notificationService.publishUserNotification(
-        new UserNotification("Kernel is now in state " + newState,
-                             UserNotification.Level.INFORMATIONAL)
+        new UserNotification(
+            "Kernel is now in state " + newState,
+            UserNotification.Level.INFORMATIONAL
+        )
     );
   }
 

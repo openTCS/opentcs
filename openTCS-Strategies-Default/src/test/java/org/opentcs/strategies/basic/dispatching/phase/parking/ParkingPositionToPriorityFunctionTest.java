@@ -10,6 +10,7 @@ package org.opentcs.strategies.basic.dispatching.phase.parking;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.Dispatcher;

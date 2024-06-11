@@ -7,11 +7,12 @@
  */
 package org.opentcs.guing.common.components.properties.panel;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.table.AbstractTableModel;
@@ -28,8 +29,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * User interface to edit a peripheral operations property.
  */
 public class PeripheralOperationsPropertyEditorPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   /**
    * The bundle to be used.
@@ -129,6 +132,7 @@ public class PeripheralOperationsPropertyEditorPanel
     }
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -245,6 +249,7 @@ public class PeripheralOperationsPropertyEditorPanel
     add(controlPanel, java.awt.BorderLayout.EAST);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void moveDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownButtonActionPerformed
     int selectedRow = itemsTable.getSelectedRow();
@@ -299,6 +304,7 @@ public class PeripheralOperationsPropertyEditorPanel
     add();
   }//GEN-LAST:event_addButtonActionPerformed
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
@@ -312,36 +318,41 @@ public class PeripheralOperationsPropertyEditorPanel
   private javax.swing.JPanel rigidArea;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private class ItemsTableModel
-      extends AbstractTableModel {
+      extends
+        AbstractTableModel {
 
     /**
      * Column classes.
      */
-    private final Class<?>[] columnClasses = new Class<?>[]{
-      String.class,
-      String.class,
-      String.class,
-      Boolean.class
-    };
+    private final Class<?>[] columnClasses
+        = new Class<?>[]{
+            String.class,
+            String.class,
+            String.class,
+            Boolean.class
+        };
     /**
      * The column names.
      */
-    private final String[] columnNames = new String[]{
-      bundle.getString(
-      "peripheralOperationsPropertyEditorPanel.table_resources.column_location.headerText"
-      ),
-      bundle.getString(
-      "peripheralOperationsPropertyEditorPanel.table_resources.column_operation.headerText"
-      ),
-      bundle.getString(
-      "peripheralOperationsPropertyEditorPanel.table_resources.column_trigger.headerText"
-      ),
-      bundle.getString(
-      "peripheralOperationsPropertyEditorPanel.table_resources.column_completion.headerText"
-      )
-    };
+    @SuppressWarnings("checkstyle:LineLength")
+    private final String[] columnNames
+        = new String[]{
+            bundle.getString(
+                "peripheralOperationsPropertyEditorPanel.table_resources.column_location.headerText"
+            ),
+            bundle.getString(
+                "peripheralOperationsPropertyEditorPanel.table_resources.column_operation.headerText"
+            ),
+            bundle.getString(
+                "peripheralOperationsPropertyEditorPanel.table_resources.column_trigger.headerText"
+            ),
+            bundle.getString(
+                "peripheralOperationsPropertyEditorPanel.table_resources.column_completion.headerText"
+            )
+        };
 
     private final int columnLocation = 0;
     private final int columnOperation = 1;

@@ -15,7 +15,8 @@ import org.opentcs.guing.common.transport.OrderTypeSuggestionsPool;
  * A Guice module for the transport order type suggestions.
  */
 public class OrderTypeSuggestionsModule
-    extends PlantOverviewInjectionModule {
+    extends
+      PlantOverviewInjectionModule {
 
   /**
    * Creates a new instance.

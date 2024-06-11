@@ -7,18 +7,19 @@
  */
 package org.opentcs.drivers.vehicle;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_ENQUEUED;
+import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_EXECUTED;
+import static org.opentcs.util.Assertions.checkInRange;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opentcs.data.model.Vehicle;
-import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_ENQUEUED;
-import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_EXECUTED;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
-import static org.opentcs.util.Assertions.checkInRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +36,9 @@ import org.slf4j.LoggerFactory;
  * </ul>
  */
 public abstract class BasicVehicleCommAdapter
-    implements VehicleCommAdapter,
-               PropertyChangeListener {
+    implements
+      VehicleCommAdapter,
+      PropertyChangeListener {
 
   /**
    * This class's Logger.
@@ -88,15 +90,19 @@ public abstract class BasicVehicleCommAdapter
    * @param rechargeOperation The string to recognize as a recharge operation.
    * @param executor The executor to run tasks on.
    */
-  public BasicVehicleCommAdapter(VehicleProcessModel vehicleModel,
-                                 int commandsCapacity,
-                                 String rechargeOperation,
-                                 ScheduledExecutorService executor) {
+  public BasicVehicleCommAdapter(
+      VehicleProcessModel vehicleModel,
+      int commandsCapacity,
+      String rechargeOperation,
+      ScheduledExecutorService executor
+  ) {
     this.vehicleModel = requireNonNull(vehicleModel, "vehicleModel");
-    this.commandsCapacity = checkInRange(commandsCapacity,
-                                         1,
-                                         Integer.MAX_VALUE,
-                                         "commandsCapacity");
+    this.commandsCapacity = checkInRange(
+        commandsCapacity,
+        1,
+        Integer.MAX_VALUE,
+        "commandsCapacity"
+    );
     this.rechargeOperation = requireNonNull(rechargeOperation, "rechargeOperation");
     this.executor = requireNonNull(executor, "executor");
   }
@@ -363,7 +369,8 @@ public abstract class BasicVehicleCommAdapter
    * The task processing the command queue.
    */
   private class CommandDispatcherTask
-      implements Runnable {
+      implements
+        Runnable {
 
     CommandDispatcherTask() {
     }

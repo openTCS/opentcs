@@ -16,7 +16,8 @@ import org.opentcs.strategies.basic.dispatching.priorization.transportorder.Tran
  * Compares {@link AssignmentCandidate}s by name of the order.
  */
 public class CandidateComparatorByOrderName
-    implements Comparator<AssignmentCandidate> {
+    implements
+      Comparator<AssignmentCandidate> {
 
   /**
    * A key used for selecting this comparator in a configuration setting.

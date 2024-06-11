@@ -13,7 +13,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property for location actions.
  */
 public class LocationTypeActionsProperty
-    extends StringSetProperty {
+    extends
+      StringSetProperty {
 
   /**
    * Creates a new instance.

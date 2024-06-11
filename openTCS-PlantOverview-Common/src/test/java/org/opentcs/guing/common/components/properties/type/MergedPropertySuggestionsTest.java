@@ -7,12 +7,13 @@
  */
 package org.opentcs.guing.common.components.properties.type;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.google.common.collect.Sets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.plantoverview.PropertySuggestions;
@@ -69,14 +70,19 @@ class MergedPropertySuggestionsTest {
   void shouldMergeSuggestions() {
     Set<PropertySuggestions> sugSet = new HashSet<>(Arrays.asList(instance1, instance2));
     MergedPropertySuggestions mergedSuggestions = new MergedPropertySuggestions(sugSet);
-    assertEquals(Sets.union(instance1.getKeySuggestions(), instance2.getKeySuggestions()),
-                 mergedSuggestions.getKeySuggestions());
-    assertEquals(Sets.union(instance1.getValueSuggestions(), instance2.getValueSuggestions()),
-                 mergedSuggestions.getValueSuggestions());
+    assertEquals(
+        Sets.union(instance1.getKeySuggestions(), instance2.getKeySuggestions()),
+        mergedSuggestions.getKeySuggestions()
+    );
+    assertEquals(
+        Sets.union(instance1.getValueSuggestions(), instance2.getValueSuggestions()),
+        mergedSuggestions.getValueSuggestions()
+    );
   }
 
   private class PropertySuggestionsImpl
-      implements PropertySuggestions {
+      implements
+        PropertySuggestions {
 
     private final Set<String> keySuggestions = new HashSet<>();
     private final Set<String> valueSuggestions = new HashSet<>();

@@ -19,7 +19,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.Undo
  * A TreeViewPanel for blocks.
  */
 public class BlocksTreeViewPanel
-    extends AbstractTreeViewPanel {
+    extends
+      AbstractTreeViewPanel {
 
   /**
    * Creates a new instance.
@@ -27,9 +28,11 @@ public class BlocksTreeViewPanel
    * @param undoRedoManager The undo redo manager
    */
   @Inject
-  public BlocksTreeViewPanel(UndoRedoManager undoRedoManager,
-                             ModelManager modelManager,
-                             ComponentsManager componentsManager) {
+  public BlocksTreeViewPanel(
+      UndoRedoManager undoRedoManager,
+      ModelManager modelManager,
+      ComponentsManager componentsManager
+  ) {
     super(undoRedoManager, modelManager, componentsManager);
   }
 

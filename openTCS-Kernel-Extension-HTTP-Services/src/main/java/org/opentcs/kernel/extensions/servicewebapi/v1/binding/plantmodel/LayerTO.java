@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
-import static java.util.Objects.requireNonNull;
 
 /**
  */
@@ -23,11 +24,19 @@ public class LayerTO {
   private int groupId;
 
   @JsonCreator
-  public LayerTO(@JsonProperty(value = "id", required = true) int id,
-                 @JsonProperty(value = "ordinal", required = true) int ordinal,
-                 @JsonProperty(value = "visible", required = true) boolean visible,
-                 @Nonnull @JsonProperty(value = "name", required = true) String name,
-                 @JsonProperty(value = "groupId", required = true) int groupId) {
+  public LayerTO(
+      @JsonProperty(value = "id", required = true)
+      int id,
+      @JsonProperty(value = "ordinal", required = true)
+      int ordinal,
+      @JsonProperty(value = "visible", required = true)
+      boolean visible,
+      @Nonnull
+      @JsonProperty(value = "name", required = true)
+      String name,
+      @JsonProperty(value = "groupId", required = true)
+      int groupId
+  ) {
     this.id = id;
     this.ordinal = ordinal;
     this.visible = visible;
@@ -67,7 +76,10 @@ public class LayerTO {
     return name;
   }
 
-  public LayerTO setName(@Nonnull String name) {
+  public LayerTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     return this;
   }

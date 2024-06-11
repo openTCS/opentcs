@@ -15,16 +15,17 @@
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.action.draw;
 
+import static javax.swing.Action.SMALL_ICON;
+import static org.opentcs.guing.common.util.I18nPlantOverview.TOOLBAR_PATH;
+
 import java.awt.event.ActionEvent;
 import java.awt.geom.AffineTransform;
 import java.util.HashSet;
 import java.util.Set;
-import static javax.swing.Action.SMALL_ICON;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
 import org.jhotdraw.draw.event.TransformEdit;
-import static org.opentcs.guing.common.util.I18nPlantOverview.TOOLBAR_PATH;
 import org.opentcs.guing.common.util.ImageDirectory;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
@@ -34,7 +35,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * @author Werner Randelshofer
  */
 public abstract class MoveAction
-    extends AbstractSelectedAction {
+    extends
+      AbstractSelectedAction {
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
   /**
@@ -94,7 +96,8 @@ public abstract class MoveAction
    * Moves the selected figures to the right.
    */
   public static class East
-      extends MoveAction {
+      extends
+        MoveAction {
 
     /**
      * This action's ID.
@@ -119,7 +122,8 @@ public abstract class MoveAction
    * Moves the selected figures to the right.
    */
   public static class West
-      extends MoveAction {
+      extends
+        MoveAction {
 
     /**
      * This action's ID.
@@ -144,7 +148,8 @@ public abstract class MoveAction
    * Moves the selected figures upwards.
    */
   public static class North
-      extends MoveAction {
+      extends
+        MoveAction {
 
     /**
      * This action's ID.
@@ -169,7 +174,8 @@ public abstract class MoveAction
    * Moves the selected figures downwards.
    */
   public static class South
-      extends MoveAction {
+      extends
+        MoveAction {
 
     /**
      * This action's ID.

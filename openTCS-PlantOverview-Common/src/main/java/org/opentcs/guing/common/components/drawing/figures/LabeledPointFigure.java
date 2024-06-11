@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.common.components.drawing.figures;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Strings;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
@@ -15,7 +17,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
-import static java.util.Objects.requireNonNull;
 import javax.swing.Action;
 import org.jhotdraw.draw.ConnectionFigure;
 import org.jhotdraw.draw.Figure;
@@ -37,7 +38,8 @@ import org.opentcs.guing.common.components.drawing.figures.decoration.PointOutli
  * {@link PointFigure} with a label.
  */
 public class LabeledPointFigure
-    extends LabeledFigure {
+    extends
+      LabeledFigure {
 
   /**
    * The tool tip text generator.
@@ -52,8 +54,11 @@ public class LabeledPointFigure
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public LabeledPointFigure(@Assisted PointFigure figure,
-                            ToolTipTextGenerator textGenerator) {
+  public LabeledPointFigure(
+      @Assisted
+      PointFigure figure,
+      ToolTipTextGenerator textGenerator
+  ) {
     requireNonNull(figure, "figure");
     this.textGenerator = requireNonNull(textGenerator, "textGenerator");
 
@@ -146,8 +151,10 @@ public class LabeledPointFigure
     if (origin != null) {
       PointFigure pf = getPresentationFigure();
 
-      Point2D exact = origin.calculatePixelPositionExactly(pf.getModel().getPropertyLayoutPosX(),
-                                                           pf.getModel().getPropertyLayoutPosY());
+      Point2D exact = origin.calculatePixelPositionExactly(
+          pf.getModel().getPropertyLayoutPosX(),
+          pf.getModel().getPropertyLayoutPosY()
+      );
       Point2D.Double anchor = new Point2D.Double(exact.getX(), exact.getY());
       setBounds(anchor, anchor);
     }

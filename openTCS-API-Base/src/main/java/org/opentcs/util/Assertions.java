@@ -40,13 +40,20 @@ public class Assertions {
    * @param messageArgs The arguments to be formatted into the message template.
    * @throws IllegalArgumentException If the given expression is not true.
    */
-  public static void checkArgument(boolean expression,
-                                   String messageTemplate,
-                                   @Nullable Object... messageArgs)
+  public static void checkArgument(
+      boolean expression,
+      String messageTemplate,
+      @Nullable
+      Object... messageArgs
+  )
       throws IllegalArgumentException {
     if (!expression) {
-      throw new IllegalArgumentException(String.format(String.valueOf(messageTemplate),
-                                                       messageArgs));
+      throw new IllegalArgumentException(
+          String.format(
+              String.valueOf(messageTemplate),
+              messageArgs
+          )
+      );
     }
   }
 
@@ -70,13 +77,20 @@ public class Assertions {
    * @param messageArgs The arguments to be formatted into the message template.
    * @throws IllegalStateException If the given expression is not true.
    */
-  public static void checkState(boolean expression,
-                                String messageTemplate,
-                                @Nullable Object... messageArgs)
+  public static void checkState(
+      boolean expression,
+      String messageTemplate,
+      @Nullable
+      Object... messageArgs
+  )
       throws IllegalStateException {
     if (!expression) {
-      throw new IllegalStateException(String.format(String.valueOf(messageTemplate),
-                                                    messageArgs));
+      throw new IllegalStateException(
+          String.format(
+              String.valueOf(messageTemplate),
+              messageArgs
+          )
+      );
     }
   }
 
@@ -109,11 +123,15 @@ public class Assertions {
   public static int checkInRange(int value, int minimum, int maximum, String valueName)
       throws IllegalArgumentException {
     if (value < minimum || value > maximum) {
-      throw new IllegalArgumentException(String.format("%s is not in [%d..%d]: %d",
-                                                       String.valueOf(valueName),
-                                                       minimum,
-                                                       maximum,
-                                                       value));
+      throw new IllegalArgumentException(
+          String.format(
+              "%s is not in [%d..%d]: %d",
+              String.valueOf(valueName),
+              minimum,
+              maximum,
+              value
+          )
+      );
     }
     return value;
   }
@@ -147,11 +165,15 @@ public class Assertions {
   public static long checkInRange(long value, long minimum, long maximum, String valueName)
       throws IllegalArgumentException {
     if (value < minimum || value > maximum) {
-      throw new IllegalArgumentException(String.format("%s is not in [%d..%d]: %d",
-                                                       String.valueOf(valueName),
-                                                       minimum,
-                                                       maximum,
-                                                       value));
+      throw new IllegalArgumentException(
+          String.format(
+              "%s is not in [%d..%d]: %d",
+              String.valueOf(valueName),
+              minimum,
+              maximum,
+              value
+          )
+      );
     }
     return value;
   }

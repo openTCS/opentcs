@@ -7,23 +7,25 @@
  */
 package org.opentcs.operationsdesk.application.action.course;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.event.ActionEvent;
-import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.common.persistence.ModelManager;
-import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  */
 public class ScrollToVehicleAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * Scrolls to a vehicle in the drawing.
@@ -53,9 +55,12 @@ public class ScrollToVehicleAction
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public ScrollToVehicleAction(@Assisted VehicleModel vehicle,
-                               OpenTCSDrawingEditor drawingEditor,
-                               ModelManager modelManager) {
+  public ScrollToVehicleAction(
+      @Assisted
+      VehicleModel vehicle,
+      OpenTCSDrawingEditor drawingEditor,
+      ModelManager modelManager
+  ) {
     this.vehicleModel = requireNonNull(vehicle, "vehicle");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.modelManager = requireNonNull(modelManager, "modelManager");

@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -39,8 +40,10 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class StandardRemoteVehicleService
-    extends StandardRemoteTCSObjectService
-    implements RemoteVehicleService {
+    extends
+      StandardRemoteTCSObjectService
+    implements
+      RemoteVehicleService {
 
   /**
    * This class's logger.
@@ -90,12 +93,15 @@ public class StandardRemoteVehicleService
    * @param kernelExecutor Executes tasks modifying kernel data.
    */
   @Inject
-  public StandardRemoteVehicleService(VehicleService vehicleService,
-                                      UserManager userManager,
-                                      RmiKernelInterfaceConfiguration configuration,
-                                      SocketFactoryProvider socketFactoryProvider,
-                                      RegistryProvider registryProvider,
-                                      @KernelExecutor ExecutorService kernelExecutor) {
+  public StandardRemoteVehicleService(
+      VehicleService vehicleService,
+      UserManager userManager,
+      RmiKernelInterfaceConfiguration configuration,
+      SocketFactoryProvider socketFactoryProvider,
+      RegistryProvider registryProvider,
+      @KernelExecutor
+      ExecutorService kernelExecutor
+  ) {
     super(vehicleService, userManager, kernelExecutor);
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.userManager = requireNonNull(userManager, "userManager");
@@ -116,10 +122,12 @@ public class StandardRemoteVehicleService
     // Export this instance via RMI.
     try {
       LOG.debug("Exporting proxy...");
-      UnicastRemoteObject.exportObject(this,
-                                       configuration.remoteVehicleServicePort(),
-                                       socketFactoryProvider.getClientSocketFactory(),
-                                       socketFactoryProvider.getServerSocketFactory());
+      UnicastRemoteObject.exportObject(
+          this,
+          configuration.remoteVehicleServicePort(),
+          socketFactoryProvider.getClientSocketFactory(),
+          socketFactoryProvider.getServerSocketFactory()
+      );
       LOG.debug("Binding instance with RMI registry...");
       rmiRegistry.rebind(RegistrationName.REMOTE_VEHICLE_SERVICE, this);
     }
@@ -156,9 +164,11 @@ public class StandardRemoteVehicleService
   }
 
   @Override
-  public void attachCommAdapter(ClientID clientId,
-                                TCSObjectReference<Vehicle> ref,
-                                VehicleCommAdapterDescription description) {
+  public void attachCommAdapter(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      VehicleCommAdapterDescription description
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
 
     try {
@@ -194,25 +204,31 @@ public class StandardRemoteVehicleService
   }
 
   @Override
-  public VehicleAttachmentInformation fetchAttachmentInformation(ClientID clientId,
-                                                                 TCSObjectReference<Vehicle> ref) {
+  public VehicleAttachmentInformation fetchAttachmentInformation(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 
     return vehicleService.fetchAttachmentInformation(ref);
   }
 
   @Override
-  public VehicleProcessModelTO fetchProcessModel(ClientID clientId,
-                                                 TCSObjectReference<Vehicle> ref) {
+  public VehicleProcessModelTO fetchProcessModel(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 
     return vehicleService.fetchProcessModel(ref);
   }
 
   @Override
-  public void sendCommAdapterCommand(ClientID clientId,
-                                     TCSObjectReference<Vehicle> ref,
-                                     AdapterCommand command) {
+  public void sendCommAdapterCommand(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      AdapterCommand command
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
 
     try {
@@ -224,9 +240,11 @@ public class StandardRemoteVehicleService
   }
 
   @Override
-  public void sendCommAdapterMessage(ClientID clientId,
-                                     TCSObjectReference<Vehicle> vehicleRef,
-                                     Object message) {
+  public void sendCommAdapterMessage(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> vehicleRef,
+      Object message
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
 
     try {
@@ -238,9 +256,11 @@ public class StandardRemoteVehicleService
   }
 
   @Override
-  public void updateVehicleIntegrationLevel(ClientID clientId,
-                                            TCSObjectReference<Vehicle> ref,
-                                            Vehicle.IntegrationLevel integrationLevel)
+  public void updateVehicleIntegrationLevel(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      Vehicle.IntegrationLevel integrationLevel
+  )
       throws RemoteException {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
 
@@ -255,9 +275,11 @@ public class StandardRemoteVehicleService
   }
 
   @Override
-  public void updateVehiclePaused(ClientID clientId,
-                                  TCSObjectReference<Vehicle> ref,
-                                  boolean paused)
+  public void updateVehiclePaused(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      boolean paused
+  )
       throws RemoteException {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
 
@@ -272,13 +294,16 @@ public class StandardRemoteVehicleService
   }
 
   @Override
-  public void updateVehicleAllowedOrderTypes(ClientID clientId, TCSObjectReference<Vehicle> ref,
-                                             Set<String> allowedOrderTypes) {
+  public void updateVehicleAllowedOrderTypes(
+      ClientID clientId, TCSObjectReference<Vehicle> ref,
+      Set<String> allowedOrderTypes
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
 
     try {
       kernelExecutor.submit(
-          () -> vehicleService.updateVehicleAllowedOrderTypes(ref, allowedOrderTypes))
+          () -> vehicleService.updateVehicleAllowedOrderTypes(ref, allowedOrderTypes)
+      )
           .get();
     }
     catch (InterruptedException | ExecutionException exc) {
@@ -287,9 +312,11 @@ public class StandardRemoteVehicleService
   }
 
   @Override
-  public void updateVehicleEnvelopeKey(ClientID clientId,
-                                       TCSObjectReference<Vehicle> ref,
-                                       String envelopeKey)
+  public void updateVehicleEnvelopeKey(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      String envelopeKey
+  )
       throws RemoteException {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
 

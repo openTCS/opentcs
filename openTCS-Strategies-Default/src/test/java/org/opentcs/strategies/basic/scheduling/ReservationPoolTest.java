@@ -7,8 +7,6 @@
  */
 package org.opentcs.strategies.basic.scheduling;
 
-import java.util.List;
-import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
@@ -17,6 +15,9 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsMapWithSize.anEmptyMap;
+
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.Scheduler;
@@ -130,7 +131,8 @@ class ReservationPoolTest {
    * A dummy client for cases in which we need to provide a client but do not have a real one.
    */
   private static class TestClient
-      implements Scheduler.Client {
+      implements
+        Scheduler.Client {
 
     @Override
     public String getId() {

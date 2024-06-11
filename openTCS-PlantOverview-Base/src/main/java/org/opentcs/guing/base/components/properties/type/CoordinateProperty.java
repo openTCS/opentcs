@@ -14,7 +14,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * Examples: 1 mm, 20 cm, 3.4 m, 17.98 km
  */
 public class CoordinateProperty
-    extends LengthProperty {
+    extends
+      LengthProperty {
 
   /**
    * Creates a new instance of CoordinateProperty.

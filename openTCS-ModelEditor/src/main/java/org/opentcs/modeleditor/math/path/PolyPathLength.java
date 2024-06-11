@@ -7,20 +7,22 @@
  */
 package org.opentcs.modeleditor.math.path;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.model.elements.PathModel;
 import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.common.persistence.ModelManager;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * Calculates the length of {@link PathModel.Type#POLYPATH} paths.
  */
 public class PolyPathLength
-    implements PathLengthFunction {
+    implements
+      PathLengthFunction {
 
   private final double scaleX;
   private final double scaleY;
@@ -33,8 +35,12 @@ public class PolyPathLength
    * @param pathLengthMath Provides euclidean distance method.
    */
   @Inject
-  public PolyPathLength(@Nonnull ModelManager manager,
-                        @Nonnull PathLengthMath pathLengthMath) {
+  public PolyPathLength(
+      @Nonnull
+      ModelManager manager,
+      @Nonnull
+      PathLengthMath pathLengthMath
+  ) {
     requireNonNull(manager, "manager");
     this.pathLengthMath = requireNonNull(pathLengthMath, "pathLengthMath");
     scaleX = manager.getModel().getLayoutModel().getPropertyScaleX()
@@ -58,7 +64,8 @@ public class PolyPathLength
         ((PointModel) path.getStartComponent()).getPropertyModelPositionX()
             .getValueByUnit(LengthProperty.Unit.MM),
         ((PointModel) path.getStartComponent()).getPropertyModelPositionY()
-            .getValueByUnit(LengthProperty.Unit.MM));
+            .getValueByUnit(LengthProperty.Unit.MM)
+    );
 
     for (int i = 0; i < cps.length; i++) {
       String couple = cps[i];

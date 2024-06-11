@@ -23,7 +23,8 @@ import org.opentcs.guing.common.util.IconToolkit;
  * Represents a Figure component in the TreeView.
  */
 public class FigureUserObject
-    extends AbstractUserObject {
+    extends
+      AbstractUserObject {
 
   /**
    * All selected user objects.
@@ -37,9 +38,11 @@ public class FigureUserObject
    * @param guiManager The gui manager.
    * @param modelManager The model manager
    */
-  public FigureUserObject(ModelComponent modelComponent,
-                          GuiManager guiManager,
-                          ModelManager modelManager) {
+  public FigureUserObject(
+      ModelComponent modelComponent,
+      GuiManager guiManager,
+      ModelManager modelManager
+  ) {
     super(modelComponent, guiManager, modelManager);
   }
 

@@ -7,6 +7,10 @@
  */
 package org.opentcs.kernelcontrolcenter.vehicles;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
+import static org.opentcs.util.Assertions.checkState;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.awt.EventQueue;
@@ -18,7 +22,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,9 +40,7 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.commands.InitPositionCommand;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
-import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 import org.opentcs.kernelcontrolcenter.util.SingleCellEditor;
-import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.CallWrapper;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.gui.BoundsPopupMenuListener;
@@ -51,7 +52,8 @@ import org.slf4j.LoggerFactory;
  * A panel containing all vehicles and detailed information.
  */
 public class DriverGUI
-    extends ControlCenterPanel {
+    extends
+      ControlCenterPanel {
 
   /**
    * This class's Logger.
@@ -92,10 +94,17 @@ public class DriverGUI
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public DriverGUI(@Nonnull KernelServicePortal servicePortal,
-                   @Nonnull @ServiceCallWrapper CallWrapper callWrapper,
-                   @Nonnull LocalVehicleEntryPool vehicleEntryPool,
-                   @Nonnull DetailPanel detailPanel) {
+  public DriverGUI(
+      @Nonnull
+      KernelServicePortal servicePortal,
+      @Nonnull
+      @ServiceCallWrapper
+      CallWrapper callWrapper,
+      @Nonnull
+      LocalVehicleEntryPool vehicleEntryPool,
+      @Nonnull
+      DetailPanel detailPanel
+  ) {
     this.servicePortal = requireNonNull(servicePortal, "servicePortal");
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");
     this.vehicleEntryPool = requireNonNull(vehicleEntryPool, "vehicleEntryPool");
@@ -103,8 +112,10 @@ public class DriverGUI
 
     initComponents();
 
-    vehicleTable.setDefaultRenderer(VehicleCommAdapterDescription.class,
-                                    new VehicleCommAdapterFactoryTableCellRenderer());
+    vehicleTable.setDefaultRenderer(
+        VehicleCommAdapterDescription.class,
+        new VehicleCommAdapterFactoryTableCellRenderer()
+    );
     vehicleDetailPanel.add(detailPanel);
   }
 
@@ -129,9 +140,11 @@ public class DriverGUI
       LOG.warn("Error getting the kernel state", ex);
       return;
     }
-    checkState(Kernel.State.OPERATING.equals(kernelState),
-               "Cannot work in kernel state %s",
-               kernelState);
+    checkState(
+        Kernel.State.OPERATING.equals(kernelState),
+        "Cannot work in kernel state %s",
+        kernelState
+    );
 
     vehicleEntryPool.initialize();
     detailPanel.initialize();
@@ -189,14 +202,19 @@ public class DriverGUI
         .setCellEditor(pointsCellEditor);
   }
 
-  private void initCommAdaptersComboBox(LocalVehicleEntry vehicleEntry,
-                                        int rowIndex,
-                                        SingleCellEditor adapterCellEditor) {
+  private void initCommAdaptersComboBox(
+      LocalVehicleEntry vehicleEntry,
+      int rowIndex,
+      SingleCellEditor adapterCellEditor
+  ) {
     final CommAdapterComboBox comboBox = new CommAdapterComboBox();
     VehicleAttachmentInformation ai;
     try {
-      ai = callWrapper.call(() -> servicePortal.getVehicleService().fetchAttachmentInformation(
-          vehicleEntry.getAttachmentInformation().getVehicleReference()));
+      ai = callWrapper.call(
+          () -> servicePortal.getVehicleService().fetchAttachmentInformation(
+              vehicleEntry.getAttachmentInformation().getVehicleReference()
+          )
+      );
     }
     catch (Exception ex) {
       LOG.warn("Error fetching attachment information for {}", vehicleEntry.getVehicleName(), ex);
@@ -225,21 +243,27 @@ public class DriverGUI
           null,
           bundle.getString("driverGui.optionPane_driverChangeConfirmation.message"),
           bundle.getString("driverGui.optionPane_driverChangeConfirmation.title"),
-          JOptionPane.YES_NO_OPTION);
+          JOptionPane.YES_NO_OPTION
+      );
       if (reply == JOptionPane.NO_OPTION) {
         return;
       }
 
       VehicleCommAdapterDescription factory = comboBox.getSelectedItem();
       try {
-        callWrapper.call(() -> servicePortal.getVehicleService().attachCommAdapter(
-            vehicleEntry.getAttachmentInformation().getVehicleReference(), factory));
+        callWrapper.call(
+            () -> servicePortal.getVehicleService().attachCommAdapter(
+                vehicleEntry.getAttachmentInformation().getVehicleReference(), factory
+            )
+        );
       }
       catch (Exception ex) {
-        LOG.warn("Error attaching adapter {} to vehicle {}",
-                 factory,
-                 vehicleEntry.getVehicleName(),
-                 ex);
+        LOG.warn(
+            "Error attaching adapter {} to vehicle {}",
+            factory,
+            vehicleEntry.getVehicleName(),
+            ex
+        );
         return;
       }
       LOG.info("Attaching comm adapter {} to {}", factory, vehicleEntry.getVehicleName());
@@ -279,13 +303,18 @@ public class DriverGUI
           Point newPoint = (Point) e.getItem();
           LocalVehicleEntry vehicleEntry = vehicleEntryPool.getEntryFor(getSelectedVehicleName());
           if (vehicleEntry.getAttachedCommAdapterDescription().isSimVehicleCommAdapter()) {
-            callWrapper.call(() -> servicePortal.getVehicleService().sendCommAdapterCommand(
-                vehicleEntry.getAttachmentInformation().getVehicleReference(),
-                new InitPositionCommand(newPoint.getName())));
+            callWrapper.call(
+                () -> servicePortal.getVehicleService().sendCommAdapterCommand(
+                    vehicleEntry.getAttachmentInformation().getVehicleReference(),
+                    new InitPositionCommand(newPoint.getName())
+                )
+            );
           }
           else {
-            LOG.debug("Vehicle {}: Not a simulation adapter -> not setting initial position.",
-                      vehicleEntry.getVehicleName());
+            LOG.debug(
+                "Vehicle {}: Not a simulation adapter -> not setting initial position.",
+                vehicleEntry.getVehicleName()
+            );
           }
         }
       }
@@ -311,8 +340,11 @@ public class DriverGUI
 
     try {
       for (LocalVehicleEntry entry : entries) {
-        callWrapper.call(() -> servicePortal.getVehicleService().enableCommAdapter(
-            entry.getAttachmentInformation().getVehicleReference()));
+        callWrapper.call(
+            () -> servicePortal.getVehicleService().enableCommAdapter(
+                entry.getAttachmentInformation().getVehicleReference()
+            )
+        );
       }
     }
     catch (Exception ex) {
@@ -335,8 +367,11 @@ public class DriverGUI
 
     try {
       for (LocalVehicleEntry entry : entries) {
-        callWrapper.call(() -> servicePortal.getVehicleService().disableCommAdapter(
-            entry.getAttachmentInformation().getVehicleReference()));
+        callWrapper.call(
+            () -> servicePortal.getVehicleService().disableCommAdapter(
+                entry.getAttachmentInformation().getVehicleReference()
+            )
+        );
       }
     }
     catch (Exception ex) {
@@ -419,6 +454,7 @@ public class DriverGUI
     return stateCounts;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
@@ -532,6 +568,8 @@ public class DriverGUI
 
         getAccessibleContext().setAccessibleName(bundle.getString("driverGui.accessibleName")); // NOI18N
     }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void driverMenuMenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_driverMenuMenuSelected
     createDriverMenu();
@@ -553,7 +591,9 @@ public class DriverGUI
     disableSelectedCommAdapters();
   }//GEN-LAST:event_disableAllSelectedMenuItemActionPerformed
 
-  private void vehicleListPopupMenuPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_vehicleListPopupMenuPopupMenuWillBecomeVisible
+  private void vehicleListPopupMenuPopupMenuWillBecomeVisible(
+      javax.swing.event.PopupMenuEvent evt
+  ) {//GEN-FIRST:event_vehicleListPopupMenuPopupMenuWillBecomeVisible
     createPopupMenu();
   }//GEN-LAST:event_vehicleListPopupMenuPopupMenuWillBecomeVisible
 
@@ -568,7 +608,10 @@ public class DriverGUI
       }
     }
   }//GEN-LAST:event_vehicleTableMouseClicked
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
+  // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem disableAllMenuItem;
     private javax.swing.JMenuItem disableAllSelectedMenuItem;
     private javax.swing.JMenu driverMenu;
@@ -584,12 +627,14 @@ public class DriverGUI
     private javax.swing.JTable vehicleTable;
     // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   /**
    * Attaches adapters produced by a given factory to a set of vehicles when performed.
    */
   private class AttachCommAdapterAction
-      extends AbstractAction {
+      extends
+        AbstractAction {
 
     /**
      * The affected vehicles' entries.
@@ -606,8 +651,10 @@ public class DriverGUI
      * @param vehicleNames The affected vehicles' entries.
      * @param commAdapterDescription The factory providing the communication adapter.
      */
-    private AttachCommAdapterAction(List<String> vehicleNames,
-                                    VehicleCommAdapterDescription commAdapterDescription) {
+    private AttachCommAdapterAction(
+        List<String> vehicleNames,
+        VehicleCommAdapterDescription commAdapterDescription
+    ) {
       super(commAdapterDescription.getDescription());
       this.vehicleNames = requireNonNull(vehicleNames, "vehicleNames");
       this.commAdapterDescription = requireNonNull(commAdapterDescription, "factory");

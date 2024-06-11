@@ -8,16 +8,18 @@
 package org.opentcs.guing.common.exchange;
 
 import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkState;
+
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortal;
-import static org.opentcs.util.Assertions.checkState;
 
 /**
  * Implementation of the {@link SharedKernelServicePortal} interface to give access to a shared
  * portal object.
  */
 public class ApplicationPortal
-    implements SharedKernelServicePortal {
+    implements
+      SharedKernelServicePortal {
 
   /**
    * The portal.
@@ -43,9 +45,11 @@ public class ApplicationPortal
    * @param portalProvider The provider this client is registered with.
    * @param registeredToken The token that is actually registered with the provider.
    */
-  public ApplicationPortal(KernelServicePortal portal,
-                           ApplicationPortalProvider portalProvider,
-                           Object registeredToken) {
+  public ApplicationPortal(
+      KernelServicePortal portal,
+      ApplicationPortalProvider portalProvider,
+      Object registeredToken
+  ) {
     this.portal = requireNonNull(portal, "portal");
     this.sharedPortalProvider = requireNonNull(portalProvider, "portalProvider");
     this.registeredToken = requireNonNull(registeredToken, "registeredToken");

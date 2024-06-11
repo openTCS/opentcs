@@ -3,6 +3,8 @@
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar;
 
+import static java.util.Objects.requireNonNull;
+
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -11,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
@@ -35,7 +36,8 @@ import org.opentcs.guing.common.application.ApplicationState;
  * The default selection tool.
  */
 public abstract class AbstractMultipleSelectionTool
-    extends DelegationSelectionTool {
+    extends
+      DelegationSelectionTool {
 
   /**
    * A bit mask for the left mouse button being clicked and the ctrl key being
@@ -72,11 +74,13 @@ public abstract class AbstractMultipleSelectionTool
    * @param selectionActions Selection-related actions for the popup menus created by this tool.
    */
   @SuppressWarnings("this-escape")
-  public AbstractMultipleSelectionTool(ApplicationState appState,
-                                       SelectAreaTracker selectAreaTracker,
-                                       DragTracker dragTracker,
-                                       Collection<Action> drawingActions,
-                                       Collection<Action> selectionActions) {
+  public AbstractMultipleSelectionTool(
+      ApplicationState appState,
+      SelectAreaTracker selectAreaTracker,
+      DragTracker dragTracker,
+      Collection<Action> drawingActions,
+      Collection<Action> selectionActions
+  ) {
     super(drawingActions, selectionActions);
     this.appState = requireNonNull(appState, "appState");
     requireNonNull(selectAreaTracker, "selectAreaTracker");
@@ -103,12 +107,12 @@ public abstract class AbstractMultipleSelectionTool
           && lastClickEvent.getClickCount() == 1
           && lastClickEvent.getX() == evt.getX()
           && lastClickEvent.getY() == evt.getY()) {
-        // click with ctrl
-        if (((evt.getModifiersEx() & CTRL_LEFT_MASK) > 0)
-            && ((lastClickEvent.getModifiersEx() & CTRL_LEFT_MASK) > 0)) {
-          handleMultiClick(evt);
-        }
-      }
+            // click with ctrl
+            if (((evt.getModifiersEx() & CTRL_LEFT_MASK) > 0)
+                && ((lastClickEvent.getModifiersEx() & CTRL_LEFT_MASK) > 0)) {
+              handleMultiClick(evt);
+            }
+          }
     }
 
     lastClickEvent = evt;

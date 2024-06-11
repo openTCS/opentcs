@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Path;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.EnvelopeTO;
@@ -35,9 +36,15 @@ public class PathTO {
 
   @JsonCreator
   public PathTO(
-      @Nonnull @JsonProperty(value = "name", required = true) String name,
-      @Nonnull @JsonProperty(value = "srcPointName", required = true) String srcPointName,
-      @Nonnull @JsonProperty(value = "destPointName", required = true) String destPointName
+      @Nonnull
+      @JsonProperty(value = "name", required = true)
+      String name,
+      @Nonnull
+      @JsonProperty(value = "srcPointName", required = true)
+      String srcPointName,
+      @Nonnull
+      @JsonProperty(value = "destPointName", required = true)
+      String destPointName
   ) {
     this.name = requireNonNull(name, "name");
     this.srcPointName = requireNonNull(srcPointName, "srcPointName");
@@ -49,7 +56,10 @@ public class PathTO {
     return name;
   }
 
-  public PathTO setName(@Nonnull String name) {
+  public PathTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     return this;
   }
@@ -59,7 +69,10 @@ public class PathTO {
     return properties;
   }
 
-  public PathTO setProperties(@Nonnull List<PropertyTO> properties) {
+  public PathTO setProperties(
+      @Nonnull
+      List<PropertyTO> properties
+  ) {
     this.properties = requireNonNull(properties, "properties");
     return this;
   }
@@ -69,7 +82,10 @@ public class PathTO {
     return srcPointName;
   }
 
-  public PathTO setSrcPointName(@Nonnull String srcPointName) {
+  public PathTO setSrcPointName(
+      @Nonnull
+      String srcPointName
+  ) {
     this.srcPointName = requireNonNull(srcPointName, "srcPointName");
     return this;
   }
@@ -79,7 +95,10 @@ public class PathTO {
     return destPointName;
   }
 
-  public PathTO setDestPointName(@Nonnull String destPointName) {
+  public PathTO setDestPointName(
+      @Nonnull
+      String destPointName
+  ) {
     this.destPointName = requireNonNull(destPointName, "destPointName");
     return this;
   }
@@ -117,7 +136,9 @@ public class PathTO {
   }
 
   public PathTO setPeripheralOperations(
-      @Nonnull List<PeripheralOperationTO> peripheralOperations) {
+      @Nonnull
+      List<PeripheralOperationTO> peripheralOperations
+  ) {
     this.peripheralOperations = requireNonNull(peripheralOperations, "peripheralOperations");
     return this;
   }
@@ -136,7 +157,10 @@ public class PathTO {
     return layout;
   }
 
-  public PathTO setLayout(@Nonnull Layout layout) {
+  public PathTO setLayout(
+      @Nonnull
+      Layout layout
+  ) {
     this.layout = requireNonNull(layout, "layout");
     return this;
   }
@@ -146,7 +170,10 @@ public class PathTO {
     return vehicleEnvelopes;
   }
 
-  public PathTO setVehicleEnvelopes(@Nonnull List<EnvelopeTO> vehicleEnvelopes) {
+  public PathTO setVehicleEnvelopes(
+      @Nonnull
+      List<EnvelopeTO> vehicleEnvelopes
+  ) {
     this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     return this;
   }
@@ -166,7 +193,10 @@ public class PathTO {
       return connectionType;
     }
 
-    public Layout setConnectionType(@Nonnull String connectionType) {
+    public Layout setConnectionType(
+        @Nonnull
+        String connectionType
+    ) {
       this.connectionType = requireNonNull(connectionType, "connectionType");
       return this;
     }
@@ -176,7 +206,10 @@ public class PathTO {
       return controlPoints;
     }
 
-    public Layout setControlPoints(@Nonnull List<CoupleTO> controlPoints) {
+    public Layout setControlPoints(
+        @Nonnull
+        List<CoupleTO> controlPoints
+    ) {
       this.controlPoints = requireNonNull(controlPoints, "controlPoints");
       return this;
     }

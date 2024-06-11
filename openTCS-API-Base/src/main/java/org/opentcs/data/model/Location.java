@@ -7,12 +7,13 @@
  */
 package org.opentcs.data.model;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
 import org.opentcs.data.ObjectHistory;
@@ -35,8 +36,10 @@ import org.opentcs.data.model.visualization.LocationRepresentation;
  * @see LocationType
  */
 public class Location
-    extends TCSResource<Location>
-    implements Serializable {
+    extends
+      TCSResource<Location>
+    implements
+      Serializable {
 
   /**
    * This location's position in mm.
@@ -82,15 +85,17 @@ public class Location
     this.layout = new Layout();
   }
 
-  private Location(String name,
-                   Map<String, String> properties,
-                   ObjectHistory history,
-                   TCSObjectReference<LocationType> locationType,
-                   Triple position,
-                   Set<Link> attachedLinks,
-                   boolean locked,
-                   PeripheralInformation peripheralInformation,
-                   Layout layout) {
+  private Location(
+      String name,
+      Map<String, String> properties,
+      ObjectHistory history,
+      TCSObjectReference<LocationType> locationType,
+      Triple position,
+      Set<Link> attachedLinks,
+      boolean locked,
+      PeripheralInformation peripheralInformation,
+      Layout layout
+  ) {
     super(name, properties, history);
     this.type = requireNonNull(locationType, "locationType");
     this.position = requireNonNull(position, "position");
@@ -102,54 +107,62 @@ public class Location
 
   @Override
   public Location withProperty(String key, String value) {
-    return new Location(getName(),
-                        propertiesWith(key, value),
-                        getHistory(),
-                        type,
-                        position,
-                        attachedLinks,
-                        locked,
-                        peripheralInformation,
-                        layout);
+    return new Location(
+        getName(),
+        propertiesWith(key, value),
+        getHistory(),
+        type,
+        position,
+        attachedLinks,
+        locked,
+        peripheralInformation,
+        layout
+    );
   }
 
   @Override
   public Location withProperties(Map<String, String> properties) {
-    return new Location(getName(),
-                        properties,
-                        getHistory(),
-                        type,
-                        position,
-                        attachedLinks,
-                        locked,
-                        peripheralInformation,
-                        layout);
+    return new Location(
+        getName(),
+        properties,
+        getHistory(),
+        type,
+        position,
+        attachedLinks,
+        locked,
+        peripheralInformation,
+        layout
+    );
   }
 
   @Override
   public TCSObject<Location> withHistoryEntry(ObjectHistory.Entry entry) {
-    return new Location(getName(),
-                        getProperties(),
-                        getHistory().withEntryAppended(entry),
-                        type,
-                        position,
-                        attachedLinks,
-                        locked,
-                        peripheralInformation,
-                        layout);
+    return new Location(
+        getName(),
+        getProperties(),
+        getHistory().withEntryAppended(entry),
+        type,
+        position,
+        attachedLinks,
+        locked,
+        peripheralInformation,
+        layout
+    );
   }
 
   @Override
   public TCSObject<Location> withHistory(ObjectHistory history) {
-    return new Location(getName(),
-                        getProperties(),
-                        history,
-                        type,
-                        position,
-                        attachedLinks,
-                        locked,
-                        peripheralInformation,
-                        layout);
+    return new Location(
+        getName(),
+        getProperties(),
+        history,
+        type,
+        position,
+        attachedLinks,
+        locked,
+        peripheralInformation,
+        layout
+    );
   }
 
   /**
@@ -168,15 +181,17 @@ public class Location
    * @return A copy of this object, differing in the given value.
    */
   public Location withPosition(Triple position) {
-    return new Location(getName(),
-                        getProperties(),
-                        getHistory(),
-                        type,
-                        position,
-                        attachedLinks,
-                        locked,
-                        peripheralInformation,
-                        layout);
+    return new Location(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        position,
+        attachedLinks,
+        locked,
+        peripheralInformation,
+        layout
+    );
   }
 
   /**
@@ -203,16 +218,21 @@ public class Location
    * @param attachedLinks The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public Location withAttachedLinks(@Nonnull Set<Link> attachedLinks) {
-    return new Location(getName(),
-                        getProperties(),
-                        getHistory(),
-                        type,
-                        position,
-                        attachedLinks,
-                        locked,
-                        peripheralInformation,
-                        layout);
+  public Location withAttachedLinks(
+      @Nonnull
+      Set<Link> attachedLinks
+  ) {
+    return new Location(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        position,
+        attachedLinks,
+        locked,
+        peripheralInformation,
+        layout
+    );
   }
 
   /**
@@ -231,16 +251,21 @@ public class Location
    * @param peripheralInformation The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public Location withPeripheralInformation(@Nonnull PeripheralInformation peripheralInformation) {
-    return new Location(getName(),
-                        getProperties(),
-                        getHistory(),
-                        type,
-                        position,
-                        attachedLinks,
-                        locked,
-                        peripheralInformation,
-                        layout);
+  public Location withPeripheralInformation(
+      @Nonnull
+      PeripheralInformation peripheralInformation
+  ) {
+    return new Location(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        position,
+        attachedLinks,
+        locked,
+        peripheralInformation,
+        layout
+    );
   }
 
   /**
@@ -260,15 +285,17 @@ public class Location
    * @return A copy of this object, differing in the given value.
    */
   public Location withLocked(boolean locked) {
-    return new Location(getName(),
-                        getProperties(),
-                        getHistory(),
-                        type,
-                        position,
-                        attachedLinks,
-                        locked,
-                        peripheralInformation,
-                        layout);
+    return new Location(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        position,
+        attachedLinks,
+        locked,
+        peripheralInformation,
+        layout
+    );
   }
 
   /**
@@ -287,15 +314,17 @@ public class Location
    * @return A copy of this object, differing in the given value.
    */
   public Location withLayout(Layout layout) {
-    return new Location(getName(),
-                        getProperties(),
-                        getHistory(),
-                        type,
-                        position,
-                        attachedLinks,
-                        locked,
-                        peripheralInformation,
-                        layout);
+    return new Location(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        position,
+        attachedLinks,
+        locked,
+        peripheralInformation,
+        layout
+    );
   }
 
   /**
@@ -303,7 +332,8 @@ public class Location
    * reachable from the point.
    */
   public static class Link
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * A reference to the location end of this link.
@@ -324,20 +354,28 @@ public class Location
      * @param location A reference to the location end of this link.
      * @param point A reference to the point end of this link.
      */
-    public Link(TCSResourceReference<Location> location,
-                TCSResourceReference<Point> point) {
+    public Link(
+        TCSResourceReference<Location> location,
+        TCSResourceReference<Point> point
+    ) {
       this.location = requireNonNull(location, "location");
       this.point = requireNonNull(point, "point");
       this.allowedOperations = new TreeSet<>();
     }
 
-    private Link(TCSResourceReference<Location> location,
-                 TCSResourceReference<Point> point,
-                 Set<String> allowedOperations) {
+    private Link(
+        TCSResourceReference<Location> location,
+        TCSResourceReference<Point> point,
+        Set<String> allowedOperations
+    ) {
       this.location = requireNonNull(location, "location");
       this.point = requireNonNull(point, "point");
-      this.allowedOperations = new TreeSet<>(requireNonNull(allowedOperations,
-                                                            "allowedOperations"));
+      this.allowedOperations = new TreeSet<>(
+          requireNonNull(
+              allowedOperations,
+              "allowedOperations"
+          )
+      );
     }
 
     /**
@@ -429,7 +467,8 @@ public class Location
    * Contains information regarding the grahical representation of a location.
    */
   public static class Layout
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The coordinates at which the location is to be drawn (in mm).
@@ -463,14 +502,18 @@ public class Location
      * @param locationRepresentation The location representation to use.
      * @param layerId The ID of the layer on which the location is to be drawn.
      */
-    public Layout(Couple position,
-                  Couple labelOffset,
-                  LocationRepresentation locationRepresentation,
-                  int layerId) {
+    public Layout(
+        Couple position,
+        Couple labelOffset,
+        LocationRepresentation locationRepresentation,
+        int layerId
+    ) {
       this.position = requireNonNull(position, "position");
       this.labelOffset = requireNonNull(labelOffset, "labelOffset");
-      this.locationRepresentation = requireNonNull(locationRepresentation,
-                                                   "locationRepresentation");
+      this.locationRepresentation = requireNonNull(
+          locationRepresentation,
+          "locationRepresentation"
+      );
       this.layerId = layerId;
     }
 
@@ -490,10 +533,12 @@ public class Location
      * @return A copy of this object, differing in the given value.
      */
     public Layout withPosition(Couple position) {
-      return new Layout(position,
-                        labelOffset,
-                        locationRepresentation,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          locationRepresentation,
+          layerId
+      );
     }
 
     /**
@@ -512,10 +557,12 @@ public class Location
      * @return A copy of this object, differing in the given value.
      */
     public Layout withLabelOffset(Couple labelOffset) {
-      return new Layout(position,
-                        labelOffset,
-                        locationRepresentation,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          locationRepresentation,
+          layerId
+      );
     }
 
     /**
@@ -534,10 +581,12 @@ public class Location
      * @return A copy of this object, differing in the given value.
      */
     public Layout withLocationRepresentation(LocationRepresentation locationRepresentation) {
-      return new Layout(position,
-                        labelOffset,
-                        locationRepresentation,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          locationRepresentation,
+          layerId
+      );
     }
 
     /**
@@ -556,10 +605,12 @@ public class Location
      * @return A copy of this object, differing in the given value.
      */
     public Layout withLayerId(int layerId) {
-      return new Layout(position,
-                        labelOffset,
-                        locationRepresentation,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          locationRepresentation,
+          layerId
+      );
     }
   }
 }

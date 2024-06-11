@@ -29,10 +29,12 @@ import org.slf4j.LoggerFactory;
 /**
  */
 public abstract class SimpleLineConnection
-    extends LineConnectionFigure
-    implements ModelBasedFigure,
-               AttributesChangeListener,
-               OriginChangeListener {
+    extends
+      LineConnectionFigure
+    implements
+      ModelBasedFigure,
+      AttributesChangeListener,
+      OriginChangeListener {
 
   protected static final AttributeKey<Color> FILL_COLOR
       = new AttributeKey<>("FillColor", Color.class);

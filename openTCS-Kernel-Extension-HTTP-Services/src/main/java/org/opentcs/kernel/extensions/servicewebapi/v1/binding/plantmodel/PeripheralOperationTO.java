@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.peripherals.PeripheralOperation;
 
 /**
@@ -24,8 +25,12 @@ public class PeripheralOperationTO {
 
   @JsonCreator
   public PeripheralOperationTO(
-      @Nonnull @JsonProperty(value = "operation", required = true) String operation,
-      @Nonnull @JsonProperty(value = "locationName", required = true) String locationName
+      @Nonnull
+      @JsonProperty(value = "operation", required = true)
+      String operation,
+      @Nonnull
+      @JsonProperty(value = "locationName", required = true)
+      String locationName
   ) {
     this.operation = requireNonNull(operation, "operation");
     this.locationName = requireNonNull(locationName, "locationName");
@@ -36,7 +41,10 @@ public class PeripheralOperationTO {
     return operation;
   }
 
-  public PeripheralOperationTO setOperation(@Nonnull String operation) {
+  public PeripheralOperationTO setOperation(
+      @Nonnull
+      String operation
+  ) {
     this.operation = requireNonNull(operation, "operation");
     return this;
   }
@@ -46,7 +54,10 @@ public class PeripheralOperationTO {
     return locationName;
   }
 
-  public PeripheralOperationTO setLocationName(@Nonnull String locationName) {
+  public PeripheralOperationTO setLocationName(
+      @Nonnull
+      String locationName
+  ) {
     this.locationName = requireNonNull(locationName, "locationName");
     return this;
   }
@@ -56,7 +67,10 @@ public class PeripheralOperationTO {
     return executionTrigger;
   }
 
-  public PeripheralOperationTO setExecutionTrigger(@Nonnull String executionTrigger) {
+  public PeripheralOperationTO setExecutionTrigger(
+      @Nonnull
+      String executionTrigger
+  ) {
     this.executionTrigger = requireNonNull(executionTrigger, "executionTrigger");
     return this;
   }

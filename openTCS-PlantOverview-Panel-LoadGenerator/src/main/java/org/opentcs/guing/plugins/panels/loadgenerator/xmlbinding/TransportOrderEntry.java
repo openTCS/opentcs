@@ -7,10 +7,11 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
@@ -48,10 +49,12 @@ public class TransportOrderEntry {
    * @param intendedVehicle The intended vehicle for this transport order
    * @param properties A map containing the properties of this transport order
    */
-  public TransportOrderEntry(TransportOrderData.Deadline deadline,
-                             List<DriveOrderStructure> driveOrders,
-                             String intendedVehicle,
-                             Map<String, String> properties) {
+  public TransportOrderEntry(
+      TransportOrderData.Deadline deadline,
+      List<DriveOrderStructure> driveOrders,
+      String intendedVehicle,
+      Map<String, String> properties
+  ) {
     switch (deadline) {
       case MINUS_FIVE_MINUTES:
         this.deadline = Deadline.MINUS_FIVE_MINUTES;
@@ -76,12 +79,16 @@ public class TransportOrderEntry {
     this.intendedVehicle = intendedVehicle;
     for (Map.Entry<String, String> curEntry : properties.entrySet()) {
       this.properties.add(
-          new XMLMapEntry(curEntry.getKey(), curEntry.getValue()));
+          new XMLMapEntry(curEntry.getKey(), curEntry.getValue())
+      );
     }
     for (DriveOrderStructure curDOS : driveOrders) {
       this.driveOrders.add(
-          new DriveOrderEntry(curDOS.getDriveOrderLocation().getName(),
-                              curDOS.getDriveOrderVehicleOperation()));
+          new DriveOrderEntry(
+              curDOS.getDriveOrderLocation().getName(),
+              curDOS.getDriveOrderVehicleOperation()
+          )
+      );
     }
   }
 

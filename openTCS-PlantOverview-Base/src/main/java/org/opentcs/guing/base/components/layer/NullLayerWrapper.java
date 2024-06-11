@@ -14,7 +14,8 @@ import org.opentcs.data.model.visualization.LayerGroup;
  * A null object for a layer wrapper.
  */
 public class NullLayerWrapper
-    extends LayerWrapper {
+    extends
+      LayerWrapper {
 
   public NullLayerWrapper() {
     super(new Layer(0, 0, true, "null", 0), new LayerGroup(0, "null", true));

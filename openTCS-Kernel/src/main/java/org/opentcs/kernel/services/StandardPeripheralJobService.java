@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.services;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.components.kernel.services.InternalPeripheralJobService;
@@ -25,8 +26,10 @@ import org.opentcs.kernel.workingset.PeripheralJobPoolManager;
  * This class is the standard implementation of the {@link PeripheralJobService} interface.
  */
 public class StandardPeripheralJobService
-    extends AbstractTCSObjectService
-    implements InternalPeripheralJobService {
+    extends
+      AbstractTCSObjectService
+    implements
+      InternalPeripheralJobService {
 
   /**
    * A global object to be used for synchronization within the kernel.
@@ -45,17 +48,22 @@ public class StandardPeripheralJobService
    * @param jobPoolManager The job pool manager to be used.
    */
   @Inject
-  public StandardPeripheralJobService(TCSObjectService objectService,
-                                      @GlobalSyncObject Object globalSyncObject,
-                                      PeripheralJobPoolManager jobPoolManager) {
+  public StandardPeripheralJobService(
+      TCSObjectService objectService,
+      @GlobalSyncObject
+      Object globalSyncObject,
+      PeripheralJobPoolManager jobPoolManager
+  ) {
     super(objectService);
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.jobPoolManager = requireNonNull(jobPoolManager, "jobPoolManager");
   }
 
   @Override
-  public void updatePeripheralJobState(TCSObjectReference<PeripheralJob> ref,
-                                       PeripheralJob.State state)
+  public void updatePeripheralJobState(
+      TCSObjectReference<PeripheralJob> ref,
+      PeripheralJob.State state
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(state, "state");
@@ -67,7 +75,9 @@ public class StandardPeripheralJobService
 
   @Override
   public PeripheralJob createPeripheralJob(PeripheralJobCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        ObjectExistsException,
+        KernelRuntimeException {
     requireNonNull(to, "to");
 
     synchronized (globalSyncObject) {

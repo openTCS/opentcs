@@ -7,11 +7,12 @@
  */
 package org.opentcs.strategies.basic.scheduling.modules;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.components.kernel.Scheduler;
@@ -30,7 +31,8 @@ import org.slf4j.LoggerFactory;
  * to the client.
  */
 public class SingleVehicleBlockModule
-    implements Scheduler.Module {
+    implements
+      Scheduler.Module {
 
   /**
    * This class's logger.
@@ -54,9 +56,15 @@ public class SingleVehicleBlockModule
   private boolean initialized;
 
   @Inject
-  public SingleVehicleBlockModule(@Nonnull ReservationPool reservationPool,
-                                  @Nonnull InternalPlantModelService plantModelService,
-                                  @Nonnull @GlobalSyncObject Object globalSyncObject) {
+  public SingleVehicleBlockModule(
+      @Nonnull
+      ReservationPool reservationPool,
+      @Nonnull
+      InternalPlantModelService plantModelService,
+      @Nonnull
+      @GlobalSyncObject
+      Object globalSyncObject
+  ) {
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
@@ -86,20 +94,26 @@ public class SingleVehicleBlockModule
   }
 
   @Override
-  public void setAllocationState(Scheduler.Client client,
-                                 Set<TCSResource<?>> alloc,
-                                 List<Set<TCSResource<?>>> remainingClaim) {
+  public void setAllocationState(
+      Scheduler.Client client,
+      Set<TCSResource<?>> alloc,
+      List<Set<TCSResource<?>>> remainingClaim
+  ) {
   }
 
   @Override
-  public boolean mayAllocate(Scheduler.Client client,
-                             Set<TCSResource<?>> resources) {
+  public boolean mayAllocate(
+      Scheduler.Client client,
+      Set<TCSResource<?>> resources
+  ) {
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
     synchronized (globalSyncObject) {
-      Set<Block> blocks = filterBlocksContainingResources(resources,
-                                                          Block.Type.SINGLE_VEHICLE_ONLY);
+      Set<Block> blocks = filterBlocksContainingResources(
+          resources,
+          Block.Type.SINGLE_VEHICLE_ONLY
+      );
 
       if (blocks.isEmpty()) {
         LOG.debug("{}: No blocks to be checked, allocation allowed.", client.getId());
@@ -121,26 +135,36 @@ public class SingleVehicleBlockModule
   }
 
   @Override
-  public void prepareAllocation(Scheduler.Client client,
-                                Set<TCSResource<?>> resources) {
+  public void prepareAllocation(
+      Scheduler.Client client,
+      Set<TCSResource<?>> resources
+  ) {
   }
 
   @Override
-  public boolean hasPreparedAllocation(Scheduler.Client client,
-                                       Set<TCSResource<?>> resources) {
+  public boolean hasPreparedAllocation(
+      Scheduler.Client client,
+      Set<TCSResource<?>> resources
+  ) {
     return true;
   }
 
   @Override
-  public void allocationReleased(Scheduler.Client client,
-                                 Set<TCSResource<?>> resources) {
+  public void allocationReleased(
+      Scheduler.Client client,
+      Set<TCSResource<?>> resources
+  ) {
   }
 
-  private Set<Block> filterBlocksContainingResources(Set<TCSResource<?>> resources,
-                                                     Block.Type type) {
+  private Set<Block> filterBlocksContainingResources(
+      Set<TCSResource<?>> resources,
+      Block.Type type
+  ) {
     Set<Block> result = new HashSet<>();
-    Set<Block> blocks = plantModelService.fetchObjects(Block.class,
-                                                       block -> block.getType() == type);
+    Set<Block> blocks = plantModelService.fetchObjects(
+        Block.class,
+        block -> block.getType() == type
+    );
     for (TCSResource<?> resource : resources) {
       for (Block block : blocks) {
         if (block.getMembers().contains(resource.getReference())) {
@@ -151,8 +175,10 @@ public class SingleVehicleBlockModule
     return result;
   }
 
-  private Set<TCSResource<?>> filterRelevantResources(Set<TCSResource<?>> resources,
-                                                      Set<Block> blocks) {
+  private Set<TCSResource<?>> filterRelevantResources(
+      Set<TCSResource<?>> resources,
+      Set<Block> blocks
+  ) {
     Set<TCSResourceReference<?>> blockResources = blocks.stream()
         .flatMap(block -> block.getMembers().stream())
         .collect(Collectors.toSet());

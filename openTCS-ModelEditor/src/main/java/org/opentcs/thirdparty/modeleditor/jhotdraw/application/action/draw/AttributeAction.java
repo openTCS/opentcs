@@ -39,16 +39,19 @@ import org.jhotdraw.draw.action.AbstractSelectedAction;
  * @author Werner Randelshofer
  */
 public class AttributeAction
-    extends AbstractSelectedAction {
+    extends
+      AbstractSelectedAction {
 
   protected Map<AttributeKey, Object> attributes;
 
   @SuppressWarnings("this-escape")
-  public AttributeAction(DrawingEditor editor,
-                         AttributeKey key,
-                         Object value,
-                         String name,
-                         Icon icon) {
+  public AttributeAction(
+      DrawingEditor editor,
+      AttributeKey key,
+      Object value,
+      String name,
+      Icon icon
+  ) {
     super(editor);
     this.attributes = new HashMap<>();
     attributes.put(key, value);
@@ -60,10 +63,12 @@ public class AttributeAction
   }
 
   @SuppressWarnings("this-escape")
-  public AttributeAction(DrawingEditor editor,
-                         Map<AttributeKey, Object> attributes,
-                         String name,
-                         Icon icon) {
+  public AttributeAction(
+      DrawingEditor editor,
+      Map<AttributeKey, Object> attributes,
+      String name,
+      Icon icon
+  ) {
     super(editor);
     this.attributes = (attributes == null) ? new HashMap<>() : attributes;
 

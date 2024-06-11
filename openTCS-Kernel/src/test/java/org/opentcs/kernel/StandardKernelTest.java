@@ -7,18 +7,19 @@
  */
 package org.opentcs.kernel;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.google.inject.Provider;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.kernel.services.NotificationService;
@@ -44,23 +45,31 @@ class StandardKernelTest {
     Map<Kernel.State, Provider<KernelState>> stateMap = new HashMap<>();
     kernelStateShutdown = mock(KernelState.class);
     when(kernelStateShutdown.getState()).thenReturn(Kernel.State.SHUTDOWN);
-    stateMap.put(Kernel.State.SHUTDOWN,
-                 new KernelStateProvider(kernelStateShutdown));
+    stateMap.put(
+        Kernel.State.SHUTDOWN,
+        new KernelStateProvider(kernelStateShutdown)
+    );
 
     kernelStateModelling = mock(KernelState.class);
     when(kernelStateModelling.getState()).thenReturn(Kernel.State.MODELLING);
-    stateMap.put(Kernel.State.MODELLING,
-                 new KernelStateProvider(kernelStateModelling));
+    stateMap.put(
+        Kernel.State.MODELLING,
+        new KernelStateProvider(kernelStateModelling)
+    );
 
     kernelStateOperating = mock(KernelState.class);
     when(kernelStateOperating.getState()).thenReturn(Kernel.State.OPERATING);
-    stateMap.put(Kernel.State.OPERATING,
-                 new KernelStateProvider(kernelStateOperating));
+    stateMap.put(
+        Kernel.State.OPERATING,
+        new KernelStateProvider(kernelStateOperating)
+    );
 
-    kernel = new StandardKernel(new SimpleEventBus(),
-                                mock(ScheduledExecutorService.class),
-                                stateMap,
-                                mock(NotificationService.class));
+    kernel = new StandardKernel(
+        new SimpleEventBus(),
+        mock(ScheduledExecutorService.class),
+        stateMap,
+        mock(NotificationService.class)
+    );
   }
 
   @Test
@@ -80,7 +89,8 @@ class StandardKernelTest {
   }
 
   private static class KernelStateProvider
-      implements Provider<KernelState> {
+      implements
+        Provider<KernelState> {
 
     private final KernelState state;
 

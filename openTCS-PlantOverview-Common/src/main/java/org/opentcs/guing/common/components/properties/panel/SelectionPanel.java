@@ -18,8 +18,10 @@ import org.opentcs.guing.common.components.dialogs.DetailsDialogContent;
  * An user interface to select a value in a combobox.
  */
 public class SelectionPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   /**
    * The title of the dialog.
@@ -101,6 +103,7 @@ public class SelectionPanel
   public void updateValues() {
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -126,11 +129,15 @@ public class SelectionPanel
     comboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
     add(comboBox, new java.awt.GridBagConstraints());
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
-
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox<Object> comboBox;
   private javax.swing.JLabel label;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

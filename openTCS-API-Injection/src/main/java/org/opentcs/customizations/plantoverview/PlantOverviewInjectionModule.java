@@ -20,7 +20,8 @@ import org.opentcs.customizations.ConfigurableInjectionModule;
  * A base class for Guice modules adding or customizing bindings for the plant overview application.
  */
 public abstract class PlantOverviewInjectionModule
-    extends ConfigurableInjectionModule {
+    extends
+      ConfigurableInjectionModule {
 
   /**
    * Returns a multibinder that can be used to register plant model importers.

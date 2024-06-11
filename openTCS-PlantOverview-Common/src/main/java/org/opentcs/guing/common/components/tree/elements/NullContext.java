@@ -14,7 +14,8 @@ import javax.swing.JPopupMenu;
  * A null context. Use this when no special context is required.
  */
 public class NullContext
-    implements UserObjectContext {
+    implements
+      UserObjectContext {
 
   /**
    * Creates a new instance.

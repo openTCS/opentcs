@@ -3,12 +3,14 @@
  */
 package org.opentcs.thirdparty.modeleditor.jhotdraw.application.toolbar;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.TOOLBAR_PATH;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JOptionPane;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
@@ -25,14 +27,14 @@ import org.opentcs.guing.common.components.drawing.figures.LinkConnection;
 import org.opentcs.guing.common.components.drawing.figures.ModelBasedFigure;
 import org.opentcs.guing.common.components.drawing.figures.SimpleLineConnection;
 import org.opentcs.modeleditor.components.layer.ActiveLayerProvider;
-import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.TOOLBAR_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A tool to connect two figures with a path for instance.
  */
 public class OpenTCSConnectionTool
-    extends ConnectionTool {
+    extends
+      ConnectionTool {
 
   /**
    * The resource bundle to use.
@@ -55,8 +57,11 @@ public class OpenTCSConnectionTool
    * @param prototype The prototypical figure to be used.
    */
   @Inject
-  public OpenTCSConnectionTool(ActiveLayerProvider activeLayerProvider,
-                               @Assisted ConnectionFigure prototype) {
+  public OpenTCSConnectionTool(
+      ActiveLayerProvider activeLayerProvider,
+      @Assisted
+      ConnectionFigure prototype
+  ) {
     super(prototype);
     this.activeLayerProvider = requireNonNull(activeLayerProvider, "activeLayerProvider");
     presentationName = BUNDLE.getString("openTcsConnectionTool.undo.presentationName");

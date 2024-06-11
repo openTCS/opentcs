@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 
 /**
  * An update for a vehicle's list of allowed order types.
@@ -23,7 +24,10 @@ public class PutVehicleAllowedOrderTypesTO {
 
   @JsonCreator
   public PutVehicleAllowedOrderTypesTO(
-      @Nonnull @JsonProperty(value = "orderTypes", required = true) List<String> orderTypes) {
+      @Nonnull
+      @JsonProperty(value = "orderTypes", required = true)
+      List<String> orderTypes
+  ) {
     this.orderTypes = requireNonNull(orderTypes, "orderTypes");
   }
 
@@ -32,7 +36,10 @@ public class PutVehicleAllowedOrderTypesTO {
     return orderTypes;
   }
 
-  public PutVehicleAllowedOrderTypesTO setOrderTypes(@Nonnull List<String> orderTypes) {
+  public PutVehicleAllowedOrderTypesTO setOrderTypes(
+      @Nonnull
+      List<String> orderTypes
+  ) {
     this.orderTypes = requireNonNull(orderTypes, "orderTypes");
     return this;
   }

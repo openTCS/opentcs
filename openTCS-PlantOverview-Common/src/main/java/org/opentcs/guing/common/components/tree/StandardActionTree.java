@@ -13,8 +13,10 @@ import org.opentcs.guing.common.components.EditableComponent;
  * A JTree which delegates actions to it's parent.
  */
 public class StandardActionTree
-    extends javax.swing.JTree
-    implements EditableComponent {
+    extends
+      javax.swing.JTree
+    implements
+      EditableComponent {
 
   private final EditableComponent parent;
 

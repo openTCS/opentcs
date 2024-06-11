@@ -13,7 +13,8 @@ import java.io.Serializable;
  * A generic 2-tuple of long integer values, usable for 2D coordinates and vectors, for instance.
  */
 public class Couple
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The X coordinate.

@@ -7,10 +7,11 @@
  */
 package org.opentcs.util.persistence.v004;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -20,10 +21,13 @@ import javax.xml.bind.annotation.XmlType;
 /**
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(propOrder = {"name", "xPosition", "yPosition", "zPosition", "vehicleOrientationAngle",
-                      "type", "vehicleEnvelopes", "outgoingPaths", "properties", "pointLayout"})
+@XmlType(
+    propOrder = {"name", "xPosition", "yPosition", "zPosition", "vehicleOrientationAngle",
+        "type", "vehicleEnvelopes", "outgoingPaths", "properties", "pointLayout"}
+)
 public class PointTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   private Long xPosition = 0L;
   private Long yPosition = 0L;
@@ -45,7 +49,10 @@ public class PointTO
     return xPosition;
   }
 
-  public PointTO setxPosition(@Nonnull Long xPosition) {
+  public PointTO setxPosition(
+      @Nonnull
+      Long xPosition
+  ) {
     requireNonNull(xPosition, "xPosition");
     this.xPosition = xPosition;
     return this;
@@ -56,7 +63,10 @@ public class PointTO
     return yPosition;
   }
 
-  public PointTO setyPosition(@Nonnull Long yPosition) {
+  public PointTO setyPosition(
+      @Nonnull
+      Long yPosition
+  ) {
     requireNonNull(yPosition, "yPosition");
     this.yPosition = yPosition;
     return this;
@@ -67,7 +77,10 @@ public class PointTO
     return zPosition;
   }
 
-  public PointTO setzPosition(@Nonnull Long zPosition) {
+  public PointTO setzPosition(
+      @Nonnull
+      Long zPosition
+  ) {
     requireNonNull(zPosition, "zPosition");
     this.zPosition = zPosition;
     return this;
@@ -78,7 +91,10 @@ public class PointTO
     return vehicleOrientationAngle;
   }
 
-  public PointTO setVehicleOrientationAngle(@Nonnull Float vehicleOrientationAngle) {
+  public PointTO setVehicleOrientationAngle(
+      @Nonnull
+      Float vehicleOrientationAngle
+  ) {
     requireNonNull(vehicleOrientationAngle, "vehicleOrientationAngle");
     this.vehicleOrientationAngle = vehicleOrientationAngle;
     return this;
@@ -89,7 +105,10 @@ public class PointTO
     return type;
   }
 
-  public PointTO setType(@Nonnull String type) {
+  public PointTO setType(
+      @Nonnull
+      String type
+  ) {
     requireNonNull(type, "type");
     this.type = type;
     return this;
@@ -100,7 +119,10 @@ public class PointTO
     return outgoingPaths;
   }
 
-  public PointTO setOutgoingPaths(@Nonnull List<OutgoingPath> outgoingPath) {
+  public PointTO setOutgoingPaths(
+      @Nonnull
+      List<OutgoingPath> outgoingPath
+  ) {
     requireNonNull(outgoingPath, "outgoingPath");
     this.outgoingPaths = outgoingPath;
     return this;
@@ -111,17 +133,23 @@ public class PointTO
     return vehicleEnvelopes;
   }
 
-  public PointTO setVehicleEnvelopes(@Nonnull List<VehicleEnvelopeTO> vehicleEnvelopes) {
+  public PointTO setVehicleEnvelopes(
+      @Nonnull
+      List<VehicleEnvelopeTO> vehicleEnvelopes
+  ) {
     this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     return this;
   }
-  
+
   @XmlElement(required = true)
   public PointLayout getPointLayout() {
     return pointLayout;
   }
 
-  public PointTO setPointLayout(@Nonnull PointLayout pointLayout) {
+  public PointTO setPointLayout(
+      @Nonnull
+      PointLayout pointLayout
+  ) {
     this.pointLayout = requireNonNull(pointLayout, "pointLayout");
     return this;
   }
@@ -142,7 +170,10 @@ public class PointTO
       return name;
     }
 
-    public OutgoingPath setName(@Nonnull String name) {
+    public OutgoingPath setName(
+        @Nonnull
+        String name
+    ) {
       requireNonNull(name, "name");
       this.name = name;
       return this;
@@ -170,7 +201,10 @@ public class PointTO
       return xPosition;
     }
 
-    public PointLayout setxPosition(@Nonnull Long xPosition) {
+    public PointLayout setxPosition(
+        @Nonnull
+        Long xPosition
+    ) {
       this.xPosition = requireNonNull(xPosition, "xPosition");
       return this;
     }
@@ -180,7 +214,10 @@ public class PointTO
       return yPosition;
     }
 
-    public PointLayout setyPosition(@Nonnull Long yPosition) {
+    public PointLayout setyPosition(
+        @Nonnull
+        Long yPosition
+    ) {
       this.yPosition = requireNonNull(yPosition, "yPosition");
       return this;
     }
@@ -190,7 +227,10 @@ public class PointTO
       return xLabelOffset;
     }
 
-    public PointLayout setxLabelOffset(@Nonnull Long xLabelOffset) {
+    public PointLayout setxLabelOffset(
+        @Nonnull
+        Long xLabelOffset
+    ) {
       this.xLabelOffset = requireNonNull(xLabelOffset, "xLabelOffset");
       return this;
     }
@@ -200,7 +240,10 @@ public class PointTO
       return yLabelOffset;
     }
 
-    public PointLayout setyLabelOffset(@Nonnull Long yLabelOffset) {
+    public PointLayout setyLabelOffset(
+        @Nonnull
+        Long yLabelOffset
+    ) {
       this.yLabelOffset = requireNonNull(yLabelOffset, "yLabelOffset");
       return this;
     }
@@ -210,7 +253,10 @@ public class PointTO
       return layerId;
     }
 
-    public PointLayout setLayerId(@Nonnull Integer layerId) {
+    public PointLayout setLayerId(
+        @Nonnull
+        Integer layerId
+    ) {
       this.layerId = requireNonNull(layerId, "layerId");
       return this;
     }

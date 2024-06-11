@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.ObjectUnknownException;
@@ -34,9 +35,11 @@ public class TransportOrderDispatcherHandler {
    * @param executorWrapper Executes calls via the kernel executor and waits for the outcome.
    */
   @Inject
-  public TransportOrderDispatcherHandler(VehicleService vehicleService,
-                                         DispatcherService dispatcherService,
-                                         KernelExecutorWrapper executorWrapper) {
+  public TransportOrderDispatcherHandler(
+      VehicleService vehicleService,
+      DispatcherService dispatcherService,
+      KernelExecutorWrapper executorWrapper
+  ) {
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
@@ -47,7 +50,8 @@ public class TransportOrderDispatcherHandler {
   }
 
   public void tryImmediateAssignment(String name)
-      throws ObjectUnknownException, IllegalArgumentException {
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     requireNonNull(name, "name");
 
     executorWrapper.callAndWait(() -> {
@@ -71,8 +75,10 @@ public class TransportOrderDispatcherHandler {
 
       TransportOrder order = vehicleService.fetchObject(TransportOrder.class, name);
       if (disableVehicle && order.getProcessingVehicle() != null) {
-        vehicleService.updateVehicleIntegrationLevel(order.getProcessingVehicle(),
-                                                     Vehicle.IntegrationLevel.TO_BE_RESPECTED);
+        vehicleService.updateVehicleIntegrationLevel(
+            order.getProcessingVehicle(),
+            Vehicle.IntegrationLevel.TO_BE_RESPECTED
+        );
       }
 
       dispatcherService.withdrawByTransportOrder(order.getReference(), immediate);
@@ -90,8 +96,10 @@ public class TransportOrderDispatcherHandler {
       }
 
       if (disableVehicle) {
-        vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
-                                                     Vehicle.IntegrationLevel.TO_BE_RESPECTED);
+        vehicleService.updateVehicleIntegrationLevel(
+            vehicle.getReference(),
+            Vehicle.IntegrationLevel.TO_BE_RESPECTED
+        );
       }
 
       dispatcherService.withdrawByVehicle(vehicle.getReference(), immediate);

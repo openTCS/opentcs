@@ -7,14 +7,15 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.assignment.priorization;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.theInstance;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.model.Point;
@@ -63,8 +64,10 @@ class CandidateComparatorIdleFirstTest {
             .withRoute(route)
     );
 
-    return new AssignmentCandidate(new Vehicle("Vehicle1").withState(vehicleState),
-                                   trasportOrder,
-                                   driveOrders);
+    return new AssignmentCandidate(
+        new Vehicle("Vehicle1").withState(vehicleState),
+        trasportOrder,
+        driveOrders
+    );
   }
 }

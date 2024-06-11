@@ -17,8 +17,10 @@ import org.opentcs.guing.base.components.properties.type.MultipleDifferentValues
  * A cell renderer for a boolean property.
  */
 public class BooleanPropertyCellRenderer
-    extends JCheckBox
-    implements javax.swing.table.TableCellRenderer {
+    extends
+      JCheckBox
+    implements
+      javax.swing.table.TableCellRenderer {
 
   /**
    * Creates a new instance of BooleanCellRenderer.
@@ -31,7 +33,8 @@ public class BooleanPropertyCellRenderer
 
   @Override
   public Component getTableCellRendererComponent(
-      JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column
+  ) {
 
     AttributesTable attributesTable = (AttributesTable) table;
     boolean editable = attributesTable.isEditable(row);

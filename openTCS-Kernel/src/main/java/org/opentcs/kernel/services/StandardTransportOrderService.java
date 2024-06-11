@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.services;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
@@ -31,8 +32,10 @@ import org.opentcs.kernel.workingset.TransportOrderPoolManager;
  * This class is the standard implementation of the {@link TransportOrderService} interface.
  */
 public class StandardTransportOrderService
-    extends AbstractTCSObjectService
-    implements InternalTransportOrderService {
+    extends
+      AbstractTCSObjectService
+    implements
+      InternalTransportOrderService {
 
   /**
    * A global object to be used for synchronization within the kernel.
@@ -61,11 +64,14 @@ public class StandardTransportOrderService
    * @param plantModelManager The plant model manager to be used.
    */
   @Inject
-  public StandardTransportOrderService(TCSObjectService objectService,
-                                       @GlobalSyncObject Object globalSyncObject,
-                                       TCSObjectRepository globalObjectPool,
-                                       TransportOrderPoolManager orderPoolManager,
-                                       PlantModelManager plantModelManager) {
+  public StandardTransportOrderService(
+      TCSObjectService objectService,
+      @GlobalSyncObject
+      Object globalSyncObject,
+      TCSObjectRepository globalObjectPool,
+      TransportOrderPoolManager orderPoolManager,
+      PlantModelManager plantModelManager
+  ) {
     super(objectService);
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.globalObjectPool = requireNonNull(globalObjectPool, "globalObjectPool");
@@ -90,8 +96,10 @@ public class StandardTransportOrderService
       // If the sequence was being processed by a vehicle, clear its back reference to the sequence
       // to make it available again and dispatch it.
       if (seq.getProcessingVehicle() != null) {
-        Vehicle vehicle = globalObjectPool.getObject(Vehicle.class,
-                                                     seq.getProcessingVehicle());
+        Vehicle vehicle = globalObjectPool.getObject(
+            Vehicle.class,
+            seq.getProcessingVehicle()
+        );
         plantModelManager.setVehicleOrderSequence(vehicle.getReference(), null);
       }
     }
@@ -108,8 +116,10 @@ public class StandardTransportOrderService
   }
 
   @Override
-  public void updateOrderSequenceProcessingVehicle(TCSObjectReference<OrderSequence> seqRef,
-                                                   TCSObjectReference<Vehicle> vehicleRef)
+  public void updateOrderSequenceProcessingVehicle(
+      TCSObjectReference<OrderSequence> seqRef,
+      TCSObjectReference<Vehicle> vehicleRef
+  )
       throws ObjectUnknownException {
     requireNonNull(seqRef, "seqRef");
 
@@ -119,10 +129,13 @@ public class StandardTransportOrderService
   }
 
   @Override
-  public void updateTransportOrderProcessingVehicle(TCSObjectReference<TransportOrder> orderRef,
-                                                    TCSObjectReference<Vehicle> vehicleRef,
-                                                    List<DriveOrder> driveOrders)
-      throws ObjectUnknownException, IllegalArgumentException {
+  public void updateTransportOrderProcessingVehicle(
+      TCSObjectReference<TransportOrder> orderRef,
+      TCSObjectReference<Vehicle> vehicleRef,
+      List<DriveOrder> driveOrders
+  )
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     requireNonNull(orderRef, "orderRef");
     requireNonNull(driveOrders, "driveOrders");
 
@@ -132,8 +145,10 @@ public class StandardTransportOrderService
   }
 
   @Override
-  public void updateTransportOrderDriveOrders(TCSObjectReference<TransportOrder> ref,
-                                              List<DriveOrder> driveOrders)
+  public void updateTransportOrderDriveOrders(
+      TCSObjectReference<TransportOrder> ref,
+      List<DriveOrder> driveOrders
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(driveOrders, "driveOrders");
@@ -154,8 +169,10 @@ public class StandardTransportOrderService
   }
 
   @Override
-  public void updateTransportOrderCurrentRouteStepIndex(TCSObjectReference<TransportOrder> ref,
-                                                        int index)
+  public void updateTransportOrderCurrentRouteStepIndex(
+      TCSObjectReference<TransportOrder> ref,
+      int index
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 
@@ -165,8 +182,10 @@ public class StandardTransportOrderService
   }
 
   @Override
-  public void updateTransportOrderState(TCSObjectReference<TransportOrder> ref,
-                                        TransportOrder.State state)
+  public void updateTransportOrderState(
+      TCSObjectReference<TransportOrder> ref,
+      TransportOrder.State state
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(state, "state");
@@ -187,7 +206,8 @@ public class StandardTransportOrderService
 
   @Override
   public TransportOrder createTransportOrder(TransportOrderCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException {
+      throws ObjectUnknownException,
+        ObjectExistsException {
     requireNonNull(to, "to");
 
     synchronized (globalSyncObject) {
@@ -215,8 +235,10 @@ public class StandardTransportOrderService
         // If the sequence was being processed by a vehicle, clear its back reference to the
         // sequence to make it available again and dispatch it.
         if (seq.getProcessingVehicle() != null) {
-          Vehicle vehicle = globalObjectPool.getObject(Vehicle.class,
-                                                       seq.getProcessingVehicle());
+          Vehicle vehicle = globalObjectPool.getObject(
+              Vehicle.class,
+              seq.getProcessingVehicle()
+          );
           plantModelManager.setVehicleOrderSequence(vehicle.getReference(), null);
         }
       }
@@ -224,9 +246,12 @@ public class StandardTransportOrderService
   }
 
   @Override
-  public void updateTransportOrderIntendedVehicle(TCSObjectReference<TransportOrder> orderRef,
-                                                  TCSObjectReference<Vehicle> vehicleRef)
-      throws ObjectUnknownException, IllegalArgumentException {
+  public void updateTransportOrderIntendedVehicle(
+      TCSObjectReference<TransportOrder> orderRef,
+      TCSObjectReference<Vehicle> vehicleRef
+  )
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     requireNonNull(orderRef, "orderRef");
 
     synchronized (globalSyncObject) {

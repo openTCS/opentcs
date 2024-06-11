@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.base.model.elements;
 
-import java.util.ResourceBundle;
 import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
+
+import java.util.ResourceBundle;
 import org.opentcs.guing.base.components.layer.NullLayerWrapper;
 import org.opentcs.guing.base.components.properties.type.LayerWrapperProperty;
 import org.opentcs.guing.base.components.properties.type.LinkActionsProperty;
@@ -19,7 +20,8 @@ import org.opentcs.guing.base.components.properties.type.StringSetProperty;
  * Basic implementation of link between a point and a location.
  */
 public class LinkModel
-    extends AbstractConnection {
+    extends
+      AbstractConnection {
 
   /**
    * The key for the possible actions on the location.

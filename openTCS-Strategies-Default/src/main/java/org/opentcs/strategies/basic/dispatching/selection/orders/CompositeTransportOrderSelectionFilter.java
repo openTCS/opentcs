@@ -7,9 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.orders;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.data.order.TransportOrder;
@@ -19,7 +20,8 @@ import org.opentcs.strategies.basic.dispatching.selection.TransportOrderSelectio
  * A collection of {@link TransportOrderSelectionFilter}s.
  */
 public class CompositeTransportOrderSelectionFilter
-    implements TransportOrderSelectionFilter {
+    implements
+      TransportOrderSelectionFilter {
 
   /**
    * The {@link TransportOrderSelectionFilter}s.

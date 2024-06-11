@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernelcontrolcenter.peripherals;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.components.Lifecycle;
@@ -33,8 +34,9 @@ import org.slf4j.LoggerFactory;
  * peripheral device.
  */
 public class LocalPeripheralEntryPool
-    implements EventHandler,
-               Lifecycle {
+    implements
+      EventHandler,
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -69,9 +71,13 @@ public class LocalPeripheralEntryPool
    * @param eventSource Where this instance registers for application events.
    */
   @Inject
-  public LocalPeripheralEntryPool(KernelServicePortal servicePortal,
-                                  @ServiceCallWrapper CallWrapper callWrapper,
-                                  @ApplicationEventBus EventSource eventSource) {
+  public LocalPeripheralEntryPool(
+      KernelServicePortal servicePortal,
+      @ServiceCallWrapper
+      CallWrapper callWrapper,
+      @ApplicationEventBus
+      EventSource eventSource
+  ) {
     this.servicePortal = requireNonNull(servicePortal, "servicePortal");
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");
     this.eventSource = requireNonNull(eventSource, "eventSource");
@@ -139,10 +145,15 @@ public class LocalPeripheralEntryPool
             .fetchAttachmentInformation(location.getReference());
       });
       PeripheralProcessModel processModel = callWrapper.call(
-          () -> servicePortal.getPeripheralService().fetchProcessModel(location.getReference()));
-      entries.put(location.getReference(), new LocalPeripheralEntry(location.getReference(),
-                                                                    ai.getAttachedCommAdapter(),
-                                                                    processModel));
+          () -> servicePortal.getPeripheralService().fetchProcessModel(location.getReference())
+      );
+      entries.put(
+          location.getReference(), new LocalPeripheralEntry(
+              location.getReference(),
+              ai.getAttachedCommAdapter(),
+              processModel
+          )
+      );
     }
   }
 

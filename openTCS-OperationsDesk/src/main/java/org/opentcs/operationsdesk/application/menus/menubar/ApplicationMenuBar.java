@@ -7,15 +7,17 @@
  */
 package org.opentcs.operationsdesk.application.menus.menubar;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import javax.swing.JMenuBar;
 
 /**
  * The plant overview's main menu bar.
  */
 public class ApplicationMenuBar
-    extends JMenuBar {
+    extends
+      JMenuBar {
 
   private final FileMenu menuFile;
   private final ActionsMenu menuActions;
@@ -32,10 +34,12 @@ public class ApplicationMenuBar
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public ApplicationMenuBar(FileMenu menuFile,
-                            ActionsMenu menuActions,
-                            ViewMenu menuView,
-                            HelpMenu menuHelp) {
+  public ApplicationMenuBar(
+      FileMenu menuFile,
+      ActionsMenu menuActions,
+      ViewMenu menuView,
+      HelpMenu menuHelp
+  ) {
     requireNonNull(menuFile, "menuFile");
     requireNonNull(menuActions, "menuActions");
     requireNonNull(menuView, "menuView");

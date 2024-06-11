@@ -7,10 +7,11 @@
  */
 package org.opentcs.access.rmi.services;
 
-import java.lang.reflect.Method;
-import java.util.List;
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import java.lang.reflect.Method;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.components.kernel.services.DispatcherService;

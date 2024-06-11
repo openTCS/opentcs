@@ -7,13 +7,14 @@
  */
 package org.opentcs.guing.common.exchange;
 
-import java.util.List;
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.model.Path;
@@ -47,9 +48,11 @@ class SplitResourcesTest {
     pathBC = new Path("BC", pointB.getReference(), pointC.getReference());
     pathCD = new Path("CD", pointC.getReference(), pointD.getReference());
 
-    allResources = List.of(Set.of(pathAB.getReference(), pointB.getReference()),
-                           Set.of(pathBC.getReference(), pointC.getReference()),
-                           Set.of(pathCD.getReference(), pointD.getReference()));
+    allResources = List.of(
+        Set.of(pathAB.getReference(), pointB.getReference()),
+        Set.of(pathBC.getReference(), pointC.getReference()),
+        Set.of(pathCD.getReference(), pointD.getReference())
+    );
   }
 
   @Test
@@ -75,10 +78,24 @@ class SplitResourcesTest {
     SplitResources result = SplitResources.from(allResources, pointC.getReference());
 
     assertThat(result, is(notNullValue()));
-    assertThat(result.getAllocatedResourcesBehind(), is(equalTo(List.of(
-               Set.of(pathAB.getReference(), pointB.getReference()),
-               Set.of(pathBC.getReference(), pointC.getReference())))));
-    assertThat(result.getAllocatedResourcesAhead(), is(equalTo(List.of(
-                   Set.of(pathCD.getReference(), pointD.getReference())))));
+    assertThat(
+        result.getAllocatedResourcesBehind(), is(
+            equalTo(
+                List.of(
+                    Set.of(pathAB.getReference(), pointB.getReference()),
+                    Set.of(pathBC.getReference(), pointC.getReference())
+                )
+            )
+        )
+    );
+    assertThat(
+        result.getAllocatedResourcesAhead(), is(
+            equalTo(
+                List.of(
+                    Set.of(pathCD.getReference(), pointD.getReference())
+                )
+            )
+        )
+    );
   }
 }

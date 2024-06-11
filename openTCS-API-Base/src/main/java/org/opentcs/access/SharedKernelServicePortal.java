@@ -11,7 +11,8 @@ package org.opentcs.access;
  * Provides access to a shared {@link KernelServicePortal} instance.
  */
 public interface SharedKernelServicePortal
-    extends AutoCloseable {
+    extends
+      AutoCloseable {
 
   @Override
   void close();

@@ -7,13 +7,14 @@
  */
 package org.opentcs.data;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -138,7 +139,8 @@ class TCSObjectTest {
   }
 
   private static class TestType1
-      extends TCSObject<TestType1> {
+      extends
+        TCSObject<TestType1> {
 
     TestType1(String objectName) {
       super(objectName);
@@ -170,7 +172,8 @@ class TCSObjectTest {
   }
 
   private static class TestType2
-      extends TCSObject<TestType2> {
+      extends
+        TCSObject<TestType2> {
 
     TestType2(String objectName) {
       super(objectName);

@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import static java.util.Objects.requireNonNull;
 
 /**
  * A key-value property.
@@ -21,8 +22,14 @@ public class Property {
 
   private String value;
 
-  public Property(@Nonnull @JsonProperty(required = true, value = "key") String key,
-                  @Nullable @JsonProperty(required = false, value = "value") String value) {
+  public Property(
+      @Nonnull
+      @JsonProperty(required = true, value = "key")
+      String key,
+      @Nullable
+      @JsonProperty(required = false, value = "value")
+      String value
+  ) {
     this.key = requireNonNull(key, "key");
     this.value = value;
   }
@@ -42,7 +49,10 @@ public class Property {
    *
    * @param key The new key.
    */
-  public void setKey(@Nonnull String key) {
+  public void setKey(
+      @Nonnull
+      String key
+  ) {
     this.key = requireNonNull(key, "key");
   }
 
@@ -61,7 +71,10 @@ public class Property {
    *
    * @param value The new value.
    */
-  public void setValue(@Nullable String value) {
+  public void setValue(
+      @Nullable
+      String value
+  ) {
     this.value = value;
   }
 }

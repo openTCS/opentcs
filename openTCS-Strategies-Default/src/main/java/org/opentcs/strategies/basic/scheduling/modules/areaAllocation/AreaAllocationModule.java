@@ -7,10 +7,11 @@
  */
 package org.opentcs.strategies.basic.scheduling.modules.areaAllocation;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -22,7 +23,8 @@ import org.opentcs.strategies.basic.scheduling.ReservationPool;
  * Allows resource allocation only if the area related to the respective resource is free.
  */
 public class AreaAllocationModule
-    implements Scheduler.Module {
+    implements
+      Scheduler.Module {
 
   private final TCSObjectService objectService;
   private final ReservationPool reservationPool;
@@ -37,9 +39,14 @@ public class AreaAllocationModule
    * @param areaAllocator Keeps track of allocated areas.
    */
   @Inject
-  public AreaAllocationModule(@Nonnull TCSObjectService objectService,
-                              @Nonnull ReservationPool reservationPool,
-                              @Nonnull AreaAllocator areaAllocator) {
+  public AreaAllocationModule(
+      @Nonnull
+      TCSObjectService objectService,
+      @Nonnull
+      ReservationPool reservationPool,
+      @Nonnull
+      AreaAllocator areaAllocator
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
     this.areaAllocator = requireNonNull(areaAllocator, "areaAllocator");
@@ -73,15 +80,24 @@ public class AreaAllocationModule
   }
 
   @Override
-  public void setAllocationState(@Nonnull Scheduler.Client client,
-                                 @Nonnull Set<TCSResource<?>> alloc,
-                                 @Nonnull List<Set<TCSResource<?>>> remainingClaim) {
+  public void setAllocationState(
+      @Nonnull
+      Scheduler.Client client,
+      @Nonnull
+      Set<TCSResource<?>> alloc,
+      @Nonnull
+      List<Set<TCSResource<?>>> remainingClaim
+  ) {
     allocationChanged(client);
   }
 
   @Override
-  public boolean mayAllocate(@Nonnull Scheduler.Client client,
-                             @Nonnull Set<TCSResource<?>> resources) {
+  public boolean mayAllocate(
+      @Nonnull
+      Scheduler.Client client,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  ) {
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
@@ -94,29 +110,46 @@ public class AreaAllocationModule
       return true;
     }
 
-    return areaAllocator.mayAllocateAreas(client.getRelatedVehicle(),
-                                          vehicle.getEnvelopeKey(),
-                                          resources);
+    return areaAllocator.mayAllocateAreas(
+        client.getRelatedVehicle(),
+        vehicle.getEnvelopeKey(),
+        resources
+    );
   }
 
   @Override
-  public void prepareAllocation(@Nonnull Scheduler.Client client,
-                                @Nonnull Set<TCSResource<?>> resources) {
+  public void prepareAllocation(
+      @Nonnull
+      Scheduler.Client client,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  ) {
   }
 
   @Override
-  public boolean hasPreparedAllocation(@Nonnull Scheduler.Client client,
-                                       @Nonnull Set<TCSResource<?>> resources) {
+  public boolean hasPreparedAllocation(
+      @Nonnull
+      Scheduler.Client client,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  ) {
     return true;
   }
 
   @Override
-  public void allocationReleased(@Nonnull Scheduler.Client client,
-                                 @Nonnull Set<TCSResource<?>> resources) {
+  public void allocationReleased(
+      @Nonnull
+      Scheduler.Client client,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  ) {
     allocationChanged(client);
   }
 
-  private void allocationChanged(@Nonnull Scheduler.Client client) {
+  private void allocationChanged(
+      @Nonnull
+      Scheduler.Client client
+  ) {
     requireNonNull(client, "client");
 
     if (client.getRelatedVehicle() == null) {
@@ -128,8 +161,10 @@ public class AreaAllocationModule
       return;
     }
 
-    areaAllocator.updateAllocatedAreas(client.getRelatedVehicle(),
-                                       vehicle.getEnvelopeKey(),
-                                       reservationPool.allocatedResources(client));
+    areaAllocator.updateAllocatedAreas(
+        client.getRelatedVehicle(),
+        vehicle.getEnvelopeKey(),
+        reservationPool.allocatedResources(client)
+    );
   }
 }

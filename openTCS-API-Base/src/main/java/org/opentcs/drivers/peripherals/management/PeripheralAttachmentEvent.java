@@ -7,9 +7,10 @@
  */
 package org.opentcs.drivers.peripherals.management;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 
@@ -17,8 +18,10 @@ import org.opentcs.data.model.TCSResourceReference;
  * Instances of this class represent events emitted by/for attaching comm adapters.
  */
 public class PeripheralAttachmentEvent
-    extends PeripheralCommAdapterEvent
-    implements Serializable {
+    extends
+      PeripheralCommAdapterEvent
+    implements
+      Serializable {
 
   /**
    * The location a peripheral comm adapter has been attached to.
@@ -36,8 +39,11 @@ public class PeripheralAttachmentEvent
    * @param attachmentInformation The information to the actual attachment.
    */
   public PeripheralAttachmentEvent(
-      @Nonnull TCSResourceReference<Location> location,
-      @Nonnull PeripheralAttachmentInformation attachmentInformation) {
+      @Nonnull
+      TCSResourceReference<Location> location,
+      @Nonnull
+      PeripheralAttachmentInformation attachmentInformation
+  ) {
     this.location = requireNonNull(location, "location");
     this.attachmentInformation = requireNonNull(attachmentInformation, "attachmentInformation");
   }

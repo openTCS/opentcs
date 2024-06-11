@@ -7,18 +7,19 @@
  */
 package org.opentcs.kernel.vehicles;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.services.PeripheralJobService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
@@ -79,17 +80,21 @@ class PeripheralInteractionTest {
 
   @Test
   void shouldNotWaitForOperationCompletion() {
-    PeripheralOperation operation = new PeripheralOperation(createLocation().getReference(),
-                                                            RESERVATION_TOKEN,
-                                                            ExecutionTrigger.AFTER_ALLOCATION,
-                                                            false);
+    PeripheralOperation operation = new PeripheralOperation(
+        createLocation().getReference(),
+        RESERVATION_TOKEN,
+        ExecutionTrigger.AFTER_ALLOCATION,
+        false
+    );
 
-    peripheralInteraction = new PeripheralInteraction(VEHICLE.getReference(),
-                                                      ORDER.getReference(),
-                                                      createDummyMovementCommand(),
-                                                      Arrays.asList(operation),
-                                                      peripheralJobService,
-                                                      RESERVATION_TOKEN);
+    peripheralInteraction = new PeripheralInteraction(
+        VEHICLE.getReference(),
+        ORDER.getReference(),
+        createDummyMovementCommand(),
+        Arrays.asList(operation),
+        peripheralJobService,
+        RESERVATION_TOKEN
+    );
 
     verify(succeededCallback, times(0)).run();
     assertThat(peripheralInteraction.hasState(PeripheralInteraction.State.PRISTINE), is(true));
@@ -105,20 +110,24 @@ class PeripheralInteractionTest {
 
   @Test
   void shouldWaitForOperationCompletion() {
-    PeripheralOperation operation = new PeripheralOperation(createLocation().getReference(),
-                                                            RESERVATION_TOKEN,
-                                                            ExecutionTrigger.AFTER_ALLOCATION,
-                                                            true);
+    PeripheralOperation operation = new PeripheralOperation(
+        createLocation().getReference(),
+        RESERVATION_TOKEN,
+        ExecutionTrigger.AFTER_ALLOCATION,
+        true
+    );
 
     PeripheralJob peripheralJob = new PeripheralJob("SomeJob", RESERVATION_TOKEN, operation);
     when(peripheralJobService.createPeripheralJob(any())).thenReturn(peripheralJob);
 
-    peripheralInteraction = new PeripheralInteraction(VEHICLE.getReference(),
-                                                      ORDER.getReference(),
-                                                      createDummyMovementCommand(),
-                                                      Arrays.asList(operation),
-                                                      peripheralJobService,
-                                                      RESERVATION_TOKEN);
+    peripheralInteraction = new PeripheralInteraction(
+        VEHICLE.getReference(),
+        ORDER.getReference(),
+        createDummyMovementCommand(),
+        Arrays.asList(operation),
+        peripheralJobService,
+        RESERVATION_TOKEN
+    );
 
     verify(succeededCallback, times(0)).run();
     assertThat(peripheralInteraction.hasState(PeripheralInteraction.State.PRISTINE), is(true));
@@ -137,20 +146,24 @@ class PeripheralInteractionTest {
 
   @Test
   void shouldCallbackOnFailedRequiredInteraction() {
-    PeripheralOperation operation = new PeripheralOperation(createLocation().getReference(),
-                                                            RESERVATION_TOKEN,
-                                                            ExecutionTrigger.AFTER_ALLOCATION,
-                                                            true);
+    PeripheralOperation operation = new PeripheralOperation(
+        createLocation().getReference(),
+        RESERVATION_TOKEN,
+        ExecutionTrigger.AFTER_ALLOCATION,
+        true
+    );
 
     PeripheralJob peripheralJob = new PeripheralJob("SomeJob", RESERVATION_TOKEN, operation);
     when(peripheralJobService.createPeripheralJob(any())).thenReturn(peripheralJob);
 
-    peripheralInteraction = new PeripheralInteraction(VEHICLE.getReference(),
-                                                      ORDER.getReference(),
-                                                      createDummyMovementCommand(),
-                                                      Arrays.asList(operation),
-                                                      peripheralJobService,
-                                                      RESERVATION_TOKEN);
+    peripheralInteraction = new PeripheralInteraction(
+        VEHICLE.getReference(),
+        ORDER.getReference(),
+        createDummyMovementCommand(),
+        Arrays.asList(operation),
+        peripheralJobService,
+        RESERVATION_TOKEN
+    );
 
     verify(succeededCallback, times(0)).run();
     assertThat(peripheralInteraction.hasState(PeripheralInteraction.State.PRISTINE), is(true));
@@ -175,20 +188,24 @@ class PeripheralInteractionTest {
   private MovementCommand createDummyMovementCommand() {
     Point srcPoint = new Point("Point-01");
     Point destPoint = new Point("Point-02");
-    Path path = new Path("Point-01 --- Point-02",
-                         srcPoint.getReference(),
-                         destPoint.getReference());
+    Path path = new Path(
+        "Point-01 --- Point-02",
+        srcPoint.getReference(),
+        destPoint.getReference()
+    );
     Route.Step step = new Route.Step(path, srcPoint, destPoint, Vehicle.Orientation.FORWARD, 0);
 
-    return new MovementCommand(new TransportOrder("dummy-transport-order", List.of()),
-                               new DriveOrder(new DriveOrder.Destination(destPoint.getReference())),
-                               step,
-                               MovementCommand.MOVE_OPERATION,
-                               null,
-                               true,
-                               null,
-                               destPoint,
-                               MovementCommand.MOVE_OPERATION,
-                               Map.of());
+    return new MovementCommand(
+        new TransportOrder("dummy-transport-order", List.of()),
+        new DriveOrder(new DriveOrder.Destination(destPoint.getReference())),
+        step,
+        MovementCommand.MOVE_OPERATION,
+        null,
+        true,
+        null,
+        destPoint,
+        MovementCommand.MOVE_OPERATION,
+        Map.of()
+    );
   }
 }

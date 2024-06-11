@@ -11,7 +11,8 @@ package org.opentcs.guing.base.components.properties.event;
  * A PropertiesModelChangeListener that does nothing.
  */
 public class NullAttributesChangeListener
-    implements AttributesChangeListener {
+    implements
+      AttributesChangeListener {
 
   /**
    * Creates a new instance of NullPropertiesModelChangeListener

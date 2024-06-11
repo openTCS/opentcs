@@ -17,7 +17,8 @@ import org.opentcs.guing.common.exchange.ApplicationPortalProviderConfiguration;
  */
 @ConfigurationPrefix(ModelEditorConfiguration.PREFIX)
 public interface ModelEditorConfiguration
-    extends ApplicationPortalProviderConfiguration {
+    extends
+      ApplicationPortalProviderConfiguration {
 
   /**
    * This configuration's prefix.
@@ -27,16 +28,17 @@ public interface ModelEditorConfiguration
   @ConfigurationEntry(
       type = "String",
       description = {"The plant overview application's locale, as a BCP 47 language tag.",
-                     "Examples: 'en', 'de', 'zh'"},
+          "Examples: 'en', 'de', 'zh'"},
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
-      orderKey = "0_init_0")
+      orderKey = "0_init_0"
+  )
   String locale();
 
   @ConfigurationEntry(
       type = "Class name",
       description = {
-        "The name of the class to be used for the location theme.",
-        "Must be a class extending org.opentcs.components.plantoverview.LocationTheme"
+          "The name of the class to be used for the location theme.",
+          "Must be a class extending org.opentcs.components.plantoverview.LocationTheme"
       },
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
       orderKey = "3_themes_0"

@@ -20,7 +20,8 @@ import org.slf4j.LoggerFactory;
  * Extends the {@link ScheduledThreadPoolExecutor} by logging exceptions thrown by scheduled tasks.
  */
 public class LoggingScheduledThreadPoolExecutor
-    extends ScheduledThreadPoolExecutor {
+    extends
+      ScheduledThreadPoolExecutor {
 
   /**
    * This class's logger.

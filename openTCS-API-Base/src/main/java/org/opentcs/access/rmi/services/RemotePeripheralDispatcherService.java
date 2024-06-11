@@ -31,7 +31,8 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * </p>
  */
 public interface RemotePeripheralDispatcherService
-    extends Remote {
+    extends
+      Remote {
 
   // CHECKSTYLE:OFF
   void dispatch(ClientID clientId)

@@ -30,7 +30,8 @@ import org.slf4j.LoggerFactory;
  * Guice configuration for the default router.
  */
 public class DefaultRouterModule
-    extends KernelInjectionModule {
+    extends
+      KernelInjectionModule {
 
   /**
    * This class's logger.
@@ -51,12 +52,18 @@ public class DefaultRouterModule
 
   private void configureRouterDependencies() {
     bind(DefaultRouterConfiguration.class)
-        .toInstance(getConfigBindingProvider().get(DefaultRouterConfiguration.PREFIX,
-                                                   DefaultRouterConfiguration.class));
+        .toInstance(
+            getConfigBindingProvider().get(
+                DefaultRouterConfiguration.PREFIX,
+                DefaultRouterConfiguration.class
+            )
+        );
 
     ShortestPathConfiguration spConfiguration
-        = getConfigBindingProvider().get(ShortestPathConfiguration.PREFIX,
-                                         ShortestPathConfiguration.class);
+        = getConfigBindingProvider().get(
+            ShortestPathConfiguration.PREFIX,
+            ShortestPathConfiguration.class
+        );
     bind(ShortestPathConfiguration.class)
         .toInstance(spConfiguration);
 
@@ -79,8 +86,10 @@ public class DefaultRouterModule
             .to(FloydWarshallPointRouterFactory.class);
         break;
       default:
-        LOG.warn("Unhandled algorithm selected ({}), falling back to Dijkstra's algorithm.",
-                 spConfiguration.algorithm());
+        LOG.warn(
+            "Unhandled algorithm selected ({}), falling back to Dijkstra's algorithm.",
+            spConfiguration.algorithm()
+        );
         bind(PointRouterFactory.class)
             .to(DijkstraPointRouterFactory.class);
     }
@@ -102,8 +111,12 @@ public class DefaultRouterModule
         .in(Singleton.class);
 
     bind(ExplicitPropertiesConfiguration.class)
-        .toInstance(getConfigBindingProvider().get(ExplicitPropertiesConfiguration.PREFIX,
-                                                   ExplicitPropertiesConfiguration.class));
+        .toInstance(
+            getConfigBindingProvider().get(
+                ExplicitPropertiesConfiguration.PREFIX,
+                ExplicitPropertiesConfiguration.class
+            )
+        );
 
     bind(DefaultRoutingGroupMapper.class)
         .in(Singleton.class);

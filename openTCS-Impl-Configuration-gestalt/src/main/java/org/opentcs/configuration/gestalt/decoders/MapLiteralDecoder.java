@@ -29,7 +29,8 @@ import org.github.gestalt.config.utils.ValidateOf;
  * (i.e. map entries) are separated by commas as a delimiter.
  */
 public class MapLiteralDecoder
-    implements Decoder<Map<?, ?>> {
+    implements
+      Decoder<Map<?, ?>> {
 
   public MapLiteralDecoder() {
   }
@@ -52,11 +53,13 @@ public class MapLiteralDecoder
   }
 
   @Override
-  public ValidateOf<Map<?, ?>> decode(String path,
-                                      Tags tags,
-                                      ConfigNode node,
-                                      TypeCapture<?> type,
-                                      DecoderContext decoderContext) {
+  public ValidateOf<Map<?, ?>> decode(
+      String path,
+      Tags tags,
+      ConfigNode node,
+      TypeCapture<?> type,
+      DecoderContext decoderContext
+  ) {
     // This decoder only decodes nodes of type leaf. For other types the default decoders
     // `ArrayDecoder` and `ObjectDecoder` will eventually call this decoder if necessary.
     if (node.getNodeType() != NodeType.LEAF) {
@@ -89,9 +92,13 @@ public class MapLiteralDecoder
 
       // Decode the key string to the required key type.
       ValidateOf<?> key = decoderContext.getDecoderService()
-          .decodeNode(path, tags, new LeafNode(keyValuePair[0].trim()),
-                      type.getFirstParameterType(),
-                      decoderContext);
+          .decodeNode(
+              path,
+              tags,
+              new LeafNode(keyValuePair[0].trim()),
+              type.getFirstParameterType(),
+              decoderContext
+          );
       if (key.hasErrors()) {
         errors.addAll(key.getErrors());
         continue;
@@ -99,9 +106,13 @@ public class MapLiteralDecoder
 
       // Decode the value string to the required value type.
       ValidateOf<?> value = decoderContext.getDecoderService()
-          .decodeNode(path, tags, new LeafNode(keyValuePair[1].trim()),
-                      type.getSecondParameterType(),
-                      decoderContext);
+          .decodeNode(
+              path,
+              tags,
+              new LeafNode(keyValuePair[1].trim()),
+              type.getSecondParameterType(),
+              decoderContext
+          );
       if (value.hasErrors()) {
         errors.addAll(value.getErrors());
         continue;
@@ -117,7 +128,8 @@ public class MapLiteralDecoder
    * A validation error for map entries not in the format {@code <KEY>=<VALUE>}.
    */
   public static class MapEntryFormatInvalid
-      extends ValidationError {
+      extends
+        ValidationError {
 
     private final String rawEntry;
 

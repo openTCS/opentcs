@@ -7,13 +7,14 @@
  */
 package org.opentcs.util;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * Provides a way to acquire unique strings.
@@ -46,9 +47,11 @@ public class UniqueStringGenerator<S> {
    * @param prefix The prefix of names to be used for the given selector.
    * @param suffixPattern The suffix pattern to be used for the given selector.
    */
-  public void registerNamePattern(S selector,
-                                  String prefix,
-                                  String suffixPattern) {
+  public void registerNamePattern(
+      S selector,
+      String prefix,
+      String suffixPattern
+  ) {
     namePatterns.put(selector, new NamePattern(prefix, suffixPattern));
   }
 
@@ -120,8 +123,10 @@ public class UniqueStringGenerator<S> {
    * <code>java.text.DecimalFormat</code>.
    * @return A String that is unique among all known Strings.
    */
-  public String getUniqueString(final String prefix,
-                                final String suffixPattern) {
+  public String getUniqueString(
+      final String prefix,
+      final String suffixPattern
+  ) {
     requireNonNull(suffixPattern, "suffixPattern is null");
 
     final String actualPrefix = prefix == null ? "" : prefix;
@@ -141,7 +146,8 @@ public class UniqueStringGenerator<S> {
       // can't be a collision.
       if (allDigits) {
         final long curSuffixValue = NumberParsers.parsePureDecimalLong(
-            curName, prefixLength, curName.length() - prefixLength);
+            curName, prefixLength, curName.length() - prefixLength
+        );
         maxSuffixValue
             = maxSuffixValue > curSuffixValue ? maxSuffixValue : curSuffixValue;
       }

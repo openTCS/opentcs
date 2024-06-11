@@ -16,7 +16,8 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapter;
  * device is currently processing.
  */
 public class FinishJobProcessingCommand
-    implements PeripheralAdapterCommand {
+    implements
+      PeripheralAdapterCommand {
 
   /**
    * Whether to fail the execution of the job the (simulated) peripheral device is currently

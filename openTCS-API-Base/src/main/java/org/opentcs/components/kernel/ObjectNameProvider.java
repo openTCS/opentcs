@@ -14,6 +14,7 @@ import org.opentcs.access.to.CreationTO;
  * Provides names for {@link CreationTO}s.
  */
 public interface ObjectNameProvider
-    extends Function<CreationTO, String> {
+    extends
+      Function<CreationTO, String> {
 
 }

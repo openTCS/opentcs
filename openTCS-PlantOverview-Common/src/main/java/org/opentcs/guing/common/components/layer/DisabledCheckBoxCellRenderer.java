@@ -18,7 +18,8 @@ import javax.swing.table.TableCellRenderer;
  * A table cell renderer for a disabled check box.
  */
 public class DisabledCheckBoxCellRenderer
-    implements TableCellRenderer {
+    implements
+      TableCellRenderer {
 
   private final JCheckBox checkBox;
 
@@ -28,8 +29,10 @@ public class DisabledCheckBoxCellRenderer
   }
 
   @Override
-  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                 boolean hasFocus, int row, int column) {
+  public Component getTableCellRendererComponent(
+      JTable table, Object value, boolean isSelected,
+      boolean hasFocus, int row, int column
+  ) {
     Color bg = isSelected ? table.getSelectionBackground() : table.getBackground();
     checkBox.setBackground(bg);
     checkBox.setEnabled(false);

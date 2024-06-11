@@ -21,8 +21,10 @@ import org.slf4j.LoggerFactory;
  * A panel that can edit a quantity property.
  */
 public class QuantityEditorPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   /**
    * This class's logger.
@@ -95,6 +97,7 @@ public class QuantityEditorPanel
     return fProperty;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -131,11 +134,15 @@ public class QuantityEditorPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(unitComboBox, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
-
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JTextField numberTextField;
   private javax.swing.JComboBox<Object> unitComboBox;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

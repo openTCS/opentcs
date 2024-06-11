@@ -7,18 +7,19 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.recharging;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.components.kernel.Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION;
+import static org.opentcs.components.kernel.Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION;
+
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import static org.opentcs.components.kernel.Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION;
-import static org.opentcs.components.kernel.Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Location;
@@ -31,7 +32,8 @@ import org.opentcs.data.order.DriveOrder;
  * Finds assigned, preferred or (routing-wise) cheapest recharge locations for vehicles.
  */
 public class DefaultRechargePositionSupplier
-    implements RechargePositionSupplier {
+    implements
+      RechargePositionSupplier {
 
   /**
    * The plant model service.
@@ -53,8 +55,10 @@ public class DefaultRechargePositionSupplier
    * @param router The router to use.
    */
   @Inject
-  public DefaultRechargePositionSupplier(InternalPlantModelService plantModelService,
-                                         Router router) {
+  public DefaultRechargePositionSupplier(
+      InternalPlantModelService plantModelService,
+      Router router
+  ) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.router = requireNonNull(router, "router");
   }
@@ -91,14 +95,18 @@ public class DefaultRechargePositionSupplier
     }
 
     Map<Location, Set<Point>> rechargeLocations
-        = findLocationsForOperation(vehicle.getRechargeOperation(),
-                                    vehicle,
-                                    router.getTargetedPoints());
+        = findLocationsForOperation(
+            vehicle.getRechargeOperation(),
+            vehicle,
+            router.getTargetedPoints()
+        );
 
     String assignedRechargeLocationName = vehicle.getProperty(PROPKEY_ASSIGNED_RECHARGE_LOCATION);
     if (assignedRechargeLocationName != null) {
-      Location location = pickLocationWithName(assignedRechargeLocationName,
-                                               rechargeLocations.keySet());
+      Location location = pickLocationWithName(
+          assignedRechargeLocationName,
+          rechargeLocations.keySet()
+      );
       if (location == null) {
         return List.of();
       }
@@ -150,18 +158,22 @@ public class DefaultRechargePositionSupplier
    * @return The locations allowing the given operation, and the points they would be accessible
    * from.
    */
-  private Map<Location, Set<Point>> findLocationsForOperation(String operation,
-                                                              Vehicle vehicle,
-                                                              Set<Point> targetedPoints) {
+  private Map<Location, Set<Point>> findLocationsForOperation(
+      String operation,
+      Vehicle vehicle,
+      Set<Point> targetedPoints
+  ) {
     Map<Location, Set<Point>> result = new HashMap<>();
 
     for (Location curLoc : plantModelService.fetchObjects(Location.class)) {
       LocationType lType = plantModelService.fetchObject(LocationType.class, curLoc.getType());
       if (lType.isAllowedOperation(operation)) {
-        Set<Point> points = findUnoccupiedAccessPointsForOperation(curLoc,
-                                                                   operation,
-                                                                   vehicle,
-                                                                   targetedPoints);
+        Set<Point> points = findUnoccupiedAccessPointsForOperation(
+            curLoc,
+            operation,
+            vehicle,
+            targetedPoints
+        );
         if (!points.isEmpty()) {
           result.put(curLoc, points);
         }
@@ -171,10 +183,12 @@ public class DefaultRechargePositionSupplier
     return result;
   }
 
-  private Set<Point> findUnoccupiedAccessPointsForOperation(Location location,
-                                                            String rechargeOp,
-                                                            Vehicle vehicle,
-                                                            Set<Point> targetedPoints) {
+  private Set<Point> findUnoccupiedAccessPointsForOperation(
+      Location location,
+      String rechargeOp,
+      Vehicle vehicle,
+      Set<Point> targetedPoints
+  ) {
     return location.getAttachedLinks().stream()
         .filter(link -> allowsOperation(link, rechargeOp))
         .map(link -> plantModelService.fetchObject(Point.class, link.getPoint()))
@@ -199,16 +213,24 @@ public class DefaultRechargePositionSupplier
     return link.getAllowedOperations().isEmpty() || link.hasAllowedOperation(operation);
   }
 
-  private Optional<LocationCandidate> bestAccessPointCandidate(Vehicle vehicle,
-                                                               Point srcPosition,
-                                                               Location location,
-                                                               Set<Point> destPositions) {
+  private Optional<LocationCandidate> bestAccessPointCandidate(
+      Vehicle vehicle,
+      Point srcPosition,
+      Location location,
+      Set<Point> destPositions
+  ) {
     return destPositions.stream()
-        .map(point -> new LocationCandidate(location,
-                                            router.getCosts(vehicle,
-                                                            srcPosition,
-                                                            point,
-                                                            Set.of())))
+        .map(
+            point -> new LocationCandidate(
+                location,
+                router.getCosts(
+                    vehicle,
+                    srcPosition,
+                    point,
+                    Set.of()
+                )
+            )
+        )
         .min(Comparator.comparingLong(candidate -> candidate.costs));
   }
 
@@ -222,18 +244,26 @@ public class DefaultRechargePositionSupplier
    * @return <code>true</code> if, and only if, ALL points within the same block as the given access
    * point are NOT occupied or targeted by any other vehicle than the given one.
    */
-  private boolean isPointUnoccupiedFor(Point accessPoint,
-                                       Vehicle vehicle,
-                                       Set<Point> targetedPoints) {
+  private boolean isPointUnoccupiedFor(
+      Point accessPoint,
+      Vehicle vehicle,
+      Set<Point> targetedPoints
+  ) {
     return expandPoints(accessPoint).stream()
-        .noneMatch(point -> pointOccupiedOrTargetedByOtherVehicle(point,
-                                                                  vehicle,
-                                                                  targetedPoints));
+        .noneMatch(
+            point -> pointOccupiedOrTargetedByOtherVehicle(
+                point,
+                vehicle,
+                targetedPoints
+            )
+        );
   }
 
-  private boolean pointOccupiedOrTargetedByOtherVehicle(Point pointToCheck,
-                                                        Vehicle vehicle,
-                                                        Set<Point> targetedPoints) {
+  private boolean pointOccupiedOrTargetedByOtherVehicle(
+      Point pointToCheck,
+      Vehicle vehicle,
+      Set<Point> targetedPoints
+  ) {
     if (pointToCheck.getOccupyingVehicle() != null
         && !pointToCheck.getOccupyingVehicle().equals(vehicle.getReference())) {
       return true;

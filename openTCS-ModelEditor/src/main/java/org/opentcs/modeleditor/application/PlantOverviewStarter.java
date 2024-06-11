@@ -7,8 +7,9 @@
  */
 package org.opentcs.modeleditor.application;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.jhotdraw.app.Application;
 import org.opentcs.guing.common.application.ProgressIndicator;
 import org.opentcs.guing.common.application.StartupProgressStatus;
@@ -45,10 +46,12 @@ public class PlantOverviewStarter {
    * @param eventLogger Provides logging for events published on the application event bus.
    */
   @Inject
-  public PlantOverviewStarter(ProgressIndicator progressIndicator,
-                              Application application,
-                              OpenTCSView opentcsView,
-                              EventLogger eventLogger) {
+  public PlantOverviewStarter(
+      ProgressIndicator progressIndicator,
+      Application application,
+      OpenTCSView opentcsView,
+      EventLogger eventLogger
+  ) {
     this.progressIndicator = requireNonNull(progressIndicator, "progressIndicator");
     this.application = requireNonNull(application, "application");
     this.opentcsView = requireNonNull(opentcsView, "opentcsView");

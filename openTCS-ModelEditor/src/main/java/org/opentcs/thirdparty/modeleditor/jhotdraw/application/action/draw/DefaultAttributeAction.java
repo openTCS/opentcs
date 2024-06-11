@@ -35,7 +35,8 @@ import org.jhotdraw.undo.CompositeEdit;
  * @author Werner Randelshofer
  */
 public class DefaultAttributeAction
-    extends AbstractSelectedAction {
+    extends
+      AbstractSelectedAction {
 
   private AttributeKey[] keys;
   private Map<AttributeKey, Object> fixedAttributes;
@@ -48,7 +49,8 @@ public class DefaultAttributeAction
    */
   public DefaultAttributeAction(
       DrawingEditor editor,
-      AttributeKey key) {
+      AttributeKey key
+  ) {
 
     this(editor, key, null, null);
   }
@@ -56,14 +58,16 @@ public class DefaultAttributeAction
   public DefaultAttributeAction(
       DrawingEditor editor,
       AttributeKey key,
-      Map<AttributeKey, Object> fixedAttributes) {
+      Map<AttributeKey, Object> fixedAttributes
+  ) {
 
     this(editor, new AttributeKey[]{key}, null, null, fixedAttributes);
   }
 
   public DefaultAttributeAction(
       DrawingEditor editor,
-      AttributeKey[] keys) {
+      AttributeKey[] keys
+  ) {
 
     this(editor, keys, null, null);
   }
@@ -98,7 +102,8 @@ public class DefaultAttributeAction
       DrawingEditor editor,
       AttributeKey[] keys,
       String name,
-      Icon icon) {
+      Icon icon
+  ) {
 
     this(editor, keys, name, icon, new HashMap<AttributeKey, Object>());
   }
@@ -109,7 +114,8 @@ public class DefaultAttributeAction
       AttributeKey[] keys,
       String name,
       Icon icon,
-      Map<AttributeKey, Object> fixedAttributes) {
+      Map<AttributeKey, Object> fixedAttributes
+  ) {
 
     super(editor);
     this.keys = keys.clone();

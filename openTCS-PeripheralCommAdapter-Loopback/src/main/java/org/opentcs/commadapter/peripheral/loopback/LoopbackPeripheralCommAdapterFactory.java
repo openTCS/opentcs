@@ -7,8 +7,9 @@
  */
 package org.opentcs.commadapter.peripheral.loopback;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.data.model.Location;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapter;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
@@ -18,7 +19,8 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapterFactory;
  * A factory for loopback communication adapters (virtual peripherals).
  */
 public class LoopbackPeripheralCommAdapterFactory
-    implements PeripheralCommAdapterFactory {
+    implements
+      PeripheralCommAdapterFactory {
 
   /**
    * The adapter components factory.
@@ -31,7 +33,8 @@ public class LoopbackPeripheralCommAdapterFactory
 
   @Inject
   public LoopbackPeripheralCommAdapterFactory(
-      LoopbackPeripheralAdapterComponentsFactory componentsFactory) {
+      LoopbackPeripheralAdapterComponentsFactory componentsFactory
+  ) {
     this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
   }
 

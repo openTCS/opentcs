@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
@@ -34,13 +35,17 @@ public class PostVehicleRoutesResponseTO {
     return routes;
   }
 
-  public PostVehicleRoutesResponseTO setRoutes(@Nonnull List<RouteTO> routes) {
+  public PostVehicleRoutesResponseTO setRoutes(
+      @Nonnull
+      List<RouteTO> routes
+  ) {
     this.routes = requireNonNull(routes, "routes");
     return this;
   }
 
   public static PostVehicleRoutesResponseTO fromMap(
-      Map<TCSObjectReference<Point>, Route> routeMap) {
+      Map<TCSObjectReference<Point>, Route> routeMap
+  ) {
     return new PostVehicleRoutesResponseTO()
         .setRoutes(
             routeMap.entrySet().stream()

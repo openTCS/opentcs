@@ -18,7 +18,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property that contains a list of layer groups.
  */
 public class LayerGroupsProperty
-    extends AbstractComplexProperty {
+    extends
+      AbstractComplexProperty {
 
   /**
    * Creates a new instance.

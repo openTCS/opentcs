@@ -9,8 +9,6 @@ package org.opentcs.kernelcontrolcenter;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
@@ -18,6 +16,9 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.common.PortalManager;
 import org.opentcs.kernelcontrolcenter.exchange.KernelEventFetcher;
 import org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration;
@@ -59,11 +60,15 @@ class KernelControlCenterApplicationTest {
     portalManager = mock(PortalManager.class);
     configuration = mock(KernelControlCenterConfiguration.class);
     controlCenter = mock(KernelControlCenter.class);
-    application = spy(new KernelControlCenterApplication(mock(KernelEventFetcher.class),
-                                                         controlCenter,
-                                                         portalManager,
-                                                         eventBus,
-                                                         configuration));
+    application = spy(
+        new KernelControlCenterApplication(
+            mock(KernelEventFetcher.class),
+            controlCenter,
+            portalManager,
+            eventBus,
+            configuration
+        )
+    );
   }
 
   @Test

@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.services;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.HashSet;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -27,7 +28,8 @@ import org.opentcs.kernel.workingset.TCSObjectRepository;
  * This class is the standard implementation of the {@link TCSObjectService} interface.
  */
 public class StandardTCSObjectService
-    implements TCSObjectService {
+    implements
+      TCSObjectService {
 
   /**
    * A global object to be used for synchronization within the kernel.
@@ -45,8 +47,11 @@ public class StandardTCSObjectService
    * @param objectManager The object manager.
    */
   @Inject
-  public StandardTCSObjectService(@GlobalSyncObject Object globalSyncObject,
-                                  TCSObjectManager objectManager) {
+  public StandardTCSObjectService(
+      @GlobalSyncObject
+      Object globalSyncObject,
+      TCSObjectManager objectManager
+  ) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.objectManager = requireNonNull(objectManager, "objectManager");
   }
@@ -85,8 +90,12 @@ public class StandardTCSObjectService
   }
 
   @Override
-  public <T extends TCSObject<T>> Set<T> fetchObjects(@Nonnull Class<T> clazz,
-                                                      @Nonnull Predicate<? super T> predicate) {
+  public <T extends TCSObject<T>> Set<T> fetchObjects(
+      @Nonnull
+      Class<T> clazz,
+      @Nonnull
+      Predicate<? super T> predicate
+  ) {
     requireNonNull(clazz, "clazz");
     requireNonNull(predicate, "predicate");
 
@@ -96,7 +105,12 @@ public class StandardTCSObjectService
   }
 
   @Override
-  public void updateObjectProperty(TCSObjectReference<?> ref, String key, @Nullable String value)
+  public void updateObjectProperty(
+      TCSObjectReference<?> ref,
+      String key,
+      @Nullable
+      String value
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(key, "key");

@@ -7,6 +7,10 @@
  */
 package org.opentcs.guing.common.components.drawing.figures;
 
+import static java.awt.image.ImageObserver.ABORT;
+import static java.awt.image.ImageObserver.ALLBITS;
+import static java.awt.image.ImageObserver.FRAMEBITS;
+
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -15,9 +19,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
-import static java.awt.image.ImageObserver.ABORT;
-import static java.awt.image.ImageObserver.ALLBITS;
-import static java.awt.image.ImageObserver.FRAMEBITS;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -30,8 +31,10 @@ import org.slf4j.LoggerFactory;
  * A Figure displaying a bitmap.
  */
 public class BitmapFigure
-    extends AbstractAttributedDecoratedFigure
-    implements ImageObserver {
+    extends
+      AbstractAttributedDecoratedFigure
+    implements
+      ImageObserver {
 
   /**
    * This class's logger.
@@ -93,8 +96,10 @@ public class BitmapFigure
   }
 
   public Rectangle displayBox() {
-    return new Rectangle(fDisplayBox.x, fDisplayBox.y,
-                         fDisplayBox.width, fDisplayBox.height);
+    return new Rectangle(
+        fDisplayBox.x, fDisplayBox.y,
+        fDisplayBox.width, fDisplayBox.height
+    );
   }
 
   public void setDisplayBox(Rectangle displayBox) {

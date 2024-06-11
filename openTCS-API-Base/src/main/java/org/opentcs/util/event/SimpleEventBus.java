@@ -8,6 +8,7 @@
 package org.opentcs.util.event;
 
 import static java.util.Objects.requireNonNull;
+
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import org.slf4j.Logger;
@@ -17,7 +18,8 @@ import org.slf4j.LoggerFactory;
  * A plain implementation of {@link EventBus}.
  */
 public class SimpleEventBus
-    implements EventBus {
+    implements
+      EventBus {
 
   /**
    * This class's logger.

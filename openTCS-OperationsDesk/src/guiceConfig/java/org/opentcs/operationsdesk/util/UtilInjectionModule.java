@@ -15,7 +15,8 @@ import org.opentcs.guing.common.util.PanelRegistry;
  * A default Guice module for this package.
  */
 public class UtilInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.

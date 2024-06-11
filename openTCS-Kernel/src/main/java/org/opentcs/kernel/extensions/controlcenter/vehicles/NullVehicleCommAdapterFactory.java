@@ -16,7 +16,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
  * A Vehicle adapter factory that creates no vehicles adapters.
  */
 public class NullVehicleCommAdapterFactory
-    implements VehicleCommAdapterFactory {
+    implements
+      VehicleCommAdapterFactory {
 
   /**
    * Creates a new instance.

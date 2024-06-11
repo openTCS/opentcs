@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.VehicleCreationTO;
@@ -40,30 +41,41 @@ public class VehicleConverter {
                 .withEnergyLevelCritical(vehicle.getEnergyLevelCritical())
                 .withEnergyLevelGood(vehicle.getEnergyLevelGood())
                 .withEnergyLevelFullyRecharged(
-                    vehicle.getEnergyLevelFullyRecharged())
+                    vehicle.getEnergyLevelFullyRecharged()
+                )
                 .withEnergyLevelSufficientlyRecharged(
-                    vehicle.getEnergyLevelSufficientlyRecharged())
+                    vehicle.getEnergyLevelSufficientlyRecharged()
+                )
                 .withMaxVelocity(vehicle.getMaxVelocity())
                 .withMaxReverseVelocity(vehicle.getMaxReverseVelocity())
-                .withLayout(new VehicleCreationTO.Layout(
-                    Colors.decodeFromHexRGB(vehicle.getLayout().getRouteColor()))))
+                .withLayout(
+                    new VehicleCreationTO.Layout(
+                        Colors.decodeFromHexRGB(vehicle.getLayout().getRouteColor())
+                    )
+                )
+        )
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
   public List<VehicleTO> toVehicleTOs(Set<Vehicle> vehicles) {
     return vehicles.stream()
-        .map(vehicle -> new VehicleTO(vehicle.getName())
-        .setLength(vehicle.getLength())
-        .setEnergyLevelCritical(vehicle.getEnergyLevelCritical())
-        .setEnergyLevelGood(vehicle.getEnergyLevelGood())
-        .setEnergyLevelFullyRecharged(vehicle.getEnergyLevelFullyRecharged())
-        .setEnergyLevelSufficientlyRecharged(
-            vehicle.getEnergyLevelSufficientlyRecharged())
-        .setMaxVelocity(vehicle.getMaxVelocity())
-        .setMaxReverseVelocity(vehicle.getMaxReverseVelocity())
-        .setLayout(new VehicleTO.Layout()
-            .setRouteColor(Colors.encodeToHexRGB(vehicle.getLayout().getRouteColor())))
-        .setProperties(pConverter.toPropertyTOs(vehicle.getProperties())))
+        .map(
+            vehicle -> new VehicleTO(vehicle.getName())
+                .setLength(vehicle.getLength())
+                .setEnergyLevelCritical(vehicle.getEnergyLevelCritical())
+                .setEnergyLevelGood(vehicle.getEnergyLevelGood())
+                .setEnergyLevelFullyRecharged(vehicle.getEnergyLevelFullyRecharged())
+                .setEnergyLevelSufficientlyRecharged(
+                    vehicle.getEnergyLevelSufficientlyRecharged()
+                )
+                .setMaxVelocity(vehicle.getMaxVelocity())
+                .setMaxReverseVelocity(vehicle.getMaxReverseVelocity())
+                .setLayout(
+                    new VehicleTO.Layout()
+                        .setRouteColor(Colors.encodeToHexRGB(vehicle.getLayout().getRouteColor()))
+                )
+                .setProperties(pConverter.toPropertyTOs(vehicle.getProperties()))
+        )
         .sorted(Comparator.comparing(VehicleTO::getName))
         .collect(Collectors.toList());
   }

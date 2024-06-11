@@ -25,8 +25,10 @@ public class ModelComponentUtil {
   private ModelComponentUtil() {
   }
 
-  public static List<Figure> getChildFigures(CompositeModelComponent parent,
-                                             SystemModel systemModel) {
+  public static List<Figure> getChildFigures(
+      CompositeModelComponent parent,
+      SystemModel systemModel
+  ) {
     List<Figure> figures = new ArrayList<>();
 
     List<ModelComponent> childComps = parent.getChildComponents();

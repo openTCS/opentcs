@@ -7,10 +7,11 @@
  */
 package org.opentcs.documentation.developers_guide;
 
+import static org.mockito.Mockito.mock;
+
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
@@ -66,7 +67,8 @@ class WithdrawTransportOrderTest {
         Collections.singletonList(
             new DriveOrder(
                 new DriveOrder.Destination(getSampleDestinationLocation().getReference())
-                    .withOperation("some-operation"))
+                    .withOperation("some-operation")
+            )
         )
     );
   }

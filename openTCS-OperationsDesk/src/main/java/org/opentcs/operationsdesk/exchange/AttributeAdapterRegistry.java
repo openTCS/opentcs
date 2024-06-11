@@ -7,8 +7,9 @@
  */
 package org.opentcs.operationsdesk.exchange;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
@@ -30,8 +31,9 @@ import org.opentcs.util.event.EventSource;
  * the kernel when it changes.
  */
 public class AttributeAdapterRegistry
-    implements EventHandler,
-               Lifecycle {
+    implements
+      EventHandler,
+      Lifecycle {
 
   /**
    * Provides access to a portal.
@@ -51,9 +53,12 @@ public class AttributeAdapterRegistry
   private boolean initialized;
 
   @Inject
-  public AttributeAdapterRegistry(SharedKernelServicePortalProvider portalProvider,
-                                  ModelManager modelManager,
-                                  @ApplicationEventBus EventSource eventSource) {
+  public AttributeAdapterRegistry(
+      SharedKernelServicePortalProvider portalProvider,
+      ModelManager modelManager,
+      @ApplicationEventBus
+      EventSource eventSource
+  ) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.eventSource = requireNonNull(eventSource, "eventSource");
@@ -99,8 +104,12 @@ public class AttributeAdapterRegistry
 
   private void registerAdapters() {
     for (VehicleModel model : modelManager.getModel().getVehicleModels()) {
-      model.addAttributesChangeListener(new VehicleAllowedOrderTypesAdapter(portalProvider,
-                                                                            model));
+      model.addAttributesChangeListener(
+          new VehicleAllowedOrderTypesAdapter(
+              portalProvider,
+              model
+          )
+      );
       model.addAttributesChangeListener(new VehiclePausedAdapter(portalProvider, model));
       model.addAttributesChangeListener(new VehicleEnvelopeKeyAdapter(portalProvider, model));
     }

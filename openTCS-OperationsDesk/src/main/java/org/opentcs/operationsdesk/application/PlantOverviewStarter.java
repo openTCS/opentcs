@@ -7,8 +7,9 @@
  */
 package org.opentcs.operationsdesk.application;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.jhotdraw.app.Application;
 import org.opentcs.guing.common.application.ProgressIndicator;
 import org.opentcs.guing.common.application.StartupProgressStatus;
@@ -90,33 +91,45 @@ public class PlantOverviewStarter {
    * @param userNotificationsContainer Maintains a list of the most recent user notifications.
    */
   @Inject
-  public PlantOverviewStarter(ProgressIndicator progressIndicator,
-                              Application application,
-                              OpenTCSView opentcsView,
-                              EventLogger eventLogger,
-                              KernelEventFetcher kernelEventFetcher,
-                              OpenTCSEventDispatcher eventDispatcher,
-                              AttributeAdapterRegistry attributeAdapterRegistry,
-                              TransportOrdersContainer transportOrdersContainer,
-                              PeripheralJobsContainer peripheralJobsContainer,
-                              OrderSequencesContainer orderSequencesContainer,
-                              UserNotificationsContainer userNotificationsContainer) {
+  public PlantOverviewStarter(
+      ProgressIndicator progressIndicator,
+      Application application,
+      OpenTCSView opentcsView,
+      EventLogger eventLogger,
+      KernelEventFetcher kernelEventFetcher,
+      OpenTCSEventDispatcher eventDispatcher,
+      AttributeAdapterRegistry attributeAdapterRegistry,
+      TransportOrdersContainer transportOrdersContainer,
+      PeripheralJobsContainer peripheralJobsContainer,
+      OrderSequencesContainer orderSequencesContainer,
+      UserNotificationsContainer userNotificationsContainer
+  ) {
     this.progressIndicator = requireNonNull(progressIndicator, "progressIndicator");
     this.application = requireNonNull(application, "application");
     this.opentcsView = requireNonNull(opentcsView, "opentcsView");
     this.eventLogger = requireNonNull(eventLogger, "eventLogger");
     this.kernelEventFetcher = requireNonNull(kernelEventFetcher, "kernelEventFetcher");
     this.eventDispatcher = requireNonNull(eventDispatcher, "eventDispatcher");
-    this.attributeAdapterRegistry = requireNonNull(attributeAdapterRegistry,
-                                                   "attributeAdapterRegistry");
-    this.transportOrdersContainer = requireNonNull(transportOrdersContainer,
-                                                   "transportOrdersContainer");
-    this.peripheralJobsContainer = requireNonNull(peripheralJobsContainer,
-                                                  "peripheralJobsContainer");
-    this.orderSequencesContainer = requireNonNull(orderSequencesContainer,
-                                                  "orderSequencesContainer");
-    this.userNotificationsContainer = requireNonNull(userNotificationsContainer,
-                                                     "userNotificationsContainer");
+    this.attributeAdapterRegistry = requireNonNull(
+        attributeAdapterRegistry,
+        "attributeAdapterRegistry"
+    );
+    this.transportOrdersContainer = requireNonNull(
+        transportOrdersContainer,
+        "transportOrdersContainer"
+    );
+    this.peripheralJobsContainer = requireNonNull(
+        peripheralJobsContainer,
+        "peripheralJobsContainer"
+    );
+    this.orderSequencesContainer = requireNonNull(
+        orderSequencesContainer,
+        "orderSequencesContainer"
+    );
+    this.userNotificationsContainer = requireNonNull(
+        userNotificationsContainer,
+        "userNotificationsContainer"
+    );
   }
 
   public void startPlantOverview() {

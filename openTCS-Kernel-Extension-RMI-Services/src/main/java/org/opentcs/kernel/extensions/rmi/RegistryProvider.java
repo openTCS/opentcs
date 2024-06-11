@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.opentcs.components.Lifecycle;
 import org.slf4j.Logger;
@@ -22,7 +23,8 @@ import org.slf4j.LoggerFactory;
  * Provides the one {@link Registry} instance used for RMI communication.
  */
 public class RegistryProvider
-    implements Lifecycle {
+    implements
+      Lifecycle {
 
   /**
    * This class' logger.
@@ -52,8 +54,12 @@ public class RegistryProvider
    * @param configuration This class' configuration.
    */
   @Inject
-  public RegistryProvider(@Nonnull SocketFactoryProvider socketFactoryProvider,
-                          @Nonnull RmiKernelInterfaceConfiguration configuration) {
+  public RegistryProvider(
+      @Nonnull
+      SocketFactoryProvider socketFactoryProvider,
+      @Nonnull
+      RmiKernelInterfaceConfiguration configuration
+  ) {
     this.socketFactoryProvider = requireNonNull(socketFactoryProvider, "socketFactoryProvider");
     this.configuration = requireNonNull(configuration, "configuration");
   }
@@ -95,9 +101,11 @@ public class RegistryProvider
   private void installRegistry() {
     try {
       LOG.debug("Trying to create a local registry...");
-      registry = LocateRegistry.createRegistry(configuration.registryPort(),
-                                               socketFactoryProvider.getClientSocketFactory(),
-                                               socketFactoryProvider.getServerSocketFactory());
+      registry = LocateRegistry.createRegistry(
+          configuration.registryPort(),
+          socketFactoryProvider.getClientSocketFactory(),
+          socketFactoryProvider.getServerSocketFactory()
+      );
       // Make sure the registry is running
       registry.list();
     }

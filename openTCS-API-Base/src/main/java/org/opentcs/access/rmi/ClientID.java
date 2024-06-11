@@ -7,16 +7,18 @@
  */
 package org.opentcs.access.rmi;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
-import static java.util.Objects.requireNonNull;
 import java.util.UUID;
 
 /**
  * Identifies a remote client unambiguously.
  */
 public class ClientID
-implements Serializable {
+    implements
+      Serializable {
   /**
    * The client's name.
    */
@@ -31,7 +33,10 @@ implements Serializable {
    *
    * @param clientName The client's name.
    */
-  public ClientID(@Nonnull String clientName) {
+  public ClientID(
+      @Nonnull
+      String clientName
+  ) {
     this.clientName = requireNonNull(clientName, "clientName");
     uuid = UUID.randomUUID();
   }

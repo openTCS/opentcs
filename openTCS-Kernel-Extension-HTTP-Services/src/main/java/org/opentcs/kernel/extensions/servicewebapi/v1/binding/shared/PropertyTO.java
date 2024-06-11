@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
-import static java.util.Objects.requireNonNull;
 
 /**
  */
@@ -20,8 +21,14 @@ public class PropertyTO {
   private String value;
 
   @JsonCreator
-  public PropertyTO(@Nonnull @JsonProperty(value = "name", required = true) String name,
-                    @Nonnull @JsonProperty(value = "value", required = true) String value) {
+  public PropertyTO(
+      @Nonnull
+      @JsonProperty(value = "name", required = true)
+      String name,
+      @Nonnull
+      @JsonProperty(value = "value", required = true)
+      String value
+  ) {
     this.name = requireNonNull(name, "name");
     this.value = requireNonNull(value, "value");
   }
@@ -31,7 +38,10 @@ public class PropertyTO {
     return name;
   }
 
-  public PropertyTO setName(@Nonnull String name) {
+  public PropertyTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     return this;
   }
@@ -41,7 +51,10 @@ public class PropertyTO {
     return value;
   }
 
-  public PropertyTO setValue(@Nonnull String value) {
+  public PropertyTO setValue(
+      @Nonnull
+      String value
+  ) {
     this.value = requireNonNull(value, "value");
     return this;
   }

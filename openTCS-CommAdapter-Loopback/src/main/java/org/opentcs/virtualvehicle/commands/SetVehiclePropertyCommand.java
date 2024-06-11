@@ -7,9 +7,10 @@
  */
 package org.opentcs.virtualvehicle.commands;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 
@@ -17,7 +18,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
  * A command to set a vehicle's property.
  */
 public class SetVehiclePropertyCommand
-    implements AdapterCommand {
+    implements
+      AdapterCommand {
 
   /**
    * The property key to set.
@@ -34,7 +36,12 @@ public class SetVehiclePropertyCommand
    * @param key The property key to set.
    * @param value The property value to set.
    */
-  public SetVehiclePropertyCommand(@Nonnull String key, @Nullable String value) {
+  public SetVehiclePropertyCommand(
+      @Nonnull
+      String key,
+      @Nullable
+      String value
+  ) {
     this.key = requireNonNull(key, "key");
     this.value = value;
   }

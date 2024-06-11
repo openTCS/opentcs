@@ -31,7 +31,8 @@ import org.opentcs.data.order.TransportOrder;
  * </p>
  */
 public interface Router
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * The key of a vehicle property defining the group of vehicles that may share the same routing.
@@ -66,7 +67,10 @@ public interface Router
    * @param paths The paths to update in the routing topology. An empty set of paths results in the
    * router updating the entire routing topology.
    */
-  void updateRoutingTopology(@Nonnull Set<Path> paths);
+  void updateRoutingTopology(
+      @Nonnull
+      Set<Path> paths
+  );
 
   /**
    * Checks the general routability of a given transport order.
@@ -79,7 +83,10 @@ public interface Router
    * would be computable.
    */
   @Nonnull
-  Set<Vehicle> checkRoutability(@Nonnull TransportOrder order);
+  Set<Vehicle> checkRoutability(
+      @Nonnull
+      TransportOrder order
+  );
 
   /**
    * Returns a complete route for a given vehicle that starts on a specified
@@ -100,9 +107,14 @@ public interface Router
    * given point, or the empty optional, if no such route exists.
    */
   @Nonnull
-  Optional<List<DriveOrder>> getRoute(@Nonnull Vehicle vehicle,
-                                      @Nonnull Point sourcePoint,
-                                      @Nonnull TransportOrder transportOrder);
+  Optional<List<DriveOrder>> getRoute(
+      @Nonnull
+      Vehicle vehicle,
+      @Nonnull
+      Point sourcePoint,
+      @Nonnull
+      TransportOrder transportOrder
+  );
 
   /**
    * Returns a route from one point to another, passable for a given vehicle.
@@ -118,10 +130,16 @@ public interface Router
    * given points does not exist.
    */
   @Nonnull
-  Optional<Route> getRoute(@Nonnull Vehicle vehicle,
-                           @Nonnull Point sourcePoint,
-                           @Nonnull Point destinationPoint,
-                           @Nonnull Set<TCSResourceReference<?>> resourcesToAvoid);
+  Optional<Route> getRoute(
+      @Nonnull
+      Vehicle vehicle,
+      @Nonnull
+      Point sourcePoint,
+      @Nonnull
+      Point destinationPoint,
+      @Nonnull
+      Set<TCSResourceReference<?>> resourcesToAvoid
+  );
 
   /**
    * Returns the costs for travelling a route from one point to another with a
@@ -137,10 +155,16 @@ public interface Router
    * @return The costs of the route, or <code>Long.MAX_VALUE</code>, if no such
    * route exists.
    */
-  long getCosts(@Nonnull Vehicle vehicle,
-                @Nonnull Point sourcePoint,
-                @Nonnull Point destinationPoint,
-                @Nonnull Set<TCSResourceReference<?>> resourcesToAvoid);
+  long getCosts(
+      @Nonnull
+      Vehicle vehicle,
+      @Nonnull
+      Point sourcePoint,
+      @Nonnull
+      Point destinationPoint,
+      @Nonnull
+      Set<TCSResourceReference<?>> resourcesToAvoid
+  );
 
   /**
    * Notifies the router of a route being selected for a vehicle.
@@ -153,7 +177,12 @@ public interface Router
    * or <code>null</code>, if no route is being selected for the vehicle (i.e.
    * an existing entry for the given vehicle would be removed).
    */
-  void selectRoute(@Nonnull Vehicle vehicle, @Nullable List<DriveOrder> driveOrders);
+  void selectRoute(
+      @Nonnull
+      Vehicle vehicle,
+      @Nullable
+      List<DriveOrder> driveOrders
+  );
 
   /**
    * Returns an unmodifiable view on the selected routes the router knows about.

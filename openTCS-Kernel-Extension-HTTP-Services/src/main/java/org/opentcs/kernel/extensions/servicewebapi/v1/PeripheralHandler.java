@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Location;
@@ -31,8 +32,10 @@ public class PeripheralHandler {
    * @param executorWrapper Executes calls via the kernel executor and waits for the outcome.
    */
   @Inject
-  public PeripheralHandler(PeripheralService peripheralService,
-                           KernelExecutorWrapper executorWrapper) {
+  public PeripheralHandler(
+      PeripheralService peripheralService,
+      KernelExecutorWrapper executorWrapper
+  ) {
     this.peripheralService = requireNonNull(peripheralService, "peripheralService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
   }
@@ -65,7 +68,8 @@ public class PeripheralHandler {
   }
 
   public void putPeripheralCommAdapterEnabled(String name, String value)
-      throws ObjectUnknownException, IllegalArgumentException {
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     requireNonNull(name, "name");
     requireNonNull(value, "value");
 

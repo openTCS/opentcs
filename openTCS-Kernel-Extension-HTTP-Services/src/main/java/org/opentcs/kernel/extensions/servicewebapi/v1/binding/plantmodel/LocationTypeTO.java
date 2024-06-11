@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 
@@ -26,7 +27,11 @@ public class LocationTypeTO {
   private List<PropertyTO> properties = List.of();
 
   @JsonCreator
-  public LocationTypeTO(@Nonnull @JsonProperty(value = "name", required = true) String name) {
+  public LocationTypeTO(
+      @Nonnull
+      @JsonProperty(value = "name", required = true)
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
   }
 
@@ -35,7 +40,10 @@ public class LocationTypeTO {
     return name;
   }
 
-  public LocationTypeTO setName(@Nonnull String name) {
+  public LocationTypeTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     return this;
   }
@@ -45,7 +53,10 @@ public class LocationTypeTO {
     return properties;
   }
 
-  public LocationTypeTO setProperties(@Nonnull List<PropertyTO> properties) {
+  public LocationTypeTO setProperties(
+      @Nonnull
+      List<PropertyTO> properties
+  ) {
     this.properties = requireNonNull(properties, "properties");
     return this;
   }
@@ -55,7 +66,10 @@ public class LocationTypeTO {
     return allowedOperations;
   }
 
-  public LocationTypeTO setAllowedOperations(@Nonnull List<String> allowedOperations) {
+  public LocationTypeTO setAllowedOperations(
+      @Nonnull
+      List<String> allowedOperations
+  ) {
     this.allowedOperations = requireNonNull(allowedOperations, "allowedOperations");
     return this;
   }
@@ -66,9 +80,13 @@ public class LocationTypeTO {
   }
 
   public LocationTypeTO setAllowedPeripheralOperations(
-      @Nonnull List<String> allowedPeripheralOperations) {
-    this.allowedPeripheralOperations = requireNonNull(allowedPeripheralOperations,
-                                                      "allowedPeripheralOperations");
+      @Nonnull
+      List<String> allowedPeripheralOperations
+  ) {
+    this.allowedPeripheralOperations = requireNonNull(
+        allowedPeripheralOperations,
+        "allowedPeripheralOperations"
+    );
     return this;
   }
 
@@ -77,7 +95,10 @@ public class LocationTypeTO {
     return layout;
   }
 
-  public LocationTypeTO setLayout(@Nonnull Layout layout) {
+  public LocationTypeTO setLayout(
+      @Nonnull
+      Layout layout
+  ) {
     this.layout = requireNonNull(layout, "layout");
     return this;
   }
@@ -96,9 +117,13 @@ public class LocationTypeTO {
     }
 
     public Layout setLocationRepresentation(
-        @Nonnull String locationRepresentation) {
-      this.locationRepresentation = requireNonNull(locationRepresentation,
-                                                   "locationRepresentation");
+        @Nonnull
+        String locationRepresentation
+    ) {
+      this.locationRepresentation = requireNonNull(
+          locationRepresentation,
+          "locationRepresentation"
+      );
       return this;
     }
 

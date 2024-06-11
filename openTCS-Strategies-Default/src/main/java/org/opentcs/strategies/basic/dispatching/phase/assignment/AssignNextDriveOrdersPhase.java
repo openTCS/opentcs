@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.assignment;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.components.kernel.services.InternalVehicleService;
@@ -25,7 +26,8 @@ import org.slf4j.LoggerFactory;
  * order if the vehicle has finished its last drive order.
  */
 public class AssignNextDriveOrdersPhase
-    implements Phase {
+    implements
+      Phase {
 
   /**
    * This class's Logger.
@@ -48,11 +50,13 @@ public class AssignNextDriveOrdersPhase
   private boolean initialized;
 
   @Inject
-  public AssignNextDriveOrdersPhase(InternalTransportOrderService transportOrderService,
-                                    InternalVehicleService vehicleService,
-                                    Router router,
-                                    VehicleControllerPool vehicleControllerPool,
-                                    TransportOrderUtil transportOrderUtil) {
+  public AssignNextDriveOrdersPhase(
+      InternalTransportOrderService transportOrderService,
+      InternalVehicleService vehicleService,
+      Router router,
+      VehicleControllerPool vehicleControllerPool,
+      TransportOrderUtil transportOrderUtil
+  ) {
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.router = requireNonNull(router, "router");
@@ -93,15 +97,21 @@ public class AssignNextDriveOrdersPhase
     // The vehicle is processing a transport order and has finished a drive order.
     // See if there's another drive order to be processed.
     transportOrderService.updateTransportOrderNextDriveOrder(vehicle.getTransportOrder());
-    TransportOrder vehicleOrder = transportOrderService.fetchObject(TransportOrder.class,
-                                                                    vehicle.getTransportOrder());
+    TransportOrder vehicleOrder = transportOrderService.fetchObject(
+        TransportOrder.class,
+        vehicle.getTransportOrder()
+    );
     if (vehicleOrder.getCurrentDriveOrder() == null) {
-      LOG.debug("Vehicle '{}' finished transport order '{}'",
-                vehicle.getName(),
-                vehicleOrder.getName());
+      LOG.debug(
+          "Vehicle '{}' finished transport order '{}'",
+          vehicle.getName(),
+          vehicleOrder.getName()
+      );
       // The current transport order has been finished - update its state and that of the vehicle.
-      transportOrderUtil.updateTransportOrderState(vehicle.getTransportOrder(),
-                                                   TransportOrder.State.FINISHED);
+      transportOrderUtil.updateTransportOrderState(
+          vehicle.getTransportOrder(),
+          TransportOrder.State.FINISHED
+      );
       // Update the vehicle's procState, implicitly dispatching it again.
       vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.IDLE);
       vehicleService.updateVehicleTransportOrder(vehicle.getReference(), null);
@@ -114,21 +124,27 @@ public class AssignNextDriveOrdersPhase
       LOG.debug("Assigning next drive order to vehicle '{}'...", vehicle.getName());
       if (transportOrderUtil.mustAssign(vehicleOrder.getCurrentDriveOrder(), vehicle)) {
         // Get an up-to-date copy of the transport order in case the route changed.
-        vehicleOrder = transportOrderService.fetchObject(TransportOrder.class,
-                                                         vehicle.getTransportOrder());
+        vehicleOrder = transportOrderService.fetchObject(
+            TransportOrder.class,
+            vehicle.getTransportOrder()
+        );
 
         // Let the vehicle controller know about the new drive order.
         vehicleControllerPool.getVehicleController(vehicle.getName())
             .setTransportOrder(vehicleOrder);
 
         // The vehicle is still processing a transport order.
-        vehicleService.updateVehicleProcState(vehicle.getReference(),
-                                              Vehicle.ProcState.PROCESSING_ORDER);
+        vehicleService.updateVehicleProcState(
+            vehicle.getReference(),
+            Vehicle.ProcState.PROCESSING_ORDER
+        );
       }
       // If the drive order need not be assigned, immediately check for another one.
       else {
-        vehicleService.updateVehicleProcState(vehicle.getReference(),
-                                              Vehicle.ProcState.AWAITING_ORDER);
+        vehicleService.updateVehicleProcState(
+            vehicle.getReference(),
+            Vehicle.ProcState.AWAITING_ORDER
+        );
         checkForNextDriveOrder(vehicle);
       }
     }

@@ -25,7 +25,10 @@ public interface LocationTheme {
    * @return The image for the given location representation.
    */
   @Nonnull
-  Image getImageFor(@Nonnull LocationRepresentation representation);
+  Image getImageFor(
+      @Nonnull
+      LocationRepresentation representation
+  );
 
   /**
    * Returns the image for the given location (type).
@@ -35,5 +38,10 @@ public interface LocationTheme {
    * @return The image for the give location.
    */
   @Nonnull
-  Image getImageFor(@Nonnull Location location, @Nonnull LocationType locationType);
+  Image getImageFor(
+      @Nonnull
+      Location location,
+      @Nonnull
+      LocationType locationType
+  );
 }

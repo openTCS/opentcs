@@ -21,6 +21,8 @@ public interface AdapterPanelComponentsFactory {
    * @param vehicleService The vehicle service used for interaction with the comm adapter.
    * @return The comm adapter panel.
    */
-  LoopbackCommAdapterPanel createPanel(LoopbackVehicleModelTO processModel,
-                                       VehicleService vehicleService);
+  LoopbackCommAdapterPanel createPanel(
+      LoopbackVehicleModelTO processModel,
+      VehicleService vehicleService
+  );
 }

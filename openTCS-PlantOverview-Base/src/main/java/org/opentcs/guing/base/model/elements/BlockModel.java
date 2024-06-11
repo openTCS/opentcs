@@ -7,14 +7,15 @@
  */
 package org.opentcs.guing.base.model.elements;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
-import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeListener;
 import org.opentcs.guing.base.components.properties.type.BlockTypeProperty;
 import org.opentcs.guing.base.components.properties.type.ColorProperty;
@@ -32,7 +33,8 @@ import org.opentcs.guing.base.model.SimpleFolder;
  * area.
  */
 public class BlockModel
-    extends SimpleFolder {
+    extends
+      SimpleFolder {
 
   /**
    * The key/name of the 'type' property.
@@ -205,9 +207,11 @@ public class BlockModel
     pColor.setHelptext(bundle.getString("blockModel.property_color.helptext"));
     setProperty(ElementPropKeys.BLOCK_COLOR, pColor);
 
-    BlockTypeProperty pType = new BlockTypeProperty(this,
-                                                    Arrays.asList(Type.values()),
-                                                    Type.values()[0]);
+    BlockTypeProperty pType = new BlockTypeProperty(
+        this,
+        Arrays.asList(Type.values()),
+        Type.values()[0]
+    );
     pType.setDescription(bundle.getString("blockModel.property_type.description"));
     pType.setHelptext(bundle.getString("blockModel.property_type.helptext"));
     pType.setCollectiveEditable(true);
@@ -238,16 +242,14 @@ public class BlockModel
      * Single vehicle only allowed.
      */
     SINGLE_VEHICLE_ONLY(
-        ResourceBundle.getBundle(BUNDLE_PATH)
-            .getString("blockModel.type.singleVehicleOnly.description")
-    ),
+                        ResourceBundle.getBundle(BUNDLE_PATH)
+                            .getString("blockModel.type.singleVehicleOnly.description")),
     /**
      * Same direction only allowed.
      */
     SAME_DIRECTION_ONLY(
-        ResourceBundle.getBundle(BUNDLE_PATH)
-            .getString("blockModel.type.sameDirectionOnly.description")
-    );
+                        ResourceBundle.getBundle(BUNDLE_PATH)
+                            .getString("blockModel.type.sameDirectionOnly.description"));
 
     private final String description;
 

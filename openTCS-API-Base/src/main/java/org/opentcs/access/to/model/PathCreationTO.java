@@ -7,26 +7,29 @@
  */
 package org.opentcs.access.to.model;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Path.Layout.ConnectionType;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A transfer object describing a path in the plant model.
  */
 public class PathCreationTO
-    extends CreationTO
-    implements Serializable {
+    extends
+      CreationTO
+    implements
+      Serializable {
 
   /**
    * The point name this path originates in.
@@ -76,9 +79,14 @@ public class PathCreationTO
    * @param srcPointName The point name this path originates in.
    * @param destPointName The point name this path ends in.
    */
-  public PathCreationTO(@Nonnull String name,
-                        @Nonnull String srcPointName,
-                        @Nonnull String destPointName) {
+  public PathCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      String srcPointName,
+      @Nonnull
+      String destPointName
+  ) {
     super(name);
     this.srcPointName = requireNonNull(srcPointName, "srcPointName");
     this.destPointName = requireNonNull(destPointName, "destPointName");
@@ -91,25 +99,36 @@ public class PathCreationTO
     this.layout = new Layout();
   }
 
-  private PathCreationTO(String name,
-                         @Nonnull String srcPointName,
-                         @Nonnull String destPointName,
-                         @Nonnull Map<String, String> properties,
-                         long length,
-                         int maxVelocity,
-                         int maxReverseVelocity,
-                         List<PeripheralOperationCreationTO> peripheralOperations,
-                         boolean locked,
-                         @Nonnull Map<String, Envelope> vehicleEnvelopes,
-                         @Nonnull Layout layout) {
+  private PathCreationTO(
+      String name,
+      @Nonnull
+      String srcPointName,
+      @Nonnull
+      String destPointName,
+      @Nonnull
+      Map<String, String> properties,
+      long length,
+      int maxVelocity,
+      int maxReverseVelocity,
+      List<PeripheralOperationCreationTO> peripheralOperations,
+      boolean locked,
+      @Nonnull
+      Map<String, Envelope> vehicleEnvelopes,
+      @Nonnull
+      Layout layout
+  ) {
     super(name, properties);
     this.srcPointName = requireNonNull(srcPointName, "srcPointName");
     this.destPointName = requireNonNull(destPointName, "destPointName");
     this.length = length;
     this.maxVelocity = maxVelocity;
     this.maxReverseVelocity = maxReverseVelocity;
-    this.peripheralOperations = new ArrayList<>(requireNonNull(peripheralOperations,
-                                                               "peripheralOperations"));
+    this.peripheralOperations = new ArrayList<>(
+        requireNonNull(
+            peripheralOperations,
+            "peripheralOperations"
+        )
+    );
     this.locked = locked;
     this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     this.layout = requireNonNull(layout, "layout");
@@ -122,18 +141,23 @@ public class PathCreationTO
    * @return A copy of this object, differing in the given name.
    */
   @Override
-  public PathCreationTO withName(@Nonnull String name) {
-    return new PathCreationTO(name,
-                              srcPointName,
-                              destPointName,
-                              getModifiableProperties(),
-                              length,
-                              maxVelocity,
-                              maxReverseVelocity,
-                              peripheralOperations,
-                              locked,
-                              vehicleEnvelopes,
-                              layout);
+  public PathCreationTO withName(
+      @Nonnull
+      String name
+  ) {
+    return new PathCreationTO(
+        name,
+        srcPointName,
+        destPointName,
+        getModifiableProperties(),
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -152,18 +176,23 @@ public class PathCreationTO
    * @param srcPointName The new source point name.
    * @return A copy of this object, differing in the given source point.
    */
-  public PathCreationTO withSrcPointName(@Nonnull String srcPointName) {
-    return new PathCreationTO(getName(),
-                              srcPointName,
-                              destPointName,
-                              getModifiableProperties(),
-                              length,
-                              maxVelocity,
-                              maxReverseVelocity,
-                              peripheralOperations,
-                              locked,
-                              vehicleEnvelopes,
-                              layout);
+  public PathCreationTO withSrcPointName(
+      @Nonnull
+      String srcPointName
+  ) {
+    return new PathCreationTO(
+        getName(),
+        srcPointName,
+        destPointName,
+        getModifiableProperties(),
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -182,18 +211,23 @@ public class PathCreationTO
    * @param destPointName The new source point.
    * @return A copy of this object, differing in the given value.
    */
-  public PathCreationTO withDestPointName(@Nonnull String destPointName) {
-    return new PathCreationTO(getName(),
-                              srcPointName,
-                              destPointName,
-                              getModifiableProperties(),
-                              length,
-                              maxVelocity,
-                              maxReverseVelocity,
-                              peripheralOperations,
-                              locked,
-                              vehicleEnvelopes,
-                              layout);
+  public PathCreationTO withDestPointName(
+      @Nonnull
+      String destPointName
+  ) {
+    return new PathCreationTO(
+        getName(),
+        srcPointName,
+        destPointName,
+        getModifiableProperties(),
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -213,17 +247,19 @@ public class PathCreationTO
    */
   public PathCreationTO withLength(long length) {
     checkArgument(length > 0, "length must be a positive value: " + length);
-    return new PathCreationTO(getName(),
-                              srcPointName,
-                              destPointName,
-                              getModifiableProperties(),
-                              length,
-                              maxVelocity,
-                              maxReverseVelocity,
-                              peripheralOperations,
-                              locked,
-                              vehicleEnvelopes,
-                              layout);
+    return new PathCreationTO(
+        getName(),
+        srcPointName,
+        destPointName,
+        getModifiableProperties(),
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -244,19 +280,23 @@ public class PathCreationTO
    * @return A copy of this object, differing in the given maximum velocity.
    */
   public PathCreationTO withMaxVelocity(int maxVelocity) {
-    checkArgument(maxVelocity >= 0,
-                  "maxVelocity may not be a negative value: " + maxVelocity);
-    return new PathCreationTO(getName(),
-                              srcPointName,
-                              destPointName,
-                              getModifiableProperties(),
-                              length,
-                              maxVelocity,
-                              maxReverseVelocity,
-                              peripheralOperations,
-                              locked,
-                              vehicleEnvelopes,
-                              layout);
+    checkArgument(
+        maxVelocity >= 0,
+        "maxVelocity may not be a negative value: " + maxVelocity
+    );
+    return new PathCreationTO(
+        getName(),
+        srcPointName,
+        destPointName,
+        getModifiableProperties(),
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -277,19 +317,23 @@ public class PathCreationTO
    * @return A copy of this object, differing in the given maximum reverse velocity.
    */
   public PathCreationTO withMaxReverseVelocity(int maxReverseVelocity) {
-    checkArgument(maxReverseVelocity >= 0,
-                  "maxReverseVelocity may not be a negative value: " + maxReverseVelocity);
-    return new PathCreationTO(getName(),
-                              srcPointName,
-                              destPointName,
-                              getModifiableProperties(),
-                              length,
-                              maxVelocity,
-                              maxReverseVelocity,
-                              peripheralOperations,
-                              locked,
-                              vehicleEnvelopes,
-                              layout);
+    checkArgument(
+        maxReverseVelocity >= 0,
+        "maxReverseVelocity may not be a negative value: " + maxReverseVelocity
+    );
+    return new PathCreationTO(
+        getName(),
+        srcPointName,
+        destPointName,
+        getModifiableProperties(),
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -308,18 +352,22 @@ public class PathCreationTO
    * @return A copy of this object, differing in the given peripheral operations.
    */
   public PathCreationTO withPeripheralOperations(
-      @Nonnull List<PeripheralOperationCreationTO> peripheralOperations) {
-    return new PathCreationTO(getName(),
-                              srcPointName,
-                              destPointName,
-                              getModifiableProperties(),
-                              length,
-                              maxVelocity,
-                              maxReverseVelocity,
-                              peripheralOperations,
-                              locked,
-                              vehicleEnvelopes,
-                              layout);
+      @Nonnull
+      List<PeripheralOperationCreationTO> peripheralOperations
+  ) {
+    return new PathCreationTO(
+        getName(),
+        srcPointName,
+        destPointName,
+        getModifiableProperties(),
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -340,17 +388,19 @@ public class PathCreationTO
    * @return a copy of this object, differing in the locked attribute.
    */
   public PathCreationTO withLocked(boolean locked) {
-    return new PathCreationTO(getName(),
-                              srcPointName,
-                              destPointName,
-                              getModifiableProperties(),
-                              length,
-                              maxVelocity,
-                              maxReverseVelocity,
-                              peripheralOperations,
-                              locked,
-                              vehicleEnvelopes,
-                              layout);
+    return new PathCreationTO(
+        getName(),
+        srcPointName,
+        destPointName,
+        getModifiableProperties(),
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -360,18 +410,23 @@ public class PathCreationTO
    * @return A copy of this object, differing in the given properties.
    */
   @Override
-  public PathCreationTO withProperties(@Nonnull Map<String, String> properties) {
-    return new PathCreationTO(getName(),
-                              srcPointName,
-                              destPointName,
-                              properties,
-                              length,
-                              maxVelocity,
-                              maxReverseVelocity,
-                              peripheralOperations,
-                              locked,
-                              vehicleEnvelopes,
-                              layout);
+  public PathCreationTO withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
+    return new PathCreationTO(
+        getName(),
+        srcPointName,
+        destPointName,
+        properties,
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -385,18 +440,25 @@ public class PathCreationTO
    * excludes the entry otherwise.
    */
   @Override
-  public PathCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new PathCreationTO(getName(),
-                              srcPointName,
-                              destPointName,
-                              propertiesWith(key, value),
-                              length,
-                              maxVelocity,
-                              maxReverseVelocity,
-                              peripheralOperations,
-                              locked,
-                              vehicleEnvelopes,
-                              layout);
+  public PathCreationTO withProperty(
+      @Nonnull
+      String key,
+      @Nonnull
+      String value
+  ) {
+    return new PathCreationTO(
+        getName(),
+        srcPointName,
+        destPointName,
+        propertiesWith(key, value),
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -414,18 +476,23 @@ public class PathCreationTO
    * @param vehicleEnvelopes The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public PathCreationTO withVehicleEnvelopes(@Nonnull Map<String, Envelope> vehicleEnvelopes) {
-    return new PathCreationTO(getName(),
-                              srcPointName,
-                              destPointName,
-                              getModifiableProperties(),
-                              length,
-                              maxVelocity,
-                              maxReverseVelocity,
-                              peripheralOperations,
-                              locked,
-                              vehicleEnvelopes,
-                              layout);
+  public PathCreationTO withVehicleEnvelopes(
+      @Nonnull
+      Map<String, Envelope> vehicleEnvelopes
+  ) {
+    return new PathCreationTO(
+        getName(),
+        srcPointName,
+        destPointName,
+        getModifiableProperties(),
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -444,17 +511,19 @@ public class PathCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public PathCreationTO withLayout(Layout layout) {
-    return new PathCreationTO(getName(),
-                              srcPointName,
-                              destPointName,
-                              getModifiableProperties(),
-                              length,
-                              maxVelocity,
-                              maxReverseVelocity,
-                              peripheralOperations,
-                              locked,
-                              vehicleEnvelopes,
-                              layout);
+    return new PathCreationTO(
+        getName(),
+        srcPointName,
+        destPointName,
+        getModifiableProperties(),
+        length,
+        maxVelocity,
+        maxReverseVelocity,
+        peripheralOperations,
+        locked,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   @Override
@@ -478,7 +547,8 @@ public class PathCreationTO
    * Contains information regarding the grahical representation of a path.
    */
   public static class Layout
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The connection type the path is represented as.

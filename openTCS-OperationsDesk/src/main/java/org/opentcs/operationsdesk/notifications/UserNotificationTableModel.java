@@ -7,10 +7,11 @@
  */
 package org.opentcs.operationsdesk.notifications;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
@@ -21,8 +22,10 @@ import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
  * A table model for user notifications.
  */
 public class UserNotificationTableModel
-    extends AbstractTableModel
-    implements UserNotificationContainerListener {
+    extends
+      AbstractTableModel
+    implements
+      UserNotificationContainerListener {
 
   /**
    * The indexes of the time column.
@@ -48,20 +51,20 @@ public class UserNotificationTableModel
       = ResourceBundle.getBundle(I18nPlantOverviewOperating.USERNOTIFICATION_PATH);
 
   private static final String[] COLUMN_NAMES = new String[]{
-    BUNDLE.getString("userNotificationTableModel.column_time.headerText"),
-    BUNDLE.getString("userNotificationTableModel.column_level.headerText"),
-    BUNDLE.getString("userNotificationTableModel.column_source.headerText"),
-    BUNDLE.getString("userNotificationTableModel.column_text.headerText")
+      BUNDLE.getString("userNotificationTableModel.column_time.headerText"),
+      BUNDLE.getString("userNotificationTableModel.column_level.headerText"),
+      BUNDLE.getString("userNotificationTableModel.column_source.headerText"),
+      BUNDLE.getString("userNotificationTableModel.column_text.headerText")
   };
 
   /**
    * The column classes.
    */
   private static final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
-    Instant.class,
-    String.class,
-    String.class,
-    String.class
+      Instant.class,
+      String.class,
+      String.class,
+      String.class
   };
 
   private final List<UserNotification> entries = new ArrayList<>();

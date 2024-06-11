@@ -19,18 +19,21 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
  * its actual description on a JLabel.
  */
 class CommAdapterFactoryTableCellRenderer
-    extends DefaultTableCellRenderer {
+    extends
+      DefaultTableCellRenderer {
 
   CommAdapterFactoryTableCellRenderer() {
   }
 
   @Override
-  public Component getTableCellRendererComponent(JTable table,
-                                                 Object value,
-                                                 boolean isSelected,
-                                                 boolean hasFocus,
-                                                 int row,
-                                                 int column)
+  public Component getTableCellRendererComponent(
+      JTable table,
+      Object value,
+      boolean isSelected,
+      boolean hasFocus,
+      int row,
+      int column
+  )
       throws IllegalArgumentException {
 
     super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);

@@ -18,7 +18,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
  * Provides comm adapter specific panels used for interaction and displaying information.
  */
 public interface VehicleCommAdapterPanelFactory
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * Returns a list of {@link VehicleCommAdapterPanel}s.
@@ -30,7 +31,12 @@ public interface VehicleCommAdapterPanelFactory
    * @return A list of comm adapter panels, or an empty list, if this factory cannot provide panels
    * for the given description.
    */
-  List<VehicleCommAdapterPanel> getPanelsFor(@Nonnull VehicleCommAdapterDescription description,
-                                             @Nonnull TCSObjectReference<Vehicle> vehicle,
-                                             @Nonnull VehicleProcessModelTO processModel);
+  List<VehicleCommAdapterPanel> getPanelsFor(
+      @Nonnull
+      VehicleCommAdapterDescription description,
+      @Nonnull
+      TCSObjectReference<Vehicle> vehicle,
+      @Nonnull
+      VehicleProcessModelTO processModel
+  );
 }

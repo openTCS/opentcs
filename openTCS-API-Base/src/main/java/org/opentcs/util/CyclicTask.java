@@ -8,6 +8,7 @@
 package org.opentcs.util;
 
 import static org.opentcs.util.Assertions.checkInRange;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,8 @@ import org.slf4j.LoggerFactory;
  * <code>runActualTask()</code>, a configurable delay may be inserted.
  */
 public abstract class CyclicTask
-    implements Runnable {
+    implements
+      Runnable {
 
   /**
    * This class's Logger.

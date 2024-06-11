@@ -18,7 +18,8 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * Contains details about a peripheral device a location may represent.
  */
 public class PeripheralInformation
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * A token for which a location/peripheral device is currently reserved.
@@ -49,10 +50,15 @@ public class PeripheralInformation
   }
 
   private PeripheralInformation(
-      @Nullable String reservationToken,
-      @Nonnull State state,
-      @Nonnull ProcState procState,
-      @Nullable TCSObjectReference<PeripheralJob> peripheralJob) {
+      @Nullable
+      String reservationToken,
+      @Nonnull
+      State state,
+      @Nonnull
+      ProcState procState,
+      @Nullable
+      TCSObjectReference<PeripheralJob> peripheralJob
+  ) {
     this.reservationToken = reservationToken;
     this.state = Objects.requireNonNull(state, "state");
     this.procState = Objects.requireNonNull(procState, "procState");
@@ -75,7 +81,10 @@ public class PeripheralInformation
    * @param reservationToken The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public PeripheralInformation withReservationToken(@Nullable String reservationToken) {
+  public PeripheralInformation withReservationToken(
+      @Nullable
+      String reservationToken
+  ) {
     return new PeripheralInformation(reservationToken, state, procState, peripheralJob);
   }
 
@@ -95,7 +104,10 @@ public class PeripheralInformation
    * @param state The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public PeripheralInformation withState(@Nonnull State state) {
+  public PeripheralInformation withState(
+      @Nonnull
+      State state
+  ) {
     return new PeripheralInformation(reservationToken, state, procState, peripheralJob);
   }
 
@@ -115,7 +127,10 @@ public class PeripheralInformation
    * @param procState The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public PeripheralInformation withProcState(@Nonnull ProcState procState) {
+  public PeripheralInformation withProcState(
+      @Nonnull
+      ProcState procState
+  ) {
     return new PeripheralInformation(reservationToken, state, procState, peripheralJob);
   }
 
@@ -137,7 +152,9 @@ public class PeripheralInformation
    * @return A copy of this object, differing in the given value.
    */
   public PeripheralInformation withPeripheralJob(
-      @Nullable TCSObjectReference<PeripheralJob> peripheralJob) {
+      @Nullable
+      TCSObjectReference<PeripheralJob> peripheralJob
+  ) {
     return new PeripheralInformation(reservationToken, state, procState, peripheralJob);
   }
 

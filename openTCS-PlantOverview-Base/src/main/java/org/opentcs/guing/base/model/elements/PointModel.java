@@ -7,19 +7,20 @@
  */
 package org.opentcs.guing.base.model.elements;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.base.AllocationState;
-import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.base.components.layer.NullLayerWrapper;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
@@ -39,9 +40,11 @@ import org.opentcs.guing.base.model.PositionableModelComponent;
  * Basic implementation of a point.
  */
 public class PointModel
-    extends AbstractConnectableModelComponent
-    implements PositionableModelComponent,
-               FigureDecorationDetails {
+    extends
+      AbstractConnectableModelComponent
+    implements
+      PositionableModelComponent,
+      FigureDecorationDetails {
 
   /**
    * Key for the prefered angle of a vehicle on this point.
@@ -148,7 +151,10 @@ public class PointModel
   }
 
   @Override
-  public void clearAllocationState(@Nonnull VehicleModel model) {
+  public void clearAllocationState(
+      @Nonnull
+      VehicleModel model
+  ) {
     requireNonNull(model, "model");
 
     allocationStates.remove(model);
@@ -175,7 +181,8 @@ public class PointModel
       throws CloneNotSupportedException {
     PointModel clone = (PointModel) super.clone();
     clone.setAllocationStates(
-        (Map<VehicleModel, AllocationState>) ((TreeMap<VehicleModel, AllocationState>) allocationStates).clone()
+        (Map<VehicleModel, AllocationState>) ((TreeMap<VehicleModel, AllocationState>) allocationStates)
+            .clone()
     );
     clone.setBlockModels((Set<BlockModel>) ((TreeSet<BlockModel>) blocks).clone());
 
@@ -188,16 +195,20 @@ public class PointModel
     pName.setHelptext(bundle.getString("pointModel.property_name.helptext"));
     setProperty(NAME, pName);
 
-    CoordinateProperty pPosX = new CoordinateProperty(this,
-                                                      DEFAULT_XY_POSITION,
-                                                      LengthProperty.Unit.MM);
+    CoordinateProperty pPosX = new CoordinateProperty(
+        this,
+        DEFAULT_XY_POSITION,
+        LengthProperty.Unit.MM
+    );
     pPosX.setDescription(bundle.getString("pointModel.property_modelPositionX.description"));
     pPosX.setHelptext(bundle.getString("pointModel.property_modelPositionX.helptext"));
     setProperty(MODEL_X_POSITION, pPosX);
 
-    CoordinateProperty pPosY = new CoordinateProperty(this,
-                                                      DEFAULT_XY_POSITION,
-                                                      LengthProperty.Unit.MM);
+    CoordinateProperty pPosY = new CoordinateProperty(
+        this,
+        DEFAULT_XY_POSITION,
+        LengthProperty.Unit.MM
+    );
     pPosY.setDescription(bundle.getString("pointModel.property_modelPositionY.description"));
     pPosY.setHelptext(bundle.getString("pointModel.property_modelPositionY.helptext"));
     setProperty(MODEL_Y_POSITION, pPosY);
@@ -207,9 +218,11 @@ public class PointModel
     pPhi.setHelptext(bundle.getString("pointModel.property_angle.helptext"));
     setProperty(VEHICLE_ORIENTATION_ANGLE, pPhi);
 
-    PointTypeProperty pType = new PointTypeProperty(this,
-                                                    Arrays.asList(Type.values()),
-                                                    Type.values()[0]);
+    PointTypeProperty pType = new PointTypeProperty(
+        this,
+        Arrays.asList(Type.values()),
+        Type.values()[0]
+    );
     pType.setDescription(bundle.getString("pointModel.property_type.description"));
     pType.setHelptext(bundle.getString("pointModel.property_type.helptext"));
     pType.setCollectiveEditable(true);
@@ -261,9 +274,11 @@ public class PointModel
 
     StringProperty pPointLabelOrientationAngle = new StringProperty(this);
     pPointLabelOrientationAngle.setDescription(
-        bundle.getString("pointModel.property_labelOrientationAngle.description"));
+        bundle.getString("pointModel.property_labelOrientationAngle.description")
+    );
     pPointLabelOrientationAngle.setHelptext(
-        bundle.getString("pointModel.property_labelOrientationAngle.helptext"));
+        bundle.getString("pointModel.property_labelOrientationAngle.helptext")
+    );
     pPointLabelOrientationAngle.setModellingEditable(false);
     setProperty(ElementPropKeys.POINT_LABEL_ORIENTATION_ANGLE, pPointLabelOrientationAngle);
 

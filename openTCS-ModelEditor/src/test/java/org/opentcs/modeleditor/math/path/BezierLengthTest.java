@@ -8,13 +8,14 @@
 package org.opentcs.modeleditor.math.path;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.model.elements.LayoutModel;
 import org.opentcs.guing.base.model.elements.PathModel;
@@ -65,10 +66,12 @@ class BezierLengthTest {
     double calculatedLength = function.applyAsDouble(pathModel);
 
     assertThat(calculatedLength).isEqualTo(47.11);
-    verify(pathLengthMath).approximateCubicBezierCurveLength(new Coordinate(10, 10),
-                                                             new Coordinate(20, 30),
-                                                             new Coordinate(40, 50),
-                                                             new Coordinate(60, 60),
-                                                             1000);
+    verify(pathLengthMath).approximateCubicBezierCurveLength(
+        new Coordinate(10, 10),
+        new Coordinate(20, 30),
+        new Coordinate(40, 50),
+        new Coordinate(60, 60),
+        1000
+    );
   }
 }

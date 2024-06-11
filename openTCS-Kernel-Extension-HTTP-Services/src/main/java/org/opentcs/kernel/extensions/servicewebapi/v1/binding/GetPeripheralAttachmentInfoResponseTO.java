@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformation;
 
@@ -27,9 +28,14 @@ public class GetPeripheralAttachmentInfoResponseTO {
   @Nonnull
   private String attachedCommAdapter;
 
-  public GetPeripheralAttachmentInfoResponseTO(@Nonnull String locationName,
-                                               @Nonnull String attachedCommAdapter,
-                                               @Nonnull List<String> availableCommAdapters) {
+  public GetPeripheralAttachmentInfoResponseTO(
+      @Nonnull
+      String locationName,
+      @Nonnull
+      String attachedCommAdapter,
+      @Nonnull
+      List<String> availableCommAdapters
+  ) {
     this.locationName = requireNonNull(locationName, "locationName");
     this.attachedCommAdapter = requireNonNull(attachedCommAdapter, "attachedCommAdapter");
     this.availableCommAdapters = requireNonNull(availableCommAdapters, "availableCommAdapters");
@@ -40,7 +46,10 @@ public class GetPeripheralAttachmentInfoResponseTO {
     return locationName;
   }
 
-  public GetPeripheralAttachmentInfoResponseTO setLocationName(@Nonnull String locationName) {
+  public GetPeripheralAttachmentInfoResponseTO setLocationName(
+      @Nonnull
+      String locationName
+  ) {
     this.locationName = requireNonNull(locationName, "locationName");
     return this;
   }
@@ -51,7 +60,9 @@ public class GetPeripheralAttachmentInfoResponseTO {
   }
 
   public GetPeripheralAttachmentInfoResponseTO setAvailableCommAdapters(
-      @Nonnull List<String> availableCommAdapters) {
+      @Nonnull
+      List<String> availableCommAdapters
+  ) {
     this.availableCommAdapters = requireNonNull(availableCommAdapters, "availableCommAdapters");
     return this;
   }
@@ -62,13 +73,17 @@ public class GetPeripheralAttachmentInfoResponseTO {
   }
 
   public GetPeripheralAttachmentInfoResponseTO setAttachedCommAdapter(
-      @Nonnull String attachedCommAdapter) {
+      @Nonnull
+      String attachedCommAdapter
+  ) {
     this.attachedCommAdapter = requireNonNull(attachedCommAdapter, "attachedCommAdapter");
     return this;
   }
 
   public static GetPeripheralAttachmentInfoResponseTO fromAttachmentInformation(
-      @Nullable PeripheralAttachmentInformation peripheralAttachmentInfo) {
+      @Nullable
+      PeripheralAttachmentInformation peripheralAttachmentInfo
+  ) {
     if (peripheralAttachmentInfo == null) {
       return null;
     }
@@ -81,6 +96,7 @@ public class GetPeripheralAttachmentInfoResponseTO {
     return new GetPeripheralAttachmentInfoResponseTO(
         peripheralAttachmentInfo.getLocationReference().getName(),
         peripheralAttachmentInfo.getAttachedCommAdapter().getClass().getName(),
-        availableAdapters);
+        availableAdapters
+    );
   }
 }

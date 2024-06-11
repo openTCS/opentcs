@@ -16,9 +16,11 @@
  */
 package org.opentcs.thirdparty.operationsdesk.jhotdraw.application.action.file;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.MENU_PATH;
+
 import java.awt.event.ActionEvent;
 import java.net.URI;
-import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -35,7 +37,6 @@ import org.jhotdraw.net.URIUtil;
 import org.opentcs.access.Kernel;
 import org.opentcs.guing.common.util.ImageDirectory;
 import org.opentcs.operationsdesk.application.OpenTCSView;
-import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.MENU_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
@@ -60,7 +61,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * @author Werner Randelshofer
  */
 public class CloseFileAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action's ID.
@@ -112,28 +114,32 @@ public class CloseFileAction
       URI unsavedURI = view.getURI();
       String message
           = "<html><b>"
-          + labels.getFormatted("file.saveBefore.doYouWantToSave.message",
-                                (unsavedURI == null)
-                                    ? Kernel.DEFAULT_MODEL_NAME
-                                    : URIUtil.getName(unsavedURI))
-          + "</b><p>"
-          + labels.getString("file.saveBefore.doYouWantToSave.details")
-          + "</p></html>";
+              + labels.getFormatted(
+                  "file.saveBefore.doYouWantToSave.message",
+                  (unsavedURI == null)
+                      ? Kernel.DEFAULT_MODEL_NAME
+                      : URIUtil.getName(unsavedURI)
+              )
+              + "</b><p>"
+              + labels.getString("file.saveBefore.doYouWantToSave.details")
+              + "</p></html>";
 
       Object[] options = {
-        labels.getString("file.saveBefore.saveOption.text"),
-        labels.getString("file.saveBefore.dontSaveOption.text"),
-        labels.getString("file.saveBefore.cancelOption.text")
+          labels.getString("file.saveBefore.saveOption.text"),
+          labels.getString("file.saveBefore.dontSaveOption.text"),
+          labels.getString("file.saveBefore.cancelOption.text")
       };
 
-      int option = JOptionPane.showOptionDialog(view.getComponent(),
-                                                message,
-                                                "",
-                                                JOptionPane.YES_NO_CANCEL_OPTION,
-                                                JOptionPane.WARNING_MESSAGE,
-                                                null,
-                                                options,
-                                                options[0]);
+      int option = JOptionPane.showOptionDialog(
+          view.getComponent(),
+          message,
+          "",
+          JOptionPane.YES_NO_CANCEL_OPTION,
+          JOptionPane.WARNING_MESSAGE,
+          null,
+          options,
+          options[0]
+      );
 
       fileSaved = JOptionPane.CANCEL_OPTION;
 

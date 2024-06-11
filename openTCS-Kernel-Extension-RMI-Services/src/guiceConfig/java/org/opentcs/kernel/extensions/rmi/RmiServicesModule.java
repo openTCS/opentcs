@@ -20,7 +20,8 @@ import org.slf4j.LoggerFactory;
  * Configures the RMI services extension.
  */
 public class RmiServicesModule
-    extends KernelInjectionModule {
+    extends
+      KernelInjectionModule {
 
   /**
    * This class's logger.
@@ -36,8 +37,10 @@ public class RmiServicesModule
   @Override
   protected void configure() {
     RmiKernelInterfaceConfiguration configuration
-        = getConfigBindingProvider().get(RmiKernelInterfaceConfiguration.PREFIX,
-                                         RmiKernelInterfaceConfiguration.class);
+        = getConfigBindingProvider().get(
+            RmiKernelInterfaceConfiguration.PREFIX,
+            RmiKernelInterfaceConfiguration.class
+        );
 
     if (!configuration.enable()) {
       LOG.info("RMI services disabled by configuration.");

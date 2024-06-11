@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
  * Loopback adapter-specific Gucie configuration for the Kernel.
  */
 public class LoopbackPeripheralKernelModule
-    extends KernelInjectionModule {
+    extends
+      KernelInjectionModule {
 
   /**
    * This class's logger.
@@ -32,8 +33,10 @@ public class LoopbackPeripheralKernelModule
   @Override
   protected void configure() {
     VirtualPeripheralConfiguration configuration
-        = getConfigBindingProvider().get(VirtualPeripheralConfiguration.PREFIX,
-                                         VirtualPeripheralConfiguration.class);
+        = getConfigBindingProvider().get(
+            VirtualPeripheralConfiguration.PREFIX,
+            VirtualPeripheralConfiguration.class
+        );
 
     if (!configuration.enable()) {
       LOG.info("Peripheral loopback driver disabled by configuration.");

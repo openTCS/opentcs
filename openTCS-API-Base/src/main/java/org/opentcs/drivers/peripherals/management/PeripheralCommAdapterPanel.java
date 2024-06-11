@@ -14,7 +14,8 @@ import org.opentcs.drivers.peripherals.PeripheralProcessModel;
  * A base class for panels associated with peripheral comm adapters.
  */
 public abstract class PeripheralCommAdapterPanel
-    extends JPanel {
+    extends
+      JPanel {
 
   /**
    * Returns the title for this comm adapter panel.

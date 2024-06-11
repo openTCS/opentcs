@@ -16,7 +16,8 @@ import org.opentcs.util.ExplainedBoolean;
  * Provides high-level methods for the system to control a peripheral device.
  */
 public interface PeripheralController
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * Lets the peripheral device associated with this controller process the given job.
@@ -27,7 +28,12 @@ public interface PeripheralController
    * @throws IllegalStateException If this peripheral device associated with this controller
    * cannot process the job.
    */
-  void process(@Nonnull PeripheralJob job, @Nonnull PeripheralJobCallback callback)
+  void process(
+      @Nonnull
+      PeripheralJob job,
+      @Nonnull
+      PeripheralJobCallback callback
+  )
       throws IllegalStateException;
 
   /**
@@ -50,12 +56,18 @@ public interface PeripheralController
    * the job.
    */
   @Nonnull
-  ExplainedBoolean canProcess(@Nonnull PeripheralJob job);
+  ExplainedBoolean canProcess(
+      @Nonnull
+      PeripheralJob job
+  );
 
   /**
    * Sends a {@link PeripheralAdapterCommand} to the communication adapter.
    *
    * @param command The adapter command to be sent.
    */
-  void sendCommAdapterCommand(@Nonnull PeripheralAdapterCommand command);
+  void sendCommAdapterCommand(
+      @Nonnull
+      PeripheralAdapterCommand command
+  );
 }

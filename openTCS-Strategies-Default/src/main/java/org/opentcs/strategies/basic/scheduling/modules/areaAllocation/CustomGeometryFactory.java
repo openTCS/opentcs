@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.scheduling.modules.areaAllocation;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -21,7 +22,8 @@ import org.opentcs.data.model.Path;
  * A {@link GeometryFactory} extended by custom methods for creating geometries.
  */
 public class CustomGeometryFactory
-    extends GeometryFactory {
+    extends
+      GeometryFactory {
 
   /**
    * A constant for an empty {@link Geometry}.
@@ -52,7 +54,10 @@ public class CustomGeometryFactory
    * @param coordinates The coordinates to create a {@link Geometry} with.
    * @return A {@link Geometry}
    */
-  public Geometry createPolygonOrEmptyGeometry(@Nonnull Coordinate... coordinates) {
+  public Geometry createPolygonOrEmptyGeometry(
+      @Nonnull
+      Coordinate... coordinates
+  ) {
     requireNonNull(coordinates, "coordinates");
 
     switch (coordinates.length) {

@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.PointCreationTO;
@@ -39,20 +40,35 @@ public class PointConverter {
 
   public List<PointTO> toPointTOs(Set<Point> points) {
     return points.stream()
-        .map(point -> new PointTO(point.getName())
-        .setPosition(new TripleTO(point.getPose().getPosition().getX(),
-                                  point.getPose().getPosition().getY(),
-                                  point.getPose().getPosition().getZ()))
-        .setType(point.getType().name())
-        .setVehicleOrientationAngle(point.getPose().getOrientationAngle())
-        .setVehicleEnvelopes(envelopeConverter.toEnvelopeTOs(point.getVehicleEnvelopes()))
-        .setProperties(pConverter.toPropertyTOs(point.getProperties()))
-        .setLayout(new PointTO.Layout()
-            .setLabelOffset(new CoupleTO(point.getLayout().getLabelOffset().getX(),
-                                         point.getLayout().getLabelOffset().getY()))
-            .setPosition(new CoupleTO(point.getLayout().getPosition().getX(),
-                                      point.getLayout().getPosition().getY()))
-            .setLayerId(point.getLayout().getLayerId()))
+        .map(
+            point -> new PointTO(point.getName())
+                .setPosition(
+                    new TripleTO(
+                        point.getPose().getPosition().getX(),
+                        point.getPose().getPosition().getY(),
+                        point.getPose().getPosition().getZ()
+                    )
+                )
+                .setType(point.getType().name())
+                .setVehicleOrientationAngle(point.getPose().getOrientationAngle())
+                .setVehicleEnvelopes(envelopeConverter.toEnvelopeTOs(point.getVehicleEnvelopes()))
+                .setProperties(pConverter.toPropertyTOs(point.getProperties()))
+                .setLayout(
+                    new PointTO.Layout()
+                        .setLabelOffset(
+                            new CoupleTO(
+                                point.getLayout().getLabelOffset().getX(),
+                                point.getLayout().getLabelOffset().getY()
+                            )
+                        )
+                        .setPosition(
+                            new CoupleTO(
+                                point.getLayout().getPosition().getX(),
+                                point.getLayout().getPosition().getY()
+                            )
+                        )
+                        .setLayerId(point.getLayout().getLayerId())
+                )
         )
         .sorted(Comparator.comparing(PointTO::getName))
         .collect(Collectors.toCollection(ArrayList::new));
@@ -65,21 +81,32 @@ public class PointConverter {
                 .withProperties(pConverter.toPropertyMap(point.getProperties()))
                 .withPose(
                     new Pose(
-                        new Triple(point.getPosition().getX(),
-                                   point.getPosition().getY(),
-                                   point.getPosition().getZ()),
+                        new Triple(
+                            point.getPosition().getX(),
+                            point.getPosition().getY(),
+                            point.getPosition().getZ()
+                        ),
                         point.getVehicleOrientationAngle()
                     )
                 )
                 .withType(Point.Type.valueOf(point.getType()))
-                .withLayout(new PointCreationTO.Layout(
-                    new Couple(point.getLayout().getPosition().getX(),
-                               point.getLayout().getPosition().getY()),
-                    new Couple(point.getLayout().getLabelOffset().getX(),
-                               point.getLayout().getLabelOffset().getY()),
-                    point.getLayout().getLayerId()))
-                .withVehicleEnvelopes(envelopeConverter
-                    .toVehicleEnvelopeMap(point.getVehicleEnvelopes()))
+                .withLayout(
+                    new PointCreationTO.Layout(
+                        new Couple(
+                            point.getLayout().getPosition().getX(),
+                            point.getLayout().getPosition().getY()
+                        ),
+                        new Couple(
+                            point.getLayout().getLabelOffset().getX(),
+                            point.getLayout().getLabelOffset().getY()
+                        ),
+                        point.getLayout().getLayerId()
+                    )
+                )
+                .withVehicleEnvelopes(
+                    envelopeConverter
+                        .toVehicleEnvelopeMap(point.getVehicleEnvelopes())
+                )
         )
         .collect(Collectors.toCollection(ArrayList::new));
   }

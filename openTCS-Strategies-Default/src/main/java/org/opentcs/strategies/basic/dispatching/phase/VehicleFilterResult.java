@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase;
 
-import java.util.Collection;
 import static java.util.Objects.requireNonNull;
+
+import java.util.Collection;
 import org.opentcs.data.model.Vehicle;
 
 /**

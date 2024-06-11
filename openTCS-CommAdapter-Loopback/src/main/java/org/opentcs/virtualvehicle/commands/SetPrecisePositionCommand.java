@@ -16,7 +16,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
  * A command to set a vehicle's precise position.
  */
 public class SetPrecisePositionCommand
-    implements AdapterCommand {
+    implements
+      AdapterCommand {
 
   /**
    * The percise position to set.
@@ -28,7 +29,10 @@ public class SetPrecisePositionCommand
    *
    * @param position The precise position to set.
    */
-  public SetPrecisePositionCommand(@Nullable Triple position) {
+  public SetPrecisePositionCommand(
+      @Nullable
+      Triple position
+  ) {
     this.position = position;
   }
 

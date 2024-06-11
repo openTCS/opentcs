@@ -7,10 +7,11 @@
  */
 package org.opentcs.strategies.basic.dispatching.rerouting;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -31,27 +32,35 @@ import org.slf4j.LoggerFactory;
  * {@link VehiclePositionResolver#getFutureOrCurrentPosition(org.opentcs.data.model.Vehicle)}.
  */
 public class RegularReroutingStrategy
-    extends AbstractReroutingStrategy
-    implements ReroutingStrategy {
+    extends
+      AbstractReroutingStrategy
+    implements
+      ReroutingStrategy {
 
   private static final Logger LOG = LoggerFactory.getLogger(RegularReroutingStrategy.class);
   private final VehiclePositionResolver vehiclePositionResolver;
 
   @Inject
-  public RegularReroutingStrategy(Router router,
-                                  TCSObjectService objectService,
-                                  RegularDriveOrderMerger driveOrderMerger,
-                                  VehiclePositionResolver vehiclePositionResolver) {
+  public RegularReroutingStrategy(
+      Router router,
+      TCSObjectService objectService,
+      RegularDriveOrderMerger driveOrderMerger,
+      VehiclePositionResolver vehiclePositionResolver
+  ) {
     super(router, objectService, driveOrderMerger);
-    this.vehiclePositionResolver = requireNonNull(vehiclePositionResolver,
-                                                  "vehiclePositionResolver");
+    this.vehiclePositionResolver = requireNonNull(
+        vehiclePositionResolver,
+        "vehiclePositionResolver"
+    );
   }
 
   @Override
   public Optional<List<DriveOrder>> reroute(Vehicle vehicle) {
     if (!isVehicleAtExpectedPosition(vehicle)) {
-      LOG.warn("Can't perform regular rerouting for {} located at unexpected position.",
-               vehicle.getName());
+      LOG.warn(
+          "Can't perform regular rerouting for {} located at unexpected position.",
+          vehicle.getName()
+      );
       return Optional.empty();
     }
 

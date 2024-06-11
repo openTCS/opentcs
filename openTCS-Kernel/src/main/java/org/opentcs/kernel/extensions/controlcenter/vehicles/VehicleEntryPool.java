@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.controlcenter.vehicles;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.TreeMap;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -24,7 +25,8 @@ import org.slf4j.LoggerFactory;
  * kernel.
  */
 public class VehicleEntryPool
-    implements Lifecycle {
+    implements
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -49,7 +51,10 @@ public class VehicleEntryPool
    * @param objectService The object service.
    */
   @Inject
-  public VehicleEntryPool(@Nonnull TCSObjectService objectService) {
+  public VehicleEntryPool(
+      @Nonnull
+      TCSObjectService objectService
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
   }
 
@@ -99,7 +104,10 @@ public class VehicleEntryPool
    * @return the vehicle entry for the given vehicle name.
    */
   @Nullable
-  public VehicleEntry getEntryFor(@Nonnull String vehicleName) {
+  public VehicleEntry getEntryFor(
+      @Nonnull
+      String vehicleName
+  ) {
     requireNonNull(vehicleName, "vehicleName");
     return entries.get(vehicleName);
   }

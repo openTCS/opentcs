@@ -19,7 +19,8 @@ import org.opentcs.guing.common.components.drawing.course.Origin;
  * larger.
  */
 public class OffsetFigure
-    extends OriginFigure {
+    extends
+      OriginFigure {
 
   @SuppressWarnings("this-escape")
   public OffsetFigure() {

@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.workingset;
 
-import de.huxhorn.sulky.ulid.ULID;
 import static java.util.Objects.requireNonNull;
+
+import de.huxhorn.sulky.ulid.ULID;
 import java.util.Optional;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.components.kernel.ObjectNameProvider;
@@ -18,7 +19,8 @@ import org.opentcs.components.kernel.ObjectNameProvider;
  * {@link CreationTO}.
  */
 public class PrefixedUlidObjectNameProvider
-    implements ObjectNameProvider {
+    implements
+      ObjectNameProvider {
 
   /**
    * Generates ULIDs for us.

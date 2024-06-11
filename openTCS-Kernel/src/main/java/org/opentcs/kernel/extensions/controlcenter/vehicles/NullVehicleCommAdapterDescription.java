@@ -13,7 +13,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
  * A {@link VehicleCommAdapterDescription} for no comm adapter.
  */
 public class NullVehicleCommAdapterDescription
-    extends VehicleCommAdapterDescription {
+    extends
+      VehicleCommAdapterDescription {
 
   /**
    * Creates a new instance.

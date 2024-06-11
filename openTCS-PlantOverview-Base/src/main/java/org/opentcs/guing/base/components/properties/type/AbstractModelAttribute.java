@@ -13,7 +13,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * Attribute of a {@link ModelComponent}.
  */
 public abstract class AbstractModelAttribute
-    implements ModelAttribute {
+    implements
+      ModelAttribute {
 
   /**
    * The model this attribute is attached to.
@@ -81,6 +82,7 @@ public abstract class AbstractModelAttribute
 
   /**
    * Returns the change state of this attribute.
+   *
    * @return The change state.
    */
   public ChangeState getChangeState() {

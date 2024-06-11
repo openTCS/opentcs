@@ -7,9 +7,10 @@
  */
 package org.opentcs.util.persistence.v005;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -33,7 +34,10 @@ public class VehicleEnvelopeTO {
   }
 
   @XmlAttribute
-  public VehicleEnvelopeTO setKey(@Nonnull String key) {
+  public VehicleEnvelopeTO setKey(
+      @Nonnull
+      String key
+  ) {
     this.key = requireNonNull(key, "key");
     return this;
   }
@@ -43,7 +47,10 @@ public class VehicleEnvelopeTO {
     return vertices;
   }
 
-  public VehicleEnvelopeTO setVertices(@Nonnull List<CoupleTO> vertices) {
+  public VehicleEnvelopeTO setVertices(
+      @Nonnull
+      List<CoupleTO> vertices
+  ) {
     this.vertices = requireNonNull(vertices, "vertices");
     return this;
   }

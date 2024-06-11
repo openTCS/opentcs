@@ -15,7 +15,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.Undo
  * Base implementation for visualisation of model component properties.
  */
 public abstract class AbstractAttributesContent
-    implements AttributesContent {
+    implements
+      AttributesContent {
 
   /**
    * The model component to show the properties of.

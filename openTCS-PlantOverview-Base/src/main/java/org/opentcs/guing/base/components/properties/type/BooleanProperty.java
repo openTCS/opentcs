@@ -13,7 +13,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property for a boolean value.
  */
 public class BooleanProperty
-    extends AbstractProperty {
+    extends
+      AbstractProperty {
 
   /**
    * Creates a new instance.

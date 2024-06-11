@@ -7,12 +7,14 @@
  */
 package org.opentcs.operationsdesk.application.action.course;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import org.opentcs.access.KernelRuntimeException;
@@ -20,7 +22,6 @@ import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.base.model.elements.VehicleModel;
-import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +29,8 @@ import org.slf4j.LoggerFactory;
 /**
  */
 public class WithdrawAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * The ID for the 'withdraw regularly' action.
@@ -71,10 +73,15 @@ public class WithdrawAction
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public WithdrawAction(@Assisted Collection<VehicleModel> vehicles,
-                        @Assisted boolean immediateAbort,
-                        SharedKernelServicePortalProvider portalProvider,
-                        @ApplicationFrame Component dialogParent) {
+  public WithdrawAction(
+      @Assisted
+      Collection<VehicleModel> vehicles,
+      @Assisted
+      boolean immediateAbort,
+      SharedKernelServicePortalProvider portalProvider,
+      @ApplicationFrame
+      Component dialogParent
+  ) {
     this.vehicles = requireNonNull(vehicles, "vehicles");
     this.immediateAbort = requireNonNull(immediateAbort, "immediateAbort");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
@@ -110,7 +117,8 @@ public class WithdrawAction
 
       for (VehicleModel vehicle : vehicles) {
         sharedPortal.getPortal().getDispatcherService().withdrawByVehicle(
-            vehicle.getVehicle().getReference(), immediateAbort);
+            vehicle.getVehicle().getReference(), immediateAbort
+        );
       }
 
     }

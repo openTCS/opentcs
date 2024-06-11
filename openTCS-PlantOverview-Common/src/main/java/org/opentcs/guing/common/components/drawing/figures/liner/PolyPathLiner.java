@@ -18,7 +18,8 @@ import org.jhotdraw.geom.BezierPath;
 /**
  */
 public class PolyPathLiner
-    implements org.jhotdraw.draw.liner.Liner {
+    implements
+      org.jhotdraw.draw.liner.Liner {
 
   public PolyPathLiner() {
   }

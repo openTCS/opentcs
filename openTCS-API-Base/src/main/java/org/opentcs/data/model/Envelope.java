@@ -7,12 +7,13 @@
  */
 package org.opentcs.data.model;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A sequence of vertices that, when connected in their defined order, represent the area that may
@@ -25,7 +26,8 @@ import static org.opentcs.util.Assertions.checkArgument;
  * two-dimensional plane. Such envelopes are therefore considered empty.
  */
 public class Envelope
-    implements Serializable {
+    implements
+      Serializable {
 
   private final List<Couple> vertices;
 
@@ -36,11 +38,16 @@ public class Envelope
    * @throws IllegalArgumentException If the sequence of vertices is empty or if the last vertext
    * in the sequence does not match the first one.
    */
-  public Envelope(@Nonnull List<Couple> vertices) {
+  public Envelope(
+      @Nonnull
+      List<Couple> vertices
+  ) {
     this.vertices = requireNonNull(vertices, "vertices");
     checkArgument(!vertices.isEmpty(), "An envelope must contain some vertices.");
-    checkArgument(Objects.equals(vertices.get(0), vertices.get(vertices.size() - 1)),
-                  "An envelope's last vertex must match the first one.");
+    checkArgument(
+        Objects.equals(vertices.get(0), vertices.get(vertices.size() - 1)),
+        "An envelope's last vertex must match the first one."
+    );
   }
 
   /**

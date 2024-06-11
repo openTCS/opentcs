@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.vehicles;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Iterator;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.drivers.vehicle.MovementCommand;
 

@@ -7,8 +7,9 @@
  */
 package org.opentcs.modeleditor.application.action;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import javax.swing.ActionMap;
 import org.opentcs.guing.common.application.action.file.ModelPropertiesAction;
 import org.opentcs.guing.common.application.action.file.SaveModelAction;
@@ -38,7 +39,8 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.application.action.file.Close
  * A custom ActionMap for the plant overview application.
  */
 public class ViewActionMap
-    extends ActionMap {
+    extends
+      ActionMap {
 
   /**
    * Creates a new instance.
@@ -51,11 +53,13 @@ public class ViewActionMap
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public ViewActionMap(OpenTCSView view,
-                       UndoRedoManager undoRedoManager,
-                       AboutAction aboutAction,
-                       ModelPropertiesAction modelPropertiesAction,
-                       DownloadModelFromKernelAction loadModelFromKernelAction) {
+  public ViewActionMap(
+      OpenTCSView view,
+      UndoRedoManager undoRedoManager,
+      AboutAction aboutAction,
+      ModelPropertiesAction modelPropertiesAction,
+      DownloadModelFromKernelAction loadModelFromKernelAction
+  ) {
     requireNonNull(view, "view");
     requireNonNull(undoRedoManager, "undoRedoManager");
     requireNonNull(aboutAction, "aboutAction");

@@ -29,9 +29,11 @@ import org.opentcs.guing.common.components.drawing.course.OriginChangeListener;
  * A figure that is labeled by another figure.
  */
 public abstract class LabeledFigure
-    extends GraphicalCompositeFigure
-    implements AttributesChangeListener,
-               OriginChangeListener {
+    extends
+      GraphicalCompositeFigure
+    implements
+      AttributesChangeListener,
+      OriginChangeListener {
 
   /**
    * The figure of the label of this labeled figure.

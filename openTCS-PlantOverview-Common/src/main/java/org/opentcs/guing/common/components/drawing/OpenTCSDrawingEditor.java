@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.common.components.drawing;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.Rectangle;
 import java.awt.event.InputEvent;
@@ -16,7 +18,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.KeyStroke;
@@ -46,8 +47,10 @@ import org.opentcs.util.event.EventHandler;
  * <code>Drawing</code>.
  */
 public class OpenTCSDrawingEditor
-    extends DefaultDrawingEditor
-    implements EventHandler {
+    extends
+      DefaultDrawingEditor
+    implements
+      EventHandler {
 
   /**
    * Width on the screen edge.
@@ -322,11 +325,15 @@ public class OpenTCSDrawingEditor
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.ALT_DOWN_MASK), MoveAction.South.ID);
 
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.SHIFT_DOWN_MASK), MoveAction.West.ID);
-    m.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.SHIFT_DOWN_MASK),
-          MoveAction.East.ID);
+    m.put(
+        KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.SHIFT_DOWN_MASK),
+        MoveAction.East.ID
+    );
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.SHIFT_DOWN_MASK), MoveAction.North.ID);
-    m.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_DOWN_MASK),
-          MoveAction.South.ID);
+    m.put(
+        KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.SHIFT_DOWN_MASK),
+        MoveAction.South.ID
+    );
 
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK), MoveAction.West.ID);
     m.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK), MoveAction.East.ID);
@@ -356,7 +363,8 @@ public class OpenTCSDrawingEditor
   }
 
   private class CompositeFigureEventHandler
-      implements CompositeFigureListener {
+      implements
+        CompositeFigureListener {
 
     /**
      * Creates a new instance.

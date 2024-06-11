@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
  * Configures the admin web API extension.
  */
 public class AdminWebApiModule
-    extends KernelInjectionModule {
+    extends
+      KernelInjectionModule {
 
   /**
    * This class's logger.
@@ -32,8 +33,10 @@ public class AdminWebApiModule
   @Override
   protected void configure() {
     AdminWebApiConfiguration configuration
-        = getConfigBindingProvider().get(AdminWebApiConfiguration.PREFIX,
-                                         AdminWebApiConfiguration.class);
+        = getConfigBindingProvider().get(
+            AdminWebApiConfiguration.PREFIX,
+            AdminWebApiConfiguration.class
+        );
 
     if (!configuration.enable()) {
       LOG.info("Admin web API disabled by configuration.");

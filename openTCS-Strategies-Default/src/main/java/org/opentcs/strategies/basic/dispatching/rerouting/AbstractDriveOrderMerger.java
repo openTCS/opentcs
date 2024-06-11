@@ -7,9 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.rerouting;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.components.kernel.Router;
@@ -22,7 +23,8 @@ import org.opentcs.data.order.Route;
  * An abstract implementation of {@link DriveOrderMerger} defining the basic merging algorithm.
  */
 public abstract class AbstractDriveOrderMerger
-    implements DriveOrderMerger {
+    implements
+      DriveOrderMerger {
 
   private final Router router;
 
@@ -36,10 +38,12 @@ public abstract class AbstractDriveOrderMerger
   }
 
   @Override
-  public DriveOrder mergeDriveOrders(DriveOrder orderA,
-                                     DriveOrder orderB,
-                                     int currentRouteStepIndex,
-                                     Vehicle vehicle) {
+  public DriveOrder mergeDriveOrders(
+      DriveOrder orderA,
+      DriveOrder orderB,
+      int currentRouteStepIndex,
+      Vehicle vehicle
+  ) {
     return new DriveOrder(orderA.getDestination())
         .withState(orderA.getState())
         .withTransportOrder(orderA.getTransportOrder())
@@ -57,22 +61,28 @@ public abstract class AbstractDriveOrderMerger
    * @param vehicle The {@link Vehicle} to merge the routes for.
    * @return The (new) merged route.
    */
-  protected Route mergeRoutes(Route routeA,
-                              Route routeB,
-                              int currentRouteStepIndex,
-                              Vehicle vehicle) {
+  protected Route mergeRoutes(
+      Route routeA,
+      Route routeB,
+      int currentRouteStepIndex,
+      Vehicle vehicle
+  ) {
     // Merge the route steps
-    List<Route.Step> mergedSteps = mergeSteps(routeA.getSteps(),
-                                              routeB.getSteps(),
-                                              currentRouteStepIndex);
+    List<Route.Step> mergedSteps = mergeSteps(
+        routeA.getSteps(),
+        routeB.getSteps(),
+        currentRouteStepIndex
+    );
 
     // Calculate the costs for merged route
     return new Route(
         mergedSteps,
-        router.getCosts(vehicle,
-                        mergedSteps.get(0).getSourcePoint(),
-                        mergedSteps.get(mergedSteps.size() - 1).getDestinationPoint(),
-                        Set.of())
+        router.getCosts(
+            vehicle,
+            mergedSteps.get(0).getSourcePoint(),
+            mergedSteps.get(mergedSteps.size() - 1).getDestinationPoint(),
+            Set.of()
+        )
     );
   }
 
@@ -84,21 +94,27 @@ public abstract class AbstractDriveOrderMerger
    * @param currentRouteStepIndex The index of the last route step travelled for {@code stepsA}.
    * @return The (new) merged list of steps.
    */
-  protected abstract List<Route.Step> mergeSteps(List<Route.Step> stepsA,
-                                                 List<Route.Step> stepsB,
-                                                 int currentRouteStepIndex);
+  protected abstract List<Route.Step> mergeSteps(
+      List<Route.Step> stepsA,
+      List<Route.Step> stepsB,
+      int currentRouteStepIndex
+  );
 
   protected List<Route.Step> updateRouteIndices(List<Route.Step> steps) {
     List<Route.Step> updatedSteps = new ArrayList<>();
     for (int i = 0; i < steps.size(); i++) {
       Route.Step currStep = steps.get(i);
-      updatedSteps.add(new Route.Step(currStep.getPath(),
-                                      currStep.getSourcePoint(),
-                                      currStep.getDestinationPoint(),
-                                      currStep.getVehicleOrientation(),
-                                      i,
-                                      currStep.isExecutionAllowed(),
-                                      currStep.getReroutingType()));
+      updatedSteps.add(
+          new Route.Step(
+              currStep.getPath(),
+              currStep.getSourcePoint(),
+              currStep.getDestinationPoint(),
+              currStep.getVehicleOrientation(),
+              i,
+              currStep.isExecutionAllowed(),
+              currStep.getReroutingType()
+          )
+      );
     }
     return updatedSteps;
   }

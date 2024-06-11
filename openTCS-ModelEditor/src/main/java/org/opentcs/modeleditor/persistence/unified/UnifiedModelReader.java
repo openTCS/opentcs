@@ -7,10 +7,11 @@
  */
 package org.opentcs.modeleditor.persistence.unified;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.io.File;
 import java.io.IOException;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import javax.swing.filechooser.FileFilter;
 import org.opentcs.access.to.model.PlantModelCreationTO;
@@ -23,7 +24,8 @@ import org.opentcs.util.persistence.ModelParser;
  * xml file.
  */
 public class UnifiedModelReader
-    implements ModelFileReader {
+    implements
+      ModelFileReader {
 
   /**
    * The model parser.

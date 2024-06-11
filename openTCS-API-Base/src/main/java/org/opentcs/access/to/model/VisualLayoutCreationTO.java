@@ -7,12 +7,13 @@
  */
 package org.opentcs.access.to.model;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.visualization.Layer;
 import org.opentcs.data.model.visualization.LayerGroup;
@@ -21,8 +22,10 @@ import org.opentcs.data.model.visualization.LayerGroup;
  * A transfer object describing a visual layout in the plant model.
  */
 public class VisualLayoutCreationTO
-    extends CreationTO
-    implements Serializable {
+    extends
+      CreationTO
+    implements
+      Serializable {
 
   /**
    * This layout's scale on the X axis (in mm/pixel).
@@ -46,7 +49,10 @@ public class VisualLayoutCreationTO
    *
    * @param name The name of this visual layout.
    */
-  public VisualLayoutCreationTO(@Nonnull String name) {
+  public VisualLayoutCreationTO(
+      @Nonnull
+      String name
+  ) {
     super(name);
 
     this.scaleX = 50.0;
@@ -55,12 +61,18 @@ public class VisualLayoutCreationTO
     this.layerGroups = List.of();
   }
 
-  private VisualLayoutCreationTO(@Nonnull String name,
-                                 @Nonnull Map<String, String> properties,
-                                 double scaleX,
-                                 double scaleY,
-                                 @Nonnull List<Layer> layers,
-                                 @Nonnull List<LayerGroup> layerGroups) {
+  private VisualLayoutCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      Map<String, String> properties,
+      double scaleX,
+      double scaleY,
+      @Nonnull
+      List<Layer> layers,
+      @Nonnull
+      List<LayerGroup> layerGroups
+  ) {
     super(name, properties);
     this.scaleX = scaleX;
     this.scaleY = scaleY;
@@ -75,13 +87,18 @@ public class VisualLayoutCreationTO
    * @return A copy of this object, differing in the given value.
    */
   @Override
-  public VisualLayoutCreationTO withName(@Nonnull String name) {
-    return new VisualLayoutCreationTO(name,
-                                      getModifiableProperties(),
-                                      scaleX,
-                                      scaleY,
-                                      layers,
-                                      layerGroups);
+  public VisualLayoutCreationTO withName(
+      @Nonnull
+      String name
+  ) {
+    return new VisualLayoutCreationTO(
+        name,
+        getModifiableProperties(),
+        scaleX,
+        scaleY,
+        layers,
+        layerGroups
+    );
   }
 
   /**
@@ -91,13 +108,18 @@ public class VisualLayoutCreationTO
    * @return A copy of this object, differing in the given value.
    */
   @Override
-  public VisualLayoutCreationTO withProperties(@Nonnull Map<String, String> properties) {
-    return new VisualLayoutCreationTO(getName(),
-                                      properties,
-                                      scaleX,
-                                      scaleY,
-                                      layers,
-                                      layerGroups);
+  public VisualLayoutCreationTO withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
+    return new VisualLayoutCreationTO(
+        getName(),
+        properties,
+        scaleX,
+        scaleY,
+        layers,
+        layerGroups
+    );
   }
 
   /**
@@ -111,13 +133,20 @@ public class VisualLayoutCreationTO
    * excludes the entry otherwise.
    */
   @Override
-  public VisualLayoutCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new VisualLayoutCreationTO(getName(),
-                                      propertiesWith(key, value),
-                                      scaleX,
-                                      scaleY,
-                                      layers,
-                                      layerGroups);
+  public VisualLayoutCreationTO withProperty(
+      @Nonnull
+      String key,
+      @Nonnull
+      String value
+  ) {
+    return new VisualLayoutCreationTO(
+        getName(),
+        propertiesWith(key, value),
+        scaleX,
+        scaleY,
+        layers,
+        layerGroups
+    );
   }
 
   /**
@@ -136,12 +165,14 @@ public class VisualLayoutCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public VisualLayoutCreationTO withScaleX(double scaleX) {
-    return new VisualLayoutCreationTO(getName(),
-                                      getModifiableProperties(),
-                                      scaleX,
-                                      scaleY,
-                                      layers,
-                                      layerGroups);
+    return new VisualLayoutCreationTO(
+        getName(),
+        getModifiableProperties(),
+        scaleX,
+        scaleY,
+        layers,
+        layerGroups
+    );
   }
 
   /**
@@ -160,12 +191,14 @@ public class VisualLayoutCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public VisualLayoutCreationTO withScaleY(double scaleY) {
-    return new VisualLayoutCreationTO(getName(),
-                                      getModifiableProperties(),
-                                      scaleX,
-                                      scaleY,
-                                      layers,
-                                      layerGroups);
+    return new VisualLayoutCreationTO(
+        getName(),
+        getModifiableProperties(),
+        scaleX,
+        scaleY,
+        layers,
+        layerGroups
+    );
   }
 
   /**
@@ -184,13 +217,18 @@ public class VisualLayoutCreationTO
    * @param layers The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public VisualLayoutCreationTO withLayers(@Nonnull List<Layer> layers) {
-    return new VisualLayoutCreationTO(getName(),
-                                      getModifiableProperties(),
-                                      scaleX,
-                                      scaleY,
-                                      layers,
-                                      layerGroups);
+  public VisualLayoutCreationTO withLayers(
+      @Nonnull
+      List<Layer> layers
+  ) {
+    return new VisualLayoutCreationTO(
+        getName(),
+        getModifiableProperties(),
+        scaleX,
+        scaleY,
+        layers,
+        layerGroups
+    );
   }
 
   /**
@@ -199,13 +237,18 @@ public class VisualLayoutCreationTO
    * @param layer The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public VisualLayoutCreationTO withLayer(@Nonnull Layer layer) {
-    return new VisualLayoutCreationTO(getName(),
-                                      getModifiableProperties(),
-                                      scaleX,
-                                      scaleY,
-                                      listWithAppendix(layers, layer),
-                                      layerGroups);
+  public VisualLayoutCreationTO withLayer(
+      @Nonnull
+      Layer layer
+  ) {
+    return new VisualLayoutCreationTO(
+        getName(),
+        getModifiableProperties(),
+        scaleX,
+        scaleY,
+        listWithAppendix(layers, layer),
+        layerGroups
+    );
   }
 
   /**
@@ -224,13 +267,18 @@ public class VisualLayoutCreationTO
    * @param layerGroups The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public VisualLayoutCreationTO withLayerGroups(@Nonnull List<LayerGroup> layerGroups) {
-    return new VisualLayoutCreationTO(getName(),
-                                      getModifiableProperties(),
-                                      scaleX,
-                                      scaleY,
-                                      layers,
-                                      layerGroups);
+  public VisualLayoutCreationTO withLayerGroups(
+      @Nonnull
+      List<LayerGroup> layerGroups
+  ) {
+    return new VisualLayoutCreationTO(
+        getName(),
+        getModifiableProperties(),
+        scaleX,
+        scaleY,
+        layers,
+        layerGroups
+    );
   }
 
   /**
@@ -239,13 +287,18 @@ public class VisualLayoutCreationTO
    * @param layerGroup The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public VisualLayoutCreationTO withLayerGroup(@Nonnull LayerGroup layerGroup) {
-    return new VisualLayoutCreationTO(getName(),
-                                      getModifiableProperties(),
-                                      scaleX,
-                                      scaleY,
-                                      layers,
-                                      listWithAppendix(layerGroups, layerGroup));
+  public VisualLayoutCreationTO withLayerGroup(
+      @Nonnull
+      LayerGroup layerGroup
+  ) {
+    return new VisualLayoutCreationTO(
+        getName(),
+        getModifiableProperties(),
+        scaleX,
+        scaleY,
+        layers,
+        listWithAppendix(layerGroups, layerGroup)
+    );
   }
 
   @Override

@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -29,7 +30,10 @@ public class KernelExecutorWrapper {
    * @param kernelExecutor The kernel executor.
    */
   @Inject
-  public KernelExecutorWrapper(@KernelExecutor ExecutorService kernelExecutor) {
+  public KernelExecutorWrapper(
+      @KernelExecutor
+      ExecutorService kernelExecutor
+  ) {
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }
 
@@ -46,7 +50,8 @@ public class KernelExecutorWrapper {
    * {@code RuntimeException}, it is wrapped in a {@link KernelRuntimeException}.
    */
   public <T> T callAndWait(Callable<T> callable)
-      throws IllegalStateException, RuntimeException {
+      throws IllegalStateException,
+        RuntimeException {
     requireNonNull(callable, "callable");
 
     try {
@@ -74,7 +79,8 @@ public class KernelExecutorWrapper {
    * {@code RuntimeException}, it is wrapped in a {@link KernelRuntimeException}.
    */
   public void callAndWait(Runnable runnable)
-      throws IllegalStateException, RuntimeException {
+      throws IllegalStateException,
+        RuntimeException {
     requireNonNull(runnable, "runnable");
 
     callAndWait(Executors.callable(runnable));

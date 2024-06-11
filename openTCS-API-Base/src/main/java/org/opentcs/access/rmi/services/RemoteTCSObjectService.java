@@ -32,12 +32,15 @@ import org.opentcs.data.TCSObjectReference;
  * </p>
  */
 public interface RemoteTCSObjectService
-    extends Remote {
+    extends
+      Remote {
 
   // CHECKSTYLE:OFF
-  <T extends TCSObject<T>> T fetchObject(ClientID clientId,
-                                         Class<T> clazz,
-                                         TCSObjectReference<T> ref)
+  <T extends TCSObject<T>> T fetchObject(
+      ClientID clientId,
+      Class<T> clazz,
+      TCSObjectReference<T> ref
+  )
       throws RemoteException;
 
   <T extends TCSObject<T>> T fetchObject(ClientID clientId, Class<T> clazz, String name)
@@ -46,20 +49,26 @@ public interface RemoteTCSObjectService
   <T extends TCSObject<T>> Set<T> fetchObjects(ClientID clientId, Class<T> clazz)
       throws RemoteException;
 
-  <T extends TCSObject<T>> Set<T> fetchObjects(ClientID clientId,
-                                               Class<T> clazz,
-                                               Predicate<? super T> predicate)
+  <T extends TCSObject<T>> Set<T> fetchObjects(
+      ClientID clientId,
+      Class<T> clazz,
+      Predicate<? super T> predicate
+  )
       throws RemoteException;
 
-  void updateObjectProperty(ClientID clientId,
-                            TCSObjectReference<?> ref,
-                            String key,
-                            String value)
+  void updateObjectProperty(
+      ClientID clientId,
+      TCSObjectReference<?> ref,
+      String key,
+      String value
+  )
       throws RemoteException;
 
-  void appendObjectHistoryEntry(ClientID clientId,
-                                TCSObjectReference<?> ref,
-                                ObjectHistory.Entry entry)
+  void appendObjectHistoryEntry(
+      ClientID clientId,
+      TCSObjectReference<?> ref,
+      ObjectHistory.Entry entry
+  )
       throws RemoteException;
   // CHECKSTYLE:ON
 }

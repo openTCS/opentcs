@@ -7,11 +7,12 @@
  */
 package org.opentcs.guing.common.exchange.adapter;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
@@ -32,7 +33,8 @@ import org.slf4j.LoggerFactory;
  * An adapter for VisualLayout instances.
  */
 public class LayoutAdapter
-    extends AbstractProcessAdapter {
+    extends
+      AbstractProcessAdapter {
 
   /**
    * This class's logger.
@@ -46,10 +48,12 @@ public class LayoutAdapter
   }
 
   @Override // OpenTCSProcessAdapter
-  public void updateModelProperties(TCSObject<?> tcsObject,
-                                    ModelComponent modelComponent,
-                                    SystemModel systemModel,
-                                    TCSObjectService objectService) {
+  public void updateModelProperties(
+      TCSObject<?> tcsObject,
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      TCSObjectService objectService
+  ) {
     VisualLayout layout = requireNonNull((VisualLayout) tcsObject, "tcsObject");
     LayoutModel model = (LayoutModel) modelComponent;
 
@@ -74,9 +78,11 @@ public class LayoutAdapter
   }
 
   @Override
-  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
-                                                SystemModel systemModel,
-                                                PlantModelCreationTO plantModel) {
+  public PlantModelCreationTO storeToPlantModel(
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      PlantModelCreationTO plantModel
+  ) {
     return plantModel.withVisualLayout(
         new VisualLayoutCreationTO(modelComponent.getName())
             .withScaleX(getScaleX((LayoutModel) modelComponent))
@@ -101,8 +107,10 @@ public class LayoutAdapter
 
     Map<Integer, LayerGroup> layerGroups = model.getPropertyLayerGroups().getValue();
     for (Layer layer : layers) {
-      layerWrappers.put(layer.getId(),
-                        new LayerWrapper(layer, layerGroups.get(layer.getGroupId())));
+      layerWrappers.put(
+          layer.getId(),
+          new LayerWrapper(layer, layerGroups.get(layer.getGroupId()))
+      );
     }
   }
 

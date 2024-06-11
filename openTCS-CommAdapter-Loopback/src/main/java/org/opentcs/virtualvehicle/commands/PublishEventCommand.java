@@ -7,8 +7,9 @@
  */
 package org.opentcs.virtualvehicle.commands;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
@@ -17,7 +18,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
  * A command to publish {@link VehicleCommAdapterEvent}s.
  */
 public class PublishEventCommand
-    implements AdapterCommand {
+    implements
+      AdapterCommand {
 
   /**
    * The event to publish.
@@ -29,7 +31,10 @@ public class PublishEventCommand
    *
    * @param event The event to publish.
    */
-  public PublishEventCommand(@Nonnull VehicleCommAdapterEvent event) {
+  public PublishEventCommand(
+      @Nonnull
+      VehicleCommAdapterEvent event
+  ) {
     this.event = requireNonNull(event, "event");
   }
 

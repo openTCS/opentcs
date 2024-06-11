@@ -7,12 +7,13 @@
  */
 package org.opentcs.guing.common.components.properties.table;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty.Unit;
 import org.opentcs.guing.base.model.ModelComponent;

@@ -7,19 +7,20 @@
  */
 package org.opentcs.kernel.workingset;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.order.TransportOrder;
@@ -47,14 +48,18 @@ class DefaultTransportOrderCleanupApprovalTest {
     given(creationTimeThreshold.getCurrentThreshold())
         .willReturn(Instant.parse("2024-01-01T12:00:00.00Z"));
 
-    approval = new DefaultTransportOrderCleanupApproval(peripheralJobPoolManager,
-                                                        defaultPeripheralJobCleanupApproval,
-                                                        creationTimeThreshold);
+    approval = new DefaultTransportOrderCleanupApproval(
+        peripheralJobPoolManager,
+        defaultPeripheralJobCleanupApproval,
+        creationTimeThreshold
+    );
   }
 
   @ParameterizedTest
-  @EnumSource(value = TransportOrder.State.class,
-              names = {"FINISHED", "FAILED", "UNROUTABLE"})
+  @EnumSource(
+      value = TransportOrder.State.class,
+      names = {"FINISHED", "FAILED", "UNROUTABLE"}
+  )
   void approveTransportOrder(TransportOrder.State state) {
     TransportOrder order = createTransportOrder()
         .withState(state)
@@ -64,9 +69,11 @@ class DefaultTransportOrderCleanupApprovalTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = TransportOrder.State.class,
-              mode = EnumSource.Mode.EXCLUDE,
-              names = {"FINISHED", "FAILED", "UNROUTABLE"})
+  @EnumSource(
+      value = TransportOrder.State.class,
+      mode = EnumSource.Mode.EXCLUDE,
+      names = {"FINISHED", "FAILED", "UNROUTABLE"}
+  )
   void disapproveTransportOrderInNonFinalState(TransportOrder.State state) {
     TransportOrder order = createTransportOrder()
         .withState(state)

@@ -7,12 +7,13 @@
  */
 package org.opentcs.strategies.basic.peripherals.dispatching;
 
+import static org.opentcs.util.Assertions.checkArgument;
+
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.peripherals.PeripheralJob;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.Comparators;
 
 /**
@@ -24,7 +25,8 @@ import org.opentcs.util.Comparators;
  * </ul>
  */
 public class DefaultJobSelectionStrategy
-    implements JobSelectionStrategy {
+    implements
+      JobSelectionStrategy {
 
   /**
    * Creates a new instance.
@@ -34,8 +36,10 @@ public class DefaultJobSelectionStrategy
 
   @Override
   public Optional<PeripheralJob> select(Collection<PeripheralJob> jobs, Location location) {
-    checkArgument(jobs.stream().allMatch(job -> matchesLocation(job, location)),
-                  "All jobs are expected to match the given location: %s", location.getName());
+    checkArgument(
+        jobs.stream().allMatch(job -> matchesLocation(job, location)),
+        "All jobs are expected to match the given location: %s", location.getName()
+    );
 
     return jobs.stream()
         .sorted(Comparators.jobsByAge())

@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.components.dialogs;
 
 import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,7 +28,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * Panel to edit a drive order.
  */
 public class EditDriveOrderPanel
-    extends DialogContent {
+    extends
+      DialogContent {
 
   /**
    * Available locations.
@@ -51,8 +53,10 @@ public class EditDriveOrderPanel
   public EditDriveOrderPanel(List<LocationModel> locations) {
     initComponents();
     fLocations = sortLocations(locations);
-    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.CREATETO_PATH)
-        .getString("editDriverOrderPanel.create.title"));
+    setDialogTitle(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.CREATETO_PATH)
+            .getString("editDriverOrderPanel.create.title")
+    );
   }
 
   /**
@@ -63,17 +67,25 @@ public class EditDriveOrderPanel
    * @param action selected action.
    */
   @SuppressWarnings("this-escape")
-  public EditDriveOrderPanel(List<LocationModel> locations,
-                             AbstractConnectableModelComponent location, String action) {
-    checkArgument(location instanceof PointModel || location instanceof LocationModel,
-                  String.format("Selected location has to be of type PointModel or LocationModel "
-                      + "and not \"%s\".", location.getClass().getName()));
+  public EditDriveOrderPanel(
+      List<LocationModel> locations,
+      AbstractConnectableModelComponent location, String action
+  ) {
+    checkArgument(
+        location instanceof PointModel || location instanceof LocationModel,
+        String.format(
+            "Selected location has to be of type PointModel or LocationModel "
+                + "and not \"%s\".", location.getClass().getName()
+        )
+    );
     initComponents();
     fLocations = sortLocations(locations);
     fSelectedLocation = location;
     fSelectedAction = action;
-    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.CREATETO_PATH)
-        .getString("editDriverOrderPanel.edit.title"));
+    setDialogTitle(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.CREATETO_PATH)
+            .getString("editDriverOrderPanel.edit.title")
+    );
   }
 
   /**
@@ -140,6 +152,7 @@ public class EditDriveOrderPanel
     return Optional.ofNullable((String) actionComboBox.getSelectedItem());
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -203,6 +216,7 @@ public class EditDriveOrderPanel
     add(actionComboBox, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   /**
    * Updates the contents of the ComboBox with the allowed operations.
@@ -227,6 +241,7 @@ public class EditDriveOrderPanel
     });
   }//GEN-LAST:event_locationComboBoxActionPerformed
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox<String> actionComboBox;
@@ -235,4 +250,5 @@ public class EditDriveOrderPanel
   private javax.swing.JLabel stationLabel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

@@ -18,8 +18,10 @@ import org.opentcs.guing.base.components.properties.type.ColorProperty;
  * A cell renderer for a color property.
  */
 public class ColorPropertyCellRenderer
-    extends JLabel
-    implements javax.swing.table.TableCellRenderer {
+    extends
+      JLabel
+    implements
+      javax.swing.table.TableCellRenderer {
 
   /**
    * Creates a new instance of ColorPropertyCellRenderer.
@@ -35,7 +37,8 @@ public class ColorPropertyCellRenderer
 
   @Override
   public java.awt.Component getTableCellRendererComponent(
-      JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column
+  ) {
 
     ColorProperty property = (ColorProperty) value;
     setBackground(property.getColor());

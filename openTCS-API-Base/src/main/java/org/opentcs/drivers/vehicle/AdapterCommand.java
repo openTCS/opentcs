@@ -13,7 +13,8 @@ import java.io.Serializable;
  * A command a comm adapter may execute.
  */
 public interface AdapterCommand
-    extends Serializable {
+    extends
+      Serializable {
 
   /**
    * Executes the command.

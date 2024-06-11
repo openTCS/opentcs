@@ -7,19 +7,20 @@
  */
 package org.opentcs.kernel.workingset;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkInRange;
+
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentcs.access.NotificationPublicationEvent;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.notification.UserNotification;
-import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,10 @@ public class NotificationBuffer {
    * @param eventListener The event listener to be used.
    */
   @Inject
-  public NotificationBuffer(@ApplicationEventBus EventHandler eventListener) {
+  public NotificationBuffer(
+      @ApplicationEventBus
+      EventHandler eventListener
+  ) {
     messageEventListener = requireNonNull(eventListener, "eventListener");
   }
 
@@ -114,7 +118,10 @@ public class NotificationBuffer {
    * notifications.
    * @return A list of notifications accepted by the given filter.
    */
-  public List<UserNotification> getNotifications(@Nullable Predicate<UserNotification> predicate) {
+  public List<UserNotification> getNotifications(
+      @Nullable
+      Predicate<UserNotification> predicate
+  ) {
     Predicate<UserNotification> filterPredicate
         = predicate == null
             ? (notification) -> true

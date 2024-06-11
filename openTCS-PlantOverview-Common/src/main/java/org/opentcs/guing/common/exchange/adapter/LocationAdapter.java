@@ -7,13 +7,14 @@
  */
 package org.opentcs.guing.common.exchange.adapter;
 
-import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import static org.opentcs.data.ObjectPropConstants.LOC_DEFAULT_REPRESENTATION;
+
+import java.util.Map;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectPropConstants;
-import static org.opentcs.data.ObjectPropConstants.LOC_DEFAULT_REPRESENTATION;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Location;
@@ -35,7 +36,8 @@ import org.slf4j.LoggerFactory;
  * An adapter for locations.
  */
 public class LocationAdapter
-    extends AbstractProcessAdapter {
+    extends
+      AbstractProcessAdapter {
 
   /**
    * This class's logger.
@@ -49,10 +51,12 @@ public class LocationAdapter
   }
 
   @Override  // OpenTCSProcessAdapter
-  public void updateModelProperties(TCSObject<?> tcsObject,
-                                    ModelComponent modelComponent,
-                                    SystemModel systemModel,
-                                    TCSObjectService objectService) {
+  public void updateModelProperties(
+      TCSObject<?> tcsObject,
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      TCSObjectService objectService
+  ) {
     Location location = requireNonNull((Location) tcsObject, "tcsObject");
     LocationModel model = (LocationModel) modelComponent;
 
@@ -61,10 +65,14 @@ public class LocationAdapter
       model.getPropertyName().setText(location.getName());
 
       // Position in model
-      model.getPropertyModelPositionX().setValueAndUnit(location.getPosition().getX(),
-                                                        LengthProperty.Unit.MM);
-      model.getPropertyModelPositionY().setValueAndUnit(location.getPosition().getY(),
-                                                        LengthProperty.Unit.MM);
+      model.getPropertyModelPositionX().setValueAndUnit(
+          location.getPosition().getX(),
+          LengthProperty.Unit.MM
+      );
+      model.getPropertyModelPositionY().setValueAndUnit(
+          location.getPosition().getY(),
+          LengthProperty.Unit.MM
+      );
 
       // Type
       model.getPropertyType().setValue(location.getType().getName());
@@ -97,16 +105,20 @@ public class LocationAdapter
   }
 
   @Override
-  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
-                                                SystemModel systemModel,
-                                                PlantModelCreationTO plantModel) {
+  public PlantModelCreationTO storeToPlantModel(
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      PlantModelCreationTO plantModel
+  ) {
     LocationModel locationModel = (LocationModel) modelComponent;
 
     PlantModelCreationTO result = plantModel
         .withLocation(
-            new LocationCreationTO(modelComponent.getName(),
-                                   locationModel.getLocationType().getName(),
-                                   getPosition(locationModel))
+            new LocationCreationTO(
+                modelComponent.getName(),
+                locationModel.getLocationType().getName(),
+                getPosition(locationModel)
+            )
                 .withLocked(getLocked(locationModel))
                 .withProperties(getKernelProperties(modelComponent))
                 .withLayout(getLayout(locationModel))
@@ -136,16 +148,19 @@ public class LocationAdapter
       switch (kvp.getKey()) {
         case ObjectPropConstants.LOC_DEFAULT_REPRESENTATION:
           model.getPropertyDefaultRepresentation().setLocationRepresentation(
-              LocationRepresentation.valueOf(kvp.getValue()));
+              LocationRepresentation.valueOf(kvp.getValue())
+          );
           break;
         default:
       }
     }
   }
 
-  private void updateModelLayoutProperties(LocationModel model,
-                                           Location location,
-                                           LayoutModel layoutModel) {
+  private void updateModelLayoutProperties(
+      LocationModel model,
+      Location location,
+      LayoutModel layoutModel
+  ) {
     model.getPropertyLayoutPositionX()
         .setText(String.valueOf(location.getLayout().getPosition().getX()));
     model.getPropertyLayoutPositionY()
@@ -168,8 +183,10 @@ public class LocationAdapter
   }
 
   private Triple getPosition(LocationModel model) {
-    return convertToTriple(model.getPropertyModelPositionX(),
-                           model.getPropertyModelPositionY());
+    return convertToTriple(
+        model.getPropertyModelPositionX(),
+        model.getPropertyModelPositionY()
+    );
   }
 
   private boolean getLocked(LocationModel model) {
@@ -181,19 +198,25 @@ public class LocationAdapter
 
   private LocationCreationTO.Layout getLayout(LocationModel model) {
     return new LocationCreationTO.Layout(
-        new Couple(Long.parseLong(model.getPropertyLayoutPositionX().getText()),
-                   Long.parseLong(model.getPropertyLayoutPositionY().getText())),
-        new Couple(Long.parseLong(model.getPropertyLabelOffsetX().getText()),
-                   Long.parseLong(model.getPropertyLabelOffsetY().getText())),
+        new Couple(
+            Long.parseLong(model.getPropertyLayoutPositionX().getText()),
+            Long.parseLong(model.getPropertyLayoutPositionY().getText())
+        ),
+        new Couple(
+            Long.parseLong(model.getPropertyLabelOffsetX().getText()),
+            Long.parseLong(model.getPropertyLabelOffsetY().getText())
+        ),
         model.getPropertyDefaultRepresentation().getLocationRepresentation(),
         model.getPropertyLayerWrapper().getValue().getLayer().getId()
     );
   }
 
   private Triple convertToTriple(CoordinateProperty cpx, CoordinateProperty cpy) {
-    Triple result = new Triple((int) cpx.getValueByUnit(LengthProperty.Unit.MM),
-                               (int) cpy.getValueByUnit(LengthProperty.Unit.MM),
-                               0);
+    Triple result = new Triple(
+        (int) cpx.getValueByUnit(LengthProperty.Unit.MM),
+        (int) cpy.getValueByUnit(LengthProperty.Unit.MM),
+        0
+    );
 
     return result;
   }

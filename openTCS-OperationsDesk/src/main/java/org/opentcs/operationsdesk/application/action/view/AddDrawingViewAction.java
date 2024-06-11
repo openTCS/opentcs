@@ -7,17 +7,19 @@
  */
 package org.opentcs.operationsdesk.application.action.view;
 
+import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.MENU_PATH;
+
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.opentcs.operationsdesk.application.OpenTCSView;
-import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.MENU_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action for adding new drawing views.
  */
 public class AddDrawingViewAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action's ID.

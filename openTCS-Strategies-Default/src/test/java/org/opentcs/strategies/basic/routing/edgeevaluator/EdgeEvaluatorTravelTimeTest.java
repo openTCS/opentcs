@@ -8,13 +8,14 @@
 package org.opentcs.strategies.basic.routing.edgeevaluator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
 
 /**
  */
@@ -30,13 +31,16 @@ class EdgeEvaluatorTravelTimeTest {
   @Test
   void computeTravelTime() {
     Edge edge = new Edge(
-        new Path("pathName",
-                 new Point("srcPoint").getReference(),
-                 new Point("dstPoint").getReference())
+        new Path(
+            "pathName",
+            new Point("srcPoint").getReference(),
+            new Point("dstPoint").getReference()
+        )
             .withLength(10000)
             .withMaxVelocity(1000)
             .withMaxReverseVelocity(500),
-        false);
+        false
+    );
     Vehicle vehicle = new Vehicle("someVehicle");
 
     // Length is 10 meters, maximum velocity is 1 m/s. -> The weight should be 10 (seconds).
@@ -51,13 +55,16 @@ class EdgeEvaluatorTravelTimeTest {
   @Test
   void infiniteCostsForUntraversablePaths() {
     Edge edge = new Edge(
-        new Path("pathName",
-                 new Point("srcPoint").getReference(),
-                 new Point("dstPoint").getReference())
+        new Path(
+            "pathName",
+            new Point("srcPoint").getReference(),
+            new Point("dstPoint").getReference()
+        )
             .withLength(10000)
             .withMaxVelocity(0)
             .withMaxReverseVelocity(0),
-        false);
+        false
+    );
     Vehicle vehicle = new Vehicle("someVehicle");
 
     // Expect the weight/costs to be infinite.

@@ -70,8 +70,12 @@ public interface TCSObjectService {
    * true. If no such objects exist, the returned set will be empty.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
-  <T extends TCSObject<T>> Set<T> fetchObjects(@Nonnull Class<T> clazz,
-                                               @Nonnull Predicate<? super T> predicate)
+  <T extends TCSObject<T>> Set<T> fetchObjects(
+      @Nonnull
+      Class<T> clazz,
+      @Nonnull
+      Predicate<? super T> predicate
+  )
       throws KernelRuntimeException;
 
   /**
@@ -83,8 +87,14 @@ public interface TCSObjectService {
    * @throws ObjectUnknownException If the referenced object does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
-  void updateObjectProperty(TCSObjectReference<?> ref, String key, @Nullable String value)
-      throws ObjectUnknownException, KernelRuntimeException;
+  void updateObjectProperty(
+      TCSObjectReference<?> ref,
+      String key,
+      @Nullable
+      String value
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Appends a history entry to a {@link TCSObject}.
@@ -95,5 +105,6 @@ public interface TCSObjectService {
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void appendObjectHistoryEntry(TCSObjectReference<?> ref, ObjectHistory.Entry entry)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 }

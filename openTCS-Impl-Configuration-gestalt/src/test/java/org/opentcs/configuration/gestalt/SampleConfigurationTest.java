@@ -7,16 +7,17 @@
  */
 package org.opentcs.configuration.gestalt;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.configuration.ConfigurationBindingProvider;
@@ -78,8 +79,14 @@ public class SampleConfigurationTest {
   @Test
   void testObjectList() {
     SampleConfig config = input.get(SampleConfig.PREFIX, SampleConfig.class);
-    assertThat(config.objectList(), equalTo(List.of(new DummyClass("A", "B", 1),
-                                                    new DummyClass("C", "D", 2))));
+    assertThat(
+        config.objectList(), equalTo(
+            List.of(
+                new DummyClass("A", "B", 1),
+                new DummyClass("C", "D", 2)
+            )
+        )
+    );
   }
 
   @Test
@@ -97,8 +104,10 @@ public class SampleConfigurationTest {
   private static ConfigurationBindingProvider gestaltConfigurationBindingProvider() {
     try {
       return new GestaltConfigurationBindingProvider(
-          Paths.get(Thread.currentThread().getContextClassLoader()
-              .getResource("org/opentcs/configuration/gestalt/sampleConfig.properties").toURI())
+          Paths.get(
+              Thread.currentThread().getContextClassLoader()
+                  .getResource("org/opentcs/configuration/gestalt/sampleConfig.properties").toURI()
+          )
       );
     }
     catch (URISyntaxException ex) {

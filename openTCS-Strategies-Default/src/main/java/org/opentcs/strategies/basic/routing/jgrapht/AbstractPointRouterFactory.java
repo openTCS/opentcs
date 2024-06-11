@@ -7,9 +7,10 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.Iterator;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
@@ -26,7 +27,8 @@ import org.slf4j.LoggerFactory;
  * Creates {@link PointRouter} instances with algorithm implementations created by subclasses.
  */
 public abstract class AbstractPointRouterFactory
-    implements PointRouterFactory {
+    implements
+      PointRouterFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractPointRouterFactory.class);
   private final GraphProvider graphProvider;
@@ -36,14 +38,19 @@ public abstract class AbstractPointRouterFactory
    *
    * @param graphProvider Provides routing graphs for vehicles.
    */
-  public AbstractPointRouterFactory(@Nonnull GraphProvider graphProvider) {
+  public AbstractPointRouterFactory(
+      @Nonnull
+      GraphProvider graphProvider
+  ) {
     this.graphProvider = requireNonNull(graphProvider, "graphProvider");
   }
 
   @Override
-  public PointRouter createPointRouter(Vehicle vehicle,
-                                       Set<Point> pointsToExclude,
-                                       Set<Path> pathsToExclude) {
+  public PointRouter createPointRouter(
+      Vehicle vehicle,
+      Set<Point> pointsToExclude,
+      Set<Path> pathsToExclude
+  ) {
     requireNonNull(vehicle, "vehicle");
     requireNonNull(pointsToExclude, "pointsToExclude");
 
@@ -70,9 +77,11 @@ public abstract class AbstractPointRouterFactory
       router.getRouteSteps(pointIter.next(), pointIter.next());
     }
 
-    LOG.debug("Created point router for {} in {} milliseconds.",
-              vehicle.getName(),
-              System.currentTimeMillis() - timeStampBefore);
+    LOG.debug(
+        "Created point router for {} in {} milliseconds.",
+        vehicle.getName(),
+        System.currentTimeMillis() - timeStampBefore
+    );
 
     return router;
   }
@@ -84,5 +93,6 @@ public abstract class AbstractPointRouterFactory
    * @return A shortest path algorithm implementation working on the given graph.
    */
   protected abstract ShortestPathAlgorithm<String, Edge> createShortestPathAlgorithm(
-      Graph<String, Edge> graph);
+      Graph<String, Edge> graph
+  );
 }

@@ -7,13 +7,14 @@
  */
 package org.opentcs.guing.common.components.properties.panel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
@@ -33,8 +34,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * @see KeyValueSetProperty
  */
 public class KeyValueSetPropertyEditorPanel
-    extends KeyValueSetPropertyViewerEditorPanel
-    implements DetailsDialogContent {
+    extends
+      KeyValueSetPropertyViewerEditorPanel
+    implements
+      DetailsDialogContent {
 
   /**
    * A resource bundle.
@@ -80,8 +83,10 @@ public class KeyValueSetPropertyEditorPanel
 
     getProperty().getItems().stream()
         .sorted((p1, p2) -> p1.getKey().compareTo(p2.getKey()))
-        .forEach(keyValueProperty
-            -> model.addRow(new String[]{keyValueProperty.getKey(), keyValueProperty.getValue()})
+        .forEach(
+            keyValueProperty -> model.addRow(
+                new String[]{keyValueProperty.getKey(), keyValueProperty.getValue()}
+            )
         );
 
     sortItems();
@@ -280,6 +285,7 @@ public class KeyValueSetPropertyEditorPanel
     removeButton.setEnabled(enableRemoval);
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -362,27 +368,29 @@ public class KeyValueSetPropertyEditorPanel
     add(controlPanel, java.awt.BorderLayout.EAST);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
-    private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-      int selectedRowIndex = itemsTable.getSelectedRow();
+  private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
+    int selectedRowIndex = itemsTable.getSelectedRow();
 
-      if (selectedRowIndex == -1) {
-        return;
-      }
+    if (selectedRowIndex == -1) {
+      return;
+    }
 
-      ((ItemsTableModel) itemsTable.getModel()).removeRow(selectedRowIndex);
+    ((ItemsTableModel) itemsTable.getModel()).removeRow(selectedRowIndex);
 
-      updateView();
-    }//GEN-LAST:event_removeButtonActionPerformed
+    updateView();
+  }//GEN-LAST:event_removeButtonActionPerformed
 
-    private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
-      edit();
-    }//GEN-LAST:event_editButtonActionPerformed
+  private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
+    edit();
+  }//GEN-LAST:event_editButtonActionPerformed
 
-    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-      add();
-    }//GEN-LAST:event_addButtonActionPerformed
+  private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+    add();
+  }//GEN-LAST:event_addButtonActionPerformed
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
@@ -393,5 +401,6 @@ public class KeyValueSetPropertyEditorPanel
   private javax.swing.JButton removeButton;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
 }

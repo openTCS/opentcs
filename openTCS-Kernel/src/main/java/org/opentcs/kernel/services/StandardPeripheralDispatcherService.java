@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.services;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.PeripheralJobDispatcher;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
@@ -24,7 +25,8 @@ import org.opentcs.kernel.workingset.TCSObjectRepository;
  * This class is the standard implementation of the {@link PeripheralDispatcherService} interface.
  */
 public class StandardPeripheralDispatcherService
-    implements PeripheralDispatcherService {
+    implements
+      PeripheralDispatcherService {
 
   /**
    * A global object to be used for synchronization within the kernel.
@@ -47,9 +49,12 @@ public class StandardPeripheralDispatcherService
    * @param dispatcher The peripheral job dispatcher.
    */
   @Inject
-  public StandardPeripheralDispatcherService(@GlobalSyncObject Object globalSyncObject,
-                                             TCSObjectRepository objectRepo,
-                                             PeripheralJobDispatcher dispatcher) {
+  public StandardPeripheralDispatcherService(
+      @GlobalSyncObject
+      Object globalSyncObject,
+      TCSObjectRepository objectRepo,
+      PeripheralJobDispatcher dispatcher
+  ) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.objectRepo = requireNonNull(objectRepo, "objectRepo");
     this.dispatcher = requireNonNull(dispatcher, "dispatcher");
@@ -74,7 +79,8 @@ public class StandardPeripheralDispatcherService
 
   @Override
   public void withdrawByPeripheralJob(TCSObjectReference<PeripheralJob> ref)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     requireNonNull(ref, "ref");
 
     synchronized (globalSyncObject) {

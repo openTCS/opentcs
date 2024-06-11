@@ -26,9 +26,8 @@ The release versions are tagged with their respective version.
 
 ### Primary formatting rules
 
-* Maximum line length: 100 characters.
-* Do not use tabs, use spaces only.
-* Indentation step size: 2 spaces.
+For consistent formatting of the project's code, [Spotless](https://github.com/diffplug/spotless) is used.
+After making changes, make sure you run `./gradlew spotlessApply` to re-format the code.
 
 ### Automatic tests
 

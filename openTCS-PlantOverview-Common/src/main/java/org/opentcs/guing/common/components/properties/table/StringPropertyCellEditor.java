@@ -20,7 +20,8 @@ import org.opentcs.guing.common.util.UserMessageHelper;
  * A cell editor for a string property.
  */
 public class StringPropertyCellEditor
-    extends AbstractPropertyCellEditor {
+    extends
+      AbstractPropertyCellEditor {
 
   /**
    * Creates a new instance of StringPropertyCellEditor
@@ -46,7 +47,8 @@ public class StringPropertyCellEditor
 
   @Override
   public Component getTableCellEditorComponent(
-      JTable table, Object value, boolean isSelected, int row, int column) {
+      JTable table, Object value, boolean isSelected, int row, int column
+  ) {
 
     setValue(value);
     JTextField textField = (JTextField) getComponent();
@@ -82,7 +84,8 @@ public class StringPropertyCellEditor
   }
 
   private class JTextFieldLimit
-      extends PlainDocument {
+      extends
+        PlainDocument {
 
     private final int limit;
 

@@ -13,8 +13,10 @@ import java.io.Serializable;
  * Thrown when there are insufficient user permissions to perform an operation.
  */
 public class CredentialsException
-    extends KernelRuntimeException
-    implements Serializable {
+    extends
+      KernelRuntimeException
+    implements
+      Serializable {
 
   /**
    * Constructs a CredentialsException with no detail message.

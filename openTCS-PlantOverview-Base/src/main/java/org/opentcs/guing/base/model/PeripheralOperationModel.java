@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.base.model;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 import org.opentcs.data.peripherals.PeripheralOperation;
 
 /**
@@ -35,10 +36,12 @@ public class PeripheralOperationModel {
    */
   private final boolean completionRequired;
 
-  public PeripheralOperationModel(String locationName,
-                                  String operation,
-                                  PeripheralOperation.ExecutionTrigger executionTrigger,
-                                  boolean completionRequired) {
+  public PeripheralOperationModel(
+      String locationName,
+      String operation,
+      PeripheralOperation.ExecutionTrigger executionTrigger,
+      boolean completionRequired
+  ) {
     this.operation = requireNonNull(operation, "operation");
     this.locationName = requireNonNull(locationName, "locationName");
     this.executionTrigger = requireNonNull(executionTrigger, "executionTrigger");

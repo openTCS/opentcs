@@ -23,7 +23,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar.Abstract
  * The default selection tool.
  */
 public class MultipleSelectionTool
-    extends AbstractMultipleSelectionTool {
+    extends
+      AbstractMultipleSelectionTool {
 
   /**
    * Creates a new instance.
@@ -35,11 +36,15 @@ public class MultipleSelectionTool
    * @param selectionActions Selection-related actions for the popup menus created by this tool.
    */
   @Inject
-  public MultipleSelectionTool(ApplicationState appState,
-                               SelectAreaTracker selectAreaTracker,
-                               DragTracker dragTracker,
-                               @Assisted("drawingActions") Collection<Action> drawingActions,
-                               @Assisted("selectionActions") Collection<Action> selectionActions) {
+  public MultipleSelectionTool(
+      ApplicationState appState,
+      SelectAreaTracker selectAreaTracker,
+      DragTracker dragTracker,
+      @Assisted("drawingActions")
+      Collection<Action> drawingActions,
+      @Assisted("selectionActions")
+      Collection<Action> selectionActions
+  ) {
     super(appState, selectAreaTracker, dragTracker, drawingActions, selectionActions);
   }
 

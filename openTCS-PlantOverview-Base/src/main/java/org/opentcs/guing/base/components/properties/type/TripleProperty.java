@@ -15,7 +15,8 @@ import org.slf4j.LoggerFactory;
  * A property for a 3 dimensional point.
  */
 public class TripleProperty
-    extends AbstractProperty {
+    extends
+      AbstractProperty {
 
   /**
    * The point.

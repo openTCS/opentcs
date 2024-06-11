@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.OrderConstants;
@@ -49,7 +50,10 @@ public class GetOrderSequenceResponseTO {
   @Nonnull
   private List<Property> properties = List.of();
 
-  public GetOrderSequenceResponseTO(@Nonnull String name) {
+  public GetOrderSequenceResponseTO(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
   }
 
@@ -58,7 +62,10 @@ public class GetOrderSequenceResponseTO {
     return name;
   }
 
-  public GetOrderSequenceResponseTO setName(@Nonnull String name) {
+  public GetOrderSequenceResponseTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     return this;
   }
@@ -68,7 +75,10 @@ public class GetOrderSequenceResponseTO {
     return type;
   }
 
-  public GetOrderSequenceResponseTO setType(@Nonnull String type) {
+  public GetOrderSequenceResponseTO setType(
+      @Nonnull
+      String type
+  ) {
     this.type = requireNonNull(type, "type");
     return this;
   }
@@ -78,7 +88,10 @@ public class GetOrderSequenceResponseTO {
     return orders;
   }
 
-  public GetOrderSequenceResponseTO setOrders(@Nonnull List<String> orders) {
+  public GetOrderSequenceResponseTO setOrders(
+      @Nonnull
+      List<String> orders
+  ) {
     this.orders = requireNonNull(orders, "orders");
     return this;
   }
@@ -124,7 +137,10 @@ public class GetOrderSequenceResponseTO {
     return intendedVehicle;
   }
 
-  public GetOrderSequenceResponseTO setIntendedVehicle(@Nullable String intendedVehicle) {
+  public GetOrderSequenceResponseTO setIntendedVehicle(
+      @Nullable
+      String intendedVehicle
+  ) {
     this.intendedVehicle = intendedVehicle;
     return this;
   }
@@ -134,7 +150,10 @@ public class GetOrderSequenceResponseTO {
     return processingVehicle;
   }
 
-  public GetOrderSequenceResponseTO setProcessingVehicle(@Nullable String processingVehicle) {
+  public GetOrderSequenceResponseTO setProcessingVehicle(
+      @Nullable
+      String processingVehicle
+  ) {
     this.processingVehicle = processingVehicle;
     return this;
   }
@@ -144,7 +163,10 @@ public class GetOrderSequenceResponseTO {
     return properties;
   }
 
-  public GetOrderSequenceResponseTO setProperties(@Nonnull List<Property> properties) {
+  public GetOrderSequenceResponseTO setProperties(
+      @Nonnull
+      List<Property> properties
+  ) {
     this.properties = requireNonNull(properties, "properties");
     return this;
   }
@@ -156,16 +178,21 @@ public class GetOrderSequenceResponseTO {
         .setFinished(orderSequence.isFinished())
         .setFinishedIndex(orderSequence.getFinishedIndex())
         .setType(orderSequence.getType())
-        .setOrders(orderSequence.getOrders()
-            .stream()
-            .map(TCSObjectReference::getName)
-            .collect(Collectors.toList()))
+        .setOrders(
+            orderSequence.getOrders()
+                .stream()
+                .map(TCSObjectReference::getName)
+                .collect(Collectors.toList())
+        )
         .setProcessingVehicle(nameOfNullableReference(orderSequence.getProcessingVehicle()))
         .setIntendedVehicle(nameOfNullableReference(orderSequence.getIntendedVehicle()))
         .setProperties(convertProperties(orderSequence.getProperties()));
   }
 
-  private static String nameOfNullableReference(@Nullable TCSObjectReference<?> reference) {
+  private static String nameOfNullableReference(
+      @Nullable
+      TCSObjectReference<?> reference
+  ) {
     return reference == null ? null : reference.getName();
   }
 

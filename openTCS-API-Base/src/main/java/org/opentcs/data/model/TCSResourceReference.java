@@ -16,8 +16,10 @@ import org.opentcs.data.TCSObjectReference;
  * @param <E> The actual resource class.
  */
 public class TCSResourceReference<E extends TCSResource<E>>
-    extends TCSObjectReference<E>
-    implements Serializable {
+    extends
+      TCSObjectReference<E>
+    implements
+      Serializable {
 
   /**
    * Creates a new TCSResourceReference.

@@ -7,19 +7,20 @@
  */
 package org.opentcs.guing.base.model.elements;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.base.AllocationState;
-import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.base.components.layer.NullLayerWrapper;
 import org.opentcs.guing.base.components.properties.type.BooleanProperty;
 import org.opentcs.guing.base.components.properties.type.EnvelopesProperty;
@@ -37,8 +38,10 @@ import org.opentcs.guing.base.model.FigureDecorationDetails;
  * A connection between two points.
  */
 public class PathModel
-    extends AbstractConnection
-    implements FigureDecorationDetails {
+    extends
+      AbstractConnection
+    implements
+      FigureDecorationDetails {
 
   /**
    * Key for the length.
@@ -145,7 +148,10 @@ public class PathModel
   }
 
   @Override
-  public void clearAllocationState(@Nonnull VehicleModel model) {
+  public void clearAllocationState(
+      @Nonnull
+      VehicleModel model
+  ) {
     requireNonNull(model, "model");
 
     allocationStates.remove(model);
@@ -172,7 +178,8 @@ public class PathModel
       throws CloneNotSupportedException {
     PathModel clone = (PathModel) super.clone();
     clone.setAllocationStates(
-        (Map<VehicleModel, AllocationState>) ((TreeMap<VehicleModel, AllocationState>) allocationStates).clone()
+        (Map<VehicleModel, AllocationState>) ((TreeMap<VehicleModel, AllocationState>) allocationStates)
+            .clone()
     );
     clone.setBlockModels((Set<BlockModel>) ((TreeSet<BlockModel>) blocks).clone());
 

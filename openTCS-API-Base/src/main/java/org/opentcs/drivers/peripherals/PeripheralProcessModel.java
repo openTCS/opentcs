@@ -7,9 +7,10 @@
  */
 package org.opentcs.drivers.peripherals;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.data.model.TCSResourceReference;
@@ -18,7 +19,8 @@ import org.opentcs.data.model.TCSResourceReference;
  * A model of a peripheral device's and its communication adapter's attributes.
  */
 public class PeripheralProcessModel
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The reference to the location that is attached to this model.
@@ -46,10 +48,14 @@ public class PeripheralProcessModel
     this(location, false, false, PeripheralInformation.State.NO_PERIPHERAL);
   }
 
-  protected PeripheralProcessModel(@Nonnull TCSResourceReference<Location> location,
-                                   boolean commAdapterEnabled,
-                                   boolean commAdapterConnected,
-                                   @Nonnull PeripheralInformation.State state) {
+  protected PeripheralProcessModel(
+      @Nonnull
+      TCSResourceReference<Location> location,
+      boolean commAdapterEnabled,
+      boolean commAdapterConnected,
+      @Nonnull
+      PeripheralInformation.State state
+  ) {
     this.location = requireNonNull(location, "location");
     this.commAdapterEnabled = commAdapterEnabled;
     this.commAdapterConnected = commAdapterConnected;
@@ -73,7 +79,9 @@ public class PeripheralProcessModel
    * @return A copy of this object, differing in the given value.
    */
   public PeripheralProcessModel withLocation(
-      @Nonnull TCSResourceReference<Location> location) {
+      @Nonnull
+      TCSResourceReference<Location> location
+  ) {
     return new PeripheralProcessModel(location, commAdapterEnabled, commAdapterConnected, state);
   }
 

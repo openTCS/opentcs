@@ -7,8 +7,9 @@
  */
 package org.opentcs.access.rmi;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 import java.util.function.Predicate;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.KernelServicePortal;
@@ -67,7 +68,9 @@ public class KernelServicePortalBuilder {
    * @return This instance.
    */
   public KernelServicePortalBuilder setSocketFactoryProvider(
-      @Nonnull SocketFactoryProvider socketFactoryProvider) {
+      @Nonnull
+      SocketFactoryProvider socketFactoryProvider
+  ) {
     this.socketFactoryProvider = requireNonNull(socketFactoryProvider, "socketFactoryProvider");
     return this;
   }
@@ -105,7 +108,10 @@ public class KernelServicePortalBuilder {
    * @param eventFilter The event filter.
    * @return This instance.
    */
-  public KernelServicePortalBuilder setEventFilter(@Nonnull Predicate<Object> eventFilter) {
+  public KernelServicePortalBuilder setEventFilter(
+      @Nonnull
+      Predicate<Object> eventFilter
+  ) {
     this.eventFilter = requireNonNull(eventFilter, "eventFilter");
     return this;
   }
@@ -119,10 +125,13 @@ public class KernelServicePortalBuilder {
    * incorrect login data.
    */
   public KernelServicePortal build()
-      throws ServiceUnavailableException, CredentialsException {
-    return new RemoteKernelServicePortalProxy(userName,
-                                              password,
-                                              socketFactoryProvider,
-                                              eventFilter);
+      throws ServiceUnavailableException,
+        CredentialsException {
+    return new RemoteKernelServicePortalProxy(
+        userName,
+        password,
+        socketFactoryProvider,
+        eventFilter
+    );
   }
 }

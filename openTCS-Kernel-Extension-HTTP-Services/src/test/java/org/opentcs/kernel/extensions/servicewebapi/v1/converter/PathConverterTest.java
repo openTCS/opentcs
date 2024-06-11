@@ -7,9 +7,6 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.contains;
@@ -17,10 +14,14 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.PathCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.model.Couple;
@@ -74,12 +75,15 @@ class PathConverterTest {
 
     peripheralOperationList = List.of(
         new PeripheralOperation(
-            new Location("some-location",
-                         new LocationType("some-location-type").getReference()).getReference(),
+            new Location(
+                "some-location",
+                new LocationType("some-location-type").getReference()
+            ).getReference(),
             "some-operation",
             PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION,
             true
-        ));
+        )
+    );
     peripheralOperationTO = new PeripheralOperationTO("some-operation", "some-location")
         .setExecutionTrigger(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION.name())
         .setCompletionRequired(true);
@@ -104,9 +108,11 @@ class PathConverterTest {
         .withLocked(true)
         .withVehicleEnvelopes(envelopeMap)
         .withLayout(
-            new Path.Layout(Path.Layout.ConnectionType.POLYPATH,
-                            List.of(new Couple(2, 2)),
-                            4)
+            new Path.Layout(
+                Path.Layout.ConnectionType.POLYPATH,
+                List.of(new Couple(2, 2)),
+                4
+            )
         )
         .withProperties(propertyMap);
 
@@ -125,11 +131,15 @@ class PathConverterTest {
     assertThat(result.get(0).getVehicleEnvelopes(), hasSize(1));
     assertThat(result.get(0).getVehicleEnvelopes(), is(envelopeList));
     assertThat(result.get(0).getLayout().getLayerId(), is(4));
-    assertThat(result.get(0).getLayout().getConnectionType(),
-               is(Path.Layout.ConnectionType.POLYPATH.name()));
+    assertThat(
+        result.get(0).getLayout().getConnectionType(),
+        is(Path.Layout.ConnectionType.POLYPATH.name())
+    );
     assertThat(result.get(0).getLayout().getControlPoints(), hasSize(1));
-    assertThat(result.get(0).getLayout().getControlPoints().get(0),
-               samePropertyValuesAs(new CoupleTO(2, 2)));
+    assertThat(
+        result.get(0).getLayout().getControlPoints().get(0),
+        samePropertyValuesAs(new CoupleTO(2, 2))
+    );
     assertThat(result.get(0).getProperties(), hasSize(1));
     assertThat(result.get(0).getProperties(), is(propertyList));
   }
@@ -166,11 +176,15 @@ class PathConverterTest {
     assertThat(result.get(0).getVehicleEnvelopes(), is(aMapWithSize(1)));
     assertThat(result.get(0).getVehicleEnvelopes(), is(envelopeMap));
     assertThat(result.get(0).getLayout().getLayerId(), is(4));
-    assertThat(result.get(0).getLayout().getConnectionType(),
-               is(Path.Layout.ConnectionType.POLYPATH));
+    assertThat(
+        result.get(0).getLayout().getConnectionType(),
+        is(Path.Layout.ConnectionType.POLYPATH)
+    );
     assertThat(result.get(0).getLayout().getControlPoints(), hasSize(1));
-    assertThat(result.get(0).getLayout().getControlPoints().get(0),
-               samePropertyValuesAs(new Couple(1, 1)));
+    assertThat(
+        result.get(0).getLayout().getControlPoints().get(0),
+        samePropertyValuesAs(new Couple(1, 1))
+    );
     assertThat(result.get(0).getProperties(), is(aMapWithSize(1)));
     assertThat(result.get(0).getProperties(), is(propertyMap));
   }

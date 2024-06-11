@@ -7,18 +7,19 @@
  */
 package org.opentcs.modeleditor.persistence;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.mockito.invocation.InvocationOnMock;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
@@ -363,9 +364,11 @@ class ModelValidatorTest {
     addProperty(vehicle, PercentProperty.class, VehicleModel.ENERGY_LEVEL, 60);
     addProperty(vehicle, SelectionProperty.class, VehicleModel.PROC_STATE, Vehicle.ProcState.IDLE);
     addProperty(vehicle, SelectionProperty.class, VehicleModel.STATE, Vehicle.State.IDLE);
-    addProperty(vehicle, SelectionProperty.class,
-                VehicleModel.INTEGRATION_LEVEL,
-                Vehicle.IntegrationLevel.TO_BE_RESPECTED);
+    addProperty(
+        vehicle, SelectionProperty.class,
+        VehicleModel.INTEGRATION_LEVEL,
+        Vehicle.IntegrationLevel.TO_BE_RESPECTED
+    );
     addProperty(vehicle, BooleanProperty.class, VehicleModel.LOADED, Boolean.FALSE);
     addProperty(vehicle, StringProperty.class, VehicleModel.POINT, POINT_NAME);
     addProperty(vehicle, StringProperty.class, VehicleModel.NEXT_POINT, POINT_NAME_2);
@@ -386,10 +389,12 @@ class ModelValidatorTest {
    * @param propName the property key
    * @param propValue the property value
    */
-  private <T extends AbstractProperty> void addProperty(ModelComponent component,
-                                                        Class<T> clazz,
-                                                        String propName,
-                                                        Object propValue) {
+  private <T extends AbstractProperty> void addProperty(
+      ModelComponent component,
+      Class<T> clazz,
+      String propName,
+      Object propValue
+  ) {
     objectPropertiesMap.putIfAbsent(component, new HashMap<>());
     T property = mock(clazz);
     when(property.getValue()).thenReturn(propValue);

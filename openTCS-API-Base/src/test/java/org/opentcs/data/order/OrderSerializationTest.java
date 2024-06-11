@@ -7,6 +7,10 @@
  */
 package org.opentcs.data.order;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,10 +18,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
@@ -39,8 +40,10 @@ class OrderSerializationTest {
 
     assertEquals(originalObject, deserializedObject);
     assertEquals(originalObject.getProperties(), deserializedObject.getProperties());
-    assertTrue(originalObject.getAllDriveOrders().get(0).getDestination()
-        .equals(deserializedObject.getAllDriveOrders().get(0).getDestination()));
+    assertTrue(
+        originalObject.getAllDriveOrders().get(0).getDestination()
+            .equals(deserializedObject.getAllDriveOrders().get(0).getDestination())
+    );
   }
 
   @Test
@@ -51,8 +54,10 @@ class OrderSerializationTest {
         = (OrderSequence) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
-    assertTrue(originalObject.getOrders().get(0)
-        .equals(deserializedObject.getOrders().get(0)));
+    assertTrue(
+        originalObject.getOrders().get(0)
+            .equals(deserializedObject.getOrders().get(0))
+    );
   }
 
   private TransportOrder createTransportOrder() {
@@ -61,10 +66,18 @@ class OrderSerializationTest {
     Location location1 = new Location("Location1", mock(TCSObjectReference.class));
     @SuppressWarnings("unchecked")
     Location location2 = new Location("Location2", mock(TCSObjectReference.class));
-    driveOrders.add(new DriveOrder(new DriveOrder.Destination(location1.getReference())
-        .withOperation("someOperation1")));
-    driveOrders.add(new DriveOrder(new DriveOrder.Destination(location2.getReference())
-        .withOperation("someOperation2")));
+    driveOrders.add(
+        new DriveOrder(
+            new DriveOrder.Destination(location1.getReference())
+                .withOperation("someOperation1")
+        )
+    );
+    driveOrders.add(
+        new DriveOrder(
+            new DriveOrder.Destination(location2.getReference())
+                .withOperation("someOperation2")
+        )
+    );
     TransportOrder transportOrder = new TransportOrder("TransportOrder", driveOrders)
         .withProperty("someKey", "someValue");
     return transportOrder;
@@ -88,7 +101,8 @@ class OrderSerializationTest {
   }
 
   private TCSObject<?> deserializeTCSObject(byte[] serializedObject)
-      throws IOException, ClassNotFoundException {
+      throws IOException,
+        ClassNotFoundException {
     TCSObject<?> deserializedObject;
     try (ByteArrayInputStream is = new ByteArrayInputStream(serializedObject);
          ObjectInputStream ois = new ObjectInputStream(is)) {

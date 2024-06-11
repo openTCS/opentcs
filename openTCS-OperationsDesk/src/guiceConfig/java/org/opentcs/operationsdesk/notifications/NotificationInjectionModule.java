@@ -15,7 +15,8 @@ import jakarta.inject.Singleton;
  * A Guice module for this package.
  */
 public class NotificationInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.

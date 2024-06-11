@@ -7,8 +7,9 @@
  */
 package org.opentcs.util.gui;
 
-import java.awt.Component;
 import static java.util.Objects.requireNonNull;
+
+import java.awt.Component;
 import java.util.function.Function;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -21,7 +22,8 @@ import javax.swing.table.TableCellRenderer;
  * @param <E> The type of the table cell values that the representer can represent.
  */
 public class StringTableCellRenderer<E>
-    implements TableCellRenderer {
+    implements
+      TableCellRenderer {
 
   /**
    * The default renderer we delegate to.
@@ -44,14 +46,18 @@ public class StringTableCellRenderer<E>
   }
 
   @Override
-  public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                 boolean hasFocus, int row, int column) {
-    JLabel label = (JLabel) delegate.getTableCellRendererComponent(table,
-                                                                   value,
-                                                                   isSelected,
-                                                                   hasFocus,
-                                                                   row,
-                                                                   column);
+  public Component getTableCellRendererComponent(
+      JTable table, Object value, boolean isSelected,
+      boolean hasFocus, int row, int column
+  ) {
+    JLabel label = (JLabel) delegate.getTableCellRendererComponent(
+        table,
+        value,
+        isSelected,
+        hasFocus,
+        row,
+        column
+    );
     @SuppressWarnings("unchecked")
     E val = (E) value;
     label.setText(representer.apply(val));

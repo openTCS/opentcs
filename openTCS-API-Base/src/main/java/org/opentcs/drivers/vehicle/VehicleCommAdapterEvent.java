@@ -7,14 +7,16 @@
  */
 package org.opentcs.drivers.vehicle;
 
-import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
+
+import java.io.Serializable;
 
 /**
  * An event emitted by a communication adapter.
  */
 public class VehicleCommAdapterEvent
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The name of the adapter that emitted this event.

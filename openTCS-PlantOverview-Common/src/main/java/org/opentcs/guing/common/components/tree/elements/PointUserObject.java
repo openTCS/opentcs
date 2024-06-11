@@ -21,8 +21,10 @@ import org.opentcs.guing.common.util.IconToolkit;
  * Represents a point in the TreeView.
  */
 public class PointUserObject
-    extends FigureUserObject
-    implements ContextObject {
+    extends
+      FigureUserObject
+    implements
+      ContextObject {
 
   private final UserObjectContext context;
 
@@ -35,10 +37,14 @@ public class PointUserObject
    * @param modelManager The model manager
    */
   @Inject
-  public PointUserObject(@Assisted PointModel model,
-                         @Assisted UserObjectContext context,
-                         GuiManager guiManager,
-                         ModelManager modelManager) {
+  public PointUserObject(
+      @Assisted
+      PointModel model,
+      @Assisted
+      UserObjectContext context,
+      GuiManager guiManager,
+      ModelManager modelManager
+  ) {
     super(model, guiManager, modelManager);
     this.context = Objects.requireNonNull(context, "context");
   }

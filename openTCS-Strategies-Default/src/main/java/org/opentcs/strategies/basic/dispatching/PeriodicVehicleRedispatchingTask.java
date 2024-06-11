@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Vehicle;
@@ -24,7 +25,8 @@ import org.slf4j.LoggerFactory;
  * sensor was triggered.
  */
 public class PeriodicVehicleRedispatchingTask
-    implements Runnable {
+    implements
+      Runnable {
 
   /**
    * This class's Logger.
@@ -42,8 +44,10 @@ public class PeriodicVehicleRedispatchingTask
    * @param objectService The object service.
    */
   @Inject
-  public PeriodicVehicleRedispatchingTask(DispatcherService dispatcherService,
-                                          TCSObjectService objectService) {
+  public PeriodicVehicleRedispatchingTask(
+      DispatcherService dispatcherService,
+      TCSObjectService objectService
+  ) {
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.objectService = requireNonNull(objectService, "objectService");
   }

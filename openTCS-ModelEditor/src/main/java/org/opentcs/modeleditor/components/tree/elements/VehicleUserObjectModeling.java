@@ -19,7 +19,8 @@ import org.opentcs.guing.common.persistence.ModelManager;
  * A Vehicle object in the tree view.
  */
 public class VehicleUserObjectModeling
-    extends VehicleUserObject {
+    extends
+      VehicleUserObject {
 
   /**
    * Creates a new instance.
@@ -29,9 +30,12 @@ public class VehicleUserObjectModeling
    * @param modelManager Provides the current system model.
    */
   @Inject
-  public VehicleUserObjectModeling(@Assisted VehicleModel model,
-                                   GuiManager guiManager,
-                                   ModelManager modelManager) {
+  public VehicleUserObjectModeling(
+      @Assisted
+      VehicleModel model,
+      GuiManager guiManager,
+      ModelManager modelManager
+  ) {
     super(model, guiManager, modelManager);
   }
 

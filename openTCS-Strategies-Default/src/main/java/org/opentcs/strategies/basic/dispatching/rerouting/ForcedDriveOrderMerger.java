@@ -25,7 +25,8 @@ import org.slf4j.LoggerFactory;
  * drive order may contain a gap/may not be continuous.
  */
 public class ForcedDriveOrderMerger
-    extends AbstractDriveOrderMerger {
+    extends
+      AbstractDriveOrderMerger {
 
   private static final Logger LOG = LoggerFactory.getLogger(ForcedDriveOrderMerger.class);
 
@@ -40,9 +41,11 @@ public class ForcedDriveOrderMerger
   }
 
   @Override
-  protected List<Route.Step> mergeSteps(List<Route.Step> stepsA,
-                                        List<Route.Step> stepsB,
-                                        int currentRouteStepIndex) {
+  protected List<Route.Step> mergeSteps(
+      List<Route.Step> stepsA,
+      List<Route.Step> stepsB,
+      int currentRouteStepIndex
+  ) {
     LOG.debug("Merging steps {} with {}", stepsToPaths(stepsA), stepsToPaths(stepsB));
     List<Route.Step> mergedSteps = new ArrayList<>();
 
@@ -52,13 +55,17 @@ public class ForcedDriveOrderMerger
     // Set the rerouting type for the first step in the new route.
     Route.Step firstStepOfNewRoute = stepsB.get(0);
     List<Route.Step> modifiedStepsB = new ArrayList<>(stepsB);
-    modifiedStepsB.set(0, new Route.Step(firstStepOfNewRoute.getPath(),
-                                         firstStepOfNewRoute.getSourcePoint(),
-                                         firstStepOfNewRoute.getDestinationPoint(),
-                                         firstStepOfNewRoute.getVehicleOrientation(),
-                                         firstStepOfNewRoute.getRouteIndex(),
-                                         firstStepOfNewRoute.isExecutionAllowed(),
-                                         ReroutingType.FORCED));
+    modifiedStepsB.set(
+        0, new Route.Step(
+            firstStepOfNewRoute.getPath(),
+            firstStepOfNewRoute.getSourcePoint(),
+            firstStepOfNewRoute.getDestinationPoint(),
+            firstStepOfNewRoute.getVehicleOrientation(),
+            firstStepOfNewRoute.getRouteIndex(),
+            firstStepOfNewRoute.isExecutionAllowed(),
+            ReroutingType.FORCED
+        )
+    );
 
     mergedSteps.addAll(modifiedStepsB);
 

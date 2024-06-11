@@ -7,7 +7,6 @@
  */
 package org.opentcs.kernel.workingset;
 
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -15,6 +14,8 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.ObjectExistsException;
@@ -99,14 +100,18 @@ class TCSObjectRepositoryTest {
 
   @Test
   void returnNullForNonexistentObjectByClassAndRef() {
-    assertThat(pool.getObjectOrNull(Point.class, new Point("some-point").getReference()),
-               is(nullValue()));
+    assertThat(
+        pool.getObjectOrNull(Point.class, new Point("some-point").getReference()),
+        is(nullValue())
+    );
   }
 
   @Test
   void throwOnGetNonexistentObjectByClassAndRef() {
-    assertThrows(ObjectUnknownException.class,
-                 () -> pool.getObject(Point.class, new Point("some-point").getReference()));
+    assertThrows(
+        ObjectUnknownException.class,
+        () -> pool.getObject(Point.class, new Point("some-point").getReference())
+    );
   }
 
   @Test
@@ -216,8 +221,10 @@ class TCSObjectRepositoryTest {
 
   @Test
   void throwOnRemoveNonexistentObjectByRef() {
-    assertThrows(ObjectUnknownException.class,
-                 () -> pool.removeObject(new Point("some-point").getReference()));
+    assertThrows(
+        ObjectUnknownException.class,
+        () -> pool.removeObject(new Point("some-point").getReference())
+    );
   }
 
   @Test

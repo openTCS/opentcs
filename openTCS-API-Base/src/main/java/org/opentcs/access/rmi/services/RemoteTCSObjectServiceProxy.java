@@ -24,8 +24,10 @@ import org.opentcs.data.TCSObjectReference;
  * @param <R> The remote service's type.
  */
 abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
-    extends AbstractRemoteServiceProxy<R>
-    implements TCSObjectService {
+    extends
+      AbstractRemoteServiceProxy<R>
+    implements
+      TCSObjectService {
 
   @Override
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, TCSObjectReference<T> ref)
@@ -67,8 +69,10 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
   }
 
   @Override
-  public <T extends TCSObject<T>> Set<T> fetchObjects(Class<T> clazz,
-                                                      Predicate<? super T> predicate)
+  public <T extends TCSObject<T>> Set<T> fetchObjects(
+      Class<T> clazz,
+      Predicate<? super T> predicate
+  )
       throws KernelRuntimeException {
     checkServiceAvailability();
 
@@ -82,7 +86,8 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
 
   @Override
   public void updateObjectProperty(TCSObjectReference<?> ref, String key, String value)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -95,7 +100,8 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
 
   @Override
   public void appendObjectHistoryEntry(TCSObjectReference<?> ref, ObjectHistory.Entry entry)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {

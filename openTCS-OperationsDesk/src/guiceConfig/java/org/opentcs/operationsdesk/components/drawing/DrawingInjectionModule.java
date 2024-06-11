@@ -25,7 +25,8 @@ import org.opentcs.thirdparty.operationsdesk.components.drawing.OpenTCSDrawingVi
  * A Guice module for this package.
  */
 public class DrawingInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.

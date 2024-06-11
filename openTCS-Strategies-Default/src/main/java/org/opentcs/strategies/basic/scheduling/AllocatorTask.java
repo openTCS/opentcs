@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.scheduling;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
@@ -23,7 +24,8 @@ import org.slf4j.LoggerFactory;
  * Handles regular resource allocations.
  */
 class AllocatorTask
-    implements Runnable {
+    implements
+      Runnable {
 
   /**
    * This class's Logger.
@@ -57,12 +59,21 @@ class AllocatorTask
   /**
    * Creates a new instance.
    */
-  AllocatorTask(@Nonnull ReservationPool reservationPool,
-                @Nonnull Queue<AllocatorCommand.Allocate> deferredAllocations,
-                @Nonnull Scheduler.Module allocationAdvisor,
-                @Nonnull ScheduledExecutorService kernelExecutor,
-                @Nonnull @GlobalSyncObject Object globalSyncObject,
-                @Nonnull AllocatorCommand command) {
+  AllocatorTask(
+      @Nonnull
+      ReservationPool reservationPool,
+      @Nonnull
+      Queue<AllocatorCommand.Allocate> deferredAllocations,
+      @Nonnull
+      Scheduler.Module allocationAdvisor,
+      @Nonnull
+      ScheduledExecutorService kernelExecutor,
+      @Nonnull
+      @GlobalSyncObject
+      Object globalSyncObject,
+      @Nonnull
+      AllocatorCommand command
+  ) {
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
     this.deferredAllocations = requireNonNull(deferredAllocations, "deferredAllocations");
     this.allocationAdvisor = requireNonNull(allocationAdvisor, "allocationAdvisor");
@@ -108,27 +119,35 @@ class AllocatorTask
 
   private void checkAllocationsPrepared(Client client, Set<TCSResource<?>> resources) {
     if (!allocationAdvisor.hasPreparedAllocation(client, resources)) {
-      LOG.debug("{}: Preparation of resources not yet done.",
-                client.getId());
+      LOG.debug(
+          "{}: Preparation of resources not yet done.",
+          client.getId()
+      );
       // XXX remember the resources a client is waiting for preparation done?
       return;
     }
 
-    LOG.debug("Preparation of resources '{}' successful, calling back client '{}'...",
-              resources,
-              client.getId());
+    LOG.debug(
+        "Preparation of resources '{}' successful, calling back client '{}'...",
+        resources,
+        client.getId()
+    );
     if (!client.allocationSuccessful(resources)) {
-      LOG.warn("{}: Client didn't want allocated resources ({}), unallocating them...",
-               client.getId(),
-               resources);
+      LOG.warn(
+          "{}: Client didn't want allocated resources ({}), unallocating them...",
+          client.getId(),
+          resources
+      );
       undoAllocate(client, resources);
       // See if others want the resources this one didn't, then.
       scheduleRetryWaitingAllocations();
     }
     // Notify modules about the changes in claimed/allocated resources for this client.
-    allocationAdvisor.setAllocationState(client,
-                                         reservationPool.allocatedResources(client),
-                                         reservationPool.getClaim(client));
+    allocationAdvisor.setAllocationState(
+        client,
+        reservationPool.allocatedResources(client),
+        reservationPool.getClaim(client)
+    );
   }
 
   /**
@@ -143,9 +162,11 @@ class AllocatorTask
 
     synchronized (globalSyncObject) {
       if (!reservationPool.isNextInClaim(client, resources)) {
-        LOG.error("{}: Not allocating resources that are not next claimed resources: {}",
-                  client.getId(),
-                  resources);
+        LOG.error(
+            "{}: Not allocating resources that are not next claimed resources: {}",
+            client.getId(),
+            resources
+        );
         return false;
       }
 
@@ -200,12 +221,16 @@ class AllocatorTask
    */
   private void scheduleRetryWaitingAllocations() {
     for (AllocatorCommand.Allocate allocate : deferredAllocations) {
-      kernelExecutor.submit(new AllocatorTask(reservationPool,
-                                              deferredAllocations,
-                                              allocationAdvisor,
-                                              kernelExecutor,
-                                              globalSyncObject,
-                                              allocate));
+      kernelExecutor.submit(
+          new AllocatorTask(
+              reservationPool,
+              deferredAllocations,
+              allocationAdvisor,
+              kernelExecutor,
+              globalSyncObject,
+              allocate
+          )
+      );
     }
     deferredAllocations.clear();
   }

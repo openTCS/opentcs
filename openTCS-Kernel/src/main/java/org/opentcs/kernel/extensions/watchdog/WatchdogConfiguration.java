@@ -25,6 +25,7 @@ public interface WatchdogConfiguration {
       type = "Integer",
       description = "The interval in which to check for block consistency in milliseconds.",
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
-      orderKey = "1_block")
+      orderKey = "1_block"
+  )
   int blockConsistencyCheckInterval();
 }

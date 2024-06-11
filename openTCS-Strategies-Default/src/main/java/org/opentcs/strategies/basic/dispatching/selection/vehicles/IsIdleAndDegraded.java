@@ -18,7 +18,8 @@ import org.opentcs.strategies.basic.dispatching.selection.RechargeVehicleSelecti
  * Filters vehicles that are idle and have a degraded energy level.
  */
 public class IsIdleAndDegraded
-    implements RechargeVehicleSelectionFilter {
+    implements
+      RechargeVehicleSelectionFilter {
 
   /**
    * Creates a new instance.
@@ -40,7 +41,7 @@ public class IsIdleAndDegraded
         && vehicle.isEnergyLevelDegraded()
         && hasAllowedOrderTypesForCharging(vehicle);
   }
-  
+
   private boolean hasAllowedOrderTypesForCharging(Vehicle vehicle) {
     return vehicle.getAllowedOrderTypes().contains(OrderConstants.TYPE_CHARGE)
         || vehicle.getAllowedOrderTypes().contains(OrderConstants.TYPE_ANY);

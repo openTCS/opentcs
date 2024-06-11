@@ -7,13 +7,14 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.opentcs.access.CredentialsException;
@@ -39,8 +40,9 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class StandardRemoteKernelClientPortal
-    implements RemoteKernelServicePortal,
-               KernelExtension {
+    implements
+      RemoteKernelServicePortal,
+      KernelExtension {
 
   /**
    * This class' logger.
@@ -95,13 +97,16 @@ public class StandardRemoteKernelClientPortal
    * @param eventHandler The event handler to publish events to.
    */
   @Inject
-  public StandardRemoteKernelClientPortal(LocalKernel kernel,
-                                          Set<KernelRemoteService> remoteServices,
-                                          UserManager userManager,
-                                          RmiKernelInterfaceConfiguration configuration,
-                                          SocketFactoryProvider socketFactoryProvider,
-                                          RegistryProvider registryProvider,
-                                          @ApplicationEventBus EventHandler eventHandler) {
+  public StandardRemoteKernelClientPortal(
+      LocalKernel kernel,
+      Set<KernelRemoteService> remoteServices,
+      UserManager userManager,
+      RmiKernelInterfaceConfiguration configuration,
+      SocketFactoryProvider socketFactoryProvider,
+      RegistryProvider registryProvider,
+      @ApplicationEventBus
+      EventHandler eventHandler
+  ) {
     this.kernel = requireNonNull(kernel, "kernel");
     this.remoteServices = requireNonNull(remoteServices, "remoteServices");
     this.userManager = requireNonNull(userManager, "userManager");
@@ -124,10 +129,12 @@ public class StandardRemoteKernelClientPortal
     // Export this instance via RMI.
     try {
       LOG.debug("Exporting proxy...");
-      UnicastRemoteObject.exportObject(this,
-                                       configuration.remoteKernelServicePortalPort(),
-                                       socketFactoryProvider.getClientSocketFactory(),
-                                       socketFactoryProvider.getServerSocketFactory());
+      UnicastRemoteObject.exportObject(
+          this,
+          configuration.remoteKernelServicePortalPort(),
+          socketFactoryProvider.getClientSocketFactory(),
+          socketFactoryProvider.getServerSocketFactory()
+      );
       LOG.debug("Binding instance with RMI registry...");
       rmiRegistry.rebind(RegistrationName.REMOTE_KERNEL_CLIENT_PORTAL, this);
       LOG.debug("Bound instance {} with registry {}.", rmiRegistry.list(), rmiRegistry);

@@ -8,6 +8,7 @@
 package org.opentcs.guing.base.components.properties.type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.opentcs.guing.base.model.AbstractModelComponent;
 
@@ -26,6 +27,7 @@ class PercentPropertyTest {
   }
 
   private class DummyComponent
-      extends AbstractModelComponent {
+      extends
+        AbstractModelComponent {
   }
 }

@@ -3,15 +3,18 @@
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit;
 
+import static javax.swing.Action.ACCELERATOR_KEY;
+import static javax.swing.Action.LARGE_ICON_KEY;
+import static javax.swing.Action.SMALL_ICON;
+import static org.opentcs.guing.common.event.SystemModelTransitionEvent.Stage.UNLOADING;
+import static org.opentcs.guing.common.util.I18nPlantOverview.MENU_PATH;
+
 import jakarta.inject.Inject;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import static javax.swing.Action.ACCELERATOR_KEY;
-import static javax.swing.Action.LARGE_ICON_KEY;
-import static javax.swing.Action.SMALL_ICON;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import javax.swing.undo.CannotRedoException;
@@ -20,9 +23,7 @@ import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import org.opentcs.guing.common.event.SystemModelTransitionEvent;
-import static org.opentcs.guing.common.event.SystemModelTransitionEvent.Stage.UNLOADING;
 import org.opentcs.guing.common.util.I18nPlantOverview;
-import static org.opentcs.guing.common.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.common.util.ImageDirectory;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 import org.opentcs.util.event.EventHandler;
@@ -36,8 +37,10 @@ import org.slf4j.LoggerFactory;
  * @author Werner Randelshofer
  */
 public class UndoRedoManager
-    extends UndoManager
-    implements EventHandler {
+    extends
+      UndoManager
+    implements
+      EventHandler {
 
   /**
    * An undo action's ID.
@@ -109,7 +112,7 @@ public class UndoRedoManager
         discardAllEdits();
         break;
       default:
-      // Do nada.
+        // Do nada.
     }
   }
 
@@ -259,7 +262,8 @@ public class UndoRedoManager
    */
   @Override
   public void undoOrRedo()
-      throws CannotUndoException, CannotRedoException {
+      throws CannotUndoException,
+        CannotRedoException {
     undoOrRedoInProgress = true;
 
     try {
@@ -303,7 +307,8 @@ public class UndoRedoManager
    * Undo Action for use in a menu bar.
    */
   private class UndoAction
-      extends AbstractAction {
+      extends
+        AbstractAction {
 
     UndoAction() {
       putValue(NAME, BUNDLE.getString("undoRedoManager.undoAction.name"));
@@ -332,7 +337,8 @@ public class UndoRedoManager
    * Redo Action for use in a menu bar.
    */
   private class RedoAction
-      extends AbstractAction {
+      extends
+        AbstractAction {
 
     RedoAction() {
       putValue(NAME, BUNDLE.getString("undoRedoManager.redoAction.name"));

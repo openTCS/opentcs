@@ -7,10 +7,11 @@
  */
 package org.opentcs.strategies.basic.scheduling;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.Scheduler.Client;
@@ -22,7 +23,8 @@ import org.slf4j.LoggerFactory;
  * A module implementation that forwards method calls to all submodules.
  */
 public class AllocationAdvisor
-    implements Scheduler.Module {
+    implements
+      Scheduler.Module {
 
   /**
    * This class' logger.
@@ -81,9 +83,14 @@ public class AllocationAdvisor
   }
 
   @Override
-  public void setAllocationState(@Nonnull Scheduler.Client client,
-                                 @Nonnull Set<TCSResource<?>> alloc,
-                                 @Nonnull List<Set<TCSResource<?>>> remainingClaim) {
+  public void setAllocationState(
+      @Nonnull
+      Scheduler.Client client,
+      @Nonnull
+      Set<TCSResource<?>> alloc,
+      @Nonnull
+      List<Set<TCSResource<?>>> remainingClaim
+  ) {
     requireNonNull(client, "client");
     requireNonNull(alloc, "alloc");
     requireNonNull(remainingClaim, "remainingClaim");
@@ -103,23 +110,29 @@ public class AllocationAdvisor
   }
 
   @Override
-  public void prepareAllocation(Scheduler.Client client,
-                                Set<TCSResource<?>> resources) {
+  public void prepareAllocation(
+      Scheduler.Client client,
+      Set<TCSResource<?>> resources
+  ) {
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
     for (Scheduler.Module module : modules) {
-      LOG.debug("Module {}: Preparing allocation for resources {} for client {}.",
-                module,
-                resources,
-                client);
+      LOG.debug(
+          "Module {}: Preparing allocation for resources {} for client {}.",
+          module,
+          resources,
+          client
+      );
       module.prepareAllocation(client, resources);
     }
   }
 
   @Override
-  public boolean hasPreparedAllocation(Scheduler.Client client,
-                                       Set<TCSResource<?>> resources) {
+  public boolean hasPreparedAllocation(
+      Scheduler.Client client,
+      Set<TCSResource<?>> resources
+  ) {
     boolean result = true;
     for (Scheduler.Module module : modules) {
       result = result && module.hasPreparedAllocation(client, resources);
@@ -132,10 +145,12 @@ public class AllocationAdvisor
     requireNonNull(resources, "resources");
 
     for (Scheduler.Module module : modules) {
-      LOG.debug("Module {}: Allocation released for resources {} for client {}.",
-                module,
-                resources,
-                client);
+      LOG.debug(
+          "Module {}: Allocation released for resources {} for client {}.",
+          module,
+          resources,
+          client
+      );
       module.allocationReleased(client, resources);
     }
   }

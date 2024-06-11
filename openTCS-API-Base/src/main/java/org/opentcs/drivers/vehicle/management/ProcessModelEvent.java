@@ -7,17 +7,20 @@
  */
 package org.opentcs.drivers.vehicle.management;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 
 /**
  * Instances of this class represent events emitted by/for changes on {@link VehicleProcessModel}s.
  */
 public class ProcessModelEvent
-    extends CommAdapterEvent
-    implements Serializable {
+    extends
+      CommAdapterEvent
+    implements
+      Serializable {
 
   /**
    * The attribute's name that changed in the process model.
@@ -34,8 +37,12 @@ public class ProcessModelEvent
    * @param attributeChanged The attribute's name that changed.
    * @param updatedProcessModel A serializable representation of the corresponding process model.
    */
-  public ProcessModelEvent(@Nonnull String attributeChanged,
-                           @Nonnull VehicleProcessModelTO updatedProcessModel) {
+  public ProcessModelEvent(
+      @Nonnull
+      String attributeChanged,
+      @Nonnull
+      VehicleProcessModelTO updatedProcessModel
+  ) {
     this.attributeChanged = requireNonNull(attributeChanged, "attributeChanged");
     this.updatedProcessModel = requireNonNull(updatedProcessModel, "updatedProcessModel");
   }

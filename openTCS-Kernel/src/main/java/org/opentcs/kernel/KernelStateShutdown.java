@@ -17,7 +17,8 @@ import org.opentcs.kernel.workingset.PlantModelManager;
  * This class implements the standard openTCS kernel when it's shut down.
  */
 public class KernelStateShutdown
-    extends KernelState {
+    extends
+      KernelState {
 
   /**
    * Indicates whether this component is enabled.
@@ -32,12 +33,17 @@ public class KernelStateShutdown
    * @param modelPersister The model persister to be used.
    */
   @Inject
-  public KernelStateShutdown(@GlobalSyncObject Object globalSyncObject,
-                             PlantModelManager plantModelManager,
-                             ModelPersister modelPersister) {
-    super(globalSyncObject,
-          plantModelManager,
-          modelPersister);
+  public KernelStateShutdown(
+      @GlobalSyncObject
+      Object globalSyncObject,
+      PlantModelManager plantModelManager,
+      ModelPersister modelPersister
+  ) {
+    super(
+        globalSyncObject,
+        plantModelManager,
+        modelPersister
+    );
   }
 
   // Methods that HAVE to be implemented/overridden start here.

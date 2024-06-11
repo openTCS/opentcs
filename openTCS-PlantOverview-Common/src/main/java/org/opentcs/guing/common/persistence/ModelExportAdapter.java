@@ -7,10 +7,11 @@
  */
 package org.opentcs.guing.common.persistence;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
@@ -70,57 +71,73 @@ public class ModelExportAdapter {
 
     long timeBefore = System.currentTimeMillis();
     plantModel = persist(systemModel.getLayoutModel(), systemModel, plantModel);
-    LOG.debug("Converting the LayoutModel took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
+    LOG.debug(
+        "Converting the LayoutModel took {} milliseconds.",
+        System.currentTimeMillis() - timeBefore
+    );
 
     timeBefore = System.currentTimeMillis();
     for (PointModel model : systemModel.getPointModels()) {
       plantModel = persist(model, systemModel, plantModel);
     }
-    LOG.debug("Converting PointModels took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
+    LOG.debug(
+        "Converting PointModels took {} milliseconds.",
+        System.currentTimeMillis() - timeBefore
+    );
 
     timeBefore = System.currentTimeMillis();
     for (PathModel model : systemModel.getPathModels()) {
       plantModel = persist(model, systemModel, plantModel);
     }
-    LOG.debug("Converting PathModels took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
+    LOG.debug(
+        "Converting PathModels took {} milliseconds.",
+        System.currentTimeMillis() - timeBefore
+    );
 
     timeBefore = System.currentTimeMillis();
     for (LocationTypeModel model : systemModel.getLocationTypeModels()) {
       plantModel = persist(model, systemModel, plantModel);
     }
-    LOG.debug("Converting LocationTypeModels took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
+    LOG.debug(
+        "Converting LocationTypeModels took {} milliseconds.",
+        System.currentTimeMillis() - timeBefore
+    );
 
     timeBefore = System.currentTimeMillis();
     for (LocationModel model : systemModel.getLocationModels()) {
       plantModel = persist(model, systemModel, plantModel);
     }
-    LOG.debug("Converting LocationModels took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
+    LOG.debug(
+        "Converting LocationModels took {} milliseconds.",
+        System.currentTimeMillis() - timeBefore
+    );
 
     timeBefore = System.currentTimeMillis();
     for (LinkModel model : systemModel.getLinkModels()) {
       plantModel = persist(model, systemModel, plantModel);
     }
-    LOG.debug("Converting LinkModels took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
+    LOG.debug(
+        "Converting LinkModels took {} milliseconds.",
+        System.currentTimeMillis() - timeBefore
+    );
 
     timeBefore = System.currentTimeMillis();
     for (BlockModel model : systemModel.getBlockModels()) {
       plantModel = persist(model, systemModel, plantModel);
     }
-    LOG.debug("Converting BlockModels took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
+    LOG.debug(
+        "Converting BlockModels took {} milliseconds.",
+        System.currentTimeMillis() - timeBefore
+    );
 
     timeBefore = System.currentTimeMillis();
     for (VehicleModel model : systemModel.getVehicleModels()) {
       plantModel = persist(model, systemModel, plantModel);
     }
-    LOG.debug("Converting VehicleModels took {} milliseconds.",
-              System.currentTimeMillis() - timeBefore);
+    LOG.debug(
+        "Converting VehicleModels took {} milliseconds.",
+        System.currentTimeMillis() - timeBefore
+    );
 
     return plantModel;
   }
@@ -130,9 +147,11 @@ public class ModelExportAdapter {
         .collect(Collectors.toMap(KeyValueProperty::getKey, KeyValueProperty::getValue));
   }
 
-  private PlantModelCreationTO persist(ModelComponent component,
-                                       SystemModel systemModel,
-                                       PlantModelCreationTO plantModel) {
+  private PlantModelCreationTO persist(
+      ModelComponent component,
+      SystemModel systemModel,
+      PlantModelCreationTO plantModel
+  ) {
     ProcessAdapter adapter = processAdapterUtil.processAdapterFor(component);
     return adapter.storeToPlantModel(component, systemModel, plantModel);
   }

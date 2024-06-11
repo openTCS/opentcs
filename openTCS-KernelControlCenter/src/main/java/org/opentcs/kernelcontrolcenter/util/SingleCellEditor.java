@@ -23,7 +23,8 @@ import javax.swing.table.TableCellEditor;
  * A cell editor for maintaining different editors in one column.
  */
 public final class SingleCellEditor
-    implements TableCellEditor {
+    implements
+      TableCellEditor {
 
   /**
    * The TableCellEditors for every cell.
@@ -64,16 +65,20 @@ public final class SingleCellEditor
   }
 
   @Override
-  public Component getTableCellEditorComponent(JTable whichTable,
-                                               Object value,
-                                               boolean isSelected,
-                                               int row,
-                                               int column) {
-    return editor.getTableCellEditorComponent(whichTable,
-                                              value,
-                                              isSelected,
-                                              row,
-                                              column);
+  public Component getTableCellEditorComponent(
+      JTable whichTable,
+      Object value,
+      boolean isSelected,
+      int row,
+      int column
+  ) {
+    return editor.getTableCellEditorComponent(
+        whichTable,
+        value,
+        isSelected,
+        row,
+        column
+    );
   }
 
   @Override

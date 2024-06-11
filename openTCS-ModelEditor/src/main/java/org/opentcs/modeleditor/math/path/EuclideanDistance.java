@@ -7,9 +7,10 @@
  */
 package org.opentcs.modeleditor.math.path;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.model.elements.PathModel;
 import org.opentcs.guing.base.model.elements.PointModel;
@@ -18,7 +19,8 @@ import org.opentcs.guing.base.model.elements.PointModel;
  * Calculates the length of a path as the Euclidean distance between the start and end point.
  */
 public class EuclideanDistance
-    implements PathLengthFunction {
+    implements
+      PathLengthFunction {
 
   private final PathLengthMath pathLengthMath;
 
@@ -28,12 +30,18 @@ public class EuclideanDistance
    * @param pathLengthMath Provides a method for the euclidean distance.
    */
   @Inject
-  public EuclideanDistance(@Nonnull PathLengthMath pathLengthMath) {
+  public EuclideanDistance(
+      @Nonnull
+      PathLengthMath pathLengthMath
+  ) {
     this.pathLengthMath = requireNonNull(pathLengthMath, "pathLengthMath");
   }
 
   @Override
-  public double applyAsDouble(@Nonnull PathModel path) {
+  public double applyAsDouble(
+      @Nonnull
+      PathModel path
+  ) {
     requireNonNull(path, "path");
 
     PointModel start = (PointModel) path.getStartComponent();

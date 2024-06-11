@@ -63,7 +63,8 @@ public class PeripheralOperationDescription {
   }
 
   public static PeripheralOperationDescription fromPeripheralOperation(
-      PeripheralOperation operation) {
+      PeripheralOperation operation
+  ) {
     PeripheralOperationDescription state = new PeripheralOperationDescription();
     state.operation = operation.getOperation();
     state.locationName = operation.getLocation().getName();

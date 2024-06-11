@@ -22,7 +22,8 @@ import org.opentcs.data.model.PeripheralInformation;
  * </ul>
  */
 public class DefaultPeripheralReleaseStrategy
-    implements PeripheralReleaseStrategy {
+    implements
+      PeripheralReleaseStrategy {
 
   /**
    * Creates a new instance.
@@ -42,10 +43,9 @@ public class DefaultPeripheralReleaseStrategy
   }
 
   private boolean processesNoJob(Location location) {
-    return location.getPeripheralInformation().getProcState()
-        == PeripheralInformation.ProcState.IDLE
-        && location.getPeripheralInformation().getState()
-        == PeripheralInformation.State.IDLE;
+    return location.getPeripheralInformation()
+        .getProcState() == PeripheralInformation.ProcState.IDLE
+        && location.getPeripheralInformation().getState() == PeripheralInformation.State.IDLE;
   }
 
   private boolean hasReservationToken(Location location) {

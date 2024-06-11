@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.event;
 
-import java.util.EventObject;
 import static java.util.Objects.requireNonNull;
+
+import java.util.EventObject;
 import org.opentcs.guing.common.model.SystemModel;
 
 /**
@@ -18,7 +19,8 @@ import org.opentcs.guing.common.model.SystemModel;
  * new one, a separate event is emitted.
  */
 public class SystemModelTransitionEvent
-    extends EventObject {
+    extends
+      EventObject {
 
   /**
    * The current stage of the transition.

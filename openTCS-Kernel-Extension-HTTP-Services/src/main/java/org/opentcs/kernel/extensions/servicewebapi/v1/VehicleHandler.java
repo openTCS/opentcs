@@ -7,13 +7,14 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -51,9 +52,11 @@ public class VehicleHandler {
    * @param executorWrapper Executes calls via the kernel executor and waits for the outcome.
    */
   @Inject
-  public VehicleHandler(VehicleService vehicleService,
-                        RouterService routerService,
-                        KernelExecutorWrapper executorWrapper) {
+  public VehicleHandler(
+      VehicleService vehicleService,
+      RouterService routerService,
+      KernelExecutorWrapper executorWrapper
+  ) {
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.routerService = requireNonNull(routerService, "routerService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
@@ -67,7 +70,10 @@ public class VehicleHandler {
    * @return A list of vehicles, that match the filter.
    * @throws IllegalArgumentException If procStateName could not be parsed.
    */
-  public List<GetVehicleResponseTO> getVehiclesState(@Nullable String procStateName)
+  public List<GetVehicleResponseTO> getVehiclesState(
+      @Nullable
+      String procStateName
+  )
       throws IllegalArgumentException {
     return executorWrapper.callAndWait(() -> {
       Vehicle.ProcState pState = procStateName == null
@@ -101,7 +107,8 @@ public class VehicleHandler {
   }
 
   public void putVehicleIntegrationLevel(String name, String value)
-      throws ObjectUnknownException, IllegalArgumentException {
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     requireNonNull(name, "name");
     requireNonNull(value, "value");
 
@@ -111,13 +118,16 @@ public class VehicleHandler {
         throw new ObjectUnknownException("Unknown vehicle: " + name);
       }
 
-      vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
-                                                   Vehicle.IntegrationLevel.valueOf(value));
+      vehicleService.updateVehicleIntegrationLevel(
+          vehicle.getReference(),
+          Vehicle.IntegrationLevel.valueOf(value)
+      );
     });
   }
 
   public void putVehiclePaused(String name, String value)
-      throws ObjectUnknownException, IllegalArgumentException {
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     requireNonNull(name, "name");
     requireNonNull(value, "value");
 
@@ -132,7 +142,8 @@ public class VehicleHandler {
   }
 
   public void putVehicleEnvelopeKey(String name, String value)
-      throws ObjectUnknownException, IllegalArgumentException {
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     requireNonNull(name, "name");
 
     executorWrapper.callAndWait(() -> {
@@ -146,7 +157,8 @@ public class VehicleHandler {
   }
 
   public void putVehicleCommAdapterEnabled(String name, String value)
-      throws ObjectUnknownException, IllegalArgumentException {
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     requireNonNull(name, "name");
     requireNonNull(value, "value");
 
@@ -203,8 +215,10 @@ public class VehicleHandler {
     });
   }
 
-  public void putVehicleAllowedOrderTypes(String name,
-                                          PutVehicleAllowedOrderTypesTO allowedOrderTypes)
+  public void putVehicleAllowedOrderTypes(
+      String name,
+      PutVehicleAllowedOrderTypesTO allowedOrderTypes
+  )
       throws ObjectUnknownException {
     requireNonNull(name, "name");
     requireNonNull(allowedOrderTypes, "allowedOrderTypes");
@@ -220,8 +234,10 @@ public class VehicleHandler {
     });
   }
 
-  public Map<TCSObjectReference<Point>, Route> getVehicleRoutes(String name,
-                                                                PostVehicleRoutesRequestTO request)
+  public Map<TCSObjectReference<Point>, Route> getVehicleRoutes(
+      String name,
+      PostVehicleRoutesRequestTO request
+  )
       throws ObjectUnknownException {
     requireNonNull(name, "name");
     requireNonNull(request, "request");
@@ -284,10 +300,12 @@ public class VehicleHandler {
         }
       }
 
-      return routerService.computeRoutes(vehicle.getReference(),
-                                         sourcePointRef,
-                                         destinationPointRefs,
-                                         resourcesToAvoid);
+      return routerService.computeRoutes(
+          vehicle.getReference(),
+          sourcePointRef,
+          destinationPointRefs,
+          resourcesToAvoid
+      );
     });
   }
 }

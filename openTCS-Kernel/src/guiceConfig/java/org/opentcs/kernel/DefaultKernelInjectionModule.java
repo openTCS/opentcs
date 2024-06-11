@@ -88,7 +88,8 @@ import org.opentcs.util.logging.UncaughtExceptionLogger;
  * A Guice module for the openTCS kernel application.
  */
 public class DefaultKernelInjectionModule
-    extends KernelInjectionModule {
+    extends
+      KernelInjectionModule {
 
   /**
    * Creates a new instance.
@@ -256,8 +257,12 @@ public class DefaultKernelInjectionModule
     stateMapBinder.addBinding(Kernel.State.OPERATING).to(KernelStateOperating.class);
 
     bind(OrderPoolConfiguration.class)
-        .toInstance(getConfigBindingProvider().get(OrderPoolConfiguration.PREFIX,
-                                                   OrderPoolConfiguration.class));
+        .toInstance(
+            getConfigBindingProvider().get(
+                OrderPoolConfiguration.PREFIX,
+                OrderPoolConfiguration.class
+            )
+        );
 
     bind(CreationTimeThreshold.class)
         .in(Singleton.class);
@@ -269,19 +274,27 @@ public class DefaultKernelInjectionModule
 
   private void configureKernelStarterDependencies() {
     bind(KernelApplicationConfiguration.class)
-        .toInstance(getConfigBindingProvider().get(KernelApplicationConfiguration.PREFIX,
-                                                   KernelApplicationConfiguration.class));
+        .toInstance(
+            getConfigBindingProvider().get(
+                KernelApplicationConfiguration.PREFIX,
+                KernelApplicationConfiguration.class
+            )
+        );
   }
 
   private void configureSslParameters() {
     SslConfiguration configuration
-        = getConfigBindingProvider().get(SslConfiguration.PREFIX,
-                                         SslConfiguration.class);
-    SslParameterSet sslParamSet = new SslParameterSet(SslParameterSet.DEFAULT_KEYSTORE_TYPE,
-                                                      new File(configuration.keystoreFile()),
-                                                      configuration.keystorePassword(),
-                                                      new File(configuration.truststoreFile()),
-                                                      configuration.truststorePassword());
+        = getConfigBindingProvider().get(
+            SslConfiguration.PREFIX,
+            SslConfiguration.class
+        );
+    SslParameterSet sslParamSet = new SslParameterSet(
+        SslParameterSet.DEFAULT_KEYSTORE_TYPE,
+        new File(configuration.keystoreFile()),
+        configuration.keystorePassword(),
+        new File(configuration.truststoreFile()),
+        configuration.truststorePassword()
+    );
     bind(SslParameterSet.class).toInstance(sslParamSet);
   }
 
@@ -312,8 +325,12 @@ public class DefaultKernelInjectionModule
         .in(Singleton.class);
 
     bind(WatchdogConfiguration.class)
-        .toInstance(getConfigBindingProvider().get(WatchdogConfiguration.PREFIX,
-                                                   WatchdogConfiguration.class));
+        .toInstance(
+            getConfigBindingProvider().get(
+                WatchdogConfiguration.PREFIX,
+                WatchdogConfiguration.class
+            )
+        );
 
   }
 }

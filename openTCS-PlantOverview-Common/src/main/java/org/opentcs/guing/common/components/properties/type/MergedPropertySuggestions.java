@@ -7,9 +7,10 @@
  */
 package org.opentcs.guing.common.components.properties.type;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.Inject;
 import java.util.HashSet;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
 import org.opentcs.components.plantoverview.PropertySuggestions;
@@ -18,7 +19,8 @@ import org.opentcs.components.plantoverview.PropertySuggestions;
  * Merges {@link PropertySuggestions} instances to a single one.
  */
 public class MergedPropertySuggestions
-    implements PropertySuggestions {
+    implements
+      PropertySuggestions {
 
   private final Set<String> keySuggestions = new TreeSet<>();
   private final Set<String> valueSuggestions = new TreeSet<>();
@@ -49,11 +51,11 @@ public class MergedPropertySuggestions
   }
 
   @Override
-  public Set<String> getValueSuggestionsFor(String key){
+  public Set<String> getValueSuggestionsFor(String key) {
     Set<String> mergedCustomSuggestions = new HashSet<>();
-    for(PropertySuggestions suggestor : propertySuggestions){
+    for (PropertySuggestions suggestor : propertySuggestions) {
       Set<String> currentSuggestion = suggestor.getValueSuggestionsFor(key);
-      if(currentSuggestion!=null){
+      if (currentSuggestion != null) {
         mergedCustomSuggestions.addAll(currentSuggestion);
       }
     }

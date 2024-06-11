@@ -15,7 +15,8 @@ import org.opentcs.components.Lifecycle;
  * A base class for kernel-side implementations of remote services.
  */
 public abstract class KernelRemoteService
-    implements Lifecycle {
+    implements
+      Lifecycle {
 
   /**
    * The message to log when a service method execution failed.

@@ -28,7 +28,8 @@ import org.opentcs.operationsdesk.peripherals.jobs.PeripheralJobHistoryEntryForm
  * </ul>
  */
 public class CompositeObjectHistoryEntryFormatter
-    implements ObjectHistoryEntryFormatter {
+    implements
+      ObjectHistoryEntryFormatter {
 
   /**
    * The actual formatters.
@@ -64,7 +65,7 @@ public class CompositeObjectHistoryEntryFormatter
   private Optional<String> fallbackFormat(ObjectHistory.Entry entry) {
     return Optional.of(
         "eventCode: '" + entry.getEventCode()
-        + "', supplement: '" + entry.getSupplement().toString() + '\''
+            + "', supplement: '" + entry.getSupplement().toString() + '\''
     );
   }
 

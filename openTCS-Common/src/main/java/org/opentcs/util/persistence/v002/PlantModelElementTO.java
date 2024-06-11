@@ -7,10 +7,11 @@
  */
 package org.opentcs.util.persistence.v002;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -50,7 +51,10 @@ public class PlantModelElementTO {
     return name;
   }
 
-  public PlantModelElementTO setName(@Nonnull String name) {
+  public PlantModelElementTO setName(
+      @Nonnull
+      String name
+  ) {
     requireNonNull(name, "name");
     this.name = name;
     return this;
@@ -61,7 +65,10 @@ public class PlantModelElementTO {
     return properties;
   }
 
-  public PlantModelElementTO setProperties(@Nonnull List<PropertyTO> properties) {
+  public PlantModelElementTO setProperties(
+      @Nonnull
+      List<PropertyTO> properties
+  ) {
     requireNonNull(properties, "properties");
     this.properties = properties;
     return this;

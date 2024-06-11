@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.exchange.adapter;
 
-import java.util.HashSet;
 import static java.util.Objects.requireNonNull;
+
+import java.util.HashSet;
 import java.util.Set;
 import org.opentcs.access.to.model.BlockCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
@@ -24,7 +25,8 @@ import org.opentcs.guing.common.model.SystemModel;
  * An adapter for blocks.
  */
 public class BlockAdapter
-    extends AbstractProcessAdapter {
+    extends
+      AbstractProcessAdapter {
 
   /**
    * Creates a new instance.
@@ -33,10 +35,12 @@ public class BlockAdapter
   }
 
   @Override  // OpenTCSProcessAdapter
-  public void updateModelProperties(TCSObject<?> tcsObject,
-                                    ModelComponent modelComponent,
-                                    SystemModel systemModel,
-                                    TCSObjectService objectService) {
+  public void updateModelProperties(
+      TCSObject<?> tcsObject,
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      TCSObjectService objectService
+  ) {
     Block block = requireNonNull((Block) tcsObject, "tcsObject");
     BlockModel model = (BlockModel) modelComponent;
 
@@ -55,15 +59,18 @@ public class BlockAdapter
   }
 
   @Override
-  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
-                                                SystemModel systemModel,
-                                                PlantModelCreationTO plantModel) {
+  public PlantModelCreationTO storeToPlantModel(
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      PlantModelCreationTO plantModel
+  ) {
     return plantModel
-        .withBlock(new BlockCreationTO(modelComponent.getName())
-            .withType(getKernelBlockType((BlockModel) modelComponent))
-            .withMemberNames(getMemberNames((BlockModel) modelComponent))
-            .withProperties(getKernelProperties(modelComponent))
-            .withLayout(getLayout((BlockModel) modelComponent))
+        .withBlock(
+            new BlockCreationTO(modelComponent.getName())
+                .withType(getKernelBlockType((BlockModel) modelComponent))
+                .withMemberNames(getMemberNames((BlockModel) modelComponent))
+                .withProperties(getKernelProperties(modelComponent))
+                .withLayout(getLayout((BlockModel) modelComponent))
         );
   }
 

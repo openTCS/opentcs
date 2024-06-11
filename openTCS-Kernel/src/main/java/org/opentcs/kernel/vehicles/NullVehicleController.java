@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.vehicles;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayDeque;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
@@ -26,7 +27,8 @@ import org.slf4j.LoggerFactory;
  * Null-object implementation of {@link VehicleController}.
  */
 public class NullVehicleController
-    implements VehicleController {
+    implements
+      VehicleController {
 
   /**
    * This class's Logger.
@@ -42,7 +44,10 @@ public class NullVehicleController
    *
    * @param vehicleName The associated vehicle's name.
    */
-  public NullVehicleController(@Nonnull String vehicleName) {
+  public NullVehicleController(
+      @Nonnull
+      String vehicleName
+  ) {
     this.vehicleName = requireNonNull(vehicleName, "vehicleName");
   }
 

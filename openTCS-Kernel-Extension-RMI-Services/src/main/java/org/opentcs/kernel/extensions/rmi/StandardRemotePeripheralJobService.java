@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import org.opentcs.access.rmi.ClientID;
@@ -34,8 +35,10 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class StandardRemotePeripheralJobService
-    extends StandardRemoteTCSObjectService
-    implements RemotePeripheralJobService {
+    extends
+      StandardRemoteTCSObjectService
+    implements
+      RemotePeripheralJobService {
 
   /**
    * This class's logger.
@@ -86,12 +89,15 @@ public class StandardRemotePeripheralJobService
    * @param kernelExecutor Executes tasks modifying kernel data.
    */
   @Inject
-  public StandardRemotePeripheralJobService(PeripheralJobService peripheralJobService,
-                                            UserManager userManager,
-                                            RmiKernelInterfaceConfiguration configuration,
-                                            SocketFactoryProvider socketFactoryProvider,
-                                            RegistryProvider registryProvider,
-                                            @KernelExecutor ExecutorService kernelExecutor) {
+  public StandardRemotePeripheralJobService(
+      PeripheralJobService peripheralJobService,
+      UserManager userManager,
+      RmiKernelInterfaceConfiguration configuration,
+      SocketFactoryProvider socketFactoryProvider,
+      RegistryProvider registryProvider,
+      @KernelExecutor
+      ExecutorService kernelExecutor
+  ) {
     super(peripheralJobService, userManager, kernelExecutor);
     this.peripheralJobService = requireNonNull(peripheralJobService, "transportOrderService");
     this.userManager = requireNonNull(userManager, "userManager");
@@ -112,10 +118,12 @@ public class StandardRemotePeripheralJobService
     // Export this instance via RMI.
     try {
       LOG.debug("Exporting proxy...");
-      UnicastRemoteObject.exportObject(this,
-                                       configuration.remotePeripheralJobServicePort(),
-                                       socketFactoryProvider.getClientSocketFactory(),
-                                       socketFactoryProvider.getServerSocketFactory());
+      UnicastRemoteObject.exportObject(
+          this,
+          configuration.remotePeripheralJobServicePort(),
+          socketFactoryProvider.getClientSocketFactory(),
+          socketFactoryProvider.getServerSocketFactory()
+      );
       LOG.debug("Binding instance with RMI registry...");
       rmiRegistry.rebind(RegistrationName.REMOTE_PERIPHERAL_JOB_SERVICE, this);
     }

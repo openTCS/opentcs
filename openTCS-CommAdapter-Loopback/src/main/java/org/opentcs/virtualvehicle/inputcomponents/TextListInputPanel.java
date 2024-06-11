@@ -16,10 +16,12 @@ import javax.swing.event.ListSelectionListener;
  * inputs to select from.
  */
 public final class TextListInputPanel
-    extends TextInputPanel {
+    extends
+      TextInputPanel {
 
   /**
    * Creates a new instance TextListInputPanel.
+   *
    * @param title the title of the panel
    */
   private TextListInputPanel(String title) {
@@ -46,6 +48,7 @@ public final class TextListInputPanel
 
   /**
    * Enable input validation against the given regular expression.
+   *
    * @see InputPanel#addValidationListener
    * @param format A regular expression.
    */
@@ -55,6 +58,7 @@ public final class TextListInputPanel
     }
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /** This method is called from within the constructor to
    * initialize the form.
@@ -105,10 +109,15 @@ public final class TextListInputPanel
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     add(jScrollPane1, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void inputFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_inputFieldFocusGained
     inputField.selectAll();
   }//GEN-LAST:event_inputFieldFocusGained
+
+  // CHECKSTYLE:OFF
+  // FORMATTER:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JTextField inputField;
   private javax.swing.JScrollPane jScrollPane1;
@@ -116,12 +125,14 @@ public final class TextListInputPanel
   private javax.swing.JLabel messageLabel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   /**
    * See {@link InputPanel.Builder}.
    */
   public static class Builder
-      implements InputPanel.Builder {
+      implements
+        InputPanel.Builder {
 
     /**
      * The panel's title.
@@ -147,6 +158,7 @@ public final class TextListInputPanel
 
     /**
      * Create a new <code>Builder</code>.
+     *
      * @param title the title of the panel
      * @param content Predefined items to display in the panel's list
      */
@@ -159,6 +171,7 @@ public final class TextListInputPanel
      * Set the message of the panel.
      * The user of this method must take care for the line breaks in the message,
      * as it is not wrapped automatically!
+     *
      * @param message the message
      * @return the instance of this <code>Builder</code>
      */
@@ -169,6 +182,7 @@ public final class TextListInputPanel
 
     /**
      * Make the panel validate it's input.
+     *
      * @param format The regular expression that will be used for validation.
      * @return the instance of this <code>Builder</code>
      */
@@ -179,6 +193,7 @@ public final class TextListInputPanel
 
     /**
      * Set the initial selected list entry.
+     *
      * @param index must be &gt; 0, will have no effect otherwise
      * @return the instance of this <code>Builder</code>
      */
@@ -191,9 +206,10 @@ public final class TextListInputPanel
 
     /**
      * Set the initial selected list entry.
+     *
      * @param element Element to select. Selection remains unchanged if
-     *                element ist not in the list or element is
-     *                <code>null</code>.
+     * element ist not in the list or element is
+     * <code>null</code>.
      * @return the instance fo this <code>Builder</code>
      */
     public Builder setInitialSelection(String element) {

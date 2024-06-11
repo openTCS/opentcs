@@ -7,11 +7,12 @@
  */
 package org.opentcs.data.model;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.data.model.visualization.Layer;
 import org.opentcs.data.model.visualization.LayerGroup;
@@ -21,7 +22,8 @@ import org.opentcs.data.model.visualization.VisualLayout;
  * An immutable representation of a complete plant model's state.
  */
 public class PlantModel
-    implements Serializable {
+    implements
+      Serializable {
 
   private final String name;
   private final Map<String, String> properties;
@@ -38,20 +40,36 @@ public class PlantModel
    *
    * @param name The model's name.
    */
-  public PlantModel(@Nonnull String name) {
-    this(name, Map.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(),
-         defaultVisualLayout());
+  public PlantModel(
+      @Nonnull
+      String name
+  ) {
+    this(
+        name, Map.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(),
+        defaultVisualLayout()
+    );
   }
 
-  private PlantModel(@Nonnull String name,
-                     @Nonnull Map<String, String> properties,
-                     @Nonnull Set<Point> points,
-                     @Nonnull Set<Path> paths,
-                     @Nonnull Set<LocationType> locationTypes,
-                     @Nonnull Set<Location> locations,
-                     @Nonnull Set<Block> blocks,
-                     @Nonnull Set<Vehicle> vehicles,
-                     @Nonnull VisualLayout visualLayout) {
+  private PlantModel(
+      @Nonnull
+      String name,
+      @Nonnull
+      Map<String, String> properties,
+      @Nonnull
+      Set<Point> points,
+      @Nonnull
+      Set<Path> paths,
+      @Nonnull
+      Set<LocationType> locationTypes,
+      @Nonnull
+      Set<Location> locations,
+      @Nonnull
+      Set<Block> blocks,
+      @Nonnull
+      Set<Vehicle> vehicles,
+      @Nonnull
+      VisualLayout visualLayout
+  ) {
     this.name = requireNonNull(name, "name");
     this.properties = Map.copyOf(properties);
     this.points = Set.copyOf(points);
@@ -90,15 +108,17 @@ public class PlantModel
    * @return A copy of this plant model, with its properties replaced by the given ones.
    */
   public PlantModel withProperties(Map<String, String> properties) {
-    return new PlantModel(name,
-                          properties,
-                          points,
-                          paths,
-                          locationTypes,
-                          locations,
-                          blocks,
-                          vehicles,
-                          visualLayout);
+    return new PlantModel(
+        name,
+        properties,
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -117,16 +137,21 @@ public class PlantModel
    * @param points The points.
    * @return A copy of this plant model, with its points replaced by the given ones.
    */
-  public PlantModel withPoints(@Nonnull Set<Point> points) {
-    return new PlantModel(name,
-                          properties,
-                          points,
-                          paths,
-                          locationTypes,
-                          locations,
-                          blocks,
-                          vehicles,
-                          visualLayout);
+  public PlantModel withPoints(
+      @Nonnull
+      Set<Point> points
+  ) {
+    return new PlantModel(
+        name,
+        properties,
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -145,16 +170,21 @@ public class PlantModel
    * @param paths The paths.
    * @return A copy of this plant model, with its paths replaced by the given ones.
    */
-  public PlantModel withPaths(@Nonnull Set<Path> paths) {
-    return new PlantModel(name,
-                          properties,
-                          points,
-                          paths,
-                          locationTypes,
-                          locations,
-                          blocks,
-                          vehicles,
-                          visualLayout);
+  public PlantModel withPaths(
+      @Nonnull
+      Set<Path> paths
+  ) {
+    return new PlantModel(
+        name,
+        properties,
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -173,16 +203,21 @@ public class PlantModel
    * @param locationTypes The location types.
    * @return A copy of this plant model, with its location types replaced by the given ones.
    */
-  public PlantModel withLocationTypes(@Nonnull Set<LocationType> locationTypes) {
-    return new PlantModel(name,
-                          properties,
-                          points,
-                          paths,
-                          locationTypes,
-                          locations,
-                          blocks,
-                          vehicles,
-                          visualLayout);
+  public PlantModel withLocationTypes(
+      @Nonnull
+      Set<LocationType> locationTypes
+  ) {
+    return new PlantModel(
+        name,
+        properties,
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -201,16 +236,21 @@ public class PlantModel
    * @param locations The locations.
    * @return A copy of this plant model, with its locations replaced by the given ones.
    */
-  public PlantModel withLocations(@Nonnull Set<Location> locations) {
-    return new PlantModel(name,
-                          properties,
-                          points,
-                          paths,
-                          locationTypes,
-                          locations,
-                          blocks,
-                          vehicles,
-                          visualLayout);
+  public PlantModel withLocations(
+      @Nonnull
+      Set<Location> locations
+  ) {
+    return new PlantModel(
+        name,
+        properties,
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -229,16 +269,21 @@ public class PlantModel
    * @param blocks The blocks.
    * @return A copy of this plant model, with its blocks replaced by the given ones.
    */
-  public PlantModel withBlocks(@Nonnull Set<Block> blocks) {
-    return new PlantModel(name,
-                          properties,
-                          points,
-                          paths,
-                          locationTypes,
-                          locations,
-                          blocks,
-                          vehicles,
-                          visualLayout);
+  public PlantModel withBlocks(
+      @Nonnull
+      Set<Block> blocks
+  ) {
+    return new PlantModel(
+        name,
+        properties,
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -257,16 +302,21 @@ public class PlantModel
    * @param vehicles The vehicles.
    * @return A copy of this plant model, with its vehicles replaced by the given ones.
    */
-  public PlantModel withVehicles(@Nonnull Set<Vehicle> vehicles) {
-    return new PlantModel(name,
-                          properties,
-                          points,
-                          paths,
-                          locationTypes,
-                          locations,
-                          blocks,
-                          vehicles,
-                          visualLayout);
+  public PlantModel withVehicles(
+      @Nonnull
+      Set<Vehicle> vehicles
+  ) {
+    return new PlantModel(
+        name,
+        properties,
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -285,16 +335,21 @@ public class PlantModel
    * @param visualLayout The visual layout to be set.
    * @return A copy of this plant model, with its visual layout replaced by the given one.
    */
-  public PlantModel withVisualLayout(@Nonnull VisualLayout visualLayout) {
-    return new PlantModel(name,
-                          properties,
-                          points,
-                          paths,
-                          locationTypes,
-                          locations,
-                          blocks,
-                          vehicles,
-                          visualLayout);
+  public PlantModel withVisualLayout(
+      @Nonnull
+      VisualLayout visualLayout
+  ) {
+    return new PlantModel(
+        name,
+        properties,
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   @Override

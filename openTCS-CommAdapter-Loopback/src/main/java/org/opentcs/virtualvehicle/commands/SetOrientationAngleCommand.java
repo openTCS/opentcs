@@ -14,7 +14,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
  * A command to set a vehicle's orientation angle.
  */
 public class SetOrientationAngleCommand
-    implements AdapterCommand {
+    implements
+      AdapterCommand {
 
   /**
    * The orientation angle to set.

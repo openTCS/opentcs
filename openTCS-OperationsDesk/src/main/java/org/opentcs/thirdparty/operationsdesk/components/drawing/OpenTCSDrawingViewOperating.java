@@ -15,6 +15,8 @@
  */
 package org.opentcs.thirdparty.operationsdesk.components.drawing;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.awt.Color;
@@ -27,7 +29,6 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.jhotdraw.draw.DefaultDrawingView;
 import org.jhotdraw.draw.Figure;
@@ -44,7 +45,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.components.drawing.AbstractO
  * A DrawingView implementation for the openTCS plant overview.
  */
 public class OpenTCSDrawingViewOperating
-    extends AbstractOpenTCSDrawingView {
+    extends
+      AbstractOpenTCSDrawingView {
 
   /**
    * Contains the vehicle on the drawing, for which transport order shall be drawn.
@@ -116,7 +118,10 @@ public class OpenTCSDrawingViewOperating
   }
 
   @Override
-  public void followVehicle(@Nonnull final VehicleModel model) {
+  public void followVehicle(
+      @Nonnull
+      final VehicleModel model
+  ) {
     requireNonNull(model, "model");
 
     stopFollowVehicle();
@@ -222,14 +227,16 @@ public class OpenTCSDrawingViewOperating
     float radius = 30;
     float[] dist = {0.0f, 0.7f, 0.8f, 1.0f};
     Color[] colors = {
-      new Color(1.0f, 1.0f, 1.0f, 0.0f), // Focus: 100% transparent
-      new Color(1.0f, 1.0f, 1.0f, 0.0f),
-      new Color(1.0f, 0.0f, 0.0f, 0.7f), // Circle: red
-      new Color(0f, 0f, 0f, 0f) // Background
+        new Color(1.0f, 1.0f, 1.0f, 0.0f), // Focus: 100% transparent
+        new Color(1.0f, 1.0f, 1.0f, 0.0f),
+        new Color(1.0f, 0.0f, 0.0f, 0.7f), // Circle: red
+        new Color(0f, 0f, 0f, 0f) // Background
     };
     RadialGradientPaint paint
-        = new RadialGradientPaint(center, radius, dist, colors,
-                                  MultipleGradientPaint.CycleMethod.NO_CYCLE);
+        = new RadialGradientPaint(
+            center, radius, dist, colors,
+            MultipleGradientPaint.CycleMethod.NO_CYCLE
+        );
 
     Graphics2D gVehicle = (Graphics2D) g2d.create();
     gVehicle.setPaint(paint);
@@ -250,13 +257,15 @@ public class OpenTCSDrawingViewOperating
 
       radius = 20;
       Color[] colorsGreen = {
-        new Color(1.0f, 1.0f, 1.0f, 0.0f), // Focus: 100% transparent
-        new Color(1.0f, 1.0f, 1.0f, 0.0f),
-        new Color(0.0f, 1.0f, 0.0f, 0.7f), // Circle: green
-        new Color(0f, 0f, 0f, 0f) // Background
+          new Color(1.0f, 1.0f, 1.0f, 0.0f), // Focus: 100% transparent
+          new Color(1.0f, 1.0f, 1.0f, 0.0f),
+          new Color(0.0f, 1.0f, 0.0f, 0.7f), // Circle: green
+          new Color(0f, 0f, 0f, 0f) // Background
       };
-      paint = new RadialGradientPaint(center, radius, dist, colorsGreen,
-                                      MultipleGradientPaint.CycleMethod.NO_CYCLE);
+      paint = new RadialGradientPaint(
+          center, radius, dist, colorsGreen,
+          MultipleGradientPaint.CycleMethod.NO_CYCLE
+      );
 
       Graphics2D gNextPosition = (Graphics2D) g2d.create();
       gNextPosition.setPaint(paint);
@@ -278,13 +287,15 @@ public class OpenTCSDrawingViewOperating
 
       radius = 20;
       Color[] colorsBlue = {
-        new Color(1.0f, 1.0f, 1.0f, 0.0f), // Focus: 100% transparent
-        new Color(1.0f, 1.0f, 1.0f, 0.0f),
-        new Color(0.0f, 0.0f, 1.0f, 0.7f), // Circle: blue
-        new Color(0f, 0f, 0f, 0f) // Background
+          new Color(1.0f, 1.0f, 1.0f, 0.0f), // Focus: 100% transparent
+          new Color(1.0f, 1.0f, 1.0f, 0.0f),
+          new Color(0.0f, 0.0f, 1.0f, 0.7f), // Circle: blue
+          new Color(0f, 0f, 0f, 0f) // Background
       };
-      paint = new RadialGradientPaint(center, radius, dist, colorsBlue,
-                                      MultipleGradientPaint.CycleMethod.NO_CYCLE);
+      paint = new RadialGradientPaint(
+          center, radius, dist, colorsBlue,
+          MultipleGradientPaint.CycleMethod.NO_CYCLE
+      );
 
       Graphics2D gCurrentPosition = (Graphics2D) g2d.create();
       gCurrentPosition.setPaint(paint);
@@ -300,7 +311,8 @@ public class OpenTCSDrawingViewOperating
   }
 
   private class ExtendedEventHandler
-      extends AbstractExtendedEventHandler {
+      extends
+        AbstractExtendedEventHandler {
 
     /**
      * Creates a new instance.

@@ -7,9 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.vehicles;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.data.model.Vehicle;
@@ -19,7 +20,8 @@ import org.opentcs.strategies.basic.dispatching.selection.ParkVehicleSelectionFi
  * A collection of {@link ParkVehicleSelectionFilter}s.
  */
 public class CompositeParkVehicleSelectionFilter
-    implements ParkVehicleSelectionFilter {
+    implements
+      ParkVehicleSelectionFilter {
 
   /**
    * The {@link ParkVehicleSelectionFilter}s.

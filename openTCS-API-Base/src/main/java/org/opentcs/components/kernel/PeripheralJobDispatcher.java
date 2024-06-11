@@ -23,7 +23,8 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * </p>
  */
 public interface PeripheralJobDispatcher
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * Notifies the dispatcher that it should start the dispatching process.
@@ -45,7 +46,10 @@ public interface PeripheralJobDispatcher
    * state, or if it is related to a transport order and this transport order is not in a final
    * state.
    */
-  void withdrawJob(@Nonnull Location location)
+  void withdrawJob(
+      @Nonnull
+      Location location
+  )
       throws IllegalArgumentException;
 
   /**
@@ -58,6 +62,9 @@ public interface PeripheralJobDispatcher
    * @throws IllegalArgumentException If the given peripheral job is already in a final state, or if
    * it is related to a transport order and this transport order is not in a final state.
    */
-  void withdrawJob(@Nonnull PeripheralJob job)
+  void withdrawJob(
+      @Nonnull
+      PeripheralJob job
+  )
       throws IllegalArgumentException;
 }

@@ -111,7 +111,20 @@ test:
     paths:
       - .gradle
 
-lint:
+lint-spotless:
+  stage: test
+  interruptible: true
+  dependencies:
+    - build
+  script:
+    - echo "Running Spotless check..."
+    - ./gradlew spotlessCheck
+  cache:
+    key: lint_spotless-$(date +%Y-%m)
+    paths:
+      - .gradle
+
+lint-checkstyle:
   stage: test
   interruptible: true
   image: ${CI_REGISTRY_IMAGE}/codequality:${CODEQUALITY_IMAGE_TAG}

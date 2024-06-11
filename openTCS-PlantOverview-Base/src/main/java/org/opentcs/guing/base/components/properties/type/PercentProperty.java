@@ -14,7 +14,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property for percentages.
  */
 public class PercentProperty
-    extends AbstractQuantity<PercentProperty.Unit> {
+    extends
+      AbstractQuantity<PercentProperty.Unit> {
 
   /**
    * Creates a new instance.

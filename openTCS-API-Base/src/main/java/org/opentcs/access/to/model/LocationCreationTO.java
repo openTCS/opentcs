@@ -7,11 +7,12 @@
  */
 package org.opentcs.access.to.model;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.Couple;
@@ -22,8 +23,10 @@ import org.opentcs.data.model.visualization.LocationRepresentation;
  * A transfer object describing a location in a plant model.
  */
 public class LocationCreationTO
-    extends CreationTO
-    implements Serializable {
+    extends
+      CreationTO
+    implements
+      Serializable {
 
   /**
    * The name of this location's type.
@@ -57,9 +60,14 @@ public class LocationCreationTO
    * @param typeName The name of this location's type.
    * @param position The position of this location.
    */
-  public LocationCreationTO(@Nonnull String name,
-                            @Nonnull String typeName,
-                            @Nonnull Triple position) {
+  public LocationCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      String typeName,
+      @Nonnull
+      Triple position
+  ) {
     super(name);
     this.typeName = requireNonNull(typeName, "typeName");
     this.position = position;
@@ -68,13 +76,21 @@ public class LocationCreationTO
     this.layout = new Layout();
   }
 
-  private LocationCreationTO(@Nonnull String name,
-                             @Nonnull Map<String, String> properties,
-                             @Nonnull String typeName,
-                             @Nonnull Triple position,
-                             @Nonnull Map<String, Set<String>> links,
-                             boolean locked,
-                             @Nonnull Layout layout) {
+  private LocationCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      Map<String, String> properties,
+      @Nonnull
+      String typeName,
+      @Nonnull
+      Triple position,
+      @Nonnull
+      Map<String, Set<String>> links,
+      boolean locked,
+      @Nonnull
+      Layout layout
+  ) {
     super(name, properties);
     this.typeName = requireNonNull(typeName, "typeName");
     this.position = requireNonNull(position, "position");
@@ -90,14 +106,19 @@ public class LocationCreationTO
    * @return A copy of this object, differing in the given name.
    */
   @Override
-  public LocationCreationTO withName(@Nonnull String name) {
-    return new LocationCreationTO(name,
-                                  getModifiableProperties(),
-                                  typeName,
-                                  position,
-                                  links,
-                                  locked,
-                                  layout);
+  public LocationCreationTO withName(
+      @Nonnull
+      String name
+  ) {
+    return new LocationCreationTO(
+        name,
+        getModifiableProperties(),
+        typeName,
+        position,
+        links,
+        locked,
+        layout
+    );
   }
 
   /**
@@ -116,14 +137,19 @@ public class LocationCreationTO
    * @param typeName The location type.
    * @return A copy of this object, differing in the given type.
    */
-  public LocationCreationTO withTypeName(@Nonnull String typeName) {
-    return new LocationCreationTO(getName(),
-                                  getModifiableProperties(),
-                                  typeName,
-                                  position,
-                                  links,
-                                  locked,
-                                  layout);
+  public LocationCreationTO withTypeName(
+      @Nonnull
+      String typeName
+  ) {
+    return new LocationCreationTO(
+        getName(),
+        getModifiableProperties(),
+        typeName,
+        position,
+        links,
+        locked,
+        layout
+    );
   }
 
   /**
@@ -142,14 +168,19 @@ public class LocationCreationTO
    * @param position the new position of this location (in mm).
    * @return A copy of this object, differing in the given position.
    */
-  public LocationCreationTO withPosition(@Nonnull Triple position) {
-    return new LocationCreationTO(getName(),
-                                  getModifiableProperties(),
-                                  typeName,
-                                  position,
-                                  links,
-                                  locked,
-                                  layout);
+  public LocationCreationTO withPosition(
+      @Nonnull
+      Triple position
+  ) {
+    return new LocationCreationTO(
+        getName(),
+        getModifiableProperties(),
+        typeName,
+        position,
+        links,
+        locked,
+        layout
+    );
   }
 
   /**
@@ -169,14 +200,19 @@ public class LocationCreationTO
    * @param links the new links. This is supposed to be a map of point names to allowed operations.
    * @return A copy of this object, differing in the given links.
    */
-  public LocationCreationTO withLinks(@Nonnull Map<String, Set<String>> links) {
-    return new LocationCreationTO(getName(),
-                                  getModifiableProperties(),
-                                  typeName,
-                                  position,
-                                  links,
-                                  locked,
-                                  layout);
+  public LocationCreationTO withLinks(
+      @Nonnull
+      Map<String, Set<String>> links
+  ) {
+    return new LocationCreationTO(
+        getName(),
+        getModifiableProperties(),
+        typeName,
+        position,
+        links,
+        locked,
+        layout
+    );
   }
 
   /**
@@ -186,15 +222,21 @@ public class LocationCreationTO
    * @param allowedOperations The operations allowed at the point.
    * @return A copy of this object, differing in the given link.
    */
-  public LocationCreationTO withLink(@Nonnull String pointName,
-                                     @Nonnull Set<String> allowedOperations) {
-    return new LocationCreationTO(getName(),
-                                  getModifiableProperties(),
-                                  typeName,
-                                  position,
-                                  mapWithMapping(links, pointName, allowedOperations),
-                                  locked,
-                                  layout);
+  public LocationCreationTO withLink(
+      @Nonnull
+      String pointName,
+      @Nonnull
+      Set<String> allowedOperations
+  ) {
+    return new LocationCreationTO(
+        getName(),
+        getModifiableProperties(),
+        typeName,
+        position,
+        mapWithMapping(links, pointName, allowedOperations),
+        locked,
+        layout
+    );
   }
 
   /**
@@ -214,13 +256,15 @@ public class LocationCreationTO
    * @return A copy of this object, differing in the locked attribute.
    */
   public LocationCreationTO withLocked(boolean locked) {
-    return new LocationCreationTO(getName(),
-                                  getModifiableProperties(),
-                                  typeName,
-                                  position,
-                                  links,
-                                  locked,
-                                  layout);
+    return new LocationCreationTO(
+        getName(),
+        getModifiableProperties(),
+        typeName,
+        position,
+        links,
+        locked,
+        layout
+    );
   }
 
   /**
@@ -230,14 +274,19 @@ public class LocationCreationTO
    * @return A copy of this object, differing in the given properties.
    */
   @Override
-  public LocationCreationTO withProperties(@Nonnull Map<String, String> properties) {
-    return new LocationCreationTO(getName(),
-                                  properties,
-                                  typeName,
-                                  position,
-                                  links,
-                                  locked,
-                                  layout);
+  public LocationCreationTO withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
+    return new LocationCreationTO(
+        getName(),
+        properties,
+        typeName,
+        position,
+        links,
+        locked,
+        layout
+    );
   }
 
   /**
@@ -251,14 +300,21 @@ public class LocationCreationTO
    * excludes the entry otherwise.
    */
   @Override
-  public LocationCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new LocationCreationTO(getName(),
-                                  propertiesWith(key, value),
-                                  typeName,
-                                  position,
-                                  links,
-                                  locked,
-                                  layout);
+  public LocationCreationTO withProperty(
+      @Nonnull
+      String key,
+      @Nonnull
+      String value
+  ) {
+    return new LocationCreationTO(
+        getName(),
+        propertiesWith(key, value),
+        typeName,
+        position,
+        links,
+        locked,
+        layout
+    );
   }
 
   /**
@@ -277,13 +333,15 @@ public class LocationCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public LocationCreationTO withLayout(Layout layout) {
-    return new LocationCreationTO(getName(),
-                                  getModifiableProperties(),
-                                  typeName,
-                                  position,
-                                  links,
-                                  locked,
-                                  layout);
+    return new LocationCreationTO(
+        getName(),
+        getModifiableProperties(),
+        typeName,
+        position,
+        links,
+        locked,
+        layout
+    );
   }
 
   @Override
@@ -303,7 +361,8 @@ public class LocationCreationTO
    * Contains information regarding the grahical representation of a location.
    */
   public static class Layout
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The coordinates at which the location is to be drawn (in mm).
@@ -337,14 +396,18 @@ public class LocationCreationTO
      * @param locationRepresentation The location representation to use.
      * @param layerId The ID of the layer on which the location is to be drawn.
      */
-    public Layout(Couple position,
-                  Couple labelOffset,
-                  LocationRepresentation locationRepresentation,
-                  int layerId) {
+    public Layout(
+        Couple position,
+        Couple labelOffset,
+        LocationRepresentation locationRepresentation,
+        int layerId
+    ) {
       this.position = requireNonNull(position, "position");
       this.labelOffset = requireNonNull(labelOffset, "labelOffset");
-      this.locationRepresentation = requireNonNull(locationRepresentation,
-                                                   "locationRepresentation");
+      this.locationRepresentation = requireNonNull(
+          locationRepresentation,
+          "locationRepresentation"
+      );
       this.layerId = layerId;
     }
 
@@ -364,10 +427,12 @@ public class LocationCreationTO
      * @return A copy of this object, differing in the given value.
      */
     public Layout withPosition(Couple position) {
-      return new Layout(position,
-                        labelOffset,
-                        locationRepresentation,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          locationRepresentation,
+          layerId
+      );
     }
 
     /**
@@ -386,10 +451,12 @@ public class LocationCreationTO
      * @return A copy of this object, differing in the given value.
      */
     public Layout withLabelOffset(Couple labelOffset) {
-      return new Layout(position,
-                        labelOffset,
-                        locationRepresentation,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          locationRepresentation,
+          layerId
+      );
     }
 
     /**
@@ -408,10 +475,12 @@ public class LocationCreationTO
      * @return A copy of this object, differing in the given value.
      */
     public Layout withLocationRepresentation(LocationRepresentation locationRepresentation) {
-      return new Layout(position,
-                        labelOffset,
-                        locationRepresentation,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          locationRepresentation,
+          layerId
+      );
     }
 
     /**
@@ -430,10 +499,12 @@ public class LocationCreationTO
      * @return A copy of this object, differing in the given value.
      */
     public Layout withLayerId(int layerId) {
-      return new Layout(position,
-                        labelOffset,
-                        locationRepresentation,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          locationRepresentation,
+          layerId
+      );
     }
 
     @Override

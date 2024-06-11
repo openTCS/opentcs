@@ -23,11 +23,14 @@ import org.jhotdraw.gui.plaf.palette.PaletteToolBarUI;
  * A toolbar border.
  */
 public class PaletteToolBarBorder
-    extends org.jhotdraw.gui.plaf.palette.PaletteToolBarBorder {
+    extends
+      org.jhotdraw.gui.plaf.palette.PaletteToolBarBorder {
 
   private static final float[] ENABLED_STOPS = new float[]{0f, 0.5f, 1f};
   private static final Color[] ENABLED_STOP_COLORS = new Color[]{
-    new Color(0xf8f8f8), new Color(0xc8c8c8), new Color(0xf8f8f8)
+      new Color(0xf8f8f8), new Color(
+          0xc8c8c8
+      ), new Color(0xf8f8f8)
   };
 
   /**
@@ -41,10 +44,14 @@ public class PaletteToolBarBorder
     Graphics2D g = (Graphics2D) gr;
 
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
-                       RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-    g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                       RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+    g.setRenderingHint(
+        RenderingHints.KEY_FRACTIONALMETRICS,
+        RenderingHints.VALUE_FRACTIONALMETRICS_ON
+    );
+    g.setRenderingHint(
+        RenderingHints.KEY_TEXT_ANTIALIASING,
+        RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+    );
 
     if (component instanceof JToolBar) {
       JToolBar c = (JToolBar) component;
@@ -58,7 +65,8 @@ public class PaletteToolBarBorder
         LinearGradientPaint lgp = new LinearGradientPaint(
             new Point2D.Float(1, 1), new Point2D.Float(19, 1),
             stops, stopColors,
-            MultipleGradientPaint.CycleMethod.REPEAT);
+            MultipleGradientPaint.CycleMethod.REPEAT
+        );
         g.setPaint(lgp);
         g.fillRect(1, 1, 7 - 2, h - 2);
         ImageIcon icon = new ImageIcon(

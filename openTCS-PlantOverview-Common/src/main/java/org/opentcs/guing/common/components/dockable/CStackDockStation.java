@@ -18,9 +18,11 @@ import bibliothek.gui.dock.common.intern.station.CommonDockStationFactory;
 /**
  */
 public class CStackDockStation
-    extends StackDockStation
+    extends
+      StackDockStation
     implements
-    CommonDockStation<StackDockStation, CStackDockStation>, CommonDockable {
+      CommonDockStation<StackDockStation, CStackDockStation>,
+      CommonDockable {
 
   private final CStack delegate;
 

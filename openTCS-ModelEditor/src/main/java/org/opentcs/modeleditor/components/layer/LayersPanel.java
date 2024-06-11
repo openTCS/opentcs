@@ -7,6 +7,8 @@
  */
 package org.opentcs.modeleditor.components.layer;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -14,7 +16,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javax.swing.AbstractCellEditor;
@@ -52,7 +53,8 @@ import org.opentcs.util.gui.StringListCellRenderer;
  * A panel to display and edit layers.
  */
 public class LayersPanel
-    extends JPanel {
+    extends
+      JPanel {
 
   /**
    * The path containing the icons.
@@ -94,11 +96,13 @@ public class LayersPanel
 
   @Inject
   @SuppressWarnings("this-escape")
-  public LayersPanel(ModelManager modelManager,
-                     LayerManager layerManager,
-                     LayerGroupManager layerGroupManager,
-                     LayerEditorModeling layerEditor,
-                     ActiveLayerProvider activeLayerProvider) {
+  public LayersPanel(
+      ModelManager modelManager,
+      LayerManager layerManager,
+      LayerGroupManager layerGroupManager,
+      LayerEditorModeling layerEditor,
+      ActiveLayerProvider activeLayerProvider
+  ) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.layerManager = requireNonNull(layerManager, "layerManager");
     this.layerGroupManager = requireNonNull(layerGroupManager, "layerGroupManager");
@@ -126,9 +130,11 @@ public class LayersPanel
 
     TableRowSorter<LayersTableModel> sorter = new TableRowSorter<>(tableModel);
     // Sort the table by the layer ordinals...
-    sorter.setSortKeys(Arrays.asList(
-        new RowSorter.SortKey(LayersTableModel.COLUMN_ORDINAL, SortOrder.DESCENDING)
-    ));
+    sorter.setSortKeys(
+        Arrays.asList(
+            new RowSorter.SortKey(LayersTableModel.COLUMN_ORDINAL, SortOrder.DESCENDING)
+        )
+    );
     // ...but prevent manual sorting.
     for (int i = 0; i < table.getColumnCount(); i++) {
       sorter.setSortable(i, false);
@@ -137,8 +143,10 @@ public class LayersPanel
     table.setRowSorter(sorter);
 
     // Hide the column that shows the layer ordinals.
-    table.removeColumn(table.getColumnModel()
-        .getColumn(table.convertColumnIndexToView(LayersTableModel.COLUMN_ORDINAL)));
+    table.removeColumn(
+        table.getColumnModel()
+            .getColumn(table.convertColumnIndexToView(LayersTableModel.COLUMN_ORDINAL))
+    );
 
     table.getColumnModel()
         .getColumn(table.convertColumnIndexToView(LayersTableModel.COLUMN_GROUP_VISIBLE))
@@ -252,7 +260,8 @@ public class LayersPanel
   }
 
   private class RemoveLayerListener
-      implements ActionListener {
+      implements
+        ActionListener {
 
     /**
      * Creates a new instance.
@@ -283,7 +292,8 @@ public class LayersPanel
   }
 
   private class RadioButtonCellRenderer
-      implements TableCellRenderer {
+      implements
+        TableCellRenderer {
 
     private final Border unfocusedCellBorder = BorderFactory.createEmptyBorder();
     private final Border focusedCellBorder = UIManager.getBorder("Table.focusCellHighlightBorder");
@@ -296,8 +306,10 @@ public class LayersPanel
     }
 
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                   boolean hasFocus, int row, int col) {
+    public Component getTableCellRendererComponent(
+        JTable table, Object value, boolean isSelected,
+        boolean hasFocus, int row, int col
+    ) {
       radioButton.setBackground(
           isSelected ? table.getSelectionBackground() : table.getBackground()
       );
@@ -312,8 +324,10 @@ public class LayersPanel
   }
 
   private class RadioButtonCellEditor
-      extends AbstractCellEditor
-      implements TableCellEditor {
+      extends
+        AbstractCellEditor
+      implements
+        TableCellEditor {
 
     private final JRadioButton radioButton;
 
@@ -324,8 +338,10 @@ public class LayersPanel
     }
 
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value,
-                                                 boolean isSelected, int row, int col) {
+    public Component getTableCellEditorComponent(
+        JTable table, Object value,
+        boolean isSelected, int row, int col
+    ) {
       radioButton.setSelected(Boolean.TRUE.equals(value));
       return radioButton;
     }
@@ -337,7 +353,8 @@ public class LayersPanel
   }
 
   private class GroupCellEditor
-      extends DefaultCellEditor {
+      extends
+        DefaultCellEditor {
 
     private final DefaultComboBoxModel<LayerGroup> model;
 
@@ -350,8 +367,10 @@ public class LayersPanel
     }
 
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value,
-                                                 boolean isSelected, int row, int column) {
+    public Component getTableCellEditorComponent(
+        JTable table, Object value,
+        boolean isSelected, int row, int column
+    ) {
       model.removeAllElements();
       List<LayerGroup> groups = modelManager.getModel().getLayoutModel().getPropertyLayerGroups()
           .getValue().values().stream()

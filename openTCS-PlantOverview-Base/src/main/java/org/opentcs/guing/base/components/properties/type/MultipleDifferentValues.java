@@ -7,13 +7,15 @@
  */
 package org.opentcs.guing.base.components.properties.type;
 
-import java.util.ResourceBundle;
 import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
+
+import java.util.ResourceBundle;
 
 /**
  */
 public class MultipleDifferentValues
-    implements AcceptableInvalidValue {
+    implements
+      AcceptableInvalidValue {
 
   /**
    * Creates a new instance.

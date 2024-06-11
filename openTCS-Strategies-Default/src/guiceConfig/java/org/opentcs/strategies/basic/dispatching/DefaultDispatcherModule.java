@@ -66,7 +66,8 @@ import org.opentcs.strategies.basic.dispatching.selection.vehicles.IsReparkable;
  * Guice configuration for the default dispatcher.
  */
 public class DefaultDispatcherModule
-    extends KernelInjectionModule {
+    extends
+      KernelInjectionModule {
 
   /**
    * Creates a new instance.
@@ -107,8 +108,12 @@ public class DefaultDispatcherModule
         .in(Singleton.class);
 
     bind(DefaultDispatcherConfiguration.class)
-        .toInstance(getConfigBindingProvider().get(DefaultDispatcherConfiguration.PREFIX,
-                                                   DefaultDispatcherConfiguration.class));
+        .toInstance(
+            getConfigBindingProvider().get(
+                DefaultDispatcherConfiguration.PREFIX,
+                DefaultDispatcherConfiguration.class
+            )
+        );
 
     bind(OrderReservationPool.class)
         .in(Singleton.class);
@@ -121,11 +126,13 @@ public class DefaultDispatcherModule
         .in(Singleton.class);
 
     MapBinder<String, Comparator<Vehicle>> vehicleComparatorBinder
-        = MapBinder.newMapBinder(binder(),
-                                 new TypeLiteral<String>() {
-                             },
-                                 new TypeLiteral<Comparator<Vehicle>>() {
-                             });
+        = MapBinder.newMapBinder(
+            binder(),
+            new TypeLiteral<String>() {
+            },
+            new TypeLiteral<Comparator<Vehicle>>() {
+            }
+        );
     vehicleComparatorBinder
         .addBinding(VehicleComparatorByEnergyLevel.CONFIGURATION_KEY)
         .to(VehicleComparatorByEnergyLevel.class);
@@ -137,11 +144,13 @@ public class DefaultDispatcherModule
         .to(VehicleComparatorIdleFirst.class);
 
     MapBinder<String, Comparator<TransportOrder>> orderComparatorBinder
-        = MapBinder.newMapBinder(binder(),
-                                 new TypeLiteral<String>() {
-                             },
-                                 new TypeLiteral<Comparator<TransportOrder>>() {
-                             });
+        = MapBinder.newMapBinder(
+            binder(),
+            new TypeLiteral<String>() {
+            },
+            new TypeLiteral<Comparator<TransportOrder>>() {
+            }
+        );
     orderComparatorBinder
         .addBinding(TransportOrderComparatorByAge.CONFIGURATION_KEY)
         .to(TransportOrderComparatorByAge.class);
@@ -156,11 +165,13 @@ public class DefaultDispatcherModule
         .to(TransportOrderComparatorByName.class);
 
     MapBinder<String, Comparator<AssignmentCandidate>> candidateComparatorBinder
-        = MapBinder.newMapBinder(binder(),
-                                 new TypeLiteral<String>() {
-                             },
-                                 new TypeLiteral<Comparator<AssignmentCandidate>>() {
-                             });
+        = MapBinder.newMapBinder(
+            binder(),
+            new TypeLiteral<String>() {
+            },
+            new TypeLiteral<Comparator<AssignmentCandidate>>() {
+            }
+        );
     candidateComparatorBinder
         .addBinding(CandidateComparatorByCompleteRoutingCosts.CONFIGURATION_KEY)
         .to(CandidateComparatorByCompleteRoutingCosts.class);
@@ -210,9 +221,11 @@ public class DefaultDispatcherModule
     bind(RegularDriveOrderMerger.class).in(Singleton.class);
 
     MapBinder<ReroutingType, ReroutingStrategy> reroutingStrategies
-        = MapBinder.newMapBinder(binder(),
-                                 ReroutingType.class,
-                                 ReroutingStrategy.class);
+        = MapBinder.newMapBinder(
+            binder(),
+            ReroutingType.class,
+            ReroutingStrategy.class
+        );
     reroutingStrategies
         .addBinding(ReroutingType.REGULAR)
         .to(RegularReroutingStrategy.class);

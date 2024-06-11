@@ -16,7 +16,8 @@ import org.opentcs.guing.common.components.tree.elements.VehicleUserObject;
  * A Guice module for this package.
  */
 public class TreeElementsInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.
@@ -26,8 +27,10 @@ public class TreeElementsInjectionModule
 
   @Override
   protected void configure() {
-    install(new FactoryModuleBuilder()
-        .implement(VehicleUserObject.class, VehicleUserObjectOperating.class)
-        .build(UserObjectFactory.class));
+    install(
+        new FactoryModuleBuilder()
+            .implement(VehicleUserObject.class, VehicleUserObjectOperating.class)
+            .build(UserObjectFactory.class)
+    );
   }
 }

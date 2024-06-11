@@ -21,7 +21,8 @@ import org.opentcs.guing.common.components.drawing.figures.TCSLabelFigure;
 /**
  */
 public class VehicleLabelFigure
-    extends TCSLabelFigure {
+    extends
+      TCSLabelFigure {
 
   private static final Color COLOR_BACKGROUND = new Color(0xFFFFF0);  // beige
   private static final int MARGIN = 4;
@@ -40,7 +41,8 @@ public class VehicleLabelFigure
           bounds.getY() + origin.y + layout.getAscent() - MARGIN,
           bounds.getWidth() + 2 * MARGIN,
           bounds.getHeight() + 2 + MARGIN,
-          MARGIN, MARGIN);
+          MARGIN, MARGIN
+      );
       g.setPaint(COLOR_BACKGROUND);
       g.fill(rr);
     }

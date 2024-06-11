@@ -18,7 +18,8 @@ import org.opentcs.guing.common.persistence.ModelManager;
  * A folder in the TreeView with no added functionality.
  */
 public class SimpleFolderUserObject
-    extends AbstractUserObject {
+    extends
+      AbstractUserObject {
 
   /**
    * Creates a new instance.
@@ -28,9 +29,12 @@ public class SimpleFolderUserObject
    * @param modelManager Provides access to the currently loaded system model.
    */
   @Inject
-  public SimpleFolderUserObject(@Assisted CompositeModelComponent dataObject,
-                                GuiManager guiManager,
-                                ModelManager modelManager) {
+  public SimpleFolderUserObject(
+      @Assisted
+      CompositeModelComponent dataObject,
+      GuiManager guiManager,
+      ModelManager modelManager
+  ) {
     super(dataObject, guiManager, modelManager);
   }
 

@@ -7,6 +7,8 @@
  */
 package org.opentcs.operationsdesk.peripherals.jobs;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -15,7 +17,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -34,7 +35,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A view on a peripheral job.
  */
 public class PeripheralJobView
-    extends DialogContent {
+    extends
+      DialogContent {
 
   /**
    * A formatter for timestamps.
@@ -57,14 +59,21 @@ public class PeripheralJobView
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public PeripheralJobView(@Nonnull @Assisted PeripheralJob job,
-                           @Nonnull CompositeObjectHistoryEntryFormatter historyEntryFormatter) {
+  public PeripheralJobView(
+      @Nonnull
+      @Assisted
+      PeripheralJob job,
+      @Nonnull
+      CompositeObjectHistoryEntryFormatter historyEntryFormatter
+  ) {
     this.peripheralJob = requireNonNull(job, "job");
     this.historyEntryFormatter = requireNonNull(historyEntryFormatter, "historyEntryFormatter");
 
     initComponents();
-    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.PJDETAIL_PATH)
-        .getString("peripheralJobView.title"));
+    setDialogTitle(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.PJDETAIL_PATH)
+            .getString("peripheralJobView.title")
+    );
   }
 
   @Override
@@ -79,9 +88,10 @@ public class PeripheralJobView
 
     createdTextField.setText(TIMESTAMP_FORMAT.format(Date.from(peripheralJob.getCreationTime())));
 
-    finishedTextField.setText(!peripheralJob.getFinishedTime().equals(Instant.MAX)
-        ? TIMESTAMP_FORMAT.format(Date.from(peripheralJob.getFinishedTime()))
-        : "-"
+    finishedTextField.setText(
+        !peripheralJob.getFinishedTime().equals(Instant.MAX)
+            ? TIMESTAMP_FORMAT.format(Date.from(peripheralJob.getFinishedTime()))
+            : "-"
     );
 
     if (peripheralJob.getRelatedVehicle() != null) {
@@ -120,14 +130,14 @@ public class PeripheralJobView
 
     tableModel.setColumnIdentifiers(
         new String[]{
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.PJDETAIL_PATH)
-              .getString(
-                  "peripheralJobView.table_properties.column_propertiesKey.headerText"
-              ),
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.PJDETAIL_PATH)
-              .getString(
-                  "peripheralJobView.table_properties.column_propertiesValue.headerText"
-              )
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.PJDETAIL_PATH)
+                .getString(
+                    "peripheralJobView.table_properties.column_propertiesKey.headerText"
+                ),
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.PJDETAIL_PATH)
+                .getString(
+                    "peripheralJobView.table_properties.column_propertiesValue.headerText"
+                )
         }
     );
     peripheralJob.getProperties().entrySet().stream()
@@ -144,23 +154,26 @@ public class PeripheralJobView
 
     tableModel.setColumnIdentifiers(
         new String[]{
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.PJDETAIL_PATH)
-              .getString("peripheralJobView.table_history.column_timestamp.headerText"),
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.PJDETAIL_PATH)
-              .getString("peripheralJobView.table_history.column_event.headerText")
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.PJDETAIL_PATH)
+                .getString("peripheralJobView.table_history.column_timestamp.headerText"),
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.PJDETAIL_PATH)
+                .getString("peripheralJobView.table_history.column_event.headerText")
         }
     );
 
     for (ObjectHistory.Entry entry : peripheralJob.getHistory().getEntries()) {
-      tableModel.addRow(new String[]{
-        TIMESTAMP_FORMAT.format(Date.from(entry.getTimestamp())),
-        historyEntryFormatter.apply(entry).get()
-      });
+      tableModel.addRow(
+          new String[]{
+              TIMESTAMP_FORMAT.format(Date.from(entry.getTimestamp())),
+              historyEntryFormatter.apply(entry).get()
+          }
+      );
     }
 
     return tableModel;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -501,12 +514,14 @@ public class PeripheralJobView
   private javax.swing.JTextField vehicleTextField;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   /**
    * A cell renderer that adds a tool tip with the cell's value.
    */
   private static class ToolTipCellRenderer
-      extends DefaultTableCellRenderer {
+      extends
+        DefaultTableCellRenderer {
 
     /**
      * Creates a new instance.
@@ -515,18 +530,22 @@ public class PeripheralJobView
     }
 
     @Override
-    public Component getTableCellRendererComponent(JTable table,
-                                                   Object value,
-                                                   boolean isSelected,
-                                                   boolean hasFocus,
-                                                   int row,
-                                                   int column) {
-      Component component = super.getTableCellRendererComponent(table,
-                                                                value,
-                                                                isSelected,
-                                                                hasFocus,
-                                                                row,
-                                                                column);
+    public Component getTableCellRendererComponent(
+        JTable table,
+        Object value,
+        boolean isSelected,
+        boolean hasFocus,
+        int row,
+        int column
+    ) {
+      Component component = super.getTableCellRendererComponent(
+          table,
+          value,
+          isSelected,
+          hasFocus,
+          row,
+          column
+      );
 
       ((JComponent) component).setToolTipText(value.toString());
 

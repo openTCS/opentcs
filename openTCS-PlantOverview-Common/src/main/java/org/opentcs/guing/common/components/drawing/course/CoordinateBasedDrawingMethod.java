@@ -12,7 +12,8 @@ package org.opentcs.guing.common.components.drawing.course;
  * to each other.
  */
 public class CoordinateBasedDrawingMethod
-    implements DrawingMethod {
+    implements
+      DrawingMethod {
 
   /**
    * The origin point.

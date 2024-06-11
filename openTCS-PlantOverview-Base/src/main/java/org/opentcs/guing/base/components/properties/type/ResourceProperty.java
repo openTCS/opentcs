@@ -18,7 +18,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property that holds a list of sets of {@link TCSResourceReference}s.
  */
 public class ResourceProperty
-    extends AbstractComplexProperty {
+    extends
+      AbstractComplexProperty {
 
   /**
    * A list of of sets {@link TCSResourceReference}s.

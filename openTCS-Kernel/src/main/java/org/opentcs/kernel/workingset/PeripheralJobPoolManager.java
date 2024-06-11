@@ -7,9 +7,11 @@
  */
 package org.opentcs.kernel.workingset;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.components.kernel.ObjectNameProvider;
@@ -24,7 +26,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralOperation;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,8 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class PeripheralJobPoolManager
-    extends TCSObjectManager {
+    extends
+      TCSObjectManager {
 
   /**
    * This class's logger.
@@ -56,9 +58,15 @@ public class PeripheralJobPoolManager
    * @param orderNameProvider Provides names for peripheral jobs.
    */
   @Inject
-  public PeripheralJobPoolManager(@Nonnull TCSObjectRepository objectRepo,
-                                  @Nonnull @ApplicationEventBus EventHandler eventHandler,
-                                  @Nonnull ObjectNameProvider orderNameProvider) {
+  public PeripheralJobPoolManager(
+      @Nonnull
+      TCSObjectRepository objectRepo,
+      @Nonnull
+      @ApplicationEventBus
+      EventHandler eventHandler,
+      @Nonnull
+      ObjectNameProvider orderNameProvider
+  ) {
     super(objectRepo, eventHandler);
     this.objectNameProvider = requireNonNull(orderNameProvider, "orderNameProvider");
   }
@@ -69,9 +77,11 @@ public class PeripheralJobPoolManager
   public void clear() {
     for (PeripheralJob job : getObjectRepo().getObjects(PeripheralJob.class)) {
       getObjectRepo().removeObject(job.getReference());
-      emitObjectEvent(null,
-                      job,
-                      TCSObjectEvent.Type.OBJECT_REMOVED);
+      emitObjectEvent(
+          null,
+          job,
+          TCSObjectEvent.Type.OBJECT_REMOVED
+      );
     }
   }
 
@@ -85,22 +95,28 @@ public class PeripheralJobPoolManager
    * @throws IllegalArgumentException If the transfer object's combination of parameters is invalid.
    */
   public PeripheralJob createPeripheralJob(PeripheralJobCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException, IllegalArgumentException {
+      throws ObjectUnknownException,
+        ObjectExistsException,
+        IllegalArgumentException {
     checkArgument(
         !hasCompletionRequiredAndExecutionTriggerImmediate(to),
         "Peripheral job's operation has executionTrigger 'immediate' and completionRequired set."
     );
 
-    PeripheralJob job = new PeripheralJob(nameFor(to),
-                                          to.getReservationToken(),
-                                          toPeripheralOperation(to.getPeripheralOperation()))
+    PeripheralJob job = new PeripheralJob(
+        nameFor(to),
+        to.getReservationToken(),
+        toPeripheralOperation(to.getPeripheralOperation())
+    )
         .withRelatedVehicle(toVehicleReference(to.getRelatedVehicleName()))
         .withRelatedTransportOrder(toTransportOrderReference(to.getRelatedTransportOrderName()))
         .withProperties(to.getProperties());
 
-    LOG.info("Peripheral job is being created: {} -- {}",
-             job.getName(),
-             job.getPeripheralOperation());
+    LOG.info(
+        "Peripheral job is being created: {} -- {}",
+        job.getName(),
+        job.getPeripheralOperation()
+    );
 
     getObjectRepo().addObject(job);
     emitObjectEvent(job, null, TCSObjectEvent.Type.OBJECT_CREATED);
@@ -116,27 +132,35 @@ public class PeripheralJobPoolManager
    * @return The modified peripheral job.
    * @throws ObjectUnknownException If the referenced peripheral job is not in this pool.
    */
-  public PeripheralJob setPeripheralJobState(TCSObjectReference<PeripheralJob> ref,
-                                             PeripheralJob.State newState)
+  public PeripheralJob setPeripheralJobState(
+      TCSObjectReference<PeripheralJob> ref,
+      PeripheralJob.State newState
+  )
       throws ObjectUnknownException {
     PeripheralJob previousState = getObjectRepo().getObject(PeripheralJob.class, ref);
 
-    checkArgument(!previousState.getState().isFinalState(),
-                  "Peripheral job %s already in a final state, not changing %s -> %s.",
-                  ref.getName(),
-                  previousState.getState(),
-                  newState);
+    checkArgument(
+        !previousState.getState().isFinalState(),
+        "Peripheral job %s already in a final state, not changing %s -> %s.",
+        ref.getName(),
+        previousState.getState(),
+        newState
+    );
 
-    LOG.info("Peripheral job's state changes: {} -- {} -> {}",
-             previousState.getName(),
-             previousState.getState(),
-             newState);
+    LOG.info(
+        "Peripheral job's state changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getState(),
+        newState
+    );
 
     PeripheralJob job = previousState.withState(newState);
     getObjectRepo().replaceObject(job);
-    emitObjectEvent(job,
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(
+        job,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
     return job;
   }
 
@@ -151,22 +175,28 @@ public class PeripheralJobPoolManager
       throws ObjectUnknownException {
     PeripheralJob job = getObjectRepo().getObject(PeripheralJob.class, ref);
     // Make sure only jobs in a final state are removed.
-    checkArgument(job.getState().isFinalState(),
-                  "Peripheral job %s is not in a final state.",
-                  job.getName());
+    checkArgument(
+        job.getState().isFinalState(),
+        "Peripheral job %s is not in a final state.",
+        job.getName()
+    );
     getObjectRepo().removeObject(ref);
-    emitObjectEvent(null,
-                    job,
-                    TCSObjectEvent.Type.OBJECT_REMOVED);
+    emitObjectEvent(
+        null,
+        job,
+        TCSObjectEvent.Type.OBJECT_REMOVED
+    );
     return job;
   }
 
   private PeripheralOperation toPeripheralOperation(PeripheralOperationCreationTO to)
       throws ObjectUnknownException {
-    return new PeripheralOperation(toLocationReference(to.getLocationName()),
-                                   to.getOperation(),
-                                   to.getExecutionTrigger(),
-                                   to.isCompletionRequired());
+    return new PeripheralOperation(
+        toLocationReference(to.getLocationName()),
+        to.getOperation(),
+        to.getExecutionTrigger(),
+        to.isCompletionRequired()
+    );
   }
 
   private TCSResourceReference<Location> toLocationReference(String locationName)
@@ -194,7 +224,10 @@ public class PeripheralJobPoolManager
   }
 
   @Nonnull
-  private String nameFor(@Nonnull PeripheralJobCreationTO to) {
+  private String nameFor(
+      @Nonnull
+      PeripheralJobCreationTO to
+  ) {
     if (to.hasIncompleteName()) {
       return objectNameProvider.apply(to);
     }

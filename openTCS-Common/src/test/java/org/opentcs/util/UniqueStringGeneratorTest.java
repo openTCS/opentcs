@@ -10,6 +10,7 @@ package org.opentcs.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,8 +34,10 @@ class UniqueStringGeneratorTest {
 
   @Test
   void testRepeatedGenerationWithoutModification() {
-    String generatedString = generator.getUniqueString(PREFIX,
-                                                       PATTERN_TWO_DIGITS);
+    String generatedString = generator.getUniqueString(
+        PREFIX,
+        PATTERN_TWO_DIGITS
+    );
     assertEquals(PREFIX + "01", generatedString);
     generatedString = generator.getUniqueString(PREFIX, PATTERN_TWO_DIGITS);
     assertEquals(PREFIX + "01", generatedString);
@@ -50,16 +53,22 @@ class UniqueStringGeneratorTest {
     generator.registerNamePattern(selector, namePatternPrefix, "0000");
     generator.registerNamePattern(selector2, namePatterPrefix2, "0000");
 
-    assertEquals(namePatternPrefix + "0001",
-                 generator.getUniqueString(selector));
-    assertEquals(namePatterPrefix2 + "0001",
-                 generator.getUniqueString(selector2));
+    assertEquals(
+        namePatternPrefix + "0001",
+        generator.getUniqueString(selector)
+    );
+    assertEquals(
+        namePatterPrefix2 + "0001",
+        generator.getUniqueString(selector2)
+    );
   }
 
   @Test
   void testRepeatedGenerationWithAddition() {
-    String generatedString = generator.getUniqueString(PREFIX,
-                                                       PATTERN_TWO_DIGITS);
+    String generatedString = generator.getUniqueString(
+        PREFIX,
+        PATTERN_TWO_DIGITS
+    );
     assertEquals(PREFIX + "01", generatedString);
     generator.addString(generatedString);
     generatedString = generator.getUniqueString(PREFIX, PATTERN_TWO_DIGITS);
@@ -68,8 +77,10 @@ class UniqueStringGeneratorTest {
 
   @Test
   void testNullPrefix() {
-    String generatedString = generator.getUniqueString(null,
-                                                       PATTERN_ONE_DIGIT);
+    String generatedString = generator.getUniqueString(
+        null,
+        PATTERN_ONE_DIGIT
+    );
     assertEquals("1", generatedString);
   }
 

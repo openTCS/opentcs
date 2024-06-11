@@ -8,6 +8,8 @@
 package org.opentcs.operationsdesk.exchange;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -15,7 +17,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
@@ -68,11 +69,13 @@ public class TransportOrderUtil {
    * kernel determine one.
    * @param category The category.
    */
-  public void createTransportOrder(List<AbstractConnectableModelComponent> destModels,
-                                   List<String> actions,
-                                   long deadline,
-                                   VehicleModel vModel,
-                                   String category) {
+  public void createTransportOrder(
+      List<AbstractConnectableModelComponent> destModels,
+      List<String> actions,
+      long deadline,
+      VehicleModel vModel,
+      String category
+  ) {
     createTransportOrder(destModels, actions, new ArrayList<>(), deadline, vModel, category);
   }
 
@@ -87,18 +90,22 @@ public class TransportOrderUtil {
    * kernel determine one.
    * @param type The type.
    */
-  public void createTransportOrder(List<AbstractConnectableModelComponent> destModels,
-                                   List<String> actions,
-                                   List<Map<String, String>> propertiesList,
-                                   long deadline,
-                                   VehicleModel vModel,
-                                   String type) {
+  public void createTransportOrder(
+      List<AbstractConnectableModelComponent> destModels,
+      List<String> actions,
+      List<Map<String, String>> propertiesList,
+      long deadline,
+      VehicleModel vModel,
+      String type
+  ) {
     requireNonNull(destModels, "locations");
     requireNonNull(actions, "actions");
     requireNonNull(propertiesList, "propertiesList");
-    checkArgument(!destModels.stream()
-        .anyMatch(o -> !(o instanceof PointModel || o instanceof LocationModel)),
-                  "destModels have to be a PointModel or a Locationmodel");
+    checkArgument(
+        !destModels.stream()
+            .anyMatch(o -> !(o instanceof PointModel || o instanceof LocationModel)),
+        "destModels have to be a PointModel or a Locationmodel"
+    );
 
     try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
       TransportOrderService transportOrderService
@@ -131,7 +138,8 @@ public class TransportOrderUtil {
               .withIncompleteName(true)
               .withDeadline(Instant.ofEpochMilli(deadline))
               .withIntendedVehicleName(vModel == null ? null : vModel.getName())
-              .withType(type));
+              .withType(type)
+      );
 
       sharedPortal.getPortal().getDispatcherService().dispatch();
     }
@@ -154,11 +162,14 @@ public class TransportOrderUtil {
           new TransportOrderCreationTO("TOrder-", copyDestinations(pattern))
               .withIncompleteName(true)
               .withDeadline(pattern.getDeadline())
-              .withIntendedVehicleName(pattern.getIntendedVehicle() == null
-                  ? null
-                  : pattern.getIntendedVehicle().getName())
+              .withIntendedVehicleName(
+                  pattern.getIntendedVehicle() == null
+                      ? null
+                      : pattern.getIntendedVehicle().getName()
+              )
               .withType(pattern.getType())
-              .withProperties(pattern.getProperties()));
+              .withProperties(pattern.getProperties())
+      );
 
       sharedPortal.getPortal().getDispatcherService().dispatch();
     }
@@ -186,8 +197,13 @@ public class TransportOrderUtil {
       sharedPortal.getPortal().getTransportOrderService().createTransportOrder(
           new TransportOrderCreationTO(
               "Move-",
-              Collections.singletonList(new DestinationCreationTO(pointModel.getName(),
-                                                                  DriveOrder.Destination.OP_MOVE)))
+              Collections.singletonList(
+                  new DestinationCreationTO(
+                      pointModel.getName(),
+                      DriveOrder.Destination.OP_MOVE
+                  )
+              )
+          )
               .withIncompleteName(true)
               .withDeadline(Instant.now())
               .withIntendedVehicleName(vModel.getName())
@@ -209,8 +225,10 @@ public class TransportOrderUtil {
   }
 
   private DestinationCreationTO copyDestination(DriveOrder driveOrder) {
-    return new DestinationCreationTO(driveOrder.getDestination().getDestination().getName(),
-                                     driveOrder.getDestination().getOperation())
+    return new DestinationCreationTO(
+        driveOrder.getDestination().getDestination().getName(),
+        driveOrder.getDestination().getOperation()
+    )
         .withProperties(driveOrder.getDestination().getProperties());
   }
 }

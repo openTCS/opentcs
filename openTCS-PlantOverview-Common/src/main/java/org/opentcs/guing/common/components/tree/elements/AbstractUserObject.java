@@ -8,6 +8,7 @@
 package org.opentcs.guing.common.components.tree.elements;
 
 import static java.util.Objects.requireNonNull;
+
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
@@ -19,7 +20,8 @@ import org.opentcs.guing.common.persistence.ModelManager;
  * Abstract implementation of a UserObject.
  */
 public abstract class AbstractUserObject
-    implements UserObject {
+    implements
+      UserObject {
 
   /**
    * The model component this user object represents.
@@ -45,9 +47,11 @@ public abstract class AbstractUserObject
    * @param guiManager The gui manager.
    * @param modelManager Provides access to the currently loaded system model.
    */
-  public AbstractUserObject(ModelComponent modelComponent,
-                            GuiManager guiManager,
-                            ModelManager modelManager) {
+  public AbstractUserObject(
+      ModelComponent modelComponent,
+      GuiManager guiManager,
+      ModelManager modelManager
+  ) {
     this.fModelComponent = requireNonNull(modelComponent, "modelComponent");
     this.guiManager = requireNonNull(guiManager, "guiManager");
     this.modelManager = requireNonNull(modelManager, "modelManager");

@@ -7,14 +7,16 @@
  */
 package org.opentcs.data;
 
-import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
+
+import java.io.Serializable;
 
 /**
  * Instances of this class represent events emitted by/for business objects.
  */
 public class TCSObjectEvent
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The current state of the object for which this event was created.
@@ -45,17 +47,21 @@ public class TCSObjectEvent
    * or <code>previousObjectState</code> is <code>null</code> while
    * <code>eventType</code> does not have an appropriate value.
    */
-  public TCSObjectEvent(TCSObject<?> currentObjectState,
-                        TCSObject<?> previousObjectState,
-                        Type eventType) {
+  public TCSObjectEvent(
+      TCSObject<?> currentObjectState,
+      TCSObject<?> previousObjectState,
+      Type eventType
+  ) {
     this.type = requireNonNull(eventType, "eventType");
     if (currentObjectState == null && !Type.OBJECT_REMOVED.equals(eventType)) {
-      throw new IllegalArgumentException("currentObjectState == null but "
-          + "eventType != OBJECT_REMOVED");
+      throw new IllegalArgumentException(
+          "currentObjectState == null but eventType != OBJECT_REMOVED"
+      );
     }
     if (previousObjectState == null && !Type.OBJECT_CREATED.equals(eventType)) {
-      throw new IllegalArgumentException("previousObjectState == null but "
-          + "eventType != OBJECT_CREATED");
+      throw new IllegalArgumentException(
+          "previousObjectState == null but eventType != OBJECT_CREATED"
+      );
     }
     this.currentObjectState = currentObjectState;
     this.previousObjectState = previousObjectState;

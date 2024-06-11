@@ -21,7 +21,8 @@ import org.opentcs.util.ExplainedBoolean;
  * A {@link PeripheralCommAdapter} implementation that is doing nothing.
  */
 public class NullPeripheralCommAdapter
-    implements PeripheralCommAdapter {
+    implements
+      PeripheralCommAdapter {
 
   /**
    * The process model.
@@ -33,7 +34,10 @@ public class NullPeripheralCommAdapter
    *
    * @param location The reference to the location this adapter is attached to.
    */
-  public NullPeripheralCommAdapter(@Nonnull TCSResourceReference<Location> location) {
+  public NullPeripheralCommAdapter(
+      @Nonnull
+      TCSResourceReference<Location> location
+  ) {
     this.processModel = new PeripheralProcessModel(location);
   }
 

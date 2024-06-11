@@ -7,10 +7,11 @@
  */
 package org.opentcs.strategies.basic.dispatching.priorization.transportorder;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.time.Instant;
 import java.util.Comparator;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 
@@ -20,7 +21,8 @@ import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
  * Note: this comparator imposes orderings that are inconsistent with equals.
  */
 public class TransportOrderComparatorDeadlineAtRiskFirst
-    implements Comparator<TransportOrder> {
+    implements
+      Comparator<TransportOrder> {
 
   /**
    * A key used for selecting this comparator in a configuration setting.

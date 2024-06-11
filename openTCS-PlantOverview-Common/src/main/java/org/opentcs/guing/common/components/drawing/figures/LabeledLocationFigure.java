@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.common.components.drawing.figures;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Strings;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
@@ -15,7 +17,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
-import static java.util.Objects.requireNonNull;
 import javax.swing.Action;
 import org.jhotdraw.draw.handle.Handle;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
@@ -29,7 +30,8 @@ import org.opentcs.guing.common.components.drawing.course.Origin;
  * {@link LocationFigure} with a label.
  */
 public class LabeledLocationFigure
-    extends LabeledFigure {
+    extends
+      LabeledFigure {
 
   /**
    * The tool tip text generator.
@@ -44,8 +46,11 @@ public class LabeledLocationFigure
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public LabeledLocationFigure(@Assisted LocationFigure figure,
-                               ToolTipTextGenerator textGenerator) {
+  public LabeledLocationFigure(
+      @Assisted
+      LocationFigure figure,
+      ToolTipTextGenerator textGenerator
+  ) {
     requireNonNull(figure, "figure");
     this.textGenerator = requireNonNull(textGenerator, "textGenerator");
 
@@ -125,8 +130,10 @@ public class LabeledLocationFigure
           || lf.getModel().getPropertyLayoutPositionY().hasChanged()) {
         getLabel().willChange();
         Point2D exact
-            = origin.calculatePixelPositionExactly(lf.getModel().getPropertyLayoutPositionX(),
-                                                   lf.getModel().getPropertyLayoutPositionY());
+            = origin.calculatePixelPositionExactly(
+                lf.getModel().getPropertyLayoutPositionX(),
+                lf.getModel().getPropertyLayoutPositionY()
+            );
         double scale = lf.getZoomPoint().scale();
         double xNew = exact.getX() / scale;
         double yNew = exact.getY() / scale;
@@ -152,8 +159,10 @@ public class LabeledLocationFigure
       LocationFigure lf = getPresentationFigure();
 
       Point2D exact
-          = origin.calculatePixelPositionExactly(lf.getModel().getPropertyLayoutPositionX(),
-                                                 lf.getModel().getPropertyLayoutPositionY());
+          = origin.calculatePixelPositionExactly(
+              lf.getModel().getPropertyLayoutPositionX(),
+              lf.getModel().getPropertyLayoutPositionY()
+          );
       Point2D.Double anchor = new Point2D.Double(exact.getX(), exact.getY());
       setBounds(anchor, anchor);
     }

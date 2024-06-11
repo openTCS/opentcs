@@ -14,7 +14,8 @@ import spark.Service;
  * A request handler.
  */
 public interface RequestHandler
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * Registers the handler's routes with the given service.

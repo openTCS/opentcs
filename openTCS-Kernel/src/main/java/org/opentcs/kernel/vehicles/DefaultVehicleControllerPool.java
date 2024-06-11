@@ -8,10 +8,11 @@
 package org.opentcs.kernel.vehicles;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -24,7 +25,8 @@ import org.slf4j.LoggerFactory;
  * {@link VehicleCommAdapter}.
  */
 public final class DefaultVehicleControllerPool
-    implements LocalVehicleControllerPool {
+    implements
+      LocalVehicleControllerPool {
 
   /**
    * This class's Logger.
@@ -55,8 +57,10 @@ public final class DefaultVehicleControllerPool
    * @param vehicleManagerFactory A factory for vehicle managers.
    */
   @Inject
-  public DefaultVehicleControllerPool(InternalVehicleService vehicleService,
-                                      VehicleControllerFactory vehicleManagerFactory) {
+  public DefaultVehicleControllerPool(
+      InternalVehicleService vehicleService,
+      VehicleControllerFactory vehicleManagerFactory
+  ) {
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.vehicleManagerFactory = requireNonNull(vehicleManagerFactory, "vehicleManagerFactory");
   }
@@ -92,8 +96,10 @@ public final class DefaultVehicleControllerPool
   }
 
   @Override
-  public synchronized void attachVehicleController(String vehicleName,
-                                                   VehicleCommAdapter commAdapter) {
+  public synchronized void attachVehicleController(
+      String vehicleName,
+      VehicleCommAdapter commAdapter
+  ) {
     requireNonNull(vehicleName, "vehicleName");
     requireNonNull(commAdapter, "commAdapter");
 
@@ -105,8 +111,10 @@ public final class DefaultVehicleControllerPool
     Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, vehicleName);
     checkArgument(vehicle != null, "No such vehicle: %s", vehicleName);
 
-    VehicleController controller = vehicleManagerFactory.createVehicleController(vehicle,
-                                                                                 commAdapter);
+    VehicleController controller = vehicleManagerFactory.createVehicleController(
+        vehicle,
+        commAdapter
+    );
     PoolEntry poolEntry = new PoolEntry(vehicleName, controller);
     poolEntries.put(vehicleName, poolEntry);
     controller.initialize();

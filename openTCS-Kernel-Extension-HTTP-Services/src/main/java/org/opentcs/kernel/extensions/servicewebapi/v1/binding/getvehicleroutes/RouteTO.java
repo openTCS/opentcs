@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.getvehicleroutes;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Vehicle;
 
 /**
@@ -30,7 +31,10 @@ public class RouteTO {
     return destinationPoint;
   }
 
-  public RouteTO setDestinationPoint(@Nonnull String destinationPoint) {
+  public RouteTO setDestinationPoint(
+      @Nonnull
+      String destinationPoint
+  ) {
     this.destinationPoint = requireNonNull(destinationPoint, "destinationPoint");
     return this;
   }
@@ -88,7 +92,10 @@ public class RouteTO {
       return destinationPoint;
     }
 
-    public Step setDestinationPoint(@Nonnull String destinationPoint) {
+    public Step setDestinationPoint(
+        @Nonnull
+        String destinationPoint
+    ) {
       this.destinationPoint = requireNonNull(destinationPoint, "destinationPoint");
       return this;
     }
@@ -98,7 +105,10 @@ public class RouteTO {
       return vehicleOrientation;
     }
 
-    public Step setVehicleOrientation(@Nonnull String vehicleOrientation) {
+    public Step setVehicleOrientation(
+        @Nonnull
+        String vehicleOrientation
+    ) {
       this.vehicleOrientation = requireNonNull(vehicleOrientation, "vehicleOrientation");
       return this;
     }

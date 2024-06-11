@@ -7,6 +7,8 @@
  */
 package org.opentcs.util.persistence.v005;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Reader;
@@ -14,7 +16,6 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -35,10 +36,13 @@ import org.xml.sax.SAXException;
  */
 @XmlRootElement(name = "model")
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(propOrder = {"version", "name", "points", "paths", "vehicles", "locationTypes",
-                      "locations", "blocks", "visualLayout", "properties"})
+@XmlType(
+    propOrder = {"version", "name", "points", "paths", "vehicles", "locationTypes",
+        "locations", "blocks", "visualLayout", "properties"}
+)
 public class V005PlantModelTO
-    extends BasePlantModelTO {
+    extends
+      BasePlantModelTO {
 
   private String name = "";
   private List<PointTO> points = new ArrayList<>();
@@ -61,7 +65,10 @@ public class V005PlantModelTO
     return name;
   }
 
-  public V005PlantModelTO setName(@Nonnull String name) {
+  public V005PlantModelTO setName(
+      @Nonnull
+      String name
+  ) {
     requireNonNull(name, "name");
     this.name = name;
     return this;
@@ -72,7 +79,10 @@ public class V005PlantModelTO
     return points;
   }
 
-  public V005PlantModelTO setPoints(@Nonnull List<PointTO> points) {
+  public V005PlantModelTO setPoints(
+      @Nonnull
+      List<PointTO> points
+  ) {
     requireNonNull(points, "points");
     this.points = points;
     return this;
@@ -83,7 +93,10 @@ public class V005PlantModelTO
     return paths;
   }
 
-  public V005PlantModelTO setPaths(@Nonnull List<PathTO> paths) {
+  public V005PlantModelTO setPaths(
+      @Nonnull
+      List<PathTO> paths
+  ) {
     requireNonNull(paths, "paths");
     this.paths = paths;
     return this;
@@ -94,7 +107,10 @@ public class V005PlantModelTO
     return vehicles;
   }
 
-  public V005PlantModelTO setVehicles(@Nonnull List<VehicleTO> vehicles) {
+  public V005PlantModelTO setVehicles(
+      @Nonnull
+      List<VehicleTO> vehicles
+  ) {
     requireNonNull(vehicles, "vehicles");
     this.vehicles = vehicles;
     return this;
@@ -105,7 +121,10 @@ public class V005PlantModelTO
     return locationTypes;
   }
 
-  public V005PlantModelTO setLocationTypes(@Nonnull List<LocationTypeTO> locationTypes) {
+  public V005PlantModelTO setLocationTypes(
+      @Nonnull
+      List<LocationTypeTO> locationTypes
+  ) {
     requireNonNull(locationTypes, "locationTypes");
     this.locationTypes = locationTypes;
     return this;
@@ -116,7 +135,10 @@ public class V005PlantModelTO
     return locations;
   }
 
-  public V005PlantModelTO setLocations(@Nonnull List<LocationTO> locations) {
+  public V005PlantModelTO setLocations(
+      @Nonnull
+      List<LocationTO> locations
+  ) {
     requireNonNull(locations, "locations");
     this.locations = locations;
     return this;
@@ -127,7 +149,10 @@ public class V005PlantModelTO
     return blocks;
   }
 
-  public V005PlantModelTO setBlocks(@Nonnull List<BlockTO> blocks) {
+  public V005PlantModelTO setBlocks(
+      @Nonnull
+      List<BlockTO> blocks
+  ) {
     requireNonNull(blocks, "blocks");
     this.blocks = blocks;
     return this;
@@ -138,7 +163,10 @@ public class V005PlantModelTO
     return visualLayout;
   }
 
-  public V005PlantModelTO setVisualLayout(@Nonnull VisualLayoutTO visualLayout) {
+  public V005PlantModelTO setVisualLayout(
+      @Nonnull
+      VisualLayoutTO visualLayout
+  ) {
     this.visualLayout = requireNonNull(visualLayout, "visualLayout");
     return this;
   }
@@ -148,7 +176,10 @@ public class V005PlantModelTO
     return properties;
   }
 
-  public V005PlantModelTO setProperties(@Nonnull List<PropertyTO> properties) {
+  public V005PlantModelTO setProperties(
+      @Nonnull
+      List<PropertyTO> properties
+  ) {
     requireNonNull(properties, "properties");
     this.properties = properties;
     return this;
@@ -160,7 +191,10 @@ public class V005PlantModelTO
    * @param writer The writer to write this instance's XML representation to.
    * @throws IOException If there was a problem marshalling this instance.
    */
-  public void toXml(@Nonnull Writer writer)
+  public void toXml(
+      @Nonnull
+      Writer writer
+  )
       throws IOException {
     requireNonNull(writer, "writer");
 
@@ -179,7 +213,10 @@ public class V005PlantModelTO
    * @return The instance unmarshalled from the given reader.
    * @throws IOException If there was a problem unmarshalling the given string.
    */
-  public static V005PlantModelTO fromXml(@Nonnull Reader reader)
+  public static V005PlantModelTO fromXml(
+      @Nonnull
+      Reader reader
+  )
       throws IOException {
     requireNonNull(reader, "reader");
 
@@ -192,7 +229,8 @@ public class V005PlantModelTO
   }
 
   private static Marshaller createMarshaller()
-      throws JAXBException, SAXException {
+      throws JAXBException,
+        SAXException {
     Marshaller marshaller = createContext().createMarshaller();
     marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
     marshaller.setSchema(createSchema());
@@ -200,7 +238,8 @@ public class V005PlantModelTO
   }
 
   private static Unmarshaller createUnmarshaller()
-      throws JAXBException, SAXException {
+      throws JAXBException,
+        SAXException {
     Unmarshaller unmarshaller = createContext().createUnmarshaller();
     unmarshaller.setSchema(createSchema());
     return unmarshaller;

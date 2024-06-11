@@ -20,7 +20,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * kernel model.
  */
 public class TCSLabelFigure
-    extends LabelFigure {
+    extends
+      LabelFigure {
 
   /**
    * The default x label offset for label figures.
@@ -101,7 +102,8 @@ public class TCSLabelFigure
 
       Point2D.Double newOffset = new Point2D.Double(
           getBounds().getX() - figure.getBounds().x,
-          getBounds().getY() - figure.getBounds().y);
+          getBounds().getY() - figure.getBounds().y
+      );
 
       if (newOffset.x != fOffset.x || newOffset.y != fOffset.y) {
         fOffset = newOffset;

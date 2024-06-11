@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.LocationCreationTO;
@@ -39,43 +40,74 @@ public class LocationConverter {
 
   public List<LocationCreationTO> toLocationCreationTOs(List<LocationTO> locations) {
     return locations.stream()
-        .map(location -> new LocationCreationTO(location.getName(),
-                                                location.getTypeName(),
-                                                new Triple(location.getPosition().getX(),
-                                                           location.getPosition().getY(),
-                                                           location.getPosition().getZ()))
-        .withProperties(pConverter.toPropertyMap(location.getProperties()))
-        .withLinks(toLinkMap(location.getLinks()))
-        .withLocked(location.isLocked())
-        .withLayout(new LocationCreationTO.Layout(
-            new Couple(location.getLayout().getPosition().getX(),
-                       location.getLayout().getPosition().getY()),
-            new Couple(location.getLayout().getLabelOffset().getX(),
-                       location.getLayout().getLabelOffset().getY()),
-            LocationRepresentation.valueOf(
-                location.getLayout().getLocationRepresentation()),
-            location.getLayout().getLayerId())))
+        .map(
+            location -> new LocationCreationTO(
+                location.getName(),
+                location.getTypeName(),
+                new Triple(
+                    location.getPosition().getX(),
+                    location.getPosition().getY(),
+                    location.getPosition().getZ()
+                )
+            )
+                .withProperties(pConverter.toPropertyMap(location.getProperties()))
+                .withLinks(toLinkMap(location.getLinks()))
+                .withLocked(location.isLocked())
+                .withLayout(
+                    new LocationCreationTO.Layout(
+                        new Couple(
+                            location.getLayout().getPosition().getX(),
+                            location.getLayout().getPosition().getY()
+                        ),
+                        new Couple(
+                            location.getLayout().getLabelOffset().getX(),
+                            location.getLayout().getLabelOffset().getY()
+                        ),
+                        LocationRepresentation.valueOf(
+                            location.getLayout().getLocationRepresentation()
+                        ),
+                        location.getLayout().getLayerId()
+                    )
+                )
+        )
         .collect(Collectors.toCollection(ArrayList::new));
   }
 
   public List<LocationTO> toLocationTOs(Set<Location> locations) {
     return locations.stream()
-        .map(location -> new LocationTO(location.getName(),
-                                        location.getType().getName(),
-                                        new TripleTO(location.getPosition().getX(),
-                                                     location.getPosition().getY(),
-                                                     location.getPosition().getZ()))
-        .setLocked(location.isLocked())
-        .setProperties(pConverter.toPropertyTOs(location.getProperties()))
-        .setLinks(toLinkTOs(location.getAttachedLinks()))
-        .setLayout(new LocationTO.Layout()
-            .setLayerId(location.getLayout().getLayerId())
-            .setLocationRepresentation(
-                location.getLayout().getLocationRepresentation().name())
-            .setLabelOffset(new CoupleTO(location.getLayout().getLabelOffset().getX(),
-                                         location.getLayout().getLabelOffset().getY()))
-            .setPosition(new CoupleTO(location.getLayout().getPosition().getX(),
-                                      location.getLayout().getPosition().getY()))))
+        .map(
+            location -> new LocationTO(
+                location.getName(),
+                location.getType().getName(),
+                new TripleTO(
+                    location.getPosition().getX(),
+                    location.getPosition().getY(),
+                    location.getPosition().getZ()
+                )
+            )
+                .setLocked(location.isLocked())
+                .setProperties(pConverter.toPropertyTOs(location.getProperties()))
+                .setLinks(toLinkTOs(location.getAttachedLinks()))
+                .setLayout(
+                    new LocationTO.Layout()
+                        .setLayerId(location.getLayout().getLayerId())
+                        .setLocationRepresentation(
+                            location.getLayout().getLocationRepresentation().name()
+                        )
+                        .setLabelOffset(
+                            new CoupleTO(
+                                location.getLayout().getLabelOffset().getX(),
+                                location.getLayout().getLabelOffset().getY()
+                            )
+                        )
+                        .setPosition(
+                            new CoupleTO(
+                                location.getLayout().getPosition().getX(),
+                                location.getLayout().getPosition().getY()
+                            )
+                        )
+                )
+        )
         .sorted(Comparator.comparing(LocationTO::getName))
         .collect(Collectors.toList());
   }
@@ -87,9 +119,11 @@ public class LocationConverter {
 
   private List<LinkTO> toLinkTOs(Set<Location.Link> links) {
     return links.stream()
-        .map(link -> new LinkTO()
-        .setPointName(link.getPoint().getName())
-        .setAllowedOperations(link.getAllowedOperations()))
+        .map(
+            link -> new LinkTO()
+                .setPointName(link.getPoint().getName())
+                .setAllowedOperations(link.getAllowedOperations())
+        )
         .collect(Collectors.toList());
   }
 }

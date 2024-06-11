@@ -7,6 +7,11 @@
  */
 package org.opentcs.operationsdesk.components.drawing.figures;
 
+import static java.awt.image.ImageObserver.ABORT;
+import static java.awt.image.ImageObserver.ALLBITS;
+import static java.awt.image.ImageObserver.FRAMEBITS;
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.Graphics2D;
@@ -17,14 +22,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
-import static java.awt.image.ImageObserver.ABORT;
-import static java.awt.image.ImageObserver.ALLBITS;
-import static java.awt.image.ImageObserver.FRAMEBITS;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
@@ -62,9 +63,11 @@ import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
  * The graphical representation of a vehicle.
  */
 public class VehicleFigure
-    extends TCSFigure
-    implements AttributesChangeListener,
-               ImageObserver {
+    extends
+      TCSFigure
+    implements
+      AttributesChangeListener,
+      ImageObserver {
 
   /**
    * When the position of the vehicle changed.
@@ -132,13 +135,16 @@ public class VehicleFigure
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public VehicleFigure(VehicleTheme vehicleTheme,
-                       MenuFactory menuFactory,
-                       OperationsDeskConfiguration appConfig,
-                       @Assisted VehicleModel model,
-                       ToolTipTextGenerator textGenerator,
-                       ModelManager modelManager,
-                       ApplicationState applicationState) {
+  public VehicleFigure(
+      VehicleTheme vehicleTheme,
+      MenuFactory menuFactory,
+      OperationsDeskConfiguration appConfig,
+      @Assisted
+      VehicleModel model,
+      ToolTipTextGenerator textGenerator,
+      ModelManager modelManager,
+      ApplicationState applicationState
+  ) {
     super(model);
     this.vehicleTheme = requireNonNull(vehicleTheme, "vehicleTheme");
     this.menuFactory = requireNonNull(menuFactory, "menuFactory");
@@ -447,9 +453,11 @@ public class VehicleFigure
   }
 
   @Override
-  public boolean handleMouseClick(Point2D.Double p,
-                                  MouseEvent evt,
-                                  DrawingView drawingView) {
+  public boolean handleMouseClick(
+      Point2D.Double p,
+      MouseEvent evt,
+      DrawingView drawingView
+  ) {
     // This gets executed on a double click AND a right click on the figure
     VehicleModel model = getModel();
     VehiclePopupMenu menu = menuFactory.createVehiclePopupMenu(Arrays.asList(model));
@@ -495,9 +503,11 @@ public class VehicleFigure
   }
 
   @Override
-  public boolean imageUpdate(Image img, int infoflags,
-                             int x, int y,
-                             int width, int height) {
+  public boolean imageUpdate(
+      Image img, int infoflags,
+      int x, int y,
+      int width, int height
+  ) {
     if ((infoflags & (FRAMEBITS | ALLBITS)) != 0) {
       invalidate();
     }

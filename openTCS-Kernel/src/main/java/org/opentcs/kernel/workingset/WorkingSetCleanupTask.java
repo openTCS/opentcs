@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.workingset;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.function.Predicate;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.TCSObjectReference;
@@ -24,7 +25,8 @@ import org.slf4j.LoggerFactory;
  * A task that periodically removes orders, order sequences and peripheral jobs in a final state.
  */
 public class WorkingSetCleanupTask
-    implements Runnable {
+    implements
+      Runnable {
 
   /**
    * This class's Logger.
@@ -79,18 +81,22 @@ public class WorkingSetCleanupTask
    */
   @Inject
   public WorkingSetCleanupTask(
-      @GlobalSyncObject Object globalSyncObject,
+      @GlobalSyncObject
+      Object globalSyncObject,
       TransportOrderPoolManager orderPoolManager,
       PeripheralJobPoolManager peripheralJobPoolManager,
       OrderPoolConfiguration configuration,
       CompositeOrderSequenceCleanupApproval compositeOrderSequenceCleanupApproval,
       CompositeTransportOrderCleanupApproval compositeTransportOrderCleanupApproval,
       CompositePeripheralJobCleanupApproval compositePeripheralJobCleanupApproval,
-      CreationTimeThreshold creationTimeThreshold) {
+      CreationTimeThreshold creationTimeThreshold
+  ) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.orderPoolManager = requireNonNull(orderPoolManager, "orderPoolManager");
-    this.peripheralJobPoolManager = requireNonNull(peripheralJobPoolManager,
-                                                   "peripheralJobPoolManager");
+    this.peripheralJobPoolManager = requireNonNull(
+        peripheralJobPoolManager,
+        "peripheralJobPoolManager"
+    );
     this.compositeOrderSequenceCleanupApproval
         = requireNonNull(compositeOrderSequenceCleanupApproval);
     this.compositeTransportOrderCleanupApproval
@@ -115,35 +121,32 @@ public class WorkingSetCleanupTask
 
       // Remove all peripheral jobs in a final state that do not belong to a transport order and
       // that are older than the threshold.
-      Predicate<PeripheralJob> noRelatedTransportOrder = job
-          -> job.getRelatedTransportOrder() == null;
-      for (PeripheralJob peripheralJob
-               : peripheralJobPoolManager.getObjectRepo().getObjects(
-              PeripheralJob.class,
-              noRelatedTransportOrder.and(compositePeripheralJobCleanupApproval)
-          )) {
+      Predicate<PeripheralJob> noRelatedTransportOrder = job -> job
+          .getRelatedTransportOrder() == null;
+      for (PeripheralJob peripheralJob : peripheralJobPoolManager.getObjectRepo().getObjects(
+          PeripheralJob.class,
+          noRelatedTransportOrder.and(compositePeripheralJobCleanupApproval)
+      )) {
         peripheralJobPoolManager.removePeripheralJob(peripheralJob.getReference());
       }
 
       // Remove all transport orders in a final state that do NOT belong to a sequence and that are
       // older than the threshold, including their related peripheral jobs.
       Predicate<TransportOrder> noWrappingSequence = order -> order.getWrappingSequence() == null;
-      for (TransportOrder transportOrder
-               : orderPoolManager.getObjectRepo().getObjects(
-              TransportOrder.class,
-              noWrappingSequence.and(compositeTransportOrderCleanupApproval)
-          )) {
+      for (TransportOrder transportOrder : orderPoolManager.getObjectRepo().getObjects(
+          TransportOrder.class,
+          noWrappingSequence.and(compositeTransportOrderCleanupApproval)
+      )) {
         removeRelatedPeripheralJobs(transportOrder.getReference());
         orderPoolManager.removeTransportOrder(transportOrder.getReference());
       }
 
       // Remove all order sequences that have been finished, including their transport orders and
       // the transport orders' related peripheral jobs.
-      for (OrderSequence orderSequence
-               : orderPoolManager.getObjectRepo().getObjects(
-              OrderSequence.class,
-              compositeOrderSequenceCleanupApproval
-          )) {
+      for (OrderSequence orderSequence : orderPoolManager.getObjectRepo().getObjects(
+          OrderSequence.class,
+          compositeOrderSequenceCleanupApproval
+      )) {
         for (TCSObjectReference<TransportOrder> transportOrderRef : orderSequence.getOrders()) {
           removeRelatedPeripheralJobs(transportOrderRef);
         }
@@ -153,11 +156,10 @@ public class WorkingSetCleanupTask
   }
 
   private void removeRelatedPeripheralJobs(TCSObjectReference<TransportOrder> transportOrderRef) {
-    for (PeripheralJob peripheralJob
-             : peripheralJobPoolManager.getObjectRepo().getObjects(
-            PeripheralJob.class,
-            job -> Objects.equals(job.getRelatedTransportOrder(), transportOrderRef)
-        )) {
+    for (PeripheralJob peripheralJob : peripheralJobPoolManager.getObjectRepo().getObjects(
+        PeripheralJob.class,
+        job -> Objects.equals(job.getRelatedTransportOrder(), transportOrderRef)
+    )) {
       peripheralJobPoolManager.removePeripheralJob(peripheralJob.getReference());
     }
   }

@@ -8,6 +8,7 @@
 package org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding;
 
 import static java.util.Objects.requireNonNull;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 

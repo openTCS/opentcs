@@ -14,7 +14,8 @@ import java.util.Comparator;
  * Compares two <code>DefaultSingleCDockable</code> instances by their titles.
  */
 public class DockableTitleComparator
-    implements Comparator<DefaultSingleCDockable> {
+    implements
+      Comparator<DefaultSingleCDockable> {
 
   /**
    * Creates a new instance.

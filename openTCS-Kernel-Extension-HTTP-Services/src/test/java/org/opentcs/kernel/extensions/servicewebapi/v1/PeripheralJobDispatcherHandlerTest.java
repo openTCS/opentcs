@@ -7,13 +7,14 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
+
+import java.util.concurrent.Executors;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
 import org.opentcs.components.kernel.services.PeripheralJobService;
 import org.opentcs.data.ObjectUnknownException;
@@ -43,9 +44,11 @@ class PeripheralJobDispatcherHandlerTest {
     jobDispatcherService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
 
-    handler = new PeripheralJobDispatcherHandler(jobService,
-                                                 jobDispatcherService,
-                                                 executorWrapper);
+    handler = new PeripheralJobDispatcherHandler(
+        jobService,
+        jobDispatcherService,
+        executorWrapper
+    );
 
     location = new Location("some-location", new LocationType("some-location-type").getReference());
     job = new PeripheralJob(

@@ -7,8 +7,9 @@
  */
 package org.opentcs.util.persistence.v004;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -31,7 +32,10 @@ public class CoupleTO {
     return x;
   }
 
-  public CoupleTO setX(@Nonnull Long x) {
+  public CoupleTO setX(
+      @Nonnull
+      Long x
+  ) {
     this.x = requireNonNull(x, "x");
     return this;
   }
@@ -41,7 +45,10 @@ public class CoupleTO {
     return y;
   }
 
-  public CoupleTO setY(@Nonnull Long y) {
+  public CoupleTO setY(
+      @Nonnull
+      Long y
+  ) {
     this.y = requireNonNull(y, "y");
     return this;
   }

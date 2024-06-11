@@ -15,17 +15,19 @@
  */
 package org.opentcs.thirdparty.modeleditor.jhotdraw.application.action.draw;
 
+import static java.util.Objects.requireNonNull;
+import static javax.swing.Action.LARGE_ICON_KEY;
+import static javax.swing.Action.SMALL_ICON;
+import static org.jhotdraw.draw.AttributeKeys.TEXT;
+import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
+import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.TOOLBAR_PATH;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
-import static javax.swing.Action.LARGE_ICON_KEY;
-import static javax.swing.Action.SMALL_ICON;
 import javax.swing.ImageIcon;
 import org.jhotdraw.draw.AttributeKey;
-import static org.jhotdraw.draw.AttributeKeys.TEXT;
-import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
@@ -34,7 +36,6 @@ import org.jhotdraw.draw.event.FigureSelectionEvent;
 import org.jhotdraw.undo.CompositeEdit;
 import org.opentcs.guing.common.util.ImageDirectory;
 import org.opentcs.modeleditor.util.I18nPlantOverviewModeling;
-import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.TOOLBAR_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
@@ -43,12 +44,14 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * @author Werner Randelshofer
  */
 public class ApplyAttributesAction
-    extends AbstractSelectedAction {
+    extends
+      AbstractSelectedAction {
 
   private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(TOOLBAR_PATH);
 
   private Set<AttributeKey<?>> excludedAttributes = new HashSet<>(
-      Arrays.asList(new AttributeKey<?>[]{TRANSFORM, TEXT}));
+      Arrays.asList(new AttributeKey<?>[]{TRANSFORM, TEXT})
+  );
 
   /**
    * Creates a new instance.

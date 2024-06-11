@@ -7,6 +7,8 @@
  */
 package org.opentcs.kernel.extensions.controlcenter.vehicles;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Strings;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -15,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -40,7 +41,8 @@ import org.slf4j.LoggerFactory;
  * Manages attachment and detachment of communication adapters to vehicles.
  */
 public class AttachmentManager
-    implements Lifecycle {
+    implements
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -90,12 +92,21 @@ public class AttachmentManager
    * @param configuration This class's configuration.
    */
   @Inject
-  public AttachmentManager(@Nonnull TCSObjectService objectService,
-                           @Nonnull LocalVehicleControllerPool controllerPool,
-                           @Nonnull VehicleCommAdapterRegistry commAdapterRegistry,
-                           @Nonnull VehicleEntryPool vehicleEntryPool,
-                           @Nonnull @ApplicationEventBus EventHandler eventHandler,
-                           @Nonnull KernelApplicationConfiguration configuration) {
+  public AttachmentManager(
+      @Nonnull
+      TCSObjectService objectService,
+      @Nonnull
+      LocalVehicleControllerPool controllerPool,
+      @Nonnull
+      VehicleCommAdapterRegistry commAdapterRegistry,
+      @Nonnull
+      VehicleEntryPool vehicleEntryPool,
+      @Nonnull
+      @ApplicationEventBus
+      EventHandler eventHandler,
+      @Nonnull
+      KernelApplicationConfiguration configuration
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.controllerPool = requireNonNull(controllerPool, "controllerPool");
     this.commAdapterRegistry = requireNonNull(commAdapterRegistry, "commAdapterRegistry");
@@ -151,28 +162,38 @@ public class AttachmentManager
    * @param vehicleName The vehicle name.
    * @param factory The factory that provides the adapter to be assigned.
    */
-  public void attachAdapterToVehicle(@Nonnull String vehicleName,
-                                     @Nonnull VehicleCommAdapterFactory factory) {
+  public void attachAdapterToVehicle(
+      @Nonnull
+      String vehicleName,
+      @Nonnull
+      VehicleCommAdapterFactory factory
+  ) {
     requireNonNull(vehicleName, "vehicleName");
     requireNonNull(factory, "factory");
 
-    LOG.info("Attaching vehicle comm adapter: '{}' -- '{}'...",
-             vehicleName,
-             factory.getClass().getName());
+    LOG.info(
+        "Attaching vehicle comm adapter: '{}' -- '{}'...",
+        vehicleName,
+        factory.getClass().getName()
+    );
 
     VehicleEntry vehicleEntry = vehicleEntryPool.getEntryFor(vehicleName);
     if (vehicleEntry == null) {
-      LOG.warn("No vehicle entry found for '{}'. Entries: {}",
-               vehicleName,
-               vehicleEntryPool);
+      LOG.warn(
+          "No vehicle entry found for '{}'. Entries: {}",
+          vehicleName,
+          vehicleEntryPool
+      );
       return;
     }
 
     VehicleCommAdapter commAdapter = factory.getAdapterFor(vehicleEntry.getVehicle());
     if (commAdapter == null) {
-      LOG.warn("Factory {} did not provide adapter for vehicle {}, ignoring.",
-               factory,
-               vehicleEntry.getVehicle().getName());
+      LOG.warn(
+          "Factory {} did not provide adapter for vehicle {}, ignoring.",
+          factory,
+          vehicleEntry.getVehicle().getName()
+      );
       return;
     }
 
@@ -187,9 +208,11 @@ public class AttachmentManager
     vehicleEntry.setCommAdapter(commAdapter);
     vehicleEntry.setProcessModel(commAdapter.getProcessModel());
 
-    objectService.updateObjectProperty(vehicleEntry.getVehicle().getReference(),
-                                       Vehicle.PREFERRED_ADAPTER,
-                                       factory.getClass().getName());
+    objectService.updateObjectProperty(
+        vehicleEntry.getVehicle().getReference(),
+        Vehicle.PREFERRED_ADAPTER,
+        factory.getClass().getName()
+    );
 
     updateAttachmentInformation(vehicleEntry);
   }
@@ -199,14 +222,19 @@ public class AttachmentManager
    *
    * @param vehicleName The name of the vehicle to attach.
    */
-  public void autoAttachAdapterToVehicle(@Nonnull String vehicleName) {
+  public void autoAttachAdapterToVehicle(
+      @Nonnull
+      String vehicleName
+  ) {
     requireNonNull(vehicleName, "vehicleName");
 
     VehicleEntry vehicleEntry = vehicleEntryPool.getEntryFor(vehicleName);
     if (vehicleEntry == null) {
-      LOG.warn("No vehicle entry found for '{}'. Entries: {}",
-               vehicleName,
-               vehicleEntryPool);
+      LOG.warn(
+          "No vehicle entry found for '{}'. Entries: {}",
+          vehicleName,
+          vehicleEntryPool
+      );
       return;
     }
 
@@ -223,9 +251,11 @@ public class AttachmentManager
     }
     else {
       if (!Strings.isNullOrEmpty(prefAdapter)) {
-        LOG.warn("Couldn't attach preferred adapter {} to {}.  Attaching first available adapter.",
-                 prefAdapter,
-                 vehicleEntry.getVehicle().getName());
+        LOG.warn(
+            "Couldn't attach preferred adapter {} to {}.  Attaching first available adapter.",
+            prefAdapter,
+            vehicleEntry.getVehicle().getName()
+        );
       }
       List<VehicleCommAdapterFactory> factories
           = commAdapterRegistry.findFactoriesFor(vehicleEntry.getVehicle());
@@ -252,9 +282,11 @@ public class AttachmentManager
    */
   public VehicleAttachmentInformation getAttachmentInformation(String vehicleName) {
     requireNonNull(vehicleName, "vehicleName");
-    Assertions.checkArgument(attachmentPool.get(vehicleName) != null,
-                             "No attachment information for vehicle %s",
-                             vehicleName);
+    Assertions.checkArgument(
+        attachmentPool.get(vehicleName) != null,
+        "No attachment information for vehicle %s",
+        vehicleName
+    );
 
     return attachmentPool.get(vehicleName);
   }
@@ -263,7 +295,10 @@ public class AttachmentManager
     return attachmentPool;
   }
 
-  private void disableAndTerminateAdapter(@Nonnull VehicleEntry vehicleEntry) {
+  private void disableAndTerminateAdapter(
+      @Nonnull
+      VehicleEntry vehicleEntry
+  ) {
     requireNonNull(vehicleEntry, "vehicleEntry");
 
     VehicleCommAdapter commAdapter = vehicleEntry.getCommAdapter();
@@ -282,10 +317,14 @@ public class AttachmentManager
               .map(f -> f.getDescription())
               .collect(Collectors.toList());
 
-      attachmentPool.put(vehicleName,
-                         new VehicleAttachmentInformation(entry.getVehicle().getReference(),
-                                                          availableCommAdapters,
-                                                          new NullVehicleCommAdapterDescription()));
+      attachmentPool.put(
+          vehicleName,
+          new VehicleAttachmentInformation(
+              entry.getVehicle().getReference(),
+              availableCommAdapters,
+              new NullVehicleCommAdapterDescription()
+          )
+      );
     });
   }
 
@@ -303,9 +342,13 @@ public class AttachmentManager
       eventHandler.onEvent(new ProcessModelEvent(vehicleName, new VehicleProcessModelTO()));
     }
     else {
-      eventHandler.onEvent(new ProcessModelEvent(vehicleName,
-                                                 entry.getCommAdapter()
-                                                     .createTransferableProcessModel()));
+      eventHandler.onEvent(
+          new ProcessModelEvent(
+              vehicleName,
+              entry.getCommAdapter()
+                  .createTransferableProcessModel()
+          )
+      );
     }
   }
 
@@ -315,7 +358,10 @@ public class AttachmentManager
    * @param vehicle The old vehicle instance.
    * @return The fresh vehicle instance.
    */
-  private Vehicle getUpdatedVehicle(@Nonnull Vehicle vehicle) {
+  private Vehicle getUpdatedVehicle(
+      @Nonnull
+      Vehicle vehicle
+  ) {
     requireNonNull(vehicle, "vehicle");
 
     return objectService.fetchObjects(Vehicle.class).stream()
@@ -340,7 +386,10 @@ public class AttachmentManager
   }
 
   @Nullable
-  private VehicleCommAdapterFactory findFactoryWithName(@Nullable String name) {
+  private VehicleCommAdapterFactory findFactoryWithName(
+      @Nullable
+      String name
+  ) {
     return commAdapterRegistry.getFactories().stream()
         .filter(factory -> factory.getClass().getName().equals(name))
         .findFirst()

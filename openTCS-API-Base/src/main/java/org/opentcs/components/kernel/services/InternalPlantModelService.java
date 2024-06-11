@@ -17,7 +17,8 @@ import org.opentcs.data.model.TCSResourceReference;
  * peers.
  */
 public interface InternalPlantModelService
-    extends PlantModelService {
+    extends
+      PlantModelService {
 
   /**
    * Expands a set of resources <em>A</em> to a set of resources <em>B</em>.

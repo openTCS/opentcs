@@ -7,15 +7,16 @@
  */
 package org.opentcs.documentation.developers_guide;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.services.DispatcherService;
@@ -42,11 +43,17 @@ class CreateTransportOrderTest {
     orderService = mock(InternalTransportOrderService.class);
     dispService = mock(DispatcherService.class);
     when(orderService.createTransportOrder(any(TransportOrderCreationTO.class)))
-        .thenReturn(new TransportOrder(
-            "Transportorder",
-            Collections.singletonList(new DriveOrder(
-                new Destination(someDestinationLocation().getReference())
-                    .withOperation(getDestinationOperation())))));
+        .thenReturn(
+            new TransportOrder(
+                "Transportorder",
+                Collections.singletonList(
+                    new DriveOrder(
+                        new Destination(someDestinationLocation().getReference())
+                            .withOperation(getDestinationOperation())
+                    )
+                )
+            )
+        );
   }
 
   @Test

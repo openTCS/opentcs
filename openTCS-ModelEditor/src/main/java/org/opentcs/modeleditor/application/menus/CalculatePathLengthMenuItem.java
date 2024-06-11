@@ -7,10 +7,11 @@
  */
 package org.opentcs.modeleditor.application.menus;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import java.awt.event.ActionEvent;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import org.jhotdraw.draw.DrawingEditor;
@@ -32,7 +33,8 @@ import org.opentcs.util.gui.Icons;
  * A menu item to calculate and update the lengths of paths.
  */
 public class CalculatePathLengthMenuItem
-    extends JMenuItem {
+    extends
+      JMenuItem {
 
   /**
    * The <code>DrawingEditor</code> instance.
@@ -49,11 +51,15 @@ public class CalculatePathLengthMenuItem
 
   @Inject
   @SuppressWarnings("this-escape")
-  public CalculatePathLengthMenuItem(OpenTCSDrawingEditor drawingEditor,
-                                     UndoRedoManager undoRedoManager,
-                                     Provider<PathLengthFunction> pathLengthFunctionProvider) {
-    super(ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH)
-        .getString("calculatePathLengthMenuItem.text"));
+  public CalculatePathLengthMenuItem(
+      OpenTCSDrawingEditor drawingEditor,
+      UndoRedoManager undoRedoManager,
+      Provider<PathLengthFunction> pathLengthFunctionProvider
+  ) {
+    super(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH)
+            .getString("calculatePathLengthMenuItem.text")
+    );
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.undoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
     this.pathLengthFunctionProvider

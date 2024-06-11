@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernelcontrolcenter.peripherals;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
@@ -46,9 +47,14 @@ public class LocalPeripheralEntry {
    * @param attachedCommAdapter The description of the attached peripheral comm adapter.
    * @param processModel The process model that describes the peripheral device's state.
    */
-  public LocalPeripheralEntry(@Nonnull TCSResourceReference<Location> location,
-                              @Nonnull PeripheralCommAdapterDescription attachedCommAdapter,
-                              @Nonnull PeripheralProcessModel processModel) {
+  public LocalPeripheralEntry(
+      @Nonnull
+      TCSResourceReference<Location> location,
+      @Nonnull
+      PeripheralCommAdapterDescription attachedCommAdapter,
+      @Nonnull
+      PeripheralProcessModel processModel
+  ) {
     this.location = requireNonNull(location, "location");
     this.attachedCommAdapter = requireNonNull(attachedCommAdapter, "attachedCommAdapter");
     this.processModel = requireNonNull(processModel, "processModel");
@@ -83,14 +89,17 @@ public class LocalPeripheralEntry {
   }
 
   public void setAttachedCommAdapter(
-      @Nonnull PeripheralCommAdapterDescription attachedCommAdapter
+      @Nonnull
+      PeripheralCommAdapterDescription attachedCommAdapter
   ) {
     PeripheralCommAdapterDescription oldAttachedCommAdapter = this.attachedCommAdapter;
     this.attachedCommAdapter = requireNonNull(attachedCommAdapter, "attachedCommAdapter");
 
-    pcs.firePropertyChange(Attribute.ATTACHED_COMM_ADAPTER.name(),
-                           oldAttachedCommAdapter,
-                           attachedCommAdapter);
+    pcs.firePropertyChange(
+        Attribute.ATTACHED_COMM_ADAPTER.name(),
+        oldAttachedCommAdapter,
+        attachedCommAdapter
+    );
   }
 
   /**
@@ -103,13 +112,18 @@ public class LocalPeripheralEntry {
     return processModel;
   }
 
-  public void setProcessModel(@Nonnull PeripheralProcessModel processModel) {
+  public void setProcessModel(
+      @Nonnull
+      PeripheralProcessModel processModel
+  ) {
     PeripheralProcessModel oldProcessModel = this.processModel;
     this.processModel = requireNonNull(processModel, "processModel");
 
-    pcs.firePropertyChange(Attribute.PROCESS_MODEL.name(),
-                           oldProcessModel,
-                           processModel);
+    pcs.firePropertyChange(
+        Attribute.PROCESS_MODEL.name(),
+        oldProcessModel,
+        processModel
+    );
   }
 
   /**

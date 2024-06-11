@@ -7,12 +7,13 @@
  */
 package org.opentcs.operationsdesk.application.action;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -44,7 +45,8 @@ import org.opentcs.util.event.EventHandler;
  * Sets up and manages a list of tool bars in the graphical user interface.
  */
 public class ToolBarManager
-    implements EventHandler {
+    implements
+      EventHandler {
 
   /**
    * A factory for selectiont tools.
@@ -100,15 +102,19 @@ public class ToolBarManager
    * @param selectionToolFactory The selection tool factory
    */
   @Inject
-  public ToolBarManager(ViewActionMap actionMap,
-                        CourseObjectFactory crsObjFactory,
-                        OpenTCSDrawingEditor editor,
-                        SelectionToolFactory selectionToolFactory) {
+  public ToolBarManager(
+      ViewActionMap actionMap,
+      CourseObjectFactory crsObjFactory,
+      OpenTCSDrawingEditor editor,
+      SelectionToolFactory selectionToolFactory
+  ) {
     requireNonNull(actionMap, "actionMap");
     requireNonNull(crsObjFactory, "crsObjFactory");
     requireNonNull(editor, "editor");
-    this.selectionToolFactory = requireNonNull(selectionToolFactory,
-                                               "selectionToolFactory");
+    this.selectionToolFactory = requireNonNull(
+        selectionToolFactory,
+        "selectionToolFactory"
+    );
 
     ResourceBundleUtil labels
         = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TOOLBAR_PATH);
@@ -186,8 +192,10 @@ public class ToolBarManager
    * @param toolBar The toolbar to add to.
    * @param editor The DrawingEditor.
    */
-  private JToggleButton addSelectionToolButton(JToolBar toolBar,
-                                               DrawingEditor editor) {
+  private JToggleButton addSelectionToolButton(
+      JToolBar toolBar,
+      DrawingEditor editor
+  ) {
     List<Action> drawingActions = new ArrayList<>();
     // Drawing Actions
     drawingActions.add(new SelectSameAction(editor));
@@ -258,8 +266,10 @@ public class ToolBarManager
     URL url = getClass().getResource(ImageDirectory.DIR + "/toolbar/cursor-opened-hand.png");
     button.setIcon(new ImageIcon(url));
     button.setText(null);
-    button.setToolTipText(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TOOLBAR_PATH)
-        .getString("toolBarManager.button_dragTool.tooltipText"));
+    button.setToolTipText(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TOOLBAR_PATH)
+            .getString("toolBarManager.button_dragTool.tooltipText")
+    );
 
     button.setSelected(false);
     button.addItemListener(new ToolButtonListener(dragTool, editor));

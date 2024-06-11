@@ -29,9 +29,11 @@ import org.opentcs.guing.base.model.ModelComponent;
  * </ol>
  */
 public abstract class AbstractConnection
-    extends AbstractModelComponent
-    implements DrawnModelComponent,
-               AttributesChangeListener {
+    extends
+      AbstractModelComponent
+    implements
+      DrawnModelComponent,
+      AttributesChangeListener {
 
   /**
    * Key for the start component.
@@ -85,8 +87,10 @@ public abstract class AbstractConnection
    * @param startComponent The start component.
    * @param endComponent The end component.
    */
-  public void setConnectedComponents(ModelComponent startComponent,
-                                     ModelComponent endComponent) {
+  public void setConnectedComponents(
+      ModelComponent startComponent,
+      ModelComponent endComponent
+  ) {
     updateListenerRegistrations(startComponent, endComponent);
     updateComponents(startComponent, endComponent);
 
@@ -183,8 +187,10 @@ public abstract class AbstractConnection
    * @param startComponent The new start component.
    * @param endComponent The new end component.
    */
-  private void updateComponents(ModelComponent startComponent,
-                                ModelComponent endComponent) {
+  private void updateComponents(
+      ModelComponent startComponent,
+      ModelComponent endComponent
+  ) {
     if (fStartComponent instanceof AbstractConnectableModelComponent) {
       ((AbstractConnectableModelComponent) fStartComponent).removeConnection(this);
     }
@@ -223,8 +229,10 @@ public abstract class AbstractConnection
    * @param startComponent The new start component to register with.
    * @param endComponent The new end component to register with.
    */
-  private void updateListenerRegistrations(ModelComponent startComponent,
-                                           ModelComponent endComponent) {
+  private void updateListenerRegistrations(
+      ModelComponent startComponent,
+      ModelComponent endComponent
+  ) {
     if (fStartComponent != null) {
       fStartComponent.removeAttributesChangeListener(this);
     }

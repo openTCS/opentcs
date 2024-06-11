@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 
 /**
@@ -26,7 +27,11 @@ public class VisualLayoutTO {
   private List<PropertyTO> properties = List.of();
 
   @JsonCreator
-  public VisualLayoutTO(@Nonnull @JsonProperty(value = "name", required = true) String name) {
+  public VisualLayoutTO(
+      @Nonnull
+      @JsonProperty(value = "name", required = true)
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
   }
 
@@ -35,7 +40,10 @@ public class VisualLayoutTO {
     return name;
   }
 
-  public VisualLayoutTO setName(@Nonnull String name) {
+  public VisualLayoutTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     return this;
   }
@@ -45,7 +53,10 @@ public class VisualLayoutTO {
     return properties;
   }
 
-  public VisualLayoutTO setProperties(@Nonnull List<PropertyTO> properties) {
+  public VisualLayoutTO setProperties(
+      @Nonnull
+      List<PropertyTO> properties
+  ) {
     this.properties = requireNonNull(properties, "properties");
     return this;
   }
@@ -73,7 +84,10 @@ public class VisualLayoutTO {
     return layers;
   }
 
-  public VisualLayoutTO setLayers(@Nonnull List<LayerTO> layers) {
+  public VisualLayoutTO setLayers(
+      @Nonnull
+      List<LayerTO> layers
+  ) {
     this.layers = requireNonNull(layers, "layers");
     return this;
   }
@@ -83,7 +97,10 @@ public class VisualLayoutTO {
     return layerGroups;
   }
 
-  public VisualLayoutTO setLayerGroups(@Nonnull List<LayerGroupTO> layerGroups) {
+  public VisualLayoutTO setLayerGroups(
+      @Nonnull
+      List<LayerGroupTO> layerGroups
+  ) {
     this.layerGroups = requireNonNull(layerGroups, "layerGroups");
     return this;
   }

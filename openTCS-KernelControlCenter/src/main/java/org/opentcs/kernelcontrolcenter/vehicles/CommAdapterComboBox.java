@@ -18,8 +18,10 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
  * {@link LocalVehicleEntry}.
  */
 public class CommAdapterComboBox
-    extends JComboBox<VehicleCommAdapterDescription>
-    implements PropertyChangeListener {
+    extends
+      JComboBox<VehicleCommAdapterDescription>
+    implements
+      PropertyChangeListener {
 
   /**
    * Creates a new instance.

@@ -22,7 +22,8 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
  * Provides methods concerning {@link Vehicle}s.
  */
 public interface VehicleService
-    extends TCSObjectService {
+    extends
+      TCSObjectService {
 
   /**
    * Attaches the described comm adapter to the referenced vehicle.
@@ -32,9 +33,12 @@ public interface VehicleService
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
-  void attachCommAdapter(TCSObjectReference<Vehicle> ref,
-                         VehicleCommAdapterDescription description)
-      throws ObjectUnknownException, KernelRuntimeException;
+  void attachCommAdapter(
+      TCSObjectReference<Vehicle> ref,
+      VehicleCommAdapterDescription description
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Disables the comm adapter attached to the referenced vehicle.
@@ -44,7 +48,8 @@ public interface VehicleService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void disableCommAdapter(TCSObjectReference<Vehicle> ref)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Enables the comm adapter attached to the referenced vehicle.
@@ -54,7 +59,8 @@ public interface VehicleService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void enableCommAdapter(TCSObjectReference<Vehicle> ref)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Returns attachment information for the referenced vehicle.
@@ -65,7 +71,8 @@ public interface VehicleService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   VehicleAttachmentInformation fetchAttachmentInformation(TCSObjectReference<Vehicle> ref)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Returns the process model for the referenced vehicle.
@@ -76,7 +83,8 @@ public interface VehicleService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   VehicleProcessModelTO fetchProcessModel(TCSObjectReference<Vehicle> ref)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Sends an {@link AdapterCommand} to the comm adapter attached to the referenced vehicle.
@@ -92,7 +100,8 @@ public interface VehicleService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void sendCommAdapterCommand(TCSObjectReference<Vehicle> ref, AdapterCommand command)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Sends a message to the communication adapter associated with the referenced vehicle.
@@ -109,7 +118,8 @@ public interface VehicleService
    * @throws KernelRuntimeException If the calling client is not allowed to execute this method.
    */
   void sendCommAdapterMessage(TCSObjectReference<Vehicle> ref, Object message)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Updates the vehicle's integration level.
@@ -121,9 +131,13 @@ public interface VehicleService
    * @throws IllegalArgumentException If changing the vehicle's integration level to
    * {@code integrationLevel} is not allowed from its current integration level.
    */
-  void updateVehicleIntegrationLevel(TCSObjectReference<Vehicle> ref,
-                                     Vehicle.IntegrationLevel integrationLevel)
-      throws ObjectUnknownException, KernelRuntimeException, IllegalArgumentException;
+  void updateVehicleIntegrationLevel(
+      TCSObjectReference<Vehicle> ref,
+      Vehicle.IntegrationLevel integrationLevel
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException,
+        IllegalArgumentException;
 
   /**
    * Updates the vehicle's paused state.
@@ -133,9 +147,12 @@ public interface VehicleService
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
-  void updateVehiclePaused(TCSObjectReference<Vehicle> ref,
-                           boolean paused)
-      throws ObjectUnknownException, KernelRuntimeException;
+  void updateVehiclePaused(
+      TCSObjectReference<Vehicle> ref,
+      boolean paused
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Updates the types of transport orders a vehicle is allowed to process.
@@ -145,9 +162,12 @@ public interface VehicleService
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
-  void updateVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
-                                      Set<String> allowedOrderTypes)
-      throws ObjectUnknownException, KernelRuntimeException;
+  void updateVehicleAllowedOrderTypes(
+      TCSObjectReference<Vehicle> ref,
+      Set<String> allowedOrderTypes
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Updates the vehicle's envelope key.
@@ -160,5 +180,7 @@ public interface VehicleService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void updateVehicleEnvelopeKey(TCSObjectReference<Vehicle> ref, String envelopeKey)
-      throws ObjectUnknownException, IllegalArgumentException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        IllegalArgumentException,
+        KernelRuntimeException;
 }

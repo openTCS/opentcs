@@ -14,9 +14,10 @@ import org.opentcs.util.event.EventHandler;
  * Organizes the layers in a plant model.
  */
 public interface LayerManager
-    extends Lifecycle,
-            LayerEditor,
-            EventHandler {
+    extends
+      Lifecycle,
+      LayerEditor,
+      EventHandler {
 
   /**
    * Sets the listener for layer data changes.

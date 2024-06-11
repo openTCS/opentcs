@@ -7,12 +7,13 @@
  */
 package org.opentcs;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.common.SameThreadExecutorService;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.data.TCSObjectEvent;
@@ -44,7 +45,8 @@ public class VehicleDispatchTriggerTest {
         new SameThreadExecutorService(),
         eventBus,
         dispatcher,
-        config);
+        config
+    );
   }
 
   @Test
@@ -56,9 +58,13 @@ public class VehicleDispatchTriggerTest {
         .withEnergyLevel(100);
     Vehicle vehicleNew = vehicleOld.withEnergyLevel(99);
 
-    trigger.onEvent(new TCSObjectEvent(vehicleNew,
-                                       vehicleOld,
-                                       TCSObjectEvent.Type.OBJECT_MODIFIED));
+    trigger.onEvent(
+        new TCSObjectEvent(
+            vehicleNew,
+            vehicleOld,
+            TCSObjectEvent.Type.OBJECT_MODIFIED
+        )
+    );
 
     verify(dispatcher).dispatch();
   }
@@ -72,9 +78,13 @@ public class VehicleDispatchTriggerTest {
         .withEnergyLevel(100);
     Vehicle vehicleNew = vehicleOld.withEnergyLevel(99);
 
-    trigger.onEvent(new TCSObjectEvent(vehicleNew,
-                                       vehicleOld,
-                                       TCSObjectEvent.Type.OBJECT_MODIFIED));
+    trigger.onEvent(
+        new TCSObjectEvent(
+            vehicleNew,
+            vehicleOld,
+            TCSObjectEvent.Type.OBJECT_MODIFIED
+        )
+    );
 
     verify(dispatcher, never()).dispatch();
   }
@@ -88,9 +98,13 @@ public class VehicleDispatchTriggerTest {
     Vehicle vehicleNew = vehicleOld.withProcState(Vehicle.ProcState.IDLE)
         .withState(Vehicle.State.IDLE);
 
-    trigger.onEvent(new TCSObjectEvent(vehicleNew,
-                                       vehicleOld,
-                                       TCSObjectEvent.Type.OBJECT_MODIFIED));
+    trigger.onEvent(
+        new TCSObjectEvent(
+            vehicleNew,
+            vehicleOld,
+            TCSObjectEvent.Type.OBJECT_MODIFIED
+        )
+    );
 
     verify(dispatcher).dispatch();
   }
@@ -102,9 +116,13 @@ public class VehicleDispatchTriggerTest {
         .withProcState(Vehicle.ProcState.PROCESSING_ORDER);
     Vehicle vehicleNew = vehicleOld.withProcState(Vehicle.ProcState.AWAITING_ORDER);
 
-    trigger.onEvent(new TCSObjectEvent(vehicleNew,
-                                       vehicleOld,
-                                       TCSObjectEvent.Type.OBJECT_MODIFIED));
+    trigger.onEvent(
+        new TCSObjectEvent(
+            vehicleNew,
+            vehicleOld,
+            TCSObjectEvent.Type.OBJECT_MODIFIED
+        )
+    );
 
     verify(dispatcher).dispatch();
   }
@@ -116,9 +134,13 @@ public class VehicleDispatchTriggerTest {
         .withOrderSequence(new OrderSequence("someSequence").getReference());
     Vehicle vehicleNew = vehicleOld.withOrderSequence(null);
 
-    trigger.onEvent(new TCSObjectEvent(vehicleNew,
-                                       vehicleOld,
-                                       TCSObjectEvent.Type.OBJECT_MODIFIED));
+    trigger.onEvent(
+        new TCSObjectEvent(
+            vehicleNew,
+            vehicleOld,
+            TCSObjectEvent.Type.OBJECT_MODIFIED
+        )
+    );
 
     verify(dispatcher).dispatch();
   }
@@ -132,9 +154,13 @@ public class VehicleDispatchTriggerTest {
 
     when(config.rerouteOnDriveOrderFinished()).thenReturn(true);
 
-    trigger.onEvent(new TCSObjectEvent(vehicleNew,
-                                       vehicleOld,
-                                       TCSObjectEvent.Type.OBJECT_MODIFIED));
+    trigger.onEvent(
+        new TCSObjectEvent(
+            vehicleNew,
+            vehicleOld,
+            TCSObjectEvent.Type.OBJECT_MODIFIED
+        )
+    );
 
     verify(dispatcher).dispatch();
     verify(dispatcher).reroute(vehicleNew.getReference(), ReroutingType.REGULAR);

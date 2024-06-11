@@ -7,9 +7,10 @@
  */
 package org.opentcs.util;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.awt.Color;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Provides utilty methods for working with colors.
@@ -32,7 +33,10 @@ public class Colors {
    * @return The representation of the given color.
    */
   @Nonnull
-  public static String encodeToHexRGB(@Nonnull Color color) {
+  public static String encodeToHexRGB(
+      @Nonnull
+      Color color
+  ) {
     requireNonNull(color, "color");
 
     return String.format("#%06X", color.getRGB() & 0x00FFFFFF);
@@ -48,7 +52,10 @@ public class Colors {
    * @throws NumberFormatException If the given string cannot be parsed.
    */
   @Nonnull
-  public static Color decodeFromHexRGB(@Nonnull String rgbHex)
+  public static Color decodeFromHexRGB(
+      @Nonnull
+      String rgbHex
+  )
       throws NumberFormatException {
     requireNonNull(rgbHex, "rgbHex");
 

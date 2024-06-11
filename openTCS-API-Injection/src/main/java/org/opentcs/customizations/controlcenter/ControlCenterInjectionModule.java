@@ -18,7 +18,8 @@ import org.opentcs.drivers.vehicle.management.VehicleCommAdapterPanelFactory;
  * application.
  */
 public abstract class ControlCenterInjectionModule
-    extends ConfigurableInjectionModule {
+    extends
+      ConfigurableInjectionModule {
 
   /**
    * Returns a multibinder that can be used to register {@link ControlCenterPanel} implementations
@@ -27,9 +28,11 @@ public abstract class ControlCenterInjectionModule
    * @return The multibinder.
    */
   protected Multibinder<ControlCenterPanel> controlCenterPanelBinderModelling() {
-    return Multibinder.newSetBinder(binder(),
-                                    ControlCenterPanel.class,
-                                    ActiveInModellingMode.class);
+    return Multibinder.newSetBinder(
+        binder(),
+        ControlCenterPanel.class,
+        ActiveInModellingMode.class
+    );
   }
 
   /**
@@ -39,9 +42,11 @@ public abstract class ControlCenterInjectionModule
    * @return The multibinder.
    */
   protected Multibinder<ControlCenterPanel> controlCenterPanelBinderOperating() {
-    return Multibinder.newSetBinder(binder(),
-                                    ControlCenterPanel.class,
-                                    ActiveInOperatingMode.class);
+    return Multibinder.newSetBinder(
+        binder(),
+        ControlCenterPanel.class,
+        ActiveInOperatingMode.class
+    );
   }
 
   /**

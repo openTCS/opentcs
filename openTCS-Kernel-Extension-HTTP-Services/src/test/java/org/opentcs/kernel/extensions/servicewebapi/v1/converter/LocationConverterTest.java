@@ -7,9 +7,6 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.contains;
@@ -19,10 +16,14 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Location;
@@ -87,13 +88,17 @@ class LocationConverterTest {
     assertThat(result.get(0).getTypeName(), is("T1"));
     assertThat(result.get(0).getPosition(), is(new Triple(1, 1, 1)));
     assertThat(result.get(0).getLinks(), is(aMapWithSize(1)));
-    assertThat(result.get(0).getLinks(),
-               hasEntry("point1", Set.of(LocationRepresentation.LOAD_TRANSFER_GENERIC.name())));
+    assertThat(
+        result.get(0).getLinks(),
+        hasEntry("point1", Set.of(LocationRepresentation.LOAD_TRANSFER_GENERIC.name()))
+    );
     assertTrue(result.get(0).isLocked());
     assertThat(result.get(0).getLayout().getPosition(), is(new Couple(2, 2)));
     assertThat(result.get(0).getLayout().getLabelOffset(), is(new Couple(3, 3)));
-    assertThat(result.get(0).getLayout().getLocationRepresentation(),
-               is(LocationRepresentation.LOAD_TRANSFER_GENERIC));
+    assertThat(
+        result.get(0).getLayout().getLocationRepresentation(),
+        is(LocationRepresentation.LOAD_TRANSFER_GENERIC)
+    );
     assertThat(result.get(0).getLayout().getLayerId(), is(4));
     assertThat(result.get(0).getProperties(), is(aMapWithSize(1)));
     assertThat(result.get(0).getProperties(), is(propertyMap));
@@ -135,10 +140,14 @@ class LocationConverterTest {
     assertThat(result.get(0).getLinks().get(0).getAllowedOperations(), contains("alle"));
     assertFalse(result.get(0).isLocked());
     assertThat(result.get(0).getLayout().getPosition(), samePropertyValuesAs(new CoupleTO(1, 1)));
-    assertThat(result.get(0).getLayout().getLabelOffset(),
-               samePropertyValuesAs(new CoupleTO(2, 2)));
-    assertThat(result.get(0).getLayout().getLocationRepresentation(),
-               is(LocationRepresentation.LOAD_TRANSFER_GENERIC.name()));
+    assertThat(
+        result.get(0).getLayout().getLabelOffset(),
+        samePropertyValuesAs(new CoupleTO(2, 2))
+    );
+    assertThat(
+        result.get(0).getLayout().getLocationRepresentation(),
+        is(LocationRepresentation.LOAD_TRANSFER_GENERIC.name())
+    );
     assertThat(result.get(0).getLayout().getLayerId(), is(3));
     assertThat(result.get(0).getProperties(), hasSize(1));
     assertThat(result.get(0).getProperties(), is(propertyList));

@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.model.Vehicle;
@@ -67,10 +68,12 @@ class VelocityControllerTest {
   @Test
   void vehicleDoesNotChangePositionWhilePaused() {
     VelocityController.WayEntry wayEntry
-        = new VelocityController.WayEntry(WAY_LENGTH,
-                                          MAX_VELO,
-                                          POINT_NAME,
-                                          Vehicle.Orientation.FORWARD);
+        = new VelocityController.WayEntry(
+            WAY_LENGTH,
+            MAX_VELO,
+            POINT_NAME,
+            Vehicle.Orientation.FORWARD
+        );
     controller.addWayEntry(wayEntry);
     controller.setVehiclePaused(true);
 
@@ -110,10 +113,12 @@ class VelocityControllerTest {
     // Way point with enough length to reach the maximum velocity and with a higher velocity limit
     // than the vehicle's own maximum velocity.
     VelocityController.WayEntry wayEntry
-        = new VelocityController.WayEntry(100000,
-                                          2 * maxFwdVelocity,
-                                          POINT_NAME,
-                                          Vehicle.Orientation.FORWARD);
+        = new VelocityController.WayEntry(
+            100000,
+            2 * maxFwdVelocity,
+            POINT_NAME,
+            Vehicle.Orientation.FORWARD
+        );
     controller.addWayEntry(wayEntry);
 
     controller.advanceTime(1000);
@@ -140,10 +145,12 @@ class VelocityControllerTest {
 
     // Way point with a velocity limit less than the vehicle's own maximum velocity.
     VelocityController.WayEntry wayEntry
-        = new VelocityController.WayEntry(10000,
-                                          250,
-                                          POINT_NAME,
-                                          Vehicle.Orientation.FORWARD);
+        = new VelocityController.WayEntry(
+            10000,
+            250,
+            POINT_NAME,
+            Vehicle.Orientation.FORWARD
+        );
     controller.addWayEntry(wayEntry);
 
     for (int i = 0; i < 10; i++) {

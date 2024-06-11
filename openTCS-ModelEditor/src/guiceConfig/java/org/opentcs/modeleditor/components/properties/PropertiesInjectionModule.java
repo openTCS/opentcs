@@ -40,7 +40,8 @@ import org.opentcs.modeleditor.application.menus.MenuItemComponentsFactory;
  * A Guice module for this package.
  */
 public class PropertiesInjectionModule
-    extends PlantOverviewInjectionModule {
+    extends
+      PlantOverviewInjectionModule {
 
   /**
    * Creates a new instance.
@@ -56,11 +57,13 @@ public class PropertiesInjectionModule
     install(new FactoryModuleBuilder().build(MenuItemComponentsFactory.class));
 
     MapBinder<Class<? extends AbstractComplexProperty>, DetailsDialogContent> dialogContentMapBinder
-        = MapBinder.newMapBinder(binder(),
-                                 new TypeLiteral<Class<? extends AbstractComplexProperty>>() {
-                             },
-                                 new TypeLiteral<DetailsDialogContent>() {
-                             });
+        = MapBinder.newMapBinder(
+            binder(),
+            new TypeLiteral<Class<? extends AbstractComplexProperty>>() {
+            },
+            new TypeLiteral<DetailsDialogContent>() {
+            }
+        );
     dialogContentMapBinder
         .addBinding(KeyValueProperty.class)
         .to(KeyValuePropertyEditorPanel.class);

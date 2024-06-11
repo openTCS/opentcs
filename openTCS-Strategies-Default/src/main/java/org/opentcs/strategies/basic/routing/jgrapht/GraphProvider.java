@@ -7,13 +7,14 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.jgrapht.Graph;
@@ -49,12 +50,19 @@ public class GraphProvider {
    * @param routingGroupMapper Used to map vehicles to their routing groups.
    */
   @Inject
-  public GraphProvider(@Nonnull TCSObjectService objectService,
-                       @Nonnull DefaultModelGraphMapper defaultModelGraphMapper,
-                       @Nonnull GroupMapper routingGroupMapper) {
+  public GraphProvider(
+      @Nonnull
+      TCSObjectService objectService,
+      @Nonnull
+      DefaultModelGraphMapper defaultModelGraphMapper,
+      @Nonnull
+      GroupMapper routingGroupMapper
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
-    this.defaultModelGraphMapper = requireNonNull(defaultModelGraphMapper,
-                                                  "defaultModelGraphMapper");
+    this.defaultModelGraphMapper = requireNonNull(
+        defaultModelGraphMapper,
+        "defaultModelGraphMapper"
+    );
     this.routingGroupMapper = requireNonNull(routingGroupMapper, "routingGroupMapper");
   }
 
@@ -77,10 +85,12 @@ public class GraphProvider {
         routingGroup -> {
           Set<Point> points = objectService.fetchObjects(Point.class);
           Set<Path> paths = objectService.fetchObjects(Path.class);
-          return new GraphResult(vehicle,
-                                 points,
-                                 paths,
-                                 defaultModelGraphMapper.translateModel(points, paths, vehicle));
+          return new GraphResult(
+              vehicle,
+              points,
+              paths,
+              defaultModelGraphMapper.translateModel(points, paths, vehicle)
+          );
         }
     );
   }
@@ -94,9 +104,11 @@ public class GraphProvider {
    * @param pathsToExclude The set of paths to not include in the derived routing graph.
    * @return The derived {@link GraphResult}.
    */
-  public GraphResult getDerivedGraphResult(Vehicle vehicle,
-                                           Set<Point> pointsToExclude,
-                                           Set<Path> pathsToExclude) {
+  public GraphResult getDerivedGraphResult(
+      Vehicle vehicle,
+      Set<Point> pointsToExclude,
+      Set<Path> pathsToExclude
+  ) {
     GraphResult baseGraph = getGraphResult(vehicle);
 
     // Determine the derived point base and path base.
@@ -127,7 +139,7 @@ public class GraphProvider {
         // result in an IllegalArgumentException.
         .filter(
             edge -> pointsToIncludeByName.contains(edge.getSourceVertex())
-            && pointsToIncludeByName.contains(edge.getTargetVertex())
+                && pointsToIncludeByName.contains(edge.getTargetVertex())
         )
         .forEach(edge -> {
           derivedGraph.addEdge(edge.getSourceVertex(), edge.getTargetVertex(), edge);
@@ -142,7 +154,10 @@ public class GraphProvider {
    *
    * @param paths The paths to use for the update.
    */
-  public void updateGraphResults(@Nonnull Collection<Path> paths) {
+  public void updateGraphResults(
+      @Nonnull
+      Collection<Path> paths
+  ) {
     requireNonNull(paths, "paths");
 
     if (paths.isEmpty() || graphResultsByRoutingGroup.isEmpty()) {
@@ -163,9 +178,11 @@ public class GraphProvider {
               graphResult.getVehicle(),
               graphResult.getPointBase(),
               updatedPathBase,
-              defaultModelGraphMapper.updateGraph(paths,
-                                                  graphResult.getVehicle(),
-                                                  graphResult.getGraph())
+              defaultModelGraphMapper.updateGraph(
+                  paths,
+                  graphResult.getVehicle(),
+                  graphResult.getGraph()
+              )
           )
       );
     }
@@ -189,10 +206,12 @@ public class GraphProvider {
      * @param pathBase The set of paths that was used to compute the given graph.
      * @param graph The computed graph.
      */
-    public GraphResult(Vehicle vehicle,
-                       Set<Point> pointBase,
-                       Set<Path> pathBase,
-                       Graph<String, Edge> graph) {
+    public GraphResult(
+        Vehicle vehicle,
+        Set<Point> pointBase,
+        Set<Path> pathBase,
+        Graph<String, Edge> graph
+    ) {
       this.pointBase = requireNonNull(pointBase, "pointBase");
       this.pathBase = requireNonNull(pathBase, "pathBase");
       this.graph = requireNonNull(graph, "graph");

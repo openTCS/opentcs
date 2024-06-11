@@ -7,12 +7,13 @@
  */
 package org.opentcs.commadapter.peripheral.loopback;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
@@ -24,7 +25,8 @@ import org.opentcs.drivers.peripherals.management.PeripheralCommAdapterPanelFact
  * A factory for creating {@link LoopbackPeripheralCommAdapterPanel} instances.
  */
 public class LoopbackPeripheralCommAdapterPanelFactory
-    implements PeripheralCommAdapterPanelFactory {
+    implements
+      PeripheralCommAdapterPanelFactory {
 
   /**
    * The panel components factory to use.
@@ -37,7 +39,8 @@ public class LoopbackPeripheralCommAdapterPanelFactory
 
   @Inject
   public LoopbackPeripheralCommAdapterPanelFactory(
-      LoopbackPeripheralAdapterPanelComponentsFactory panelComponentsFactory) {
+      LoopbackPeripheralAdapterPanelComponentsFactory panelComponentsFactory
+  ) {
     this.panelComponentsFactory = requireNonNull(panelComponentsFactory, "panelComponentsFactory");
   }
 
@@ -66,9 +69,13 @@ public class LoopbackPeripheralCommAdapterPanelFactory
 
   @Override
   public List<PeripheralCommAdapterPanel> getPanelsFor(
-      @Nonnull PeripheralCommAdapterDescription description,
-      @Nonnull TCSResourceReference<Location> location,
-      @Nonnull PeripheralProcessModel processModel) {
+      @Nonnull
+      PeripheralCommAdapterDescription description,
+      @Nonnull
+      TCSResourceReference<Location> location,
+      @Nonnull
+      PeripheralProcessModel processModel
+  ) {
     requireNonNull(description, "description");
     requireNonNull(location, "location");
     requireNonNull(processModel, "processModel");
@@ -77,12 +84,16 @@ public class LoopbackPeripheralCommAdapterPanelFactory
       return new ArrayList<>();
     }
 
-    return Arrays.asList(panelComponentsFactory
-        .createPanel((LoopbackPeripheralProcessModel) processModel));
+    return Arrays.asList(
+        panelComponentsFactory
+            .createPanel((LoopbackPeripheralProcessModel) processModel)
+    );
   }
 
-  private boolean providesPanelsFor(PeripheralCommAdapterDescription description,
-                                    PeripheralProcessModel processModel) {
+  private boolean providesPanelsFor(
+      PeripheralCommAdapterDescription description,
+      PeripheralProcessModel processModel
+  ) {
     return (description instanceof LoopbackPeripheralCommAdapterDescription)
         && (processModel instanceof LoopbackPeripheralProcessModel);
   }

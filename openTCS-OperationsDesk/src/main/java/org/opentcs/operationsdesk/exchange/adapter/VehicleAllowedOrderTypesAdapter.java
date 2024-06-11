@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.exchange.adapter;
 
 import static java.util.Objects.requireNonNull;
+
 import java.util.Set;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelServicePortal;
@@ -25,7 +26,8 @@ import org.slf4j.LoggerFactory;
  * Updates a vehicle's allowed order types with the kernel when it changes.
  */
 public class VehicleAllowedOrderTypesAdapter
-    implements AttributesChangeListener {
+    implements
+      AttributesChangeListener {
 
   /**
    * This class's logger.
@@ -50,8 +52,10 @@ public class VehicleAllowedOrderTypesAdapter
    * @param portalProvider A kernel provider.
    * @param model The vehicle model.
    */
-  public VehicleAllowedOrderTypesAdapter(SharedKernelServicePortalProvider portalProvider,
-                                         VehicleModel model) {
+  public VehicleAllowedOrderTypesAdapter(
+      SharedKernelServicePortalProvider portalProvider,
+      VehicleModel model
+  ) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.model = requireNonNull(model, "model");
     this.previousAllowedOrderTypes = getAllowedOrderTypes();
@@ -88,8 +92,10 @@ public class VehicleAllowedOrderTypesAdapter
           LOG.debug("Ignoring vehicle properties update. Already up do date.");
           return;
         }
-        portal.getVehicleService().updateVehicleAllowedOrderTypes(vehicle.getReference(),
-                                                                  allowedOrderTypes);
+        portal.getVehicleService().updateVehicleAllowedOrderTypes(
+            vehicle.getReference(),
+            allowedOrderTypes
+        );
       }
 
     }

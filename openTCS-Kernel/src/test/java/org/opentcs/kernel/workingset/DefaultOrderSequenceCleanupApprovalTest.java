@@ -7,17 +7,18 @@
  */
 package org.opentcs.kernel.workingset;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 
@@ -38,8 +39,10 @@ class DefaultOrderSequenceCleanupApprovalTest {
     defaultTransportOrderCleanupApproval = mock();
     given(orderPoolManager.getObjectRepo()).willReturn(objectRepo);
 
-    approval = new DefaultOrderSequenceCleanupApproval(orderPoolManager,
-                                                       defaultTransportOrderCleanupApproval);
+    approval = new DefaultOrderSequenceCleanupApproval(
+        orderPoolManager,
+        defaultTransportOrderCleanupApproval
+    );
   }
 
   @Test

@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.components.tree.elements;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.Set;
 import javax.swing.JPopupMenu;
 import org.opentcs.guing.common.application.GuiManager;
@@ -17,7 +18,8 @@ import org.opentcs.guing.common.application.GuiManager;
  * Context for the component tree view.
  */
 public class ComponentContext
-    implements UserObjectContext {
+    implements
+      UserObjectContext {
 
   private final GuiManager guiManager;
 

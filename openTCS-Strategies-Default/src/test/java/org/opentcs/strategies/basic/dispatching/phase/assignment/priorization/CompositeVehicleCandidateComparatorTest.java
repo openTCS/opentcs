@@ -7,6 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.assignment.priorization;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.theInstance;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,9 +18,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.theInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -94,8 +95,10 @@ class CompositeVehicleCandidateComparatorTest {
     String initRoutingCostKey = "BY_INITIAL_ROUTING_COSTS";
     Mockito.when(configuration.vehicleCandidatePriorities())
         .thenReturn(List.of(initRoutingCostKey));
-    availableComparators.put(initRoutingCostKey,
-                             new CandidateComparatorByInitialRoutingCosts());
+    availableComparators.put(
+        initRoutingCostKey,
+        new CandidateComparatorByInitialRoutingCosts()
+    );
 
     comparator = new CompositeVehicleCandidateComparator(configuration, availableComparators);
 
@@ -120,26 +123,36 @@ class CompositeVehicleCandidateComparatorTest {
 
   private AssignmentCandidate candidateWithName(String name) {
     TransportOrder trasportOrder = new TransportOrder("TOrder-1", new ArrayList<>());
-    return new AssignmentCandidate(new Vehicle(name),
-                                   trasportOrder,
-                                   buildDriveOrders(10));
+    return new AssignmentCandidate(
+        new Vehicle(name),
+        trasportOrder,
+        buildDriveOrders(10)
+    );
   }
 
-  private AssignmentCandidate candidateWithNameEnergylevel(String name,
-                                                           int energyLevel) {
+  private AssignmentCandidate candidateWithNameEnergylevel(
+      String name,
+      int energyLevel
+  ) {
     TransportOrder trasportOrder = new TransportOrder("TOrder-1", new ArrayList<>());
-    return new AssignmentCandidate(new Vehicle(name).withEnergyLevel(energyLevel),
-                                   trasportOrder,
-                                   buildDriveOrders(10));
+    return new AssignmentCandidate(
+        new Vehicle(name).withEnergyLevel(energyLevel),
+        trasportOrder,
+        buildDriveOrders(10)
+    );
   }
 
-  private AssignmentCandidate candidateWithNameEnergylevelInitialRoutingCosts(String name,
-                                                                              int energyLevel,
-                                                                              long routingCost) {
+  private AssignmentCandidate candidateWithNameEnergylevelInitialRoutingCosts(
+      String name,
+      int energyLevel,
+      long routingCost
+  ) {
     TransportOrder trasportOrder = new TransportOrder("TOrder-1", new ArrayList<>());
-    return new AssignmentCandidate(new Vehicle(name).withEnergyLevel(energyLevel),
-                                   trasportOrder,
-                                   buildDriveOrders(routingCost));
+    return new AssignmentCandidate(
+        new Vehicle(name).withEnergyLevel(energyLevel),
+        trasportOrder,
+        buildDriveOrders(routingCost)
+    );
   }
 
   private List<DriveOrder> buildDriveOrders(long routingCost) {

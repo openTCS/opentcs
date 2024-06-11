@@ -7,21 +7,23 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
-import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
 
 /**
  * Creates load generator panels.
  */
 public class ContinuousLoadPanelFactory
-    implements PluggablePanelFactory {
+    implements
+      PluggablePanelFactory {
 
   /**
    * This classe's bundle.
@@ -43,8 +45,10 @@ public class ContinuousLoadPanelFactory
    * @param panelProvider A provider for the actual panels.
    */
   @Inject
-  public ContinuousLoadPanelFactory(SharedKernelServicePortalProvider portalProvider,
-                                    Provider<ContinuousLoadPanel> panelProvider) {
+  public ContinuousLoadPanelFactory(
+      SharedKernelServicePortalProvider portalProvider,
+      Provider<ContinuousLoadPanel> panelProvider
+  ) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.panelProvider = requireNonNull(panelProvider, "panelProvider");
   }

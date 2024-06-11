@@ -7,13 +7,16 @@
  */
 package org.opentcs.guing.common.model;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.base.model.ModelComponent.MISCELLANEOUS;
+import static org.opentcs.guing.base.model.ModelComponent.NAME;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import org.jhotdraw.draw.DefaultDrawing;
 import org.jhotdraw.draw.Drawing;
 import org.jhotdraw.draw.Figure;
@@ -25,8 +28,6 @@ import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.StringProperty;
 import org.opentcs.guing.base.model.CompositeModelComponent;
 import org.opentcs.guing.base.model.ModelComponent;
-import static org.opentcs.guing.base.model.ModelComponent.MISCELLANEOUS;
-import static org.opentcs.guing.base.model.ModelComponent.NAME;
 import org.opentcs.guing.base.model.SimpleFolder;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.LayoutModel;
@@ -49,8 +50,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * for each component type (e.g. points, locations, vehicles, ...).
  */
 public class StandardSystemModel
-    extends CompositeModelComponent
-    implements SystemModel {
+    extends
+      CompositeModelComponent
+    implements
+      SystemModel {
 
   /**
    * A Map that represents the main folder of the system model.
@@ -357,55 +360,75 @@ public class StandardSystemModel
    */
   private void createMainFolders() {
     ResourceBundleUtil bundle = ResourceBundleUtil.getBundle(I18nPlantOverview.TREEVIEW_PATH);
-    createMainFolder(this,
-                     FolderKey.VEHICLES,
-                     new SimpleFolder(
-                         bundle.getString("standardSystemModel.folder_vehicles.name")
-                     ));
+    createMainFolder(
+        this,
+        FolderKey.VEHICLES,
+        new SimpleFolder(
+            bundle.getString("standardSystemModel.folder_vehicles.name")
+        )
+    );
 
     createMainFolder(this, FolderKey.LAYOUT, createDefaultLayoutModel());
 
-    createMainFolder(getMainFolder(FolderKey.LAYOUT),
-                     FolderKey.POINTS,
-                     new SimpleFolder(bundle.getString("standardSystemModel.folder_points.name")));
-    createMainFolder(getMainFolder(FolderKey.LAYOUT),
-                     FolderKey.PATHS,
-                     new SimpleFolder(bundle.getString("standardSystemModel.folder_paths.name")));
-    createMainFolder(getMainFolder(FolderKey.LAYOUT),
-                     FolderKey.LOCATIONS,
-                     new SimpleFolder(
-                         bundle.getString("standardSystemModel.folder_locations.name")
-                     ));
-    createMainFolder(getMainFolder(FolderKey.LAYOUT),
-                     FolderKey.LOCATION_TYPES,
-                     new SimpleFolder(
-                         bundle.getString("standardSystemModel.folder_locationTypes.name")
-                     ));
-    createMainFolder(getMainFolder(FolderKey.LAYOUT),
-                     FolderKey.LINKS,
-                     new SimpleFolder(bundle.getString("standardSystemModel.folder_links.name")));
-    createMainFolder(getMainFolder(FolderKey.LAYOUT),
-                     FolderKey.BLOCKS,
-                     new SimpleFolder(bundle.getString("standardSystemModel.folder_blocks.name")));
-    createMainFolder(getMainFolder(FolderKey.LAYOUT),
-                     FolderKey.OTHER_GRAPHICAL_ELEMENTS,
-                     new SimpleFolder(
-                         bundle.getString("standardSystemModel.folder_otherGraphicalElements.name")
-                     ));
+    createMainFolder(
+        getMainFolder(FolderKey.LAYOUT),
+        FolderKey.POINTS,
+        new SimpleFolder(bundle.getString("standardSystemModel.folder_points.name"))
+    );
+    createMainFolder(
+        getMainFolder(FolderKey.LAYOUT),
+        FolderKey.PATHS,
+        new SimpleFolder(bundle.getString("standardSystemModel.folder_paths.name"))
+    );
+    createMainFolder(
+        getMainFolder(FolderKey.LAYOUT),
+        FolderKey.LOCATIONS,
+        new SimpleFolder(
+            bundle.getString("standardSystemModel.folder_locations.name")
+        )
+    );
+    createMainFolder(
+        getMainFolder(FolderKey.LAYOUT),
+        FolderKey.LOCATION_TYPES,
+        new SimpleFolder(
+            bundle.getString("standardSystemModel.folder_locationTypes.name")
+        )
+    );
+    createMainFolder(
+        getMainFolder(FolderKey.LAYOUT),
+        FolderKey.LINKS,
+        new SimpleFolder(bundle.getString("standardSystemModel.folder_links.name"))
+    );
+    createMainFolder(
+        getMainFolder(FolderKey.LAYOUT),
+        FolderKey.BLOCKS,
+        new SimpleFolder(bundle.getString("standardSystemModel.folder_blocks.name"))
+    );
+    createMainFolder(
+        getMainFolder(FolderKey.LAYOUT),
+        FolderKey.OTHER_GRAPHICAL_ELEMENTS,
+        new SimpleFolder(
+            bundle.getString("standardSystemModel.folder_otherGraphicalElements.name")
+        )
+    );
   }
 
   private LayoutModel createDefaultLayoutModel() {
     LayoutModel layoutModel = modelComponentFactory.createLayoutModel();
     layoutModel.setName(ModelConstants.DEFAULT_VISUAL_LAYOUT_NAME);
-    LayerGroup defaultGroup = new LayerGroup(ModelConstants.DEFAULT_LAYER_GROUP_ID,
-                                             ModelConstants.DEFAULT_LAYER_GROUP_NAME,
-                                             true);
+    LayerGroup defaultGroup = new LayerGroup(
+        ModelConstants.DEFAULT_LAYER_GROUP_ID,
+        ModelConstants.DEFAULT_LAYER_GROUP_NAME,
+        true
+    );
     layoutModel.getPropertyLayerGroups().getValue().put(defaultGroup.getId(), defaultGroup);
-    Layer defaultLayer = new Layer(ModelConstants.DEFAULT_LAYER_ID,
-                                   ModelConstants.DEFAULT_LAYER_ORDINAL,
-                                   true,
-                                   ModelConstants.DEFAULT_LAYER_NAME,
-                                   ModelConstants.DEFAULT_LAYER_GROUP_ID);
+    Layer defaultLayer = new Layer(
+        ModelConstants.DEFAULT_LAYER_ID,
+        ModelConstants.DEFAULT_LAYER_ORDINAL,
+        true,
+        ModelConstants.DEFAULT_LAYER_NAME,
+        ModelConstants.DEFAULT_LAYER_GROUP_ID
+    );
     layoutModel.getPropertyLayerWrappers().getValue()
         .put(defaultLayer.getId(), new LayerWrapper(defaultLayer, defaultGroup));
 
@@ -429,9 +452,11 @@ public class StandardSystemModel
   /**
    * Creates a folder for the system model and the TreeView.
    */
-  private void createMainFolder(ModelComponent parentFolder,
-                                FolderKey key,
-                                ModelComponent newFolder) {
+  private void createMainFolder(
+      ModelComponent parentFolder,
+      FolderKey key,
+      ModelComponent newFolder
+  ) {
     addMainFolder(key, newFolder);
     parentFolder.add(newFolder);
   }
@@ -448,7 +473,9 @@ public class StandardSystemModel
     fParentFolders.put(LocationTypeModel.class, getMainFolder(FolderKey.LOCATION_TYPES));
     fParentFolders.put(LinkModel.class, getMainFolder(FolderKey.LINKS));
     fParentFolders.put(BlockModel.class, getMainFolder(FolderKey.BLOCKS));
-    fParentFolders.put(OtherGraphicalElement.class,
-                       getMainFolder(FolderKey.OTHER_GRAPHICAL_ELEMENTS));
+    fParentFolders.put(
+        OtherGraphicalElement.class,
+        getMainFolder(FolderKey.OTHER_GRAPHICAL_ELEMENTS)
+    );
   }
 }

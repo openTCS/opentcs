@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.concurrent.Executor;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.DispatcherService;
@@ -26,8 +27,9 @@ import org.slf4j.LoggerFactory;
  * Triggers dispatching of vehicles and transport orders on certain events.
  */
 public class VehicleDispatchTrigger
-    implements EventHandler,
-               Lifecycle {
+    implements
+      EventHandler,
+      Lifecycle {
 
   /**
    * This class's Logger.
@@ -63,10 +65,14 @@ public class VehicleDispatchTrigger
    * @param configuration The application configuration.
    */
   @Inject
-  public VehicleDispatchTrigger(@KernelExecutor Executor kernelExecutor,
-                                @ApplicationEventBus EventBus eventBus,
-                                DispatcherService dispatcher,
-                                KernelApplicationConfiguration configuration) {
+  public VehicleDispatchTrigger(
+      @KernelExecutor
+      Executor kernelExecutor,
+      @ApplicationEventBus
+      EventBus eventBus,
+      DispatcherService dispatcher,
+      KernelApplicationConfiguration configuration
+  ) {
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.dispatcher = requireNonNull(dispatcher, "dispatcher");
@@ -103,8 +109,10 @@ public class VehicleDispatchTrigger
     }
     TCSObjectEvent objectEvent = (TCSObjectEvent) event;
     if (objectEvent.getCurrentOrPreviousObjectState() instanceof Vehicle) {
-      checkVehicleChange((Vehicle) objectEvent.getPreviousObjectState(),
-                         (Vehicle) objectEvent.getCurrentObjectState());
+      checkVehicleChange(
+          (Vehicle) objectEvent.getPreviousObjectState(),
+          (Vehicle) objectEvent.getCurrentObjectState()
+      );
     }
   }
 
@@ -116,7 +124,7 @@ public class VehicleDispatchTrigger
     }
 
     if ((newVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
-         || newVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_RESPECTED)
+        || newVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_RESPECTED)
         && (idleAndEnergyLevelChanged(oldVehicle, newVehicle)
             || awaitingNextOrder(oldVehicle, newVehicle)
             || orderSequenceNulled(oldVehicle, newVehicle))) {

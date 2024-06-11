@@ -18,8 +18,10 @@ import org.opentcs.data.model.Location;
  * A combo box renderer for locations.
  */
 class LocationComboBoxRenderer
-    extends JLabel
-    implements ListCellRenderer<TCSObjectReference<Location>> {
+    extends
+      JLabel
+    implements
+      ListCellRenderer<TCSObjectReference<Location>> {
 
   /**
    * Creates a new instance.
@@ -33,7 +35,8 @@ class LocationComboBoxRenderer
       TCSObjectReference<Location> value,
       int index,
       boolean isSelected,
-      boolean cellHasFocus) {
+      boolean cellHasFocus
+  ) {
     if (value == null) {
       setText("");
     }

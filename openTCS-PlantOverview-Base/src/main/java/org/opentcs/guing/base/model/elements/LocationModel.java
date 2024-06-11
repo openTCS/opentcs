@@ -7,12 +7,14 @@
  */
 package org.opentcs.guing.base.model.elements;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
@@ -22,7 +24,6 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.base.AllocationState;
-import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.base.components.layer.NullLayerWrapper;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeListener;
@@ -42,10 +43,12 @@ import org.opentcs.guing.base.model.PositionableModelComponent;
  * Basic implementation for every kind of location.
  */
 public class LocationModel
-    extends AbstractConnectableModelComponent
-    implements AttributesChangeListener,
-               PositionableModelComponent,
-               FigureDecorationDetails {
+    extends
+      AbstractConnectableModelComponent
+    implements
+      AttributesChangeListener,
+      PositionableModelComponent,
+      FigureDecorationDetails {
 
   /**
    * The property key for the location's type.
@@ -255,7 +258,10 @@ public class LocationModel
   }
 
   @Override
-  public void clearAllocationState(@Nonnull VehicleModel model) {
+  public void clearAllocationState(
+      @Nonnull
+      VehicleModel model
+  ) {
     requireNonNull(model, "model");
 
     allocationStates.remove(model);
@@ -282,7 +288,8 @@ public class LocationModel
       throws CloneNotSupportedException {
     LocationModel clone = (LocationModel) super.clone();
     clone.setAllocationStates(
-        (Map<VehicleModel, AllocationState>) ((TreeMap<VehicleModel, AllocationState>) allocationStates).clone()
+        (Map<VehicleModel, AllocationState>) ((TreeMap<VehicleModel, AllocationState>) allocationStates)
+            .clone()
     );
     clone.setBlockModels((Set<BlockModel>) ((TreeSet<BlockModel>) blocks).clone());
 
@@ -429,7 +436,10 @@ public class LocationModel
     this.blocks = blocks;
   }
 
-  public void setLocation(@Nonnull Location location) {
+  public void setLocation(
+      @Nonnull
+      Location location
+  ) {
     this.location = requireNonNull(location, "location");
   }
 

@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.order.TransportOrder;
@@ -21,7 +22,8 @@ import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
  * assignment.
  */
 public class CheckNewOrdersPhase
-    implements Phase {
+    implements
+      Phase {
 
   /**
    * The object service
@@ -42,10 +44,12 @@ public class CheckNewOrdersPhase
   private boolean initialized;
 
   @Inject
-  public CheckNewOrdersPhase(TCSObjectService objectService,
-                             Router router,
-                             TransportOrderUtil transportOrderUtil,
-                             DefaultDispatcherConfiguration configuration) {
+  public CheckNewOrdersPhase(
+      TCSObjectService objectService,
+      Router router,
+      TransportOrderUtil transportOrderUtil,
+      DefaultDispatcherConfiguration configuration
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.router = requireNonNull(router, "router");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
@@ -85,17 +89,23 @@ public class CheckNewOrdersPhase
     // Check if the transport order is routable.
     if (configuration.dismissUnroutableTransportOrders()
         && router.checkRoutability(order).isEmpty()) {
-      transportOrderUtil.updateTransportOrderState(order.getReference(),
-                                                   TransportOrder.State.UNROUTABLE);
+      transportOrderUtil.updateTransportOrderState(
+          order.getReference(),
+          TransportOrder.State.UNROUTABLE
+      );
       return;
     }
-    transportOrderUtil.updateTransportOrderState(order.getReference(),
-                                                 TransportOrder.State.ACTIVE);
+    transportOrderUtil.updateTransportOrderState(
+        order.getReference(),
+        TransportOrder.State.ACTIVE
+    );
     // The transport order has been activated - dispatch it.
     // Check if it has unfinished dependencies.
     if (!transportOrderUtil.hasUnfinishedDependencies(order)) {
-      transportOrderUtil.updateTransportOrderState(order.getReference(),
-                                                   TransportOrder.State.DISPATCHABLE);
+      transportOrderUtil.updateTransportOrderState(
+          order.getReference(),
+          TransportOrder.State.DISPATCHABLE
+      );
     }
   }
 

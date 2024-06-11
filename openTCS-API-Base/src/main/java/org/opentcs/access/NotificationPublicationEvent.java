@@ -7,15 +7,17 @@
  */
 package org.opentcs.access;
 
-import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
+
+import java.io.Serializable;
 import org.opentcs.data.notification.UserNotification;
 
 /**
  * Instances of this class represent events emitted by/for notifications being published.
  */
 public class NotificationPublicationEvent
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The published message.

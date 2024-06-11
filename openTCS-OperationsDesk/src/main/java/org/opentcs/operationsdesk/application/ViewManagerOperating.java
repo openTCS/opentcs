@@ -7,6 +7,8 @@
  */
 package org.opentcs.operationsdesk.application;
 
+import static java.util.Objects.requireNonNull;
+
 import bibliothek.gui.Dockable;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.intern.DefaultCommonDockable;
@@ -15,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.opentcs.customizations.ApplicationEventBus;
@@ -35,7 +36,8 @@ import org.opentcs.util.event.EventSource;
  * order sequence views.
  */
 public class ViewManagerOperating
-    extends AbstractViewManager {
+    extends
+      AbstractViewManager {
 
   /**
    * Manages the application's docking frames.
@@ -69,8 +71,11 @@ public class ViewManagerOperating
    * @param eventSource Where this instance registers event listeners.
    */
   @Inject
-  public ViewManagerOperating(DockingManagerOperating dockingManager,
-                              @ApplicationEventBus EventSource eventSource) {
+  public ViewManagerOperating(
+      DockingManagerOperating dockingManager,
+      @ApplicationEventBus
+      EventSource eventSource
+  ) {
     super(eventSource);
     this.dockingManager = requireNonNull(dockingManager, "dockingManager");
     this.eventSource = requireNonNull(eventSource, "eventSource");
@@ -202,8 +207,10 @@ public class ViewManagerOperating
    * @param dockable The dockable the panel is wrapped into. Used as the key.
    * @param panel The panel.
    */
-  public void addUserNotificationView(DefaultSingleCDockable dockable,
-                                      UserNotificationsContainerPanel panel) {
+  public void addUserNotificationView(
+      DefaultSingleCDockable dockable,
+      UserNotificationsContainerPanel panel
+  ) {
     requireNonNull(dockable, "dockable");
     requireNonNull(panel, "panel");
 
@@ -217,8 +224,10 @@ public class ViewManagerOperating
    * @param dockable The dockable the panel is wrapped into. Used as the key.
    * @param panel The panel.
    */
-  public void addTransportOrderView(DefaultSingleCDockable dockable,
-                                    TransportOrdersContainerPanel panel) {
+  public void addTransportOrderView(
+      DefaultSingleCDockable dockable,
+      TransportOrdersContainerPanel panel
+  ) {
     requireNonNull(dockable, "dockable");
     requireNonNull(panel, "panel");
 
@@ -232,8 +241,10 @@ public class ViewManagerOperating
    * @param dockable The dockable the panel is wrapped into. Used as the key.
    * @param panel The panel.
    */
-  public void addOrderSequenceView(DefaultSingleCDockable dockable,
-                                   OrderSequencesContainerPanel panel) {
+  public void addOrderSequenceView(
+      DefaultSingleCDockable dockable,
+      OrderSequencesContainerPanel panel
+  ) {
     requireNonNull(dockable, "dockable");
     requireNonNull(panel, "panel");
 
@@ -247,8 +258,10 @@ public class ViewManagerOperating
    * @param dockable The dockable the panel is wrapped into. Used as the key.
    * @param panel The panel.
    */
-  public void addPeripheralJobView(DefaultSingleCDockable dockable,
-                                   PeripheralJobsContainerPanel panel) {
+  public void addPeripheralJobView(
+      DefaultSingleCDockable dockable,
+      PeripheralJobsContainerPanel panel
+  ) {
     requireNonNull(dockable, "dockable");
     requireNonNull(panel, "panel");
 

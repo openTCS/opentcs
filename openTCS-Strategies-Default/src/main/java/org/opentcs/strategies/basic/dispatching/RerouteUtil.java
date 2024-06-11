@@ -7,13 +7,17 @@
  */
 package org.opentcs.strategies.basic.dispatching;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.IGNORE_PATH_LOCKS;
+import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.PAUSE_AT_PATH_LOCK;
+import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.PAUSE_IMMEDIATELY;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.function.Predicate;
 import org.opentcs.components.kernel.Router;
@@ -29,9 +33,6 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy;
-import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.IGNORE_PATH_LOCKS;
-import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.PAUSE_AT_PATH_LOCK;
-import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.PAUSE_IMMEDIATELY;
 import org.opentcs.strategies.basic.dispatching.rerouting.ReroutingStrategy;
 import org.opentcs.strategies.basic.dispatching.rerouting.VehiclePositionResolver;
 import org.slf4j.Logger;
@@ -76,19 +77,23 @@ public class RerouteUtil {
    * @param vehiclePositionResolver Used to resolve the position of vehicles.
    */
   @Inject
-  public RerouteUtil(Router router,
-                     VehicleControllerPool vehicleControllerPool,
-                     InternalTransportOrderService transportOrderService,
-                     DefaultDispatcherConfiguration configuration,
-                     Map<ReroutingType, ReroutingStrategy> reroutingStrategies,
-                     VehiclePositionResolver vehiclePositionResolver) {
+  public RerouteUtil(
+      Router router,
+      VehicleControllerPool vehicleControllerPool,
+      InternalTransportOrderService transportOrderService,
+      DefaultDispatcherConfiguration configuration,
+      Map<ReroutingType, ReroutingStrategy> reroutingStrategies,
+      VehiclePositionResolver vehiclePositionResolver
+  ) {
     this.router = requireNonNull(router, "router");
     this.vehicleControllerPool = requireNonNull(vehicleControllerPool, "vehicleControllerPool");
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.configuration = requireNonNull(configuration, "configuration");
     this.reroutingStrategies = requireNonNull(reroutingStrategies, "reroutingStrategies");
-    this.vehiclePositionResolver = requireNonNull(vehiclePositionResolver,
-                                                  "vehiclePositionResolver");
+    this.vehiclePositionResolver = requireNonNull(
+        vehiclePositionResolver,
+        "vehiclePositionResolver"
+    );
   }
 
   public void reroute(Collection<Vehicle> vehicles, ReroutingType reroutingType) {
@@ -106,17 +111,21 @@ public class RerouteUtil {
       return;
     }
 
-    TransportOrder originalOrder = transportOrderService.fetchObject(TransportOrder.class,
-                                                                     vehicle.getTransportOrder());
+    TransportOrder originalOrder = transportOrderService.fetchObject(
+        TransportOrder.class,
+        vehicle.getTransportOrder()
+    );
 
     Optional<List<DriveOrder>> optOrders;
     if (reroutingStrategies.containsKey(reroutingType)) {
       optOrders = reroutingStrategies.get(reroutingType).reroute(vehicle);
     }
     else {
-      LOG.warn("Cannot reroute {} for unknown rerouting type: {}",
-               vehicle.getName(),
-               reroutingType.name());
+      LOG.warn(
+          "Cannot reroute {} for unknown rerouting type: {}",
+          vehicle.getName(),
+          reroutingType.name()
+      );
       optOrders = Optional.empty();
     }
 
@@ -133,10 +142,14 @@ public class RerouteUtil {
     updateTransportOrder(originalOrder, newDriveOrders, vehicle);
   }
 
-  private List<DriveOrder> updatePathLocksAndRestrictions(Vehicle vehicle,
-                                                          TransportOrder originalOrder) {
-    LOG.debug("Couldn't find a new route for {}. Updating the current one...",
-              vehicle.getName());
+  private List<DriveOrder> updatePathLocksAndRestrictions(
+      Vehicle vehicle,
+      TransportOrder originalOrder
+  ) {
+    LOG.debug(
+        "Couldn't find a new route for {}. Updating the current one...",
+        vehicle.getName()
+    );
     // Get all unfinished drive order of the transport order the vehicle is processing
     List<DriveOrder> unfinishedOrders = new ArrayList<>();
     unfinishedOrders.add(originalOrder.getCurrentDriveOrder());
@@ -145,15 +158,19 @@ public class RerouteUtil {
     unfinishedOrders = updatePathLocks(unfinishedOrders);
     unfinishedOrders = markRestrictedSteps(
         unfinishedOrders,
-        new ExecutionTest(configuration.reroutingImpossibleStrategy(),
-                          vehiclePositionResolver.getFutureOrCurrentPosition(vehicle))
+        new ExecutionTest(
+            configuration.reroutingImpossibleStrategy(),
+            vehiclePositionResolver.getFutureOrCurrentPosition(vehicle)
+        )
     );
     return unfinishedOrders;
   }
 
-  private void updateTransportOrder(TransportOrder originalOrder,
-                                    List<DriveOrder> newDriveOrders,
-                                    Vehicle vehicle) {
+  private void updateTransportOrder(
+      TransportOrder originalOrder,
+      List<DriveOrder> newDriveOrders,
+      Vehicle vehicle
+  ) {
     VehicleController controller = vehicleControllerPool.getVehicleController(vehicle.getName());
 
     // Restore the transport order's history
@@ -163,8 +180,10 @@ public class RerouteUtil {
 
     // Update the transport order's drive orders with the re-routed ones
     LOG.debug("{}: Updating drive orders with {}.", originalOrder.getName(), newOrders);
-    transportOrderService.updateTransportOrderDriveOrders(originalOrder.getReference(),
-                                                          newOrders);
+    transportOrderService.updateTransportOrderDriveOrders(
+        originalOrder.getReference(),
+        newOrders
+    );
 
     // If the vehicle is currently processing a (drive) order (and not waiting to get the next
     // drive order) we need to update the vehicle's current drive order with the new one.
@@ -186,11 +205,15 @@ public class RerouteUtil {
 
       for (Step step : order.getRoute().getSteps()) {
         Path path = transportOrderService.fetchObject(Path.class, step.getPath().getReference());
-        updatedSteps.add(new Route.Step(path,
-                                        step.getSourcePoint(),
-                                        step.getDestinationPoint(),
-                                        step.getVehicleOrientation(),
-                                        step.getRouteIndex()));
+        updatedSteps.add(
+            new Route.Step(
+                path,
+                step.getSourcePoint(),
+                step.getDestinationPoint(),
+                step.getVehicleOrientation(),
+                step.getRouteIndex()
+            )
+        );
       }
 
       Route updatedRoute = new Route(updatedSteps, order.getRoute().getCosts());
@@ -205,8 +228,10 @@ public class RerouteUtil {
     return updatedOrders;
   }
 
-  private List<DriveOrder> markRestrictedSteps(List<DriveOrder> orders,
-                                               Predicate<Step> executionTest) {
+  private List<DriveOrder> markRestrictedSteps(
+      List<DriveOrder> orders,
+      Predicate<Step> executionTest
+  ) {
     if (configuration.reroutingImpossibleStrategy() == IGNORE_PATH_LOCKS) {
       return orders;
     }
@@ -221,12 +246,16 @@ public class RerouteUtil {
       for (Step step : order.getRoute().getSteps()) {
         boolean executionAllowed = executionTest.test(step);
         LOG.debug("Marking path '{}' allowed: {}", step.getPath(), executionAllowed);
-        updatedSteps.add(new Step(step.getPath(),
-                                  step.getSourcePoint(),
-                                  step.getDestinationPoint(),
-                                  step.getVehicleOrientation(),
-                                  step.getRouteIndex(),
-                                  executionAllowed));
+        updatedSteps.add(
+            new Step(
+                step.getPath(),
+                step.getSourcePoint(),
+                step.getDestinationPoint(),
+                step.getVehicleOrientation(),
+                step.getRouteIndex(),
+                executionAllowed
+            )
+        );
       }
 
       Route updatedRoute = new Route(updatedSteps, order.getRoute().getCosts());
@@ -249,7 +278,8 @@ public class RerouteUtil {
   }
 
   private class ExecutionTest
-      implements Predicate<Step> {
+      implements
+        Predicate<Step> {
 
     /**
      * The current fallback strategy.

@@ -36,18 +36,19 @@ import org.opentcs.modeleditor.model.ModelInjectionModule;
 import org.opentcs.modeleditor.persistence.DefaultPersistenceInjectionModule;
 import org.opentcs.modeleditor.transport.TransportInjectionModule;
 import org.opentcs.modeleditor.util.ElementNamingSchemeConfiguration;
+import org.opentcs.modeleditor.util.ModelEditorConfiguration;
 import org.opentcs.modeleditor.util.UtilInjectionModule;
 import org.opentcs.util.ClassMatcher;
 import org.opentcs.util.gui.dialog.ConnectionParamSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.opentcs.modeleditor.util.ModelEditorConfiguration;
 
 /**
  * A Guice module for the openTCS plant overview application.
  */
 public class DefaultPlantOverviewInjectionModule
-    extends PlantOverviewInjectionModule {
+    extends
+      PlantOverviewInjectionModule {
 
   /**
    * This class's logger.
@@ -86,8 +87,10 @@ public class DefaultPlantOverviewInjectionModule
 
   private void configurePlantOverviewDependencies() {
     ModelEditorConfiguration configuration
-        = getConfigBindingProvider().get(ModelEditorConfiguration.PREFIX,
-                                         ModelEditorConfiguration.class);
+        = getConfigBindingProvider().get(
+            ModelEditorConfiguration.PREFIX,
+            ModelEditorConfiguration.class
+        );
     bind(ApplicationPortalProviderConfiguration.class)
         .toInstance(configuration);
     bind(ModelEditorConfiguration.class)
@@ -104,22 +107,28 @@ public class DefaultPlantOverviewInjectionModule
 
   private void configureNamingConfiguration() {
     ElementNamingSchemeConfiguration configuration
-        = getConfigBindingProvider().get(ElementNamingSchemeConfiguration.PREFIX,
-                                         ElementNamingSchemeConfiguration.class);
+        = getConfigBindingProvider().get(
+            ElementNamingSchemeConfiguration.PREFIX,
+            ElementNamingSchemeConfiguration.class
+        );
     bind(ElementNamingSchemeConfiguration.class)
         .toInstance(configuration);
   }
 
   private void configureSocketConnections() {
-    SslConfiguration sslConfiguration = getConfigBindingProvider().get(SslConfiguration.PREFIX,
-                                                                       SslConfiguration.class);
+    SslConfiguration sslConfiguration = getConfigBindingProvider().get(
+        SslConfiguration.PREFIX,
+        SslConfiguration.class
+    );
 
     //Create the data object for the ssl configuration
-    SslParameterSet sslParamSet = new SslParameterSet(SslParameterSet.DEFAULT_KEYSTORE_TYPE,
-                                                      null,
-                                                      null,
-                                                      new File(sslConfiguration.truststoreFile()),
-                                                      sslConfiguration.truststorePassword());
+    SslParameterSet sslParamSet = new SslParameterSet(
+        SslParameterSet.DEFAULT_KEYSTORE_TYPE,
+        null,
+        null,
+        new File(sslConfiguration.truststoreFile()),
+        sslConfiguration.truststorePassword()
+    );
     bind(SslParameterSet.class).toInstance(sslParamSet);
 
     SocketFactoryProvider socketFactoryProvider;
@@ -133,11 +142,15 @@ public class DefaultPlantOverviewInjectionModule
 
     //Bind socket provider to the kernel portal
     bind(KernelServicePortal.class)
-        .toInstance(new KernelServicePortalBuilder(GuestUserCredentials.USER,
-                                                   GuestUserCredentials.PASSWORD)
-            .setSocketFactoryProvider(socketFactoryProvider)
-            .setEventFilter(new ClassMatcher(LowLevelCommunicationEvent.class).negate())
-            .build());
+        .toInstance(
+            new KernelServicePortalBuilder(
+                GuestUserCredentials.USER,
+                GuestUserCredentials.PASSWORD
+            )
+                .setSocketFactoryProvider(socketFactoryProvider)
+                .setEventFilter(new ClassMatcher(LowLevelCommunicationEvent.class).negate())
+                .build()
+        );
   }
 
   private void configureThemes(ModelEditorConfiguration configuration) {
@@ -153,7 +166,7 @@ public class DefaultPlantOverviewInjectionModule
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     }
     catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-               | UnsupportedLookAndFeelException ex) {
+           | UnsupportedLookAndFeelException ex) {
       LOG.warn("Could not set look-and-feel", ex);
     }
     // Show tooltips for 30 seconds (Default: 4 sec)

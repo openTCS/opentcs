@@ -15,7 +15,8 @@ import org.slf4j.LoggerFactory;
  * Configures the load generator panel.
  */
 public class LoadGeneratorPanelModule
-    extends PlantOverviewInjectionModule {
+    extends
+      PlantOverviewInjectionModule {
 
   /**
    * This class's logger.
@@ -31,8 +32,10 @@ public class LoadGeneratorPanelModule
   @Override
   protected void configure() {
     ContinuousLoadPanelConfiguration configuration
-        = getConfigBindingProvider().get(ContinuousLoadPanelConfiguration.PREFIX,
-                                         ContinuousLoadPanelConfiguration.class);
+        = getConfigBindingProvider().get(
+            ContinuousLoadPanelConfiguration.PREFIX,
+            ContinuousLoadPanelConfiguration.class
+        );
 
     if (!configuration.enable()) {
       LOG.info("Continuous load panel disabled by configuration.");

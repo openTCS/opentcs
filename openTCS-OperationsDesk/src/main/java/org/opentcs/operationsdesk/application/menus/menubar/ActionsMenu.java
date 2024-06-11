@@ -7,9 +7,10 @@
  */
 package org.opentcs.operationsdesk.application.menus.menubar;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.event.ActionEvent;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -22,14 +23,15 @@ import org.opentcs.operationsdesk.application.action.actions.FindVehicleAction;
 import org.opentcs.operationsdesk.application.menus.MenuFactory;
 import org.opentcs.operationsdesk.components.drawing.figures.VehicleFigure;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
-import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
+import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * The application's menu for run-time actions.
  */
 public class ActionsMenu
-    extends JMenu {
+    extends
+      JMenu {
 
   /**
    * A menu item for creating new transport orders.
@@ -62,10 +64,12 @@ public class ActionsMenu
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public ActionsMenu(ViewActionMap actionMap,
-                     OpenTCSDrawingEditor drawingEditor,
-                     MenuFactory menuFactory,
-                     OperationsDeskConfiguration appConfig) {
+  public ActionsMenu(
+      ViewActionMap actionMap,
+      OpenTCSDrawingEditor drawingEditor,
+      MenuFactory menuFactory,
+      OperationsDeskConfiguration appConfig
+  ) {
     requireNonNull(actionMap, "actionMap");
     requireNonNull(drawingEditor, "drawingEditor");
     requireNonNull(menuFactory, "menuFactory");

@@ -17,7 +17,8 @@ import org.slf4j.LoggerFactory;
  * A tree node that can be sorted.
  */
 public class SortableTreeNode
-    extends DefaultMutableTreeNode {
+    extends
+      DefaultMutableTreeNode {
 
   /**
    * True if the child elements of this node can be sorted.

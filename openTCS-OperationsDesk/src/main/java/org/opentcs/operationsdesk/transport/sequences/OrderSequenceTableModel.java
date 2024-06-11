@@ -7,10 +7,11 @@
  */
 package org.opentcs.operationsdesk.transport.sequences;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
@@ -22,8 +23,10 @@ import org.slf4j.LoggerFactory;
 /**
  */
 public class OrderSequenceTableModel
-    extends AbstractTableModel
-    implements OrderSequenceContainerListener {
+    extends
+      AbstractTableModel
+    implements
+      OrderSequenceContainerListener {
 
   private static final Logger LOG = LoggerFactory.getLogger(OrderSequenceTableModel.class);
   /**
@@ -41,26 +44,26 @@ public class OrderSequenceTableModel
   private static final int COLUMN_FAILURE = 6;
 
   private static final String[] COLUMN_NAMES = {
-    "Name",
-    BUNDLE.getString("orderSequenceTableModel.column_intendedVehicle.headerText"),
-    BUNDLE.getString("orderSequenceTableModel.column_executingVehicle.headerText"),
-    "Index",
-    BUNDLE.getString("orderSequenceTableModel.column_complete.headerText"),
-    BUNDLE.getString("orderSequenceTableModel.column_finished.headerText"),
-    BUNDLE.getString("orderSequenceTableModel.column_failureFatal.headerText")
+      "Name",
+      BUNDLE.getString("orderSequenceTableModel.column_intendedVehicle.headerText"),
+      BUNDLE.getString("orderSequenceTableModel.column_executingVehicle.headerText"),
+      "Index",
+      BUNDLE.getString("orderSequenceTableModel.column_complete.headerText"),
+      BUNDLE.getString("orderSequenceTableModel.column_finished.headerText"),
+      BUNDLE.getString("orderSequenceTableModel.column_failureFatal.headerText")
   };
 
   /**
    * The column classes.
    */
   private static final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
-    String.class,
-    String.class,
-    String.class,
-    String.class,
-    String.class,
-    String.class,
-    String.class
+      String.class,
+      String.class,
+      String.class,
+      String.class,
+      String.class,
+      String.class,
+      String.class
   };
 
   private final List<OrderSequence> entries = new ArrayList<>();
@@ -179,8 +182,10 @@ public class OrderSequenceTableModel
     SwingUtilities.invokeLater(() -> {
       int sequenceIndex = entries.indexOf(sequence);
       if (sequenceIndex == -1) {
-        LOG.warn("Unknown order sequence: {}. Ignoring order sequence removal.",
-                 sequence.getName());
+        LOG.warn(
+            "Unknown order sequence: {}. Ignoring order sequence removal.",
+            sequence.getName()
+        );
         return;
       }
       entries.remove(sequenceIndex);

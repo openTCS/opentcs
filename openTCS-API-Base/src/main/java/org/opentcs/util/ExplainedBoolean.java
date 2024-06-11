@@ -7,8 +7,9 @@
  */
 package org.opentcs.util;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * A boolean with an explanation/reason for its value.
@@ -30,7 +31,11 @@ public class ExplainedBoolean {
    * @param value The actual value.
    * @param reason A reason/explanation for the value.
    */
-  public ExplainedBoolean(boolean value, @Nonnull String reason) {
+  public ExplainedBoolean(
+      boolean value,
+      @Nonnull
+      String reason
+  ) {
     this.value = value;
     this.reason = requireNonNull(reason, "reason");
   }

@@ -17,8 +17,9 @@ import org.opentcs.drivers.peripherals.PeripheralControllerPool;
  * Manages the attachment of peripheral controllers to locations and peripheral comm adapters.
  */
 public interface LocalPeripheralControllerPool
-    extends PeripheralControllerPool,
-            Lifecycle {
+    extends
+      PeripheralControllerPool,
+      Lifecycle {
 
   /**
    * Associates a peripheral controller with a location and a comm adapter.
@@ -27,8 +28,10 @@ public interface LocalPeripheralControllerPool
    * @param commAdapter The comm adapter that is going to control the peripheral deivce.
    * @throws IllegalArgumentException If the referenced location does not exist.
    */
-  void attachPeripheralController(TCSResourceReference<Location> location,
-                                  PeripheralCommAdapter commAdapter)
+  void attachPeripheralController(
+      TCSResourceReference<Location> location,
+      PeripheralCommAdapter commAdapter
+  )
       throws IllegalArgumentException;
 
   /**

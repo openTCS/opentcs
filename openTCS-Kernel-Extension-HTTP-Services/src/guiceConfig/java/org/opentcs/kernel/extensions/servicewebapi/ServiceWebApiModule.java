@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
  * Configures the service web API extension.
  */
 public class ServiceWebApiModule
-    extends KernelInjectionModule {
+    extends
+      KernelInjectionModule {
 
   /**
    * This class's logger.
@@ -32,8 +33,10 @@ public class ServiceWebApiModule
   @Override
   protected void configure() {
     ServiceWebApiConfiguration configuration
-        = getConfigBindingProvider().get(ServiceWebApiConfiguration.PREFIX,
-                                         ServiceWebApiConfiguration.class);
+        = getConfigBindingProvider().get(
+            ServiceWebApiConfiguration.PREFIX,
+            ServiceWebApiConfiguration.class
+        );
 
     if (!configuration.enable()) {
       LOG.info("Service web API disabled by configuration.");

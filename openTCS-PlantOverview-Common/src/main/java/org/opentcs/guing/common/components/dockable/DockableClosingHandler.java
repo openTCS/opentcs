@@ -7,19 +7,21 @@
  */
 package org.opentcs.guing.common.components.dockable;
 
+import static java.util.Objects.requireNonNull;
+
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.event.CVetoClosingEvent;
 import bibliothek.gui.dock.common.event.CVetoClosingListener;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.guing.common.application.ViewManager;
 
 /**
  * Handles closing of a dockable.
  */
 public class DockableClosingHandler
-    implements CVetoClosingListener {
+    implements
+      CVetoClosingListener {
 
   /**
    * The dockable.
@@ -42,9 +44,12 @@ public class DockableClosingHandler
    * @param dockingManager Manages the application's dockables.
    */
   @Inject
-  public DockableClosingHandler(@Assisted DefaultSingleCDockable dockable,
-                                ViewManager viewManager,
-                                DockingManager dockingManager) {
+  public DockableClosingHandler(
+      @Assisted
+      DefaultSingleCDockable dockable,
+      ViewManager viewManager,
+      DockingManager dockingManager
+  ) {
     this.dockable = requireNonNull(dockable, "dockable");
     this.viewManager = requireNonNull(viewManager, "viewManager");
     this.dockingManager = requireNonNull(dockingManager, "dockingManager");

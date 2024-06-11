@@ -7,11 +7,12 @@
  */
 package org.opentcs.virtualvehicle;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
@@ -26,7 +27,8 @@ import org.slf4j.LoggerFactory;
  * A factory for creating {@link LoopbackCommAdapterPanel} instances.
  */
 public class LoopbackCommAdapterPanelFactory
-    implements VehicleCommAdapterPanelFactory {
+    implements
+      VehicleCommAdapterPanelFactory {
 
   /**
    * This class's logger.
@@ -52,8 +54,10 @@ public class LoopbackCommAdapterPanelFactory
    * @param componentsFactory The components factory.
    */
   @Inject
-  public LoopbackCommAdapterPanelFactory(KernelServicePortal servicePortal,
-                                         AdapterPanelComponentsFactory componentsFactory) {
+  public LoopbackCommAdapterPanelFactory(
+      KernelServicePortal servicePortal,
+      AdapterPanelComponentsFactory componentsFactory
+  ) {
     this.servicePortal = requireNonNull(servicePortal, "servicePortal");
     this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
   }
@@ -83,9 +87,13 @@ public class LoopbackCommAdapterPanelFactory
 
   @Override
   public List<VehicleCommAdapterPanel> getPanelsFor(
-      @Nonnull VehicleCommAdapterDescription description,
-      @Nonnull TCSObjectReference<Vehicle> vehicle,
-      @Nonnull VehicleProcessModelTO processModel) {
+      @Nonnull
+      VehicleCommAdapterDescription description,
+      @Nonnull
+      TCSObjectReference<Vehicle> vehicle,
+      @Nonnull
+      VehicleProcessModelTO processModel
+  ) {
     requireNonNull(description, "description");
     requireNonNull(vehicle, "vehicle");
     requireNonNull(processModel, "processModel");
@@ -95,8 +103,12 @@ public class LoopbackCommAdapterPanelFactory
     }
 
     List<VehicleCommAdapterPanel> panels = new ArrayList<>();
-    panels.add(componentsFactory.createPanel(((LoopbackVehicleModelTO) processModel),
-                                             servicePortal.getVehicleService()));
+    panels.add(
+        componentsFactory.createPanel(
+            ((LoopbackVehicleModelTO) processModel),
+            servicePortal.getVehicleService()
+        )
+    );
     return panels;
   }
 
@@ -109,8 +121,10 @@ public class LoopbackCommAdapterPanelFactory
    * @return {@code true} if, and only if, this factory can provide comm adapter panels for the
    * given description and the given type of process model.
    */
-  private boolean providesPanelsFor(VehicleCommAdapterDescription description,
-                                    VehicleProcessModelTO processModel) {
+  private boolean providesPanelsFor(
+      VehicleCommAdapterDescription description,
+      VehicleProcessModelTO processModel
+  ) {
     return (description instanceof LoopbackCommunicationAdapterDescription)
         && (processModel instanceof LoopbackVehicleModelTO);
   }

@@ -14,7 +14,8 @@ import org.jhotdraw.draw.tool.AbstractTool;
  * The tool to drag the drawing.
  */
 public class DragTool
-    extends AbstractTool {
+    extends
+      AbstractTool {
 
   public DragTool() {
     super();

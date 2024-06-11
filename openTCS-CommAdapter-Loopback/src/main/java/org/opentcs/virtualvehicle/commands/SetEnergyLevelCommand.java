@@ -14,7 +14,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
  * A command to set a vehicle's energy level.
  */
 public class SetEnergyLevelCommand
-    implements AdapterCommand {
+    implements
+      AdapterCommand {
 
   /**
    * The energy level to set.

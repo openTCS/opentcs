@@ -7,15 +7,16 @@
  */
 package org.opentcs.kernel.workingset;
 
-import java.time.Instant;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.peripherals.PeripheralJob;
@@ -39,8 +40,10 @@ class DefaultPeripheralJobCleanupApprovalTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = PeripheralJob.State.class,
-              names = {"FINISHED", "FAILED"})
+  @EnumSource(
+      value = PeripheralJob.State.class,
+      names = {"FINISHED", "FAILED"}
+  )
   void approvePeripheralJob(PeripheralJob.State state) {
     PeripheralJob job = createPeripheralJob()
         .withState(state)
@@ -50,9 +53,11 @@ class DefaultPeripheralJobCleanupApprovalTest {
   }
 
   @ParameterizedTest
-  @EnumSource(value = PeripheralJob.State.class,
-              mode = EnumSource.Mode.EXCLUDE,
-              names = {"FINISHED", "FAILED"})
+  @EnumSource(
+      value = PeripheralJob.State.class,
+      mode = EnumSource.Mode.EXCLUDE,
+      names = {"FINISHED", "FAILED"}
+  )
   void disapprovePeripheralJobNotInFinalState(PeripheralJob.State state) {
     PeripheralJob job = createPeripheralJob()
         .withState(state)

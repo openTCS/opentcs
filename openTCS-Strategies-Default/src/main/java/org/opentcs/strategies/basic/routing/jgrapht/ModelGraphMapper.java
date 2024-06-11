@@ -27,9 +27,11 @@ public interface ModelGraphMapper {
    * @param vehicle The vehicle for which to build the graph.
    * @return A weighted graph representing the topology to be used for the given vehicle.
    */
-  Graph<String, Edge> translateModel(Collection<Point> points,
-                                     Collection<Path> paths,
-                                     Vehicle vehicle);
+  Graph<String, Edge> translateModel(
+      Collection<Point> points,
+      Collection<Path> paths,
+      Vehicle vehicle
+  );
 
   /**
    * Re-translates the given paths and replaces corresponding edges in a copy of the provided graph.
@@ -43,7 +45,9 @@ public interface ModelGraphMapper {
    * @param graph The graph to whose copy the re-translated paths are to be added.
    * @return A copy of the provided graph including the re-translated paths.
    */
-  Graph<String, Edge> updateGraph(Collection<Path> paths,
-                                  Vehicle vehicle,
-                                  Graph<String, Edge> graph);
+  Graph<String, Edge> updateGraph(
+      Collection<Path> paths,
+      Vehicle vehicle,
+      Graph<String, Edge> graph
+  );
 }

@@ -33,13 +33,16 @@ import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformatio
  * </p>
  */
 public interface RemotePeripheralService
-    extends RemoteTCSObjectService,
-            Remote {
+    extends
+      RemoteTCSObjectService,
+      Remote {
 
   // CHECKSTYLE:OFF
-  void attachCommAdapter(ClientID clientId,
-                         TCSResourceReference<Location> ref,
-                         PeripheralCommAdapterDescription description)
+  void attachCommAdapter(
+      ClientID clientId,
+      TCSResourceReference<Location> ref,
+      PeripheralCommAdapterDescription description
+  )
       throws RemoteException;
 
   void disableCommAdapter(ClientID clientId, TCSResourceReference<Location> ref)
@@ -48,16 +51,20 @@ public interface RemotePeripheralService
   void enableCommAdapter(ClientID clientId, TCSResourceReference<Location> ref)
       throws RemoteException;
 
-  PeripheralAttachmentInformation fetchAttachmentInformation(ClientID clientId,
-                                                             TCSResourceReference<Location> ref)
+  PeripheralAttachmentInformation fetchAttachmentInformation(
+      ClientID clientId,
+      TCSResourceReference<Location> ref
+  )
       throws RemoteException;
 
   PeripheralProcessModel fetchProcessModel(ClientID clientId, TCSResourceReference<Location> ref)
       throws RemoteException;
 
-  void sendCommAdapterCommand(ClientID clientId,
-                              TCSResourceReference<Location> ref,
-                              PeripheralAdapterCommand command)
+  void sendCommAdapterCommand(
+      ClientID clientId,
+      TCSResourceReference<Location> ref,
+      PeripheralAdapterCommand command
+  )
       throws RemoteException;
   // CHECKSTYLE:ON
 }

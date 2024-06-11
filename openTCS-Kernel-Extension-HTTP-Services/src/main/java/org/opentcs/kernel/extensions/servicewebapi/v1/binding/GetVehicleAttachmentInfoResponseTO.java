@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
-import java.util.List;
 import static java.util.Objects.requireNonNull;
+
+import java.util.List;
 import java.util.stream.Collectors;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 
@@ -43,7 +44,8 @@ public class GetVehicleAttachmentInfoResponseTO {
   }
 
   public GetVehicleAttachmentInfoResponseTO setAvailableCommAdapters(
-      List<String> availableCommAdapters) {
+      List<String> availableCommAdapters
+  ) {
     this.availableCommAdapters = requireNonNull(availableCommAdapters, "availableCommAdapters");
     return this;
   }
@@ -69,7 +71,8 @@ public class GetVehicleAttachmentInfoResponseTO {
    * @return A new instance containing the data from the given <code>AttachmentInformation</code>.
    */
   public static GetVehicleAttachmentInfoResponseTO fromAttachmentInformation(
-      VehicleAttachmentInformation attachmentInformation) {
+      VehicleAttachmentInformation attachmentInformation
+  ) {
     if (attachmentInformation == null) {
       return null;
     }

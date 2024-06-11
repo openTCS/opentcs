@@ -25,7 +25,10 @@ public interface UserObjectContext {
    * in the tree view.
    * @return A popup menu.
    */
-  JPopupMenu getPopupMenu(@Nullable Set<UserObject> selectedUserObjects);
+  JPopupMenu getPopupMenu(
+      @Nullable
+      Set<UserObject> selectedUserObjects
+  );
 
   /**
    * Called after a specific item was removed from the tree (via the <code>

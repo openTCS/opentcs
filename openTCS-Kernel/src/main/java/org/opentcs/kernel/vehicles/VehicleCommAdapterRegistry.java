@@ -8,11 +8,13 @@
 package org.opentcs.kernel.vehicles;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -21,7 +23,6 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.virtualvehicle.LoopbackCommunicationAdapterDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,8 @@ import org.slf4j.LoggerFactory;
  * A registry for all communication adapters in the system.
  */
 public class VehicleCommAdapterRegistry
-    implements Lifecycle {
+    implements
+      Lifecycle {
 
   /**
    * This class's Logger.
@@ -122,9 +124,11 @@ public class VehicleCommAdapterRegistry
    */
   public VehicleCommAdapterFactory findFactoryFor(VehicleCommAdapterDescription description) {
     requireNonNull(description, "description");
-    checkArgument(factories.get(description) != null,
-                  "No factory for description %s",
-                  description);
+    checkArgument(
+        factories.get(description) != null,
+        "No factory for description %s",
+        description
+    );
 
     return factories.get(description);
   }

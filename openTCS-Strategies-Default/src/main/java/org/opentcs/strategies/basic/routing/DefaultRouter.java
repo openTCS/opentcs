@@ -7,6 +7,9 @@
  */
 package org.opentcs.strategies.basic.routing;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +34,6 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
-import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
 import org.opentcs.strategies.basic.routing.jgrapht.PointRouterProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,8 @@ import org.slf4j.LoggerFactory;
  * A basic {@link Router} implementation.
  */
 public class DefaultRouter
-    implements Router {
+    implements
+      Router {
 
   /**
    * This class's Logger.
@@ -81,10 +83,12 @@ public class DefaultRouter
    * @param configuration This class's configuration.
    */
   @Inject
-  public DefaultRouter(TCSObjectService objectService,
-                       PointRouterProvider pointRouterProvider,
-                       GroupMapper routingGroupMapper,
-                       DefaultRouterConfiguration configuration) {
+  public DefaultRouter(
+      TCSObjectService objectService,
+      PointRouterProvider pointRouterProvider,
+      GroupMapper routingGroupMapper,
+      DefaultRouterConfiguration configuration
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.pointRouterProvider = requireNonNull(pointRouterProvider, "pointRouterProvider");
     this.routingGroupMapper = requireNonNull(routingGroupMapper, "routingGroupMapper");
@@ -141,8 +145,8 @@ public class DefaultRouter
       DriveOrder[] driveOrders
           = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
 
-      for (Map.Entry<String, PointRouter> curEntry
-               : pointRouterProvider.getPointRoutersByVehicleGroup().entrySet()) {
+      for (Map.Entry<String, PointRouter> curEntry : pointRouterProvider
+          .getPointRoutersByVehicleGroup().entrySet()) {
         // Get all points at the first location at which a vehicle of the current
         // type can execute the desired operation and check if an acceptable route
         // originating in one of them exists.
@@ -158,9 +162,11 @@ public class DefaultRouter
   }
 
   @Override
-  public Optional<List<DriveOrder>> getRoute(Vehicle vehicle,
-                                             Point sourcePoint,
-                                             TransportOrder transportOrder) {
+  public Optional<List<DriveOrder>> getRoute(
+      Vehicle vehicle,
+      Point sourcePoint,
+      TransportOrder transportOrder
+  ) {
     requireNonNull(vehicle, "vehicle");
     requireNonNull(sourcePoint, "sourcePoint");
     requireNonNull(transportOrder, "transportOrder");
@@ -168,8 +174,10 @@ public class DefaultRouter
     synchronized (this) {
       List<DriveOrder> driveOrderList = transportOrder.getFutureDriveOrders();
       DriveOrder[] driveOrders = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
-      PointRouter pointRouter = pointRouterProvider.getPointRouterForVehicle(vehicle,
-                                                                             transportOrder);
+      PointRouter pointRouter = pointRouterProvider.getPointRouterForVehicle(
+          vehicle,
+          transportOrder
+      );
       OrderRouteParameterStruct params = new OrderRouteParameterStruct(driveOrders, pointRouter);
       OrderRouteResultStruct resultStruct = new OrderRouteResultStruct(driveOrderList.size());
       computeCheapestOrderRoute(sourcePoint, params, 0, resultStruct);
@@ -180,10 +188,12 @@ public class DefaultRouter
   }
 
   @Override
-  public Optional<Route> getRoute(Vehicle vehicle,
-                                  Point sourcePoint,
-                                  Point destinationPoint,
-                                  Set<TCSResourceReference<?>> resourcesToAvoid) {
+  public Optional<Route> getRoute(
+      Vehicle vehicle,
+      Point sourcePoint,
+      Point destinationPoint,
+      Set<TCSResourceReference<?>> resourcesToAvoid
+  ) {
     requireNonNull(vehicle, "vehicle");
     requireNonNull(sourcePoint, "sourcePoint");
     requireNonNull(destinationPoint, "destinationPoint");
@@ -207,10 +217,12 @@ public class DefaultRouter
   }
 
   @Override
-  public long getCosts(Vehicle vehicle,
-                       Point sourcePoint,
-                       Point destinationPoint,
-                       Set<TCSResourceReference<?>> resourcesToAvoid) {
+  public long getCosts(
+      Vehicle vehicle,
+      Point sourcePoint,
+      Point destinationPoint,
+      Set<TCSResourceReference<?>> resourcesToAvoid
+  ) {
     requireNonNull(vehicle, "vehicle");
     requireNonNull(sourcePoint, "sourcePoint");
     requireNonNull(destinationPoint, "destinationPoint");
@@ -270,10 +282,12 @@ public class DefaultRouter
    * would allow a vehicle of the given type to process the whole list of drive
    * orders.
    */
-  private boolean isRoutable(Point startPoint,
-                             DriveOrder[] driveOrders,
-                             int nextHopIndex,
-                             PointRouter pointRouter) {
+  private boolean isRoutable(
+      Point startPoint,
+      DriveOrder[] driveOrders,
+      int nextHopIndex,
+      PointRouter pointRouter
+  ) {
     assert startPoint != null;
     assert driveOrders != null;
     assert pointRouter != null;
@@ -306,10 +320,12 @@ public class DefaultRouter
    * @param hopIndex The current index in the list of drive orders/checkpoints.
    * @param result A struct for keeping the (partial) result in.
    */
-  private void computeCheapestOrderRoute(Point startPoint,
-                                         OrderRouteParameterStruct params,
-                                         int hopIndex,
-                                         OrderRouteResultStruct result) {
+  private void computeCheapestOrderRoute(
+      Point startPoint,
+      OrderRouteParameterStruct params,
+      int hopIndex,
+      OrderRouteResultStruct result
+  ) {
     assert startPoint != null;
     assert params != null;
     assert result != null;
@@ -339,11 +355,15 @@ public class DefaultRouter
           // destination point of the drive order - create a single step
           // without a path.
           steps = new ArrayList<>(1);
-          steps.add(new Route.Step(null,
-                                   null,
-                                   startPoint,
-                                   Vehicle.Orientation.UNDEFINED,
-                                   0));
+          steps.add(
+              new Route.Step(
+                  null,
+                  null,
+                  startPoint,
+                  Vehicle.Orientation.UNDEFINED,
+                  0
+              )
+          );
         }
         // Create a route from the list of steps gathered.
         Route hopRoute = new Route(steps, hopCosts);
@@ -365,11 +385,11 @@ public class DefaultRouter
     }
     // If we have reached the final drive order, ...
     else // If the route computed is cheaper than the best route found so far,
-    // replace the latter.
-    if (result.currentCosts < result.bestCosts) {
-      System.arraycopy(result.currentRoute, 0, result.bestRoute, 0, result.currentRoute.length);
-      result.bestCosts = result.currentCosts;
-    }
+      // replace the latter.
+      if (result.currentCosts < result.bestCosts) {
+        System.arraycopy(result.currentRoute, 0, result.bestRoute, 0, result.currentRoute.length);
+        result.bestCosts = result.currentCosts;
+      }
   }
 
   /**
@@ -403,10 +423,14 @@ public class DefaultRouter
     // to the destination location.
     else if (dest.getDestination().getReferentClass() == Location.class) {
       final Set<Point> result = new HashSet<>();
-      final Location destLoc = objectService.fetchObject(Location.class,
-                                                         dest.getDestination().getName());
-      final LocationType destLocType = objectService.fetchObject(LocationType.class,
-                                                                 destLoc.getType());
+      final Location destLoc = objectService.fetchObject(
+          Location.class,
+          dest.getDestination().getName()
+      );
+      final LocationType destLocType = objectService.fetchObject(
+          LocationType.class,
+          destLoc.getType()
+      );
       for (Location.Link curLink : destLoc.getAttachedLinks()) {
         // A link is acceptable if any of the following conditions are true:
         // - The destination operation is OP_NOP, which is allowed everywhere.
@@ -468,8 +492,10 @@ public class DefaultRouter
      * of the route to be computed.
      * @param pointRouter The point router for the vehicle type.
      */
-    OrderRouteParameterStruct(DriveOrder[] driveOrders,
-                              PointRouter pointRouter) {
+    OrderRouteParameterStruct(
+        DriveOrder[] driveOrders,
+        PointRouter pointRouter
+    ) {
       this.driveOrders = requireNonNull(driveOrders, "driveOrders");
       this.pointRouter = requireNonNull(pointRouter, "pointRouter");
     }

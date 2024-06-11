@@ -7,10 +7,11 @@
  */
 package org.opentcs.util.persistence.v002;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -23,7 +24,8 @@ import org.opentcs.data.model.Block;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(propOrder = {"name", "id", "type", "members", "properties"})
 public class BlockTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   private String type = Block.Type.SINGLE_VEHICLE_ONLY.name();
   private List<MemberTO> members = new ArrayList<>();
@@ -39,7 +41,10 @@ public class BlockTO
     return type;
   }
 
-  public BlockTO setType(@Nonnull String type) {
+  public BlockTO setType(
+      @Nonnull
+      String type
+  ) {
     requireNonNull(type, "type");
     this.type = type;
     return this;
@@ -50,7 +55,10 @@ public class BlockTO
     return members;
   }
 
-  public BlockTO setMembers(@Nonnull List<MemberTO> members) {
+  public BlockTO setMembers(
+      @Nonnull
+      List<MemberTO> members
+  ) {
     requireNonNull(members, "members");
     this.members = members;
     return this;

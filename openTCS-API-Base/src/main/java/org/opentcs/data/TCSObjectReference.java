@@ -7,10 +7,11 @@
  */
 package org.opentcs.data;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 
 /**
  * A transient reference to a {@link TCSObject}.
@@ -18,7 +19,8 @@ import static java.util.Objects.requireNonNull;
  * @param <E> The actual object class.
  */
 public class TCSObjectReference<E extends TCSObject<E>>
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The referenced object's class.
@@ -34,7 +36,10 @@ public class TCSObjectReference<E extends TCSObject<E>>
    *
    * @param referent The object this reference references.
    */
-  protected TCSObjectReference(@Nonnull TCSObject<E> referent) {
+  protected TCSObjectReference(
+      @Nonnull
+      TCSObject<E> referent
+  ) {
     requireNonNull(referent, "newReferent");
 
     referentClass = referent.getClass();

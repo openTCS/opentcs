@@ -17,7 +17,8 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * Provides methods concerning {@link PeripheralJob}s.
  */
 public interface PeripheralJobService
-    extends TCSObjectService {
+    extends
+      TCSObjectService {
 
   /**
    * Creates a peripheral job.
@@ -32,5 +33,7 @@ public interface PeripheralJobService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   PeripheralJob createPeripheralJob(PeripheralJobCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        ObjectExistsException,
+        KernelRuntimeException;
 }

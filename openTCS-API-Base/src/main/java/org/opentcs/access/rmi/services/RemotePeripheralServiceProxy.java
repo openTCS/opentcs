@@ -23,8 +23,10 @@ import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformatio
  * Delegates method invocations to the corresponding remote service.
  */
 class RemotePeripheralServiceProxy
-    extends RemoteTCSObjectServiceProxy<RemotePeripheralService>
-    implements PeripheralService {
+    extends
+      RemoteTCSObjectServiceProxy<RemotePeripheralService>
+    implements
+      PeripheralService {
 
   /**
    * Creates a new instance.
@@ -33,9 +35,12 @@ class RemotePeripheralServiceProxy
   }
 
   @Override
-  public void attachCommAdapter(TCSResourceReference<Location> ref,
-                                PeripheralCommAdapterDescription description)
-      throws ObjectUnknownException, KernelRuntimeException {
+  public void attachCommAdapter(
+      TCSResourceReference<Location> ref,
+      PeripheralCommAdapterDescription description
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -48,7 +53,8 @@ class RemotePeripheralServiceProxy
 
   @Override
   public void disableCommAdapter(TCSResourceReference<Location> ref)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -61,7 +67,8 @@ class RemotePeripheralServiceProxy
 
   @Override
   public void enableCommAdapter(TCSResourceReference<Location> ref)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -74,8 +81,10 @@ class RemotePeripheralServiceProxy
 
   @Override
   public PeripheralAttachmentInformation fetchAttachmentInformation(
-      TCSResourceReference<Location> ref)
-      throws ObjectUnknownException, KernelRuntimeException {
+      TCSResourceReference<Location> ref
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -88,7 +97,8 @@ class RemotePeripheralServiceProxy
 
   @Override
   public PeripheralProcessModel fetchProcessModel(TCSResourceReference<Location> ref)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -100,9 +110,12 @@ class RemotePeripheralServiceProxy
   }
 
   @Override
-  public void sendCommAdapterCommand(TCSResourceReference<Location> ref,
-                                     PeripheralAdapterCommand command)
-      throws ObjectUnknownException, KernelRuntimeException {
+  public void sendCommAdapterCommand(
+      TCSResourceReference<Location> ref,
+      PeripheralAdapterCommand command
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {

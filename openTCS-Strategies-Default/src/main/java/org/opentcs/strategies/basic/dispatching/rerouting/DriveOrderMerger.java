@@ -24,8 +24,10 @@ public interface DriveOrderMerger {
    * @param vehicle The {@link Vehicle} to merge the drive orders for.
    * @return The (new) merged drive order.
    */
-  DriveOrder mergeDriveOrders(DriveOrder orderA,
-                              DriveOrder orderB,
-                              int currentRouteStepIndex,
-                              Vehicle vehicle);
+  DriveOrder mergeDriveOrders(
+      DriveOrder orderA,
+      DriveOrder orderB,
+      int currentRouteStepIndex,
+      Vehicle vehicle
+  );
 }

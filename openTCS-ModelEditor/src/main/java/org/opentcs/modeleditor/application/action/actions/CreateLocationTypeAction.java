@@ -7,21 +7,23 @@
  */
 package org.opentcs.modeleditor.application.action.actions;
 
-import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
 import static javax.swing.Action.LARGE_ICON_KEY;
 import static javax.swing.Action.SMALL_ICON;
+import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.TOOLBAR_PATH;
+
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import org.opentcs.guing.common.application.GuiManagerModeling;
 import org.opentcs.guing.common.util.ImageDirectory;
-import static org.opentcs.modeleditor.util.I18nPlantOverviewModeling.TOOLBAR_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * An action to trigger the creation of a location type.
  */
 public class CreateLocationTypeAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action class's ID.

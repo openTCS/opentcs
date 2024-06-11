@@ -7,6 +7,8 @@
  */
 package org.opentcs.kernel.vehicles;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -14,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentcs.components.Lifecycle;
@@ -40,8 +41,9 @@ import org.slf4j.LoggerFactory;
  * execution of movement commands.
  */
 public class PeripheralInteractor
-    implements EventHandler,
-               Lifecycle {
+    implements
+      EventHandler,
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -89,14 +91,24 @@ public class PeripheralInteractor
    * @param eventSource The event source to register with.
    */
   @Inject
-  public PeripheralInteractor(@Assisted @Nonnull TCSObjectReference<Vehicle> vehicleRef,
-                              @Nonnull PeripheralJobService peripheralJobService,
-                              @Nonnull PeripheralDispatcherService peripheralDispatcherService,
-                              @Nonnull @ApplicationEventBus EventSource eventSource) {
+  public PeripheralInteractor(
+      @Assisted
+      @Nonnull
+      TCSObjectReference<Vehicle> vehicleRef,
+      @Nonnull
+      PeripheralJobService peripheralJobService,
+      @Nonnull
+      PeripheralDispatcherService peripheralDispatcherService,
+      @Nonnull
+      @ApplicationEventBus
+      EventSource eventSource
+  ) {
     this.vehicleRef = requireNonNull(vehicleRef, "vehicleRef");
     this.peripheralJobService = requireNonNull(peripheralJobService, "peripheralJobService");
-    this.peripheralDispatcherService = requireNonNull(peripheralDispatcherService,
-                                                      "peripheralDispatcherService");
+    this.peripheralDispatcherService = requireNonNull(
+        peripheralDispatcherService,
+        "peripheralDispatcherService"
+    );
     this.eventSource = requireNonNull(eventSource, "eventSource");
   }
 
@@ -160,8 +172,10 @@ public class PeripheralInteractor
    * @param orderRef A reference to the transport order that the movement command belongs to.
    * @param movementCommand The movement command to prepare peripheral interactions for.
    */
-  public void prepareInteractions(TCSObjectReference<TransportOrder> orderRef,
-                                  MovementCommand movementCommand) {
+  public void prepareInteractions(
+      TCSObjectReference<TransportOrder> orderRef,
+      MovementCommand movementCommand
+  ) {
     Path path = movementCommand.getStep().getPath();
     if (path == null) {
       return;
@@ -170,34 +184,46 @@ public class PeripheralInteractor
     Map<PeripheralOperation.ExecutionTrigger, List<PeripheralOperation>> operations
         = path.getPeripheralOperations().stream()
             .collect(Collectors.groupingBy(t -> t.getExecutionTrigger()));
-    operations.computeIfAbsent(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION,
-                               executionTrigger -> new ArrayList<>());
-    operations.computeIfAbsent(PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT,
-                               executionTrigger -> new ArrayList<>());
+    operations.computeIfAbsent(
+        PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION,
+        executionTrigger -> new ArrayList<>()
+    );
+    operations.computeIfAbsent(
+        PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT,
+        executionTrigger -> new ArrayList<>()
+    );
     String reservationToken = determineReservationToken();
 
     List<PeripheralOperation> preMovementOperations
         = operations.get(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION);
     if (!preMovementOperations.isEmpty()) {
-      preMovementInteractions.put(movementCommand,
-                                  new PeripheralInteraction(vehicleRef,
-                                                            orderRef,
-                                                            movementCommand,
-                                                            preMovementOperations,
-                                                            peripheralJobService,
-                                                            reservationToken));
+      preMovementInteractions.put(
+          movementCommand,
+          new PeripheralInteraction(
+              vehicleRef,
+              orderRef,
+              movementCommand,
+              preMovementOperations,
+              peripheralJobService,
+              reservationToken
+          )
+      );
     }
 
     List<PeripheralOperation> postMovementOperations
         = operations.get(PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT);
     if (!postMovementOperations.isEmpty()) {
-      postMovementInteractions.put(movementCommand,
-                                   new PeripheralInteraction(vehicleRef,
-                                                             orderRef,
-                                                             movementCommand,
-                                                             postMovementOperations,
-                                                             peripheralJobService,
-                                                             reservationToken));
+      postMovementInteractions.put(
+          movementCommand,
+          new PeripheralInteraction(
+              vehicleRef,
+              orderRef,
+              movementCommand,
+              postMovementOperations,
+              peripheralJobService,
+              reservationToken
+          )
+      );
     }
   }
 
@@ -211,23 +237,32 @@ public class PeripheralInteractor
    * @param failedCallback The callback that is executed if the interactions fails (i.e. if a
    * single interaction failed).
    */
-  public void startPreMovementInteractions(@Nonnull MovementCommand movementCommand,
-                                           @Nonnull Runnable succeededCallback,
-                                           @Nonnull Runnable failedCallback) {
+  public void startPreMovementInteractions(
+      @Nonnull
+      MovementCommand movementCommand,
+      @Nonnull
+      Runnable succeededCallback,
+      @Nonnull
+      Runnable failedCallback
+  ) {
     requireNonNull(movementCommand, "movementCommand");
     requireNonNull(succeededCallback, "succeededCallback");
     requireNonNull(failedCallback, "failedCallback");
     if (!preMovementInteractions.containsKey(movementCommand)) {
-      LOG.debug("{}: No interactions to be performed before movement to {}...",
-                vehicleRef.getName(),
-                movementCommand.getStep().getDestinationPoint().getName());
+      LOG.debug(
+          "{}: No interactions to be performed before movement to {}...",
+          vehicleRef.getName(),
+          movementCommand.getStep().getDestinationPoint().getName()
+      );
       succeededCallback.run();
       return;
     }
 
-    LOG.debug("{}: There are interactions to be performed before movement to {}...",
-              vehicleRef.getName(),
-              movementCommand.getStep().getDestinationPoint().getName());
+    LOG.debug(
+        "{}: There are interactions to be performed before movement to {}...",
+        vehicleRef.getName(),
+        movementCommand.getStep().getDestinationPoint().getName()
+    );
     preMovementInteractions.get(movementCommand).start(succeededCallback, failedCallback);
 
     // In case there are only operations with the completion required flag not set, the interaction
@@ -250,23 +285,32 @@ public class PeripheralInteractor
    * @param failedCallback The callback that is executed if the interactions fails (i.e. if a
    * single interaction failed).
    */
-  public void startPostMovementInteractions(@Nonnull MovementCommand movementCommand,
-                                            @Nonnull Runnable succeededCallback,
-                                            @Nonnull Runnable failedCallback) {
+  public void startPostMovementInteractions(
+      @Nonnull
+      MovementCommand movementCommand,
+      @Nonnull
+      Runnable succeededCallback,
+      @Nonnull
+      Runnable failedCallback
+  ) {
     requireNonNull(movementCommand, "movementCommand");
     requireNonNull(succeededCallback, "succeededCallback");
     requireNonNull(failedCallback, "failedCallback");
     if (!postMovementInteractions.containsKey(movementCommand)) {
-      LOG.debug("{}: No interactions to be performed after movement to {}...",
-                vehicleRef.getName(),
-                movementCommand.getStep().getDestinationPoint().getName());
+      LOG.debug(
+          "{}: No interactions to be performed after movement to {}...",
+          vehicleRef.getName(),
+          movementCommand.getStep().getDestinationPoint().getName()
+      );
       succeededCallback.run();
       return;
     }
 
-    LOG.debug("{}: There are interactions to be performed after movement to {}...",
-              vehicleRef.getName(),
-              movementCommand.getStep().getDestinationPoint().getName());
+    LOG.debug(
+        "{}: There are interactions to be performed after movement to {}...",
+        vehicleRef.getName(),
+        movementCommand.getStep().getDestinationPoint().getName()
+    );
     postMovementInteractions.get(movementCommand).start(succeededCallback, failedCallback);
 
     // In case there are only operations with the completion required flag not set, the interaction
@@ -330,8 +374,10 @@ public class PeripheralInteractor
    * movement command's destination point.
    */
   public Map<String, List<PeripheralOperation>> pendingRequiredInteractionsByDestination() {
-    return Stream.concat(preMovementInteractions.entrySet().stream(),
-                         postMovementInteractions.entrySet().stream())
+    return Stream.concat(
+        preMovementInteractions.entrySet().stream(),
+        postMovementInteractions.entrySet().stream()
+    )
         .map(entry -> entry.getValue())
         .filter(interaction -> interaction.hasRequiredOperations())
         // We're working with two streams from two maps which can each contain the same keys.
@@ -366,8 +412,10 @@ public class PeripheralInteractor
   }
 
   private void onPeripheralJobFinished(PeripheralJob job) {
-    Stream.concat(preMovementInteractions.values().stream(),
-                  postMovementInteractions.values().stream())
+    Stream.concat(
+        preMovementInteractions.values().stream(),
+        postMovementInteractions.values().stream()
+    )
         .forEach(interaction -> interaction.onPeripheralJobFinished(job));
 
     // With a peripheral job finished, an associated interaction might now be finished as well. If
@@ -377,8 +425,10 @@ public class PeripheralInteractor
   }
 
   private void onPeripheralJobFailed(PeripheralJob job) {
-    Stream.concat(preMovementInteractions.values().stream(),
-                  postMovementInteractions.values().stream())
+    Stream.concat(
+        preMovementInteractions.values().stream(),
+        postMovementInteractions.values().stream()
+    )
         .forEach(interaction -> interaction.onPeripheralJobFailed(job));
 
     // With a peripheral job failed, an associated interaction might now be failed as well. If
@@ -398,8 +448,10 @@ public class PeripheralInteractor
   private String determineReservationToken() {
     Vehicle vehicle = peripheralJobService.fetchObject(Vehicle.class, vehicleRef);
     if (vehicle.getTransportOrder() != null) {
-      TransportOrder transportOrder = peripheralJobService.fetchObject(TransportOrder.class,
-                                                                       vehicle.getTransportOrder());
+      TransportOrder transportOrder = peripheralJobService.fetchObject(
+          TransportOrder.class,
+          vehicle.getTransportOrder()
+      );
       if (transportOrder.getPeripheralReservationToken() != null) {
         return transportOrder.getPeripheralReservationToken();
       }

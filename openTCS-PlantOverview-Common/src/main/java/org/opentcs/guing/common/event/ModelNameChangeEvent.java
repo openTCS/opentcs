@@ -13,7 +13,8 @@ import java.util.EventObject;
  * An event that indicates that the model name has changed.
  */
 public class ModelNameChangeEvent
-    extends EventObject {
+    extends
+      EventObject {
 
   private final String newName;
 

@@ -7,18 +7,19 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
-import java.util.Map;
-import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DirectedWeightedMultigraph;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Map;
+import java.util.Set;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DirectedWeightedMultigraph;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
 import org.opentcs.data.model.Path;
@@ -61,8 +62,10 @@ class DefaultModelGraphMapperTest {
     pathEdgeMapper = mock(PathEdgeMapper.class);
     when(mapperComponentsFactory.createPathEdgeMapper(any(EdgeEvaluator.class), anyBoolean()))
         .thenReturn(pathEdgeMapper);
-    mapper = new DefaultModelGraphMapper(mock(EdgeEvaluatorComposite.class),
-                                         mapperComponentsFactory);
+    mapper = new DefaultModelGraphMapper(
+        mock(EdgeEvaluatorComposite.class),
+        mapperComponentsFactory
+    );
 
   }
 

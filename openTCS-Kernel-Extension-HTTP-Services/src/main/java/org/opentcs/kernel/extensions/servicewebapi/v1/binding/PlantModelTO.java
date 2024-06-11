@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.BlockTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationTypeTO;
@@ -36,7 +37,11 @@ public class PlantModelTO {
   private List<PropertyTO> properties = List.of();
 
   @JsonCreator
-  public PlantModelTO(@Nonnull @JsonProperty(value = "name", required = true) String name) {
+  public PlantModelTO(
+      @Nonnull
+      @JsonProperty(value = "name", required = true)
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
   }
 
@@ -45,7 +50,10 @@ public class PlantModelTO {
     return name;
   }
 
-  public PlantModelTO setName(@Nonnull String name) {
+  public PlantModelTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     return this;
   }
@@ -55,7 +63,10 @@ public class PlantModelTO {
     return properties;
   }
 
-  public PlantModelTO setProperties(@Nonnull List<PropertyTO> properties) {
+  public PlantModelTO setProperties(
+      @Nonnull
+      List<PropertyTO> properties
+  ) {
     this.properties = requireNonNull(properties, "properties");
     return this;
   }
@@ -65,7 +76,10 @@ public class PlantModelTO {
     return points;
   }
 
-  public PlantModelTO setPoints(@Nonnull List<PointTO> points) {
+  public PlantModelTO setPoints(
+      @Nonnull
+      List<PointTO> points
+  ) {
     this.points = requireNonNull(points, "points");
     return this;
   }
@@ -75,7 +89,10 @@ public class PlantModelTO {
     return paths;
   }
 
-  public PlantModelTO setPaths(@Nonnull List<PathTO> paths) {
+  public PlantModelTO setPaths(
+      @Nonnull
+      List<PathTO> paths
+  ) {
     this.paths = requireNonNull(paths, "paths");
     return this;
   }
@@ -85,7 +102,10 @@ public class PlantModelTO {
     return locations;
   }
 
-  public PlantModelTO setLocations(@Nonnull List<LocationTO> locations) {
+  public PlantModelTO setLocations(
+      @Nonnull
+      List<LocationTO> locations
+  ) {
     this.locations = requireNonNull(locations, "locations");
     return this;
   }
@@ -95,7 +115,10 @@ public class PlantModelTO {
     return locationTypes;
   }
 
-  public PlantModelTO setLocationTypes(@Nonnull List<LocationTypeTO> locationTypes) {
+  public PlantModelTO setLocationTypes(
+      @Nonnull
+      List<LocationTypeTO> locationTypes
+  ) {
     this.locationTypes = requireNonNull(locationTypes, "locationTypes");
     return this;
   }
@@ -105,7 +128,10 @@ public class PlantModelTO {
     return blocks;
   }
 
-  public PlantModelTO setBlocks(@Nonnull List<BlockTO> blocks) {
+  public PlantModelTO setBlocks(
+      @Nonnull
+      List<BlockTO> blocks
+  ) {
     this.blocks = requireNonNull(blocks, "blocks");
     return this;
   }
@@ -115,7 +141,10 @@ public class PlantModelTO {
     return vehicles;
   }
 
-  public PlantModelTO setVehicles(@Nonnull List<VehicleTO> vehicles) {
+  public PlantModelTO setVehicles(
+      @Nonnull
+      List<VehicleTO> vehicles
+  ) {
     this.vehicles = requireNonNull(vehicles, "vehicles");
     return this;
   }
@@ -125,7 +154,10 @@ public class PlantModelTO {
     return visualLayout;
   }
 
-  public PlantModelTO setVisualLayout(@Nonnull VisualLayoutTO visualLayout) {
+  public PlantModelTO setVisualLayout(
+      @Nonnull
+      VisualLayoutTO visualLayout
+  ) {
     this.visualLayout = requireNonNull(visualLayout, "visualLayout");
     return this;
   }

@@ -7,6 +7,8 @@
  */
 package org.opentcs.kernelcontrolcenter.vehicles;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
 import javax.swing.JPanel;
@@ -45,9 +46,11 @@ import org.slf4j.LoggerFactory;
  * Displays information about a vehicle (VehicleModel) graphically.
  */
 public class DetailPanel
-    extends JPanel
-    implements EventHandler,
-               Lifecycle {
+    extends
+      JPanel
+    implements
+      EventHandler,
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -111,10 +114,14 @@ public class DetailPanel
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public DetailPanel(KernelServicePortal servicePortal,
-                     @ServiceCallWrapper CallWrapper callWrapper,
-                     @ApplicationEventBus EventSource eventSource,
-                     Set<VehicleCommAdapterPanelFactory> panelFactories) {
+  public DetailPanel(
+      KernelServicePortal servicePortal,
+      @ServiceCallWrapper
+      CallWrapper callWrapper,
+      @ApplicationEventBus
+      EventSource eventSource,
+      Set<VehicleCommAdapterPanelFactory> panelFactories
+  ) {
     this.servicePortal = requireNonNull(servicePortal, "servicePortal");
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");
     this.eventSource = requireNonNull(eventSource, "eventSource");
@@ -176,20 +183,28 @@ public class DetailPanel
 
     if (e instanceof VehicleAttachmentEvent) {
       VehicleAttachmentEvent event = (VehicleAttachmentEvent) e;
-      if (Objects.equals(vehicleEntry.getVehicleName(),
-                         event.getVehicleName())) {
+      if (Objects.equals(
+          vehicleEntry.getVehicleName(),
+          event.getVehicleName()
+      )) {
         updateFromVehicleEntry(event);
       }
     }
     if (e instanceof ProcessModelEvent) {
       ProcessModelEvent event = (ProcessModelEvent) e;
-      if (Objects.equals(vehicleEntry.getVehicleName(),
-                         event.getUpdatedProcessModel().getName())) {
+      if (Objects.equals(
+          vehicleEntry.getVehicleName(),
+          event.getUpdatedProcessModel().getName()
+      )) {
         updateFromVehicleProcessModel(event);
 
         // Forward event to the comm adapter panels
-        customPanelList.forEach(panel -> panel.processModelChange(event.getAttributeChanged(),
-                                                                  event.getUpdatedProcessModel()));
+        customPanelList.forEach(
+            panel -> panel.processModelChange(
+                event.getAttributeChanged(),
+                event.getUpdatedProcessModel()
+            )
+        );
       }
     }
   }
@@ -262,20 +277,28 @@ public class DetailPanel
   }
 
   private void updateFromVehicleProcessModel(ProcessModelEvent evt) {
-    if (Objects.equals(evt.getAttributeChanged(),
-                       VehicleProcessModel.Attribute.COMM_ADAPTER_ENABLED.name())) {
+    if (Objects.equals(
+        evt.getAttributeChanged(),
+        VehicleProcessModel.Attribute.COMM_ADAPTER_ENABLED.name()
+    )) {
       updateCommAdapterEnabled(evt.getUpdatedProcessModel().isCommAdapterEnabled());
     }
-    else if (Objects.equals(evt.getAttributeChanged(),
-                            VehicleProcessModel.Attribute.POSITION.name())) {
+    else if (Objects.equals(
+        evt.getAttributeChanged(),
+        VehicleProcessModel.Attribute.POSITION.name()
+    )) {
       updateVehiclePosition(evt.getUpdatedProcessModel().getPosition());
     }
-    else if (Objects.equals(evt.getAttributeChanged(),
-                            VehicleProcessModel.Attribute.STATE.name())) {
+    else if (Objects.equals(
+        evt.getAttributeChanged(),
+        VehicleProcessModel.Attribute.STATE.name()
+    )) {
       updateVehicleState(evt.getUpdatedProcessModel().getState());
     }
-    else if (Objects.equals(evt.getAttributeChanged(),
-                            VehicleProcessModel.Attribute.USER_NOTIFICATION.name())) {
+    else if (Objects.equals(
+        evt.getAttributeChanged(),
+        VehicleProcessModel.Attribute.USER_NOTIFICATION.name()
+    )) {
       updateUserNotification(evt.getUpdatedProcessModel().getNotifications());
     }
   }
@@ -296,8 +319,10 @@ public class DetailPanel
         updateCustomPanels();
       }
       chkBoxEnable.setEnabled(attachmentInfo != null);
-      chkBoxEnable.setSelected(attachmentInfo != null
-          && vehicleEntry.getProcessModel().isCommAdapterEnabled());
+      chkBoxEnable.setSelected(
+          attachmentInfo != null
+              && vehicleEntry.getProcessModel().isCommAdapterEnabled()
+      );
     });
   }
 
@@ -332,9 +357,11 @@ public class DetailPanel
     if (attachmentInfo != null) {
       for (VehicleCommAdapterPanelFactory panelFactory : panelFactories) {
         customPanelList.addAll(
-            panelFactory.getPanelsFor(vehicleEntry.getAttachedCommAdapterDescription(),
-                                      vehicleEntry.getAttachmentInformation().getVehicleReference(),
-                                      vehicleEntry.getProcessModel())
+            panelFactory.getPanelsFor(
+                vehicleEntry.getAttachedCommAdapterDescription(),
+                vehicleEntry.getAttachmentInformation().getVehicleReference(),
+                vehicleEntry.getProcessModel()
+            )
         );
         for (VehicleCommAdapterPanel curPanel : customPanelList) {
           LOG.debug("Adding {} with title {} to tabbedPane.", curPanel, curPanel.getTitle());
@@ -380,6 +407,7 @@ public class DetailPanel
     loggingTextArea.setText(output);
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
@@ -595,11 +623,14 @@ public class DetailPanel
 
         add(tabbedPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void warningsCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_warningsCheckBoxMenuItemActionPerformed
-    loggingTableModel.filterMessages((notification)
-        -> notification.getLevel().equals(UserNotification.Level.IMPORTANT)
-        || notification.getLevel().equals(UserNotification.Level.NOTEWORTHY));
+    loggingTableModel.filterMessages(
+        (notification) -> notification.getLevel().equals(UserNotification.Level.IMPORTANT)
+            || notification.getLevel().equals(UserNotification.Level.NOTEWORTHY)
+    );
     warningsCheckBoxMenuItem.setSelected(true);
     errorsCheckBoxMenuItem.setSelected(false);
     everythingCheckBoxMenuItem.setSelected(false);
@@ -614,7 +645,8 @@ public class DetailPanel
 
   private void errorsCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_errorsCheckBoxMenuItemActionPerformed
     loggingTableModel.filterMessages(
-        (notification) -> notification.getLevel().equals(UserNotification.Level.IMPORTANT));
+        (notification) -> notification.getLevel().equals(UserNotification.Level.IMPORTANT)
+    );
     errorsCheckBoxMenuItem.setSelected(true);
     everythingCheckBoxMenuItem.setSelected(false);
     warningsCheckBoxMenuItem.setSelected(false);
@@ -627,19 +659,26 @@ public class DetailPanel
   private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkBoxEnableActionPerformed
     try {
       if (chkBoxEnable.isSelected()) {
-        callWrapper.call(() -> servicePortal.getVehicleService()
-            .enableCommAdapter(vehicleEntry.getAttachmentInformation().getVehicleReference()));
+        callWrapper.call(
+            () -> servicePortal.getVehicleService()
+                .enableCommAdapter(vehicleEntry.getAttachmentInformation().getVehicleReference())
+        );
       }
       else {
-        callWrapper.call(() -> servicePortal.getVehicleService()
-            .disableCommAdapter(vehicleEntry.getAttachmentInformation().getVehicleReference()));
+        callWrapper.call(
+            () -> servicePortal.getVehicleService()
+                .disableCommAdapter(vehicleEntry.getAttachmentInformation().getVehicleReference())
+        );
       }
     }
     catch (Exception ex) {
       LOG.warn("Error enabling/disabling comm adapter for {}", vehicleEntry.getVehicleName(), ex);
     }
   }//GEN-LAST:event_chkBoxEnableActionPerformed
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
+  // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel adapterStatusPanel;
     private javax.swing.JCheckBox chkBoxEnable;
     private javax.swing.JMenuItem clearMenuItem;
@@ -670,12 +709,14 @@ public class DetailPanel
     private javax.swing.JCheckBoxMenuItem warningsCheckBoxMenuItem;
     // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   /**
    * A <code>ListSelectionListener</code> for handling the logging table selection events.
    */
   private final class RowListener
-      implements ListSelectionListener {
+      implements
+        ListSelectionListener {
 
     /**
      * Creates a new instance.

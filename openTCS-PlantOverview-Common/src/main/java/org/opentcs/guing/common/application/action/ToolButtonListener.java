@@ -17,7 +17,8 @@ import org.jhotdraw.draw.tool.Tool;
  * A listener if a tool was (de)selected.
  */
 public final class ToolButtonListener
-    implements ItemListener {
+    implements
+      ItemListener {
 
   private final Tool tool;
   private final DrawingEditor editor;

@@ -7,6 +7,10 @@
  */
 package org.opentcs.kernelcontrolcenter.peripherals;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
+import static org.opentcs.util.Assertions.checkState;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.awt.EventQueue;
@@ -14,7 +18,6 @@ import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JOptionPane;
@@ -27,9 +30,7 @@ import org.opentcs.components.kernelcontrolcenter.ControlCenterPanel;
 import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
 import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformation;
-import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 import org.opentcs.kernelcontrolcenter.util.SingleCellEditor;
-import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.CallWrapper;
 import org.opentcs.util.gui.BoundsPopupMenuListener;
 import org.opentcs.util.gui.StringTableCellRenderer;
@@ -40,7 +41,8 @@ import org.slf4j.LoggerFactory;
  * A panel containing all locations representing peripheral devices.
  */
 public class PeripheralsPanel
-    extends ControlCenterPanel {
+    extends
+      ControlCenterPanel {
 
   /**
    * This class's logger.
@@ -85,10 +87,17 @@ public class PeripheralsPanel
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public PeripheralsPanel(@Nonnull KernelServicePortal servicePortal,
-                          @Nonnull @ServiceCallWrapper CallWrapper callWrapper,
-                          @Nonnull LocalPeripheralEntryPool peripheralEntryPool,
-                          @Nonnull PeripheralDetailPanel detailPanel) {
+  public PeripheralsPanel(
+      @Nonnull
+      KernelServicePortal servicePortal,
+      @Nonnull
+      @ServiceCallWrapper
+      CallWrapper callWrapper,
+      @Nonnull
+      LocalPeripheralEntryPool peripheralEntryPool,
+      @Nonnull
+      PeripheralDetailPanel detailPanel
+  ) {
     this.servicePortal = requireNonNull(servicePortal, "servicePortal");
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");
     this.peripheralEntryPool = requireNonNull(peripheralEntryPool, "peripheralEntryPool");
@@ -96,8 +105,10 @@ public class PeripheralsPanel
 
     initComponents();
 
-    peripheralTable.setDefaultRenderer(PeripheralCommAdapterDescription.class,
-                                       new CommAdapterFactoryTableCellRenderer());
+    peripheralTable.setDefaultRenderer(
+        PeripheralCommAdapterDescription.class,
+        new CommAdapterFactoryTableCellRenderer()
+    );
 
     peripheralDetailsPanel.add(detailPanel);
   }
@@ -122,9 +133,11 @@ public class PeripheralsPanel
       LOG.warn("Error getting the kernel state", ex);
       return;
     }
-    checkState(Kernel.State.OPERATING.equals(kernelState),
-               "Cannot work in kernel state %s",
-               kernelState);
+    checkState(
+        Kernel.State.OPERATING.equals(kernelState),
+        "Cannot work in kernel state %s",
+        kernelState
+    );
 
     peripheralEntryPool.initialize();
     detailPanel.initialize();
@@ -181,20 +194,25 @@ public class PeripheralsPanel
         .setCellEditor(adpaterCellEditor);
   }
 
-  private void initCommAdaptersComboBox(LocalPeripheralEntry peripheralEntry,
-                                        int rowIndex,
-                                        SingleCellEditor adapterCellEditor) {
+  private void initCommAdaptersComboBox(
+      LocalPeripheralEntry peripheralEntry,
+      int rowIndex,
+      SingleCellEditor adapterCellEditor
+  ) {
     final PeripheralAdapterComboBox comboBox = new PeripheralAdapterComboBox();
     PeripheralAttachmentInformation ai;
     try {
-      ai = callWrapper.call(() -> servicePortal.getPeripheralService().fetchAttachmentInformation(
-          peripheralEntry.getLocation()
-      ));
+      ai = callWrapper.call(
+          () -> servicePortal.getPeripheralService().fetchAttachmentInformation(
+              peripheralEntry.getLocation()
+          )
+      );
     }
     catch (Exception ex) {
-      LOG.warn("Error fetching attachment information for {}",
-               peripheralEntry.getLocation().getName(),
-               ex
+      LOG.warn(
+          "Error fetching attachment information for {}",
+          peripheralEntry.getLocation().getName(),
+          ex
       );
       return;
     }
@@ -219,9 +237,10 @@ public class PeripheralsPanel
 
       // If we selected a comm adapter that's already attached, do nothing.
       if (Objects.equals(evt.getItem(), peripheralEntry.getAttachedCommAdapter())) {
-        LOG.debug("{} is already attached to: {}",
-                  peripheralEntry.getLocation().getName(),
-                  evt.getItem()
+        LOG.debug(
+            "{} is already attached to: {}",
+            peripheralEntry.getLocation().getName(),
+            evt.getItem()
         );
         return;
       }
@@ -230,23 +249,28 @@ public class PeripheralsPanel
           null,
           bundle.getString("peripheralsPanel.optionPane_driverChangeConfirmation.message"),
           bundle.getString("peripheralsPanel.optionPane_driverChangeConfirmation.title"),
-          JOptionPane.YES_NO_OPTION);
+          JOptionPane.YES_NO_OPTION
+      );
       if (reply == JOptionPane.NO_OPTION) {
         return;
       }
 
       PeripheralCommAdapterDescription factory = comboBox.getSelectedItem();
       try {
-        callWrapper.call(() -> servicePortal.getPeripheralService().attachCommAdapter(
-            peripheralEntry.getLocation(),
-            factory
-        ));
+        callWrapper.call(
+            () -> servicePortal.getPeripheralService().attachCommAdapter(
+                peripheralEntry.getLocation(),
+                factory
+            )
+        );
       }
       catch (Exception ex) {
-        LOG.warn("Error attaching adapter {} to vehicle {}",
-                 factory,
-                 peripheralEntry.getLocation().getName(),
-                 ex);
+        LOG.warn(
+            "Error attaching adapter {} to vehicle {}",
+            factory,
+            peripheralEntry.getLocation().getName(),
+            ex
+        );
         return;
       }
       LOG.info("Attaching comm adapter {} to {}", factory, peripheralEntry.getLocation().getName());
@@ -264,15 +288,20 @@ public class PeripheralsPanel
     List<RowFilter<PeripheralTableModel, Integer>> result = new ArrayList<>();
     result.add(RowFilter.regexFilter(".*", PeripheralTableModel.COLUMN_ADAPTER));
     if (hideDetachedLocationsCheckBox.isSelected()) {
-      result.add(RowFilter.notFilter(
-          RowFilter.regexFilter(NullPeripheralCommAdapterDescription.class.getSimpleName(),
-                                PeripheralTableModel.COLUMN_ADAPTER))
+      result.add(
+          RowFilter.notFilter(
+              RowFilter.regexFilter(
+                  NullPeripheralCommAdapterDescription.class.getSimpleName(),
+                  PeripheralTableModel.COLUMN_ADAPTER
+              )
+          )
       );
     }
 
     return result;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
@@ -332,6 +361,7 @@ public class PeripheralsPanel
     getAccessibleContext().setAccessibleName(bundle.getString("peripheralsPanel.accessibleName")); // NOI18N
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void peripheralTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_peripheralTableMouseClicked
     if (evt.getClickCount() == 2) {
@@ -349,6 +379,7 @@ public class PeripheralsPanel
     updateRowFilter();
   }//GEN-LAST:event_hideDetachedLocationsCheckBoxActionPerformed
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel filterPanel;
@@ -359,4 +390,5 @@ public class PeripheralsPanel
   private javax.swing.JTable peripheralTable;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

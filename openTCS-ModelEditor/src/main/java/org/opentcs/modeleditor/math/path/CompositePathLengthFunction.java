@@ -7,10 +7,11 @@
  */
 package org.opentcs.modeleditor.math.path;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.guing.base.model.elements.PathModel;
 
 /**
@@ -18,15 +19,19 @@ import org.opentcs.guing.base.model.elements.PathModel;
  * falls back to {@link EuclideanDistance}.
  */
 public class CompositePathLengthFunction
-    implements PathLengthFunction {
+    implements
+      PathLengthFunction {
 
   private final Map<PathModel.Type, PathLengthFunction> pathLengthFunctions;
   private final EuclideanDistance euclideanDistance;
 
   @Inject
   public CompositePathLengthFunction(
-      @Nonnull Map<PathModel.Type, PathLengthFunction> pathLengthFunctions,
-      @Nonnull EuclideanDistance euclideanDistance) {
+      @Nonnull
+      Map<PathModel.Type, PathLengthFunction> pathLengthFunctions,
+      @Nonnull
+      EuclideanDistance euclideanDistance
+  ) {
     this.pathLengthFunctions = requireNonNull(pathLengthFunctions, "pathLengthFunctions");
     this.euclideanDistance = requireNonNull(euclideanDistance, "euclideanDistance");
   }

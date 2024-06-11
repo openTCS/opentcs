@@ -7,10 +7,11 @@
  */
 package org.opentcs.guing.base.components.properties.type;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,8 @@ import org.slf4j.LoggerFactory;
  * @param <U> The enum type.
  */
 public abstract class AbstractQuantity<U extends Enum<U>>
-    extends AbstractProperty {
+    extends
+      AbstractProperty {
 
   /**
    * This class's logger.
@@ -70,8 +72,10 @@ public abstract class AbstractQuantity<U extends Enum<U>>
    * @param relations The relations.
    */
   @SuppressWarnings("this-escape")
-  public AbstractQuantity(ModelComponent model, double value, U unit, Class<U> unitClass,
-                          List<Relation<U>> relations) {
+  public AbstractQuantity(
+      ModelComponent model, double value, U unit, Class<U> unitClass,
+      List<Relation<U>> relations
+  ) {
     super(model);
     fUnit = requireNonNull(unit, "unit");
     fUnitClass = requireNonNull(unitClass, "unitClass");

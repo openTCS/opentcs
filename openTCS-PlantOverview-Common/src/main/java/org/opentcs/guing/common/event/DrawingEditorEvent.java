@@ -20,7 +20,8 @@ import org.jhotdraw.draw.Figure;
  * @see DrawingEditorListener
  */
 public class DrawingEditorEvent
-    extends EventObject {
+    extends
+      EventObject {
 
   /**
    * The affected Figure objects.

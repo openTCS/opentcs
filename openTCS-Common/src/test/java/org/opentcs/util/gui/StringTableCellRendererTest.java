@@ -7,12 +7,13 @@
  */
 package org.opentcs.util.gui;
 
-import java.awt.Component;
-import javax.swing.JLabel;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+
+import java.awt.Component;
+import javax.swing.JLabel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.TCSObjectReference;

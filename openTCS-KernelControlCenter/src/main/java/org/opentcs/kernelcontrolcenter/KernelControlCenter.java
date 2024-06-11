@@ -7,6 +7,11 @@
  */
 package org.opentcs.kernelcontrolcenter;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.common.PortalManager.ConnectionState.CONNECTED;
+import static org.opentcs.common.PortalManager.ConnectionState.DISCONNECTED;
+import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
@@ -17,7 +22,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.JFrame;
@@ -29,15 +33,12 @@ import org.opentcs.access.ModelTransitionEvent;
 import org.opentcs.common.ClientConnectionMode;
 import org.opentcs.common.KernelClientApplication;
 import org.opentcs.common.PortalManager;
-import static org.opentcs.common.PortalManager.ConnectionState.CONNECTED;
-import static org.opentcs.common.PortalManager.ConnectionState.DISCONNECTED;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernelcontrolcenter.ControlCenterPanel;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.customizations.controlcenter.ActiveInModellingMode;
 import org.opentcs.customizations.controlcenter.ActiveInOperatingMode;
-import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 import org.opentcs.util.CallWrapper;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;
@@ -49,9 +50,11 @@ import org.slf4j.LoggerFactory;
  * A GUI frontend for basic control over the kernel.
  */
 public class KernelControlCenter
-    extends JFrame
-    implements Lifecycle,
-               EventHandler {
+    extends
+      JFrame
+    implements
+      Lifecycle,
+      EventHandler {
 
   /**
    * This class's logger.
@@ -129,27 +132,44 @@ public class KernelControlCenter
   @Inject
   @SuppressWarnings("this-escape")
   public KernelControlCenter(
-      @Nonnull KernelClientApplication application,
-      @Nonnull KernelServicePortal servicePortal,
-      @Nonnull @ServiceCallWrapper CallWrapper callWrapper,
-      @Nonnull PortalManager portalManager,
-      @Nonnull @ApplicationEventBus EventSource eventSource,
-      @Nonnull ControlCenterInfoHandlerFactory controlCenterInfoHandlerFactory,
       @Nonnull
-      @ActiveInModellingMode Collection<Provider<ControlCenterPanel>> panelProvidersModelling,
+      KernelClientApplication application,
       @Nonnull
-      @ActiveInOperatingMode Collection<Provider<ControlCenterPanel>> panelProvidersOperating) {
+      KernelServicePortal servicePortal,
+      @Nonnull
+      @ServiceCallWrapper
+      CallWrapper callWrapper,
+      @Nonnull
+      PortalManager portalManager,
+      @Nonnull
+      @ApplicationEventBus
+      EventSource eventSource,
+      @Nonnull
+      ControlCenterInfoHandlerFactory controlCenterInfoHandlerFactory,
+      @Nonnull
+      @ActiveInModellingMode
+      Collection<Provider<ControlCenterPanel>> panelProvidersModelling,
+      @Nonnull
+      @ActiveInOperatingMode
+      Collection<Provider<ControlCenterPanel>> panelProvidersOperating
+  ) {
     this.application = requireNonNull(application, "application");
     this.servicePortal = requireNonNull(servicePortal, "servicePortal");
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");
     this.portalManager = requireNonNull(portalManager, "portalManager");
     this.eventSource = requireNonNull(eventSource, "eventSource");
-    this.controlCenterInfoHandlerFactoy = requireNonNull(controlCenterInfoHandlerFactory,
-                                                         "controlCenterInfoHandlerFactory");
-    this.panelProvidersModelling = requireNonNull(panelProvidersModelling,
-                                                  "panelProvidersModelling");
-    this.panelProvidersOperating = requireNonNull(panelProvidersOperating,
-                                                  "panelProvidersOperating");
+    this.controlCenterInfoHandlerFactoy = requireNonNull(
+        controlCenterInfoHandlerFactory,
+        "controlCenterInfoHandlerFactory"
+    );
+    this.panelProvidersModelling = requireNonNull(
+        panelProvidersModelling,
+        "panelProvidersModelling"
+    );
+    this.panelProvidersOperating = requireNonNull(
+        panelProvidersOperating,
+        "panelProvidersOperating"
+    );
 
     initComponents();
     setIconImages(Icons.getOpenTCSIcons());
@@ -291,7 +311,7 @@ public class KernelControlCenter
         addPanels(panelProvidersModelling);
         break;
       default:
-      // Do nada.
+        // Do nada.
     }
     // Updating the window title
     updateWindowTitle();
@@ -349,6 +369,7 @@ public class KernelControlCenter
     setTitle(titleBase + loadedModel + connectedTo);
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Generated code starts here.
   /**
@@ -459,6 +480,8 @@ public class KernelControlCenter
         setSize(new java.awt.Dimension(1208, 782));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void menuButtonExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuButtonExitActionPerformed
     application.terminate();
@@ -490,6 +513,8 @@ public class KernelControlCenter
     application.offline();
   }//GEN-LAST:event_menuButtonDisconnectActionPerformed
 
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox autoScrollCheckBox;
     private javax.swing.JPopupMenu.Separator jSeparator1;
@@ -507,4 +532,5 @@ public class KernelControlCenter
     private javax.swing.JTabbedPane tabbedPaneMain;
     // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

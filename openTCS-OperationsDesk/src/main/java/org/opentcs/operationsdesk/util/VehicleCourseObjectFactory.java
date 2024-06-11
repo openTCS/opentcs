@@ -7,8 +7,9 @@
  */
 package org.opentcs.operationsdesk.util;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.util.CourseObjectFactory;
 import org.opentcs.operationsdesk.components.drawing.figures.NamedVehicleFigure;
@@ -19,7 +20,8 @@ import org.opentcs.operationsdesk.components.drawing.figures.VehicleFigureFactor
  * A factory for Figures and ModelComponents.
  */
 public class VehicleCourseObjectFactory
-    extends CourseObjectFactory  {
+    extends
+      CourseObjectFactory {
 
   /**
    * A factory for figures.

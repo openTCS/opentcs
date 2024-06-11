@@ -11,7 +11,8 @@ package org.opentcs.configuration;
  * Thrown when a configuration error occured.
  */
 public class ConfigurationException
-    extends RuntimeException {
+    extends
+      RuntimeException {
 
   /**
    * Constructs a new instance with no detail message.

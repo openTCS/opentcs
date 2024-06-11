@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.services;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentException;
 import org.opentcs.components.kernel.services.DispatcherService;
@@ -24,7 +25,8 @@ import org.opentcs.kernel.workingset.TCSObjectRepository;
  * This class is the standard implementation of the {@link DispatcherService} interface.
  */
 public class StandardDispatcherService
-    implements DispatcherService {
+    implements
+      DispatcherService {
 
   /**
    * A global object to be used for synchronization within the kernel.
@@ -47,9 +49,12 @@ public class StandardDispatcherService
    * @param dispatcher The dispatcher.
    */
   @Inject
-  public StandardDispatcherService(@GlobalSyncObject Object globalSyncObject,
-                                   TCSObjectRepository objectRepo,
-                                   Dispatcher dispatcher) {
+  public StandardDispatcherService(
+      @GlobalSyncObject
+      Object globalSyncObject,
+      TCSObjectRepository objectRepo,
+      Dispatcher dispatcher
+  ) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.objectRepo = requireNonNull(objectRepo, "objectRepo");
     this.dispatcher = requireNonNull(dispatcher, "dispatcher");
@@ -73,14 +78,18 @@ public class StandardDispatcherService
   }
 
   @Override
-  public void withdrawByTransportOrder(TCSObjectReference<TransportOrder> ref,
-                                       boolean immediateAbort)
+  public void withdrawByTransportOrder(
+      TCSObjectReference<TransportOrder> ref,
+      boolean immediateAbort
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 
     synchronized (globalSyncObject) {
-      dispatcher.withdrawOrder(objectRepo.getObject(TransportOrder.class, ref),
-                               immediateAbort);
+      dispatcher.withdrawOrder(
+          objectRepo.getObject(TransportOrder.class, ref),
+          immediateAbort
+      );
     }
   }
 
@@ -104,7 +113,8 @@ public class StandardDispatcherService
 
   @Override
   public void assignNow(TCSObjectReference<TransportOrder> ref)
-      throws ObjectUnknownException, TransportOrderAssignmentException {
+      throws ObjectUnknownException,
+        TransportOrderAssignmentException {
     requireNonNull(ref, "ref");
 
     synchronized (globalSyncObject) {

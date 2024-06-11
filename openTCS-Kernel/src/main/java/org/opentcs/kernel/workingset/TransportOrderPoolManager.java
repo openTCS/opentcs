@@ -7,6 +7,9 @@
  */
 package org.opentcs.kernel.workingset;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
@@ -15,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
@@ -36,7 +38,6 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,8 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class TransportOrderPoolManager
-    extends TCSObjectManager {
+    extends
+      TCSObjectManager {
 
   /**
    * This class's Logger.
@@ -68,9 +70,15 @@ public class TransportOrderPoolManager
    * @param orderNameProvider Provides names for transport orders.
    */
   @Inject
-  public TransportOrderPoolManager(@Nonnull TCSObjectRepository objectRepo,
-                                   @Nonnull @ApplicationEventBus EventHandler eventHandler,
-                                   @Nonnull ObjectNameProvider orderNameProvider) {
+  public TransportOrderPoolManager(
+      @Nonnull
+      TCSObjectRepository objectRepo,
+      @Nonnull
+      @ApplicationEventBus
+      EventHandler eventHandler,
+      @Nonnull
+      ObjectNameProvider orderNameProvider
+  ) {
     super(objectRepo, eventHandler);
     this.objectNameProvider = requireNonNull(orderNameProvider, "orderNameProvider");
   }
@@ -85,9 +93,11 @@ public class TransportOrderPoolManager
 
     for (TCSObject<?> curObject : objects) {
       getObjectRepo().removeObject(curObject.getReference());
-      emitObjectEvent(null,
-                      curObject,
-                      TCSObjectEvent.Type.OBJECT_REMOVED);
+      emitObjectEvent(
+          null,
+          curObject,
+          TCSObjectEvent.Type.OBJECT_REMOVED
+      );
     }
   }
 
@@ -109,9 +119,13 @@ public class TransportOrderPoolManager
    * </ol>
    */
   public TransportOrder createTransportOrder(TransportOrderCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException, IllegalArgumentException {
-    TransportOrder newOrder = new TransportOrder(nameFor(to),
-                                                 toDriveOrders(to.getDestinations()))
+      throws ObjectUnknownException,
+        ObjectExistsException,
+        IllegalArgumentException {
+    TransportOrder newOrder = new TransportOrder(
+        nameFor(to),
+        toDriveOrders(to.getDestinations())
+    )
         .withCreationTime(Instant.now())
         .withPeripheralReservationToken(to.getPeripheralReservationToken())
         .withIntendedVehicle(toVehicleReference(to.getIntendedVehicleName()))
@@ -122,16 +136,20 @@ public class TransportOrderPoolManager
         .withDependencies(getDependencies(to))
         .withProperties(to.getProperties());
 
-    LOG.info("Transport order is being created: {} -- {}",
-             newOrder.getName(),
-             newOrder.getAllDriveOrders());
+    LOG.info(
+        "Transport order is being created: {} -- {}",
+        newOrder.getName(),
+        newOrder.getAllDriveOrders()
+    );
 
     getObjectRepo().addObject(newOrder);
     emitObjectEvent(newOrder, null, TCSObjectEvent.Type.OBJECT_CREATED);
 
     if (newOrder.getWrappingSequence() != null) {
-      OrderSequence sequence = getObjectRepo().getObject(OrderSequence.class,
-                                                         newOrder.getWrappingSequence());
+      OrderSequence sequence = getObjectRepo().getObject(
+          OrderSequence.class,
+          newOrder.getWrappingSequence()
+      );
       OrderSequence prevSeq = sequence;
       sequence = sequence.withOrder(newOrder.getReference());
       getObjectRepo().replaceObject(sequence);
@@ -151,27 +169,35 @@ public class TransportOrderPoolManager
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
    */
-  public TransportOrder setTransportOrderState(TCSObjectReference<TransportOrder> ref,
-                                               TransportOrder.State newState)
+  public TransportOrder setTransportOrderState(
+      TCSObjectReference<TransportOrder> ref,
+      TransportOrder.State newState
+  )
       throws ObjectUnknownException {
     TransportOrder previousState = getObjectRepo().getObject(TransportOrder.class, ref);
 
-    checkArgument(!previousState.getState().isFinalState(),
-                  "Transport order %s already in a final state, not changing %s -> %s.",
-                  ref.getName(),
-                  previousState.getState(),
-                  newState);
+    checkArgument(
+        !previousState.getState().isFinalState(),
+        "Transport order %s already in a final state, not changing %s -> %s.",
+        ref.getName(),
+        previousState.getState(),
+        newState
+    );
 
-    LOG.info("Transport order's state changes: {} -- {} -> {}",
-             previousState.getName(),
-             previousState.getState(),
-             newState);
+    LOG.info(
+        "Transport order's state changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getState(),
+        newState
+    );
 
     TransportOrder order = previousState.withState(newState);
     getObjectRepo().replaceObject(order);
-    emitObjectEvent(order,
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(
+        order,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
     return order;
   }
 
@@ -192,14 +218,18 @@ public class TransportOrderPoolManager
   public TransportOrder setTransportOrderProcessingVehicle(
       TCSObjectReference<TransportOrder> orderRef,
       TCSObjectReference<Vehicle> vehicleRef,
-      List<DriveOrder> driveOrders)
-      throws ObjectUnknownException, IllegalArgumentException {
+      List<DriveOrder> driveOrders
+  )
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     TransportOrder order = getObjectRepo().getObject(TransportOrder.class, orderRef);
 
-    LOG.info("Transport order's processing vehicle changes: {} -- {} -> {}",
-             order.getName(),
-             toObjectName(order.getProcessingVehicle()),
-             toObjectName(vehicleRef));
+    LOG.info(
+        "Transport order's processing vehicle changes: {} -- {} -> {}",
+        order.getName(),
+        toObjectName(order.getProcessingVehicle()),
+        toObjectName(vehicleRef)
+    );
 
     TransportOrder previousState = order;
     if (vehicleRef == null) {
@@ -217,9 +247,11 @@ public class TransportOrderPoolManager
         getObjectRepo().replaceObject(order);
       }
     }
-    emitObjectEvent(order,
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(
+        order,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
     return order;
   }
 
@@ -237,15 +269,20 @@ public class TransportOrderPoolManager
    * orders do not match the destinations of the drive orders in this transport
    * order.
    */
-  public TransportOrder setTransportOrderDriveOrders(TCSObjectReference<TransportOrder> orderRef,
-                                                     List<DriveOrder> newOrders)
-      throws ObjectUnknownException, IllegalArgumentException {
+  public TransportOrder setTransportOrderDriveOrders(
+      TCSObjectReference<TransportOrder> orderRef,
+      List<DriveOrder> newOrders
+  )
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     TransportOrder previousState = getObjectRepo().getObject(TransportOrder.class, orderRef);
     TransportOrder order = previousState.withDriveOrders(newOrders);
     getObjectRepo().replaceObject(order);
-    emitObjectEvent(order,
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(
+        order,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
     return order;
   }
 
@@ -270,38 +307,48 @@ public class TransportOrderPoolManager
     // Then, shift drive orders and send a second event.
     // Then, mark the current drive order as TRAVELLING and send another event.
     if (order.getCurrentDriveOrder() != null) {
-      LOG.info("Transport order's drive order finished: {} -- {}",
-               order.getName(),
-               order.getCurrentDriveOrder().getDestination());
+      LOG.info(
+          "Transport order's drive order finished: {} -- {}",
+          order.getName(),
+          order.getCurrentDriveOrder().getDestination()
+      );
 
       order = order.withCurrentDriveOrderState(DriveOrder.State.FINISHED);
       getObjectRepo().replaceObject(order);
       TransportOrder newState = order;
-      emitObjectEvent(newState,
-                      previousState,
-                      TCSObjectEvent.Type.OBJECT_MODIFIED);
+      emitObjectEvent(
+          newState,
+          previousState,
+          TCSObjectEvent.Type.OBJECT_MODIFIED
+      );
       previousState = newState;
       order = order.withCurrentDriveOrderIndex(order.getCurrentDriveOrderIndex() + 1)
           .withCurrentRouteStepIndex(TransportOrder.ROUTE_STEP_INDEX_DEFAULT);
       getObjectRepo().replaceObject(order);
       newState = order;
-      emitObjectEvent(newState,
-                      previousState,
-                      TCSObjectEvent.Type.OBJECT_MODIFIED);
+      emitObjectEvent(
+          newState,
+          previousState,
+          TCSObjectEvent.Type.OBJECT_MODIFIED
+      );
       previousState = newState;
       if (order.getCurrentDriveOrder() != null) {
         order = order.withCurrentDriveOrderState(DriveOrder.State.TRAVELLING);
         getObjectRepo().replaceObject(order);
         newState = order;
-        emitObjectEvent(newState,
-                        previousState,
-                        TCSObjectEvent.Type.OBJECT_MODIFIED);
+        emitObjectEvent(
+            newState,
+            previousState,
+            TCSObjectEvent.Type.OBJECT_MODIFIED
+        );
         previousState = newState;
       }
     }
-    emitObjectEvent(order,
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(
+        order,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
     return order;
   }
 
@@ -316,14 +363,17 @@ public class TransportOrderPoolManager
    */
   public TransportOrder setTransportOrderCurrentRouteStepIndex(
       TCSObjectReference<TransportOrder> ref,
-      int index)
+      int index
+  )
       throws ObjectUnknownException {
     TransportOrder previousState = getObjectRepo().getObject(TransportOrder.class, ref);
     TransportOrder order = previousState.withCurrentRouteStepIndex(index);
     getObjectRepo().replaceObject(order);
-    emitObjectEvent(order,
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(
+        order,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
     return order;
   }
 
@@ -339,34 +389,42 @@ public class TransportOrderPoolManager
    */
   public TransportOrder setTransportOrderIntendedVehicle(
       TCSObjectReference<TransportOrder> orderRef,
-      TCSObjectReference<Vehicle> vehicleRef)
-      throws ObjectUnknownException, IllegalArgumentException {
+      TCSObjectReference<Vehicle> vehicleRef
+  )
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     TransportOrder order = getObjectRepo().getObject(TransportOrder.class, orderRef);
 
     if (!canSetIntendedVehicle(order)) {
-      throw new IllegalArgumentException(String.format(
-          "Cannot set intended vehicle '%s' for transport order '%s' in state '%s'",
-          toObjectName(vehicleRef),
-          order.getName(),
-          order.getState()
-      ));
+      throw new IllegalArgumentException(
+          String.format(
+              "Cannot set intended vehicle '%s' for transport order '%s' in state '%s'",
+              toObjectName(vehicleRef),
+              order.getName(),
+              order.getState()
+          )
+      );
     }
 
     if (vehicleRef != null && getObjectRepo().getObjectOrNull(Vehicle.class, vehicleRef) == null) {
       throw new ObjectUnknownException("Unknown vehicle: " + vehicleRef.getName());
     }
 
-    LOG.info("Transport order's intended vehicle changes: {} -- {} -> {}",
-             order.getName(),
-             toObjectName(order.getIntendedVehicle()),
-             toObjectName(vehicleRef));
+    LOG.info(
+        "Transport order's intended vehicle changes: {} -- {} -> {}",
+        order.getName(),
+        toObjectName(order.getIntendedVehicle()),
+        toObjectName(vehicleRef)
+    );
 
     TransportOrder previousState = order;
     order = order.withIntendedVehicle(vehicleRef);
     getObjectRepo().replaceObject(order);
-    emitObjectEvent(order,
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(
+        order,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
     return order;
   }
 
@@ -382,13 +440,17 @@ public class TransportOrderPoolManager
       throws ObjectUnknownException {
     TransportOrder order = getObjectRepo().getObject(TransportOrder.class, ref);
     // Make sure only orders in a final state are removed.
-    checkArgument(order.getState().isFinalState(),
-                  "Transport order %s is not in a final state.",
-                  order.getName());
+    checkArgument(
+        order.getState().isFinalState(),
+        "Transport order %s is not in a final state.",
+        order.getName()
+    );
     getObjectRepo().removeObject(ref);
-    emitObjectEvent(null,
-                    order,
-                    TCSObjectEvent.Type.OBJECT_REMOVED);
+    emitObjectEvent(
+        null,
+        order,
+        TCSObjectEvent.Type.OBJECT_REMOVED
+    );
     return order;
   }
 
@@ -401,7 +463,8 @@ public class TransportOrderPoolManager
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    */
   public OrderSequence createOrderSequence(OrderSequenceCreationTO to)
-      throws ObjectExistsException, ObjectUnknownException {
+      throws ObjectExistsException,
+        ObjectUnknownException {
     OrderSequence newSequence = new OrderSequence(nameFor(to))
         .withType(to.getType())
         .withIntendedVehicle(toVehicleReference(to.getIntendedVehicleName()))
@@ -411,9 +474,11 @@ public class TransportOrderPoolManager
     LOG.info("Order sequence is being created: {}", newSequence.getName());
 
     getObjectRepo().addObject(newSequence);
-    emitObjectEvent(newSequence,
-                    null,
-                    TCSObjectEvent.Type.OBJECT_CREATED);
+    emitObjectEvent(
+        newSequence,
+        null,
+        TCSObjectEvent.Type.OBJECT_CREATED
+    );
     // Return the newly created transport order.
     return newSequence;
   }
@@ -427,15 +492,19 @@ public class TransportOrderPoolManager
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
    */
-  public OrderSequence setOrderSequenceFinishedIndex(TCSObjectReference<OrderSequence> seqRef,
-                                                     int index)
+  public OrderSequence setOrderSequenceFinishedIndex(
+      TCSObjectReference<OrderSequence> seqRef,
+      int index
+  )
       throws ObjectUnknownException {
     OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
     OrderSequence sequence = previousState.withFinishedIndex(index);
     getObjectRepo().replaceObject(sequence);
-    emitObjectEvent(sequence,
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(
+        sequence,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
     return sequence;
   }
 
@@ -448,14 +517,17 @@ public class TransportOrderPoolManager
    * in this pool.
    */
   public OrderSequence setOrderSequenceComplete(
-      TCSObjectReference<OrderSequence> seqRef)
+      TCSObjectReference<OrderSequence> seqRef
+  )
       throws ObjectUnknownException {
     OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
     OrderSequence sequence = previousState.withComplete(true);
     getObjectRepo().replaceObject(sequence);
-    emitObjectEvent(sequence,
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(
+        sequence,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
     return sequence;
   }
 
@@ -472,9 +544,11 @@ public class TransportOrderPoolManager
     OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
     OrderSequence sequence = previousState.withFinished(true);
     getObjectRepo().replaceObject(sequence);
-    emitObjectEvent(sequence,
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(
+        sequence,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
     return sequence;
   }
 
@@ -489,14 +563,17 @@ public class TransportOrderPoolManager
    */
   public OrderSequence setOrderSequenceProcessingVehicle(
       TCSObjectReference<OrderSequence> seqRef,
-      TCSObjectReference<Vehicle> vehicleRef)
+      TCSObjectReference<Vehicle> vehicleRef
+  )
       throws ObjectUnknownException {
     OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
 
-    LOG.info("Order sequence's processing vehicle changes: {} -- {} -> {}",
-             previousState.getName(),
-             toObjectName(previousState.getProcessingVehicle()),
-             toObjectName(vehicleRef));
+    LOG.info(
+        "Order sequence's processing vehicle changes: {} -- {} -> {}",
+        previousState.getName(),
+        toObjectName(previousState.getProcessingVehicle()),
+        toObjectName(vehicleRef)
+    );
 
     OrderSequence sequence = previousState;
     if (vehicleRef == null) {
@@ -508,9 +585,11 @@ public class TransportOrderPoolManager
       sequence = sequence.withProcessingVehicle(vehicle.getReference());
       getObjectRepo().replaceObject(sequence);
     }
-    emitObjectEvent(sequence,
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_MODIFIED);
+    emitObjectEvent(
+        sequence,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
     return sequence;
   }
 
@@ -527,9 +606,11 @@ public class TransportOrderPoolManager
     OrderSequence sequence = previousState;
     // XXX Any sanity checks here?
     getObjectRepo().removeObject(ref);
-    emitObjectEvent(null,
-                    previousState,
-                    TCSObjectEvent.Type.OBJECT_REMOVED);
+    emitObjectEvent(
+        null,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_REMOVED
+    );
     return sequence;
   }
 
@@ -541,11 +622,14 @@ public class TransportOrderPoolManager
    * @throws IllegalArgumentException If the order sequence is not finished, yet.
    */
   public void removeFinishedOrderSequenceAndOrders(TCSObjectReference<OrderSequence> ref)
-      throws ObjectUnknownException, IllegalArgumentException {
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, ref);
-    checkArgument(previousState.isFinished(),
-                  "Order sequence %s is not finished",
-                  previousState.getName());
+    checkArgument(
+        previousState.isFinished(),
+        "Order sequence %s is not finished",
+        previousState.getName()
+    );
     OrderSequence sequence = previousState;
     getObjectRepo().removeObject(ref);
     emitObjectEvent(null, previousState, TCSObjectEvent.Type.OBJECT_REMOVED);
@@ -565,25 +649,32 @@ public class TransportOrderPoolManager
   }
 
   private TCSObjectReference<OrderSequence> getWrappingSequence(TransportOrderCreationTO to)
-      throws ObjectUnknownException, IllegalArgumentException {
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     if (to.getWrappingSequence() == null) {
       return null;
     }
-    OrderSequence sequence = getObjectRepo().getObject(OrderSequence.class,
-                                                       to.getWrappingSequence());
+    OrderSequence sequence = getObjectRepo().getObject(
+        OrderSequence.class,
+        to.getWrappingSequence()
+    );
     checkArgument(!sequence.isComplete(), "Order sequence %s is already complete", sequence);
-    checkArgument(Objects.equals(to.getType(), sequence.getType()),
-                  "Order sequence %s has different type than order %s: %s != %s",
-                  sequence,
-                  to.getName(),
-                  sequence.getType(),
-                  to.getType());
-    checkArgument(Objects.equals(to.getIntendedVehicleName(), getIntendedVehicleName(sequence)),
-                  "Order sequence %s has different intended vehicle than order %s: %s != %s",
-                  sequence,
-                  to.getName(),
-                  sequence.getIntendedVehicle(),
-                  to.getIntendedVehicleName());
+    checkArgument(
+        Objects.equals(to.getType(), sequence.getType()),
+        "Order sequence %s has different type than order %s: %s != %s",
+        sequence,
+        to.getName(),
+        sequence.getType(),
+        to.getType()
+    );
+    checkArgument(
+        Objects.equals(to.getIntendedVehicleName(), getIntendedVehicleName(sequence)),
+        "Order sequence %s has different intended vehicle than order %s: %s != %s",
+        sequence,
+        to.getName(),
+        sequence.getIntendedVehicle(),
+        to.getIntendedVehicleName()
+    );
     return sequence.getReference();
   }
 
@@ -597,29 +688,38 @@ public class TransportOrderPoolManager
   }
 
   private List<DriveOrder> toDriveOrders(List<DestinationCreationTO> dests)
-      throws ObjectUnknownException, IllegalArgumentException {
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     List<DriveOrder> result = new ArrayList<>(dests.size());
     for (DestinationCreationTO destTo : dests) {
       TCSObject<?> destObject = getObjectRepo().getObjectOrNull(destTo.getDestLocationName());
 
       if (destObject instanceof Point) {
         if (!isValidOperationOnPoint(destTo.getDestOperation())) {
-          throw new IllegalArgumentException(destTo.getDestOperation()
-              + " is not a valid operation for point destination " + destObject.getName());
+          throw new IllegalArgumentException(
+              destTo.getDestOperation()
+                  + " is not a valid operation for point destination " + destObject.getName()
+          );
         }
       }
       else if (destObject instanceof Location) {
         if (!isValidLocationDestination(destTo, (Location) destObject)) {
-          throw new IllegalArgumentException(destTo.getDestOperation()
-              + " is not a valid operation for location destination " + destObject.getName());
+          throw new IllegalArgumentException(
+              destTo.getDestOperation()
+                  + " is not a valid operation for location destination " + destObject.getName()
+          );
         }
       }
       else {
         throw new ObjectUnknownException(destTo.getDestLocationName());
       }
-      result.add(new DriveOrder(new DriveOrder.Destination(destObject.getReference())
-          .withOperation(destTo.getDestOperation())
-          .withProperties(destTo.getProperties())));
+      result.add(
+          new DriveOrder(
+              new DriveOrder.Destination(destObject.getReference())
+                  .withOperation(destTo.getDestOperation())
+                  .withProperties(destTo.getProperties())
+          )
+      );
     }
     return result;
   }
@@ -656,7 +756,10 @@ public class TransportOrderPoolManager
   }
 
   @Nonnull
-  private String nameFor(@Nonnull TransportOrderCreationTO to) {
+  private String nameFor(
+      @Nonnull
+      TransportOrderCreationTO to
+  ) {
     if (to.hasIncompleteName()) {
       return objectNameProvider.apply(to);
     }
@@ -666,7 +769,10 @@ public class TransportOrderPoolManager
   }
 
   @Nonnull
-  private String nameFor(@Nonnull OrderSequenceCreationTO to) {
+  private String nameFor(
+      @Nonnull
+      OrderSequenceCreationTO to
+  ) {
     if (to.hasIncompleteName()) {
       return objectNameProvider.apply(to);
     }

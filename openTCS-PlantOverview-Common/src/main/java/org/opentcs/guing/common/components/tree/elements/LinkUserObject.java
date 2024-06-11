@@ -19,7 +19,8 @@ import org.opentcs.guing.common.util.IconToolkit;
  * Represents a link in the TreeView.
  */
 public class LinkUserObject
-    extends FigureUserObject {
+    extends
+      FigureUserObject {
 
   /**
    * Creates a new instance of LinkUserObject
@@ -29,9 +30,12 @@ public class LinkUserObject
    * @param modelManager The model manager
    */
   @Inject
-  public LinkUserObject(@Assisted LinkModel modelComponent,
-                        GuiManager guiManager,
-                        ModelManager modelManager) {
+  public LinkUserObject(
+      @Assisted
+      LinkModel modelComponent,
+      GuiManager guiManager,
+      ModelManager modelManager
+  ) {
     super(modelComponent, guiManager, modelManager);
   }
 

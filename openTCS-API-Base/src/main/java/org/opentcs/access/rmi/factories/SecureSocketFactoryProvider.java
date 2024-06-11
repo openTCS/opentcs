@@ -7,10 +7,11 @@
  */
 package org.opentcs.access.rmi.factories;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
-import static java.util.Objects.requireNonNull;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
 import javax.rmi.ssl.SslRMIServerSocketFactory;
@@ -23,7 +24,8 @@ import org.opentcs.access.SslParameterSet;
  * truststore on the client-side is necessary.
  */
 public class SecureSocketFactoryProvider
-    implements SocketFactoryProvider {
+    implements
+      SocketFactoryProvider {
 
   /**
    * Provides methods for creating client-side and server-side {@link SSLContext} instances.
@@ -50,9 +52,11 @@ public class SecureSocketFactoryProvider
   public RMIServerSocketFactory getServerSocketFactory() {
     SSLContext context = secureSslContextFactory.createServerContext();
     SSLParameters param = context.getSupportedSSLParameters();
-    return new SslRMIServerSocketFactory(context,
-                                         param.getCipherSuites(),
-                                         param.getProtocols(),
-                                         param.getWantClientAuth());
+    return new SslRMIServerSocketFactory(
+        context,
+        param.getCipherSuites(),
+        param.getProtocols(),
+        param.getWantClientAuth()
+    );
   }
 }

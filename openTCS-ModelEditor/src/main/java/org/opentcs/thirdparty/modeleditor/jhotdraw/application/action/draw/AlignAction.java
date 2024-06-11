@@ -15,10 +15,11 @@
  */
 package org.opentcs.thirdparty.modeleditor.jhotdraw.application.action.draw;
 
+import static javax.swing.Action.SMALL_ICON;
+
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
-import static javax.swing.Action.SMALL_ICON;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
@@ -36,7 +37,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * @author Werner Randelshofer
  */
 public abstract class AlignAction
-    extends AbstractSelectedAction {
+    extends
+      AbstractSelectedAction {
 
   protected ResourceBundleUtil bundle
       = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH);
@@ -55,8 +57,10 @@ public abstract class AlignAction
   @Override
   protected final void updateEnabledState() {
     if (getView() != null) {
-      setEnabled(getView().isEnabled()
-          && getView().getSelectionCount() > 1);
+      setEnabled(
+          getView().isEnabled()
+              && getView().getSelectionCount() > 1
+      );
     }
     else {
       setEnabled(false);
@@ -71,8 +75,10 @@ public abstract class AlignAction
     fireUndoableEditHappened(edit);
   }
 
-  protected abstract void alignFigures(Collection<?> selectedFigures,
-                                       Rectangle2D.Double selectionBounds);
+  protected abstract void alignFigures(
+      Collection<?> selectedFigures,
+      Rectangle2D.Double selectionBounds
+  );
 
   /**
    * Returns the bounds of the selected figures.
@@ -95,7 +101,8 @@ public abstract class AlignAction
   }
 
   public static class North
-      extends AlignAction {
+      extends
+        AlignAction {
 
     @SuppressWarnings("this-escape")
     public North(DrawingEditor editor) {
@@ -124,7 +131,8 @@ public abstract class AlignAction
   }
 
   public static class East
-      extends AlignAction {
+      extends
+        AlignAction {
 
     @SuppressWarnings("this-escape")
     public East(DrawingEditor editor) {
@@ -153,7 +161,8 @@ public abstract class AlignAction
   }
 
   public static class West
-      extends AlignAction {
+      extends
+        AlignAction {
 
     @SuppressWarnings("this-escape")
     public West(DrawingEditor editor) {
@@ -182,7 +191,8 @@ public abstract class AlignAction
   }
 
   public static class South
-      extends AlignAction {
+      extends
+        AlignAction {
 
     @SuppressWarnings("this-escape")
     public South(DrawingEditor editor) {
@@ -211,7 +221,8 @@ public abstract class AlignAction
   }
 
   public static class Vertical
-      extends AlignAction {
+      extends
+        AlignAction {
 
     @SuppressWarnings("this-escape")
     public Vertical(DrawingEditor editor) {
@@ -240,7 +251,8 @@ public abstract class AlignAction
   }
 
   public static class Horizontal
-      extends AlignAction {
+      extends
+        AlignAction {
 
     @SuppressWarnings("this-escape")
     public Horizontal(DrawingEditor editor) {

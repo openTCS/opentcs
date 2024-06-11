@@ -7,6 +7,8 @@
  */
 package org.opentcs.operationsdesk.application;
 
+import static java.util.Objects.requireNonNull;
+
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.event.CVetoClosingEvent;
@@ -32,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.swing.BoxLayout;
@@ -129,6 +130,7 @@ import org.opentcs.operationsdesk.transport.orders.TransportOrdersContainerPanel
 import org.opentcs.operationsdesk.transport.sequences.OrderSequencesContainerPanel;
 import org.opentcs.operationsdesk.util.Cursors;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
+import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.UndoRedoManager;
 import org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar.PaletteToolBarBorder;
 import org.opentcs.thirdparty.guing.common.jhotdraw.components.drawing.AbstractOpenTCSDrawingView;
@@ -138,7 +140,6 @@ import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 
 /**
  * Visualizes the driving course and other kernel objects as well as messages
@@ -146,11 +147,13 @@ import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
  * (Contains everything underneath the tool bars.)
  */
 public class OpenTCSView
-    extends AbstractView
-    implements GuiManager,
-               ComponentsManager,
-               PluginPanelManager,
-               EventHandler {
+    extends
+      AbstractView
+    implements
+      GuiManager,
+      ComponentsManager,
+      PluginPanelManager,
+      EventHandler {
 
   /**
    * The name/title of this application.
@@ -344,36 +347,40 @@ public class OpenTCSView
    * @param configuration The operations desk application's configuration.
    */
   @Inject
-  public OpenTCSView(ApplicationState appState,
-                     @ApplicationFrame JFrame appFrame,
-                     ProgressIndicator progressIndicator,
-                     SharedKernelServicePortalProvider portalProvider,
-                     ViewManagerOperating viewManager,
-                     OpenTCSDrawingEditorOperating tcsDrawingEditor,
-                     ModelManager modelManager,
-                     StatusPanel statusPanel,
-                     PanelRegistry panelRegistry,
-                     UserMessageHelper userMessageHelper,
-                     DrawingViewFactory drawingViewFactory,
-                     UndoRedoManager undoRedoManager,
-                     ComponentsTreeViewManager componentsTreeManager,
-                     BlocksTreeViewManager blocksTreeManager,
-                     SelectionPropertiesComponent propertiesComponent,
-                     VehiclesPanel vehiclesPanel,
-                     Provider<ViewActionMap> actionMapProvider,
-                     Provider<ToolBarManager> toolBarManagerProvider,
-                     PropertiesPanelFactory propertiesPanelFactory,
-                     Provider<UserNotificationsContainerPanel> unContainerPanelProvider,
-                     Provider<TransportOrdersContainerPanel> toContainerPanelProvider,
-                     Provider<OrderSequencesContainerPanel> osContainerPanelProvider,
-                     Provider<PeripheralJobsContainerPanel> pjContainerPanelProvider,
-                     TransportOrderUtil orderUtil,
-                     @ApplicationEventBus EventBus eventBus,
-                     DockingManagerOperating dockingManager,
-                     DrawingViewFocusHandler drawingViewFocusHandler,
-                     DockableHandlerFactory dockableHandlerFactory,
-                     LayerManager layerManager,
-                     OperationsDeskConfiguration configuration) {
+  public OpenTCSView(
+      ApplicationState appState,
+      @ApplicationFrame
+      JFrame appFrame,
+      ProgressIndicator progressIndicator,
+      SharedKernelServicePortalProvider portalProvider,
+      ViewManagerOperating viewManager,
+      OpenTCSDrawingEditorOperating tcsDrawingEditor,
+      ModelManager modelManager,
+      StatusPanel statusPanel,
+      PanelRegistry panelRegistry,
+      UserMessageHelper userMessageHelper,
+      DrawingViewFactory drawingViewFactory,
+      UndoRedoManager undoRedoManager,
+      ComponentsTreeViewManager componentsTreeManager,
+      BlocksTreeViewManager blocksTreeManager,
+      SelectionPropertiesComponent propertiesComponent,
+      VehiclesPanel vehiclesPanel,
+      Provider<ViewActionMap> actionMapProvider,
+      Provider<ToolBarManager> toolBarManagerProvider,
+      PropertiesPanelFactory propertiesPanelFactory,
+      Provider<UserNotificationsContainerPanel> unContainerPanelProvider,
+      Provider<TransportOrdersContainerPanel> toContainerPanelProvider,
+      Provider<OrderSequencesContainerPanel> osContainerPanelProvider,
+      Provider<PeripheralJobsContainerPanel> pjContainerPanelProvider,
+      TransportOrderUtil orderUtil,
+      @ApplicationEventBus
+      EventBus eventBus,
+      DockingManagerOperating dockingManager,
+      DrawingViewFocusHandler drawingViewFocusHandler,
+      DockableHandlerFactory dockableHandlerFactory,
+      LayerManager layerManager,
+      OperationsDeskConfiguration configuration
+  ) {
     this.appState = requireNonNull(appState, "appState");
     this.fFrame = requireNonNull(appFrame, "appFrame");
     this.progressIndicator = requireNonNull(progressIndicator, "progressIndicator");
@@ -393,19 +400,29 @@ public class OpenTCSView
     this.actionMapProvider = requireNonNull(actionMapProvider, "actionMapProvider");
     this.toolBarManagerProvider = requireNonNull(toolBarManagerProvider, "toolBarManagerProvider");
     this.propertiesPanelFactory = requireNonNull(propertiesPanelFactory, "propertiesPanelFactory");
-    this.unContainerPanelProvider = requireNonNull(unContainerPanelProvider,
-                                                   "unContainerPanelProvider");
-    this.toContainerPanelProvider = requireNonNull(toContainerPanelProvider,
-                                                   "toContainerPanelProvider");
-    this.osContainerPanelProvider = requireNonNull(osContainerPanelProvider,
-                                                   "osContainerPanelProvider");
-    this.pjContainerPanelProvider = requireNonNull(pjContainerPanelProvider,
-                                                   "pjContainerPanelProvider");
+    this.unContainerPanelProvider = requireNonNull(
+        unContainerPanelProvider,
+        "unContainerPanelProvider"
+    );
+    this.toContainerPanelProvider = requireNonNull(
+        toContainerPanelProvider,
+        "toContainerPanelProvider"
+    );
+    this.osContainerPanelProvider = requireNonNull(
+        osContainerPanelProvider,
+        "osContainerPanelProvider"
+    );
+    this.pjContainerPanelProvider = requireNonNull(
+        pjContainerPanelProvider,
+        "pjContainerPanelProvider"
+    );
     this.orderUtil = requireNonNull(orderUtil, "orderUtil");
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.dockingManager = requireNonNull(dockingManager, "dockingManager");
-    this.drawingViewFocusHandler = requireNonNull(drawingViewFocusHandler,
-                                                  "drawingViewFocusHandler");
+    this.drawingViewFocusHandler = requireNonNull(
+        drawingViewFocusHandler,
+        "drawingViewFocusHandler"
+    );
     this.dockableHandlerFactory = requireNonNull(dockableHandlerFactory, "dockableHandlerFactory");
     this.layerManager = requireNonNull(layerManager, "layerManager");
     this.configuration = requireNonNull(configuration, "configuration");
@@ -426,7 +443,8 @@ public class OpenTCSView
 
     // Properties view (lower left corner)
     fPropertiesComponent.setPropertiesContent(
-        propertiesPanelFactory.createPropertiesTableContent(this));
+        propertiesPanelFactory.createPropertiesTableContent(this)
+    );
 
     // Register a listener for dragging vehicles around.
     VehicleDragHandler listener = new VehicleDragHandler(Cursors.getDragVehicleCursor());
@@ -480,7 +498,7 @@ public class OpenTCSView
         setModelNameProperty(fModelManager.getModel().getName());
         break;
       default:
-      // Do nada.
+        // Do nada.
     }
   }
 
@@ -507,7 +525,8 @@ public class OpenTCSView
       DefaultSingleCDockable factoryDockable = dockingManager.createFloatingDockable(
           factory.getClass().getName(),
           factory.getPanelDescription(),
-          panel);
+          panel
+      );
       factoryDockable.addVetoClosingListener(new CVetoClosingListener() {
 
         @Override
@@ -531,19 +550,23 @@ public class OpenTCSView
    */
   public DefaultSingleCDockable addDrawingView() {
     DrawingViewScrollPane newScrollPane
-        = drawingViewFactory.createDrawingView(fModelManager.getModel(),
-                                               toolBarManager.getSelectionToolButton(),
-                                               toolBarManager.getDragToolButton());
+        = drawingViewFactory.createDrawingView(
+            fModelManager.getModel(),
+            toolBarManager.getSelectionToolButton(),
+            toolBarManager.getDragToolButton()
+        );
 
     int drawingViewIndex = viewManager.getNextDrawingViewIndex();
 
     String title
         = bundle.getString("openTcsView.panel_operatingDrawingView.title") + " " + drawingViewIndex;
     DefaultSingleCDockable newDockable
-        = dockingManager.createDockable("drivingCourse" + drawingViewIndex,
-                                        title,
-                                        newScrollPane,
-                                        true);
+        = dockingManager.createDockable(
+            "drivingCourse" + drawingViewIndex,
+            title,
+            newScrollPane,
+            true
+        );
     viewManager.addDrawingView(newDockable, newScrollPane);
 
     int lastIndex = Math.max(0, drawingViewIndex - 1);
@@ -567,16 +590,20 @@ public class OpenTCSView
     DefaultSingleCDockable lastTOView = viewManager.getLastTransportOrderView();
     TransportOrdersContainerPanel panel = toContainerPanelProvider.get();
     DefaultSingleCDockable newDockable
-        = dockingManager.createDockable("transportOrders" + biggestIndex,
-                                        bundle.getString(
-                                            "openTcsView.panel_operatingTransportOrdersView.title")
-                                        + " " + biggestIndex, panel, true);
+        = dockingManager.createDockable(
+            "transportOrders" + biggestIndex,
+            bundle.getString(
+                "openTcsView.panel_operatingTransportOrdersView.title"
+            )
+                + " " + biggestIndex, panel, true
+        );
     viewManager.addTransportOrderView(newDockable, panel);
 
     panel.initView();
 
     newDockable.addVetoClosingListener(
-        dockableHandlerFactory.createDockableClosingHandler(newDockable));
+        dockableHandlerFactory.createDockableClosingHandler(newDockable)
+    );
 
     final int indexToInsert;
 
@@ -602,17 +629,21 @@ public class OpenTCSView
 
     OrderSequencesContainerPanel panel = osContainerPanelProvider.get();
     DefaultSingleCDockable newDockable
-        = dockingManager.createDockable("orderSequences" + biggestIndex,
-                                        bundle.getString(
-                                            "openTcsView.panel_operatingOrderSequencesView.title")
-                                        + " " + biggestIndex,
-                                        panel, true);
+        = dockingManager.createDockable(
+            "orderSequences" + biggestIndex,
+            bundle.getString(
+                "openTcsView.panel_operatingOrderSequencesView.title"
+            )
+                + " " + biggestIndex,
+            panel, true
+        );
     viewManager.addOrderSequenceView(newDockable, panel);
 
     panel.initView();
 
     newDockable.addVetoClosingListener(
-        dockableHandlerFactory.createDockableClosingHandler(newDockable));
+        dockableHandlerFactory.createDockableClosingHandler(newDockable)
+    );
 
     final int indexToInsert;
     if (lastOSView != null) {
@@ -637,17 +668,21 @@ public class OpenTCSView
 
     PeripheralJobsContainerPanel panel = pjContainerPanelProvider.get();
     DefaultSingleCDockable newDockable
-        = dockingManager.createDockable("peripheralJobs" + biggestIndex,
-                                        bundle.getString(
-                                            "openTcsView.panel_peripheralJobsView.title")
-                                        + " " + biggestIndex,
-                                        panel, true);
+        = dockingManager.createDockable(
+            "peripheralJobs" + biggestIndex,
+            bundle.getString(
+                "openTcsView.panel_peripheralJobsView.title"
+            )
+                + " " + biggestIndex,
+            panel, true
+        );
     viewManager.addPeripheralJobView(newDockable, panel);
 
     panel.initView();
 
     newDockable.addVetoClosingListener(
-        dockableHandlerFactory.createDockableClosingHandler(newDockable));
+        dockableHandlerFactory.createDockableClosingHandler(newDockable)
+    );
 
     final int indexToInsert;
     if (lastView != null) {
@@ -675,8 +710,10 @@ public class OpenTCSView
         = dockingManager.createDockable(
             "userNotifications" + biggestIndex,
             bundle.getString(
-                "openTcsView.panel_operatingUserNotificationsView.title")
-            + " " + biggestIndex, panel, true);
+                "openTcsView.panel_operatingUserNotificationsView.title"
+            )
+                + " " + biggestIndex, panel, true
+        );
     viewManager.addUserNotificationView(newDockable, panel);
 
     panel.initView();
@@ -710,20 +747,24 @@ public class OpenTCSView
     for (DefaultSingleCDockable dock : new ArrayList<>(viewManager.getDrawingViewMap().keySet())) {
       removeDrawingView(dock);
     }
-    for (DefaultSingleCDockable dock
-             : new ArrayList<>(viewManager.getUserNotificationMap().keySet())) {
+    for (DefaultSingleCDockable dock : new ArrayList<>(
+        viewManager.getUserNotificationMap().keySet()
+    )) {
       dockingManager.removeDockable(dock);
     }
-    for (DefaultSingleCDockable dock
-             : new ArrayList<>(viewManager.getTransportOrderMap().keySet())) {
+    for (DefaultSingleCDockable dock : new ArrayList<>(
+        viewManager.getTransportOrderMap().keySet()
+    )) {
       dockingManager.removeDockable(dock);
     }
-    for (DefaultSingleCDockable dock
-             : new ArrayList<>(viewManager.getOrderSequenceMap().keySet())) {
+    for (DefaultSingleCDockable dock : new ArrayList<>(
+        viewManager.getOrderSequenceMap().keySet()
+    )) {
       dockingManager.removeDockable(dock);
     }
-    for (DefaultSingleCDockable dock
-             : new ArrayList<>(viewManager.getPeripheralJobMap().keySet())) {
+    for (DefaultSingleCDockable dock : new ArrayList<>(
+        viewManager.getPeripheralJobMap().keySet()
+    )) {
       dockingManager.removeDockable(dock);
     }
     dockingManager.reset();
@@ -741,37 +782,57 @@ public class OpenTCSView
   public void createEmptyModel() {
     CloseFileAction action = (CloseFileAction) getActionMap().get(CloseFileAction.ID);
     if (action != null) {
-      action.actionPerformed(new ActionEvent(this,
-                                             ActionEvent.ACTION_PERFORMED,
-                                             CloseFileAction.ID_MODEL_CLOSING));
+      action.actionPerformed(
+          new ActionEvent(
+              this,
+              ActionEvent.ACTION_PERFORMED,
+              CloseFileAction.ID_MODEL_CLOSING
+          )
+      );
       if (action.getFileSavedStatus() == JOptionPane.CANCEL_OPTION) {
         return;
       }
     }
 
     // Clean up first...
-    eventBus.onEvent(new SystemModelTransitionEvent(this,
-                                                    SystemModelTransitionEvent.Stage.UNLOADING,
-                                                    fModelManager.getModel()));
+    eventBus.onEvent(
+        new SystemModelTransitionEvent(
+            this,
+            SystemModelTransitionEvent.Stage.UNLOADING,
+            fModelManager.getModel()
+        )
+    );
 
-    eventBus.onEvent(new SystemModelTransitionEvent(this,
-                                                    SystemModelTransitionEvent.Stage.UNLOADED,
-                                                    fModelManager.getModel()));
+    eventBus.onEvent(
+        new SystemModelTransitionEvent(
+            this,
+            SystemModelTransitionEvent.Stage.UNLOADED,
+            fModelManager.getModel()
+        )
+    );
 
     // Create the new, empty model.
     LOG.debug("Creating new driving course model...");
     fModelManager.createEmptyModel();
 
-    eventBus.onEvent(new SystemModelTransitionEvent(this,
-                                                    SystemModelTransitionEvent.Stage.LOADING,
-                                                    fModelManager.getModel()));
+    eventBus.onEvent(
+        new SystemModelTransitionEvent(
+            this,
+            SystemModelTransitionEvent.Stage.LOADING,
+            fModelManager.getModel()
+        )
+    );
 
     // Now let components set themselves up for the new model.
     setSystemModel(fModelManager.getModel());
 
-    eventBus.onEvent(new SystemModelTransitionEvent(this,
-                                                    SystemModelTransitionEvent.Stage.LOADED,
-                                                    fModelManager.getModel()));
+    eventBus.onEvent(
+        new SystemModelTransitionEvent(
+            this,
+            SystemModelTransitionEvent.Stage.LOADED,
+            fModelManager.getModel()
+        )
+    );
 
     // makes sure the origin is on the lower left side and the ruler
     // are correctly drawn
@@ -809,33 +870,52 @@ public class OpenTCSView
    * @param portal If not null, the model from the given kernel will be loaded, else the model from
    * the model manager
    */
-  private void restoreModel(@Nullable KernelServicePortal portal) {
+  private void restoreModel(
+      @Nullable
+      KernelServicePortal portal
+  ) {
     progressIndicator.initialize();
 
     progressIndicator.setProgress(ModelRestorationProgressStatus.CLEANUP);
-    eventBus.onEvent(new SystemModelTransitionEvent(this,
-                                                    SystemModelTransitionEvent.Stage.UNLOADING,
-                                                    fModelManager.getModel()));
+    eventBus.onEvent(
+        new SystemModelTransitionEvent(
+            this,
+            SystemModelTransitionEvent.Stage.UNLOADING,
+            fModelManager.getModel()
+        )
+    );
 
     progressIndicator.setProgress(ModelRestorationProgressStatus.START_LOADING_MODEL);
-    eventBus.onEvent(new SystemModelTransitionEvent(this,
-                                                    SystemModelTransitionEvent.Stage.UNLOADED,
-                                                    fModelManager.getModel()));
+    eventBus.onEvent(
+        new SystemModelTransitionEvent(
+            this,
+            SystemModelTransitionEvent.Stage.UNLOADED,
+            fModelManager.getModel()
+        )
+    );
 
     if (portal == null) {
       fModelManager.restoreModel();
     }
     else {
       fModelManager.restoreModel(portal);
-      statusPanel.setLogMessage(Level.INFO,
-                                bundle.getFormatted("openTcsView.message_modelLoaded.text",
-                                                    fModelManager.getModel().getName()));
+      statusPanel.setLogMessage(
+          Level.INFO,
+          bundle.getFormatted(
+              "openTcsView.message_modelLoaded.text",
+              fModelManager.getModel().getName()
+          )
+      );
     }
 
     progressIndicator.setProgress(ModelRestorationProgressStatus.SET_UP_MODEL_VIEW);
-    eventBus.onEvent(new SystemModelTransitionEvent(this,
-                                                    SystemModelTransitionEvent.Stage.LOADING,
-                                                    fModelManager.getModel()));
+    eventBus.onEvent(
+        new SystemModelTransitionEvent(
+            this,
+            SystemModelTransitionEvent.Stage.LOADING,
+            fModelManager.getModel()
+        )
+    );
 
     setSystemModel(fModelManager.getModel());
 
@@ -847,8 +927,12 @@ public class OpenTCSView
         = fModelManager.getModel().getMainFolder(SystemModel.FolderKey.LAYOUT);
     layoutComponent.addAttributesChangeListener(attributesEventHandler);
 
-    eventBus.onEvent(new SystemModelTransitionEvent(this, SystemModelTransitionEvent.Stage.LOADED,
-                                                    fModelManager.getModel()));
+    eventBus.onEvent(
+        new SystemModelTransitionEvent(
+            this, SystemModelTransitionEvent.Stage.LOADED,
+            fModelManager.getModel()
+        )
+    );
     updateModelName();
 
     progressIndicator.terminate();
@@ -866,12 +950,14 @@ public class OpenTCSView
     String title = bundle.getString("openTcsView.dialog_unsavedChanges.title");
     String text = bundle.getString("openTcsView.dialog_unsavedChanges.message");
     String[] options = {bundle.getString("openTcsView.dialog_unsavedChanges.option_upload.text"),
-                        bundle.getString("openTcsView.dialog_unsavedChanges.option_discard.text"),
-                        bundle.getString("openTcsView.dialog_unsavedChanges.option_cancel.text")};
-    switch (userMessageHelper.showOptionsDialog(title,
-                                                text,
-                                                UserMessageHelper.Type.ERROR,
-                                                options)) {
+        bundle.getString("openTcsView.dialog_unsavedChanges.option_discard.text"),
+        bundle.getString("openTcsView.dialog_unsavedChanges.option_cancel.text")};
+    switch (userMessageHelper.showOptionsDialog(
+        title,
+        text,
+        UserMessageHelper.Type.ERROR,
+        options
+    )) {
       case 0:
         return uploadModelToKernel();
       case 1:
@@ -1088,9 +1174,13 @@ public class OpenTCSView
    */
   private boolean showUnsavedChangesDialog() {
     CloseFileAction action = (CloseFileAction) getActionMap().get(CloseFileAction.ID);
-    action.actionPerformed(new ActionEvent(this,
-                                           ActionEvent.ACTION_PERFORMED,
-                                           CloseFileAction.ID_MODEL_CLOSING));
+    action.actionPerformed(
+        new ActionEvent(
+            this,
+            ActionEvent.ACTION_PERFORMED,
+            CloseFileAction.ID_MODEL_CLOSING
+        )
+    );
     switch (action.getFileSavedStatus()) {
       case JOptionPane.YES_OPTION:
         super.setHasUnsavedChanges(false);
@@ -1231,9 +1321,13 @@ public class OpenTCSView
       @Override
       public void run() {
         // XXX The event should probably be emitted in ApplicationState now.
-        eventBus.onEvent(new OperationModeChangeEvent(this,
-                                                      OperationMode.UNDEFINED,
-                                                      OperationMode.OPERATING));
+        eventBus.onEvent(
+            new OperationModeChangeEvent(
+                this,
+                OperationMode.UNDEFINED,
+                OperationMode.OPERATING
+            )
+        );
       }
     };
 
@@ -1261,8 +1355,10 @@ public class OpenTCSView
    * @param folder The folder.
    * @param model The component to be removed.
    */
-  private boolean removeModelComponent(ModelComponent folder,
-                                       ModelComponent model) {
+  private boolean removeModelComponent(
+      ModelComponent folder,
+      ModelComponent model
+  ) {
     if (!folder.contains(model)) {
       return false;
     }
@@ -1421,7 +1517,8 @@ public class OpenTCSView
   }
 
   private class AttributesEventHandler
-      implements AttributesChangeListener {
+      implements
+        AttributesChangeListener {
 
     /**
      * Creates a new instance.
@@ -1497,7 +1594,8 @@ public class OpenTCSView
    * Handles events emitted for changes of blocks.
    */
   private class BlockEventHandler
-      implements BlockChangeListener {
+      implements
+        BlockChangeListener {
 
     /**
      * Creates a new instance.
@@ -1530,7 +1628,8 @@ public class OpenTCSView
    * Handles events emitted by the drawing editor.
    */
   private class DrawingEditorEventHandler
-      implements DrawingEditorListener {
+      implements
+        DrawingEditorListener {
 
     /**
      * Provides access to the current system model.
@@ -1697,7 +1796,8 @@ public class OpenTCSView
    * MouseListener for vehicle dragging events in the tree view.
    */
   private class VehicleDragHandler
-      extends MouseAdapter {
+      extends
+        MouseAdapter {
 
     /**
      * The cursor to be used when a vehicle is dragged.
@@ -1755,8 +1855,8 @@ public class OpenTCSView
       vehicleModel = null;
 
       if (vehicleModel != null
-          && (Vehicle.ProcState) vehicleModel.getPropertyProcState().getValue()
-          == Vehicle.ProcState.IDLE) {
+          && (Vehicle.ProcState) vehicleModel.getPropertyProcState()
+              .getValue() == Vehicle.ProcState.IDLE) {
         createOrderToPointOnScreen(event.getLocationOnScreen());
       }
     }
@@ -1776,12 +1876,16 @@ public class OpenTCSView
       }
     }
 
-    private Figure getFigureAtPointInView(Point locationOnScreen,
-                                          OpenTCSDrawingView drawView) {
+    private Figure getFigureAtPointInView(
+        Point locationOnScreen,
+        OpenTCSDrawingView drawView
+    ) {
       Point drawingViewOnScreen = drawView.getComponent().getLocationOnScreen();
       Point drawingViewPoint
-          = new Point(locationOnScreen.x - drawingViewOnScreen.x,
-                      locationOnScreen.y - drawingViewOnScreen.y);
+          = new Point(
+              locationOnScreen.x - drawingViewOnScreen.x,
+              locationOnScreen.y - drawingViewOnScreen.y
+          );
       return drawView.findFigure(drawingViewPoint);
     }
 
@@ -1792,7 +1896,8 @@ public class OpenTCSView
   }
 
   private class DrawingViewClosingListener
-      implements CVetoClosingListener {
+      implements
+        CVetoClosingListener {
 
     private final DefaultSingleCDockable newDockable;
 

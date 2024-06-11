@@ -7,20 +7,21 @@
  */
 package org.opentcs.kernel.vehicles;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.eq;
-import org.mockito.Mockito;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.opentcs.DataObjectFactory;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.DispatcherService;
@@ -118,17 +119,19 @@ class DefaultVehicleControllerTest {
 
     scheduler = spy(new DummyScheduler());
     scheduler.initialize();
-    stdVehicleController = new DefaultVehicleController(vehicle,
-                                                        commAdapter,
-                                                        vehicleService,
-                                                        mock(InternalTransportOrderService.class),
-                                                        mock(NotificationService.class),
-                                                        mock(DispatcherService.class),
-                                                        scheduler,
-                                                        eventBus,
-                                                        componentsFactory,
-                                                        mock(MovementCommandMapper.class),
-                                                        mock(KernelApplicationConfiguration.class));
+    stdVehicleController = new DefaultVehicleController(
+        vehicle,
+        commAdapter,
+        vehicleService,
+        mock(InternalTransportOrderService.class),
+        mock(NotificationService.class),
+        mock(DispatcherService.class),
+        scheduler,
+        eventBus,
+        componentsFactory,
+        mock(MovementCommandMapper.class),
+        mock(KernelApplicationConfiguration.class)
+    );
     stdVehicleController.initialize();
   }
 
@@ -146,8 +149,10 @@ class DefaultVehicleControllerTest {
 
     vehicleModel.setPosition(point.getName());
 
-    verify(vehicleService).updateVehiclePosition(vehicle.getReference(),
-                                                 point.getReference());
+    verify(vehicleService).updateVehiclePosition(
+        vehicle.getReference(),
+        point.getReference()
+    );
   }
 
   @Test
@@ -155,8 +160,10 @@ class DefaultVehicleControllerTest {
     Triple newPos = new Triple(211, 391, 0);
     vehicleModel.setPrecisePosition(newPos);
 
-    verify(vehicleService).updateVehiclePrecisePosition(vehicle.getReference(),
-                                                        newPos);
+    verify(vehicleService).updateVehiclePrecisePosition(
+        vehicle.getReference(),
+        newPos
+    );
   }
 
   @Test
@@ -164,16 +171,20 @@ class DefaultVehicleControllerTest {
     double newAngle = 7.5;
     vehicleModel.setOrientationAngle(newAngle);
 
-    verify(vehicleService).updateVehicleOrientationAngle(vehicle.getReference(),
-                                                         newAngle);
+    verify(vehicleService).updateVehicleOrientationAngle(
+        vehicle.getReference(),
+        newAngle
+    );
   }
 
   @Test
   void shouldForwardEnergyLevelChangeToKernel() {
     int newLevel = 80;
     vehicleModel.setEnergyLevel(newLevel);
-    verify(vehicleService).updateVehicleEnergyLevel(vehicle.getReference(),
-                                                    newLevel);
+    verify(vehicleService).updateVehicleEnergyLevel(
+        vehicle.getReference(),
+        newLevel
+    );
   }
 
   @Test
@@ -182,16 +193,20 @@ class DefaultVehicleControllerTest {
         = List.of(new LoadHandlingDevice("MyLoadHandlingDevice", true));
     vehicleModel.setLoadHandlingDevices(devices);
 
-    verify(vehicleService).updateVehicleLoadHandlingDevices(vehicle.getReference(),
-                                                            devices);
+    verify(vehicleService).updateVehicleLoadHandlingDevices(
+        vehicle.getReference(),
+        devices
+    );
   }
 
   @Test
   void shouldForwardVehicleStateChangeToKernel() {
     vehicleModel.setState(Vehicle.State.EXECUTING);
 
-    verify(vehicleService).updateVehicleState(vehicle.getReference(),
-                                              Vehicle.State.EXECUTING);
+    verify(vehicleService).updateVehicleState(
+        vehicle.getReference(),
+        Vehicle.State.EXECUTING
+    );
   }
 
   @Test

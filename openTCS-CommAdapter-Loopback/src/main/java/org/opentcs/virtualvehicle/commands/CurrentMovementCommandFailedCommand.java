@@ -15,7 +15,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
  * A command to notify the loopback adapter the last/current movement command failed.
  */
 public class CurrentMovementCommandFailedCommand
-    implements AdapterCommand {
+    implements
+      AdapterCommand {
 
   /**
    * Creates a new instance.

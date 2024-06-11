@@ -7,9 +7,10 @@
  */
 package org.opentcs.virtualvehicle.commands;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -18,7 +19,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
  * A command to set the {@link LoadHandlingDevice}s attached to a vehicle.
  */
 public class SetLoadHandlingDevicesCommand
-    implements AdapterCommand {
+    implements
+      AdapterCommand {
 
   /**
    * The list of load handling devices.
@@ -30,7 +32,10 @@ public class SetLoadHandlingDevicesCommand
    *
    * @param devices The list of load handling devices.
    */
-  public SetLoadHandlingDevicesCommand(@Nonnull List<LoadHandlingDevice> devices) {
+  public SetLoadHandlingDevicesCommand(
+      @Nonnull
+      List<LoadHandlingDevice> devices
+  ) {
     this.devices = requireNonNull(devices, "devices");
   }
 

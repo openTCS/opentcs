@@ -20,7 +20,8 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.application.toolbar.OpenTCSCo
  * This action manages the behaviour when the user selects the path button.
  */
 public class DefaultPathSelectedAction
-    extends org.jhotdraw.draw.action.AbstractSelectedAction {
+    extends
+      org.jhotdraw.draw.action.AbstractSelectedAction {
 
   private final PathModel.Type pathType;
   private final Tool tool;
@@ -52,7 +53,8 @@ public class DefaultPathSelectedAction
       DrawingEditor editor,
       Tool tool,
       JPopupButton popupButton,
-      ButtonGroup group) {
+      ButtonGroup group
+  ) {
 
     super(editor);
     this.tool = Objects.requireNonNull(tool);
@@ -77,7 +79,8 @@ public class DefaultPathSelectedAction
       Tool tool,
       PathModel.Type pathType,
       JPopupButton popupButton,
-      ButtonGroup group) {
+      ButtonGroup group
+  ) {
 
     super(editor);
     this.tool = Objects.requireNonNull(tool);

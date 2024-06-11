@@ -16,7 +16,8 @@ import org.jhotdraw.draw.Drawing;
  * A Handle which allows to interactively change a control point
  */
 public class BezierLinerControlPointHandle
-    extends org.jhotdraw.draw.handle.BezierControlPointHandle {
+    extends
+      org.jhotdraw.draw.handle.BezierControlPointHandle {
 
   public BezierLinerControlPointHandle(BezierFigure owner, int index, int coord) {
     super(owner, index, coord);

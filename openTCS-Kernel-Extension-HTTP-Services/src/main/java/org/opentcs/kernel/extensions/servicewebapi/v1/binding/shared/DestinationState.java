@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.order.DriveOrder;
 
 /**
@@ -38,7 +39,10 @@ public class DestinationState {
     return locationName;
   }
 
-  public DestinationState setLocationName(@Nonnull String name) {
+  public DestinationState setLocationName(
+      @Nonnull
+      String name
+  ) {
     this.locationName = requireNonNull(name, "name");
     return this;
   }
@@ -48,7 +52,10 @@ public class DestinationState {
     return operation;
   }
 
-  public DestinationState setOperation(@Nonnull String operation) {
+  public DestinationState setOperation(
+      @Nonnull
+      String operation
+  ) {
     this.operation = requireNonNull(operation, "operation");
     return this;
   }
@@ -58,7 +65,10 @@ public class DestinationState {
     return state;
   }
 
-  public DestinationState setState(@Nonnull State state) {
+  public DestinationState setState(
+      @Nonnull
+      State state
+  ) {
     this.state = requireNonNull(state, "state");
     return this;
   }
@@ -68,7 +78,10 @@ public class DestinationState {
     return properties;
   }
 
-  public DestinationState setProperties(@Nonnull List<Property> properties) {
+  public DestinationState setProperties(
+      @Nonnull
+      List<Property> properties
+  ) {
     this.properties = requireNonNull(properties, "properties");
     return this;
   }
@@ -82,8 +95,8 @@ public class DestinationState {
     destination.setOperation(driveOrder.getDestination().getOperation());
     destination.setState(mapDriveOrderState(driveOrder.getState()));
 
-    for (Map.Entry<String, String> mapEntry
-             : driveOrder.getDestination().getProperties().entrySet()) {
+    for (Map.Entry<String, String> mapEntry : driveOrder.getDestination().getProperties()
+        .entrySet()) {
       destination.getProperties().add(new Property(mapEntry.getKey(), mapEntry.getValue()));
     }
     return destination;

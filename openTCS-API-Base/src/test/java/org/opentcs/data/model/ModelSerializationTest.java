@@ -7,14 +7,15 @@
  */
 package org.opentcs.data.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 
@@ -57,9 +58,11 @@ class ModelSerializationTest {
   void shouldSerializeAndDeserializePath()
       throws Exception {
     @SuppressWarnings("unchecked")
-    Path originalObject = new Path("Path1",
-                                   mock(TCSObjectReference.class),
-                                   mock(TCSObjectReference.class));
+    Path originalObject = new Path(
+        "Path1",
+        mock(TCSObjectReference.class),
+        mock(TCSObjectReference.class)
+    );
     Path deserializedObject = (Path) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
@@ -95,7 +98,8 @@ class ModelSerializationTest {
   }
 
   private TCSObject<?> deserializeTCSObject(byte[] serializedObject)
-      throws IOException, ClassNotFoundException {
+      throws IOException,
+        ClassNotFoundException {
     TCSObject<?> deserializedObject;
     try (ByteArrayInputStream is = new ByteArrayInputStream(serializedObject);
          ObjectInputStream ois = new ObjectInputStream(is)) {

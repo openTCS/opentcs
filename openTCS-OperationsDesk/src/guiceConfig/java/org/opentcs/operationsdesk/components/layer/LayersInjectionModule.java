@@ -19,7 +19,8 @@ import org.opentcs.guing.common.components.layer.LayerManager;
  * A Guice module for this package.
  */
 public class LayersInjectionModule
-    extends PlantOverviewInjectionModule {
+    extends
+      PlantOverviewInjectionModule {
 
   /**
    * Creates a new instance.

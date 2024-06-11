@@ -22,7 +22,8 @@ import org.opentcs.util.ExplainedBoolean;
  * Provides high-level methods for the kernel to control a vehicle.
  */
 public interface VehicleController
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * Sets/Updates the current transport order for the vehicle associated with this controller.
@@ -48,7 +49,10 @@ public interface VehicleController
    * vehicle's current position is unknown or the resources for the vehicle's current position may
    * not be allocated (in case of forced rerouting).
    */
-  void setTransportOrder(@Nonnull TransportOrder newOrder)
+  void setTransportOrder(
+      @Nonnull
+      TransportOrder newOrder
+  )
       throws IllegalArgumentException;
 
   /**
@@ -73,7 +77,10 @@ public interface VehicleController
    * process given order.
    */
   @Nonnull
-  ExplainedBoolean canProcess(@Nonnull TransportOrder order);
+  ExplainedBoolean canProcess(
+      @Nonnull
+      TransportOrder order
+  );
 
   /**
    * Notifies the implementation that the vehicle's <em>paused</em> state in the kernel has changed.
@@ -89,14 +96,20 @@ public interface VehicleController
    *
    * @param message The message to be delivered.
    */
-  void sendCommAdapterMessage(@Nullable Object message);
+  void sendCommAdapterMessage(
+      @Nullable
+      Object message
+  );
 
   /**
    * Sends a {@link AdapterCommand} to the communication adapter.
    *
    * @param command The adapter command to be sent.
    */
-  void sendCommAdapterCommand(@Nonnull AdapterCommand command);
+  void sendCommAdapterCommand(
+      @Nonnull
+      AdapterCommand command
+  );
 
   /**
    * Returns a list of {@link MovementCommand}s that have been sent to the communication adapter.
@@ -125,5 +138,8 @@ public interface VehicleController
    * @return {@code true} if the given resources are safe to be allocated by this controller,
    * otherwise {@code false}.
    */
-  boolean mayAllocateNow(@Nonnull Set<TCSResource<?>> resources);
+  boolean mayAllocateNow(
+      @Nonnull
+      Set<TCSResource<?>> resources
+  );
 }

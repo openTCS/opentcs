@@ -7,13 +7,14 @@
  */
 package org.opentcs.kernelcontrolcenter.peripherals;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
@@ -27,9 +28,11 @@ import org.slf4j.LoggerFactory;
  * Displays the comm adapter panels for a given peripheral device.
  */
 public class PeripheralDetailPanel
-    extends JPanel
-    implements PropertyChangeListener,
-               Lifecycle {
+    extends
+      JPanel
+    implements
+      PropertyChangeListener,
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -118,8 +121,10 @@ public class PeripheralDetailPanel
       return;
     }
 
-    if (Objects.equals(evt.getPropertyName(),
-                       LocalPeripheralEntry.Attribute.PROCESS_MODEL.name())) {
+    if (Objects.equals(
+        evt.getPropertyName(),
+        LocalPeripheralEntry.Attribute.PROCESS_MODEL.name()
+    )) {
       for (PeripheralCommAdapterPanel panel : customPanelList) {
         panel.processModelChanged(entry.getProcessModel());
       }
@@ -197,9 +202,13 @@ public class PeripheralDetailPanel
     }
 
     for (PeripheralCommAdapterPanelFactory panelFactory : panelFactories) {
-      customPanelList.addAll(panelFactory.getPanelsFor(peripheralEntry.getAttachedCommAdapter(),
-                                                       peripheralEntry.getLocation(),
-                                                       peripheralEntry.getProcessModel()));
+      customPanelList.addAll(
+          panelFactory.getPanelsFor(
+              peripheralEntry.getAttachedCommAdapter(),
+              peripheralEntry.getLocation(),
+              peripheralEntry.getProcessModel()
+          )
+      );
     }
 
     for (PeripheralCommAdapterPanel curPanel : customPanelList) {
@@ -220,6 +229,7 @@ public class PeripheralDetailPanel
     repaint();
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
@@ -255,5 +265,6 @@ public class PeripheralDetailPanel
   private javax.swing.JTabbedPane tabbedPane;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
 }

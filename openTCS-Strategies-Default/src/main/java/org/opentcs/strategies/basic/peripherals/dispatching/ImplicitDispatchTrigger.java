@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.peripherals.dispatching;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.PeripheralJobDispatcher;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.order.TransportOrder;
@@ -20,7 +21,8 @@ import org.slf4j.LoggerFactory;
  * An event listener that triggers the peripheral job dispatcher on certain events.
  */
 public class ImplicitDispatchTrigger
-    implements EventHandler {
+    implements
+      EventHandler {
 
   /**
    * This class's Logger.
@@ -49,8 +51,10 @@ public class ImplicitDispatchTrigger
     TCSObjectEvent objectEvent = (TCSObjectEvent) event;
     if (objectEvent.getType() == TCSObjectEvent.Type.OBJECT_MODIFIED
         && objectEvent.getCurrentOrPreviousObjectState() instanceof TransportOrder) {
-      checkTransportOrderChange((TransportOrder) objectEvent.getPreviousObjectState(),
-                                (TransportOrder) objectEvent.getCurrentObjectState());
+      checkTransportOrderChange(
+          (TransportOrder) objectEvent.getPreviousObjectState(),
+          (TransportOrder) objectEvent.getCurrentObjectState()
+      );
     }
   }
 

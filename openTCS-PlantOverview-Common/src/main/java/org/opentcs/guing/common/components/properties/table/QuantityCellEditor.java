@@ -21,7 +21,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A cell editor for a quantity property.
  */
 public class QuantityCellEditor
-    extends AbstractPropertyCellEditor {
+    extends
+      AbstractPropertyCellEditor {
 
   /**
    * Creates a new instance of QuantityCellEditor
@@ -74,8 +75,10 @@ public class QuantityCellEditor
 
     // Check if unitString is a valid unit
     if (!property().isPossibleUnit(unitString)) {
-      showCellEditingErrorMsg("quantityCellEditor.dialog_errorUnit.message",
-                              property().getPossibleUnits());
+      showCellEditingErrorMsg(
+          "quantityCellEditor.dialog_errorUnit.message",
+          property().getPossibleUnits()
+      );
       return;
     }
 
@@ -90,9 +93,11 @@ public class QuantityCellEditor
 
     // Check if value is inside the valid range
     if (!property().getValidRange().isValueValid(newValue)) {
-      showCellEditingErrorMsg("quantityCellEditor.dialog_errorRange.message",
-                              property().getValidRange().getMin(),
-                              property().getValidRange().getMax());
+      showCellEditingErrorMsg(
+          "quantityCellEditor.dialog_errorRange.message",
+          property().getValidRange().getMin(),
+          property().getValidRange().getMax()
+      );
       return;
     }
 
@@ -135,7 +140,8 @@ public class QuantityCellEditor
 
   @Override  // DefaultCellEditor
   public Component getTableCellEditorComponent(
-      JTable table, Object value, boolean isSelected, int row, int column) {
+      JTable table, Object value, boolean isSelected, int row, int column
+  ) {
 
     setValue(value);
     ((JTextField) getComponent()).setText(property().toString());
@@ -158,7 +164,8 @@ public class QuantityCellEditor
     userMessageHelper.showMessageDialog(
         bundle.getString("quantityCellEditor.dialog_error.title"),
         bundle.getFormatted(resourceName, arguments),
-        UserMessageHelper.Type.ERROR);
+        UserMessageHelper.Type.ERROR
+    );
   }
 
   private void showCellEditingErrorMsg(String resourceName) {

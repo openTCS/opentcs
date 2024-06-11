@@ -7,12 +7,13 @@
  */
 package org.opentcs.data.model;
 
+import static java.util.Objects.requireNonNull;
+
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
@@ -23,8 +24,10 @@ import org.opentcs.data.TCSObject;
  * @see TCSResource
  */
 public class Block
-    extends TCSResource<Block>
-    implements Serializable {
+    extends
+      TCSResource<Block>
+    implements
+      Serializable {
 
   /**
    * This block's type.
@@ -51,12 +54,14 @@ public class Block
     this.layout = new Layout();
   }
 
-  private Block(String name,
-                Map<String, String> properties,
-                ObjectHistory history,
-                Type type,
-                Set<TCSResourceReference<?>> members,
-                Layout layout) {
+  private Block(
+      String name,
+      Map<String, String> properties,
+      ObjectHistory history,
+      Type type,
+      Set<TCSResourceReference<?>> members,
+      Layout layout
+  ) {
     super(name, properties, history);
     this.type = type;
     this.members = new HashSet<>(requireNonNull(members, "members"));
@@ -65,42 +70,50 @@ public class Block
 
   @Override
   public Block withProperty(String key, String value) {
-    return new Block(getName(),
-                     propertiesWith(key, value),
-                     getHistory(),
-                     type,
-                     members,
-                     layout);
+    return new Block(
+        getName(),
+        propertiesWith(key, value),
+        getHistory(),
+        type,
+        members,
+        layout
+    );
   }
 
   @Override
   public Block withProperties(Map<String, String> properties) {
-    return new Block(getName(),
-                     properties,
-                     getHistory(),
-                     type,
-                     members,
-                     layout);
+    return new Block(
+        getName(),
+        properties,
+        getHistory(),
+        type,
+        members,
+        layout
+    );
   }
 
   @Override
   public TCSObject<Block> withHistoryEntry(ObjectHistory.Entry entry) {
-    return new Block(getName(),
-                     getProperties(),
-                     getHistory().withEntryAppended(entry),
-                     type,
-                     members,
-                     layout);
+    return new Block(
+        getName(),
+        getProperties(),
+        getHistory().withEntryAppended(entry),
+        type,
+        members,
+        layout
+    );
   }
 
   @Override
   public TCSObject<Block> withHistory(ObjectHistory history) {
-    return new Block(getName(),
-                     getProperties(),
-                     history,
-                     type,
-                     members,
-                     layout);
+    return new Block(
+        getName(),
+        getProperties(),
+        history,
+        type,
+        members,
+        layout
+    );
   }
 
   /**
@@ -119,12 +132,14 @@ public class Block
    * @return A copy of this object, differing in the given value.
    */
   public Block withType(Type type) {
-    return new Block(getName(),
-                     getProperties(),
-                     getHistory(),
-                     type,
-                     members,
-                     layout);
+    return new Block(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        members,
+        layout
+    );
   }
 
   /**
@@ -143,12 +158,14 @@ public class Block
    * @return A copy of this object, differing in the given value.
    */
   public Block withMembers(Set<TCSResourceReference<?>> members) {
-    return new Block(getName(),
-                     getProperties(),
-                     getHistory(),
-                     type,
-                     members,
-                     layout);
+    return new Block(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        members,
+        layout
+    );
   }
 
   /**
@@ -167,12 +184,14 @@ public class Block
    * @return A copy of this object, differing in the given value.
    */
   public Block withLayout(Layout layout) {
-    return new Block(getName(),
-                     getProperties(),
-                     getHistory(),
-                     type,
-                     members,
-                     layout);
+    return new Block(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        members,
+        layout
+    );
   }
 
   /**
@@ -195,7 +214,8 @@ public class Block
    * Contains information regarding the grahical representation of a block.
    */
   public static class Layout
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The color in which block elements are to be emphasized.

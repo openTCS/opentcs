@@ -7,16 +7,17 @@
  */
 package org.opentcs.kernel.persistence;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkState;
+
 import jakarta.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.customizations.ApplicationHome;
-import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.persistence.ModelParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,8 @@ import org.slf4j.LoggerFactory;
  * A {@link ModelPersister} implementation using an XML file.
  */
 public class XMLFileModelPersister
-    implements ModelPersister {
+    implements
+      ModelPersister {
 
   /**
    * This class's Logger.
@@ -55,8 +57,11 @@ public class XMLFileModelPersister
    * @param modelParser Reads and writes into the xml file.
    */
   @Inject
-  public XMLFileModelPersister(@ApplicationHome File directory,
-                               ModelParser modelParser) {
+  public XMLFileModelPersister(
+      @ApplicationHome
+      File directory,
+      ModelParser modelParser
+  ) {
     this.modelParser = requireNonNull(modelParser, "modelParser");
     this.dataDirectory = new File(requireNonNull(directory, "directory"), "data");
 
@@ -71,12 +76,16 @@ public class XMLFileModelPersister
     LOG.debug("Saving model '{}'.", model.getName());
 
     // Check if writing the model is possible.
-    checkState(dataDirectory.isDirectory() || dataDirectory.mkdirs(),
-               "%s is not an existing directory and could not be created, either.",
-               dataDirectory.getPath());
-    checkState(!modelFile.exists() || modelFile.isFile(),
-               "%s exists, but is not a regular file",
-               modelFile.getPath());
+    checkState(
+        dataDirectory.isDirectory() || dataDirectory.mkdirs(),
+        "%s is not an existing directory and could not be created, either.",
+        dataDirectory.getPath()
+    );
+    checkState(
+        !modelFile.exists() || modelFile.isFile(),
+        "%s exists, but is not a regular file",
+        modelFile.getPath()
+    );
     try {
       if (modelFile.exists()) {
         createBackup();
@@ -127,18 +136,22 @@ public class XMLFileModelPersister
     if (modelBackupDirectory.exists()) {
       if (!modelBackupDirectory.isDirectory()) {
         throw new IOException(
-            modelBackupDirectory.getPath() + " exists, but is not a directory");
+            modelBackupDirectory.getPath() + " exists, but is not a directory"
+        );
       }
     }
     else {
       if (!modelBackupDirectory.mkdir()) {
         throw new IOException(
-            "Could not create model directory " + modelBackupDirectory.getPath());
+            "Could not create model directory " + modelBackupDirectory.getPath()
+        );
       }
     }
     // Backup the model file
-    Files.copy(modelFile.toPath(),
-               new File(modelBackupDirectory, modelBackupName).toPath());
+    Files.copy(
+        modelFile.toPath(),
+        new File(modelBackupDirectory, modelBackupName).toPath()
+    );
   }
 
   /**

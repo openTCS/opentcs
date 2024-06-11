@@ -11,7 +11,8 @@ package org.opentcs.util.gui.dialog;
  * A connection param set used for not established connections.
  */
 public class NullConnectionParamSet
-    extends ConnectionParamSet {
+    extends
+      ConnectionParamSet {
 
   public NullConnectionParamSet() {
     super("-", "", 0);

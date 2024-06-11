@@ -7,8 +7,9 @@
  */
 package org.opentcs.modeleditor.application.menus.menubar;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.opentcs.modeleditor.application.action.ViewActionMap;
@@ -20,7 +21,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * The application's "Help" menu.
  */
 public class HelpMenu
-    extends JMenu {
+    extends
+      JMenu {
 
   /**
    * A menu item for showing the application's "about" panel.

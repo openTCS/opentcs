@@ -14,7 +14,8 @@ import java.util.EventObject;
  * interaction tool for the user.
  */
 public class ResetInteractionToolCommand
-    extends EventObject {
+    extends
+      EventObject {
 
   /**
    * Creates a new instance.

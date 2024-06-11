@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.PathCreationTO;
@@ -30,8 +31,10 @@ public class PathConverter {
   private final EnvelopeConverter envelopeConverter;
 
   @Inject
-  public PathConverter(PropertyConverter pConverter, PeripheralOperationConverter pOConverter,
-                       EnvelopeConverter envelopeConverter) {
+  public PathConverter(
+      PropertyConverter pConverter, PeripheralOperationConverter pOConverter,
+      EnvelopeConverter envelopeConverter
+  ) {
     this.pConverter = requireNonNull(pConverter, "pConverter");
     this.pOConverter = requireNonNull(pOConverter, "pOConverter");
     this.envelopeConverter = requireNonNull(envelopeConverter, "envelopeConverter");
@@ -39,21 +42,28 @@ public class PathConverter {
 
   public List<PathTO> toPathTOs(Set<Path> paths) {
     return paths.stream()
-        .map(path -> new PathTO(path.getName(),
-                                path.getSourcePoint().getName(),
-                                path.getDestinationPoint().getName())
-        .setLength(path.getLength())
-        .setLocked(path.isLocked())
-        .setMaxReverseVelocity(path.getMaxReverseVelocity())
-        .setMaxVelocity(path.getMaxVelocity())
-        .setVehicleEnvelopes(envelopeConverter.toEnvelopeTOs(path.getVehicleEnvelopes()))
-        .setProperties(pConverter.toPropertyTOs(path.getProperties()))
-        .setPeripheralOperations(
-            pOConverter.toPeripheralOperationsTOs(path.getPeripheralOperations()))
-        .setLayout(new PathTO.Layout()
-            .setLayerId(path.getLayout().getLayerId())
-            .setConnectionType(path.getLayout().getConnectionType().name())
-            .setControlPoints(toCoupleTOs(path.getLayout().getControlPoints()))))
+        .map(
+            path -> new PathTO(
+                path.getName(),
+                path.getSourcePoint().getName(),
+                path.getDestinationPoint().getName()
+            )
+                .setLength(path.getLength())
+                .setLocked(path.isLocked())
+                .setMaxReverseVelocity(path.getMaxReverseVelocity())
+                .setMaxVelocity(path.getMaxVelocity())
+                .setVehicleEnvelopes(envelopeConverter.toEnvelopeTOs(path.getVehicleEnvelopes()))
+                .setProperties(pConverter.toPropertyTOs(path.getProperties()))
+                .setPeripheralOperations(
+                    pOConverter.toPeripheralOperationsTOs(path.getPeripheralOperations())
+                )
+                .setLayout(
+                    new PathTO.Layout()
+                        .setLayerId(path.getLayout().getLayerId())
+                        .setConnectionType(path.getLayout().getConnectionType().name())
+                        .setControlPoints(toCoupleTOs(path.getLayout().getControlPoints()))
+                )
+        )
         .sorted(Comparator.comparing(PathTO::getName))
         .collect(Collectors.toList());
   }
@@ -61,9 +71,11 @@ public class PathConverter {
   public List<PathCreationTO> toPathCreationTOs(List<PathTO> paths) {
     return paths.stream()
         .map(
-            path -> new PathCreationTO(path.getName(),
-                                       path.getSrcPointName(),
-                                       path.getDestPointName())
+            path -> new PathCreationTO(
+                path.getName(),
+                path.getSrcPointName(),
+                path.getDestPointName()
+            )
                 .withName(path.getName())
                 .withProperties(pConverter.toPropertyMap(path.getProperties()))
                 .withLength(path.getLength())
@@ -71,10 +83,14 @@ public class PathConverter {
                 .withMaxReverseVelocity(path.getMaxReverseVelocity())
                 .withLocked(path.isLocked())
                 .withLayout(toPathCreationTOLayout(path.getLayout()))
-                .withVehicleEnvelopes(envelopeConverter
-                    .toVehicleEnvelopeMap(path.getVehicleEnvelopes()))
+                .withVehicleEnvelopes(
+                    envelopeConverter
+                        .toVehicleEnvelopeMap(path.getVehicleEnvelopes())
+                )
                 .withPeripheralOperations(
-                    pOConverter.toPeripheralOperationCreationTOs(path.getPeripheralOperations())))
+                    pOConverter.toPeripheralOperationCreationTOs(path.getPeripheralOperations())
+                )
+        )
         .collect(Collectors.toCollection(ArrayList::new));
   }
 

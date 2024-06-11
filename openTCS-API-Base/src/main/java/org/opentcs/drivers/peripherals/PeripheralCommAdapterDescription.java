@@ -14,7 +14,8 @@ import java.io.Serializable;
  * Provides the description for a peripheral communication adapter.
  */
 public abstract class PeripheralCommAdapterDescription
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * Returns the description for a peripheral communication adapter.

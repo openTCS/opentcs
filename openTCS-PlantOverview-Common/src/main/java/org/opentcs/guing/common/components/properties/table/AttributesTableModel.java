@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.components.properties.table;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.guing.base.components.properties.type.ModelAttribute;
 import org.opentcs.guing.common.application.ApplicationState;
 import org.opentcs.guing.common.application.OperationMode;
@@ -17,7 +18,8 @@ import org.opentcs.guing.common.application.OperationMode;
  * A table model for the PropertiesTable.
  */
 public class AttributesTableModel
-    extends javax.swing.table.DefaultTableModel {
+    extends
+      javax.swing.table.DefaultTableModel {
 
   /**
    * Stores the application's current state.

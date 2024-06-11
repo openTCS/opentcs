@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.common.components.properties.table;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
@@ -15,7 +17,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -27,8 +28,10 @@ import org.opentcs.guing.common.components.dialogs.StandardDetailsDialog;
  * A cell editor for a complex property.
  */
 public class ComplexPropertyCellEditor
-    extends javax.swing.AbstractCellEditor
-    implements javax.swing.table.TableCellEditor {
+    extends
+      javax.swing.AbstractCellEditor
+    implements
+      javax.swing.table.TableCellEditor {
 
   /**
    * The button for showing the details dialog.
@@ -58,7 +61,9 @@ public class ComplexPropertyCellEditor
   @Inject
   public ComplexPropertyCellEditor(
       Map<Class<? extends AbstractComplexProperty>, Provider<DetailsDialogContent>> contentMap,
-      @Assisted JPanel dialogParent) {
+      @Assisted
+      JPanel dialogParent
+  ) {
     this.contentMap = requireNonNull(contentMap, "contentMap");
     this.dialogParent = requireNonNull(dialogParent, "dialogParent");
 
@@ -80,7 +85,8 @@ public class ComplexPropertyCellEditor
 
   @Override
   public Component getTableCellEditorComponent(
-      JTable table, Object value, boolean isSelected, int row, int column) {
+      JTable table, Object value, boolean isSelected, int row, int column
+  ) {
 
     fProperty = (AbstractComplexProperty) value;
     fButton.setText(fProperty.toString());

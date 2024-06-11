@@ -35,7 +35,8 @@ import org.opentcs.data.order.Route;
  * </p>
  */
 public interface RemoteRouterService
-    extends Remote {
+    extends
+      Remote {
 
   // CHECKSTYLE:OFF
   public void updateRoutingTopology(ClientID clientId, Set<TCSObjectReference<Path>> refs)
@@ -46,7 +47,8 @@ public interface RemoteRouterService
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<Point> sourcePointRef,
       Set<TCSObjectReference<Point>> destinationPointRefs,
-      Set<TCSResourceReference<?>> resourcesToAvoid)
+      Set<TCSResourceReference<?>> resourcesToAvoid
+  )
       throws RemoteException;
   // CHECKSTYLE:ON
 }

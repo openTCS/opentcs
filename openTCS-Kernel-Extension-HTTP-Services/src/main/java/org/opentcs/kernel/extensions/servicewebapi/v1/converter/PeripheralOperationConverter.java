@@ -22,26 +22,38 @@ public class PeripheralOperationConverter {
   }
 
   public List<PeripheralOperationTO> toPeripheralOperationsTOs(
-      List<PeripheralOperation> peripheralOperations) {
+      List<PeripheralOperation> peripheralOperations
+  ) {
     return peripheralOperations.stream()
-        .map(perOp -> new PeripheralOperationTO(perOp.getOperation(),
-                                                perOp.getLocation().getName())
-        .setCompletionRequired(perOp.isCompletionRequired())
-        .setExecutionTrigger(
-            perOp.getExecutionTrigger().name())
+        .map(
+            perOp -> new PeripheralOperationTO(
+                perOp.getOperation(),
+                perOp.getLocation().getName()
+            )
+                .setCompletionRequired(perOp.isCompletionRequired())
+                .setExecutionTrigger(
+                    perOp.getExecutionTrigger().name()
+                )
         )
         .collect(Collectors.toList());
   }
 
   public List<PeripheralOperationCreationTO> toPeripheralOperationCreationTOs(
-      List<PeripheralOperationTO> perOps) {
+      List<PeripheralOperationTO> perOps
+  ) {
     return perOps.stream()
         .map(
-            perOp -> new PeripheralOperationCreationTO(perOp.getOperation(),
-                                                       perOp.getLocationName())
+            perOp -> new PeripheralOperationCreationTO(
+                perOp.getOperation(),
+                perOp.getLocationName()
+            )
                 .withCompletionRequired(perOp.isCompletionRequired())
-                .withExecutionTrigger(PeripheralOperation.ExecutionTrigger.valueOf(
-                    perOp.getExecutionTrigger())))
+                .withExecutionTrigger(
+                    PeripheralOperation.ExecutionTrigger.valueOf(
+                        perOp.getExecutionTrigger()
+                    )
+                )
+        )
         .collect(Collectors.toList());
   }
 }

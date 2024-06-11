@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.services;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -32,8 +33,10 @@ import org.opentcs.kernel.workingset.PlantModelManager;
  * This class is the standard implementation of the {@link PeripheralService} interface.
  */
 public class StandardPeripheralService
-    extends AbstractTCSObjectService
-    implements InternalPeripheralService {
+    extends
+      AbstractTCSObjectService
+    implements
+      InternalPeripheralService {
 
   /**
    * A global object to be used for synchronization within the kernel.
@@ -62,11 +65,14 @@ public class StandardPeripheralService
    * @param plantModelManager The plant model manager to be used.
    */
   @Inject
-  public StandardPeripheralService(TCSObjectService objectService,
-                                   @GlobalSyncObject Object globalSyncObject,
-                                   PeripheralAttachmentManager attachmentManager,
-                                   PeripheralEntryPool peripheralEntryPool,
-                                   PlantModelManager plantModelManager) {
+  public StandardPeripheralService(
+      TCSObjectService objectService,
+      @GlobalSyncObject
+      Object globalSyncObject,
+      PeripheralAttachmentManager attachmentManager,
+      PeripheralEntryPool peripheralEntryPool,
+      PlantModelManager plantModelManager
+  ) {
     super(objectService);
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.attachmentManager = requireNonNull(attachmentManager, "attachmentManager");
@@ -75,8 +81,10 @@ public class StandardPeripheralService
   }
 
   @Override
-  public void attachCommAdapter(TCSResourceReference<Location> ref,
-                                PeripheralCommAdapterDescription description)
+  public void attachCommAdapter(
+      TCSResourceReference<Location> ref,
+      PeripheralCommAdapterDescription description
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(description, "description");
@@ -108,7 +116,8 @@ public class StandardPeripheralService
 
   @Override
   public PeripheralAttachmentInformation fetchAttachmentInformation(
-      TCSResourceReference<Location> ref)
+      TCSResourceReference<Location> ref
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 
@@ -128,8 +137,10 @@ public class StandardPeripheralService
   }
 
   @Override
-  public void sendCommAdapterCommand(TCSResourceReference<Location> ref,
-                                     PeripheralAdapterCommand command)
+  public void sendCommAdapterCommand(
+      TCSResourceReference<Location> ref,
+      PeripheralAdapterCommand command
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(command, "command");
@@ -143,8 +154,10 @@ public class StandardPeripheralService
   }
 
   @Override
-  public void updatePeripheralProcState(TCSResourceReference<Location> ref,
-                                        PeripheralInformation.ProcState state)
+  public void updatePeripheralProcState(
+      TCSResourceReference<Location> ref,
+      PeripheralInformation.ProcState state
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(state, "state");
@@ -155,8 +168,10 @@ public class StandardPeripheralService
   }
 
   @Override
-  public void updatePeripheralReservationToken(TCSResourceReference<Location> ref,
-                                               String reservationToken)
+  public void updatePeripheralReservationToken(
+      TCSResourceReference<Location> ref,
+      String reservationToken
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 
@@ -166,8 +181,10 @@ public class StandardPeripheralService
   }
 
   @Override
-  public void updatePeripheralState(TCSResourceReference<Location> ref,
-                                    PeripheralInformation.State state)
+  public void updatePeripheralState(
+      TCSResourceReference<Location> ref,
+      PeripheralInformation.State state
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(state, "state");
@@ -178,8 +195,10 @@ public class StandardPeripheralService
   }
 
   @Override
-  public void updatePeripheralJob(TCSResourceReference<Location> ref,
-                                  TCSObjectReference<PeripheralJob> peripheralJob)
+  public void updatePeripheralJob(
+      TCSResourceReference<Location> ref,
+      TCSObjectReference<PeripheralJob> peripheralJob
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 

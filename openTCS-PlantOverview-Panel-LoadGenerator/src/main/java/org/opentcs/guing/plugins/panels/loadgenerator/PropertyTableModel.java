@@ -7,21 +7,23 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.table.AbstractTableModel;
-import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
 
 /**
  * Table model for transport order proerties.
  */
 class PropertyTableModel
-    extends AbstractTableModel {
+    extends
+      AbstractTableModel {
 
   /**
    * This classe's bundle.
@@ -31,17 +33,23 @@ class PropertyTableModel
   /**
    * The column names.
    */
-  private static final String[] COLUMN_NAMES = new String[] {
-    BUNDLE.getString("propertyTableModel.column_key.headerText"),
-    BUNDLE.getString("propertyTableModel.column_value.headerText")
-  };
+  private static final String[] COLUMN_NAMES
+      = new String[]{
+          BUNDLE.getString(
+              "propertyTableModel.column_key.headerText"
+          ),
+          BUNDLE.getString(
+              "propertyTableModel.column_value.headerText"
+          )
+      };
   /**
    * The column classes.
    */
-  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[] {
-    String.class,
-    String.class
-  };
+  private static final Class<?>[] COLUMN_CLASSES
+      = new Class<?>[]{
+          String.class,
+          String.class
+      };
   /**
    * The properties we're maintaining.
    */

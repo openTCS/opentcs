@@ -24,7 +24,10 @@ public interface PeripheralJobCallback {
    *
    * @param ref A reference to the peripheral job that was successfully completed.
    */
-  void peripheralJobFinished(@Nonnull TCSObjectReference<PeripheralJob> ref);
+  void peripheralJobFinished(
+      @Nonnull
+      TCSObjectReference<PeripheralJob> ref
+  );
 
   /**
    * Called on failed completion of a job.
@@ -34,5 +37,8 @@ public interface PeripheralJobCallback {
    *
    * @param ref A reference to the peripheral job whose completion has failed.
    */
-  void peripheralJobFailed(@Nonnull TCSObjectReference<PeripheralJob> ref);
+  void peripheralJobFailed(
+      @Nonnull
+      TCSObjectReference<PeripheralJob> ref
+  );
 }

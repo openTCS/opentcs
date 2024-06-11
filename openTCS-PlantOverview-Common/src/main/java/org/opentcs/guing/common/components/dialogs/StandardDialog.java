@@ -20,7 +20,8 @@ import org.opentcs.util.gui.Icons;
  * A dialog with an ok and a cancel button.
  */
 public class StandardDialog
-    extends JDialog {
+    extends
+      JDialog {
 
   /**
    * A return status code - returned if Cancel button has been pressed
@@ -84,6 +85,7 @@ public class StandardDialog
     return returnStatus;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -129,18 +131,19 @@ public class StandardDialog
     pack();
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
-    private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-      doClose(RET_OK);
-    }//GEN-LAST:event_okButtonActionPerformed
+  private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+    doClose(RET_OK);
+  }//GEN-LAST:event_okButtonActionPerformed
 
-    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-      doClose(RET_CANCEL);
-    }//GEN-LAST:event_cancelButtonActionPerformed
+  private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+    doClose(RET_CANCEL);
+  }//GEN-LAST:event_cancelButtonActionPerformed
 
-    private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
-      doClose(RET_CANCEL);
-    }//GEN-LAST:event_closeDialog
+  private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
+    doClose(RET_CANCEL);
+  }//GEN-LAST:event_closeDialog
 
   /**
    * Closes the dialog.
@@ -151,6 +154,7 @@ public class StandardDialog
     dispose();
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel buttonPanel;
@@ -158,4 +162,5 @@ public class StandardDialog
   private javax.swing.JButton okButton;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

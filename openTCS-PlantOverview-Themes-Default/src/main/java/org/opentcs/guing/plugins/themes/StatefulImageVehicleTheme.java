@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.plugins.themes;
 
+import static java.util.Objects.requireNonNull;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
@@ -14,7 +16,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.EnumMap;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import javax.imageio.ImageIO;
 import org.opentcs.components.plantoverview.VehicleTheme;
 import org.opentcs.data.model.Vehicle;
@@ -24,7 +25,8 @@ import org.opentcs.data.model.Vehicle;
  * states.
  */
 public class StatefulImageVehicleTheme
-    implements VehicleTheme {
+    implements
+      VehicleTheme {
 
   /**
    * The path containing the images.
@@ -135,13 +137,17 @@ public class StatefulImageVehicleTheme
     stateMapPaused.put(Vehicle.State.UNAVAILABLE, loadImage(PATH + "normal_paused.png"));
     stateMapPaused.put(Vehicle.State.UNKNOWN, loadImage(PATH + "normal_paused.png"));
 
-    stateMapLoadedPaused.put(Vehicle.State.CHARGING,
-                             loadImage(PATH + "charging_loaded_paused.png"));
+    stateMapLoadedPaused.put(
+        Vehicle.State.CHARGING,
+        loadImage(PATH + "charging_loaded_paused.png")
+    );
     stateMapLoadedPaused.put(Vehicle.State.ERROR, loadImage(PATH + "error_loaded_paused.png"));
     stateMapLoadedPaused.put(Vehicle.State.EXECUTING, loadImage(PATH + "normal_loaded_paused.png"));
     stateMapLoadedPaused.put(Vehicle.State.IDLE, loadImage(PATH + "normal_loaded_paused.png"));
-    stateMapLoadedPaused.put(Vehicle.State.UNAVAILABLE,
-                             loadImage(PATH + "normal_loaded_paused.png"));
+    stateMapLoadedPaused.put(
+        Vehicle.State.UNAVAILABLE,
+        loadImage(PATH + "normal_loaded_paused.png")
+    );
     stateMapLoadedPaused.put(Vehicle.State.UNKNOWN, loadImage(PATH + "normal_loaded_paused.png"));
   }
 

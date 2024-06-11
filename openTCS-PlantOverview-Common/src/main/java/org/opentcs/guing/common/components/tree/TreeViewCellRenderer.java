@@ -18,7 +18,8 @@ import org.opentcs.guing.common.components.tree.elements.UserObject;
  * A cell renderer for a node in the tree view.
  */
 public class TreeViewCellRenderer
-    extends DefaultTreeCellRenderer {
+    extends
+      DefaultTreeCellRenderer {
 
   /**
    * Creates a new instance.
@@ -30,7 +31,8 @@ public class TreeViewCellRenderer
   @Override
   public Component getTreeCellRendererComponent(
       JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
-      int row, boolean hasFocus) {
+      int row, boolean hasFocus
+  ) {
 
     super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 

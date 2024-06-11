@@ -34,12 +34,15 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
  * </p>
  */
 public interface RemoteVehicleService
-    extends RemoteTCSObjectService,
-            Remote {
+    extends
+      RemoteTCSObjectService,
+      Remote {
 
   // CHECKSTYLE:OFF
-  void attachCommAdapter(ClientID clientId, TCSObjectReference<Vehicle> ref,
-                         VehicleCommAdapterDescription description)
+  void attachCommAdapter(
+      ClientID clientId, TCSObjectReference<Vehicle> ref,
+      VehicleCommAdapterDescription description
+  )
       throws RemoteException;
 
   void disableCommAdapter(ClientID clientId, TCSObjectReference<Vehicle> ref)
@@ -48,41 +51,55 @@ public interface RemoteVehicleService
   void enableCommAdapter(ClientID clientId, TCSObjectReference<Vehicle> ref)
       throws RemoteException;
 
-  VehicleAttachmentInformation fetchAttachmentInformation(ClientID clientId,
-                                                          TCSObjectReference<Vehicle> ref)
+  VehicleAttachmentInformation fetchAttachmentInformation(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref
+  )
       throws RemoteException;
 
   VehicleProcessModelTO fetchProcessModel(ClientID clientId, TCSObjectReference<Vehicle> ref)
       throws RemoteException;
 
-  void sendCommAdapterCommand(ClientID clientId,
-                              TCSObjectReference<Vehicle> ref,
-                              AdapterCommand command)
+  void sendCommAdapterCommand(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      AdapterCommand command
+  )
       throws RemoteException;
 
-  void sendCommAdapterMessage(ClientID clientId,
-                              TCSObjectReference<Vehicle> vehicleRef,
-                              Object message)
+  void sendCommAdapterMessage(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> vehicleRef,
+      Object message
+  )
       throws RemoteException;
 
-  void updateVehicleIntegrationLevel(ClientID clientId,
-                                     TCSObjectReference<Vehicle> ref,
-                                     Vehicle.IntegrationLevel integrationLevel)
+  void updateVehicleIntegrationLevel(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      Vehicle.IntegrationLevel integrationLevel
+  )
       throws RemoteException;
 
-  void updateVehiclePaused(ClientID clientId,
-                           TCSObjectReference<Vehicle> ref,
-                           boolean paused)
+  void updateVehiclePaused(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      boolean paused
+  )
       throws RemoteException;
 
-  void updateVehicleAllowedOrderTypes(ClientID clientId,
-                                      TCSObjectReference<Vehicle> ref,
-                                      Set<String> allowedOrderTypes)
+  void updateVehicleAllowedOrderTypes(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      Set<String> allowedOrderTypes
+  )
       throws RemoteException;
 
-  void updateVehicleEnvelopeKey(ClientID clientId,
-                                TCSObjectReference<Vehicle> ref,
-                                String envelopeKey)
+  void updateVehicleEnvelopeKey(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      String envelopeKey
+  )
       throws RemoteException;
   // CHECKSTYLE:ON
 }

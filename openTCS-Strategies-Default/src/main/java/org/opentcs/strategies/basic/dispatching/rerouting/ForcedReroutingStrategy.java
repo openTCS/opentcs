@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.rerouting;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.Optional;
 import java.util.Set;
 import org.opentcs.components.kernel.Router;
@@ -28,17 +29,20 @@ import org.slf4j.LoggerFactory;
  * allocated the resources for that position.
  */
 public class ForcedReroutingStrategy
-    extends AbstractReroutingStrategy {
+    extends
+      AbstractReroutingStrategy {
 
   private static final Logger LOG = LoggerFactory.getLogger(ForcedReroutingStrategy.class);
   private final VehicleControllerPool vehicleControllerPool;
   private final InternalTransportOrderService transportOrderService;
 
   @Inject
-  public ForcedReroutingStrategy(Router router,
-                                 InternalTransportOrderService transportOrderService,
-                                 VehicleControllerPool vehicleControllerPool,
-                                 ForcedDriveOrderMerger driveOrderMerger) {
+  public ForcedReroutingStrategy(
+      Router router,
+      InternalTransportOrderService transportOrderService,
+      VehicleControllerPool vehicleControllerPool,
+      ForcedDriveOrderMerger driveOrderMerger
+  ) {
     super(router, transportOrderService, driveOrderMerger);
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.vehicleControllerPool = requireNonNull(vehicleControllerPool, "vehicleControllerPool");
@@ -46,8 +50,10 @@ public class ForcedReroutingStrategy
 
   @Override
   protected Optional<Point> determineRerouteSource(Vehicle vehicle) {
-    Point currentVehiclePosition = transportOrderService.fetchObject(Point.class,
-                                                                     vehicle.getCurrentPosition());
+    Point currentVehiclePosition = transportOrderService.fetchObject(
+        Point.class,
+        vehicle.getCurrentPosition()
+    );
 
     if (currentVehiclePosition == null) {
       return Optional.empty();
@@ -56,9 +62,11 @@ public class ForcedReroutingStrategy
     VehicleController vehicleController
         = vehicleControllerPool.getVehicleController(vehicle.getName());
     if (!vehicleController.mayAllocateNow(Set.of(currentVehiclePosition))) {
-      LOG.warn("{}: The resources for the current position are unavailable. "
-          + "Unable to determine the reroute source.",
-               vehicle.getName());
+      LOG.warn(
+          "{}: The resources for the current position are unavailable. "
+              + "Unable to determine the reroute source.",
+          vehicle.getName()
+      );
       return Optional.empty();
     }
 

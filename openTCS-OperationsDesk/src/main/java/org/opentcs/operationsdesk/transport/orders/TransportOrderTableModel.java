@@ -7,11 +7,12 @@
  */
 package org.opentcs.operationsdesk.transport.orders;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Vector;
 import javax.swing.SwingUtilities;
@@ -26,8 +27,10 @@ import org.slf4j.LoggerFactory;
  * A table model for transport orders.
  */
 public class TransportOrderTableModel
-    extends AbstractTableModel
-    implements TransportOrderContainerListener {
+    extends
+      AbstractTableModel
+    implements
+      TransportOrderContainerListener {
 
   /**
    * The index of the 'name' column.
@@ -70,28 +73,28 @@ public class TransportOrderTableModel
       = ResourceBundle.getBundle(I18nPlantOverviewOperating.TRANSPORTORDER_PATH);
 
   private static final String[] COLUMN_NAMES = new String[]{
-    "Name",
-    BUNDLE.getString("transportOrderTableModel.column_source.headerText"),
-    BUNDLE.getString("transportOrderTableModel.column_destination.headerText"),
-    BUNDLE.getString("transportOrderTableModel.column_intendedVehicle.headerText"),
-    BUNDLE.getString("transportOrderTableModel.column_executingVehicle.headerText"),
-    "Status",
-    BUNDLE.getString("transportOrderTableModel.column_orderSequence.headerText"),
-    BUNDLE.getString("transportOrderTableModel.column_creationTime.headerText")
+      "Name",
+      BUNDLE.getString("transportOrderTableModel.column_source.headerText"),
+      BUNDLE.getString("transportOrderTableModel.column_destination.headerText"),
+      BUNDLE.getString("transportOrderTableModel.column_intendedVehicle.headerText"),
+      BUNDLE.getString("transportOrderTableModel.column_executingVehicle.headerText"),
+      "Status",
+      BUNDLE.getString("transportOrderTableModel.column_orderSequence.headerText"),
+      BUNDLE.getString("transportOrderTableModel.column_creationTime.headerText")
   };
 
   /**
    * The column classes.
    */
   private static final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
-    String.class,
-    String.class,
-    String.class,
-    String.class,
-    String.class,
-    String.class,
-    String.class,
-    Instant.class
+      String.class,
+      String.class,
+      String.class,
+      String.class,
+      String.class,
+      String.class,
+      String.class,
+      Instant.class
   };
 
   private final List<TransportOrder> entries = new ArrayList<>();

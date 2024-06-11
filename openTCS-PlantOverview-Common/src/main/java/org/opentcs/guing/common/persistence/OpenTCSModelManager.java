@@ -7,6 +7,10 @@
  */
 package org.opentcs.guing.common.persistence;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.common.util.I18nPlantOverview.STATUS_PATH;
+import static org.opentcs.util.Assertions.checkState;
+
 import com.google.common.base.Strings;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
@@ -18,7 +22,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.swing.JFileChooser;
@@ -68,11 +71,9 @@ import org.opentcs.guing.common.components.drawing.figures.TCSLabelFigure;
 import org.opentcs.guing.common.exchange.adapter.ProcessAdapterUtil;
 import org.opentcs.guing.common.model.SystemModel;
 import org.opentcs.guing.common.util.CourseObjectFactory;
-import static org.opentcs.guing.common.util.I18nPlantOverview.STATUS_PATH;
 import org.opentcs.guing.common.util.ModelComponentFactory;
 import org.opentcs.guing.common.util.SynchronizedFileChooser;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
-import static org.opentcs.util.Assertions.checkState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +81,8 @@ import org.slf4j.LoggerFactory;
  * Manages (loads, persists and keeps) the driving course model.
  */
 public class OpenTCSModelManager
-    implements ModelManager {
+    implements
+      ModelManager {
 
   /**
    * Identifier for the default layout object.
@@ -158,15 +160,18 @@ public class OpenTCSModelManager
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public OpenTCSModelManager(CourseObjectFactory crsObjFactory,
-                             ModelComponentFactory modelComponentFactory,
-                             ProcessAdapterUtil procAdapterUtil,
-                             Provider<SystemModel> systemModelProvider,
-                             StatusPanel statusPanel,
-                             @ApplicationHome File homeDir,
-                             ModelFilePersistor modelPersistor,
-                             ModelExportAdapter modelExportAdapter,
-                             ProgressIndicator progressIndicator) {
+  public OpenTCSModelManager(
+      CourseObjectFactory crsObjFactory,
+      ModelComponentFactory modelComponentFactory,
+      ProcessAdapterUtil procAdapterUtil,
+      Provider<SystemModel> systemModelProvider,
+      StatusPanel statusPanel,
+      @ApplicationHome
+      File homeDir,
+      ModelFilePersistor modelPersistor,
+      ModelExportAdapter modelExportAdapter,
+      ProgressIndicator progressIndicator
+  ) {
     this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
     this.modelComponentFactory = requireNonNull(modelComponentFactory, "modelComponentFactory");
     this.procAdapterUtil = requireNonNull(procAdapterUtil, "procAdapterUtil");
@@ -210,20 +215,26 @@ public class OpenTCSModelManager
 
       // Set the last-modified time stamp of the model to right now, as we're saving the model file.
       systemModel.getPropertyMiscellaneous().addItem(
-          new KeyValueProperty(systemModel,
-                               ObjectPropConstants.MODEL_FILE_LAST_MODIFIED,
-                               Instant.now().truncatedTo(ChronoUnit.SECONDS).toString())
+          new KeyValueProperty(
+              systemModel,
+              ObjectPropConstants.MODEL_FILE_LAST_MODIFIED,
+              Instant.now().truncatedTo(ChronoUnit.SECONDS).toString()
+          )
       );
 
-      return persistModel(systemModel,
-                          currentModelFile,
-                          modelPersistor);
+      return persistModel(
+          systemModel,
+          currentModelFile,
+          modelPersistor
+      );
 
     }
     catch (IOException e) {
-      statusPanel.setLogMessage(Level.SEVERE,
-                                ResourceBundleUtil.getBundle(STATUS_PATH)
-                                    .getString("openTcsModelManager.message_notSaved.text"));
+      statusPanel.setLogMessage(
+          Level.SEVERE,
+          ResourceBundleUtil.getBundle(STATUS_PATH)
+              .getString("openTcsModelManager.message_notSaved.text")
+      );
       LOG.warn("Exception persisting model", e);
       return false;
     }
@@ -249,10 +260,13 @@ public class OpenTCSModelManager
    * @param ignoreError whether the model should be persisted when duplicates exist
    * @return Whether the model was actually saved.
    */
-  private boolean persistModel(SystemModel systemModel,
-                               File file,
-                               ModelFilePersistor persistor)
-      throws IOException, KernelRuntimeException {
+  private boolean persistModel(
+      SystemModel systemModel,
+      File file,
+      ModelFilePersistor persistor
+  )
+      throws IOException,
+        KernelRuntimeException {
     requireNonNull(systemModel, "systemModel");
     requireNonNull(persistor, "persistor");
 
@@ -284,10 +298,12 @@ public class OpenTCSModelManager
     systemModel.getDrawing().addAll(associateFiguresWithOrigin(paths, origin));
 
     progressIndicator.setProgress(ModelRestorationProgressStatus.LOADING_LOCATIONS);
-    List<Figure> locations = restoreLocationsInModel(systemModel.getLocationModels(),
-                                                     scaleX,
-                                                     scaleY,
-                                                     systemModel);
+    List<Figure> locations = restoreLocationsInModel(
+        systemModel.getLocationModels(),
+        scaleX,
+        scaleY,
+        systemModel
+    );
     systemModel.getDrawing().addAll(associateFiguresWithOrigin(locations, origin));
 
     progressIndicator.setProgress(ModelRestorationProgressStatus.LOADING_BLOCKS);
@@ -324,9 +340,11 @@ public class OpenTCSModelManager
     TCSObjectService objectService = (TCSObjectService) portal.getPlantModelService();
 
     Set<VisualLayout> allVisualLayouts = objectService.fetchObjects(VisualLayout.class);
-    checkState(allVisualLayouts.size() == 1,
-               "There has to be one, and only one, visual layout. Number of visual layouts: %d",
-               allVisualLayouts.size());
+    checkState(
+        allVisualLayouts.size() == 1,
+        "There has to be one, and only one, visual layout. Number of visual layouts: %d",
+        allVisualLayouts.size()
+    );
     Set<Vehicle> allVehicles = objectService.fetchObjects(Vehicle.class);
     Set<Point> allPoints = objectService.fetchObjects(Point.class);
     Set<LocationType> allLocationTypes = objectService.fetchObjects(LocationType.class);
@@ -377,16 +395,23 @@ public class OpenTCSModelManager
     }
   }
 
-  private void prepareLayout(LayoutModel layoutModel,
-                             SystemModel systemModel,
-                             Origin origin,
-                             TCSObjectService objectService,
-                             @Nullable VisualLayout layout) {
+  private void prepareLayout(
+      LayoutModel layoutModel,
+      SystemModel systemModel,
+      Origin origin,
+      TCSObjectService objectService,
+      @Nullable
+      VisualLayout layout
+  ) {
     layoutModel.getPropertyName().setText(ModelConstants.DEFAULT_VISUAL_LAYOUT_NAME);
-    layoutModel.getPropertyScaleX().setValueAndUnit(origin.getScaleX(),
-                                                    LengthProperty.Unit.MM);
-    layoutModel.getPropertyScaleY().setValueAndUnit(origin.getScaleY(),
-                                                    LengthProperty.Unit.MM);
+    layoutModel.getPropertyScaleX().setValueAndUnit(
+        origin.getScaleX(),
+        LengthProperty.Unit.MM
+    );
+    layoutModel.getPropertyScaleY().setValueAndUnit(
+        origin.getScaleY(),
+        LengthProperty.Unit.MM
+    );
 
     if (layout != null) {
       procAdapterUtil.processAdapterFor(layoutModel)
@@ -408,8 +433,10 @@ public class OpenTCSModelManager
     return new ArrayList<>();
   }
 
-  private void restoreModelBlocks(Set<Block> allBlocks, SystemModel systemModel,
-                                  TCSObjectService objectService) {
+  private void restoreModelBlocks(
+      Set<Block> allBlocks, SystemModel systemModel,
+      TCSObjectService objectService
+  ) {
     for (Block block : allBlocks) {
       BlockModel blockModel = modelComponentFactory.createBlockModel();
       procAdapterUtil.processAdapterFor(blockModel)
@@ -419,10 +446,12 @@ public class OpenTCSModelManager
     }
   }
 
-  private List<Figure> restoreLocationsInModel(List<LocationModel> locationModels,
-                                               double scaleX,
-                                               double scaleY,
-                                               SystemModel systemModel) {
+  private List<Figure> restoreLocationsInModel(
+      List<LocationModel> locationModels,
+      double scaleX,
+      double scaleY,
+      SystemModel systemModel
+  ) {
     List<Figure> restoredFigures = new ArrayList<>(locationModels.size());
 
     for (LocationModel locationModel : locationModels) {
@@ -449,9 +478,11 @@ public class OpenTCSModelManager
     return restoredFigures;
   }
 
-  private LabeledLocationFigure createLocationFigure(LocationModel locationModel,
-                                                     double scaleX,
-                                                     double scaleY) {
+  private LabeledLocationFigure createLocationFigure(
+      LocationModel locationModel,
+      double scaleX,
+      double scaleY
+  ) {
     LabeledLocationFigure llf = crsObjFactory.createLocationFigure();
     LocationFigure locationFigure = llf.getPresentationFigure();
     locationFigure.set(FigureConstants.MODEL, locationModel);
@@ -516,19 +547,23 @@ public class OpenTCSModelManager
     return linkConnection;
   }
 
-  private void restoreModelLocations(Set<Location> allLocations,
-                                     SystemModel systemModel,
-                                     Origin origin,
-                                     List<Figure> restoredFigures,
-                                     TCSObjectService objectService) {
+  private void restoreModelLocations(
+      Set<Location> allLocations,
+      SystemModel systemModel,
+      Origin origin,
+      List<Figure> restoredFigures,
+      TCSObjectService objectService
+  ) {
     for (Location location : allLocations) {
       LocationModel locationModel = new LocationModel();
       procAdapterUtil.processAdapterFor(locationModel)
           .updateModelProperties(location, locationModel, systemModel, objectService);
 
-      LabeledLocationFigure llf = createLocationFigure(locationModel,
-                                                       origin.getScaleX(),
-                                                       origin.getScaleY());
+      LabeledLocationFigure llf = createLocationFigure(
+          locationModel,
+          origin.getScaleX(),
+          origin.getScaleY()
+      );
 
       systemModel.registerFigure(locationModel, llf);
       locationModel.addAttributesChangeListener(llf);
@@ -567,9 +602,11 @@ public class OpenTCSModelManager
     }
   }
 
-  private void restoreModelLocationTypes(Set<LocationType> allLocationTypes,
-                                         SystemModel systemModel,
-                                         TCSObjectService objectService) {
+  private void restoreModelLocationTypes(
+      Set<LocationType> allLocationTypes,
+      SystemModel systemModel,
+      TCSObjectService objectService
+  ) {
     for (LocationType locationType : allLocationTypes) {
       LocationTypeModel locationTypeModel = modelComponentFactory.createLocationTypeModel();
       procAdapterUtil.processAdapterFor(locationTypeModel)
@@ -578,9 +615,11 @@ public class OpenTCSModelManager
     }
   }
 
-  private void restoreModelVehicles(Set<Vehicle> allVehicles,
-                                    SystemModel systemModel,
-                                    TCSObjectService objectService) {
+  private void restoreModelVehicles(
+      Set<Vehicle> allVehicles,
+      SystemModel systemModel,
+      TCSObjectService objectService
+  ) {
     for (Vehicle vehicle : allVehicles) {
       VehicleModel vehicleModel = modelComponentFactory.createVehicleModel();
       vehicleModel.setVehicle(vehicle);
@@ -611,10 +650,14 @@ public class OpenTCSModelManager
     PathConnection pathFigure = crsObjFactory.createPathConnection();
 
     pathFigure.set(FigureConstants.MODEL, pathModel);
-    PointModel startPointModel = getPointComponent(systemModel,
-                                                   pathModel.getPropertyStartComponent().getText());
-    PointModel endPointModel = getPointComponent(systemModel,
-                                                 pathModel.getPropertyEndComponent().getText());
+    PointModel startPointModel = getPointComponent(
+        systemModel,
+        pathModel.getPropertyStartComponent().getText()
+    );
+    PointModel endPointModel = getPointComponent(
+        systemModel,
+        pathModel.getPropertyEndComponent().getText()
+    );
     if (startPointModel != null && endPointModel != null) {
       LabeledPointFigure startFigure = (LabeledPointFigure) systemModel.getFigure(startPointModel);
       LabeledPointFigure endFigure = (LabeledPointFigure) systemModel.getFigure(endPointModel);
@@ -625,9 +668,11 @@ public class OpenTCSModelManager
         = (PathModel.Type) pathModel.getPropertyPathConnType().getValue();
 
     if (connectionType != null) {
-      initPathControlPoints(connectionType,
-                            pathModel.getPropertyPathControlPoints().getText(),
-                            pathFigure);
+      initPathControlPoints(
+          connectionType,
+          pathModel.getPropertyPathControlPoints().getText(),
+          pathFigure
+      );
       pathFigure.setLinerByType(connectionType);
     }
 
@@ -636,10 +681,12 @@ public class OpenTCSModelManager
     return pathFigure;
   }
 
-  private void restoreModelPaths(Set<Path> allPaths, SystemModel systemModel,
-                                 Origin origin,
-                                 List<Figure> restoredFigures,
-                                 TCSObjectService objectService) {
+  private void restoreModelPaths(
+      Set<Path> allPaths, SystemModel systemModel,
+      Origin origin,
+      List<Figure> restoredFigures,
+      TCSObjectService objectService
+  ) {
     for (Path path : allPaths) {
       PathModel pathModel = new PathModel();
       procAdapterUtil.processAdapterFor(pathModel)
@@ -656,9 +703,11 @@ public class OpenTCSModelManager
     }
   }
 
-  private void initPathControlPoints(PathModel.Type connectionType,
-                                     String sControlPoints,
-                                     PathConnection pathFigure) {
+  private void initPathControlPoints(
+      PathModel.Type connectionType,
+      String sControlPoints,
+      PathConnection pathFigure
+  ) {
     if (connectionType != PathModel.Type.BEZIER
         && connectionType != PathModel.Type.BEZIER_3) {
       return;
@@ -707,9 +756,11 @@ public class OpenTCSModelManager
     }
   }
 
-  private List<Figure> restorePointsInModel(List<PointModel> points,
-                                            double scaleX,
-                                            double scaleY) {
+  private List<Figure> restorePointsInModel(
+      List<PointModel> points,
+      double scaleX,
+      double scaleY
+  ) {
     List<Figure> restoredFigures = new ArrayList<>(points.size());
 
     for (PointModel pointModel : points) {
@@ -723,9 +774,11 @@ public class OpenTCSModelManager
     return restoredFigures;
   }
 
-  private LabeledPointFigure createPointFigure(PointModel pointModel,
-                                               double scaleX,
-                                               double scaleY) {
+  private LabeledPointFigure createPointFigure(
+      PointModel pointModel,
+      double scaleX,
+      double scaleY
+  ) {
     LabeledPointFigure lpf = crsObjFactory.createPointFigure();
     PointFigure pointFigure = lpf.getPresentationFigure();
     pointFigure.setModel(pointModel);
@@ -779,18 +832,22 @@ public class OpenTCSModelManager
     return lpf;
   }
 
-  private void restoreModelPoints(Set<Point> allPoints, SystemModel systemModel,
-                                  Origin origin,
-                                  List<Figure> restoredFigures,
-                                  TCSObjectService objectService) {
+  private void restoreModelPoints(
+      Set<Point> allPoints, SystemModel systemModel,
+      Origin origin,
+      List<Figure> restoredFigures,
+      TCSObjectService objectService
+  ) {
     for (Point point : allPoints) {
       PointModel pointModel = new PointModel();
       procAdapterUtil.processAdapterFor(pointModel)
           .updateModelProperties(point, pointModel, systemModel, objectService);
 
-      LabeledPointFigure lpf = createPointFigure(pointModel,
-                                                 origin.getScaleX(),
-                                                 origin.getScaleY());
+      LabeledPointFigure lpf = createPointFigure(
+          pointModel,
+          origin.getScaleX(),
+          origin.getScaleY()
+      );
 
       systemModel.registerFigure(pointModel, lpf);
       pointModel.addAttributesChangeListener(lpf);
@@ -901,15 +958,19 @@ public class OpenTCSModelManager
     String locationName = locationModel.getName();
     for (LinkModel link : systemModel.getLinkModels()) {
       if (link.getPropertyStartComponent().getText().equals(locationName)) {
-        PointModel pointModel = getPointComponent(systemModel,
-                                                  link.getPropertyEndComponent().getText());
+        PointModel pointModel = getPointComponent(
+            systemModel,
+            link.getPropertyEndComponent().getText()
+        );
         link.setConnectedComponents(pointModel, locationModel);
         link.updateName();
         links.add(link);
       }
       else if (link.getPropertyEndComponent().getText().equals(locationName)) {
-        PointModel pointModel = getPointComponent(systemModel,
-                                                  link.getPropertyStartComponent().getText());
+        PointModel pointModel = getPointComponent(
+            systemModel,
+            link.getPropertyStartComponent().getText()
+        );
         link.setConnectedComponents(pointModel, locationModel);
         link.updateName();
         links.add(link);
@@ -933,8 +994,10 @@ public class OpenTCSModelManager
     }
 
     systemModel.getDrawingMethod().getOrigin()
-        .setScale(pScaleX.getValueByUnit(LengthProperty.Unit.MM),
-                  pScaleY.getValueByUnit(LengthProperty.Unit.MM));
+        .setScale(
+            pScaleX.getValueByUnit(LengthProperty.Unit.MM),
+            pScaleY.getValueByUnit(LengthProperty.Unit.MM)
+        );
   }
 
   protected void setCurrentModelFile(File currentModelFile) {

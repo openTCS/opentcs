@@ -17,7 +17,8 @@ import org.opentcs.guing.common.components.dockable.AbstractDockingManager;
  * Handles changes of a plugin panel's properties.
  */
 class PluginPanelPropertyHandler
-    implements PropertyChangeListener {
+    implements
+      PropertyChangeListener {
 
   /**
    * The menu item corresponding to the plugin panel.

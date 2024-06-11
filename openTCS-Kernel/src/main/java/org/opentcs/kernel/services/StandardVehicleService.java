@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.services;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.InternalVehicleService;
@@ -42,8 +43,10 @@ import org.slf4j.LoggerFactory;
  * This class is the standard implementation of the {@link VehicleService} interface.
  */
 public class StandardVehicleService
-    extends AbstractTCSObjectService
-    implements InternalVehicleService {
+    extends
+      AbstractTCSObjectService
+    implements
+      InternalVehicleService {
 
   /**
    * This class' logger.
@@ -86,13 +89,16 @@ public class StandardVehicleService
    * @param plantModelManager The plant model manager to be used.
    */
   @Inject
-  public StandardVehicleService(TCSObjectService objectService,
-                                @GlobalSyncObject Object globalSyncObject,
-                                LocalVehicleControllerPool vehicleControllerPool,
-                                VehicleEntryPool vehicleEntryPool,
-                                AttachmentManager attachmentManager,
-                                VehicleCommAdapterRegistry commAdapterRegistry,
-                                PlantModelManager plantModelManager) {
+  public StandardVehicleService(
+      TCSObjectService objectService,
+      @GlobalSyncObject
+      Object globalSyncObject,
+      LocalVehicleControllerPool vehicleControllerPool,
+      VehicleEntryPool vehicleEntryPool,
+      AttachmentManager attachmentManager,
+      VehicleCommAdapterRegistry commAdapterRegistry,
+      PlantModelManager plantModelManager
+  ) {
     super(objectService);
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
     this.vehicleControllerPool = requireNonNull(vehicleControllerPool, "vehicleControllerPool");
@@ -113,8 +119,10 @@ public class StandardVehicleService
   }
 
   @Override
-  public void updateVehicleLoadHandlingDevices(TCSObjectReference<Vehicle> ref,
-                                               List<LoadHandlingDevice> devices)
+  public void updateVehicleLoadHandlingDevices(
+      TCSObjectReference<Vehicle> ref,
+      List<LoadHandlingDevice> devices
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(devices, "devices");
@@ -125,8 +133,10 @@ public class StandardVehicleService
   }
 
   @Override
-  public void updateVehicleNextPosition(TCSObjectReference<Vehicle> vehicleRef,
-                                        TCSObjectReference<Point> pointRef)
+  public void updateVehicleNextPosition(
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<Point> pointRef
+  )
       throws ObjectUnknownException {
     requireNonNull(vehicleRef, "vehicleRef");
 
@@ -136,8 +146,10 @@ public class StandardVehicleService
   }
 
   @Override
-  public void updateVehicleOrderSequence(TCSObjectReference<Vehicle> vehicleRef,
-                                         TCSObjectReference<OrderSequence> sequenceRef)
+  public void updateVehicleOrderSequence(
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<OrderSequence> sequenceRef
+  )
       throws ObjectUnknownException {
     requireNonNull(vehicleRef, "vehicleRef");
 
@@ -157,8 +169,10 @@ public class StandardVehicleService
   }
 
   @Override
-  public void updateVehiclePosition(TCSObjectReference<Vehicle> vehicleRef,
-                                    TCSObjectReference<Point> pointRef)
+  public void updateVehiclePosition(
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<Point> pointRef
+  )
       throws ObjectUnknownException {
     requireNonNull(vehicleRef, "vehicleRef");
 
@@ -191,8 +205,10 @@ public class StandardVehicleService
   }
 
   @Override
-  public void updateVehicleRechargeOperation(TCSObjectReference<Vehicle> ref,
-                                             String rechargeOperation)
+  public void updateVehicleRechargeOperation(
+      TCSObjectReference<Vehicle> ref,
+      String rechargeOperation
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(rechargeOperation, "rechargeOperation");
@@ -203,8 +219,10 @@ public class StandardVehicleService
   }
 
   @Override
-  public void updateVehicleClaimedResources(TCSObjectReference<Vehicle> ref,
-                                            List<Set<TCSResourceReference<?>>> resources)
+  public void updateVehicleClaimedResources(
+      TCSObjectReference<Vehicle> ref,
+      List<Set<TCSResourceReference<?>>> resources
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(resources, "resources");
@@ -215,8 +233,10 @@ public class StandardVehicleService
   }
 
   @Override
-  public void updateVehicleAllocatedResources(TCSObjectReference<Vehicle> ref,
-                                              List<Set<TCSResourceReference<?>>> resources)
+  public void updateVehicleAllocatedResources(
+      TCSObjectReference<Vehicle> ref,
+      List<Set<TCSResourceReference<?>>> resources
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(resources, "resources");
@@ -248,8 +268,10 @@ public class StandardVehicleService
   }
 
   @Override
-  public void updateVehicleTransportOrder(TCSObjectReference<Vehicle> vehicleRef,
-                                          TCSObjectReference<TransportOrder> orderRef)
+  public void updateVehicleTransportOrder(
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<TransportOrder> orderRef
+  )
       throws ObjectUnknownException {
     requireNonNull(vehicleRef, "vehicleRef");
 
@@ -259,15 +281,19 @@ public class StandardVehicleService
   }
 
   @Override
-  public void attachCommAdapter(TCSObjectReference<Vehicle> ref,
-                                VehicleCommAdapterDescription description)
+  public void attachCommAdapter(
+      TCSObjectReference<Vehicle> ref,
+      VehicleCommAdapterDescription description
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(description, "description");
 
     synchronized (globalSyncObject) {
-      attachmentManager.attachAdapterToVehicle(ref.getName(),
-                                               commAdapterRegistry.findFactoryFor(description));
+      attachmentManager.attachAdapterToVehicle(
+          ref.getName(),
+          commAdapterRegistry.findFactoryFor(description)
+      );
     }
   }
 
@@ -352,9 +378,12 @@ public class StandardVehicleService
   }
 
   @Override
-  public void updateVehicleIntegrationLevel(TCSObjectReference<Vehicle> ref,
-                                            Vehicle.IntegrationLevel integrationLevel)
-      throws ObjectUnknownException, KernelRuntimeException {
+  public void updateVehicleIntegrationLevel(
+      TCSObjectReference<Vehicle> ref,
+      Vehicle.IntegrationLevel integrationLevel
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     requireNonNull(ref, "ref");
     requireNonNull(integrationLevel, "integrationLevel");
 
@@ -365,9 +394,11 @@ public class StandardVehicleService
           && (integrationLevel == Vehicle.IntegrationLevel.TO_BE_IGNORED
               || integrationLevel == Vehicle.IntegrationLevel.TO_BE_NOTICED)) {
         throw new IllegalArgumentException(
-            String.format("%s: Cannot change integration level to %s while processing orders.",
-                          vehicle.getName(),
-                          integrationLevel.name())
+            String.format(
+                "%s: Cannot change integration level to %s while processing orders.",
+                vehicle.getName(),
+                integrationLevel.name()
+            )
         );
       }
 
@@ -377,7 +408,8 @@ public class StandardVehicleService
 
   @Override
   public void updateVehiclePaused(TCSObjectReference<Vehicle> ref, boolean paused)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     requireNonNull(ref, "ref");
 
     synchronized (globalSyncObject) {
@@ -388,8 +420,10 @@ public class StandardVehicleService
   }
 
   @Override
-  public void updateVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
-                                             Set<String> allowedOrderTypes)
+  public void updateVehicleAllowedOrderTypes(
+      TCSObjectReference<Vehicle> ref,
+      Set<String> allowedOrderTypes
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
     requireNonNull(allowedOrderTypes, "allowedOrderTypes");
@@ -401,7 +435,9 @@ public class StandardVehicleService
 
   @Override
   public void updateVehicleEnvelopeKey(TCSObjectReference<Vehicle> ref, String envelopeKey)
-      throws ObjectUnknownException, IllegalArgumentException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        IllegalArgumentException,
+        KernelRuntimeException {
     requireNonNull(ref, "ref");
 
     synchronized (globalSyncObject) {
@@ -411,7 +447,7 @@ public class StandardVehicleService
           || !vehicle.getAllocatedResources().isEmpty()) {
         throw new IllegalArgumentException(
             "Updating a vehicle's envelope key while the vehicle is processing an order or "
-            + "claiming/allocating resources is currently not supported."
+                + "claiming/allocating resources is currently not supported."
         );
       }
 

@@ -21,7 +21,8 @@ import org.opentcs.guing.base.components.properties.type.Property;
  * A standard cell renderer for for properties in general.
  */
 public class StandardPropertyCellRenderer
-    extends javax.swing.table.DefaultTableCellRenderer {
+    extends
+      javax.swing.table.DefaultTableCellRenderer {
 
   /**
    * The background color for uneditable properties.
@@ -53,10 +54,13 @@ public class StandardPropertyCellRenderer
    */
   @Override
   public Component getTableCellRendererComponent(
-      JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column
+  ) {
 
-    JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected,
-                                                                hasFocus, row, column);
+    JLabel label = (JLabel) super.getTableCellRendererComponent(
+        table, value, isSelected,
+        hasFocus, row, column
+    );
     label.setText(value.toString());
 
     if (value instanceof AbstractProperty

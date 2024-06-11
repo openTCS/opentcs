@@ -7,15 +7,16 @@
  */
 package org.opentcs.kernel.persistence;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+
 import java.io.File;
 import java.io.IOException;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.mock;
 import org.opentcs.TestEnvironment;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
@@ -58,8 +59,10 @@ public class XMLFileModelPersisterTest {
   void setUp()
       throws IOException {
     modelParser = mock(ModelParser.class);
-    persister = new XMLFileModelPersister(TestEnvironment.getKernelHomeDirectory(),
-                                          modelParser);
+    persister = new XMLFileModelPersister(
+        TestEnvironment.getKernelHomeDirectory(),
+        modelParser
+    );
     modelCaptor = ArgumentCaptor.forClass(PlantModelCreationTO.class);
     fileCaptor = ArgumentCaptor.forClass(File.class);
   }
@@ -71,8 +74,10 @@ public class XMLFileModelPersisterTest {
 
     Mockito.verify(modelParser).writeModel(modelCaptor.capture(), fileCaptor.capture());
 
-    assertEquals(TestEnvironment.getKernelHomeDirectory(),
-                 fileCaptor.getValue().getParentFile().getParentFile());
+    assertEquals(
+        TestEnvironment.getKernelHomeDirectory(),
+        fileCaptor.getValue().getParentFile().getParentFile()
+    );
     assertEquals(".xml", getFileExtension(fileCaptor.getValue()));
   }
 

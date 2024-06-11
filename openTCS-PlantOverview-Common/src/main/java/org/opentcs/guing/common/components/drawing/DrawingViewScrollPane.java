@@ -7,13 +7,14 @@
  */
 package org.opentcs.guing.common.components.drawing;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.EventObject;
-import static java.util.Objects.requireNonNull;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
@@ -28,8 +29,10 @@ import org.opentcs.guing.common.components.drawing.course.OriginChangeListener;
  * A custom scroll pane to wrap an <code>OpenTCSDrawingView</code>.
  */
 public class DrawingViewScrollPane
-    extends JScrollPane
-    implements OriginChangeListener {
+    extends
+      JScrollPane
+    implements
+      OriginChangeListener {
 
   /**
    * The drawing view.
@@ -52,8 +55,10 @@ public class DrawingViewScrollPane
    * @param placardPanel The view's placard panel.
    */
   @SuppressWarnings("this-escape")
-  public DrawingViewScrollPane(OpenTCSDrawingView drawingView,
-                               DrawingViewPlacardPanel placardPanel) {
+  public DrawingViewScrollPane(
+      OpenTCSDrawingView drawingView,
+      DrawingViewPlacardPanel placardPanel
+  ) {
     this.drawingView = requireNonNull(drawingView, "drawingView");
     this.placardPanel = requireNonNull(placardPanel, "placardPanel");
 
@@ -85,7 +90,8 @@ public class DrawingViewScrollPane
 
     // Register handler for rulers toggle button.
     placardPanel.getToggleRulersButton().addItemListener(
-        new RulersToggleListener(placardPanel.getToggleRulersButton()));
+        new RulersToggleListener(placardPanel.getToggleRulersButton())
+    );
     placardPanel.getToggleRulersButton().setSelected(rulersVisible);
   }
 
@@ -127,7 +133,10 @@ public class DrawingViewScrollPane
     }
   }
 
-  public void originChanged(@Nonnull Origin origin) {
+  public void originChanged(
+      @Nonnull
+      Origin origin
+  ) {
     requireNonNull(origin, "origin");
     if (origin == this.origin) {
       return;
@@ -160,7 +169,8 @@ public class DrawingViewScrollPane
   }
 
   private class RulersToggleListener
-      implements ItemListener {
+      implements
+        ItemListener {
 
     private final JToggleButton rulersButton;
 

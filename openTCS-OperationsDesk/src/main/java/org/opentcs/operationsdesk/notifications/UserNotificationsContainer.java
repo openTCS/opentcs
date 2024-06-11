@@ -7,11 +7,12 @@
  */
 package org.opentcs.operationsdesk.notifications;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
@@ -24,18 +25,19 @@ import org.opentcs.data.notification.UserNotification;
 import org.opentcs.guing.common.event.OperationModeChangeEvent;
 import org.opentcs.guing.common.event.SystemModelTransitionEvent;
 import org.opentcs.operationsdesk.event.KernelStateChangeEvent;
+import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
 
 /**
  * Maintains a list of the most recent user notifications.
  */
 public class UserNotificationsContainer
-    implements EventHandler,
-               Lifecycle {
+    implements
+      EventHandler,
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -75,9 +77,12 @@ public class UserNotificationsContainer
    * @param configuration The operations desk application's configuration.
    */
   @Inject
-  public UserNotificationsContainer(@ApplicationEventBus EventBus eventBus,
-                                    SharedKernelServicePortalProvider portalProvider,
-                                    OperationsDeskConfiguration configuration) {
+  public UserNotificationsContainer(
+      @ApplicationEventBus
+      EventBus eventBus,
+      SharedKernelServicePortalProvider portalProvider,
+      OperationsDeskConfiguration configuration
+  ) {
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.capacity = requireNonNull(configuration, "configuration").userNotificationDisplayCount();

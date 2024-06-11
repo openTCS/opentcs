@@ -15,7 +15,8 @@ import java.io.Serializable;
  * Represents an exact point that won't change when zooming the model.
  */
 public class ZoomPoint
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The x position with a scale of 1.

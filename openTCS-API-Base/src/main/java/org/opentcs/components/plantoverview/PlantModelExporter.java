@@ -23,7 +23,10 @@ public interface PlantModelExporter {
    * @param model The plant model data to be exported.
    * @throws IOException If there was a problem exporting plant model data.
    */
-  void exportPlantModel(@Nonnull PlantModelCreationTO model)
+  void exportPlantModel(
+      @Nonnull
+      PlantModelCreationTO model
+  )
       throws IOException;
 
   /**

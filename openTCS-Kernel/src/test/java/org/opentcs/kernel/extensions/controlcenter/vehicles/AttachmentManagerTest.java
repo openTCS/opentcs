@@ -7,23 +7,24 @@
  */
 package org.opentcs.kernel.extensions.controlcenter.vehicles;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Executors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
@@ -69,20 +70,28 @@ class AttachmentManagerTest {
     commAdapterFactory = mock(VehicleCommAdapterFactory.class);
     vehicleEntryPool = new VehicleEntryPool(objectService);
     eventHandler = mock(EventHandler.class);
-    attachmentManager = spy(new AttachmentManager(objectService,
-                                                  vehicleControllerPool,
-                                                  commAdapterRegistry,
-                                                  vehicleEntryPool,
-                                                  eventHandler,
-                                                  mock(KernelApplicationConfiguration.class)));
+    attachmentManager = spy(
+        new AttachmentManager(
+            objectService,
+            vehicleControllerPool,
+            commAdapterRegistry,
+            vehicleEntryPool,
+            eventHandler,
+            mock(KernelApplicationConfiguration.class)
+        )
+    );
 
     vehicle1 = new Vehicle(VEHICLE_1_NAME);
     vehicle2 = new Vehicle(VEHICLE_2_NAME)
-        .withProperty(Vehicle.PREFERRED_ADAPTER,
-                      SimpleCommAdapterFactory.class.getName());
+        .withProperty(
+            Vehicle.PREFERRED_ADAPTER,
+            SimpleCommAdapterFactory.class.getName()
+        );
     vehicle3 = new Vehicle(VEHICLE_3_NAME)
-        .withProperty(Vehicle.PREFERRED_ADAPTER,
-                      RefusingCommAdapterFactory.class.getName());
+        .withProperty(
+            Vehicle.PREFERRED_ADAPTER,
+            RefusingCommAdapterFactory.class.getName()
+        );
   }
 
   @BeforeEach
@@ -108,8 +117,10 @@ class AttachmentManagerTest {
     attachmentManager.attachAdapterToVehicle("UnknownVehicle", commAdapterFactory);
 
     verify(commAdapterFactory, times(0)).getAdapterFor(any(Vehicle.class));
-    verify(vehicleControllerPool, times(0)).attachVehicleController(any(String.class),
-                                                                    any(VehicleCommAdapter.class));
+    verify(vehicleControllerPool, times(0)).attachVehicleController(
+        any(String.class),
+        any(VehicleCommAdapter.class)
+    );
   }
 
   @Test
@@ -123,18 +134,26 @@ class AttachmentManagerTest {
     verify(vehicleControllerPool, times(1)).detachVehicleController(VEHICLE_1_NAME);
     verify(vehicleControllerPool, times(1)).attachVehicleController(VEHICLE_1_NAME, commAdapter);
     assertNotNull(vehicleEntryPool.getEntryFor(VEHICLE_1_NAME));
-    assertThat(vehicleEntryPool.getEntryFor(VEHICLE_1_NAME).getCommAdapter(),
-               is(commAdapter));
-    assertThat(vehicleEntryPool.getEntryFor(VEHICLE_1_NAME).getCommAdapterFactory(),
-               is(commAdapterFactory));
-    assertThat(vehicleEntryPool.getEntryFor(VEHICLE_1_NAME).getProcessModel(),
-               is(commAdapter.getProcessModel()));
+    assertThat(
+        vehicleEntryPool.getEntryFor(VEHICLE_1_NAME).getCommAdapter(),
+        is(commAdapter)
+    );
+    assertThat(
+        vehicleEntryPool.getEntryFor(VEHICLE_1_NAME).getCommAdapterFactory(),
+        is(commAdapterFactory)
+    );
+    assertThat(
+        vehicleEntryPool.getEntryFor(VEHICLE_1_NAME).getProcessModel(),
+        is(commAdapter.getProcessModel())
+    );
   }
 
   @Test
   void shouldAutoAttachAdapterToVehicle() {
-    List<VehicleCommAdapterFactory> factories = Arrays.asList(new NullVehicleCommAdapterFactory(),
-                                                              new SimpleCommAdapterFactory());
+    List<VehicleCommAdapterFactory> factories = Arrays.asList(
+        new NullVehicleCommAdapterFactory(),
+        new SimpleCommAdapterFactory()
+    );
     when(commAdapterRegistry.getFactories()).thenReturn(factories);
 
     attachmentManager.autoAttachAdapterToVehicle(VEHICLE_2_NAME);
@@ -144,8 +163,10 @@ class AttachmentManagerTest {
 
   @Test
   void shouldAutoAttachToFirstAvailableAdapter() {
-    List<VehicleCommAdapterFactory> factories = Arrays.asList(new SimpleCommAdapterFactory(),
-                                                              new NullVehicleCommAdapterFactory());
+    List<VehicleCommAdapterFactory> factories = Arrays.asList(
+        new SimpleCommAdapterFactory(),
+        new NullVehicleCommAdapterFactory()
+    );
     when(commAdapterRegistry.getFactories()).thenReturn(factories);
     when(commAdapterRegistry.findFactoriesFor(vehicle1)).thenReturn(factories);
 
@@ -169,13 +190,16 @@ class AttachmentManagerTest {
   }
 
   private class SimpleCommAdapter
-      extends BasicVehicleCommAdapter {
+      extends
+        BasicVehicleCommAdapter {
 
     SimpleCommAdapter(Vehicle vehicle) {
-      super(new VehicleProcessModel(vehicle),
-            1,
-            "",
-            Executors.newSingleThreadScheduledExecutor());
+      super(
+          new VehicleProcessModel(vehicle),
+          1,
+          "",
+          Executors.newSingleThreadScheduledExecutor()
+      );
     }
 
     @Override
@@ -211,7 +235,8 @@ class AttachmentManagerTest {
   }
 
   private class SimpleCommAdapterFactory
-      implements VehicleCommAdapterFactory {
+      implements
+        VehicleCommAdapterFactory {
 
     @Override
     public boolean providesAdapterFor(Vehicle vehicle) {
@@ -248,7 +273,8 @@ class AttachmentManagerTest {
   }
 
   private class SimpleVehicleCommAdapterDescription
-      extends VehicleCommAdapterDescription {
+      extends
+        VehicleCommAdapterDescription {
 
     @Override
     public String getDescription() {
@@ -262,7 +288,8 @@ class AttachmentManagerTest {
   }
 
   private class RefusingCommAdapterFactory
-      implements VehicleCommAdapterFactory {
+      implements
+        VehicleCommAdapterFactory {
 
     @Override
     public boolean providesAdapterFor(Vehicle vehicle) {

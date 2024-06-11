@@ -14,12 +14,16 @@ import java.io.Serializable;
  * A command a peripheral communication adapter may execute.
  */
 public interface PeripheralAdapterCommand
-    extends Serializable {
+    extends
+      Serializable {
 
   /**
    * Executes the command.
    *
    * @param adapter The communication adapter to execute the command with.
    */
-  void execute(@Nonnull PeripheralCommAdapter adapter);
+  void execute(
+      @Nonnull
+      PeripheralCommAdapter adapter
+  );
 }

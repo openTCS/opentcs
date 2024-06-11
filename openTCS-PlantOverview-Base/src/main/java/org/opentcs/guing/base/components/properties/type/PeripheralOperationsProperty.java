@@ -17,10 +17,13 @@ import org.opentcs.guing.base.model.PeripheralOperationModel;
  * A property that contains a list of Peripheral operations.
  */
 public class PeripheralOperationsProperty
-    extends AbstractComplexProperty {
+    extends
+      AbstractComplexProperty {
 
-  public PeripheralOperationsProperty(ModelComponent model,
-                                      List<PeripheralOperationModel> operations) {
+  public PeripheralOperationsProperty(
+      ModelComponent model,
+      List<PeripheralOperationModel> operations
+  ) {
     super(model);
     fValue = operations;
   }

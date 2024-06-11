@@ -14,7 +14,8 @@ import org.opentcs.virtualvehicle.LoopbackCommAdapterPanelFactory;
  * Registers the loopback adapter's panels.
  */
 public class LoopbackCommAdapterPanelsModule
-    extends ControlCenterInjectionModule {
+    extends
+      ControlCenterInjectionModule {
 
   /**
    * Creates a new instance.

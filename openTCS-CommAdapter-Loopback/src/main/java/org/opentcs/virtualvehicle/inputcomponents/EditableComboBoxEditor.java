@@ -7,9 +7,10 @@
  */
 package org.opentcs.virtualvehicle.inputcomponents;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.HashSet;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.function.Function;
 import javax.swing.ComboBoxModel;
@@ -22,8 +23,10 @@ import javax.swing.plaf.basic.BasicComboBoxEditor;
  * An editor for editable combo boxes.
  */
 public class EditableComboBoxEditor<E>
-    extends BasicComboBoxEditor
-    implements ListDataListener {
+    extends
+      BasicComboBoxEditor
+    implements
+      ListDataListener {
 
   /**
    * Represents the model of the comboBox as a set.
@@ -45,15 +48,21 @@ public class EditableComboBoxEditor<E>
    * @param comboBox the comboBox that is edited.
    * @param representer Returns the string representation for the combo box's selected item.
    */
-  public EditableComboBoxEditor(List<ValidationListener> validationListeners,
-                                JComboBox<E> comboBox,
-                                Function<E, String> representer) {
+  public EditableComboBoxEditor(
+      List<ValidationListener> validationListeners,
+      JComboBox<E> comboBox,
+      Function<E, String> representer
+  ) {
     this.comboBox = requireNonNull(comboBox, "comboBox");
     this.representer = requireNonNull(representer, "representer");
-    editor.getDocument().addDocumentListener(new EditableComboBoxListener<>(content,
-                                                                            validationListeners,
-                                                                            editor,
-                                                                            representer));
+    editor.getDocument().addDocumentListener(
+        new EditableComboBoxListener<>(
+            content,
+            validationListeners,
+            editor,
+            representer
+        )
+    );
   }
 
   @Override

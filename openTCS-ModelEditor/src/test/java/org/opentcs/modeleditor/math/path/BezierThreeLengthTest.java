@@ -8,14 +8,15 @@
 package org.opentcs.modeleditor.math.path;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.model.elements.LayoutModel;
 import org.opentcs.guing.base.model.elements.PathModel;
@@ -68,15 +69,19 @@ class BezierThreeLengthTest {
     assertThat(calculatedLength).isEqualTo(94.22);
     verify(pathLengthMath, times(2))
         .approximateCubicBezierCurveLength(any(), any(), any(), any(), anyDouble());
-    verify(pathLengthMath).approximateCubicBezierCurveLength(new Coordinate(0, 0),
-                                                             new Coordinate(1800, 1750),
-                                                             new Coordinate(3400, 3350),
-                                                             new Coordinate(5000, 4950),
-                                                             1000);
-    verify(pathLengthMath).approximateCubicBezierCurveLength(new Coordinate(5000, 4950),
-                                                             new Coordinate(6600, 6550),
-                                                             new Coordinate(8200, 8150),
-                                                             new Coordinate(10000, 10000),
-                                                             1000);
+    verify(pathLengthMath).approximateCubicBezierCurveLength(
+        new Coordinate(0, 0),
+        new Coordinate(1800, 1750),
+        new Coordinate(3400, 3350),
+        new Coordinate(5000, 4950),
+        1000
+    );
+    verify(pathLengthMath).approximateCubicBezierCurveLength(
+        new Coordinate(5000, 4950),
+        new Coordinate(6600, 6550),
+        new Coordinate(8200, 8150),
+        new Coordinate(10000, 10000),
+        1000
+    );
   }
 }

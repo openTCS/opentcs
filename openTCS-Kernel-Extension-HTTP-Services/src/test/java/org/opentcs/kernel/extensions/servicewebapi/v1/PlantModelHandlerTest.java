@@ -7,17 +7,18 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.mock;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.components.kernel.services.RouterService;
@@ -69,19 +70,23 @@ class PlantModelHandlerTest {
     PropertyConverter propertyConverter = new PropertyConverter();
     routerService = mock();
 
-    handler = new PlantModelHandler(orderService,
-                                    executorWrapper,
-                                    new PointConverter(propertyConverter, envelopeConverter),
-                                    new PathConverter(propertyConverter,
-                                                      new PeripheralOperationConverter(),
-                                                      envelopeConverter),
-                                    new LocationTypeConverter(propertyConverter),
-                                    new LocationConverter(propertyConverter),
-                                    new BlockConverter(propertyConverter),
-                                    new VehicleConverter(propertyConverter),
-                                    new VisualLayoutConverter(propertyConverter),
-                                    propertyConverter,
-                                    routerService);
+    handler = new PlantModelHandler(
+        orderService,
+        executorWrapper,
+        new PointConverter(propertyConverter, envelopeConverter),
+        new PathConverter(
+            propertyConverter,
+            new PeripheralOperationConverter(),
+            envelopeConverter
+        ),
+        new LocationTypeConverter(propertyConverter),
+        new LocationConverter(propertyConverter),
+        new BlockConverter(propertyConverter),
+        new VehicleConverter(propertyConverter),
+        new VisualLayoutConverter(propertyConverter),
+        propertyConverter,
+        routerService
+    );
   }
 
   @Test

@@ -20,8 +20,10 @@ import javax.swing.border.EmptyBorder;
  * A standard dialog with an OK and a cancel button.
  */
 public class StandardContentDialog
-    extends javax.swing.JDialog
-    implements InputValidationListener {
+    extends
+      javax.swing.JDialog
+    implements
+      InputValidationListener {
 
   /**
    * A return status code - returned if Cancel button has been pressed.
@@ -72,10 +74,12 @@ public class StandardContentDialog
    * @param options Which user interface options to use.
    */
   @SuppressWarnings("this-escape")
-  public StandardContentDialog(Component parent,
-                               DialogContent content,
-                               boolean modal,
-                               int options) {
+  public StandardContentDialog(
+      Component parent,
+      DialogContent content,
+      boolean modal,
+      int options
+  ) {
     super(JOptionPane.getFrameForComponent(parent), modal);
 
     initComponents();
@@ -165,6 +169,7 @@ public class StandardContentDialog
     }
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -231,6 +236,7 @@ public class StandardContentDialog
     pack();
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   /**
    * Button "close" pressed.
@@ -290,6 +296,7 @@ public class StandardContentDialog
     dispose();
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton applyButton;
@@ -299,4 +306,5 @@ public class StandardContentDialog
   private javax.swing.JButton okButton;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

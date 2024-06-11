@@ -16,7 +16,8 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
  * An observable model of a virtual vehicle's and its comm adapter's attributes.
  */
 public class LoopbackVehicleModel
-    extends VehicleProcessModel {
+    extends
+      VehicleProcessModel {
 
   /**
    * Indicates whether this communication adapter is in single step mode or not (i.e. in automatic
@@ -42,10 +43,12 @@ public class LoopbackVehicleModel
 
   public LoopbackVehicleModel(Vehicle attachedVehicle) {
     super(attachedVehicle);
-    this.velocityController = new VelocityController(parseDeceleration(attachedVehicle),
-                                                     parseAcceleration(attachedVehicle),
-                                                     attachedVehicle.getMaxReverseVelocity(),
-                                                     attachedVehicle.getMaxVelocity());
+    this.velocityController = new VelocityController(
+        parseDeceleration(attachedVehicle),
+        parseAcceleration(attachedVehicle),
+        attachedVehicle.getMaxReverseVelocity(),
+        attachedVehicle.getMaxVelocity()
+    );
     this.operatingTime = parseOperatingTime(attachedVehicle);
     this.loadOperation = extractLoadOperation(attachedVehicle);
     this.unloadOperation = extractUnloadOperation(attachedVehicle);
@@ -69,9 +72,11 @@ public class LoopbackVehicleModel
     boolean oldValue = singleStepModeEnabled;
     singleStepModeEnabled = mode;
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.SINGLE_STEP_MODE.name(),
-                                                  oldValue,
-                                                  mode);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.SINGLE_STEP_MODE.name(),
+        oldValue,
+        mode
+    );
   }
 
   /**
@@ -102,9 +107,11 @@ public class LoopbackVehicleModel
     int oldValue = this.operatingTime;
     this.operatingTime = defaultOperatingTime;
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.OPERATING_TIME.name(),
-                                                  oldValue,
-                                                  defaultOperatingTime);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.OPERATING_TIME.name(),
+        oldValue,
+        defaultOperatingTime
+    );
   }
 
   /**
@@ -125,9 +132,11 @@ public class LoopbackVehicleModel
     int oldValue = velocityController.getMaxDeceleration();
     velocityController.setMaxDeceleration(maxDeceleration);
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.DECELERATION.name(),
-                                                  oldValue,
-                                                  maxDeceleration);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.DECELERATION.name(),
+        oldValue,
+        maxDeceleration
+    );
   }
 
   /**
@@ -148,9 +157,11 @@ public class LoopbackVehicleModel
     int oldValue = velocityController.getMaxAcceleration();
     velocityController.setMaxAcceleration(maxAcceleration);
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.ACCELERATION.name(),
-                                                  oldValue,
-                                                  maxAcceleration);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.ACCELERATION.name(),
+        oldValue,
+        maxAcceleration
+    );
   }
 
   /**
@@ -171,9 +182,11 @@ public class LoopbackVehicleModel
     int oldValue = velocityController.getMaxRevVelocity();
     velocityController.setMaxRevVelocity(maxRevVelocity);
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.MAX_REVERSE_VELOCITY.name(),
-                                                  oldValue,
-                                                  maxRevVelocity);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.MAX_REVERSE_VELOCITY.name(),
+        oldValue,
+        maxRevVelocity
+    );
   }
 
   /**
@@ -194,9 +207,11 @@ public class LoopbackVehicleModel
     int oldValue = velocityController.getMaxFwdVelocity();
     velocityController.setMaxFwdVelocity(maxFwdVelocity);
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.MAX_FORWARD_VELOCITY.name(),
-                                                  oldValue,
-                                                  maxFwdVelocity);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.MAX_FORWARD_VELOCITY.name(),
+        oldValue,
+        maxFwdVelocity
+    );
   }
 
   /**
@@ -217,9 +232,11 @@ public class LoopbackVehicleModel
     boolean oldValue = velocityController.isVehiclePaused();
     velocityController.setVehiclePaused(pause);
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.VEHICLE_PAUSED.name(),
-                                                  oldValue,
-                                                  pause);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.VEHICLE_PAUSED.name(),
+        oldValue,
+        pause
+    );
   }
 
   /**

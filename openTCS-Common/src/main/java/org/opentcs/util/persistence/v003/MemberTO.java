@@ -14,7 +14,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 public class MemberTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   /**
    * Creates a new instance.

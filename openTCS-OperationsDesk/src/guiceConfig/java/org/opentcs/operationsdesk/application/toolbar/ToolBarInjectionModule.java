@@ -19,7 +19,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar.OpenTCSS
 /**
  */
 public class ToolBarInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.

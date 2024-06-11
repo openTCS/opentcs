@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.base.model.elements;
 
-import java.util.ResourceBundle;
 import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
+
+import java.util.ResourceBundle;
 import org.opentcs.guing.base.model.AbstractModelComponent;
 
 /**
@@ -16,7 +17,8 @@ import org.opentcs.guing.base.model.AbstractModelComponent;
  * on the driving course.
  */
 public class OtherGraphicalElement
-    extends AbstractModelComponent {
+    extends
+      AbstractModelComponent {
 
   /**
    * Creates a new instance of OtherGraphicalElement.

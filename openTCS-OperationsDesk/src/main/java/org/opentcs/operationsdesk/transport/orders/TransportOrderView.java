@@ -7,6 +7,8 @@
  */
 package org.opentcs.operationsdesk.transport.orders;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.Component;
@@ -16,7 +18,6 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map.Entry;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
@@ -39,7 +40,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A view on a transport order.
  */
 public class TransportOrderView
-    extends DialogContent {
+    extends
+      DialogContent {
 
   /**
    * A formatter for timestamps.
@@ -62,14 +64,19 @@ public class TransportOrderView
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public TransportOrderView(@Assisted TransportOrder order,
-                            CompositeObjectHistoryEntryFormatter historyEntryFormatter) {
+  public TransportOrderView(
+      @Assisted
+      TransportOrder order,
+      CompositeObjectHistoryEntryFormatter historyEntryFormatter
+  ) {
     this.fTransportOrder = requireNonNull(order, "order");
     this.historyEntryFormatter = requireNonNull(historyEntryFormatter, "historyEntryFormatter");
 
     initComponents();
-    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
-        .getString("transportOrderView.title"));
+    setDialogTitle(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+            .getString("transportOrderView.title")
+    );
   }
 
   @Override
@@ -82,14 +89,16 @@ public class TransportOrderView
 
     createdTextField.setText(TIMESTAMP_FORMAT.format(Date.from(fTransportOrder.getCreationTime())));
 
-    finishedTextField.setText(!fTransportOrder.getFinishedTime().equals(Instant.MAX)
-        ? TIMESTAMP_FORMAT.format(Date.from(fTransportOrder.getFinishedTime()))
-        : "-"
+    finishedTextField.setText(
+        !fTransportOrder.getFinishedTime().equals(Instant.MAX)
+            ? TIMESTAMP_FORMAT.format(Date.from(fTransportOrder.getFinishedTime()))
+            : "-"
     );
 
-    deadlineTextField.setText(!fTransportOrder.getDeadline().equals(Instant.MAX)
-        ? TIMESTAMP_FORMAT.format(Date.from(fTransportOrder.getDeadline()))
-        : "-"
+    deadlineTextField.setText(
+        !fTransportOrder.getDeadline().equals(Instant.MAX)
+            ? TIMESTAMP_FORMAT.format(Date.from(fTransportOrder.getDeadline()))
+            : "-"
     );
 
     dispensableTextField.setText(Boolean.toString(fTransportOrder.isDispensable()));
@@ -130,14 +139,14 @@ public class TransportOrderView
 
     tableModel.setColumnIdentifiers(
         new String[]{
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
-              .getString(
-                  "transportOrderView.table_properties.column_propertiesKey.headerText"
-              ),
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
-              .getString(
-                  "transportOrderView.table_properties.column_propertiesValue.headerText"
-              )
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+                .getString(
+                    "transportOrderView.table_properties.column_propertiesKey.headerText"
+                ),
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+                .getString(
+                    "transportOrderView.table_properties.column_propertiesValue.headerText"
+                )
         }
     );
     fTransportOrder.getProperties().entrySet().stream()
@@ -154,10 +163,12 @@ public class TransportOrderView
 
     tableModel.setColumnIdentifiers(
         new String[]{
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
-              .getString("transportOrderView.table_driveOrderProperties.column_target.headerText"),
-          "Operation",
-          "Status"
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+                .getString(
+                    "transportOrderView.table_driveOrderProperties.column_target.headerText"
+                ),
+            "Operation",
+            "Status"
         }
     );
 
@@ -182,14 +193,14 @@ public class TransportOrderView
     // CHECKSTYLE:OFF
     tableModel.setColumnIdentifiers(
         new String[]{
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
-              .getString(
-                  "transportOrderView.table_driveOrderProperties.column_driveOrderPropertiesKey.headerText"
-              ),
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
-              .getString(
-                  "transportOrderView.table_driveOrderProperties.column_driveOrderPropertiesValue.headerText"
-              )
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+                .getString(
+                    "transportOrderView.table_driveOrderProperties.column_driveOrderPropertiesKey.headerText"
+                ),
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+                .getString(
+                    "transportOrderView.table_driveOrderProperties.column_driveOrderPropertiesValue.headerText"
+                )
         }
     );
     // CHECKSTYLE:ON
@@ -202,25 +213,26 @@ public class TransportOrderView
 
     tableModel.setColumnIdentifiers(
         new String[]{
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
-              .getString("transportOrderView.table_route.column_route.headerText"),
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
-              .getString("transportOrderView.table_routeTable.column_destination.headerText")
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+                .getString("transportOrderView.table_route.column_route.headerText"),
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+                .getString("transportOrderView.table_routeTable.column_destination.headerText")
         }
     );
 
     return tableModel;
   }
 
+  @SuppressWarnings("checkstyle:LineLength")
   private TableModel createDependenciesTableModel() {
     DefaultTableModel tableModel = new UneditableTableModel();
 
     tableModel.setColumnIdentifiers(
         new String[]{
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
-              .getString(
-                  "transportOrderView.table_dependencies.column_dependentTransportOrder.headerText"
-              )
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+                .getString(
+                    "transportOrderView.table_dependencies.column_dependentTransportOrder.headerText"
+                )
         }
     );
 
@@ -238,18 +250,20 @@ public class TransportOrderView
 
     tableModel.setColumnIdentifiers(
         new String[]{
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
-              .getString("transportOrderView.table_history.column_timestamp.headerText"),
-          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
-              .getString("transportOrderView.table_history.column_event.headerText")
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+                .getString("transportOrderView.table_history.column_timestamp.headerText"),
+            ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.TODETAIL_PATH)
+                .getString("transportOrderView.table_history.column_event.headerText")
         }
     );
 
     for (ObjectHistory.Entry entry : fTransportOrder.getHistory().getEntries()) {
-      tableModel.addRow(new String[]{
-        TIMESTAMP_FORMAT.format(Date.from(entry.getTimestamp())),
-        historyEntryFormatter.apply(entry).get()
-      });
+      tableModel.addRow(
+          new String[]{
+              TIMESTAMP_FORMAT.format(Date.from(entry.getTimestamp())),
+              historyEntryFormatter.apply(entry).get()
+          }
+      );
     }
 
     return tableModel;
@@ -280,14 +294,18 @@ public class TransportOrderView
     costsTextField.setText(Long.toString(driveOrder.getRoute().getCosts()));
 
     for (Step step : driveOrder.getRoute().getSteps()) {
-      routeTableModel.addRow(new String[]{
-        step.getPath() == null ? "" : step.getPath().getName(),
-        step.getDestinationPoint().getName()
-      });
+      routeTableModel.addRow(
+          new String[]{
+              step.getPath() == null ? "" : step.getPath().getName(),
+              step.getDestinationPoint().getName()
+          }
+      );
     }
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
+
   /**
    * This method is called from within the constructor to initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is always
@@ -510,12 +528,12 @@ public class TransportOrderView
 
     dependenciesTable.setFont(dependenciesTable.getFont());
     dependenciesTable.setModel(new javax.swing.table.DefaultTableModel(
-      new Object [][] {
+        new Object[][]{
 
-      },
-      new String [] {
+        },
+        new String[]{
 
-      }
+        }
     ));
     dependenciesScrollPane.setViewportView(dependenciesTable);
 
@@ -553,12 +571,12 @@ public class TransportOrderView
     historyScrollPane.setPreferredSize(new java.awt.Dimension(150, 100));
 
     historyTable.setModel(new javax.swing.table.DefaultTableModel(
-      new Object [][] {
+        new Object[][]{
 
-      },
-      new String [] {
+        },
+        new String[]{
 
-      }
+        }
     ));
     historyScrollPane.setViewportView(historyTable);
 
@@ -658,6 +676,7 @@ public class TransportOrderView
     gridBagConstraints.weighty = 0.5;
     add(driveOrdersPanel, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JLabel costsLabel;
   private javax.swing.JTextField costsTextField;
@@ -698,12 +717,14 @@ public class TransportOrderView
   private javax.swing.JTextField vehicleTextField;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   /**
    * A cell renderer that adds a tool tip with the cell's value.
    */
   private static class ToolTipCellRenderer
-      extends DefaultTableCellRenderer {
+      extends
+        DefaultTableCellRenderer {
 
     /**
      * Creates a new instance.
@@ -712,18 +733,22 @@ public class TransportOrderView
     }
 
     @Override
-    public Component getTableCellRendererComponent(JTable table,
-                                                   Object value,
-                                                   boolean isSelected,
-                                                   boolean hasFocus,
-                                                   int row,
-                                                   int column) {
-      Component component = super.getTableCellRendererComponent(table,
-                                                                value,
-                                                                isSelected,
-                                                                hasFocus,
-                                                                row,
-                                                                column);
+    public Component getTableCellRendererComponent(
+        JTable table,
+        Object value,
+        boolean isSelected,
+        boolean hasFocus,
+        int row,
+        int column
+    ) {
+      Component component = super.getTableCellRendererComponent(
+          table,
+          value,
+          isSelected,
+          hasFocus,
+          row,
+          column
+      );
 
       ((JComponent) component).setToolTipText(value.toString());
 

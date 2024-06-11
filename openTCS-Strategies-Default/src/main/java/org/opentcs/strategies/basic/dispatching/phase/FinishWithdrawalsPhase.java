@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
@@ -19,7 +20,8 @@ import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
  * Finishes withdrawals of transport orders after the vehicle has come to a halt.
  */
 public class FinishWithdrawalsPhase
-    implements Phase {
+    implements
+      Phase {
 
   /**
    * The object service
@@ -32,8 +34,10 @@ public class FinishWithdrawalsPhase
   private boolean initialized;
 
   @Inject
-  public FinishWithdrawalsPhase(TCSObjectService objectService,
-                                TransportOrderUtil transportOrderUtil) {
+  public FinishWithdrawalsPhase(
+      TCSObjectService objectService,
+      TransportOrderUtil transportOrderUtil
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
   }

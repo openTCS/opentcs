@@ -19,7 +19,8 @@ import java.awt.Insets;
  * JScrollPane.
  */
 public class ModifiedFlowLayout
-    extends FlowLayout {
+    extends
+      FlowLayout {
 
   /**
    * Creates a new instance.

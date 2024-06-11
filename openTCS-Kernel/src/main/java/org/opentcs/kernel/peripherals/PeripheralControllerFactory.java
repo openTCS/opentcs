@@ -24,6 +24,8 @@ public interface PeripheralControllerFactory {
    * @param commAdapter The communication adapter.
    * @return A new peripheral controller.
    */
-  DefaultPeripheralController createPeripheralController(TCSResourceReference<Location> location,
-                                                         PeripheralCommAdapter commAdapter);
+  DefaultPeripheralController createPeripheralController(
+      TCSResourceReference<Location> location,
+      PeripheralCommAdapter commAdapter
+  );
 }

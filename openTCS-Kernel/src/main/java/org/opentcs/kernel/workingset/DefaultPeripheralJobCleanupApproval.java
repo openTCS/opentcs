@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.workingset;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.PeripheralJobCleanupApproval;
 import org.opentcs.data.peripherals.PeripheralJob;
 
@@ -16,7 +17,8 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * Checks whether a peripheral job may be removed.
  */
 public class DefaultPeripheralJobCleanupApproval
-    implements PeripheralJobCleanupApproval {
+    implements
+      PeripheralJobCleanupApproval {
 
   private final CreationTimeThreshold creationTimeThreshold;
 

@@ -9,6 +9,7 @@ package org.opentcs.guing.base.components.properties.type;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -47,12 +48,13 @@ class SpeedPropertyTest {
   }
 
   static Object[][] paramsFactory() {
-    return new Object[][] {{Unit.MM_S, 10000.0},
-                           {Unit.M_S, 10.0},
-                           {Unit.KM_H, 36.0}};
+    return new Object[][]{{Unit.MM_S, 10000.0},
+        {Unit.M_S, 10.0},
+        {Unit.KM_H, 36.0}};
   }
 
   private class DummyComponent
-      extends AbstractModelComponent {
+      extends
+        AbstractModelComponent {
   }
 }

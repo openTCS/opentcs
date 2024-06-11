@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
-import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
@@ -44,8 +45,10 @@ class PeripheralOperationConverterTest {
     assertThat(result, hasSize(1));
     assertThat(result.get(0).getOperation(), is("all"));
     assertThat(result.get(0).getLocationName(), is("l1"));
-    assertThat(result.get(0).getExecutionTrigger(),
-               is(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION));
+    assertThat(
+        result.get(0).getExecutionTrigger(),
+        is(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION)
+    );
     assertTrue(result.get(0).isCompletionRequired());
   }
 
@@ -64,8 +67,10 @@ class PeripheralOperationConverterTest {
     assertThat(result, hasSize(1));
     assertThat(result.get(0).getOperation(), is("operation"));
     assertThat(result.get(0).getLocationName(), is("L1"));
-    assertThat(result.get(0).getExecutionTrigger(),
-               is(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION.name()));
+    assertThat(
+        result.get(0).getExecutionTrigger(),
+        is(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION.name())
+    );
     assertTrue(result.get(0).isCompletionRequired());
   }
 }

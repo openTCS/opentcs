@@ -22,7 +22,8 @@ import org.opentcs.guing.common.components.drawing.figures.PointFigure;
 /**
  */
 public class PointOutlineHandle
-    extends BoundsOutlineHandle {
+    extends
+      BoundsOutlineHandle {
 
   public PointOutlineHandle(Figure owner) {
     super(owner);

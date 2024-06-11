@@ -14,7 +14,8 @@ import org.opentcs.access.KernelRuntimeException;
  * object with the same ID/name/attributes already exists.
  */
 public class ObjectExistsException
-    extends KernelRuntimeException {
+    extends
+      KernelRuntimeException {
 
   /**
    * Creates a new ObjectExistsException with the given detail message.

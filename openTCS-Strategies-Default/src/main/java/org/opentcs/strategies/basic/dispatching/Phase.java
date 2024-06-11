@@ -13,7 +13,8 @@ import org.opentcs.components.Lifecycle;
  * Describes a reusable dispatching (sub-)task with a life cycle.
  */
 public interface Phase
-    extends Runnable,
-            Lifecycle {
+    extends
+      Runnable,
+      Lifecycle {
 
 }

@@ -19,7 +19,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * with a normal {@link FileFilter} the value of a file extension is unknown.
  */
 public class SynchronizedFileChooser
-    extends javax.swing.JFileChooser {
+    extends
+      javax.swing.JFileChooser {
 
   /**
    * The selected file of this file chooser.
@@ -37,6 +38,8 @@ public class SynchronizedFileChooser
     initComponents();
   }
 
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
    * initialize the form.
@@ -52,6 +55,8 @@ public class SynchronizedFileChooser
             }
         });
     }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void formPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_formPropertyChange
     //Synchronize if the user selects a different filter
@@ -72,8 +77,10 @@ public class SynchronizedFileChooser
         //If the file has a known file ending, replace it. Else just add the new extension
         //at the end
         StringBuilder newPathBuilder = new StringBuilder();
-        newPathBuilder.append(fileExtensionIndex >= 0
-            ? file.getName().substring(0, fileExtensionIndex) : file.getName());
+        newPathBuilder.append(
+            fileExtensionIndex >= 0
+                ? file.getName().substring(0, fileExtensionIndex) : file.getName()
+        );
         if (!newPathBuilder.toString().endsWith(".")) {
           newPathBuilder.append(".");
         }
@@ -111,6 +118,11 @@ public class SynchronizedFileChooser
     }
     return -1;
   }
+
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

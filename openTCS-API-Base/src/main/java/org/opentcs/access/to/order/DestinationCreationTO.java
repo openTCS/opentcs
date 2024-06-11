@@ -7,18 +7,21 @@
  */
 package org.opentcs.access.to.order;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.to.CreationTO;
 
 /**
  * A transfer object describing a destination of a drive order.
  */
 public class DestinationCreationTO
-    extends CreationTO
-    implements Serializable {
+    extends
+      CreationTO
+    implements
+      Serializable {
 
   /**
    * The name of the destination location (or point).
@@ -37,17 +40,27 @@ public class DestinationCreationTO
    * @param destLocationName The name of the destination location (or destination point).
    * @param destOperation The operation to be performed at the destination.
    */
-  public DestinationCreationTO(@Nonnull String destLocationName,
-                               @Nonnull String destOperation) {
+  public DestinationCreationTO(
+      @Nonnull
+      String destLocationName,
+      @Nonnull
+      String destOperation
+  ) {
     super("");
     this.destLocationName = requireNonNull(destLocationName, "destLocationName");
     this.destOperation = requireNonNull(destOperation, "destOperation");
   }
 
-  private DestinationCreationTO(@Nonnull String destLocationName,
-                                @Nonnull String destOperation,
-                                @Nonnull String name,
-                                @Nonnull Map<String, String> properties) {
+  private DestinationCreationTO(
+      @Nonnull
+      String destLocationName,
+      @Nonnull
+      String destOperation,
+      @Nonnull
+      String name,
+      @Nonnull
+      Map<String, String> properties
+  ) {
     super(name, properties);
     this.destLocationName = requireNonNull(destLocationName, "destLocationName");
     this.destOperation = requireNonNull(destOperation, "destOperation");
@@ -60,11 +73,16 @@ public class DestinationCreationTO
    * @return A copy of this object, differing in the given value.
    */
   @Override
-  public DestinationCreationTO withName(@Nonnull String name) {
-    return new DestinationCreationTO(destLocationName,
-                                     destOperation,
-                                     name,
-                                     getModifiableProperties());
+  public DestinationCreationTO withName(
+      @Nonnull
+      String name
+  ) {
+    return new DestinationCreationTO(
+        destLocationName,
+        destOperation,
+        name,
+        getModifiableProperties()
+    );
   }
 
   /**
@@ -74,7 +92,10 @@ public class DestinationCreationTO
    * @return A copy of this object, differing in the given value.
    */
   @Override
-  public DestinationCreationTO withProperties(@Nonnull Map<String, String> properties) {
+  public DestinationCreationTO withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
     return new DestinationCreationTO(destLocationName, destOperation, getName(), properties);
   }
 
@@ -89,11 +110,18 @@ public class DestinationCreationTO
    * excludes the entry otherwise.
    */
   @Override
-  public DestinationCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new DestinationCreationTO(destLocationName,
-                                     destOperation,
-                                     getName(),
-                                     propertiesWith(key, value));
+  public DestinationCreationTO withProperty(
+      @Nonnull
+      String key,
+      @Nonnull
+      String value
+  ) {
+    return new DestinationCreationTO(
+        destLocationName,
+        destOperation,
+        getName(),
+        propertiesWith(key, value)
+    );
   }
 
   /**
@@ -112,11 +140,16 @@ public class DestinationCreationTO
    * @param desLocationName The destination location (or point) name.
    * @return A copy of this object, differing in the given destination.
    */
-  public DestinationCreationTO withDestLocationName(@Nonnull String desLocationName) {
-    return new DestinationCreationTO(destLocationName,
-                                     destOperation,
-                                     getName(),
-                                     getModifiableProperties());
+  public DestinationCreationTO withDestLocationName(
+      @Nonnull
+      String desLocationName
+  ) {
+    return new DestinationCreationTO(
+        destLocationName,
+        destOperation,
+        getName(),
+        getModifiableProperties()
+    );
   }
 
   /**
@@ -135,10 +168,15 @@ public class DestinationCreationTO
    * @param destOperation The operation.
    * @return A copy of this object, differing in the given destination operation.
    */
-  public DestinationCreationTO withDestOperation(@Nonnull String destOperation) {
-    return new DestinationCreationTO(destLocationName,
-                                     destOperation,
-                                     getName(),
-                                     getModifiableProperties());
+  public DestinationCreationTO withDestOperation(
+      @Nonnull
+      String destOperation
+  ) {
+    return new DestinationCreationTO(
+        destLocationName,
+        destOperation,
+        getName(),
+        getModifiableProperties()
+    );
   }
 }

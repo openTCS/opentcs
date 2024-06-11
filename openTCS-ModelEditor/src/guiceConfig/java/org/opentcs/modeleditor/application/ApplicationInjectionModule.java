@@ -31,7 +31,8 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.application.OpenTCSSDIApplica
  * An injection module for this package.
  */
 public class ApplicationInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * The application's main frame.

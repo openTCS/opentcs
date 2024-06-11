@@ -7,16 +7,17 @@
  */
 package org.opentcs.guing.base.model.elements;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
+
 import jakarta.annotation.Nonnull;
 import java.awt.Color;
 import java.util.Arrays;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.order.TransportOrder;
-import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.BooleanProperty;
 import org.opentcs.guing.base.components.properties.type.ColorProperty;
@@ -36,8 +37,10 @@ import org.opentcs.guing.base.model.DrawnModelComponent;
  * Basic implementation of a vehicle. A vehicle has an unique number.
  */
 public class VehicleModel
-    extends AbstractModelComponent
-    implements DrawnModelComponent {
+    extends
+      AbstractModelComponent
+    implements
+      DrawnModelComponent {
 
   /**
    * The name/key of the 'length' property.
@@ -336,7 +339,10 @@ public class VehicleModel
    *
    * @param vehicle The kernel object.
    */
-  public void setVehicle(@Nonnull Vehicle vehicle) {
+  public void setVehicle(
+      @Nonnull
+      Vehicle vehicle
+  ) {
     this.vehicle = requireNonNull(vehicle, "vehicle");
   }
 
@@ -489,7 +495,7 @@ public class VehicleModel
   public StringProperty getPropertyEnvelopeKey() {
     return (StringProperty) getProperty(ENVELOPE_KEY);
   }
-  
+
   public KeyValueSetProperty getPropertyMiscellaneous() {
     return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
@@ -518,10 +524,12 @@ public class VehicleModel
     pColor.setHelptext(bundle.getString("vehicleModel.property_routeColor.helptext"));
     setProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR, pColor);
 
-    PercentProperty pEnergyLevelCritical = new PercentProperty(this,
-                                                               30,
-                                                               PercentProperty.Unit.PERCENT,
-                                                               true);
+    PercentProperty pEnergyLevelCritical = new PercentProperty(
+        this,
+        30,
+        PercentProperty.Unit.PERCENT,
+        true
+    );
     pEnergyLevelCritical.setDescription(
         bundle.getString("vehicleModel.property_energyLevelCritical.description")
     );
@@ -530,10 +538,12 @@ public class VehicleModel
     );
     setProperty(ENERGY_LEVEL_CRITICAL, pEnergyLevelCritical);
 
-    PercentProperty pEnergyLevelGood = new PercentProperty(this,
-                                                           90,
-                                                           PercentProperty.Unit.PERCENT,
-                                                           true);
+    PercentProperty pEnergyLevelGood = new PercentProperty(
+        this,
+        90,
+        PercentProperty.Unit.PERCENT,
+        true
+    );
     pEnergyLevelGood.setDescription(
         bundle.getString("vehicleModel.property_energyLevelGood.description")
     );
@@ -542,10 +552,12 @@ public class VehicleModel
     );
     setProperty(ENERGY_LEVEL_GOOD, pEnergyLevelGood);
 
-    PercentProperty pEnergyLevelFullyRecharged = new PercentProperty(this,
-                                                                     95,
-                                                                     PercentProperty.Unit.PERCENT,
-                                                                     true);
+    PercentProperty pEnergyLevelFullyRecharged = new PercentProperty(
+        this,
+        95,
+        PercentProperty.Unit.PERCENT,
+        true
+    );
     pEnergyLevelFullyRecharged.setDescription(
         bundle.getString("vehicleModel.property_energyLevelFullyRecharged.description")
     );
@@ -555,10 +567,12 @@ public class VehicleModel
     setProperty(ENERGY_LEVEL_FULLY_RECHARGED, pEnergyLevelFullyRecharged);
 
     PercentProperty pEnergyLevelSufficientlyRecharged
-        = new PercentProperty(this,
-                              40,
-                              PercentProperty.Unit.PERCENT,
-                              true);
+        = new PercentProperty(
+            this,
+            40,
+            PercentProperty.Unit.PERCENT,
+            true
+        );
     pEnergyLevelSufficientlyRecharged.setDescription(
         bundle.getString("vehicleModel.property_energyLevelSufficientlyRecharged.description")
     );
@@ -598,18 +612,22 @@ public class VehicleModel
     setProperty(LOADED, pLoaded);
 
     SelectionProperty<Vehicle.State> pState
-        = new SelectionProperty<>(this,
-                                  Arrays.asList(Vehicle.State.values()),
-                                  Vehicle.State.UNKNOWN);
+        = new SelectionProperty<>(
+            this,
+            Arrays.asList(Vehicle.State.values()),
+            Vehicle.State.UNKNOWN
+        );
     pState.setDescription(bundle.getString("vehicleModel.property_state.description"));
     pState.setHelptext(bundle.getString("vehicleModel.property_state.helptext"));
     pState.setModellingEditable(false);
     setProperty(STATE, pState);
 
     SelectionProperty<Vehicle.ProcState> pProcState
-        = new SelectionProperty<>(this,
-                                  Arrays.asList(Vehicle.ProcState.values()),
-                                  Vehicle.ProcState.IDLE);
+        = new SelectionProperty<>(
+            this,
+            Arrays.asList(Vehicle.ProcState.values()),
+            Vehicle.ProcState.IDLE
+        );
     pProcState.setDescription(
         bundle.getString("vehicleModel.property_processingState.description")
     );
@@ -618,9 +636,11 @@ public class VehicleModel
     setProperty(PROC_STATE, pProcState);
 
     SelectionProperty<Vehicle.IntegrationLevel> pIntegrationLevel
-        = new SelectionProperty<>(this,
-                                  Arrays.asList(Vehicle.IntegrationLevel.values()),
-                                  Vehicle.IntegrationLevel.TO_BE_RESPECTED);
+        = new SelectionProperty<>(
+            this,
+            Arrays.asList(Vehicle.IntegrationLevel.values()),
+            Vehicle.IntegrationLevel.TO_BE_RESPECTED
+        );
     pIntegrationLevel.setDescription(
         bundle.getString("vehicleModel.property_integrationLevel.description")
     );
@@ -675,7 +695,7 @@ public class VehicleModel
     pEnvelopeKey.setModellingEditable(true);
     pEnvelopeKey.setOperatingEditable(false);
     setProperty(ENVELOPE_KEY, pEnvelopeKey);
-    
+
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(
         bundle.getString("vehicleModel.property_miscellaneous.description")

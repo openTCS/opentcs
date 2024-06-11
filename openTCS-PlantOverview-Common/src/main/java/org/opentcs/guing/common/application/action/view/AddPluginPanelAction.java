@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.application.action.view;
 
-import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
+
+import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
@@ -18,7 +19,8 @@ import org.opentcs.guing.common.application.PluginPanelManager;
  * An action to add a plugin panel.
  */
 public class AddPluginPanelAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This action's ID.
@@ -33,8 +35,10 @@ public class AddPluginPanelAction
    * @param pluginPanelManager The openTCS view
    * @param factory The pluggable panel factory
    */
-  public AddPluginPanelAction(PluginPanelManager pluginPanelManager,
-                              PluggablePanelFactory factory) {
+  public AddPluginPanelAction(
+      PluginPanelManager pluginPanelManager,
+      PluggablePanelFactory factory
+  ) {
     this.pluginPanelManager = requireNonNull(pluginPanelManager, "pluginPanelManager");
     this.factory = requireNonNull(factory, "factory");
   }

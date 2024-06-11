@@ -7,9 +7,10 @@
  */
 package org.opentcs.guing.common.components.tree.elements;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 import org.opentcs.data.model.Block;
@@ -25,8 +26,10 @@ import org.opentcs.guing.common.util.IconToolkit;
  * @see Block
  */
 public class BlockUserObject
-    extends AbstractUserObject
-    implements ContextObject {
+    extends
+      AbstractUserObject
+    implements
+      ContextObject {
 
   private final UserObjectContext context;
   /**
@@ -44,11 +47,15 @@ public class BlockUserObject
    * @param blockSelector A helper for selecting blocks/block elements.
    */
   @Inject
-  public BlockUserObject(@Assisted BlockModel dataObject,
-                         @Assisted UserObjectContext context,
-                         GuiManager guiManager,
-                         ModelManager modelManager,
-                         BlockSelector blockSelector) {
+  public BlockUserObject(
+      @Assisted
+      BlockModel dataObject,
+      @Assisted
+      UserObjectContext context,
+      GuiManager guiManager,
+      ModelManager modelManager,
+      BlockSelector blockSelector
+  ) {
     super(dataObject, guiManager, modelManager);
     this.context = requireNonNull(context, "context");
     this.blockSelector = requireNonNull(blockSelector, "blockSelector");

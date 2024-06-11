@@ -20,7 +20,8 @@ import org.opentcs.data.order.TransportOrder;
  * peers.
  */
 public interface InternalTransportOrderService
-    extends TransportOrderService {
+    extends
+      TransportOrderService {
 
   /**
    * Sets an order sequence's finished flag.
@@ -48,8 +49,10 @@ public interface InternalTransportOrderService
    * @param vehicleRef A reference to the vehicle processing the order sequence.
    * @throws ObjectUnknownException If the referenced transport order is not in this pool.
    */
-  void updateOrderSequenceProcessingVehicle(TCSObjectReference<OrderSequence> seqRef,
-                                            TCSObjectReference<Vehicle> vehicleRef)
+  void updateOrderSequenceProcessingVehicle(
+      TCSObjectReference<OrderSequence> seqRef,
+      TCSObjectReference<Vehicle> vehicleRef
+  )
       throws ObjectUnknownException;
 
   /**
@@ -60,8 +63,10 @@ public interface InternalTransportOrderService
    * order's drive orders.
    * @throws ObjectUnknownException If the referenced transport order does not exist.
    */
-  void updateTransportOrderDriveOrders(TCSObjectReference<TransportOrder> ref,
-                                       List<DriveOrder> driveOrders)
+  void updateTransportOrderDriveOrders(
+      TCSObjectReference<TransportOrder> ref,
+      List<DriveOrder> driveOrders
+  )
       throws ObjectUnknownException;
 
   /**
@@ -88,8 +93,10 @@ public interface InternalTransportOrderService
    * @param index The new index.
    * @throws ObjectUnknownException If the referenced transport order does not exist.
    */
-  void updateTransportOrderCurrentRouteStepIndex(TCSObjectReference<TransportOrder> ref,
-                                                 int index)
+  void updateTransportOrderCurrentRouteStepIndex(
+      TCSObjectReference<TransportOrder> ref,
+      int index
+  )
       throws ObjectUnknownException;
 
   /**
@@ -103,10 +110,13 @@ public interface InternalTransportOrderService
    * @throws IllegalArgumentException If the destinations of the given drive orders do not match
    * the destinations of the drive orders in this transport order.
    */
-  void updateTransportOrderProcessingVehicle(TCSObjectReference<TransportOrder> orderRef,
-                                             TCSObjectReference<Vehicle> vehicleRef,
-                                             List<DriveOrder> driveOrders)
-      throws ObjectUnknownException, IllegalArgumentException;
+  void updateTransportOrderProcessingVehicle(
+      TCSObjectReference<TransportOrder> orderRef,
+      TCSObjectReference<Vehicle> vehicleRef,
+      List<DriveOrder> driveOrders
+  )
+      throws ObjectUnknownException,
+        IllegalArgumentException;
 
   /**
    * Updates a transport order's state.
@@ -117,7 +127,9 @@ public interface InternalTransportOrderService
    * @param state The transport order's new state.
    * @throws ObjectUnknownException If the referenced transport order does not exist.
    */
-  void updateTransportOrderState(TCSObjectReference<TransportOrder> ref,
-                                 TransportOrder.State state)
+  void updateTransportOrderState(
+      TCSObjectReference<TransportOrder> ref,
+      TransportOrder.State state
+  )
       throws ObjectUnknownException;
 }

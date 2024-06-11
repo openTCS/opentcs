@@ -8,9 +8,10 @@
 package org.opentcs.kernel.services;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
@@ -45,8 +46,10 @@ import org.opentcs.util.event.EventHandler;
  * This class is the standard implementation of the {@link PlantModelService} interface.
  */
 public class StandardPlantModelService
-    extends AbstractTCSObjectService
-    implements InternalPlantModelService {
+    extends
+      AbstractTCSObjectService
+    implements
+      InternalPlantModelService {
 
   /**
    * The kernel.
@@ -85,13 +88,17 @@ public class StandardPlantModelService
    * @param notificationService The notification service.
    */
   @Inject
-  public StandardPlantModelService(LocalKernel kernel,
-                                   TCSObjectService objectService,
-                                   @GlobalSyncObject Object globalSyncObject,
-                                   PlantModelManager plantModelManager,
-                                   ModelPersister modelPersister,
-                                   @ApplicationEventBus EventHandler eventHandler,
-                                   NotificationService notificationService) {
+  public StandardPlantModelService(
+      LocalKernel kernel,
+      TCSObjectService objectService,
+      @GlobalSyncObject
+      Object globalSyncObject,
+      PlantModelManager plantModelManager,
+      ModelPersister modelPersister,
+      @ApplicationEventBus
+      EventHandler eventHandler,
+      NotificationService notificationService
+  ) {
     super(objectService);
     this.kernel = requireNonNull(kernel, "kernel");
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
@@ -132,8 +139,11 @@ public class StandardPlantModelService
       // Let listeners know we're done with the transition.
       emitModelEvent(oldModelName, newModelName, true, true);
       notificationService.publishUserNotification(
-          new UserNotification("Kernel loaded model " + newModelName,
-                               UserNotification.Level.INFORMATIONAL));
+          new UserNotification(
+              "Kernel loaded model " + newModelName,
+              UserNotification.Level.INFORMATIONAL
+          )
+      );
     }
   }
 
@@ -162,7 +172,9 @@ public class StandardPlantModelService
 
   @Override
   public void createPlantModel(PlantModelCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException, IllegalStateException {
+      throws ObjectUnknownException,
+        ObjectExistsException,
+        IllegalStateException {
     requireNonNull(to, "to");
 
     boolean kernelInOperating = kernel.getState() == Kernel.State.OPERATING;
@@ -188,8 +200,11 @@ public class StandardPlantModelService
 
     emitModelEvent(oldModelName, to.getName(), true, true);
     notificationService.publishUserNotification(
-        new UserNotification("Kernel created model " + to.getName(),
-                             UserNotification.Level.INFORMATIONAL));
+        new UserNotification(
+            "Kernel created model " + to.getName(),
+            UserNotification.Level.INFORMATIONAL
+        )
+    );
   }
 
   @Override
@@ -219,7 +234,8 @@ public class StandardPlantModelService
 
   @Override
   public void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     synchronized (globalSyncObject) {
       plantModelManager.setPathLocked(ref, locked);
     }
@@ -233,15 +249,21 @@ public class StandardPlantModelService
    * @param modelContentChanged Whether the model's content actually changed.
    * @param transitionFinished Whether the transition is finished or not.
    */
-  private void emitModelEvent(String oldModelName,
-                              String newModelName,
-                              boolean modelContentChanged,
-                              boolean transitionFinished) {
+  private void emitModelEvent(
+      String oldModelName,
+      String newModelName,
+      boolean modelContentChanged,
+      boolean transitionFinished
+  ) {
     requireNonNull(newModelName, "newModelName");
 
-    eventHandler.onEvent(new ModelTransitionEvent(oldModelName,
-                                                  newModelName,
-                                                  modelContentChanged,
-                                                  transitionFinished));
+    eventHandler.onEvent(
+        new ModelTransitionEvent(
+            oldModelName,
+            newModelName,
+            modelContentChanged,
+            transitionFinished
+        )
+    );
   }
 }

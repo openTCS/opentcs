@@ -19,7 +19,8 @@ import org.opentcs.strategies.basic.routing.PointRouter;
  * Creates {@link PointRouter} instances based on the Dijkstra algorithm.
  */
 public class DijkstraPointRouterFactory
-    extends AbstractPointRouterFactory {
+    extends
+      AbstractPointRouterFactory {
 
   /**
    * Creates a new instance.
@@ -27,13 +28,17 @@ public class DijkstraPointRouterFactory
    * @param graphProvider Provides routing graphs for vehicles.
    */
   @Inject
-  public DijkstraPointRouterFactory(@Nonnull GraphProvider graphProvider) {
+  public DijkstraPointRouterFactory(
+      @Nonnull
+      GraphProvider graphProvider
+  ) {
     super(graphProvider);
   }
 
   @Override
   protected ShortestPathAlgorithm<String, Edge> createShortestPathAlgorithm(
-      Graph<String, Edge> graph) {
+      Graph<String, Edge> graph
+  ) {
     return new DijkstraShortestPath<>(graph);
   }
 

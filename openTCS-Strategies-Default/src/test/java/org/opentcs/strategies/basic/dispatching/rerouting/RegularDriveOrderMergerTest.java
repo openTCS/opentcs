@@ -7,18 +7,19 @@
  */
 package org.opentcs.strategies.basic.dispatching.rerouting;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
@@ -82,17 +83,21 @@ class RegularDriveOrderMergerTest {
     List<Route.Step> routeSteps = new ArrayList<>();
     Point srcPoint = startPoint;
     Point destPoint = points.get(0);
-    Path path = new Path(srcPoint.getName() + " --- " + destPoint.getName(),
-                         srcPoint.getReference(),
-                         destPoint.getReference());
+    Path path = new Path(
+        srcPoint.getName() + " --- " + destPoint.getName(),
+        srcPoint.getReference(),
+        destPoint.getReference()
+    );
     routeSteps.add(new Route.Step(path, srcPoint, destPoint, Vehicle.Orientation.FORWARD, 0));
 
     for (int i = 1; i < points.size(); i++) {
       srcPoint = points.get(i - 1);
       destPoint = points.get(i);
-      path = new Path(srcPoint.getName() + " --- " + destPoint.getName(),
-                      srcPoint.getReference(),
-                      destPoint.getReference());
+      path = new Path(
+          srcPoint.getName() + " --- " + destPoint.getName(),
+          srcPoint.getReference(),
+          destPoint.getReference()
+      );
       routeSteps.add(new Route.Step(path, srcPoint, destPoint, Vehicle.Orientation.FORWARD, i));
     }
     return new Route(routeSteps, costs);
@@ -105,11 +110,11 @@ class RegularDriveOrderMergerTest {
       Route.Step stepB = routeB.getSteps().get(i);
       assertTrue(
           Objects.equals(stepA.getPath(), stepB.getPath())
-          && Objects.equals(stepA.getSourcePoint(), stepB.getSourcePoint())
-          && Objects.equals(stepA.getDestinationPoint(), stepB.getDestinationPoint())
-          && Objects.equals(stepA.getVehicleOrientation(), stepB.getVehicleOrientation())
-          && stepA.getRouteIndex() == stepB.getRouteIndex()
-          && stepA.isExecutionAllowed() == stepB.isExecutionAllowed()
+              && Objects.equals(stepA.getSourcePoint(), stepB.getSourcePoint())
+              && Objects.equals(stepA.getDestinationPoint(), stepB.getDestinationPoint())
+              && Objects.equals(stepA.getVehicleOrientation(), stepB.getVehicleOrientation())
+              && stepA.getRouteIndex() == stepB.getRouteIndex()
+              && stepA.isExecutionAllowed() == stepB.isExecutionAllowed()
       );
     }
   }

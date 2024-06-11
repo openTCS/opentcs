@@ -7,15 +7,17 @@
  */
 package org.opentcs.guing.common.event;
 
-import java.util.EventObject;
 import static java.util.Objects.requireNonNull;
+
+import java.util.EventObject;
 import org.opentcs.guing.common.application.OperationMode;
 
 /**
  * Informs listeners about a change of the application's mode of operation.
  */
 public class OperationModeChangeEvent
-    extends EventObject {
+    extends
+      EventObject {
 
   /**
    * The old operation mode.
@@ -33,9 +35,11 @@ public class OperationModeChangeEvent
    * @param oldMode The old operation mode.
    * @param newMode The new/current operation mode.
    */
-  public OperationModeChangeEvent(Object source,
-                                  OperationMode oldMode,
-                                  OperationMode newMode) {
+  public OperationModeChangeEvent(
+      Object source,
+      OperationMode oldMode,
+      OperationMode newMode
+  ) {
     super(source);
     this.oldMode = requireNonNull(oldMode, "oldMode");
     this.newMode = requireNonNull(newMode, "newMode");

@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.peripherals.dispatching;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.strategies.basic.peripherals.dispatching.phase.AssignFreePeripheralsPhase;
 import org.opentcs.strategies.basic.peripherals.dispatching.phase.AssignReservedPeripheralsPhase;
@@ -21,8 +22,9 @@ import org.slf4j.LoggerFactory;
  * Performs a full dispatch run.
  */
 public class FullDispatchTask
-    implements Runnable,
-               Lifecycle {
+    implements
+      Runnable,
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -39,17 +41,25 @@ public class FullDispatchTask
   private boolean initialized;
 
   @Inject
-  public FullDispatchTask(FinishWithdrawalsPhase finishWithdrawalsPhase,
-                          AssignReservedPeripheralsPhase assignReservedPeripheralsPhase,
-                          ReleasePeripheralsPhase releasePeripheralsPhase,
-                          AssignFreePeripheralsPhase assignFreePeripheralsPhase) {
+  public FullDispatchTask(
+      FinishWithdrawalsPhase finishWithdrawalsPhase,
+      AssignReservedPeripheralsPhase assignReservedPeripheralsPhase,
+      ReleasePeripheralsPhase releasePeripheralsPhase,
+      AssignFreePeripheralsPhase assignFreePeripheralsPhase
+  ) {
     this.finishWithdrawalsPhase = requireNonNull(finishWithdrawalsPhase, "finishWithdrawalsPhase");
-    this.assignReservedPeripheralsPhase = requireNonNull(assignReservedPeripheralsPhase,
-                                                         "assignReservedPeripheralsPhase");
-    this.releasePeripheralsPhase = requireNonNull(releasePeripheralsPhase,
-                                                  "releasePeripheralsPhase");
-    this.assignFreePeripheralsPhase = requireNonNull(assignFreePeripheralsPhase,
-                                                     "assignFreePeripheralsPhase");
+    this.assignReservedPeripheralsPhase = requireNonNull(
+        assignReservedPeripheralsPhase,
+        "assignReservedPeripheralsPhase"
+    );
+    this.releasePeripheralsPhase = requireNonNull(
+        releasePeripheralsPhase,
+        "releasePeripheralsPhase"
+    );
+    this.assignFreePeripheralsPhase = requireNonNull(
+        assignFreePeripheralsPhase,
+        "assignFreePeripheralsPhase"
+    );
   }
 
   @Override

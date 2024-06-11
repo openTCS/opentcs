@@ -17,5 +17,6 @@ import org.opentcs.data.model.Vehicle;
  * If the returned collection is empty, no reason to filter it was encountered.
  */
 public interface VehicleSelectionFilter
-    extends Function<Vehicle, Collection<String>> {
+    extends
+      Function<Vehicle, Collection<String>> {
 }

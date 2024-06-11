@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.Optional;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -25,7 +26,8 @@ import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAs
  * Assigns vehicles to the next transport orders in their respective order sequences, if any.
  */
 public class AssignSequenceSuccessorsPhase
-    implements Phase {
+    implements
+      Phase {
 
   /**
    * The object service
@@ -51,11 +53,14 @@ public class AssignSequenceSuccessorsPhase
       TCSObjectService objectService,
       Router router,
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
-      TransportOrderUtil transportOrderUtil) {
+      TransportOrderUtil transportOrderUtil
+  ) {
     this.router = requireNonNull(router, "router");
     this.objectService = requireNonNull(objectService, "objectService");
-    this.assignmentCandidateSelectionFilter = requireNonNull(assignmentCandidateSelectionFilter,
-                                                             "assignmentCandidateSelectionFilter");
+    this.assignmentCandidateSelectionFilter = requireNonNull(
+        assignmentCandidateSelectionFilter,
+        "assignmentCandidateSelectionFilter"
+    );
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
   }
 
@@ -82,8 +87,10 @@ public class AssignSequenceSuccessorsPhase
 
   @Override
   public void run() {
-    for (Vehicle vehicle : objectService.fetchObjects(Vehicle.class,
-                                                      this::readyForNextInSequence)) {
+    for (Vehicle vehicle : objectService.fetchObjects(
+        Vehicle.class,
+        this::readyForNextInSequence
+    )) {
       tryAssignNextOrderInSequence(vehicle);
     }
   }
@@ -93,16 +100,20 @@ public class AssignSequenceSuccessorsPhase
         .map(order -> computeCandidate(vehicle, order))
         .filter(candidate -> assignmentCandidateSelectionFilter.apply(candidate).isEmpty())
         .ifPresent(
-            candidate -> transportOrderUtil.assignTransportOrder(vehicle,
-                                                                 candidate.getTransportOrder(),
-                                                                 candidate.getDriveOrders())
+            candidate -> transportOrderUtil.assignTransportOrder(
+                vehicle,
+                candidate.getTransportOrder(),
+                candidate.getDriveOrders()
+            )
         );
   }
 
   private AssignmentCandidate computeCandidate(Vehicle vehicle, TransportOrder order) {
-    return router.getRoute(vehicle,
-                           objectService.fetchObject(Point.class, vehicle.getCurrentPosition()),
-                           order)
+    return router.getRoute(
+        vehicle,
+        objectService.fetchObject(Point.class, vehicle.getCurrentPosition()),
+        order
+    )
         .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders))
         .orElse(null);
   }
@@ -116,8 +127,12 @@ public class AssignSequenceSuccessorsPhase
     }
 
     // Return the next order to be processed for the sequence.
-    return Optional.of(objectService.fetchObject(TransportOrder.class,
-                                                 seq.getNextUnfinishedOrder()));
+    return Optional.of(
+        objectService.fetchObject(
+            TransportOrder.class,
+            seq.getNextUnfinishedOrder()
+        )
+    );
   }
 
   private boolean readyForNextInSequence(Vehicle vehicle) {

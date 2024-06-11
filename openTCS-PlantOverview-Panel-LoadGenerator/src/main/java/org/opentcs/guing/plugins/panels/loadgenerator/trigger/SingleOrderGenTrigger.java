@@ -17,7 +17,8 @@ import org.slf4j.LoggerFactory;
  * Triggers creation of transport orders only once.
  */
 public class SingleOrderGenTrigger
-    implements OrderGenerationTrigger {
+    implements
+      OrderGenerationTrigger {
 
   /**
    * This class's Logger.
@@ -34,8 +35,10 @@ public class SingleOrderGenTrigger
    * @param orderBatchCreator The order batch creator
    */
   public SingleOrderGenTrigger(final OrderBatchCreator orderBatchCreator) {
-    this.orderBatchCreator = Objects.requireNonNull(orderBatchCreator,
-                                                    "orderBatchCreator is null");
+    this.orderBatchCreator = Objects.requireNonNull(
+        orderBatchCreator,
+        "orderBatchCreator is null"
+    );
   }
 
   @Override

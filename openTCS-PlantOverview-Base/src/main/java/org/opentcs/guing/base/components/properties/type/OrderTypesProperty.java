@@ -16,7 +16,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property that contains a set of transport order types represented by strings.
  */
 public class OrderTypesProperty
-    extends AbstractComplexProperty {
+    extends
+      AbstractComplexProperty {
 
   /**
    * The set of transport order types.

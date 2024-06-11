@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 
 /**
  *
@@ -26,7 +27,10 @@ public class PostVehicleRoutesRequestTO {
   @JsonCreator
   @SuppressWarnings("checkstyle:LineLength")
   public PostVehicleRoutesRequestTO(
-      @Nonnull @JsonProperty(value = "destinationPoints", required = true) List<String> destinationPoints) {
+      @Nonnull
+      @JsonProperty(value = "destinationPoints", required = true)
+      List<String> destinationPoints
+  ) {
     this.destinationPoints = requireNonNull(destinationPoints, "destinationPoints");
   }
 
@@ -35,7 +39,10 @@ public class PostVehicleRoutesRequestTO {
     return sourcePoint;
   }
 
-  public PostVehicleRoutesRequestTO setSourcePoint(@Nullable String sourcePoint) {
+  public PostVehicleRoutesRequestTO setSourcePoint(
+      @Nullable
+      String sourcePoint
+  ) {
     this.sourcePoint = sourcePoint;
     return this;
   }
@@ -45,7 +52,10 @@ public class PostVehicleRoutesRequestTO {
     return destinationPoints;
   }
 
-  public PostVehicleRoutesRequestTO setDestinationPoints(@Nonnull List<String> destinationPoints) {
+  public PostVehicleRoutesRequestTO setDestinationPoints(
+      @Nonnull
+      List<String> destinationPoints
+  ) {
     this.destinationPoints = requireNonNull(destinationPoints, "destinationPoints");
     return this;
   }
@@ -55,7 +65,10 @@ public class PostVehicleRoutesRequestTO {
     return resourcesToAvoid;
   }
 
-  public PostVehicleRoutesRequestTO setResourcesToAvoid(@Nullable List<String> resourcesToAvoid) {
+  public PostVehicleRoutesRequestTO setResourcesToAvoid(
+      @Nullable
+      List<String> resourcesToAvoid
+  ) {
     this.resourcesToAvoid = resourcesToAvoid;
     return this;
   }

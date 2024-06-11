@@ -7,10 +7,11 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nullable;
 import java.util.Collections;
 import java.util.Comparator;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.components.kernel.Router;
@@ -22,7 +23,8 @@ import org.opentcs.data.model.Vehicle;
  * An abstract base class for parking position suppliers.
  */
 public abstract class AbstractParkingPositionSupplier
-    implements ParkingPositionSupplier {
+    implements
+      ParkingPositionSupplier {
 
   /**
    * The plant model service.
@@ -43,8 +45,10 @@ public abstract class AbstractParkingPositionSupplier
    * @param plantModelService The plant model service.
    * @param router A router for computing distances to parking positions.
    */
-  protected AbstractParkingPositionSupplier(InternalPlantModelService plantModelService,
-                                            Router router) {
+  protected AbstractParkingPositionSupplier(
+      InternalPlantModelService plantModelService,
+      Router router
+  ) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.router = requireNonNull(router, "router");
   }
@@ -161,18 +165,26 @@ public abstract class AbstractParkingPositionSupplier
    * @return <code>true</code> if, and only if, ALL points within the same block as the given access
    * point are NOT occupied or targeted by any other vehicle than the given one.
    */
-  private boolean isPointUnoccupiedFor(Point accessPoint,
-                                       Vehicle vehicle,
-                                       Set<Point> targetedPoints) {
+  private boolean isPointUnoccupiedFor(
+      Point accessPoint,
+      Vehicle vehicle,
+      Set<Point> targetedPoints
+  ) {
     return expandPoints(accessPoint).stream()
-        .allMatch(point -> !pointOccupiedOrTargetedByOtherVehicle(point,
-                                                                  vehicle,
-                                                                  targetedPoints));
+        .allMatch(
+            point -> !pointOccupiedOrTargetedByOtherVehicle(
+                point,
+                vehicle,
+                targetedPoints
+            )
+        );
   }
 
-  private boolean pointOccupiedOrTargetedByOtherVehicle(Point pointToCheck,
-                                                        Vehicle vehicle,
-                                                        Set<Point> targetedPoints) {
+  private boolean pointOccupiedOrTargetedByOtherVehicle(
+      Point pointToCheck,
+      Vehicle vehicle,
+      Set<Point> targetedPoints
+  ) {
     if (pointToCheck.getOccupyingVehicle() != null
         && !pointToCheck.getOccupyingVehicle().equals(vehicle.getReference())) {
       return true;
@@ -183,11 +195,15 @@ public abstract class AbstractParkingPositionSupplier
     return false;
   }
 
-  private PointCandidate parkingPositionCandidate(Vehicle vehicle,
-                                                  Point srcPosition,
-                                                  Point destPosition) {
-    return new PointCandidate(destPosition,
-                              router.getCosts(vehicle, srcPosition, destPosition, Set.of()));
+  private PointCandidate parkingPositionCandidate(
+      Vehicle vehicle,
+      Point srcPosition,
+      Point destPosition
+  ) {
+    return new PointCandidate(
+        destPosition,
+        router.getCosts(vehicle, srcPosition, destPosition, Set.of())
+    );
   }
 
   private static class PointCandidate {

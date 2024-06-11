@@ -24,8 +24,10 @@ import org.opentcs.data.order.TransportOrder;
  * Delegates method invocations to the corresponding remote service.
  */
 class RemoteTransportOrderServiceProxy
-    extends RemoteTCSObjectServiceProxy<RemoteTransportOrderService>
-    implements TransportOrderService {
+    extends
+      RemoteTCSObjectServiceProxy<RemoteTransportOrderService>
+    implements
+      TransportOrderService {
 
   /**
    * Creates a new instance.
@@ -48,7 +50,9 @@ class RemoteTransportOrderServiceProxy
 
   @Override
   public TransportOrder createTransportOrder(TransportOrderCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        ObjectExistsException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -61,7 +65,8 @@ class RemoteTransportOrderServiceProxy
 
   @Override
   public void markOrderSequenceComplete(TCSObjectReference<OrderSequence> ref)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -73,9 +78,12 @@ class RemoteTransportOrderServiceProxy
   }
 
   @Override
-  public void updateTransportOrderIntendedVehicle(TCSObjectReference<TransportOrder> orderRef,
-                                                  TCSObjectReference<Vehicle> vehicleRef)
-      throws ObjectUnknownException, IllegalArgumentException {
+  public void updateTransportOrderIntendedVehicle(
+      TCSObjectReference<TransportOrder> orderRef,
+      TCSObjectReference<Vehicle> vehicleRef
+  )
+      throws ObjectUnknownException,
+        IllegalArgumentException {
     checkServiceAvailability();
 
     try {

@@ -7,6 +7,9 @@
  */
 package org.opentcs.virtualvehicle;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.virtualvehicle.I18nLoopbackCommAdapter.BUNDLE_PATH;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
@@ -14,7 +17,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.SwingUtilities;
@@ -33,7 +35,6 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.CallWrapper;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.gui.StringListCellRenderer;
-import static org.opentcs.virtualvehicle.I18nLoopbackCommAdapter.BUNDLE_PATH;
 import org.opentcs.virtualvehicle.commands.CurrentMovementCommandFailedCommand;
 import org.opentcs.virtualvehicle.commands.PublishEventCommand;
 import org.opentcs.virtualvehicle.commands.SetEnergyLevelCommand;
@@ -59,7 +60,8 @@ import org.slf4j.LoggerFactory;
  * The panel corresponding to the LoopbackCommunicationAdapter.
  */
 public class LoopbackCommAdapterPanel
-    extends VehicleCommAdapterPanel {
+    extends
+      VehicleCommAdapterPanel {
 
   /**
    * The resource bundle.
@@ -91,9 +93,14 @@ public class LoopbackCommAdapterPanel
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public LoopbackCommAdapterPanel(@Assisted LoopbackVehicleModelTO processModel,
-                                  @Assisted VehicleService vehicleService,
-                                  @ServiceCallWrapper CallWrapper callWrapper) {
+  public LoopbackCommAdapterPanel(
+      @Assisted
+      LoopbackVehicleModelTO processModel,
+      @Assisted
+      VehicleService vehicleService,
+      @ServiceCallWrapper
+      CallWrapper callWrapper
+  ) {
 
     this.processModel = requireNonNull(processModel, "processModel");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
@@ -123,66 +130,98 @@ public class LoopbackCommAdapterPanel
     }
   }
 
-  private void updateLoopbackVehicleModelData(String attributeChanged,
-                                              LoopbackVehicleModelTO processModel) {
-    if (Objects.equals(attributeChanged,
-                       LoopbackVehicleModel.Attribute.OPERATING_TIME.name())) {
+  private void updateLoopbackVehicleModelData(
+      String attributeChanged,
+      LoopbackVehicleModelTO processModel
+  ) {
+    if (Objects.equals(
+        attributeChanged,
+        LoopbackVehicleModel.Attribute.OPERATING_TIME.name()
+    )) {
       updateOperatingTime(processModel.getOperatingTime());
     }
-    else if (Objects.equals(attributeChanged,
-                            LoopbackVehicleModel.Attribute.ACCELERATION.name())) {
+    else if (Objects.equals(
+        attributeChanged,
+        LoopbackVehicleModel.Attribute.ACCELERATION.name()
+    )) {
       updateMaxAcceleration(processModel.getMaxAcceleration());
     }
-    else if (Objects.equals(attributeChanged,
-                            LoopbackVehicleModel.Attribute.DECELERATION.name())) {
+    else if (Objects.equals(
+        attributeChanged,
+        LoopbackVehicleModel.Attribute.DECELERATION.name()
+    )) {
       updateMaxDeceleration(processModel.getMaxDeceleration());
     }
-    else if (Objects.equals(attributeChanged,
-                            LoopbackVehicleModel.Attribute.MAX_FORWARD_VELOCITY.name())) {
+    else if (Objects.equals(
+        attributeChanged,
+        LoopbackVehicleModel.Attribute.MAX_FORWARD_VELOCITY.name()
+    )) {
       updateMaxForwardVelocity(processModel.getMaxFwdVelocity());
     }
-    else if (Objects.equals(attributeChanged,
-                            LoopbackVehicleModel.Attribute.MAX_REVERSE_VELOCITY.name())) {
+    else if (Objects.equals(
+        attributeChanged,
+        LoopbackVehicleModel.Attribute.MAX_REVERSE_VELOCITY.name()
+    )) {
       updateMaxReverseVelocity(processModel.getMaxRevVelocity());
     }
-    else if (Objects.equals(attributeChanged,
-                            LoopbackVehicleModel.Attribute.SINGLE_STEP_MODE.name())) {
+    else if (Objects.equals(
+        attributeChanged,
+        LoopbackVehicleModel.Attribute.SINGLE_STEP_MODE.name()
+    )) {
       updateSingleStepMode(processModel.isSingleStepModeEnabled());
     }
-    else if (Objects.equals(attributeChanged,
-                            LoopbackVehicleModel.Attribute.VEHICLE_PAUSED.name())) {
+    else if (Objects.equals(
+        attributeChanged,
+        LoopbackVehicleModel.Attribute.VEHICLE_PAUSED.name()
+    )) {
       updateVehiclePaused(processModel.isVehiclePaused());
     }
   }
 
-  private void updateVehicleProcessModelData(String attributeChanged,
-                                             VehicleProcessModelTO processModel) {
-    if (Objects.equals(attributeChanged,
-                       VehicleProcessModel.Attribute.COMM_ADAPTER_ENABLED.name())) {
+  private void updateVehicleProcessModelData(
+      String attributeChanged,
+      VehicleProcessModelTO processModel
+  ) {
+    if (Objects.equals(
+        attributeChanged,
+        VehicleProcessModel.Attribute.COMM_ADAPTER_ENABLED.name()
+    )) {
       updateCommAdapterEnabled(processModel.isCommAdapterEnabled());
     }
-    else if (Objects.equals(attributeChanged,
-                            VehicleProcessModel.Attribute.POSITION.name())) {
+    else if (Objects.equals(
+        attributeChanged,
+        VehicleProcessModel.Attribute.POSITION.name()
+    )) {
       updatePosition(processModel.getPosition());
     }
-    else if (Objects.equals(attributeChanged,
-                            VehicleProcessModel.Attribute.STATE.name())) {
+    else if (Objects.equals(
+        attributeChanged,
+        VehicleProcessModel.Attribute.STATE.name()
+    )) {
       updateVehicleState(processModel.getState());
     }
-    else if (Objects.equals(attributeChanged,
-                            VehicleProcessModel.Attribute.PRECISE_POSITION.name())) {
+    else if (Objects.equals(
+        attributeChanged,
+        VehicleProcessModel.Attribute.PRECISE_POSITION.name()
+    )) {
       updatePrecisePosition(processModel.getPrecisePosition());
     }
-    else if (Objects.equals(attributeChanged,
-                            VehicleProcessModel.Attribute.ORIENTATION_ANGLE.name())) {
+    else if (Objects.equals(
+        attributeChanged,
+        VehicleProcessModel.Attribute.ORIENTATION_ANGLE.name()
+    )) {
       updateOrientationAngle(processModel.getOrientationAngle());
     }
-    else if (Objects.equals(attributeChanged,
-                            VehicleProcessModel.Attribute.ENERGY_LEVEL.name())) {
+    else if (Objects.equals(
+        attributeChanged,
+        VehicleProcessModel.Attribute.ENERGY_LEVEL.name()
+    )) {
       updateEnergyLevel(processModel.getEnergyLevel());
     }
-    else if (Objects.equals(attributeChanged,
-                            VehicleProcessModel.Attribute.LOAD_HANDLING_DEVICES.name())) {
+    else if (Objects.equals(
+        attributeChanged,
+        VehicleProcessModel.Attribute.LOAD_HANDLING_DEVICES.name()
+    )) {
       updateVehicleLoadHandlingDevice(processModel.getLoadHandlingDevices());
     }
   }
@@ -302,8 +341,8 @@ public class LoopbackCommAdapterPanel
 
   private TCSObjectReference<Vehicle> getVehicleReference()
       throws Exception {
-    return callWrapper.call(() -> vehicleService.
-        fetchObject(Vehicle.class, processModel.getName())).getReference();
+    return callWrapper.call(() -> vehicleService.fetchObject(Vehicle.class, processModel.getName()))
+        .getReference();
   }
 
   private void sendCommAdapterCommand(AdapterCommand command) {
@@ -316,6 +355,7 @@ public class LoopbackCommAdapterPanel
     }
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -983,6 +1023,8 @@ public class LoopbackCommAdapterPanel
 
     getAccessibleContext().setAccessibleName(bundle.getString("loopbackCommAdapterPanel.accessibleName")); // NOI18N
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void singleModeRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_singleModeRadioButtonActionPerformed
     if (singleModeRadioButton.isSelected()) {
@@ -1004,23 +1046,25 @@ public class LoopbackCommAdapterPanel
     sendCommAdapterCommand(new TriggerCommand());
   }//GEN-LAST:event_triggerButtonActionPerformed
 
-private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkBoxEnableActionPerformed
-  try {
-    Vehicle vehicle = callWrapper.call(() -> vehicleService.fetchObject(Vehicle.class, processModel.getName()));
+  private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkBoxEnableActionPerformed
+    try {
+      Vehicle vehicle = callWrapper.call(
+          () -> vehicleService.fetchObject(Vehicle.class, processModel.getName())
+      );
 
-    if (chkBoxEnable.isSelected()) {
-      callWrapper.call(() -> vehicleService.enableCommAdapter(vehicle.getReference()));
-    }
-    else {
-      callWrapper.call(() -> vehicleService.disableCommAdapter(vehicle.getReference()));
-    }
+      if (chkBoxEnable.isSelected()) {
+        callWrapper.call(() -> vehicleService.enableCommAdapter(vehicle.getReference()));
+      }
+      else {
+        callWrapper.call(() -> vehicleService.disableCommAdapter(vehicle.getReference()));
+      }
 
-    setStatePanelEnabled(chkBoxEnable.isSelected());
-  }
-  catch (Exception ex) {
-    LOG.warn("Error enabling/disabling comm adapter", ex);
-  }
-}//GEN-LAST:event_chkBoxEnableActionPerformed
+      setStatePanelEnabled(chkBoxEnable.isSelected());
+    }
+    catch (Exception ex) {
+      LOG.warn("Error enabling/disabling comm adapter", ex);
+    }
+  }//GEN-LAST:event_chkBoxEnableActionPerformed
 
 
   private void precisePosTextAreaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_precisePosTextAreaMouseClicked
@@ -1028,15 +1072,19 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
       Triple pos = processModel.getPrecisePosition();
       // Create panel and dialog
       TripleTextInputPanel.Builder builder
-          = new TripleTextInputPanel.Builder(BUNDLE.getString("loopbackCommAdapterPanel.dialog_setPrecisePosition.title"));
+          = new TripleTextInputPanel.Builder(
+              BUNDLE.getString("loopbackCommAdapterPanel.dialog_setPrecisePosition.title")
+          );
       builder.setUnitLabels("mm");
       builder.setLabels("X:", "Y:", "Z:");
       builder.enableResetButton(null);
       builder.enableValidation(TextInputPanel.TextInputValidator.REGEX_INT);
       if (pos != null) {
-        builder.setInitialValues(Long.toString(pos.getX()),
-                                 Long.toString(pos.getY()),
-                                 Long.toString(pos.getZ()));
+        builder.setInitialValues(
+            Long.toString(pos.getX()),
+            Long.toString(pos.getY()),
+            Long.toString(pos.getZ())
+        );
       }
       InputPanel panel = builder.build();
       InputDialog dialog = new InputDialog(panel);
@@ -1049,7 +1097,9 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         }
         else {
           // Set new precise position
-          long x, y, z;
+          long x;
+          long y;
+          long z;
           String[] newPos = (String[]) dialog.getInput();
           try {
             x = Long.parseLong(newPos[0]);
@@ -1073,8 +1123,10 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
     Vehicle.State currentState = processModel.getState();
     // Create panel and dialog
-    InputPanel panel = new DropdownListInputPanel.Builder<>(BUNDLE.getString("loopbackCommAdapterPanel.dialog_setState.title"),
-                                                            Arrays.asList(Vehicle.State.values()))
+    InputPanel panel = new DropdownListInputPanel.Builder<>(
+        BUNDLE.getString("loopbackCommAdapterPanel.dialog_setState.title"),
+        Arrays.asList(Vehicle.State.values())
+    )
         .setSelectionRepresenter(x -> x == null ? "" : x.name())
         .setLabel(BUNDLE.getString("loopbackCommAdapterPanel.label_state.text"))
         .setInitialSelection(currentState)
@@ -1120,7 +1172,8 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     }
     // Create panel and dialog
     InputPanel panel = new DropdownListInputPanel.Builder<>(
-        BUNDLE.getString("loopbackCommAdapterPanel.dialog_setPosition.title"), pointList)
+        BUNDLE.getString("loopbackCommAdapterPanel.dialog_setPosition.title"), pointList
+    )
         .setSelectionRepresenter(x -> x == null ? "" : x.getName())
         .setLabel(BUNDLE.getString("loopbackCommAdapterPanel.label_position.text"))
         .setEditable(true)
@@ -1150,7 +1203,8 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     String initialValue = (Double.isNaN(currentAngle) ? "" : Double.toString(currentAngle));
     // Create dialog and panel
     InputPanel panel = new SingleTextInputPanel.Builder(
-        BUNDLE.getString("loopbackCommAdapterPanel.dialog_setOrientationAngle.title"))
+        BUNDLE.getString("loopbackCommAdapterPanel.dialog_setOrientationAngle.title")
+    )
         .setLabel(BUNDLE.getString("loopbackCommAdapterPanel.label_orientationAngle.text"))
         .setUnitLabel("<html>&#186;")
         .setInitialValue(initialValue)
@@ -1201,7 +1255,8 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
     // Create panel and dialog
     InputPanel panel = new SingleTextInputPanel.Builder(
-        BUNDLE.getString("loopbackCommAdapterPanel.dialog_setEnergyLevel.title"))
+        BUNDLE.getString("loopbackCommAdapterPanel.dialog_setEnergyLevel.title")
+    )
         .setLabel(BUNDLE.getString("loopbackCommAdapterPanel.label_energyLevel.text"))
         .setUnitLabel("%")
         .setInitialValue(energyLevelTxt.getText())
@@ -1230,8 +1285,10 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
   private void dispatchEventButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dispatchEventButtonActionPerformed
     String appendix = includeAppendixCheckBox.isSelected() ? appendixTxt.getText() : null;
-    VehicleCommAdapterEvent event = new VehicleCommAdapterEvent(processModel.getName(),
-                                                                appendix);
+    VehicleCommAdapterEvent event = new VehicleCommAdapterEvent(
+        processModel.getName(),
+        appendix
+    );
     sendCommAdapterCommand(new PublishEventCommand(event));
   }//GEN-LAST:event_dispatchEventButtonActionPerformed
 
@@ -1240,9 +1297,13 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
   }//GEN-LAST:event_dispatchCommandFailedButtonActionPerformed
 
   private void propSetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_propSetButtonActionPerformed
-    sendCommAdapterCommand(new SetVehiclePropertyCommand(keyTextField.getText(),
-                                                         setPropValueRadioBtn.isSelected()
-                                                         ? valueTextField.getText() : null));
+    sendCommAdapterCommand(
+        new SetVehiclePropertyCommand(
+            keyTextField.getText(),
+            setPropValueRadioBtn.isSelected()
+                ? valueTextField.getText() : null
+        )
+    );
   }//GEN-LAST:event_propSetButtonActionPerformed
 
   private void removePropRadioBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removePropRadioBtnActionPerformed
@@ -1255,7 +1316,8 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
   private void lHDCheckboxClicked(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lHDCheckboxClicked
     List<LoadHandlingDevice> devices = Arrays.asList(
-        new LoadHandlingDevice(LoopbackCommunicationAdapter.LHD_NAME, lHDCheckbox.isSelected()));
+        new LoadHandlingDevice(LoopbackCommunicationAdapter.LHD_NAME, lHDCheckbox.isSelected())
+    );
     sendCommAdapterCommand(new SetLoadHandlingDevicesCommand(devices));
   }//GEN-LAST:event_lHDCheckboxClicked
 
@@ -1270,9 +1332,15 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
    */
   private void setPrecisePosText(Triple precisePos) {
     // Convert values to strings
-    String xS = BUNDLE.getString("loopbackCommAdapterPanel.textArea_precisePosition.positionNotSetPlaceholder");
-    String yS = BUNDLE.getString("loopbackCommAdapterPanel.textArea_precisePosition.positionNotSetPlaceholder");
-    String zS = BUNDLE.getString("loopbackCommAdapterPanel.textArea_precisePosition.positionNotSetPlaceholder");
+    String xS = BUNDLE.getString(
+        "loopbackCommAdapterPanel.textArea_precisePosition.positionNotSetPlaceholder"
+    );
+    String yS = BUNDLE.getString(
+        "loopbackCommAdapterPanel.textArea_precisePosition.positionNotSetPlaceholder"
+    );
+    String zS = BUNDLE.getString(
+        "loopbackCommAdapterPanel.textArea_precisePosition.positionNotSetPlaceholder"
+    );
 
     if (precisePos != null) {
       xS = String.valueOf(precisePos.getX());
@@ -1293,6 +1361,8 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     precisePosTextArea.setText(text.toString());
   }
 
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel PropsPowerInnerContainerPanel;
   private javax.swing.JPanel PropsPowerOuterContainerPanel;
@@ -1360,5 +1430,5 @@ private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
   private javax.swing.JPanel vehicleStatePanel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
-
+  // FORMATTER:ON
 }

@@ -7,10 +7,11 @@
  */
 package org.opentcs.util.persistence.v005;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -21,19 +22,22 @@ import javax.xml.bind.annotation.XmlType;
 /**
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(propOrder = {"name",
-                      "sourcePoint",
-                      "destinationPoint",
-                      "length",
-                      "maxVelocity",
-                      "maxReverseVelocity",
-                      "peripheralOperations",
-                      "locked",
-                      "vehicleEnvelopes",
-                      "properties",
-                      "pathLayout"})
+@XmlType(
+    propOrder = {"name",
+        "sourcePoint",
+        "destinationPoint",
+        "length",
+        "maxVelocity",
+        "maxReverseVelocity",
+        "peripheralOperations",
+        "locked",
+        "vehicleEnvelopes",
+        "properties",
+        "pathLayout"}
+)
 public class PathTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   private String sourcePoint = "";
   private String destinationPoint = "";
@@ -56,7 +60,10 @@ public class PathTO
     return sourcePoint;
   }
 
-  public PathTO setSourcePoint(@Nonnull String sourcePoint) {
+  public PathTO setSourcePoint(
+      @Nonnull
+      String sourcePoint
+  ) {
     requireNonNull(sourcePoint, "sourcePoint");
     this.sourcePoint = sourcePoint;
     return this;
@@ -67,7 +74,10 @@ public class PathTO
     return destinationPoint;
   }
 
-  public PathTO setDestinationPoint(@Nonnull String destinationPoint) {
+  public PathTO setDestinationPoint(
+      @Nonnull
+      String destinationPoint
+  ) {
     requireNonNull(destinationPoint, "destinationPoint");
     this.destinationPoint = destinationPoint;
     return this;
@@ -79,7 +89,10 @@ public class PathTO
     return length;
   }
 
-  public PathTO setLength(@Nonnull Long length) {
+  public PathTO setLength(
+      @Nonnull
+      Long length
+  ) {
     requireNonNull(length, "length");
     this.length = length;
     return this;
@@ -91,7 +104,10 @@ public class PathTO
     return maxVelocity;
   }
 
-  public PathTO setMaxVelocity(@Nonnull Long maxVelocity) {
+  public PathTO setMaxVelocity(
+      @Nonnull
+      Long maxVelocity
+  ) {
     requireNonNull(maxVelocity, "maxVelocity");
     this.maxVelocity = maxVelocity;
     return this;
@@ -103,7 +119,10 @@ public class PathTO
     return maxReverseVelocity;
   }
 
-  public PathTO setMaxReverseVelocity(@Nonnull Long maxReverseVelocity) {
+  public PathTO setMaxReverseVelocity(
+      @Nonnull
+      Long maxReverseVelocity
+  ) {
     requireNonNull(maxReverseVelocity, "maxReverseVelocity");
     this.maxReverseVelocity = maxReverseVelocity;
     return this;
@@ -134,7 +153,10 @@ public class PathTO
     return vehicleEnvelopes;
   }
 
-  public PathTO setVehicleEnvelopes(@Nonnull List<VehicleEnvelopeTO> vehicleEnvelopes) {
+  public PathTO setVehicleEnvelopes(
+      @Nonnull
+      List<VehicleEnvelopeTO> vehicleEnvelopes
+  ) {
     this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     return this;
   }
@@ -144,7 +166,10 @@ public class PathTO
     return pathLayout;
   }
 
-  public PathTO setPathLayout(@Nonnull PathLayout pathLayout) {
+  public PathTO setPathLayout(
+      @Nonnull
+      PathLayout pathLayout
+  ) {
     this.pathLayout = requireNonNull(pathLayout, "pathLayout");
     return this;
   }
@@ -168,7 +193,10 @@ public class PathTO
       return connectionType;
     }
 
-    public PathLayout setConnectionType(@Nonnull String connectionType) {
+    public PathLayout setConnectionType(
+        @Nonnull
+        String connectionType
+    ) {
       this.connectionType = requireNonNull(connectionType, "connectionType");
       return this;
     }
@@ -178,7 +206,10 @@ public class PathTO
       return layerId;
     }
 
-    public PathLayout setLayerId(@Nonnull Integer layerId) {
+    public PathLayout setLayerId(
+        @Nonnull
+        Integer layerId
+    ) {
       this.layerId = requireNonNull(layerId, "layerId");
       return this;
     }
@@ -188,7 +219,10 @@ public class PathTO
       return controlPoints;
     }
 
-    public PathLayout setControlPoints(@Nonnull List<ControlPoint> controlPoints) {
+    public PathLayout setControlPoints(
+        @Nonnull
+        List<ControlPoint> controlPoints
+    ) {
       this.controlPoints = requireNonNull(controlPoints, "controlPoints");
       return this;
     }
@@ -212,7 +246,10 @@ public class PathTO
       return x;
     }
 
-    public ControlPoint setX(@Nonnull Long x) {
+    public ControlPoint setX(
+        @Nonnull
+        Long x
+    ) {
       this.x = requireNonNull(x, "x");
       return this;
     }
@@ -222,7 +259,10 @@ public class PathTO
       return y;
     }
 
-    public ControlPoint setY(@Nonnull Long y) {
+    public ControlPoint setY(
+        @Nonnull
+        Long y
+    ) {
       this.y = requireNonNull(y, "y");
       return this;
     }

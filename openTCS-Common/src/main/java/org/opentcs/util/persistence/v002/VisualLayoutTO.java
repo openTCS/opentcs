@@ -7,10 +7,11 @@
  */
 package org.opentcs.util.persistence.v002;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -21,10 +22,13 @@ import javax.xml.bind.annotation.XmlType;
 /**
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(propOrder = {"name", "id", "scaleX", "scaleY", "colors", "shapeLayoutElements",
-                      "modelLayoutElements", "viewBookmarks", "properties"})
+@XmlType(
+    propOrder = {"name", "id", "scaleX", "scaleY", "colors", "shapeLayoutElements",
+        "modelLayoutElements", "viewBookmarks", "properties"}
+)
 public class VisualLayoutTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   private Float scaleX = 0.0F;
   private Float scaleY = 0.0F;
@@ -44,7 +48,10 @@ public class VisualLayoutTO
     return scaleX;
   }
 
-  public VisualLayoutTO setScaleX(@Nonnull Float scaleX) {
+  public VisualLayoutTO setScaleX(
+      @Nonnull
+      Float scaleX
+  ) {
     requireNonNull(scaleX, "scaleX");
     this.scaleX = scaleX;
     return this;
@@ -55,7 +62,10 @@ public class VisualLayoutTO
     return scaleY;
   }
 
-  public VisualLayoutTO setScaleY(@Nonnull Float scaleY) {
+  public VisualLayoutTO setScaleY(
+      @Nonnull
+      Float scaleY
+  ) {
     requireNonNull(scaleY, "scaleY");
     this.scaleY = scaleY;
     return this;
@@ -66,7 +76,10 @@ public class VisualLayoutTO
     return colors;
   }
 
-  public VisualLayoutTO setColors(@Nonnull List<Color> colors) {
+  public VisualLayoutTO setColors(
+      @Nonnull
+      List<Color> colors
+  ) {
     requireNonNull(colors, "colors");
     this.colors = colors;
     return this;
@@ -78,7 +91,8 @@ public class VisualLayoutTO
   }
 
   public VisualLayoutTO setShapeLayoutElements(
-      @Nonnull List<ShapeLayoutElement> shapeLayoutElements
+      @Nonnull
+      List<ShapeLayoutElement> shapeLayoutElements
   ) {
     requireNonNull(shapeLayoutElements, "shapeLayoutElements");
     this.shapeLayoutElements = shapeLayoutElements;
@@ -91,7 +105,8 @@ public class VisualLayoutTO
   }
 
   public VisualLayoutTO setModelLayoutElements(
-      @Nonnull List<ModelLayoutElement> modelLayoutElements
+      @Nonnull
+      List<ModelLayoutElement> modelLayoutElements
   ) {
     requireNonNull(modelLayoutElements, "modelLayoutElements");
     this.modelLayoutElements = modelLayoutElements;
@@ -103,7 +118,10 @@ public class VisualLayoutTO
     return viewBookmarks;
   }
 
-  public VisualLayoutTO setViewBookmarks(@Nonnull List<ViewBookmark> viewBookmarks) {
+  public VisualLayoutTO setViewBookmarks(
+      @Nonnull
+      List<ViewBookmark> viewBookmarks
+  ) {
     requireNonNull(viewBookmarks, "viewBookmarks");
     this.viewBookmarks = viewBookmarks;
     return this;
@@ -129,7 +147,10 @@ public class VisualLayoutTO
       return name;
     }
 
-    public Color setName(@Nonnull String name) {
+    public Color setName(
+        @Nonnull
+        String name
+    ) {
       requireNonNull(name, "name");
       this.name = name;
       return this;
@@ -141,7 +162,10 @@ public class VisualLayoutTO
       return redValue;
     }
 
-    public Color setRedValue(@Nonnull Long redValue) {
+    public Color setRedValue(
+        @Nonnull
+        Long redValue
+    ) {
       requireNonNull(redValue, "redValue");
       this.redValue = redValue;
       return this;
@@ -153,7 +177,10 @@ public class VisualLayoutTO
       return greenValue;
     }
 
-    public Color setGreenValue(@Nonnull Long greenValue) {
+    public Color setGreenValue(
+        @Nonnull
+        Long greenValue
+    ) {
       requireNonNull(greenValue, "greenValue");
       this.greenValue = greenValue;
       return this;
@@ -165,7 +192,10 @@ public class VisualLayoutTO
       return blueValue;
     }
 
-    public Color setBlueValue(@Nonnull Long blueValue) {
+    public Color setBlueValue(
+        @Nonnull
+        Long blueValue
+    ) {
       requireNonNull(blueValue, "blueValue");
       this.blueValue = blueValue;
       return this;
@@ -191,7 +221,10 @@ public class VisualLayoutTO
       return layer;
     }
 
-    public ShapeLayoutElement setLayer(@Nonnull Long layer) {
+    public ShapeLayoutElement setLayer(
+        @Nonnull
+        Long layer
+    ) {
       requireNonNull(layer, "layer");
       this.layer = layer;
       return this;
@@ -202,7 +235,10 @@ public class VisualLayoutTO
       return properties;
     }
 
-    public ShapeLayoutElement setProperties(@Nonnull List<PropertyTO> properties) {
+    public ShapeLayoutElement setProperties(
+        @Nonnull
+        List<PropertyTO> properties
+    ) {
       requireNonNull(properties, "properties");
       this.properties = properties;
       return this;
@@ -228,7 +264,10 @@ public class VisualLayoutTO
       return visualizedObjectName;
     }
 
-    public ModelLayoutElement setVisualizedObjectName(@Nonnull String visualizedObjectName) {
+    public ModelLayoutElement setVisualizedObjectName(
+        @Nonnull
+        String visualizedObjectName
+    ) {
       requireNonNull(visualizedObjectName, "visualizedObjectName");
       this.visualizedObjectName = visualizedObjectName;
       return this;
@@ -240,7 +279,10 @@ public class VisualLayoutTO
       return layer;
     }
 
-    public ModelLayoutElement setLayer(@Nonnull Long layer) {
+    public ModelLayoutElement setLayer(
+        @Nonnull
+        Long layer
+    ) {
       requireNonNull(layer, "layer");
       this.layer = layer;
       return this;
@@ -251,7 +293,10 @@ public class VisualLayoutTO
       return properties;
     }
 
-    public ModelLayoutElement setProperties(@Nonnull List<PropertyTO> properties) {
+    public ModelLayoutElement setProperties(
+        @Nonnull
+        List<PropertyTO> properties
+    ) {
       requireNonNull(properties, "properties");
       this.properties = properties;
       return this;
@@ -280,7 +325,10 @@ public class VisualLayoutTO
       return label;
     }
 
-    public ViewBookmark setLabel(@Nonnull String label) {
+    public ViewBookmark setLabel(
+        @Nonnull
+        String label
+    ) {
       requireNonNull(label, "label");
       this.label = label;
       return this;
@@ -292,7 +340,10 @@ public class VisualLayoutTO
       return centerX;
     }
 
-    public ViewBookmark setCenterX(@Nonnull Integer centerX) {
+    public ViewBookmark setCenterX(
+        @Nonnull
+        Integer centerX
+    ) {
       requireNonNull(centerX, "centerX");
       this.centerX = centerX;
       return this;
@@ -304,7 +355,10 @@ public class VisualLayoutTO
       return centerY;
     }
 
-    public ViewBookmark setCenterY(@Nonnull Integer centerY) {
+    public ViewBookmark setCenterY(
+        @Nonnull
+        Integer centerY
+    ) {
       requireNonNull(centerY, "centerY");
       this.centerY = centerY;
       return this;
@@ -316,7 +370,10 @@ public class VisualLayoutTO
       return viewScaleX;
     }
 
-    public ViewBookmark setViewScaleX(@Nonnull Float viewScaleX) {
+    public ViewBookmark setViewScaleX(
+        @Nonnull
+        Float viewScaleX
+    ) {
       requireNonNull(viewScaleX, "viewScaleX");
       this.viewScaleX = viewScaleX;
       return this;
@@ -328,7 +385,10 @@ public class VisualLayoutTO
       return viewScaleY;
     }
 
-    public ViewBookmark setViewScaleY(@Nonnull Float viewScaleY) {
+    public ViewBookmark setViewScaleY(
+        @Nonnull
+        Float viewScaleY
+    ) {
       requireNonNull(viewScaleY, "viewScaleY");
       this.viewScaleY = viewScaleY;
       return this;
@@ -340,7 +400,10 @@ public class VisualLayoutTO
       return viewRotation;
     }
 
-    public ViewBookmark setViewRotation(@Nonnull Integer viewRotation) {
+    public ViewBookmark setViewRotation(
+        @Nonnull
+        Integer viewRotation
+    ) {
       requireNonNull(viewRotation, "viewRotation");
       this.viewRotation = viewRotation;
       return this;

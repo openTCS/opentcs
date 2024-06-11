@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
  * Configures/binds the loopback communication adapters of the openTCS kernel.
  */
 public class LoopbackCommAdapterModule
-    extends KernelInjectionModule {
+    extends
+      KernelInjectionModule {
 
   /**
    * This class's logger.
@@ -32,8 +33,10 @@ public class LoopbackCommAdapterModule
   @Override
   protected void configure() {
     VirtualVehicleConfiguration configuration
-        = getConfigBindingProvider().get(VirtualVehicleConfiguration.PREFIX,
-                                         VirtualVehicleConfiguration.class);
+        = getConfigBindingProvider().get(
+            VirtualVehicleConfiguration.PREFIX,
+            VirtualVehicleConfiguration.class
+        );
 
     if (!configuration.enable()) {
       LOG.info("Loopback driver disabled by configuration.");

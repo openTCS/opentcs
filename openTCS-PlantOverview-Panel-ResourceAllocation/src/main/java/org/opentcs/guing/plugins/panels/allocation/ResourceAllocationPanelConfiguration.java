@@ -24,6 +24,7 @@ public interface ResourceAllocationPanelConfiguration {
   @ConfigurationEntry(
       type = "Boolean",
       description = "Whether to enable to register/enable the resource allocation panel.",
-      orderKey = "0_enable")
+      orderKey = "0_enable"
+  )
   boolean enable();
 }

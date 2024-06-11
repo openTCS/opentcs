@@ -7,20 +7,21 @@
  */
 package org.opentcs.kernel.peripherals;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.Location;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterFactory;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,8 @@ import org.slf4j.LoggerFactory;
  * A registry for all peripheral communication adapters in the system.
  */
 public class PeripheralCommAdapterRegistry
-    implements Lifecycle {
+    implements
+      Lifecycle {
 
   /**
    * This class's Logger.
@@ -53,8 +55,10 @@ public class PeripheralCommAdapterRegistry
   public PeripheralCommAdapterRegistry(Set<PeripheralCommAdapterFactory> factories) {
     requireNonNull(factories, "factories");
     for (PeripheralCommAdapterFactory factory : factories) {
-      LOG.info("Setting up peripheral communication adapter factory: {}",
-               factory.getClass().getName());
+      LOG.info(
+          "Setting up peripheral communication adapter factory: {}",
+          factory.getClass().getName()
+      );
       this.factories.put(factory.getDescription(), factory);
     }
   }
@@ -107,11 +111,15 @@ public class PeripheralCommAdapterRegistry
    */
   @Nonnull
   public PeripheralCommAdapterFactory findFactoryFor(
-      @Nonnull PeripheralCommAdapterDescription description) {
+      @Nonnull
+      PeripheralCommAdapterDescription description
+  ) {
     requireNonNull(description, "description");
-    checkArgument(factories.get(description) != null,
-                  "No factory for description %s",
-                  description);
+    checkArgument(
+        factories.get(description) != null,
+        "No factory for description %s",
+        description
+    );
 
     return factories.get(description);
   }

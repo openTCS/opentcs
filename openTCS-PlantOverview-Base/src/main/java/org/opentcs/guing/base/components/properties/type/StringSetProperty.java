@@ -16,7 +16,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property that contains a quantity of strings.
  */
 public class StringSetProperty
-    extends AbstractComplexProperty {
+    extends
+      AbstractComplexProperty {
 
   /**
    * The strings.

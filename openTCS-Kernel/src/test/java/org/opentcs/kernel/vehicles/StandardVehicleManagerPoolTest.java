@@ -8,9 +8,10 @@
 package org.opentcs.kernel.vehicles;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -45,43 +46,56 @@ class StandardVehicleManagerPoolTest {
   void setUp() {
     vehicleService = mock(InternalVehicleService.class);
     commAdapter = mock(VehicleCommAdapter.class);
-    vehManagerPool = new DefaultVehicleControllerPool(vehicleService,
-                                                      new MockedVehicleManagerFactory());
+    vehManagerPool = new DefaultVehicleControllerPool(
+        vehicleService,
+        new MockedVehicleManagerFactory()
+    );
   }
 
   @Test
   void testThrowsNPEIfVehicleNameIsNull() {
-    assertThrows(NullPointerException.class,
-                 () -> vehManagerPool.attachVehicleController(null, commAdapter));
+    assertThrows(
+        NullPointerException.class,
+        () -> vehManagerPool.attachVehicleController(null, commAdapter)
+    );
   }
 
   @Test
   void testThrowsNPEIfCommAdapterIsNull() {
-    assertThrows(NullPointerException.class,
-                 () -> vehManagerPool.attachVehicleController(A_VEHICLE_NAME, null));
+    assertThrows(
+        NullPointerException.class,
+        () -> vehManagerPool.attachVehicleController(A_VEHICLE_NAME, null)
+    );
   }
 
   @Test
   void testThrowsExceptionForUnknownVehicleName() {
-    assertThrows(IllegalArgumentException.class,
-                 () -> vehManagerPool.attachVehicleController(UNKNOWN_VEHICLE_NAME, commAdapter));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> vehManagerPool.attachVehicleController(UNKNOWN_VEHICLE_NAME, commAdapter)
+    );
   }
 
   @Test
   void testThrowsNPEIfDetachingNullVehicleName() {
-    assertThrows(NullPointerException.class,
-                 () -> vehManagerPool.detachVehicleController(null));
+    assertThrows(
+        NullPointerException.class,
+        () -> vehManagerPool.detachVehicleController(null)
+    );
   }
 
   /**
    * A factory delivering vehicle manager mocks.
    */
   private static class MockedVehicleManagerFactory
-      implements VehicleControllerFactory {
+      implements
+        VehicleControllerFactory {
 
     @Override
-    public DefaultVehicleController createVehicleController(Vehicle vehicle,
-                                                            VehicleCommAdapter commAdapter) {
+    public DefaultVehicleController createVehicleController(
+        Vehicle vehicle,
+        VehicleCommAdapter commAdapter
+    ) {
       return mock(DefaultVehicleController.class);
     }
   }

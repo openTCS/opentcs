@@ -7,18 +7,19 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.recharging;
 
-import java.util.List;
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.oneOf;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
@@ -121,7 +122,8 @@ class DefaultRechargePositionSupplierTest {
         rechargePosSupplier.findRechargeSequence(
             vehicle.withProperty(
                 Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION,
-                "some-unknown-location")
+                "some-unknown-location"
+            )
         ),
         is(empty())
     );
@@ -132,17 +134,20 @@ class DefaultRechargePositionSupplierTest {
     List<Destination> result = rechargePosSupplier.findRechargeSequence(
         vehicle.withProperty(
             Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION,
-            "some-unknown-location")
+            "some-unknown-location"
+        )
     );
 
     assertThat(result, hasSize(1));
     assertThat(
         result.get(0).getDestination(),
-        is(oneOf(
-            rechargeLoc1.getReference(),
-            rechargeLoc2.getReference(),
-            rechargeLoc2.getReference()
-        ))
+        is(
+            oneOf(
+                rechargeLoc1.getReference(),
+                rechargeLoc2.getReference(),
+                rechargeLoc2.getReference()
+            )
+        )
     );
   }
 
@@ -153,11 +158,13 @@ class DefaultRechargePositionSupplierTest {
     assertThat(result, hasSize(1));
     assertThat(
         result.get(0).getDestination(),
-        is(oneOf(
-            rechargeLoc1.getReference(),
-            rechargeLoc2.getReference(),
-            rechargeLoc2.getReference()
-        ))
+        is(
+            oneOf(
+                rechargeLoc1.getReference(),
+                rechargeLoc2.getReference(),
+                rechargeLoc2.getReference()
+            )
+        )
     );
   }
 

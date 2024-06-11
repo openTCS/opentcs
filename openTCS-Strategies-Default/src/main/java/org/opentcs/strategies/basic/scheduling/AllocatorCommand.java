@@ -8,6 +8,7 @@
 package org.opentcs.strategies.basic.scheduling;
 
 import static java.util.Objects.requireNonNull;
+
 import java.util.Set;
 import org.opentcs.components.kernel.Scheduler.Client;
 import org.opentcs.data.model.TCSResource;
@@ -16,7 +17,8 @@ import org.opentcs.data.model.TCSResource;
  * A command for the scheduler's allocation task.
  */
 abstract class AllocatorCommand
-    implements Comparable<AllocatorCommand> {
+    implements
+      Comparable<AllocatorCommand> {
 
   /**
    * The command's priority (lesser values represent higher priority).
@@ -76,7 +78,8 @@ abstract class AllocatorCommand
    * Indicates resources being released by a client.
    */
   public static class AllocationsReleased
-      extends AllocatorCommand {
+      extends
+        AllocatorCommand {
 
     /**
      * The resources being released.
@@ -116,7 +119,8 @@ abstract class AllocatorCommand
    * Indicates the receiving task should retry to grant deferred allocations.
    */
   public static class RetryAllocates
-      extends AllocatorCommand {
+      extends
+        AllocatorCommand {
 
     /**
      * Creates a new instance.
@@ -140,7 +144,8 @@ abstract class AllocatorCommand
    * allocation.
    */
   public static class CheckAllocationsPrepared
-      extends AllocatorCommand {
+      extends
+        AllocatorCommand {
 
     /**
      * The resources to be checked.
@@ -180,7 +185,8 @@ abstract class AllocatorCommand
    * Indicates the receiving task should try to allocate a set of resources for a client.
    */
   public static class Allocate
-      extends AllocatorCommand {
+      extends
+        AllocatorCommand {
 
     /**
      * The resources to be allocated.

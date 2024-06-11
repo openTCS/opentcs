@@ -16,7 +16,8 @@ import org.opentcs.guing.base.model.elements.BlockModel;
  * Context for the block tree view.
  */
 public class BlockContext
-    implements UserObjectContext {
+    implements
+      UserObjectContext {
 
   /**
    * Creates a new instance.

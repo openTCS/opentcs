@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.TransportOrder;
@@ -64,7 +65,8 @@ public class GetTransportOrderResponseTO {
   }
 
   public GetTransportOrderResponseTO setPeripheralReservationToken(
-      String peripheralReservationToken) {
+      String peripheralReservationToken
+  ) {
     this.peripheralReservationToken = peripheralReservationToken;
     return this;
   }
@@ -143,19 +145,26 @@ public class GetTransportOrderResponseTO {
         nameOfNullableReference(transportOrder.getWrappingSequence())
     );
     transportOrderState.setType(transportOrder.getType());
-    transportOrderState.setDestinations(transportOrder.getAllDriveOrders()
-        .stream()
-        .map(driveOrder -> DestinationState.fromDriveOrder(driveOrder))
-        .collect(Collectors.toList()));
+    transportOrderState.setDestinations(
+        transportOrder.getAllDriveOrders()
+            .stream()
+            .map(driveOrder -> DestinationState.fromDriveOrder(driveOrder))
+            .collect(Collectors.toList())
+    );
     transportOrderState.setIntendedVehicle(
-        nameOfNullableReference(transportOrder.getIntendedVehicle()));
+        nameOfNullableReference(transportOrder.getIntendedVehicle())
+    );
     transportOrderState.setProcessingVehicle(
-        nameOfNullableReference(transportOrder.getProcessingVehicle()));
+        nameOfNullableReference(transportOrder.getProcessingVehicle())
+    );
     transportOrderState.setState(transportOrder.getState());
     return transportOrderState;
   }
 
-  private static String nameOfNullableReference(@Nullable TCSObjectReference<?> reference) {
+  private static String nameOfNullableReference(
+      @Nullable
+      TCSObjectReference<?> reference
+  ) {
     return reference == null ? null : reference.getName();
   }
 }

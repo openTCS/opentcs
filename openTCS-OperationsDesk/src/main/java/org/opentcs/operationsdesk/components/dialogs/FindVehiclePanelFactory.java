@@ -22,6 +22,8 @@ public interface FindVehiclePanelFactory {
    * @param drawingView The drawing view.
    * @return A {@link FindVehiclePanel}.
    */
-  FindVehiclePanel createFindVehiclesPanel(Collection<VehicleModel> vehicles,
-                                           OpenTCSDrawingView drawingView);
+  FindVehiclePanel createFindVehiclesPanel(
+      Collection<VehicleModel> vehicles,
+      OpenTCSDrawingView drawingView
+  );
 }

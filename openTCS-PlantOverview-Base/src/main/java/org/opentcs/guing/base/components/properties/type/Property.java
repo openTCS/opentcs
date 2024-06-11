@@ -13,8 +13,9 @@ package org.opentcs.guing.base.components.properties.type;
  * The property object stays the same while the value changes.
  */
 public interface Property
-    extends ModelAttribute,
-            Cloneable {
+    extends
+      ModelAttribute,
+      Cloneable {
 
   /**
    * Copies the value of the property into this property.

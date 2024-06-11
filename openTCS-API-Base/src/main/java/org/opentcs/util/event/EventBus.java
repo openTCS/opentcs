@@ -12,7 +12,8 @@ package org.opentcs.util.event;
  * Forwards events received via {@link #onEvent(java.lang.Object)} to all subscribed handlers.
  */
 public interface EventBus
-    extends EventHandler,
-            EventSource {
+    extends
+      EventHandler,
+      EventSource {
 
 }

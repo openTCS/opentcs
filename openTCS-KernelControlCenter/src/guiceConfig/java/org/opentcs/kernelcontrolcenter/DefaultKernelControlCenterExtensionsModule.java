@@ -20,7 +20,8 @@ import org.opentcs.kernelcontrolcenter.vehicles.DriverGUI;
  * Configures the default extensions of the openTCS kernel control center application.
  */
 public class DefaultKernelControlCenterExtensionsModule
-    extends ControlCenterInjectionModule {
+    extends
+      ControlCenterInjectionModule {
 
   /**
    * Creates a new instance.
@@ -35,8 +36,10 @@ public class DefaultKernelControlCenterExtensionsModule
 
   private void configureControlCenterDependencies() {
     KernelControlCenterConfiguration configuration
-        = getConfigBindingProvider().get(KernelControlCenterConfiguration.PREFIX,
-                                         KernelControlCenterConfiguration.class);
+        = getConfigBindingProvider().get(
+            KernelControlCenterConfiguration.PREFIX,
+            KernelControlCenterConfiguration.class
+        );
     bind(KernelControlCenterConfiguration.class).toInstance(configuration);
 
     // Ensure these binders are initialized.

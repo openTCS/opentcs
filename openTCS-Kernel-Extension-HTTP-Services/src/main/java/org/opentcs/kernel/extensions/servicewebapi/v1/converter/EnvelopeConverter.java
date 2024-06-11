@@ -26,24 +26,28 @@ public class EnvelopeConverter {
 
   public Map<String, Envelope> toVehicleEnvelopeMap(List<EnvelopeTO> envelopeEntries) {
     return envelopeEntries.stream()
-        .collect(Collectors.toMap(
-            EnvelopeTO::getKey,
-            entry -> {
-              List<Couple> couples = entry.getVertices().stream()
-                  .map(coupleTO -> new Couple(coupleTO.getX(), coupleTO.getY()))
-                  .collect(Collectors.toList());
-              return new Envelope(couples);
-            }
-        ));
+        .collect(
+            Collectors.toMap(
+                EnvelopeTO::getKey,
+                entry -> {
+                  List<Couple> couples = entry.getVertices().stream()
+                      .map(coupleTO -> new Couple(coupleTO.getX(), coupleTO.getY()))
+                      .collect(Collectors.toList());
+                  return new Envelope(couples);
+                }
+            )
+        );
   }
 
   public List<EnvelopeTO> toEnvelopeTOs(Map<String, Envelope> envelopeMap) {
     return envelopeMap.entrySet().stream()
-        .map(entry -> new EnvelopeTO(
-        entry.getKey(),
-        entry.getValue().getVertices().stream()
-            .map(couple -> new CoupleTO(couple.getX(), couple.getY()))
-            .collect(Collectors.toList()))
+        .map(
+            entry -> new EnvelopeTO(
+                entry.getKey(),
+                entry.getValue().getVertices().stream()
+                    .map(couple -> new CoupleTO(couple.getX(), couple.getY()))
+                    .collect(Collectors.toList())
+            )
         )
         .sorted(Comparator.comparing(EnvelopeTO::getKey))
         .collect(Collectors.toList());

@@ -7,12 +7,13 @@
  */
 package org.opentcs.modeleditor.application;
 
+import static java.util.Objects.requireNonNull;
+
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import jakarta.inject.Inject;
 import java.awt.event.FocusEvent;
 import java.io.File;
 import java.util.ArrayList;
-import static java.util.Objects.requireNonNull;
 import org.jhotdraw.draw.DrawingView;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.guing.common.application.AbstractViewManager;
@@ -25,7 +26,8 @@ import org.opentcs.util.event.EventSource;
  * order sequence views.
  */
 public class ViewManagerModeling
-    extends AbstractViewManager {
+    extends
+      AbstractViewManager {
 
   /**
    * Manages the application's docking frames.
@@ -43,8 +45,11 @@ public class ViewManagerModeling
    * @param eventSource Where this instance registers event listeners.
    */
   @Inject
-  public ViewManagerModeling(DockingManagerModeling dockingManager,
-                             @ApplicationEventBus EventSource eventSource) {
+  public ViewManagerModeling(
+      DockingManagerModeling dockingManager,
+      @ApplicationEventBus
+      EventSource eventSource
+  ) {
     super(eventSource);
     this.dockingManager = requireNonNull(dockingManager, "dockingManager");
   }

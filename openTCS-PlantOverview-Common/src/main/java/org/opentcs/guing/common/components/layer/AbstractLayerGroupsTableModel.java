@@ -7,9 +7,10 @@
  */
 package org.opentcs.guing.common.components.layer;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javax.swing.table.AbstractTableModel;
@@ -21,8 +22,10 @@ import org.opentcs.guing.common.util.I18nPlantOverview;
  * A table model for layer groups.
  */
 public abstract class AbstractLayerGroupsTableModel
-    extends AbstractTableModel
-    implements LayerGroupChangeListener {
+    extends
+      AbstractTableModel
+    implements
+      LayerGroupChangeListener {
 
   /**
    * The number of the "ID" column.
@@ -44,19 +47,21 @@ public abstract class AbstractLayerGroupsTableModel
   /**
    * The column names.
    */
-  private static final String[] COLUMN_NAMES = new String[]{
-    BUNDLE.getString("abstractLayerGroupsTableModel.column_id.headerText"),
-    BUNDLE.getString("abstractLayerGroupsTableModel.column_name.headerText"),
-    BUNDLE.getString("abstractLayerGroupsTableModel.column_visible.headerText")
-  };
+  private static final String[] COLUMN_NAMES
+      = new String[]{
+          BUNDLE.getString("abstractLayerGroupsTableModel.column_id.headerText"),
+          BUNDLE.getString("abstractLayerGroupsTableModel.column_name.headerText"),
+          BUNDLE.getString("abstractLayerGroupsTableModel.column_visible.headerText")
+      };
   /**
    * The column classes.
    */
-  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
-    Integer.class,
-    String.class,
-    Boolean.class
-  };
+  private static final Class<?>[] COLUMN_CLASSES
+      = new Class<?>[]{
+          Integer.class,
+          String.class,
+          Boolean.class
+      };
   /**
    * The model manager.
    */
@@ -72,8 +77,10 @@ public abstract class AbstractLayerGroupsTableModel
    * @param modelManager The model manager.
    * @param layerGroupEditor The layer group editor.
    */
-  public AbstractLayerGroupsTableModel(ModelManager modelManager,
-                                       LayerGroupEditor layerGroupEditor) {
+  public AbstractLayerGroupsTableModel(
+      ModelManager modelManager,
+      LayerGroupEditor layerGroupEditor
+  ) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.layerGroupEditor = requireNonNull(layerGroupEditor, "layerGroupEditor");
   }

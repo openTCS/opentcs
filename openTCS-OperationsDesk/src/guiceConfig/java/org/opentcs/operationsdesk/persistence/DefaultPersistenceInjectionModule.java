@@ -18,7 +18,8 @@ import org.opentcs.guing.common.persistence.unified.UnifiedModelPersistor;
  * Default bindings for model readers and persistors.
  */
 public class DefaultPersistenceInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.

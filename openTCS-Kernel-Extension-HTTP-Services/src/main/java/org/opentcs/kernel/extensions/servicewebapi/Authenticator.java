@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Strings;
 import jakarta.inject.Inject;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -50,9 +51,11 @@ public class Authenticator {
     requireNonNull(request, "request");
 
     String requestAccessKey = request.headers(HttpConstants.HEADER_NAME_ACCESS_KEY);
-    LOG.debug("Provided access key in header is '{}', required value is '{}'",
-              requestAccessKey,
-              configuration.accessKey());
+    LOG.debug(
+        "Provided access key in header is '{}', required value is '{}'",
+        requestAccessKey,
+        configuration.accessKey()
+    );
 
     // Any empty access key indicates authentication is not required.
     if (Strings.isNullOrEmpty(configuration.accessKey())) {

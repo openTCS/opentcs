@@ -21,8 +21,10 @@ import org.opentcs.guing.common.util.IconToolkit;
  * Represents a location in the TreeView.
  */
 public class LocationUserObject
-    extends FigureUserObject
-    implements ContextObject {
+    extends
+      FigureUserObject
+    implements
+      ContextObject {
 
   private final UserObjectContext context;
 
@@ -35,10 +37,14 @@ public class LocationUserObject
    * @param modelManager The model manager
    */
   @Inject
-  public LocationUserObject(@Assisted LocationModel model,
-                            @Assisted UserObjectContext context,
-                            GuiManager guiManager,
-                            ModelManager modelManager) {
+  public LocationUserObject(
+      @Assisted
+      LocationModel model,
+      @Assisted
+      UserObjectContext context,
+      GuiManager guiManager,
+      ModelManager modelManager
+  ) {
     super(model, guiManager, modelManager);
     this.context = Objects.requireNonNull(context, "context");
   }

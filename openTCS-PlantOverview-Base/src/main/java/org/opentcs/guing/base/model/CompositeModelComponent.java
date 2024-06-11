@@ -14,7 +14,8 @@ import java.util.List;
  * Abstract implementation of a composite model component that holds a set of child components.
  */
 public abstract class CompositeModelComponent
-    extends AbstractModelComponent {
+    extends
+      AbstractModelComponent {
 
   /**
    * The child elements.

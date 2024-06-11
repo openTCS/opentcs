@@ -7,8 +7,9 @@
  */
 package org.opentcs.modeleditor.application.menus.menubar;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.opentcs.guing.common.application.action.file.ModelPropertiesAction;
@@ -27,7 +28,8 @@ import org.opentcs.thirdparty.modeleditor.jhotdraw.application.action.file.Close
  * The application's "File" menu.
  */
 public class FileMenu
-    extends JMenu {
+    extends
+      JMenu {
 
   /**
    * A menu item for creating a new, empty system model.
@@ -71,9 +73,11 @@ public class FileMenu
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public FileMenu(ViewActionMap actionMap,
-                  FileImportMenu menuImport,
-                  FileExportMenu menuExport) {
+  public FileMenu(
+      ViewActionMap actionMap,
+      FileImportMenu menuImport,
+      FileExportMenu menuExport
+  ) {
     requireNonNull(actionMap, "actionMap");
     requireNonNull(menuImport, "menuImport");
     requireNonNull(menuExport, "menuExport");

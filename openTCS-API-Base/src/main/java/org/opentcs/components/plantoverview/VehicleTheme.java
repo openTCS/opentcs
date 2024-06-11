@@ -24,7 +24,10 @@ public interface VehicleTheme {
    * @param vehicle The vehicle for which to return the image.
    * @return An image for the given vehicle.
    */
-  Image statelessImage(@Nonnull Vehicle vehicle);
+  Image statelessImage(
+      @Nonnull
+      Vehicle vehicle
+  );
 
   /**
    * Returns an image for the given vehicle, representing its current state.
@@ -32,7 +35,10 @@ public interface VehicleTheme {
    * @param vehicle The vehicle for which to return the image.
    * @return An image for the given vehicle.
    */
-  Image statefulImage(@Nonnull Vehicle vehicle);
+  Image statefulImage(
+      @Nonnull
+      Vehicle vehicle
+  );
 
   /**
    * Provides a label that describes this vehicle.

@@ -7,14 +7,15 @@
  */
 package org.opentcs.guing.common.components.drawing.figures;
 
-import java.util.ArrayList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.common.model.SystemModel;
@@ -47,18 +48,34 @@ class ToolTipTextGeneratorTest {
     final String propkey4 = "prop4";
 
     PointModel pointModel = new PointModel();
-    pointModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(pointModel,
-                                                                       propkey4,
-                                                                       "some-value"));
-    pointModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(pointModel,
-                                                                       propKey2,
-                                                                       "some-value"));
-    pointModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(pointModel,
-                                                                       propKey3,
-                                                                       "some-value"));
-    pointModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(pointModel,
-                                                                       propKey1,
-                                                                       "some-value"));
+    pointModel.getPropertyMiscellaneous().addItem(
+        new KeyValueProperty(
+            pointModel,
+            propkey4,
+            "some-value"
+        )
+    );
+    pointModel.getPropertyMiscellaneous().addItem(
+        new KeyValueProperty(
+            pointModel,
+            propKey2,
+            "some-value"
+        )
+    );
+    pointModel.getPropertyMiscellaneous().addItem(
+        new KeyValueProperty(
+            pointModel,
+            propKey3,
+            "some-value"
+        )
+    );
+    pointModel.getPropertyMiscellaneous().addItem(
+        new KeyValueProperty(
+            pointModel,
+            propKey1,
+            "some-value"
+        )
+    );
 
     String toolTipText = toolTipTextGenerator.getToolTipText(pointModel);
 

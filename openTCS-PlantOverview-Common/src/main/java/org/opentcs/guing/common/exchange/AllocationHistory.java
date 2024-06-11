@@ -7,12 +7,13 @@
  */
 package org.opentcs.guing.common.exchange;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.data.model.TCSResourceReference;
@@ -50,32 +51,41 @@ public class AllocationHistory {
    * allocated resources.
    */
   @Nonnull
-  public Entry updateHistory(@Nonnull Vehicle vehicle) {
+  public Entry updateHistory(
+      @Nonnull
+      Vehicle vehicle
+  ) {
     requireNonNull(vehicle, "vehicle");
 
     Set<TCSResourceReference<?>> newClaimedResources = vehicle.getClaimedResources().stream()
         .flatMap(Collection::stream)
         .collect(Collectors.toSet());
-    SplitResources allocatedResources = SplitResources.from(vehicle.getAllocatedResources(),
-                                                            vehicle.getCurrentPosition());
+    SplitResources allocatedResources = SplitResources.from(
+        vehicle.getAllocatedResources(),
+        vehicle.getCurrentPosition()
+    );
     Set<TCSResourceReference<?>> newAllocatedResourcesBehind
         = allocatedResources.getAllocatedResourcesBehind().stream()
-              .flatMap(Set::stream)
-              .collect(Collectors.toSet());
+            .flatMap(Set::stream)
+            .collect(Collectors.toSet());
     Set<TCSResourceReference<?>> newAllocatedResourcesAhead
         = allocatedResources.getAllocatedResourcesAhead().stream()
-              .flatMap(Set::stream)
-              .collect(Collectors.toSet());
+            .flatMap(Set::stream)
+            .collect(Collectors.toSet());
     Set<TCSResourceReference<?>> noLongerClaimedOrAllocatedResources
-        = determineNoLongerClaimedOrAllocatedResources(vehicle.getName(),
-                                                       newClaimedResources,
-                                                       newAllocatedResourcesAhead,
-                                                       newAllocatedResourcesBehind);
+        = determineNoLongerClaimedOrAllocatedResources(
+            vehicle.getName(),
+            newClaimedResources,
+            newAllocatedResourcesAhead,
+            newAllocatedResourcesBehind
+        );
 
-    Entry newEntry = new Entry(newClaimedResources,
-                               newAllocatedResourcesAhead,
-                               newAllocatedResourcesBehind,
-                               noLongerClaimedOrAllocatedResources);
+    Entry newEntry = new Entry(
+        newClaimedResources,
+        newAllocatedResourcesAhead,
+        newAllocatedResourcesBehind,
+        noLongerClaimedOrAllocatedResources
+    );
 
     history.put(vehicle.getName(), newEntry);
 
@@ -86,7 +96,8 @@ public class AllocationHistory {
       String vehicleName,
       Set<TCSResourceReference<?>> newCurrentClaimedResources,
       Set<TCSResourceReference<?>> newCurrentAllocatedResourcesAhead,
-      Set<TCSResourceReference<?>> newCurrentAllocatedResourcesBehind) {
+      Set<TCSResourceReference<?>> newCurrentAllocatedResourcesBehind
+  ) {
     Set<TCSResourceReference<?>> result = new HashSet<>();
     result.addAll(getEntryFor(vehicleName).getCurrentClaimedResources());
     result.addAll(getEntryFor(vehicleName).getCurrentAllocatedResourcesAhead());
@@ -114,19 +125,29 @@ public class AllocationHistory {
     private final Set<TCSResourceReference<?>> currentAllocatedResourcesBehind;
     private final Set<TCSResourceReference<?>> previouslyClaimedOrAllocatedResources;
 
-    Entry(Set<TCSResourceReference<?>> currentClaimedResources,
-          Set<TCSResourceReference<?>> currentAllocatedResourcesAhead,
-          Set<TCSResourceReference<?>> currentAllocatedResourcesBehind,
-          Set<TCSResourceReference<?>> previouslyClaimedOrAllocatedResources) {
-      this.currentClaimedResources = requireNonNull(currentClaimedResources,
-                                                    "currentClaimedResources");
-      this.currentAllocatedResourcesAhead = requireNonNull(currentAllocatedResourcesAhead,
-                                                           "currentAllocatedResourcesAhead");
-      this.currentAllocatedResourcesBehind = requireNonNull(currentAllocatedResourcesBehind,
-                                                            "currentAllocatedResourcesBehind");
+    Entry(
+        Set<TCSResourceReference<?>> currentClaimedResources,
+        Set<TCSResourceReference<?>> currentAllocatedResourcesAhead,
+        Set<TCSResourceReference<?>> currentAllocatedResourcesBehind,
+        Set<TCSResourceReference<?>> previouslyClaimedOrAllocatedResources
+    ) {
+      this.currentClaimedResources = requireNonNull(
+          currentClaimedResources,
+          "currentClaimedResources"
+      );
+      this.currentAllocatedResourcesAhead = requireNonNull(
+          currentAllocatedResourcesAhead,
+          "currentAllocatedResourcesAhead"
+      );
+      this.currentAllocatedResourcesBehind = requireNonNull(
+          currentAllocatedResourcesBehind,
+          "currentAllocatedResourcesBehind"
+      );
       this.previouslyClaimedOrAllocatedResources
-          = requireNonNull(previouslyClaimedOrAllocatedResources,
-                           "previouslyClaimedOrAllocatedResources");
+          = requireNonNull(
+              previouslyClaimedOrAllocatedResources,
+              "previouslyClaimedOrAllocatedResources"
+          );
     }
 
     public Set<TCSResourceReference<?>> getCurrentClaimedResources() {

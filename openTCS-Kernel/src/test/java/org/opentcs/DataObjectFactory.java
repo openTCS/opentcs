@@ -112,8 +112,10 @@ public class DataObjectFactory {
    * @param dstRef Reference to the end point.
    * @return A new path from the start point to the end point.
    */
-  Path createPath(TCSObjectReference<Point> srcRef,
-                         TCSObjectReference<Point> dstRef) {
+  Path createPath(
+      TCSObjectReference<Point> srcRef,
+      TCSObjectReference<Point> dstRef
+  ) {
     ++uniqueIdCounter;
     return new Path(pathNamePrefix + uniqueIdCounter, srcRef, dstRef);
   }

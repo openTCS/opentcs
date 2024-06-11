@@ -9,6 +9,7 @@ package org.opentcs.strategies.basic.scheduling;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
+
 import org.opentcs.components.kernel.Scheduler.Client;
 import org.opentcs.data.model.TCSResource;
 import org.slf4j.Logger;
@@ -82,13 +83,17 @@ public class ReservationEntry {
     }
     else if (this.client != client) {
       // The resource is already allocated by someone else - may not happen.
-      throw new IllegalStateException("'" + client + "' tried to allocate resource allocated by "
-          + this.client);
+      throw new IllegalStateException(
+          "'" + client + "' tried to allocate resource allocated by "
+              + this.client
+      );
     }
     else {
-      LOG.debug("Incrementing allocation counter for resource {}; client: {}",
-                resource,
-                client.getId());
+      LOG.debug(
+          "Incrementing allocation counter for resource {}; client: {}",
+          resource,
+          client.getId()
+      );
     }
     counter++;
   }

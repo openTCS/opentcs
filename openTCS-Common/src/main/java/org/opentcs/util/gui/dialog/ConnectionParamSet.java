@@ -7,11 +7,12 @@
  */
 package org.opentcs.util.gui.dialog;
 
-import java.rmi.registry.Registry;
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkInRange;
+
+import java.rmi.registry.Registry;
+import java.util.Objects;
 
 /**
  * A set of parameters for a connection to the portal.
@@ -55,7 +56,8 @@ public class ConnectionParamSet {
    * @throws IllegalArgumentException If the port number is out of the range of valid port numbers.
    */
   public ConnectionParamSet(String description, String host, String port)
-      throws NumberFormatException, IllegalArgumentException {
+      throws NumberFormatException,
+        IllegalArgumentException {
     this(description, host, Integer.parseInt(port));
   }
 
@@ -68,9 +70,11 @@ public class ConnectionParamSet {
   public ConnectionParamSet(String paramString) {
     requireNonNull(paramString, "paramString");
     String[] split = paramString.split("\\|", 3);
-    checkArgument(split.length == 3,
-                  "Could not parse input as 'description:host:port': %s",
-                  paramString);
+    checkArgument(
+        split.length == 3,
+        "Could not parse input as 'description:host:port': %s",
+        paramString
+    );
     this.description = split[0];
     this.host = split[1];
     this.port = checkInRange(Integer.parseInt(split[2]), 0, 65535, "port");

@@ -7,8 +7,9 @@
  */
 package org.opentcs.operationsdesk.application.action;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import javax.swing.ActionMap;
 import org.opentcs.guing.common.application.action.file.ModelPropertiesAction;
 import org.opentcs.guing.common.application.action.file.SaveModelAction;
@@ -34,7 +35,8 @@ import org.opentcs.thirdparty.operationsdesk.jhotdraw.application.action.file.Cl
  * A custom ActionMap for the plant overview application.
  */
 public class ViewActionMap
-    extends ActionMap {
+    extends
+      ActionMap {
 
   /**
    * Creates a new instance.
@@ -52,16 +54,18 @@ public class ViewActionMap
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public ViewActionMap(OpenTCSView view,
-                       UndoRedoManager undoRedoManager,
-                       ActionFactory actionFactory,
-                       CreateTransportOrderAction createTransportOrderAction,
-                       FindVehicleAction findVehicleAction,
-                       PauseAllVehiclesAction pauseAllVehiclesAction,
-                       ResumeAllVehiclesAction resumeAllVehiclesAction,
-                       AboutAction aboutAction,
-                       ModelPropertiesAction modelPropertiesAction,
-                       CreatePeripheralJobAction createPeripheralJobAction) {
+  public ViewActionMap(
+      OpenTCSView view,
+      UndoRedoManager undoRedoManager,
+      ActionFactory actionFactory,
+      CreateTransportOrderAction createTransportOrderAction,
+      FindVehicleAction findVehicleAction,
+      PauseAllVehiclesAction pauseAllVehiclesAction,
+      ResumeAllVehiclesAction resumeAllVehiclesAction,
+      AboutAction aboutAction,
+      ModelPropertiesAction modelPropertiesAction,
+      CreatePeripheralJobAction createPeripheralJobAction
+  ) {
     requireNonNull(view, "view");
     requireNonNull(undoRedoManager, "undoRedoManager");
     requireNonNull(actionFactory, "actionFactory");

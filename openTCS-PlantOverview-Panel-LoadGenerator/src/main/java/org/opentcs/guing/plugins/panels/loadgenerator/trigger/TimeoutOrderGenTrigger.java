@@ -18,7 +18,8 @@ import org.slf4j.LoggerFactory;
  * Triggers creation of a batch of orders after a given timeout.
  */
 public class TimeoutOrderGenTrigger
-    implements OrderGenerationTrigger {
+    implements
+      OrderGenerationTrigger {
 
   /**
    * This class's Logger.
@@ -43,11 +44,15 @@ public class TimeoutOrderGenTrigger
    * @param timeout The timeout after which to trigger (in ms).
    * @param orderBatchCreator The order batch creator
    */
-  public TimeoutOrderGenTrigger(final int timeout,
-                                final OrderBatchCreator orderBatchCreator) {
+  public TimeoutOrderGenTrigger(
+      final int timeout,
+      final OrderBatchCreator orderBatchCreator
+  ) {
     this.timeout = timeout;
-    this.orderBatchCreator = Objects.requireNonNull(orderBatchCreator,
-                                                    "orderBatchCreator is null");
+    this.orderBatchCreator = Objects.requireNonNull(
+        orderBatchCreator,
+        "orderBatchCreator is null"
+    );
   }
 
   @Override
@@ -75,7 +80,8 @@ public class TimeoutOrderGenTrigger
    * A task that repeatedly triggers order generation after a given timeout.
    */
   private final class TriggerTask
-      extends CyclicTask {
+      extends
+        CyclicTask {
 
     /**
      * Creates a new instance.

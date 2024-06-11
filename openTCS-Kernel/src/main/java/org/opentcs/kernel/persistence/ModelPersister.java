@@ -37,5 +37,6 @@ public interface ModelPersister {
    * @return The <Code>PlantModelCreationTO</Code> that contains the data that was read.
    * @throws IllegalStateException If reading the model is not possible for some reason.
    */
-  PlantModelCreationTO readModel() throws IllegalStateException;
+  PlantModelCreationTO readModel()
+      throws IllegalStateException;
 }

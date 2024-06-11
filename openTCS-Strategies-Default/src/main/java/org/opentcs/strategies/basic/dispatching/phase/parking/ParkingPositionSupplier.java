@@ -17,7 +17,8 @@ import org.opentcs.data.model.Vehicle;
  * A strategy for finding parking positions for vehicles.
  */
 public interface ParkingPositionSupplier
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * Returns a suitable parking position for the given vehicle.
@@ -27,5 +28,8 @@ public interface ParkingPositionSupplier
    * position is available.
    */
   @Nonnull
-  Optional<Point> findParkingPosition(@Nonnull Vehicle vehicle);
+  Optional<Point> findParkingPosition(
+      @Nonnull
+      Vehicle vehicle
+  );
 }

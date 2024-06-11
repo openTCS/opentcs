@@ -7,10 +7,11 @@
  */
 package org.opentcs.util.persistence.v004;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -22,7 +23,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(propOrder = {"name", "scaleX", "scaleY", "layers", "layerGroups", "properties"})
 public class VisualLayoutTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   private Float scaleX = 0.0F;
   private Float scaleY = 0.0F;
@@ -40,7 +42,10 @@ public class VisualLayoutTO
     return scaleX;
   }
 
-  public VisualLayoutTO setScaleX(@Nonnull Float scaleX) {
+  public VisualLayoutTO setScaleX(
+      @Nonnull
+      Float scaleX
+  ) {
     requireNonNull(scaleX, "scaleX");
     this.scaleX = scaleX;
     return this;
@@ -51,7 +56,10 @@ public class VisualLayoutTO
     return scaleY;
   }
 
-  public VisualLayoutTO setScaleY(@Nonnull Float scaleY) {
+  public VisualLayoutTO setScaleY(
+      @Nonnull
+      Float scaleY
+  ) {
     requireNonNull(scaleY, "scaleY");
     this.scaleY = scaleY;
     return this;
@@ -62,7 +70,10 @@ public class VisualLayoutTO
     return layers;
   }
 
-  public VisualLayoutTO setLayers(@Nonnull List<Layer> layers) {
+  public VisualLayoutTO setLayers(
+      @Nonnull
+      List<Layer> layers
+  ) {
     this.layers = requireNonNull(layers, "layers");
     return this;
   }
@@ -72,7 +83,10 @@ public class VisualLayoutTO
     return layerGroups;
   }
 
-  public VisualLayoutTO setLayerGroups(@Nonnull List<LayerGroup> layerGroups) {
+  public VisualLayoutTO setLayerGroups(
+      @Nonnull
+      List<LayerGroup> layerGroups
+  ) {
     this.layerGroups = requireNonNull(layerGroups, "layerGroups");
     return this;
   }

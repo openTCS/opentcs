@@ -14,7 +14,8 @@ import org.opentcs.guing.common.util.I18nPlantOverview;
  * Progress status for the process of starting the application.
  */
 public enum StartupProgressStatus
-    implements ProgressStatus {
+    implements
+      ProgressStatus {
 
   /**
    * Starting the plant overview.

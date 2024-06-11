@@ -7,11 +7,12 @@
  */
 package org.opentcs.strategies.basic.routing;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.HashSet;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectPropConstants;
@@ -57,7 +58,10 @@ public class ResourceAvoidanceExtractor {
    * @return The extracted resources.
    */
   @Nonnull
-  public ResourcesToAvoid extractResourcesToAvoid(@Nullable TransportOrder order) {
+  public ResourcesToAvoid extractResourcesToAvoid(
+      @Nullable
+      TransportOrder order
+  ) {
     if (order == null) {
       return ResourcesToAvoid.EMPTY;
     }

@@ -3,6 +3,8 @@
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.toolbar;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -16,7 +18,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.handle.Handle;
@@ -27,7 +28,8 @@ import org.opentcs.guing.common.application.ApplicationState;
  * Utility to track area selections made by the user.
  */
 public class OpenTCSSelectAreaTracker
-    extends DefaultSelectAreaTracker {
+    extends
+      DefaultSelectAreaTracker {
 
   /**
    * Stores the application's current state.
@@ -85,7 +87,8 @@ public class OpenTCSSelectAreaTracker
         Math.min(anchor.x, evt.getX()),
         Math.min(anchor.y, evt.getY()),
         Math.abs(anchor.x - evt.getX()),
-        Math.abs(anchor.y - evt.getY()));
+        Math.abs(anchor.y - evt.getY())
+    );
 
     if (invalidatedArea.isEmpty()) {
       invalidatedArea = (Rectangle) rubberband.clone();
@@ -209,7 +212,7 @@ public class OpenTCSSelectAreaTracker
 
             break;
           default:
-          // Do nada.
+            // Do nada.
         }
       }
 

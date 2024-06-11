@@ -19,7 +19,8 @@ import org.opentcs.strategies.basic.routing.PointRouter;
  * Creates {@link PointRouter} instances based on the Bellman-Ford algorithm.
  */
 public class BellmanFordPointRouterFactory
-    extends AbstractPointRouterFactory {
+    extends
+      AbstractPointRouterFactory {
 
   /**
    * Creates a new instance.
@@ -27,13 +28,17 @@ public class BellmanFordPointRouterFactory
    * @param graphProvider Provides routing graphs for vehicles.
    */
   @Inject
-  public BellmanFordPointRouterFactory(@Nonnull GraphProvider graphProvider) {
+  public BellmanFordPointRouterFactory(
+      @Nonnull
+      GraphProvider graphProvider
+  ) {
     super(graphProvider);
   }
 
   @Override
   protected ShortestPathAlgorithm<String, Edge> createShortestPathAlgorithm(
-      Graph<String, Edge> graph) {
+      Graph<String, Edge> graph
+  ) {
     return new BellmanFordShortestPath<>(graph);
   }
 

@@ -7,9 +7,10 @@
  */
 package org.opentcs.data.peripherals;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 
@@ -17,7 +18,8 @@ import org.opentcs.data.model.TCSResourceReference;
  * Describes an operation that is to be executed by a peripheral device.
  */
 public class PeripheralOperation
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The location the peripheral device is associated with.
@@ -48,10 +50,15 @@ public class PeripheralOperation
    * @param completionRequired Whether the completion of this operation is required to allow a
    * vehicle to continue driving.
    */
-  public PeripheralOperation(@Nonnull TCSResourceReference<Location> location,
-                             @Nonnull String operation,
-                             @Nonnull ExecutionTrigger executionTrigger,
-                             boolean completionRequired) {
+  public PeripheralOperation(
+      @Nonnull
+      TCSResourceReference<Location> location,
+      @Nonnull
+      String operation,
+      @Nonnull
+      ExecutionTrigger executionTrigger,
+      boolean completionRequired
+  ) {
     this.location = requireNonNull(location, "location");
     this.operation = requireNonNull(operation, "operation");
     this.executionTrigger = requireNonNull(executionTrigger, "executionTrigger");

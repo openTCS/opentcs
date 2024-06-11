@@ -7,18 +7,19 @@
  */
 package org.opentcs.operationsdesk.application.action.course;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.base.model.elements.VehicleModel;
-import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,8 @@ import org.slf4j.LoggerFactory;
 /**
  */
 public class IntegrationLevelChangeAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * This class's logger.
@@ -58,9 +60,13 @@ public class IntegrationLevelChangeAction
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public IntegrationLevelChangeAction(@Assisted Collection<VehicleModel> vehicles,
-                                      @Assisted Vehicle.IntegrationLevel level,
-                                      SharedKernelServicePortalProvider portalProvider) {
+  public IntegrationLevelChangeAction(
+      @Assisted
+      Collection<VehicleModel> vehicles,
+      @Assisted
+      Vehicle.IntegrationLevel level,
+      SharedKernelServicePortalProvider portalProvider
+  ) {
     this.vehicles = requireNonNull(vehicles, "vehicles");
     this.level = requireNonNull(level, "level");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
@@ -89,7 +95,8 @@ public class IntegrationLevelChangeAction
 
       for (VehicleModel vehicle : vehicles) {
         sharedPortal.getPortal().getVehicleService().updateVehicleIntegrationLevel(
-            vehicle.getVehicle().getReference(), level);
+            vehicle.getVehicle().getReference(), level
+        );
       }
 
     }

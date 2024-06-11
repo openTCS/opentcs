@@ -41,8 +41,10 @@ public class AreaAllocations {
    * @param vehicleRef The vehicle reference.
    * @param allocatedAreas The allocated areas to set as the vehicle's current area allocation.
    */
-  public void setAreaAllocation(TCSObjectReference<Vehicle> vehicleRef,
-                                GeometryCollection allocatedAreas) {
+  public void setAreaAllocation(
+      TCSObjectReference<Vehicle> vehicleRef,
+      GeometryCollection allocatedAreas
+  ) {
     allocatedAreasByVehicles.put(vehicleRef, allocatedAreas);
   }
 
@@ -64,8 +66,10 @@ public class AreaAllocations {
    * {@code false} (i.e. in case some of the reuqested areas are already allocated by other
    * vehicles).
    */
-  public boolean isAreaAllocationAllowed(TCSObjectReference<Vehicle> vehicleRef,
-                                         GeometryCollection requestedAreas) {
+  public boolean isAreaAllocationAllowed(
+      TCSObjectReference<Vehicle> vehicleRef,
+      GeometryCollection requestedAreas
+  ) {
     return allocatedAreasByVehicles.entrySet().stream()
         // Only check areas allocated by vehicles other than the given vehicle.
         .filter(entry -> !Objects.equals(entry.getKey(), vehicleRef))

@@ -7,12 +7,13 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.orders;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Objects;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
@@ -23,7 +24,8 @@ import org.opentcs.strategies.basic.dispatching.selection.TransportOrderSelectio
  * Filters transport orders that contain locked target locations.
  */
 public class ContainsLockedTargetLocations
-    implements TransportOrderSelectionFilter {
+    implements
+      TransportOrderSelectionFilter {
 
   /**
    * The object service.

@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.data.model.Block;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
@@ -27,7 +28,11 @@ public class BlockTO {
   private List<PropertyTO> properties = List.of();
 
   @JsonCreator
-  public BlockTO(@Nonnull @JsonProperty(value = "name", required = true) String name) {
+  public BlockTO(
+      @Nonnull
+      @JsonProperty(value = "name", required = true)
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
   }
 
@@ -36,7 +41,10 @@ public class BlockTO {
     return name;
   }
 
-  public BlockTO setName(@Nonnull String name) {
+  public BlockTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     return this;
   }
@@ -46,7 +54,10 @@ public class BlockTO {
     return properties;
   }
 
-  public BlockTO setProperties(@Nonnull List<PropertyTO> properties) {
+  public BlockTO setProperties(
+      @Nonnull
+      List<PropertyTO> properties
+  ) {
     this.properties = requireNonNull(properties, "properties");
     return this;
   }
@@ -56,7 +67,10 @@ public class BlockTO {
     return type;
   }
 
-  public BlockTO setType(@Nonnull String type) {
+  public BlockTO setType(
+      @Nonnull
+      String type
+  ) {
     this.type = requireNonNull(type, "type");
     return this;
   }
@@ -66,7 +80,10 @@ public class BlockTO {
     return layout;
   }
 
-  public BlockTO setLayout(@Nonnull Layout layout) {
+  public BlockTO setLayout(
+      @Nonnull
+      Layout layout
+  ) {
     this.layout = requireNonNull(layout, "layout");
     return this;
   }
@@ -76,7 +93,10 @@ public class BlockTO {
     return memberNames;
   }
 
-  public BlockTO setMemberNames(@Nonnull Set<String> memberNames) {
+  public BlockTO setMemberNames(
+      @Nonnull
+      Set<String> memberNames
+  ) {
     this.memberNames = requireNonNull(memberNames, "memberNames");
     return this;
   }
@@ -93,7 +113,10 @@ public class BlockTO {
       return color;
     }
 
-    public Layout setColor(@Nonnull String color) {
+    public Layout setColor(
+        @Nonnull
+        String color
+    ) {
       this.color = requireNonNull(color, "color");
       return this;
     }

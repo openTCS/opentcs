@@ -48,7 +48,8 @@ import org.slf4j.LoggerFactory;
  * A Guice module for the openTCS kernel control center application.
  */
 public class DefaultKernelControlCenterInjectionModule
-    extends ConfigurableInjectionModule {
+    extends
+      ConfigurableInjectionModule {
 
   /**
    * This class' logger.
@@ -104,8 +105,10 @@ public class DefaultKernelControlCenterInjectionModule
 
   private void configureKernelControlCenterDependencies() {
     KernelControlCenterConfiguration configuration
-        = getConfigBindingProvider().get(KernelControlCenterConfiguration.PREFIX,
-                                         KernelControlCenterConfiguration.class);
+        = getConfigBindingProvider().get(
+            KernelControlCenterConfiguration.PREFIX,
+            KernelControlCenterConfiguration.class
+        );
     bind(KernelControlCenterConfiguration.class)
         .toInstance(configuration);
     configureKernelControlCenter(configuration);
@@ -122,15 +125,19 @@ public class DefaultKernelControlCenterInjectionModule
   }
 
   private void configureSocketConnections() {
-    SslConfiguration sslConfiguration = getConfigBindingProvider().get(SslConfiguration.PREFIX,
-                                                                       SslConfiguration.class);
+    SslConfiguration sslConfiguration = getConfigBindingProvider().get(
+        SslConfiguration.PREFIX,
+        SslConfiguration.class
+    );
 
     //Create the data object for the ssl configuration
-    SslParameterSet sslParamSet = new SslParameterSet(SslParameterSet.DEFAULT_KEYSTORE_TYPE,
-                                                      null,
-                                                      null,
-                                                      new File(sslConfiguration.truststoreFile()),
-                                                      sslConfiguration.truststorePassword());
+    SslParameterSet sslParamSet = new SslParameterSet(
+        SslParameterSet.DEFAULT_KEYSTORE_TYPE,
+        null,
+        null,
+        new File(sslConfiguration.truststoreFile()),
+        sslConfiguration.truststorePassword()
+    );
     bind(SslParameterSet.class).toInstance(sslParamSet);
 
     SocketFactoryProvider socketFactoryProvider;
@@ -144,10 +151,14 @@ public class DefaultKernelControlCenterInjectionModule
 
     //Bind socket provider to the kernel portal
     bind(KernelServicePortal.class)
-        .toInstance(new KernelServicePortalBuilder(GuestUserCredentials.USER,
-                                                   GuestUserCredentials.PASSWORD)
-            .setSocketFactoryProvider(socketFactoryProvider)
-            .build());
+        .toInstance(
+            new KernelServicePortalBuilder(
+                GuestUserCredentials.USER,
+                GuestUserCredentials.PASSWORD
+            )
+                .setSocketFactoryProvider(socketFactoryProvider)
+                .build()
+        );
   }
 
   private void configureKernelControlCenter(KernelControlCenterConfiguration configuration) {
@@ -157,7 +168,7 @@ public class DefaultKernelControlCenterInjectionModule
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     }
     catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-               | UnsupportedLookAndFeelException ex) {
+           | UnsupportedLookAndFeelException ex) {
       LOG.warn("Could not set look-and-feel", ex);
     }
     // Show tooltips for 30 seconds (Default: 4 sec)

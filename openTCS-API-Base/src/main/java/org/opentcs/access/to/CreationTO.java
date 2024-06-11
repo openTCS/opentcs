@@ -7,6 +7,8 @@
  */
 package org.opentcs.access.to;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,13 +16,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 
 /**
  * The base class for all creation transfer objects.
  */
 public class CreationTO
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The name of this transfer object.
@@ -39,12 +41,20 @@ public class CreationTO
    *
    * @param name The name of this transfer object.
    */
-  public CreationTO(@Nonnull String name) {
+  public CreationTO(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     this.properties = Map.of();
   }
 
-  protected CreationTO(@Nonnull String name, @Nonnull Map<String, String> properties) {
+  protected CreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      Map<String, String> properties
+  ) {
     this.name = requireNonNull(name, "name");
     this.properties = requireNonNull(properties, "properties");
   }
@@ -65,9 +75,14 @@ public class CreationTO
    * @param name the new name
    * @return A copy of this object, differing in the given value.
    */
-  public CreationTO withName(@Nonnull String name) {
-    return new CreationTO(name,
-                          properties);
+  public CreationTO withName(
+      @Nonnull
+      String name
+  ) {
+    return new CreationTO(
+        name,
+        properties
+    );
   }
 
   /**
@@ -95,7 +110,10 @@ public class CreationTO
    * @param properties The properties.
    * @return A copy of this object with the given properties.
    */
-  public CreationTO withProperties(@Nonnull Map<String, String> properties) {
+  public CreationTO withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
     return new CreationTO(name, properties);
   }
 
@@ -108,9 +126,16 @@ public class CreationTO
    * @return A copy of this object that includes the given property or
    * removes the entry, if value == null.
    */
-  public CreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new CreationTO(name,
-                          propertiesWith(key, value));
+  public CreationTO withProperty(
+      @Nonnull
+      String key,
+      @Nonnull
+      String value
+  ) {
+    return new CreationTO(
+        name,
+        propertiesWith(key, value)
+    );
   }
 
   protected final Map<String, String> propertiesWith(String key, String value) {

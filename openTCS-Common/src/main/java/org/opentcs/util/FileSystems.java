@@ -7,8 +7,9 @@
  */
 package org.opentcs.util;
 
-import java.io.File;
 import static java.util.Objects.requireNonNull;
+
+import java.io.File;
 
 /**
  * This class provides helper methods for working with file systems.

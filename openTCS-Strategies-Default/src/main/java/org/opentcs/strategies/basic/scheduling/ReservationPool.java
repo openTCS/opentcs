@@ -7,6 +7,8 @@
  */
 package org.opentcs.strategies.basic.scheduling;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.ArrayDeque;
@@ -15,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -74,7 +75,10 @@ public class ReservationPool {
    * @return The sequence of resource sets claimed by the given client.
    */
   @Nonnull
-  public List<Set<TCSResource<?>>> getClaim(@Nonnull Scheduler.Client client) {
+  public List<Set<TCSResource<?>>> getClaim(
+      @Nonnull
+      Scheduler.Client client
+  ) {
     requireNonNull(client, "client");
 
     return claimsByClient.getOrDefault(client, new ArrayDeque<>()).stream()
@@ -88,8 +92,12 @@ public class ReservationPool {
    * @param client The client.
    * @param resources The sequence of claimed resources.
    */
-  public void setClaim(@Nonnull Scheduler.Client client,
-                       @Nonnull List<Set<TCSResource<?>>> resources) {
+  public void setClaim(
+      @Nonnull
+      Scheduler.Client client,
+      @Nonnull
+      List<Set<TCSResource<?>>> resources
+  ) {
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
@@ -105,7 +113,12 @@ public class ReservationPool {
    * @throws IllegalArgumentException If the given resource set is not the head of the client's
    * claim sequence.
    */
-  public void unclaim(@Nonnull Scheduler.Client client, @Nonnull Set<TCSResource<?>> resources)
+  public void unclaim(
+      @Nonnull
+      Scheduler.Client client,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  )
       throws IllegalArgumentException {
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
@@ -116,9 +129,11 @@ public class ReservationPool {
 
     if (!isNextInClaim(client, resources)) {
       throw new IllegalArgumentException(
-          String.format("Resources to unclaim and head of claimed resource don't match: %s != %s",
-                        resources,
-                        claimsByClient.get(client).peek())
+          String.format(
+              "Resources to unclaim and head of claimed resource don't match: %s != %s",
+              resources,
+              claimsByClient.get(client).peek()
+          )
       );
     }
 
@@ -133,8 +148,12 @@ public class ReservationPool {
    * @return <code>true</code> if, and only if, the given resource set is at the head of the given
    * client's claim sequence.
    */
-  public boolean isNextInClaim(@Nonnull Scheduler.Client client,
-                               @Nonnull Set<TCSResource<?>> resources) {
+  public boolean isNextInClaim(
+      @Nonnull
+      Scheduler.Client client,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  ) {
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
@@ -156,7 +175,10 @@ public class ReservationPool {
    * @return All resources allocated by the given client.
    */
   @Nonnull
-  public Set<TCSResource<?>> allocatedResources(@Nonnull Scheduler.Client client) {
+  public Set<TCSResource<?>> allocatedResources(
+      @Nonnull
+      Scheduler.Client client
+  ) {
     requireNonNull(client, "client");
 
     return reservations.entrySet().stream()
@@ -173,8 +195,12 @@ public class ReservationPool {
    * @return <code>true</code> if, and only if, all resources in the given set
    * are available for the given client.
    */
-  public boolean resourcesAvailableForUser(@Nonnull Set<TCSResource<?>> resources,
-                                           @Nonnull Scheduler.Client client) {
+  public boolean resourcesAvailableForUser(
+      @Nonnull
+      Set<TCSResource<?>> resources,
+      @Nonnull
+      Scheduler.Client client
+  ) {
     requireNonNull(resources, "resources");
     requireNonNull(client, "client");
 
@@ -182,17 +208,24 @@ public class ReservationPool {
       // Check if the resource is available.
       ReservationEntry entry = getReservationEntry(curResource);
       if (!entry.isFree() && !entry.isAllocatedBy(client)) {
-        LOG.debug("{}: Resource {} unavailable, reserved by {}",
-                  client.getId(),
-                  curResource.getName(),
-                  entry.getClient().getId());
+        LOG.debug(
+            "{}: Resource {} unavailable, reserved by {}",
+            client.getId(),
+            curResource.getName(),
+            entry.getClient().getId()
+        );
         return false;
       }
     }
     return true;
   }
 
-  public void free(@Nonnull Scheduler.Client client, @Nonnull Set<TCSResource<?>> resources) {
+  public void free(
+      @Nonnull
+      Scheduler.Client client,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  ) {
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
@@ -202,7 +235,10 @@ public class ReservationPool {
     }
   }
 
-  public void freeAll(@Nonnull Scheduler.Client client) {
+  public void freeAll(
+      @Nonnull
+      Scheduler.Client client
+  ) {
     requireNonNull(client, "client");
 
     reservations.values().stream()
@@ -243,8 +279,12 @@ public class ReservationPool {
    * be released by the given client.
    */
   @Nonnull
-  private Set<TCSResource<?>> getFreeableResources(@Nonnull Set<TCSResource<?>> resources,
-                                                   @Nonnull Scheduler.Client client) {
+  private Set<TCSResource<?>> getFreeableResources(
+      @Nonnull
+      Set<TCSResource<?>> resources,
+      @Nonnull
+      Scheduler.Client client
+  ) {
     // Make sure we're freeing only resources that are allocated by us.
     final Set<TCSResource<?>> freeableResources = new HashSet<>();
     for (TCSResource<?> curRes : resources) {

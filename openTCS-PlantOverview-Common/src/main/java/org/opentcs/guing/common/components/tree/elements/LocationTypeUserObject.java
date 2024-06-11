@@ -19,7 +19,8 @@ import org.opentcs.guing.common.util.IconToolkit;
  * Represents a location type in the TreeView.
  */
 public class LocationTypeUserObject
-    extends AbstractUserObject {
+    extends
+      AbstractUserObject {
 
   /**
    * Creates a new instance of StationUserObject
@@ -29,9 +30,12 @@ public class LocationTypeUserObject
    * @param modelManager The model manager
    */
   @Inject
-  public LocationTypeUserObject(@Assisted LocationTypeModel modelComponent,
-                                GuiManager guiManager,
-                                ModelManager modelManager) {
+  public LocationTypeUserObject(
+      @Assisted
+      LocationTypeModel modelComponent,
+      GuiManager guiManager,
+      ModelManager modelManager
+  ) {
     super(modelComponent, guiManager, modelManager);
   }
 

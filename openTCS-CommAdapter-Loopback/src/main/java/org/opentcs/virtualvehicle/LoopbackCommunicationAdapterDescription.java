@@ -7,15 +7,17 @@
  */
 package org.opentcs.virtualvehicle;
 
+import static org.opentcs.virtualvehicle.I18nLoopbackCommAdapter.BUNDLE_PATH;
+
 import java.util.ResourceBundle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
-import static org.opentcs.virtualvehicle.I18nLoopbackCommAdapter.BUNDLE_PATH;
 
 /**
  * The loopback adapter's {@link VehicleCommAdapterDescription}.
  */
 public class LoopbackCommunicationAdapterDescription
-    extends VehicleCommAdapterDescription {
+    extends
+      VehicleCommAdapterDescription {
 
   /**
    * Creates a new instance.

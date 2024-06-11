@@ -23,7 +23,8 @@ import org.opentcs.guing.common.model.SystemModel;
  * An adapter for <code>Links</code>.
  */
 public class LinkAdapter
-    extends AbstractProcessAdapter {
+    extends
+      AbstractProcessAdapter {
 
   /**
    * Creates a new instance.
@@ -32,16 +33,20 @@ public class LinkAdapter
   }
 
   @Override
-  public void updateModelProperties(TCSObject<?> tcsObject,
-                                    ModelComponent modelComponent,
-                                    SystemModel systemModel,
-                                    TCSObjectService objectService) {
+  public void updateModelProperties(
+      TCSObject<?> tcsObject,
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      TCSObjectService objectService
+  ) {
   }
 
   @Override
-  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
-                                                SystemModel systemModel,
-                                                PlantModelCreationTO plantModel) {
+  public PlantModelCreationTO storeToPlantModel(
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      PlantModelCreationTO plantModel
+  ) {
     return plantModel.withLocations(
         plantModel.getLocations().stream()
             .map(loc -> mapLocation((LinkModel) modelComponent, loc))

@@ -7,12 +7,13 @@
  */
 package org.opentcs.access.to.model;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.ModelConstants;
 import org.opentcs.data.model.visualization.Layer;
@@ -24,8 +25,10 @@ import org.slf4j.LoggerFactory;
  * A transfer object describing a plant model.
  */
 public class PlantModelCreationTO
-    extends CreationTO
-    implements Serializable {
+    extends
+      CreationTO
+    implements
+      Serializable {
 
   /**
    * This class's logger.
@@ -77,15 +80,26 @@ public class PlantModelCreationTO
     this.visualLayout = defaultVisualLayout();
   }
 
-  private PlantModelCreationTO(@Nonnull String name,
-                               @Nonnull Map<String, String> properties,
-                               @Nonnull List<PointCreationTO> points,
-                               @Nonnull List<PathCreationTO> paths,
-                               @Nonnull List<LocationTypeCreationTO> locationTypes,
-                               @Nonnull List<LocationCreationTO> locations,
-                               @Nonnull List<BlockCreationTO> blocks,
-                               @Nonnull List<VehicleCreationTO> vehicles,
-                               @Nonnull VisualLayoutCreationTO visualLayout) {
+  private PlantModelCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      Map<String, String> properties,
+      @Nonnull
+      List<PointCreationTO> points,
+      @Nonnull
+      List<PathCreationTO> paths,
+      @Nonnull
+      List<LocationTypeCreationTO> locationTypes,
+      @Nonnull
+      List<LocationCreationTO> locations,
+      @Nonnull
+      List<BlockCreationTO> blocks,
+      @Nonnull
+      List<VehicleCreationTO> vehicles,
+      @Nonnull
+      VisualLayoutCreationTO visualLayout
+  ) {
     super(name, properties);
     this.points = requireNonNull(points, "points");
     this.paths = requireNonNull(paths, "paths");
@@ -111,16 +125,21 @@ public class PlantModelCreationTO
    * @param points The new points.
    * @return A copy of this model, differing in the given points.
    */
-  public PlantModelCreationTO withPoints(@Nonnull List<PointCreationTO> points) {
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    vehicles,
-                                    visualLayout);
+  public PlantModelCreationTO withPoints(
+      @Nonnull
+      List<PointCreationTO> points
+  ) {
+    return new PlantModelCreationTO(
+        getName(),
+        getModifiableProperties(),
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -129,17 +148,22 @@ public class PlantModelCreationTO
    * @param point the new point.
    * @return A copy of this model that also includes the given point.
    */
-  public PlantModelCreationTO withPoint(@Nonnull PointCreationTO point) {
+  public PlantModelCreationTO withPoint(
+      @Nonnull
+      PointCreationTO point
+  ) {
     requireNonNull(point, "point");
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    listWithAppendix(points, point),
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    vehicles,
-                                    visualLayout);
+    return new PlantModelCreationTO(
+        getName(),
+        getModifiableProperties(),
+        listWithAppendix(points, point),
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -157,16 +181,21 @@ public class PlantModelCreationTO
    * @param paths The new paths.
    * @return A copy of this model, differing in the given paths.
    */
-  public PlantModelCreationTO withPaths(@Nonnull List<PathCreationTO> paths) {
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    vehicles,
-                                    visualLayout);
+  public PlantModelCreationTO withPaths(
+      @Nonnull
+      List<PathCreationTO> paths
+  ) {
+    return new PlantModelCreationTO(
+        getName(),
+        getModifiableProperties(),
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -175,17 +204,22 @@ public class PlantModelCreationTO
    * @param path the new path.
    * @return A copy of this model that also includes the given path.
    */
-  public PlantModelCreationTO withPath(@Nonnull PathCreationTO path) {
+  public PlantModelCreationTO withPath(
+      @Nonnull
+      PathCreationTO path
+  ) {
     requireNonNull(path, "path");
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    listWithAppendix(paths, path),
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    vehicles,
-                                    visualLayout);
+    return new PlantModelCreationTO(
+        getName(),
+        getModifiableProperties(),
+        points,
+        listWithAppendix(paths, path),
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -204,17 +238,20 @@ public class PlantModelCreationTO
    * @return A copy of this model, differing in the given location types.
    */
   public PlantModelCreationTO withLocationTypes(
-      @Nonnull List<LocationTypeCreationTO> locationTypes
+      @Nonnull
+      List<LocationTypeCreationTO> locationTypes
   ) {
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    vehicles,
-                                    visualLayout);
+    return new PlantModelCreationTO(
+        getName(),
+        getModifiableProperties(),
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -223,17 +260,22 @@ public class PlantModelCreationTO
    * @param locationType the new location type.
    * @return A copy of this model that also includes the given location type.
    */
-  public PlantModelCreationTO withLocationType(@Nonnull LocationTypeCreationTO locationType) {
+  public PlantModelCreationTO withLocationType(
+      @Nonnull
+      LocationTypeCreationTO locationType
+  ) {
     requireNonNull(locationType, "locationType");
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    listWithAppendix(locationTypes, locationType),
-                                    locations,
-                                    blocks,
-                                    vehicles,
-                                    visualLayout);
+    return new PlantModelCreationTO(
+        getName(),
+        getModifiableProperties(),
+        points,
+        paths,
+        listWithAppendix(locationTypes, locationType),
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -251,16 +293,21 @@ public class PlantModelCreationTO
    * @param locations The new locations.
    * @return A copy of this model, differing in the given locations.
    */
-  public PlantModelCreationTO withLocations(@Nonnull List<LocationCreationTO> locations) {
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    vehicles,
-                                    visualLayout);
+  public PlantModelCreationTO withLocations(
+      @Nonnull
+      List<LocationCreationTO> locations
+  ) {
+    return new PlantModelCreationTO(
+        getName(),
+        getModifiableProperties(),
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -269,17 +316,22 @@ public class PlantModelCreationTO
    * @param location the new location.
    * @return A copy of this model that also includes the given location.
    */
-  public PlantModelCreationTO withLocation(@Nonnull LocationCreationTO location) {
+  public PlantModelCreationTO withLocation(
+      @Nonnull
+      LocationCreationTO location
+  ) {
     requireNonNull(location, "location");
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    listWithAppendix(locations, location),
-                                    blocks,
-                                    vehicles,
-                                    visualLayout);
+    return new PlantModelCreationTO(
+        getName(),
+        getModifiableProperties(),
+        points,
+        paths,
+        locationTypes,
+        listWithAppendix(locations, location),
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -297,16 +349,21 @@ public class PlantModelCreationTO
    * @param blocks The new blocks.
    * @return A copy of this model, differing in the given blocks.
    */
-  public PlantModelCreationTO withBlocks(@Nonnull List<BlockCreationTO> blocks) {
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    vehicles,
-                                    visualLayout);
+  public PlantModelCreationTO withBlocks(
+      @Nonnull
+      List<BlockCreationTO> blocks
+  ) {
+    return new PlantModelCreationTO(
+        getName(),
+        getModifiableProperties(),
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -315,17 +372,22 @@ public class PlantModelCreationTO
    * @param block the new block.
    * @return A copy of this model that also includes the given block.
    */
-  public PlantModelCreationTO withBlock(@Nonnull BlockCreationTO block) {
+  public PlantModelCreationTO withBlock(
+      @Nonnull
+      BlockCreationTO block
+  ) {
     requireNonNull(block, "block");
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    CreationTO.listWithAppendix(blocks, block),
-                                    vehicles,
-                                    visualLayout);
+    return new PlantModelCreationTO(
+        getName(),
+        getModifiableProperties(),
+        points,
+        paths,
+        locationTypes,
+        locations,
+        CreationTO.listWithAppendix(blocks, block),
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -343,16 +405,21 @@ public class PlantModelCreationTO
    * @param vehicles The new vehicles.
    * @return A copy of this model, differing in the given vehicles.
    */
-  public PlantModelCreationTO withVehicles(@Nonnull List<VehicleCreationTO> vehicles) {
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    vehicles,
-                                    visualLayout);
+  public PlantModelCreationTO withVehicles(
+      @Nonnull
+      List<VehicleCreationTO> vehicles
+  ) {
+    return new PlantModelCreationTO(
+        getName(),
+        getModifiableProperties(),
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -361,17 +428,22 @@ public class PlantModelCreationTO
    * @param vehicle the new vehicle.
    * @return A copy of this model that also includes the given vehicle.
    */
-  public PlantModelCreationTO withVehicle(@Nonnull VehicleCreationTO vehicle) {
+  public PlantModelCreationTO withVehicle(
+      @Nonnull
+      VehicleCreationTO vehicle
+  ) {
     requireNonNull(vehicle, "vehicle");
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    listWithAppendix(vehicles, vehicle),
-                                    visualLayout);
+    return new PlantModelCreationTO(
+        getName(),
+        getModifiableProperties(),
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        listWithAppendix(vehicles, vehicle),
+        visualLayout
+    );
   }
 
   /**
@@ -389,17 +461,22 @@ public class PlantModelCreationTO
    * @param visualLayout the new visual layout.
    * @return A copy of this model with the given visual layout.
    */
-  public PlantModelCreationTO withVisualLayout(@Nonnull VisualLayoutCreationTO visualLayout) {
+  public PlantModelCreationTO withVisualLayout(
+      @Nonnull
+      VisualLayoutCreationTO visualLayout
+  ) {
     requireNonNull(visualLayout, "visualLayout");
-    return new PlantModelCreationTO(getName(),
-                                    getModifiableProperties(),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    vehicles,
-                                    ensureValidity(visualLayout));
+    return new PlantModelCreationTO(
+        getName(),
+        getModifiableProperties(),
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        ensureValidity(visualLayout)
+    );
   }
 
   /**
@@ -409,16 +486,21 @@ public class PlantModelCreationTO
    * @return A copy of this object, differing in the given properties.
    */
   @Override
-  public PlantModelCreationTO withProperties(@Nonnull Map<String, String> properties) {
-    return new PlantModelCreationTO(getName(),
-                                    properties,
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    vehicles,
-                                    visualLayout);
+  public PlantModelCreationTO withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
+    return new PlantModelCreationTO(
+        getName(),
+        properties,
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   /**
@@ -432,16 +514,23 @@ public class PlantModelCreationTO
    * excludes the entry otherwise.
    */
   @Override
-  public PlantModelCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new PlantModelCreationTO(getName(),
-                                    propertiesWith(key, value),
-                                    points,
-                                    paths,
-                                    locationTypes,
-                                    locations,
-                                    blocks,
-                                    vehicles,
-                                    visualLayout);
+  public PlantModelCreationTO withProperty(
+      @Nonnull
+      String key,
+      @Nonnull
+      String value
+  ) {
+    return new PlantModelCreationTO(
+        getName(),
+        propertiesWith(key, value),
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
   }
 
   @Override
@@ -461,33 +550,52 @@ public class PlantModelCreationTO
 
   private VisualLayoutCreationTO defaultVisualLayout() {
     return new VisualLayoutCreationTO(ModelConstants.DEFAULT_VISUAL_LAYOUT_NAME)
-        .withLayer(new Layer(ModelConstants.DEFAULT_LAYER_ID,
-                             ModelConstants.DEFAULT_LAYER_ORDINAL,
-                             true,
-                             ModelConstants.DEFAULT_LAYER_NAME,
-                             ModelConstants.DEFAULT_LAYER_GROUP_ID))
-        .withLayerGroup(new LayerGroup(ModelConstants.DEFAULT_LAYER_GROUP_ID,
-                                       ModelConstants.DEFAULT_LAYER_GROUP_NAME,
-                                       true));
+        .withLayer(
+            new Layer(
+                ModelConstants.DEFAULT_LAYER_ID,
+                ModelConstants.DEFAULT_LAYER_ORDINAL,
+                true,
+                ModelConstants.DEFAULT_LAYER_NAME,
+                ModelConstants.DEFAULT_LAYER_GROUP_ID
+            )
+        )
+        .withLayerGroup(
+            new LayerGroup(
+                ModelConstants.DEFAULT_LAYER_GROUP_ID,
+                ModelConstants.DEFAULT_LAYER_GROUP_NAME,
+                true
+            )
+        );
   }
 
-  private VisualLayoutCreationTO ensureValidity(@Nonnull VisualLayoutCreationTO visualLayout) {
+  private VisualLayoutCreationTO ensureValidity(
+      @Nonnull
+      VisualLayoutCreationTO visualLayout
+  ) {
     VisualLayoutCreationTO vLayout = visualLayout;
 
     if (visualLayout.getLayers().isEmpty()) {
       LOG.warn("Adding default layer to visual layout with no layers...");
-      vLayout = visualLayout.withLayer(new Layer(ModelConstants.DEFAULT_LAYER_ID,
-                                                 ModelConstants.DEFAULT_LAYER_ORDINAL,
-                                                 true,
-                                                 ModelConstants.DEFAULT_LAYER_NAME,
-                                                 ModelConstants.DEFAULT_LAYER_GROUP_ID));
+      vLayout = visualLayout.withLayer(
+          new Layer(
+              ModelConstants.DEFAULT_LAYER_ID,
+              ModelConstants.DEFAULT_LAYER_ORDINAL,
+              true,
+              ModelConstants.DEFAULT_LAYER_NAME,
+              ModelConstants.DEFAULT_LAYER_GROUP_ID
+          )
+      );
     }
 
     if (visualLayout.getLayerGroups().isEmpty()) {
       LOG.warn("Adding default layer group to visual layout with no layer groups...");
-      vLayout = vLayout.withLayerGroup(new LayerGroup(ModelConstants.DEFAULT_LAYER_GROUP_ID,
-                                                      ModelConstants.DEFAULT_LAYER_GROUP_NAME,
-                                                      true));
+      vLayout = vLayout.withLayerGroup(
+          new LayerGroup(
+              ModelConstants.DEFAULT_LAYER_GROUP_ID,
+              ModelConstants.DEFAULT_LAYER_GROUP_NAME,
+              true
+          )
+      );
     }
 
     return vLayout;

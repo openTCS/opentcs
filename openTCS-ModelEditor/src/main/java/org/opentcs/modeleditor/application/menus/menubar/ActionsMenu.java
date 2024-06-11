@@ -7,8 +7,9 @@
  */
 package org.opentcs.modeleditor.application.menus.menubar;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingEditor;
@@ -21,7 +22,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * The application's menu for run-time actions.
  */
 public class ActionsMenu
-    extends JMenu {
+    extends
+      JMenu {
 
   /**
    * A menu item for assuming the model coordinates from the layout coordinates.
@@ -45,9 +47,11 @@ public class ActionsMenu
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public ActionsMenu(ViewActionMap actionMap,
-                     OpenTCSDrawingEditor drawingEditor,
-                     MenuFactory menuFactory) {
+  public ActionsMenu(
+      ViewActionMap actionMap,
+      OpenTCSDrawingEditor drawingEditor,
+      MenuFactory menuFactory
+  ) {
     requireNonNull(actionMap, "actionMap");
     requireNonNull(drawingEditor, "drawingEditor");
     requireNonNull(menuFactory, "menuFactory");

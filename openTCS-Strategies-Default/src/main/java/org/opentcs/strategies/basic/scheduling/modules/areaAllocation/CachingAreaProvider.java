@@ -7,12 +7,14 @@
  */
 package org.opentcs.strategies.basic.scheduling.modules.areaAllocation;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.strategies.basic.scheduling.modules.areaAllocation.CustomGeometryFactory.EMPTY_GEOMETRY;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
@@ -23,14 +25,14 @@ import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
-import static org.opentcs.strategies.basic.scheduling.modules.areaAllocation.CustomGeometryFactory.EMPTY_GEOMETRY;
 
 /**
  * An {@link AreaProvider} implementation that, upon initialization, computes and caches the areas
  * for the {@link Envelope}s defined at all {@link Point}s and {@link Path}s.
  */
 public class CachingAreaProvider
-    implements AreaProvider {
+    implements
+      AreaProvider {
 
   private final TCSObjectService objectService;
   private final CustomGeometryFactory geometryFactory = new CustomGeometryFactory();
@@ -75,8 +77,12 @@ public class CachingAreaProvider
   }
 
   @Override
-  public GeometryCollection getAreas(@Nonnull String envelopeKey,
-                                     @Nonnull Set<TCSResource<?>> resources) {
+  public GeometryCollection getAreas(
+      @Nonnull
+      String envelopeKey,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  ) {
     requireNonNull(envelopeKey, "envelopeKey");
     requireNonNull(resources, "resources");
 
@@ -89,8 +95,10 @@ public class CachingAreaProvider
   }
 
   private void populateCache() {
-    Set<Point> points = objectService.fetchObjects(Point.class,
-                                                   point -> !point.getVehicleEnvelopes().isEmpty());
+    Set<Point> points = objectService.fetchObjects(
+        Point.class,
+        point -> !point.getVehicleEnvelopes().isEmpty()
+    );
     for (Point point : points) {
       for (Map.Entry<String, Envelope> entry : point.getVehicleEnvelopes().entrySet()) {
         String envelopeKey = entry.getKey();
@@ -99,8 +107,10 @@ public class CachingAreaProvider
       }
     }
 
-    Set<Path> paths = objectService.fetchObjects(Path.class,
-                                                 path -> !path.getVehicleEnvelopes().isEmpty());
+    Set<Path> paths = objectService.fetchObjects(
+        Path.class,
+        path -> !path.getVehicleEnvelopes().isEmpty()
+    );
     for (Path path : paths) {
       for (Map.Entry<String, Envelope> entry : path.getVehicleEnvelopes().entrySet()) {
         String envelopeKey = entry.getKey();

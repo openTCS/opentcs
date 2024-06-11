@@ -7,6 +7,14 @@
  */
 package org.opentcs.guing.common.components.tree;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.common.model.SystemModel.FolderKey.LINKS;
+import static org.opentcs.guing.common.model.SystemModel.FolderKey.LOCATIONS;
+import static org.opentcs.guing.common.model.SystemModel.FolderKey.LOCATION_TYPES;
+import static org.opentcs.guing.common.model.SystemModel.FolderKey.OTHER_GRAPHICAL_ELEMENTS;
+import static org.opentcs.guing.common.model.SystemModel.FolderKey.PATHS;
+import static org.opentcs.guing.common.model.SystemModel.FolderKey.POINTS;
+
 import jakarta.inject.Inject;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -17,7 +25,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.ActionMap;
@@ -42,12 +49,6 @@ import org.opentcs.guing.common.components.EditableComponent;
 import org.opentcs.guing.common.components.tree.elements.LayoutUserObject;
 import org.opentcs.guing.common.components.tree.elements.SimpleFolderUserObject;
 import org.opentcs.guing.common.components.tree.elements.UserObject;
-import static org.opentcs.guing.common.model.SystemModel.FolderKey.LINKS;
-import static org.opentcs.guing.common.model.SystemModel.FolderKey.LOCATIONS;
-import static org.opentcs.guing.common.model.SystemModel.FolderKey.LOCATION_TYPES;
-import static org.opentcs.guing.common.model.SystemModel.FolderKey.OTHER_GRAPHICAL_ELEMENTS;
-import static org.opentcs.guing.common.model.SystemModel.FolderKey.PATHS;
-import static org.opentcs.guing.common.model.SystemModel.FolderKey.POINTS;
 import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.guing.common.util.I18nPlantOverview;
 import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.DeleteAction;
@@ -58,9 +59,11 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * Abstract implementation of a tree view to display model components in a tree.
  */
 public abstract class AbstractTreeViewPanel
-    extends JPanel
-    implements TreeView,
-               EditableComponent {
+    extends
+      JPanel
+    implements
+      TreeView,
+      EditableComponent {
 
   /**
    * The undo manger.
@@ -100,9 +103,11 @@ public abstract class AbstractTreeViewPanel
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public AbstractTreeViewPanel(UndoRedoManager undoRedoManager,
-                               ModelManager modelManager,
-                               ComponentsManager componentsManager) {
+  public AbstractTreeViewPanel(
+      UndoRedoManager undoRedoManager,
+      ModelManager modelManager,
+      ComponentsManager componentsManager
+  ) {
     this.fUndoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.componentsManager = requireNonNull(componentsManager, "componentsManager");
@@ -295,28 +300,40 @@ public abstract class AbstractTreeViewPanel
 
         folder = ((SimpleFolder) ((SimpleFolderUserObject) item).getModelComponent());
 
-        if (Objects.equals(folder,
-                           modelManager.getModel().getMainFolder(POINTS))) {
+        if (Objects.equals(
+            folder,
+            modelManager.getModel().getMainFolder(POINTS)
+        )) {
           fTreeModel.insertNodeInto(treeItem, parentItem, 0);
         }
-        else if (Objects.equals(folder,
-                                modelManager.getModel().getMainFolder(PATHS))) {
+        else if (Objects.equals(
+            folder,
+            modelManager.getModel().getMainFolder(PATHS)
+        )) {
           insertElementAt(treeItem, parentItem, 1);
         }
-        else if (Objects.equals(folder,
-                                modelManager.getModel().getMainFolder(LOCATIONS))) {
+        else if (Objects.equals(
+            folder,
+            modelManager.getModel().getMainFolder(LOCATIONS)
+        )) {
           insertElementAt(treeItem, parentItem, 2);
         }
-        else if (Objects.equals(folder,
-                                modelManager.getModel().getMainFolder(LOCATION_TYPES))) {
+        else if (Objects.equals(
+            folder,
+            modelManager.getModel().getMainFolder(LOCATION_TYPES)
+        )) {
           insertElementAt(treeItem, parentItem, 3);
         }
-        else if (Objects.equals(folder,
-                                modelManager.getModel().getMainFolder(LINKS))) {
+        else if (Objects.equals(
+            folder,
+            modelManager.getModel().getMainFolder(LINKS)
+        )) {
           insertElementAt(treeItem, parentItem, 4);
         }
-        else if (Objects.equals(folder,
-                                modelManager.getModel().getMainFolder(OTHER_GRAPHICAL_ELEMENTS))) {
+        else if (Objects.equals(
+            folder,
+            modelManager.getModel().getMainFolder(OTHER_GRAPHICAL_ELEMENTS)
+        )) {
           insertElementAt(treeItem, parentItem, 7);
         }
       }
@@ -441,9 +458,11 @@ public abstract class AbstractTreeViewPanel
    * @param parentItem the parent item.
    * @param index The index at which to add the item.
    */
-  private void insertElementAt(SortableTreeNode treeItem,
-                               DefaultMutableTreeNode parentItem,
-                               int index) {
+  private void insertElementAt(
+      SortableTreeNode treeItem,
+      DefaultMutableTreeNode parentItem,
+      int index
+  ) {
     if (parentItem.getChildCount() < index) {
       fTreeModel.insertNodeInto(treeItem, parentItem, parentItem.getChildCount());
     }
@@ -549,7 +568,8 @@ public abstract class AbstractTreeViewPanel
    * Called by delete(): Undo/Redo the "Delete" action.
    */
   protected class DeleteEdit
-      extends AbstractUndoableEdit {
+      extends
+        AbstractUndoableEdit {
 
     private final List<UserObject> userObjects = new ArrayList<>();
     private final List<Figure> figures = new ArrayList<>();
@@ -587,7 +607,8 @@ public abstract class AbstractTreeViewPanel
    * Called by paste(): Undo/Redo the "Paste" action
    */
   protected class PasteEdit
-      extends AbstractUndoableEdit {
+      extends
+        AbstractUndoableEdit {
 
     private final List<UserObject> userObjects = new ArrayList<>();
     private final List<Figure> figures = new ArrayList<>();
@@ -626,6 +647,7 @@ public abstract class AbstractTreeViewPanel
     }
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -662,4 +684,5 @@ public abstract class AbstractTreeViewPanel
   private javax.swing.JTextField textFieldModelName;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

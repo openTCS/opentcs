@@ -7,8 +7,9 @@
  */
 package org.opentcs.components.kernel.routing;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 import org.opentcs.data.model.Path;
 
 /**
@@ -31,7 +32,11 @@ public class Edge {
    * @param modelPath The path in the model that is traversed on this edge.
    * @param travellingReverse Whether the path is travelled in reverse direction.
    */
-  public Edge(@Nonnull Path modelPath, boolean travellingReverse) {
+  public Edge(
+      @Nonnull
+      Path modelPath,
+      boolean travellingReverse
+  ) {
     this.path = requireNonNull(modelPath, "modelPath");
     this.travellingReverse = travellingReverse;
   }

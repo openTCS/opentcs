@@ -7,6 +7,8 @@
  */
 package org.opentcs.operationsdesk.components.dialogs;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.BorderLayout;
@@ -19,7 +21,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Arrays;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -44,9 +45,11 @@ import org.opentcs.operationsdesk.util.VehicleCourseObjectFactory;
  * A single vehicle in the {@link VehiclesPanel}.
  */
 public class SingleVehicleView
-    extends JPanel
-    implements AttributesChangeListener,
-               Comparable<SingleVehicleView> {
+    extends
+      JPanel
+    implements
+      AttributesChangeListener,
+      Comparable<SingleVehicleView> {
 
   /**
    * The resource bundle this component uses.
@@ -107,23 +110,30 @@ public class SingleVehicleView
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public SingleVehicleView(@Assisted VehicleModel vehicle,
-                           ComponentsTreeViewManager treeViewManager,
-                           SelectionPropertiesComponent propertiesComponent,
-                           OpenTCSDrawingEditor drawingEditor,
-                           VehicleCourseObjectFactory crsObjFactory,
-                           MenuFactory menuFactory,
-                           ModelManager modelManager) {
+  public SingleVehicleView(
+      @Assisted
+      VehicleModel vehicle,
+      ComponentsTreeViewManager treeViewManager,
+      SelectionPropertiesComponent propertiesComponent,
+      OpenTCSDrawingEditor drawingEditor,
+      VehicleCourseObjectFactory crsObjFactory,
+      MenuFactory menuFactory,
+      ModelManager modelManager
+  ) {
     this.fVehicleModel = requireNonNull(vehicle, "vehicle");
     this.treeViewManager = requireNonNull(treeViewManager, "treeViewManager");
-    this.propertiesComponent = requireNonNull(propertiesComponent,
-                                              "propertiesComponent");
+    this.propertiesComponent = requireNonNull(
+        propertiesComponent,
+        "propertiesComponent"
+    );
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.menuFactory = requireNonNull(menuFactory, "menuFactory");
     this.modelManager = requireNonNull(modelManager, "modelManager");
     requireNonNull(crsObjFactory, "crsObjFactory");
-    this.fVehicleView = new VehicleView(fVehicleModel,
-                                        crsObjFactory.createVehicleFigure(fVehicleModel));
+    this.fVehicleView = new VehicleView(
+        fVehicleModel,
+        crsObjFactory.createVehicleFigure(fVehicleModel)
+    );
 
     initComponents();
 
@@ -216,16 +226,37 @@ public class SingleVehicleView
     Vehicle vehicle = fVehicleModel.getVehicle();
 
     if (vehicle.isEnergyLevelCritical()) {
-      batteryIcon.setIcon(new ImageIcon(getToolkit().getImage(getClass().getClassLoader().
-          getResource("org/opentcs/guing/res/symbols/panel/battery-caution-3.png"))));
+      batteryIcon.setIcon(
+          new ImageIcon(
+              getToolkit().getImage(
+                  getClass().getClassLoader().getResource(
+                      "org/opentcs/guing/res/symbols/panel/battery-caution-3.png"
+                  )
+              )
+          )
+      );
     }
     else if (vehicle.isEnergyLevelDegraded()) {
-      batteryIcon.setIcon(new ImageIcon(getToolkit().getImage(getClass().getClassLoader().
-          getResource("org/opentcs/guing/res/symbols/panel/battery-060-2.png"))));
+      batteryIcon.setIcon(
+          new ImageIcon(
+              getToolkit().getImage(
+                  getClass().getClassLoader().getResource(
+                      "org/opentcs/guing/res/symbols/panel/battery-060-2.png"
+                  )
+              )
+          )
+      );
     }
     else if (vehicle.isEnergyLevelGood()) {
-      batteryIcon.setIcon(new ImageIcon(getToolkit().getImage(getClass().getClassLoader().
-          getResource("org/opentcs/guing/res/symbols/panel/battery-100-2.png"))));
+      batteryIcon.setIcon(
+          new ImageIcon(
+              getToolkit().getImage(
+                  getClass().getClassLoader().getResource(
+                      "org/opentcs/guing/res/symbols/panel/battery-100-2.png"
+                  )
+              )
+          )
+      );
     }
   }
 
@@ -238,6 +269,7 @@ public class SingleVehicleView
     updateVehicle();
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -403,6 +435,7 @@ public class SingleVehicleView
   private javax.swing.JLabel vehicleStateValueLabel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   @Override
   public int compareTo(SingleVehicleView o) {
@@ -410,8 +443,10 @@ public class SingleVehicleView
   }
 
   private class VehicleView
-      extends JPanel
-      implements AttributesChangeListener {
+      extends
+        JPanel
+      implements
+        AttributesChangeListener {
 
     private final VehicleFigure figure;
 
@@ -453,8 +488,10 @@ public class SingleVehicleView
      */
     private void drawVehicle(Graphics2D g2d) {
       figure.setIgnorePrecisePosition(true);
-      Point2D.Double posDialog = new Point2D.Double(fVehicleView.getWidth() / 2,
-                                                    fVehicleView.getHeight() / 2);
+      Point2D.Double posDialog = new Point2D.Double(
+          fVehicleView.getWidth() / 2,
+          fVehicleView.getHeight() / 2
+      );
       figure.setBounds(posDialog, null);
       figure.setAngle(0.0);
       figure.forcedDraw(g2d);
@@ -462,7 +499,8 @@ public class SingleVehicleView
   }
 
   private class VehicleMouseAdapter
-      extends MouseAdapter {
+      extends
+        MouseAdapter {
 
     private final VehicleModel vehicleModel;
 

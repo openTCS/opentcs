@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.StatusMessage;
 
 /**

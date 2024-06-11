@@ -7,13 +7,14 @@
  */
 package org.opentcs.guing.common.components.properties.panel;
 
+import static java.util.Objects.requireNonNull;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,7 +38,8 @@ import org.opentcs.util.ExplainedBoolean;
  * User interface to edit a single envelope.
  */
 public class EnvelopePanel
-    extends DialogContent {
+    extends
+      DialogContent {
 
   /**
    * The default key to use for envelopes.
@@ -77,10 +79,12 @@ public class EnvelopePanel
    * @param systemModel The current system model.
    */
   @SuppressWarnings("this-escape")
-  public EnvelopePanel(EnvelopeModel envelopeTemplate,
-                       Mode mode,
-                       Set<String> propertyEnvelopeKeys,
-                       SystemModel systemModel) {
+  public EnvelopePanel(
+      EnvelopeModel envelopeTemplate,
+      Mode mode,
+      Set<String> propertyEnvelopeKeys,
+      SystemModel systemModel
+  ) {
     this.envelopeTemplate = requireNonNull(envelopeTemplate, "envelopeTemplate");
     this.mode = requireNonNull(mode, "mode");
     this.propertyEnvelopeKeys = requireNonNull(propertyEnvelopeKeys, "propertyEnvelopeKeys");
@@ -130,8 +134,10 @@ public class EnvelopePanel
     }
 
     return Optional.of(
-        new EnvelopeModel(envelopeKeyComboBox.getSelectedItem().toString(),
-                          getTableModel().getValues())
+        new EnvelopeModel(
+            envelopeKeyComboBox.getSelectedItem().toString(),
+            getTableModel().getValues()
+        )
     );
   }
 
@@ -259,6 +265,7 @@ public class EnvelopePanel
     return (CoupleTableModel) couplesTable.getModel();
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -411,6 +418,7 @@ public class EnvelopePanel
     add(validationScrollPane, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
     getTableModel().add(new Couple(0, 0));
@@ -434,6 +442,7 @@ public class EnvelopePanel
     }
   }//GEN-LAST:event_moveUpButtonActionPerformed
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
@@ -452,6 +461,7 @@ public class EnvelopePanel
   private javax.swing.JTextArea validationTextArea;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   /**
    * Defines the modes this panel can be used in.
@@ -468,7 +478,8 @@ public class EnvelopePanel
   }
 
   private class CoupleTableModel
-      extends AbstractTableModel {
+      extends
+        AbstractTableModel {
 
     /**
      * The number of the "X" column.
@@ -481,17 +492,19 @@ public class EnvelopePanel
     /**
      * The column names.
      */
-    private final String[] columnNames = new String[]{
-      bundle.getString("envelopePanel.table_couples.column_x.headerText"),
-      bundle.getString("envelopePanel.table_couples.column_y.headerText")
-    };
+    private final String[] columnNames
+        = new String[]{
+            bundle.getString("envelopePanel.table_couples.column_x.headerText"),
+            bundle.getString("envelopePanel.table_couples.column_y.headerText")
+        };
     /**
      * Column classes.
      */
-    private final Class<?>[] columnClasses = new Class<?>[]{
-      String.class,
-      String.class
-    };
+    private final Class<?>[] columnClasses
+        = new Class<?>[]{
+            String.class,
+            String.class
+        };
     /**
      * The values in this model.
      */

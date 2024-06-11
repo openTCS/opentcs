@@ -7,10 +7,11 @@
  */
 package org.opentcs.guing.common.application;
 
+import static java.util.Objects.requireNonNull;
+
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -22,7 +23,8 @@ import org.slf4j.LoggerFactory;
  * A panel at the bottom of the view, showing the mouse position and status.
  */
 public class StatusPanel
-    extends JPanel {
+    extends
+      JPanel {
 
   /**
    * This class's logger.

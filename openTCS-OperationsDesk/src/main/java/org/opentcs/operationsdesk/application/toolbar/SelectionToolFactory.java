@@ -16,6 +16,9 @@ import javax.swing.Action;
 public interface SelectionToolFactory {
 
   MultipleSelectionTool createMultipleSelectionTool(
-      @Assisted("drawingActions") Collection<Action> drawingActions,
-      @Assisted("selectionActions") Collection<Action> selectionActions);
+      @Assisted("drawingActions")
+      Collection<Action> drawingActions,
+      @Assisted("selectionActions")
+      Collection<Action> selectionActions
+  );
 }

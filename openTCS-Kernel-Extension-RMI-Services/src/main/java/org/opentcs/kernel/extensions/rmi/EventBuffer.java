@@ -7,19 +7,21 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.function.Predicate;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.event.EventHandler;
 
 /**
  * Stores events and keeps them until a client fetches them.
  */
 public class EventBuffer
-    implements EventHandler {
+    implements
+      EventHandler {
 
   /**
    * The buffered events.
@@ -39,7 +41,10 @@ public class EventBuffer
    *
    * @param eventFilter This buffer's initial event filter.
    */
-  public EventBuffer(@Nonnull Predicate<Object> eventFilter) {
+  public EventBuffer(
+      @Nonnull
+      Predicate<Object> eventFilter
+  ) {
     this.eventFilter = requireNonNull(eventFilter, "eventFilter");
   }
 
@@ -112,7 +117,10 @@ public class EventBuffer
    *
    * @param eventFilter This buffer's new event filter.
    */
-  public void setEventFilter(@Nonnull Predicate<Object> eventFilter) {
+  public void setEventFilter(
+      @Nonnull
+      Predicate<Object> eventFilter
+  ) {
     synchronized (events) {
       this.eventFilter = requireNonNull(eventFilter);
     }

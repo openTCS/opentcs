@@ -7,8 +7,9 @@
  */
 package org.opentcs.modeleditor.application.action.file;
 
-import java.awt.event.ActionEvent;
 import static java.util.Objects.requireNonNull;
+
+import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.opentcs.components.plantoverview.PlantModelImporter;
 import org.opentcs.guing.common.application.GuiManager;
@@ -16,7 +17,8 @@ import org.opentcs.guing.common.application.GuiManager;
 /**
  */
 public class ImportPlantModelAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   private final PlantModelImporter importer;
   private final GuiManager guiManager;

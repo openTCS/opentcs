@@ -7,10 +7,11 @@
  */
 package org.opentcs.guing.common.exchange.adapter;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
@@ -35,7 +36,8 @@ import org.slf4j.LoggerFactory;
  * An adapter for vehicles.
  */
 public class VehicleAdapter
-    extends AbstractProcessAdapter {
+    extends
+      AbstractProcessAdapter {
 
   /**
    * This class's logger.
@@ -46,10 +48,12 @@ public class VehicleAdapter
   }
 
   @Override // OpenTCSProcessAdapter
-  public void updateModelProperties(TCSObject<?> tcsObject,
-                                    ModelComponent modelComponent,
-                                    SystemModel systemModel,
-                                    TCSObjectService objectService) {
+  public void updateModelProperties(
+      TCSObject<?> tcsObject,
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      TCSObjectService objectService
+  ) {
     requireNonNull(objectService, "objectService");
     Vehicle vehicle = requireNonNull((Vehicle) tcsObject, "tcsObject");
     VehicleModel model = (VehicleModel) modelComponent;
@@ -58,20 +62,32 @@ public class VehicleAdapter
       model.getPropertyName().setText(vehicle.getName());
       model.getPropertyLength().setValueAndUnit(vehicle.getLength(), LengthProperty.Unit.MM);
       model.getPropertyMaxVelocity().setValueAndUnit(vehicle.getMaxVelocity(), Unit.MM_S);
-      model.getPropertyMaxReverseVelocity().setValueAndUnit(vehicle.getMaxReverseVelocity(),
-                                                            Unit.MM_S);
-      model.getPropertyEnergyLevelCritical().setValueAndUnit(vehicle.getEnergyLevelCritical(),
-                                                             PercentProperty.Unit.PERCENT);
-      model.getPropertyEnergyLevelGood().setValueAndUnit(vehicle.getEnergyLevelGood(),
-                                                         PercentProperty.Unit.PERCENT);
+      model.getPropertyMaxReverseVelocity().setValueAndUnit(
+          vehicle.getMaxReverseVelocity(),
+          Unit.MM_S
+      );
+      model.getPropertyEnergyLevelCritical().setValueAndUnit(
+          vehicle.getEnergyLevelCritical(),
+          PercentProperty.Unit.PERCENT
+      );
+      model.getPropertyEnergyLevelGood().setValueAndUnit(
+          vehicle.getEnergyLevelGood(),
+          PercentProperty.Unit.PERCENT
+      );
       model.getPropertyEnergyLevelFullyRecharged()
-          .setValueAndUnit(vehicle.getEnergyLevelFullyRecharged(),
-                           PercentProperty.Unit.PERCENT);
+          .setValueAndUnit(
+              vehicle.getEnergyLevelFullyRecharged(),
+              PercentProperty.Unit.PERCENT
+          );
       model.getPropertyEnergyLevelSufficientlyRecharged()
-          .setValueAndUnit(vehicle.getEnergyLevelSufficientlyRecharged(),
-                           PercentProperty.Unit.PERCENT);
-      model.getPropertyEnergyLevel().setValueAndUnit(vehicle.getEnergyLevel(),
-                                                     PercentProperty.Unit.PERCENT);
+          .setValueAndUnit(
+              vehicle.getEnergyLevelSufficientlyRecharged(),
+              PercentProperty.Unit.PERCENT
+          );
+      model.getPropertyEnergyLevel().setValueAndUnit(
+          vehicle.getEnergyLevel(),
+          PercentProperty.Unit.PERCENT
+      );
 
       model.getPropertyLoaded().setValue(
           vehicle.getLoadHandlingDevices().stream().anyMatch(lhe -> lhe.isFull())
@@ -87,8 +103,10 @@ public class VehicleAdapter
       model.getPropertyPrecisePosition().setValue(vehicle.getPrecisePosition());
       model.setPrecisePosition(vehicle.getPrecisePosition());
 
-      model.getPropertyOrientationAngle().setValueAndUnit(vehicle.getOrientationAngle(),
-                                                          AngleProperty.Unit.DEG);
+      model.getPropertyOrientationAngle().setValueAndUnit(
+          vehicle.getOrientationAngle(),
+          AngleProperty.Unit.DEG
+      );
       model.setOrientationAngle(vehicle.getOrientationAngle());
 
       updateCurrentTransportName(vehicle, model);
@@ -98,7 +116,7 @@ public class VehicleAdapter
       model.setVehicle(vehicle);
 
       model.getPropertyEnvelopeKey().setText(vehicle.getEnvelopeKey());
-      
+
       updateMiscModelProperties(model, vehicle);
       updateModelDriveOrder(objectService, vehicle, model, systemModel);
       updateModelLayoutProperties(model, vehicle);
@@ -114,9 +132,11 @@ public class VehicleAdapter
   }
 
   @Override // OpenTCSProcessAdapter
-  public PlantModelCreationTO storeToPlantModel(ModelComponent modelComponent,
-                                                SystemModel systemModel,
-                                                PlantModelCreationTO plantModel) {
+  public PlantModelCreationTO storeToPlantModel(
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      PlantModelCreationTO plantModel
+  ) {
     VehicleModel vehicleModel = (VehicleModel) modelComponent;
     return plantModel
         .withVehicle(
@@ -136,18 +156,22 @@ public class VehicleAdapter
         );
   }
 
-  protected void updateModelDriveOrder(TCSObjectService objectService,
-                                       Vehicle vehicle,
-                                       VehicleModel vehicleModel,
-                                       SystemModel systemModel)
+  protected void updateModelDriveOrder(
+      TCSObjectService objectService,
+      Vehicle vehicle,
+      VehicleModel vehicleModel,
+      SystemModel systemModel
+  )
       throws CredentialsException {
     vehicleModel.setDriveOrderDestination(null);
     vehicleModel.setCurrentDriveOrderPath(null);
   }
 
-  private void updateModelNextPoint(VehicleModel vehicleModel,
-                                    Vehicle vehicle,
-                                    SystemModel systemModel) {
+  private void updateModelNextPoint(
+      VehicleModel vehicleModel,
+      Vehicle vehicle,
+      SystemModel systemModel
+  ) {
     if (vehicle.getNextPosition() != null) {
       PointModel pointModel = systemModel.getPointModel(vehicle.getNextPosition().getName());
       vehicleModel.setNextPoint(pointModel);
@@ -159,9 +183,11 @@ public class VehicleAdapter
     }
   }
 
-  private void updateModelCurrentPoint(VehicleModel vehicleModel,
-                                       Vehicle vehicle,
-                                       SystemModel systemModel) {
+  private void updateModelCurrentPoint(
+      VehicleModel vehicleModel,
+      Vehicle vehicle,
+      SystemModel systemModel
+  ) {
     if (vehicle.getCurrentPosition() != null) {
       PointModel pointModel = systemModel.getPointModel(vehicle.getCurrentPosition().getName());
 
@@ -179,8 +205,10 @@ public class VehicleAdapter
     }
   }
 
-  private void updateCurrentTransportName(Vehicle vehicle,
-                                          VehicleModel vehicleModel) {
+  private void updateCurrentTransportName(
+      Vehicle vehicle,
+      VehicleModel vehicleModel
+  ) {
     if (vehicle.getTransportOrder() == null) {
       vehicleModel.getPropertyCurrentOrderName().setText("null");
     }
@@ -190,8 +218,10 @@ public class VehicleAdapter
 
   }
 
-  private void updateCurrentOrderSequenceName(Vehicle vehicle,
-                                              VehicleModel vehicleModel) {
+  private void updateCurrentOrderSequenceName(
+      Vehicle vehicle,
+      VehicleModel vehicleModel
+  ) {
     if (vehicle.getOrderSequence() == null) {
       vehicleModel.getPropertyCurrentSequenceName().setText("null");
     }
@@ -231,7 +261,7 @@ public class VehicleAdapter
   private int getEnergyLevelSufficientlyRecharged(VehicleModel model) {
     return (Integer) model.getPropertyEnergyLevelSufficientlyRecharged().getValue();
   }
-  
+
   private String getEnvelopeKey(VehicleModel model) {
     return model.getPropertyEnvelopeKey().getText();
   }

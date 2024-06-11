@@ -7,12 +7,14 @@
  */
 package org.opentcs.kernelcontrolcenter.vehicles;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
@@ -20,7 +22,6 @@ import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
-import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 import org.opentcs.util.CallWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +30,10 @@ import org.slf4j.LoggerFactory;
  * A model for displaying a list/table of vehicles in the kernel GUI.
  */
 public class VehicleTableModel
-    extends AbstractTableModel
-    implements PropertyChangeListener {
+    extends
+      AbstractTableModel
+    implements
+      PropertyChangeListener {
 
   /**
    * This class's logger.
@@ -43,23 +46,25 @@ public class VehicleTableModel
   /**
    * The column names.
    */
-  private static final String[] COLUMN_NAMES = new String[]{
-    BUNDLE.getString("vehicleTableModel.column_vehicle.headerText"),
-    BUNDLE.getString("vehicleTableModel.column_state.headerText"),
-    BUNDLE.getString("vehicleTableModel.column_adapter.headerText"),
-    BUNDLE.getString("vehicleTableModel.column_enabled.headerText"),
-    BUNDLE.getString("vehicleTableModel.column_position.headerText")
-  };
+  private static final String[] COLUMN_NAMES
+      = new String[]{
+          BUNDLE.getString("vehicleTableModel.column_vehicle.headerText"),
+          BUNDLE.getString("vehicleTableModel.column_state.headerText"),
+          BUNDLE.getString("vehicleTableModel.column_adapter.headerText"),
+          BUNDLE.getString("vehicleTableModel.column_enabled.headerText"),
+          BUNDLE.getString("vehicleTableModel.column_position.headerText")
+      };
   /**
    * The column classes.
    */
-  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
-    String.class,
-    String.class,
-    VehicleCommAdapterDescription.class,
-    Boolean.class,
-    String.class
-  };
+  private static final Class<?>[] COLUMN_CLASSES
+      = new Class<?>[]{
+          String.class,
+          String.class,
+          VehicleCommAdapterDescription.class,
+          Boolean.class,
+          String.class
+      };
   /**
    * The index of the column showing the vehicle name.
    */
@@ -107,8 +112,10 @@ public class VehicleTableModel
    * @param vehicleService The vehicle service used for interactions.
    * @param callWrapper The call wrapper to use for service calls.
    */
-  public VehicleTableModel(VehicleService vehicleService,
-                           CallWrapper callWrapper) {
+  public VehicleTableModel(
+      VehicleService vehicleService,
+      CallWrapper callWrapper
+  ) {
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");
   }
@@ -270,12 +277,18 @@ public class VehicleTableModel
   private void setEnabledState(boolean enabled, LocalVehicleEntry entry) {
     try {
       if (enabled) {
-        callWrapper.call(() -> vehicleService.enableCommAdapter(
-            entry.getAttachmentInformation().getVehicleReference()));
+        callWrapper.call(
+            () -> vehicleService.enableCommAdapter(
+                entry.getAttachmentInformation().getVehicleReference()
+            )
+        );
       }
       else {
-        callWrapper.call(() -> vehicleService.disableCommAdapter(
-            entry.getAttachmentInformation().getVehicleReference()));
+        callWrapper.call(
+            () -> vehicleService.disableCommAdapter(
+                entry.getAttachmentInformation().getVehicleReference()
+            )
+        );
       }
     }
     catch (Exception ex) {
@@ -288,14 +301,18 @@ public class VehicleTableModel
   }
 
   private boolean isRelevantUpdate(PropertyChangeEvent evt) {
-    if (Objects.equals(evt.getPropertyName(),
-                       LocalVehicleEntry.Attribute.ATTACHMENT_INFORMATION.name())) {
+    if (Objects.equals(
+        evt.getPropertyName(),
+        LocalVehicleEntry.Attribute.ATTACHMENT_INFORMATION.name()
+    )) {
       VehicleAttachmentInformation oldInfo = (VehicleAttachmentInformation) evt.getOldValue();
       VehicleAttachmentInformation newInfo = (VehicleAttachmentInformation) evt.getNewValue();
       return !oldInfo.getAttachedCommAdapter().equals(newInfo.getAttachedCommAdapter());
     }
-    if (Objects.equals(evt.getPropertyName(),
-                       LocalVehicleEntry.Attribute.PROCESS_MODEL.name())) {
+    if (Objects.equals(
+        evt.getPropertyName(),
+        LocalVehicleEntry.Attribute.PROCESS_MODEL.name()
+    )) {
       VehicleProcessModelTO oldTo = (VehicleProcessModelTO) evt.getOldValue();
       VehicleProcessModelTO newTo = (VehicleProcessModelTO) evt.getNewValue();
       return oldTo.isCommAdapterEnabled() != newTo.isCommAdapterEnabled()

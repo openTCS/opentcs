@@ -15,7 +15,8 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapter;
  * A command to enable/disable the comm adapter's manual mode.
  */
 public class EnableManualModeCommand
-    implements PeripheralAdapterCommand {
+    implements
+      PeripheralAdapterCommand {
 
   /**
    * Whether to enable/disable manual mode.

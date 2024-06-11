@@ -14,7 +14,8 @@ import org.opentcs.guing.common.components.layer.LayerEditor;
  * Provides methods to edit layers.
  */
 public interface LayerEditorModeling
-    extends LayerEditor {
+    extends
+      LayerEditor {
 
   /**
    * Creates a new layer.

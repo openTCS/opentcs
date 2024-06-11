@@ -7,9 +7,10 @@
  */
 package org.opentcs.operationsdesk.components.layer;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javax.swing.SwingUtilities;
@@ -27,9 +28,11 @@ import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
  * A table model for layers.
  */
 class LayersTableModel
-    extends AbstractTableModel
-    implements LayerChangeListener,
-               LayerGroupChangeListener {
+    extends
+      AbstractTableModel
+    implements
+      LayerChangeListener,
+      LayerGroupChangeListener {
 
   /**
    * The number of the "Ordinal" column.
@@ -60,21 +63,21 @@ class LayersTableModel
    * The column names.
    */
   private static final String[] COLUMN_NAMES = new String[]{
-    BUNDLE.getString("layersTableModel.column_ordinal.headerText"),
-    BUNDLE.getString("layersTableModel.column_visible.headerText"),
-    BUNDLE.getString("layersTableModel.column_name.headerText"),
-    BUNDLE.getString("layersTableModel.column_group.headerText"),
-    BUNDLE.getString("layersTableModel.column_groupVisible.headerText")
+      BUNDLE.getString("layersTableModel.column_ordinal.headerText"),
+      BUNDLE.getString("layersTableModel.column_visible.headerText"),
+      BUNDLE.getString("layersTableModel.column_name.headerText"),
+      BUNDLE.getString("layersTableModel.column_group.headerText"),
+      BUNDLE.getString("layersTableModel.column_groupVisible.headerText")
   };
   /**
    * The column classes.
    */
   private static final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
-    Integer.class,
-    Boolean.class,
-    String.class,
-    LayerGroup.class,
-    Boolean.class
+      Integer.class,
+      Boolean.class,
+      String.class,
+      LayerGroup.class,
+      Boolean.class
   };
   /**
    * The model manager.
@@ -91,8 +94,10 @@ class LayersTableModel
    * @param modelManager The model manager.
    * @param layerEditor The layer editor.
    */
-  LayersTableModel(ModelManager modelManager,
-                   LayerEditor layerEditor) {
+  LayersTableModel(
+      ModelManager modelManager,
+      LayerEditor layerEditor
+  ) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.layerEditor = requireNonNull(layerEditor, "layerEditor");
   }

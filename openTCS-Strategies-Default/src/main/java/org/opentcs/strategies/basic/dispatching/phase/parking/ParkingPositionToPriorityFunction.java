@@ -22,7 +22,8 @@ import org.opentcs.data.model.Point;
  * </p>
  */
 public class ParkingPositionToPriorityFunction
-    implements Function<Point, Integer> {
+    implements
+      Function<Point, Integer> {
 
   /**
    * Creates a new instance.

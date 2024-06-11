@@ -7,8 +7,10 @@
  */
 package org.opentcs.operationsdesk.exchange;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+import static org.opentcs.data.TCSObjectEvent.Type.OBJECT_MODIFIED;
+
+import jakarta.inject.Inject;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelStateTransitionEvent;
 import org.opentcs.access.SharedKernelServicePortal;
@@ -18,7 +20,6 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
-import static org.opentcs.data.TCSObjectEvent.Type.OBJECT_MODIFIED;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.base.model.ModelComponent;
@@ -37,8 +38,9 @@ import org.slf4j.LoggerFactory;
  * A central event dispatcher between the kernel and the plant overview.
  */
 public class OpenTCSEventDispatcher
-    implements Lifecycle,
-               EventHandler {
+    implements
+      Lifecycle,
+      EventHandler {
 
   /**
    * This class's logger.
@@ -78,10 +80,13 @@ public class OpenTCSEventDispatcher
    * @param modelManager The model manager.
    */
   @Inject
-  public OpenTCSEventDispatcher(SharedKernelServicePortalProvider portalProvider,
-                                @ApplicationEventBus EventBus eventBus,
-                                ProcessAdapterUtil processAdapterUtil,
-                                ModelManager modelManager) {
+  public OpenTCSEventDispatcher(
+      SharedKernelServicePortalProvider portalProvider,
+      @ApplicationEventBus
+      EventBus eventBus,
+      ProcessAdapterUtil processAdapterUtil,
+      ModelManager modelManager
+  ) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.processAdapterUtil = requireNonNull(processAdapterUtil, "processAdapterUtil");
@@ -157,17 +162,24 @@ public class OpenTCSEventDispatcher
       // the transition to finish
       if (kse.isTransitionFinished()
           || kse.getEnteredState() == Kernel.State.SHUTDOWN) {
-        eventBus.onEvent(new KernelStateChangeEvent(
-            this,
-            KernelStateChangeEvent.convertKernelState(kse.getEnteredState())));
+        eventBus.onEvent(
+            new KernelStateChangeEvent(
+                this,
+                KernelStateChangeEvent.convertKernelState(kse.getEnteredState())
+            )
+        );
       }
     }
     else if (event instanceof OperationModeChangeEvent) {
       handleOperationModeChange((OperationModeChangeEvent) event);
     }
     else if (event == ClientConnectionMode.OFFLINE) {
-      eventBus.onEvent(new KernelStateChangeEvent(this,
-                                                  KernelStateChangeEvent.State.DISCONNECTED));
+      eventBus.onEvent(
+          new KernelStateChangeEvent(
+              this,
+              KernelStateChangeEvent.State.DISCONNECTED
+          )
+      );
     }
   }
 
@@ -211,10 +223,12 @@ public class OpenTCSEventDispatcher
     }
 
     ProcessAdapter adapter = processAdapterUtil.processAdapterFor(modelComponent);
-    adapter.updateModelProperties(tcsObject,
-                                  modelComponent,
-                                  modelManager.getModel(),
-                                  sharedPortal.getPortal().getPlantModelService());
+    adapter.updateModelProperties(
+        tcsObject,
+        modelComponent,
+        modelManager.getModel(),
+        sharedPortal.getPortal().getPlantModelService()
+    );
   }
 
 }

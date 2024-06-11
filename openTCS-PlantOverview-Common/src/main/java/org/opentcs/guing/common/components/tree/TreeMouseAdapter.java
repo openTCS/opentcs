@@ -32,7 +32,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A mouse adapter for the <code>TreeView</code> for components and blocks.
  */
 public class TreeMouseAdapter
-    extends MouseAdapter {
+    extends
+      MouseAdapter {
 
   /**
    * The TreeView this mouse adapter belongs to.
@@ -86,9 +87,11 @@ public class TreeMouseAdapter
    * @param userObject The user object that was right clicked.
    * @param currentSelection The user objects that were selected.
    */
-  protected void evaluateRightClick(MouseEvent e,
-                                    UserObject userObject,
-                                    Set<UserObject> currentSelection) {
+  protected void evaluateRightClick(
+      MouseEvent e,
+      UserObject userObject,
+      Set<UserObject> currentSelection
+  ) {
 
     if (!currentSelection.contains(userObject)) {
       currentSelection.clear();

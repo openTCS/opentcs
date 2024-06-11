@@ -15,7 +15,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property for angles.
  */
 public class AngleProperty
-    extends AbstractQuantity<AngleProperty.Unit> {
+    extends
+      AbstractQuantity<AngleProperty.Unit> {
 
   /**
    * Creates a new instance.

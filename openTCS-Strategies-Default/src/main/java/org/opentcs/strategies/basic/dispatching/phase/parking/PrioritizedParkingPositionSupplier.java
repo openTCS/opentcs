@@ -7,11 +7,13 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,7 +21,6 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,8 @@ import org.slf4j.LoggerFactory;
  * vehicle's current position.
  */
 public class PrioritizedParkingPositionSupplier
-    extends AbstractParkingPositionSupplier {
+    extends
+      AbstractParkingPositionSupplier {
 
   /**
    * This class's Logger.
@@ -49,9 +51,11 @@ public class PrioritizedParkingPositionSupplier
    * @param priorityFunction A function computing the priority of a parking position.
    */
   @Inject
-  public PrioritizedParkingPositionSupplier(InternalPlantModelService plantModelService,
-                                            Router router,
-                                            ParkingPositionToPriorityFunction priorityFunction) {
+  public PrioritizedParkingPositionSupplier(
+      InternalPlantModelService plantModelService,
+      Router router,
+      ParkingPositionToPriorityFunction priorityFunction
+  ) {
     super(plantModelService, router);
     this.priorityFunction = requireNonNull(priorityFunction, "priorityFunction");
   }
@@ -74,9 +78,11 @@ public class PrioritizedParkingPositionSupplier
       return Optional.empty();
     }
 
-    LOG.debug("{}: Selecting parking position from candidates {}.",
-              vehicle.getName(),
-              parkingPosCandidates);
+    LOG.debug(
+        "{}: Selecting parking position from candidates {}.",
+        vehicle.getName(),
+        parkingPosCandidates
+    );
 
     parkingPosCandidates = filterPositionsWithHighestPriority(parkingPosCandidates);
     Point parkingPos = nearestPoint(vehicle, parkingPosCandidates);
@@ -87,8 +93,10 @@ public class PrioritizedParkingPositionSupplier
   }
 
   private int priorityOfCurrentPosition(Vehicle vehicle) {
-    Point currentPos = getPlantModelService().fetchObject(Point.class,
-                                                          vehicle.getCurrentPosition());
+    Point currentPos = getPlantModelService().fetchObject(
+        Point.class,
+        vehicle.getCurrentPosition()
+    );
     return priorityFunction
         .andThen(priority -> priority != null ? priority : Integer.MAX_VALUE)
         .apply(currentPos);

@@ -43,12 +43,14 @@ public final class Cursors {
     BufferedImage bi = new BufferedImage(32, 32, BufferedImage.TYPE_INT_ARGB);
     bi.createGraphics().drawImage(
         new ImageIcon(
-            Cursors.class.getClassLoader().
-                getResource("org/opentcs/guing/res/symbols/toolbar/create-order.22.png")
+            Cursors.class.getClassLoader().getResource(
+                "org/opentcs/guing/res/symbols/toolbar/create-order.22.png"
+            )
         ).getImage(),
         0,
         0,
-        null);
+        null
+    );
     return Toolkit.getDefaultToolkit().createCustomCursor(bi, new Point(0, 0), "toCursor");
   }
 }

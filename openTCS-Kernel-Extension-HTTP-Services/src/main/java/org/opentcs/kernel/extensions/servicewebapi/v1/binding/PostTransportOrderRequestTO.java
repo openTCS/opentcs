@@ -7,13 +7,14 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.posttransportorder.Destination;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
@@ -45,16 +46,35 @@ public class PostTransportOrderRequestTO {
   // CHECKSTYLE:OFF (because of very long parameter declarations)
   @JsonCreator
   public PostTransportOrderRequestTO(
-      @JsonProperty(required = false, value = "incompleteName") boolean incompleteName,
-      @JsonProperty(required = false, value = "dispensable") boolean dispensable,
-      @Nullable @JsonProperty(required = false, value = "deadline") Instant deadline,
-      @Nullable @JsonProperty(required = false, value = "intendedVehicle") String intendedVehicle,
-      @Nullable @JsonProperty(required = false, value = "peripheralReservationToken") String peripheralReservationToken,
-      @Nullable @JsonProperty(required = false, value = "wrappingSequence") String wrappingSequence,
-      @Nullable @JsonProperty(required = false, value = "type") String type,
-      @Nonnull @JsonProperty(required = true, value = "destinations") List<Destination> destinations,
-      @Nullable @JsonProperty(required = false, value = "properties") List<Property> properties,
-      @Nullable @JsonProperty(required = false, value = "dependencies") List<String> dependencies) {
+      @JsonProperty(required = false, value = "incompleteName")
+      boolean incompleteName,
+      @JsonProperty(required = false, value = "dispensable")
+      boolean dispensable,
+      @Nullable
+      @JsonProperty(required = false, value = "deadline")
+      Instant deadline,
+      @Nullable
+      @JsonProperty(required = false, value = "intendedVehicle")
+      String intendedVehicle,
+      @Nullable
+      @JsonProperty(required = false, value = "peripheralReservationToken")
+      String peripheralReservationToken,
+      @Nullable
+      @JsonProperty(required = false, value = "wrappingSequence")
+      String wrappingSequence,
+      @Nullable
+      @JsonProperty(required = false, value = "type")
+      String type,
+      @Nonnull
+      @JsonProperty(required = true, value = "destinations")
+      List<Destination> destinations,
+      @Nullable
+      @JsonProperty(required = false, value = "properties")
+      List<Property> properties,
+      @Nullable
+      @JsonProperty(required = false, value = "dependencies")
+      List<String> dependencies
+  ) {
     this.incompleteName = incompleteName;
     this.dispensable = dispensable;
     this.deadline = deadline;
@@ -94,7 +114,10 @@ public class PostTransportOrderRequestTO {
     return deadline;
   }
 
-  public PostTransportOrderRequestTO setDeadline(@Nullable Instant deadline) {
+  public PostTransportOrderRequestTO setDeadline(
+      @Nullable
+      Instant deadline
+  ) {
     this.deadline = deadline;
     return this;
   }
@@ -104,7 +127,10 @@ public class PostTransportOrderRequestTO {
     return intendedVehicle;
   }
 
-  public PostTransportOrderRequestTO setIntendedVehicle(@Nullable String intendedVehicle) {
+  public PostTransportOrderRequestTO setIntendedVehicle(
+      @Nullable
+      String intendedVehicle
+  ) {
     this.intendedVehicle = intendedVehicle;
     return this;
   }
@@ -115,7 +141,9 @@ public class PostTransportOrderRequestTO {
   }
 
   public PostTransportOrderRequestTO setPeripheralReservationToken(
-      @Nullable String peripheralReservationToken) {
+      @Nullable
+      String peripheralReservationToken
+  ) {
     this.peripheralReservationToken = peripheralReservationToken;
     return this;
   }
@@ -125,7 +153,10 @@ public class PostTransportOrderRequestTO {
     return wrappingSequence;
   }
 
-  public PostTransportOrderRequestTO setWrappingSequence(@Nullable String wrappingSequence) {
+  public PostTransportOrderRequestTO setWrappingSequence(
+      @Nullable
+      String wrappingSequence
+  ) {
     this.wrappingSequence = wrappingSequence;
     return this;
   }
@@ -135,7 +166,10 @@ public class PostTransportOrderRequestTO {
     return type;
   }
 
-  public PostTransportOrderRequestTO setType(@Nullable String type) {
+  public PostTransportOrderRequestTO setType(
+      @Nullable
+      String type
+  ) {
     this.type = type;
     return this;
   }
@@ -145,7 +179,10 @@ public class PostTransportOrderRequestTO {
     return destinations;
   }
 
-  public PostTransportOrderRequestTO setDestinations(@Nonnull List<Destination> destinations) {
+  public PostTransportOrderRequestTO setDestinations(
+      @Nonnull
+      List<Destination> destinations
+  ) {
     this.destinations = requireNonNull(destinations, "destinations");
     return this;
   }
@@ -155,7 +192,10 @@ public class PostTransportOrderRequestTO {
     return properties;
   }
 
-  public PostTransportOrderRequestTO setProperties(@Nullable List<Property> properties) {
+  public PostTransportOrderRequestTO setProperties(
+      @Nullable
+      List<Property> properties
+  ) {
     this.properties = properties;
     return this;
   }
@@ -165,7 +205,10 @@ public class PostTransportOrderRequestTO {
     return dependencies;
   }
 
-  public PostTransportOrderRequestTO setDependencies(@Nullable List<String> dependencies) {
+  public PostTransportOrderRequestTO setDependencies(
+      @Nullable
+      List<String> dependencies
+  ) {
     this.dependencies = dependencies;
     return this;
   }

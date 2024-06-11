@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.data.TCSObjectReference;
@@ -223,7 +224,10 @@ public class GetVehicleResponseTO {
     return envelopeKey;
   }
 
-  public GetVehicleResponseTO setEnvelopeKey(@Nullable String envelopeKey) {
+  public GetVehicleResponseTO setEnvelopeKey(
+      @Nullable
+      String envelopeKey
+  ) {
     this.envelopeKey = envelopeKey;
     return this;
   }
@@ -252,29 +256,38 @@ public class GetVehicleResponseTO {
     vehicleState.setTransportOrder(nameOfNullableReference(vehicle.getTransportOrder()));
     vehicleState.setCurrentPosition(nameOfNullableReference(vehicle.getCurrentPosition()));
     if (vehicle.getPrecisePosition() != null) {
-      vehicleState.setPrecisePosition(new PrecisePosition(vehicle.getPrecisePosition().getX(),
-                                                          vehicle.getPrecisePosition().getY(),
-                                                          vehicle.getPrecisePosition().getZ()));
+      vehicleState.setPrecisePosition(
+          new PrecisePosition(
+              vehicle.getPrecisePosition().getX(),
+              vehicle.getPrecisePosition().getY(),
+              vehicle.getPrecisePosition().getZ()
+          )
+      );
     }
     vehicleState.setOrientationAngle(vehicle.getOrientationAngle());
     vehicleState.setState(vehicle.getState());
     vehicleState.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
     vehicleState.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));
     vehicleState.setEnvelopeKey(vehicle.getEnvelopeKey());
-    vehicleState.setAllowedOrderTypes(vehicle.getAllowedOrderTypes()
-        .stream()
-        .sorted()
-        .collect(Collectors.toCollection(ArrayList::new))
+    vehicleState.setAllowedOrderTypes(
+        vehicle.getAllowedOrderTypes()
+            .stream()
+            .sorted()
+            .collect(Collectors.toCollection(ArrayList::new))
     );
     return vehicleState;
   }
 
-  private static String nameOfNullableReference(@Nullable TCSObjectReference<?> reference) {
+  private static String nameOfNullableReference(
+      @Nullable
+      TCSObjectReference<?> reference
+  ) {
     return reference == null ? null : reference.getName();
   }
 
   private static List<List<String>> toListOfListOfNames(
-      List<Set<TCSResourceReference<?>>> resources) {
+      List<Set<TCSResourceReference<?>>> resources
+  ) {
     List<List<String>> result = new ArrayList<>(resources.size());
 
     for (Set<TCSResourceReference<?>> resSet : resources) {

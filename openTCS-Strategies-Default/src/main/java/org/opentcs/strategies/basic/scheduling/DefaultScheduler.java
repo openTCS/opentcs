@@ -7,6 +7,9 @@
  */
 package org.opentcs.strategies.basic.scheduling;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
@@ -14,7 +17,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -34,7 +36,6 @@ import org.opentcs.strategies.basic.scheduling.AllocatorCommand.Allocate;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.AllocationsReleased;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.CheckAllocationsPrepared;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.RetryAllocates;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.slf4j.Logger;
@@ -45,8 +46,9 @@ import org.slf4j.LoggerFactory;
  * collisions.
  */
 public class DefaultScheduler
-    implements Scheduler,
-               EventHandler {
+    implements
+      Scheduler,
+      EventHandler {
 
   /**
    * This class's Logger.
@@ -95,11 +97,16 @@ public class DefaultScheduler
    * @param globalSyncObject The kernel threads' global synchronization object.
    */
   @Inject
-  public DefaultScheduler(AllocationAdvisor allocationAdvisor,
-                          ReservationPool reservationPool,
-                          @KernelExecutor ScheduledExecutorService kernelExecutor,
-                          @ApplicationEventBus EventBus eventBus,
-                          @GlobalSyncObject Object globalSyncObject) {
+  public DefaultScheduler(
+      AllocationAdvisor allocationAdvisor,
+      ReservationPool reservationPool,
+      @KernelExecutor
+      ScheduledExecutorService kernelExecutor,
+      @ApplicationEventBus
+      EventBus eventBus,
+      @GlobalSyncObject
+      Object globalSyncObject
+  ) {
     this.allocationAdvisor = requireNonNull(allocationAdvisor, "allocationAdvisor");
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
@@ -147,9 +154,11 @@ public class DefaultScheduler
     synchronized (globalSyncObject) {
       reservationPool.setClaim(client, resources);
 
-      allocationAdvisor.setAllocationState(client,
-                                           reservationPool.allocatedResources(client),
-                                           resources);
+      allocationAdvisor.setAllocationState(
+          client,
+          reservationPool.allocatedResources(client),
+          resources
+      );
     }
   }
 
@@ -159,17 +168,21 @@ public class DefaultScheduler
     requireNonNull(resources, "resources");
 
     synchronized (globalSyncObject) {
-      checkArgument(reservationPool.isNextInClaim(client, resources),
-                    "Not the next claimed resources: %s",
-                    resources);
+      checkArgument(
+          reservationPool.isNextInClaim(client, resources),
+          "Not the next claimed resources: %s",
+          resources
+      );
 
       Future<?> allocateFuture = kernelExecutor.submit(
-          new AllocatorTask(reservationPool,
-                            deferredAllocations,
-                            allocationAdvisor,
-                            kernelExecutor,
-                            globalSyncObject,
-                            new Allocate(client, resources))
+          new AllocatorTask(
+              reservationPool,
+              deferredAllocations,
+              allocationAdvisor,
+              kernelExecutor,
+              globalSyncObject,
+              new Allocate(client, resources)
+          )
       );
 
       // Remember the allocate future in case we need to cancel it.
@@ -230,19 +243,25 @@ public class DefaultScheduler
       Set<TCSResource<?>> completelyFreeResources = resources.stream()
           .filter(resource -> reservationPool.getReservationEntry(resource).isFree())
           .collect(Collectors.toCollection(HashSet::new));
-      new AllocatorTask(reservationPool,
-                        deferredAllocations,
-                        allocationAdvisor,
-                        kernelExecutor,
-                        globalSyncObject,
-                        new AllocationsReleased(client, completelyFreeResources)).run();
+      new AllocatorTask(
+          reservationPool,
+          deferredAllocations,
+          allocationAdvisor,
+          kernelExecutor,
+          globalSyncObject,
+          new AllocationsReleased(client, completelyFreeResources)
+      ).run();
     }
-    kernelExecutor.submit(new AllocatorTask(reservationPool,
-                                            deferredAllocations,
-                                            allocationAdvisor,
-                                            kernelExecutor,
-                                            globalSyncObject,
-                                            new RetryAllocates(client)));
+    kernelExecutor.submit(
+        new AllocatorTask(
+            reservationPool,
+            deferredAllocations,
+            allocationAdvisor,
+            kernelExecutor,
+            globalSyncObject,
+            new RetryAllocates(client)
+        )
+    );
   }
 
   @Override
@@ -256,19 +275,25 @@ public class DefaultScheduler
       reservationPool.freeAll(client);
       clearPendingAllocations(client);
 
-      new AllocatorTask(reservationPool,
-                        deferredAllocations,
-                        allocationAdvisor,
-                        kernelExecutor,
-                        globalSyncObject,
-                        new AllocationsReleased(client, freedResources)).run();
+      new AllocatorTask(
+          reservationPool,
+          deferredAllocations,
+          allocationAdvisor,
+          kernelExecutor,
+          globalSyncObject,
+          new AllocationsReleased(client, freedResources)
+      ).run();
     }
-    kernelExecutor.submit(new AllocatorTask(reservationPool,
-                                            deferredAllocations,
-                                            allocationAdvisor,
-                                            kernelExecutor,
-                                            globalSyncObject,
-                                            new RetryAllocates(client)));
+    kernelExecutor.submit(
+        new AllocatorTask(
+            reservationPool,
+            deferredAllocations,
+            allocationAdvisor,
+            kernelExecutor,
+            globalSyncObject,
+            new RetryAllocates(client)
+        )
+    );
   }
 
   @Override
@@ -283,12 +308,14 @@ public class DefaultScheduler
 
   @Override
   public void reschedule() {
-    new AllocatorTask(reservationPool,
-                      deferredAllocations,
-                      allocationAdvisor,
-                      kernelExecutor,
-                      globalSyncObject,
-                      new RetryAllocates(new DummyClient())).run();
+    new AllocatorTask(
+        reservationPool,
+        deferredAllocations,
+        allocationAdvisor,
+        kernelExecutor,
+        globalSyncObject,
+        new RetryAllocates(new DummyClient())
+    ).run();
   }
 
   @Override
@@ -299,19 +326,26 @@ public class DefaultScheduler
   }
 
   @Override
-  public void preparationSuccessful(@Nonnull Module module,
-                                    @Nonnull Client client,
-                                    @Nonnull Set<TCSResource<?>> resources) {
+  public void preparationSuccessful(
+      @Nonnull
+      Module module,
+      @Nonnull
+      Client client,
+      @Nonnull
+      Set<TCSResource<?>> resources
+  ) {
     requireNonNull(module, "module");
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
-    new AllocatorTask(reservationPool,
-                      deferredAllocations,
-                      allocationAdvisor,
-                      kernelExecutor,
-                      globalSyncObject,
-                      new CheckAllocationsPrepared(client, resources)).run();
+    new AllocatorTask(
+        reservationPool,
+        deferredAllocations,
+        allocationAdvisor,
+        kernelExecutor,
+        globalSyncObject,
+        new CheckAllocationsPrepared(client, resources)
+    ).run();
   }
 
   @Override
@@ -368,7 +402,8 @@ public class DefaultScheduler
    * A dummy client for cases in which we need to provide a client but do not have a real one.
    */
   private static class DummyClient
-      implements Scheduler.Client {
+      implements
+        Scheduler.Client {
 
     /**
      * Creates a new instance.

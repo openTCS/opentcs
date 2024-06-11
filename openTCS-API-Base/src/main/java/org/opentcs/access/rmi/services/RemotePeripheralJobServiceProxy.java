@@ -20,8 +20,10 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * Delegates method invocations to the corresponding remote service.
  */
 class RemotePeripheralJobServiceProxy
-    extends RemoteTCSObjectServiceProxy<RemotePeripheralJobService>
-    implements PeripheralJobService {
+    extends
+      RemoteTCSObjectServiceProxy<RemotePeripheralJobService>
+    implements
+      PeripheralJobService {
 
   /**
    * Creates a new instance.
@@ -31,7 +33,9 @@ class RemotePeripheralJobServiceProxy
 
   @Override
   public PeripheralJob createPeripheralJob(PeripheralJobCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        ObjectExistsException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {

@@ -7,15 +7,17 @@
  */
 package org.opentcs.modeleditor.application.menus.menubar;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import javax.swing.JMenuBar;
 
 /**
  * The plant overview's main menu bar.
  */
 public class ApplicationMenuBar
-    extends JMenuBar {
+    extends
+      JMenuBar {
 
   private final FileMenu menuFile;
   private final EditMenu menuEdit;
@@ -34,11 +36,13 @@ public class ApplicationMenuBar
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public ApplicationMenuBar(FileMenu menuFile,
-                            EditMenu menuEdit,
-                            ActionsMenu menuActions,
-                            ViewMenu menuView,
-                            HelpMenu menuHelp) {
+  public ApplicationMenuBar(
+      FileMenu menuFile,
+      EditMenu menuEdit,
+      ActionsMenu menuActions,
+      ViewMenu menuView,
+      HelpMenu menuHelp
+  ) {
     requireNonNull(menuFile, "menuFile");
     requireNonNull(menuEdit, "menuEdit");
     requireNonNull(menuActions, "menuActions");

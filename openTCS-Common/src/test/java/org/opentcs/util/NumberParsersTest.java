@@ -7,8 +7,9 @@
  */
 package org.opentcs.util;
 
-import java.util.stream.LongStream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.stream.LongStream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 

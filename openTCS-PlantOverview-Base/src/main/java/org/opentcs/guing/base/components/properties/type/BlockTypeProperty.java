@@ -15,11 +15,14 @@ import org.opentcs.guing.base.model.elements.BlockModel.Type;
  * Subclass for a {@link Type} selection property.
  */
 public class BlockTypeProperty
-    extends SelectionProperty<Type> {
+    extends
+      SelectionProperty<Type> {
 
-  public BlockTypeProperty(ModelComponent model,
-                           List<Type> possibleValues,
-                           Object value) {
+  public BlockTypeProperty(
+      ModelComponent model,
+      List<Type> possibleValues,
+      Object value
+  ) {
     super(model, possibleValues, value);
   }
 }

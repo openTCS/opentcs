@@ -7,12 +7,13 @@
  */
 package org.opentcs.modeleditor.components.dockable;
 
+import static java.util.Objects.requireNonNull;
+
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.group.CGroupBehavior;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
@@ -30,7 +31,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * Utility class for working with dockables.
  */
 public class DockingManagerModeling
-    extends AbstractDockingManager {
+    extends
+      AbstractDockingManager {
 
   /**
    * ID of the tab pane that contains the course, transport orders and order sequences.
@@ -91,18 +93,24 @@ public class DockingManagerModeling
    * @param layerGroupsPanel The panel displaying the layer groups in the plant model.
    */
   @Inject
-  public DockingManagerModeling(@ApplicationFrame JFrame applicationFrame,
-                                ComponentsTreeViewManager componentsTreeViewManager,
-                                BlocksTreeViewManager blocksTreeViewManager,
-                                SelectionPropertiesComponent selectionPropertiesComponent,
-                                LayersPanel layersPanel,
-                                LayerGroupsPanel layerGroupsPanel) {
+  public DockingManagerModeling(@ApplicationFrame
+  JFrame applicationFrame,
+      ComponentsTreeViewManager componentsTreeViewManager,
+      BlocksTreeViewManager blocksTreeViewManager,
+      SelectionPropertiesComponent selectionPropertiesComponent,
+      LayersPanel layersPanel,
+      LayerGroupsPanel layerGroupsPanel
+  ) {
     super(new CControl(applicationFrame));
-    this.componentsTreeViewManager = requireNonNull(componentsTreeViewManager,
-                                                    "componentsTreeViewManager");
+    this.componentsTreeViewManager = requireNonNull(
+        componentsTreeViewManager,
+        "componentsTreeViewManager"
+    );
     this.blocksTreeViewManager = requireNonNull(blocksTreeViewManager, "blocksTreeViewManager");
-    this.selectionPropertiesComponent = requireNonNull(selectionPropertiesComponent,
-                                                       "selectionPropertiesComponent");
+    this.selectionPropertiesComponent = requireNonNull(
+        selectionPropertiesComponent,
+        "selectionPropertiesComponent"
+    );
     this.layersPanel = requireNonNull(layersPanel, "layersPanel");
     this.layerGroupsPanel = requireNonNull(layerGroupsPanel, "layerGroupsPanel");
   }
@@ -139,32 +147,44 @@ public class DockingManagerModeling
     layerTabPane = new CStack(LAYER_TAB_PANE_ID);
     addTabPane(LAYER_TAB_PANE_ID, layerTabPane);
     DefaultSingleCDockable treeViewDock
-        = createDockable(COMPONENTS_ID,
-                         bundle.getString("dockingManagerModeling.panel_components.title"),
-                         (JComponent) componentsTreeViewManager.getTreeView(),
-                         false);
+        = createDockable(
+            COMPONENTS_ID,
+            bundle.getString("dockingManagerModeling.panel_components.title"),
+            (JComponent) componentsTreeViewManager.getTreeView(),
+            false
+        );
     DefaultSingleCDockable treeBlocks
-        = createDockable(BLOCKS_ID,
-                         bundle.getString("dockingManagerModeling.panel_blocks.title"),
-                         (JComponent) blocksTreeViewManager.getTreeView(),
-                         false);
+        = createDockable(
+            BLOCKS_ID,
+            bundle.getString("dockingManagerModeling.panel_blocks.title"),
+            (JComponent) blocksTreeViewManager.getTreeView(),
+            false
+        );
 
     grid.add(0, 0, 250, 400, treeTabPane);
-    grid.add(0, 400, 250, 300,
-             createDockable(PROPERTIES_ID,
-                            bundle.getString("dockingManagerModeling.panel_properties.title"),
-                            selectionPropertiesComponent,
-                            false));
+    grid.add(
+        0, 400, 250, 300,
+        createDockable(
+            PROPERTIES_ID,
+            bundle.getString("dockingManagerModeling.panel_properties.title"),
+            selectionPropertiesComponent,
+            false
+        )
+    );
     DefaultSingleCDockable layersDock
-        = createDockable(LAYERS_ID,
-                         bundle.getString("dockingManagerModeling.panel_layers.title"),
-                         layersPanel,
-                         false);
+        = createDockable(
+            LAYERS_ID,
+            bundle.getString("dockingManagerModeling.panel_layers.title"),
+            layersPanel,
+            false
+        );
     DefaultSingleCDockable layerGroupsDock
-        = createDockable(LAYER_GROUPS_ID,
-                         bundle.getString("dockingManagerModeling.panel_layerGroups.title"),
-                         layerGroupsPanel,
-                         false);
+        = createDockable(
+            LAYER_GROUPS_ID,
+            bundle.getString("dockingManagerModeling.panel_layerGroups.title"),
+            layerGroupsPanel,
+            false
+        );
     grid.add(0, 700, 250, 300, layerTabPane);
     grid.add(400, 0, 1000, 500, courseTabPane);
 

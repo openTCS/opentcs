@@ -7,9 +7,10 @@
  */
 package org.opentcs.strategies.basic.peripherals.dispatching.phase;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Location;
@@ -29,7 +30,8 @@ import org.slf4j.LoggerFactory;
  * Peripherals with no reservation token set are not cosidered in this phase.
  */
 public class AssignReservedPeripheralsPhase
-    implements PeripheralDispatcherPhase {
+    implements
+      PeripheralDispatcherPhase {
 
   /**
    * This class's Logger.
@@ -53,12 +55,16 @@ public class AssignReservedPeripheralsPhase
   private boolean initialized;
 
   @Inject
-  public AssignReservedPeripheralsPhase(TCSObjectService objectService,
-                                        PeripheralControllerPool peripheralControllerPool,
-                                        PeripheralJobUtil peripheralJobUtil) {
+  public AssignReservedPeripheralsPhase(
+      TCSObjectService objectService,
+      PeripheralControllerPool peripheralControllerPool,
+      PeripheralJobUtil peripheralJobUtil
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
-    this.peripheralControllerPool = requireNonNull(peripheralControllerPool,
-                                                   "peripheralControllerPool");
+    this.peripheralControllerPool = requireNonNull(
+        peripheralControllerPool,
+        "peripheralControllerPool"
+    );
     this.peripheralJobUtil = requireNonNull(peripheralJobUtil, "peripheralJobUtil");
   }
 
@@ -85,8 +91,10 @@ public class AssignReservedPeripheralsPhase
 
   @Override
   public void run() {
-    Set<Location> availablePeripherals = objectService.fetchObjects(Location.class,
-                                                                    this::reservedAndAvailable);
+    Set<Location> availablePeripherals = objectService.fetchObjects(
+        Location.class,
+        this::reservedAndAvailable
+    );
     LOG.debug("Available for dispatching: {} peripheral devices.", availablePeripherals.size());
     for (Location location : availablePeripherals) {
       checkForReservedJobs(location);
@@ -98,10 +106,9 @@ public class AssignReservedPeripheralsPhase
   }
 
   private boolean processesNoJob(Location location) {
-    return location.getPeripheralInformation().getProcState()
-        == PeripheralInformation.ProcState.IDLE
-        && location.getPeripheralInformation().getState()
-        == PeripheralInformation.State.IDLE;
+    return location.getPeripheralInformation()
+        .getProcState() == PeripheralInformation.ProcState.IDLE
+        && location.getPeripheralInformation().getState() == PeripheralInformation.State.IDLE;
   }
 
   private boolean hasReservationToken(Location location) {
@@ -124,23 +131,29 @@ public class AssignReservedPeripheralsPhase
   }
 
   private boolean matchesReservationToken(PeripheralJob job, Location location) {
-    return Objects.equals(job.getReservationToken(),
-                          location.getPeripheralInformation().getReservationToken());
+    return Objects.equals(
+        job.getReservationToken(),
+        location.getPeripheralInformation().getReservationToken()
+    );
   }
 
   private boolean matchesLocation(PeripheralJob job, Location location) {
-    return Objects.equals(job.getPeripheralOperation().getLocation(),
-                          location.getReference());
+    return Objects.equals(
+        job.getPeripheralOperation().getLocation(),
+        location.getReference()
+    );
   }
 
   private boolean canProcess(Location location, PeripheralJob job) {
     ExplainedBoolean canProcess
         = peripheralControllerPool.getPeripheralController(location.getReference()).canProcess(job);
     if (!canProcess.getValue()) {
-      LOG.debug("{} cannot process peripheral job {}: {}",
-                location.getName(),
-                job.getName(),
-                canProcess.getReason());
+      LOG.debug(
+          "{} cannot process peripheral job {}: {}",
+          location.getName(),
+          job.getName(),
+          canProcess.getReason()
+      );
 
     }
 

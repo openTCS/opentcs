@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
 import org.opentcs.components.kernel.services.PeripheralJobService;
 import org.opentcs.data.ObjectUnknownException;
@@ -33,9 +34,11 @@ public class PeripheralJobDispatcherHandler {
    * @param executorWrapper Executes calls via the kernel executor and waits for the outcome.
    */
   @Inject
-  public PeripheralJobDispatcherHandler(PeripheralJobService jobService,
-                                        PeripheralDispatcherService jobDispatcherService,
-                                        KernelExecutorWrapper executorWrapper) {
+  public PeripheralJobDispatcherHandler(
+      PeripheralJobService jobService,
+      PeripheralDispatcherService jobDispatcherService,
+      KernelExecutorWrapper executorWrapper
+  ) {
     this.jobService = requireNonNull(jobService, "jobService");
     this.jobDispatcherService = requireNonNull(jobDispatcherService, "jobDispatcherService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");

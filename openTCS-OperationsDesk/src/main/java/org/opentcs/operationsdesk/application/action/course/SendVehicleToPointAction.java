@@ -7,11 +7,13 @@
  */
 package org.opentcs.operationsdesk.application.action.course;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.event.ActionEvent;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
@@ -21,13 +23,13 @@ import org.opentcs.guing.common.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.operationsdesk.exchange.TransportOrderUtil;
 import org.opentcs.operationsdesk.transport.PointPanel;
-import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLEPOPUP_PATH;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  */
 public class SendVehicleToPointAction
-    extends AbstractAction {
+    extends
+      AbstractAction {
 
   /**
    * Sends a vehicle directly to a point.
@@ -62,10 +64,14 @@ public class SendVehicleToPointAction
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public SendVehicleToPointAction(@Assisted VehicleModel vehicle,
-                                  @ApplicationFrame JFrame applicationFrame,
-                                  ModelManager modelManager,
-                                  TransportOrderUtil orderUtil) {
+  public SendVehicleToPointAction(
+      @Assisted
+      VehicleModel vehicle,
+      @ApplicationFrame
+      JFrame applicationFrame,
+      ModelManager modelManager,
+      TransportOrderUtil orderUtil
+  ) {
     this.vehicleModel = requireNonNull(vehicle, "vehicle");
     this.applicationFrame = requireNonNull(applicationFrame, "applicationFrame");
     this.modelManager = requireNonNull(modelManager, "modelManager");

@@ -28,9 +28,11 @@ public class UserMessageHelper {
    * @param message The message to be shown.
    * @param type The type of the message.
    */
-  public void showMessageDialog(String title,
-                                String message,
-                                Type type) {
+  public void showMessageDialog(
+      String title,
+      String message,
+      Type type
+  ) {
     showJOptionPane(title, message, type);
   }
 
@@ -43,10 +45,12 @@ public class UserMessageHelper {
    * @param options The options that shall be selectable.
    * @return An int indicating the selected value or -1, if it was closed.
    */
-  public int showOptionsDialog(String title,
-                               String message,
-                               Type type,
-                               String[] options) {
+  public int showOptionsDialog(
+      String title,
+      String message,
+      Type type,
+      String[] options
+  ) {
     if (options == null || options.length == 0) {
       return -1;
     }
@@ -61,31 +65,39 @@ public class UserMessageHelper {
    * @param type The type of the message.
    * @return A {@link ReturnType} indicating the selected value.
    */
-  public ReturnType showConfirmDialog(String title,
-                                      String message,
-                                      Type type) {
+  public ReturnType showConfirmDialog(
+      String title,
+      String message,
+      Type type
+  ) {
     return translateJOptionReturnType(showJOptionConfirmDialog(title, message, type));
   }
 
-  private int showJOptionConfirmDialog(String title,
-                                       String message,
-                                       Type type) {
+  private int showJOptionConfirmDialog(
+      String title,
+      String message,
+      Type type
+  ) {
     int jOptionType = translateType(type);
     return JOptionPane.showConfirmDialog(null, message, title, jOptionType);
   }
 
-  private int showJOptionsDialog(String title,
-                                 String message,
-                                 Type type,
-                                 String[] options) {
-    int n = JOptionPane.showOptionDialog(null,
-                                         message,
-                                         title,
-                                         JOptionPane.DEFAULT_OPTION,
-                                         translateType(type),
-                                         null,
-                                         options,
-                                         options[0]);
+  private int showJOptionsDialog(
+      String title,
+      String message,
+      Type type,
+      String[] options
+  ) {
+    int n = JOptionPane.showOptionDialog(
+        null,
+        message,
+        title,
+        JOptionPane.DEFAULT_OPTION,
+        translateType(type),
+        null,
+        options,
+        options[0]
+    );
     return n;
   }
 
@@ -120,15 +132,19 @@ public class UserMessageHelper {
     }
   }
 
-  private void showJOptionPane(String title,
-                               String message,
-                               Type type) {
+  private void showJOptionPane(
+      String title,
+      String message,
+      Type type
+  ) {
     int jOptionType;
     jOptionType = translateType(type);
-    JOptionPane.showMessageDialog(null,
-                                  message,
-                                  title,
-                                  jOptionType);
+    JOptionPane.showMessageDialog(
+        null,
+        message,
+        title,
+        jOptionType
+    );
   }
 
   /**

@@ -19,7 +19,8 @@ import org.opentcs.components.plantoverview.PropertySuggestions;
  * The default property suggestions of the baseline plant overview.
  */
 public class DefaultPropertySuggestions
-    implements PropertySuggestions {
+    implements
+      PropertySuggestions {
 
   private final Set<String> keySuggestions = new HashSet<>();
   private final Set<String> valueSuggestions = new HashSet<>();

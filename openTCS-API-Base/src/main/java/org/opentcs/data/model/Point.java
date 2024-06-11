@@ -7,11 +7,12 @@
  */
 package org.opentcs.data.model;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
@@ -23,8 +24,10 @@ import org.opentcs.data.TCSObjectReference;
  * @see Path
  */
 public class Point
-    extends TCSResource<Point>
-    implements Serializable {
+    extends
+      TCSResource<Point>
+    implements
+      Serializable {
 
   /**
    * The pose of the vehicle at this point.
@@ -76,17 +79,19 @@ public class Point
     this.layout = new Layout();
   }
 
-  private Point(String name,
-                Map<String, String> properties,
-                ObjectHistory history,
-                Pose pose,
-                Type type,
-                Set<TCSObjectReference<Path>> incomingPaths,
-                Set<TCSObjectReference<Path>> outgoingPaths,
-                Set<Location.Link> attachedLinks,
-                TCSObjectReference<Vehicle> occupyingVehicle,
-                Map<String, Envelope> vehicleEnvelopes,
-                Layout layout) {
+  private Point(
+      String name,
+      Map<String, String> properties,
+      ObjectHistory history,
+      Pose pose,
+      Type type,
+      Set<TCSObjectReference<Path>> incomingPaths,
+      Set<TCSObjectReference<Path>> outgoingPaths,
+      Set<Location.Link> attachedLinks,
+      TCSObjectReference<Vehicle> occupyingVehicle,
+      Map<String, Envelope> vehicleEnvelopes,
+      Layout layout
+  ) {
     super(name, properties, history);
     this.pose = requireNonNull(pose, "pose");
     this.type = requireNonNull(type, "type");
@@ -100,62 +105,70 @@ public class Point
 
   @Override
   public Point withProperty(String key, String value) {
-    return new Point(getName(),
-                     propertiesWith(key, value),
-                     getHistory(),
-                     pose,
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
+    return new Point(
+        getName(),
+        propertiesWith(key, value),
+        getHistory(),
+        pose,
+        type,
+        incomingPaths,
+        outgoingPaths,
+        attachedLinks,
+        occupyingVehicle,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   @Override
   public Point withProperties(Map<String, String> properties) {
-    return new Point(getName(),
-                     properties,
-                     getHistory(),
-                     pose,
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
+    return new Point(
+        getName(),
+        properties,
+        getHistory(),
+        pose,
+        type,
+        incomingPaths,
+        outgoingPaths,
+        attachedLinks,
+        occupyingVehicle,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   @Override
   public TCSObject<Point> withHistoryEntry(ObjectHistory.Entry entry) {
-    return new Point(getName(),
-                     getProperties(),
-                     getHistory().withEntryAppended(entry),
-                     pose,
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
+    return new Point(
+        getName(),
+        getProperties(),
+        getHistory().withEntryAppended(entry),
+        pose,
+        type,
+        incomingPaths,
+        outgoingPaths,
+        attachedLinks,
+        occupyingVehicle,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   @Override
   public TCSObject<Point> withHistory(ObjectHistory history) {
-    return new Point(getName(),
-                     getProperties(),
-                     history,
-                     pose,
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
+    return new Point(
+        getName(),
+        getProperties(),
+        history,
+        pose,
+        type,
+        incomingPaths,
+        outgoingPaths,
+        attachedLinks,
+        occupyingVehicle,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -174,17 +187,19 @@ public class Point
    * @return A copy of this object, differing in the given value.
    */
   public Point withPose(Pose pose) {
-    return new Point(getName(),
-                     getProperties(),
-                     getHistory(),
-                     pose,
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
+    return new Point(
+        getName(),
+        getProperties(),
+        getHistory(),
+        pose,
+        type,
+        incomingPaths,
+        outgoingPaths,
+        attachedLinks,
+        occupyingVehicle,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -203,17 +218,19 @@ public class Point
    * @return A copy of this object, differing in the given value.
    */
   public Point withType(Type type) {
-    return new Point(getName(),
-                     getProperties(),
-                     getHistory(),
-                     pose,
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
+    return new Point(
+        getName(),
+        getProperties(),
+        getHistory(),
+        pose,
+        type,
+        incomingPaths,
+        outgoingPaths,
+        attachedLinks,
+        occupyingVehicle,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -262,17 +279,19 @@ public class Point
    * @return A copy of this object, differing in the given value.
    */
   public Point withOccupyingVehicle(TCSObjectReference<Vehicle> occupyingVehicle) {
-    return new Point(getName(),
-                     getProperties(),
-                     getHistory(),
-                     pose,
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
+    return new Point(
+        getName(),
+        getProperties(),
+        getHistory(),
+        pose,
+        type,
+        incomingPaths,
+        outgoingPaths,
+        attachedLinks,
+        occupyingVehicle,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -291,17 +310,19 @@ public class Point
    * @return A copy of this object, differing in the given value.
    */
   public Point withIncomingPaths(Set<TCSObjectReference<Path>> incomingPaths) {
-    return new Point(getName(),
-                     getProperties(),
-                     getHistory(),
-                     pose,
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
+    return new Point(
+        getName(),
+        getProperties(),
+        getHistory(),
+        pose,
+        type,
+        incomingPaths,
+        outgoingPaths,
+        attachedLinks,
+        occupyingVehicle,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -320,17 +341,19 @@ public class Point
    * @return A copy of this object, differing in the given value.
    */
   public Point withOutgoingPaths(Set<TCSObjectReference<Path>> outgoingPaths) {
-    return new Point(getName(),
-                     getProperties(),
-                     getHistory(),
-                     pose,
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
+    return new Point(
+        getName(),
+        getProperties(),
+        getHistory(),
+        pose,
+        type,
+        incomingPaths,
+        outgoingPaths,
+        attachedLinks,
+        occupyingVehicle,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -349,17 +372,19 @@ public class Point
    * @return A copy of this object, differing in the given value.
    */
   public Point withAttachedLinks(Set<Location.Link> attachedLinks) {
-    return new Point(getName(),
-                     getProperties(),
-                     getHistory(),
-                     pose,
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
+    return new Point(
+        getName(),
+        getProperties(),
+        getHistory(),
+        pose,
+        type,
+        incomingPaths,
+        outgoingPaths,
+        attachedLinks,
+        occupyingVehicle,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -378,17 +403,19 @@ public class Point
    * @return A copy of this object, differing in the given value.
    */
   public Point withVehicleEnvelopes(Map<String, Envelope> vehicleEnvelopes) {
-    return new Point(getName(),
-                     getProperties(),
-                     getHistory(),
-                     pose,
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
+    return new Point(
+        getName(),
+        getProperties(),
+        getHistory(),
+        pose,
+        type,
+        incomingPaths,
+        outgoingPaths,
+        attachedLinks,
+        occupyingVehicle,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -407,17 +434,19 @@ public class Point
    * @return A copy of this object, differing in the given value.
    */
   public Point withLayout(Layout layout) {
-    return new Point(getName(),
-                     getProperties(),
-                     getHistory(),
-                     pose,
-                     type,
-                     incomingPaths,
-                     outgoingPaths,
-                     attachedLinks,
-                     occupyingVehicle,
-                     vehicleEnvelopes,
-                     layout);
+    return new Point(
+        getName(),
+        getProperties(),
+        getHistory(),
+        pose,
+        type,
+        incomingPaths,
+        outgoingPaths,
+        attachedLinks,
+        occupyingVehicle,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -444,7 +473,8 @@ public class Point
    * Contains information regarding the grahical representation of a point.
    */
   public static class Layout
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The coordinates at which the point is to be drawn (in mm).
@@ -473,9 +503,11 @@ public class Point
      * @param labelOffset The offset of the label's position to the point's position (in lu).
      * @param layerId The ID of the layer on which the point is to be drawn.
      */
-    public Layout(Couple position,
-                  Couple labelOffset,
-                  int layerId) {
+    public Layout(
+        Couple position,
+        Couple labelOffset,
+        int layerId
+    ) {
       this.position = requireNonNull(position, "position");
       this.labelOffset = requireNonNull(labelOffset, "labelOffset");
       this.layerId = layerId;
@@ -497,9 +529,11 @@ public class Point
      * @return A copy of this object, differing in the given value.
      */
     public Layout withPosition(Couple position) {
-      return new Layout(position,
-                        labelOffset,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          layerId
+      );
     }
 
     /**
@@ -518,9 +552,11 @@ public class Point
      * @return A copy of this object, differing in the given value.
      */
     public Layout withLabelOffset(Couple labelOffset) {
-      return new Layout(position,
-                        labelOffset,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          layerId
+      );
     }
 
     /**
@@ -539,9 +575,11 @@ public class Point
      * @return A copy of this object, differing in the given value.
      */
     public Layout withLayerId(int layerId) {
-      return new Layout(position,
-                        labelOffset,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          layerId
+      );
     }
   }
 }

@@ -24,7 +24,8 @@ package org.opentcs.virtualvehicle.inputcomponents;
  * a <code>String</code> (the text in the text field).
  */
 public final class SingleTextInputPanel
-    extends TextInputPanel {
+    extends
+      TextInputPanel {
 
   /**
    * If the panel is resetable this is the value the input is set to when
@@ -36,6 +37,7 @@ public final class SingleTextInputPanel
    * Creates new instance of SingleTextInputPanel.
    * The given title is not used in the panel itselft but can be used by
    * the enclosing component.
+   *
    * @param title The title of the panel.
    */
   private SingleTextInputPanel(String title) {
@@ -45,6 +47,7 @@ public final class SingleTextInputPanel
 
   /**
    * Enable input validation against the given regular expression.
+   *
    * @see InputPanel#addValidationListener
    * @param format A regular expression.
    */
@@ -64,133 +67,7 @@ public final class SingleTextInputPanel
     input = resetValue;
   }
 
-  /**
-   * See {@link InputPanel.Builder}.
-   */
-  public static class Builder
-      implements InputPanel.Builder {
-
-    /**
-     * The panel's title.
-     */
-    private final String title;
-    /**
-     * Label of for the text field.
-     */
-    private String label;
-    /**
-     * Unit label of the text field.
-     */
-    private String unitLabel;
-    /**
-     * Initial value for the text field.
-     */
-    private String initialValue;
-    /**
-     * Message to be displayed in the panel.
-     */
-    private String message;
-    /**
-     * Regex for validation of the text field's content.
-     */
-    private String format;
-    /**
-     * Show a reset button in the panel.
-     * Default is <code>false</code>.
-     */
-    private boolean resetButton;
-    /**
-     * Value the input is reset to when the reset button is used.
-     */
-    private Object resetValue;
-
-    /**
-     * Create a new builder.
-     * @param title Title of the panel.
-     */
-    public Builder(String title) {
-      this.title = title;
-    }
-
-    @Override
-    public InputPanel build() {
-      SingleTextInputPanel panel = new SingleTextInputPanel(title);
-      panel.enableInputValidation(format);
-      panel.label.setText(label);
-      panel.unitLabel.setText(unitLabel);
-      panel.inputField.setText(initialValue);
-      panel.messageLabel.setText(message);
-      panel.resetable = resetButton;
-      if (panel.resetable) {
-        panel.resetValue = resetValue;
-      }
-      return panel;
-    }
-
-    /**
-     * Set the label of the panel.
-     * @param label The Label
-     * @return the instance of this <code>Builder</code>
-     */
-    public Builder setLabel(String label) {
-      this.label = label;
-      return this;
-    }
-
-    /**
-     * Set the initial value for the text field of the panel.
-     * @param initialValue the initial value
-     * @return the instance of this <code>Builder</code>
-     */
-    public Builder setInitialValue(String initialValue) {
-      this.initialValue = initialValue;
-      return this;
-    }
-
-    /**
-     * Set the text for the unit label of the panel.
-     * @param unitLabel the unit
-     * @return the instance of this <code>Builder</code>
-     */
-    public Builder setUnitLabel(String unitLabel) {
-      this.unitLabel = unitLabel;
-      return this;
-    }
-
-    /**
-     * Set the message of the panel.
-     * The user of this method must take care for the line breaks in the message,
-     * as it is not wrapped automatically!
-     * @param message the message
-     * @return the instance of this <code>Builder</code>
-     */
-    public Builder setMessage(String message) {
-      this.message = message;
-      return this;
-    }
-
-    /**
-     * Make the panel validate it's input.
-     * @param format The regular expression that will be used for validation.
-     * @return the instance of this <code>Builder</code>
-     */
-    public Builder enableValidation(String format) {
-      this.format = format;
-      return this;
-    }
-
-    /**
-     * Set a value the panel's input can be reset to.
-     * @param resetValue the reset value
-     * @return the instance of this <code>Builder</code>
-     */
-    public Builder enableResetButton(Object resetValue) {
-      this.resetButton = true;
-      this.resetValue = resetValue;
-      return this;
-    }
-  }
-
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /** This method is called from within the constructor to
    * initialize the form.
@@ -251,15 +128,156 @@ public final class SingleTextInputPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(messageLabel, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void inputFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_inputFieldFocusGained
     inputField.selectAll();
   }//GEN-LAST:event_inputFieldFocusGained
+
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JTextField inputField;
   private javax.swing.JLabel label;
   private javax.swing.JLabel messageLabel;
   private javax.swing.JLabel unitLabel;
   // End of variables declaration//GEN-END:variables
-  //CHECKSTYLE:ON
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
+
+  /**
+   * See {@link InputPanel.Builder}.
+   */
+  public static class Builder
+      implements
+        InputPanel.Builder {
+
+    /**
+     * The panel's title.
+     */
+    private final String title;
+    /**
+     * Label of for the text field.
+     */
+    private String label;
+    /**
+     * Unit label of the text field.
+     */
+    private String unitLabel;
+    /**
+     * Initial value for the text field.
+     */
+    private String initialValue;
+    /**
+     * Message to be displayed in the panel.
+     */
+    private String message;
+    /**
+     * Regex for validation of the text field's content.
+     */
+    private String format;
+    /**
+     * Show a reset button in the panel.
+     * Default is <code>false</code>.
+     */
+    private boolean resetButton;
+    /**
+     * Value the input is reset to when the reset button is used.
+     */
+    private Object resetValue;
+
+    /**
+     * Create a new builder.
+     *
+     * @param title Title of the panel.
+     */
+    public Builder(String title) {
+      this.title = title;
+    }
+
+    @Override
+    public InputPanel build() {
+      SingleTextInputPanel panel = new SingleTextInputPanel(title);
+      panel.enableInputValidation(format);
+      panel.label.setText(label);
+      panel.unitLabel.setText(unitLabel);
+      panel.inputField.setText(initialValue);
+      panel.messageLabel.setText(message);
+      panel.resetable = resetButton;
+      if (panel.resetable) {
+        panel.resetValue = resetValue;
+      }
+      return panel;
+    }
+
+    /**
+     * Set the label of the panel.
+     *
+     * @param label The Label
+     * @return the instance of this <code>Builder</code>
+     */
+    public Builder setLabel(String label) {
+      this.label = label;
+      return this;
+    }
+
+    /**
+     * Set the initial value for the text field of the panel.
+     *
+     * @param initialValue the initial value
+     * @return the instance of this <code>Builder</code>
+     */
+    public Builder setInitialValue(String initialValue) {
+      this.initialValue = initialValue;
+      return this;
+    }
+
+    /**
+     * Set the text for the unit label of the panel.
+     *
+     * @param unitLabel the unit
+     * @return the instance of this <code>Builder</code>
+     */
+    public Builder setUnitLabel(String unitLabel) {
+      this.unitLabel = unitLabel;
+      return this;
+    }
+
+    /**
+     * Set the message of the panel.
+     * The user of this method must take care for the line breaks in the message,
+     * as it is not wrapped automatically!
+     *
+     * @param message the message
+     * @return the instance of this <code>Builder</code>
+     */
+    public Builder setMessage(String message) {
+      this.message = message;
+      return this;
+    }
+
+    /**
+     * Make the panel validate it's input.
+     *
+     * @param format The regular expression that will be used for validation.
+     * @return the instance of this <code>Builder</code>
+     */
+    public Builder enableValidation(String format) {
+      this.format = format;
+      return this;
+    }
+
+    /**
+     * Set a value the panel's input can be reset to.
+     *
+     * @param resetValue the reset value
+     * @return the instance of this <code>Builder</code>
+     */
+    public Builder enableResetButton(Object resetValue) {
+      this.resetButton = true;
+      this.resetValue = resetValue;
+      return this;
+    }
+  }
 }

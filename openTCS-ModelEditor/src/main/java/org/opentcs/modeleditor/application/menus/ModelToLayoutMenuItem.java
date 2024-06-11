@@ -7,12 +7,13 @@
  */
 package org.opentcs.modeleditor.application.menus;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import static java.util.Objects.requireNonNull;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import org.jhotdraw.draw.DrawingEditor;
@@ -43,7 +44,8 @@ import org.opentcs.util.event.EventHandler;
  * or locations to the corresponding layout properties.
  */
 public class ModelToLayoutMenuItem
-    extends JMenuItem {
+    extends
+      JMenuItem {
 
   /**
    * The <code>DrawingEditor</code> instance.
@@ -81,23 +83,31 @@ public class ModelToLayoutMenuItem
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public ModelToLayoutMenuItem(OpenTCSDrawingEditor drawingEditor,
-                               UndoRedoManager undoRedoManager,
-                               @ApplicationEventBus EventHandler eventHandler,
-                               MenuItemComponentsFactory componentsFactory,
-                               @Assisted boolean copyAll) {
-    super(ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH)
-        .getString("modelToLayoutMenuItem.text"));
+  public ModelToLayoutMenuItem(
+      OpenTCSDrawingEditor drawingEditor,
+      UndoRedoManager undoRedoManager,
+      @ApplicationEventBus
+      EventHandler eventHandler,
+      MenuItemComponentsFactory componentsFactory,
+      @Assisted
+      boolean copyAll
+  ) {
+    super(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH)
+            .getString("modelToLayoutMenuItem.text")
+    );
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.undoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
     this.eventBus = requireNonNull(eventHandler, "eventHandler");
     this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
     this.copyAll = copyAll;
 
-    setIcon(new ImageIcon(
-        getClass().getClassLoader()
-            .getResource("org/opentcs/guing/res/symbols/menu/arrow-down-3.png")
-    ));
+    setIcon(
+        new ImageIcon(
+            getClass().getClassLoader()
+                .getResource("org/opentcs/guing/res/symbols/menu/arrow-down-3.png")
+        )
+    );
     setMargin(new Insets(0, 2, 0, 2));
     addActionListener();
   }
@@ -116,8 +126,11 @@ public class ModelToLayoutMenuItem
             updateLayoutY(model);
             // ... and move the figure
             final LabeledFigure labeledFigure = (LabeledFigure) figure;
-            labeledFigure.propertiesChanged(new AttributesChangeEvent(
-                new NullAttributesChangeListener(), model));
+            labeledFigure.propertiesChanged(
+                new AttributesChangeEvent(
+                    new NullAttributesChangeListener(), model
+                )
+            );
 
             model.propertiesChanged(new NullAttributesChangeListener());
             eventBus.onEvent(new ResetInteractionToolCommand(this));

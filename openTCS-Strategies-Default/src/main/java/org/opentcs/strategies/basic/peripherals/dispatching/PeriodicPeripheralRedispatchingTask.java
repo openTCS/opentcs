@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.peripherals.dispatching;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Location;
@@ -20,7 +21,8 @@ import org.slf4j.LoggerFactory;
  * Periodically checks for idle peripheral devices that could process a peripheral job.
  */
 public class PeriodicPeripheralRedispatchingTask
-    implements Runnable {
+    implements
+      Runnable {
 
   /**
    * This class's Logger.
@@ -39,8 +41,10 @@ public class PeriodicPeripheralRedispatchingTask
    * @param objectService The object service.
    */
   @Inject
-  public PeriodicPeripheralRedispatchingTask(PeripheralDispatcherService dispatcherService,
-                                             TCSObjectService objectService) {
+  public PeriodicPeripheralRedispatchingTask(
+      PeripheralDispatcherService dispatcherService,
+      TCSObjectService objectService
+  ) {
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.objectService = requireNonNull(objectService, "objectService");
   }
@@ -52,8 +56,10 @@ public class PeriodicPeripheralRedispatchingTask
     objectService.fetchObjects(Location.class, this::couldProcessJob).stream()
         .findAny()
         .ifPresent(location -> {
-          LOG.debug("Peripheral {} could process peripheral job, triggering dispatcher ...",
-                    location);
+          LOG.debug(
+              "Peripheral {} could process peripheral job, triggering dispatcher ...",
+              location
+          );
           dispatcherService.dispatch();
         });
   }
@@ -64,9 +70,8 @@ public class PeriodicPeripheralRedispatchingTask
   }
 
   private boolean processesNoJob(Location location) {
-    return location.getPeripheralInformation().getProcState()
-        == PeripheralInformation.ProcState.IDLE
-        && location.getPeripheralInformation().getState()
-        == PeripheralInformation.State.IDLE;
+    return location.getPeripheralInformation()
+        .getProcState() == PeripheralInformation.ProcState.IDLE
+        && location.getPeripheralInformation().getState() == PeripheralInformation.State.IDLE;
   }
 }

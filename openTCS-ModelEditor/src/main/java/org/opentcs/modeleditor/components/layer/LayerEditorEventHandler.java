@@ -7,8 +7,9 @@
  */
 package org.opentcs.modeleditor.components.layer;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.base.model.DrawnModelComponent;
 import org.opentcs.guing.base.model.ModelComponent;
@@ -20,7 +21,8 @@ import org.opentcs.guing.common.event.DrawingEditorListener;
  * Handles drawing editor events that the layer editor needs to know about.
  */
 public class LayerEditorEventHandler
-    implements DrawingEditorListener {
+    implements
+      DrawingEditorListener {
 
   /**
    * The layer editor.

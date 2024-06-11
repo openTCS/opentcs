@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
-import jakarta.annotation.Nullable;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nullable;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -25,8 +26,10 @@ import org.opentcs.data.TCSObjectReference;
  * This class is the standard implementation of the {@link RemoteTCSObjectService} interface.
  */
 public abstract class StandardRemoteTCSObjectService
-    extends KernelRemoteService
-    implements RemoteTCSObjectService {
+    extends
+      KernelRemoteService
+    implements
+      RemoteTCSObjectService {
 
   /**
    * The object service to invoke methods on.
@@ -48,17 +51,22 @@ public abstract class StandardRemoteTCSObjectService
    * @param userManager The user manager.
    * @param kernelExecutor Executes tasks modifying kernel data.
    */
-  public StandardRemoteTCSObjectService(TCSObjectService objectService,
-                                        UserManager userManager,
-                                        @KernelExecutor ExecutorService kernelExecutor) {
+  public StandardRemoteTCSObjectService(
+      TCSObjectService objectService,
+      UserManager userManager,
+      @KernelExecutor
+      ExecutorService kernelExecutor
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.userManager = requireNonNull(userManager, "userManager");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }
 
   @Override
-  public <T extends TCSObject<T>> T fetchObject(ClientID clientId, Class<T> clazz,
-                                                TCSObjectReference<T> ref) {
+  public <T extends TCSObject<T>> T fetchObject(
+      ClientID clientId, Class<T> clazz,
+      TCSObjectReference<T> ref
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 
     return objectService.fetchObject(clazz, ref);
@@ -79,19 +87,24 @@ public abstract class StandardRemoteTCSObjectService
   }
 
   @Override
-  public <T extends TCSObject<T>> Set<T> fetchObjects(ClientID clientId,
-                                                      Class<T> clazz,
-                                                      Predicate<? super T> predicate) {
+  public <T extends TCSObject<T>> Set<T> fetchObjects(
+      ClientID clientId,
+      Class<T> clazz,
+      Predicate<? super T> predicate
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 
     return objectService.fetchObjects(clazz, predicate);
   }
 
   @Override
-  public void updateObjectProperty(ClientID clientId,
-                                   TCSObjectReference<?> ref,
-                                   String key,
-                                   @Nullable String value) {
+  public void updateObjectProperty(
+      ClientID clientId,
+      TCSObjectReference<?> ref,
+      String key,
+      @Nullable
+      String value
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
 
     try {
@@ -103,9 +116,11 @@ public abstract class StandardRemoteTCSObjectService
   }
 
   @Override
-  public void appendObjectHistoryEntry(ClientID clientId,
-                                       TCSObjectReference<?> ref,
-                                       ObjectHistory.Entry entry) {
+  public void appendObjectHistoryEntry(
+      ClientID clientId,
+      TCSObjectReference<?> ref,
+      ObjectHistory.Entry entry
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
 
     try {

@@ -7,12 +7,13 @@
  */
 package org.opentcs.modeleditor.persistence;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import java.io.File;
 import java.io.IOException;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.logging.Level;
 import javax.swing.JFileChooser;
@@ -43,8 +44,10 @@ import org.slf4j.LoggerFactory;
  * Manages (loads, persists and keeps) the driving course model.
  */
 public class OpenTCSModelManagerModeling
-    extends OpenTCSModelManager
-    implements ModelManagerModeling {
+    extends
+      OpenTCSModelManager
+    implements
+      ModelManagerModeling {
 
   /**
    * This class's logger.
@@ -88,27 +91,32 @@ public class OpenTCSModelManagerModeling
    * @param progressIndicator The progress indicator to be used.
    */
   @Inject
-  public OpenTCSModelManagerModeling(CourseObjectFactory crsObjFactory,
-                                     ModelComponentFactory modelComponentFactory,
-                                     ProcessAdapterUtil procAdapterUtil,
-                                     Provider<SystemModel> systemModelProvider,
-                                     StatusPanel statusPanel,
-                                     @ApplicationHome File homeDir,
-                                     ModelKernelPersistor kernelPersistor,
-                                     ModelFileReader modelReader,
-                                     ModelFilePersistor modelPersistor,
-                                     ModelImportAdapter modelImportAdapter,
-                                     ModelExportAdapter modelExportAdapter,
-                                     ProgressIndicator progressIndicator) {
-    super(crsObjFactory,
-          modelComponentFactory,
-          procAdapterUtil,
-          systemModelProvider,
-          statusPanel,
-          homeDir,
-          modelPersistor,
-          modelExportAdapter,
-          progressIndicator);
+  public OpenTCSModelManagerModeling(
+      CourseObjectFactory crsObjFactory,
+      ModelComponentFactory modelComponentFactory,
+      ProcessAdapterUtil procAdapterUtil,
+      Provider<SystemModel> systemModelProvider,
+      StatusPanel statusPanel,
+      @ApplicationHome
+      File homeDir,
+      ModelKernelPersistor kernelPersistor,
+      ModelFileReader modelReader,
+      ModelFilePersistor modelPersistor,
+      ModelImportAdapter modelImportAdapter,
+      ModelExportAdapter modelExportAdapter,
+      ProgressIndicator progressIndicator
+  ) {
+    super(
+        crsObjFactory,
+        modelComponentFactory,
+        procAdapterUtil,
+        systemModelProvider,
+        statusPanel,
+        homeDir,
+        modelPersistor,
+        modelExportAdapter,
+        progressIndicator
+    );
     this.kernelPersistor = requireNonNull(kernelPersistor, "kernelPersistor");
 
     this.modelReader = requireNonNull(modelReader, "modelReader");
@@ -124,7 +132,10 @@ public class OpenTCSModelManagerModeling
   }
 
   @Override
-  public boolean loadModel(@Nullable File modelFile) {
+  public boolean loadModel(
+      @Nullable
+      File modelFile
+  ) {
     File file = modelFile != null ? modelFile : showOpenDialog();
     if (file == null) {
       return false;
@@ -134,7 +145,10 @@ public class OpenTCSModelManagerModeling
   }
 
   @Override
-  public boolean loadModel(@Nullable File modelFile, ModelFileReader reader) {
+  public boolean loadModel(
+      @Nullable
+      File modelFile, ModelFileReader reader
+  ) {
     requireNonNull(reader, "reader");
     File file = modelFile != null ? modelFile : showOpenDialog();
     if (file == null) {
@@ -156,8 +170,10 @@ public class OpenTCSModelManagerModeling
       getStatusPanel().setLogMessage(
           Level.SEVERE,
           ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.STATUS_PATH)
-              .getFormatted("openTcsModelManagerModeling.message_notLoaded.text",
-                            file.getName())
+              .getFormatted(
+                  "openTcsModelManagerModeling.message_notLoaded.text",
+                  file.getName()
+              )
       );
       LOG.info("Error reading file", ex);
     }
@@ -208,8 +224,10 @@ public class OpenTCSModelManagerModeling
       return false;
     }
     catch (IllegalArgumentException e) {
-      getStatusPanel().setLogMessage(Level.SEVERE,
-                                     e.getMessage());
+      getStatusPanel().setLogMessage(
+          Level.SEVERE,
+          e.getMessage()
+      );
       LOG.warn("Exception persisting model", e);
       return false;
     }
@@ -243,11 +261,14 @@ public class OpenTCSModelManagerModeling
    * @return Whether the model was actually saved.
    * @throws IllegalStateException If there was a problem persisting the model
    */
-  private boolean persistModel(SystemModel systemModel,
-                               KernelServicePortal portal,
-                               ModelKernelPersistor persistor,
-                               boolean ignoreError)
-      throws IllegalStateException, KernelRuntimeException {
+  private boolean persistModel(
+      SystemModel systemModel,
+      KernelServicePortal portal,
+      ModelKernelPersistor persistor,
+      boolean ignoreError
+  )
+      throws IllegalStateException,
+        KernelRuntimeException {
     requireNonNull(systemModel, "systemModel");
     requireNonNull(persistor, "persistor");
 

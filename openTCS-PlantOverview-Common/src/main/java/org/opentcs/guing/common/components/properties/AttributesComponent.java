@@ -7,9 +7,10 @@
  */
 package org.opentcs.guing.common.components.properties;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.Component;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JPanel;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.common.model.ComponentSelectionListener;
@@ -21,8 +22,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.Undo
  * The right column contains the value of the property and can be clicked to edit the value.
  */
 public class AttributesComponent
-    extends JPanel
-    implements ComponentSelectionListener {
+    extends
+      JPanel
+    implements
+      ComponentSelectionListener {
 
   /**
    * The table with the properties.
@@ -97,6 +100,7 @@ public class AttributesComponent
     return fPropertiesContent;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -119,4 +123,5 @@ public class AttributesComponent
   protected javax.swing.JLabel descriptionLabel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

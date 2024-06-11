@@ -7,11 +7,12 @@
  */
 package org.opentcs.operationsdesk.transport;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Vector;
 import java.util.stream.Collectors;
 import javax.swing.DefaultComboBoxModel;
@@ -27,7 +28,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A UI to select a point or location as a destination for a vehicle.
  */
 public class LocationActionPanel
-    extends DialogContent {
+    extends
+      DialogContent {
 
   /**
    * Available locations.
@@ -49,8 +51,10 @@ public class LocationActionPanel
 
     initComponents();
 
-    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.VEHICLEPOPUP_PATH)
-        .getString("locationActionPanel.title"));
+    setDialogTitle(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.VEHICLEPOPUP_PATH)
+            .getString("locationActionPanel.title")
+    );
 
     Collections.sort(fLocations, getComparator());
 
@@ -123,6 +127,7 @@ public class LocationActionPanel
   public void initFields() {
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -177,11 +182,13 @@ public class LocationActionPanel
     add(actionsComboBox, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void locationsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_locationsComboBoxItemStateChanged
     updateActions();
   }//GEN-LAST:event_locationsComboBoxItemStateChanged
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox<String> actionsComboBox;
@@ -190,4 +197,5 @@ public class LocationActionPanel
   private javax.swing.JLabel locationsLabel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

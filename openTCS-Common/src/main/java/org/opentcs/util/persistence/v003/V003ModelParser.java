@@ -81,14 +81,16 @@ public class V003ModelParser {
   }
 
   private List<PropertyTO> convertProperties(
-      List<org.opentcs.util.persistence.v002.PropertyTO> tos) {
+      List<org.opentcs.util.persistence.v002.PropertyTO> tos
+  ) {
     return tos.stream()
         .map(property -> new PropertyTO().setName(property.getName()).setValue(property.getValue()))
         .collect(Collectors.toList());
   }
 
   private List<PointTO.OutgoingPath> convertOutgoingPaths(
-      org.opentcs.util.persistence.v002.PointTO to) {
+      org.opentcs.util.persistence.v002.PointTO to
+  ) {
     return to.getOutgoingPaths().stream()
         .map(path -> new PointTO.OutgoingPath().setName(path.getName()))
         .collect(Collectors.toList());
@@ -143,7 +145,8 @@ public class V003ModelParser {
   }
 
   private List<AllowedOperationTO> convertAllowedOperations(
-      List<org.opentcs.util.persistence.v002.AllowedOperationTO> tos) {
+      List<org.opentcs.util.persistence.v002.AllowedOperationTO> tos
+  ) {
     return tos.stream()
         .map(allowedOperation -> {
           AllowedOperationTO result = new AllowedOperationTO();
@@ -233,7 +236,8 @@ public class V003ModelParser {
   }
 
   private List<VisualLayoutTO.ShapeLayoutElement> convertShapeLayoutElements(
-      org.opentcs.util.persistence.v002.VisualLayoutTO to) {
+      org.opentcs.util.persistence.v002.VisualLayoutTO to
+  ) {
     return to.getShapeLayoutElements().stream()
         .map(shapeLayoutElement -> {
           return new VisualLayoutTO.ShapeLayoutElement()
@@ -244,7 +248,8 @@ public class V003ModelParser {
   }
 
   private List<VisualLayoutTO.ModelLayoutElement> convertModelLayoutElements(
-      org.opentcs.util.persistence.v002.VisualLayoutTO to) {
+      org.opentcs.util.persistence.v002.VisualLayoutTO to
+  ) {
     return to.getModelLayoutElements().stream()
         .map(modelLayoutElement -> {
           return new VisualLayoutTO.ModelLayoutElement()

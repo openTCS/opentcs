@@ -7,22 +7,24 @@
  */
 package org.opentcs.kernel.services;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.Query;
 import org.opentcs.components.kernel.QueryResponder;
 import org.opentcs.components.kernel.services.InternalQueryService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * The default implementation of the {@link InternalQueryService} interface.
  */
 public class StandardQueryService
-    implements InternalQueryService {
+    implements
+      InternalQueryService {
 
   /**
    * A global object to be used for synchronization within the kernel.
@@ -40,7 +42,10 @@ public class StandardQueryService
    * @param globalSyncObject The kernel threads' global synchronization object.
    */
   @Inject
-  public StandardQueryService(@GlobalSyncObject Object globalSyncObject) {
+  public StandardQueryService(
+      @GlobalSyncObject
+      Object globalSyncObject
+  ) {
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
   }
 
@@ -57,22 +62,31 @@ public class StandardQueryService
   }
 
   @Override
-  public void registerResponder(@Nonnull Class<? extends Query<?>> clazz,
-                                @Nonnull QueryResponder responder) {
+  public void registerResponder(
+      @Nonnull
+      Class<? extends Query<?>> clazz,
+      @Nonnull
+      QueryResponder responder
+  ) {
     requireNonNull(clazz, "clazz");
     requireNonNull(responder, "responder");
 
     synchronized (globalSyncObject) {
-      checkArgument(!respondersByQueryType.containsKey(clazz),
-                    "Query class already taken: %s",
-                    clazz.getName());
+      checkArgument(
+          !respondersByQueryType.containsKey(clazz),
+          "Query class already taken: %s",
+          clazz.getName()
+      );
 
       respondersByQueryType.put(clazz, responder);
     }
   }
 
   @Override
-  public void unregisterResponder(@Nonnull Class<? extends Query<?>> clazz) {
+  public void unregisterResponder(
+      @Nonnull
+      Class<? extends Query<?>> clazz
+  ) {
     requireNonNull(clazz, "clazz");
 
     synchronized (globalSyncObject) {

@@ -9,6 +9,7 @@ package org.opentcs.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,8 +32,10 @@ class AssertionsTest {
 
   @Test
   void checkArgumentShouldThrowIfExpressionIsFalse() {
-    assertThrows(IllegalArgumentException.class,
-                 () -> Assertions.checkArgument(false, "The given expression is not true!"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> Assertions.checkArgument(false, "The given expression is not true!")
+    );
   }
 
   @Test
@@ -47,8 +50,10 @@ class AssertionsTest {
 
   @Test
   void checkStateShouldThrowIfExpressionIsFalse() {
-    assertThrows(IllegalStateException.class,
-                 () -> Assertions.checkState(false, "The given expression is not true"));
+    assertThrows(
+        IllegalStateException.class,
+        () -> Assertions.checkState(false, "The given expression is not true")
+    );
   }
 
   @Test
@@ -56,22 +61,30 @@ class AssertionsTest {
     assertEquals(22, Assertions.checkInRange(22, 22, 24));
     assertEquals(23, Assertions.checkInRange(23, 22, 24));
     assertEquals(24, Assertions.checkInRange(24, 22, 24));
-    assertEquals(Integer.MAX_VALUE,
-                 Assertions.checkInRange(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE));
-    assertEquals(Integer.MIN_VALUE,
-                 Assertions.checkInRange(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE));
+    assertEquals(
+        Integer.MAX_VALUE,
+        Assertions.checkInRange(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE)
+    );
+    assertEquals(
+        Integer.MIN_VALUE,
+        Assertions.checkInRange(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE)
+    );
   }
 
   @Test
   void checkInRangeShouldFailOnLessThanMinimum() {
-    assertThrows(IllegalArgumentException.class,
-                 () -> Assertions.checkInRange(21, 22, 24));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> Assertions.checkInRange(21, 22, 24)
+    );
   }
 
   @Test
   void checkInRangeShouldFailOnMoreThanMaximum() {
-    assertThrows(IllegalArgumentException.class,
-                 () -> Assertions.checkInRange(25, 22, 24));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> Assertions.checkInRange(25, 22, 24)
+    );
   }
 
   @Test
@@ -79,21 +92,29 @@ class AssertionsTest {
     assertEquals(23, Assertions.checkInRange(23, 23, 25));
     assertEquals(24, Assertions.checkInRange(24, 23, 25));
     assertEquals(25, Assertions.checkInRange(25, 23, 25));
-    assertEquals(Long.MIN_VALUE,
-                 Assertions.checkInRange(Long.MIN_VALUE, Long.MIN_VALUE, Long.MIN_VALUE));
-    assertEquals(Long.MAX_VALUE,
-                 Assertions.checkInRange(Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE));
+    assertEquals(
+        Long.MIN_VALUE,
+        Assertions.checkInRange(Long.MIN_VALUE, Long.MIN_VALUE, Long.MIN_VALUE)
+    );
+    assertEquals(
+        Long.MAX_VALUE,
+        Assertions.checkInRange(Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE)
+    );
   }
 
   @Test
   void checkInRangeLongShouldFailOnLessThanMinimum() {
-    assertThrows(IllegalArgumentException.class,
-                 () -> Assertions.checkInRange(22, 23, 25));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> Assertions.checkInRange(22, 23, 25)
+    );
   }
 
   @Test
   void checkInRangeLongShouldFailOnMoreThanMaximum() {
-    assertThrows(IllegalArgumentException.class,
-                 () -> Assertions.checkInRange(26, 23, 25));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> Assertions.checkInRange(26, 23, 25)
+    );
   }
 }

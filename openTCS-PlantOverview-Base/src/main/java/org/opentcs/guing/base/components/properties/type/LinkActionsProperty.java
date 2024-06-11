@@ -13,7 +13,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property for link actions.
  */
 public class LinkActionsProperty
-    extends StringSetProperty {
+    extends
+      StringSetProperty {
 
   /**
    * Creates a new instance.

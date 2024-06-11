@@ -15,7 +15,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * A property for speeds.
  */
 public class SpeedProperty
-    extends AbstractQuantity<SpeedProperty.Unit> {
+    extends
+      AbstractQuantity<SpeedProperty.Unit> {
 
   /**
    * Creates a new instance.

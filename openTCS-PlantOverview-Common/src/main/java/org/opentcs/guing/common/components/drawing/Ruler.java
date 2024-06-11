@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.common.components.drawing;
 
+import static java.util.Objects.requireNonNull;
+
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -17,7 +19,6 @@ import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.EventObject;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.DrawingView;
@@ -28,9 +29,11 @@ import org.opentcs.guing.common.components.drawing.course.OriginChangeListener;
  * A ruler.
  */
 public abstract class Ruler
-    extends JComponent
-    implements PropertyChangeListener,
-               OriginChangeListener {
+    extends
+      JComponent
+    implements
+      PropertyChangeListener,
+      OriginChangeListener {
 
   /**
    * Size of the rulers (height of the horizontal ruler, width of the vertical).
@@ -72,7 +75,8 @@ public abstract class Ruler
    * A horizontal ruler.
    */
   public static class Horizontal
-      extends Ruler {
+      extends
+        Ruler {
 
     /**
      * Creates a new instance.
@@ -98,8 +102,10 @@ public abstract class Ruler
       super.paintComponent(g);
 
       Rectangle drawHere = g.getClipBounds();
-      Point translation = new Point((int) -drawingView.getDrawingToViewTransform().getTranslateX(),
-                                    (int) -drawingView.getDrawingToViewTransform().getTranslateY());
+      Point translation = new Point(
+          (int) -drawingView.getDrawingToViewTransform().getTranslateX(),
+          (int) -drawingView.getDrawingToViewTransform().getTranslateY()
+      );
       // If we scroll right, the translation isn't incremented by default.
       // We use the translation of the visible rectangle instead.
       int visibleRectX = drawingView.getComponent().getVisibleRect().x + STANDARD_TRANSLATION;
@@ -120,8 +126,10 @@ public abstract class Ruler
       String lastIndex;
 
       // base line
-      g2d.drawLine(0, SIZE - 1,
-                   getWidth(), SIZE - 1);
+      g2d.drawLine(
+          0, SIZE - 1,
+          getWidth(), SIZE - 1
+      );
 
       for (int i = drawHere.x; i < getWidth(); i += 10) {
         translated = translateValue(i, translation);
@@ -230,7 +238,8 @@ public abstract class Ruler
    * A vertical ruler.
    */
   public static class Vertical
-      extends Ruler {
+      extends
+        Ruler {
 
     /**
      * Creates a new instance.
@@ -256,8 +265,10 @@ public abstract class Ruler
       super.paintComponent(g);
 
       Rectangle drawHere = g.getClipBounds();
-      Point translation = new Point((int) -drawingView.getDrawingToViewTransform().getTranslateX(),
-                                    (int) -drawingView.getDrawingToViewTransform().getTranslateY());
+      Point translation = new Point(
+          (int) -drawingView.getDrawingToViewTransform().getTranslateX(),
+          (int) -drawingView.getDrawingToViewTransform().getTranslateY()
+      );
       // If we scroll downwards, the translation isn't incremented by default.
       // We use the translation of the visible rectangle instead.
       if (translation.y == STANDARD_TRANSLATION) {
@@ -279,7 +290,8 @@ public abstract class Ruler
       // base line
       g2d.drawLine(
           SIZE - 1, 0,
-          SIZE - 1, getHeight());
+          SIZE - 1, getHeight()
+      );
 
       // Rotate the font for vertical axis
       AffineTransform fontAT = new AffineTransform();

@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.model.visualization.Layer;
@@ -51,37 +52,53 @@ public class VisualLayoutConverter {
 
   private List<LayerGroup> convertLayerGroups(List<LayerGroupTO> layerGroups) {
     return layerGroups.stream()
-        .map(layerGroup -> new LayerGroup(layerGroup.getId(),
-                                          layerGroup.getName(),
-                                          layerGroup.isVisible()))
+        .map(
+            layerGroup -> new LayerGroup(
+                layerGroup.getId(),
+                layerGroup.getName(),
+                layerGroup.isVisible()
+            )
+        )
         .collect(Collectors.toList());
   }
 
   private List<LayerGroupTO> toLayerGroupTOs(List<LayerGroup> layerGroups) {
     return layerGroups.stream()
-        .map(layerGroup -> new LayerGroupTO(layerGroup.getId(),
-                                            layerGroup.getName(),
-                                            layerGroup.isVisible()))
+        .map(
+            layerGroup -> new LayerGroupTO(
+                layerGroup.getId(),
+                layerGroup.getName(),
+                layerGroup.isVisible()
+            )
+        )
         .collect(Collectors.toList());
   }
 
   private List<Layer> convertLayers(List<LayerTO> layers) {
     return layers.stream()
-        .map(layer -> new Layer(layer.getId(),
-                                layer.getOrdinal(),
-                                layer.isVisible(),
-                                layer.getName(),
-                                layer.getGroupId()))
+        .map(
+            layer -> new Layer(
+                layer.getId(),
+                layer.getOrdinal(),
+                layer.isVisible(),
+                layer.getName(),
+                layer.getGroupId()
+            )
+        )
         .collect(Collectors.toList());
   }
 
   private List<LayerTO> toLayerTOs(List<Layer> layers) {
     return layers.stream()
-        .map(layer -> new LayerTO(layer.getId(),
-                                  layer.getOrdinal(),
-                                  layer.isVisible(),
-                                  layer.getName(),
-                                  layer.getGroupId()))
+        .map(
+            layer -> new LayerTO(
+                layer.getId(),
+                layer.getOrdinal(),
+                layer.isVisible(),
+                layer.getName(),
+                layer.getGroupId()
+            )
+        )
         .collect(Collectors.toList());
   }
 }

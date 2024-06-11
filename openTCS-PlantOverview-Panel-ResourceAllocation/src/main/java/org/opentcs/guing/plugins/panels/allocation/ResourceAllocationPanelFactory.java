@@ -7,22 +7,24 @@
  */
 package org.opentcs.guing.plugins.panels.allocation;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.plugins.panels.allocation.I18nPlantOverviewPanelResourceAllocation.BUNDLE_PATH;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
-import static org.opentcs.guing.plugins.panels.allocation.I18nPlantOverviewPanelResourceAllocation.BUNDLE_PATH;
 
 /**
  * Provides a {@link ResourceAllocationPanel} for the plant overview if the kernel is in operating
  * state.
  */
 public class ResourceAllocationPanelFactory
-    implements PluggablePanelFactory {
+    implements
+      PluggablePanelFactory {
 
   /**
    * This classe's bundle.
@@ -45,8 +47,10 @@ public class ResourceAllocationPanelFactory
    * @param panelProvider the provider for the panel
    */
   @Inject
-  public ResourceAllocationPanelFactory(SharedKernelServicePortalProvider portalProvider,
-                                        Provider<ResourceAllocationPanel> panelProvider) {
+  public ResourceAllocationPanelFactory(
+      SharedKernelServicePortalProvider portalProvider,
+      Provider<ResourceAllocationPanel> panelProvider
+  ) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.panelProvider = requireNonNull(panelProvider, "panelProvider");
   }

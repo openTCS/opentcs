@@ -13,7 +13,8 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 /**
  */
 public class MenusInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.

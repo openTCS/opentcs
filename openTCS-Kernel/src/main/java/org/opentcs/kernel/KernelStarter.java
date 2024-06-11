@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.io.IOException;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opentcs.access.Kernel;
@@ -56,10 +57,14 @@ public class KernelStarter {
    * @param kernelExecutor The kernel's executor service.
    */
   @Inject
-  protected KernelStarter(LocalKernel kernel,
-                          InternalPlantModelService plantModelService,
-                          @ActiveInAllModes Set<KernelExtension> extensions,
-                          @KernelExecutor ScheduledExecutorService kernelExecutor) {
+  protected KernelStarter(
+      LocalKernel kernel,
+      InternalPlantModelService plantModelService,
+      @ActiveInAllModes
+      Set<KernelExtension> extensions,
+      @KernelExecutor
+      ScheduledExecutorService kernelExecutor
+  ) {
     this.kernel = requireNonNull(kernel, "kernel");
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.extensions = requireNonNull(extensions, "extensions");

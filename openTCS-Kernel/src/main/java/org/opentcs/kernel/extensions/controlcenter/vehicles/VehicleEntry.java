@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel.extensions.controlcenter.vehicles;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
@@ -22,7 +23,8 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
  * Represents a {@link Vehicle} in the {@link VehicleEntryPool}.
  */
 public class VehicleEntry
-    implements PropertyChangeListener {
+    implements
+      PropertyChangeListener {
 
   /**
    * The vehicle this entry represents.
@@ -118,7 +120,10 @@ public class VehicleEntry
    *
    * @param processModel The new process model for the vehicle.
    */
-  public void setProcessModel(@Nonnull VehicleProcessModel processModel) {
+  public void setProcessModel(
+      @Nonnull
+      VehicleProcessModel processModel
+  ) {
     VehicleProcessModel oldProcessModel = this.processModel;
     this.processModel = requireNonNull(processModel, "processModel");
 
@@ -138,7 +143,10 @@ public class VehicleEntry
    *
    * @param commAdapterFactory The new comm adapter factory.
    */
-  public void setCommAdapterFactory(@Nonnull VehicleCommAdapterFactory commAdapterFactory) {
+  public void setCommAdapterFactory(
+      @Nonnull
+      VehicleCommAdapterFactory commAdapterFactory
+  ) {
     VehicleCommAdapterFactory oldValue = this.commAdapterFactory;
     this.commAdapterFactory = commAdapterFactory;
 
@@ -160,7 +168,10 @@ public class VehicleEntry
    *
    * @param commAdapter The new comm adapter.
    */
-  public void setCommAdapter(@Nullable VehicleCommAdapter commAdapter) {
+  public void setCommAdapter(
+      @Nullable
+      VehicleCommAdapter commAdapter
+  ) {
     VehicleCommAdapter oldValue = this.commAdapter;
     this.commAdapter = commAdapter;
 

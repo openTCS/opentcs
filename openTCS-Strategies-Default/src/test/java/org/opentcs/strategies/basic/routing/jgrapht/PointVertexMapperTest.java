@@ -7,10 +7,11 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.model.Point;

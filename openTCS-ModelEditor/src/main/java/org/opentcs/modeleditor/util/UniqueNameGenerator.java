@@ -22,7 +22,8 @@ import org.opentcs.util.UniqueStringGenerator;
 /**
  */
 public class UniqueNameGenerator
-    extends UniqueStringGenerator<Class<? extends ModelComponent>> {
+    extends
+      UniqueStringGenerator<Class<? extends ModelComponent>> {
 
   @Inject
   @SuppressWarnings("this-escape")

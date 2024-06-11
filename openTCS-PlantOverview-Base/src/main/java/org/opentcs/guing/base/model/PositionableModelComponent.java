@@ -11,7 +11,8 @@ package org.opentcs.guing.base.model;
  * Defines constants for {@link ModelComponent}s that have model coordinates.
  */
 public interface PositionableModelComponent
-    extends ModelComponent {
+    extends
+      ModelComponent {
 
   /**
    * Key for the X (model) cordinate.

@@ -15,7 +15,8 @@ import java.util.List;
  * embedded in an {@link InputDialog}.
  */
 public abstract class InputPanel
-    extends javax.swing.JPanel {
+    extends
+      javax.swing.JPanel {
 
   /**
    * Object to store the user's input. Must be explicitly set via captureInput()
@@ -45,6 +46,7 @@ public abstract class InputPanel
 
   /**
    * Create a new instance of InputPanel.
+   *
    * @param title The title of this panel.
    */
   public InputPanel(String title) {
@@ -53,6 +55,7 @@ public abstract class InputPanel
 
   /**
    * Get the title of this panel.
+   *
    * @return The title
    */
   public String getTitle() {
@@ -66,6 +69,7 @@ public abstract class InputPanel
    * {@link ValidationListener} will receive a {@link ValidationEvent} with the
    * current validity state immediately after beeing added.
    * If the panel does not validate it's input the validity will never change.
+   *
    * @param listener The {@link ValidationListener}
    */
   public void addValidationListener(ValidationListener listener) {
@@ -79,6 +83,7 @@ public abstract class InputPanel
    * {@link ValidationEvent ValidationEvents}
    * to the attached {@link ValidationListener ValidationListeners}.
    * The Validity should only be changed via this method!
+   *
    * @param valid true, if input is valid. false otherwise.
    */
   protected void setInputValid(boolean valid) {
@@ -91,10 +96,11 @@ public abstract class InputPanel
       }
     }
   }
-/**
- *
- * @return The validation Listeners.
- */
+
+  /**
+   *
+   * @return The validation Listeners.
+   */
   public List<ValidationListener> getValidationListeners() {
     return validationListeners;
   }
@@ -102,6 +108,7 @@ public abstract class InputPanel
   /**
    * Determine if the current input in the panel is valid.
    * If the input isn't validated this will always return <code>true</code>.
+   *
    * @see #addValidationListener
    * @return <code>true</code> if input is valid, <code>false</code> otherwise.
    */
@@ -113,6 +120,7 @@ public abstract class InputPanel
    * Get the user input from the panel. If the input wasn't captured before
    * (see {@link #captureInput()}) null is returned. Otherwise it depends on the
    * concrete implementing panel what the input can look like.
+   *
    * @return The input
    */
   public Object getInput() {
@@ -132,6 +140,7 @@ public abstract class InputPanel
    * Returns whether the content of this panel can be reset to a default value.
    * If the panel is resetable the enclosing dialog might want to show a reset
    * button.
+   *
    * @see #doReset()
    * @return panel is resetable?
    */

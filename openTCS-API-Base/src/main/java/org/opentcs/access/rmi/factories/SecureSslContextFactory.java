@@ -7,6 +7,8 @@
  */
 package org.opentcs.access.rmi.factories;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -16,7 +18,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import static java.util.Objects.requireNonNull;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -26,7 +27,8 @@ import org.opentcs.access.SslParameterSet;
  * Provides methods for creating client-side and server-side {@link SSLContext} instances.
  */
 class SecureSslContextFactory
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The name of the algorithm to use for the {@link KeyManagerFactory} and
@@ -63,8 +65,10 @@ class SecureSslContextFactory
 
     try {
       KeyStore ts = KeyStore.getInstance(sslParameterSet.getKeystoreType());
-      ts.load(new FileInputStream(sslParameterSet.getTruststoreFile()),
-              sslParameterSet.getTruststorePassword().toCharArray());
+      ts.load(
+          new FileInputStream(sslParameterSet.getTruststoreFile()),
+          sslParameterSet.getTruststorePassword().toCharArray()
+      );
       TrustManagerFactory tmf = TrustManagerFactory.getInstance(KEY_TRUST_MANAGEMENT_ALGORITHM);
       tmf.init(ts);
 
@@ -72,7 +76,7 @@ class SecureSslContextFactory
       context.init(null, tmf.getTrustManagers(), null);
     }
     catch (NoSuchAlgorithmException | KeyStoreException | CertificateException | IOException
-               | KeyManagementException ex) {
+           | KeyManagementException ex) {
       throw new IllegalStateException("Error creating the client's ssl context", ex);
     }
 
@@ -91,8 +95,10 @@ class SecureSslContextFactory
 
     try {
       KeyStore ks = KeyStore.getInstance(sslParameterSet.getKeystoreType());
-      ks.load(new FileInputStream(sslParameterSet.getKeystoreFile()),
-              sslParameterSet.getKeystorePassword().toCharArray());
+      ks.load(
+          new FileInputStream(sslParameterSet.getKeystoreFile()),
+          sslParameterSet.getKeystorePassword().toCharArray()
+      );
       KeyManagerFactory kmf = KeyManagerFactory.getInstance(KEY_TRUST_MANAGEMENT_ALGORITHM);
       kmf.init(ks, sslParameterSet.getKeystorePassword().toCharArray());
 
@@ -101,7 +107,7 @@ class SecureSslContextFactory
 
     }
     catch (NoSuchAlgorithmException | KeyStoreException | CertificateException | IOException
-               | KeyManagementException | UnrecoverableKeyException ex) {
+           | KeyManagementException | UnrecoverableKeyException ex) {
       throw new IllegalStateException("Error creating the server's ssl context", ex);
     }
 

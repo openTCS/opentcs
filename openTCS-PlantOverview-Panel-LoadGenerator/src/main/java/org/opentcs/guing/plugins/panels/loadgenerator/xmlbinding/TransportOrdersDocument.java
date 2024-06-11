@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -17,7 +19,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -133,8 +134,9 @@ public class TransportOrdersDocument {
     try (InputStream inStream = new FileInputStream(sourceFile)) {
       int bytesRead = inStream.read(buffer);
       if (bytesRead != fileSize) {
-        throw new IOException("read() returned unexpected value: " + bytesRead
-            + ", should be :" + fileSize);
+        throw new IOException(
+            "read() returned unexpected value: " + bytesRead + ", should be :" + fileSize
+        );
       }
     }
     String fileContent = new String(buffer);

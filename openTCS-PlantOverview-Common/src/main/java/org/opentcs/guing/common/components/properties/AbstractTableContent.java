@@ -7,12 +7,13 @@
  */
 package org.opentcs.guing.common.components.properties;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Provider;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -28,8 +29,10 @@ import org.opentcs.guing.common.components.properties.table.AttributesTable;
  * Base implementation for content that displays model properties in a table.
  */
 public abstract class AbstractTableContent
-    extends AbstractAttributesContent
-    implements TableChangeListener {
+    extends
+      AbstractAttributesContent
+    implements
+      TableChangeListener {
 
   /**
    * The table that shows the properties.

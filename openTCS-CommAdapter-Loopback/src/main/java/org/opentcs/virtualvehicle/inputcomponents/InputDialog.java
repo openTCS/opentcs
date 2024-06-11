@@ -19,8 +19,10 @@ import javax.swing.border.EmptyBorder;
  * enable/disable the <i>ok</i>-button if the panel validates it's input.
  */
 public class InputDialog
-    extends javax.swing.JDialog
-    implements ValidationListener {
+    extends
+      javax.swing.JDialog
+    implements
+      ValidationListener {
 
   /**
    * The panel that contains the content of the dialog.
@@ -50,6 +52,7 @@ public class InputDialog
 
   /**
    * Create a new instance of <code>InputDialog</code>.
+   *
    * @param panel the panel to be displayed in the dialog.
    */
   @SuppressWarnings("this-escape")
@@ -87,6 +90,7 @@ public class InputDialog
    * {@link #getInput()} should <b>not</b>
    * be called as the dialog was canceled and there is no valid input available.
    * If the dialog wasn't closed yet, <code>null</code> will be returned.
+   *
    * @return the return status
    */
   public ReturnStatus getReturnStatus() {
@@ -98,12 +102,14 @@ public class InputDialog
    * {@link InputPanel#getInput()} directly.
    * Prior to calling this method you should check if there even is any input
    * (see {@link #getReturnStatus()}).
+   *
    * @return The input from the panel
    */
   public Object getInput() {
     return panel.getInput();
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /** This method is called from within the constructor to
    * initialize the form.
@@ -163,6 +169,8 @@ public class InputDialog
 
     pack();
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
     doClose(ReturnStatus.CANCELED);
@@ -181,6 +189,7 @@ public class InputDialog
   /**
    * Handler for the WindowClosing event.
    * Called when the user closes the dialog via the X-Button or F4.
+   *
    * @param evt WindowEvent
    */
   private void dialogClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_dialogClosing
@@ -196,6 +205,9 @@ public class InputDialog
     setVisible(false);
     dispose();
   }
+
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel buttonPanel;
   private javax.swing.JButton cancelButton;
@@ -203,4 +215,5 @@ public class InputDialog
   private javax.swing.JButton resetButton;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

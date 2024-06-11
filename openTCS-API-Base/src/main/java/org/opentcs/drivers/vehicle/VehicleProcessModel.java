@@ -7,6 +7,8 @@
  */
 package org.opentcs.drivers.vehicle;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.beans.PropertyChangeListener;
@@ -17,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Triple;
@@ -102,7 +103,10 @@ public class VehicleProcessModel {
    *
    * @param attachedVehicle The vehicle attached to the new instance.
    */
-  public VehicleProcessModel(@Nonnull Vehicle attachedVehicle) {
+  public VehicleProcessModel(
+      @Nonnull
+      Vehicle attachedVehicle
+  ) {
     this.vehicle = requireNonNull(attachedVehicle, "attachedVehicle");
     this.vehicleReference = vehicle.getReference();
     this.length = vehicle.getLength();
@@ -161,7 +165,10 @@ public class VehicleProcessModel {
    *
    * @param notification The notification to be published.
    */
-  public void publishUserNotification(@Nonnull UserNotification notification) {
+  public void publishUserNotification(
+      @Nonnull
+      UserNotification notification
+  ) {
     requireNonNull(notification, "notification");
 
     notifications.add(notification);
@@ -169,9 +176,11 @@ public class VehicleProcessModel {
       notifications.remove();
     }
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.USER_NOTIFICATION.name(),
-                                                  null,
-                                                  notification);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.USER_NOTIFICATION.name(),
+        null,
+        notification
+    );
   }
 
   /**
@@ -179,12 +188,17 @@ public class VehicleProcessModel {
    *
    * @param event The event to be published.
    */
-  public void publishEvent(@Nonnull VehicleCommAdapterEvent event) {
+  public void publishEvent(
+      @Nonnull
+      VehicleCommAdapterEvent event
+  ) {
     requireNonNull(event, "event");
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.COMM_ADAPTER_EVENT.name(),
-                                                  null,
-                                                  event);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.COMM_ADAPTER_EVENT.name(),
+        null,
+        event
+    );
   }
 
   /**
@@ -205,9 +219,11 @@ public class VehicleProcessModel {
     boolean oldValue = this.commAdapterEnabled;
     this.commAdapterEnabled = commAdapterEnabled;
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.COMM_ADAPTER_ENABLED.name(),
-                                                  oldValue,
-                                                  commAdapterEnabled);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.COMM_ADAPTER_ENABLED.name(),
+        oldValue,
+        commAdapterEnabled
+    );
   }
 
   /**
@@ -228,9 +244,11 @@ public class VehicleProcessModel {
     boolean oldValue = this.commAdapterConnected;
     this.commAdapterConnected = commAdapterConnected;
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.COMM_ADAPTER_CONNECTED.name(),
-                                                  oldValue,
-                                                  commAdapterConnected);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.COMM_ADAPTER_CONNECTED.name(),
+        oldValue,
+        commAdapterConnected
+    );
   }
 
   /**
@@ -248,14 +266,19 @@ public class VehicleProcessModel {
    *
    * @param position The new position
    */
-  public void setPosition(@Nullable String position) {
+  public void setPosition(
+      @Nullable
+      String position
+  ) {
     // Otherwise update the position, notify listeners and let the kernel know.
     String oldValue = this.position;
     this.position = position;
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.POSITION.name(),
-                                                  oldValue,
-                                                  position);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.POSITION.name(),
+        oldValue,
+        position
+    );
   }
 
   /**
@@ -273,14 +296,19 @@ public class VehicleProcessModel {
    *
    * @param position The new position.
    */
-  public void setPrecisePosition(@Nullable Triple position) {
+  public void setPrecisePosition(
+      @Nullable
+      Triple position
+  ) {
     // Otherwise update the position, notify listeners and let the kernel know.
     Triple oldValue = this.precisePosition;
     this.precisePosition = position;
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.PRECISE_POSITION.name(),
-                                                  oldValue,
-                                                  position);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.PRECISE_POSITION.name(),
+        oldValue,
+        position
+    );
   }
 
   /**
@@ -302,9 +330,11 @@ public class VehicleProcessModel {
     double oldValue = this.orientationAngle;
     this.orientationAngle = angle;
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.ORIENTATION_ANGLE.name(),
-                                                  oldValue,
-                                                  angle);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.ORIENTATION_ANGLE.name(),
+        oldValue,
+        angle
+    );
   }
 
   /**
@@ -325,9 +355,11 @@ public class VehicleProcessModel {
     int oldValue = this.energyLevel;
     this.energyLevel = newLevel;
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.ENERGY_LEVEL.name(),
-                                                  oldValue,
-                                                  newLevel);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.ENERGY_LEVEL.name(),
+        oldValue,
+        newLevel
+    );
   }
 
   /**
@@ -345,15 +377,20 @@ public class VehicleProcessModel {
    *
    * @param devices The new devices
    */
-  public void setLoadHandlingDevices(@Nonnull List<LoadHandlingDevice> devices) {
+  public void setLoadHandlingDevices(
+      @Nonnull
+      List<LoadHandlingDevice> devices
+  ) {
     List<LoadHandlingDevice> devs = new ArrayList<>(devices);
 
     List<LoadHandlingDevice> oldValue = this.loadHandlingDevices;
     this.loadHandlingDevices = devs;
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.LOAD_HANDLING_DEVICES.name(),
-                                                  oldValue,
-                                                  devs);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.LOAD_HANDLING_DEVICES.name(),
+        oldValue,
+        devs
+    );
   }
 
   /**
@@ -362,7 +399,12 @@ public class VehicleProcessModel {
    * @param key The property's key.
    * @param value The property's new value.
    */
-  public void setProperty(@Nonnull String key, @Nullable String value) {
+  public void setProperty(
+      @Nonnull
+      String key,
+      @Nullable
+      String value
+  ) {
     requireNonNull(key, "key");
 
     // Check whether the new value is the same as the last one we set. If yes, ignore the update,
@@ -374,9 +416,11 @@ public class VehicleProcessModel {
     }
     vehicleProperties.put(key, value);
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.VEHICLE_PROPERTY.name(),
-                                                  null,
-                                                  new VehiclePropertyUpdate(key, value));
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.VEHICLE_PROPERTY.name(),
+        null,
+        new VehiclePropertyUpdate(key, value)
+    );
   }
 
   /**
@@ -394,21 +438,32 @@ public class VehicleProcessModel {
    *
    * @param newState The new state
    */
-  public void setState(@Nonnull Vehicle.State newState) {
+  public void setState(
+      @Nonnull
+      Vehicle.State newState
+  ) {
     Vehicle.State oldState = this.state;
     this.state = newState;
 
     getPropertyChangeSupport().firePropertyChange(Attribute.STATE.name(), oldState, newState);
 
     if (oldState != Vehicle.State.ERROR && newState == Vehicle.State.ERROR) {
-      publishUserNotification(new UserNotification(getName(),
-                                                   "Vehicle state changed to ERROR",
-                                                   UserNotification.Level.NOTEWORTHY));
+      publishUserNotification(
+          new UserNotification(
+              getName(),
+              "Vehicle state changed to ERROR",
+              UserNotification.Level.NOTEWORTHY
+          )
+      );
     }
     else if (oldState == Vehicle.State.ERROR && newState != Vehicle.State.ERROR) {
-      publishUserNotification(new UserNotification(getName(),
-                                                   "Vehicle state is no longer ERROR",
-                                                   UserNotification.Level.NOTEWORTHY));
+      publishUserNotification(
+          new UserNotification(
+              getName(),
+              "Vehicle state is no longer ERROR",
+              UserNotification.Level.NOTEWORTHY
+          )
+      );
     }
   }
 
@@ -430,9 +485,11 @@ public class VehicleProcessModel {
     int oldValue = this.length;
     this.length = length;
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.LENGTH.name(),
-                                                  oldValue,
-                                                  length);
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.LENGTH.name(),
+        oldValue,
+        length
+    );
   }
 
   /**
@@ -441,7 +498,12 @@ public class VehicleProcessModel {
    * @param key The property's key.
    * @param value The property's new value.
    */
-  public void setTransportOrderProperty(@Nonnull String key, @Nullable String value) {
+  public void setTransportOrderProperty(
+      @Nonnull
+      String key,
+      @Nullable
+      String value
+  ) {
     requireNonNull(key, "key");
 
     // Check whether the new value is the same as the last one we set. If yes, ignore the update,
@@ -453,9 +515,11 @@ public class VehicleProcessModel {
     }
     transportOrderProperties.put(key, value);
 
-    getPropertyChangeSupport().firePropertyChange(Attribute.TRANSPORT_ORDER_PROPERTY.name(),
-                                                  null,
-                                                  new TransportOrderPropertyUpdate(key, value));
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.TRANSPORT_ORDER_PROPERTY.name(),
+        null,
+        new TransportOrderPropertyUpdate(key, value)
+    );
   }
 
   /**
@@ -463,10 +527,15 @@ public class VehicleProcessModel {
    *
    * @param enqueuedCommand The command that has been added to the queue.
    */
-  public void commandEnqueued(@Nonnull MovementCommand enqueuedCommand) {
-    getPropertyChangeSupport().firePropertyChange(Attribute.COMMAND_ENQUEUED.name(),
-                                                  null,
-                                                  enqueuedCommand);
+  public void commandEnqueued(
+      @Nonnull
+      MovementCommand enqueuedCommand
+  ) {
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.COMMAND_ENQUEUED.name(),
+        null,
+        enqueuedCommand
+    );
   }
 
   /**
@@ -474,10 +543,15 @@ public class VehicleProcessModel {
    *
    * @param sentCommand The command that has been sent to the vehicle.
    */
-  public void commandSent(@Nonnull MovementCommand sentCommand) {
-    getPropertyChangeSupport().firePropertyChange(Attribute.COMMAND_SENT.name(),
-                                                  null,
-                                                  sentCommand);
+  public void commandSent(
+      @Nonnull
+      MovementCommand sentCommand
+  ) {
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.COMMAND_SENT.name(),
+        null,
+        sentCommand
+    );
   }
 
   /**
@@ -485,10 +559,15 @@ public class VehicleProcessModel {
    *
    * @param executedCommand The command that has been executed.
    */
-  public void commandExecuted(@Nonnull MovementCommand executedCommand) {
-    getPropertyChangeSupport().firePropertyChange(Attribute.COMMAND_EXECUTED.name(),
-                                                  null,
-                                                  executedCommand);
+  public void commandExecuted(
+      @Nonnull
+      MovementCommand executedCommand
+  ) {
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.COMMAND_EXECUTED.name(),
+        null,
+        executedCommand
+    );
   }
 
   /**
@@ -496,10 +575,15 @@ public class VehicleProcessModel {
    *
    * @param failedCommand The command that could not be executed.
    */
-  public void commandFailed(@Nonnull MovementCommand failedCommand) {
-    getPropertyChangeSupport().firePropertyChange(Attribute.COMMAND_FAILED.name(),
-                                                  null,
-                                                  failedCommand);
+  public void commandFailed(
+      @Nonnull
+      MovementCommand failedCommand
+  ) {
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.COMMAND_FAILED.name(),
+        null,
+        failedCommand
+    );
   }
 
   /**
@@ -507,7 +591,10 @@ public class VehicleProcessModel {
    *
    * @param level The integration level to change to.
    */
-  public void integrationLevelChangeRequested(@Nonnull Vehicle.IntegrationLevel level) {
+  public void integrationLevelChangeRequested(
+      @Nonnull
+      Vehicle.IntegrationLevel level
+  ) {
     getPropertyChangeSupport().firePropertyChange(
         Attribute.INTEGRATION_LEVEL_CHANGE_REQUESTED.name(),
         null,
@@ -580,7 +667,8 @@ public class VehicleProcessModel {
    * A notification object sent to observers to indicate a change of a vehicle's property.
    */
   public static class VehiclePropertyUpdate
-      extends PropertyUpdate {
+      extends
+        PropertyUpdate {
 
     /**
      * Creates a new instance.
@@ -597,7 +685,8 @@ public class VehicleProcessModel {
    * A notification object sent to observers to indicate a change of a transport order's property.
    */
   public static class TransportOrderPropertyUpdate
-      extends PropertyUpdate {
+      extends
+        PropertyUpdate {
 
     /**
      * Creates a new instance.

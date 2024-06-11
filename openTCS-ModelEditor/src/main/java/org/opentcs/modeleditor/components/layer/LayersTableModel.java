@@ -7,9 +7,10 @@
  */
 package org.opentcs.modeleditor.components.layer;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javax.swing.SwingUtilities;
@@ -26,9 +27,11 @@ import org.opentcs.modeleditor.util.I18nPlantOverviewModeling;
  * A table model for layers.
  */
 class LayersTableModel
-    extends AbstractTableModel
-    implements LayerChangeListener,
-               LayerGroupChangeListener {
+    extends
+      AbstractTableModel
+    implements
+      LayerChangeListener,
+      LayerGroupChangeListener {
 
   /**
    * The number of the "Active" column.
@@ -62,25 +65,39 @@ class LayersTableModel
   /**
    * The column names.
    */
-  private static final String[] COLUMN_NAMES = new String[]{
-    BUNDLE.getString("layersTableModel.column_active.headerText"),
-    BUNDLE.getString("layersTableModel.column_ordinal.headerText"),
-    BUNDLE.getString("layersTableModel.column_visible.headerText"),
-    BUNDLE.getString("layersTableModel.column_name.headerText"),
-    BUNDLE.getString("layersTableModel.column_group.headerText"),
-    BUNDLE.getString("layersTableModel.column_groupVisible.headerText")
-  };
+  private static final String[] COLUMN_NAMES
+      = new String[]{
+          BUNDLE.getString(
+              "layersTableModel.column_active.headerText"
+          ),
+          BUNDLE.getString(
+              "layersTableModel.column_ordinal.headerText"
+          ),
+          BUNDLE.getString(
+              "layersTableModel.column_visible.headerText"
+          ),
+          BUNDLE.getString(
+              "layersTableModel.column_name.headerText"
+          ),
+          BUNDLE.getString(
+              "layersTableModel.column_group.headerText"
+          ),
+          BUNDLE.getString(
+              "layersTableModel.column_groupVisible.headerText"
+          )
+      };
   /**
    * The column classes.
    */
-  private static final Class<?>[] COLUMN_CLASSES = new Class<?>[]{
-    Boolean.class,
-    Integer.class,
-    Boolean.class,
-    String.class,
-    LayerGroup.class,
-    Boolean.class
-  };
+  private static final Class<?>[] COLUMN_CLASSES
+      = new Class<?>[]{
+          Boolean.class,
+          Integer.class,
+          Boolean.class,
+          String.class,
+          LayerGroup.class,
+          Boolean.class
+      };
   /**
    * The model manager.
    */
@@ -101,9 +118,11 @@ class LayersTableModel
    * @param activeLayerProvider Provides the currently active layer.
    * @param layerEditor The layer editor.
    */
-  LayersTableModel(ModelManager modelManager,
-                   ActiveLayerProvider activeLayerProvider,
-                   LayerEditorModeling layerEditor) {
+  LayersTableModel(
+      ModelManager modelManager,
+      ActiveLayerProvider activeLayerProvider,
+      LayerEditorModeling layerEditor
+  ) {
     this.modelManager = requireNonNull(modelManager, "modelManager");
     this.activeLayerProvider = requireNonNull(activeLayerProvider, "activeLayerProvider");
     this.layerEditor = requireNonNull(layerEditor, "layerEditor");

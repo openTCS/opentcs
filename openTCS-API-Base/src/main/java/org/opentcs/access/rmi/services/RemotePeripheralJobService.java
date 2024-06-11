@@ -29,8 +29,9 @@ import org.opentcs.data.peripherals.PeripheralJob;
  * </p>
  */
 public interface RemotePeripheralJobService
-    extends RemoteTCSObjectService,
-            Remote {
+    extends
+      RemoteTCSObjectService,
+      Remote {
 
   // CHECKSTYLE:OFF
   PeripheralJob createPeripheralJob(ClientID clientId, PeripheralJobCreationTO to)

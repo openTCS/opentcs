@@ -24,7 +24,8 @@ import javax.swing.text.Document;
  * an <code>Array</code> of three <code>Strings</code>.
  */
 public final class TripleTextInputPanel
-    extends TextInputPanel {
+    extends
+      TextInputPanel {
 
   /**
    * If the panel is resetable this is the value the input is set to when
@@ -46,6 +47,7 @@ public final class TripleTextInputPanel
 
   /**
    * Create a new <code>TripleTextInputPanel</code>.
+   *
    * @param title Title of the panel
    */
   private TripleTextInputPanel(String title) {
@@ -57,14 +59,17 @@ public final class TripleTextInputPanel
    * Enable input validation against the given regular expressions.
    * If a format string is <code>null</code> the related text field is not
    * validated.
+   *
    * @see InputPanel#addValidationListener
    * @param format1 A regular expression for the first text field.
    * @param format2 A regular expression for the second text field.
    * @param format3 A regular expression for the third text field.
    */
-  private void enableInputValidation(String format1,
-                                     String format2,
-                                     String format3) {
+  private void enableInputValidation(
+      String format1,
+      String format2,
+      String format3
+  ) {
     if (format1 != null) {
       inputField1.getDocument().addDocumentListener(new TextInputValidator(format1));
     }
@@ -78,9 +83,11 @@ public final class TripleTextInputPanel
 
   @Override
   protected void captureInput() {
-    input = new String[] {inputField1.getText(),
-                          inputField2.getText(),
-                          inputField3.getText()};
+    input = new String[]{
+        inputField1.getText(),
+        inputField2.getText(),
+        inputField3.getText()
+    };
   }
 
   @Override
@@ -127,6 +134,7 @@ public final class TripleTextInputPanel
     setInputValid(allValid);
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /** This method is called from within the constructor to
    * initialize the form.
@@ -265,6 +273,8 @@ public final class TripleTextInputPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(unitLabel2, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void inputField1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_inputField1FocusGained
     inputField1.selectAll();
@@ -277,6 +287,9 @@ public final class TripleTextInputPanel
   private void inputField3FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_inputField3FocusGained
     inputField3.selectAll();
   }//GEN-LAST:event_inputField3FocusGained
+
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JTextField inputField1;
   private javax.swing.JTextField inputField2;
@@ -289,13 +302,15 @@ public final class TripleTextInputPanel
   private javax.swing.JLabel unitLabel2;
   private javax.swing.JLabel unitLabel3;
   // End of variables declaration//GEN-END:variables
-  //CHECKSTYLE:ON
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   /**
    * See {@link InputPanel.Builder}.
    */
   public static class Builder
-      implements InputPanel.Builder {
+      implements
+        InputPanel.Builder {
 
     /**
      * The panel's title.
@@ -333,6 +348,7 @@ public final class TripleTextInputPanel
 
     /**
      * Create a new builder.
+     *
      * @param title Title of the panel.
      */
     public Builder(String title) {
@@ -363,6 +379,7 @@ public final class TripleTextInputPanel
     /**
      * Set the labels for the text fields.
      * Passing <code>null</code> means there should not be such a label.
+     *
      * @param label1 The label of the first text field
      * @param label2 The label of the second text field
      * @param label3 The label of the third text field
@@ -377,6 +394,7 @@ public final class TripleTextInputPanel
 
     /**
      * Set the same initial value for all three text fields.
+     *
      * @param value The initial value.
      * @return the isntance of this <code>Builder</code>
      */
@@ -388,6 +406,7 @@ public final class TripleTextInputPanel
      * Set the initial values for the text fields of the panel
      * Passing <code>null</code> means there should not be an initial value
      * for this text field.
+     *
      * @param val1 The initial value of the first text field
      * @param val2 The initial value of the second text field
      * @param val3 The initial value of the third text field
@@ -402,6 +421,7 @@ public final class TripleTextInputPanel
 
     /**
      * Set the same text for the unit label for all three text fields.
+     *
      * @param unit The unit
      * @return the isntance of this <code>Builder</code>
      */
@@ -413,6 +433,7 @@ public final class TripleTextInputPanel
      * Set the text for the unit labels of the panel.
      * Passing <code>null</code> means there should not be a unit label for
      * the corresponding text field.
+     *
      * @param unit1 The unit of the first text field
      * @param unit2 The unit of the second text field
      * @param unit3 The unit of the third text field
@@ -429,6 +450,7 @@ public final class TripleTextInputPanel
      * Set the message of the panel.
      * The user of this method must take care for the line breaks in the message,
      * as it is not wrapped automatically!
+     *
      * @param message the message
      * @return the instance of this <code>Builder</code>
      */
@@ -446,17 +468,20 @@ public final class TripleTextInputPanel
      * expressions for the text fields.
      * Passing null as an argument means that the corresponding text field
      * should not be validated.
+     *
      * @param format1 The regular expression that will be used for validation in
-     *                the first text field.
+     * the first text field.
      * @param format2 The regular expression that will be used for validation in
-     *                the second text field.
+     * the second text field.
      * @param format3 The regular expression that will be used for validation in
-     *                the third text field.
+     * the third text field.
      * @return the instance of this <code>Builder</code>
      */
-    public Builder enableValidation(String format1,
-                                    String format2,
-                                    String format3) {
+    public Builder enableValidation(
+        String format1,
+        String format2,
+        String format3
+    ) {
       formats[0] = format1;
       formats[1] = format2;
       formats[2] = format3;
@@ -465,6 +490,7 @@ public final class TripleTextInputPanel
 
     /**
      * Set a value the panel's input can be reset to.
+     *
      * @param resetValue the reset value
      * @return the instance of this <code>Builder</code>
      */

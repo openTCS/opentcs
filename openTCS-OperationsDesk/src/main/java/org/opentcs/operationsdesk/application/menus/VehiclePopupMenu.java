@@ -7,10 +7,11 @@
  */
 package org.opentcs.operationsdesk.application.menus;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -22,14 +23,15 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.operationsdesk.application.action.ActionFactory;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
-import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 import org.opentcs.operationsdesk.util.OperationsDeskConfiguration;
+import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
  * A popup menu for actions for multiple selected vehicles.
  */
 public class VehiclePopupMenu
-    extends JPopupMenu {
+    extends
+      JPopupMenu {
 
   /**
    * Creates a new instance.
@@ -41,10 +43,13 @@ public class VehiclePopupMenu
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public VehiclePopupMenu(ModelManager modelManager,
-                          ActionFactory actionFactory,
-                          OperationsDeskConfiguration configuration,
-                          @Assisted Collection<VehicleModel> vehicles) {
+  public VehiclePopupMenu(
+      ModelManager modelManager,
+      ActionFactory actionFactory,
+      OperationsDeskConfiguration configuration,
+      @Assisted
+      Collection<VehicleModel> vehicles
+  ) {
     requireNonNull(modelManager, "modelManager");
     requireNonNull(actionFactory, "actionFactory");
     requireNonNull(vehicles, "vehicles");
@@ -84,13 +89,17 @@ public class VehiclePopupMenu
 
     if (vehicles.size() == 1) {
       action = actionFactory.createSendVehicleToPointAction(singleVehicle);
-      action.setEnabled(singleVehicle.isAvailableForOrder()
-          && !modelManager.getModel().getPointModels().isEmpty());
+      action.setEnabled(
+          singleVehicle.isAvailableForOrder()
+              && !modelManager.getModel().getPointModels().isEmpty()
+      );
       add(action);
 
       action = actionFactory.createSendVehicleToLocationAction(singleVehicle);
-      action.setEnabled(singleVehicle.isAvailableForOrder()
-          && !modelManager.getModel().getLocationModels().isEmpty());
+      action.setEnabled(
+          singleVehicle.isAvailableForOrder()
+              && !modelManager.getModel().getLocationModels().isEmpty()
+      );
       add(action);
 
       addSeparator();
@@ -121,8 +130,12 @@ public class VehiclePopupMenu
     );
     action.setEnabled(!isAnyProcessingOrder(vehicles));
     checkBoxMenuItem = new JCheckBoxMenuItem(action);
-    checkBoxMenuItem.setSelected(isAnyAtIntegrationLevel(vehicles,
-                                                         Vehicle.IntegrationLevel.TO_BE_IGNORED));
+    checkBoxMenuItem.setSelected(
+        isAnyAtIntegrationLevel(
+            vehicles,
+            Vehicle.IntegrationLevel.TO_BE_IGNORED
+        )
+    );
     integrateSubMenu.add(checkBoxMenuItem);
 
     action = actionFactory.createIntegrationLevelChangeAction(
@@ -131,8 +144,12 @@ public class VehiclePopupMenu
     );
     action.setEnabled(!isAnyProcessingOrder(vehicles));
     checkBoxMenuItem = new JCheckBoxMenuItem(action);
-    checkBoxMenuItem.setSelected(isAnyAtIntegrationLevel(vehicles,
-                                                         Vehicle.IntegrationLevel.TO_BE_NOTICED));
+    checkBoxMenuItem.setSelected(
+        isAnyAtIntegrationLevel(
+            vehicles,
+            Vehicle.IntegrationLevel.TO_BE_NOTICED
+        )
+    );
     integrateSubMenu.add(checkBoxMenuItem);
 
     action = actionFactory.createIntegrationLevelChangeAction(
@@ -209,8 +226,10 @@ public class VehiclePopupMenu
         || vehicle.getPropertyProcState().getValue() == Vehicle.ProcState.AWAITING_ORDER;
   }
 
-  private boolean isAnyAtIntegrationLevel(Collection<VehicleModel> vehicles,
-                                          Vehicle.IntegrationLevel level) {
+  private boolean isAnyAtIntegrationLevel(
+      Collection<VehicleModel> vehicles,
+      Vehicle.IntegrationLevel level
+  ) {
     return vehicles.stream().anyMatch(
         vehicle -> vehicle.getPropertyIntegrationLevel().getComparableValue().equals(level)
     );

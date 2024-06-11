@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.LinkTO;
@@ -32,9 +33,15 @@ public class LocationTO {
 
   @JsonCreator
   public LocationTO(
-      @Nonnull @JsonProperty(value = "name", required = true) String name,
-      @Nonnull @JsonProperty(value = "typeName", required = true) String typeName,
-      @Nonnull @JsonProperty(value = "position", required = true) TripleTO position
+      @Nonnull
+      @JsonProperty(value = "name", required = true)
+      String name,
+      @Nonnull
+      @JsonProperty(value = "typeName", required = true)
+      String typeName,
+      @Nonnull
+      @JsonProperty(value = "position", required = true)
+      TripleTO position
   ) {
     this.name = requireNonNull(name, "name");
     this.typeName = requireNonNull(typeName, "typeName");
@@ -46,7 +53,10 @@ public class LocationTO {
     return name;
   }
 
-  public LocationTO setName(@Nonnull String name) {
+  public LocationTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     return this;
   }
@@ -56,7 +66,10 @@ public class LocationTO {
     return properties;
   }
 
-  public LocationTO setProperties(@Nonnull List<PropertyTO> properties) {
+  public LocationTO setProperties(
+      @Nonnull
+      List<PropertyTO> properties
+  ) {
     this.properties = requireNonNull(properties, "properties");
     return this;
   }
@@ -66,7 +79,10 @@ public class LocationTO {
     return typeName;
   }
 
-  public LocationTO setTypeName(@Nonnull String typeName) {
+  public LocationTO setTypeName(
+      @Nonnull
+      String typeName
+  ) {
     this.typeName = requireNonNull(typeName, "typeName");
     return this;
   }
@@ -76,7 +92,10 @@ public class LocationTO {
     return position;
   }
 
-  public LocationTO setPosition(@Nonnull TripleTO position) {
+  public LocationTO setPosition(
+      @Nonnull
+      TripleTO position
+  ) {
     this.position = requireNonNull(position, "position");
     return this;
   }
@@ -86,7 +105,10 @@ public class LocationTO {
     return links;
   }
 
-  public LocationTO setLinks(@Nonnull List<LinkTO> links) {
+  public LocationTO setLinks(
+      @Nonnull
+      List<LinkTO> links
+  ) {
     this.links = requireNonNull(links, "links");
     return this;
   }
@@ -106,7 +128,10 @@ public class LocationTO {
   }
 
   @Nonnull
-  public LocationTO setLayout(@Nonnull Layout layout) {
+  public LocationTO setLayout(
+      @Nonnull
+      Layout layout
+  ) {
     this.layout = requireNonNull(layout, "layout");
     return this;
   }
@@ -127,7 +152,10 @@ public class LocationTO {
       return position;
     }
 
-    public Layout setPosition(@Nonnull CoupleTO position) {
+    public Layout setPosition(
+        @Nonnull
+        CoupleTO position
+    ) {
       this.position = requireNonNull(position, "position");
       return this;
     }
@@ -137,7 +165,10 @@ public class LocationTO {
       return labelOffset;
     }
 
-    public Layout setLabelOffset(@Nonnull CoupleTO labelOffset) {
+    public Layout setLabelOffset(
+        @Nonnull
+        CoupleTO labelOffset
+    ) {
       this.labelOffset = requireNonNull(labelOffset, "labelOffset");
       return this;
     }
@@ -148,9 +179,12 @@ public class LocationTO {
     }
 
     public Layout setLocationRepresentation(
-        @Nonnull String locationRepresentation) {
+        @Nonnull
+        String locationRepresentation
+    ) {
       this.locationRepresentation = requireNonNull(
-          locationRepresentation, "locationRepresentation");
+          locationRepresentation, "locationRepresentation"
+      );
       return this;
     }
 

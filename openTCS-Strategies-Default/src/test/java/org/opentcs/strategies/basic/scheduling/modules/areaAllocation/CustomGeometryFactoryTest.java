@@ -11,6 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -44,7 +45,7 @@ class CustomGeometryFactoryTest {
   void providesEmptyGeometryWhenCreatingPolygonWithOneCoordinate() {
     Geometry result = factory.createPolygonOrEmptyGeometry(
         new Coordinate[]{
-          new Coordinate(0, 0)
+            new Coordinate(0, 0)
         }
     );
     assertThat(result, is(CustomGeometryFactory.EMPTY_GEOMETRY));
@@ -54,8 +55,8 @@ class CustomGeometryFactoryTest {
   void providesEmptyGeometryWhenCreatingPolygonWithTwoCoordinates() {
     Geometry result = factory.createPolygonOrEmptyGeometry(
         new Coordinate[]{
-          new Coordinate(0, 0),
-          new Coordinate(0, 0)
+            new Coordinate(0, 0),
+            new Coordinate(0, 0)
         }
     );
     assertThat(result, is(CustomGeometryFactory.EMPTY_GEOMETRY));
@@ -65,9 +66,9 @@ class CustomGeometryFactoryTest {
   void providesEmptyGeometryWhenCreatingPolygonWithThreeCoordinates() {
     Geometry result = factory.createPolygonOrEmptyGeometry(
         new Coordinate[]{
-          new Coordinate(0, 0),
-          new Coordinate(0, 10),
-          new Coordinate(0, 0)
+            new Coordinate(0, 0),
+            new Coordinate(0, 10),
+            new Coordinate(0, 0)
         }
     );
     assertThat(result, is(CustomGeometryFactory.EMPTY_GEOMETRY));
@@ -77,11 +78,12 @@ class CustomGeometryFactoryTest {
   void providesValidPolygonWhenCreatingPolygonWithSufficientAmountOfCoordinates() {
     Geometry result = factory.createPolygonOrEmptyGeometry(
         new Coordinate[]{
-          new Coordinate(0, 0),
-          new Coordinate(0, 10),
-          new Coordinate(5, 5),
-          new Coordinate(0, 0)
-        });
+            new Coordinate(0, 0),
+            new Coordinate(0, 10),
+            new Coordinate(5, 5),
+            new Coordinate(0, 0)
+        }
+    );
 
     assertThat(result, isA(Polygon.class));
     assertTrue(result.isValid());

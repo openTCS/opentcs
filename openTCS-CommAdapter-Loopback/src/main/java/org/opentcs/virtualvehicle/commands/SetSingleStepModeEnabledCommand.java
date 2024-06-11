@@ -15,7 +15,8 @@ import org.opentcs.virtualvehicle.LoopbackCommunicationAdapter;
  * A command to enable/disable the comm adapter's single step mode.
  */
 public class SetSingleStepModeEnabledCommand
-    implements AdapterCommand {
+    implements
+      AdapterCommand {
 
   /**
    * Whether to enable/disable single step mode.

@@ -7,13 +7,14 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
 import org.opentcs.data.model.Path;
@@ -39,9 +40,15 @@ public class PathEdgeMapper {
    * @param configuration The configuration.
    */
   @Inject
-  public PathEdgeMapper(@Nonnull @Assisted EdgeEvaluator edgeEvaluator,
-                        @Assisted boolean excludeLockedPaths,
-                        @Nonnull ShortestPathConfiguration configuration) {
+  public PathEdgeMapper(
+      @Nonnull
+      @Assisted
+      EdgeEvaluator edgeEvaluator,
+      @Assisted
+      boolean excludeLockedPaths,
+      @Nonnull
+      ShortestPathConfiguration configuration
+  ) {
     this.edgeEvaluator = requireNonNull(edgeEvaluator, "edgeEvaluator");
     this.excludeLockedPaths = excludeLockedPaths;
     this.configuration = requireNonNull(configuration, "configuration");
@@ -70,10 +77,12 @@ public class PathEdgeMapper {
         double weight = edgeEvaluator.computeWeight(edge, vehicle);
 
         if (weight < 0 && !allowNegativeEdgeWeights) {
-          LOG.warn("Edge {} with weight {} ignored. Algorithm {} cannot handle negative weights.",
-                   edge,
-                   weight,
-                   configuration.algorithm().name());
+          LOG.warn(
+              "Edge {} with weight {} ignored. Algorithm {} cannot handle negative weights.",
+              edge,
+              weight,
+              configuration.algorithm().name()
+          );
         }
         else if (weight == Double.POSITIVE_INFINITY) {
           LOG.debug("Edge {} with infinite weight ignored.", edge);
@@ -88,10 +97,12 @@ public class PathEdgeMapper {
         double weight = edgeEvaluator.computeWeight(edge, vehicle);
 
         if (weight < 0 && !allowNegativeEdgeWeights) {
-          LOG.warn("Edge {} with weight {} ignored. Algorithm {} cannot handle negative weights.",
-                   edge,
-                   weight,
-                   configuration.algorithm().name());
+          LOG.warn(
+              "Edge {} with weight {} ignored. Algorithm {} cannot handle negative weights.",
+              edge,
+              weight,
+              configuration.algorithm().name()
+          );
         }
         else if (weight == Double.POSITIVE_INFINITY) {
           LOG.debug("Edge {} with infinite weight ignored.", edge);

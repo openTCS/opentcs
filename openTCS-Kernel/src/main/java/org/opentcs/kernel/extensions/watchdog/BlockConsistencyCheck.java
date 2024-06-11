@@ -7,11 +7,14 @@
  */
 package org.opentcs.kernel.extensions.watchdog;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.data.model.Vehicle.IntegrationLevel.TO_BE_RESPECTED;
+import static org.opentcs.data.model.Vehicle.IntegrationLevel.TO_BE_UTILIZED;
+
 import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -26,8 +29,6 @@ import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
-import static org.opentcs.data.model.Vehicle.IntegrationLevel.TO_BE_RESPECTED;
-import static org.opentcs.data.model.Vehicle.IntegrationLevel.TO_BE_UTILIZED;
 import org.opentcs.data.notification.UserNotification;
 
 /**
@@ -61,8 +62,9 @@ import org.opentcs.data.notification.UserNotification;
  * </ul>
  */
 public class BlockConsistencyCheck
-    implements Runnable,
-               Lifecycle {
+    implements
+      Runnable,
+      Lifecycle {
 
   /**
    * Notification source.
@@ -108,10 +110,13 @@ public class BlockConsistencyCheck
    * @param configuration The watchdog configuration.
    */
   @Inject
-  public BlockConsistencyCheck(@KernelExecutor ScheduledExecutorService kernelExecutor,
-                    TCSObjectService objectService,
-                    NotificationService notificationService,
-                    WatchdogConfiguration configuration) {
+  public BlockConsistencyCheck(
+      @KernelExecutor
+      ScheduledExecutorService kernelExecutor,
+      TCSObjectService objectService,
+      NotificationService notificationService,
+      WatchdogConfiguration configuration
+  ) {
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.objectService = requireNonNull(objectService, "objectService");
     this.notificationService = requireNonNull(notificationService, "notificationService");
@@ -166,17 +171,19 @@ public class BlockConsistencyCheck
               || !occupations.get(entry.getKey()).equals(entry.getValue());
         })
         .forEach(entry -> {
-          notificationService.publishUserNotification(new UserNotification(
-              NOTIFICATION_SOURCE,
-              String.format(
-                  "Block %s is overfull. Occupied by vehicles: %s",
-                  entry.getKey().getName(),
-                  entry.getValue().stream()
-                      .map(vehicle -> vehicle.getName())
-                      .collect(Collectors.joining(", "))
-              ),
-              UserNotification.Level.IMPORTANT
-          ));
+          notificationService.publishUserNotification(
+              new UserNotification(
+                  NOTIFICATION_SOURCE,
+                  String.format(
+                      "Block %s is overfull. Occupied by vehicles: %s",
+                      entry.getKey().getName(),
+                      entry.getValue().stream()
+                          .map(vehicle -> vehicle.getName())
+                          .collect(Collectors.joining(", "))
+                  ),
+                  UserNotification.Level.IMPORTANT
+              )
+          );
         });
 
     // Find resolved violations
@@ -187,11 +194,13 @@ public class BlockConsistencyCheck
               || currentOccupations.get(entry.getKey()).size() <= 1;
         })
         .forEach(entry -> {
-          notificationService.publishUserNotification(new UserNotification(
-              NOTIFICATION_SOURCE,
-              String.format("Block %s is not overfull any more.", entry.getKey().getName()),
-              UserNotification.Level.IMPORTANT
-          ));
+          notificationService.publishUserNotification(
+              new UserNotification(
+                  NOTIFICATION_SOURCE,
+                  String.format("Block %s is not overfull any more.", entry.getKey().getName()),
+                  UserNotification.Level.IMPORTANT
+              )
+          );
         });
 
     occupations = currentOccupations;

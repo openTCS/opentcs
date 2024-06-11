@@ -8,10 +8,12 @@
 package org.opentcs.strategies.basic.peripherals.dispatching;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +29,6 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.drivers.peripherals.PeripheralControllerPool;
 import org.opentcs.drivers.peripherals.PeripheralJobCallback;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.event.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +37,9 @@ import org.slf4j.LoggerFactory;
  * Dispatches peripheral jobs and peripheral devices represented by locations.
  */
 public class DefaultPeripheralJobDispatcher
-    implements PeripheralJobDispatcher,
-               PeripheralJobCallback {
+    implements
+      PeripheralJobDispatcher,
+      PeripheralJobCallback {
 
   /**
    * This class's Logger.
@@ -111,22 +113,29 @@ public class DefaultPeripheralJobDispatcher
       InternalPeripheralService peripheralService,
       InternalPeripheralJobService peripheralJobService,
       PeripheralControllerPool controllerPool,
-      @ApplicationEventBus EventSource eventSource,
-      @KernelExecutor ScheduledExecutorService kernelExecutor,
+      @ApplicationEventBus
+      EventSource eventSource,
+      @KernelExecutor
+      ScheduledExecutorService kernelExecutor,
       FullDispatchTask fullDispatchTask,
       Provider<PeriodicPeripheralRedispatchingTask> periodicDispatchTaskProvider,
       Provider<ImplicitDispatchTrigger> implicitDispatchTriggerProvider,
-      DefaultPeripheralJobDispatcherConfiguration configuration) {
+      DefaultPeripheralJobDispatcherConfiguration configuration
+  ) {
     this.peripheralService = requireNonNull(peripheralService, "peripheralService");
     this.peripheralJobService = requireNonNull(peripheralJobService, "peripheralJobService");
     this.controllerPool = requireNonNull(controllerPool, "controllerPool");
     this.eventSource = requireNonNull(eventSource, "eventSource");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.fullDispatchTask = requireNonNull(fullDispatchTask, "fullDispatchTask");
-    this.periodicDispatchTaskProvider = requireNonNull(periodicDispatchTaskProvider,
-                                                       "periodicDispatchTaskProvider");
-    this.implicitDispatchTriggerProvider = requireNonNull(implicitDispatchTriggerProvider,
-                                                          "implicitDispatchTriggerProvider");
+    this.periodicDispatchTaskProvider = requireNonNull(
+        periodicDispatchTaskProvider,
+        "periodicDispatchTaskProvider"
+    );
+    this.implicitDispatchTriggerProvider = requireNonNull(
+        implicitDispatchTriggerProvider,
+        "implicitDispatchTriggerProvider"
+    );
     this.configuration = requireNonNull(configuration, "configuration");
   }
 
@@ -142,8 +151,10 @@ public class DefaultPeripheralJobDispatcher
     implicitDispatchTrigger = implicitDispatchTriggerProvider.get();
     eventSource.subscribe(implicitDispatchTrigger);
 
-    LOG.debug("Scheduling periodic peripheral job dispatch task with interval of {} ms...",
-              configuration.idlePeripheralRedispatchingInterval());
+    LOG.debug(
+        "Scheduling periodic peripheral job dispatch task with interval of {} ms...",
+        configuration.idlePeripheralRedispatchingInterval()
+    );
     periodicDispatchTaskFuture = kernelExecutor.scheduleAtFixedRate(
         periodicDispatchTaskProvider.get(),
         configuration.idlePeripheralRedispatchingInterval(),
@@ -189,16 +200,20 @@ public class DefaultPeripheralJobDispatcher
     requireNonNull(location, "location");
     checkState(isInitialized(), "Not initialized");
 
-    LOG.debug("Withdrawing peripheral job for location '{}' ({})...",
-              location.getName(),
-              location.getPeripheralInformation().getPeripheralJob());
+    LOG.debug(
+        "Withdrawing peripheral job for location '{}' ({})...",
+        location.getName(),
+        location.getPeripheralInformation().getPeripheralJob()
+    );
     if (location.getPeripheralInformation().getPeripheralJob() == null) {
       return;
     }
 
-    withdrawJob(peripheralService.fetchObject(
-        PeripheralJob.class,
-        location.getPeripheralInformation().getPeripheralJob())
+    withdrawJob(
+        peripheralService.fetchObject(
+            PeripheralJob.class,
+            location.getPeripheralInformation().getPeripheralJob()
+        )
     );
   }
 
@@ -207,9 +222,11 @@ public class DefaultPeripheralJobDispatcher
     requireNonNull(job, "job");
     checkState(isInitialized(), "Not initialized");
     if (job.getState().isFinalState()) {
-      LOG.info("Peripheral job '{}' already in final state '{}', skipping withdrawal.",
-               job.getName(),
-               job.getState());
+      LOG.info(
+          "Peripheral job '{}' already in final state '{}', skipping withdrawal.",
+          job.getName(),
+          job.getState()
+      );
       return;
     }
     checkArgument(
@@ -236,14 +253,19 @@ public class DefaultPeripheralJobDispatcher
   }
 
   @Override
-  public void peripheralJobFinished(@Nonnull TCSObjectReference<PeripheralJob> ref) {
+  public void peripheralJobFinished(
+      @Nonnull
+      TCSObjectReference<PeripheralJob> ref
+  ) {
     requireNonNull(ref, "ref");
 
     PeripheralJob job = peripheralJobService.fetchObject(PeripheralJob.class, ref);
     if (job.getState() != PeripheralJob.State.BEING_PROCESSED) {
-      LOG.info("Peripheral job not in state BEING_PROCESSED, ignoring: {} ({})",
-               job.getName(),
-               job.getState());
+      LOG.info(
+          "Peripheral job not in state BEING_PROCESSED, ignoring: {} ({})",
+          job.getName(),
+          job.getState()
+      );
       return;
     }
 
@@ -252,14 +274,19 @@ public class DefaultPeripheralJobDispatcher
   }
 
   @Override
-  public void peripheralJobFailed(@Nonnull TCSObjectReference<PeripheralJob> ref) {
+  public void peripheralJobFailed(
+      @Nonnull
+      TCSObjectReference<PeripheralJob> ref
+  ) {
     requireNonNull(ref, "ref");
 
     PeripheralJob job = peripheralJobService.fetchObject(PeripheralJob.class, ref);
     if (job.getState() != PeripheralJob.State.BEING_PROCESSED) {
-      LOG.info("Peripheral job not in state BEING_PROCESSED, ignoring: {} ({})",
-               job.getName(),
-               job.getState());
+      LOG.info(
+          "Peripheral job not in state BEING_PROCESSED, ignoring: {} ({})",
+          job.getName(),
+          job.getState()
+      );
       return;
     }
 
@@ -269,8 +296,10 @@ public class DefaultPeripheralJobDispatcher
 
   private void finalizeJob(PeripheralJob job, PeripheralJob.State state) {
     if (job.getState() == PeripheralJob.State.BEING_PROCESSED) {
-      peripheralService.updatePeripheralProcState(job.getPeripheralOperation().getLocation(),
-                                                  PeripheralInformation.ProcState.IDLE);
+      peripheralService.updatePeripheralProcState(
+          job.getPeripheralOperation().getLocation(),
+          PeripheralInformation.ProcState.IDLE
+      );
       peripheralService.updatePeripheralJob(job.getPeripheralOperation().getLocation(), null);
     }
 

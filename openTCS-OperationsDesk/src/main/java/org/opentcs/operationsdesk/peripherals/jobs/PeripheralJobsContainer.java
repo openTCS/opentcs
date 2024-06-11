@@ -7,12 +7,13 @@
  */
 package org.opentcs.operationsdesk.peripherals.jobs;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
@@ -33,8 +34,9 @@ import org.slf4j.LoggerFactory;
  * Maintains a set of all peripheral jobs existing on the kernel side.
  */
 public class PeripheralJobsContainer
-    implements EventHandler,
-               Lifecycle {
+    implements
+      EventHandler,
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -68,8 +70,11 @@ public class PeripheralJobsContainer
    * @param portalProvider Provides a access to a portal.
    */
   @Inject
-  public PeripheralJobsContainer(@ApplicationEventBus EventBus eventBus,
-                                 SharedKernelServicePortalProvider portalProvider) {
+  public PeripheralJobsContainer(
+      @ApplicationEventBus
+      EventBus eventBus,
+      SharedKernelServicePortalProvider portalProvider
+  ) {
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
   }

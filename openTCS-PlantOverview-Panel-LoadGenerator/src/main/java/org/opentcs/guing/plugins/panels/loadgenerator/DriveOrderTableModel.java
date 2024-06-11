@@ -7,21 +7,23 @@
  */
 package org.opentcs.guing.plugins.panels.loadgenerator;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.ResourceBundle;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
-import static org.opentcs.guing.plugins.panels.loadgenerator.I18nPlantOverviewPanelLoadGenerator.BUNDLE_PATH;
 
 /**
  * A table model for drive orders.
  */
 class DriveOrderTableModel
-    extends AbstractTableModel {
+    extends
+      AbstractTableModel {
 
   /**
    * This classe's bundle.
@@ -30,17 +32,23 @@ class DriveOrderTableModel
   /**
    * The column names.
    */
-  private final String[] columnNames = new String[]{
-    bundle.getString("driveOrderTableModel.column_location.headerText"),
-    bundle.getString("driveOrderTableModel.column_operation.headerText")
-  };
+  private final String[] columnNames
+      = new String[]{
+          bundle.getString(
+              "driveOrderTableModel.column_location.headerText"
+          ),
+          bundle.getString(
+              "driveOrderTableModel.column_operation.headerText"
+          )
+      };
   /**
    * The column classes.
    */
-  private final Class<?>[] columnClasses = new Class<?>[]{
-    TCSObjectReference.class,
-    String.class
-  };
+  private final Class<?>[] columnClasses
+      = new Class<?>[]{
+          TCSObjectReference.class,
+          String.class
+      };
   /**
    * The actual content.
    */

@@ -14,7 +14,8 @@ import org.opentcs.data.model.visualization.LayerGroup;
  * A table cell renderer for {@link LayerGroup}s.
  */
 public class LayerGroupCellRenderer
-    extends DefaultTableCellRenderer {
+    extends
+      DefaultTableCellRenderer {
 
   /**
    * Creates a new instance.

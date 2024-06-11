@@ -13,7 +13,8 @@ import java.util.EventObject;
  * An event holding a single boolean variable indicating if something is valid.
  */
 public class ValidationEvent
-    extends EventObject {
+    extends
+      EventObject {
 
   /**
    * Validation state.
@@ -22,6 +23,7 @@ public class ValidationEvent
 
   /**
    * Create a new <code>ValidationEvent</code>.
+   *
    * @param source The source of the event.
    * @param valid The state of validation that should be reported by this event.
    */
@@ -32,6 +34,7 @@ public class ValidationEvent
 
   /**
    * Return the state of validation.
+   *
    * @return valid
    */
   public boolean valid() {

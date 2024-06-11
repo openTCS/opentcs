@@ -7,6 +7,9 @@
  */
 package org.opentcs.data.order;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.Serializable;
@@ -14,12 +17,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * Describes a sequence of movements and an optional operation at the end that a {@link Vehicle} is
@@ -28,7 +29,8 @@ import static org.opentcs.util.Assertions.checkArgument;
  * @see TransportOrder
  */
 public class DriveOrder
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * This drive order's destination.
@@ -52,17 +54,26 @@ public class DriveOrder
    *
    * @param destination This drive order's destination.
    */
-  public DriveOrder(@Nonnull Destination destination) {
+  public DriveOrder(
+      @Nonnull
+      Destination destination
+  ) {
     this.destination = requireNonNull(destination, "destination");
     this.transportOrder = null;
     this.route = null;
     this.state = State.PRISTINE;
   }
 
-  private DriveOrder(@Nonnull Destination destination,
-                     @Nullable TCSObjectReference<TransportOrder> transportOrder,
-                     @Nullable Route route,
-                     @Nonnull State state) {
+  private DriveOrder(
+      @Nonnull
+      Destination destination,
+      @Nullable
+      TCSObjectReference<TransportOrder> transportOrder,
+      @Nullable
+      Route route,
+      @Nonnull
+      State state
+  ) {
     this.destination = requireNonNull(destination, "destination");
     this.transportOrder = transportOrder;
     this.route = route;
@@ -96,7 +107,9 @@ public class DriveOrder
    * @return A copy of this object, differing in the given value.
    */
   public DriveOrder withTransportOrder(
-      @Nullable TCSObjectReference<TransportOrder> transportOrder) {
+      @Nullable
+      TCSObjectReference<TransportOrder> transportOrder
+  ) {
     return new DriveOrder(destination, transportOrder, route, state);
   }
 
@@ -117,7 +130,10 @@ public class DriveOrder
    * @param route The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public DriveOrder withRoute(@Nullable Route route) {
+  public DriveOrder withRoute(
+      @Nullable
+      Route route
+  ) {
     return new DriveOrder(destination, transportOrder, route, state);
   }
 
@@ -137,7 +153,10 @@ public class DriveOrder
    * @param state The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public DriveOrder withState(@Nonnull State state) {
+  public DriveOrder withState(
+      @Nonnull
+      State state
+  ) {
     return new DriveOrder(destination, transportOrder, route, state);
   }
 
@@ -166,7 +185,8 @@ public class DriveOrder
    * Describes the destination of a drive order.
    */
   public static class Destination
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * An operation constant for doing nothing.
@@ -200,20 +220,30 @@ public class DriveOrder
      * @param destination The actual destination (must be a reference to a location or point).
      */
     @SuppressWarnings("unchecked")
-    public Destination(@Nonnull TCSObjectReference<?> destination) {
-      checkArgument(destination.getReferentClass() == Location.class
-          || destination.getReferentClass() == Point.class,
-                    "Not a reference on a location or point: %s",
-                    destination);
+    public Destination(
+        @Nonnull
+        TCSObjectReference<?> destination
+    ) {
+      checkArgument(
+          destination.getReferentClass() == Location.class
+              || destination.getReferentClass() == Point.class,
+          "Not a reference on a location or point: %s",
+          destination
+      );
 
       this.destination = requireNonNull(destination, "destination");
       this.operation = OP_NOP;
       this.properties = Collections.unmodifiableMap(new HashMap<>());
     }
 
-    private Destination(@Nonnull TCSObjectReference<?> destination,
-                        @Nonnull Map<String, String> properties,
-                        @Nonnull String operation) {
+    private Destination(
+        @Nonnull
+        TCSObjectReference<?> destination,
+        @Nonnull
+        Map<String, String> properties,
+        @Nonnull
+        String operation
+    ) {
       this.destination = requireNonNull(destination, "destination");
       this.operation = requireNonNull(operation, "operation");
       this.properties = Collections.unmodifiableMap(new HashMap<>(properties));
@@ -245,7 +275,10 @@ public class DriveOrder
      * @param operation The value to be set in the copy.
      * @return A copy of this object, differing in the given value.
      */
-    public Destination withOperation(@Nonnull String operation) {
+    public Destination withOperation(
+        @Nonnull
+        String operation
+    ) {
       return new Destination(destination, properties, operation);
     }
 

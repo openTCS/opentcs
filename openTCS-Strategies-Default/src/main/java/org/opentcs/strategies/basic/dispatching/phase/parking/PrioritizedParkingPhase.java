@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.data.model.Vehicle;
@@ -24,7 +25,8 @@ import org.slf4j.LoggerFactory;
  * prioritized parking positions.
  */
 public class PrioritizedParkingPhase
-    extends AbstractParkingPhase {
+    extends
+      AbstractParkingPhase {
 
   /**
    * This class's logger.
@@ -43,13 +45,16 @@ public class PrioritizedParkingPhase
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       TransportOrderUtil transportOrderUtil,
       DefaultDispatcherConfiguration configuration,
-      CompositeParkVehicleSelectionFilter vehicleSelectionFilter) {
-    super(orderService,
-          parkingPosSupplier,
-          router,
-          assignmentCandidateSelectionFilter,
-          transportOrderUtil,
-          configuration);
+      CompositeParkVehicleSelectionFilter vehicleSelectionFilter
+  ) {
+    super(
+        orderService,
+        parkingPosSupplier,
+        router,
+        assignmentCandidateSelectionFilter,
+        transportOrderUtil,
+        configuration
+    );
     this.vehicleSelectionFilter = requireNonNull(vehicleSelectionFilter, "vehicleSelectionFilter");
   }
 

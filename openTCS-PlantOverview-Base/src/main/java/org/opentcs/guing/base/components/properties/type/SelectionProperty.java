@@ -18,8 +18,10 @@ import org.opentcs.guing.base.model.ModelComponent;
  * @param <E> The type of the enum.
  */
 public class SelectionProperty<E extends Enum<E>>
-    extends AbstractProperty
-    implements Selectable<E> {
+    extends
+      AbstractProperty
+    implements
+      Selectable<E> {
 
   /**
    * The possible values.
@@ -43,8 +45,10 @@ public class SelectionProperty<E extends Enum<E>>
    * @param value The value.
    */
   @SuppressWarnings("this-escape")
-  public SelectionProperty(ModelComponent model, List<E> possibleValues,
-                           Object value) {
+  public SelectionProperty(
+      ModelComponent model, List<E> possibleValues,
+      Object value
+  ) {
     super(model);
     setPossibleValues(possibleValues);
     fValue = value;

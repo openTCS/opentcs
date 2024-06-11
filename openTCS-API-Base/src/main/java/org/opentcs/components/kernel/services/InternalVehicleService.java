@@ -23,7 +23,8 @@ import org.opentcs.drivers.vehicle.LoadHandlingDevice;
  * Declares the methods the vehicle service must provide which are not accessible to remote peers.
  */
 public interface InternalVehicleService
-    extends VehicleService {
+    extends
+      VehicleService {
 
   /**
    * Updates a vehicle's energy level.
@@ -42,8 +43,10 @@ public interface InternalVehicleService
    * @param devices The vehicle's new load handling devices.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
-  void updateVehicleLoadHandlingDevices(TCSObjectReference<Vehicle> ref,
-                                        List<LoadHandlingDevice> devices)
+  void updateVehicleLoadHandlingDevices(
+      TCSObjectReference<Vehicle> ref,
+      List<LoadHandlingDevice> devices
+  )
       throws ObjectUnknownException;
 
   /**
@@ -53,8 +56,10 @@ public interface InternalVehicleService
    * @param pointRef A reference to the point which the vehicle is expected to occupy next.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
-  void updateVehicleNextPosition(TCSObjectReference<Vehicle> vehicleRef,
-                                 TCSObjectReference<Point> pointRef)
+  void updateVehicleNextPosition(
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<Point> pointRef
+  )
       throws ObjectUnknownException;
 
   /**
@@ -64,8 +69,10 @@ public interface InternalVehicleService
    * @param sequenceRef A reference to the order sequence the vehicle processes.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
-  void updateVehicleOrderSequence(TCSObjectReference<Vehicle> vehicleRef,
-                                  TCSObjectReference<OrderSequence> sequenceRef)
+  void updateVehicleOrderSequence(
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<OrderSequence> sequenceRef
+  )
       throws ObjectUnknownException;
 
   /**
@@ -86,8 +93,10 @@ public interface InternalVehicleService
    * @param pointRef A reference to the point on which the vehicle is to be placed.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
-  void updateVehiclePosition(TCSObjectReference<Vehicle> vehicleRef,
-                             TCSObjectReference<Point> pointRef)
+  void updateVehiclePosition(
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<Point> pointRef
+  )
       throws ObjectUnknownException;
 
   /**
@@ -127,8 +136,10 @@ public interface InternalVehicleService
    * @param resources The new resources.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
-  void updateVehicleClaimedResources(TCSObjectReference<Vehicle> ref,
-                                     List<Set<TCSResourceReference<?>>> resources)
+  void updateVehicleClaimedResources(
+      TCSObjectReference<Vehicle> ref,
+      List<Set<TCSResourceReference<?>>> resources
+  )
       throws ObjectUnknownException;
 
   /**
@@ -138,8 +149,10 @@ public interface InternalVehicleService
    * @param resources The new resources.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
-  void updateVehicleAllocatedResources(TCSObjectReference<Vehicle> ref,
-                                       List<Set<TCSResourceReference<?>>> resources)
+  void updateVehicleAllocatedResources(
+      TCSObjectReference<Vehicle> ref,
+      List<Set<TCSResourceReference<?>>> resources
+  )
       throws ObjectUnknownException;
 
   /**
@@ -169,7 +182,9 @@ public interface InternalVehicleService
    * @param orderRef A reference to the transport order the vehicle processes.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
-  void updateVehicleTransportOrder(TCSObjectReference<Vehicle> vehicleRef,
-                                   TCSObjectReference<TransportOrder> orderRef)
+  void updateVehicleTransportOrder(
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<TransportOrder> orderRef
+  )
       throws ObjectUnknownException;
 }

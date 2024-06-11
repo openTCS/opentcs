@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.plugins.panels.allocation;
 
+import static org.opentcs.guing.plugins.panels.allocation.I18nPlantOverviewPanelResourceAllocation.BUNDLE_PATH;
+
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -16,14 +18,14 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import org.opentcs.data.model.TCSResourceReference;
-import static org.opentcs.guing.plugins.panels.allocation.I18nPlantOverviewPanelResourceAllocation.BUNDLE_PATH;
 
 /**
  * A model for a resource allocation tree to display an alphabetically ordered view for vehicle
  * names and their not ordered allocated resources.
  */
 public class AllocationTreeModel
-    extends DefaultTreeModel {
+    extends
+      DefaultTreeModel {
 
   /**
    * This class' bundle.
@@ -34,8 +36,10 @@ public class AllocationTreeModel
    * Creates a new instance.
    */
   public AllocationTreeModel() {
-    super(new DefaultMutableTreeNode(BUNDLE.getString("resourceAllocationPanel.treeRoot.text")),
-          true);
+    super(
+        new DefaultMutableTreeNode(BUNDLE.getString("resourceAllocationPanel.treeRoot.text")),
+        true
+    );
   }
 
   /**
@@ -54,8 +58,10 @@ public class AllocationTreeModel
    *
    * @param allocatedVehicles The vehicles which have a resource allocation
    */
-  private void removeNotAllocatedVehicles(String vehicleName,
-                                          List<TCSResourceReference<?>> resources) {
+  private void removeNotAllocatedVehicles(
+      String vehicleName,
+      List<TCSResourceReference<?>> resources
+  ) {
     @SuppressWarnings("unchecked")
     List<DefaultMutableTreeNode> rootChildren
         = Collections.list((Enumeration<DefaultMutableTreeNode>) root.children());
@@ -75,8 +81,10 @@ public class AllocationTreeModel
    * @param vehicleName The name of the vehicle
    * @param resources The allocated resources of the vehicle
    */
-  private void updateVehicleAllocation(String vehicleName,
-                                       List<TCSResourceReference<?>> resources) {
+  private void updateVehicleAllocation(
+      String vehicleName,
+      List<TCSResourceReference<?>> resources
+  ) {
     DefaultMutableTreeNode vehicleNode = null;
     for (int x = 0; x < root.getChildCount(); x++) {
       DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) root.getChildAt(x);
@@ -131,8 +139,10 @@ public class AllocationTreeModel
    * @param vehicleNode The parent node
    * @return The index of the node containing the resource or -1 if not found
    */
-  private int getChildIndexOf(TCSResourceReference<?> resource,
-                              DefaultMutableTreeNode vehicleNode) {
+  private int getChildIndexOf(
+      TCSResourceReference<?> resource,
+      DefaultMutableTreeNode vehicleNode
+  ) {
     int index = 0;
 
     List<DefaultMutableTreeNode> vehicleChildren = Collections.list(vehicleNode.children()).stream()

@@ -20,7 +20,8 @@ import org.opentcs.guing.common.persistence.ModelManager;
  * Manages (loads, saves and keeps) the driving course model.
  */
 public interface ModelManagerModeling
-    extends ModelManager {
+    extends
+      ModelManager {
 
   /**
    * Shows a dialog to select a model and loads it.
@@ -30,7 +31,10 @@ public interface ModelManagerModeling
    * @return <code>true</code> if, and only if, a model was successfully
    * loaded.
    */
-  boolean loadModel(@Nullable File modelFile);
+  boolean loadModel(
+      @Nullable
+      File modelFile
+  );
 
   /**
    * Shows a dialog to select a model and loads it.
@@ -41,7 +45,10 @@ public interface ModelManagerModeling
    * @return <code>true</code> if, and only if, a model was successfully
    * loaded.
    */
-  boolean loadModel(@Nullable File modelFile, ModelFileReader reader);
+  boolean loadModel(
+      @Nullable
+      File modelFile, ModelFileReader reader
+  );
 
   /**
    * Imports a model using the given importer.
@@ -49,7 +56,10 @@ public interface ModelManagerModeling
    * @param importer The importer to be used.
    * @return <code>true</code> if, and only if, a model was successfully imported.
    */
-  boolean importModel(@Nonnull PlantModelImporter importer);
+  boolean importModel(
+      @Nonnull
+      PlantModelImporter importer
+  );
 
   /**
    * Uploads the given system model to the kernel.
@@ -65,5 +75,8 @@ public interface ModelManagerModeling
    * @param exporter The exporter to be used.
    * @return <code>true</code> if, and only if, the model was successfully exported.
    */
-  boolean exportModel(@Nonnull PlantModelExporter exporter);
+  boolean exportModel(
+      @Nonnull
+      PlantModelExporter exporter
+  );
 }

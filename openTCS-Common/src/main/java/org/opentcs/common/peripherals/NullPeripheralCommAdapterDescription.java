@@ -13,7 +13,8 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
  * A {@link PeripheralCommAdapterDescription} for no comm adapter.
  */
 public class NullPeripheralCommAdapterDescription
-    extends PeripheralCommAdapterDescription {
+    extends
+      PeripheralCommAdapterDescription {
 
   /**
    * Creates a new instance.

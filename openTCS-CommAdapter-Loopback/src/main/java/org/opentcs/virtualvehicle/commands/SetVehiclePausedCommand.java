@@ -15,7 +15,8 @@ import org.opentcs.virtualvehicle.LoopbackCommunicationAdapter;
  * A command to pause/unpause the vehicle.
  */
 public class SetVehiclePausedCommand
-    implements AdapterCommand {
+    implements
+      AdapterCommand {
 
   /**
    * Whether to pause/unpause the vehicle.

@@ -40,7 +40,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * @author Werner Randelshofer
  */
 public class EditorColorChooserAction
-    extends AttributeAction {
+    extends
+      AttributeAction {
 
   protected AttributeKey<Color> key;
 
@@ -54,18 +55,22 @@ public class EditorColorChooserAction
    * @param fixedAttributes The fixed attributes
    */
   @SuppressWarnings("this-escape")
-  public EditorColorChooserAction(DrawingEditor editor,
-                                  AttributeKey<Color> key,
-                                  String name,
-                                  Icon icon,
-                                  Map<AttributeKey, Object> fixedAttributes) {
+  public EditorColorChooserAction(
+      DrawingEditor editor,
+      AttributeKey<Color> key,
+      String name,
+      Icon icon,
+      Map<AttributeKey, Object> fixedAttributes
+  ) {
 
     super(editor, fixedAttributes, name, icon);
     this.key = key;
     putValue(AbstractAction.NAME, name);
-    putValue(Action.SHORT_DESCRIPTION,
-             ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH)
-                 .getString("editorColorChooserAction.shortDescription"));
+    putValue(
+        Action.SHORT_DESCRIPTION,
+        ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.TOOLBAR_PATH)
+            .getString("editorColorChooserAction.shortDescription")
+    );
     putValue(AbstractAction.SMALL_ICON, icon);
     updateEnabledState();
   }

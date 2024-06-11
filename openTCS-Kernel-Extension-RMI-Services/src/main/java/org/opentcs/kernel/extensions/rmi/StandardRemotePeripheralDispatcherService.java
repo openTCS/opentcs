@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import org.opentcs.access.rmi.ClientID;
@@ -37,8 +38,10 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class StandardRemotePeripheralDispatcherService
-    extends KernelRemoteService
-    implements RemotePeripheralDispatcherService {
+    extends
+      KernelRemoteService
+    implements
+      RemotePeripheralDispatcherService {
 
   /**
    * This class's logger.
@@ -89,12 +92,15 @@ public class StandardRemotePeripheralDispatcherService
    * @param kernelExecutor Executes tasks modifying kernel data.
    */
   @Inject
-  public StandardRemotePeripheralDispatcherService(PeripheralDispatcherService dispatcherService,
-                                                   UserManager userManager,
-                                                   RmiKernelInterfaceConfiguration configuration,
-                                                   SocketFactoryProvider socketFactoryProvider,
-                                                   RegistryProvider registryProvider,
-                                                   @KernelExecutor ExecutorService kernelExecutor) {
+  public StandardRemotePeripheralDispatcherService(
+      PeripheralDispatcherService dispatcherService,
+      UserManager userManager,
+      RmiKernelInterfaceConfiguration configuration,
+      SocketFactoryProvider socketFactoryProvider,
+      RegistryProvider registryProvider,
+      @KernelExecutor
+      ExecutorService kernelExecutor
+  ) {
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.userManager = requireNonNull(userManager, "userManager");
     this.configuration = requireNonNull(configuration, "configuration");
@@ -114,10 +120,12 @@ public class StandardRemotePeripheralDispatcherService
     // Export this instance via RMI.
     try {
       LOG.debug("Exporting proxy...");
-      UnicastRemoteObject.exportObject(this,
-                                       configuration.remoteDispatcherServicePort(),
-                                       socketFactoryProvider.getClientSocketFactory(),
-                                       socketFactoryProvider.getServerSocketFactory());
+      UnicastRemoteObject.exportObject(
+          this,
+          configuration.remoteDispatcherServicePort(),
+          socketFactoryProvider.getClientSocketFactory(),
+          socketFactoryProvider.getServerSocketFactory()
+      );
       LOG.debug("Binding instance with RMI registry...");
       rmiRegistry.rebind(RegistrationName.REMOTE_PERIPHERAL_DISPATCHER_SERVICE, this);
     }

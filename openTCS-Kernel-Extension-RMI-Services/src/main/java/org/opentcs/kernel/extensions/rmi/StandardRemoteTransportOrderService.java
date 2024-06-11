@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import org.opentcs.access.rmi.ClientID;
@@ -38,8 +39,10 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class StandardRemoteTransportOrderService
-    extends StandardRemoteTCSObjectService
-    implements RemoteTransportOrderService {
+    extends
+      StandardRemoteTCSObjectService
+    implements
+      RemoteTransportOrderService {
 
   /**
    * This class's logger.
@@ -90,12 +93,15 @@ public class StandardRemoteTransportOrderService
    * @param kernelExecutor Executes tasks modifying kernel data.
    */
   @Inject
-  public StandardRemoteTransportOrderService(TransportOrderService transportOrderService,
-                                             UserManager userManager,
-                                             RmiKernelInterfaceConfiguration configuration,
-                                             SocketFactoryProvider socketFactoryProvider,
-                                             RegistryProvider registryProvider,
-                                             @KernelExecutor ExecutorService kernelExecutor) {
+  public StandardRemoteTransportOrderService(
+      TransportOrderService transportOrderService,
+      UserManager userManager,
+      RmiKernelInterfaceConfiguration configuration,
+      SocketFactoryProvider socketFactoryProvider,
+      RegistryProvider registryProvider,
+      @KernelExecutor
+      ExecutorService kernelExecutor
+  ) {
     super(transportOrderService, userManager, kernelExecutor);
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.userManager = requireNonNull(userManager, "userManager");
@@ -116,10 +122,12 @@ public class StandardRemoteTransportOrderService
     // Export this instance via RMI.
     try {
       LOG.debug("Exporting proxy...");
-      UnicastRemoteObject.exportObject(this,
-                                       configuration.remoteTransportOrderServicePort(),
-                                       socketFactoryProvider.getClientSocketFactory(),
-                                       socketFactoryProvider.getServerSocketFactory());
+      UnicastRemoteObject.exportObject(
+          this,
+          configuration.remoteTransportOrderServicePort(),
+          socketFactoryProvider.getClientSocketFactory(),
+          socketFactoryProvider.getServerSocketFactory()
+      );
       LOG.debug("Binding instance with RMI registry...");
       rmiRegistry.rebind(RegistrationName.REMOTE_TRANSPORT_ORDER_SERVICE, this);
     }
@@ -192,16 +200,20 @@ public class StandardRemoteTransportOrderService
   }
 
   @Override
-  public void updateTransportOrderIntendedVehicle(ClientID clientId,
-                                                  TCSObjectReference<TransportOrder> orderRef,
-                                                  TCSObjectReference<Vehicle> vehicleRef) {
+  public void updateTransportOrderIntendedVehicle(
+      ClientID clientId,
+      TCSObjectReference<TransportOrder> orderRef,
+      TCSObjectReference<Vehicle> vehicleRef
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_ORDER);
 
     try {
-      kernelExecutor.submit(() -> transportOrderService.updateTransportOrderIntendedVehicle(
-          orderRef,
-          vehicleRef
-      )).get();
+      kernelExecutor.submit(
+          () -> transportOrderService.updateTransportOrderIntendedVehicle(
+              orderRef,
+              vehicleRef
+          )
+      ).get();
     }
     catch (InterruptedException | ExecutionException exc) {
       throw findSuitableExceptionFor(exc);

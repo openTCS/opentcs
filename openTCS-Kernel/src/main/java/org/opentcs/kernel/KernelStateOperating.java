@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.Uninterruptibles;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -41,7 +42,8 @@ import org.slf4j.LoggerFactory;
  * This class implements the standard openTCS kernel in normal operation.
  */
 public class KernelStateOperating
-    extends KernelStateOnline {
+    extends
+      KernelStateOnline {
 
   /**
    * This class's Logger.
@@ -146,46 +148,59 @@ public class KernelStateOperating
    * events.
    */
   @Inject
-  public KernelStateOperating(@GlobalSyncObject Object globalSyncObject,
-                              PlantModelManager plantModelManager,
-                              TransportOrderPoolManager orderPoolManager,
-                              PeripheralJobPoolManager jobPoolManager,
-                              ModelPersister modelPersister,
-                              KernelApplicationConfiguration configuration,
-                              Router router,
-                              Scheduler scheduler,
-                              Dispatcher dispatcher,
-                              PeripheralJobDispatcher peripheralJobDispatcher,
-                              LocalVehicleControllerPool controllerPool,
-                              LocalPeripheralControllerPool peripheralControllerPool,
-                              @KernelExecutor ScheduledExecutorService kernelExecutor,
-                              WorkingSetCleanupTask workingSetCleanupTask,
-                              @ActiveInOperatingMode Set<KernelExtension> extensions,
-                              AttachmentManager attachmentManager,
-                              PeripheralAttachmentManager peripheralAttachmentManager,
-                              InternalVehicleService vehicleService,
-                              PathLockEventListener pathLockListener,
-                              VehicleDispatchTrigger vehicleDispatchTrigger) {
-    super(globalSyncObject,
-          plantModelManager,
-          modelPersister,
-          configuration.saveModelOnTerminateOperating());
+  public KernelStateOperating(
+      @GlobalSyncObject
+      Object globalSyncObject,
+      PlantModelManager plantModelManager,
+      TransportOrderPoolManager orderPoolManager,
+      PeripheralJobPoolManager jobPoolManager,
+      ModelPersister modelPersister,
+      KernelApplicationConfiguration configuration,
+      Router router,
+      Scheduler scheduler,
+      Dispatcher dispatcher,
+      PeripheralJobDispatcher peripheralJobDispatcher,
+      LocalVehicleControllerPool controllerPool,
+      LocalPeripheralControllerPool peripheralControllerPool,
+      @KernelExecutor
+      ScheduledExecutorService kernelExecutor,
+      WorkingSetCleanupTask workingSetCleanupTask,
+      @ActiveInOperatingMode
+      Set<KernelExtension> extensions,
+      AttachmentManager attachmentManager,
+      PeripheralAttachmentManager peripheralAttachmentManager,
+      InternalVehicleService vehicleService,
+      PathLockEventListener pathLockListener,
+      VehicleDispatchTrigger vehicleDispatchTrigger
+  ) {
+    super(
+        globalSyncObject,
+        plantModelManager,
+        modelPersister,
+        configuration.saveModelOnTerminateOperating()
+    );
     this.orderPoolManager = requireNonNull(orderPoolManager, "orderPoolManager");
     this.jobPoolManager = requireNonNull(jobPoolManager, "jobPoolManager");
     this.router = requireNonNull(router, "router");
     this.scheduler = requireNonNull(scheduler, "scheduler");
     this.dispatcher = requireNonNull(dispatcher, "dispatcher");
-    this.peripheralJobDispatcher = requireNonNull(peripheralJobDispatcher,
-                                                  "peripheralJobDispatcher");
+    this.peripheralJobDispatcher = requireNonNull(
+        peripheralJobDispatcher,
+        "peripheralJobDispatcher"
+    );
     this.vehicleControllerPool = requireNonNull(controllerPool, "controllerPool");
-    this.peripheralControllerPool = requireNonNull(peripheralControllerPool,
-                                                   "peripheralControllerPool");
+    this.peripheralControllerPool = requireNonNull(
+        peripheralControllerPool,
+        "peripheralControllerPool"
+    );
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.workingSetCleanupTask = requireNonNull(workingSetCleanupTask, "workingSetCleanupTask");
     this.extensions = requireNonNull(extensions, "extensions");
     this.attachmentManager = requireNonNull(attachmentManager, "attachmentManager");
-    this.peripheralAttachmentManager = requireNonNull(peripheralAttachmentManager,
-                                                      "peripheralAttachmentManager");
+    this.peripheralAttachmentManager = requireNonNull(
+        peripheralAttachmentManager,
+        "peripheralAttachmentManager"
+    );
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.pathLockListener = requireNonNull(pathLockListener, "pathLockListener");
     this.vehicleDispatchTrigger = requireNonNull(vehicleDispatchTrigger, "vehicleDispatchTrigger");
@@ -203,8 +218,10 @@ public class KernelStateOperating
     // Reset vehicle states to ensure vehicles are not dispatchable initially.
     for (Vehicle curVehicle : vehicleService.fetchObjects(Vehicle.class)) {
       vehicleService.updateVehicleProcState(curVehicle.getReference(), Vehicle.ProcState.IDLE);
-      vehicleService.updateVehicleIntegrationLevel(curVehicle.getReference(),
-                                                   Vehicle.IntegrationLevel.TO_BE_RESPECTED);
+      vehicleService.updateVehicleIntegrationLevel(
+          curVehicle.getReference(),
+          Vehicle.IntegrationLevel.TO_BE_RESPECTED
+      );
       vehicleService.updateVehicleState(curVehicle.getReference(), Vehicle.State.UNKNOWN);
       vehicleService.updateVehicleTransportOrder(curVehicle.getReference(), null);
       vehicleService.updateVehicleOrderSequence(curVehicle.getReference(), null);
@@ -231,10 +248,12 @@ public class KernelStateOperating
     vehicleDispatchTrigger.initialize();
 
     // Start a task for cleaning up old orders periodically.
-    cleanerTaskFuture = kernelExecutor.scheduleAtFixedRate(workingSetCleanupTask,
-                                                           workingSetCleanupTask.getSweepInterval(),
-                                                           workingSetCleanupTask.getSweepInterval(),
-                                                           TimeUnit.MILLISECONDS);
+    cleanerTaskFuture = kernelExecutor.scheduleAtFixedRate(
+        workingSetCleanupTask,
+        workingSetCleanupTask.getSweepInterval(),
+        workingSetCleanupTask.getSweepInterval(),
+        TimeUnit.MILLISECONDS
+    );
 
     // Start kernel extensions.
     for (KernelExtension extension : extensions) {
@@ -300,8 +319,10 @@ public class KernelStateOperating
     // Ensure that vehicles do not reference orders any more.
     for (Vehicle curVehicle : vehicleService.fetchObjects(Vehicle.class)) {
       vehicleService.updateVehicleProcState(curVehicle.getReference(), Vehicle.ProcState.IDLE);
-      vehicleService.updateVehicleIntegrationLevel(curVehicle.getReference(),
-                                                   Vehicle.IntegrationLevel.TO_BE_RESPECTED);
+      vehicleService.updateVehicleIntegrationLevel(
+          curVehicle.getReference(),
+          Vehicle.IntegrationLevel.TO_BE_RESPECTED
+      );
       vehicleService.updateVehicleState(curVehicle.getReference(), Vehicle.State.UNKNOWN);
       vehicleService.updateVehicleTransportOrder(curVehicle.getReference(), null);
       vehicleService.updateVehicleOrderSequence(curVehicle.getReference(), null);

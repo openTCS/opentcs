@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.extensions.adminwebapi;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.kernel.extensions.adminwebapi.v1.V1RequestHandler;
 import org.opentcs.kernel.extensions.servicewebapi.HttpConstants;
@@ -18,7 +19,8 @@ import spark.Service;
  * Provides an HTTP interface for basic administration needs.
  */
 public class AdminWebApi
-    implements KernelExtension {
+    implements
+      KernelExtension {
 
   /**
    * The interface configuration.
@@ -44,8 +46,10 @@ public class AdminWebApi
    * @param v1RequestHandler Handles requests for API version 1.
    */
   @Inject
-  public AdminWebApi(AdminWebApiConfiguration configuration,
-                     V1RequestHandler v1RequestHandler) {
+  public AdminWebApi(
+      AdminWebApiConfiguration configuration,
+      V1RequestHandler v1RequestHandler
+  ) {
     this.configuration = requireNonNull(configuration, "configuration");
     this.v1RequestHandler = requireNonNull(v1RequestHandler, "v1RequestHandler");
   }
@@ -61,21 +65,21 @@ public class AdminWebApi
         .port(configuration.bindPort());
 
     service.path("/v1", () -> {
-               service.get("/version", v1RequestHandler::handleGetVersion);
-               service.get("/status", v1RequestHandler::handleGetStatus);
-               service.delete("/kernel", v1RequestHandler::handleDeleteKernel);
-             }
+      service.get("/version", v1RequestHandler::handleGetVersion);
+      service.get("/status", v1RequestHandler::handleGetStatus);
+      service.delete("/kernel", v1RequestHandler::handleDeleteKernel);
+    }
     );
     service.exception(IllegalArgumentException.class, (exception, request, response) -> {
-                    response.status(400);
-                    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-                    response.body(exception.getMessage());
-                  });
+      response.status(400);
+      response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+      response.body(exception.getMessage());
+    });
     service.exception(IllegalStateException.class, (exception, request, response) -> {
-                    response.status(500);
-                    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-                    response.body(exception.getMessage());
-                  });
+      response.status(500);
+      response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+      response.body(exception.getMessage());
+    });
 
     initialized = true;
   }

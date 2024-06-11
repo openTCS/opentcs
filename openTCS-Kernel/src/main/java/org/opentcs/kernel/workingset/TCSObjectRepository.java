@@ -7,11 +7,13 @@
  */
 package org.opentcs.kernel.workingset;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -19,7 +21,6 @@ import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A container for <code>TCSObject</code>s belonging together.
@@ -47,7 +48,10 @@ public class TCSObjectRepository {
    * @throws ObjectExistsException If an object with the same ID or the same
    * name as the new one already exists in this pool.
    */
-  public void addObject(@Nonnull TCSObject<?> newObject)
+  public void addObject(
+      @Nonnull
+      TCSObject<?> newObject
+  )
       throws ObjectExistsException {
     requireNonNull(newObject, "newObject");
 
@@ -72,18 +76,25 @@ public class TCSObjectRepository {
    * of a different class.
    */
   @Nonnull
-  public void replaceObject(@Nonnull TCSObject<?> object)
+  public void replaceObject(
+      @Nonnull
+      TCSObject<?> object
+  )
       throws IllegalArgumentException {
     requireNonNull(object, "object");
     TCSObject<?> oldObject = getObjectOrNull(object.getName());
-    checkArgument(oldObject != null,
-                  "Object named '%s' does not exist",
-                  object.getName());
-    checkArgument(object.getClass() == oldObject.getClass(),
-                  "Object named '%s' not an instance of the same class: '%s' != '%s'",
-                  object.getName(),
-                  object.getClass().getName(),
-                  oldObject.getClass().getName());
+    checkArgument(
+        oldObject != null,
+        "Object named '%s' does not exist",
+        object.getName()
+    );
+    checkArgument(
+        object.getClass() == oldObject.getClass(),
+        "Object named '%s' not an instance of the same class: '%s' != '%s'",
+        object.getName(),
+        object.getClass().getName(),
+        oldObject.getClass().getName()
+    );
 
     objects.get(object.getClass()).put(object.getName(), object);
   }
@@ -95,7 +106,10 @@ public class TCSObjectRepository {
    * @return The referenced object, or <code>null</code>, if no such object exists in this pool.
    */
   @Nullable
-  public TCSObject<?> getObjectOrNull(@Nonnull TCSObjectReference<?> ref) {
+  public TCSObject<?> getObjectOrNull(
+      @Nonnull
+      TCSObjectReference<?> ref
+  ) {
     requireNonNull(ref);
 
     return objects.getOrDefault(ref.getReferentClass(), Map.of()).get(ref.getName());
@@ -109,7 +123,10 @@ public class TCSObjectRepository {
    * @throws ObjectUnknownException If the referenced object does not exist.
    */
   @Nonnull
-  public TCSObject<?> getObject(@Nonnull TCSObjectReference<?> ref)
+  public TCSObject<?> getObject(
+      @Nonnull
+      TCSObjectReference<?> ref
+  )
       throws ObjectUnknownException {
     TCSObject<?> result = getObjectOrNull(ref);
     if (result == null) {
@@ -129,8 +146,12 @@ public class TCSObjectRepository {
    * given class.
    */
   @Nullable
-  public <T extends TCSObject<T>> T getObjectOrNull(@Nonnull Class<T> clazz,
-                                                    @Nonnull TCSObjectReference<T> ref) {
+  public <T extends TCSObject<T>> T getObjectOrNull(
+      @Nonnull
+      Class<T> clazz,
+      @Nonnull
+      TCSObjectReference<T> ref
+  ) {
     requireNonNull(clazz, "clazz");
     requireNonNull(ref, "ref");
 
@@ -154,8 +175,12 @@ public class TCSObjectRepository {
    * but is not an instance of the given class.
    */
   @Nonnull
-  public <T extends TCSObject<T>> T getObject(@Nonnull Class<T> clazz,
-                                              @Nonnull TCSObjectReference<T> ref)
+  public <T extends TCSObject<T>> T getObject(
+      @Nonnull
+      Class<T> clazz,
+      @Nonnull
+      TCSObjectReference<T> ref
+  )
       throws ObjectUnknownException {
     T result = getObjectOrNull(clazz, ref);
     if (result == null) {
@@ -172,7 +197,10 @@ public class TCSObjectRepository {
    * object exists in this pool.
    */
   @Nullable
-  public TCSObject<?> getObjectOrNull(@Nonnull String name) {
+  public TCSObject<?> getObjectOrNull(
+      @Nonnull
+      String name
+  ) {
     requireNonNull(name, "name");
 
     return objects.values().stream()
@@ -190,7 +218,10 @@ public class TCSObjectRepository {
    * @throws ObjectUnknownException If the referenced object does not exist.
    */
   @Nonnull
-  public TCSObject<?> getObject(@Nonnull String name)
+  public TCSObject<?> getObject(
+      @Nonnull
+      String name
+  )
       throws ObjectUnknownException {
     TCSObject<?> result = getObjectOrNull(name);
     if (result == null) {
@@ -210,7 +241,12 @@ public class TCSObjectRepository {
    * given class.
    */
   @Nullable
-  public <T extends TCSObject<T>> T getObjectOrNull(@Nonnull Class<T> clazz, @Nonnull String name) {
+  public <T extends TCSObject<T>> T getObjectOrNull(
+      @Nonnull
+      Class<T> clazz,
+      @Nonnull
+      String name
+  ) {
     requireNonNull(clazz, "clazz");
     requireNonNull(name, "name");
 
@@ -234,7 +270,12 @@ public class TCSObjectRepository {
    * object exists but is not an instance of the given class.
    */
   @Nonnull
-  public <T extends TCSObject<T>> T getObject(@Nonnull Class<T> clazz, @Nonnull String name)
+  public <T extends TCSObject<T>> T getObject(
+      @Nonnull
+      Class<T> clazz,
+      @Nonnull
+      String name
+  )
       throws ObjectUnknownException {
     T result = getObjectOrNull(clazz, name);
     if (result == null) {
@@ -251,7 +292,10 @@ public class TCSObjectRepository {
    * @return A set of objects belonging to the given class.
    */
   @Nonnull
-  public <T extends TCSObject<T>> Set<T> getObjects(@Nonnull Class<T> clazz) {
+  public <T extends TCSObject<T>> Set<T> getObjects(
+      @Nonnull
+      Class<T> clazz
+  ) {
     return objects.getOrDefault(clazz, Map.of()).values().stream()
         .map(object -> clazz.cast(object))
         .collect(Collectors.toSet());
@@ -267,8 +311,12 @@ public class TCSObjectRepository {
    * objects exist, the returned set is empty.
    */
   @Nonnull
-  public <T extends TCSObject<T>> Set<T> getObjects(@Nonnull Class<T> clazz,
-                                                    @Nonnull Predicate<? super T> predicate) {
+  public <T extends TCSObject<T>> Set<T> getObjects(
+      @Nonnull
+      Class<T> clazz,
+      @Nonnull
+      Predicate<? super T> predicate
+  ) {
     requireNonNull(clazz, "clazz");
     requireNonNull(predicate, "predicate");
 
@@ -286,7 +334,10 @@ public class TCSObjectRepository {
    * @throws ObjectUnknownException If the referenced object does not exist.
    */
   @Nonnull
-  public TCSObject<?> removeObject(@Nonnull TCSObjectReference<?> ref)
+  public TCSObject<?> removeObject(
+      @Nonnull
+      TCSObjectReference<?> ref
+  )
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 

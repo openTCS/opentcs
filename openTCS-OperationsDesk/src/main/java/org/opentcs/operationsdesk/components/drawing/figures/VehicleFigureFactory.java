@@ -13,7 +13,8 @@ import org.opentcs.guing.common.components.drawing.figures.FigureFactory;
 /**
  */
 public interface VehicleFigureFactory
-    extends FigureFactory {
+    extends
+      FigureFactory {
 
   VehicleFigure createVehicleFigure(VehicleModel model);
 

@@ -7,9 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Arrays;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
@@ -33,7 +34,8 @@ import org.slf4j.LoggerFactory;
  * The base class for parking phases.
  */
 public abstract class AbstractParkingPhase
-    implements Phase {
+    implements
+      Phase {
 
   /**
    * This class's Logger.
@@ -74,12 +76,15 @@ public abstract class AbstractParkingPhase
       Router router,
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       TransportOrderUtil transportOrderUtil,
-      DefaultDispatcherConfiguration configuration) {
+      DefaultDispatcherConfiguration configuration
+  ) {
     this.router = requireNonNull(router, "router");
     this.orderService = requireNonNull(orderService, "orderService");
     this.parkingPosSupplier = requireNonNull(parkingPosSupplier, "parkingPosSupplier");
-    this.assignmentCandidateSelectionFilter = requireNonNull(assignmentCandidateSelectionFilter,
-                                                             "assignmentCandidateSelectionFilter");
+    this.assignmentCandidateSelectionFilter = requireNonNull(
+        assignmentCandidateSelectionFilter,
+        "assignmentCandidateSelectionFilter"
+    );
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
     this.configuration = requireNonNull(configuration, "configuration");
   }
@@ -146,9 +151,11 @@ public abstract class AbstractParkingPhase
         .filter(c -> assignmentCandidateSelectionFilter.apply(c).isEmpty());
     // XXX Change this to Optional.ifPresentOrElse() once we're at Java 9+.
     if (candidate.isPresent()) {
-      transportOrderUtil.assignTransportOrder(candidate.get().getVehicle(),
-                                              candidate.get().getTransportOrder(),
-                                              candidate.get().getDriveOrders());
+      transportOrderUtil.assignTransportOrder(
+          candidate.get().getVehicle(),
+          candidate.get().getTransportOrder(),
+          candidate.get().getDriveOrders()
+      );
     }
     else {
       // Mark the order as failed, since the vehicle cannot execute it.
@@ -156,9 +163,11 @@ public abstract class AbstractParkingPhase
     }
   }
 
-  private Optional<AssignmentCandidate> computeCandidate(Vehicle vehicle,
-                                                         Point vehiclePosition,
-                                                         TransportOrder order) {
+  private Optional<AssignmentCandidate> computeCandidate(
+      Vehicle vehicle,
+      Point vehiclePosition,
+      TransportOrder order
+  ) {
     return router.getRoute(vehicle, vehiclePosition, order)
         .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders));
   }

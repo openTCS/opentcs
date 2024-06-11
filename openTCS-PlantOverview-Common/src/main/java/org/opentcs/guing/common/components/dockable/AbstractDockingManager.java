@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.common.components.dockable;
 
+import static java.util.Objects.requireNonNull;
+
 import bibliothek.gui.dock.common.CContentArea;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CLocation;
@@ -23,14 +25,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JComponent;
 
 /**
  * Utility class for working with dockables.
  */
 public abstract class AbstractDockingManager
-    implements DockingManager {
+    implements
+      DockingManager {
 
   /**
    * PropertyChangeEvent when a floating dockable closes.
@@ -69,10 +71,12 @@ public abstract class AbstractDockingManager
    * @param closeable If the dockable can be closeable or not.
    * @return The newly created dockable.
    */
-  public DefaultSingleCDockable createDockable(String id,
-                                               String title,
-                                               JComponent comp,
-                                               boolean closeable) {
+  public DefaultSingleCDockable createDockable(
+      String id,
+      String title,
+      JComponent comp,
+      boolean closeable
+  ) {
     Objects.requireNonNull(id, "id is null");
     Objects.requireNonNull(title, "title is null");
     Objects.requireNonNull(comp, "comp is null");
@@ -93,9 +97,11 @@ public abstract class AbstractDockingManager
    * @param comp The JComponent wrapped by the new dockable.
    * @return The newly created dockable.
    */
-  public DefaultSingleCDockable createFloatingDockable(String id,
-                                                       String title,
-                                                       JComponent comp) {
+  public DefaultSingleCDockable createFloatingDockable(
+      String id,
+      String title,
+      JComponent comp
+  ) {
     if (control == null) {
       return null;
     }
@@ -117,10 +123,14 @@ public abstract class AbstractDockingManager
     control.addDockable(dockable);
     dockable.setExtendedMode(ExtendedMode.EXTERNALIZED);
     Rectangle centerRectangle = control.getContentArea().getCenter().getBounds();
-    dockable.setLocation(CLocation.external((centerRectangle.width - comp.getWidth()) / 2,
-                                            (centerRectangle.height - comp.getHeight()) / 2,
-                                            comp.getWidth(),
-                                            comp.getHeight()));
+    dockable.setLocation(
+        CLocation.external(
+            (centerRectangle.width - comp.getWidth()) / 2,
+            (centerRectangle.height - comp.getHeight()) / 2,
+            comp.getWidth(),
+            comp.getHeight()
+        )
+    );
     return dockable;
   }
 
@@ -232,9 +242,11 @@ public abstract class AbstractDockingManager
    * @param dockable The dockable to show.
    * @param index Where to add the dockable.
    */
-  public void showDockable(CStackDockStation station,
-                           DefaultSingleCDockable dockable,
-                           int index) {
+  public void showDockable(
+      CStackDockStation station,
+      DefaultSingleCDockable dockable,
+      int index
+  ) {
     if (station.indexOf(dockable.intern()) <= -1) {
       station.add(dockable.intern(), index);
     }
@@ -275,7 +287,8 @@ public abstract class AbstractDockingManager
   private void fireFloatingDockableClosed(DefaultSingleCDockable dockable) {
     for (PropertyChangeListener listener : listeners) {
       listener.propertyChange(
-          new PropertyChangeEvent(this, DOCKABLE_CLOSED, dockable, dockable));
+          new PropertyChangeEvent(this, DOCKABLE_CLOSED, dockable, dockable)
+      );
     }
   }
 }

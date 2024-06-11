@@ -18,8 +18,10 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
  * {@link LocalPeripheralEntry}.
  */
 public class PeripheralAdapterComboBox
-    extends JComboBox<PeripheralCommAdapterDescription>
-    implements PropertyChangeListener {
+    extends
+      JComboBox<PeripheralCommAdapterDescription>
+    implements
+      PropertyChangeListener {
 
   /**
    * Creates a new instance.

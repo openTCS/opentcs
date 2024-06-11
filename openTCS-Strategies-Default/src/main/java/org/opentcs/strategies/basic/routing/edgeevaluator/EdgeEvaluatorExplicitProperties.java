@@ -7,11 +7,12 @@
  */
 package org.opentcs.strategies.basic.routing.edgeevaluator;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
 import static org.opentcs.components.kernel.Router.PROPKEY_ROUTING_COST_FORWARD;
 import static org.opentcs.components.kernel.Router.PROPKEY_ROUTING_COST_REVERSE;
 import static org.opentcs.components.kernel.Router.PROPKEY_ROUTING_GROUP;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
 import org.opentcs.data.model.Path;
@@ -23,7 +24,8 @@ import org.slf4j.LoggerFactory;
  * Uses an edge's explicit routing cost (given as a property value) as its weight.
  */
 public class EdgeEvaluatorExplicitProperties
-    implements EdgeEvaluator {
+    implements
+      EdgeEvaluator {
 
   /**
    * A key used for selecting this evaluator in a configuration setting.
@@ -60,12 +62,20 @@ public class EdgeEvaluatorExplicitProperties
     String group = extractVehicleGroup(vehicle);
 
     if (edge.isTravellingReverse()) {
-      return parseCosts(extractRoutingCostString(edge.getPath(),
-                                                 PROPKEY_ROUTING_COST_REVERSE + group));
+      return parseCosts(
+          extractRoutingCostString(
+              edge.getPath(),
+              PROPKEY_ROUTING_COST_REVERSE + group
+          )
+      );
     }
     else {
-      return parseCosts(extractRoutingCostString(edge.getPath(),
-                                                 PROPKEY_ROUTING_COST_FORWARD + group));
+      return parseCosts(
+          extractRoutingCostString(
+              edge.getPath(),
+              PROPKEY_ROUTING_COST_FORWARD + group
+          )
+      );
     }
   }
 

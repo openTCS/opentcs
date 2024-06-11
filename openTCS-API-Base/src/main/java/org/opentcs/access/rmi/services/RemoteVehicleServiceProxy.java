@@ -24,8 +24,10 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
  * Delegates method invocations to the corresponding remote service.
  */
 class RemoteVehicleServiceProxy
-    extends RemoteTCSObjectServiceProxy<RemoteVehicleService>
-    implements VehicleService {
+    extends
+      RemoteTCSObjectServiceProxy<RemoteVehicleService>
+    implements
+      VehicleService {
 
   /**
    * Creates a new instance.
@@ -34,9 +36,12 @@ class RemoteVehicleServiceProxy
   }
 
   @Override
-  public void attachCommAdapter(TCSObjectReference<Vehicle> ref,
-                                VehicleCommAdapterDescription description)
-      throws ObjectUnknownException, KernelRuntimeException {
+  public void attachCommAdapter(
+      TCSObjectReference<Vehicle> ref,
+      VehicleCommAdapterDescription description
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -49,7 +54,8 @@ class RemoteVehicleServiceProxy
 
   @Override
   public void disableCommAdapter(TCSObjectReference<Vehicle> ref)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -62,7 +68,8 @@ class RemoteVehicleServiceProxy
 
   @Override
   public void enableCommAdapter(TCSObjectReference<Vehicle> ref)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -75,7 +82,8 @@ class RemoteVehicleServiceProxy
 
   @Override
   public VehicleAttachmentInformation fetchAttachmentInformation(TCSObjectReference<Vehicle> ref)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -88,7 +96,8 @@ class RemoteVehicleServiceProxy
 
   @Override
   public VehicleProcessModelTO fetchProcessModel(TCSObjectReference<Vehicle> ref)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -101,7 +110,8 @@ class RemoteVehicleServiceProxy
 
   @Override
   public void sendCommAdapterCommand(TCSObjectReference<Vehicle> ref, AdapterCommand command)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -114,7 +124,8 @@ class RemoteVehicleServiceProxy
 
   @Override
   public void sendCommAdapterMessage(TCSObjectReference<Vehicle> ref, Object message)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -126,9 +137,12 @@ class RemoteVehicleServiceProxy
   }
 
   @Override
-  public void updateVehicleIntegrationLevel(TCSObjectReference<Vehicle> ref,
-                                            Vehicle.IntegrationLevel integrationLevel)
-      throws ObjectUnknownException, KernelRuntimeException {
+  public void updateVehicleIntegrationLevel(
+      TCSObjectReference<Vehicle> ref,
+      Vehicle.IntegrationLevel integrationLevel
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -141,7 +155,8 @@ class RemoteVehicleServiceProxy
 
   @Override
   public void updateVehiclePaused(TCSObjectReference<Vehicle> ref, boolean paused)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -153,15 +168,20 @@ class RemoteVehicleServiceProxy
   }
 
   @Override
-  public void updateVehicleAllowedOrderTypes(TCSObjectReference<Vehicle> ref,
-                                             Set<String> allowedOrderTypes)
-      throws ObjectUnknownException, KernelRuntimeException {
+  public void updateVehicleAllowedOrderTypes(
+      TCSObjectReference<Vehicle> ref,
+      Set<String> allowedOrderTypes
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
-      getRemoteService().updateVehicleAllowedOrderTypes(getClientId(),
-                                                        ref,
-                                                        allowedOrderTypes);
+      getRemoteService().updateVehicleAllowedOrderTypes(
+          getClientId(),
+          ref,
+          allowedOrderTypes
+      );
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);
@@ -170,7 +190,8 @@ class RemoteVehicleServiceProxy
 
   @Override
   public void updateVehicleEnvelopeKey(TCSObjectReference<Vehicle> ref, String envelopeKey)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {

@@ -16,7 +16,8 @@ import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorComposite
  * weighted graph.
  */
 public class DefaultModelGraphMapper
-    extends AbstractModelGraphMapper {
+    extends
+      AbstractModelGraphMapper {
 
   /**
    * Creates a new instance.
@@ -25,9 +26,15 @@ public class DefaultModelGraphMapper
    * @param mapperComponentsFactory A factory for creating mapper-related components.
    */
   @Inject
-  public DefaultModelGraphMapper(@Nonnull EdgeEvaluatorComposite edgeEvaluator,
-                                 @Nonnull MapperComponentsFactory mapperComponentsFactory) {
-    super(mapperComponentsFactory.createPointVertexMapper(),
-          mapperComponentsFactory.createPathEdgeMapper(edgeEvaluator, true));
+  public DefaultModelGraphMapper(
+      @Nonnull
+      EdgeEvaluatorComposite edgeEvaluator,
+      @Nonnull
+      MapperComponentsFactory mapperComponentsFactory
+  ) {
+    super(
+        mapperComponentsFactory.createPointVertexMapper(),
+        mapperComponentsFactory.createPathEdgeMapper(edgeEvaluator, true)
+    );
   }
 }

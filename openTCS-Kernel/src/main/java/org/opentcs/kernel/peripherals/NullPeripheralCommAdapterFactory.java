@@ -17,7 +17,8 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapterFactory;
  * A factory for {@link NullPeripheralCommAdapter}s.
  */
 public class NullPeripheralCommAdapterFactory
-    implements PeripheralCommAdapterFactory {
+    implements
+      PeripheralCommAdapterFactory {
 
   /**
    * Creates a new NullPeripheralCommAdapterFactory.

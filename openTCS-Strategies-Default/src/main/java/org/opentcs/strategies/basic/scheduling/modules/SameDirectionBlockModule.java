@@ -7,6 +7,9 @@
  */
 package org.opentcs.strategies.basic.scheduling.modules;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.components.kernel.Scheduler.PROPKEY_BLOCK_ENTRY_DIRECTION;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
@@ -16,11 +19,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.Set;
 import org.opentcs.components.kernel.Scheduler;
-import static org.opentcs.components.kernel.Scheduler.PROPKEY_BLOCK_ENTRY_DIRECTION;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.model.Block;
@@ -36,7 +37,8 @@ import org.slf4j.LoggerFactory;
  * the block in the requested direction.
  */
 public class SameDirectionBlockModule
-    implements Scheduler.Module {
+    implements
+      Scheduler.Module {
 
   /**
    * This class's logger.
@@ -64,9 +66,14 @@ public class SameDirectionBlockModule
   private boolean initialized;
 
   @Inject
-  public SameDirectionBlockModule(@Nonnull ReservationPool reservationPool,
-                                  @Nonnull InternalPlantModelService plantModelService,
-                                  @GlobalSyncObject Object globalSyncObject) {
+  public SameDirectionBlockModule(
+      @Nonnull
+      ReservationPool reservationPool,
+      @Nonnull
+      InternalPlantModelService plantModelService,
+      @GlobalSyncObject
+      Object globalSyncObject
+  ) {
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
@@ -105,9 +112,11 @@ public class SameDirectionBlockModule
   }
 
   @Override
-  public void setAllocationState(Scheduler.Client client,
-                                 Set<TCSResource<?>> alloc,
-                                 List<Set<TCSResource<?>>> remainingClaim) {
+  public void setAllocationState(
+      Scheduler.Client client,
+      Set<TCSResource<?>> alloc,
+      List<Set<TCSResource<?>>> remainingClaim
+  ) {
   }
 
   @Override
@@ -119,8 +128,10 @@ public class SameDirectionBlockModule
       // Other modules may prevented the last allocation, discard any previous requests.
       discardPreviousRequests();
 
-      Set<Block> blocks = filterBlocksContainingResources(resources,
-                                                          Block.Type.SAME_DIRECTION_ONLY);
+      Set<Block> blocks = filterBlocksContainingResources(
+          resources,
+          Block.Type.SAME_DIRECTION_ONLY
+      );
       if (blocks.isEmpty()) {
         LOG.debug("{}: No blocks to be checked, allocation allowed.", client.getId());
         return true;
@@ -189,11 +200,15 @@ public class SameDirectionBlockModule
     permissions.values().forEach(permission -> permission.clearPendingRequests());
   }
 
-  private Set<Block> filterBlocksContainingResources(Set<TCSResource<?>> resources,
-                                                     Block.Type type) {
+  private Set<Block> filterBlocksContainingResources(
+      Set<TCSResource<?>> resources,
+      Block.Type type
+  ) {
     Set<Block> result = new HashSet<>();
-    Set<Block> blocks = plantModelService.fetchObjects(Block.class,
-                                                       block -> block.getType() == type);
+    Set<Block> blocks = plantModelService.fetchObjects(
+        Block.class,
+        block -> block.getType() == type
+    );
     for (TCSResource<?> resource : resources) {
       for (Block block : blocks) {
         if (block.getMembers().contains(resource.getReference())) {
@@ -215,12 +230,16 @@ public class SameDirectionBlockModule
     return null;
   }
 
-  private boolean checkBlockEntryPermissions(Scheduler.Client client,
-                                             Set<Block> blocks,
-                                             String entryDirection) {
-    LOG.debug("{}: Checking entry permissions for blocks '{}' with entry direction '{}'.",
-              client.getId(),
-              entryDirection);
+  private boolean checkBlockEntryPermissions(
+      Scheduler.Client client,
+      Set<Block> blocks,
+      String entryDirection
+  ) {
+    LOG.debug(
+        "{}: Checking entry permissions for blocks '{}' with entry direction '{}'.",
+        client.getId(),
+        entryDirection
+    );
     boolean entryPermissible = true;
     for (Block block : blocks) {
       entryPermissible &= permissions.get(block).enqueueRequest(client, entryDirection);
@@ -231,8 +250,10 @@ public class SameDirectionBlockModule
 
   private boolean blockResourcesAllocatedByClient(Block block, Scheduler.Client client) {
     Set<Block> clientBlocks
-        = filterBlocksContainingResources(reservationPool.allocatedResources(client),
-                                          Block.Type.SAME_DIRECTION_ONLY);
+        = filterBlocksContainingResources(
+            reservationPool.allocatedResources(client),
+            Block.Type.SAME_DIRECTION_ONLY
+        );
     return clientBlocks.contains(block);
   }
 
@@ -269,17 +290,21 @@ public class SameDirectionBlockModule
         PermissionRequest request = pendingRequests.poll();
 
         if (clientAlreadyInBlock(request.getClient())) {
-          LOG.debug("Permission for block {} already granted to {}.",
-                    block.getName(),
-                    request.getClient().getId());
+          LOG.debug(
+              "Permission for block {} already granted to {}.",
+              block.getName(),
+              request.getClient().getId()
+          );
         }
         else if (entryPermissible(request.getEntryDirection())) {
           clients.add(request.getClient());
           this.entryDirection = request.getEntryDirection();
-          LOG.debug("Permission for block {} granted to {} (entryDirection={}).",
-                    block.getName(),
-                    request.getClient().getId(),
-                    request.getEntryDirection());
+          LOG.debug(
+              "Permission for block {} granted to {} (entryDirection={}).",
+              block.getName(),
+              request.getClient().getId(),
+              request.getEntryDirection()
+          );
         }
       }
     }
@@ -287,19 +312,23 @@ public class SameDirectionBlockModule
     public boolean enqueueRequest(Scheduler.Client client, String entryDirection) {
       if (clientAlreadyInBlock(client)
           || entryPermissible(entryDirection)) {
-        LOG.debug("Enqueuing permission request for block {} to {} with entry direction '{}'.",
-                  block.getName(),
-                  client.getId(),
-                  entryDirection);
+        LOG.debug(
+            "Enqueuing permission request for block {} to {} with entry direction '{}'.",
+            block.getName(),
+            client.getId(),
+            entryDirection
+        );
         pendingRequests.add(new PermissionRequest(client, entryDirection));
         return true;
       }
 
-      LOG.debug("Client {} not permissible to block {} with entry direction '{}' (!= '{}').",
-                client.getId(),
-                block.getName(),
-                entryDirection,
-                this.entryDirection);
+      LOG.debug(
+          "Client {} not permissible to block {} with entry direction '{}' (!= '{}').",
+          client.getId(),
+          block.getName(),
+          entryDirection,
+          this.entryDirection
+      );
       return false;
     }
 

@@ -7,14 +7,15 @@
  */
 package org.opentcs.guing.common.exchange;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.common.PortalManager;
@@ -46,8 +47,10 @@ class ApplicationKernelProviderTest {
     portalManager = mock(PortalManager.class);
     dialog = mock(ConnectToServerDialog.class);
     appConfig = mock(ApplicationPortalProviderConfiguration.class);
-    portalProvider = new ApplicationPortalProvider(portalManager,
-                                                   appConfig);
+    portalProvider = new ApplicationPortalProvider(
+        portalManager,
+        appConfig
+    );
   }
 
   @Disabled

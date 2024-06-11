@@ -7,8 +7,9 @@
  */
 package org.opentcs.operationsdesk.exchange.adapter;
 
-import java.util.Objects;
 import static java.util.Objects.requireNonNull;
+
+import java.util.Objects;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortal;
@@ -25,7 +26,8 @@ import org.slf4j.LoggerFactory;
  * Updates a vehicle's envelope key with the kernel when it changes.
  */
 public class VehicleEnvelopeKeyAdapter
-    implements AttributesChangeListener {
+    implements
+      AttributesChangeListener {
 
   /**
    * This class's logger.
@@ -50,8 +52,10 @@ public class VehicleEnvelopeKeyAdapter
    * @param portalProvider A kernel provider.
    * @param model The vehicle model.
    */
-  public VehicleEnvelopeKeyAdapter(SharedKernelServicePortalProvider portalProvider,
-                                   VehicleModel model) {
+  public VehicleEnvelopeKeyAdapter(
+      SharedKernelServicePortalProvider portalProvider,
+      VehicleModel model
+  ) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.model = requireNonNull(model, "model");
     this.previousEnvelopeKey = getEnvelopeKey();
@@ -87,8 +91,10 @@ public class VehicleEnvelopeKeyAdapter
           LOG.debug("Ignoring vehicle properties update. Already up do date.");
           return;
         }
-        portal.getVehicleService().updateVehicleEnvelopeKey(vehicle.getReference(),
-                                                            envelopeKey);
+        portal.getVehicleService().updateVehicleEnvelopeKey(
+            vehicle.getReference(),
+            envelopeKey
+        );
       }
 
     }

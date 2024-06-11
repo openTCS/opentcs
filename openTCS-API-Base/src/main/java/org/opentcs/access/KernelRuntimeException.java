@@ -13,8 +13,10 @@ import java.io.Serializable;
  * A runtime exception thrown by the openTCS kernel.
  */
 public class KernelRuntimeException
-    extends RuntimeException
-    implements Serializable {
+    extends
+      RuntimeException
+    implements
+      Serializable {
 
   /**
    * Constructs a new instance with no detail message.

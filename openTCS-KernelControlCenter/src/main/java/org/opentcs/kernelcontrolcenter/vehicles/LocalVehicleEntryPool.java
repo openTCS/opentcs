@@ -7,11 +7,12 @@
  */
 package org.opentcs.kernelcontrolcenter.vehicles;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeMap;
 import org.opentcs.access.KernelServicePortal;
@@ -34,8 +35,9 @@ import org.slf4j.LoggerFactory;
  * the kernel.
  */
 public class LocalVehicleEntryPool
-    implements EventHandler,
-               Lifecycle {
+    implements
+      EventHandler,
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -70,9 +72,13 @@ public class LocalVehicleEntryPool
    * @param eventSource Where this instance registers for application events.
    */
   @Inject
-  public LocalVehicleEntryPool(KernelServicePortal servicePortal,
-                               @ServiceCallWrapper CallWrapper callWrapper,
-                               @ApplicationEventBus EventSource eventSource) {
+  public LocalVehicleEntryPool(
+      KernelServicePortal servicePortal,
+      @ServiceCallWrapper
+      CallWrapper callWrapper,
+      @ApplicationEventBus
+      EventSource eventSource
+  ) {
     this.servicePortal = requireNonNull(servicePortal, "servicePortal");
     this.callWrapper = requireNonNull(callWrapper, "callWrapper");
     this.eventSource = requireNonNull(eventSource, "eventSource");

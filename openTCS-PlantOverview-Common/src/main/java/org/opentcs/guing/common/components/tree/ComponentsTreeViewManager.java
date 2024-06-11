@@ -18,7 +18,8 @@ import org.opentcs.guing.common.components.tree.elements.UserObjectUtil;
  * The tree view manager for components.
  */
 public class ComponentsTreeViewManager
-    extends TreeViewManager {
+    extends
+      TreeViewManager {
 
   /**
    * Creates a new instance.
@@ -28,12 +29,15 @@ public class ComponentsTreeViewManager
    * @param mouseListener The mouse listener
    */
   @Inject
-  public ComponentsTreeViewManager(TreeView treeView,
-                                   UserObjectUtil userObjectUtil,
-                                   MouseListener mouseListener) {
+  public ComponentsTreeViewManager(
+      TreeView treeView,
+      UserObjectUtil userObjectUtil,
+      MouseListener mouseListener
+  ) {
     super(treeView, userObjectUtil, mouseListener);
     treeView.getTree().getSelectionModel().setSelectionMode(
-        TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION
+    );
   }
 
   @Override

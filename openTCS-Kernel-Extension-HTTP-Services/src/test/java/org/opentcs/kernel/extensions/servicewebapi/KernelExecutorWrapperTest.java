@@ -7,12 +7,13 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.access.KernelRuntimeException;
@@ -48,32 +49,35 @@ class KernelExecutorWrapperTest {
 
   @Test
   void forwardCausingExceptionIfRuntimeException() {
-    assertThrows(ObjectUnknownException.class,
-                 () -> {
-                   executorWrapper.callAndWait(() -> {
-                     throw new ObjectUnknownException("some exception");
-                   });
-                 }
+    assertThrows(
+        ObjectUnknownException.class,
+        () -> {
+          executorWrapper.callAndWait(() -> {
+            throw new ObjectUnknownException("some exception");
+          });
+        }
     );
 
-    assertThrows(ObjectExistsException.class,
-                 () -> {
-                   executorWrapper.callAndWait(() -> {
-                     throw new ObjectExistsException("some exception");
-                   });
-                 }
+    assertThrows(
+        ObjectExistsException.class,
+        () -> {
+          executorWrapper.callAndWait(() -> {
+            throw new ObjectExistsException("some exception");
+          });
+        }
     );
   }
 
   @Test
   void wrapUnhandledExceptionInKernelRuntimeException() {
-    assertThrows(KernelRuntimeException.class,
-                 () -> {
-                   executorWrapper.callAndWait(() -> {
-                     throw new Exception("some exception");
-                   });
-                 }
+    assertThrows(
+        KernelRuntimeException.class,
+        () -> {
+          executorWrapper.callAndWait(() -> {
+            throw new Exception("some exception");
+          });
+        }
     );
-    
+
   }
 }

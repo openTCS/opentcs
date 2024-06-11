@@ -7,10 +7,11 @@
  */
 package org.opentcs.guing.common.exchange;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.TCSResourceReference;
@@ -32,12 +33,20 @@ public class SplitResources {
    * for the vehicle's current position.
    * @param allocatedResourcesAhead The resources ahead of the vehicle.
    */
-  public SplitResources(@Nonnull List<Set<TCSResourceReference<?>>> allocatedResourcesBehind,
-                        @Nonnull List<Set<TCSResourceReference<?>>> allocatedResourcesAhead) {
-    this.allocatedResourcesBehind = requireNonNull(allocatedResourcesBehind,
-                                                   "allocatedResourcesBehind");
-    this.allocatedResourcesAhead = requireNonNull(allocatedResourcesAhead,
-                                                  "allocatedResourcesAhead");
+  public SplitResources(
+      @Nonnull
+      List<Set<TCSResourceReference<?>>> allocatedResourcesBehind,
+      @Nonnull
+      List<Set<TCSResourceReference<?>>> allocatedResourcesAhead
+  ) {
+    this.allocatedResourcesBehind = requireNonNull(
+        allocatedResourcesBehind,
+        "allocatedResourcesBehind"
+    );
+    this.allocatedResourcesAhead = requireNonNull(
+        allocatedResourcesAhead,
+        "allocatedResourcesAhead"
+    );
   }
 
   /**
@@ -69,8 +78,11 @@ public class SplitResources {
    * @return A new instance created from the given list of resource sets, split at the given
    * delimiter. If the delimiter is null, all given resources are added to allocatedResourcesBehind.
    */
-  public static SplitResources from(@Nonnull List<Set<TCSResourceReference<?>>> resourceSets,
-                                    TCSObjectReference<?> delimiter) {
+  public static SplitResources from(
+      @Nonnull
+      List<Set<TCSResourceReference<?>>> resourceSets,
+      TCSObjectReference<?> delimiter
+  ) {
     requireNonNull(resourceSets, "resources");
     if (delimiter == null) {
       return new SplitResources(resourceSets, List.of());

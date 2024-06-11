@@ -13,7 +13,8 @@ import javax.swing.table.DefaultTableModel;
  * A table model in which each cell is uneditable.
  */
 public class UneditableTableModel
-    extends DefaultTableModel {
+    extends
+      DefaultTableModel {
 
   /**
    * Creates a new instance.

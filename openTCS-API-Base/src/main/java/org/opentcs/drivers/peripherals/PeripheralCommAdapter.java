@@ -17,7 +17,8 @@ import org.opentcs.util.ExplainedBoolean;
  * peripheral device must implement.
  */
 public interface PeripheralCommAdapter
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * Enables this comm adapter, i.e. turns it on.
@@ -53,7 +54,10 @@ public interface PeripheralCommAdapter
    * the job.
    */
   @Nonnull
-  ExplainedBoolean canProcess(@Nonnull PeripheralJob job);
+  ExplainedBoolean canProcess(
+      @Nonnull
+      PeripheralJob job
+  );
 
   /**
    * Processes the given job by sending it or a representation that the peripheral device
@@ -63,7 +67,12 @@ public interface PeripheralCommAdapter
    * @param callback The callback to use to report back about the successful or failed completion of
    * the job.
    */
-  void process(@Nonnull PeripheralJob job, @Nonnull PeripheralJobCallback callback);
+  void process(
+      @Nonnull
+      PeripheralJob job,
+      @Nonnull
+      PeripheralJobCallback callback
+  );
 
   /**
    * Aborts the current job, if any.
@@ -81,5 +90,8 @@ public interface PeripheralCommAdapter
    *
    * @param command The command to execute.
    */
-  void execute(@Nonnull PeripheralAdapterCommand command);
+  void execute(
+      @Nonnull
+      PeripheralAdapterCommand command
+  );
 }

@@ -18,8 +18,10 @@ import org.opentcs.util.event.EventHandler;
  * properties of the currently selected driving course components.
  */
 public class SelectionPropertiesComponent
-    extends AttributesComponent
-    implements EventHandler {
+    extends
+      AttributesComponent
+    implements
+      EventHandler {
 
   /**
    * Creates a new instance.
@@ -47,7 +49,7 @@ public class SelectionPropertiesComponent
         reset();
         break;
       default:
-      // Do nada.
+        // Do nada.
     }
   }
 

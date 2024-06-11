@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernelcontrolcenter;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.common.ClientConnectionMode;
 import org.opentcs.common.KernelClientApplication;
 import org.opentcs.common.PortalManager;
@@ -23,7 +24,8 @@ import org.slf4j.LoggerFactory;
  * The kernel control center application's entry point.
  */
 public class KernelControlCenterApplication
-    implements KernelClientApplication {
+    implements
+      KernelClientApplication {
 
   /**
    * This class' logger.
@@ -68,11 +70,14 @@ public class KernelControlCenterApplication
    * @param configuration The application's configuration.
    */
   @Inject
-  public KernelControlCenterApplication(KernelEventFetcher eventFetcher,
-                                        KernelControlCenter kernelControlCenter,
-                                        PortalManager portalManager,
-                                        @ApplicationEventBus EventBus eventBus,
-                                        KernelControlCenterConfiguration configuration) {
+  public KernelControlCenterApplication(
+      KernelEventFetcher eventFetcher,
+      KernelControlCenter kernelControlCenter,
+      PortalManager portalManager,
+      @ApplicationEventBus
+      EventBus eventBus,
+      KernelControlCenterConfiguration configuration
+  ) {
     this.eventFetcher = requireNonNull(eventFetcher, "eventHub");
     this.kernelControlCenter = requireNonNull(kernelControlCenter, "kernelControlCenter");
     this.portalManager = requireNonNull(portalManager, "portalManager");

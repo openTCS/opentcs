@@ -11,7 +11,8 @@ package org.opentcs.guing.common.components.properties.event;
  * A listener that listens for changes on a table.
  */
 public interface TableChangeListener
-    extends java.util.EventListener {
+    extends
+      java.util.EventListener {
 
   /**
    * Indicates that a line in the table has been selected.

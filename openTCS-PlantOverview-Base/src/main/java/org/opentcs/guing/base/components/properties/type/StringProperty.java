@@ -8,13 +8,15 @@
 package org.opentcs.guing.base.components.properties.type;
 
 import static java.util.Objects.requireNonNull;
+
 import org.opentcs.guing.base.model.ModelComponent;
 
 /**
  * A property for a string.
  */
 public class StringProperty
-    extends AbstractProperty {
+    extends
+      AbstractProperty {
 
   /**
    * The string.

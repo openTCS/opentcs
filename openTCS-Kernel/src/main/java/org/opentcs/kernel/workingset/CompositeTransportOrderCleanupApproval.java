@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.workingset;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.Set;
 import org.opentcs.components.kernel.TransportOrderCleanupApproval;
 import org.opentcs.data.order.TransportOrder;
@@ -17,7 +18,8 @@ import org.opentcs.data.order.TransportOrder;
  * A collection of {@link TransportOrderCleanupApproval}s.
  */
 public class CompositeTransportOrderCleanupApproval
-    implements TransportOrderCleanupApproval {
+    implements
+      TransportOrderCleanupApproval {
 
   private final Set<TransportOrderCleanupApproval> orderCleanupApprovals;
   private final DefaultTransportOrderCleanupApproval defaultTransportOrderCleanupApproval;
@@ -32,11 +34,14 @@ public class CompositeTransportOrderCleanupApproval
   @Inject
   public CompositeTransportOrderCleanupApproval(
       Set<TransportOrderCleanupApproval> orderCleanupApprovals,
-      DefaultTransportOrderCleanupApproval defaultTransportOrderCleanupApproval) {
+      DefaultTransportOrderCleanupApproval defaultTransportOrderCleanupApproval
+  ) {
     this.orderCleanupApprovals = requireNonNull(orderCleanupApprovals, "orderCleanupApprovals");
     this.defaultTransportOrderCleanupApproval
-        = requireNonNull(defaultTransportOrderCleanupApproval,
-                         "defaultTransportOrderCleanupApproval");
+        = requireNonNull(
+            defaultTransportOrderCleanupApproval,
+            "defaultTransportOrderCleanupApproval"
+        );
   }
 
   @Override

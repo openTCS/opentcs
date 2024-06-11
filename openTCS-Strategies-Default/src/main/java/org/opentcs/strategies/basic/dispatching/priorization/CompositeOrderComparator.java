@@ -7,6 +7,8 @@
  */
 package org.opentcs.strategies.basic.dispatching.priorization;
 
+import static org.opentcs.util.Assertions.checkArgument;
+
 import com.google.common.collect.Lists;
 import jakarta.inject.Inject;
 import java.util.Comparator;
@@ -15,13 +17,13 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorByAge;
 import org.opentcs.strategies.basic.dispatching.priorization.transportorder.TransportOrderComparatorByName;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A composite of all configured transport order comparators.
  */
 public class CompositeOrderComparator
-    implements Comparator<TransportOrder> {
+    implements
+      Comparator<TransportOrder> {
 
   /**
    * A comparator composed of all configured comparators, in the configured order.
@@ -29,8 +31,10 @@ public class CompositeOrderComparator
   private final Comparator<TransportOrder> compositeComparator;
 
   @Inject
-  public CompositeOrderComparator(DefaultDispatcherConfiguration configuration,
-                                  Map<String, Comparator<TransportOrder>> availableComparators) {
+  public CompositeOrderComparator(
+      DefaultDispatcherConfiguration configuration,
+      Map<String, Comparator<TransportOrder>> availableComparators
+  ) {
     // At the end, if all other comparators failed to see a difference, compare by age.
     // As the age of two distinct transport orders may still be the same, finally compare by name.
     // Add configured comparators before these two.

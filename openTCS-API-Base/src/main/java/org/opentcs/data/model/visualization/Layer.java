@@ -7,14 +7,16 @@
  */
 package org.opentcs.data.model.visualization;
 
-import java.io.Serializable;
 import static java.util.Objects.requireNonNull;
+
+import java.io.Serializable;
 
 /**
  * Describes a layer in a plant model which is used to group model elements.
  */
 public class Layer
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The unique ID of this layer.
@@ -147,7 +149,7 @@ public class Layer
         + "id=" + id + ", "
         + "ordinal=" + ordinal + ", "
         + "visible=" + visible + ", "
-        + "name=" + name +  ", "
+        + "name=" + name + ", "
         + "groupId=" + groupId + '}';
   }
 }

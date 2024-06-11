@@ -18,7 +18,8 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
  * ListCellRenderer for the adapter combo box.
  */
 final class AdapterFactoryCellRenderer
-    implements ListCellRenderer<PeripheralCommAdapterDescription> {
+    implements
+      ListCellRenderer<PeripheralCommAdapterDescription> {
 
   /**
    * A default renderer for creating the label.
@@ -37,12 +38,15 @@ final class AdapterFactoryCellRenderer
       PeripheralCommAdapterDescription value,
       int index,
       boolean isSelected,
-      boolean cellHasFocus) {
-    JLabel label = (JLabel) defaultRenderer.getListCellRendererComponent(list,
-                                                                         value,
-                                                                         index,
-                                                                         isSelected,
-                                                                         cellHasFocus);
+      boolean cellHasFocus
+  ) {
+    JLabel label = (JLabel) defaultRenderer.getListCellRendererComponent(
+        list,
+        value,
+        index,
+        isSelected,
+        cellHasFocus
+    );
     if (value != null) {
       label.setText(value.getDescription());
     }

@@ -7,10 +7,12 @@
  */
 package org.opentcs.kernel.vehicles;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkState;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
@@ -21,7 +23,6 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.drivers.vehicle.MovementCommand;
-import static org.opentcs.util.Assertions.checkState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,12 +102,20 @@ public class PeripheralInteraction {
    * @param peripheralJobService The peripheral job service to use for creating jobs.
    * @param reservationToken The reservation token to use for creating jobs.
    */
-  public PeripheralInteraction(@Nonnull TCSObjectReference<Vehicle> vehicleRef,
-                               @Nonnull TCSObjectReference<TransportOrder> orderRef,
-                               @Nonnull MovementCommand movementCommand,
-                               @Nonnull List<PeripheralOperation> operations,
-                               @Nonnull PeripheralJobService peripheralJobService,
-                               @Nonnull String reservationToken) {
+  public PeripheralInteraction(
+      @Nonnull
+      TCSObjectReference<Vehicle> vehicleRef,
+      @Nonnull
+      TCSObjectReference<TransportOrder> orderRef,
+      @Nonnull
+      MovementCommand movementCommand,
+      @Nonnull
+      List<PeripheralOperation> operations,
+      @Nonnull
+      PeripheralJobService peripheralJobService,
+      @Nonnull
+      String reservationToken
+  ) {
     this.vehicleRef = requireNonNull(vehicleRef, "vehicleRef");
     this.orderRef = requireNonNull(orderRef, "orderRef");
     this.movementCommand = requireNonNull(movementCommand, "movementCommand");
@@ -122,16 +131,26 @@ public class PeripheralInteraction {
    * succeeds.
    * @param interactionFailedCallback The callback that is to be executed if the interaction fails.
    */
-  public void start(@Nonnull Runnable interactionSucceededCallback,
-                    @Nonnull Runnable interactionFailedCallback) {
-    this.interactionSucceededCallback = requireNonNull(interactionSucceededCallback,
-                                                       "interactionSucceededCallback");
-    this.interactionFailedCallback = requireNonNull(interactionFailedCallback,
-                                                    "interactionFailedCallback");
+  public void start(
+      @Nonnull
+      Runnable interactionSucceededCallback,
+      @Nonnull
+      Runnable interactionFailedCallback
+  ) {
+    this.interactionSucceededCallback = requireNonNull(
+        interactionSucceededCallback,
+        "interactionSucceededCallback"
+    );
+    this.interactionFailedCallback = requireNonNull(
+        interactionFailedCallback,
+        "interactionFailedCallback"
+    );
 
-    LOG.debug("{}: Starting peripheral interaction for movement to {}",
-              vehicleRef.getName(),
-              movementCommand.getStep().getDestinationPoint().getName());
+    LOG.debug(
+        "{}: Starting peripheral interaction for movement to {}",
+        vehicleRef.getName(),
+        movementCommand.getStep().getDestinationPoint().getName()
+    );
     for (PeripheralOperation operation : operations) {
       PeripheralJob job = createPeripheralJob(operation);
       if (operation.isCompletionRequired()) {
@@ -152,7 +171,10 @@ public class PeripheralInteraction {
    *
    * @param job The peripheral job that has been finished.
    */
-  public void onPeripheralJobFinished(@Nonnull PeripheralJob job) {
+  public void onPeripheralJobFinished(
+      @Nonnull
+      PeripheralJob job
+  ) {
     requireNonNull(job, "job");
     if (pendingJobsWithCompletionRequired.remove(job)
         && pendingJobsWithCompletionRequired.isEmpty()) {
@@ -167,7 +189,10 @@ public class PeripheralInteraction {
    *
    * @param job The peripheral job that has failed.
    */
-  public void onPeripheralJobFailed(@Nonnull PeripheralJob job) {
+  public void onPeripheralJobFailed(
+      @Nonnull
+      PeripheralJob job
+  ) {
     requireNonNull(job, "job");
     if (pendingJobsWithCompletionRequired.contains(job)) {
       // As soon as one of the jobs for this interaction fails, the entire interaction itself is
@@ -264,9 +289,11 @@ public class PeripheralInteraction {
     checkState(!hasState(State.FINISHED), "The interaction has already been marked as finished.");
     state = State.FINISHED;
 
-    LOG.debug("{}: Peripheral interaction finished for movement to {}",
-              vehicleRef.getName(),
-              movementCommand.getStep().getDestinationPoint().getName());
+    LOG.debug(
+        "{}: Peripheral interaction finished for movement to {}",
+        vehicleRef.getName(),
+        movementCommand.getStep().getDestinationPoint().getName()
+    );
     interactionSucceededCallback.run();
   }
 
@@ -294,9 +321,11 @@ public class PeripheralInteraction {
     checkState(!hasState(State.FAILED), "The interaction has already been marked as failed.");
     state = State.FAILED;
 
-    LOG.debug("{}: Peripheral interaction failed for movement to {}",
-              vehicleRef.getName(),
-              movementCommand.getStep().getDestinationPoint().getName());
+    LOG.debug(
+        "{}: Peripheral interaction failed for movement to {}",
+        vehicleRef.getName(),
+        movementCommand.getStep().getDestinationPoint().getName()
+    );
     interactionFailedCallback.run();
   }
 

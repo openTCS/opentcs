@@ -15,7 +15,8 @@ import java.io.Serializable;
  * @param <U> The type of units the relation is valid for.
  */
 public class Relation<U>
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The source unit.

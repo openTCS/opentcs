@@ -7,8 +7,6 @@
  */
 package org.opentcs.kernel.workingset;
 
-import java.util.List;
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
@@ -16,6 +14,9 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.BlockCreationTO;
@@ -55,18 +56,22 @@ class PlantModelManagerTest {
         .withPoint(new PointCreationTO("point2"))
         .withPath(
             new PathCreationTO("some-path", "point1", "point2")
-                .withPeripheralOperations(List.of(
-                    new PeripheralOperationCreationTO("some-op", "some-location")
-                ))
+                .withPeripheralOperations(
+                    List.of(
+                        new PeripheralOperationCreationTO("some-op", "some-location")
+                    )
+                )
         )
         .withLocationType(
             new LocationTypeCreationTO("some-location-type")
                 .withAllowedOperations(List.of("some-op"))
         )
         .withLocation(
-            new LocationCreationTO("some-location",
-                                   "some-location-type",
-                                   new Triple(1, 2, 3))
+            new LocationCreationTO(
+                "some-location",
+                "some-location-type",
+                new Triple(1, 2, 3)
+            )
                 .withLink("point1", Set.of("some-op"))
         )
         .withBlock(new BlockCreationTO("some-block"))
@@ -137,15 +142,23 @@ class PlantModelManagerTest {
             .withPoint(new PointCreationTO("point-outside-of-block"))
             .withPath(new PathCreationTO("path-in-block", "point-in-block-1", "point-in-block-2"))
             .withLocationType(new LocationTypeCreationTO("some-location-type"))
-            .withLocation(new LocationCreationTO("location-in-block",
-                                                 "some-location-type",
-                                                 new Triple(1, 2, 3)))
+            .withLocation(
+                new LocationCreationTO(
+                    "location-in-block",
+                    "some-location-type",
+                    new Triple(1, 2, 3)
+                )
+            )
             .withBlock(
                 new BlockCreationTO("some-block")
-                    .withMemberNames(Set.of("point-in-block-1",
-                                            "point-in-block-2",
-                                            "path-in-block",
-                                            "location-in-block"))
+                    .withMemberNames(
+                        Set.of(
+                            "point-in-block-1",
+                            "point-in-block-2",
+                            "path-in-block",
+                            "location-in-block"
+                        )
+                    )
             )
     );
 
@@ -160,8 +173,10 @@ class PlantModelManagerTest {
     );
     assertThat(
         "Multiple elements in block should result in all elements of block.",
-        plantModelManager.expandResources(Set.of(
-            pathInBlock.getReference(), pointInBlock.getReference())
+        plantModelManager.expandResources(
+            Set.of(
+                pathInBlock.getReference(), pointInBlock.getReference()
+            )
         ),
         hasSize(4)
     );
@@ -172,9 +187,11 @@ class PlantModelManagerTest {
     );
     assertThat(
         "Elements inside and outside of block should result in block + outside elements.",
-        plantModelManager.expandResources(Set.of(
-            pointOutsideOfBlock.getReference(), pointInBlock.getReference()
-        )),
+        plantModelManager.expandResources(
+            Set.of(
+                pointOutsideOfBlock.getReference(), pointInBlock.getReference()
+            )
+        ),
         hasSize(5)
     );
   }

@@ -21,7 +21,8 @@ import org.opentcs.data.model.PlantModel;
  * Provides methods concerning the plant model.
  */
 public interface PlantModelService
-    extends TCSObjectService {
+    extends
+      TCSObjectService {
 
   /**
    * Returns a representation of the plant model's current state.
@@ -43,8 +44,10 @@ public interface PlantModelService
    * @throws IllegalStateException If there was a problem persisting the model.
    */
   void createPlantModel(PlantModelCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException, KernelRuntimeException,
-             IllegalStateException;
+      throws ObjectUnknownException,
+        ObjectExistsException,
+        KernelRuntimeException,
+        IllegalStateException;
 
   /**
    * Returns the name of the model that is currently loaded in the kernel.
@@ -74,7 +77,8 @@ public interface PlantModelService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void updateLocationLock(TCSObjectReference<Location> ref, boolean locked)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Updates a path's lock state.
@@ -86,5 +90,6 @@ public interface PlantModelService
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 }

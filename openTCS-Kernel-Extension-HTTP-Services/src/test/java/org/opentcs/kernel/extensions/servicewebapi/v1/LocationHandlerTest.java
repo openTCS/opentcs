@@ -7,15 +7,16 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
+
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.mock;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Location;
@@ -41,8 +42,10 @@ class LocationHandlerTest {
 
     handler = new LocationHandler(plantModelService, executorWrapper);
 
-    location = new Location("some-location",
-                            new LocationType("some-location-type").getReference());
+    location = new Location(
+        "some-location",
+        new LocationType("some-location-type").getReference()
+    );
     given(plantModelService.fetchObject(Location.class, "some-location"))
         .willReturn(location);
   }

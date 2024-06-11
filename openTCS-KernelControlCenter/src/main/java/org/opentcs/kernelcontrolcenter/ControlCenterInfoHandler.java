@@ -7,13 +7,14 @@
  */
 package org.opentcs.kernelcontrolcenter;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Locale;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
@@ -31,7 +32,8 @@ import org.slf4j.LoggerFactory;
  * A logging handler that writes all INFO-logs to KernelControlCenter's logging text area.
  */
 public class ControlCenterInfoHandler
-    implements EventHandler {
+    implements
+      EventHandler {
 
   /**
    * This class's Logger.
@@ -64,8 +66,11 @@ public class ControlCenterInfoHandler
    * @param configuration This class' configuration.
    */
   @Inject
-  public ControlCenterInfoHandler(@Assisted JTextArea textArea,
-                                  KernelControlCenterConfiguration configuration) {
+  public ControlCenterInfoHandler(
+      @Assisted
+      JTextArea textArea,
+      KernelControlCenterConfiguration configuration
+  ) {
     this.textArea = requireNonNull(textArea, "textArea");
     this.configuration = requireNonNull(configuration, "configuration");
 
@@ -77,15 +82,23 @@ public class ControlCenterInfoHandler
     if (event instanceof PortalManager.ConnectionState) {
       PortalManager.ConnectionState connectionState = (PortalManager.ConnectionState) event;
       SwingUtilities.invokeLater(() -> {
-        publish(new UserNotification("Kernel connection state: " + connectionState.name(),
-                                     UserNotification.Level.INFORMATIONAL));
+        publish(
+            new UserNotification(
+                "Kernel connection state: " + connectionState.name(),
+                UserNotification.Level.INFORMATIONAL
+            )
+        );
       });
     }
     else if (event instanceof ClientConnectionMode) {
       ClientConnectionMode applicationState = (ClientConnectionMode) event;
       SwingUtilities.invokeLater(() -> {
-        publish(new UserNotification("Application state: " + applicationState.name(),
-                                     UserNotification.Level.INFORMATIONAL));
+        publish(
+            new UserNotification(
+                "Application state: " + applicationState.name(),
+                UserNotification.Level.INFORMATIONAL
+            )
+        );
       });
     }
     else if (event instanceof NotificationPublicationEvent) {

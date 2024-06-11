@@ -15,7 +15,9 @@ import org.opentcs.components.Lifecycle;
  * application.
  */
 public abstract class PluggablePanel
-    extends JPanel
-    implements Lifecycle {
+    extends
+      JPanel
+    implements
+      Lifecycle {
 
 }

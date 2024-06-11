@@ -7,22 +7,25 @@
  */
 package org.opentcs.access.to.model;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+import static org.opentcs.util.Assertions.checkInRange;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.to.CreationTO;
-import static org.opentcs.util.Assertions.checkArgument;
-import static org.opentcs.util.Assertions.checkInRange;
 
 /**
  * A transfer object describing a block in the plant model.
  */
 public class VehicleCreationTO
-    extends CreationTO
-    implements Serializable {
+    extends
+      CreationTO
+    implements
+      Serializable {
 
   /**
    * The vehicle's length (in mm).
@@ -66,7 +69,10 @@ public class VehicleCreationTO
    *
    * @param name The name of this vehicle.
    */
-  public VehicleCreationTO(@Nonnull String name) {
+  public VehicleCreationTO(
+      @Nonnull
+      String name
+  ) {
     super(name);
     this.length = 1000;
     this.energyLevelCritical = 30;
@@ -79,17 +85,23 @@ public class VehicleCreationTO
     this.layout = new Layout();
   }
 
-  private VehicleCreationTO(@Nonnull String name,
-                            @Nonnull Map<String, String> properties,
-                            int length,
-                            int energyLevelCritical,
-                            int energyLevelGood,
-                            int energyLevelFullyRecharged,
-                            int energyLevelSufficientlyRecharged,
-                            int maxVelocity,
-                            int maxReverseVelocity,
-                            @Nullable String envelopeKey,
-                            @Nonnull Layout layout) {
+  private VehicleCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      Map<String, String> properties,
+      int length,
+      int energyLevelCritical,
+      int energyLevelGood,
+      int energyLevelFullyRecharged,
+      int energyLevelSufficientlyRecharged,
+      int maxVelocity,
+      int maxReverseVelocity,
+      @Nullable
+      String envelopeKey,
+      @Nonnull
+      Layout layout
+  ) {
     super(name, properties);
     this.length = length;
     this.energyLevelCritical = energyLevelCritical;
@@ -109,18 +121,23 @@ public class VehicleCreationTO
    * @return A copy of this object, differing in the given name.
    */
   @Override
-  public VehicleCreationTO withName(@Nonnull String name) {
-    return new VehicleCreationTO(name,
-                                 getModifiableProperties(),
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 energyLevelFullyRecharged,
-                                 energyLevelSufficientlyRecharged,
-                                 maxVelocity,
-                                 maxReverseVelocity,
-                                 envelopeKey,
-                                 layout);
+  public VehicleCreationTO withName(
+      @Nonnull
+      String name
+  ) {
+    return new VehicleCreationTO(
+        name,
+        getModifiableProperties(),
+        length,
+        energyLevelCritical,
+        energyLevelGood,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        envelopeKey,
+        layout
+    );
   }
 
   /**
@@ -130,18 +147,23 @@ public class VehicleCreationTO
    * @return A copy of this object, differing in the given properties.
    */
   @Override
-  public VehicleCreationTO withProperties(@Nonnull Map<String, String> properties) {
-    return new VehicleCreationTO(getName(),
-                                 properties,
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 energyLevelFullyRecharged,
-                                 energyLevelSufficientlyRecharged,
-                                 maxVelocity,
-                                 maxReverseVelocity,
-                                 envelopeKey,
-                                 layout);
+  public VehicleCreationTO withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
+    return new VehicleCreationTO(
+        getName(),
+        properties,
+        length,
+        energyLevelCritical,
+        energyLevelGood,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        envelopeKey,
+        layout
+    );
   }
 
   /**
@@ -155,18 +177,25 @@ public class VehicleCreationTO
    * excludes the entry otherwise.
    */
   @Override
-  public VehicleCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new VehicleCreationTO(getName(),
-                                 propertiesWith(key, value),
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 energyLevelFullyRecharged,
-                                 energyLevelSufficientlyRecharged,
-                                 maxVelocity,
-                                 maxReverseVelocity,
-                                 envelopeKey,
-                                 layout);
+  public VehicleCreationTO withProperty(
+      @Nonnull
+      String key,
+      @Nonnull
+      String value
+  ) {
+    return new VehicleCreationTO(
+        getName(),
+        propertiesWith(key, value),
+        length,
+        energyLevelCritical,
+        energyLevelGood,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        envelopeKey,
+        layout
+    );
   }
 
   /**
@@ -186,17 +215,19 @@ public class VehicleCreationTO
    */
   public VehicleCreationTO withLength(int length) {
     checkArgument(length >= 1, "length must be at least 1: " + length);
-    return new VehicleCreationTO(getName(),
-                                 getModifiableProperties(),
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 energyLevelFullyRecharged,
-                                 energyLevelSufficientlyRecharged,
-                                 maxVelocity,
-                                 maxReverseVelocity,
-                                 envelopeKey,
-                                 layout);
+    return new VehicleCreationTO(
+        getName(),
+        getModifiableProperties(),
+        length,
+        energyLevelCritical,
+        energyLevelGood,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        envelopeKey,
+        layout
+    );
   }
 
   /**
@@ -219,17 +250,19 @@ public class VehicleCreationTO
    */
   public VehicleCreationTO withEnergyLevelCritical(int energyLevelCritical) {
     checkInRange(energyLevelCritical, 0, 100);
-    return new VehicleCreationTO(getName(),
-                                 getModifiableProperties(),
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 energyLevelFullyRecharged,
-                                 energyLevelSufficientlyRecharged,
-                                 maxVelocity,
-                                 maxReverseVelocity,
-                                 envelopeKey,
-                                 layout);
+    return new VehicleCreationTO(
+        getName(),
+        getModifiableProperties(),
+        length,
+        energyLevelCritical,
+        energyLevelGood,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        envelopeKey,
+        layout
+    );
   }
 
   /**
@@ -254,17 +287,19 @@ public class VehicleCreationTO
    */
   public VehicleCreationTO withEnergyLevelGood(int energyLevelGood) {
     checkInRange(energyLevelGood, 0, 100);
-    return new VehicleCreationTO(getName(),
-                                 getModifiableProperties(),
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 energyLevelFullyRecharged,
-                                 energyLevelSufficientlyRecharged,
-                                 maxVelocity,
-                                 maxReverseVelocity,
-                                 envelopeKey,
-                                 layout);
+    return new VehicleCreationTO(
+        getName(),
+        getModifiableProperties(),
+        length,
+        energyLevelCritical,
+        energyLevelGood,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        envelopeKey,
+        layout
+    );
   }
 
   /**
@@ -286,17 +321,19 @@ public class VehicleCreationTO
    */
   public VehicleCreationTO withEnergyLevelFullyRecharged(int energyLevelFullyRecharged) {
     checkInRange(energyLevelFullyRecharged, 0, 100);
-    return new VehicleCreationTO(getName(),
-                                 getModifiableProperties(),
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 energyLevelFullyRecharged,
-                                 energyLevelSufficientlyRecharged,
-                                 maxVelocity,
-                                 maxReverseVelocity,
-                                 envelopeKey,
-                                 layout);
+    return new VehicleCreationTO(
+        getName(),
+        getModifiableProperties(),
+        length,
+        energyLevelCritical,
+        energyLevelGood,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        envelopeKey,
+        layout
+    );
   }
 
   /**
@@ -317,19 +354,22 @@ public class VehicleCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public VehicleCreationTO withEnergyLevelSufficientlyRecharged(
-      int energyLevelSufficientlyRecharged) {
+      int energyLevelSufficientlyRecharged
+  ) {
     checkInRange(energyLevelSufficientlyRecharged, 0, 100);
-    return new VehicleCreationTO(getName(),
-                                 getModifiableProperties(),
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 energyLevelFullyRecharged,
-                                 energyLevelSufficientlyRecharged,
-                                 maxVelocity,
-                                 maxReverseVelocity,
-                                 envelopeKey,
-                                 layout);
+    return new VehicleCreationTO(
+        getName(),
+        getModifiableProperties(),
+        length,
+        energyLevelCritical,
+        energyLevelGood,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        envelopeKey,
+        layout
+    );
   }
 
   public int getMaxVelocity() {
@@ -344,17 +384,19 @@ public class VehicleCreationTO
    */
   public VehicleCreationTO withMaxVelocity(int maxVelocity) {
     checkInRange(maxVelocity, 0, Integer.MAX_VALUE);
-    return new VehicleCreationTO(getName(),
-                                 getModifiableProperties(),
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 energyLevelFullyRecharged,
-                                 energyLevelSufficientlyRecharged,
-                                 maxVelocity,
-                                 maxReverseVelocity,
-                                 envelopeKey,
-                                 layout);
+    return new VehicleCreationTO(
+        getName(),
+        getModifiableProperties(),
+        length,
+        energyLevelCritical,
+        energyLevelGood,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        envelopeKey,
+        layout
+    );
   }
 
   public int getMaxReverseVelocity() {
@@ -369,17 +411,19 @@ public class VehicleCreationTO
    */
   public VehicleCreationTO withMaxReverseVelocity(int maxReverseVelocity) {
     checkInRange(maxReverseVelocity, 0, Integer.MAX_VALUE);
-    return new VehicleCreationTO(getName(),
-                                 getModifiableProperties(),
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 energyLevelFullyRecharged,
-                                 energyLevelSufficientlyRecharged,
-                                 maxVelocity,
-                                 maxReverseVelocity,
-                                 envelopeKey,
-                                 layout);
+    return new VehicleCreationTO(
+        getName(),
+        getModifiableProperties(),
+        length,
+        energyLevelCritical,
+        energyLevelGood,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        envelopeKey,
+        layout
+    );
   }
 
   /**
@@ -399,18 +443,23 @@ public class VehicleCreationTO
    * @param envelopeKey The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public VehicleCreationTO withEnvelopeKey(@Nullable String envelopeKey) {
-    return new VehicleCreationTO(getName(),
-                                 getModifiableProperties(),
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 energyLevelFullyRecharged,
-                                 energyLevelSufficientlyRecharged,
-                                 maxVelocity,
-                                 maxReverseVelocity,
-                                 envelopeKey,
-                                 layout);
+  public VehicleCreationTO withEnvelopeKey(
+      @Nullable
+      String envelopeKey
+  ) {
+    return new VehicleCreationTO(
+        getName(),
+        getModifiableProperties(),
+        length,
+        energyLevelCritical,
+        energyLevelGood,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        envelopeKey,
+        layout
+    );
   }
 
   /**
@@ -429,17 +478,19 @@ public class VehicleCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public VehicleCreationTO withLayout(Layout layout) {
-    return new VehicleCreationTO(getName(),
-                                 getModifiableProperties(),
-                                 length,
-                                 energyLevelCritical,
-                                 energyLevelGood,
-                                 energyLevelFullyRecharged,
-                                 energyLevelSufficientlyRecharged,
-                                 maxVelocity,
-                                 maxReverseVelocity,
-                                 envelopeKey,
-                                 layout);
+    return new VehicleCreationTO(
+        getName(),
+        getModifiableProperties(),
+        length,
+        energyLevelCritical,
+        energyLevelGood,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        envelopeKey,
+        layout
+    );
   }
 
   @Override
@@ -463,7 +514,8 @@ public class VehicleCreationTO
    * Contains information regarding the grahical representation of a vehicle.
    */
   public static class Layout
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The color in which vehicle routes are to be emphasized.

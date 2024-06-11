@@ -24,8 +24,10 @@ import org.opentcs.data.order.Route;
  * Delegates method invocations to the corresponding remote service.
  */
 class RemoteRouterServiceProxy
-    extends AbstractRemoteServiceProxy<RemoteRouterService>
-    implements RouterService {
+    extends
+      AbstractRemoteServiceProxy<RemoteRouterService>
+    implements
+      RouterService {
 
   /**
    * Creates a new instance.
@@ -51,16 +53,19 @@ class RemoteRouterServiceProxy
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<Point> sourcePointRef,
       Set<TCSObjectReference<Point>> destinationPointRefs,
-      Set<TCSResourceReference<?>> resourcesToAvoid)
+      Set<TCSResourceReference<?>> resourcesToAvoid
+  )
       throws KernelRuntimeException {
     checkServiceAvailability();
 
     try {
-      return getRemoteService().computeRoutes(getClientId(),
-                                              vehicleRef,
-                                              sourcePointRef,
-                                              destinationPointRefs,
-                                              resourcesToAvoid);
+      return getRemoteService().computeRoutes(
+          getClientId(),
+          vehicleRef,
+          sourcePointRef,
+          destinationPointRefs,
+          resourcesToAvoid
+      );
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

@@ -7,6 +7,8 @@
  */
 package org.opentcs.modeleditor.components.drawing;
 
+import static java.util.Objects.requireNonNull;
+
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Point;
@@ -16,7 +18,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
 import javax.swing.JViewport;
@@ -40,7 +41,8 @@ import org.opentcs.guing.common.persistence.ModelManager;
  * view.
  */
 public class ViewDragScrollListener
-    extends MouseAdapter {
+    extends
+      MouseAdapter {
 
   /**
    * The scroll pane enclosing the drawing view.
@@ -112,14 +114,16 @@ public class ViewDragScrollListener
    * @param statusPanel The status panel to display the current mouse position in.
    * @param modelManager The manager keeping/providing the currently loaded model.
    */
-  public ViewDragScrollListener(DrawingViewScrollPane scrollPane,
-                                JComboBox<ZoomItem> zoomComboBox,
-                                JToggleButton selectionTool,
-                                JToggleButton dragTool,
-                                JToggleButton linkCreationTool,
-                                JPopupButton pathCreationTool,
-                                StatusPanel statusPanel,
-                                ModelManager modelManager) {
+  public ViewDragScrollListener(
+      DrawingViewScrollPane scrollPane,
+      JComboBox<ZoomItem> zoomComboBox,
+      JToggleButton selectionTool,
+      JToggleButton dragTool,
+      JToggleButton linkCreationTool,
+      JPopupButton pathCreationTool,
+      StatusPanel statusPanel,
+      ModelManager modelManager
+  ) {
     this.scrollPane = requireNonNull(scrollPane, "scrollPane");
     this.zoomComboBox = requireNonNull(zoomComboBox, "zoomComboBox");
     this.selectionTool = requireNonNull(selectionTool, "selectionTool");
@@ -186,9 +190,11 @@ public class ViewDragScrollListener
             && (((PathConnection) figure).getLiner() instanceof TripleBezierLiner));
   }
 
-  private boolean isFigureCompletelyInView(Figure figure,
-                                           JViewport viewport,
-                                           DrawingView drawingView) {
+  private boolean isFigureCompletelyInView(
+      Figure figure,
+      JViewport viewport,
+      DrawingView drawingView
+  ) {
     Rectangle viewPortBounds = viewport.getViewRect();
     Rectangle figureBounds = drawingView.drawingToView(figure.getDrawingArea());
 
@@ -328,7 +334,8 @@ public class ViewDragScrollListener
       double w = Math.abs(fMouseEndPoint.x - fMouseStartPoint.x);
       double h = Math.abs(fMouseEndPoint.y - fMouseStartPoint.y);
       statusPanel.setPositionText(
-          String.format("X %.0f Y %.0f W %.0f H %.0f", x, y, w, h));
+          String.format("X %.0f Y %.0f W %.0f H %.0f", x, y, w, h)
+      );
     }
     else {
       LayoutModel layout = modelManager.getModel().getLayoutModel();
@@ -337,7 +344,8 @@ public class ViewDragScrollListener
       double xmm = x * scaleX;
       double ymm = y * scaleY;
       statusPanel.setPositionText(
-          String.format("X %.0f (%.0fmm) Y %.0f (%.0fmm)", x, xmm, y, ymm));
+          String.format("X %.0f (%.0fmm) Y %.0f (%.0fmm)", x, xmm, y, ymm)
+      );
     }
   }
 }

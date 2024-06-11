@@ -16,7 +16,8 @@ import org.opentcs.data.order.OrderConstants;
  * The default suggestions for transport order types.
  */
 public class DefaultOrderTypeSuggestions
-    implements OrderTypeSuggestions {
+    implements
+      OrderTypeSuggestions {
 
   /**
    * The transport order type suggestions.

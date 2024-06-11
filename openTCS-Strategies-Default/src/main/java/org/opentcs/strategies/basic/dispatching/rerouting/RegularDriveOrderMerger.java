@@ -26,7 +26,8 @@ import org.slf4j.LoggerFactory;
  * there, the merged drive order follows the route of {@code orderB}.
  */
 public class RegularDriveOrderMerger
-    extends AbstractDriveOrderMerger {
+    extends
+      AbstractDriveOrderMerger {
 
   private static final Logger LOG = LoggerFactory.getLogger(RegularDriveOrderMerger.class);
 
@@ -41,9 +42,11 @@ public class RegularDriveOrderMerger
   }
 
   @Override
-  protected List<Route.Step> mergeSteps(List<Route.Step> stepsA,
-                                        List<Route.Step> stepsB,
-                                        int currentRouteStepIndex) {
+  protected List<Route.Step> mergeSteps(
+      List<Route.Step> stepsA,
+      List<Route.Step> stepsB,
+      int currentRouteStepIndex
+  ) {
     LOG.debug("Merging steps {} with {}", stepsToPaths(stepsA), stepsToPaths(stepsB));
     List<Route.Step> mergedSteps = new ArrayList<>();
 
@@ -56,13 +59,17 @@ public class RegularDriveOrderMerger
     // Set the rerouting type for the first step in the new route.
     Route.Step firstStepOfNewRoute = stepsB.get(0);
     List<Route.Step> modifiedStepsB = new ArrayList<>(stepsB);
-    modifiedStepsB.set(0, new Route.Step(firstStepOfNewRoute.getPath(),
-                                         firstStepOfNewRoute.getSourcePoint(),
-                                         firstStepOfNewRoute.getDestinationPoint(),
-                                         firstStepOfNewRoute.getVehicleOrientation(),
-                                         firstStepOfNewRoute.getRouteIndex(),
-                                         firstStepOfNewRoute.isExecutionAllowed(),
-                                         ReroutingType.REGULAR));
+    modifiedStepsB.set(
+        0, new Route.Step(
+            firstStepOfNewRoute.getPath(),
+            firstStepOfNewRoute.getSourcePoint(),
+            firstStepOfNewRoute.getDestinationPoint(),
+            firstStepOfNewRoute.getVehicleOrientation(),
+            firstStepOfNewRoute.getRouteIndex(),
+            firstStepOfNewRoute.isExecutionAllowed(),
+            ReroutingType.REGULAR
+        )
+    );
 
     mergedSteps.addAll(modifiedStepsB);
 
@@ -73,9 +80,11 @@ public class RegularDriveOrderMerger
   }
 
   private Route.Step findStepWithSource(Point sourcePoint, List<Route.Step> steps) {
-    LOG.debug("Looking for a step with source point {} in {}",
-              sourcePoint,
-              stepsToPaths(steps));
+    LOG.debug(
+        "Looking for a step with source point {} in {}",
+        sourcePoint,
+        stepsToPaths(steps)
+    );
     return steps.stream()
         .filter(step -> Objects.equals(step.getSourcePoint(), sourcePoint))
         .findFirst()

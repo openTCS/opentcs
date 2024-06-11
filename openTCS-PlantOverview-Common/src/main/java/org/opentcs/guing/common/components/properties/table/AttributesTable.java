@@ -7,10 +7,11 @@
  */
 package org.opentcs.guing.common.components.properties.table;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -31,7 +32,8 @@ import org.opentcs.guing.common.components.properties.event.TableSelectionChange
  * value of the property.
  */
 public class AttributesTable
-    extends JTable {
+    extends
+      JTable {
 
   /**
    * Stores the application's current state.

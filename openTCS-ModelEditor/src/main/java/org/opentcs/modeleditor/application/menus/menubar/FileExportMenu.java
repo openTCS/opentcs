@@ -7,8 +7,9 @@
  */
 package org.opentcs.modeleditor.application.menus.menubar;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.Set;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -21,15 +22,18 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 /**
  */
 public class FileExportMenu
-    extends JMenu {
+    extends
+      JMenu {
 
   private static final ResourceBundleUtil LABELS
       = ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH);
 
   @Inject
   @SuppressWarnings("this-escape")
-  public FileExportMenu(Set<PlantModelExporter> exporters,
-                        GuiManager guiManager) {
+  public FileExportMenu(
+      Set<PlantModelExporter> exporters,
+      GuiManager guiManager
+  ) {
     super(LABELS.getString("fileExportMenu.text"));
     requireNonNull(exporters, "exporters");
     requireNonNull(guiManager, "guiManager");

@@ -7,15 +7,16 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
+
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.mock;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectUnknownException;
@@ -44,9 +45,11 @@ class PathHandlerTest {
 
     handler = new PathHandler(objectService, executorWrapper, plantModelService);
 
-    path = new Path("some-path",
-                    new Point("some-point-1").getReference(),
-                    new Point("some-point-2").getReference());
+    path = new Path(
+        "some-path",
+        new Point("some-point-1").getReference(),
+        new Point("some-point-2").getReference()
+    );
     given(objectService.fetchObject(Path.class, "some-path"))
         .willReturn(path);
   }

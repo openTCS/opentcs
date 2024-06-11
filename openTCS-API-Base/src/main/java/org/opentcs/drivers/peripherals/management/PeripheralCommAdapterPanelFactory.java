@@ -19,7 +19,8 @@ import org.opentcs.drivers.peripherals.PeripheralProcessModel;
  * Provides peripheral comm adapter specific panels used for interaction and displaying information.
  */
 public interface PeripheralCommAdapterPanelFactory
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * Returns a list of {@link PeripheralCommAdapterPanel}s.
@@ -32,7 +33,11 @@ public interface PeripheralCommAdapterPanelFactory
    * for the given description.
    */
   List<PeripheralCommAdapterPanel> getPanelsFor(
-      @Nonnull PeripheralCommAdapterDescription description,
-      @Nonnull TCSResourceReference<Location> location,
-      @Nonnull PeripheralProcessModel processModel);
+      @Nonnull
+      PeripheralCommAdapterDescription description,
+      @Nonnull
+      TCSResourceReference<Location> location,
+      @Nonnull
+      PeripheralProcessModel processModel
+  );
 }

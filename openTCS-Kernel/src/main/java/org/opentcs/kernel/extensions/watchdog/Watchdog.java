@@ -7,15 +7,17 @@
  */
 package org.opentcs.kernel.extensions.watchdog;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.KernelExtension;
 
 /**
  * A kernel extension to periodicly monitor the state of the kernel with check tasks.
  */
 public class Watchdog
-    implements KernelExtension {
+    implements
+      KernelExtension {
 
   /**
    * Whether this kernel extension is initialized.

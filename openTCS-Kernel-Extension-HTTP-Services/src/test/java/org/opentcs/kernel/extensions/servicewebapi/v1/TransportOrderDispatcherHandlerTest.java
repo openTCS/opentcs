@@ -7,14 +7,15 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import java.util.List;
-import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
+
+import java.util.List;
+import java.util.concurrent.Executors;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.ObjectUnknownException;
@@ -42,9 +43,11 @@ class TransportOrderDispatcherHandlerTest {
     dispatcherService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
 
-    handler = new TransportOrderDispatcherHandler(vehicleService,
-                                                  dispatcherService,
-                                                  executorWrapper);
+    handler = new TransportOrderDispatcherHandler(
+        vehicleService,
+        dispatcherService,
+        executorWrapper
+    );
 
     vehicle = new Vehicle("some-vehicle");
     order = new TransportOrder("some-order", List.of())
@@ -96,8 +99,10 @@ class TransportOrderDispatcherHandlerTest {
 
     then(vehicleService)
         .should()
-        .updateVehicleIntegrationLevel(vehicle.getReference(),
-                                       Vehicle.IntegrationLevel.TO_BE_RESPECTED);
+        .updateVehicleIntegrationLevel(
+            vehicle.getReference(),
+            Vehicle.IntegrationLevel.TO_BE_RESPECTED
+        );
     then(dispatcherService).should().withdrawByTransportOrder(order.getReference(), false);
   }
 
@@ -127,8 +132,10 @@ class TransportOrderDispatcherHandlerTest {
 
     then(vehicleService)
         .should()
-        .updateVehicleIntegrationLevel(vehicle.getReference(),
-                                       Vehicle.IntegrationLevel.TO_BE_RESPECTED);
+        .updateVehicleIntegrationLevel(
+            vehicle.getReference(),
+            Vehicle.IntegrationLevel.TO_BE_RESPECTED
+        );
     then(dispatcherService).should().withdrawByVehicle(vehicle.getReference(), false);
   }
 

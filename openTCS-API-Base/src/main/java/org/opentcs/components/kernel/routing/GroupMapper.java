@@ -14,5 +14,6 @@ import org.opentcs.data.model.Vehicle;
  * Determines the routing group for a {@link Vehicle} instance.
  */
 public interface GroupMapper
-    extends Function<Vehicle, String> {
+    extends
+      Function<Vehicle, String> {
 }

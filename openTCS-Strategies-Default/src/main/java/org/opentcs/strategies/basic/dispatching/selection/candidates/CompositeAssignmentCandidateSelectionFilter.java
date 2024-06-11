@@ -7,9 +7,10 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.candidates;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
@@ -19,7 +20,8 @@ import org.opentcs.strategies.basic.dispatching.selection.AssignmentCandidateSel
  * A collection of {@link AssignmentCandidateSelectionFilter}s.
  */
 public class CompositeAssignmentCandidateSelectionFilter
-    implements AssignmentCandidateSelectionFilter {
+    implements
+      AssignmentCandidateSelectionFilter {
 
   /**
    * The {@link AssignmentCandidateSelectionFilter}s.
@@ -28,7 +30,8 @@ public class CompositeAssignmentCandidateSelectionFilter
 
   @Inject
   public CompositeAssignmentCandidateSelectionFilter(
-      Set<AssignmentCandidateSelectionFilter> filters) {
+      Set<AssignmentCandidateSelectionFilter> filters
+  ) {
     this.filters = requireNonNull(filters, "filters");
   }
 

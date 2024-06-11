@@ -15,7 +15,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * changed.
  */
 public class AttributesChangeEvent
-    extends EventObject {
+    extends
+      EventObject {
 
   /**
    * The model.

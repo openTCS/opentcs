@@ -7,11 +7,12 @@
  */
 package org.opentcs.modeleditor.persistence.unified;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.BlockCreationTO;
@@ -61,10 +62,14 @@ public class PlantModelElementConverter {
 
     model.setName(pointTO.getName());
 
-    model.getPropertyModelPositionX().setValueAndUnit(pointTO.getPose().getPosition().getX(),
-                                                      LengthProperty.Unit.MM);
-    model.getPropertyModelPositionY().setValueAndUnit(pointTO.getPose().getPosition().getY(),
-                                                      LengthProperty.Unit.MM);
+    model.getPropertyModelPositionX().setValueAndUnit(
+        pointTO.getPose().getPosition().getX(),
+        LengthProperty.Unit.MM
+    );
+    model.getPropertyModelPositionY().setValueAndUnit(
+        pointTO.getPose().getPosition().getY(),
+        LengthProperty.Unit.MM
+    );
     model.getPropertyVehicleOrientationAngle().setValueAndUnit(
         pointTO.getPose().getOrientationAngle(),
         AngleProperty.Unit.DEG
@@ -78,9 +83,13 @@ public class PlantModelElementConverter {
     }
 
     for (Map.Entry<String, String> property : pointTO.getProperties().entrySet()) {
-      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
-                                                                    property.getKey(),
-                                                                    property.getValue()));
+      model.getPropertyMiscellaneous().addItem(
+          new KeyValueProperty(
+              model,
+              property.getKey(),
+              property.getValue()
+          )
+      );
     }
 
     // Gather information contained in the layout
@@ -105,10 +114,14 @@ public class PlantModelElementConverter {
 
     model.setName(pathTO.getName());
     model.getPropertyLength().setValueAndUnit(pathTO.getLength(), LengthProperty.Unit.MM);
-    model.getPropertyMaxVelocity().setValueAndUnit(pathTO.getMaxVelocity(),
-                                                   SpeedProperty.Unit.MM_S);
-    model.getPropertyMaxReverseVelocity().setValueAndUnit(pathTO.getMaxReverseVelocity(),
-                                                          SpeedProperty.Unit.MM_S);
+    model.getPropertyMaxVelocity().setValueAndUnit(
+        pathTO.getMaxVelocity(),
+        SpeedProperty.Unit.MM_S
+    );
+    model.getPropertyMaxReverseVelocity().setValueAndUnit(
+        pathTO.getMaxReverseVelocity(),
+        SpeedProperty.Unit.MM_S
+    );
     model.getPropertyStartComponent().setText(pathTO.getSrcPointName());
     model.getPropertyEndComponent().setText(pathTO.getDestPointName());
     model.getPropertyLocked().setValue(pathTO.isLocked());
@@ -120,17 +133,23 @@ public class PlantModelElementConverter {
     }
 
     for (Map.Entry<String, String> property : pathTO.getProperties().entrySet()) {
-      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
-                                                                    property.getKey(),
-                                                                    property.getValue()));
+      model.getPropertyMiscellaneous().addItem(
+          new KeyValueProperty(
+              model,
+              property.getKey(),
+              property.getValue()
+          )
+      );
     }
 
     for (PeripheralOperationCreationTO operationTO : pathTO.getPeripheralOperations()) {
       model.getPropertyPeripheralOperations().getValue().add(
-          new PeripheralOperationModel(operationTO.getLocationName(),
-                                       operationTO.getOperation(),
-                                       operationTO.getExecutionTrigger(),
-                                       operationTO.isCompletionRequired())
+          new PeripheralOperationModel(
+              operationTO.getLocationName(),
+              operationTO.getOperation(),
+              operationTO.getExecutionTrigger(),
+              operationTO.isCompletionRequired()
+          )
       );
     }
 
@@ -154,14 +173,21 @@ public class PlantModelElementConverter {
 
     model.setName(vehicleTO.getName());
     model.getPropertyLength().setValueAndUnit(vehicleTO.getLength(), LengthProperty.Unit.MM);
-    model.getPropertyMaxVelocity().setValueAndUnit(((double) vehicleTO.getMaxVelocity()),
-                                                   SpeedProperty.Unit.MM_S);
+    model.getPropertyMaxVelocity().setValueAndUnit(
+        ((double) vehicleTO.getMaxVelocity()),
+        SpeedProperty.Unit.MM_S
+    );
     model.getPropertyMaxReverseVelocity().setValueAndUnit(
-        ((double) vehicleTO.getMaxReverseVelocity()), SpeedProperty.Unit.MM_S);
-    model.getPropertyEnergyLevelCritical().setValueAndUnit(vehicleTO.getEnergyLevelCritical(),
-                                                           PercentProperty.Unit.PERCENT);
-    model.getPropertyEnergyLevelGood().setValueAndUnit(vehicleTO.getEnergyLevelGood(),
-                                                       PercentProperty.Unit.PERCENT);
+        ((double) vehicleTO.getMaxReverseVelocity()), SpeedProperty.Unit.MM_S
+    );
+    model.getPropertyEnergyLevelCritical().setValueAndUnit(
+        vehicleTO.getEnergyLevelCritical(),
+        PercentProperty.Unit.PERCENT
+    );
+    model.getPropertyEnergyLevelGood().setValueAndUnit(
+        vehicleTO.getEnergyLevelGood(),
+        PercentProperty.Unit.PERCENT
+    );
     model.getPropertyEnergyLevelFullyRecharged().setValueAndUnit(
         vehicleTO.getEnergyLevelFullyRecharged(), PercentProperty.Unit.PERCENT
     );
@@ -172,9 +198,13 @@ public class PlantModelElementConverter {
     model.getPropertyEnvelopeKey().setText(vehicleTO.getEnvelopeKey());
 
     for (Map.Entry<String, String> property : vehicleTO.getProperties().entrySet()) {
-      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
-                                                                    property.getKey(),
-                                                                    property.getValue()));
+      model.getPropertyMiscellaneous().addItem(
+          new KeyValueProperty(
+              model,
+              property.getKey(),
+              property.getValue()
+          )
+      );
     }
 
     // Gather information contained in the layout
@@ -196,9 +226,13 @@ public class PlantModelElementConverter {
     }
 
     for (Map.Entry<String, String> property : locTypeTO.getProperties().entrySet()) {
-      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
-                                                                    property.getKey(),
-                                                                    property.getValue()));
+      model.getPropertyMiscellaneous().addItem(
+          new KeyValueProperty(
+              model,
+              property.getKey(),
+              property.getValue()
+          )
+      );
     }
 
     // Gather information contained in the layout
@@ -209,16 +243,22 @@ public class PlantModelElementConverter {
     return model;
   }
 
-  public LocationModel importLocation(LocationCreationTO locationTO,
-                                      Collection<LocationTypeCreationTO> locTypes,
-                                      SystemModel systemModel) {
+  public LocationModel importLocation(
+      LocationCreationTO locationTO,
+      Collection<LocationTypeCreationTO> locTypes,
+      SystemModel systemModel
+  ) {
     LocationModel model = new LocationModel();
 
     model.setName(locationTO.getName());
-    model.getPropertyModelPositionX().setValueAndUnit(locationTO.getPosition().getX(),
-                                                      LengthProperty.Unit.MM);
-    model.getPropertyModelPositionY().setValueAndUnit(locationTO.getPosition().getY(),
-                                                      LengthProperty.Unit.MM);
+    model.getPropertyModelPositionX().setValueAndUnit(
+        locationTO.getPosition().getX(),
+        LengthProperty.Unit.MM
+    );
+    model.getPropertyModelPositionY().setValueAndUnit(
+        locationTO.getPosition().getY(),
+        LengthProperty.Unit.MM
+    );
 
     List<String> possibleLocationTypes = new ArrayList<>();
     for (LocationTypeCreationTO locType : locTypes) {
@@ -231,9 +271,13 @@ public class PlantModelElementConverter {
     model.getPropertyLocked().setValue(locationTO.isLocked());
 
     for (Map.Entry<String, String> property : locationTO.getProperties().entrySet()) {
-      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
-                                                                    property.getKey(),
-                                                                    property.getValue()));
+      model.getPropertyMiscellaneous().addItem(
+          new KeyValueProperty(
+              model,
+              property.getKey(),
+              property.getValue()
+          )
+      );
     }
 
     // Gather information contained in the layout
@@ -260,10 +304,12 @@ public class PlantModelElementConverter {
     return model;
   }
 
-  public LinkModel importLocationLink(LocationCreationTO locationTO,
-                                      String pointName,
-                                      Set<String> operations,
-                                      SystemModel systemModel) {
+  public LinkModel importLocationLink(
+      LocationCreationTO locationTO,
+      String pointName,
+      Set<String> operations,
+      SystemModel systemModel
+  ) {
     LinkModel model = new LinkModel();
 
     model.setName(String.format("%s --- %s", pointName, locationTO.getName()));
@@ -293,9 +339,13 @@ public class PlantModelElementConverter {
     }
 
     for (Map.Entry<String, String> property : blockTO.getProperties().entrySet()) {
-      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
-                                                                    property.getKey(),
-                                                                    property.getValue()));
+      model.getPropertyMiscellaneous().addItem(
+          new KeyValueProperty(
+              model,
+              property.getKey(),
+              property.getValue()
+          )
+      );
     }
 
     // Gather information contained in the layout
@@ -314,9 +364,13 @@ public class PlantModelElementConverter {
     initLayers(model, layoutTO.getLayers());
 
     for (Map.Entry<String, String> property : layoutTO.getProperties().entrySet()) {
-      model.getPropertyMiscellaneous().addItem(new KeyValueProperty(model,
-                                                                    property.getKey(),
-                                                                    property.getValue()));
+      model.getPropertyMiscellaneous().addItem(
+          new KeyValueProperty(
+              model,
+              property.getKey(),
+              property.getValue()
+          )
+      );
     }
 
     return model;
@@ -358,8 +412,10 @@ public class PlantModelElementConverter {
 
     Map<Integer, LayerGroup> layerGroups = model.getPropertyLayerGroups().getValue();
     for (Layer layer : layers) {
-      layerWrappers.put(layer.getId(),
-                        new LayerWrapper(layer, layerGroups.get(layer.getGroupId())));
+      layerWrappers.put(
+          layer.getId(),
+          new LayerWrapper(layer, layerGroups.get(layer.getGroupId()))
+      );
     }
   }
 }

@@ -7,6 +7,10 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+import static org.opentcs.util.Assertions.checkInRange;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
@@ -16,7 +20,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -27,8 +30,6 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.ApplicationHome;
 import org.opentcs.customizations.kernel.KernelExecutor;
-import static org.opentcs.util.Assertions.checkArgument;
-import static org.opentcs.util.Assertions.checkInRange;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;
 import org.slf4j.Logger;
@@ -38,8 +39,9 @@ import org.slf4j.LoggerFactory;
  * Manages users allowed to connect/operate with the kernel and authenticated clients.
  */
 public class UserManager
-    implements EventHandler,
-               Lifecycle {
+    implements
+      EventHandler,
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -89,11 +91,16 @@ public class UserManager
    * @param userAccountProvider Provides user account data.
    */
   @Inject
-  public UserManager(@ApplicationHome File homeDirectory,
-                     @ApplicationEventBus EventSource eventSource,
-                     @KernelExecutor ScheduledExecutorService kernelExecutor,
-                     RmiKernelInterfaceConfiguration configuration,
-                     UserAccountProvider userAccountProvider) {
+  public UserManager(
+      @ApplicationHome
+      File homeDirectory,
+      @ApplicationEventBus
+      EventSource eventSource,
+      @KernelExecutor
+      ScheduledExecutorService kernelExecutor,
+      RmiKernelInterfaceConfiguration configuration,
+      UserAccountProvider userAccountProvider
+  ) {
     requireNonNull(homeDirectory, "homeDirectory");
     this.eventSource = requireNonNull(eventSource, "eventSource");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
@@ -119,10 +126,12 @@ public class UserManager
 
     // Start the thread that periodically cleans up the list of known clients and event buffers.
     LOG.debug("Starting cleaner task...");
-    cleanerTaskFuture = kernelExecutor.scheduleWithFixedDelay(new ClientCleanerTask(),
-                                                              configuration.clientSweepInterval(),
-                                                              configuration.clientSweepInterval(),
-                                                              TimeUnit.MILLISECONDS);
+    cleanerTaskFuture = kernelExecutor.scheduleWithFixedDelay(
+        new ClientCleanerTask(),
+        configuration.clientSweepInterval(),
+        configuration.clientSweepInterval(),
+        TimeUnit.MILLISECONDS
+    );
 
     initialized = true;
   }
@@ -208,7 +217,12 @@ public class UserManager
    * @param clientID The client id to identify the given ClientEntry.
    * @param clientEntry The ClientEntry object to be registered.
    */
-  public void registerClient(@Nonnull ClientID clientID, @Nonnull ClientEntry clientEntry) {
+  public void registerClient(
+      @Nonnull
+      ClientID clientID,
+      @Nonnull
+      ClientEntry clientEntry
+  ) {
     requireNonNull(clientID, "clientID");
     requireNonNull(clientEntry, "clientEntry");
 
@@ -225,7 +239,10 @@ public class UserManager
    *
    * @param clientID The client id to be removed.
    */
-  public void unregisterClient(@Nonnull ClientID clientID) {
+  public void unregisterClient(
+      @Nonnull
+      ClientID clientID
+  ) {
     requireNonNull(clientID, "clientID");
 
     synchronized (knownClients) {
@@ -303,8 +320,11 @@ public class UserManager
       throw new CredentialsException("Client permissions insufficient.");
     }
   }
-  
-  private boolean isClientRegistered(@Nonnull ClientID clientID) {
+
+  private boolean isClientRegistered(
+      @Nonnull
+      ClientID clientID
+  ) {
     return knownClients.containsKey(clientID);
   }
 
@@ -376,7 +396,8 @@ public class UserManager
    * A task for cleaning out stale client entries.
    */
   private class ClientCleanerTask
-      implements Runnable {
+      implements
+        Runnable {
 
     /**
      * Creates a new instance.
@@ -404,8 +425,10 @@ public class UserManager
             // ID from the list of known clients - the client has been
             // inactive for long enough.
             else {
-              LOG.debug("Removing inactive client entry (client user: {})",
-                        clientEntry.getUserName());
+              LOG.debug(
+                  "Removing inactive client entry (client user: {})",
+                  clientEntry.getUserName()
+              );
               clientIter.remove();
             }
           }

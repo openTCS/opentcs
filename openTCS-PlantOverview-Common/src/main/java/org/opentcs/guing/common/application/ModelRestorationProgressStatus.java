@@ -14,7 +14,8 @@ import org.opentcs.guing.common.util.I18nPlantOverview;
  * Progress status for the process of loading a model.
  */
 public enum ModelRestorationProgressStatus
-    implements ProgressStatus {
+    implements
+      ProgressStatus {
 
   /**
    * Cleanup phase.

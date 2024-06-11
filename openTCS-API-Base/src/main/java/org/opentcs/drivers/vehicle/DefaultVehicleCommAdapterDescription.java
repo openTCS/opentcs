@@ -7,14 +7,16 @@
  */
 package org.opentcs.drivers.vehicle;
 
-import jakarta.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * The default implementation of {@link VehicleCommAdapterDescription}.
  */
 public class DefaultVehicleCommAdapterDescription
-    extends VehicleCommAdapterDescription {
+    extends
+      VehicleCommAdapterDescription {
 
   /**
    * The description.
@@ -31,8 +33,11 @@ public class DefaultVehicleCommAdapterDescription
    * @param description The description.
    * @param isSimVehicleCommAdapter Whether the comm adapter is a simulating one.
    */
-  public DefaultVehicleCommAdapterDescription(@Nonnull String description,
-                                              boolean isSimVehicleCommAdapter) {
+  public DefaultVehicleCommAdapterDescription(
+      @Nonnull
+      String description,
+      boolean isSimVehicleCommAdapter
+  ) {
     this.description = requireNonNull(description, "description");
     this.isSimVehicleCommAdapter = isSimVehicleCommAdapter;
   }

@@ -35,11 +35,15 @@ public interface ActionFactory {
 
   WithdrawAction createWithdrawAction(Collection<VehicleModel> vehicles, boolean immediateAbort);
 
-  IntegrationLevelChangeAction createIntegrationLevelChangeAction(Collection<VehicleModel> vehicles,
-                                                                  Vehicle.IntegrationLevel level);
+  IntegrationLevelChangeAction createIntegrationLevelChangeAction(
+      Collection<VehicleModel> vehicles,
+      Vehicle.IntegrationLevel level
+  );
 
   PauseAction createPauseAction(Collection<VehicleModel> vehicles, boolean pause);
 
-  RerouteAction createRerouteAction(Collection<VehicleModel> vehicles,
-                                    ReroutingType reroutingType);
+  RerouteAction createRerouteAction(
+      Collection<VehicleModel> vehicles,
+      ReroutingType reroutingType
+  );
 }

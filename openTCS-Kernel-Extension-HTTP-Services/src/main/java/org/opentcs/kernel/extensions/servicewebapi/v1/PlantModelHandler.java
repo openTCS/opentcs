@@ -7,8 +7,9 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.Set;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.PlantModelService;
@@ -66,17 +67,19 @@ public class PlantModelHandler {
    * @param routerService Provides methods concerning the router.
    */
   @Inject
-  public PlantModelHandler(PlantModelService plantModelService,
-                           KernelExecutorWrapper executorWrapper,
-                           PointConverter pointConverter,
-                           PathConverter pathConverter,
-                           LocationTypeConverter locationTypeConverter,
-                           LocationConverter locationConverter,
-                           BlockConverter blockConverter,
-                           VehicleConverter vehicleConverter,
-                           VisualLayoutConverter visualLayoutConverter,
-                           PropertyConverter propertyConverter,
-                           RouterService routerService) {
+  public PlantModelHandler(
+      PlantModelService plantModelService,
+      KernelExecutorWrapper executorWrapper,
+      PointConverter pointConverter,
+      PathConverter pathConverter,
+      LocationTypeConverter locationTypeConverter,
+      LocationConverter locationConverter,
+      BlockConverter blockConverter,
+      VehicleConverter vehicleConverter,
+      VisualLayoutConverter visualLayoutConverter,
+      PropertyConverter propertyConverter,
+      RouterService routerService
+  ) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
     this.pointConverter = requireNonNull(pointConverter, "pointConverter");
@@ -92,7 +95,7 @@ public class PlantModelHandler {
 
   public void putPlantModel(PlantModelTO putPlantModel)
       throws ObjectUnknownException,
-             IllegalArgumentException {
+        IllegalArgumentException {
     requireNonNull(putPlantModel, "putPlantModel");
 
     PlantModelCreationTO plantModelCreationTO = new PlantModelCreationTO(putPlantModel.getName())

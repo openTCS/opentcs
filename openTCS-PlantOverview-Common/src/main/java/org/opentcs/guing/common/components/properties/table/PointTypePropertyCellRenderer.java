@@ -17,7 +17,8 @@ import org.opentcs.guing.base.model.elements.PointModel.Type;
  * A cell renderer for a {@link PointTypeProperty}.
  */
 public class PointTypePropertyCellRenderer
-    extends StandardPropertyCellRenderer {
+    extends
+      StandardPropertyCellRenderer {
 
   public PointTypePropertyCellRenderer() {
     super();
@@ -25,10 +26,13 @@ public class PointTypePropertyCellRenderer
 
   @Override
   public Component getTableCellRendererComponent(
-      JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column
+  ) {
 
-    JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected,
-                                                                hasFocus, row, column);
+    JLabel label = (JLabel) super.getTableCellRendererComponent(
+        table, value, isSelected,
+        hasFocus, row, column
+    );
 
     if (value instanceof PointTypeProperty
         && ((PointTypeProperty) value).getValue() instanceof Type) {

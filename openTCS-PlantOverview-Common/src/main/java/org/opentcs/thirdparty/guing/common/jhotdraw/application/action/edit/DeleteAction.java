@@ -3,6 +3,8 @@
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit;
 
+import static org.opentcs.guing.common.util.I18nPlantOverview.MENU_PATH;
+
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
@@ -15,7 +17,6 @@ import javax.swing.text.Caret;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
 import org.opentcs.guing.common.components.EditableComponent;
-import static org.opentcs.guing.common.util.I18nPlantOverview.MENU_PATH;
 import org.opentcs.guing.common.util.ImageDirectory;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
@@ -29,7 +30,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * @author Werner Randelshofer
  */
 public class DeleteAction
-    extends TextAction {
+    extends
+      TextAction {
 
   /**
    * This action's ID.

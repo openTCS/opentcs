@@ -7,10 +7,11 @@
  */
 package org.opentcs.drivers.peripherals.management;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
@@ -19,7 +20,8 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
  * Describes which communication adapter a location is currently associated with.
  */
 public class PeripheralAttachmentInformation
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The location this attachment information belongs to.
@@ -43,9 +45,13 @@ public class PeripheralAttachmentInformation
    * @param attachedCommAdapter The comm adapter attached to the referenced location.
    */
   public PeripheralAttachmentInformation(
-      @Nonnull TCSResourceReference<Location> locationReference,
-      @Nonnull List<PeripheralCommAdapterDescription> availableCommAdapters,
-      @Nonnull PeripheralCommAdapterDescription attachedCommAdapter) {
+      @Nonnull
+      TCSResourceReference<Location> locationReference,
+      @Nonnull
+      List<PeripheralCommAdapterDescription> availableCommAdapters,
+      @Nonnull
+      PeripheralCommAdapterDescription attachedCommAdapter
+  ) {
     this.locationReference = requireNonNull(locationReference, "locationReference");
     this.availableCommAdapters = requireNonNull(availableCommAdapters, "availableCommAdapters");
     this.attachedCommAdapter = requireNonNull(attachedCommAdapter, "attachedCommAdapter");
@@ -68,7 +74,8 @@ public class PeripheralAttachmentInformation
    * @return A copy of this object, differing in the given location reference.
    */
   public PeripheralAttachmentInformation withLocationReference(
-      TCSResourceReference<Location> locationReference) {
+      TCSResourceReference<Location> locationReference
+  ) {
     return new PeripheralAttachmentInformation(
         locationReference,
         availableCommAdapters,
@@ -93,10 +100,14 @@ public class PeripheralAttachmentInformation
    * @return A copy of this object, differing in the given available comm adapters.
    */
   public PeripheralAttachmentInformation withAvailableCommAdapters(
-      @Nonnull List<PeripheralCommAdapterDescription> availableCommAdapters) {
-    return new PeripheralAttachmentInformation(locationReference,
-                                               availableCommAdapters,
-                                               attachedCommAdapter);
+      @Nonnull
+      List<PeripheralCommAdapterDescription> availableCommAdapters
+  ) {
+    return new PeripheralAttachmentInformation(
+        locationReference,
+        availableCommAdapters,
+        attachedCommAdapter
+    );
   }
 
   /**
@@ -116,7 +127,9 @@ public class PeripheralAttachmentInformation
    * @return A copy of this object, differing in the given attached comm adapter.
    */
   public PeripheralAttachmentInformation withAttachedCommAdapter(
-      @Nonnull PeripheralCommAdapterDescription attachedCommAdapter) {
+      @Nonnull
+      PeripheralCommAdapterDescription attachedCommAdapter
+  ) {
     return new PeripheralAttachmentInformation(
         locationReference,
         availableCommAdapters,

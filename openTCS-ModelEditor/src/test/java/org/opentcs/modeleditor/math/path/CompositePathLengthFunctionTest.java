@@ -7,12 +7,13 @@
  */
 package org.opentcs.modeleditor.math.path;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import org.opentcs.guing.base.model.elements.PathModel;
 
 /**

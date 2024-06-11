@@ -27,9 +27,13 @@ class PutVehicleAllowedOrderTypesTOTest {
   @Test
   void jsonSample() {
     PutVehicleAllowedOrderTypesTO to
-        = new PutVehicleAllowedOrderTypesTO(List.of("some-orderType",
-                                                   "another-orderType",
-                                                   "orderType-3"));
+        = new PutVehicleAllowedOrderTypesTO(
+            List.of(
+                "some-orderType",
+                "another-orderType",
+                "orderType-3"
+            )
+        );
 
     Approvals.verify(jsonBinder.toJson(to));
   }

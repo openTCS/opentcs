@@ -16,7 +16,8 @@ import org.opentcs.data.model.Location;
  * Provides communication adapter instances for peripheral devices to be controlled.
  */
 public interface PeripheralCommAdapterFactory
-    extends Lifecycle {
+    extends
+      Lifecycle {
 
   /**
    * Returns a {@link PeripheralCommAdapterDescription} for the factory/the adapters provided.
@@ -34,7 +35,10 @@ public interface PeripheralCommAdapterFactory
    * @return {@code true} if, and only if, this factory can provide a communication adapter to
    * control the given location/peripheral device.
    */
-  boolean providesAdapterFor(@Nonnull Location location);
+  boolean providesAdapterFor(
+      @Nonnull
+      Location location
+  );
 
   /**
    * Returns a communication adapter for controlling the given location/peripheral device.
@@ -44,5 +48,8 @@ public interface PeripheralCommAdapterFactory
    * {@code null}, if this factory cannot provide an adapter for it.
    */
   @Nullable
-  PeripheralCommAdapter getAdapterFor(@Nonnull Location location);
+  PeripheralCommAdapter getAdapterFor(
+      @Nonnull
+      Location location
+  );
 }

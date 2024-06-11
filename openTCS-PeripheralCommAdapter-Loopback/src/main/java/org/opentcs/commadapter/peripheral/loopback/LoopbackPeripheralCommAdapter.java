@@ -7,11 +7,13 @@
  */
 package org.opentcs.commadapter.peripheral.loopback;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkState;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.time.Duration;
 import java.util.ArrayDeque;
-import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,7 +30,6 @@ import org.opentcs.drivers.peripherals.PeripheralCommAdapter;
 import org.opentcs.drivers.peripherals.PeripheralJobCallback;
 import org.opentcs.drivers.peripherals.PeripheralProcessModel;
 import org.opentcs.drivers.peripherals.management.PeripheralProcessModelEvent;
-import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.ExplainedBoolean;
 import org.opentcs.util.event.EventHandler;
 
@@ -36,7 +37,8 @@ import org.opentcs.util.event.EventHandler;
  * A {@link PeripheralCommAdapter} implementation that is doing nothing.
  */
 public class LoopbackPeripheralCommAdapter
-    extends BasicPeripheralCommAdapter {
+    extends
+      BasicPeripheralCommAdapter {
 
   /**
    * The time it takes for loopback peripherals to process a job.
@@ -69,9 +71,14 @@ public class LoopbackPeripheralCommAdapter
    * @param kernelExecutor The kernel's executor.
    */
   @Inject
-  public LoopbackPeripheralCommAdapter(@Assisted TCSResourceReference<Location> location,
-                                       @ApplicationEventBus EventHandler eventHandler,
-                                       @KernelExecutor ScheduledExecutorService kernelExecutor) {
+  public LoopbackPeripheralCommAdapter(
+      @Assisted
+      TCSResourceReference<Location> location,
+      @ApplicationEventBus
+      EventHandler eventHandler,
+      @KernelExecutor
+      ScheduledExecutorService kernelExecutor
+  ) {
     super(new LoopbackPeripheralProcessModel(location), eventHandler);
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }
@@ -107,10 +114,12 @@ public class LoopbackPeripheralCommAdapter
   @Override
   public void process(PeripheralJob job, PeripheralJobCallback callback) {
     ExplainedBoolean canProcess = canProcess(job);
-    checkState(canProcess.getValue(),
-               "%s: Can't process job: %s",
-               getProcessModel().getLocation().getName(),
-               canProcess.getReason());
+    checkState(
+        canProcess.getValue(),
+        "%s: Can't process job: %s",
+        getProcessModel().getLocation().getName(),
+        canProcess.getReason()
+    );
 
     jobTaskQueue.add(() -> {
       if (failJobs) {
@@ -127,9 +136,11 @@ public class LoopbackPeripheralCommAdapter
     sendProcessModelChangedEvent(PeripheralProcessModel.Attribute.STATE);
 
     if (!getProcessModel().isManualModeEnabled()) {
-      currentJobFuture = kernelExecutor.schedule(jobTaskQueue.poll(),
-                                                 JOB_PROCESSING_DURATION.getSeconds(),
-                                                 TimeUnit.SECONDS);
+      currentJobFuture = kernelExecutor.schedule(
+          jobTaskQueue.poll(),
+          JOB_PROCESSING_DURATION.getSeconds(),
+          TimeUnit.SECONDS
+      );
     }
   }
 
@@ -211,9 +222,14 @@ public class LoopbackPeripheralCommAdapter
   }
 
   private void sendProcessModelChangedEvent(
-      LoopbackPeripheralProcessModel.Attribute attributeChanged) {
-    getEventHandler().onEvent(new PeripheralProcessModelEvent(getProcessModel().getLocation(),
-                                                              attributeChanged.name(),
-                                                              getProcessModel()));
+      LoopbackPeripheralProcessModel.Attribute attributeChanged
+  ) {
+    getEventHandler().onEvent(
+        new PeripheralProcessModelEvent(
+            getProcessModel().getLocation(),
+            attributeChanged.name(),
+            getProcessModel()
+        )
+    );
   }
 }

@@ -7,13 +7,14 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.opentcs.components.kernel.routing.GroupMapper;
@@ -55,14 +56,18 @@ public class PointRouterProvider {
    * @param graphProvider Provides routing graphs for vehicles.
    */
   @Inject
-  public PointRouterProvider(TCSObjectService objectService,
-                             ResourceAvoidanceExtractor resourceAvoidanceExtractor,
-                             GroupMapper routingGroupMapper,
-                             PointRouterFactory pointRouterFactory,
-                             GraphProvider graphProvider) {
+  public PointRouterProvider(
+      TCSObjectService objectService,
+      ResourceAvoidanceExtractor resourceAvoidanceExtractor,
+      GroupMapper routingGroupMapper,
+      PointRouterFactory pointRouterFactory,
+      GraphProvider graphProvider
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
-    this.resourceAvoidanceExtractor = requireNonNull(resourceAvoidanceExtractor,
-                                                     "resourceAvoidanceExtractor");
+    this.resourceAvoidanceExtractor = requireNonNull(
+        resourceAvoidanceExtractor,
+        "resourceAvoidanceExtractor"
+    );
     this.routingGroupMapper = requireNonNull(routingGroupMapper, "routingGroupMapper");
     this.pointRouterFactory = requireNonNull(pointRouterFactory, "pointRouterFactory");
     this.graphProvider = requireNonNull(graphProvider, "graphProvider");
@@ -82,7 +87,10 @@ public class PointRouterProvider {
    * @param paths The paths to update in the routing topology. An empty set of paths results in any
    * constructed point routers to be invalidated.
    */
-  public void updateRoutingTopology(@Nonnull Set<Path> paths) {
+  public void updateRoutingTopology(
+      @Nonnull
+      Set<Path> paths
+  ) {
     requireNonNull(paths, "paths");
 
     pointRoutersByVehicleGroup.clear();
@@ -103,8 +111,12 @@ public class PointRouterProvider {
    * @param order The transport order to be processed by the vehicle.
    * @return The point router.
    */
-  public PointRouter getPointRouterForVehicle(@Nonnull Vehicle vehicle,
-                                              @Nullable TransportOrder order) {
+  public PointRouter getPointRouterForVehicle(
+      @Nonnull
+      Vehicle vehicle,
+      @Nullable
+      TransportOrder order
+  ) {
     requireNonNull(vehicle, "vehicle");
 
     return getPointRouterForVehicle(
@@ -123,8 +135,10 @@ public class PointRouterProvider {
    * @return The point router.
    */
   public PointRouter getPointRouterForVehicle(
-      @Nonnull Vehicle vehicle,
-      @Nonnull Set<TCSResourceReference<?>> resourcesToAvoid
+      @Nonnull
+      Vehicle vehicle,
+      @Nonnull
+      Set<TCSResourceReference<?>> resourcesToAvoid
   ) {
     requireNonNull(vehicle, "vehicle");
     requireNonNull(resourcesToAvoid, "resourcesToAvoid");
@@ -163,9 +177,11 @@ public class PointRouterProvider {
 
   private PointRouter getPointRouterForVehicle(Vehicle vehicle, ResourcesToAvoid resourcesToAvoid) {
     if (!resourcesToAvoid.isEmpty()) {
-      return pointRouterFactory.createPointRouter(vehicle,
-                                                  resourcesToAvoid.getPoints(),
-                                                  resourcesToAvoid.getPaths());
+      return pointRouterFactory.createPointRouter(
+          vehicle,
+          resourcesToAvoid.getPoints(),
+          resourcesToAvoid.getPaths()
+      );
     }
 
     // In all other cases, create a point router if it does not yet exist for the vehicle's routing

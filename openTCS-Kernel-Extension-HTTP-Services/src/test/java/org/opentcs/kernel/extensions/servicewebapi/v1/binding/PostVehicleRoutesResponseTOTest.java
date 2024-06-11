@@ -28,49 +28,52 @@ class PostVehicleRoutesResponseTOTest {
 
   @Test
   void jsonSample() {
-    Approvals.verify(jsonBinder.toJson(new PostVehicleRoutesResponseTO()
-        .setRoutes(
-            List.of(
-                new RouteTO()
-                    .setDestinationPoint("C")
-                    .setCosts(1376)
-                    .setSteps(
-                        List.of(
-                            new RouteTO.Step()
-                                .setSourcePoint("A")
-                                .setDestinationPoint("B")
-                                .setPath("A --- B")
-                                .setVehicleOrientation("FORWARD"),
-                            new RouteTO.Step()
-                                .setSourcePoint("B")
-                                .setDestinationPoint("C")
-                                .setPath("B --- C")
-                                .setVehicleOrientation("FORWARD")
-                        )
-                    ),
-                new RouteTO()
-                    .setDestinationPoint("E")
-                    .setCosts(-1)
-                    .setSteps(null),
-                new RouteTO()
-                    .setDestinationPoint("F")
-                    .setCosts(4682)
-                    .setSteps(
-                        List.of(
-                            new RouteTO.Step()
-                                .setSourcePoint("D")
-                                .setDestinationPoint("E")
-                                .setPath("D --- E")
-                                .setVehicleOrientation("BACKWARD"),
-                            new RouteTO.Step()
-                                .setSourcePoint("E")
-                                .setDestinationPoint("F")
-                                .setPath("E --- F")
-                                .setVehicleOrientation("UNDEFINED")
-                        )
+    Approvals.verify(
+        jsonBinder.toJson(
+            new PostVehicleRoutesResponseTO()
+                .setRoutes(
+                    List.of(
+                        new RouteTO()
+                            .setDestinationPoint("C")
+                            .setCosts(1376)
+                            .setSteps(
+                                List.of(
+                                    new RouteTO.Step()
+                                        .setSourcePoint("A")
+                                        .setDestinationPoint("B")
+                                        .setPath("A --- B")
+                                        .setVehicleOrientation("FORWARD"),
+                                    new RouteTO.Step()
+                                        .setSourcePoint("B")
+                                        .setDestinationPoint("C")
+                                        .setPath("B --- C")
+                                        .setVehicleOrientation("FORWARD")
+                                )
+                            ),
+                        new RouteTO()
+                            .setDestinationPoint("E")
+                            .setCosts(-1)
+                            .setSteps(null),
+                        new RouteTO()
+                            .setDestinationPoint("F")
+                            .setCosts(4682)
+                            .setSteps(
+                                List.of(
+                                    new RouteTO.Step()
+                                        .setSourcePoint("D")
+                                        .setDestinationPoint("E")
+                                        .setPath("D --- E")
+                                        .setVehicleOrientation("BACKWARD"),
+                                    new RouteTO.Step()
+                                        .setSourcePoint("E")
+                                        .setDestinationPoint("F")
+                                        .setPath("E --- F")
+                                        .setVehicleOrientation("UNDEFINED")
+                                )
+                            )
                     )
-            )
+                )
         )
-    ));
+    );
   }
 }

@@ -19,7 +19,8 @@ import org.opentcs.guing.common.util.UserMessageHelper;
  * A cell editor for a coordinate property.
  */
 public class CoordinateCellEditor
-    extends QuantityCellEditor {
+    extends
+      QuantityCellEditor {
 
   /**
    * Creates a new instance.
@@ -27,7 +28,12 @@ public class CoordinateCellEditor
    * @param textField
    */
   @Inject
-  public CoordinateCellEditor(@Assisted JTextField textField, @Assisted UserMessageHelper umh) {
+  public CoordinateCellEditor(
+      @Assisted
+      JTextField textField,
+      @Assisted
+      UserMessageHelper umh
+  ) {
     super(textField, umh);
   }
 

@@ -17,5 +17,6 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
  * If the returned collection is empty, no reason to filter it was encountered.
  */
 public interface AssignmentCandidateSelectionFilter
-    extends Function<AssignmentCandidate, Collection<String>> {
+    extends
+      Function<AssignmentCandidate, Collection<String>> {
 }

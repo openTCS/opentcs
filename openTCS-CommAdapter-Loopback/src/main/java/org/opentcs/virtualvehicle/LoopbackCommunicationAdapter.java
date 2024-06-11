@@ -7,6 +7,8 @@
  */
 package org.opentcs.virtualvehicle;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.beans.PropertyChangeEvent;
@@ -14,7 +16,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -41,8 +42,10 @@ import org.slf4j.LoggerFactory;
  * simulates one.
  */
 public class LoopbackCommunicationAdapter
-    extends BasicVehicleCommAdapter
-    implements SimVehicleCommAdapter {
+    extends
+      BasicVehicleCommAdapter
+    implements
+      SimVehicleCommAdapter {
 
   /**
    * The name of the load handling device set by this adapter.
@@ -95,13 +98,19 @@ public class LoopbackCommunicationAdapter
    * @param kernelExecutor The kernel's executor.
    */
   @Inject
-  public LoopbackCommunicationAdapter(VirtualVehicleConfiguration configuration,
-                                      @Assisted Vehicle vehicle,
-                                      @KernelExecutor ScheduledExecutorService kernelExecutor) {
-    super(new LoopbackVehicleModel(vehicle),
-          configuration.commandQueueCapacity(),
-          configuration.rechargeOperation(),
-          kernelExecutor);
+  public LoopbackCommunicationAdapter(
+      VirtualVehicleConfiguration configuration,
+      @Assisted
+      Vehicle vehicle,
+      @KernelExecutor
+      ScheduledExecutorService kernelExecutor
+  ) {
+    super(
+        new LoopbackVehicleModel(vehicle),
+        configuration.commandQueueCapacity(),
+        configuration.rechargeOperation(),
+        kernelExecutor
+    );
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.configuration = requireNonNull(configuration, "configuration");
   }
@@ -146,8 +155,10 @@ public class LoopbackCommunicationAdapter
     if (!((evt.getSource()) instanceof LoopbackVehicleModel)) {
       return;
     }
-    if (Objects.equals(evt.getPropertyName(),
-                       VehicleProcessModel.Attribute.LOAD_HANDLING_DEVICES.name())) {
+    if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.LOAD_HANDLING_DEVICES.name()
+    )) {
       if (!getProcessModel().getLoadHandlingDevices().isEmpty()
           && getProcessModel().getLoadHandlingDevices().get(0).isFull()) {
         loadState = LoadState.FULL;
@@ -158,8 +169,10 @@ public class LoopbackCommunicationAdapter
         getProcessModel().setLength(configuration.vehicleLengthUnloaded());
       }
     }
-    if (Objects.equals(evt.getPropertyName(),
-                       LoopbackVehicleModel.Attribute.SINGLE_STEP_MODE.name())) {
+    if (Objects.equals(
+        evt.getPropertyName(),
+        LoopbackVehicleModel.Attribute.SINGLE_STEP_MODE.name()
+    )) {
       // When switching from single step mode to automatic mode and there are commands to be
       // processed, ensure that we start/continue processing them.
       if (!getProcessModel().isSingleStepModeEnabled()
@@ -208,8 +221,9 @@ public class LoopbackCommunicationAdapter
         ((ExecutorService) getExecutor()).submit(() -> startVehicleSimulation(cmd));
       }
       else {
-        ((ExecutorService) getExecutor()).submit(()
-            -> startVehicleSimulation(getSentCommands().peek()));
+        ((ExecutorService) getExecutor()).submit(
+            () -> startVehicleSimulation(getSentCommands().peek())
+        );
       }
     }
   }
@@ -329,20 +343,25 @@ public class LoopbackCommunicationAdapter
       getExecutor().schedule(
           () -> operationSimulation(command, 0),
           SIMULATION_PERIOD,
-          TimeUnit.MILLISECONDS);
+          TimeUnit.MILLISECONDS
+      );
     }
     else {
       getProcessModel().getVelocityController().addWayEntry(
-          new WayEntry(step.getPath().getLength(),
-                       maxVelocity(step),
-                       step.getDestinationPoint().getName(),
-                       step.getVehicleOrientation())
+          new WayEntry(
+              step.getPath().getLength(),
+              maxVelocity(step),
+              step.getDestinationPoint().getName(),
+              step.getVehicleOrientation()
+          )
       );
 
       LOG.debug("Starting movement simulation...");
-      getExecutor().schedule(() -> movementSimulation(command),
-                             SIMULATION_PERIOD,
-                             TimeUnit.MILLISECONDS);
+      getExecutor().schedule(
+          () -> movementSimulation(command),
+          SIMULATION_PERIOD,
+          TimeUnit.MILLISECONDS
+      );
     }
   }
 
@@ -367,9 +386,11 @@ public class LoopbackCommunicationAdapter
     WayEntry currentWayEntry = getProcessModel().getVelocityController().getCurrentWayEntry();
     //if we are still on the same way entry then reschedule to do it again
     if (prevWayEntry == currentWayEntry) {
-      getExecutor().schedule(() -> movementSimulation(command),
-                             SIMULATION_PERIOD,
-                             TimeUnit.MILLISECONDS);
+      getExecutor().schedule(
+          () -> movementSimulation(command),
+          SIMULATION_PERIOD,
+          TimeUnit.MILLISECONDS
+      );
     }
     else {
       //if the way enties are different then we have finished this step
@@ -397,8 +418,10 @@ public class LoopbackCommunicationAdapter
    * @param command The command to simulate.
    * @param timePassed The amount of time passed since starting the simulation.
    */
-  private void operationSimulation(MovementCommand command,
-                                   int timePassed) {
+  private void operationSimulation(
+      MovementCommand command,
+      int timePassed
+  ) {
     if (timePassed < getProcessModel().getOperatingTime()) {
       getProcessModel().getVelocityController().advanceTime(getSimulationTimeStep());
       getExecutor().schedule(
@@ -449,8 +472,10 @@ public class LoopbackCommunicationAdapter
    * @param rechargePosition The vehicle position where the recharge simulation was started.
    * @param rechargePercentage The recharge percentage of the vehicle while it is charging.
    */
-  private void chargingSimulation(String rechargePosition,
-                                  float rechargePercentage) {
+  private void chargingSimulation(
+      String rechargePosition,
+      float rechargePercentage
+  ) {
     if (!getSentCommands().isEmpty()) {
       LOG.debug("Aborting recharge operation, vehicle has an order...");
       simulateNextCommand();
@@ -498,10 +523,12 @@ public class LoopbackCommunicationAdapter
       getProcessModel().commandExecuted(getSentCommands().poll());
     }
     else {
-      LOG.warn("{}: Simulated command not oldest in sent queue: {} != {}",
-               getName(),
-               command,
-               getSentCommands().peek());
+      LOG.warn(
+          "{}: Simulated command not oldest in sent queue: {} != {}",
+          getName(),
+          command,
+          getSentCommands().peek()
+      );
     }
   }
 
@@ -514,7 +541,8 @@ public class LoopbackCommunicationAdapter
     else {
       LOG.debug("Triggering simulation for next command: {}", getSentCommands().peek());
       ((ExecutorService) getExecutor()).submit(
-          () -> startVehicleSimulation(getSentCommands().peek()));
+          () -> startVehicleSimulation(getSentCommands().peek())
+      );
     }
   }
 

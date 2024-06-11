@@ -7,8 +7,9 @@
  */
 package org.opentcs.virtualvehicle;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
@@ -17,7 +18,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
  * A factory for loopback communication adapters (virtual vehicles).
  */
 public class LoopbackCommunicationAdapterFactory
-    implements VehicleCommAdapterFactory {
+    implements
+      VehicleCommAdapterFactory {
 
   /**
    * The adapter components factory.

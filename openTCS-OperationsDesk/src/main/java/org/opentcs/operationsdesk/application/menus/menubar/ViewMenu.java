@@ -7,8 +7,9 @@
  */
 package org.opentcs.operationsdesk.application.menus.menubar;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.opentcs.guing.common.application.OperationMode;
@@ -26,7 +27,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * The application's menu for view-related operations.
  */
 public class ViewMenu
-    extends JMenu {
+    extends
+      JMenu {
 
   /**
    * A menu item for adding a drawing view.
@@ -61,8 +63,10 @@ public class ViewMenu
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public ViewMenu(ViewActionMap actionMap,
-                  ViewPluginPanelsMenu menuPluginPanels) {
+  public ViewMenu(
+      ViewActionMap actionMap,
+      ViewPluginPanelsMenu menuPluginPanels
+  ) {
     requireNonNull(actionMap, "actionMap");
     requireNonNull(menuPluginPanels, "menuPluginPanels");
 

@@ -15,6 +15,8 @@
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.components.drawing;
 
+import static java.util.Objects.requireNonNull;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -39,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
@@ -78,10 +79,12 @@ import org.slf4j.LoggerFactory;
  * A DrawingView implementation for the openTCS plant overview.
  */
 public abstract class AbstractOpenTCSDrawingView
-    extends DefaultDrawingView
-    implements OpenTCSDrawingView,
-               EditableComponent,
-               PropertyChangeListener {
+    extends
+      DefaultDrawingView
+    implements
+      OpenTCSDrawingView,
+      EditableComponent,
+      PropertyChangeListener {
 
   /**
    * A property name for 'focus gained'.
@@ -383,7 +386,7 @@ public abstract class AbstractOpenTCSDrawingView
   @Override
   public boolean containsPointOnScreen(Point p) {
     return (p.x >= getLocationOnScreen().x && p.x < (getLocationOnScreen().x + getWidth())
-            && p.y >= getLocationOnScreen().y && p.y < (getLocationOnScreen().y + getHeight()));
+        && p.y >= getLocationOnScreen().y && p.y < (getLocationOnScreen().y + getHeight()));
   }
 
   @Override
@@ -404,8 +407,10 @@ public abstract class AbstractOpenTCSDrawingView
 
     Graphics2D g2d = (Graphics2D) gr.create();
     AffineTransform tx = g2d.getTransform();
-    tx.translate(getDrawingToViewTransform().getTranslateX(),
-                 getDrawingToViewTransform().getTranslateY());
+    tx.translate(
+        getDrawingToViewTransform().getTranslateX(),
+        getDrawingToViewTransform().getTranslateY()
+    );
     tx.scale(getScaleFactor(), getScaleFactor());
     g2d.setTransform(tx);
 
@@ -427,7 +432,7 @@ public abstract class AbstractOpenTCSDrawingView
         removeAll();
         break;
       default:
-      // Do nada.
+        // Do nada.
     }
   }
 
@@ -524,14 +529,16 @@ public abstract class AbstractOpenTCSDrawingView
     float radius = 30;
     float[] dist = {0.0f, 0.7f, 0.8f, 1.0f};
     Color[] colors = {
-      new Color(1.0f, 1.0f, 1.0f, 0.0f), // Focus: 100% transparent
-      new Color(1.0f, 1.0f, 1.0f, 0.0f),
-      new Color(1.0f, 0.0f, 0.0f, 0.7f), // Circle: red
-      new Color(0.9f, 0.9f, 0.9f, 0.5f) // Background
+        new Color(1.0f, 1.0f, 1.0f, 0.0f), // Focus: 100% transparent
+        new Color(1.0f, 1.0f, 1.0f, 0.0f),
+        new Color(1.0f, 0.0f, 0.0f, 0.7f), // Circle: red
+        new Color(0.9f, 0.9f, 0.9f, 0.5f) // Background
     };
     RadialGradientPaint p
-        = new RadialGradientPaint(center, radius, dist, colors,
-                                  MultipleGradientPaint.CycleMethod.NO_CYCLE);
+        = new RadialGradientPaint(
+            center, radius, dist, colors,
+            MultipleGradientPaint.CycleMethod.NO_CYCLE
+        );
 
     Graphics2D gFocus = (Graphics2D) g2d.create();
     gFocus.setPaint(p);
@@ -612,10 +619,16 @@ public abstract class AbstractOpenTCSDrawingView
 
     final int margin = 50;
 
-    Point pCenterDrawing = drawingToView(new Point2D.Double(bounds.getCenterX() - margin,
-                                                            bounds.getCenterY() - margin));
-    Dimension dBounds = new Dimension((int) (bounds.getWidth() + 2 * margin),
-                                      (int) (bounds.getHeight() + 2 * margin));
+    Point pCenterDrawing = drawingToView(
+        new Point2D.Double(
+            bounds.getCenterX() - margin,
+            bounds.getCenterY() - margin
+        )
+    );
+    Dimension dBounds = new Dimension(
+        (int) (bounds.getWidth() + 2 * margin),
+        (int) (bounds.getHeight() + 2 * margin)
+    );
 
     return new Rectangle(pCenterDrawing, dBounds);
   }
@@ -681,7 +694,8 @@ public abstract class AbstractOpenTCSDrawingView
   }
 
   public abstract class AbstractExtendedEventHandler
-      extends DefaultDrawingView.EventHandler {
+      extends
+        DefaultDrawingView.EventHandler {
 
     @Override // CompositeFigureListener
     public void figureRemoved(CompositeFigureEvent evt) {

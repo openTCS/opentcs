@@ -7,12 +7,14 @@
  */
 package org.opentcs.operationsdesk.exchange.adapter;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.data.order.TransportOrder.State.WITHDRAWN;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,7 +28,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
-import static org.opentcs.data.order.TransportOrder.State.WITHDRAWN;
 import org.opentcs.guing.base.AllocationState;
 import org.opentcs.guing.base.model.FigureDecorationDetails;
 import org.opentcs.guing.base.model.elements.PathModel;
@@ -43,7 +44,8 @@ import org.slf4j.LoggerFactory;
  * An adapter for vehicles specific to the Operations Desk application.
  */
 public class OpsDeskVehicleAdapter
-    extends VehicleAdapter {
+    extends
+      VehicleAdapter {
 
   /**
    * This class's logger.
@@ -59,26 +61,35 @@ public class OpsDeskVehicleAdapter
   private final TransportOrdersContainer transportOrdersContainer;
 
   @Inject
-  public OpsDeskVehicleAdapter(AllocationHistory allocationHistory,
-                               @Nonnull TransportOrdersContainer transportOrdersContainer) {
+  public OpsDeskVehicleAdapter(
+      AllocationHistory allocationHistory,
+      @Nonnull
+      TransportOrdersContainer transportOrdersContainer
+  ) {
     this.allocationHistory = requireNonNull(allocationHistory, "allocationHistory");
-    this.transportOrdersContainer = requireNonNull(transportOrdersContainer,
-                                                   "transportOrdersContainer");
+    this.transportOrdersContainer = requireNonNull(
+        transportOrdersContainer,
+        "transportOrdersContainer"
+    );
   }
 
   @Override
-  protected void updateModelDriveOrder(TCSObjectService objectService,
-                                       Vehicle vehicle,
-                                       VehicleModel vehicleModel,
-                                       SystemModel systemModel)
+  protected void updateModelDriveOrder(
+      TCSObjectService objectService,
+      Vehicle vehicle,
+      VehicleModel vehicleModel,
+      SystemModel systemModel
+  )
       throws CredentialsException {
     TransportOrder transportOrder = getTransportOrder(objectService, vehicle.getTransportOrder());
 
     if (transportOrder != null) {
       vehicleModel.setCurrentDriveOrderPath(getCurrentDriveOrderPath(vehicle, systemModel));
       vehicleModel.setDriveOrderDestination(
-          getCurrentDriveOrderDestination(transportOrder.getCurrentDriveOrder(),
-                                          systemModel)
+          getCurrentDriveOrderDestination(
+              transportOrder.getCurrentDriveOrder(),
+              systemModel
+          )
       );
 
       vehicleModel.setDriveOrderState(transportOrder.getState());
@@ -92,8 +103,10 @@ public class OpsDeskVehicleAdapter
   }
 
   @Nullable
-  private TransportOrder getTransportOrder(TCSObjectService objectService,
-                                           TCSObjectReference<TransportOrder> ref)
+  private TransportOrder getTransportOrder(
+      TCSObjectService objectService,
+      TCSObjectReference<TransportOrder> ref
+  )
       throws CredentialsException {
     if (ref == null) {
       return null;
@@ -106,8 +119,10 @@ public class OpsDeskVehicleAdapter
       return null;
     }
 
-    return Stream.concat(vehicle.getAllocatedResources().stream(),
-                         vehicle.getClaimedResources().stream())
+    return Stream.concat(
+        vehicle.getAllocatedResources().stream(),
+        vehicle.getClaimedResources().stream()
+    )
         .dropWhile(
             resources -> !containsPointWithName(resources, vehicle.getCurrentPosition().getName())
         )
@@ -133,8 +148,11 @@ public class OpsDeskVehicleAdapter
         .orElse(null);
   }
 
-  private PointModel getCurrentDriveOrderDestination(@Nullable DriveOrder driveOrder,
-                                                     SystemModel systemModel) {
+  private PointModel getCurrentDriveOrderDestination(
+      @Nullable
+      DriveOrder driveOrder,
+      SystemModel systemModel
+  ) {
     if (driveOrder == null) {
       return null;
     }
@@ -145,18 +163,22 @@ public class OpsDeskVehicleAdapter
     );
   }
 
-  private void updateAllocationStates(Vehicle vehicle,
-                                      SystemModel systemModel,
-                                      VehicleModel vehicleModel) {
+  private void updateAllocationStates(
+      Vehicle vehicle,
+      SystemModel systemModel,
+      VehicleModel vehicleModel
+  ) {
     AllocationHistory.Entry entry = allocationHistory.updateHistory(vehicle);
 
-    for (FigureDecorationDetails component
-             : toFigureDecorationDetails(entry.getCurrentClaimedResources(), systemModel)) {
+    for (FigureDecorationDetails component : toFigureDecorationDetails(
+        entry.getCurrentClaimedResources(), systemModel
+    )) {
       component.updateAllocationState(vehicleModel, AllocationState.CLAIMED);
     }
 
-    for (FigureDecorationDetails component
-             : toFigureDecorationDetails(entry.getCurrentAllocatedResourcesAhead(), systemModel)) {
+    for (FigureDecorationDetails component : toFigureDecorationDetails(
+        entry.getCurrentAllocatedResourcesAhead(), systemModel
+    )) {
       if (vehicleModel.getDriveOrderState() == WITHDRAWN) {
         component.updateAllocationState(vehicleModel, AllocationState.ALLOCATED_WITHDRAWN);
       }
@@ -165,21 +187,24 @@ public class OpsDeskVehicleAdapter
       }
     }
 
-    for (FigureDecorationDetails component
-             : toFigureDecorationDetails(entry.getCurrentAllocatedResourcesBehind(), systemModel)) {
+    for (FigureDecorationDetails component : toFigureDecorationDetails(
+        entry.getCurrentAllocatedResourcesBehind(), systemModel
+    )) {
       component.updateAllocationState(vehicleModel, AllocationState.ALLOCATED);
     }
 
-    for (FigureDecorationDetails component
-             : toFigureDecorationDetails(entry.getPreviouslyClaimedOrAllocatedResources(),
-                                         systemModel)) {
+    for (FigureDecorationDetails component : toFigureDecorationDetails(
+        entry.getPreviouslyClaimedOrAllocatedResources(),
+        systemModel
+    )) {
       component.clearAllocationState(vehicleModel);
     }
   }
 
   private Set<FigureDecorationDetails> toFigureDecorationDetails(
       Set<TCSResourceReference<?>> resources,
-      SystemModel systemModel) {
+      SystemModel systemModel
+  ) {
     return resources.stream()
         .map(res -> systemModel.getModelComponent(res.getName()))
         .filter(modelComponent -> modelComponent instanceof FigureDecorationDetails)

@@ -7,14 +7,15 @@
  */
 package org.opentcs.kernel.vehicles;
 
-import java.util.List;
-import java.util.Set;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.model.Path;
@@ -74,8 +75,10 @@ class SplitResourcesTest {
     SplitResources result = SplitResources.from(allResources, Set.of(pathBC, pointC));
 
     assertThat(result, is(notNullValue()));
-    assertThat(result.getResourcesPassed(),
-               contains(Set.of(pathAB, pointB), Set.of(pathBC, pointC)));
+    assertThat(
+        result.getResourcesPassed(),
+        contains(Set.of(pathAB, pointB), Set.of(pathBC, pointC))
+    );
     assertThat(result.getResourcesAhead(), contains(Set.of(pathCD, pointD)));
   }
 
@@ -84,8 +87,10 @@ class SplitResourcesTest {
     SplitResources result = SplitResources.from(allResources, Set.of(pointC));
 
     assertThat(result, is(notNullValue()));
-    assertThat(result.getResourcesPassed(),
-               contains(Set.of(pathAB, pointB), Set.of(pathBC, pointC)));
+    assertThat(
+        result.getResourcesPassed(),
+        contains(Set.of(pathAB, pointB), Set.of(pathBC, pointC))
+    );
     assertThat(result.getResourcesAhead(), contains(Set.of(pathCD, pointD)));
   }
 }

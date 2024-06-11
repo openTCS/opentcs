@@ -7,11 +7,12 @@
  */
 package org.opentcs.modeleditor.components.drawing;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.jhotdraw.draw.AbstractFigure;
@@ -27,7 +28,8 @@ import org.opentcs.guing.common.util.ModelComponentUtil;
 /**
  */
 public class BlockChangeHandler
-    implements BlockChangeListener {
+    implements
+      BlockChangeListener {
 
   /**
    * The members/elements of a block mapped to the block model.
@@ -65,8 +67,10 @@ public class BlockChangeHandler
     }
 
     // The elements that are no longer part of the block should also know this.
-    Set<FigureDecorationDetails> removedBlockElements = updateBlockElementHistory(block,
-                                                                                  blockElements);
+    Set<FigureDecorationDetails> removedBlockElements = updateBlockElementHistory(
+        block,
+        blockElements
+    );
     for (FigureDecorationDetails component : removedBlockElements) {
       component.removeBlockModel(block);
       // Update the figure so that it no longer appears as being part of the block.
@@ -108,7 +112,8 @@ public class BlockChangeHandler
    */
   private Set<FigureDecorationDetails> updateBlockElementHistory(
       BlockModel block,
-      Set<FigureDecorationDetails> newBlockElements) {
+      Set<FigureDecorationDetails> newBlockElements
+  ) {
     Set<FigureDecorationDetails> oldBlockElements = getBlockElements(block);
     Set<FigureDecorationDetails> removedBlockElements = new HashSet<>(oldBlockElements);
 

@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.exchange.adapter;
 
 import static java.util.Objects.requireNonNull;
+
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortal;
@@ -24,7 +25,8 @@ import org.slf4j.LoggerFactory;
  * Updates a vehicle's paused state with the kernel when it changes.
  */
 public class VehiclePausedAdapter
-    implements AttributesChangeListener {
+    implements
+      AttributesChangeListener {
 
   /**
    * This class's logger.
@@ -49,8 +51,10 @@ public class VehiclePausedAdapter
    * @param portalProvider A kernel provider.
    * @param model The vehicle model.
    */
-  public VehiclePausedAdapter(SharedKernelServicePortalProvider portalProvider,
-                              VehicleModel model) {
+  public VehiclePausedAdapter(
+      SharedKernelServicePortalProvider portalProvider,
+      VehicleModel model
+  ) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.model = requireNonNull(model, "model");
     this.pausedPreviously = isVehiclePaused();

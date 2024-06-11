@@ -7,11 +7,12 @@
  */
 package org.opentcs.guing.base.model;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.concurrent.CopyOnWriteArrayList;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeListener;
@@ -22,7 +23,8 @@ import org.opentcs.guing.base.components.properties.type.StringProperty;
  * Abstract implementation of a model component.
  */
 public abstract class AbstractModelComponent
-    implements ModelComponent {
+    implements
+      ModelComponent {
 
   /**
    * Name of the component in the tree view.

@@ -7,6 +7,9 @@
  */
 package org.opentcs.operationsdesk.components.drawing.figures;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,8 +17,6 @@ import java.util.Locale;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Vehicle;

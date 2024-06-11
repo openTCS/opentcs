@@ -7,15 +7,21 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import org.hamcrest.MatcherAssert;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
+
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,11 +29,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.mock;
 import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.ObjectUnknownException;
@@ -198,13 +199,21 @@ class VehicleHandlerTest {
   void throwOnUpdateIntegrationLevelForUnknownVehicleOrIntegrationLevel() {
     // Act & Assert: nonexistent vehicle
     assertThatExceptionOfType(ObjectUnknownException.class)
-        .isThrownBy(() -> handler.putVehicleIntegrationLevel("some-unknown-vehicle",
-                                                             "TO_BE_UTILIZED"));
+        .isThrownBy(
+            () -> handler.putVehicleIntegrationLevel(
+                "some-unknown-vehicle",
+                "TO_BE_UTILIZED"
+            )
+        );
 
     // Act & Assert: unknown integration level
     assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> handler.putVehicleIntegrationLevel("some-vehicle",
-                                                             "some-unknown-integration-level"));
+        .isThrownBy(
+            () -> handler.putVehicleIntegrationLevel(
+                "some-vehicle",
+                "some-unknown-integration-level"
+            )
+        );
   }
 
   @Test
@@ -272,8 +281,10 @@ class VehicleHandlerTest {
   void throwOnUpdateAllowedOrderTypesForUnknownVehicle() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(
-            () -> handler.putVehicleAllowedOrderTypes("some-unknown-vehicle",
-                                                      new PutVehicleAllowedOrderTypesTO(List.of()))
+            () -> handler.putVehicleAllowedOrderTypes(
+                "some-unknown-vehicle",
+                new PutVehicleAllowedOrderTypesTO(List.of())
+            )
         );
   }
 
@@ -388,11 +399,15 @@ class VehicleHandlerTest {
     Point destinationPoint1 = new Point("some-destination-point");
     Point destinationPoint2 = new Point("some-destination-point-2");
     Point pointToAvoid = new Point("some-point-to-avoid");
-    Path pathToAvoid = new Path("some-path",
-                                sourcePoint.getReference(),
-                                destinationPoint1.getReference());
-    Location locationToAvoid = new Location("some-location",
-                                            new LocationType("some-locType").getReference());
+    Path pathToAvoid = new Path(
+        "some-path",
+        sourcePoint.getReference(),
+        destinationPoint1.getReference()
+    );
+    Location locationToAvoid = new Location(
+        "some-location",
+        new LocationType("some-locType").getReference()
+    );
     given(vehicleService.fetchObject(Point.class, "some-source-point"))
         .willReturn(sourcePoint);
     given(vehicleService.fetchObject(Point.class, "some-destination-point"))
@@ -410,10 +425,12 @@ class VehicleHandlerTest {
     handler.getVehicleRoutes(
         "some-vehicle",
         new PostVehicleRoutesRequestTO(
-            List.of("some-destination-point", "some-destination-point-2"))
+            List.of("some-destination-point", "some-destination-point-2")
+        )
             .setSourcePoint("some-source-point")
             .setResourcesToAvoid(
-                List.of("some-point-to-avoid", "some-path", "some-location"))
+                List.of("some-point-to-avoid", "some-path", "some-location")
+            )
     );
 
     then(routerService)
@@ -425,7 +442,8 @@ class VehicleHandlerTest {
             Set.of(
                 pointToAvoid.getReference(),
                 pathToAvoid.getReference(),
-                locationToAvoid.getReference())
+                locationToAvoid.getReference()
+            )
         );
 
     // Act & Assert: nonexistent resource to avoid
@@ -441,7 +459,8 @@ class VehicleHandlerTest {
   }
 
   static class MockVehicleCommAdapterDescription
-      extends VehicleCommAdapterDescription {
+      extends
+        VehicleCommAdapterDescription {
 
     @Override
     public String getDescription() {

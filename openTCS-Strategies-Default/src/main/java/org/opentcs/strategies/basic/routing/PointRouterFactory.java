@@ -26,7 +26,9 @@ public interface PointRouterFactory {
    * @param pathsToExclude The set of paths to be excluded.
    * @return The point router.
    */
-  PointRouter createPointRouter(Vehicle vehicle,
-                                Set<Point> pointsToExclude,
-                                Set<Path> pathsToExclude);
+  PointRouter createPointRouter(
+      Vehicle vehicle,
+      Set<Point> pointsToExclude,
+      Set<Path> pathsToExclude
+  );
 }

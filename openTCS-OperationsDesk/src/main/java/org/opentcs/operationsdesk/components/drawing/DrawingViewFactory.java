@@ -7,9 +7,10 @@
  */
 package org.opentcs.operationsdesk.components.drawing;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JToggleButton;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.application.StatusPanel;
@@ -53,12 +54,14 @@ public class DrawingViewFactory {
   private final DrawingOptions drawingOptions;
 
   @Inject
-  public DrawingViewFactory(Provider<OpenTCSDrawingView> drawingViewProvider,
-                            OpenTCSDrawingEditor drawingEditor,
-                            StatusPanel statusPanel,
-                            ModelManager modelManager,
-                            TransportOrderUtil orderUtil,
-                            DrawingOptions drawingOptions) {
+  public DrawingViewFactory(
+      Provider<OpenTCSDrawingView> drawingViewProvider,
+      OpenTCSDrawingEditor drawingEditor,
+      StatusPanel statusPanel,
+      ModelManager modelManager,
+      TransportOrderUtil orderUtil,
+      DrawingOptions drawingOptions
+  ) {
     this.drawingViewProvider = requireNonNull(drawingViewProvider, "drawingViewProvider");
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.statusPanel = requireNonNull(statusPanel, "statusPanel");
@@ -76,9 +79,11 @@ public class DrawingViewFactory {
    * @param dragToolButton The drag tool button in the tool bar.
    * @return A new drawing view, wrapped in a scroll pane.
    */
-  public DrawingViewScrollPane createDrawingView(SystemModel systemModel,
-                                                 JToggleButton selectionToolButton,
-                                                 JToggleButton dragToolButton) {
+  public DrawingViewScrollPane createDrawingView(
+      SystemModel systemModel,
+      JToggleButton selectionToolButton,
+      JToggleButton dragToolButton
+  ) {
     requireNonNull(systemModel, "systemModel");
     requireNonNull(selectionToolButton, "selectionToolButton");
     requireNonNull(dragToolButton, "dragToolButton");
@@ -97,13 +102,15 @@ public class DrawingViewFactory {
 
     // --- Listens to draggings in the drawing ---
     ViewDragScrollListener dragScrollListener
-        = new ViewDragScrollListener(scrollPane,
-                                     placardPanel.getZoomComboBox(),
-                                     selectionToolButton,
-                                     dragToolButton,
-                                     statusPanel,
-                                     modelManager,
-                                     orderUtil);
+        = new ViewDragScrollListener(
+            scrollPane,
+            placardPanel.getZoomComboBox(),
+            selectionToolButton,
+            dragToolButton,
+            statusPanel,
+            modelManager,
+            orderUtil
+        );
     drawingView.addMouseListener(dragScrollListener);
     drawingView.addMouseMotionListener(dragScrollListener);
     drawingView.getComponent().addMouseWheelListener(dragScrollListener);

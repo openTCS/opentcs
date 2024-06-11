@@ -7,11 +7,12 @@
  */
 package org.opentcs.strategies.basic.dispatching.selection.vehicles;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
@@ -23,7 +24,8 @@ import org.opentcs.strategies.basic.dispatching.selection.ParkVehicleSelectionFi
  * Filters vehicles that are parkable.
  */
 public class IsParkable
-    implements ParkVehicleSelectionFilter {
+    implements
+      ParkVehicleSelectionFilter {
 
   /**
    * The object service.

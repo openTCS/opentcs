@@ -7,6 +7,11 @@
  */
 package org.opentcs.kernel.vehicles;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.kernel.vehicles.MovementComparisons.equalsInMovement;
+import static org.opentcs.util.Assertions.checkArgument;
+import static org.opentcs.util.Assertions.checkState;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -20,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
@@ -55,9 +59,6 @@ import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.ProcessModelEvent;
 import org.opentcs.kernel.KernelApplicationConfiguration;
-import static org.opentcs.kernel.vehicles.MovementComparisons.equalsInMovement;
-import static org.opentcs.util.Assertions.checkArgument;
-import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.ExplainedBoolean;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
@@ -69,10 +70,11 @@ import org.slf4j.LoggerFactory;
  * vehicle.
  */
 public class DefaultVehicleController
-    implements VehicleController,
-               Scheduler.Client,
-               PropertyChangeListener,
-               EventHandler {
+    implements
+      VehicleController,
+      Scheduler.Client,
+      PropertyChangeListener,
+      EventHandler {
 
   /**
    * This class's Logger.
@@ -199,17 +201,33 @@ public class DefaultVehicleController
    * @param configuration The configuration to use.
    */
   @Inject
-  public DefaultVehicleController(@Assisted @Nonnull Vehicle vehicle,
-                                  @Assisted @Nonnull VehicleCommAdapter adapter,
-                                  @Nonnull InternalVehicleService vehicleService,
-                                  @Nonnull InternalTransportOrderService transportOrderService,
-                                  @Nonnull NotificationService notificationService,
-                                  @Nonnull DispatcherService dispatcherService,
-                                  @Nonnull Scheduler scheduler,
-                                  @Nonnull @ApplicationEventBus EventBus eventBus,
-                                  @Nonnull VehicleControllerComponentsFactory componentsFactory,
-                                  @Nonnull MovementCommandMapper movementCommandMapper,
-                                  @Nonnull KernelApplicationConfiguration configuration) {
+  public DefaultVehicleController(
+      @Assisted
+      @Nonnull
+      Vehicle vehicle,
+      @Assisted
+      @Nonnull
+      VehicleCommAdapter adapter,
+      @Nonnull
+      InternalVehicleService vehicleService,
+      @Nonnull
+      InternalTransportOrderService transportOrderService,
+      @Nonnull
+      NotificationService notificationService,
+      @Nonnull
+      DispatcherService dispatcherService,
+      @Nonnull
+      Scheduler scheduler,
+      @Nonnull
+      @ApplicationEventBus
+      EventBus eventBus,
+      @Nonnull
+      VehicleControllerComponentsFactory componentsFactory,
+      @Nonnull
+      MovementCommandMapper movementCommandMapper,
+      @Nonnull
+      KernelApplicationConfiguration configuration
+  ) {
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.commAdapter = requireNonNull(adapter, "adapter");
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
@@ -238,8 +256,10 @@ public class DefaultVehicleController
 
     eventBus.subscribe(this);
 
-    vehicleService.updateVehicleRechargeOperation(vehicle.getReference(),
-                                                  commAdapter.getRechargeOperation());
+    vehicleService.updateVehicleRechargeOperation(
+        vehicle.getReference(),
+        commAdapter.getRechargeOperation()
+    );
     commAdapter.getProcessModel().addPropertyChangeListener(this);
 
     // Initialize standard attributes once.
@@ -252,8 +272,10 @@ public class DefaultVehicleController
         vehicle.getReference(),
         commAdapter.getProcessModel().getOrientationAngle()
     );
-    vehicleService.updateVehicleEnergyLevel(vehicle.getReference(),
-                                            commAdapter.getProcessModel().getEnergyLevel());
+    vehicleService.updateVehicleEnergyLevel(
+        vehicle.getReference(),
+        commAdapter.getProcessModel().getEnergyLevel()
+    );
     vehicleService.updateVehicleLoadHandlingDevices(
         vehicle.getReference(),
         commAdapter.getProcessModel().getLoadHandlingDevices()
@@ -315,8 +337,10 @@ public class DefaultVehicleController
       return;
     }
 
-    if (!(Objects.equals(objectEvent.getCurrentOrPreviousObjectState().getName(),
-                         vehicle.getName()))) {
+    if (!(Objects.equals(
+        objectEvent.getCurrentOrPreviousObjectState().getName(),
+        vehicle.getName()
+    ))) {
       return;
     }
 
@@ -329,7 +353,10 @@ public class DefaultVehicleController
   }
 
   @Override
-  public void setTransportOrder(@Nonnull TransportOrder newOrder)
+  public void setTransportOrder(
+      @Nonnull
+      TransportOrder newOrder
+  )
       throws IllegalArgumentException {
     requireNonNull(newOrder, "newOrder");
     requireNonNull(newOrder.getCurrentDriveOrder(), "newOrder.getCurrentDriveOrder()");
@@ -346,16 +373,20 @@ public class DefaultVehicleController
       // We received an update for a drive order we're already processing.
       transportOrder = newOrder;
 
-      checkArgument(driveOrdersContinual(currentDriveOrder, transportOrder.getCurrentDriveOrder()),
-                    "The new and old drive orders are not considered continual.");
+      checkArgument(
+          driveOrdersContinual(currentDriveOrder, transportOrder.getCurrentDriveOrder()),
+          "The new and old drive orders are not considered continual."
+      );
 
       if (isForcedRerouting(transportOrder.getCurrentDriveOrder())) {
         Vehicle currVehicle = vehicleService.fetchObject(Vehicle.class, vehicle.getReference());
         if (currVehicle.getCurrentPosition() == null) {
           throw new IllegalArgumentException("The vehicle's current position is unknown.");
         }
-        Point currPosition = vehicleService.fetchObject(Point.class,
-                                                        currVehicle.getCurrentPosition());
+        Point currPosition = vehicleService.fetchObject(
+            Point.class,
+            currVehicle.getCurrentPosition()
+        );
         // Before interacting with the scheduler in any way, ensure that the we will be able to
         // allocate the required resources.
         if (!mayAllocateNow(Set.of(currPosition))) {
@@ -369,8 +400,10 @@ public class DefaultVehicleController
           // Allocate the resources for the vehicle's current position.
           scheduler.allocateNow(this, Set.of(currPosition));
           allocatedResources.add(Set.of(currPosition));
-          vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
-                                                         toListOfResourceSets(allocatedResources));
+          vehicleService.updateVehicleAllocatedResources(
+              vehicle.getReference(),
+              toListOfResourceSets(allocatedResources)
+          );
         }
         catch (ResourceAllocationException ex) {
           // May never happen. The caller is expected to call mayAllocateNow() first before applying
@@ -386,19 +419,25 @@ public class DefaultVehicleController
     }
   }
 
-  private void setDriveOrder(@Nonnull DriveOrder newOrder,
-                             @Nonnull Map<String, String> orderProperties)
+  private void setDriveOrder(
+      @Nonnull
+      DriveOrder newOrder,
+      @Nonnull
+      Map<String, String> orderProperties
+  )
       throws IllegalArgumentException {
     synchronized (commAdapter) {
       requireNonNull(newOrder, "newOrder");
       requireNonNull(orderProperties, "orderProperties");
       requireNonNull(newOrder.getRoute(), "newOrder.getRoute()");
       // Assert that there isn't still is a drive order that hasn't been finished/removed, yet.
-      checkArgument(currentDriveOrder == null,
-                    "%s still has an order! Current order: %s, new order: %s",
-                    vehicle.getName(),
-                    currentDriveOrder,
-                    newOrder);
+      checkArgument(
+          currentDriveOrder == null,
+          "%s still has an order! Current order: %s, new order: %s",
+          vehicle.getName(),
+          currentDriveOrder,
+          newOrder
+      );
 
       LOG.debug("{}: Setting drive order: {}", vehicle.getName(), newOrder);
 
@@ -411,8 +450,10 @@ public class DefaultVehicleController
       claimedResources.clear();
       claimedResources.addAll(claim);
 
-      vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
-                                                   toListOfResourceSets(claimedResources));
+      vehicleService.updateVehicleClaimedResources(
+          vehicle.getReference(),
+          toListOfResourceSets(claimedResources)
+      );
 
       futureCommands.addAll(movementCommandMapper.toMovementCommands(newOrder, transportOrder));
 
@@ -422,13 +463,19 @@ public class DefaultVehicleController
 
       // Set the vehicle's next expected position.
       Point nextPoint = newOrder.getRoute().getSteps().get(0).getDestinationPoint();
-      vehicleService.updateVehicleNextPosition(vehicle.getReference(),
-                                               nextPoint.getReference());
+      vehicleService.updateVehicleNextPosition(
+          vehicle.getReference(),
+          nextPoint.getReference()
+      );
     }
   }
 
-  private void updateDriveOrder(@Nonnull DriveOrder newOrder,
-                                @Nonnull Map<String, String> orderProperties)
+  private void updateDriveOrder(
+      @Nonnull
+      DriveOrder newOrder,
+      @Nonnull
+      Map<String, String> orderProperties
+  )
       throws IllegalArgumentException {
     synchronized (commAdapter) {
       requireNonNull(newOrder, "newOrder");
@@ -446,8 +493,10 @@ public class DefaultVehicleController
       claimedResources.clear();
       claimedResources.addAll(claim);
 
-      vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
-                                                   toListOfResourceSets(claimedResources));
+      vehicleService.updateVehicleClaimedResources(
+          vehicle.getReference(),
+          toListOfResourceSets(claimedResources)
+      );
 
       futureCommands.addAll(movementCommandMapper.toMovementCommands(newOrder, transportOrder));
       // The current drive order got updated but our queue of future commands now contains commands
@@ -462,8 +511,10 @@ public class DefaultVehicleController
   }
 
   private boolean driveOrdersContinual(DriveOrder oldOrder, DriveOrder newOrder) {
-    LOG.debug("{}: Checking drive order continuity for {} (old) and {} (new).",
-              vehicle.getName(), oldOrder, newOrder);
+    LOG.debug(
+        "{}: Checking drive order continuity for {} (old) and {} (new).",
+        vehicle.getName(), oldOrder, newOrder
+    );
 
     if (lastCommandExecutedRouteIndex == TransportOrder.ROUTE_STEP_INDEX_DEFAULT) {
       LOG.debug("{}: Drive orders continuous: No route progress, yet.", vehicle.getName());
@@ -476,13 +527,17 @@ public class DefaultVehicleController
     // Compare already processed steps (up to and including the last executed command) for equality.
     List<Step> oldProcessedSteps = oldSteps.subList(0, lastCommandExecutedRouteIndex + 1);
     List<Step> newProcessedSteps = newSteps.subList(0, lastCommandExecutedRouteIndex + 1);
-    LOG.debug("{}: Comparing already processed steps for equality: {} (old) and {} (new)",
-              vehicle.getName(),
-              oldProcessedSteps,
-              newProcessedSteps);
+    LOG.debug(
+        "{}: Comparing already processed steps for equality: {} (old) and {} (new)",
+        vehicle.getName(),
+        oldProcessedSteps,
+        newProcessedSteps
+    );
     if (!equalsInMovement(oldProcessedSteps, newProcessedSteps)) {
-      LOG.debug("{}: Drive orders not continuous: Mismatching old and new processed steps.",
-                vehicle.getName());
+      LOG.debug(
+          "{}: Drive orders not continuous: Mismatching old and new processed steps.",
+          vehicle.getName()
+      );
       return false;
     }
 
@@ -493,17 +548,25 @@ public class DefaultVehicleController
 
     // Compare pending steps (after the last executed command) for equality.
     int futureOrCurrentPositionIndex = getFutureOrCurrentPositionIndex();
-    List<Step> oldPendingSteps = oldSteps.subList(lastCommandExecutedRouteIndex + 1,
-                                                  futureOrCurrentPositionIndex + 1);
-    List<Step> newPendingSteps = newSteps.subList(lastCommandExecutedRouteIndex + 1,
-                                                  futureOrCurrentPositionIndex + 1);
-    LOG.debug("{}: Comparing pending steps for equality: {} (old) and {} (new)",
-              vehicle.getName(),
-              oldPendingSteps,
-              newPendingSteps);
+    List<Step> oldPendingSteps = oldSteps.subList(
+        lastCommandExecutedRouteIndex + 1,
+        futureOrCurrentPositionIndex + 1
+    );
+    List<Step> newPendingSteps = newSteps.subList(
+        lastCommandExecutedRouteIndex + 1,
+        futureOrCurrentPositionIndex + 1
+    );
+    LOG.debug(
+        "{}: Comparing pending steps for equality: {} (old) and {} (new)",
+        vehicle.getName(),
+        oldPendingSteps,
+        newPendingSteps
+    );
     if (!equalsInMovement(oldPendingSteps, newPendingSteps)) {
-      LOG.debug("{}: Drive orders not continuous: Mismatching old and new pending steps.",
-                vehicle.getName());
+      LOG.debug(
+          "{}: Drive orders not continuous: Mismatching old and new pending steps.",
+          vehicle.getName()
+      );
       return false;
     }
 
@@ -513,23 +576,29 @@ public class DefaultVehicleController
 
   private int getFutureOrCurrentPositionIndex() {
     if (commandsSent.isEmpty() && getInteractionsPendingCommand().isEmpty()) {
-      LOG.debug("{}: No commands expected to be executed. Last executed command route index: {}",
-                vehicle.getName(),
-                lastCommandExecutedRouteIndex);
+      LOG.debug(
+          "{}: No commands expected to be executed. Last executed command route index: {}",
+          vehicle.getName(),
+          lastCommandExecutedRouteIndex
+      );
       return lastCommandExecutedRouteIndex;
     }
 
     if (getInteractionsPendingCommand().isPresent()) {
-      LOG.debug("{}: Command with pending peripheral operations present. Route index: {}",
-                vehicle.getName(),
-                getInteractionsPendingCommand().get().getStep().getRouteIndex());
+      LOG.debug(
+          "{}: Command with pending peripheral operations present. Route index: {}",
+          vehicle.getName(),
+          getInteractionsPendingCommand().get().getStep().getRouteIndex()
+      );
       return getInteractionsPendingCommand().get().getStep().getRouteIndex();
     }
 
     MovementCommand lastCommandSent = commandsSent.getLast();
-    LOG.debug("{}: Using the last command sent to the communication adapter. Route index: {}",
-              vehicle.getName(),
-              lastCommandSent.getStep().getRouteIndex());
+    LOG.debug(
+        "{}: Using the last command sent to the communication adapter. Route index: {}",
+        vehicle.getName(),
+        lastCommandSent.getStep().getRouteIndex()
+    );
     return lastCommandSent.getStep().getRouteIndex();
   }
 
@@ -545,10 +614,12 @@ public class DefaultVehicleController
       return;
     }
 
-    LOG.debug("{}: Discarding future commands up to '{}' (inclusively): {}",
-              vehicle.getName(),
-              lastCommandProcessed,
-              futureCommands);
+    LOG.debug(
+        "{}: Discarding future commands up to '{}' (inclusively): {}",
+        vehicle.getName(),
+        lastCommandProcessed,
+        futureCommands
+    );
     // Discard commands up to lastCommandSent...
     while (!lastCommandProcessed.equalsInMovement(futureCommands.peek())) {
       futureCommands.poll();
@@ -585,10 +656,14 @@ public class DefaultVehicleController
         checkForPendingCommands();
       }
 
-      vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
-                                                   toListOfResourceSets(claimedResources));
-      vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
-                                                     toListOfResourceSets(allocatedResources));
+      vehicleService.updateVehicleClaimedResources(
+          vehicle.getReference(),
+          toListOfResourceSets(claimedResources)
+      );
+      vehicleService.updateVehicleAllocatedResources(
+          vehicle.getReference(),
+          toListOfResourceSets(allocatedResources)
+      );
     }
   }
 
@@ -639,11 +714,13 @@ public class DefaultVehicleController
         // any movement. Ensure the resources for the current command/position are retained.
         splitResources = SplitResources.from(
             allocatedResources,
-            Set.of(allocatedResources.stream()
-                .flatMap(resSet -> resSet.stream())
-                .filter(res -> res instanceof Point)
-                .findFirst()
-                .get())
+            Set.of(
+                allocatedResources.stream()
+                    .flatMap(resSet -> resSet.stream())
+                    .filter(res -> res instanceof Point)
+                    .findFirst()
+                    .get()
+            )
         );
       }
       for (Set<TCSResource<?>> resSet : splitResources.getResourcesAhead()) {
@@ -672,7 +749,10 @@ public class DefaultVehicleController
   }
 
   @Override
-  public void sendCommAdapterMessage(@Nullable Object message) {
+  public void sendCommAdapterMessage(
+      @Nullable
+      Object message
+  ) {
     synchronized (commAdapter) {
       commAdapter.processMessage(message);
     }
@@ -712,17 +792,22 @@ public class DefaultVehicleController
   }
 
   @Override
-  public boolean allocationSuccessful(@Nonnull Set<TCSResource<?>> resources) {
+  public boolean allocationSuccessful(
+      @Nonnull
+      Set<TCSResource<?>> resources
+  ) {
     requireNonNull(resources, "resources");
 
     synchronized (commAdapter) {
       // Check if we've actually been waiting for these resources now. If not,
       // let the scheduler know that we don't want them.
       if (!Objects.equals(resources, pendingResources)) {
-        LOG.warn("{}: Allocated resources ({}) != pending resources ({}), refusing them",
-                 vehicle.getName(),
-                 resources,
-                 pendingResources);
+        LOG.warn(
+            "{}: Allocated resources ({}) != pending resources ({}), refusing them",
+            vehicle.getName(),
+            resources,
+            pendingResources
+        );
         return false;
       }
 
@@ -734,24 +819,33 @@ public class DefaultVehicleController
       MovementCommand command = pendingCommand;
       resetPendingResourceAllocations();
 
-      vehicleService.updateVehicleClaimedResources(vehicle.getReference(),
-                                                   toListOfResourceSets(claimedResources));
-      vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
-                                                     toListOfResourceSets(allocatedResources));
+      vehicleService.updateVehicleClaimedResources(
+          vehicle.getReference(),
+          toListOfResourceSets(claimedResources)
+      );
+      vehicleService.updateVehicleAllocatedResources(
+          vehicle.getReference(),
+          toListOfResourceSets(allocatedResources)
+      );
 
       interactionsPendingCommand = command;
 
       peripheralInteractor.prepareInteractions(transportOrder.getReference(), command);
-      peripheralInteractor.startPreMovementInteractions(command,
-                                                        () -> sendCommand(command),
-                                                        this::onPreMovementInteractionFailed);
+      peripheralInteractor.startPreMovementInteractions(
+          command,
+          () -> sendCommand(command),
+          this::onPreMovementInteractionFailed
+      );
     }
     // Let the scheduler know we've accepted the resources given.
     return true;
   }
 
   @Override
-  public void allocationFailed(@Nonnull Set<TCSResource<?>> resources) {
+  public void allocationFailed(
+      @Nonnull
+      Set<TCSResource<?>> resources
+  ) {
     requireNonNull(resources, "resources");
     throw new IllegalStateException("Failed to allocate: " + resources);
   }
@@ -765,8 +859,10 @@ public class DefaultVehicleController
       throws IllegalStateException {
     LOG.debug("{}: Enqueuing movement command with comm adapter: {}", vehicle.getName(), command);
     // Send the command to the communication adapter.
-    checkState(commAdapter.enqueueCommand(command),
-               "Comm adapter did not accept command");
+    checkState(
+        commAdapter.enqueueCommand(command),
+        "Comm adapter did not accept command"
+    );
     commandsSent.add(command);
     interactionsPendingCommand = null;
 
@@ -785,8 +881,10 @@ public class DefaultVehicleController
     // resources will not be sent to the vehicle. Therefore, free these resources.
     Set<TCSResource<?>> res = allocatedResources.pollLast();
     scheduler.free(this, res);
-    vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
-                                                   toListOfResourceSets(allocatedResources));
+    vehicleService.updateVehicleAllocatedResources(
+        vehicle.getReference(),
+        toListOfResourceSets(allocatedResources)
+    );
 
     // Ensure there is no command with pending interactions that would otherwise prevent the vehicle
     // state from being set properly in checkForPendingCommands().
@@ -809,29 +907,45 @@ public class DefaultVehicleController
 
   @SuppressWarnings("unchecked")
   private void handleProcessModelEvent(PropertyChangeEvent evt) {
-    eventBus.onEvent(new ProcessModelEvent(evt.getPropertyName(),
-                                           commAdapter.createTransferableProcessModel()));
+    eventBus.onEvent(
+        new ProcessModelEvent(
+            evt.getPropertyName(),
+            commAdapter.createTransferableProcessModel()
+        )
+    );
 
     if (Objects.equals(evt.getPropertyName(), VehicleProcessModel.Attribute.POSITION.name())) {
       updateVehiclePosition((String) evt.getNewValue());
     }
-    else if (Objects.equals(evt.getPropertyName(),
-                            VehicleProcessModel.Attribute.PRECISE_POSITION.name())) {
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.PRECISE_POSITION.name()
+    )) {
       updateVehiclePrecisePosition((Triple) evt.getNewValue());
     }
-    else if (Objects.equals(evt.getPropertyName(),
-                            VehicleProcessModel.Attribute.ORIENTATION_ANGLE.name())) {
-      vehicleService.updateVehicleOrientationAngle(vehicle.getReference(),
-                                                   (Double) evt.getNewValue());
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.ORIENTATION_ANGLE.name()
+    )) {
+      vehicleService.updateVehicleOrientationAngle(
+          vehicle.getReference(),
+          (Double) evt.getNewValue()
+      );
     }
-    else if (Objects.equals(evt.getPropertyName(),
-                            VehicleProcessModel.Attribute.ENERGY_LEVEL.name())) {
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.ENERGY_LEVEL.name()
+    )) {
       vehicleService.updateVehicleEnergyLevel(vehicle.getReference(), (Integer) evt.getNewValue());
     }
-    else if (Objects.equals(evt.getPropertyName(),
-                            VehicleProcessModel.Attribute.LOAD_HANDLING_DEVICES.name())) {
-      vehicleService.updateVehicleLoadHandlingDevices(vehicle.getReference(),
-                                                      (List<LoadHandlingDevice>) evt.getNewValue());
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.LOAD_HANDLING_DEVICES.name()
+    )) {
+      vehicleService.updateVehicleLoadHandlingDevices(
+          vehicle.getReference(),
+          (List<LoadHandlingDevice>) evt.getNewValue()
+      );
     }
     else if (Objects.equals(evt.getPropertyName(), VehicleProcessModel.Attribute.STATE.name())) {
       updateVehicleState((Vehicle.State) evt.getNewValue());
@@ -839,49 +953,69 @@ public class DefaultVehicleController
     else if (Objects.equals(evt.getPropertyName(), VehicleProcessModel.Attribute.LENGTH.name())) {
       updateVehicleLength((int) evt.getNewValue());
     }
-    else if (Objects.equals(evt.getPropertyName(),
-                            VehicleProcessModel.Attribute.COMMAND_EXECUTED.name())) {
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.COMMAND_EXECUTED.name()
+    )) {
       commandExecuted((MovementCommand) evt.getNewValue());
     }
-    else if (Objects.equals(evt.getPropertyName(),
-                            VehicleProcessModel.Attribute.COMMAND_FAILED.name())) {
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.COMMAND_FAILED.name()
+    )) {
       commandFailed((MovementCommand) evt.getNewValue());
     }
-    else if (Objects.equals(evt.getPropertyName(),
-                            VehicleProcessModel.Attribute.USER_NOTIFICATION.name())) {
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.USER_NOTIFICATION.name()
+    )) {
       notificationService.publishUserNotification((UserNotification) evt.getNewValue());
     }
-    else if (Objects.equals(evt.getPropertyName(),
-                            VehicleProcessModel.Attribute.COMM_ADAPTER_EVENT.name())) {
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.COMM_ADAPTER_EVENT.name()
+    )) {
       eventBus.onEvent(evt.getNewValue());
     }
-    else if (Objects.equals(evt.getPropertyName(),
-                            VehicleProcessModel.Attribute.VEHICLE_PROPERTY.name())) {
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.VEHICLE_PROPERTY.name()
+    )) {
       VehicleProcessModel.VehiclePropertyUpdate propUpdate
           = (VehicleProcessModel.VehiclePropertyUpdate) evt.getNewValue();
-      vehicleService.updateObjectProperty(vehicle.getReference(),
-                                          propUpdate.getKey(),
-                                          propUpdate.getValue());
+      vehicleService.updateObjectProperty(
+          vehicle.getReference(),
+          propUpdate.getKey(),
+          propUpdate.getValue()
+      );
     }
-    else if (Objects.equals(evt.getPropertyName(),
-                            VehicleProcessModel.Attribute.TRANSPORT_ORDER_PROPERTY.name())) {
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.TRANSPORT_ORDER_PROPERTY.name()
+    )) {
       VehicleProcessModel.TransportOrderPropertyUpdate propUpdate
           = (VehicleProcessModel.TransportOrderPropertyUpdate) evt.getNewValue();
       if (currentDriveOrder != null) {
-        vehicleService.updateObjectProperty(currentDriveOrder.getTransportOrder(),
-                                            propUpdate.getKey(),
-                                            propUpdate.getValue());
+        vehicleService.updateObjectProperty(
+            currentDriveOrder.getTransportOrder(),
+            propUpdate.getKey(),
+            propUpdate.getValue()
+        );
       }
     }
     else if (Objects.equals(
         evt.getPropertyName(),
-        VehicleProcessModel.Attribute.INTEGRATION_LEVEL_CHANGE_REQUESTED.name())) {
-      vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
-                                                   (Vehicle.IntegrationLevel) evt.getNewValue());
+        VehicleProcessModel.Attribute.INTEGRATION_LEVEL_CHANGE_REQUESTED.name()
+    )) {
+      vehicleService.updateVehicleIntegrationLevel(
+          vehicle.getReference(),
+          (Vehicle.IntegrationLevel) evt.getNewValue()
+      );
     }
     else if (Objects.equals(
         evt.getPropertyName(),
-        VehicleProcessModel.Attribute.TRANSPORT_ORDER_WITHDRAWAL_REQUESTED.name())) {
+        VehicleProcessModel.Attribute.TRANSPORT_ORDER_WITHDRAWAL_REQUESTED.name()
+    )) {
       dispatcherService.withdrawByVehicle(vehicle.getReference(), (Boolean) evt.getNewValue());
     }
   }
@@ -948,9 +1082,11 @@ public class DefaultVehicleController
     synchronized (commAdapter) {
       // If the current drive order is null, just set the vehicle's position.
       if (currentDriveOrder == null) {
-        LOG.debug("{}: Reported new position {} and we do not have a drive order.",
-                  vehicle.getName(),
-                  point);
+        LOG.debug(
+            "{}: Reported new position {} and we do not have a drive order.",
+            vehicle.getName(),
+            point
+        );
         updatePositionWithoutOrder(point);
       }
       else if (commandsSent.isEmpty()) {
@@ -958,9 +1094,11 @@ public class DefaultVehicleController
         // vehicle. Just set the position without touching the resources, as
         // that might cause even more damage when we actually send commands
         // to the vehicle.
-        LOG.debug("{}: Reported new position {} and we didn't send any commands of drive order.",
-                  vehicle.getName(),
-                  point);
+        LOG.debug(
+            "{}: Reported new position {} and we didn't send any commands of drive order.",
+            vehicle.getName(),
+            point
+        );
         updatePosition(toReference(point), null);
       }
       else {
@@ -972,18 +1110,22 @@ public class DefaultVehicleController
   private void commandExecuted(MovementCommand executedCommand) {
     requireNonNull(executedCommand, "executedCommand");
 
-    LOG.debug("{}: Communication adapter reports movement command as executed: {}",
-              vehicle.getName(),
-              executedCommand);
+    LOG.debug(
+        "{}: Communication adapter reports movement command as executed: {}",
+        vehicle.getName(),
+        executedCommand
+    );
 
     synchronized (commAdapter) {
       // Check if the executed command is the one we expect at this point.
       MovementCommand expectedCommand = commandsSent.peek();
-      checkArgument(Objects.equals(expectedCommand, executedCommand),
-                    "%s: Communication adapter executed unexpected command: %s != %s",
-                    vehicle.getName(),
-                    executedCommand,
-                    expectedCommand);
+      checkArgument(
+          Objects.equals(expectedCommand, executedCommand),
+          "%s: Communication adapter executed unexpected command: %s != %s",
+          vehicle.getName(),
+          executedCommand,
+          expectedCommand
+      );
 
       // Remove the command from the queue, since it has been processed successfully.
       lastCommandExecuted = commandsSent.remove();
@@ -1016,28 +1158,34 @@ public class DefaultVehicleController
         default:
           throw new IllegalArgumentException(
               "Unhandled resource deallocation method: "
-              + configuration.vehicleResourceManagementType().name()
+                  + configuration.vehicleResourceManagementType().name()
           );
       }
 
-      vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
-                                                     toListOfResourceSets(allocatedResources));
+      vehicleService.updateVehicleAllocatedResources(
+          vehicle.getReference(),
+          toListOfResourceSets(allocatedResources)
+      );
 
       transportOrderService.updateTransportOrderCurrentRouteStepIndex(
           transportOrder.getReference(),
           executedCommand.getStep().getRouteIndex()
       );
 
-      peripheralInteractor.startPostMovementInteractions(executedCommand,
-                                                         this::checkForPendingCommands,
-                                                         this::onPostMovementInteractionFailed);
+      peripheralInteractor.startPostMovementInteractions(
+          executedCommand,
+          this::checkForPendingCommands,
+          this::onPostMovementInteractionFailed
+      );
     }
   }
 
   private void commandFailed(MovementCommand failedCommand) {
-    LOG.debug("{}: Communication adapter reports movement command as failed: {}",
-              vehicle.getName(),
-              failedCommand);
+    LOG.debug(
+        "{}: Communication adapter reports movement command as failed: {}",
+        vehicle.getName(),
+        failedCommand
+    );
     dispatcherService.withdrawByVehicle(vehicle.getReference(), true);
   }
 
@@ -1055,8 +1203,10 @@ public class DefaultVehicleController
         currentDriveOrder = null;
         // Let the kernel/dispatcher know that the drive order has been processed completely (by
         // setting its state to AWAITING_ORDER).
-        vehicleService.updateVehicleProcState(vehicle.getReference(),
-                                              Vehicle.ProcState.AWAITING_ORDER);
+        vehicleService.updateVehicleProcState(
+            vehicle.getReference(),
+            Vehicle.ProcState.AWAITING_ORDER
+        );
       }
     }
     // There are more commands to be processed.
@@ -1088,8 +1238,10 @@ public class DefaultVehicleController
       return false;
     }
     if (!commAdapter.canAcceptNextCommand()) {
-      LOG.debug("{}: Cannot send, comm adapter cannot accept any further commands.",
-                vehicle.getName());
+      LOG.debug(
+          "{}: Cannot send, comm adapter cannot accept any further commands.",
+          vehicle.getName()
+      );
       return false;
     }
     if (!futureCommands.peek().getStep().isExecutionAllowed()) {
@@ -1097,15 +1249,19 @@ public class DefaultVehicleController
       return false;
     }
     if (isWaitingForAllocation()) {
-      LOG.debug("{}: Cannot send, resource allocation is pending for: {}",
-                vehicle.getName(),
-                pendingCommand);
+      LOG.debug(
+          "{}: Cannot send, resource allocation is pending for: {}",
+          vehicle.getName(),
+          pendingCommand
+      );
       return false;
     }
     if (peripheralInteractor.isWaitingForMovementInteractionsToFinish()) {
-      LOG.debug("{}: Cannot send, waiting for peripheral operations to be completed: {}",
-                vehicle.getName(),
-                peripheralInteractor.pendingRequiredInteractionsByDestination());
+      LOG.debug(
+          "{}: Cannot send, waiting for peripheral operations to be completed: {}",
+          vehicle.getName(),
+          peripheralInteractor.pendingRequiredInteractionsByDestination()
+      );
       return false;
     }
     return true;
@@ -1115,10 +1271,12 @@ public class DefaultVehicleController
    * Allocate the resources needed for executing the next command.
    */
   private void allocateForNextCommand() {
-    checkState(!isWaitingForAllocation(),
-               "%s: Already waiting for allocation: %s",
-               vehicle.getName(),
-               pendingResources);
+    checkState(
+        !isWaitingForAllocation(),
+        "%s: Already waiting for allocation: %s",
+        vehicle.getName(),
+        pendingResources
+    );
 
     // Find out which resources are actually needed for the next command.
     pendingCommand = futureCommands.poll();
@@ -1194,10 +1352,12 @@ public class DefaultVehicleController
 
       // Before giving up the resources allocated, ensure that we will be able to allocate the
       // newly required resources.
-      checkArgument(mayAllocateNow(requiredResource),
-                    "%s: Current position may not be allocated now: %s",
-                    vehicle.getName(),
-                    point.getName());
+      checkArgument(
+          mayAllocateNow(requiredResource),
+          "%s: Current position may not be allocated now: %s",
+          vehicle.getName(),
+          point.getName()
+      );
       freeAllResources();
       try {
         scheduler.allocateNow(this, requiredResource);
@@ -1206,18 +1366,22 @@ public class DefaultVehicleController
       catch (ResourceAllocationException exc) {
         // May never happen. After a successful call to `mayAllocateNow` the allocation should
         // always succeed.
-        LOG.error("{}: Could not allocate now although permission previously granted: {}",
-                  vehicle.getName(),
-                  point.getName(),
-                  exc);
+        LOG.error(
+            "{}: Could not allocate now although permission previously granted: {}",
+            vehicle.getName(),
+            point.getName(),
+            exc
+        );
         throw new IllegalArgumentException(
             vehicle.getName()
-            + ": Could not allocate now although permission previously granted: "
-            + point.getName()
+                + ": Could not allocate now although permission previously granted: "
+                + point.getName()
         );
       }
-      vehicleService.updateVehicleAllocatedResources(vehicle.getReference(),
-                                                     toListOfResourceSets(allocatedResources));
+      vehicleService.updateVehicleAllocatedResources(
+          vehicle.getReference(),
+          toListOfResourceSets(allocatedResources)
+      );
     }
 
     updatePosition(toReference(point), null);
@@ -1234,24 +1398,30 @@ public class DefaultVehicleController
     else {
       Point dstPoint = moveCommand.getStep().getDestinationPoint();
       if (!dstPoint.getName().equals(position)) {
-        LOG.warn("{}: Reported position: {}, expected: {}",
-                 vehicle.getName(),
-                 position,
-                 dstPoint.getName());
+        LOG.warn(
+            "{}: Reported position: {}, expected: {}",
+            vehicle.getName(),
+            position,
+            dstPoint.getName()
+        );
       }
     }
 
     updatePosition(toReference(point), extractNextPosition(findNextCommand()));
   }
 
-  private void updatePosition(TCSObjectReference<Point> posRef,
-                              TCSObjectReference<Point> nextPosRef) {
+  private void updatePosition(
+      TCSObjectReference<Point> posRef,
+      TCSObjectReference<Point> nextPosRef
+  ) {
     vehicleService.updateVehiclePosition(vehicle.getReference(), posRef);
     vehicleService.updateVehicleNextPosition(vehicle.getReference(), nextPosRef);
   }
 
-  private void onIntegrationLevelChange(Vehicle prevVehicleState,
-                                        Vehicle currVehicleState) {
+  private void onIntegrationLevelChange(
+      Vehicle prevVehicleState,
+      Vehicle currVehicleState
+  ) {
     Vehicle.IntegrationLevel prevIntegrationLevel = prevVehicleState.getIntegrationLevel();
     Vehicle.IntegrationLevel currIntegrationLevel = currVehicleState.getIntegrationLevel();
 
@@ -1271,26 +1441,31 @@ public class DefaultVehicleController
           Point point = vehicleService.fetchObject(Point.class, processModel.getPosition());
           vehicleService.updateVehiclePosition(vehicle.getReference(), point.getReference());
         }
-        vehicleService.updateVehiclePrecisePosition(vehicle.getReference(),
-                                                    processModel.getPrecisePosition());
+        vehicleService.updateVehiclePrecisePosition(
+            vehicle.getReference(),
+            processModel.getPrecisePosition()
+        );
       }
       else if ((currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_RESPECTED
-                || currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_UTILIZED)
+          || currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_UTILIZED)
           && (prevIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_IGNORED
               || prevIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_NOTICED)) {
-        // Allocate the vehicle's current position and implicitly update its model's position
-        allocateVehiclePosition();
-      }
+                // Allocate the vehicle's current position and implicitly update its model's
+                // position
+                allocateVehiclePosition();
+              }
     }
   }
 
   private void resetVehiclePosition() {
     synchronized (commAdapter) {
       checkState(currentDriveOrder == null, "%s: Vehicle has a drive order", vehicle.getName());
-      checkState(!isWaitingForAllocation(),
-                 "%s: Vehicle is waiting for resource allocation (%s)",
-                 vehicle.getName(),
-                 pendingResources);
+      checkState(
+          !isWaitingForAllocation(),
+          "%s: Vehicle is waiting for resource allocation (%s)",
+          vehicle.getName(),
+          pendingResources
+      );
 
       setVehiclePosition(null);
     }
@@ -1304,8 +1479,10 @@ public class DefaultVehicleController
     if (!alreadyAllocated(processModel.getPosition())) {
       // Set vehicle's position to allocate the resources
       setVehiclePosition(processModel.getPosition());
-      vehicleService.updateVehiclePrecisePosition(vehicle.getReference(),
-                                                  processModel.getPrecisePosition());
+      vehicleService.updateVehiclePrecisePosition(
+          vehicle.getReference(),
+          processModel.getPrecisePosition()
+      );
     }
   }
 
@@ -1345,7 +1522,10 @@ public class DefaultVehicleController
     return result;
   }
 
-  private List<Set<TCSResource<?>>> remainingRequiredClaim(@Nonnull TransportOrder order) {
+  private List<Set<TCSResource<?>>> remainingRequiredClaim(
+      @Nonnull
+      TransportOrder order
+  ) {
     List<MovementCommand> futureMovementCommands = order.getAllDriveOrders().stream()
         .skip(order.getCurrentDriveOrderIndex())
         .map(driveOrder -> movementCommandMapper.toMovementCommands(driveOrder, order))
@@ -1370,8 +1550,10 @@ public class DefaultVehicleController
 
   private boolean isForcedRerouting(DriveOrder newOrder) {
     if (lastCommandExecutedRouteIndex == TransportOrder.ROUTE_STEP_INDEX_DEFAULT) {
-      LOG.debug("{}: No route progress, yet. Not considering rerouting as forced.",
-                vehicle.getName());
+      LOG.debug(
+          "{}: No route progress, yet. Not considering rerouting as forced.",
+          vehicle.getName()
+      );
       return false;
     }
 

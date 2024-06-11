@@ -57,6 +57,7 @@ public interface RouterService {
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<Point> sourcePointRef,
       Set<TCSObjectReference<Point>> destinationPointRefs,
-      Set<TCSResourceReference<?>> resourcesToAvoid)
+      Set<TCSResourceReference<?>> resourcesToAvoid
+  )
       throws KernelRuntimeException;
 }

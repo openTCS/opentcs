@@ -7,11 +7,12 @@
  */
 package org.opentcs.guing.common.components.properties.panel;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import org.opentcs.components.plantoverview.LocationTheme;
@@ -26,8 +27,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * User interface to edit a symbol property.
  */
 public class SymbolPropertyEditorPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   /**
    * The possible symbols.
@@ -57,7 +60,10 @@ public class SymbolPropertyEditorPanel
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public SymbolPropertyEditorPanel(@Nonnull LocationTheme locationTheme) {
+  public SymbolPropertyEditorPanel(
+      @Nonnull
+      LocationTheme locationTheme
+  ) {
     this.locationTheme = requireNonNull(locationTheme, "locationTheme");
 
     initComponents();
@@ -115,6 +121,7 @@ public class SymbolPropertyEditorPanel
     labelSymbolName.setText(fRepresentations.get(fIndex).name());
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -199,28 +206,30 @@ public class SymbolPropertyEditorPanel
     gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
     add(removeButton, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
-    private void nextSymbolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextSymbolButtonActionPerformed
-      if (fIndex >= fSymbols.size() - 1 || fIndex < 0) {
-        fIndex = 0;
-      }
-      else {
-        fIndex++;
-      }
+  private void nextSymbolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextSymbolButtonActionPerformed
+    if (fIndex >= fSymbols.size() - 1 || fIndex < 0) {
+      fIndex = 0;
+    }
+    else {
+      fIndex++;
+    }
 
-      updateView();
-    }//GEN-LAST:event_nextSymbolButtonActionPerformed
+    updateView();
+  }//GEN-LAST:event_nextSymbolButtonActionPerformed
 
-    private void previousSymbolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousSymbolButtonActionPerformed
-      if (fIndex <= 0 || fIndex >= fSymbols.size()) {
-        fIndex = fSymbols.size() - 1;
-      }
-      else {
-        fIndex--;
-      }
+  private void previousSymbolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_previousSymbolButtonActionPerformed
+    if (fIndex <= 0 || fIndex >= fSymbols.size()) {
+      fIndex = fSymbols.size() - 1;
+    }
+    else {
+      fIndex--;
+    }
 
-      updateView();
-    }//GEN-LAST:event_previousSymbolButtonActionPerformed
+    updateView();
+  }//GEN-LAST:event_previousSymbolButtonActionPerformed
 
   private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
     labelSymbol.setIcon(null);
@@ -228,6 +237,8 @@ public class SymbolPropertyEditorPanel
     fIndex = -2;  // Invalid index, so in updateValues() no Icon will be loaded
   }//GEN-LAST:event_removeButtonActionPerformed
 
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JLabel labelSymbol;
   private javax.swing.JLabel labelSymbolName;
@@ -236,4 +247,5 @@ public class SymbolPropertyEditorPanel
   private javax.swing.JButton removeButton;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

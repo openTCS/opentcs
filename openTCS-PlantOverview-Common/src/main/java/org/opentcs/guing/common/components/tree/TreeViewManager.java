@@ -7,6 +7,8 @@
  */
 package org.opentcs.guing.common.components.tree;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
@@ -14,7 +16,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.Enumeration;
 import java.util.HashSet;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.function.Predicate;
 import javax.swing.tree.TreeNode;
@@ -31,7 +32,8 @@ import org.opentcs.util.event.EventHandler;
  * @see TreeView
  */
 public abstract class TreeViewManager
-    implements EventHandler {
+    implements
+      EventHandler {
 
   /**
    * A factory for UserObjects.
@@ -54,9 +56,11 @@ public abstract class TreeViewManager
    * @param mouseListener The MouseListener for the TreeView.
    */
   @Inject
-  public TreeViewManager(TreeView treeView,
-                         UserObjectUtil userObjectUtil,
-                         MouseListener mouseListener) {
+  public TreeViewManager(
+      TreeView treeView,
+      UserObjectUtil userObjectUtil,
+      MouseListener mouseListener
+  ) {
     this.fTreeView = requireNonNull(treeView, "treeView is null");
     this.userObjectUtil = requireNonNull(userObjectUtil, "userObjectUtil");
     requireNonNull(mouseListener, "mouseListener");

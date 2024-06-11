@@ -7,9 +7,10 @@
  */
 package org.opentcs.kernel.services;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.opentcs.access.CredentialsException;
@@ -24,7 +25,8 @@ import org.opentcs.data.TCSObjectReference;
  * Delegate method calls to the {@link TCSObjectService} implementation.
  */
 public abstract class AbstractTCSObjectService
-    implements TCSObjectService {
+    implements
+      TCSObjectService {
 
   /**
    * The tcs object service to delegate method calls to.
@@ -66,8 +68,12 @@ public abstract class AbstractTCSObjectService
   }
 
   @Override
-  public <T extends TCSObject<T>> Set<T> fetchObjects(@Nonnull Class<T> clazz,
-                                                      @Nonnull Predicate<? super T> predicate)
+  public <T extends TCSObject<T>> Set<T> fetchObjects(
+      @Nonnull
+      Class<T> clazz,
+      @Nonnull
+      Predicate<? super T> predicate
+  )
       throws CredentialsException {
     requireNonNull(clazz, "clazz");
     requireNonNull(predicate, "predicate");
@@ -76,10 +82,14 @@ public abstract class AbstractTCSObjectService
   }
 
   @Override
-  public void updateObjectProperty(TCSObjectReference<?> ref,
-                                   String key,
-                                   @Nullable String value)
-      throws ObjectUnknownException, CredentialsException {
+  public void updateObjectProperty(
+      TCSObjectReference<?> ref,
+      String key,
+      @Nullable
+      String value
+  )
+      throws ObjectUnknownException,
+        CredentialsException {
     requireNonNull(ref, "ref");
     requireNonNull(key, "key");
 
@@ -88,7 +98,8 @@ public abstract class AbstractTCSObjectService
 
   @Override
   public void appendObjectHistoryEntry(TCSObjectReference<?> ref, ObjectHistory.Entry entry)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     requireNonNull(ref, "ref");
     requireNonNull(entry, "entry");
 

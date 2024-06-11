@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.application;
 
-import java.lang.reflect.InvocationTargetException;
 import static java.util.Objects.requireNonNull;
+
+import java.lang.reflect.InvocationTargetException;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import org.opentcs.util.gui.Icons;
@@ -19,8 +20,10 @@ import org.slf4j.LoggerFactory;
  * A frame for displaying the progress of longer-running processes.
  */
 public class SplashFrame
-    extends JFrame
-    implements ProgressIndicator {
+    extends
+      JFrame
+    implements
+      ProgressIndicator {
 
   /**
    * This class's logger.
@@ -105,6 +108,7 @@ public class SplashFrame
     toFront();
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -175,4 +179,5 @@ public class SplashFrame
     private javax.swing.JProgressBar progressBar;
     // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

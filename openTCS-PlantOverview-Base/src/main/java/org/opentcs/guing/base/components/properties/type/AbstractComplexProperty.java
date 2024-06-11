@@ -15,7 +15,8 @@ import org.opentcs.guing.base.model.ModelComponent;
  * realize or not comfortable for the user.
  */
 public abstract class AbstractComplexProperty
-    extends AbstractProperty {
+    extends
+      AbstractProperty {
 
   /**
    * Creates a new instance.

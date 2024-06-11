@@ -7,10 +7,11 @@
  */
 package org.opentcs.access.to.model;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Envelope;
@@ -22,8 +23,10 @@ import org.opentcs.data.model.Triple;
  * A transfer object describing a point in the plant model.
  */
 public class PointCreationTO
-    extends CreationTO
-    implements Serializable {
+    extends
+      CreationTO
+    implements
+      Serializable {
 
   /**
    * The pose of the vehicle at this point.
@@ -48,7 +51,10 @@ public class PointCreationTO
    *
    * @param name The name of this point.
    */
-  public PointCreationTO(@Nonnull String name) {
+  public PointCreationTO(
+      @Nonnull
+      String name
+  ) {
     super(name);
     this.pose = new Pose(new Triple(0, 0, 0), Double.NaN);
     this.type = Point.Type.HALT_POSITION;
@@ -56,12 +62,20 @@ public class PointCreationTO
     this.layout = new Layout();
   }
 
-  private PointCreationTO(@Nonnull String name,
-                          @Nonnull Map<String, String> properties,
-                          @Nonnull Pose pose,
-                          @Nonnull Point.Type type,
-                          @Nonnull Map<String, Envelope> vehicleEnvelopes,
-                          @Nonnull Layout layout) {
+  private PointCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      Map<String, String> properties,
+      @Nonnull
+      Pose pose,
+      @Nonnull
+      Point.Type type,
+      @Nonnull
+      Map<String, Envelope> vehicleEnvelopes,
+      @Nonnull
+      Layout layout
+  ) {
     super(name, properties);
     this.pose = requireNonNull(pose, "pose");
     this.type = requireNonNull(type, "type");
@@ -76,13 +90,18 @@ public class PointCreationTO
    * @return A copy of this object, differing in the given name.
    */
   @Override
-  public PointCreationTO withName(@Nonnull String name) {
-    return new PointCreationTO(name,
-                               getModifiableProperties(),
-                               pose,
-                               type,
-                               vehicleEnvelopes,
-                               layout);
+  public PointCreationTO withName(
+      @Nonnull
+      String name
+  ) {
+    return new PointCreationTO(
+        name,
+        getModifiableProperties(),
+        pose,
+        type,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -101,13 +120,18 @@ public class PointCreationTO
    * @param pose The new pose.
    * @return A copy of this object, differing in the given position.
    */
-  public PointCreationTO withPose(@Nonnull Pose pose) {
-    return new PointCreationTO(getName(),
-                               getModifiableProperties(),
-                               pose,
-                               type,
-                               vehicleEnvelopes,
-                               layout);
+  public PointCreationTO withPose(
+      @Nonnull
+      Pose pose
+  ) {
+    return new PointCreationTO(
+        getName(),
+        getModifiableProperties(),
+        pose,
+        type,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -126,13 +150,18 @@ public class PointCreationTO
    * @param type The new type.
    * @return A copy of this object, differing in the given type.
    */
-  public PointCreationTO withType(@Nonnull Point.Type type) {
-    return new PointCreationTO(getName(),
-                               getProperties(),
-                               pose,
-                               type,
-                               vehicleEnvelopes,
-                               layout);
+  public PointCreationTO withType(
+      @Nonnull
+      Point.Type type
+  ) {
+    return new PointCreationTO(
+        getName(),
+        getProperties(),
+        pose,
+        type,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -142,13 +171,18 @@ public class PointCreationTO
    * @return A copy of this object, differing in the given properties.
    */
   @Override
-  public PointCreationTO withProperties(@Nonnull Map<String, String> properties) {
-    return new PointCreationTO(getName(),
-                               properties,
-                               pose,
-                               type,
-                               vehicleEnvelopes,
-                               layout);
+  public PointCreationTO withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
+    return new PointCreationTO(
+        getName(),
+        properties,
+        pose,
+        type,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -162,13 +196,20 @@ public class PointCreationTO
    * excludes the entry otherwise.
    */
   @Override
-  public PointCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new PointCreationTO(getName(),
-                               propertiesWith(key, value),
-                               pose,
-                               type,
-                               vehicleEnvelopes,
-                               layout);
+  public PointCreationTO withProperty(
+      @Nonnull
+      String key,
+      @Nonnull
+      String value
+  ) {
+    return new PointCreationTO(
+        getName(),
+        propertiesWith(key, value),
+        pose,
+        type,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -186,13 +227,18 @@ public class PointCreationTO
    * @param vehicleEnvelopes The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public PointCreationTO withVehicleEnvelopes(@Nonnull Map<String, Envelope> vehicleEnvelopes) {
-    return new PointCreationTO(getName(),
-                               getModifiableProperties(),
-                               pose,
-                               type,
-                               vehicleEnvelopes,
-                               layout);
+  public PointCreationTO withVehicleEnvelopes(
+      @Nonnull
+      Map<String, Envelope> vehicleEnvelopes
+  ) {
+    return new PointCreationTO(
+        getName(),
+        getModifiableProperties(),
+        pose,
+        type,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   /**
@@ -211,12 +257,14 @@ public class PointCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public PointCreationTO withLayout(Layout layout) {
-    return new PointCreationTO(getName(),
-                               getModifiableProperties(),
-                               pose,
-                               type,
-                               vehicleEnvelopes,
-                               layout);
+    return new PointCreationTO(
+        getName(),
+        getModifiableProperties(),
+        pose,
+        type,
+        vehicleEnvelopes,
+        layout
+    );
   }
 
   @Override
@@ -235,7 +283,8 @@ public class PointCreationTO
    * Contains information regarding the grahical representation of a point.
    */
   public static class Layout
-      implements Serializable {
+      implements
+        Serializable {
 
     /**
      * The coordinates at which the point is to be drawn (in mm).
@@ -264,9 +313,11 @@ public class PointCreationTO
      * @param labelOffset The offset of the label's position to the point's position (in lu).
      * @param layerId The ID of the layer on which the point is to be drawn.
      */
-    public Layout(Couple position,
-                  Couple labelOffset,
-                  int layerId) {
+    public Layout(
+        Couple position,
+        Couple labelOffset,
+        int layerId
+    ) {
       this.position = requireNonNull(position, "position");
       this.labelOffset = requireNonNull(labelOffset, "labelOffset");
       this.layerId = layerId;
@@ -288,9 +339,11 @@ public class PointCreationTO
      * @return A copy of this object, differing in the given value.
      */
     public Layout withPosition(Couple position) {
-      return new Layout(position,
-                        labelOffset,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          layerId
+      );
     }
 
     /**
@@ -309,9 +362,11 @@ public class PointCreationTO
      * @return A copy of this object, differing in the given value.
      */
     public Layout withLabelOffset(Couple labelOffset) {
-      return new Layout(position,
-                        labelOffset,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          layerId
+      );
     }
 
     /**
@@ -330,9 +385,11 @@ public class PointCreationTO
      * @return A copy of this object, differing in the given value.
      */
     public Layout withLayerId(int layerId) {
-      return new Layout(position,
-                        labelOffset,
-                        layerId);
+      return new Layout(
+          position,
+          labelOffset,
+          layerId
+      );
     }
 
     @Override

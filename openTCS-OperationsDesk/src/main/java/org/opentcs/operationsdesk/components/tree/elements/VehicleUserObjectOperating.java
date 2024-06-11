@@ -7,9 +7,10 @@
  */
 package org.opentcs.operationsdesk.components.tree.elements;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JPopupMenu;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.application.GuiManager;
@@ -21,7 +22,8 @@ import org.opentcs.operationsdesk.application.menus.MenuFactory;
  * A Vehicle in the tree view.
  */
 public class VehicleUserObjectOperating
-    extends VehicleUserObject {
+    extends
+      VehicleUserObject {
 
   /**
    * A factory for popup menus.
@@ -37,10 +39,13 @@ public class VehicleUserObjectOperating
    * @param menuFactory A factory for popup menus.
    */
   @Inject
-  public VehicleUserObjectOperating(@Assisted VehicleModel model,
-                                    GuiManager guiManager,
-                                    ModelManager modelManager,
-                                    MenuFactory menuFactory) {
+  public VehicleUserObjectOperating(
+      @Assisted
+      VehicleModel model,
+      GuiManager guiManager,
+      ModelManager modelManager,
+      MenuFactory menuFactory
+  ) {
     super(model, guiManager, modelManager);
     this.menuFactory = requireNonNull(menuFactory, "menuFactory");
   }

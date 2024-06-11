@@ -16,7 +16,8 @@ import org.opentcs.guing.base.model.elements.PathModel;
  * A Guice configuration module for this package.
  */
 public class PathLengthFunctionInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.
@@ -27,11 +28,13 @@ public class PathLengthFunctionInjectionModule
   @Override
   protected void configure() {
     MapBinder<PathModel.Type, PathLengthFunction> pathLengthFunctionBinder
-        = MapBinder.newMapBinder(binder(),
-                                 new TypeLiteral<PathModel.Type>() {
-                             },
-                                 new TypeLiteral<PathLengthFunction>() {
-                             });
+        = MapBinder.newMapBinder(
+            binder(),
+            new TypeLiteral<PathModel.Type>() {
+            },
+            new TypeLiteral<PathLengthFunction>() {
+            }
+        );
     pathLengthFunctionBinder
         .addBinding(PathModel.Type.DIRECT)
         .to(EuclideanDistance.class);

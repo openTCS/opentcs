@@ -15,13 +15,14 @@
  */
 package org.opentcs.thirdparty.guing.common.jhotdraw.application.action.draw;
 
+import static javax.swing.Action.SMALL_ICON;
+import static org.opentcs.guing.common.util.I18nPlantOverview.MODELVIEW_PATH;
+
 import java.util.HashSet;
 import java.util.Set;
-import static javax.swing.Action.SMALL_ICON;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.Figure;
 import org.jhotdraw.draw.action.AbstractSelectedAction;
-import static org.opentcs.guing.common.util.I18nPlantOverview.MODELVIEW_PATH;
 import org.opentcs.guing.common.util.ImageDirectory;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
@@ -31,7 +32,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * @author Werner Randelshofer
  */
 public class SelectSameAction
-    extends AbstractSelectedAction {
+    extends
+      AbstractSelectedAction {
 
   /**
    * This action's ID.

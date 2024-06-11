@@ -7,10 +7,11 @@
  */
 package org.opentcs.modeleditor.util;
 
+import static java.util.Objects.requireNonNull;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 

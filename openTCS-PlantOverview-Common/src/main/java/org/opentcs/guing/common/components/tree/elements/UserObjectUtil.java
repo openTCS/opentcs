@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.components.tree.elements;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.guing.base.model.CompositeModelComponent;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.BlockModel;
@@ -68,8 +69,10 @@ public class UserObjectUtil {
       return factory.createSimpleFolderUserObject((CompositeModelComponent) model);
     }
 
-    throw new IllegalArgumentException("Unhandled component class "
-        + model.getClass());
+    throw new IllegalArgumentException(
+        "Unhandled component class "
+            + model.getClass()
+    );
   }
 
   public UserObjectContext createContext(ContextType type) {

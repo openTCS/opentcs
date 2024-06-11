@@ -28,7 +28,8 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
  * A base class for Guice modules adding or customizing bindings for the kernel application.
  */
 public abstract class KernelInjectionModule
-    extends ConfigurableInjectionModule {
+    extends
+      ConfigurableInjectionModule {
 
   /**
    * Sets the scheduler implementation to be used.
@@ -155,8 +156,10 @@ public abstract class KernelInjectionModule
    * @return The mapbinder.
    */
   protected MapBinder<String, EdgeEvaluator> edgeEvaluatorBinder() {
-    return MapBinder.newMapBinder(binder(),
-                                  TypeLiteral.get(String.class),
-                                  TypeLiteral.get(EdgeEvaluator.class));
+    return MapBinder.newMapBinder(
+        binder(),
+        TypeLiteral.get(String.class),
+        TypeLiteral.get(EdgeEvaluator.class)
+    );
   }
 }

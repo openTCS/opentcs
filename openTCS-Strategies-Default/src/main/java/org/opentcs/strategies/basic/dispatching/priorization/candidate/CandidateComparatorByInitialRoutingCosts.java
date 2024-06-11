@@ -16,7 +16,8 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
  * Note: this comparator imposes orderings that are inconsistent with equals.
  */
 public class CandidateComparatorByInitialRoutingCosts
-    implements Comparator<AssignmentCandidate> {
+    implements
+      Comparator<AssignmentCandidate> {
 
   /**
    * A key used for selecting this comparator in a configuration setting.

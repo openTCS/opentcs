@@ -7,21 +7,22 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.assignment;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_ASSIGNED_TO_VEHICLE;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DISPATCHING_DEFERRED;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DISPATCHING_RESUMED;
+import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_RESERVED_FOR_VEHICLE;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
-import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_ASSIGNED_TO_VEHICLE;
-import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DISPATCHING_DEFERRED;
-import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DISPATCHING_RESUMED;
-import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_RESERVED_FOR_VEHICLE;
 import org.opentcs.strategies.basic.dispatching.phase.OrderFilterResult;
 
 /**
@@ -138,11 +139,16 @@ public class DispatchingStatusMarker {
   }
 
   private Optional<ObjectHistory.Entry> lastRelevantDeferredHistoryEntry(
-      TransportOrder transportOrder) {
+      TransportOrder transportOrder
+  ) {
     return transportOrder.getHistory().getEntries().stream()
-        .filter(entry -> equalsAny(entry.getEventCode(),
-                                   ORDER_DISPATCHING_DEFERRED,
-                                   ORDER_DISPATCHING_RESUMED))
+        .filter(
+            entry -> equalsAny(
+                entry.getEventCode(),
+                ORDER_DISPATCHING_DEFERRED,
+                ORDER_DISPATCHING_RESUMED
+            )
+        )
         .reduce((firstEntry, secondEntry) -> secondEntry)
         .filter(entry -> entry.getEventCode().equals(ORDER_DISPATCHING_DEFERRED));
   }

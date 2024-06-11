@@ -21,8 +21,10 @@ import org.opentcs.data.order.TransportOrder;
  * Delegates method invocations to the corresponding remote service.
  */
 class RemoteDispatcherServiceProxy
-    extends AbstractRemoteServiceProxy<RemoteDispatcherService>
-    implements DispatcherService {
+    extends
+      AbstractRemoteServiceProxy<RemoteDispatcherService>
+    implements
+      DispatcherService {
 
   /**
    * Creates a new instance.
@@ -44,15 +46,20 @@ class RemoteDispatcherServiceProxy
   }
 
   @Override
-  public void withdrawByVehicle(TCSObjectReference<Vehicle> vehicleRef,
-                                boolean immediateAbort)
-      throws ObjectUnknownException, KernelRuntimeException {
+  public void withdrawByVehicle(
+      TCSObjectReference<Vehicle> vehicleRef,
+      boolean immediateAbort
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
-      getRemoteService().withdrawByVehicle(getClientId(),
-                                           vehicleRef,
-                                           immediateAbort);
+      getRemoteService().withdrawByVehicle(
+          getClientId(),
+          vehicleRef,
+          immediateAbort
+      );
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);
@@ -60,15 +67,20 @@ class RemoteDispatcherServiceProxy
   }
 
   @Override
-  public void withdrawByTransportOrder(TCSObjectReference<TransportOrder> ref,
-                                       boolean immediateAbort)
-      throws ObjectUnknownException, KernelRuntimeException {
+  public void withdrawByTransportOrder(
+      TCSObjectReference<TransportOrder> ref,
+      boolean immediateAbort
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
-      getRemoteService().withdrawByTransportOrder(getClientId(),
-                                                  ref,
-                                                  immediateAbort);
+      getRemoteService().withdrawByTransportOrder(
+          getClientId(),
+          ref,
+          immediateAbort
+      );
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);
@@ -77,7 +89,8 @@ class RemoteDispatcherServiceProxy
 
   @Override
   public void reroute(TCSObjectReference<Vehicle> ref, ReroutingType reroutingType)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {

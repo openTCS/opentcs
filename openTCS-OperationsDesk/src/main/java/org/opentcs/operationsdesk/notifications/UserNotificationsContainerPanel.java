@@ -7,6 +7,8 @@
  */
 package org.opentcs.operationsdesk.notifications;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -17,7 +19,6 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -41,7 +42,8 @@ import org.opentcs.util.gui.StringTableCellRenderer;
  * Shows a table of the most recent user notifications.
  */
 public class UserNotificationsContainerPanel
-    extends JPanel {
+    extends
+      JPanel {
 
   /**
    * A formatter for timestamps.
@@ -76,12 +78,18 @@ public class UserNotificationsContainerPanel
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public UserNotificationsContainerPanel(UserNotificationViewFactory notificationViewFactory,
-                                         UserNotificationsContainer userNotificationsContainer) {
-    this.notificationViewFactory = requireNonNull(notificationViewFactory,
-                                                  "notificationViewFactory");
-    this.userNotificationsContainer = requireNonNull(userNotificationsContainer,
-                                                     "userNotificationsContainer");
+  public UserNotificationsContainerPanel(
+      UserNotificationViewFactory notificationViewFactory,
+      UserNotificationsContainer userNotificationsContainer
+  ) {
+    this.notificationViewFactory = requireNonNull(
+        notificationViewFactory,
+        "notificationViewFactory"
+    );
+    this.userNotificationsContainer = requireNonNull(
+        userNotificationsContainer,
+        "userNotificationsContainer"
+    );
 
     initComponents();
   }
@@ -105,9 +113,11 @@ public class UserNotificationsContainerPanel
 
     sorter = new FilteredRowSorter<>(tableModel);
     // Sort the table by the creation instant.
-    sorter.setSortKeys(Arrays.asList(
-        new RowSorter.SortKey(UserNotificationTableModel.COLUMN_TIME, SortOrder.DESCENDING)
-    ));
+    sorter.setSortKeys(
+        Arrays.asList(
+            new RowSorter.SortKey(UserNotificationTableModel.COLUMN_TIME, SortOrder.DESCENDING)
+        )
+    );
     // ...but prevent manual sorting.
     for (int i = 0; i < fTable.getColumnCount(); i++) {
       sorter.setSortable(i, false);
@@ -173,12 +183,16 @@ public class UserNotificationsContainerPanel
     getSelectedUserNotification().ifPresent(userNotification -> {
       DialogContent content = notificationViewFactory.createUserNotificationView(userNotification);
       StandardContentDialog dialog
-          = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
-                                      content,
-                                      true,
-                                      StandardContentDialog.CLOSE);
-      dialog.setTitle(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.UNDETAIL_PATH)
-          .getString("userNotificationView.title"));
+          = new StandardContentDialog(
+              JOptionPane.getFrameForComponent(this),
+              content,
+              true,
+              StandardContentDialog.CLOSE
+          );
+      dialog.setTitle(
+          ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.UNDETAIL_PATH)
+              .getString("userNotificationView.title")
+      );
       dialog.setVisible(true);
     });
   }

@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.routing;
 
-import java.util.List;
 import static java.util.Objects.requireNonNull;
+
+import java.util.List;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.Route;
@@ -45,8 +46,10 @@ public interface PointRouter {
    * point.
    * If no route exists, {@link #INFINITE_COSTS INFINITE_COSTS} will be returned.
    */
-  long getCosts(TCSObjectReference<Point> srcPointRef,
-                TCSObjectReference<Point> destPointRef);
+  long getCosts(
+      TCSObjectReference<Point> srcPointRef,
+      TCSObjectReference<Point> destPointRef
+  );
 
   /**
    * Returns the costs for travelling the shortest route from one point to another.

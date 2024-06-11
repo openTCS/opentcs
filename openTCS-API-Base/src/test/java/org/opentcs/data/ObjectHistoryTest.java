@@ -7,15 +7,16 @@
  */
 package org.opentcs.data;
 
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.ObjectHistory.Entry;
 
@@ -37,8 +38,10 @@ class ObjectHistoryTest {
 
     ObjectHistory history = new ObjectHistory().withEntries(List.of(entry1));
 
-    assertThrows(UnsupportedOperationException.class,
-                 () -> history.getEntries().add(entry2));
+    assertThrows(
+        UnsupportedOperationException.class,
+        () -> history.getEntries().add(entry2)
+    );
   }
 
   @Test
@@ -80,8 +83,10 @@ class ObjectHistoryTest {
 
   @Test
   void throwIfSupplementIsNotSerializable() {
-    assertThrows(IllegalArgumentException.class,
-                 () -> new Entry(Instant.now(), "eventCode", new Object()));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> new Entry(Instant.now(), "eventCode", new Object())
+    );
   }
 
   @Test

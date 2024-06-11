@@ -7,10 +7,11 @@
  */
 package org.opentcs.modeleditor.math.path;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.model.elements.PathModel;
 import org.opentcs.guing.base.model.elements.PointModel;
@@ -46,7 +47,9 @@ class EuclideanDistanceTest {
 
     function.applyAsDouble(pathModel);
 
-    verify(pathLengthMath).euclideanDistance(new Coordinate(1000, 1000),
-                                             new Coordinate(1000, 1000));
+    verify(pathLengthMath).euclideanDistance(
+        new Coordinate(1000, 1000),
+        new Coordinate(1000, 1000)
+    );
   }
 }

@@ -13,7 +13,8 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
  * A serializable representation of a {@link LoopbackVehicleModel}.
  */
 public class LoopbackVehicleModelTO
-    extends VehicleProcessModelTO {
+    extends
+      VehicleProcessModelTO {
 
   /**
    * Whether this communication adapter is in single step mode or not (i.e. in automatic mode).

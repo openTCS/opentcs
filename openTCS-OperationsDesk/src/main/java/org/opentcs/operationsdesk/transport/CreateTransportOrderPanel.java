@@ -7,6 +7,8 @@
  */
 package org.opentcs.operationsdesk.transport;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,7 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -43,7 +44,8 @@ import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
  * Allows creation of transport orders.
  */
 public class CreateTransportOrderPanel
-    extends DialogContent {
+    extends
+      DialogContent {
 
   /**
    * This instance's resource bundle.
@@ -91,19 +93,21 @@ public class CreateTransportOrderPanel
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public CreateTransportOrderPanel(ModelManager modelManager,
-                                   OrderTypeSuggestionsPool orderTypeSuggestionsPool) {
+  public CreateTransportOrderPanel(
+      ModelManager modelManager,
+      OrderTypeSuggestionsPool orderTypeSuggestionsPool
+  ) {
     this.fModelManager = requireNonNull(modelManager, "modelManager");
     requireNonNull(orderTypeSuggestionsPool, "orderTypeSuggestionsPool");
 
     initComponents();
     Object[] columnNames = {
-      bundle.getString(
-      "createTransportOrderPanel.table_driveOrdersTable.column_location.headerText"
-      ),
-      bundle.getString(
-      "createTransportOrderPanel.table_driveOrdersTable.column_action.headerText"
-      )
+        bundle.getString(
+            "createTransportOrderPanel.table_driveOrdersTable.column_location.headerText"
+        ),
+        bundle.getString(
+            "createTransportOrderPanel.table_driveOrdersTable.column_action.headerText"
+        )
     };
     DefaultTableModel model = (DefaultTableModel) driveOrdersTable.getModel();
     model.setColumnIdentifiers(columnNames);
@@ -261,6 +265,7 @@ public class CreateTransportOrderPanel
     }
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -510,6 +515,7 @@ public class CreateTransportOrderPanel
     add(vehiclePanel);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void moveDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownButtonActionPerformed
     int index = driveOrdersTable.getSelectedRow();
@@ -589,8 +595,10 @@ public class CreateTransportOrderPanel
     EditDriveOrderPanel contentPanel
         = new EditDriveOrderPanel(fetchSuitableLocations(), location, action);
     StandardContentDialog dialog
-        = new StandardContentDialog(JOptionPane.getFrameForComponent(this),
-                                    contentPanel);
+        = new StandardContentDialog(
+            JOptionPane.getFrameForComponent(this),
+            contentPanel
+        );
     dialog.setVisible(true);
 
     Optional<LocationModel> locModel = contentPanel.getSelectedLocation();
@@ -647,6 +655,7 @@ public class CreateTransportOrderPanel
         .collect(Collectors.toList());
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
@@ -670,4 +679,5 @@ public class CreateTransportOrderPanel
   private javax.swing.JPanel vehiclePanel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

@@ -28,8 +28,10 @@ import bibliothek.util.Path;
  * A tab dockable copied from the dockingframes examples.
  */
 public class CStack
-    extends AbstractDockableCStation<CStackDockStation>
-    implements CNormalModeArea {
+    extends
+      AbstractDockableCStation<CStackDockStation>
+    implements
+      CNormalModeArea {
 
   @SuppressWarnings("this-escape")
   public CStack(String id) {

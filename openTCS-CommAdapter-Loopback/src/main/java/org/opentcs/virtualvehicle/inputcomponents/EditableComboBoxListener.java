@@ -7,8 +7,9 @@
  */
 package org.opentcs.virtualvehicle.inputcomponents;
 
-import java.util.List;
 import static java.util.Objects.requireNonNull;
+
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import javax.swing.JTextField;
@@ -19,7 +20,8 @@ import javax.swing.event.DocumentListener;
  * A validator for the input of the textfield.
  */
 public class EditableComboBoxListener<E>
-    implements DocumentListener {
+    implements
+      DocumentListener {
 
   private final JTextField textField;
   private final List<ValidationListener> validationListeners;
@@ -38,10 +40,12 @@ public class EditableComboBoxListener<E>
    * @param textField the textfield with the input to be validated.
    * @param representer Returns the string representation for the combo box's selected item.
    */
-  public EditableComboBoxListener(Set<E> content,
-                                  List<ValidationListener> validationListeners,
-                                  JTextField textField,
-                                  Function<E, String> representer) {
+  public EditableComboBoxListener(
+      Set<E> content,
+      List<ValidationListener> validationListeners,
+      JTextField textField,
+      Function<E, String> representer
+  ) {
 
     this.content = requireNonNull(content, "content");
     this.validationListeners = requireNonNull(validationListeners, "validationListeners");

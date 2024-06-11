@@ -7,10 +7,11 @@
  */
 package org.opentcs.util.persistence.v003;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -21,10 +22,13 @@ import javax.xml.bind.annotation.XmlType;
 /**
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(propOrder = {"name", "scaleX", "scaleY", "shapeLayoutElements", "modelLayoutElements",
-                      "properties"})
+@XmlType(
+    propOrder = {"name", "scaleX", "scaleY", "shapeLayoutElements", "modelLayoutElements",
+        "properties"}
+)
 public class VisualLayoutTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   private Float scaleX = 0.0F;
   private Float scaleY = 0.0F;
@@ -42,7 +46,10 @@ public class VisualLayoutTO
     return scaleX;
   }
 
-  public VisualLayoutTO setScaleX(@Nonnull Float scaleX) {
+  public VisualLayoutTO setScaleX(
+      @Nonnull
+      Float scaleX
+  ) {
     requireNonNull(scaleX, "scaleX");
     this.scaleX = scaleX;
     return this;
@@ -53,7 +60,10 @@ public class VisualLayoutTO
     return scaleY;
   }
 
-  public VisualLayoutTO setScaleY(@Nonnull Float scaleY) {
+  public VisualLayoutTO setScaleY(
+      @Nonnull
+      Float scaleY
+  ) {
     requireNonNull(scaleY, "scaleY");
     this.scaleY = scaleY;
     return this;
@@ -65,7 +75,9 @@ public class VisualLayoutTO
   }
 
   public VisualLayoutTO setShapeLayoutElements(
-      @Nonnull List<ShapeLayoutElement> shapeLayoutElements) {
+      @Nonnull
+      List<ShapeLayoutElement> shapeLayoutElements
+  ) {
     requireNonNull(shapeLayoutElements, "shapeLayoutElements");
     this.shapeLayoutElements = shapeLayoutElements;
     return this;
@@ -77,7 +89,9 @@ public class VisualLayoutTO
   }
 
   public VisualLayoutTO setModelLayoutElements(
-      @Nonnull List<ModelLayoutElement> modelLayoutElements) {
+      @Nonnull
+      List<ModelLayoutElement> modelLayoutElements
+  ) {
     requireNonNull(modelLayoutElements, "modelLayoutElements");
     this.modelLayoutElements = modelLayoutElements;
     return this;
@@ -102,7 +116,10 @@ public class VisualLayoutTO
       return layer;
     }
 
-    public ShapeLayoutElement setLayer(@Nonnull Long layer) {
+    public ShapeLayoutElement setLayer(
+        @Nonnull
+        Long layer
+    ) {
       requireNonNull(layer, "layer");
       this.layer = layer;
       return this;
@@ -113,7 +130,10 @@ public class VisualLayoutTO
       return properties;
     }
 
-    public ShapeLayoutElement setProperties(@Nonnull List<PropertyTO> properties) {
+    public ShapeLayoutElement setProperties(
+        @Nonnull
+        List<PropertyTO> properties
+    ) {
       requireNonNull(properties, "properties");
       this.properties = properties;
       return this;
@@ -139,7 +159,10 @@ public class VisualLayoutTO
       return visualizedObjectName;
     }
 
-    public ModelLayoutElement setVisualizedObjectName(@Nonnull String visualizedObjectName) {
+    public ModelLayoutElement setVisualizedObjectName(
+        @Nonnull
+        String visualizedObjectName
+    ) {
       requireNonNull(visualizedObjectName, "visualizedObjectName");
       this.visualizedObjectName = visualizedObjectName;
       return this;
@@ -151,7 +174,10 @@ public class VisualLayoutTO
       return layer;
     }
 
-    public ModelLayoutElement setLayer(@Nonnull Long layer) {
+    public ModelLayoutElement setLayer(
+        @Nonnull
+        Long layer
+    ) {
       requireNonNull(layer, "layer");
       this.layer = layer;
       return this;
@@ -162,7 +188,10 @@ public class VisualLayoutTO
       return properties;
     }
 
-    public ModelLayoutElement setProperties(@Nonnull List<PropertyTO> properties) {
+    public ModelLayoutElement setProperties(
+        @Nonnull
+        List<PropertyTO> properties
+    ) {
       requireNonNull(properties, "properties");
       this.properties = properties;
       return this;

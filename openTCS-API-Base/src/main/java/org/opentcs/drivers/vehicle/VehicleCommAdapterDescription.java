@@ -13,7 +13,8 @@ import java.io.Serializable;
  * Provides the description for a vehicle comm adapter.
  */
 public abstract class VehicleCommAdapterDescription
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * Returns the description for a vehicle comm adapter.

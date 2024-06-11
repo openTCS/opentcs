@@ -19,8 +19,10 @@ import org.opentcs.data.notification.UserNotification;
  * Delegates method invocations to the corresponding remote service.
  */
 class RemoteNotificationServiceProxy
-    extends AbstractRemoteServiceProxy<RemoteNotificationService>
-    implements NotificationService {
+    extends
+      AbstractRemoteServiceProxy<RemoteNotificationService>
+    implements
+      NotificationService {
 
   /**
    * Creates a new instance.

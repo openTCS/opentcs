@@ -7,12 +7,13 @@
  */
 package org.opentcs.strategies.basic.dispatching.phase.assignment.priorization;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.theInstance;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.order.TransportOrder;

@@ -16,8 +16,10 @@ import org.opentcs.components.kernel.services.QueryService;
  * Delegates method invocations to the corresponding remote service.
  */
 class RemoteQueryServiceProxy
-    extends AbstractRemoteServiceProxy<RemoteQueryService>
-    implements QueryService {
+    extends
+      AbstractRemoteServiceProxy<RemoteQueryService>
+    implements
+      QueryService {
 
   /**
    * Creates a new instance.

@@ -15,7 +15,8 @@ import org.slf4j.LoggerFactory;
  * Configures the resource allocation panel.
  */
 public class AllocationPanelModule
-    extends PlantOverviewInjectionModule {
+    extends
+      PlantOverviewInjectionModule {
 
   /**
    * This class's logger.
@@ -31,8 +32,10 @@ public class AllocationPanelModule
   @Override
   protected void configure() {
     ResourceAllocationPanelConfiguration configuration
-        = getConfigBindingProvider().get(ResourceAllocationPanelConfiguration.PREFIX,
-                                         ResourceAllocationPanelConfiguration.class);
+        = getConfigBindingProvider().get(
+            ResourceAllocationPanelConfiguration.PREFIX,
+            ResourceAllocationPanelConfiguration.class
+        );
 
     if (!configuration.enable()) {
       LOG.info("Resource allocation panel disabled by configuration.");

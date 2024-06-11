@@ -15,7 +15,8 @@ import java.awt.event.ComponentListener;
  * about resize events.
  */
 public class OffsetListener
-    implements ComponentListener {
+    implements
+      ComponentListener {
 
   /**
    * The drawing view we're working with.

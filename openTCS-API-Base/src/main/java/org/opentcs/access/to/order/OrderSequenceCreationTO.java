@@ -7,11 +7,12 @@
  */
 package org.opentcs.access.to.order;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.order.OrderConstants;
 
@@ -19,8 +20,10 @@ import org.opentcs.data.order.OrderConstants;
  * A transfer object describing a transport order.
  */
 public class OrderSequenceCreationTO
-    extends CreationTO
-    implements Serializable {
+    extends
+      CreationTO
+    implements
+      Serializable {
 
   /**
    * Indicates whether the name is incomplete and requires to be completed when creating the actual
@@ -47,7 +50,10 @@ public class OrderSequenceCreationTO
    *
    * @param name The name of this transport order.
    */
-  public OrderSequenceCreationTO(@Nonnull String name) {
+  public OrderSequenceCreationTO(
+      @Nonnull
+      String name
+  ) {
     super(name);
     this.incompleteName = false;
     this.type = OrderConstants.TYPE_NONE;
@@ -55,12 +61,18 @@ public class OrderSequenceCreationTO
     this.failureFatal = false;
   }
 
-  private OrderSequenceCreationTO(@Nonnull String name,
-                                  @Nonnull Map<String, String> properties,
-                                  boolean incompleteName,
-                                  @Nonnull String type,
-                                  @Nullable String intendedVehicleName,
-                                  boolean failureFatal) {
+  private OrderSequenceCreationTO(
+      @Nonnull
+      String name,
+      @Nonnull
+      Map<String, String> properties,
+      boolean incompleteName,
+      @Nonnull
+      String type,
+      @Nullable
+      String intendedVehicleName,
+      boolean failureFatal
+  ) {
     super(name, properties);
     this.incompleteName = incompleteName;
     this.type = requireNonNull(type, "type");
@@ -75,13 +87,18 @@ public class OrderSequenceCreationTO
    * @return A copy of this object, differing in the given name.
    */
   @Override
-  public OrderSequenceCreationTO withName(@Nonnull String name) {
-    return new OrderSequenceCreationTO(name,
-                                       getModifiableProperties(),
-                                       incompleteName,
-                                       type,
-                                       intendedVehicleName,
-                                       failureFatal);
+  public OrderSequenceCreationTO withName(
+      @Nonnull
+      String name
+  ) {
+    return new OrderSequenceCreationTO(
+        name,
+        getModifiableProperties(),
+        incompleteName,
+        type,
+        intendedVehicleName,
+        failureFatal
+    );
   }
 
   /**
@@ -91,13 +108,18 @@ public class OrderSequenceCreationTO
    * @return A copy of this object, differing in the given value.
    */
   @Override
-  public OrderSequenceCreationTO withProperties(@Nonnull Map<String, String> properties) {
-    return new OrderSequenceCreationTO(getName(),
-                                       properties,
-                                       incompleteName,
-                                       type,
-                                       intendedVehicleName,
-                                       failureFatal);
+  public OrderSequenceCreationTO withProperties(
+      @Nonnull
+      Map<String, String> properties
+  ) {
+    return new OrderSequenceCreationTO(
+        getName(),
+        properties,
+        incompleteName,
+        type,
+        intendedVehicleName,
+        failureFatal
+    );
   }
 
   /**
@@ -111,13 +133,20 @@ public class OrderSequenceCreationTO
    * excludes the entry otherwise.
    */
   @Override
-  public OrderSequenceCreationTO withProperty(@Nonnull String key, @Nonnull String value) {
-    return new OrderSequenceCreationTO(getName(),
-                                       propertiesWith(key, value),
-                                       incompleteName,
-                                       type,
-                                       intendedVehicleName,
-                                       failureFatal);
+  public OrderSequenceCreationTO withProperty(
+      @Nonnull
+      String key,
+      @Nonnull
+      String value
+  ) {
+    return new OrderSequenceCreationTO(
+        getName(),
+        propertiesWith(key, value),
+        incompleteName,
+        type,
+        intendedVehicleName,
+        failureFatal
+    );
   }
 
   /**
@@ -141,12 +170,14 @@ public class OrderSequenceCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public OrderSequenceCreationTO withIncompleteName(boolean incompleteName) {
-    return new OrderSequenceCreationTO(getName(),
-                                       getModifiableProperties(),
-                                       incompleteName,
-                                       type,
-                                       intendedVehicleName,
-                                       failureFatal);
+    return new OrderSequenceCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        type,
+        intendedVehicleName,
+        failureFatal
+    );
   }
 
   /**
@@ -165,13 +196,18 @@ public class OrderSequenceCreationTO
    * @param type The type.
    * @return A copy of this object, differing in the given type.
    */
-  public OrderSequenceCreationTO withType(@Nonnull String type) {
-    return new OrderSequenceCreationTO(getName(),
-                                       getModifiableProperties(),
-                                       incompleteName,
-                                       type,
-                                       intendedVehicleName,
-                                       failureFatal);
+  public OrderSequenceCreationTO withType(
+      @Nonnull
+      String type
+  ) {
+    return new OrderSequenceCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        type,
+        intendedVehicleName,
+        failureFatal
+    );
   }
 
   /**
@@ -191,13 +227,18 @@ public class OrderSequenceCreationTO
    * @param intendedVehicleName The vehicle name.
    * @return A copy of this object, differing in the given name of the intended vehicle.
    */
-  public OrderSequenceCreationTO withIntendedVehicleName(@Nullable String intendedVehicleName) {
-    return new OrderSequenceCreationTO(getName(),
-                                       getModifiableProperties(),
-                                       incompleteName,
-                                       type,
-                                       intendedVehicleName,
-                                       failureFatal);
+  public OrderSequenceCreationTO withIntendedVehicleName(
+      @Nullable
+      String intendedVehicleName
+  ) {
+    return new OrderSequenceCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        type,
+        intendedVehicleName,
+        failureFatal
+    );
   }
 
   /**
@@ -218,11 +259,13 @@ public class OrderSequenceCreationTO
    * @return A copy of this object, differing in the given value.
    */
   public OrderSequenceCreationTO withFailureFatal(boolean failureFatal) {
-    return new OrderSequenceCreationTO(getName(),
-                                       getModifiableProperties(),
-                                       incompleteName,
-                                       type,
-                                       intendedVehicleName,
-                                       failureFatal);
+    return new OrderSequenceCreationTO(
+        getName(),
+        getModifiableProperties(),
+        incompleteName,
+        type,
+        intendedVehicleName,
+        failureFatal
+    );
   }
 }

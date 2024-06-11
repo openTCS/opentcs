@@ -7,12 +7,13 @@
  */
 package org.opentcs.operationsdesk.notifications;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import static java.util.Objects.requireNonNull;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.guing.common.components.dialogs.DialogContent;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
@@ -22,7 +23,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * A view of a user notification.
  */
 public class UserNotificationView
-    extends DialogContent {
+    extends
+      DialogContent {
 
   /**
    * A formatter for timestamps.
@@ -40,12 +42,17 @@ public class UserNotificationView
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public UserNotificationView(@Assisted UserNotification notification) {
+  public UserNotificationView(
+      @Assisted
+      UserNotification notification
+  ) {
     this.fUserNotification = requireNonNull(notification, "notification");
 
     initComponents();
-    setDialogTitle(ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.UNDETAIL_PATH)
-        .getString("userNotificationView.title"));
+    setDialogTitle(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.UNDETAIL_PATH)
+            .getString("userNotificationView.title")
+    );
   }
 
   @Override
@@ -62,6 +69,7 @@ public class UserNotificationView
     textTextArea.setText(fUserNotification.getText());
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to
@@ -183,7 +191,9 @@ public class UserNotificationView
     add(textPanel, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JLabel createdLabel;
@@ -198,5 +208,5 @@ public class UserNotificationView
   private javax.swing.JTextArea textTextArea;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
-
+  // FORMATTER:ON
 }

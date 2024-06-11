@@ -18,7 +18,8 @@ import java.rmi.server.RMIServerSocketFactory;
  * {@link Registry} stubs.
  */
 public class NullSocketFactoryProvider
-    implements SocketFactoryProvider {
+    implements
+      SocketFactoryProvider {
 
   @Inject
   public NullSocketFactoryProvider() {

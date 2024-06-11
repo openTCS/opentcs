@@ -7,14 +7,15 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
-import java.util.List;
-import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
+
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.model.Couple;
@@ -42,8 +43,10 @@ class EnvelopeConverterTest {
 
     assertThat(result, is(aMapWithSize(1)));
     assertThat(result, hasKey("E1"));
-    assertThat(result.get("E1").getVertices().get(0),
-               samePropertyValuesAs(new Couple(1, 1)));
+    assertThat(
+        result.get("E1").getVertices().get(0),
+        samePropertyValuesAs(new Couple(1, 1))
+    );
   }
 
   @Test

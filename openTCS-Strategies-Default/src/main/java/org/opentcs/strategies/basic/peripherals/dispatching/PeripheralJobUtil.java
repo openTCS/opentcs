@@ -7,8 +7,9 @@
  */
 package org.opentcs.strategies.basic.peripherals.dispatching;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import org.opentcs.components.kernel.services.InternalPeripheralJobService;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.data.TCSObjectReference;
@@ -48,14 +49,18 @@ public class PeripheralJobUtil {
   private final PeripheralJobCallback peripheralJobCallback;
 
   @Inject
-  public PeripheralJobUtil(InternalPeripheralService peripheralService,
-                           InternalPeripheralJobService peripheralJobService,
-                           PeripheralControllerPool peripheralControllerPool,
-                           PeripheralJobCallback peripheralJobCallback) {
+  public PeripheralJobUtil(
+      InternalPeripheralService peripheralService,
+      InternalPeripheralJobService peripheralJobService,
+      PeripheralControllerPool peripheralControllerPool,
+      PeripheralJobCallback peripheralJobCallback
+  ) {
     this.peripheralService = requireNonNull(peripheralService, "peripheralService");
     this.peripheralJobService = requireNonNull(peripheralJobService, "peripheralJobService");
-    this.peripheralControllerPool = requireNonNull(peripheralControllerPool,
-                                                   "peripheralControllerPool");
+    this.peripheralControllerPool = requireNonNull(
+        peripheralControllerPool,
+        "peripheralControllerPool"
+    );
     this.peripheralJobCallback = requireNonNull(peripheralJobCallback, "peripheralJobCallback");
   }
 
@@ -67,10 +72,14 @@ public class PeripheralJobUtil {
     final TCSResourceReference<Location> locationRef = location.getReference();
     final TCSObjectReference<PeripheralJob> jobRef = peripheralJob.getReference();
     // Set the locations's and peripheral job's state.
-    peripheralService.updatePeripheralProcState(locationRef,
-                                                PeripheralInformation.ProcState.PROCESSING_JOB);
-    peripheralService.updatePeripheralReservationToken(locationRef,
-                                                       peripheralJob.getReservationToken());
+    peripheralService.updatePeripheralProcState(
+        locationRef,
+        PeripheralInformation.ProcState.PROCESSING_JOB
+    );
+    peripheralService.updatePeripheralReservationToken(
+        locationRef,
+        peripheralJob.getReservationToken()
+    );
     peripheralService.updatePeripheralJob(locationRef, jobRef);
     peripheralJobService.updatePeripheralJobState(jobRef, PeripheralJob.State.BEING_PROCESSED);
 

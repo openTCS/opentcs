@@ -7,10 +7,11 @@
  */
 package org.opentcs.util.persistence.v002;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -21,11 +22,14 @@ import javax.xml.bind.annotation.XmlType;
 /**
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
-@XmlType(propOrder = {"name", "id", "sourcePoint", "destinationPoint", "length", "routingCost",
-                      "maxVelocity", "maxReverseVelocity", "locked", "typeMaxVelocity",
-                      "typeMaxReverseVelocity", "typeLock", "typeActions", "properties"})
+@XmlType(
+    propOrder = {"name", "id", "sourcePoint", "destinationPoint", "length", "routingCost",
+        "maxVelocity", "maxReverseVelocity", "locked", "typeMaxVelocity",
+        "typeMaxReverseVelocity", "typeLock", "typeActions", "properties"}
+)
 public class PathTO
-    extends PlantModelElementTO {
+    extends
+      PlantModelElementTO {
 
   private String sourcePoint = "";
   private String destinationPoint = "";
@@ -50,7 +54,10 @@ public class PathTO
     return sourcePoint;
   }
 
-  public PathTO setSourcePoint(@Nonnull String sourcePoint) {
+  public PathTO setSourcePoint(
+      @Nonnull
+      String sourcePoint
+  ) {
     requireNonNull(sourcePoint, "sourcePoint");
     this.sourcePoint = sourcePoint;
     return this;
@@ -61,7 +68,10 @@ public class PathTO
     return destinationPoint;
   }
 
-  public PathTO setDestinationPoint(@Nonnull String destinationPoint) {
+  public PathTO setDestinationPoint(
+      @Nonnull
+      String destinationPoint
+  ) {
     requireNonNull(destinationPoint, "destinationPoint");
     this.destinationPoint = destinationPoint;
     return this;
@@ -73,7 +83,10 @@ public class PathTO
     return length;
   }
 
-  public PathTO setLength(@Nonnull Long length) {
+  public PathTO setLength(
+      @Nonnull
+      Long length
+  ) {
     requireNonNull(length, "length");
     this.length = length;
     return this;
@@ -85,7 +98,10 @@ public class PathTO
     return routingCost;
   }
 
-  public PathTO setRoutingCost(@Nonnull Long routingCost) {
+  public PathTO setRoutingCost(
+      @Nonnull
+      Long routingCost
+  ) {
     requireNonNull(routingCost, "routingCost");
     this.routingCost = routingCost;
     return this;
@@ -97,7 +113,10 @@ public class PathTO
     return maxVelocity;
   }
 
-  public PathTO setMaxVelocity(@Nonnull Long maxVelocity) {
+  public PathTO setMaxVelocity(
+      @Nonnull
+      Long maxVelocity
+  ) {
     requireNonNull(maxVelocity, "maxVelocity");
     this.maxVelocity = maxVelocity;
     return this;
@@ -109,7 +128,10 @@ public class PathTO
     return maxReverseVelocity;
   }
 
-  public PathTO setMaxReverseVelocity(@Nonnull Long maxReverseVelocity) {
+  public PathTO setMaxReverseVelocity(
+      @Nonnull
+      Long maxReverseVelocity
+  ) {
     requireNonNull(maxReverseVelocity, "maxReverseVelocity");
     this.maxReverseVelocity = maxReverseVelocity;
     return this;
@@ -130,7 +152,10 @@ public class PathTO
     return typeMaxVelocity;
   }
 
-  public PathTO setTypeMaxVelocity(@Nonnull List<MaxVelocityType> typeMaxVelocity) {
+  public PathTO setTypeMaxVelocity(
+      @Nonnull
+      List<MaxVelocityType> typeMaxVelocity
+  ) {
     requireNonNull(typeMaxVelocity, "typeMaxVelocity");
     this.typeMaxVelocity = typeMaxVelocity;
     return this;
@@ -141,7 +166,10 @@ public class PathTO
     return typeMaxReverseVelocity;
   }
 
-  public PathTO setTypeMaxReverseVelocity(@Nonnull List<MaxVelocityType> typeMaxReverseVelocity) {
+  public PathTO setTypeMaxReverseVelocity(
+      @Nonnull
+      List<MaxVelocityType> typeMaxReverseVelocity
+  ) {
     requireNonNull(typeMaxReverseVelocity, "typeMaxReverseVelocity");
     this.typeMaxReverseVelocity = typeMaxReverseVelocity;
     return this;
@@ -152,7 +180,10 @@ public class PathTO
     return typeLock;
   }
 
-  public PathTO setTypeLock(@Nonnull List<LockType> typeLock) {
+  public PathTO setTypeLock(
+      @Nonnull
+      List<LockType> typeLock
+  ) {
     requireNonNull(typeLock, "typeLock");
     this.typeLock = typeLock;
     return this;
@@ -163,7 +194,10 @@ public class PathTO
     return typeActions;
   }
 
-  public PathTO setTypeActions(@Nonnull List<ActionsType> typeActions) {
+  public PathTO setTypeActions(
+      @Nonnull
+      List<ActionsType> typeActions
+  ) {
     requireNonNull(typeActions, "typeActions");
     this.typeActions = typeActions;
     return this;
@@ -187,7 +221,10 @@ public class PathTO
       return vehicleType;
     }
 
-    public MaxVelocityType setVehicleType(@Nonnull String vehicleType) {
+    public MaxVelocityType setVehicleType(
+        @Nonnull
+        String vehicleType
+    ) {
       requireNonNull(vehicleType, "vehicleType");
       this.vehicleType = vehicleType;
       return this;
@@ -199,7 +236,10 @@ public class PathTO
       return velocity;
     }
 
-    public MaxVelocityType setVelocity(@Nonnull Long velocity) {
+    public MaxVelocityType setVelocity(
+        @Nonnull
+        Long velocity
+    ) {
       requireNonNull(velocity, "velocity");
       this.velocity = velocity;
       return this;
@@ -224,7 +264,10 @@ public class PathTO
       return vehicleType;
     }
 
-    public LockType setVehicleType(@Nonnull String vehicleType) {
+    public LockType setVehicleType(
+        @Nonnull
+        String vehicleType
+    ) {
       requireNonNull(vehicleType, "vehicleType");
       this.vehicleType = vehicleType;
       return this;
@@ -259,7 +302,10 @@ public class PathTO
       return vehicleType;
     }
 
-    public ActionsType setVehicleType(@Nonnull String vehicleType) {
+    public ActionsType setVehicleType(
+        @Nonnull
+        String vehicleType
+    ) {
       requireNonNull(vehicleType, "vehicleType");
       this.vehicleType = vehicleType;
       return this;
@@ -270,7 +316,10 @@ public class PathTO
       return actions;
     }
 
-    public ActionsType setActions(@Nonnull List<Action> actions) {
+    public ActionsType setActions(
+        @Nonnull
+        List<Action> actions
+    ) {
       requireNonNull(actions, "actions");
       this.actions = actions;
       return this;
@@ -296,7 +345,10 @@ public class PathTO
         return distance;
       }
 
-      public Action setDistance(@Nonnull Long distance) {
+      public Action setDistance(
+          @Nonnull
+          Long distance
+      ) {
         requireNonNull(distance, "distance");
         this.distance = distance;
         return this;
@@ -307,7 +359,10 @@ public class PathTO
         return action;
       }
 
-      public Action setAction(@Nonnull String action) {
+      public Action setAction(
+          @Nonnull
+          String action
+      ) {
         requireNonNull(action, "action");
         this.action = action;
         return this;
@@ -318,7 +373,10 @@ public class PathTO
         return orientations;
       }
 
-      public Action setOrientations(@Nonnull List<Orientation> orientations) {
+      public Action setOrientations(
+          @Nonnull
+          List<Orientation> orientations
+      ) {
         requireNonNull(orientations, "orientations");
         this.orientations = orientations;
         return this;
@@ -341,7 +399,10 @@ public class PathTO
         return name;
       }
 
-      public Orientation setName(@Nonnull String name) {
+      public Orientation setName(
+          @Nonnull
+          String name
+      ) {
         requireNonNull(name, "name");
         this.name = name;
         return this;

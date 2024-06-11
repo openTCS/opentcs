@@ -7,12 +7,13 @@
  */
 package org.opentcs.modeleditor.persistence;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.access.to.model.BlockCreationTO;
 import org.opentcs.access.to.model.LocationCreationTO;
@@ -64,10 +65,12 @@ public class ModelImportAdapter {
   private final StatusPanel statusPanel;
 
   @Inject
-  public ModelImportAdapter(Provider<SystemModel> systemModelProvider,
-                            PlantModelElementConverter elementConverter,
-                            ModelValidator validator,
-                            StatusPanel statusPanel) {
+  public ModelImportAdapter(
+      Provider<SystemModel> systemModelProvider,
+      PlantModelElementConverter elementConverter,
+      ModelValidator validator,
+      StatusPanel statusPanel
+  ) {
     this.systemModelProvider = requireNonNull(systemModelProvider, "systemModelProvider");
     this.elementConverter = requireNonNull(elementConverter, "elementConverter");
     this.validator = requireNonNull(validator, "validator");
@@ -113,23 +116,31 @@ public class ModelImportAdapter {
 
   private void importProperties(PlantModelCreationTO model, SystemModel systemModel) {
     for (Map.Entry<String, String> property : model.getProperties().entrySet()) {
-      systemModel.getPropertyMiscellaneous().addItem(new KeyValueProperty(systemModel,
-                                                                          property.getKey(),
-                                                                          property.getValue()));
+      systemModel.getPropertyMiscellaneous().addItem(
+          new KeyValueProperty(
+              systemModel,
+              property.getKey(),
+              property.getValue()
+          )
+      );
     }
   }
 
-  private void importVisualLayout(VisualLayoutCreationTO layoutTO, SystemModel systemModel,
-                                  Set<String> collectedErrorMessages) {
+  private void importVisualLayout(
+      VisualLayoutCreationTO layoutTO, SystemModel systemModel,
+      Set<String> collectedErrorMessages
+  ) {
     LayoutModel layoutModel = elementConverter.importLayout(layoutTO);
     if (validModelComponent(layoutModel, systemModel, collectedErrorMessages)) {
       updateLayoutInModel(layoutModel, systemModel);
     }
   }
 
-  private void importBlocks(PlantModelCreationTO model,
-                            SystemModel systemModel,
-                            Set<String> collectedErrorMessages) {
+  private void importBlocks(
+      PlantModelCreationTO model,
+      SystemModel systemModel,
+      Set<String> collectedErrorMessages
+  ) {
     for (BlockCreationTO blockTO : model.getBlocks()) {
       BlockModel blockModel = elementConverter.importBlock(blockTO);
       if (validModelComponent(blockModel, systemModel, collectedErrorMessages)) {
@@ -138,21 +149,27 @@ public class ModelImportAdapter {
     }
   }
 
-  private void importLocations(PlantModelCreationTO model,
-                               SystemModel systemModel,
-                               Set<String> collectedErrorMessages) {
+  private void importLocations(
+      PlantModelCreationTO model,
+      SystemModel systemModel,
+      Set<String> collectedErrorMessages
+  ) {
     for (LocationCreationTO locationTO : model.getLocations()) {
-      LocationModel locationModel = elementConverter.importLocation(locationTO,
-                                                                    model.getLocationTypes(),
-                                                                    systemModel);
+      LocationModel locationModel = elementConverter.importLocation(
+          locationTO,
+          model.getLocationTypes(),
+          systemModel
+      );
       if (validModelComponent(locationModel, systemModel, collectedErrorMessages)) {
         addLocationToModel(locationModel, systemModel);
 
         for (Map.Entry<String, Set<String>> entry : locationTO.getLinks().entrySet()) {
-          LinkModel linkModel = elementConverter.importLocationLink(locationTO,
-                                                                    entry.getKey(),
-                                                                    entry.getValue(),
-                                                                    systemModel);
+          LinkModel linkModel = elementConverter.importLocationLink(
+              locationTO,
+              entry.getKey(),
+              entry.getValue(),
+              systemModel
+          );
           if (validModelComponent(linkModel, systemModel, collectedErrorMessages)) {
             addLinkToModel(linkModel, systemModel);
           }
@@ -161,9 +178,11 @@ public class ModelImportAdapter {
     }
   }
 
-  private void importLocationTypes(PlantModelCreationTO model,
-                                   SystemModel systemModel,
-                                   Set<String> collectedErrorMessages) {
+  private void importLocationTypes(
+      PlantModelCreationTO model,
+      SystemModel systemModel,
+      Set<String> collectedErrorMessages
+  ) {
     for (LocationTypeCreationTO locTypeTO : model.getLocationTypes()) {
       LocationTypeModel locTypeModel = elementConverter.importLocationType(locTypeTO);
       if (validModelComponent(locTypeModel, systemModel, collectedErrorMessages)) {
@@ -172,9 +191,11 @@ public class ModelImportAdapter {
     }
   }
 
-  private void importVehicles(PlantModelCreationTO model,
-                              SystemModel systemModel,
-                              Set<String> collectedErrorMessages) {
+  private void importVehicles(
+      PlantModelCreationTO model,
+      SystemModel systemModel,
+      Set<String> collectedErrorMessages
+  ) {
     for (VehicleCreationTO vehicleTO : model.getVehicles()) {
       VehicleModel vehicleModel = elementConverter.importVehicle(vehicleTO);
       if (validModelComponent(vehicleModel, systemModel, collectedErrorMessages)) {
@@ -183,9 +204,11 @@ public class ModelImportAdapter {
     }
   }
 
-  private void importPaths(PlantModelCreationTO model,
-                           SystemModel systemModel,
-                           Set<String> collectedErrorMessages) {
+  private void importPaths(
+      PlantModelCreationTO model,
+      SystemModel systemModel,
+      Set<String> collectedErrorMessages
+  ) {
     for (PathCreationTO pathTO : model.getPaths()) {
       PathModel pathModel = elementConverter.importPath(pathTO, systemModel);
       if (validModelComponent(pathModel, systemModel, collectedErrorMessages)) {
@@ -194,9 +217,11 @@ public class ModelImportAdapter {
     }
   }
 
-  private void importPoints(PlantModelCreationTO model,
-                            SystemModel systemModel,
-                            Set<String> collectedErrorMessages) {
+  private void importPoints(
+      PlantModelCreationTO model,
+      SystemModel systemModel,
+      Set<String> collectedErrorMessages
+  ) {
     for (PointCreationTO pointTO : model.getPoints()) {
       PointModel pointModel = elementConverter.importPoint(pointTO, systemModel);
       if (validModelComponent(pointModel, systemModel, collectedErrorMessages)) {
@@ -205,15 +230,19 @@ public class ModelImportAdapter {
     }
   }
 
-  private boolean validModelComponent(ModelComponent modelComponent,
-                                      SystemModel systemModel,
-                                      Set<String> collectedErrorMessages) {
+  private boolean validModelComponent(
+      ModelComponent modelComponent,
+      SystemModel systemModel,
+      Set<String> collectedErrorMessages
+  ) {
     if (validator.isValidWith(systemModel, modelComponent)) {
       return true;
     }
     else {
-      String deserializationError = validator.formatDeserializationErrors(modelComponent,
-                                                                          validator.getErrors());
+      String deserializationError = validator.formatDeserializationErrors(
+          modelComponent,
+          validator.getErrors()
+      );
       validator.formatDeserializationErrors(modelComponent, validator.getErrors());
       validator.resetErrors();
       LOG.warn("Deserialization error: {}", deserializationError);

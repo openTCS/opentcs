@@ -45,7 +45,8 @@ public interface PeripheralDispatcherService {
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void withdrawByLocation(TCSResourceReference<Location> ref)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Withdraw the given peripheral job.
@@ -59,5 +60,6 @@ public interface PeripheralDispatcherService {
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void withdrawByPeripheralJob(TCSObjectReference<PeripheralJob> ref)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 }

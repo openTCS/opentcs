@@ -7,12 +7,13 @@
  */
 package org.opentcs.operationsdesk.components.dialogs;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import javax.swing.JPanel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingView;
@@ -23,7 +24,8 @@ import org.opentcs.operationsdesk.components.drawing.figures.VehicleFigure;
  * Panel to select a Vehicle that will be searched for in the view.
  */
 public class FindVehiclePanel
-    extends JPanel {
+    extends
+      JPanel {
 
   /**
    * The list of existing vehicles.
@@ -47,9 +49,13 @@ public class FindVehiclePanel
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public FindVehiclePanel(@Assisted Collection<VehicleModel> vehicles,
-                          @Assisted OpenTCSDrawingView drawingView,
-                          ModelManager modelManager) {
+  public FindVehiclePanel(
+      @Assisted
+      Collection<VehicleModel> vehicles,
+      @Assisted
+      OpenTCSDrawingView drawingView,
+      ModelManager modelManager
+  ) {
     fVehicles = new ArrayList<>(requireNonNull(vehicles, "vehicles"));
     fDrawingView = requireNonNull(drawingView, "drawingView");
     this.modelManager = requireNonNull(modelManager, "modelManager");
@@ -76,6 +82,7 @@ public class FindVehiclePanel
     return fVehicles.get(index);
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -107,22 +114,24 @@ public class FindVehiclePanel
     add(buttonFind);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   /**
    * Starts the search for the vehicle.
    */
-    private void buttonFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonFindActionPerformed
-      VehicleModel vehicle = getSelectedVehicle();
-      if (vehicle == null) {
-        return;
-      }
+  private void buttonFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonFindActionPerformed
+    VehicleModel vehicle = getSelectedVehicle();
+    if (vehicle == null) {
+      return;
+    }
 
-      VehicleFigure figure = (VehicleFigure) modelManager.getModel().getFigure(vehicle);
-      if (figure != null) {
-        fDrawingView.scrollTo(figure);
-      }
-    }//GEN-LAST:event_buttonFindActionPerformed
+    VehicleFigure figure = (VehicleFigure) modelManager.getModel().getFigure(vehicle);
+    if (figure != null) {
+      fDrawingView.scrollTo(figure);
+    }
+  }//GEN-LAST:event_buttonFindActionPerformed
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton buttonFind;
@@ -130,4 +139,5 @@ public class FindVehiclePanel
   private javax.swing.JLabel labelVehicles;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

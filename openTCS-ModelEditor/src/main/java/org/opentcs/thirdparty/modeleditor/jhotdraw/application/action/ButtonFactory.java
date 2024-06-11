@@ -142,8 +142,10 @@ public class ButtonFactory {
    * @param toolBar The toolbar.
    * @param editor The drawing editor.
    */
-  public static void addAttributesButtonsTo(JToolBar toolBar,
-                                            DrawingEditor editor) {
+  public static void addAttributesButtonsTo(
+      JToolBar toolBar,
+      DrawingEditor editor
+  ) {
 
     JButton button;
 
@@ -167,26 +169,32 @@ public class ButtonFactory {
   }
 
   private static void addColorButtonsTo(JToolBar bar, DrawingEditor editor) {
-    bar.add(createEditorColorButton(
-        editor,
-        AttributeKeys.STROKE_COLOR,
-        BUNDLE.getString("buttonFactory.button_lineColor.tooltipText"),
-        ImageDirectory.getImageIcon("/toolbar/attributeStrokeColor.png"),
-        new HashMap<AttributeKey, Object>())
+    bar.add(
+        createEditorColorButton(
+            editor,
+            AttributeKeys.STROKE_COLOR,
+            BUNDLE.getString("buttonFactory.button_lineColor.tooltipText"),
+            ImageDirectory.getImageIcon("/toolbar/attributeStrokeColor.png"),
+            new HashMap<AttributeKey, Object>()
+        )
     );
-    bar.add(createEditorColorButton(
-        editor,
-        AttributeKeys.FILL_COLOR,
-        BUNDLE.getString("buttonFactory.button_fillColor.tooltipText"),
-        ImageDirectory.getImageIcon("/toolbar/attributeFillColor.png"),
-        new HashMap<AttributeKey, Object>())
+    bar.add(
+        createEditorColorButton(
+            editor,
+            AttributeKeys.FILL_COLOR,
+            BUNDLE.getString("buttonFactory.button_fillColor.tooltipText"),
+            ImageDirectory.getImageIcon("/toolbar/attributeFillColor.png"),
+            new HashMap<AttributeKey, Object>()
+        )
     );
-    bar.add(createEditorColorButton(
-        editor,
-        AttributeKeys.TEXT_COLOR,
-        BUNDLE.getString("buttonFactory.button_textlColor.tooltipText"),
-        ImageDirectory.getImageIcon("/toolbar/attributeTextColor.png"),
-        new HashMap<AttributeKey, Object>())
+    bar.add(
+        createEditorColorButton(
+            editor,
+            AttributeKeys.TEXT_COLOR,
+            BUNDLE.getString("buttonFactory.button_textlColor.tooltipText"),
+            ImageDirectory.getImageIcon("/toolbar/attributeTextColor.png"),
+            new HashMap<AttributeKey, Object>()
+        )
     );
   }
 
@@ -215,13 +223,15 @@ public class ButtonFactory {
       AttributeKey<Color> attributeKey,
       String toolTipText,
       ImageIcon baseIcon,
-      Map<AttributeKey, Object> defaultAttributes) {
+      Map<AttributeKey, Object> defaultAttributes
+  ) {
     final JPopupButton popupButton = new JPopupButton();
     popupButton.setPopupAlpha(1f);
 
     popupButton.setAction(
         new DefaultAttributeAction(editor, attributeKey, defaultAttributes),
-        new Rectangle(0, 0, 22, 22));
+        new Rectangle(0, 0, 22, 22)
+    );
     popupButton.setColumnCount(DEFAULT_COLORS_COLUMN_COUNT, false);
     boolean hasNullColor = false;
 
@@ -234,10 +244,12 @@ public class ButtonFactory {
         hasNullColor = true;
       }
 
-      AttributeAction action = new AttributeAction(editor,
-                                                   attributes,
-                                                   toolTipText,
-                                                   swatch);
+      AttributeAction action = new AttributeAction(
+          editor,
+          attributes,
+          toolTipText,
+          swatch
+      );
       popupButton.add(action);
       action.putValue(Action.SHORT_DESCRIPTION, swatch.getName());
       action.setUpdateEnabledState(false);
@@ -248,36 +260,49 @@ public class ButtonFactory {
       HashMap<AttributeKey, Object> attributes = new HashMap<>(defaultAttributes);
       attributes.put(attributeKey, null);
       AttributeAction action
-          = new AttributeAction(editor,
-                                attributes,
-                                BUNDLE.getString("buttonFactory.action_noColor.name"),
-                                new ColorIcon(null,
-                                              "",
-                                              DEFAULT_COLOR_ICONS.get(0).getIconWidth(),
-                                              DEFAULT_COLOR_ICONS.get(0).getIconHeight()));
+          = new AttributeAction(
+              editor,
+              attributes,
+              BUNDLE.getString("buttonFactory.action_noColor.name"),
+              new ColorIcon(
+                  null,
+                  "",
+                  DEFAULT_COLOR_ICONS.get(0).getIconWidth(),
+                  DEFAULT_COLOR_ICONS.get(0).getIconHeight()
+              )
+          );
       popupButton.add(action);
-      action.putValue(Action.SHORT_DESCRIPTION,
-                      BUNDLE.getString("buttonFactory.action_noColor.shortDescription"));
+      action.putValue(
+          Action.SHORT_DESCRIPTION,
+          BUNDLE.getString("buttonFactory.action_noColor.shortDescription")
+      );
       action.setUpdateEnabledState(false);
     }
 
     // Color chooser
     ImageIcon chooserIcon = new ImageIcon(
-        Images.createImage(ButtonFactory.class,
-                           "/org/jhotdraw/draw/action/images/attribute.color.colorChooser.png"));
-    Action action = new EditorColorChooserAction(editor,
-                                                 attributeKey,
-                                                 "color",
-                                                 chooserIcon,
-                                                 defaultAttributes);
+        Images.createImage(
+            ButtonFactory.class,
+            "/org/jhotdraw/draw/action/images/attribute.color.colorChooser.png"
+        )
+    );
+    Action action = new EditorColorChooserAction(
+        editor,
+        attributeKey,
+        "color",
+        chooserIcon,
+        defaultAttributes
+    );
     popupButton.add(action);
     popupButton.setText(null);
     popupButton.setToolTipText(toolTipText);
 
-    Icon icon = new EditorColorIcon(editor,
-                                    attributeKey,
-                                    baseIcon.getImage(),
-                                    new Rectangle(1, 17, 20, 4));
+    Icon icon = new EditorColorIcon(
+        editor,
+        attributeKey,
+        baseIcon.getImage(),
+        new Rectangle(1, 17, 20, 4)
+    );
 
     popupButton.setIcon(icon);
     popupButton.setDisabledIcon(icon);
@@ -308,7 +333,8 @@ public class ButtonFactory {
     JPopupButton strokeDecorationPopupButton = new JPopupButton();
 
     strokeDecorationPopupButton.setIcon(
-        ImageDirectory.getImageIcon("/toolbar/attributeStrokeDecoration.png"));
+        ImageDirectory.getImageIcon("/toolbar/attributeStrokeDecoration.png")
+    );
 
     strokeDecorationPopupButton.setText(null);
     strokeDecorationPopupButton.setToolTipText(
@@ -318,36 +344,42 @@ public class ButtonFactory {
     strokeDecorationPopupButton.setFocusable(false);
     strokeDecorationPopupButton.setColumnCount(2, false);
     LineDecoration[] decorations = {
-      // Arrow
-      new ArrowTip(0.35, 12, 11.3),
-      // Arrow
-      new ArrowTip(0.35, 13, 7),
-      // Generalization triangle
-      new ArrowTip(Math.PI / 5, 12, 9.8, true, true, false),
-      // Dependency arrow
-      new ArrowTip(Math.PI / 6, 12, 0, false, true, false),
-      // Link arrow
-      new ArrowTip(Math.PI / 11, 13, 0, false, true, true),
-      // Aggregation diamond
-      new ArrowTip(Math.PI / 6, 10, 18, false, true, false),
-      // Composition diamond
-      new ArrowTip(Math.PI / 6, 10, 18, true, true, true),
-      null
+        // Arrow
+        new ArrowTip(0.35, 12, 11.3),
+        // Arrow
+        new ArrowTip(0.35, 13, 7),
+        // Generalization triangle
+        new ArrowTip(Math.PI / 5, 12, 9.8, true, true, false),
+        // Dependency arrow
+        new ArrowTip(Math.PI / 6, 12, 0, false, true, false),
+        // Link arrow
+        new ArrowTip(Math.PI / 11, 13, 0, false, true, true),
+        // Aggregation diamond
+        new ArrowTip(Math.PI / 6, 10, 18, false, true, false),
+        // Composition diamond
+        new ArrowTip(Math.PI / 6, 10, 18, true, true, true),
+        null
     };
 
     for (LineDecoration decoration : decorations) {
       strokeDecorationPopupButton.add(
-          new AttributeAction(editor,
-                              AttributeKeys.START_DECORATION,
-                              decoration,
-                              null,
-                              new LineDecorationIcon(decoration, true)));
+          new AttributeAction(
+              editor,
+              AttributeKeys.START_DECORATION,
+              decoration,
+              null,
+              new LineDecorationIcon(decoration, true)
+          )
+      );
       strokeDecorationPopupButton.add(
-          new AttributeAction(editor,
-                              AttributeKeys.END_DECORATION,
-                              decoration,
-                              null,
-                              new LineDecorationIcon(decoration, false)));
+          new AttributeAction(
+              editor,
+              AttributeKeys.END_DECORATION,
+              decoration,
+              null,
+              new LineDecorationIcon(decoration, false)
+          )
+      );
     }
 
     return strokeDecorationPopupButton;
@@ -375,13 +407,20 @@ public class ButtonFactory {
 
     for (int i = 0; i < widths.length; i++) {
       String label = Double.toString(widths[i]);
-      Icon icon = new StrokeIcon(new BasicStroke((float) widths[i],
-                                                 BasicStroke.CAP_BUTT,
-                                                 BasicStroke.JOIN_BEVEL));
+      Icon icon = new StrokeIcon(
+          new BasicStroke(
+              (float) widths[i],
+              BasicStroke.CAP_BUTT,
+              BasicStroke.JOIN_BEVEL
+          )
+      );
       AttributeAction action = new AttributeAction(
-          editor, AttributeKeys.STROKE_WIDTH, widths[i], label, icon);
-      action.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY,
-                      BUNDLE.getString("buttonFactory.action_strokeWidth.undo.presentationName"));
+          editor, AttributeKeys.STROKE_WIDTH, widths[i], label, icon
+      );
+      action.putValue(
+          ActionUtil.UNDO_PRESENTATION_NAME_KEY,
+          BUNDLE.getString("buttonFactory.action_strokeWidth.undo.presentationName")
+      );
       AbstractButton btn = strokeWidthPopupButton.add(action);
       btn.setDisabledIcon(icon);
     }
@@ -401,13 +440,13 @@ public class ButtonFactory {
     strokeDashesPopupButton.setFocusable(false);
 
     double[][] dashes = new double[][]{
-      null,
-      {4d, 4d},
-      {2d, 2d},
-      {4d, 2d},
-      {2d, 4d},
-      {8d, 2d},
-      {6d, 2d, 2d, 2d},};
+        null,
+        {4d, 4d},
+        {2d, 2d},
+        {4d, 2d},
+        {2d, 4d},
+        {8d, 2d},
+        {6d, 2d, 2d, 2d},};
 
     for (double[] dash : dashes) {
       float[] fdashes;
@@ -423,14 +462,19 @@ public class ButtonFactory {
         }
       }
 
-      Icon icon = new StrokeIcon(new BasicStroke(2f,
-                                                 BasicStroke.CAP_BUTT,
-                                                 BasicStroke.JOIN_BEVEL,
-                                                 10f,
-                                                 fdashes,
-                                                 0));
+      Icon icon = new StrokeIcon(
+          new BasicStroke(
+              2f,
+              BasicStroke.CAP_BUTT,
+              BasicStroke.JOIN_BEVEL,
+              10f,
+              fdashes,
+              0
+          )
+      );
       AbstractButton button = strokeDashesPopupButton.add(
-          new AttributeAction(editor, AttributeKeys.STROKE_DASHES, dash, null, icon));
+          new AttributeAction(editor, AttributeKeys.STROKE_DASHES, dash, null, icon)
+      );
       button.setDisabledIcon(icon);
     }
 
@@ -449,37 +493,53 @@ public class ButtonFactory {
     strokeTypePopupButton.setFocusable(false);
 
     strokeTypePopupButton.add(
-        new AttributeAction(editor,
-                            AttributeKeys.STROKE_TYPE,
-                            AttributeKeys.StrokeType.BASIC,
-                            BUNDLE.getString("buttonFactory.action_strokeTypeBasic.name"),
-                            new StrokeIcon(new BasicStroke(1,
-                                                           BasicStroke.CAP_BUTT,
-                                                           BasicStroke.JOIN_BEVEL))));
+        new AttributeAction(
+            editor,
+            AttributeKeys.STROKE_TYPE,
+            AttributeKeys.StrokeType.BASIC,
+            BUNDLE.getString("buttonFactory.action_strokeTypeBasic.name"),
+            new StrokeIcon(
+                new BasicStroke(
+                    1,
+                    BasicStroke.CAP_BUTT,
+                    BasicStroke.JOIN_BEVEL
+                )
+            )
+        )
+    );
     HashMap<AttributeKey, Object> attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_TYPE, AttributeKeys.StrokeType.DOUBLE);
     attributes.put(AttributeKeys.STROKE_INNER_WIDTH_FACTOR, 2d);
     strokeTypePopupButton.add(
-        new AttributeAction(editor,
-                            attributes,
-                            BUNDLE.getString("buttonFactory.action_strokeTypeDouble.name"),
-                            new StrokeIcon(new DoubleStroke(2, 1))));
+        new AttributeAction(
+            editor,
+            attributes,
+            BUNDLE.getString("buttonFactory.action_strokeTypeDouble.name"),
+            new StrokeIcon(new DoubleStroke(2, 1))
+        )
+    );
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_TYPE, AttributeKeys.StrokeType.DOUBLE);
     attributes.put(AttributeKeys.STROKE_INNER_WIDTH_FACTOR, 3d);
     strokeTypePopupButton.add(
-        new AttributeAction(editor,
-                            attributes,
-                            BUNDLE.getString("buttonFactory.action_strokeTypeDouble.name"),
-                            new StrokeIcon(new DoubleStroke(3, 1))));
+        new AttributeAction(
+            editor,
+            attributes,
+            BUNDLE.getString("buttonFactory.action_strokeTypeDouble.name"),
+            new StrokeIcon(new DoubleStroke(3, 1))
+        )
+    );
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_TYPE, AttributeKeys.StrokeType.DOUBLE);
     attributes.put(AttributeKeys.STROKE_INNER_WIDTH_FACTOR, 4d);
     strokeTypePopupButton.add(
-        new AttributeAction(editor,
-                            attributes,
-                            BUNDLE.getString("buttonFactory.action_strokeTypeDouble.name"),
-                            new StrokeIcon(new DoubleStroke(4, 1))));
+        new AttributeAction(
+            editor,
+            attributes,
+            BUNDLE.getString("buttonFactory.action_strokeTypeDouble.name"),
+            new StrokeIcon(new DoubleStroke(4, 1))
+        )
+    );
 
     return strokeTypePopupButton;
   }
@@ -500,28 +560,37 @@ public class ButtonFactory {
     attributes.put(AttributeKeys.STROKE_PLACEMENT, AttributeKeys.StrokePlacement.CENTER);
     attributes.put(AttributeKeys.FILL_UNDER_STROKE, AttributeKeys.Underfill.CENTER);
     strokePlacementPopupButton.add(
-        new AttributeAction(editor,
-                            attributes,
-                            BUNDLE.getString("buttonFactory.action_strokePlacementCenter.name"),
-                            null));
+        new AttributeAction(
+            editor,
+            attributes,
+            BUNDLE.getString("buttonFactory.action_strokePlacementCenter.name"),
+            null
+        )
+    );
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_PLACEMENT, AttributeKeys.StrokePlacement.INSIDE);
     attributes.put(AttributeKeys.FILL_UNDER_STROKE, AttributeKeys.Underfill.CENTER);
     strokePlacementPopupButton.add(
-        new AttributeAction(editor,
-                            attributes,
-                            BUNDLE.getString("buttonFactory.action_strokePlacementInside.name"),
-                            null));
+        new AttributeAction(
+            editor,
+            attributes,
+            BUNDLE.getString("buttonFactory.action_strokePlacementInside.name"),
+            null
+        )
+    );
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_PLACEMENT, AttributeKeys.StrokePlacement.OUTSIDE);
     attributes.put(AttributeKeys.FILL_UNDER_STROKE, AttributeKeys.Underfill.CENTER);
     strokePlacementPopupButton.add(
-        new AttributeAction(editor,
-                            attributes,
-                            BUNDLE.getString("buttonFactory.action_strokePlacementOutside.name"),
-                            null));
+        new AttributeAction(
+            editor,
+            attributes,
+            BUNDLE.getString("buttonFactory.action_strokePlacementOutside.name"),
+            null
+        )
+    );
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_PLACEMENT, AttributeKeys.StrokePlacement.CENTER);
@@ -610,26 +679,32 @@ public class ButtonFactory {
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_CAP, BasicStroke.CAP_BUTT);
     AttributeAction action;
-    action = new AttributeAction(editor,
-                                 attributes,
-                                 BUNDLE.getString("buttonFactory.action_strokeCapButt.name"),
-                                 null);
+    action = new AttributeAction(
+        editor,
+        attributes,
+        BUNDLE.getString("buttonFactory.action_strokeCapButt.name"),
+        null
+    );
     popupButton.add(action);
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_CAP, BasicStroke.CAP_ROUND);
-    action = new AttributeAction(editor,
-                                 attributes,
-                                 BUNDLE.getString("buttonFactory.action_strokeCapRound.name"),
-                                 null);
+    action = new AttributeAction(
+        editor,
+        attributes,
+        BUNDLE.getString("buttonFactory.action_strokeCapRound.name"),
+        null
+    );
     popupButton.add(action);
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_CAP, BasicStroke.CAP_SQUARE);
-    action = new AttributeAction(editor,
-                                 attributes,
-                                 BUNDLE.getString("buttonFactory.action_strokeCapSquare.name"),
-                                 null);
+    action = new AttributeAction(
+        editor,
+        attributes,
+        BUNDLE.getString("buttonFactory.action_strokeCapSquare.name"),
+        null
+    );
     popupButton.add(action);
 
     return popupButton;
@@ -647,26 +722,32 @@ public class ButtonFactory {
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_JOIN, BasicStroke.JOIN_BEVEL);
     AttributeAction action;
-    action = new AttributeAction(editor,
-                                 attributes,
-                                 BUNDLE.getString("buttonFactory.action_strokeJoinBevel.name"),
-                                 null);
+    action = new AttributeAction(
+        editor,
+        attributes,
+        BUNDLE.getString("buttonFactory.action_strokeJoinBevel.name"),
+        null
+    );
     popupButton.add(action);
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_JOIN, BasicStroke.JOIN_ROUND);
-    action = new AttributeAction(editor,
-                                 attributes,
-                                 BUNDLE.getString("buttonFactory.action_strokeJoinRound.name"),
-                                 null);
+    action = new AttributeAction(
+        editor,
+        attributes,
+        BUNDLE.getString("buttonFactory.action_strokeJoinRound.name"),
+        null
+    );
     popupButton.add(action);
 
     attributes = new HashMap<>();
     attributes.put(AttributeKeys.STROKE_JOIN, BasicStroke.JOIN_MITER);
-    action = new AttributeAction(editor,
-                                 attributes,
-                                 BUNDLE.getString("buttonFactory.action_strokeJoinMiter.name"),
-                                 null);
+    action = new AttributeAction(
+        editor,
+        attributes,
+        BUNDLE.getString("buttonFactory.action_strokeJoinMiter.name"),
+        null
+    );
     popupButton.add(action);
 
     return popupButton;
@@ -706,13 +787,17 @@ public class ButtonFactory {
     button.setFocusable(false);
 
     AbstractAction action
-        = new AttributeToggler<>(editor,
-                                 AttributeKeys.FONT_BOLD,
-                                 Boolean.TRUE,
-                                 Boolean.FALSE,
-                                 new StyledEditorKit.BoldAction());
-    action.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY,
-                    BUNDLE.getString("buttonFactory.action_fontStyleBold.undo.presentationName"));
+        = new AttributeToggler<>(
+            editor,
+            AttributeKeys.FONT_BOLD,
+            Boolean.TRUE,
+            Boolean.FALSE,
+            new StyledEditorKit.BoldAction()
+        );
+    action.putValue(
+        ActionUtil.UNDO_PRESENTATION_NAME_KEY,
+        BUNDLE.getString("buttonFactory.action_fontStyleBold.undo.presentationName")
+    );
     button.addActionListener(action);
 
     return button;
@@ -726,13 +811,17 @@ public class ButtonFactory {
     button.setFocusable(false);
 
     AbstractAction action
-        = new AttributeToggler<>(editor,
-                                 AttributeKeys.FONT_ITALIC,
-                                 Boolean.TRUE,
-                                 Boolean.FALSE,
-                                 new StyledEditorKit.BoldAction());
-    action.putValue(ActionUtil.UNDO_PRESENTATION_NAME_KEY,
-                    BUNDLE.getString("buttonFactory.action_fontStyleItalic.undo.presentationName"));
+        = new AttributeToggler<>(
+            editor,
+            AttributeKeys.FONT_ITALIC,
+            Boolean.TRUE,
+            Boolean.FALSE,
+            new StyledEditorKit.BoldAction()
+        );
+    action.putValue(
+        ActionUtil.UNDO_PRESENTATION_NAME_KEY,
+        BUNDLE.getString("buttonFactory.action_fontStyleItalic.undo.presentationName")
+    );
     button.addActionListener(action);
 
     return button;
@@ -746,11 +835,13 @@ public class ButtonFactory {
     button.setFocusable(false);
 
     AbstractAction action
-        = new AttributeToggler<>(editor,
-                                 AttributeKeys.FONT_UNDERLINE,
-                                 Boolean.TRUE,
-                                 Boolean.FALSE,
-                                 new StyledEditorKit.BoldAction());
+        = new AttributeToggler<>(
+            editor,
+            AttributeKeys.FONT_UNDERLINE,
+            Boolean.TRUE,
+            Boolean.FALSE,
+            new StyledEditorKit.BoldAction()
+        );
     action.putValue(
         ActionUtil.UNDO_PRESENTATION_NAME_KEY,
         BUNDLE.getString("buttonFactory.action_fontStyleUnderline.undo.presentationName")

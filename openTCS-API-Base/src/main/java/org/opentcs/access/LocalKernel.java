@@ -15,8 +15,9 @@ import org.opentcs.components.kernel.KernelExtension;
  * to remote peers.
  */
 public interface LocalKernel
-    extends Kernel,
-            Lifecycle {
+    extends
+      Kernel,
+      Lifecycle {
 
   /**
    * Adds a <code>KernelExtension</code> to this kernel.

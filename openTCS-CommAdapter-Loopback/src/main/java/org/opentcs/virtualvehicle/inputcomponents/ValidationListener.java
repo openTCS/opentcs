@@ -13,7 +13,8 @@ import java.util.EventListener;
  * A listener interface for {@link ValidationEvent ValidationEvents}.
  */
 public interface ValidationListener
-    extends EventListener {
+    extends
+      EventListener {
 
   /**
    * Should be called when the state of validation changed.

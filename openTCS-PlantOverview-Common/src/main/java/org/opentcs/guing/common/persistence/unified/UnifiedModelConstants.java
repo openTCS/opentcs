@@ -25,7 +25,9 @@ public interface UnifiedModelConstants {
    * The file filter this persistor supports.
    */
   FileFilter DIALOG_FILE_FILTER
-      = new FileNameExtensionFilter(ResourceBundleUtil.getBundle(I18nPlantOverview.SYSTEM_PATH)
-          .getFormatted("unifiedModelConstants.dialogFileFilter.description", FILE_ENDING_XML),
-                                    FILE_ENDING_XML);
+      = new FileNameExtensionFilter(
+          ResourceBundleUtil.getBundle(I18nPlantOverview.SYSTEM_PATH)
+              .getFormatted("unifiedModelConstants.dialogFileFilter.description", FILE_ENDING_XML),
+          FILE_ENDING_XML
+      );
 }

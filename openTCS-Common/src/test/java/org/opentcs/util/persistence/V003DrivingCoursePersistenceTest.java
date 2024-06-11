@@ -7,6 +7,8 @@
  */
 package org.opentcs.util.persistence;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -19,7 +21,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.opentcs.util.persistence.v003.AllowedOperationTO;
 import org.opentcs.util.persistence.v003.BlockTO;
@@ -53,13 +54,19 @@ class V003DrivingCoursePersistenceTest {
     model.setVersion("0.0.3");
     model.setName("Demo");
 
-    PointTO point1 = createPoint("Point1", 1, 2, 3, Float.NaN, "HALT_POSITION",
-                                 Arrays.asList(createOutgoingPath("Path1")),
-                                 new ArrayList<>());
-    PointTO point2 = createPoint("Point2", 4, 5, 6, Float.NaN, "PARK_POSITION",
-                                 Arrays.asList(createOutgoingPath("Path2"),
-                                               createOutgoingPath("Path3")),
-                                 new ArrayList<>());
+    PointTO point1 = createPoint(
+        "Point1", 1, 2, 3, Float.NaN, "HALT_POSITION",
+        Arrays.asList(createOutgoingPath("Path1")),
+        new ArrayList<>()
+    );
+    PointTO point2 = createPoint(
+        "Point2", 4, 5, 6, Float.NaN, "PARK_POSITION",
+        Arrays.asList(
+            createOutgoingPath("Path2"),
+            createOutgoingPath("Path3")
+        ),
+        new ArrayList<>()
+    );
     model.setPoints(Arrays.asList(point1, point2));
 
     PathTO path1 = createPath();
@@ -99,9 +106,13 @@ class V003DrivingCoursePersistenceTest {
   }
 
   private boolean validateXml(Reader reader)
-      throws SAXException, IOException {
-    Source schemaFile = new StreamSource(getClass().getResourceAsStream(
-        "/org/opentcs/util/persistence/model-0.0.3.xsd"));
+      throws SAXException,
+        IOException {
+    Source schemaFile = new StreamSource(
+        getClass().getResourceAsStream(
+            "/org/opentcs/util/persistence/model-0.0.3.xsd"
+        )
+    );
     SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     Schema schema = schemaFactory.newSchema(schemaFile);
     try {
@@ -115,10 +126,12 @@ class V003DrivingCoursePersistenceTest {
     }
   }
 
-  private PointTO createPoint(String name, long xPosition, long yPosition, long zPosition,
-                              Float vehicleOrientationAngle, String type,
-                              List<OutgoingPath> outgoingPaths,
-                              List<PropertyTO> properties) {
+  private PointTO createPoint(
+      String name, long xPosition, long yPosition, long zPosition,
+      Float vehicleOrientationAngle, String type,
+      List<OutgoingPath> outgoingPaths,
+      List<PropertyTO> properties
+  ) {
     PointTO p = new PointTO();
     p.setName(name);
     p.setxPosition(xPosition);

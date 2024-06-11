@@ -8,6 +8,7 @@
 package org.opentcs.guing.common.components.properties.panel;
 
 import static java.util.Objects.requireNonNull;
+
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
@@ -24,8 +25,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * Panel for selecting a property from a combo box.
  */
 public class SelectionPropertyEditorPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   private final ListCellRenderer<Object> listCellRenderer;
   /**
@@ -77,6 +80,7 @@ public class SelectionPropertyEditorPanel
     return fProperty;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -111,4 +115,5 @@ public class SelectionPropertyEditorPanel
   private javax.swing.JLabel valueLabel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

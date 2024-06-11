@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.data.model.TCSResourceReference;
@@ -20,7 +21,8 @@ import org.opentcs.data.model.Vehicle;
  * A status message containing information about a vehicle.
  */
 public class VehicleStatusMessage
-    extends StatusMessage {
+    extends
+      StatusMessage {
 
   private String vehicleName = "";
 
@@ -148,30 +150,40 @@ public class VehicleStatusMessage
     return this;
   }
 
-  public static VehicleStatusMessage fromVehicle(Vehicle vehicle,
-                                                 long sequenceNumber) {
+  public static VehicleStatusMessage fromVehicle(
+      Vehicle vehicle,
+      long sequenceNumber
+  ) {
     return fromVehicle(vehicle, sequenceNumber, Instant.now());
   }
 
-  public static VehicleStatusMessage fromVehicle(Vehicle vehicle,
-                                                 long sequenceNumber,
-                                                 Instant creationTimeStamp) {
+  public static VehicleStatusMessage fromVehicle(
+      Vehicle vehicle,
+      long sequenceNumber,
+      Instant creationTimeStamp
+  ) {
     VehicleStatusMessage vehicleMessage = new VehicleStatusMessage();
     vehicleMessage.setSequenceNumber(sequenceNumber);
     vehicleMessage.setCreationTimeStamp(creationTimeStamp);
     vehicleMessage.setVehicleName(vehicle.getName());
     vehicleMessage.setTransportOrderName(
-        vehicle.getTransportOrder() == null ? null : vehicle.getTransportOrder().getName());
+        vehicle.getTransportOrder() == null ? null : vehicle.getTransportOrder().getName()
+    );
     vehicleMessage.setPosition(
-        vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName());
+        vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName()
+    );
     vehicleMessage.setOrientationAngle(vehicle.getOrientationAngle());
     vehicleMessage.setPaused(vehicle.isPaused());
     vehicleMessage.setState(vehicle.getState());
     vehicleMessage.setProcState(vehicle.getProcState());
     if (vehicle.getPrecisePosition() != null) {
-      vehicleMessage.setPrecisePosition(new PrecisePosition(vehicle.getPrecisePosition().getX(),
-                                                            vehicle.getPrecisePosition().getY(),
-                                                            vehicle.getPrecisePosition().getZ()));
+      vehicleMessage.setPrecisePosition(
+          new PrecisePosition(
+              vehicle.getPrecisePosition().getX(),
+              vehicle.getPrecisePosition().getY(),
+              vehicle.getPrecisePosition().getZ()
+          )
+      );
     }
     vehicleMessage.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
     vehicleMessage.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));
@@ -179,7 +191,8 @@ public class VehicleStatusMessage
   }
 
   private static List<List<String>> toListOfListOfNames(
-      List<Set<TCSResourceReference<?>>> resources) {
+      List<Set<TCSResourceReference<?>>> resources
+  ) {
     List<List<String>> result = new ArrayList<>(resources.size());
 
     for (Set<TCSResourceReference<?>> resSet : resources) {

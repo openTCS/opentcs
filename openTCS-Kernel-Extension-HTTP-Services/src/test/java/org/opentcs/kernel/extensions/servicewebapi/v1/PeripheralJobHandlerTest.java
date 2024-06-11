@@ -7,22 +7,23 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.theInstance;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
+
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
 import org.opentcs.components.kernel.services.PeripheralJobService;
@@ -56,9 +57,11 @@ class PeripheralJobHandlerTest {
     jobDispatcherService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
 
-    handler = new PeripheralJobHandler(jobService,
-                                       jobDispatcherService,
-                                       executorWrapper);
+    handler = new PeripheralJobHandler(
+        jobService,
+        jobDispatcherService,
+        executorWrapper
+    );
   }
 
   @Test
@@ -75,7 +78,8 @@ class PeripheralJobHandlerTest {
             location.getReference(),
             "some-operation",
             PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION,
-            true)
+            true
+        )
     )
         .withRelatedVehicle(vehicle.getReference())
         .withRelatedTransportOrder(order.getReference())

@@ -27,7 +27,8 @@ import org.opentcs.guing.common.components.drawing.course.DrawingMethod;
  * Interface for the date model of the whole system model.
  */
 public interface SystemModel
-    extends ModelComponent {
+    extends
+      ModelComponent {
 
   /**
    * Returns this model's set of miscellaneous properties.

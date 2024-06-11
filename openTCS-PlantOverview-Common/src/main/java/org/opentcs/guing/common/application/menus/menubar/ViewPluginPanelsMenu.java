@@ -7,8 +7,9 @@
  */
 package org.opentcs.guing.common.application.menus.menubar;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.swing.JCheckBoxMenuItem;
@@ -27,7 +28,8 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 /**
  */
 public class ViewPluginPanelsMenu
-    extends JMenu {
+    extends
+      JMenu {
 
   private static final ResourceBundleUtil BUNDLE
       = ResourceBundleUtil.getBundle(I18nPlantOverview.MENU_PATH);
@@ -46,9 +48,11 @@ public class ViewPluginPanelsMenu
   private final DockingManager dockingManager;
 
   @Inject
-  public ViewPluginPanelsMenu(PluginPanelManager pluginPanelManager,
-                              PanelRegistry panelRegistry,
-                              DockingManager dockingManager) {
+  public ViewPluginPanelsMenu(
+      PluginPanelManager pluginPanelManager,
+      PanelRegistry panelRegistry,
+      DockingManager dockingManager
+  ) {
     super(BUNDLE.getString("viewPluginPanelsMenu.text"));
 
     this.pluginPanelManager = requireNonNull(pluginPanelManager, "pluginPanelManager");

@@ -17,6 +17,7 @@ import org.opentcs.data.ObjectHistory;
  * Indicates that it cannot map an entry by returning an empty {@code Optional}.
  */
 public interface ObjectHistoryEntryFormatter
-    extends Function<ObjectHistory.Entry, Optional<String>> {
+    extends
+      Function<ObjectHistory.Entry, Optional<String>> {
 
 }

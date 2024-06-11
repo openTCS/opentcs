@@ -7,13 +7,14 @@
  */
 package org.opentcs.kernel.extensions.rmi;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -40,8 +41,10 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class StandardRemoteRouterService
-    extends KernelRemoteService
-    implements RemoteRouterService {
+    extends
+      KernelRemoteService
+    implements
+      RemoteRouterService {
 
   /**
    * This class's logger.
@@ -91,12 +94,15 @@ public class StandardRemoteRouterService
    * @param kernelExecutor Executes tasks modifying kernel data.
    */
   @Inject
-  public StandardRemoteRouterService(RouterService routerService,
-                                     UserManager userManager,
-                                     RmiKernelInterfaceConfiguration configuration,
-                                     SocketFactoryProvider socketFactoryProvider,
-                                     RegistryProvider registryProvider,
-                                     @KernelExecutor ExecutorService kernelExecutor) {
+  public StandardRemoteRouterService(
+      RouterService routerService,
+      UserManager userManager,
+      RmiKernelInterfaceConfiguration configuration,
+      SocketFactoryProvider socketFactoryProvider,
+      RegistryProvider registryProvider,
+      @KernelExecutor
+      ExecutorService kernelExecutor
+  ) {
     this.routerService = requireNonNull(routerService, "routerService");
     this.userManager = requireNonNull(userManager, "userManager");
     this.configuration = requireNonNull(configuration, "configuration");
@@ -116,10 +122,12 @@ public class StandardRemoteRouterService
     // Export this instance via RMI.
     try {
       LOG.debug("Exporting proxy...");
-      UnicastRemoteObject.exportObject(this,
-                                       configuration.remoteRouterServicePort(),
-                                       socketFactoryProvider.getClientSocketFactory(),
-                                       socketFactoryProvider.getServerSocketFactory());
+      UnicastRemoteObject.exportObject(
+          this,
+          configuration.remoteRouterServicePort(),
+          socketFactoryProvider.getClientSocketFactory(),
+          socketFactoryProvider.getServerSocketFactory()
+      );
       LOG.debug("Binding instance with RMI registry...");
       rmiRegistry.rebind(RegistrationName.REMOTE_ROUTER_SERVICE, this);
     }
@@ -174,14 +182,19 @@ public class StandardRemoteRouterService
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<Point> sourcePointRef,
       Set<TCSObjectReference<Point>> destinationPointRefs,
-      Set<TCSResourceReference<?>> resourcesToAvoid) {
+      Set<TCSResourceReference<?>> resourcesToAvoid
+  ) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
 
     try {
-      return kernelExecutor.submit(() -> routerService.computeRoutes(vehicleRef,
-                                                                     sourcePointRef,
-                                                                     destinationPointRefs,
-                                                                     resourcesToAvoid))
+      return kernelExecutor.submit(
+          () -> routerService.computeRoutes(
+              vehicleRef,
+              sourcePointRef,
+              destinationPointRefs,
+              resourcesToAvoid
+          )
+      )
           .get();
     }
     catch (InterruptedException | ExecutionException exc) {

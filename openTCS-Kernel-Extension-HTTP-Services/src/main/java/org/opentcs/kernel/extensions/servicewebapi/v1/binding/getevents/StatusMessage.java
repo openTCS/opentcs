@@ -17,12 +17,15 @@ import java.time.Instant;
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
-    property = "type")
-@JsonSubTypes({
-  @JsonSubTypes.Type(value = OrderStatusMessage.class, name = "TransportOrder"),
-  @JsonSubTypes.Type(value = VehicleStatusMessage.class, name = "Vehicle"),
-  @JsonSubTypes.Type(value = PeripheralJobStatusMessage.class, name = "PeripheralJob")
-})
+    property = "type"
+)
+@JsonSubTypes(
+  {
+      @JsonSubTypes.Type(value = OrderStatusMessage.class, name = "TransportOrder"),
+      @JsonSubTypes.Type(value = VehicleStatusMessage.class, name = "Vehicle"),
+      @JsonSubTypes.Type(value = PeripheralJobStatusMessage.class, name = "PeripheralJob")
+  }
+)
 public abstract class StatusMessage {
 
   private long sequenceNumber;

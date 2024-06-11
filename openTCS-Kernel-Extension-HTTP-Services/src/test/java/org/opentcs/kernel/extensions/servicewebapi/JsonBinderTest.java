@@ -7,10 +7,11 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi;
 
-import org.approvaltests.Approvals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+
+import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -57,7 +58,8 @@ class JsonBinderTest {
   }
 
   private static class TestException
-      extends Exception {
+      extends
+        Exception {
 
     TestException(String message) {
       super(message);

@@ -7,17 +7,19 @@
  */
 package org.opentcs.data.model;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Objects;
-import static java.util.Objects.requireNonNull;
-import static org.opentcs.util.Assertions.checkArgument;
 
 /**
  * A pose consisting of a position and an orientation angle.
  */
 public class Pose
-    implements Serializable {
+    implements
+      Serializable {
 
   /**
    * The position/coordinates in mm.
@@ -35,12 +37,18 @@ public class Pose
    * @param orientationAngle The orientation angle in degrees (-360..360). May be Double.NaN if
    * unknown/undefined.
    */
-  public Pose(@Nonnull Triple position, double orientationAngle) {
+  public Pose(
+      @Nonnull
+      Triple position,
+      double orientationAngle
+  ) {
     this.position = requireNonNull(position, "position");
-    checkArgument(Double.isNaN(orientationAngle)
-        || (orientationAngle >= -360.0 && orientationAngle <= 360.0),
-                  "orientationAngle not Double.NaN or in [-360..360]: %s",
-                  orientationAngle);
+    checkArgument(
+        Double.isNaN(orientationAngle)
+            || (orientationAngle >= -360.0 && orientationAngle <= 360.0),
+        "orientationAngle not Double.NaN or in [-360..360]: %s",
+        orientationAngle
+    );
     this.orientationAngle = orientationAngle;
   }
 
@@ -60,7 +68,10 @@ public class Pose
    * @param position The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  public Pose withPosition(@Nonnull Triple position) {
+  public Pose withPosition(
+      @Nonnull
+      Triple position
+  ) {
     return new Pose(position, orientationAngle);
   }
 
@@ -89,7 +100,7 @@ public class Pose
     hash = 47 * hash + Objects.hashCode(this.position);
     hash = 47 * hash
         + (int) (Double.doubleToLongBits(this.orientationAngle)
-                 ^ (Double.doubleToLongBits(this.orientationAngle) >>> 32));
+            ^ (Double.doubleToLongBits(this.orientationAngle) >>> 32));
     return hash;
   }
 
@@ -102,8 +113,9 @@ public class Pose
       return true;
     }
     final Pose other = (Pose) obj;
-    if (Double.doubleToLongBits(this.orientationAngle)
-        != Double.doubleToLongBits(other.orientationAngle)) {
+    if (Double.doubleToLongBits(this.orientationAngle) != Double.doubleToLongBits(
+        other.orientationAngle
+    )) {
       return false;
     }
     return Objects.equals(this.position, other.position);

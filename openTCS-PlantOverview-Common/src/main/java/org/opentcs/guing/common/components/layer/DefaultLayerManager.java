@@ -7,13 +7,15 @@
  */
 package org.opentcs.guing.common.components.layer;
 
+import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.SwingUtilities;
@@ -26,15 +28,15 @@ import org.opentcs.guing.base.model.DrawnModelComponent;
 import org.opentcs.guing.common.application.ViewManager;
 import org.opentcs.guing.common.event.SystemModelTransitionEvent;
 import org.opentcs.guing.common.model.SystemModel;
-import static org.opentcs.util.Assertions.checkArgument;
 import org.opentcs.util.event.EventBus;
 
 /**
  * The default implementation of {@link LayerManager}.
  */
 public class DefaultLayerManager
-    implements LayerManager,
-               LayerGroupManager {
+    implements
+      LayerManager,
+      LayerGroupManager {
 
   /**
    * The sets of model components mapped to the IDs of the layers the model components are drawn on.
@@ -66,7 +68,11 @@ public class DefaultLayerManager
   private boolean initialized;
 
   @Inject
-  public DefaultLayerManager(ViewManager viewManager, @ApplicationEventBus EventBus eventBus) {
+  public DefaultLayerManager(
+      ViewManager viewManager,
+      @ApplicationEventBus
+      EventBus eventBus
+  ) {
     this.viewManager = requireNonNull(viewManager, "viewManager");
     this.eventBus = requireNonNull(eventBus, "eventBus");
   }
@@ -105,9 +111,11 @@ public class DefaultLayerManager
 
   @Override
   public void setLayerVisible(int layerId, boolean visible) {
-    checkArgument(getLayerWrapper(layerId) != null,
-                  "A layer with layer ID '%d' doesn't exist.",
-                  layerId);
+    checkArgument(
+        getLayerWrapper(layerId) != null,
+        "A layer with layer ID '%d' doesn't exist.",
+        layerId
+    );
 
     LayerWrapper wrapper = getLayerWrapper(layerId);
     // We want to  manipulate the drawing (by adding or removing figures) only if the visible state
@@ -132,9 +140,11 @@ public class DefaultLayerManager
 
   @Override
   public void setLayerName(int layerId, String name) {
-    checkArgument(getLayerWrapper(layerId) != null,
-                  "A layer with layer ID '%d' doesn't exist.",
-                  layerId);
+    checkArgument(
+        getLayerWrapper(layerId) != null,
+        "A layer with layer ID '%d' doesn't exist.",
+        layerId
+    );
 
     LayerWrapper wrapper = getLayerWrapper(layerId);
     Layer oldLayer = wrapper.getLayer();
@@ -175,9 +185,11 @@ public class DefaultLayerManager
 
   @Override
   public void setGroupVisible(int groupId, boolean visible) {
-    checkArgument(getLayerGroup(groupId) != null,
-                  "A layer group with layer group ID '%d' doesn't exist.",
-                  groupId);
+    checkArgument(
+        getLayerGroup(groupId) != null,
+        "A layer group with layer group ID '%d' doesn't exist.",
+        groupId
+    );
 
     LayerGroup oldGroup = getLayerGroup(groupId);
     if (oldGroup.isVisible() == visible) {
@@ -211,9 +223,11 @@ public class DefaultLayerManager
 
   @Override
   public void setGroupName(int groupId, String name) {
-    checkArgument(getLayerGroup(groupId) != null,
-                  "A layer group with layer group ID '%d' doesn't exist.",
-                  groupId);
+    checkArgument(
+        getLayerGroup(groupId) != null,
+        "A layer group with layer group ID '%d' doesn't exist.",
+        groupId
+    );
 
     LayerGroup oldGroup = getLayerGroup(groupId);
     LayerGroup newGroup = oldGroup.withName(name);
@@ -381,8 +395,10 @@ public class DefaultLayerManager
 
     // Add all model components to their respective layer.
     for (DrawnModelComponent modelComponent : drawnModelComponents) {
-      addComponent(modelComponent,
-                   modelComponent.getPropertyLayerWrapper().getValue().getLayer().getId());
+      addComponent(
+          modelComponent,
+          modelComponent.getPropertyLayerWrapper().getValue().getLayer().getId()
+      );
     }
 
   }

@@ -7,18 +7,19 @@
  */
 package org.opentcs.strategies.basic.routing.edgeevaluator;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
 import org.opentcs.data.model.Path;
@@ -46,8 +47,10 @@ class EdgeEvaluatorCompositeTest {
     Point srcPoint = new Point("srcPoint");
     Point dstPoint = new Point("dstPoint");
 
-    edge = new Edge(new Path("pathName", srcPoint.getReference(), dstPoint.getReference()),
-                    true);
+    edge = new Edge(
+        new Path("pathName", srcPoint.getReference(), dstPoint.getReference()),
+        true
+    );
     vehicle = new Vehicle("someVehicle");
 
     configuration = mock(ShortestPathConfiguration.class);
@@ -113,7 +116,8 @@ class EdgeEvaluatorCompositeTest {
   }
 
   private static class FixedValueEdgeEvaluator
-      implements EdgeEvaluator {
+      implements
+        EdgeEvaluator {
 
     private final double value;
 

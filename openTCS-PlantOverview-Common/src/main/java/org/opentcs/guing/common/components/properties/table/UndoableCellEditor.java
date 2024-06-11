@@ -21,8 +21,10 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.Undo
  * A cell editor wrapped in an undo manager.
  */
 public class UndoableCellEditor
-    extends javax.swing.AbstractCellEditor
-    implements javax.swing.table.TableCellEditor {
+    extends
+      javax.swing.AbstractCellEditor
+    implements
+      javax.swing.table.TableCellEditor {
 
   /**
    * The undo manager.
@@ -96,7 +98,8 @@ public class UndoableCellEditor
 
   @Override
   public Component getTableCellEditorComponent(
-      JTable table, Object value, boolean isSelected, int row, int column) {
+      JTable table, Object value, boolean isSelected, int row, int column
+  ) {
 
     Property property = (Property) value;
     fUndoActivity = new PropertyUndoActivity(property);

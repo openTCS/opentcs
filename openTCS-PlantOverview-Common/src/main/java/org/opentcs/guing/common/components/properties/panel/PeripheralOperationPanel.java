@@ -25,8 +25,10 @@ import org.opentcs.util.gui.StringListCellRenderer;
  * User interface for a single line text.
  */
 public class PeripheralOperationPanel
-    extends JPanel
-    implements DetailsDialogContent {
+    extends
+      JPanel
+    implements
+      DetailsDialogContent {
 
   private static final Comparator<LocationModel> BY_NAME
       = (o1, o2) -> o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
@@ -61,8 +63,8 @@ public class PeripheralOperationPanel
     }
 
     operationComboBox.removeAllItems();
-    for (String op
-             : location.getLocationType().getPropertyAllowedPeripheralOperations().getItems()) {
+    for (String op : location.getLocationType().getPropertyAllowedPeripheralOperations()
+        .getItems()) {
       operationComboBox.addItem(op);
     }
   }
@@ -90,11 +92,14 @@ public class PeripheralOperationPanel
       return Optional.empty();
     }
 
-    return Optional.of(new PeripheralOperationModel(
-        ((LocationModel) locationComboBox.getSelectedItem()).getName(),
-        (String) operationComboBox.getSelectedItem(),
-        (PeripheralOperation.ExecutionTrigger) triggerComboBox.getSelectedItem(),
-        requireCompleteCheckBox.isSelected()));
+    return Optional.of(
+        new PeripheralOperationModel(
+            ((LocationModel) locationComboBox.getSelectedItem()).getName(),
+            (String) operationComboBox.getSelectedItem(),
+            (PeripheralOperation.ExecutionTrigger) triggerComboBox.getSelectedItem(),
+            requireCompleteCheckBox.isSelected()
+        )
+    );
   }
 
   public void setPeripheralOpartionModel(PeripheralOperationModel model) {
@@ -116,6 +121,7 @@ public class PeripheralOperationPanel
         && triggerComboBox.getSelectedItem() != null;
   }
 
+  // FORMATTER:OFF
   // CHECKSTYLE:OFF
   /**
    * This method is called from within the constructor to initialize the form.
@@ -207,6 +213,8 @@ public class PeripheralOperationPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(triggerComboBox, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
+  // CHECKSTYLE:ON
+  // FORMATTER:ON
 
   private void locationComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_locationComboBoxItemStateChanged
     if (evt.getStateChange() == ItemEvent.SELECTED) {
@@ -214,6 +222,8 @@ public class PeripheralOperationPanel
     }
   }//GEN-LAST:event_locationComboBoxItemStateChanged
 
+  // FORMATTER:OFF
+  // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JComboBox<LocationModel> locationComboBox;
   private javax.swing.JLabel locationLabel;
@@ -225,4 +235,5 @@ public class PeripheralOperationPanel
   private javax.swing.JLabel triggerLabel;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
+  // FORMATTER:ON
 }

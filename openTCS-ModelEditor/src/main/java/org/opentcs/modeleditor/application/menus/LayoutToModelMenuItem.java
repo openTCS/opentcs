@@ -7,12 +7,13 @@
  */
 package org.opentcs.modeleditor.application.menus;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import static java.util.Objects.requireNonNull;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import org.jhotdraw.draw.DrawingEditor;
@@ -40,7 +41,8 @@ import org.opentcs.util.event.EventHandler;
  * or locations to the corresponding model properties.
  */
 public class LayoutToModelMenuItem
-    extends JMenuItem {
+    extends
+      JMenuItem {
 
   /**
    * The <code>DrawingEditor</code> instance.
@@ -78,23 +80,31 @@ public class LayoutToModelMenuItem
    */
   @Inject
   @SuppressWarnings("this-escape")
-  public LayoutToModelMenuItem(OpenTCSDrawingEditor drawingEditor,
-                               UndoRedoManager undoRedoManager,
-                               @ApplicationEventBus EventHandler eventHandler,
-                               MenuItemComponentsFactory componentsFactory,
-                               @Assisted boolean copyAll) {
-    super(ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH)
-        .getString("layoutToModelMenuItem.text"));
+  public LayoutToModelMenuItem(
+      OpenTCSDrawingEditor drawingEditor,
+      UndoRedoManager undoRedoManager,
+      @ApplicationEventBus
+      EventHandler eventHandler,
+      MenuItemComponentsFactory componentsFactory,
+      @Assisted
+      boolean copyAll
+  ) {
+    super(
+        ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MENU_PATH)
+            .getString("layoutToModelMenuItem.text")
+    );
     this.drawingEditor = requireNonNull(drawingEditor, "drawingEditor");
     this.undoRedoManager = requireNonNull(undoRedoManager, "undoRedoManager");
     this.eventHandler = requireNonNull(eventHandler, "eventHandler");
     this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
     this.copyAll = copyAll;
 
-    setIcon(new ImageIcon(
-        getClass().getClassLoader()
-            .getResource("org/opentcs/guing/res/symbols/menu/arrow-up-3.png")
-    ));
+    setIcon(
+        new ImageIcon(
+            getClass().getClassLoader()
+                .getResource("org/opentcs/guing/res/symbols/menu/arrow-up-3.png")
+        )
+    );
     setMargin(new Insets(0, 2, 0, 2));
     addActionListener();
   }

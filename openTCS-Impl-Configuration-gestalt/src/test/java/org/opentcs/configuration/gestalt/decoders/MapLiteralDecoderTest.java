@@ -7,6 +7,13 @@
  */
 package org.opentcs.configuration.gestalt.decoders;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -25,14 +32,8 @@ import org.github.gestalt.config.reflect.TypeCapture;
 import org.github.gestalt.config.source.MapConfigSourceBuilder;
 import org.github.gestalt.config.tag.Tags;
 import org.github.gestalt.config.utils.ValidateOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
 
 /**
  * Tests the map literal decoder {@link MapLiteralDecoder} for Gestalt.
@@ -48,10 +49,12 @@ class MapLiteralDecoderTest {
       throws GestaltConfigurationException {
     configNodeService = mock(ConfigNodeService.class);
     lexer = mock(SentenceLexer.class);
-    decoderService = new DecoderRegistry(Collections.singletonList(new MapLiteralDecoder()),
-                                         configNodeService,
-                                         lexer,
-                                         List.of(new StandardPathMapper()));
+    decoderService = new DecoderRegistry(
+        Collections.singletonList(new MapLiteralDecoder()),
+        configNodeService,
+        lexer,
+        List.of(new StandardPathMapper())
+    );
   }
 
   @Test
@@ -60,9 +63,11 @@ class MapLiteralDecoderTest {
     Map<String, String> config = Map.of("entry_path", "AAAA=1, BBBB=2, CCCC=3");
     Gestalt gestalt = buildGestaltConfig(config);
 
-    Map<String, Integer> result = gestalt.getConfig("entry_path",
-                                                    new TypeCapture<Map<String, Integer>>() {
-                                                });
+    Map<String, Integer> result = gestalt.getConfig(
+        "entry_path",
+        new TypeCapture<Map<String, Integer>>() {
+        }
+    );
 
     assertEquals(result.get("AAAA"), 1);
     assertEquals(result.get("BBBB"), 2);
@@ -75,9 +80,11 @@ class MapLiteralDecoderTest {
     Map<String, String> config = Map.of("entry_path", "Foo=1, Bar=2, Baz=3");
     Gestalt gestalt = buildGestaltConfig(config);
 
-    Map<Things, Integer> result = gestalt.getConfig("entry_path",
-                                                    new TypeCapture<Map<Things, Integer>>() {
-                                                });
+    Map<Things, Integer> result = gestalt.getConfig(
+        "entry_path",
+        new TypeCapture<Map<Things, Integer>>() {
+        }
+    );
 
     assertEquals(result.get(Things.Foo), 1);
     assertEquals(result.get(Things.Bar), 2);
@@ -90,9 +97,11 @@ class MapLiteralDecoderTest {
     Map<String, String> config = Map.of("entry_path", "");
     Gestalt gestalt = buildGestaltConfig(config);
 
-    Map<String, Integer> result = gestalt.getConfig("entry_path",
-                                                    new TypeCapture<Map<String, Integer>>() {
-                                                });
+    Map<String, Integer> result = gestalt.getConfig(
+        "entry_path",
+        new TypeCapture<Map<String, Integer>>() {
+        }
+    );
 
     assertTrue(result.isEmpty());
   }
@@ -106,12 +115,14 @@ class MapLiteralDecoderTest {
         Tags.of(),
         new LeafNode("AAAA=1; BBBB=2; CCCC=3"),
         new TypeCapture<Map<String, String>>() {
-    },
+        },
         new DecoderContext(decoderService, null)
     );
     assertThat(result.getErrors(), hasSize(1));
-    assertThat(result.getErrors().get(0),
-               instanceOf(MapLiteralDecoder.MapEntryFormatInvalid.class));
+    assertThat(
+        result.getErrors().get(0),
+        instanceOf(MapLiteralDecoder.MapEntryFormatInvalid.class)
+    );
   }
 
   @Test
@@ -123,16 +134,22 @@ class MapLiteralDecoderTest {
         Tags.of(),
         new LeafNode("AAAA~1, BBBB~2, CCCC~3"),
         new TypeCapture<Map<String, String>>() {
-    },
+        },
         new DecoderContext(decoderService, null)
     );
     assertThat(result.getErrors(), hasSize(3));
-    assertThat(result.getErrors().get(0),
-               instanceOf(MapLiteralDecoder.MapEntryFormatInvalid.class));
-    assertThat(result.getErrors().get(1),
-               instanceOf(MapLiteralDecoder.MapEntryFormatInvalid.class));
-    assertThat(result.getErrors().get(2),
-               instanceOf(MapLiteralDecoder.MapEntryFormatInvalid.class));
+    assertThat(
+        result.getErrors().get(0),
+        instanceOf(MapLiteralDecoder.MapEntryFormatInvalid.class)
+    );
+    assertThat(
+        result.getErrors().get(1),
+        instanceOf(MapLiteralDecoder.MapEntryFormatInvalid.class)
+    );
+    assertThat(
+        result.getErrors().get(2),
+        instanceOf(MapLiteralDecoder.MapEntryFormatInvalid.class)
+    );
   }
 
   private enum Things {

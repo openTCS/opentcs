@@ -7,8 +7,10 @@
  */
 package org.opentcs.kernelcontrolcenter.exchange;
 
-import jakarta.inject.Inject;
 import static java.util.Objects.requireNonNull;
+import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
+
+import jakarta.inject.Inject;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
@@ -16,7 +18,6 @@ import javax.swing.JOptionPane;
 import org.opentcs.common.KernelClientApplication;
 import org.opentcs.common.PortalManager;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
-import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
 import org.opentcs.util.CallWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +45,8 @@ import org.slf4j.LoggerFactory;
  * </ul>
  */
 public class DefaultServiceCallWrapper
-    implements CallWrapper {
+    implements
+      CallWrapper {
 
   /**
    * This class' logger.
@@ -70,8 +72,10 @@ public class DefaultServiceCallWrapper
    * @param portalManager The portal manager.
    */
   @Inject
-  public DefaultServiceCallWrapper(KernelClientApplication application,
-                                   PortalManager portalManager) {
+  public DefaultServiceCallWrapper(
+      KernelClientApplication application,
+      PortalManager portalManager
+  ) {
     this.application = requireNonNull(application, "application");
     this.portalManager = requireNonNull(portalManager, "portalManager");
   }

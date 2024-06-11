@@ -30,7 +30,8 @@ import org.opentcs.modeleditor.components.tree.elements.TreeElementsInjectionMod
  * A Guice module for this package.
  */
 public class ComponentsInjectionModule
-    extends AbstractModule {
+    extends
+      AbstractModule {
 
   /**
    * Creates a new instance.
@@ -53,7 +54,8 @@ public class ComponentsInjectionModule
   }
 
   private static class ComponentsTreeViewModule
-      extends PrivateModule {
+      extends
+        PrivateModule {
 
     ComponentsTreeViewModule() {
     }
@@ -85,7 +87,8 @@ public class ComponentsInjectionModule
   }
 
   private static class BlocksTreeViewModule
-      extends PrivateModule {
+      extends
+        PrivateModule {
 
     BlocksTreeViewModule() {
     }

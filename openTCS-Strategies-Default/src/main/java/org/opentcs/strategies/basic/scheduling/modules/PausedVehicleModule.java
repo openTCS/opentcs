@@ -7,10 +7,11 @@
  */
 package org.opentcs.strategies.basic.scheduling.modules;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.List;
-import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -28,7 +29,8 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class PausedVehicleModule
-    implements Scheduler.Module {
+    implements
+      Scheduler.Module {
 
   /**
    * This class's logger.
@@ -48,8 +50,13 @@ public class PausedVehicleModule
   private boolean initialized;
 
   @Inject
-  public PausedVehicleModule(@Nonnull TCSObjectService objectService,
-                             @Nonnull @GlobalSyncObject Object globalSyncObject) {
+  public PausedVehicleModule(
+      @Nonnull
+      TCSObjectService objectService,
+      @Nonnull
+      @GlobalSyncObject
+      Object globalSyncObject
+  ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
   }
@@ -78,14 +85,18 @@ public class PausedVehicleModule
   }
 
   @Override
-  public void setAllocationState(Scheduler.Client client,
-                                 Set<TCSResource<?>> alloc,
-                                 List<Set<TCSResource<?>>> remainingClaim) {
+  public void setAllocationState(
+      Scheduler.Client client,
+      Set<TCSResource<?>> alloc,
+      List<Set<TCSResource<?>>> remainingClaim
+  ) {
   }
 
   @Override
-  public boolean mayAllocate(Scheduler.Client client,
-                             Set<TCSResource<?>> resources) {
+  public boolean mayAllocate(
+      Scheduler.Client client,
+      Set<TCSResource<?>> resources
+  ) {
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
@@ -106,18 +117,24 @@ public class PausedVehicleModule
   }
 
   @Override
-  public void prepareAllocation(Scheduler.Client client,
-                                Set<TCSResource<?>> resources) {
+  public void prepareAllocation(
+      Scheduler.Client client,
+      Set<TCSResource<?>> resources
+  ) {
   }
 
   @Override
-  public boolean hasPreparedAllocation(Scheduler.Client client,
-                                       Set<TCSResource<?>> resources) {
+  public boolean hasPreparedAllocation(
+      Scheduler.Client client,
+      Set<TCSResource<?>> resources
+  ) {
     return true;
   }
 
   @Override
-  public void allocationReleased(Scheduler.Client client,
-                                 Set<TCSResource<?>> resources) {
+  public void allocationReleased(
+      Scheduler.Client client,
+      Set<TCSResource<?>> resources
+  ) {
   }
 }

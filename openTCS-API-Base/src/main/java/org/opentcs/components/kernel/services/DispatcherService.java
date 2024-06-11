@@ -52,7 +52,8 @@ public interface DispatcherService {
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void withdrawByVehicle(TCSObjectReference<Vehicle> ref, boolean immediateAbort)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Withdraw the referenced order.
@@ -71,7 +72,8 @@ public interface DispatcherService {
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void withdrawByTransportOrder(TCSObjectReference<TransportOrder> ref, boolean immediateAbort)
-      throws ObjectUnknownException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Explicitly trigger a rerouting for the given vehicles.
@@ -83,9 +85,14 @@ public interface DispatcherService {
    * @param ref The vehicle to be rerouted.
    * @param reroutingType The type of the requested rerouting.
    */
-  void reroute(@Nonnull TCSObjectReference<Vehicle> ref,
-               @Nonnull ReroutingType reroutingType)
-      throws ObjectUnknownException, KernelRuntimeException;
+  void reroute(
+      @Nonnull
+      TCSObjectReference<Vehicle> ref,
+      @Nonnull
+      ReroutingType reroutingType
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException;
 
   /**
    * Explicitly trigger a rerouting for all vehicles.
@@ -96,7 +103,10 @@ public interface DispatcherService {
    *
    * @param reroutingType The type of rerouting.
    */
-  void rerouteAll(@Nonnull ReroutingType reroutingType);
+  void rerouteAll(
+      @Nonnull
+      ReroutingType reroutingType
+  );
 
   /**
    * Assign the referenced transport order (to its intended vehicle) <em>now</em>.
@@ -112,5 +122,7 @@ public interface DispatcherService {
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
   void assignNow(TCSObjectReference<TransportOrder> ref)
-      throws ObjectUnknownException, TransportOrderAssignmentException, KernelRuntimeException;
+      throws ObjectUnknownException,
+        TransportOrderAssignmentException,
+        KernelRuntimeException;
 }

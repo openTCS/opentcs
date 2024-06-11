@@ -7,15 +7,17 @@
  */
 package org.opentcs.operationsdesk.event;
 
-import java.util.EventObject;
 import static java.util.Objects.requireNonNull;
+
+import java.util.EventObject;
 import org.opentcs.access.Kernel;
 
 /**
  * Informs listeners about a change of the kernel's state.
  */
 public class KernelStateChangeEvent
-    extends EventObject {
+    extends
+      EventObject {
 
   /**
    * The new/current kernel state.

@@ -24,8 +24,10 @@ import org.opentcs.data.model.PlantModel;
  * Delegates method invocations to the corresponding remote service.
  */
 class RemotePlantModelServiceProxy
-    extends RemoteTCSObjectServiceProxy<RemotePlantModelService>
-    implements PlantModelService {
+    extends
+      RemoteTCSObjectServiceProxy<RemotePlantModelService>
+    implements
+      PlantModelService {
 
   /**
    * Creates a new instance.
@@ -48,8 +50,10 @@ class RemotePlantModelServiceProxy
 
   @Override
   public void createPlantModel(PlantModelCreationTO to)
-      throws ObjectUnknownException, ObjectExistsException, KernelRuntimeException,
-             IllegalStateException {
+      throws ObjectUnknownException,
+        ObjectExistsException,
+        KernelRuntimeException,
+        IllegalStateException {
     checkServiceAvailability();
 
     try {
@@ -88,7 +92,8 @@ class RemotePlantModelServiceProxy
 
   @Override
   public void updateLocationLock(TCSObjectReference<Location> ref, boolean locked)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
@@ -101,7 +106,8 @@ class RemotePlantModelServiceProxy
 
   @Override
   public void updatePathLock(TCSObjectReference<Path> ref, boolean locked)
-      throws ObjectUnknownException, KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     checkServiceAvailability();
 
     try {
