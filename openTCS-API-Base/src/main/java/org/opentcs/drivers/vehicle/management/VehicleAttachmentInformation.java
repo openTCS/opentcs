@@ -10,6 +10,7 @@ package org.opentcs.drivers.vehicle.management;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
+import java.io.Serializable;
 import java.util.List;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
@@ -19,7 +20,9 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
  * Describes which communication adapter a vehicle is currently associated with and which adapters
  * are available.
  */
-public class VehicleAttachmentInformation {
+public class VehicleAttachmentInformation
+    implements
+      Serializable {
 
   /**
    * The vehicle this attachment information belongs to.
