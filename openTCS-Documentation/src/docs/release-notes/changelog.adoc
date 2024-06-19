@@ -27,6 +27,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Remove deprecated code.
 * Other changes:
 ** Replace the configuration prefix 'plantoverviewapp' in the Model Editor and Operations Desk applications (which is reminiscent of the old Plant Overview application) with prefixes that are more suitable for the respective applications.
+** Update web API specification and implementation to version 1.7.0:
+*** Remove support for the `REPORT_POSITION` point type, which was scheduled for removal with openTCS 6.0.
 
 === Migration notes
 
