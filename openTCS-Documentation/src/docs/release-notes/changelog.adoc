@@ -12,6 +12,11 @@ The openTCS developers
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+== Version 5.17.1 (2024-06-19)
+
+* Bugs fixed:
+** Avoid `NullPointerException`s when rerouting vehicles that process transport orders containing drive order steps that don't have a path.
+
 == Version 5.17 (2024-05-21)
 
 * Bugs fixed:
