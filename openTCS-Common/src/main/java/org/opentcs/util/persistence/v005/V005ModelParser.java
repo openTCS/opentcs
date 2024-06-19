@@ -95,6 +95,7 @@ public class V005ModelParser {
               .setzPosition(point.getzPosition())
               .setVehicleOrientationAngle(point.getVehicleOrientationAngle())
               .setType(point.getType())
+              .setVehicleEnvelopes(convertVehicleEnvelopes(point.getVehicleEnvelopes()))
               .setOutgoingPaths(convertOutgoingPaths(point))
               .setPointLayout(
                   new PointTO.PointLayout()
@@ -105,6 +106,26 @@ public class V005ModelParser {
               );
           return result;
         })
+        .toList();
+  }
+
+  private List<VehicleEnvelopeTO> convertVehicleEnvelopes(
+      List<org.opentcs.util.persistence.v004.VehicleEnvelopeTO> tos
+  ) {
+    return tos.stream()
+        .map(
+            vehicleEnvelope -> new VehicleEnvelopeTO()
+                .setKey(vehicleEnvelope.getKey())
+                .setVertices(
+                    vehicleEnvelope.getVertices().stream()
+                        .map(
+                            couple -> new CoupleTO()
+                                .setX(couple.getX())
+                                .setY(couple.getY())
+                        )
+                        .toList()
+                )
+        )
         .toList();
   }
 
@@ -137,7 +158,9 @@ public class V005ModelParser {
               .setLength(path.getLength())
               .setMaxVelocity(path.getMaxVelocity())
               .setMaxReverseVelocity(path.getMaxReverseVelocity())
+              .setPeripheralOperations(convertPeripheralOperations(path.getPeripheralOperations()))
               .setLocked(path.isLocked())
+              .setVehicleEnvelopes(convertVehicleEnvelopes(path.getVehicleEnvelopes()))
               .setPathLayout(
                   new PathTO.PathLayout()
                       .setConnectionType(path.getPathLayout().getConnectionType())
@@ -156,6 +179,24 @@ public class V005ModelParser {
         .toList();
   }
 
+  private List<PeripheralOperationTO> convertPeripheralOperations(
+      List<org.opentcs.util.persistence.v004.PeripheralOperationTO> tos
+  ) {
+    return tos.stream()
+        .map(
+            peripheralOperation -> {
+              PeripheralOperationTO result = new PeripheralOperationTO();
+              result.setName(peripheralOperation.getName())
+                  .setProperties(convertProperties(peripheralOperation.getProperties()));
+              result.setLocationName(peripheralOperation.getLocationName())
+                  .setExecutionTrigger(peripheralOperation.getExecutionTrigger())
+                  .setCompletionRequired(peripheralOperation.isCompletionRequired());
+              return result;
+            }
+        )
+        .toList();
+  }
+
   private List<VehicleTO> convertVehicles(V004PlantModelTO to) {
     return to.getVehicles().stream()
         .map(vehicle -> {
@@ -169,6 +210,7 @@ public class V005ModelParser {
               .setEnergyLevelSufficientlyRecharged(vehicle.getEnergyLevelSufficientlyRecharged())
               .setMaxVelocity(vehicle.getMaxVelocity())
               .setMaxReverseVelocity(vehicle.getMaxReverseVelocity())
+              .setEnvelopeKey(vehicle.getEnvelopeKey())
               .setVehicleLayout(
                   new VehicleTO.VehicleLayout()
                       .setColor(vehicle.getVehicleLayout().getColor())
@@ -188,6 +230,9 @@ public class V005ModelParser {
           result.setName(locationType.getName())
               .setProperties(convertProperties(locationType.getProperties()));
           result.setAllowedOperations(convertAllowedOperations(locationType.getAllowedOperations()))
+              .setAllowedPeripheralOperations(
+                  convertAllowedPeripheralOperations(locationType.getAllowedPeripheralOperations())
+              )
               .setLocationTypeLayout(
                   new LocationTypeTO.LocationTypeLayout()
                       .setLocationRepresentation(locationRepresentation)
@@ -207,6 +252,21 @@ public class V005ModelParser {
           result.setProperties(convertProperties(allowedOperation.getProperties()));
           return result;
         })
+        .toList();
+  }
+
+  private List<AllowedPeripheralOperationTO> convertAllowedPeripheralOperations(
+      List<org.opentcs.util.persistence.v004.AllowedPeripheralOperationTO> tos
+  ) {
+    return tos.stream()
+        .map(
+            allowedPeripheralOperation -> {
+              AllowedPeripheralOperationTO result = new AllowedPeripheralOperationTO();
+              result.setName(allowedPeripheralOperation.getName());
+              result.setProperties(convertProperties(allowedPeripheralOperation.getProperties()));
+              return result;
+            }
+        )
         .toList();
   }
 
