@@ -204,16 +204,22 @@ public class RerouteUtil {
       List<Step> updatedSteps = new ArrayList<>();
 
       for (Step step : order.getRoute().getSteps()) {
-        Path path = transportOrderService.fetchObject(Path.class, step.getPath().getReference());
-        updatedSteps.add(
-            new Route.Step(
-                path,
-                step.getSourcePoint(),
-                step.getDestinationPoint(),
-                step.getVehicleOrientation(),
-                step.getRouteIndex()
-            )
-        );
+        if (step.getPath() != null) {
+          updatedSteps.add(
+              new Route.Step(
+                  transportOrderService.fetchObject(Path.class, step.getPath().getReference()),
+                  step.getSourcePoint(),
+                  step.getDestinationPoint(),
+                  step.getVehicleOrientation(),
+                  step.getRouteIndex()
+              )
+          );
+        }
+        else {
+          // If the step doesn't have a path, there are no path locks to be updated and we can
+          // simply keep the step as it is.
+          updatedSteps.add(step);
+        }
       }
 
       Route updatedRoute = new Route(updatedSteps, order.getRoute().getCosts());
@@ -274,6 +280,7 @@ public class RerouteUtil {
     return orders.stream()
         .map(order -> order.getRoute().getSteps())
         .flatMap(steps -> steps.stream())
+        .filter(step -> step.getPath() != null)
         .anyMatch(step -> step.getPath().isLocked());
   }
 
@@ -318,7 +325,7 @@ public class RerouteUtil {
           }
           break;
         case PAUSE_AT_PATH_LOCK:
-          if (step.getPath().isLocked()) {
+          if (step.getPath() != null && step.getPath().isLocked()) {
             executionAllowed = false;
           }
           break;
