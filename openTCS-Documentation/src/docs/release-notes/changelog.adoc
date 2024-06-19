@@ -17,9 +17,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Changes affecting developers:
 ** Update project to Java 21.
 ** Update slf4j to 2.0.13.
-*** Migration note: Integration projects need to update any use of slf4j providers to the same version, too, or the respective logging backend might not be used.
 ** Update Guice to 7.0.0.
-*** Migration note: Integration projects now need to use injection-related annotations in the `jakarta.inject` namespace, e.g. `jakarta.inject.Inject` or `jakarta.inject.Provider`.
 ** Use annotations `jakarta.annotation.Nullable` and `jakarta.annotation.Nonnull` instead of `javax.annotation.Nullable` and `javax.annotation.Nonnull`.
    For the latter, use of the `javax` namespace was never officially approved, so the former may be considered more official.
 ** Remove code for reading configuration (interfaces) via cfg4j.
@@ -30,10 +28,14 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update web API specification and implementation to version 1.7.0:
 *** Remove support for the `REPORT_POSITION` point type, which was scheduled for removal with openTCS 6.0.
 
-=== Migration notes
-
-* When a plant model that was created with an earlier version is intended to be used with openTCS 6.0, it is recommended to first load and save the plant model with the Model Editor of the latest openTCS 5 release, which is openTCS 5.17 at the time of this writing.
+[IMPORTANT] 
+.Migration notes
+==== 
+* When a plant model that was created with an earlier version is intended to be used with openTCS 6.0, it is recommended to first load and save the plant model with the Model Editor of the latest openTCS 5 release, which is openTCS 5.17.1 at the time of this writing.
   Otherwise, loading such a plant model with openTCS 6 might fail.
+* Integration projects need to update any use of slf4j providers to version 2.0.13, too, or the respective logging backend might not be used.
+* Integration projects now need to use injection-related annotations in the `jakarta.inject` namespace, e.g. `jakarta.inject.Inject` or `jakarta.inject.Provider`.
+====
 
 == Version 5.17.1 (2024-06-19)
 
