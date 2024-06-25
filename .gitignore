@@ -1,5 +1,6 @@
 /.idea/*
 !/.idea/codeStyles
+!/.idea/runConfigurations
 /.gradle/
 /build/
 /openTCS-*/build/
