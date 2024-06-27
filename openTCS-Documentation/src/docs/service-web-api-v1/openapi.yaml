@@ -18,7 +18,7 @@ info:
     Optionally, an access key can be set in the kernel configuration.
     The configured value is then expected to be sent by the client in an HTTP header named `X-Api-Access-Key`.
   # IMPORTANT: When updating this version number, remember to mention that in the changelog, too!
-  version: 1.7.0
+  version: 1.8.0
   title: openTCS web API specification
 servers:
   - url: http://localhost:55200/v1
@@ -1192,9 +1192,25 @@ paths:
         - Plant models
       summary: Triggers an update of the routing topology.
       description: ""
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TopologyUpdateRequest"
       responses:
         "200":
           description: Successful response.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find path 'Path-BA'.
   /paths/{NAME}/locked:
     put:
       tags:
@@ -1778,6 +1794,21 @@ components:
         type: string
         description: Name of the resource
       example: [ Point-0042, Path-0041--0042 ]
+    TopologyUpdateRequest:
+      title: TopologyUpdateRequest
+      type: object
+      additionalProperties: false
+      properties:
+        paths:
+         type: array
+         items:
+          type: string
+         description: >-
+           The names of the paths to update in the routing topology.
+           An empty list of paths causes the entire routing topology to be updated.
+         example: [ Path-0042--0043, Path-0041--0042 ]
+      required:
+        - paths
     StatusMessageList:
       title: Status Message List
       type: object
