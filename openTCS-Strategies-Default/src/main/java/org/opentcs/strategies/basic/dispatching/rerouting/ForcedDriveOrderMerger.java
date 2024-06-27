@@ -13,6 +13,7 @@ import java.util.List;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route;
+import org.opentcs.strategies.basic.routing.ResourceAvoidanceExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,10 +35,14 @@ public class ForcedDriveOrderMerger
    * Creates a new instance.
    *
    * @param router The router to use.
+   * @param resourceAvoidanceExtractor Extracts resources to be avoided from transport orders.
    */
   @Inject
-  public ForcedDriveOrderMerger(Router router) {
-    super(router);
+  public ForcedDriveOrderMerger(
+      Router router,
+      ResourceAvoidanceExtractor resourceAvoidanceExtractor
+  ) {
+    super(router, resourceAvoidanceExtractor);
   }
 
   @Override

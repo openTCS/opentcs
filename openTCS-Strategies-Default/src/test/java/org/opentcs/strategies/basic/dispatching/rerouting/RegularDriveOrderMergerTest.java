@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +28,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.routing.ResourceAvoidanceExtractor;
 
 /**
  * Test cases for {@link RegularDriveOrderMerger}.
@@ -45,7 +47,14 @@ class RegularDriveOrderMergerTest {
   @BeforeEach
   void setUp() {
     router = mock(Router.class);
-    driveOrderMerger = new RegularDriveOrderMerger(router);
+    ResourceAvoidanceExtractor resourceAvoidanceExtractor = mock();
+    driveOrderMerger = new RegularDriveOrderMerger(
+        router,
+        resourceAvoidanceExtractor
+    );
+
+    given(resourceAvoidanceExtractor.extractResourcesToAvoid(any(TransportOrder.class)))
+        .willReturn(ResourceAvoidanceExtractor.ResourcesToAvoid.EMPTY);
   }
 
   @Test
@@ -61,6 +70,7 @@ class RegularDriveOrderMergerTest {
     Route actual = driveOrderMerger.mergeDriveOrders(
         orderA,
         orderB,
+        new TransportOrder("t1", List.of()),
         TransportOrder.ROUTE_STEP_INDEX_DEFAULT,
         new Vehicle("Vehicle")
     ).getRoute();

@@ -14,6 +14,8 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.Location;
@@ -198,6 +200,18 @@ public class ResourceAvoidanceExtractor {
      */
     public boolean isEmpty() {
       return points.isEmpty() && paths.isEmpty();
+    }
+
+    /**
+     * Transforms the sets of paths and points to avoid to a single set of TCSResourceReferences.
+     *
+     * @return A set of TCSResourceReferences referencing the points and paths to avoid.
+     */
+    public Set<TCSResourceReference<?>> toResourceReferenceSet() {
+      return Stream.concat(
+          paths.stream().map(path -> path.getReference()),
+          points.stream().map(point -> point.getReference())
+      ).collect(Collectors.toSet());
     }
   }
 }

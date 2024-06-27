@@ -17,6 +17,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 * New features and enhancements:
 ** Update web API specification and implementation to version 1.8.0:
 *** The endpoint `POST /plantModel/topologyUpdateRequest` now also accepts an optional list of path names allowing the routing topology to be updated selectively.
+* Bugs fixed:
+** Correctly calculate the costs for new routes when rerouting transport orders for which resources to be avoided are defined.
 
 == Version 6.0 (2024-06-19)
 
