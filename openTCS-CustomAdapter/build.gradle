@@ -1,19 +1,13 @@
-plugins {
-    id 'java'
-}
-
-group = 'org.opentcs'
-version = '6.0.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
+apply from: "${rootDir}/gradle/java-project.gradle"
+apply from: "${rootDir}/gradle/java-codequality.gradle"
+apply from: "${rootDir}/gradle/guice-project.gradle"
+apply from: "${rootDir}/gradle/publishing-java.gradle"
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+  api project(':openTCS-API-Injection')
+  api project(':openTCS-Common')
 }
 
-test {
-    useJUnitPlatform()
+task release {
+  dependsOn build
 }
