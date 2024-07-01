@@ -16,6 +16,7 @@ ext.guiceSrcDir = sourceSets.guiceConfig.java.srcDirs[0]
 
 compileGuiceConfigJava {
   options.release = 21
+  options.compilerArgs << "-Werror"
   options.compilerArgs << "-Xlint:all"
   options.compilerArgs << "-Xlint:-serial"
 }
