@@ -1,5 +1,7 @@
 package org.opentcs.customadapter;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -7,20 +9,38 @@ import java.util.concurrent.ScheduledExecutorService;
  * Default implementation of VehicleConfiguration interface.
  * Provides basic settings for vehicles without specific configurations.
  */
-public class DefaultVehicleConfiguration implements VehicleConfigurationInterface {
+public class DefaultVehicleConfiguration
+    implements VehicleConfigurationInterface {
+
+  private String host = "localhost";
+  private int port = 502;
+//  private final Map<String, String> ethernetParameters = new HashMap<>();
+  private String communicationStrategy = "ModbusTCP";
 
   @Override
-  public String getRechargeOperation() {
-    return "CHARGE";
+  public String getHost() {
+    return host;
   }
 
   @Override
-  public int getCommandsCapacity() {
-    return 10;
+  public int getPort() {
+    return port;
   }
 
   @Override
-  public ScheduledExecutorService getExecutorService() {
-    return Executors.newSingleThreadScheduledExecutor();
+  public String getCommunicationStrategy() {
+    return communicationStrategy;
+  }
+
+  public void setHost(String host) {
+    this.host = host;
+  }
+
+  public void setPort(int port) {
+    this.port = port;
+  }
+
+  public void setCommunicationStrategy(String communicationStrategy) {
+    this.communicationStrategy = communicationStrategy;
   }
 }
