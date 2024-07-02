@@ -7,23 +7,23 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public interface VehicleConfigurationInterface {
   /**
-   * Get the name of the charging operation.
+   * Get the host of the vehicle.
    *
-   * @return String representation of the charging operation.
+   * @return The host name or IP address of the vehicle.
    */
-  String getRechargeOperation();
+  String getHost();
 
   /**
-   * Get the command capacity.
+   * Get the port of the vehicle.
    *
-   * @return The maximum capacity of the command queue.
+   * @return The port number of the vehicle.
    */
-  int getCommandsCapacity();
+  int getPort();
 
   /**
-   * Get the executor service.
+   * Get the communication strategy used by the vehicle for communication.
    *
-   * @return ScheduledExecutorService for executing asynchronous tasks.
+   * @return The communication strategy used by the vehicle.
    */
-  ScheduledExecutorService getExecutorService();
+  String getCommunicationStrategy();
 }
