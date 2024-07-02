@@ -3,27 +3,27 @@ package org.opentcs.customadapter;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * 定義車輛配置的接口。
+ * Interface that defines vehicle configuration
  */
 public interface VehicleConfigurationInterface {
   /**
-   * 獲取充電操作的名稱。
+   * Get the name of the charging operation.
    *
-   * @return 充電操作的字符串表示。
+   * @return String representation of the charging operation.
    */
   String getRechargeOperation();
 
   /**
-   * 獲取命令容量。
+   * Get the command capacity.
    *
-   * @return 命令隊列的最大容量。
+   * @return The maximum capacity of the command queue.
    */
   int getCommandsCapacity();
 
   /**
-   * 獲取執行器服務。
+   * Get the executor service.
    *
-   * @return 用於執行異步任務的 ScheduledExecutorService。
+   * @return ScheduledExecutorService for executing asynchronous tasks.
    */
   ScheduledExecutorService getExecutorService();
 }
