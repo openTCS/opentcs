@@ -4,6 +4,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
@@ -17,6 +18,11 @@ public class CustomAdapterComponentsFactory
     implements VehicleCommAdapterFactory {
 
   /**
+   * This class's logger.
+   */
+  private static final Logger LOG = Logger.getLogger(CustomAdapterComponentsFactory.class.getName());
+
+  /**
    * Map to store vehicle configuration.
    */
   private final Map<String, VehicleConfigurationInterface> vehicleConfigurations = new HashMap<>();
@@ -28,7 +34,9 @@ public class CustomAdapterComponentsFactory
 
   @Override
   public void initialize() {
-    // Do any necessary initialization here
+    LOG.info("Initializing CustomAdapterComponentsFactory");
+    // Add any necessary initialization logic here
+    // For example, you might want to load default configurations for known vehicles
     initialized = true;
   }
 
@@ -39,7 +47,10 @@ public class CustomAdapterComponentsFactory
 
   @Override
   public void terminate() {
-    // Do any necessary cleanup here
+    LOG.info("Terminating CustomAdapterComponentsFactory");
+    // Add any necessary cleanup logic here
+    // For example, you might want to close any open connections or release resources
+    vehicleConfigurations.clear();
     initialized = false;
   }
 
@@ -49,20 +60,18 @@ public class CustomAdapterComponentsFactory
   }
 
   @Override
-  public boolean providesAdapterFor(
-      @Nonnull
-      Vehicle vehicle
-  ) {
+  public boolean providesAdapterFor(@Nonnull Vehicle vehicle) {
+    LOG.fine("Checking if adapter is provided for vehicle: " + vehicle.getName());
     // Implement specific logic based on requirements to determine whether to provide an adapter for a given vehicle
-    return true;
+    // For example, you might check if the vehicle has certain properties or capabilities
+    return vehicleConfigurations.containsKey(vehicle.getName()) ||
+        vehicle.getProperties().containsKey("customAdapter");
   }
 
   @Nullable
   @Override
-  public VehicleCommAdapter getAdapterFor(
-      @Nonnull
-      Vehicle vehicle
-  ) {
+  public VehicleCommAdapter getAdapterFor(@Nonnull Vehicle vehicle) {
+    LOG.info("Creating adapter for vehicle: " + vehicle.getName());
     VehicleConfigurationInterface config = vehicleConfigurations.getOrDefault(
         vehicle.getName(),
         new DefaultVehicleConfiguration()
@@ -82,7 +91,18 @@ public class CustomAdapterComponentsFactory
    * @param config Vehicle configuration
    */
   public void addVehicleConfiguration(String vehicleName, VehicleConfigurationInterface config) {
+    LOG.info("Adding configuration for vehicle: " + vehicleName);
     vehicleConfigurations.put(vehicleName, config);
+  }
+
+  /**
+   * Remove vehicle configuration
+   *
+   * @param vehicleName vehicle name
+   */
+  public void removeVehicleConfiguration(String vehicleName) {
+    LOG.info("Removing configuration for vehicle: " + vehicleName);
+    vehicleConfigurations.remove(vehicleName);
   }
 
   /**
