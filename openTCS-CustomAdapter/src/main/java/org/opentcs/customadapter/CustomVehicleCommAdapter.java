@@ -3,6 +3,7 @@ package org.opentcs.customadapter;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.logging.Logger;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.BasicVehicleCommAdapter;
@@ -10,8 +11,11 @@ import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.util.ExplainedBoolean;
 
-public class CustomVehicleCommAdapter
+public abstract class CustomVehicleCommAdapter
     extends BasicVehicleCommAdapter {
+
+  private static final Logger LOG = Logger.getLogger(CustomVehicleCommAdapter.class.getName());
+
   public CustomVehicleCommAdapter(
       VehicleProcessModel processModel,
       String rechargeOperation,
@@ -19,31 +23,44 @@ public class CustomVehicleCommAdapter
       @KernelExecutor ScheduledExecutorService executor
   ) {
     super(
-//        new CustomAdapterComponentsFactory().createVehicleCommAdapterDescription(),
         processModel,
         commandsCapacity,
         rechargeOperation,
         executor
     );
   }
+
   @Override
   public void sendCommand(MovementCommand cmd) {
-    // Implement the logic of sending commands to the vehicle here
+    LOG.info("Sending command to vehicle: " + cmd.toString());
+    sendSpecificCommand(cmd);
   }
+
+  protected abstract void sendSpecificCommand(MovementCommand cmd);
 
   @Override
   protected void connectVehicle() {
-
+    LOG.info("Connecting to vehicle...");
+    if (performConnection()) {
+      getProcessModel().setCommAdapterConnected(true);
+    }
   }
+
+  protected abstract boolean performConnection();
 
   @Override
   protected void disconnectVehicle() {
-
+    LOG.info("Disconnecting from vehicle...");
+    if (performDisconnection()) {
+      getProcessModel().setCommAdapterConnected(false);
+    }
   }
+
+  protected abstract boolean performDisconnection();
 
   @Override
   protected boolean isVehicleConnected() {
-    return false;
+    return getProcessModel().isCommAdapterConnected();
   }
 
   @Nonnull
@@ -52,12 +69,13 @@ public class CustomVehicleCommAdapter
       @Nonnull
       TransportOrder order
   ) {
-    return new ExplainedBoolean(true, "");
+    return new ExplainedBoolean(true, "Custom adapter can process all orders.");
   }
 
   @Override
   public void onVehiclePaused(boolean paused) {
-
+    LOG.info("Vehicle paused: " + paused);
+    // Implement specific behavior for vehicle paused state
   }
 
   @Override
@@ -65,24 +83,13 @@ public class CustomVehicleCommAdapter
       @Nullable
       Object message
   ) {
-
+    LOG.info("Processing message: " + (message != null ? message.toString() : "null"));
+    // Implement message processing logic
   }
 
-//  @Override
-//  protected VehicleProcessModelTO createCustomTransferableProcessModel() {
-//    CustomVehicleProcessModelTO transferableProcessModel = new CustomVehicleProcessModelTO()
-//        .setVehicleName(getProcessModel().getVehicleName())
-//        .setCommAdapterConnected(isConnected())
-//        .setCommAdapterEnabled(isEnabled())
-//        .setPosition(getProcessModel().getVehiclePosition())
-//        .setPrecisePosition(getProcessModel().getPrecisePosition())
-//        .setOrientationAngle(getProcessModel().getOrientationAngle())
-//        .setEnergyLevel(getProcessModel().getVehicleEnergyLevel())
-//        .setLoadHandlingDevices(getProcessModel().getLoadHandlingDevices());
-//
-//    return transferableProcessModel;
-//  }
+  protected abstract void updateVehiclePosition();
 
-  // TODO
-  // Don't forget to implement all other necessary methods
+  protected abstract void updateVehicleState();
+
+  // You can add more abstract methods here if needed for specific implementations
 }
