@@ -12,6 +12,7 @@ import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_
 import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_EXECUTED;
 import static org.opentcs.util.Assertions.checkInRange;
 
+import jakarta.annotation.Nonnull;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Objects;
@@ -193,6 +194,7 @@ public abstract class BasicVehicleCommAdapter
   }
 
   @Override
+  @Nonnull
   public VehicleProcessModelTO createTransferableProcessModel() {
     return createCustomTransferableProcessModel()
         .setName(getProcessModel().getName())
