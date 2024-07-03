@@ -1,9 +1,7 @@
 package org.opentcs.customadapter;
 
-import java.util.concurrent.ScheduledExecutorService;
-
 /**
- * Interface that defines vehicle configuration
+ * Interface that defines vehicle configuration.
  */
 public interface VehicleConfigurationInterface {
   /**
