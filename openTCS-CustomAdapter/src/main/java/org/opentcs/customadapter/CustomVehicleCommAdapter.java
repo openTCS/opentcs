@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) The openTCS Authors.
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
+ */
+
 package org.opentcs.customadapter;
 
 import jakarta.annotation.Nonnull;
@@ -12,15 +20,27 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.util.ExplainedBoolean;
 
 public abstract class CustomVehicleCommAdapter
-    extends BasicVehicleCommAdapter {
+    extends
+    BasicVehicleCommAdapter {
 
   private static final Logger LOG = Logger.getLogger(CustomVehicleCommAdapter.class.getName());
 
+  /**
+   * CustomVehicleCommAdapter is a subclass of BasicVehicleCommAdapter that provides a customized communication
+   * adapter for a vehicle. It extends the BasicVehicleCommAdapter class and overrides certain methods to
+   * implement specific behavior for the vehicle.
+   *
+   * @param processModel The VehicleProcessModel associated with the vehicle.
+   * @param rechargeOperation The recharge operation associated with the vehicle.
+   * @param commandsCapacity The maximum number of commands that the adapter can hold.
+   * @param executor The ScheduledExecutorService used for executing tasks.
+   */
   public CustomVehicleCommAdapter(
       VehicleProcessModel processModel,
       String rechargeOperation,
       int commandsCapacity,
-      @KernelExecutor ScheduledExecutorService executor
+      @KernelExecutor
+      ScheduledExecutorService executor
   ) {
     super(
         processModel,
