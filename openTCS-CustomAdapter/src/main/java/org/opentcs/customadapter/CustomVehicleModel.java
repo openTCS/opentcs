@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) The openTCS Authors.
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
+ */
+
 package org.opentcs.customadapter;
 
 import org.opentcs.data.model.Vehicle;
@@ -9,13 +17,14 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
  * Used to store and manage vehicle status information specific to custom adapters.
  */
 public class CustomVehicleModel
-    extends VehicleProcessModel {
+    extends
+    VehicleProcessModel {
 
   // Add custom properties
   private String customProperty;
 
   /**
-   * Constructor
+   * Constructor.
    *
    * @param vehicle The associated vehicle object.
    */
@@ -72,6 +81,6 @@ public class CustomVehicleModel
     return to;
   }
 
-  // VehicleProcessModel The other methods in have already been implemented, we don't need to override them
-  // Unless we want to change their behavior
+  // VehicleProcessModel The other methods in have already been implemented, we don't need to
+  // override them Unless we want to change their behavior
 }
