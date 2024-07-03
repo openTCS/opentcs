@@ -26,21 +26,50 @@ import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.util.ExplainedBoolean;
 
+/**
+ * A communication adapter implementation for Modbus TCP protocol.
+ */
 public class ModbusTCPVehicleCommAdapter
     extends
       CustomVehicleCommAdapter {
 
+  /**
+   * This class's logger.
+   */
   private static final Logger LOG = Logger.getLogger(ModbusTCPVehicleCommAdapter.class.getName());
 
+  /**
+   * The default recharge operation.
+   */
   private static final String DEFAULT_RECHARGE_OPERATION = "";
+  /**
+   * The default commands capacity.
+   */
   private static final int DEFAULT_COMMANDS_CAPACITY = Integer.MAX_VALUE;
+  /**
+   * The Modbus TCP master.
+   */
   private ModbusTcpMaster master;
+  /**
+   * The host to connect to.
+   */
   private final String host;
+  /**
+   * The port to connect to.
+   */
   private final int port;
+  /**
+   * Indicates whether the adapter is connected.
+   */
+  private boolean isConnected;
 
   /**
-   * ModbusTCPVehicleCommAdapter is a class that represents a communication adapter for a vehicle using Modbus TCP protocol.
-   * It provides methods for establishing a connection with the vehicle, sending commands, and updating the vehicle's position and state.
+   * Creates a new instance.
+   *
+   * @param processModel The vehicle process model.
+   * @param executor The kernel executor.
+   * @param host The host to connect to.
+   * @param port The port to connect to.
    */
   public ModbusTCPVehicleCommAdapter(
       VehicleProcessModel processModel,
@@ -53,8 +82,14 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   /**
-   * ModbusTCPVehicleCommAdapter is a class that represents a communication adapter for a vehicle using Modbus TCP protocol.
-   * It provides methods for establishing a connection with the vehicle, sending commands, and updating the vehicle's position and state.
+   * Creates a new instance.
+   *
+   * @param processModel The vehicle process model.
+   * @param rechargeOperation The recharge operation.
+   * @param commandsCapacity The commands' capacity.
+   * @param executor The kernel executor.
+   * @param host The host to connect to.
+   * @param port The port to connect to.
    */
   public ModbusTCPVehicleCommAdapter(
       VehicleProcessModel processModel,
@@ -97,28 +132,27 @@ public class ModbusTCPVehicleCommAdapter
     });
   }
 
-  private boolean isConnected = false;
-
+  /**
+   * Performs the connection to the Modbus TCP server.
+   *
+   * @return true if the connection is successful, false otherwise.
+   */
   @Override
   protected boolean performConnection() {
     ModbusTcpMasterConfig config = new ModbusTcpMasterConfig.Builder(host)
         .setPort(port)
         .build();
-
     master = new ModbusTcpMaster(config);
-
-    try {
-      master.connect();
-      isConnected = true;
-      return true;
-    }
-    catch (Exception e) {
-      LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", e);
-      isConnected = false;
-      return false;
-    }
+    master.connect();
+    isConnected = true;
+    return true;
   }
 
+  /**
+   * Performs the disconnection from the Modbus TCP server.
+   *
+   * @return true if the disconnection is successful, false otherwise
+   */
   @Override
   protected boolean performDisconnection() {
     if (master != null) {
@@ -127,10 +161,6 @@ public class ModbusTCPVehicleCommAdapter
         isConnected = false;
         return true;
       }
-      catch (Exception e) {
-        LOG.log(Level.SEVERE, "Failed to disconnect from Modbus TCP server", e);
-        return false;
-      }
       finally {
         master = null;
       }
@@ -138,6 +168,11 @@ public class ModbusTCPVehicleCommAdapter
     return true;
   }
 
+  /**
+   * Checks if the vehicle is connected.
+   *
+   * @return true if connected, false otherwise.
+   */
   protected boolean isVehicleConnected() {
     return isConnected && master != null;
   }
@@ -158,7 +193,7 @@ public class ModbusTCPVehicleCommAdapter
       int x = buffer.readShort();
       int y = buffer.readShort();
 
-      //TODO: check setPosition parameter format
+      // TODO: check setPosition parameter format
       getProcessModel().setPosition(String.format("%d,%d", x, y));
     }).exceptionally(throwable -> {
       LOG.log(Level.SEVERE, "Failed to read vehicle position", throwable);
@@ -194,7 +229,7 @@ public class ModbusTCPVehicleCommAdapter
         default:
           newState = Vehicle.State.UNKNOWN;
       }
-      //TODO: check setState parameter format
+      // TODO: check setState parameter format
       getProcessModel().setState(newState);
     }).exceptionally(throwable -> {
       LOG.log(Level.SEVERE, "Failed to read vehicle state", throwable);

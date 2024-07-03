@@ -18,7 +18,7 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
  */
 public class CustomVehicleModel
     extends
-    VehicleProcessModel {
+      VehicleProcessModel {
 
   // Add custom properties
   private String customProperty;

@@ -26,11 +26,12 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
 
 /**
- * Customized vehicle communication adapter factory.
- * Responsible for creating and managing custom vehicle communication adapters.
+ * CustomAdapterComponentsFactory class is an implementation of VehicleCommAdapterFactory.
+ * It provides communication adapter instances for vehicles to be controlled.
  */
 public class CustomAdapterComponentsFactory
-    implements VehicleCommAdapterFactory {
+    implements
+      VehicleCommAdapterFactory {
 
   /**
    * This class's logger.
@@ -66,7 +67,8 @@ public class CustomAdapterComponentsFactory
    */
   @Inject
   public CustomAdapterComponentsFactory(
-      @KernelExecutor ScheduledExecutorService executor
+      @KernelExecutor
+      ScheduledExecutorService executor
   ) {
     this.executor = executor;
     strategies.put("ModbusTCP", new ModbusTCPStrategy());
@@ -99,7 +101,8 @@ public class CustomAdapterComponentsFactory
 
   @Override
   public boolean providesAdapterFor(
-      @Nonnull Vehicle vehicle
+      @Nonnull
+      Vehicle vehicle
   ) {
     LOG.fine("Checking if adapter is provided for vehicle: " + vehicle.getName());
     return vehicleConfigurations.containsKey(vehicle.getName());
@@ -114,7 +117,8 @@ public class CustomAdapterComponentsFactory
   @Nullable
   @Override
   public VehicleCommAdapter getAdapterFor(
-      @Nonnull Vehicle vehicle
+      @Nonnull
+      Vehicle vehicle
   ) {
     LOG.info("Creating adapter for vehicle: " + vehicle.getName());
 
@@ -193,7 +197,8 @@ public class CustomAdapterComponentsFactory
    * Custom vehicle communication adapter description class.
    */
   private static class CustomVehicleCommAdapterDescription
-      extends VehicleCommAdapterDescription {
+      extends
+        VehicleCommAdapterDescription {
 
     /**
      * Creates a new instance.
@@ -230,7 +235,8 @@ interface CommunicationStrategy {
   VehicleCommAdapter createAdapter(
       Vehicle vehicle,
       VehicleConfigurationInterface config,
-      @KernelExecutor ScheduledExecutorService executor
+      @KernelExecutor
+      ScheduledExecutorService executor
   );
 }
 
@@ -238,7 +244,8 @@ interface CommunicationStrategy {
  * ModbusTCP communication strategy.
  */
 class ModbusTCPStrategy
-    implements CommunicationStrategy {
+    implements
+      CommunicationStrategy {
 
   /**
    * Creates a new instance.
@@ -251,7 +258,8 @@ class ModbusTCPStrategy
   public VehicleCommAdapter createAdapter(
       Vehicle vehicle,
       VehicleConfigurationInterface config,
-      @KernelExecutor ScheduledExecutorService executor
+      @KernelExecutor
+      ScheduledExecutorService executor
   ) {
     return new ModbusTCPVehicleCommAdapter(
         new CustomVehicleModel(vehicle),
