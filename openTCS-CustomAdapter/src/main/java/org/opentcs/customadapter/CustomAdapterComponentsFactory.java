@@ -1,20 +1,21 @@
-/**
- * Copyright (c) The SAA Authors.
- *
- * This program is free software and subject to the MIT license. (For details,
- * see the licensing information (LICENSE.txt) you should have received with
- * this copy of the software.)
- */
 package org.opentcs.customadapter;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -25,59 +26,37 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
 
-/**
- * CustomAdapterComponentsFactory class is an implementation of VehicleCommAdapterFactory.
- * It provides communication adapter instances for vehicles to be controlled.
- */
 public class CustomAdapterComponentsFactory
     implements
       VehicleCommAdapterFactory {
 
-  /**
-   * This class's logger.
-   */
   private static final Logger LOG = Logger.getLogger(
       CustomAdapterComponentsFactory.class.getName()
   );
+  private static final String CONFIG_FILE = "vehicle_config.json";
 
-  /**
-   * The kernel executor.
-   */
   private final ScheduledExecutorService executor;
-
-  /**
-   * Map to store vehicle configuration.
-   */
   private final Map<String, VehicleConfigurationInterface> vehicleConfigurations = new HashMap<>();
-
-  /**
-   * Map to store communication strategies.
-   */
   private final Map<String, CommunicationStrategy> strategies = new HashMap<>();
-
-  /**
-   * Flag indicating whether the factory has been initialized.
-   */
   private boolean initialized;
 
   /**
-   * Constructor.
+   * Constructs a CustomAdapterComponentsFactory.
    *
-   * @param executor The kernel executor.
+   * @param executor The scheduled executor service to be used by the factory.
+   * @inject
    */
   @Inject
-  public CustomAdapterComponentsFactory(
-      @KernelExecutor
-      ScheduledExecutorService executor
-  ) {
+  public CustomAdapterComponentsFactory(@KernelExecutor
+  ScheduledExecutorService executor) {
     this.executor = executor;
     strategies.put("ModbusTCP", new ModbusTCPStrategy());
+    loadConfigurations();
   }
 
   @Override
   public void initialize() {
     LOG.info("Initializing CustomAdapterComponentsFactory");
-    // Add any necessary initialization logic here
     initialized = true;
   }
 
@@ -89,6 +68,7 @@ public class CustomAdapterComponentsFactory
   @Override
   public void terminate() {
     LOG.info("Terminating CustomAdapterComponentsFactory");
+    saveConfigurations();
     vehicleConfigurations.clear();
     strategies.clear();
     initialized = false;
@@ -100,26 +80,16 @@ public class CustomAdapterComponentsFactory
   }
 
   @Override
-  public boolean providesAdapterFor(
-      @Nonnull
-      Vehicle vehicle
-  ) {
+  public boolean providesAdapterFor(@Nonnull
+  Vehicle vehicle) {
     LOG.fine("Checking if adapter is provided for vehicle: " + vehicle.getName());
     return vehicleConfigurations.containsKey(vehicle.getName());
   }
 
-  /**
-   * Returns the appropriate VehicleCommAdapter for the given Vehicle.
-   *
-   * @param vehicle The Vehicle for which to get the adapter.
-   * @return The VehicleCommAdapter for the given Vehicle, or null if no suitable adapter is found.
-   */
   @Nullable
   @Override
-  public VehicleCommAdapter getAdapterFor(
-      @Nonnull
-      Vehicle vehicle
-  ) {
+  public VehicleCommAdapter getAdapterFor(@Nonnull
+  Vehicle vehicle) {
     LOG.info("Creating adapter for vehicle: " + vehicle.getName());
 
     VehicleConfigurationInterface config = vehicleConfigurations.computeIfAbsent(
@@ -143,17 +113,22 @@ public class CustomAdapterComponentsFactory
   private VehicleConfigurationInterface createConfig(Vehicle vehicle) {
     JTextField hostField = new JTextField(10);
     JTextField portField = new JTextField(10);
+    JComboBox<String> strategyComboBox = new JComboBox<>(
+        strategies.keySet().toArray(new String[0])
+    );
 
     JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.add(new JLabel("Host:"));
     panel.add(hostField);
-    panel.add(Box.createHorizontalStrut(15)); // a spacer
     panel.add(new JLabel("Port:"));
     panel.add(portField);
+    panel.add(new JLabel("Communication Strategy:"));
+    panel.add(strategyComboBox);
 
     int result = JOptionPane.showConfirmDialog(
         null, panel,
-        "Enter Host and Port for " + vehicle.getName(), JOptionPane.OK_CANCEL_OPTION
+        "Enter Configuration for " + vehicle.getName(), JOptionPane.OK_CANCEL_OPTION
     );
     if (result == JOptionPane.OK_OPTION) {
       DefaultVehicleConfiguration config = new DefaultVehicleConfiguration();
@@ -165,6 +140,8 @@ public class CustomAdapterComponentsFactory
         LOG.warning("Invalid port number. Using default port 502.");
         config.setPort(502);
       }
+      config.setCommunicationStrategy((String) strategyComboBox.getSelectedItem());
+      saveConfigurations();
       return config;
     }
     else {
@@ -172,37 +149,42 @@ public class CustomAdapterComponentsFactory
     }
   }
 
-  /**
-   * Add or update vehicle configuration.
-   *
-   * @param vehicleName vehicle name
-   * @param config Vehicle configuration
-   */
   public void setVehicleConfiguration(String vehicleName, VehicleConfigurationInterface config) {
     LOG.info("Adding configuration for vehicle: " + vehicleName);
     vehicleConfigurations.put(vehicleName, config);
+    saveConfigurations();
   }
 
-  /**
-   * Remove vehicle configuration.
-   *
-   * @param vehicleName vehicle name
-   */
   public void removeVehicleConfiguration(String vehicleName) {
     LOG.info("Removing configuration for vehicle: " + vehicleName);
     vehicleConfigurations.remove(vehicleName);
+    saveConfigurations();
   }
 
-  /**
-   * Custom vehicle communication adapter description class.
-   */
+  private void loadConfigurations() {
+    try (FileReader reader = new FileReader(CONFIG_FILE)) {
+      Type type = new TypeToken<HashMap<String, DefaultVehicleConfiguration>>() {}.getType();
+      Map<String, DefaultVehicleConfiguration> loadedConfigs = new Gson().fromJson(reader, type);
+      vehicleConfigurations.putAll(loadedConfigs);
+    }
+    catch (IOException e) {
+      LOG.log(Level.WARNING, "Failed to load configurations", e);
+    }
+  }
+
+  private void saveConfigurations() {
+    try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
+      new Gson().toJson(vehicleConfigurations, writer);
+    }
+    catch (IOException e) {
+      LOG.log(Level.WARNING, "Failed to save configurations", e);
+    }
+  }
+
   private static class CustomVehicleCommAdapterDescription
       extends
         VehicleCommAdapterDescription {
 
-    /**
-     * Creates a new instance.
-     */
     CustomVehicleCommAdapterDescription() {
       // Do nothing
     }
@@ -220,18 +202,9 @@ public class CustomAdapterComponentsFactory
 }
 
 /**
- * Interface for communication strategies.
+ *
  */
 interface CommunicationStrategy {
-
-  /**
-   * Creates an adapter for the given vehicle and configuration.
-   *
-   * @param vehicle The vehicle.
-   * @param config The vehicle configuration.
-   * @param executor The kernel executor.
-   * @return The created vehicle communication adapter.
-   */
   VehicleCommAdapter createAdapter(
       Vehicle vehicle,
       VehicleConfigurationInterface config,
@@ -241,15 +214,11 @@ interface CommunicationStrategy {
 }
 
 /**
- * ModbusTCP communication strategy.
+ *
  */
 class ModbusTCPStrategy
     implements
       CommunicationStrategy {
-
-  /**
-   * Creates a new instance.
-   */
   ModbusTCPStrategy() {
     // Do nothing
   }
