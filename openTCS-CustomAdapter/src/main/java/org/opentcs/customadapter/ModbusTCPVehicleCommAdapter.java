@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) The openTCS Authors.
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
+ */
+
 package org.opentcs.customadapter;
 
 import com.digitalpetri.modbus.master.ModbusTcpMaster;
@@ -19,7 +27,8 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.util.ExplainedBoolean;
 
 public class ModbusTCPVehicleCommAdapter
-    extends CustomVehicleCommAdapter {
+    extends
+      CustomVehicleCommAdapter {
 
   private static final Logger LOG = Logger.getLogger(ModbusTCPVehicleCommAdapter.class.getName());
 
@@ -29,20 +38,30 @@ public class ModbusTCPVehicleCommAdapter
   private final String host;
   private final int port;
 
+  /**
+   * ModbusTCPVehicleCommAdapter is a class that represents a communication adapter for a vehicle using Modbus TCP protocol.
+   * It provides methods for establishing a connection with the vehicle, sending commands, and updating the vehicle's position and state.
+   */
   public ModbusTCPVehicleCommAdapter(
       VehicleProcessModel processModel,
-      @KernelExecutor ScheduledExecutorService executor,
+      @KernelExecutor
+      ScheduledExecutorService executor,
       String host,
       int port
   ) {
     this(processModel, DEFAULT_RECHARGE_OPERATION, DEFAULT_COMMANDS_CAPACITY, executor, host, port);
   }
 
+  /**
+   * ModbusTCPVehicleCommAdapter is a class that represents a communication adapter for a vehicle using Modbus TCP protocol.
+   * It provides methods for establishing a connection with the vehicle, sending commands, and updating the vehicle's position and state.
+   */
   public ModbusTCPVehicleCommAdapter(
       VehicleProcessModel processModel,
       String rechargeOperation,
       int commandsCapacity,
-      @KernelExecutor ScheduledExecutorService executor,
+      @KernelExecutor
+      ScheduledExecutorService executor,
       String host,
       int port
   ) {
@@ -59,16 +78,17 @@ public class ModbusTCPVehicleCommAdapter
     }
 
     // Example: Write the X and Y coordinates to holding registers 0 and 1
-    int x = (int) cmd.getStep().getDestinationPoint().getPosition().getX();
-    int y = (int) cmd.getStep().getDestinationPoint().getPosition().getY();
+    int x = (int) cmd.getStep().getDestinationPoint().getPose().getPosition().getX();
+    int y = (int) cmd.getStep().getDestinationPoint().getPose().getPosition().getY();
 
     ByteBuf buffer = Unpooled.buffer(4);
     buffer.writeShort(x);
     buffer.writeShort(y);
 
-    int register_quantity = 2;
+    int registerQuantity = 2;
     CompletableFuture<Void> future = master.sendRequest(
-            new WriteMultipleRegistersRequest(0, register_quantity, buffer), 0)
+        new WriteMultipleRegistersRequest(0, registerQuantity, buffer), 0
+    )
         .thenAccept(response -> LOG.info("Command sent successfully"));
 
     future.exceptionally(throwable -> {
@@ -129,14 +149,17 @@ public class ModbusTCPVehicleCommAdapter
       return;
     }
 
-    CompletableFuture<ReadHoldingRegistersResponse> future =
-        master.sendRequest(new ReadHoldingRegistersRequest(0, 2), 0);
+    CompletableFuture<ReadHoldingRegistersResponse> future = master.sendRequest(
+        new ReadHoldingRegistersRequest(0, 2), 0
+    );
 
     future.thenAccept(response -> {
       ByteBuf buffer = response.getRegisters();
       int x = buffer.readShort();
       int y = buffer.readShort();
-      getProcessModel().setVehiclePosition(String.format("%d,%d", x, y));
+
+      //TODO: check setPosition parameter format
+      getProcessModel().setPosition(String.format("%d,%d", x, y));
     }).exceptionally(throwable -> {
       LOG.log(Level.SEVERE, "Failed to read vehicle position", throwable);
       return null;
@@ -150,8 +173,9 @@ public class ModbusTCPVehicleCommAdapter
       return;
     }
 
-    CompletableFuture<ReadHoldingRegistersResponse> future =
-        master.sendRequest(new ReadHoldingRegistersRequest(2, 1), 0);
+    CompletableFuture<ReadHoldingRegistersResponse> future = master.sendRequest(
+        new ReadHoldingRegistersRequest(2, 1), 0
+    );
 
     future.thenAccept(response -> {
       ByteBuf buffer = response.getRegisters();
@@ -170,7 +194,8 @@ public class ModbusTCPVehicleCommAdapter
         default:
           newState = Vehicle.State.UNKNOWN;
       }
-      getProcessModel().setVehicleState(newState);
+      //TODO: check setState parameter format
+      getProcessModel().setState(newState);
     }).exceptionally(throwable -> {
       LOG.log(Level.SEVERE, "Failed to read vehicle state", throwable);
       return null;
