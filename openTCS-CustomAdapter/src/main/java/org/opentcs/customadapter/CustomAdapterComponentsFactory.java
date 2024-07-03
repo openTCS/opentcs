@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) The SAA Authors.
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
+ */
 package org.opentcs.customadapter;
 
 import com.google.inject.Inject;
@@ -7,6 +14,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
+import javax.swing.Box;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -20,26 +32,17 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
 public class CustomAdapterComponentsFactory
     implements VehicleCommAdapterFactory {
 
-  private final ScheduledExecutorService executor;
-
-
-  /**
-   * Constructor.
-   */
-  @Inject
-  public CustomAdapterComponentsFactory(
-      @KernelExecutor
-      ScheduledExecutorService executor
-  ) {
-    strategies.put("ModbusTCP", new ModbusTCPStrategy());
-    this.executor = executor;
-  }
-
   /**
    * This class's logger.
    */
   private static final Logger LOG = Logger.getLogger(
-      CustomAdapterComponentsFactory.class.getName());
+      CustomAdapterComponentsFactory.class.getName()
+  );
+
+  /**
+   * The kernel executor.
+   */
+  private final ScheduledExecutorService executor;
 
   /**
    * Map to store vehicle configuration.
@@ -52,9 +55,22 @@ public class CustomAdapterComponentsFactory
   private final Map<String, CommunicationStrategy> strategies = new HashMap<>();
 
   /**
-   * Flag indicating whether the factory has been initialized
+   * Flag indicating whether the factory has been initialized.
    */
   private boolean initialized;
+
+  /**
+   * Constructor.
+   *
+   * @param executor The kernel executor.
+   */
+  @Inject
+  public CustomAdapterComponentsFactory(
+      @KernelExecutor ScheduledExecutorService executor
+  ) {
+    this.executor = executor;
+    strategies.put("ModbusTCP", new ModbusTCPStrategy());
+  }
 
   @Override
   public void initialize() {
@@ -83,8 +99,7 @@ public class CustomAdapterComponentsFactory
 
   @Override
   public boolean providesAdapterFor(
-      @Nonnull
-      Vehicle vehicle
+      @Nonnull Vehicle vehicle
   ) {
     LOG.fine("Checking if adapter is provided for vehicle: " + vehicle.getName());
     return vehicleConfigurations.containsKey(vehicle.getName());
@@ -99,8 +114,7 @@ public class CustomAdapterComponentsFactory
   @Nullable
   @Override
   public VehicleCommAdapter getAdapterFor(
-      @Nonnull
-      Vehicle vehicle
+      @Nonnull Vehicle vehicle
   ) {
     LOG.info("Creating adapter for vehicle: " + vehicle.getName());
 
@@ -109,13 +123,13 @@ public class CustomAdapterComponentsFactory
         k -> createConfig(vehicle)
     );
 
-//    String strategyKey = vehicle.getProperties().getOrDefault("commStrategy", "ModbusTCP");
     String strategyKey = config.getCommunicationStrategy();
     CommunicationStrategy strategy = strategies.get(strategyKey);
 
     if (strategy == null) {
       LOG.warning(
-          "No strategy found for key: " + strategyKey + ". Using default ModbusTCP strategy.");
+          "No strategy found for key: " + strategyKey + ". Using default ModbusTCP strategy."
+      );
       strategy = strategies.get("ModbusTCP");
     }
 
@@ -123,14 +137,39 @@ public class CustomAdapterComponentsFactory
   }
 
   private VehicleConfigurationInterface createConfig(Vehicle vehicle) {
-    DefaultVehicleConfiguration config = new DefaultVehicleConfiguration();
-//    config.setHost(vehicle.getProperties().getOrDefault("host", "localhost"));
-//    config.setPort(Integer.parseInt(vehicle.getProperties().getOrDefault("port", "502")));
-    return config;
+    JTextField hostField = new JTextField(10);
+    JTextField portField = new JTextField(10);
+
+    JPanel panel = new JPanel();
+    panel.add(new JLabel("Host:"));
+    panel.add(hostField);
+    panel.add(Box.createHorizontalStrut(15)); // a spacer
+    panel.add(new JLabel("Port:"));
+    panel.add(portField);
+
+    int result = JOptionPane.showConfirmDialog(
+        null, panel,
+        "Enter Host and Port for " + vehicle.getName(), JOptionPane.OK_CANCEL_OPTION
+    );
+    if (result == JOptionPane.OK_OPTION) {
+      DefaultVehicleConfiguration config = new DefaultVehicleConfiguration();
+      config.setHost(hostField.getText());
+      try {
+        config.setPort(Integer.parseInt(portField.getText()));
+      }
+      catch (NumberFormatException e) {
+        LOG.warning("Invalid port number. Using default port 502.");
+        config.setPort(502);
+      }
+      return config;
+    }
+    else {
+      return new DefaultVehicleConfiguration();
+    }
   }
 
   /**
-   * Add or update vehicle configuration
+   * Add or update vehicle configuration.
    *
    * @param vehicleName vehicle name
    * @param config Vehicle configuration
@@ -141,7 +180,7 @@ public class CustomAdapterComponentsFactory
   }
 
   /**
-   * Remove vehicle configuration
+   * Remove vehicle configuration.
    *
    * @param vehicleName vehicle name
    */
@@ -151,10 +190,17 @@ public class CustomAdapterComponentsFactory
   }
 
   /**
-   * Custom vehicle communication adapter description class
+   * Custom vehicle communication adapter description class.
    */
   private static class CustomVehicleCommAdapterDescription
       extends VehicleCommAdapterDescription {
+
+    /**
+     * Creates a new instance.
+     */
+    CustomVehicleCommAdapterDescription() {
+      // Do nothing
+    }
 
     @Override
     public String getDescription() {
@@ -172,10 +218,19 @@ public class CustomAdapterComponentsFactory
  * Interface for communication strategies.
  */
 interface CommunicationStrategy {
+
+  /**
+   * Creates an adapter for the given vehicle and configuration.
+   *
+   * @param vehicle The vehicle.
+   * @param config The vehicle configuration.
+   * @param executor The kernel executor.
+   * @return The created vehicle communication adapter.
+   */
   VehicleCommAdapter createAdapter(
-      Vehicle vehicle, VehicleConfigurationInterface config,
-      @KernelExecutor
-      ScheduledExecutorService executor
+      Vehicle vehicle,
+      VehicleConfigurationInterface config,
+      @KernelExecutor ScheduledExecutorService executor
   );
 }
 
@@ -184,12 +239,19 @@ interface CommunicationStrategy {
  */
 class ModbusTCPStrategy
     implements CommunicationStrategy {
+
+  /**
+   * Creates a new instance.
+   */
+  ModbusTCPStrategy() {
+    // Do nothing
+  }
+
   @Override
   public VehicleCommAdapter createAdapter(
       Vehicle vehicle,
       VehicleConfigurationInterface config,
-      @KernelExecutor
-      ScheduledExecutorService executor
+      @KernelExecutor ScheduledExecutorService executor
   ) {
     return new ModbusTCPVehicleCommAdapter(
         new CustomVehicleModel(vehicle),
@@ -199,18 +261,3 @@ class ModbusTCPStrategy
     );
   }
 }
-
-/**
- * Ethernet communication strategy.
- */
-//class EthernetStrategy implements CommunicationStrategy {
-//  @Override
-//  public VehicleCommAdapter createAdapter(Vehicle vehicle, VehicleConfigurationInterface config) {
-//    return new EthernetVehicleCommAdapter(
-//        new CustomVehicleModel(vehicle),
-//        config.getRechargeOperation(),
-//        config.getCommandsCapacity(),
-//        config.getExecutorService()
-//    );
-//  }
-//}
