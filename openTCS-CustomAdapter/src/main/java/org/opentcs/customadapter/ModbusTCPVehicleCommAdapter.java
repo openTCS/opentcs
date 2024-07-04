@@ -1,11 +1,3 @@
-/**
- * Copyright (c) The openTCS Authors.
- *
- * This program is free software and subject to the MIT license. (For details,
- * see the licensing information (LICENSE.txt) you should have received with
- * this copy of the software.)
- */
-
 package org.opentcs.customadapter;
 
 import com.digitalpetri.modbus.master.ModbusTcpMaster;
@@ -17,6 +9,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import jakarta.annotation.Nonnull;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -103,6 +96,7 @@ public class ModbusTCPVehicleCommAdapter
     super(processModel, rechargeOperation, commandsCapacity, executor);
     this.host = host;
     this.port = port;
+    this.isConnected = false;
   }
 
   @Override
@@ -132,40 +126,70 @@ public class ModbusTCPVehicleCommAdapter
     });
   }
 
+
   /**
    * Performs the connection to the Modbus TCP server.
    *
-   * @return true if the connection is successful, false otherwise.
+   * @return true if the connection is successful, false otherwise
    */
   @Override
   protected boolean performConnection() {
-    ModbusTcpMasterConfig config = new ModbusTcpMasterConfig.Builder(host)
+    LOG.info("Connecting to Modbus TCP server at " + host + ":" + port);
+    ModbusTcpMasterConfig modbusTcpMasterConfig = new ModbusTcpMasterConfig.Builder(host)
         .setPort(port)
         .build();
-    master = new ModbusTcpMaster(config);
-    master.connect();
-    isConnected = true;
-    return true;
+
+    CompletableFuture<ModbusTcpMaster> future = CompletableFuture.supplyAsync(() -> {
+      ModbusTcpMaster modbusTcpMaster = new ModbusTcpMaster(modbusTcpMasterConfig);
+      modbusTcpMaster.connect();
+      return modbusTcpMaster;
+    });
+
+
+    future.thenAccept(connectedMaster -> {
+      this.master = connectedMaster;
+      this.isConnected = true;
+      LOG.info("Successfully connected to Modbus TCP server");
+      getProcessModel().setCommAdapterConnected(true);
+    }).exceptionally(ex -> {
+      LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
+      this.isConnected = false;
+      return null;
+    });
+
+    return true; // We return true here and update the connection status asynchronously
   }
 
   /**
    * Performs the disconnection from the Modbus TCP server.
    *
-   * @return true if the disconnection is successful, false otherwise
+   * @return true if the disconnection is successful, false otherwise.
    */
   @Override
   protected boolean performDisconnection() {
+    LOG.info("Disconnecting from Modbus TCP server");
     if (master != null) {
-      try {
-        master.disconnect();
-        isConnected = false;
-        return true;
-      }
-      finally {
-        master = null;
-      }
+      CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+        try {
+          master.disconnect();
+        }
+        catch (Exception ex) {
+          throw new CompletionException(ex);
+        }
+      });
+
+      future.thenRun(() -> {
+        LOG.info("Successfully disconnected from Modbus TCP server");
+        this.isConnected = false;
+        getProcessModel().setCommAdapterConnected(false);
+      }).exceptionally(ex -> {
+        LOG.log(Level.SEVERE, "Failed to disconnect from Modbus TCP server", ex);
+        return null;
+      });
+
+      master = null;
     }
-    return true;
+    return true; // We return true here and update the connection status asynchronously
   }
 
   /**
@@ -174,7 +198,7 @@ public class ModbusTCPVehicleCommAdapter
    * @return true if connected, false otherwise.
    */
   protected boolean isVehicleConnected() {
-    return isConnected && master != null;
+    return isConnected;
   }
 
   @Override
