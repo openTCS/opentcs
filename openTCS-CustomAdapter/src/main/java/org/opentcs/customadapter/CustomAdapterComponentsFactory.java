@@ -231,7 +231,7 @@ class ModbusTCPStrategy
       ScheduledExecutorService executor
   ) {
     return new ModbusTCPVehicleCommAdapter(
-        new CustomVehicleModel(vehicle),
+        new CustomProcessModel(vehicle),
         executor,
         config.getHost(),
         config.getPort()
