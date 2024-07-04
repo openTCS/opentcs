@@ -15,6 +15,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 == Unreleased
 
 * New features and enhancements:
+** Ignore path locks and configured edge evaluators when checking for general routability of transport orders.
+   As paths locks and the results of edge evaluators may change during operation of a plant, it does not seem reasonable to consider them when checking for _general_ routability.
 ** Update web API specification and implementation to version 1.8.0:
 *** The endpoint `POST /plantModel/topologyUpdateRequest` now also accepts an optional list of path names allowing the routing topology to be updated selectively.
 * Bugs fixed:

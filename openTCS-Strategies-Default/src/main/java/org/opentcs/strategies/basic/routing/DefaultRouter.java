@@ -162,6 +162,26 @@ public class DefaultRouter
   }
 
   @Override
+  public boolean checkGeneralRoutability(TransportOrder order) {
+    requireNonNull(order, "order");
+
+    synchronized (this) {
+      List<DriveOrder> driveOrderList = order.getFutureDriveOrders();
+      DriveOrder[] driveOrders
+          = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
+
+      PointRouter generalPointRouter = pointRouterProvider.getGeneralPointRouter(order);
+
+      for (Point curStartPoint : getDestinationPoints(driveOrders[0])) {
+        if (!isRoutable(curStartPoint, driveOrders, 1, generalPointRouter)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
+  @Override
   public Optional<List<DriveOrder>> getRoute(
       Vehicle vehicle,
       Point sourcePoint,

@@ -88,7 +88,7 @@ public class CheckNewOrdersPhase
 
     // Check if the transport order is routable.
     if (configuration.dismissUnroutableTransportOrders()
-        && router.checkRoutability(order).isEmpty()) {
+        && !router.checkGeneralRoutability(order)) {
       transportOrderUtil.updateTransportOrderState(
           order.getReference(),
           TransportOrder.State.UNROUTABLE

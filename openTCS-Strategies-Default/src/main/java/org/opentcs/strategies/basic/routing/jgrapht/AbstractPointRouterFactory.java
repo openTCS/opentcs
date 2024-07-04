@@ -20,6 +20,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.routing.PointRouter;
 import org.opentcs.strategies.basic.routing.PointRouterFactory;
+import org.opentcs.strategies.basic.routing.jgrapht.GraphProvider.GraphResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,12 +48,16 @@ public abstract class AbstractPointRouterFactory
 
   @Override
   public PointRouter createPointRouter(
+      @Nonnull
       Vehicle vehicle,
+      @Nonnull
       Set<Point> pointsToExclude,
+      @Nonnull
       Set<Path> pathsToExclude
   ) {
     requireNonNull(vehicle, "vehicle");
     requireNonNull(pointsToExclude, "pointsToExclude");
+    requireNonNull(pathsToExclude, "pathsToExclude");
 
     long timeStampBefore = System.currentTimeMillis();
 
@@ -64,22 +69,41 @@ public abstract class AbstractPointRouterFactory
       graphResult = graphProvider.getDerivedGraphResult(vehicle, pointsToExclude, pathsToExclude);
     }
 
-    Set<Point> points = graphResult.getPointBase();
-
-    PointRouter router = new ShortestPathPointRouter(
-        createShortestPathAlgorithm(graphResult.getGraph()),
-        points
-    );
-    // Make a single request for a route from one point to a different one to make sure the
-    // point router is primed. (Some implementations are initialized lazily.)
-    if (points.size() >= 2) {
-      Iterator<Point> pointIter = points.iterator();
-      router.getRouteSteps(pointIter.next(), pointIter.next());
-    }
+    PointRouter router = createPointRouter(graphResult);
 
     LOG.debug(
         "Created point router for {} in {} milliseconds.",
         vehicle.getName(),
+        System.currentTimeMillis() - timeStampBefore
+    );
+
+    return router;
+  }
+
+  @Override
+  public PointRouter createGeneralPointRouter(
+      @Nonnull
+      Set<Point> pointsToExclude,
+      @Nonnull
+      Set<Path> pathsToExclude
+  ) {
+    requireNonNull(pointsToExclude, "pointsToExclude");
+    requireNonNull(pathsToExclude, "pathsToExclude");
+
+    long timeStampBefore = System.currentTimeMillis();
+
+    GraphProvider.GraphResult graphResult;
+    if (pointsToExclude.isEmpty() && pathsToExclude.isEmpty()) {
+      graphResult = graphProvider.getGeneralGraphResult();
+    }
+    else {
+      graphResult = graphProvider.getDerivedGeneralGraphResult(pointsToExclude, pathsToExclude);
+    }
+
+    PointRouter router = createPointRouter(graphResult);
+
+    LOG.debug(
+        "Created a general point router in {} milliseconds.",
         System.currentTimeMillis() - timeStampBefore
     );
 
@@ -95,4 +119,21 @@ public abstract class AbstractPointRouterFactory
   protected abstract ShortestPathAlgorithm<String, Edge> createShortestPathAlgorithm(
       Graph<String, Edge> graph
   );
+
+  private PointRouter createPointRouter(GraphResult graphResult) {
+    Set<Point> points = graphResult.getPointBase();
+
+    PointRouter router = new ShortestPathPointRouter(
+        createShortestPathAlgorithm(graphResult.getGraph()),
+        points
+    );
+    // Make a single request for a route from one point to a different one to make sure the
+    // point router is primed. (Some implementations are initialized lazily.)
+    if (points.size() >= 2) {
+      Iterator<Point> pointIter = points.iterator();
+      router.getRouteSteps(pointIter.next(), pointIter.next());
+    }
+
+    return router;
+  }
 }
