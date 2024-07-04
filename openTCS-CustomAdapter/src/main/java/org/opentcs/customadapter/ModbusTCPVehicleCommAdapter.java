@@ -8,6 +8,7 @@ import com.digitalpetri.modbus.responses.ReadHoldingRegistersResponse;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -17,6 +18,7 @@ import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
+import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.ExplainedBoolean;
 
 /**
@@ -99,6 +101,17 @@ public class ModbusTCPVehicleCommAdapter
     this.isConnected = false;
   }
 
+  /**
+   * Retrieves the custom process model associated with this vehicle communication adapter.
+   *
+   * @return The custom process model.
+   */
+  @Override
+  @Nonnull
+  public CustomProcessModel getProcessModel() {
+    return (CustomProcessModel) super.getProcessModel();
+  }
+
   @Override
   protected void sendSpecificCommand(MovementCommand cmd) {
     if (master == null || !isVehicleConnected()) {
@@ -115,6 +128,8 @@ public class ModbusTCPVehicleCommAdapter
     buffer.writeShort(y);
 
     int registerQuantity = 2;
+
+    // TODO: check if the unitID need changing everytime.
     CompletableFuture<Void> future = master.sendRequest(
         new WriteMultipleRegistersRequest(0, registerQuantity, buffer), 0
     )
@@ -239,20 +254,12 @@ public class ModbusTCPVehicleCommAdapter
     future.thenAccept(response -> {
       ByteBuf buffer = response.getRegisters();
       int state = buffer.readShort();
-      Vehicle.State newState;
-      switch (state) {
-        case 0:
-          newState = Vehicle.State.IDLE;
-          break;
-        case 1:
-          newState = Vehicle.State.EXECUTING;
-          break;
-        case 2:
-          newState = Vehicle.State.CHARGING;
-          break;
-        default:
-          newState = Vehicle.State.UNKNOWN;
-      }
+      Vehicle.State newState = switch (state) {
+        case 0 -> Vehicle.State.IDLE;
+        case 1 -> Vehicle.State.EXECUTING;
+        case 2 -> Vehicle.State.CHARGING;
+        default -> Vehicle.State.UNKNOWN;
+      };
       // TODO: check setState parameter format
       getProcessModel().setState(newState);
     }).exceptionally(throwable -> {
@@ -272,10 +279,16 @@ public class ModbusTCPVehicleCommAdapter
 
   @Override
   public void processMessage(
-      @Nonnull
+      @Nullable
       Object message
   ) {
     LOG.info("Received message: " + message);
     // Implement specific message processing logic
+  }
+
+  @Override
+  protected VehicleProcessModelTO createCustomTransferableProcessModel() {
+    return new CustomProcessModelTO()
+        .setCustomProperty(getProcessModel().getCustomProperty());
   }
 }
