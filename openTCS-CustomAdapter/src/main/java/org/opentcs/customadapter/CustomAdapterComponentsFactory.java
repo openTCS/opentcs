@@ -111,11 +111,16 @@ public class CustomAdapterComponentsFactory
   }
 
   private VehicleConfigurationInterface createConfig(Vehicle vehicle) {
-    JTextField hostField = new JTextField(10);
-    JTextField portField = new JTextField(10);
+    String defaultHost = "localhost";
+    String defaultPort = "502";
+    String defaultStrategy = "ModbusTCP";
+
+    JTextField hostField = new JTextField(defaultHost,10);
+    JTextField portField = new JTextField(defaultPort,10);
     JComboBox<String> strategyComboBox = new JComboBox<>(
         strategies.keySet().toArray(new String[0])
     );
+    strategyComboBox.setSelectedItem(defaultStrategy);
 
     JPanel panel = new JPanel();
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
