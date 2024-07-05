@@ -3,7 +3,9 @@ package org.opentcs.customadapter;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 
-public class CustomProcessModel extends VehicleProcessModel {
+public class CustomProcessModel
+    extends
+      VehicleProcessModel {
 
   private String customProperty;
 
