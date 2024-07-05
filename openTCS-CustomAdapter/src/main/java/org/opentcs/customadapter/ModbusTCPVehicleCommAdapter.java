@@ -4,13 +4,14 @@ import com.digitalpetri.modbus.master.ModbusTcpMaster;
 import com.digitalpetri.modbus.master.ModbusTcpMasterConfig;
 import com.digitalpetri.modbus.requests.ReadHoldingRegistersRequest;
 import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
-import com.digitalpetri.modbus.responses.ReadHoldingRegistersResponse;
+import com.digitalpetri.modbus.responses.ModbusResponse;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,71 +22,102 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.ExplainedBoolean;
 
-/**
- * A communication adapter implementation for Modbus TCP protocol.
- */
 public class ModbusTCPVehicleCommAdapter
     extends
       CustomVehicleCommAdapter {
 
-  /**
-   * This class's logger.
-   */
   private static final Logger LOG = Logger.getLogger(ModbusTCPVehicleCommAdapter.class.getName());
+  private static final String DEFAULT_RECHARGE_OPERATION = "RECHARGE";
+  private static final int DEFAULT_COMMANDS_CAPACITY = 1000;
 
-  /**
-   * The default recharge operation.
-   */
-  private static final String DEFAULT_RECHARGE_OPERATION = "";
-  /**
-   * The default commands capacity.
-   */
-  private static final int DEFAULT_COMMANDS_CAPACITY = Integer.MAX_VALUE;
-  /**
-   * The Modbus TCP master.
-   */
   private ModbusTcpMaster master;
-  /**
-   * The host to connect to.
-   */
   private final String host;
-  /**
-   * The port to connect to.
-   */
   private final int port;
-  /**
-   * Indicates whether the adapter is connected.
-   */
   private boolean isConnected;
+  private VelocityController velocityController;
 
-  /**
-   * Creates a new instance.
-   *
-   * @param processModel The vehicle process model.
-   * @param executor The kernel executor.
-   * @param host The host to connect to.
-   * @param port The port to connect to.
-   */
-  public ModbusTCPVehicleCommAdapter(
-      VehicleProcessModel processModel,
-      @KernelExecutor
-      ScheduledExecutorService executor,
-      String host,
-      int port
-  ) {
-    this(processModel, DEFAULT_RECHARGE_OPERATION, DEFAULT_COMMANDS_CAPACITY, executor, host, port);
+  private static final Map<String, ModbusRegister> REGISTER_MAP = new HashMap<>();
+  static {
+    // OHT movement handshake position - status (0x04)
+    REGISTER_MAP.put("HEART_BIT", new ModbusRegister(300, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("DIRECTION", new ModbusRegister(301, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("FORK", new ModbusRegister(302, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("SPEED", new ModbusRegister(303, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("OBSTACLE", new ModbusRegister(304, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("STATUS", new ModbusRegister(305, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("ERROR_CODE", new ModbusRegister(306, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("DESTINATION", new ModbusRegister(308, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("MARK_NO", new ModbusRegister(309, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("POSITION", new ModbusRegister(310, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("IO_IN", new ModbusRegister(318, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("IO_OUT", new ModbusRegister(319, ModbusFunction.READ_INPUT_REGISTERS));
+
+    // OHT movement handshake position - command (0x03, 0x10)
+    REGISTER_MAP.put(
+        "SET_HEART_BIT", new ModbusRegister(300, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
+    );
+    REGISTER_MAP.put(
+        "SET_DIRECTION", new ModbusRegister(301, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
+    );
+    REGISTER_MAP.put("SET_FORK", new ModbusRegister(302, ModbusFunction.WRITE_MULTIPLE_REGISTERS));
+    REGISTER_MAP.put("SET_SPEED", new ModbusRegister(303, ModbusFunction.WRITE_MULTIPLE_REGISTERS));
+    REGISTER_MAP.put(
+        "SET_OBSTACLE", new ModbusRegister(304, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
+    );
+    REGISTER_MAP.put(
+        "SET_COMMAND", new ModbusRegister(305, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
+    );
+    REGISTER_MAP.put("SET_MODE", new ModbusRegister(306, ModbusFunction.WRITE_MULTIPLE_REGISTERS));
+    REGISTER_MAP.put(
+        "SET_DESTINATION", new ModbusRegister(308, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
+    );
+    REGISTER_MAP.put(
+        "SET_JOG_MOVE", new ModbusRegister(312, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
+    );
   }
 
-  /**
-   * Creates a new instance.
-   *
-   * @param processModel The vehicle process model.
-   * @param rechargeOperation The recharge operation.
-   * @param commandsCapacity The commands' capacity.
-   * @param executor The kernel executor.
-   * @param host The host to connect to.
-   * @param port The port to connect to.
-   */
+  private enum ModbusFunction {
+    READ_COILS(0x01),
+    READ_DISCRETE_INPUTS(0x02),
+    READ_HOLDING_REGISTERS(0x03),
+    READ_INPUT_REGISTERS(0x04),
+    WRITE_SINGLE_COIL(0x05),
+    WRITE_SINGLE_REGISTER(0x06),
+    WRITE_MULTIPLE_COILS(0x0F),
+    WRITE_MULTIPLE_REGISTERS(0x10);
+
+    private final int functionCode;
+
+    ModbusFunction(int functionCode) {
+      this.functionCode = functionCode;
+    }
+
+    public int getFunctionCode() {
+      return functionCode;
+    }
+  }
+
+  private static class ModbusRegister {
+    private final int address;
+    private final ModbusFunction function;
+
+    public ModbusRegister(int address, ModbusFunction function) {
+      this.address = address;
+      this.function = function;
+    }
+
+    public int getAddress() {
+      return address;
+    }
+
+    public ModbusFunction getFunction() {
+      return function;
+    }
+  }
+
+  private int maxVelocity;
+  private int currentVelocity;
+
   public ModbusTCPVehicleCommAdapter(
       VehicleProcessModel processModel,
       String rechargeOperation,
@@ -99,13 +131,21 @@ public class ModbusTCPVehicleCommAdapter
     this.host = host;
     this.port = port;
     this.isConnected = false;
+//    this.maxVelocity = processModel
+    this.currentVelocity = 0;
+
+    // Initialize VelocityController with default values
+    int maxAcceleration = 1000; // Example value, adjust as needed
+    int maxDeceleration = -1000; // Example value, adjust as needed
+
+    // TODO: Change magic number into max path/vehicle velocity.
+    int maxFwdVelocity = 1;
+    int maxRevVelocity = 1;
+    this.velocityController = new VelocityController(
+        maxAcceleration, maxDeceleration, maxFwdVelocity, maxRevVelocity
+    );
   }
 
-  /**
-   * Retrieves the custom process model associated with this vehicle communication adapter.
-   *
-   * @return The custom process model.
-   */
   @Override
   @Nonnull
   public CustomProcessModel getProcessModel() {
@@ -114,174 +154,191 @@ public class ModbusTCPVehicleCommAdapter
 
   @Override
   protected void sendSpecificCommand(MovementCommand cmd) {
-    if (master == null || !isVehicleConnected()) {
+    if (!isVehicleConnected()) {
       LOG.warning("Not connected to Modbus TCP server. Cannot send command.");
       return;
     }
 
-    // Example: Write the X and Y coordinates to holding registers 0 and 1
-    int x = (int) cmd.getStep().getDestinationPoint().getPose().getPosition().getX();
-    int y = (int) cmd.getStep().getDestinationPoint().getPose().getPosition().getY();
+    // Set destination
+    int destination = Integer.parseInt(cmd.getStep().getDestinationPoint().getName());
+    sendModbusCommand("SET_DESTINATION", destination);
 
-    ByteBuf buffer = Unpooled.buffer(4);
-    buffer.writeShort(x);
-    buffer.writeShort(y);
+    // Set direction (assume 0 for forward, 1 for backward)
+    int direction = cmd.getStep().getVehicleOrientation() == Vehicle.Orientation.FORWARD ? 0 : 1;
+    sendModbusCommand("SET_DIRECTION", direction);
 
-    int registerQuantity = 2;
+    // Set speed
+    int speed = velocityController.getCurrentVelocity();
+    sendModbusCommand("SET_SPEED", speed);
 
-    // TODO: check if the unitID need changing everytime.
-    CompletableFuture<Void> future = master.sendRequest(
-        new WriteMultipleRegistersRequest(0, registerQuantity, buffer), 0
-    )
-        .thenAccept(response -> LOG.info("Command sent successfully"));
+    // Start command
+    sendModbusCommand("SET_COMMAND", 1);  // Assume 1 means start
 
-    future.exceptionally(throwable -> {
-      LOG.log(Level.SEVERE, "Failed to send command", throwable);
-      return null;
-    });
+    // Verify commands were written correctly
+    verifyModbusCommands();
   }
 
+  private void sendModbusCommand(String command, int value) {
+    ModbusRegister register = REGISTER_MAP.get(command);
+    if (register == null || register.getFunction() != ModbusFunction.WRITE_MULTIPLE_REGISTERS) {
+      LOG.warning("Invalid command or function: " + command);
+      return;
+    }
 
-  /**
-   * Performs the connection to the Modbus TCP server.
-   *
-   * @return true if the connection is successful, false otherwise
-   */
+    ByteBuf buffer = Unpooled.buffer(2);
+    buffer.writeShort(value);
+
+    sendModbusRequest(new WriteMultipleRegistersRequest(register.getAddress(), 1, buffer))
+        .thenAccept(response -> LOG.info(command + " set successfully"))
+        .exceptionally(throwable -> {
+          LOG.log(Level.SEVERE, "Failed to set " + command, throwable);
+          return null;
+        });
+  }
+
+  private void verifyModbusCommands() {
+    ModbusRegister destinationRegister = REGISTER_MAP.get("SET_DESTINATION");
+    sendModbusRequest(new ReadHoldingRegistersRequest(destinationRegister.getAddress(), 1))
+        .thenAccept(response -> {
+          ByteBuf buffer = response.getRegisters();
+          int readValue = buffer.readShort();
+          LOG.info("Verified SET_DESTINATION: " + readValue);
+        })
+        .exceptionally(throwable -> {
+          LOG.log(Level.SEVERE, "Failed to verify SET_DESTINATION", throwable);
+          return null;
+        });
+
+    // Add similar verification for other commands
+  }
+
   @Override
   protected boolean performConnection() {
     LOG.info("Connecting to Modbus TCP server at " + host + ":" + port);
-    ModbusTcpMasterConfig modbusTcpMasterConfig = new ModbusTcpMasterConfig.Builder(host)
+    ModbusTcpMasterConfig config = new ModbusTcpMasterConfig.Builder(host)
         .setPort(port)
         .build();
 
-    CompletableFuture<ModbusTcpMaster> future = CompletableFuture.supplyAsync(() -> {
-      ModbusTcpMaster modbusTcpMaster = new ModbusTcpMaster(modbusTcpMasterConfig);
-      modbusTcpMaster.connect();
-      return modbusTcpMaster;
-    });
-
-
-    future.thenAccept(connectedMaster -> {
-      this.master = connectedMaster;
-      this.isConnected = true;
-      LOG.info("Successfully connected to Modbus TCP server");
-      getProcessModel().setCommAdapterConnected(true);
-    }).exceptionally(ex -> {
-      LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
-      this.isConnected = false;
-      return null;
-    });
-
-    return true; // We return true here and update the connection status asynchronously
+    return CompletableFuture.supplyAsync(() -> new ModbusTcpMaster(config))
+        .thenCompose(newMaster -> {
+          this.master = newMaster;
+          return newMaster.connect();
+        })
+        .thenRun(() -> {
+          this.isConnected = true;
+          LOG.info("Successfully connected to Modbus TCP server");
+          getProcessModel().setCommAdapterConnected(true);
+        })
+        .exceptionally(ex -> {
+          LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
+          this.isConnected = false;
+          return null;
+        })
+        .isDone();
   }
 
-  /**
-   * Performs the disconnection from the Modbus TCP server.
-   *
-   * @return true if the disconnection is successful, false otherwise.
-   */
   @Override
   protected boolean performDisconnection() {
     LOG.info("Disconnecting from Modbus TCP server");
     if (master != null) {
-      CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-        try {
-          master.disconnect();
-        }
-        catch (Exception ex) {
-          throw new CompletionException(ex);
-        }
-      });
-
-      future.thenRun(() -> {
-        LOG.info("Successfully disconnected from Modbus TCP server");
-        this.isConnected = false;
-        getProcessModel().setCommAdapterConnected(false);
-      }).exceptionally(ex -> {
-        LOG.log(Level.SEVERE, "Failed to disconnect from Modbus TCP server", ex);
-        return null;
-      });
-
-      master = null;
+      return master.disconnect()
+          .thenRun(() -> {
+            LOG.info("Successfully disconnected from Modbus TCP server");
+            this.isConnected = false;
+            getProcessModel().setCommAdapterConnected(false);
+            this.master = null;
+          })
+          .exceptionally(ex -> {
+            LOG.log(Level.SEVERE, "Failed to disconnect from Modbus TCP server", ex);
+            return null;
+          })
+          .isDone();
     }
-    return true; // We return true here and update the connection status asynchronously
+    return true;
   }
 
-  /**
-   * Checks if the vehicle is connected.
-   *
-   * @return true if connected, false otherwise.
-   */
+  @Override
   protected boolean isVehicleConnected() {
-    return isConnected;
+    return isConnected && master != null;
   }
 
   @Override
   protected void updateVehiclePosition() {
-    if (master == null || !isVehicleConnected()) {
+    if (!isVehicleConnected()) {
       LOG.warning("Not connected to Modbus TCP server. Cannot update position.");
       return;
     }
 
-    CompletableFuture<ReadHoldingRegistersResponse> future = master.sendRequest(
-        new ReadHoldingRegistersRequest(0, 2), 0
-    );
-
-    future.thenAccept(response -> {
-      ByteBuf buffer = response.getRegisters();
-      int x = buffer.readShort();
-      int y = buffer.readShort();
-
-      // TODO: check setPosition parameter format
-      getProcessModel().setPosition(String.format("%d,%d", x, y));
-    }).exceptionally(throwable -> {
-      LOG.log(Level.SEVERE, "Failed to read vehicle position", throwable);
-      return null;
-    });
+    sendModbusRequest(new ReadHoldingRegistersRequest(REGISTER_MAP.get("POSITION").getAddress(), 1))
+        .thenAccept(response -> {
+          ByteBuf buffer = response.getRegisters();
+          int position = buffer.readShort();
+          getProcessModel().setPosition(String.valueOf(position));
+        })
+        .exceptionally(throwable -> {
+          LOG.log(Level.SEVERE, "Failed to read vehicle position", throwable);
+          return null;
+        });
   }
 
   @Override
   protected void updateVehicleState() {
-    if (master == null || !isVehicleConnected()) {
+    if (!isVehicleConnected()) {
       LOG.warning("Not connected to Modbus TCP server. Cannot update state.");
       return;
     }
 
-    CompletableFuture<ReadHoldingRegistersResponse> future = master.sendRequest(
-        new ReadHoldingRegistersRequest(2, 1), 0
-    );
+    sendModbusRequest(new ReadHoldingRegistersRequest(REGISTER_MAP.get("STATUS").getAddress(), 1))
+        .thenAccept(response -> {
+          ByteBuf buffer = response.getRegisters();
+          int state = buffer.readShort();
+          Vehicle.State newState = mapModbusStateToVehicleState(state);
+          getProcessModel().setState(newState);
+        })
+        .exceptionally(throwable -> {
+          LOG.log(Level.SEVERE, "Failed to read vehicle state", throwable);
+          return null;
+        });
 
-    future.thenAccept(response -> {
-      ByteBuf buffer = response.getRegisters();
-      int state = buffer.readShort();
-      Vehicle.State newState = switch (state) {
-        case 0 -> Vehicle.State.IDLE;
-        case 1 -> Vehicle.State.EXECUTING;
-        case 2 -> Vehicle.State.CHARGING;
-        default -> Vehicle.State.UNKNOWN;
-      };
-      // TODO: check setState parameter format
-      getProcessModel().setState(newState);
-    }).exceptionally(throwable -> {
-      LOG.log(Level.SEVERE, "Failed to read vehicle state", throwable);
-      return null;
-    });
+    // Read current speed from Modbus (register 303)
+    sendModbusRequest(new ReadHoldingRegistersRequest(303, 1))
+        .thenAccept(response -> {
+          ByteBuf buffer = response.getRegisters();
+          int currentSpeed = buffer.readShort();
+          velocityController.setCurrentVelocity(currentSpeed);
+          LOG.info("Current vehicle speed: " + currentSpeed);
+        })
+        .exceptionally(throwable -> {
+          LOG.log(Level.SEVERE, "Failed to read current speed", throwable);
+          return null;
+        });
+  }
+
+  private Vehicle.State mapModbusStateToVehicleState(int modbusState) {
+    return switch (modbusState) {
+      case 0 -> Vehicle.State.IDLE;
+      case 1 -> Vehicle.State.EXECUTING;
+      case 2 -> Vehicle.State.CHARGING;
+      default -> Vehicle.State.UNKNOWN;
+    };
+  }
+
+  private CompletableFuture<ModbusResponse> sendModbusRequest(
+      com.digitalpetri.modbus.requests.ModbusRequest request
+  ) {
+    return master.sendRequest(request, 0);
   }
 
   @Nonnull
   @Override
-  public ExplainedBoolean canProcess(
-      @Nonnull
-      org.opentcs.data.order.TransportOrder order
-  ) {
+  public ExplainedBoolean canProcess(@Nonnull
+  org.opentcs.data.order.TransportOrder order) {
     return new ExplainedBoolean(true, "ModbusTCP adapter can process all orders.");
   }
 
   @Override
-  public void processMessage(
-      @Nullable
-      Object message
-  ) {
+  public void processMessage(@Nullable
+  Object message) {
     LOG.info("Received message: " + message);
     // Implement specific message processing logic
   }
@@ -290,5 +347,11 @@ public class ModbusTCPVehicleCommAdapter
   protected VehicleProcessModelTO createCustomTransferableProcessModel() {
     return new CustomProcessModelTO()
         .setCustomProperty(getProcessModel().getCustomProperty());
+  }
+
+  // Add a method to update the vehicle's speed
+  public void updateVehicleSpeed(int newSpeed) {
+    velocityController.setCurrentVelocity(newSpeed);
+    sendModbusCommand("SET_SPEED", velocityController.getCurrentVelocity());
   }
 }
