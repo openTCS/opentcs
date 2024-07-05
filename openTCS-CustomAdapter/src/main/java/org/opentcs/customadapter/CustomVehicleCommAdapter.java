@@ -10,6 +10,7 @@ package org.opentcs.customadapter;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
 import org.opentcs.customizations.kernel.KernelExecutor;
@@ -37,6 +38,7 @@ public abstract class CustomVehicleCommAdapter
    * @param commandsCapacity The maximum number of commands that the adapter can hold.
    * @param executor The ScheduledExecutorService used for executing tasks.
    */
+  @Inject
   public CustomVehicleCommAdapter(
       VehicleProcessModel processModel,
       String rechargeOperation,
