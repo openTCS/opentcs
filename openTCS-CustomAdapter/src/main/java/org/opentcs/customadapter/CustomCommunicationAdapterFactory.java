@@ -1,19 +1,12 @@
 package org.opentcs.customadapter;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -155,7 +148,7 @@ class CommunicationStrategy
       configProvider.setConfiguration(vehicle.getName(), config);
     }
 
-    String strategyKey = config.getCurrentStrategy();
+    String strategyKey = config.currentStrategy();
     StrategyCreator creator = strategies.get(strategyKey);
     if (creator == null) {
       LOG.warning("Unknown strategy: " + strategyKey + ". Using default ModbusTCP strategy.");
@@ -233,6 +226,9 @@ interface StrategyCreator {
 class ModbusTCPStrategy
     implements
       StrategyCreator {
+  private static final String DEFAULT_RECHARGE_OPERATION = "RECHARGE";
+  private static final int DEFAULT_COMMANDS_CAPACITY = 1000;
+
   ModbusTCPStrategy() {
   }
 
@@ -242,100 +238,11 @@ class ModbusTCPStrategy
   ) {
     return new ModbusTCPVehicleCommAdapter(
         new CustomProcessModel(vehicle),
-        "RECHARGE",
-        1000,
+        DEFAULT_RECHARGE_OPERATION,
+        DEFAULT_COMMANDS_CAPACITY,
         executor,
-        config.getHost(),
-        config.getPort()
+        config.host(),
+        config.port()
     );
-  }
-}
-
-@Singleton
-class VehicleConfigurationProvider {
-  private static final Logger LOG = Logger.getLogger(VehicleConfigurationProvider.class.getName());
-  private static final String CONFIG_FILE = "vehicle_config.json";
-
-  private final Map<String, VehicleConfiguration> configurations = new HashMap<>();
-
-  VehicleConfigurationProvider() {
-    loadConfigurations();
-  }
-
-  public VehicleConfiguration getConfiguration(String vehicleName) {
-    return configurations.getOrDefault(vehicleName, null);
-  }
-
-  public void setConfiguration(String vehicleName, VehicleConfiguration config) {
-    configurations.put(vehicleName, config);
-    saveConfigurations();
-  }
-
-  public void loadConfigurations() {
-    try (FileReader reader = new FileReader(CONFIG_FILE)) {
-      Type type = new TypeToken<HashMap<String, VehicleConfiguration>>() {}.getType();
-      Map<String, VehicleConfiguration> loadedConfigs = new Gson().fromJson(reader, type);
-      if (loadedConfigs != null) {
-        configurations.clear();
-        configurations.putAll(loadedConfigs);
-      }
-      LOG.info("Configurations loaded successfully.");
-    }
-    catch (IOException e) {
-      LOG.log(Level.WARNING, "Failed to load configurations. Using empty configuration.", e);
-    }
-  }
-
-  public void saveConfigurations() {
-    try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
-      new Gson().toJson(configurations, writer);
-      LOG.info("Configurations saved successfully.");
-    }
-    catch (IOException e) {
-      LOG.log(Level.SEVERE, "Failed to save configurations", e);
-    }
-  }
-}
-
-class VehicleConfiguration {
-  private String currentStrategy;
-  private String host;
-  private int port;
-
-  VehicleConfiguration() {
-  }
-
-  VehicleConfiguration(String currentStrategy, String host, int port) {
-    this.currentStrategy = currentStrategy;
-    this.host = host;
-    this.port = port;
-  }
-
-  // Getters and setters
-  public String getCurrentStrategy() {
-    return currentStrategy;
-  }
-
-  public void setCurrentStrategy(String currentStrategy) {
-    this.currentStrategy = currentStrategy;
-  }
-
-  public String getHost() {
-    return host;
-  }
-
-  public void setHost(String host) {
-    this.host = host;
-  }
-
-  public int getPort() {
-    return port;
-  }
-
-  public void setPort(int port) {
-    if (port < 0 || port > 65535) {
-      throw new IllegalArgumentException("Invalid port number, port number range is 0 - 65535");
-    }
-    this.port = port;
   }
 }
