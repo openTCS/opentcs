@@ -5,6 +5,7 @@ import com.digitalpetri.modbus.master.ModbusTcpMasterConfig;
 import com.digitalpetri.modbus.requests.ReadHoldingRegistersRequest;
 import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
 import com.digitalpetri.modbus.responses.ModbusResponse;
+import com.digitalpetri.modbus.responses.ReadHoldingRegistersResponse;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import jakarta.annotation.Nonnull;
@@ -198,18 +199,36 @@ public class ModbusTCPVehicleCommAdapter
 
   private void verifyModbusCommands() {
     ModbusRegister destinationRegister = REGISTER_MAP.get("SET_DESTINATION");
-    sendModbusRequest(new ReadHoldingRegistersRequest(destinationRegister.getAddress(), 1))
-        .thenAccept(response -> {
-          ByteBuf buffer = response.getRegisters();
-          int readValue = buffer.readShort();
-          LOG.info("Verified SET_DESTINATION: " + readValue);
-        })
-        .exceptionally(throwable -> {
-          LOG.log(Level.SEVERE, "Failed to verify SET_DESTINATION", throwable);
-          return null;
-        });
+    sendModbusRequestAndHandleResponse(destinationRegister);
+  }
 
-    // Add similar verification for other commands
+  private void sendModbusRequestAndHandleResponse(ModbusRegister register) {
+    sendModbusRequest(new ReadHoldingRegistersRequest(register.getAddress(), 1))
+        .thenAccept(response -> handleSuccessResponse(response, register))
+        .exceptionally(throwable -> handleErrorResponse(throwable, register));
+  }
+
+  private void handleSuccessResponse(ModbusResponse response, ModbusRegister register) {
+    if (response instanceof ReadHoldingRegistersResponse holdingRegistersResponse) {
+      ByteBuf buffer = holdingRegistersResponse.getRegisters();
+      try {
+        if (buffer.readableBytes() >= 2) {
+          int readValue = buffer.readShort();
+          LOG.info("Verified " + register.getFunction().name() + ": " + readValue);
+        } else {
+          LOG.warning("Insufficient data in response for register: " + register.getFunction().name());
+        }
+      } finally {
+        buffer.release();
+      }
+    } else {
+      LOG.warning("Unexpected response type: " + response.getClass().getSimpleName());
+    }
+  }
+
+  private Void handleErrorResponse(Throwable throwable, ModbusRegister register) {
+    LOG.log(Level.SEVERE, "Failed to verify " + register.getFunction().name(), throwable);
+    return null;
   }
 
   @Override
@@ -271,9 +290,22 @@ public class ModbusTCPVehicleCommAdapter
 
     sendModbusRequest(new ReadHoldingRegistersRequest(REGISTER_MAP.get("POSITION").getAddress(), 1))
         .thenAccept(response -> {
-          ByteBuf buffer = response.getRegisters();
-          int position = buffer.readShort();
-          getProcessModel().setPosition(String.valueOf(position));
+          if (response instanceof ReadHoldingRegistersResponse holdingRegistersResponse) {
+            ByteBuf buffer = holdingRegistersResponse.getRegisters();
+            try {
+              if (buffer.readableBytes() >= 2) {
+                int position = buffer.readShort();
+                getProcessModel().setPosition(String.valueOf(position));
+                LOG.info("Updated vehicle position: " + position);
+              } else {
+                LOG.warning("Insufficient data in response for POSITION register");
+              }
+            } finally {
+              buffer.release();
+            }
+          } else {
+            LOG.warning("Unexpected response type for POSITION: " + response.getClass().getSimpleName());
+          }
         })
         .exceptionally(throwable -> {
           LOG.log(Level.SEVERE, "Failed to read vehicle position", throwable);
@@ -290,10 +322,22 @@ public class ModbusTCPVehicleCommAdapter
 
     sendModbusRequest(new ReadHoldingRegistersRequest(REGISTER_MAP.get("STATUS").getAddress(), 1))
         .thenAccept(response -> {
-          ByteBuf buffer = response.getRegisters();
-          int state = buffer.readShort();
-          Vehicle.State newState = mapModbusStateToVehicleState(state);
-          getProcessModel().setState(newState);
+          if (response instanceof ReadHoldingRegistersResponse holdingRegistersResponse) {
+            ByteBuf buffer = holdingRegistersResponse.getRegisters();
+            try {
+              if (buffer.readableBytes() >= 2) {
+                int state = buffer.readShort();
+                Vehicle.State newState = mapModbusStateToVehicleState(state);
+                getProcessModel().setState(newState);
+              } else {
+                LOG.warning("Insufficient data in response for STATUS register");
+              }
+            } finally {
+              buffer.release();
+            }
+          } else {
+            LOG.warning("Unexpected response type for STATUS: " + response.getClass().getSimpleName());
+          }
         })
         .exceptionally(throwable -> {
           LOG.log(Level.SEVERE, "Failed to read vehicle state", throwable);
@@ -303,10 +347,22 @@ public class ModbusTCPVehicleCommAdapter
     // Read current speed from Modbus (register 303)
     sendModbusRequest(new ReadHoldingRegistersRequest(303, 1))
         .thenAccept(response -> {
-          ByteBuf buffer = response.getRegisters();
-          int currentSpeed = buffer.readShort();
-          velocityController.setCurrentVelocity(currentSpeed);
-          LOG.info("Current vehicle speed: " + currentSpeed);
+          if (response instanceof ReadHoldingRegistersResponse holdingRegistersResponse) {
+            ByteBuf buffer = holdingRegistersResponse.getRegisters();
+            try {
+              if (buffer.readableBytes() >= 2) {
+                int currentSpeed = buffer.readShort();
+                velocityController.setCurrentVelocity(currentSpeed);
+                LOG.info("Current vehicle speed: " + currentSpeed);
+              } else {
+                LOG.warning("Insufficient data in response for SPEED register");
+              }
+            } finally {
+              buffer.release();
+            }
+          } else {
+            LOG.warning("Unexpected response type for SPEED: " + response.getClass().getSimpleName());
+          }
         })
         .exceptionally(throwable -> {
           LOG.log(Level.SEVERE, "Failed to read current speed", throwable);
