@@ -30,15 +30,13 @@ public class ModbusTCPVehicleCommAdapter
   private static final Map<String, ModbusTCPVehicleCommAdapter.ModbusRegister> REGISTER_MAP
       = new HashMap<>();
   private static final Logger LOG = Logger.getLogger(ModbusTCPVehicleCommAdapter.class.getName());
-  private static final String DEFAULT_RECHARGE_OPERATION = "RECHARGE";
-  private static final int DEFAULT_COMMANDS_CAPACITY = 1000;
-  private ModbusTcpMaster master;
   private final String host;
   private final int port;
   private boolean isConnected;
-  private VelocityController velocityController;
   private int maxVelocity;
   private int currentVelocity;
+  private ModbusTcpMaster master;
+  private VelocityController velocityController;
 
   /**
    * Initializes a new instance of ModbusTCPVehicleCommAdapter.
@@ -67,13 +65,11 @@ public class ModbusTCPVehicleCommAdapter
     // this.maxVelocity = processModel
     this.currentVelocity = 0;
 
-    // Initialize VelocityController with default values
-    int maxAcceleration = 1000; // Example value, adjust as needed
-    int maxDeceleration = -1000; // Example value, adjust as needed
-
-    // TODO: Change magic number into max path/vehicle velocity.
-    int maxFwdVelocity = 1;
-    int maxRevVelocity = 1;
+    // Initialize VelocityController with default values unit: meter
+    double maxAcceleration = 1.6;
+    double maxDeceleration = -1.6;
+    double maxFwdVelocity = 2.4;
+    double maxRevVelocity = -2.4;
     this.velocityController = new VelocityController(
         maxAcceleration, maxDeceleration, maxFwdVelocity, maxRevVelocity
     );
@@ -101,8 +97,9 @@ public class ModbusTCPVehicleCommAdapter
     sendModbusCommand("SET_DIRECTION", direction);
 
     // Set speed
-    int speed = velocityController.getCurrentVelocity();
-    sendModbusCommand("SET_SPEED", speed);
+    double speed = velocityController.getCurrentVelocity();
+    // TODO: overload a double type parameter version of sendModbusCommand for speed.
+    sendModbusCommand("SET_SPEED", (int) speed);
 
     // Start command
     sendModbusCommand("SET_COMMAND", 1);  // Assume 1 means start
@@ -113,7 +110,7 @@ public class ModbusTCPVehicleCommAdapter
 
   private void sendModbusCommand(String command, int value) {
     ModbusRegister register = REGISTER_MAP.get(command);
-    if (register == null || register.getFunction() != ModbusFunction.WRITE_MULTIPLE_REGISTERS) {
+    if (register == null || register.function() != ModbusFunction.WRITE_MULTIPLE_REGISTERS) {
       LOG.warning("Invalid command or function: " + command);
       return;
     }
@@ -121,7 +118,7 @@ public class ModbusTCPVehicleCommAdapter
     ByteBuf buffer = Unpooled.buffer(2);
     buffer.writeShort(value);
 
-    sendModbusRequest(new WriteMultipleRegistersRequest(register.getAddress(), 1, buffer))
+    sendModbusRequest(new WriteMultipleRegistersRequest(register.address(), 1, buffer))
         .thenAccept(response -> LOG.info(command + " set successfully"))
         .exceptionally(throwable -> {
           LOG.log(Level.SEVERE, "Failed to set " + command, throwable);
@@ -135,7 +132,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private void sendModbusRequestAndHandleResponse(ModbusRegister register) {
-    sendModbusRequest(new ReadHoldingRegistersRequest(register.getAddress(), 1))
+    sendModbusRequest(new ReadHoldingRegistersRequest(register.address(), 1))
         .thenAccept(response -> handleSuccessResponse(response, register))
         .exceptionally(throwable -> handleErrorResponse(throwable, register));
   }
@@ -146,11 +143,11 @@ public class ModbusTCPVehicleCommAdapter
       try {
         if (buffer.readableBytes() >= 2) {
           int readValue = buffer.readShort();
-          LOG.info("Verified " + register.getFunction().name() + ": " + readValue);
+          LOG.info("Verified " + register.function().name() + ": " + readValue);
         }
         else {
           LOG.warning(
-              "Insufficient data in response for register: " + register.getFunction().name()
+              "Insufficient data in response for register: " + register.function().name()
           );
         }
       }
@@ -164,7 +161,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private Void handleErrorResponse(Throwable throwable, ModbusRegister register) {
-    LOG.log(Level.SEVERE, "Failed to verify " + register.getFunction().name(), throwable);
+    LOG.log(Level.SEVERE, "Failed to verify " + register.function().name(), throwable);
     return null;
   }
 
@@ -225,7 +222,7 @@ public class ModbusTCPVehicleCommAdapter
       return;
     }
 
-    sendModbusRequest(new ReadHoldingRegistersRequest(REGISTER_MAP.get("POSITION").getAddress(), 1))
+    sendModbusRequest(new ReadHoldingRegistersRequest(REGISTER_MAP.get("POSITION").address(), 1))
         .thenAccept(response -> {
           if (response instanceof ReadHoldingRegistersResponse holdingRegistersResponse) {
             ByteBuf buffer = holdingRegistersResponse.getRegisters();
@@ -262,7 +259,7 @@ public class ModbusTCPVehicleCommAdapter
       return;
     }
 
-    sendModbusRequest(new ReadHoldingRegistersRequest(REGISTER_MAP.get("STATUS").getAddress(), 1))
+    sendModbusRequest(new ReadHoldingRegistersRequest(REGISTER_MAP.get("STATUS").address(), 1))
         .thenAccept(response -> {
           if (response instanceof ReadHoldingRegistersResponse holdingRegistersResponse) {
             ByteBuf buffer = holdingRegistersResponse.getRegisters();
@@ -365,7 +362,8 @@ public class ModbusTCPVehicleCommAdapter
   // Add a method to update the vehicle's speed
   public void updateVehicleSpeed(int newSpeed) {
     velocityController.setCurrentVelocity(newSpeed);
-    sendModbusCommand("SET_SPEED", velocityController.getCurrentVelocity());
+    // TODO: overload a double type parameter version of sendModbusCommand for speed.
+    sendModbusCommand("SET_SPEED", (int) velocityController.getCurrentVelocity());
   }
 
   static {
@@ -423,13 +421,13 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private enum ModbusFunction {
-    READ_COILS(0x01),
-    READ_DISCRETE_INPUTS(0x02),
-    READ_HOLDING_REGISTERS(0x03),
+//    READ_COILS(0x01),
+//    READ_DISCRETE_INPUTS(0x02),
+//    READ_HOLDING_REGISTERS(0x03),
     READ_INPUT_REGISTERS(0x04),
-    WRITE_SINGLE_COIL(0x05),
-    WRITE_SINGLE_REGISTER(0x06),
-    WRITE_MULTIPLE_COILS(0x0F),
+//    WRITE_SINGLE_COIL(0x05),
+//    WRITE_SINGLE_REGISTER(0x06),
+//    WRITE_MULTIPLE_COILS(0x0F),
     WRITE_MULTIPLE_REGISTERS(0x10);
 
     private final int functionCode;
@@ -443,23 +441,7 @@ public class ModbusTCPVehicleCommAdapter
     }
   }
 
-  private static class ModbusRegister {
-    private final int address;
-    private final ModbusFunction function;
-
-    ModbusRegister(int address, ModbusFunction function) {
-      this.address = address;
-      this.function = function;
-    }
-
-    public int getAddress() {
-      return address;
-    }
-
-    public ModbusFunction getFunction() {
-      return function;
-    }
+  private record ModbusRegister(int address, ModbusFunction function) {
   }
-
 
 }
