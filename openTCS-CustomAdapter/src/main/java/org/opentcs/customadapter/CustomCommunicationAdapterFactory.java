@@ -40,9 +40,14 @@ public class CustomCommunicationAdapterFactory
   private final VehicleConfigurationProvider configProvider;
   private boolean initialized;
 
+
   /**
-   * CustomCommunicationAdapterFactory is responsible for creating CustomCommunicationAdapter
-   * instances for vehicles to be controlled.
+   * CustomCommunicationAdapterFactory constructor.
+   *
+   * @param adapterFactory - an instance of CustomAdapterComponentsFactory to initialize the
+   * adapterFactory field.
+   * @param configProvider - an instance of VehicleConfigurationProvider to initialize the
+   * configProvider field.
    */
   @Inject
   public CustomCommunicationAdapterFactory(
@@ -100,6 +105,8 @@ public class CustomCommunicationAdapterFactory
   private static class CustomVehicleCommAdapterDescription
       extends
         VehicleCommAdapterDescription {
+    CustomVehicleCommAdapterDescription() {
+    }
 
     @Override
     public String getDescription() {
@@ -124,7 +131,7 @@ class CommunicationStrategy
   private final ScheduledExecutorService executor;
 
   @Inject
-  public CommunicationStrategy(
+  CommunicationStrategy(
       @KernelExecutor
       ScheduledExecutorService executor,
       VehicleConfigurationProvider configProvider
@@ -134,6 +141,7 @@ class CommunicationStrategy
     initializeStrategies();
   }
 
+  @SuppressWarnings("checkstyle:TodoComment")
   private void initializeStrategies() {
     strategies.put("ModbusTCP", new ModbusTCPStrategy());
     // TODO: Add other strategies here
@@ -195,7 +203,8 @@ class CommunicationStrategy
           LOG.warning("Invalid port number. Using default port " + defaultPort);
           port = defaultPort;
         }
-      } catch (NumberFormatException e) {
+      }
+      catch (NumberFormatException e) {
         LOG.warning("Invalid port number. Using default port " + defaultPort);
         port = defaultPort;
       }
@@ -203,7 +212,8 @@ class CommunicationStrategy
       if (strategy == null || strategy.isEmpty()) {
         strategy = defaultStrategy;
       }
-    } else {
+    }
+    else {
       // Use default values if user cancels
       host = defaultHost;
       port = defaultPort;
@@ -223,6 +233,9 @@ interface StrategyCreator {
 class ModbusTCPStrategy
     implements
       StrategyCreator {
+  ModbusTCPStrategy() {
+  }
+
   @Override
   public CustomVehicleCommAdapter createAdapter(
       Vehicle vehicle, VehicleConfiguration config, ScheduledExecutorService executor
@@ -245,7 +258,7 @@ class VehicleConfigurationProvider {
 
   private final Map<String, VehicleConfiguration> configurations = new HashMap<>();
 
-  public VehicleConfigurationProvider() {
+  VehicleConfigurationProvider() {
     loadConfigurations();
   }
 
@@ -289,10 +302,10 @@ class VehicleConfiguration {
   private String host;
   private int port;
 
-  public VehicleConfiguration() {
+  VehicleConfiguration() {
   }
 
-  public VehicleConfiguration(String currentStrategy, String host, int port) {
+  VehicleConfiguration(String currentStrategy, String host, int port) {
     this.currentStrategy = currentStrategy;
     this.host = host;
     this.port = port;

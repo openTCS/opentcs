@@ -8,6 +8,13 @@ public class CustomProcessModelTO
 
   private String customProperty;
 
+  /**
+   * A serializable representation of a {@link CustomProcessModel}.
+   * <p>
+   * This class extends the {@link VehicleProcessModelTO} class and provides additional methods
+   * and properties specific to the custom process model.
+   * </p>
+   */
   public CustomProcessModelTO() {
     super();
   }
@@ -16,6 +23,12 @@ public class CustomProcessModelTO
     return customProperty;
   }
 
+  /**
+   * Sets the value of the customProperty attribute in the CustomProcessModelTO object.
+   *
+   * @param customProperty the new value for the customProperty attribute
+   * @return The updated CustomProcessModelTO object
+   */
   public CustomProcessModelTO setCustomProperty(String customProperty) {
     this.customProperty = customProperty;
     return this;
@@ -23,6 +36,12 @@ public class CustomProcessModelTO
 
   // You can add getters and setters for other custom properties here if needed
 
+  /**
+   * This method creates a CustomProcessModelTO object from a CustomProcessModel object.
+   *
+   * @param model The CustomProcessModel object to create the CustomProcessModelTO from.
+   * @return The created CustomProcessModelTO object.
+   */
   // We keep this method, but only handle custom properties
   public static CustomProcessModelTO createFrom(CustomProcessModel model) {
     CustomProcessModelTO to = new CustomProcessModelTO();

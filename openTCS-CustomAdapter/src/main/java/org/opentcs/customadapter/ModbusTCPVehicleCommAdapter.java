@@ -27,98 +27,30 @@ public class ModbusTCPVehicleCommAdapter
     extends
       CustomVehicleCommAdapter {
 
+  private static final Map<String, ModbusTCPVehicleCommAdapter.ModbusRegister> REGISTER_MAP
+      = new HashMap<>();
   private static final Logger LOG = Logger.getLogger(ModbusTCPVehicleCommAdapter.class.getName());
   private static final String DEFAULT_RECHARGE_OPERATION = "RECHARGE";
   private static final int DEFAULT_COMMANDS_CAPACITY = 1000;
-
   private ModbusTcpMaster master;
   private final String host;
   private final int port;
   private boolean isConnected;
   private VelocityController velocityController;
-
-  private static final Map<String, ModbusRegister> REGISTER_MAP = new HashMap<>();
-  static {
-    // OHT movement handshake position - status (0x04)
-    REGISTER_MAP.put("HEART_BIT", new ModbusRegister(300, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("DIRECTION", new ModbusRegister(301, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("FORK", new ModbusRegister(302, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("SPEED", new ModbusRegister(303, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("OBSTACLE", new ModbusRegister(304, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("STATUS", new ModbusRegister(305, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("ERROR_CODE", new ModbusRegister(306, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("DESTINATION", new ModbusRegister(308, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("MARK_NO", new ModbusRegister(309, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("POSITION", new ModbusRegister(310, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("IO_IN", new ModbusRegister(318, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("IO_OUT", new ModbusRegister(319, ModbusFunction.READ_INPUT_REGISTERS));
-
-    // OHT movement handshake position - command (0x03, 0x10)
-    REGISTER_MAP.put(
-        "SET_HEART_BIT", new ModbusRegister(300, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
-    );
-    REGISTER_MAP.put(
-        "SET_DIRECTION", new ModbusRegister(301, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
-    );
-    REGISTER_MAP.put("SET_FORK", new ModbusRegister(302, ModbusFunction.WRITE_MULTIPLE_REGISTERS));
-    REGISTER_MAP.put("SET_SPEED", new ModbusRegister(303, ModbusFunction.WRITE_MULTIPLE_REGISTERS));
-    REGISTER_MAP.put(
-        "SET_OBSTACLE", new ModbusRegister(304, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
-    );
-    REGISTER_MAP.put(
-        "SET_COMMAND", new ModbusRegister(305, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
-    );
-    REGISTER_MAP.put("SET_MODE", new ModbusRegister(306, ModbusFunction.WRITE_MULTIPLE_REGISTERS));
-    REGISTER_MAP.put(
-        "SET_DESTINATION", new ModbusRegister(308, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
-    );
-    REGISTER_MAP.put(
-        "SET_JOG_MOVE", new ModbusRegister(312, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
-    );
-  }
-
-  private enum ModbusFunction {
-    READ_COILS(0x01),
-    READ_DISCRETE_INPUTS(0x02),
-    READ_HOLDING_REGISTERS(0x03),
-    READ_INPUT_REGISTERS(0x04),
-    WRITE_SINGLE_COIL(0x05),
-    WRITE_SINGLE_REGISTER(0x06),
-    WRITE_MULTIPLE_COILS(0x0F),
-    WRITE_MULTIPLE_REGISTERS(0x10);
-
-    private final int functionCode;
-
-    ModbusFunction(int functionCode) {
-      this.functionCode = functionCode;
-    }
-
-    public int getFunctionCode() {
-      return functionCode;
-    }
-  }
-
-  private static class ModbusRegister {
-    private final int address;
-    private final ModbusFunction function;
-
-    public ModbusRegister(int address, ModbusFunction function) {
-      this.address = address;
-      this.function = function;
-    }
-
-    public int getAddress() {
-      return address;
-    }
-
-    public ModbusFunction getFunction() {
-      return function;
-    }
-  }
-
   private int maxVelocity;
   private int currentVelocity;
 
+  /**
+   * Initializes a new instance of ModbusTCPVehicleCommAdapter.
+   *
+   * @param processModel The process model associated with the vehicle.
+   * @param rechargeOperation The name of the recharge operation.
+   * @param commandsCapacity The maximum capacity for storing commands.
+   * @param executor The executor for scheduled tasks.
+   * @param host The host address for the TCP connection.
+   * @param port The port number for the TCP connection.
+   */
+  @SuppressWarnings("checkstyle:TodoComment")
   public ModbusTCPVehicleCommAdapter(
       VehicleProcessModel processModel,
       String rechargeOperation,
@@ -132,7 +64,7 @@ public class ModbusTCPVehicleCommAdapter
     this.host = host;
     this.port = port;
     this.isConnected = false;
-//    this.maxVelocity = processModel
+    // this.maxVelocity = processModel
     this.currentVelocity = 0;
 
     // Initialize VelocityController with default values
@@ -425,9 +357,109 @@ public class ModbusTCPVehicleCommAdapter
         .setCustomProperty(getProcessModel().getCustomProperty());
   }
 
+  /**
+   * Updates the vehicle's speed.
+   *
+   * @param newSpeed The new speed value to set.
+   */
   // Add a method to update the vehicle's speed
   public void updateVehicleSpeed(int newSpeed) {
     velocityController.setCurrentVelocity(newSpeed);
     sendModbusCommand("SET_SPEED", velocityController.getCurrentVelocity());
   }
+
+  static {
+    // OHT movement handshake position - status (0x04)
+    REGISTER_MAP.put("HEART_BIT", new ModbusRegister(300, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("DIRECTION", new ModbusRegister(301, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("FORK", new ModbusRegister(302, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("SPEED", new ModbusRegister(303, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("OBSTACLE", new ModbusRegister(304, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("STATUS", new ModbusRegister(305, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("ERROR_CODE", new ModbusRegister(306, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("DESTINATION", new ModbusRegister(308, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("MARK_NO", new ModbusRegister(309, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("POSITION", new ModbusRegister(310, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("IO_IN", new ModbusRegister(318, ModbusFunction.READ_INPUT_REGISTERS));
+    REGISTER_MAP.put("IO_OUT", new ModbusRegister(319, ModbusFunction.READ_INPUT_REGISTERS));
+
+    // OHT movement handshake position - command (0x03, 0x10)
+    REGISTER_MAP.put(
+        "SET_HEART_BIT", new ModbusRegister(300, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
+    );
+    REGISTER_MAP.put(
+        "SET_DIRECTION", new ModbusRegister(301, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
+    );
+    REGISTER_MAP.put(
+        "SET_FORK", new ModbusRegister(
+            302,
+            ModbusFunction.WRITE_MULTIPLE_REGISTERS
+        )
+    );
+    REGISTER_MAP.put(
+        "SET_SPEED", new ModbusRegister(
+            303,
+            ModbusFunction.WRITE_MULTIPLE_REGISTERS
+        )
+    );
+    REGISTER_MAP.put(
+        "SET_OBSTACLE", new ModbusRegister(304, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
+    );
+    REGISTER_MAP.put(
+        "SET_COMMAND", new ModbusRegister(305, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
+    );
+    REGISTER_MAP.put(
+        "SET_MODE", new ModbusRegister(
+            306,
+            ModbusFunction.WRITE_MULTIPLE_REGISTERS
+        )
+    );
+    REGISTER_MAP.put(
+        "SET_DESTINATION", new ModbusRegister(308, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
+    );
+    REGISTER_MAP.put(
+        "SET_JOG_MOVE", new ModbusRegister(312, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
+    );
+  }
+
+  private enum ModbusFunction {
+    READ_COILS(0x01),
+    READ_DISCRETE_INPUTS(0x02),
+    READ_HOLDING_REGISTERS(0x03),
+    READ_INPUT_REGISTERS(0x04),
+    WRITE_SINGLE_COIL(0x05),
+    WRITE_SINGLE_REGISTER(0x06),
+    WRITE_MULTIPLE_COILS(0x0F),
+    WRITE_MULTIPLE_REGISTERS(0x10);
+
+    private final int functionCode;
+
+    ModbusFunction(int functionCode) {
+      this.functionCode = functionCode;
+    }
+
+    public int getFunctionCode() {
+      return functionCode;
+    }
+  }
+
+  private static class ModbusRegister {
+    private final int address;
+    private final ModbusFunction function;
+
+    ModbusRegister(int address, ModbusFunction function) {
+      this.address = address;
+      this.function = function;
+    }
+
+    public int getAddress() {
+      return address;
+    }
+
+    public ModbusFunction getFunction() {
+      return function;
+    }
+  }
+
+
 }
