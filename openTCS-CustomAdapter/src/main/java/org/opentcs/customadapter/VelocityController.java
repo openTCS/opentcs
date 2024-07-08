@@ -6,11 +6,11 @@ import java.util.logging.Logger;
 public class VelocityController {
   private static final Logger LOG = Logger.getLogger(VelocityController.class.getName());
 
-  private int maxAcceleration;
-  private int maxDeceleration;
-  private int maxFwdVelocity;
-  private int maxRevVelocity;
-  private int currentVelocity;
+  private double maxAcceleration;
+  private double maxDeceleration;
+  private double maxFwdVelocity;
+  private double maxRevVelocity;
+  private double currentVelocity;
 
   /**
    * The VelocityController class represents a controller for managing the velocity of a vehicle.
@@ -24,7 +24,7 @@ public class VelocityController {
    * @param maxRevVelocity Max Back Velocity of vehicle.
    */
   public VelocityController(
-      int maxAcceleration, int maxDeceleration, int maxFwdVelocity, int maxRevVelocity
+      double maxAcceleration, double maxDeceleration, double maxFwdVelocity, double maxRevVelocity
   ) {
     this.maxAcceleration = maxAcceleration;
     this.maxDeceleration = maxDeceleration;
@@ -38,7 +38,7 @@ public class VelocityController {
    *
    * @return The current velocity of the vehicle.
    */
-  public int getCurrentVelocity() {
+  public double getCurrentVelocity() {
     return currentVelocity;
   }
 
@@ -67,7 +67,7 @@ public class VelocityController {
     }
   }
 
-  public int getMaxAcceleration() {
+  public double getMaxAcceleration() {
     return maxAcceleration;
   }
 
@@ -75,7 +75,7 @@ public class VelocityController {
     this.maxAcceleration = maxAcceleration;
   }
 
-  public int getMaxDeceleration() {
+  public double getMaxDeceleration() {
     return maxDeceleration;
   }
 
@@ -83,7 +83,7 @@ public class VelocityController {
     this.maxDeceleration = maxDeceleration;
   }
 
-  public int getMaxFwdVelocity() {
+  public double getMaxFwdVelocity() {
     return maxFwdVelocity;
   }
 
@@ -91,7 +91,7 @@ public class VelocityController {
     this.maxFwdVelocity = maxFwdVelocity;
   }
 
-  public int getMaxRevVelocity() {
+  public double getMaxRevVelocity() {
     return maxRevVelocity;
   }
 
