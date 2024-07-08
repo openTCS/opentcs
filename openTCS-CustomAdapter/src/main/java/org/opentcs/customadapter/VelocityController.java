@@ -18,6 +18,7 @@ public class VelocityController {
    * maximum acceleration,
    * maximum deceleration, maximum forward velocity, and maximum reverse velocity.
    * parameters:
+   * 
    * @param maxAcceleration Max Acceleration of vehicle.
    * @param maxDeceleration Max Deceleration of vehicle.
    * @param maxFwdVelocity Max Forward Velocity of vehicle.
