@@ -215,13 +215,18 @@ public class ModbusTCPVehicleCommAdapter
         if (buffer.readableBytes() >= 2) {
           int readValue = buffer.readShort();
           LOG.info("Verified " + register.getFunction().name() + ": " + readValue);
-        } else {
-          LOG.warning("Insufficient data in response for register: " + register.getFunction().name());
         }
-      } finally {
+        else {
+          LOG.warning(
+              "Insufficient data in response for register: " + register.getFunction().name()
+          );
+        }
+      }
+      finally {
         buffer.release();
       }
-    } else {
+    }
+    else {
       LOG.warning("Unexpected response type: " + response.getClass().getSimpleName());
     }
   }
@@ -297,14 +302,19 @@ public class ModbusTCPVehicleCommAdapter
                 int position = buffer.readShort();
                 getProcessModel().setPosition(String.valueOf(position));
                 LOG.info("Updated vehicle position: " + position);
-              } else {
+              }
+              else {
                 LOG.warning("Insufficient data in response for POSITION register");
               }
-            } finally {
+            }
+            finally {
               buffer.release();
             }
-          } else {
-            LOG.warning("Unexpected response type for POSITION: " + response.getClass().getSimpleName());
+          }
+          else {
+            LOG.warning(
+                "Unexpected response type for POSITION: " + response.getClass().getSimpleName()
+            );
           }
         })
         .exceptionally(throwable -> {
@@ -329,14 +339,19 @@ public class ModbusTCPVehicleCommAdapter
                 int state = buffer.readShort();
                 Vehicle.State newState = mapModbusStateToVehicleState(state);
                 getProcessModel().setState(newState);
-              } else {
+              }
+              else {
                 LOG.warning("Insufficient data in response for STATUS register");
               }
-            } finally {
+            }
+            finally {
               buffer.release();
             }
-          } else {
-            LOG.warning("Unexpected response type for STATUS: " + response.getClass().getSimpleName());
+          }
+          else {
+            LOG.warning(
+                "Unexpected response type for STATUS: " + response.getClass().getSimpleName()
+            );
           }
         })
         .exceptionally(throwable -> {
@@ -354,14 +369,19 @@ public class ModbusTCPVehicleCommAdapter
                 int currentSpeed = buffer.readShort();
                 velocityController.setCurrentVelocity(currentSpeed);
                 LOG.info("Current vehicle speed: " + currentSpeed);
-              } else {
+              }
+              else {
                 LOG.warning("Insufficient data in response for SPEED register");
               }
-            } finally {
+            }
+            finally {
               buffer.release();
             }
-          } else {
-            LOG.warning("Unexpected response type for SPEED: " + response.getClass().getSimpleName());
+          }
+          else {
+            LOG.warning(
+                "Unexpected response type for SPEED: " + response.getClass().getSimpleName()
+            );
           }
         })
         .exceptionally(throwable -> {
