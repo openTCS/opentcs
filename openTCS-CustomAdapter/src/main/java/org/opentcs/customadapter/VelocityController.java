@@ -17,8 +17,7 @@ public class VelocityController {
    * It allows setting and retrieving the current velocity, as well as configuring the
    * maximum acceleration,
    * maximum deceleration, maximum forward velocity, and maximum reverse velocity.
-   * parameters:
-   * 
+   *
    * @param maxAcceleration Max Acceleration of vehicle.
    * @param maxDeceleration Max Deceleration of vehicle.
    * @param maxFwdVelocity Max Forward Velocity of vehicle.
