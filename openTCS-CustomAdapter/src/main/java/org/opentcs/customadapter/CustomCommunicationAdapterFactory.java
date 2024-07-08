@@ -136,7 +136,7 @@ class CommunicationStrategy
 
   private void initializeStrategies() {
     strategies.put("ModbusTCP", new ModbusTCPStrategy());
-    // Add other strategies here
+    // TODO: Add other strategies here
   }
 
   @Override
@@ -159,11 +159,11 @@ class CommunicationStrategy
 
   private VehicleConfiguration createConfigWithUserInput(Vehicle vehicle) {
     String defaultHost = "localhost";
-    String defaultPort = "502";
+    int defaultPort = 502;
     String defaultStrategy = "ModbusTCP";
 
     JTextField hostField = new JTextField(defaultHost, 10);
-    JTextField portField = new JTextField(defaultPort, 10);
+    JTextField portField = new JTextField(String.valueOf(defaultPort), 10);
     JComboBox<String> strategyComboBox = new JComboBox<>(
         strategies.keySet().toArray(new String[0])
     );
@@ -183,25 +183,34 @@ class CommunicationStrategy
         "Enter Configuration for " + vehicle.getName(), JOptionPane.OK_CANCEL_OPTION
     );
 
-    VehicleConfiguration config = new VehicleConfiguration();
+    String host;
+    int port;
+    String strategy;
+
     if (result == JOptionPane.OK_OPTION) {
-      config.setHost(hostField.getText());
+      host = hostField.getText().isEmpty() ? defaultHost : hostField.getText();
       try {
-        config.setPort(Integer.parseInt(portField.getText()));
+        port = Integer.parseInt(portField.getText());
+        if (port < 0 || port > 65535) {
+          LOG.warning("Invalid port number. Using default port " + defaultPort);
+          port = defaultPort;
+        }
+      } catch (NumberFormatException e) {
+        LOG.warning("Invalid port number. Using default port " + defaultPort);
+        port = defaultPort;
       }
-      catch (NumberFormatException e) {
-        LOG.warning("Invalid port number. Using default port 502.");
-        config.setPort(502);
+      strategy = (String) strategyComboBox.getSelectedItem();
+      if (strategy == null || strategy.isEmpty()) {
+        strategy = defaultStrategy;
       }
-      config.setCurrentStrategy((String) strategyComboBox.getSelectedItem());
-    }
-    else {
+    } else {
       // Use default values if user cancels
-      config.setHost(defaultHost);
-      config.setPort(Integer.parseInt(defaultPort));
-      config.setCurrentStrategy(defaultStrategy);
+      host = defaultHost;
+      port = defaultPort;
+      strategy = defaultStrategy;
     }
-    return config;
+
+    return new VehicleConfiguration(strategy, host, port);
   }
 }
 
@@ -241,7 +250,7 @@ class VehicleConfigurationProvider {
   }
 
   public VehicleConfiguration getConfiguration(String vehicleName) {
-    return configurations.get(vehicleName);
+    return configurations.getOrDefault(vehicleName, null);
   }
 
   public void setConfiguration(String vehicleName, VehicleConfiguration config) {
@@ -280,6 +289,15 @@ class VehicleConfiguration {
   private String host;
   private int port;
 
+  public VehicleConfiguration() {
+  }
+
+  public VehicleConfiguration(String currentStrategy, String host, int port) {
+    this.currentStrategy = currentStrategy;
+    this.host = host;
+    this.port = port;
+  }
+
   // Getters and setters
   public String getCurrentStrategy() {
     return currentStrategy;
@@ -302,6 +320,9 @@ class VehicleConfiguration {
   }
 
   public void setPort(int port) {
+    if (port < 0 || port > 65535) {
+      throw new IllegalArgumentException("Invalid port number, port number range is 0 - 65535");
+    }
     this.port = port;
   }
 }
