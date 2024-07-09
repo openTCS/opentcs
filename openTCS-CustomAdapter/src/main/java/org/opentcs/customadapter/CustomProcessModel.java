@@ -8,6 +8,8 @@ public class CustomProcessModel
       VehicleProcessModel {
 
   private String customProperty;
+  private String loadOperation = "Load";
+  private String unloadOperation = "Unload";
 
   /**
    * Constructs a new CustomProcessModel object with the specified attachedVehicle.
@@ -17,6 +19,40 @@ public class CustomProcessModel
   public CustomProcessModel(Vehicle attachedVehicle) {
     super(attachedVehicle);
     this.customProperty = "Default Value";
+  }
+
+  public String getLoadOperation() {
+    return loadOperation;
+  }
+
+  /**
+   * Sets the value of the loadOperation attribute.
+   *
+   * @param loadOperation the new value for the loadOperation attribute
+   *
+   * @see CustomProcessModel#loadOperation
+   * @see CustomProcessModel#setLoadOperation(String)
+   * @see CustomProcessModel.Attribute#LOAD
+   */
+  public void setLoadOperation(String loadOperation) {
+    String oldValue = this.loadOperation;
+    this.loadOperation = loadOperation;
+    getPropertyChangeSupport().firePropertyChange("loadOperation", oldValue, loadOperation);
+  }
+
+  public String getUnloadOperation() {
+    return unloadOperation;
+  }
+
+  /**
+   * Sets the value of the unloadOperation attribute in the CustomProcessModel class.
+   *
+   * @param unloadOperation the new value for the unloadOperation attribute
+   */
+  public void setUnloadOperation(String unloadOperation) {
+    String oldValue = this.unloadOperation;
+    this.unloadOperation = unloadOperation;
+    getPropertyChangeSupport().firePropertyChange("unloadOperation", oldValue, unloadOperation);
   }
 
   public String getCustomProperty() {
@@ -44,7 +80,15 @@ public class CustomProcessModel
     /**
      * Custom property attribute.
      */
-    CUSTOM_PROPERTY
+    CUSTOM_PROPERTY,
+    /**
+     * Custom load operation attribute.
+     */
+    LOAD,
+    /**
+     * Custom unload operation attribute.
+     */
+    UNLOAD
     // If you have other custom attributes, you can add them here
   }
 }

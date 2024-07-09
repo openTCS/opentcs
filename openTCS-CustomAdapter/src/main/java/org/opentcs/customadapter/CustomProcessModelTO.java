@@ -5,7 +5,8 @@ import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 public class CustomProcessModelTO
     extends
       VehicleProcessModelTO {
-
+  private String loadOperation = "Load";
+  private String unloadOperation = "Unload";
   private String customProperty;
 
   /**
@@ -17,6 +18,36 @@ public class CustomProcessModelTO
    */
   public CustomProcessModelTO() {
     super();
+  }
+
+  public String getLoadOperation() {
+    return loadOperation;
+  }
+
+  /**
+   * Sets the value of the loadOperation attribute in the CustomProcessModelTO object.
+   *
+   * @param loadOperation the new value for the loadOperation attribute
+   * @return The updated CustomProcessModelTO object
+   */
+  public CustomProcessModelTO setLoadOperation(String loadOperation) {
+    this.loadOperation = loadOperation;
+    return this;
+  }
+
+  public String getUnloadOperation() {
+    return unloadOperation;
+  }
+
+  /**
+   * Sets the value of the unloadOperation attribute in the CustomProcessModelTO object.
+   *
+   * @param unloadOperation the new value for the unloadOperation attribute
+   * @return The updated CustomProcessModelTO object
+   */
+  public CustomProcessModelTO setUnloadOperation(String unloadOperation) {
+    this.unloadOperation = unloadOperation;
+    return this;
   }
 
   public String getCustomProperty() {
