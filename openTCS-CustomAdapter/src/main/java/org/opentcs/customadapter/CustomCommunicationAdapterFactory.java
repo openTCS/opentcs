@@ -241,6 +241,7 @@ class ModbusTCPStrategy
         DEFAULT_RECHARGE_OPERATION,
         DEFAULT_COMMANDS_CAPACITY,
         executor,
+        vehicle,
         config.host(),
         config.port()
     );
