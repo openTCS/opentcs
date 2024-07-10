@@ -332,15 +332,22 @@ public class ModbusTCPVehicleCommAdapter
 
   private void initializeMCPool(MovementCommand cmd) {
     TransportOrder order = cmd.getTransportOrder();
-    List<DriveOrder> driveOrders = order.getAllDriveOrders();
+    List<DriveOrder> relevantOrders = getRelevantOrders(order);
 
-//    List<MovementCommand> allCommands = order.getAllDriveOrders().stream()
-//        .map(DriveOrder::getRoute)
-//        .flatMap(route -> route.getSteps().stream())
-//        .map(step -> createMovementCommand(order, step))
-//        .collect(Collectors.toList());
+    for (DriveOrder driveOrder : relevantOrders) {
+      // TODO: add movementCommands into mcpool.
+      LOG.info("DDDD");
+    }
 
+    LOG.info(
+        String.format(
+            "Initialized MC pool for TransportOrder: %s. Pool size: %d", order.getName(), mcPool
+                .size()
+        )
+    );
+  }
 
+  private static List<DriveOrder> getRelevantOrders(TransportOrder order) {
     List<DriveOrder> relevantOrders = new ArrayList<>();
 
     // Get the current DriveOrder
@@ -351,26 +358,7 @@ public class ModbusTCPVehicleCommAdapter
 
     // Get future DriveOrders
     relevantOrders.addAll(order.getFutureDriveOrders());
-
-    for (DriveOrder driveOrder : relevantOrders) {
-      // TODO: add movementCommands into mcpool.
-      LOG.info("DDDD");
-//      Route route = driveOrder.getRoute();
-//      if (route != null) {
-//        for (Route.Step step : route.getSteps()) {
-//          //Create a MovementCommand for each Step
-//          MovementCommand movementCmd = createMovementCommand(step, driveOrder);
-//          mcPool.add(movementCmd);
-//        }
-//      }
-    }
-
-    LOG.info(
-        String.format(
-            "Initialized MC pool for TransportOrder: %s. Pool size: %d", order.getName(), mcPool
-                .size()
-        )
-    );
+    return relevantOrders;
   }
 
   private void processMovementCommand(MovementCommand cmd) {
@@ -418,10 +406,8 @@ public class ModbusTCPVehicleCommAdapter
 //    String operation = driveOrder.getDestination().getOperation();
 //    Location opLocation = driveOrder.getDestination().getLocation();
 //
-//    // 判斷是否為最後一個移動命令
 //    boolean isFinalMovement = driveOrder.equals(transportOrder.getAllDriveOrders());
 //
-//    // 獲取最終目的地信息
 //    DriveOrder finalDriveOrder = transportOrder.getFinalDriveOrder();
 //    Location finalDestinationLocation = finalDriveOrder.getDestination().getLocation();
 //    Point finalDestination = finalDriveOrder.getDestination().getDestination();
@@ -468,10 +454,10 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private void writeModbusCommands(List<ModbusCommand> commands) {
-    int startAddress = 1000;  // 假設起始地址為 1000
+    int startAddress = 1000;
     int quantity = commands.size();
 
-    ByteBuf values = Unpooled.buffer(quantity * 2);  // 每個寄存器 2 個字節
+    ByteBuf values = Unpooled.buffer(quantity * 2);
 
     for (ModbusCommand command : commands) {
       values.writeShort(command.value());
@@ -504,8 +490,8 @@ public class ModbusTCPVehicleCommAdapter
     // Initialize stationToCommands
     for (int i = 1; i <= 100; i++) {
       String station = "MK" + i;
-      CMD1 cmd1 = new CMD1(0, 0, 0, 0);  // 示例值
-      CMD2 cmd2 = new CMD2(0, 0, 0);     // 示例值
+      CMD1 cmd1 = new CMD1(0, 0, 0, 0);
+      CMD2 cmd2 = new CMD2(0, 0, 0);
       stationToCommands.put(station, new Pair<>(cmd1, cmd2));
     }
   }
@@ -773,7 +759,7 @@ public class ModbusTCPVehicleCommAdapter
     velocityController.setCurrentVelocity(newSpeed);
     currentVelocity = newSpeed;
     // TODO: overload a double type parameter version of sendModbusCommand for speed.
-    sendModbusCommand("SET_SPEED", (int) currentVelocity);
+    sendModbusCommand("SET_SPEED", currentVelocity);
   }
 
   static {
