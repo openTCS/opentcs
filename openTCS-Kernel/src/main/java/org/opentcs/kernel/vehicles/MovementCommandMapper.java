@@ -70,28 +70,25 @@ public class MovementCommandMapper {
     Iterator<Route.Step> stepIter = orderRoute.getSteps().iterator();
     while (stepIter.hasNext()) {
       Route.Step curStep = stepIter.next();
-      // Ignore report positions on the route.
-      if (curStep.getDestinationPoint().isHaltingPosition()) {
-        boolean isFinalMovement = !stepIter.hasNext();
+      boolean isFinalMovement = !stepIter.hasNext();
 
-        String operation = isFinalMovement ? op : MovementCommand.NO_OPERATION;
-        Location location = isFinalMovement ? finalDestinationLocation : null;
+      String operation = isFinalMovement ? op : MovementCommand.NO_OPERATION;
+      Location location = isFinalMovement ? finalDestinationLocation : null;
 
-        result.add(
-            new MovementCommand(
-                transportOrder,
-                driveOrder,
-                curStep,
-                operation,
-                location,
-                isFinalMovement,
-                finalDestinationLocation,
-                finalDestination,
-                op,
-                mergeProperties(transportOrder.getProperties(), destProperties)
-            )
-        );
-      }
+      result.add(
+          new MovementCommand(
+              transportOrder,
+              driveOrder,
+              curStep,
+              operation,
+              location,
+              isFinalMovement,
+              finalDestinationLocation,
+              finalDestination,
+              op,
+              mergeProperties(transportOrder.getProperties(), destProperties)
+          )
+      );
     }
 
     return result;

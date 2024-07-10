@@ -21,6 +21,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 *** The endpoint `POST /plantModel/topologyUpdateRequest` now also accepts an optional list of path names allowing the routing topology to be updated selectively.
 * Bugs fixed:
 ** Correctly calculate the costs for new routes when rerouting transport orders for which resources to be avoided are defined.
+* Changes affecting developers:
+** Deprecate `Point.isHaltingPosition()`.
+   With openTCS 6.0, the point type `REPORT_POSITION` was removed, which makes this method redundant, as all remaining point types allow halting.
 
 == Version 6.0 (2024-06-19)
 

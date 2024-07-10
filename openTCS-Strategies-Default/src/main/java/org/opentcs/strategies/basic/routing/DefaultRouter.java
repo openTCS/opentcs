@@ -434,9 +434,7 @@ public class DefaultRouter
       Point destPoint = objectService.fetchObject(Point.class, dest.getDestination().getName());
       requireNonNull(destPoint, "destPoint");
       final Set<Point> result = new HashSet<>();
-      if (destPoint.isHaltingPosition()) {
-        result.add(destPoint);
-      }
+      result.add(destPoint);
       return result;
     }
     // If it's a "normal" transport order, look for destination points adjacent
@@ -463,9 +461,7 @@ public class DefaultRouter
             || (curLink.getAllowedOperations().isEmpty()
                 && destLocType.isAllowedOperation(dest.getOperation()))) {
           Point destPoint = objectService.fetchObject(Point.class, curLink.getPoint());
-          if (destPoint.isHaltingPosition()) {
-            result.add(destPoint);
-          }
+          result.add(destPoint);
         }
       }
       return result;
