@@ -47,7 +47,7 @@ public class VelocityController {
    *
    * @param velocity The new velocity value to set.
    */
-  public void setCurrentVelocity(int velocity) {
+  public void setCurrentVelocity(double velocity) {
     if (velocity > maxFwdVelocity) {
       LOG.warning(
           "Attempted to set velocity above maximum forward velocity. Setting to max forward "
@@ -71,7 +71,7 @@ public class VelocityController {
     return maxAcceleration;
   }
 
-  public void setMaxAcceleration(int maxAcceleration) {
+  public void setMaxAcceleration(double maxAcceleration) {
     this.maxAcceleration = maxAcceleration;
   }
 
@@ -79,7 +79,7 @@ public class VelocityController {
     return maxDeceleration;
   }
 
-  public void setMaxDeceleration(int maxDeceleration) {
+  public void setMaxDeceleration(double maxDeceleration) {
     this.maxDeceleration = maxDeceleration;
   }
 
@@ -87,7 +87,7 @@ public class VelocityController {
     return maxFwdVelocity;
   }
 
-  public void setMaxFwdVelocity(int maxFwdVelocity) {
+  public void setMaxFwdVelocity(double maxFwdVelocity) {
     this.maxFwdVelocity = maxFwdVelocity;
   }
 
@@ -95,7 +95,7 @@ public class VelocityController {
     return maxRevVelocity;
   }
 
-  public void setMaxRevVelocity(int maxRevVelocity) {
+  public void setMaxRevVelocity(double maxRevVelocity) {
     this.maxRevVelocity = maxRevVelocity;
   }
 }
