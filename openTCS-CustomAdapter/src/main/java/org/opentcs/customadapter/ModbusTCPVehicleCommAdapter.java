@@ -1,6 +1,7 @@
 package org.opentcs.customadapter;
 
 import static java.util.Objects.requireNonNull;
+
 import com.digitalpetri.modbus.master.ModbusTcpMaster;
 import com.digitalpetri.modbus.master.ModbusTcpMasterConfig;
 import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
@@ -78,7 +79,7 @@ public class ModbusTCPVehicleCommAdapter
    */
   private Set<MovementCommand> mcPool = new HashSet<>();
 
-  private TransportOrder currentOrder;
+  private TransportOrder currentTransportOrder = null;
   private List<MovementCommand> allMovementCommands = new ArrayList<>();
 
   /**
@@ -283,14 +284,20 @@ public class ModbusTCPVehicleCommAdapter
       return false;
     }
 
-    // 如果是新的 TransportOrder，清空之前的命令
-    if (currentOrder == null || !currentOrder.equals(newCommand.getTransportOrder())) {
-      currentOrder = newCommand.getTransportOrder();
+    if (currentTransportOrder == null || !currentTransportOrder.equals(
+        newCommand.getTransportOrder()
+    )) {
+      currentTransportOrder = newCommand.getTransportOrder();
       allMovementCommands.clear();
     }
 
     allMovementCommands.add(newCommand);
-    LOG.info(String.format("{}: Custom Adding command: {}", getName(), newCommand));
+    LOG.info(
+        String.format(
+            "{}: Custom Adding command: {}, Current Movement Pool Size: {}", getName(), newCommand,
+            allMovementCommands.size()
+        )
+    );
 
     getUnsentCommands().add(newCommand);
     getProcessModel().commandEnqueued(newCommand);
@@ -328,7 +335,8 @@ public class ModbusTCPVehicleCommAdapter
   private void processAllMovementCommands() {
     LOG.info(
         String.format(
-            "Processing all movement commands for TransportOrder: %s", currentOrder.getName()
+            "Processing all movement commands for TransportOrder: %s", currentTransportOrder
+                .getName()
         )
     );
     List<ModbusCommand> modbusCommands = convertMovementCommandsToModbusCommands(
@@ -336,7 +344,7 @@ public class ModbusTCPVehicleCommAdapter
     );
     writeModbusCommands(modbusCommands);
     allMovementCommands.clear();
-    currentOrder = null;
+    currentTransportOrder = null;
 //    Point destination = cmd.getStep().getDestinationPoint();
 //    String stationName = map1.get(Integer.parseInt(destination.getName()));
 //    if (stationName == null) {
@@ -357,7 +365,7 @@ public class ModbusTCPVehicleCommAdapter
 
     for (MovementCommand cmd : commands) {
       Point destination = cmd.getStep().getDestinationPoint();
-      String stationName = distanceToStation.get(Integer.parseInt(destination.getName()));
+      String stationName = distanceToStation.get((int) destination.getPose().getPosition().getX());
       if (stationName == null) {
         throw new IllegalArgumentException("Cannot find station for the given destination point.");
       }
@@ -389,13 +397,27 @@ public class ModbusTCPVehicleCommAdapter
 
   @SuppressWarnings("checkstyle:TodoComment")
   private CMD1 createCMD1(MovementCommand cmd) {
+    int liftCmd = 0;
+    int speedLevel = 0;
+    int obstacleSensor = 0;
+    String command = cmd.getFinalOperation();
+
+    // TODO: load operation not only have up and down properties.
+    if(command.equals("Load")) {
+      liftCmd = 2;
+    }
+    else liftCmd = 1;
+
     // TODO: MAKE IT REAL
     return new CMD1(
-        0, 3, 4, cmd.getStep().getVehicleOrientation() == Vehicle.Orientation.FORWARD ? 0 : 1
+
+        liftCmd, speedLevel, obstacleSensor, cmd.getStep().getVehicleOrientation()
+            == Vehicle.Orientation.FORWARD ? 0 : 1
     );
   }
 
   private CMD2 createCMD2(MovementCommand cmd) {
+    cmd.getFinalOperation()
     // TODO: MAKE IT REAL
     return new CMD2(0, 0, 2);
   }
@@ -705,9 +727,9 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private double maxVelocity(Route.Step step) {
-    return(step.getVehicleOrientation() == Vehicle.Orientation.BACKWARD)
-        ?  (double)step.getPath().getMaxReverseVelocity()
-        :  (double)step.getPath().getMaxVelocity();
+    return (step.getVehicleOrientation() == Vehicle.Orientation.BACKWARD)
+        ? (double) step.getPath().getMaxReverseVelocity()
+        : (double) step.getPath().getMaxVelocity();
   }
 
   /**

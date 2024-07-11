@@ -48,6 +48,7 @@ public class CustomProcessModelTO
   public String getLoadOperation() {
     return loadOperation;
   }
+
   /**
    * Sets the load operation for the custom process model.
    *
@@ -62,6 +63,7 @@ public class CustomProcessModelTO
   public String getUnloadOperation() {
     return unloadOperation;
   }
+
   /**
    * Sets the unload operation for the custom process model associated with the vehicle.
    *
@@ -76,6 +78,7 @@ public class CustomProcessModelTO
   public double getMaxAcceleration() {
     return maxAcceleration;
   }
+
   /**
    * Sets the maximum acceleration of the custom process model associated with the vehicle.
    *
@@ -90,6 +93,7 @@ public class CustomProcessModelTO
   public double getMaxDeceleration() {
     return maxDeceleration;
   }
+
   /**
    * Sets the maximum deceleration for the custom process model associated with the vehicle.
    *
@@ -104,6 +108,7 @@ public class CustomProcessModelTO
   public double getMaxFwdVelocity() {
     return maxFwdVelocity;
   }
+
   /**
    * Sets the maximum forward velocity of the custom process model associated with the vehicle.
    *
@@ -118,6 +123,7 @@ public class CustomProcessModelTO
   public double getMaxRevVelocity() {
     return maxRevVelocity;
   }
+
   /**
    * Sets the maximum reverse velocity of the custom process model associated with the vehicle.
    *
