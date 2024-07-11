@@ -2,12 +2,37 @@ package org.opentcs.customadapter;
 
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 
+/**
+ * A serializable representation of a {@link CustomProcessModel}.
+ */
 public class CustomProcessModelTO
     extends
       VehicleProcessModelTO {
+
+  /**
+   * Indicates which operation is a loading operation.
+   */
   private String loadOperation = "Load";
+  /**
+   * Indicates which operation is an unloading operation.
+   */
   private String unloadOperation = "Unload";
-  private String customProperty;
+  /**
+   * The maximum acceleration.
+   */
+  private double maxAcceleration;
+  /**
+   * The maximum deceleration.
+   */
+  private double maxDeceleration;
+  /**
+   * The maximum forward velocity.
+   */
+  private double maxFwdVelocity;
+  /**
+   * The maximum reverse velocity.
+   */
+  private double maxRevVelocity;
 
   /**
    * A serializable representation of a {@link CustomProcessModel}.
@@ -23,12 +48,11 @@ public class CustomProcessModelTO
   public String getLoadOperation() {
     return loadOperation;
   }
-
   /**
-   * Sets the value of the loadOperation attribute in the CustomProcessModelTO object.
+   * Sets the load operation for the custom process model.
    *
-   * @param loadOperation the new value for the loadOperation attribute
-   * @return The updated CustomProcessModelTO object
+   * @param loadOperation The name of the load operation.
+   * @return The updated CustomProcessModelTO object.
    */
   public CustomProcessModelTO setLoadOperation(String loadOperation) {
     this.loadOperation = loadOperation;
@@ -38,46 +62,70 @@ public class CustomProcessModelTO
   public String getUnloadOperation() {
     return unloadOperation;
   }
-
   /**
-   * Sets the value of the unloadOperation attribute in the CustomProcessModelTO object.
+   * Sets the unload operation for the custom process model associated with the vehicle.
    *
-   * @param unloadOperation the new value for the unloadOperation attribute
-   * @return The updated CustomProcessModelTO object
+   * @param unloadOperation The unload operation to set.
+   * @return The updated CustomProcessModelTO object.
    */
   public CustomProcessModelTO setUnloadOperation(String unloadOperation) {
     this.unloadOperation = unloadOperation;
     return this;
   }
 
-  public String getCustomProperty() {
-    return customProperty;
+  public double getMaxAcceleration() {
+    return maxAcceleration;
   }
-
   /**
-   * Sets the value of the customProperty attribute in the CustomProcessModelTO object.
+   * Sets the maximum acceleration of the custom process model associated with the vehicle.
    *
-   * @param customProperty the new value for the customProperty attribute
-   * @return The updated CustomProcessModelTO object
+   * @param maxAcceleration The new maximum acceleration to set.
+   * @return The updated CustomProcessModelTO object.
    */
-  public CustomProcessModelTO setCustomProperty(String customProperty) {
-    this.customProperty = customProperty;
+  public CustomProcessModelTO setMaxAcceleration(double maxAcceleration) {
+    this.maxAcceleration = maxAcceleration;
     return this;
   }
 
-  // You can add getters and setters for other custom properties here if needed
-
+  public double getMaxDeceleration() {
+    return maxDeceleration;
+  }
   /**
-   * This method creates a CustomProcessModelTO object from a CustomProcessModel object.
+   * Sets the maximum deceleration for the custom process model associated with the vehicle.
    *
-   * @param model The CustomProcessModel object to create the CustomProcessModelTO from.
-   * @return The created CustomProcessModelTO object.
+   * @param maxDeceleration The maximum deceleration to set.
+   * @return The updated CustomProcessModelTO object.
    */
-  // We keep this method, but only handle custom properties
-  public static CustomProcessModelTO createFrom(CustomProcessModel model) {
-    CustomProcessModelTO to = new CustomProcessModelTO();
-    to.setCustomProperty(model.getCustomProperty());
-    // If there are other custom properties, set them here
-    return to;
+  public CustomProcessModelTO setMaxDeceleration(double maxDeceleration) {
+    this.maxDeceleration = maxDeceleration;
+    return this;
+  }
+
+  public double getMaxFwdVelocity() {
+    return maxFwdVelocity;
+  }
+  /**
+   * Sets the maximum forward velocity of the custom process model associated with the vehicle.
+   *
+   * @param maxFwdVelocity The new maximum forward velocity to set.
+   * @return The updated CustomProcessModelTO object.
+   */
+  public CustomProcessModelTO setMaxFwdVelocity(double maxFwdVelocity) {
+    this.maxFwdVelocity = maxFwdVelocity;
+    return this;
+  }
+
+  public double getMaxRevVelocity() {
+    return maxRevVelocity;
+  }
+  /**
+   * Sets the maximum reverse velocity of the custom process model associated with the vehicle.
+   *
+   * @param maxRevVelocity The new maximum reverse velocity to set.
+   * @return The updated CustomProcessModelTO object.
+   */
+  public CustomProcessModelTO setMaxRevVelocity(double maxRevVelocity) {
+    this.maxRevVelocity = maxRevVelocity;
+    return this;
   }
 }

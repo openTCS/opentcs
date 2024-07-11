@@ -7,9 +7,12 @@ public class CustomProcessModel
     extends
       VehicleProcessModel {
 
-  private String customProperty;
-  private String loadOperation = "Load";
-  private String unloadOperation = "Unload";
+  private final String loadOperation = "Load";
+  private final String unloadOperation = "Unload";
+  /**
+   * The velocity controller for calculating the simulated vehicle's velocity and current position.
+   */
+  private final VelocityController velocityController;
 
   /**
    * Constructs a new CustomProcessModel object with the specified attachedVehicle.
@@ -18,26 +21,16 @@ public class CustomProcessModel
    */
   public CustomProcessModel(Vehicle attachedVehicle) {
     super(attachedVehicle);
-    this.customProperty = "Default Value";
+    this.velocityController = new VelocityController(
+        1.6,
+        -1.6,
+        attachedVehicle.getMaxReverseVelocity(),
+        attachedVehicle.getMaxVelocity()
+    );
   }
 
   public String getLoadOperation() {
     return loadOperation;
-  }
-
-  /**
-   * Sets the value of the loadOperation attribute.
-   *
-   * @param loadOperation the new value for the loadOperation attribute
-   *
-   * @see CustomProcessModel#loadOperation
-   * @see CustomProcessModel#setLoadOperation(String)
-   * @see CustomProcessModel.Attribute#LOAD
-   */
-  public void setLoadOperation(String loadOperation) {
-    String oldValue = this.loadOperation;
-    this.loadOperation = loadOperation;
-    getPropertyChangeSupport().firePropertyChange("loadOperation", oldValue, loadOperation);
   }
 
   public String getUnloadOperation() {
@@ -45,50 +38,124 @@ public class CustomProcessModel
   }
 
   /**
-   * Sets the value of the unloadOperation attribute in the CustomProcessModel class.
+   * Returns the maximum deceleration.
    *
-   * @param unloadOperation the new value for the unloadOperation attribute
+   * @return The maximum deceleration
    */
-  public void setUnloadOperation(String unloadOperation) {
-    String oldValue = this.unloadOperation;
-    this.unloadOperation = unloadOperation;
-    getPropertyChangeSupport().firePropertyChange("unloadOperation", oldValue, unloadOperation);
-  }
-
-  public String getCustomProperty() {
-    return customProperty;
+  public synchronized double getMaxDecceleration() {
+    return velocityController.getMaxDeceleration();
   }
 
   /**
-   * Sets the value of the customProperty attribute.
+   * Sets the maximum deceleration.
    *
-   * @param customProperty the new value for the customProperty attribute
+   * @param maxDeceleration The new maximum deceleration
    */
-  public void setCustomProperty(String customProperty) {
-    String oldValue = this.customProperty;
-    this.customProperty = customProperty;
-    getPropertyChangeSupport().firePropertyChange("customProperty", oldValue, customProperty);
+  public synchronized void setMaxDeceleration(double maxDeceleration) {
+    double oldValue = velocityController.getMaxDeceleration();
+    velocityController.setMaxDeceleration(maxDeceleration);
+
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.DECELERATION.name(),
+        oldValue,
+        maxDeceleration
+    );
   }
 
-  // You can add getters and setters for other custom properties here if needed
+  /**
+   * Returns the maximum acceleration.
+   *
+   * @return The maximum acceleration
+   */
+  public synchronized double getMaxAcceleration() {
+    return velocityController.getMaxAcceleration();
+  }
+
+  /**
+   * Sets the maximum acceleration.
+   *
+   * @param maxAcceleration The new maximum acceleration
+   */
+  public synchronized void setMaxAcceleration(double maxAcceleration) {
+    double oldValue = velocityController.getMaxAcceleration();
+    velocityController.setMaxAcceleration(maxAcceleration);
+
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.ACCELERATION.name(),
+        oldValue,
+        maxAcceleration
+    );
+  }
+
+  /**
+   * Returns the maximum reverse velocity.
+   *
+   * @return The maximum reverse velocity.
+   */
+  public synchronized double getMaxRevVelocity() {
+    return velocityController.getMaxRevVelocity();
+  }
+
+  /**
+   * Sets the maximum reverse velocity.
+   *
+   * @param maxRevVelocity The new maximum reverse velocity
+   */
+  public synchronized void setMaxRevVelocity(double maxRevVelocity) {
+    double oldValue = velocityController.getMaxRevVelocity();
+    velocityController.setMaxRevVelocity(maxRevVelocity);
+
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.MAX_REVERSE_VELOCITY.name(),
+        oldValue,
+        maxRevVelocity
+    );
+  }
+
+  /**
+   * Returns the maximum forward velocity.
+   *
+   * @return The maximum forward velocity.
+   */
+  public synchronized double getMaxFwdVelocity() {
+    return velocityController.getMaxFwdVelocity();
+  }
+
+  /**
+   * Sets the maximum forward velocity.
+   *
+   * @param maxFwdVelocity The new maximum forward velocity.
+   */
+  public synchronized void setMaxFwdVelocity(double maxFwdVelocity) {
+    double oldValue = velocityController.getMaxFwdVelocity();
+    velocityController.setMaxFwdVelocity(maxFwdVelocity);
+
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.MAX_FORWARD_VELOCITY.name(),
+        oldValue,
+        maxFwdVelocity
+    );
+  }
 
   /**
    * The Attribute enumeration.
    */
   public enum Attribute {
-
     /**
-     * Custom property attribute.
+     * Indicates a change of the virtual vehicle's maximum acceleration.
      */
-    CUSTOM_PROPERTY,
+    ACCELERATION,
     /**
-     * Custom load operation attribute.
+     * Indicates a change of the virtual vehicle's maximum deceleration.
      */
-    LOAD,
+    DECELERATION,
     /**
-     * Custom unload operation attribute.
+     * Indicates a change of the virtual vehicle's maximum forward velocity.
      */
-    UNLOAD
-    // If you have other custom attributes, you can add them here
+    MAX_FORWARD_VELOCITY,
+    /**
+     * Indicates a change of the virtual vehicle's maximum reverse velocity.
+     */
+    MAX_REVERSE_VELOCITY,
   }
 }
