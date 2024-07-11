@@ -8,9 +8,12 @@
 
 package org.opentcs.customadapter;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
 import org.opentcs.customizations.kernel.KernelExecutor;
@@ -56,8 +59,9 @@ public abstract class CustomVehicleCommAdapter
 
   @Override
   public void sendCommand(MovementCommand cmd) {
+    requireNonNull(cmd, "cmd");
     LOG.info("Sending command to vehicle: " + cmd.toString());
-    sendSpecificCommand(cmd);
+    ((ExecutorService) getExecutor()).submit(() -> sendSpecificCommand(cmd));
   }
 
   protected abstract void sendSpecificCommand(MovementCommand cmd);
