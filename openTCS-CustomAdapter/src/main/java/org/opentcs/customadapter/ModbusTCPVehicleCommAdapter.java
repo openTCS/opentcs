@@ -1,7 +1,6 @@
 package org.opentcs.customadapter;
 
 import static java.util.Objects.requireNonNull;
-
 import com.digitalpetri.modbus.master.ModbusTcpMaster;
 import com.digitalpetri.modbus.master.ModbusTcpMasterConfig;
 import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
@@ -34,6 +33,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
@@ -345,16 +345,6 @@ public class ModbusTCPVehicleCommAdapter
     writeModbusCommands(modbusCommands);
     allMovementCommands.clear();
     currentTransportOrder = null;
-//    Point destination = cmd.getStep().getDestinationPoint();
-//    String stationName = map1.get(Integer.parseInt(destination.getName()));
-//    if (stationName == null) {
-//      throw new IllegalArgumentException("Cannot find station for the given destination point.");
-//    }
-//
-//    CMD1 cmd1 = createCMD1(cmd);
-//    CMD2 cmd2 = createCMD2(cmd);
-//
-//    map2.put(stationName, new Pair<>(cmd1, cmd2));
   }
 
   // TODO: Important part of command converting.
@@ -401,25 +391,48 @@ public class ModbusTCPVehicleCommAdapter
     int speedLevel = 0;
     int obstacleSensor = 0;
     String command = cmd.getFinalOperation();
+    cmd.getStep().getDestinationPoint().getName();
+    liftCmd = getLiftCommand(command);
 
-    // TODO: load operation not only have up and down properties.
-    if(command.equals("Load")) {
-      liftCmd = 2;
+    if (cmd.getStep().getPath() != null) {
+      double maxSpeed = getMaxAllowedSpeed(cmd.getStep().getPath());
     }
-    else liftCmd = 1;
 
     // TODO: MAKE IT REAL
     return new CMD1(
-
         liftCmd, speedLevel, obstacleSensor, cmd.getStep().getVehicleOrientation()
             == Vehicle.Orientation.FORWARD ? 0 : 1
     );
   }
 
   private CMD2 createCMD2(MovementCommand cmd) {
-    cmd.getFinalOperation()
-    // TODO: MAKE IT REAL
-    return new CMD2(0, 0, 2);
+    // TODO: horizontalCommand & guideTimeoutCommand
+    String switchOperation = "";
+    int horizontalCommand = 0;
+    int guideTimeoutCommand = 0;
+    int motionCommand = 0;
+    List<PeripheralOperation> peripheralOperations = null;
+
+    if (cmd.getStep().getPath() != null) {
+      peripheralOperations = cmd.getStep().getPath().getPeripheralOperations();
+    }
+    if (peripheralOperations != null && !peripheralOperations.isEmpty()) {
+      switchOperation = peripheralOperations.getFirst().getOperation();
+    }
+    motionCommand = switch (switchOperation) {
+      case "switchLeft" -> 1;
+      case "switchRight" -> 2;
+      default -> 0;
+    };
+    return new CMD2(horizontalCommand, guideTimeoutCommand, motionCommand);
+  }
+
+  private static int getLiftCommand(String command) {
+    return switch (command) {
+      case "Load" -> 2;
+      case "Unload" -> 1;
+      default -> 1;
+    };
   }
 
   private void writeModbusCommands(List<ModbusCommand> commands) {
@@ -451,8 +464,10 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private double getMaxAllowedSpeed(Path path) {
-    // TODO:
-    return path.getMaxReverseVelocity();
+    double maxFwdVelocity = getProcessModel().getMaxFwdVelocity();
+    double maxRevVelocity = path.getMaxReverseVelocity();
+
+    return Math.min(maxFwdVelocity, maxRevVelocity);
   }
 
   private void sendModbusCommand(String command, int value) {
@@ -523,119 +538,6 @@ public class ModbusTCPVehicleCommAdapter
     return isConnected && master != null;
   }
 
-//  @Override
-//  protected void updateVehiclePosition() {
-//    if (!isVehicleConnected()) {
-//      LOG.warning("Not connected to Modbus TCP server. Cannot update position.");
-//      return;
-//    }
-//
-//    sendModbusRequest(new ReadHoldingRegistersRequest(REGISTER_MAP.get("POSITION").address(), 1))
-//        .thenAccept(response -> {
-//          if (response instanceof ReadHoldingRegistersResponse holdingRegistersResponse) {
-//            ByteBuf buffer = holdingRegistersResponse.getRegisters();
-//            try {
-//              if (buffer.readableBytes() >= 2) {
-//                int position = buffer.readShort();
-//                getProcessModel().setPosition(String.valueOf(position));
-//                LOG.info("Updated vehicle position: " + position);
-//              }
-//              else {
-//                LOG.warning("Insufficient data in response for POSITION register");
-//              }
-//            }
-//            finally {
-//              buffer.release();
-//            }
-//          }
-//          else {
-//            LOG.warning(
-//                "Unexpected response type for POSITION: " + response.getClass().getSimpleName()
-//            );
-//          }
-//        })
-//        .exceptionally(throwable -> {
-//          LOG.log(Level.SEVERE, "Failed to read vehicle position", throwable);
-//          return null;
-//        });
-//  }
-//
-//  @Override
-//  protected void updateVehicleState() {
-//    if (!isVehicleConnected()) {
-//      LOG.warning("Not connected to Modbus TCP server. Cannot update state.");
-//      return;
-//    }
-//
-//    sendModbusRequest(new ReadHoldingRegistersRequest(REGISTER_MAP.get("STATUS").address(), 1))
-//        .thenAccept(response -> {
-//          if (response instanceof ReadHoldingRegistersResponse holdingRegistersResponse) {
-//            ByteBuf buffer = holdingRegistersResponse.getRegisters();
-//            try {
-//              if (buffer.readableBytes() >= 2) {
-//                int state = buffer.readShort();
-//                Vehicle.State newState = mapModbusStateToVehicleState(state);
-//                getProcessModel().setState(newState);
-//              }
-//              else {
-//                LOG.warning("Insufficient data in response for STATUS register");
-//              }
-//            }
-//            finally {
-//              buffer.release();
-//            }
-//          }
-//          else {
-//            LOG.warning(
-//                "Unexpected response type for STATUS: " + response.getClass().getSimpleName()
-//            );
-//          }
-//        })
-//        .exceptionally(throwable -> {
-//          LOG.log(Level.SEVERE, "Failed to read vehicle state", throwable);
-//          return null;
-//        });
-//
-//    // Read current speed from Modbus (register 303)
-//    sendModbusRequest(new ReadHoldingRegistersRequest(303, 1))
-//        .thenAccept(response -> {
-//          if (response instanceof ReadHoldingRegistersResponse holdingRegistersResponse) {
-//            ByteBuf buffer = holdingRegistersResponse.getRegisters();
-//            try {
-//              if (buffer.readableBytes() >= 2) {
-//                int currentSpeed = buffer.readShort();
-//                velocityController.setCurrentVelocity(currentSpeed);
-//                LOG.info("Current vehicle speed: " + currentSpeed);
-//              }
-//              else {
-//                LOG.warning("Insufficient data in response for SPEED register");
-//              }
-//            }
-//            finally {
-//              buffer.release();
-//            }
-//          }
-//          else {
-//            LOG.warning(
-//                "Unexpected response type for SPEED: " + response.getClass().getSimpleName()
-//            );
-//          }
-//        })
-//        .exceptionally(throwable -> {
-//          LOG.log(Level.SEVERE, "Failed to read current speed", throwable);
-//          return null;
-//        });
-//  }
-//
-//  private Vehicle.State mapModbusStateToVehicleState(int modbusState) {
-//    return switch (modbusState) {
-//      case 0 -> Vehicle.State.IDLE;
-//      case 1 -> Vehicle.State.EXECUTING;
-//      case 2 -> Vehicle.State.CHARGING;
-//      default -> Vehicle.State.UNKNOWN;
-//    };
-//  }
-
   private CompletableFuture<ModbusResponse> sendModbusRequest(
       com.digitalpetri.modbus.requests.ModbusRequest request
   ) {
@@ -643,6 +545,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   @Override
+  @Nonnull
   public synchronized ExplainedBoolean canProcess(TransportOrder order) {
     requireNonNull(order, "order");
 
