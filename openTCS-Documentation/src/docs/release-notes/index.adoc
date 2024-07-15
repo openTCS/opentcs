@@ -1,0 +1,31 @@
+= openTCS: Distribution Documentation
+The openTCS developers
+:doctype: article
+:toc!:
+:sectnums!:
+:icons: font
+:source-highlighter: coderay
+:coderay-linenums-mode: table
+:last-update-label!:
+:experimental:
+
+== Content
+
+* Release Notes:
+** Change Log: link:./changelog.html[HTML]
+** Contributors List: link:./contributors.html[HTML]
+* User Resources:
+** User's Guide:
+   link:./user/opentcs-users-guide.html[HTML],
+   link:./user/opentcs-users-guide.pdf[PDF]
+** Frequently Asked Questions: link:./faq.html[HTML]
+* Developer Resources:
+** Developer's Guide:
+   link:./developer/developers-guide/opentcs-developers-guide.html[HTML],
+   link:./developer/developers-guide/opentcs-developers-guide.pdf[PDF]
+** Base API:
+   link:./developer/api-base/index.html[JavaDoc documentation]
+** Injection API:
+   link:./developer/api-injection/index.html[JavaDoc documentation]
+** Web API:
+   link:./developer/service-web-api-v1/index.html?docExpansion=list[OpenAPI documentation]

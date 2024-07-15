@@ -1,0 +1,3 @@
+org.opentcs.operationsdesk.DefaultImportersExportersModule
+org.opentcs.operationsdesk.PropertySuggestionsModule
+org.opentcs.operationsdesk.transport.OrderTypeSuggestionsModule

@@ -1,0 +1,21 @@
+<html>
+Vehicle <b>Vehicle-001</b>
+<hr>
+Current point: ?
+<br>
+Next point: ?
+<br>
+State: <font color=orange>UNKNOWN</font>
+<br>
+Processing state: IDLE
+<br>
+Integration level: TO_BE_RESPECTED
+<br>
+Current energy level: <font color=green>0%</font>
+<hr>
+Peripheral operations that need to be waited for:
+<ul>
+<li>⧖Location-001: PeripheralOperation (Approved-job-01)</li>
+<li>⏵Location-001: PeripheralOperation (Approved-job-02)</li>
+</ul>
+</html>

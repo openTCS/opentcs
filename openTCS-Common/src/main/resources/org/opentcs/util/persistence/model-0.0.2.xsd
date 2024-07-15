@@ -1,0 +1,550 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <!-- Root element of a model document -->
+  <xsd:element name="model">
+    <xsd:complexType>
+      <!-- model elements -->
+      <xsd:sequence>
+        <xsd:element name="point"
+                     type="pointType"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+        <xsd:element name="path"
+                     type="pathType"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+        <xsd:element name="vehicleType"
+                     type="vehicleTypeType"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+        <xsd:element name="vehicle"
+                     type="vehicleType"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+        <xsd:element name="locationType"
+                     type="locationTypeType"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+        <xsd:element name="location"
+                     type="locationType"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+        <xsd:element name="block"
+                     type="blockType"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+        <xsd:element name="staticRoute"
+                     type="staticRouteType"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+        <xsd:element name="group"
+                     type="groupType"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+        <xsd:element name="visualLayout"
+                     type="visualLayoutType"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+        <xsd:element name="property"
+                     type="propertyType"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <!-- model attributes -->
+      <xsd:attribute name="version"
+                     type="versionType"
+                     use="required"/>
+      <xsd:attribute name="name"
+                     type="xsd:string"
+                     use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <!-- Simple data type for version strings -->
+  <xsd:simpleType name="versionType">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="\d\.\d\.\d"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- Data type for point elements -->
+  <xsd:complexType name="pointType">
+    <xsd:sequence>
+      <xsd:element name="outgoingPath"
+                   minOccurs="0"
+                   maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="name"
+                         type="xsd:string"
+                         use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="property"
+                   type="propertyType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="id"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="name"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="xPosition"
+                   type="xsd:long"
+                   use="required"/>
+    <xsd:attribute name="yPosition"
+                   type="xsd:long"
+                   use="required"/>
+    <xsd:attribute name="zPosition"
+                   type="xsd:long"/>
+    <xsd:attribute name="vehicleOrientationAngle"
+                   type="xsd:float"/>
+    <xsd:attribute name="type"
+                   type="pointTypeType"
+                   use="required"/>
+  </xsd:complexType>
+  
+  <xsd:simpleType name="pointTypeType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="REPORT_POSITION"/>
+      <xsd:enumeration value="HALT_POSITION"/>
+      <xsd:enumeration value="PARK_POSITION"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <!-- Data type for path elements -->
+  <xsd:complexType name="pathType">
+    <xsd:sequence>
+      <xsd:element name="typeMaxVelocity"
+                   type="pathTypeMaxVelocityType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      <xsd:element name="typeMaxReverseVelocity"
+                   type="pathTypeMaxVelocityType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      <xsd:element name="typeLock"
+                   type="pathTypeLockType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      <xsd:element name="typeActions"
+                   type="pathTypeActionsType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      <xsd:element name="property"
+                   type="propertyType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="id"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="name"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="sourcePoint"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="destinationPoint"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="length"
+                   type="xsd:unsignedInt"
+                   use="optional"/>
+    <xsd:attribute name="routingCost"
+                   type="xsd:long"
+                   use="optional"/>
+    <xsd:attribute name="maxVelocity"
+                   type="xsd:unsignedInt"
+                   use="required"/>
+    <xsd:attribute name="maxReverseVelocity"
+                   type="xsd:unsignedInt"
+                   use="required"/>
+    <xsd:attribute name="locked"
+                   type="xsd:boolean"
+                   use="required"/>
+  </xsd:complexType>
+  
+  <!-- Data type for typed maximum velocities -->
+  <xsd:complexType name="pathTypeMaxVelocityType">
+    <xsd:attribute name="vehicleType"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="velocity"
+                   type="xsd:unsignedInt"
+                   use="required"/>
+  </xsd:complexType>
+  
+  <!-- Data type for typed path locks -->
+  <xsd:complexType name="pathTypeLockType">
+    <xsd:attribute name="vehicleType"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="locked"
+                   use="required">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="true"/>
+          <xsd:enumeration value="false"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
+  
+  <!-- Data type for typed path actions -->
+  <xsd:complexType name="pathTypeActionsType">
+    <xsd:sequence>
+      <xsd:element name="action"
+                   minOccurs="1"
+                   maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="orientation"
+                         minOccurs="1"
+                         maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:attribute name="name"
+                               type="xsd:string"
+                               use="required"/>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+          <xsd:attribute name="distance"
+                         type="xsd:unsignedInt"
+                         use="required"/>
+          <xsd:attribute name="action"
+                         type="xsd:string"
+                         use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="vehicleType"
+                   type="xsd:string"
+                   use="required"/>
+  </xsd:complexType>
+
+  <!-- Data type for vehicle type elements -->
+  <xsd:complexType name="vehicleTypeType">
+    <xsd:sequence>
+      <xsd:element name="action"
+                   minOccurs="0"
+                   maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="name"
+                         type="xsd:string"
+                         use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="property"
+                   type="propertyType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="id"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="name"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="maxVelocity"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="maxReverseVelocity"
+                   type="xsd:unsignedInt"/>
+  </xsd:complexType>
+
+  <!-- Data type for vehicle elements -->
+  <xsd:complexType name="vehicleType">
+    <xsd:sequence>
+      <xsd:element name="property"
+                   type="propertyType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="id"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="name"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="type"
+                   type="xsd:string"/>
+    <xsd:attribute name="length"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="energyLevelCritical"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="energyLevelGood"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="energyLevelFullyRecharged"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="energyLevelSufficientlyRecharged"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="maxVelocity"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="maxReverseVelocity"
+                   type="xsd:unsignedInt"/>
+    
+  </xsd:complexType>
+
+  <!-- Data type for location type elements -->
+  <xsd:complexType name="locationTypeType">
+    <xsd:sequence>
+      <xsd:element name="allowedOperation"
+                   minOccurs="0"
+                   maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="name"
+                         type="xsd:string"
+                         use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="property"
+                   type="propertyType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="id"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="name"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="locationNamePrefix"
+                   type="xsd:string"/>
+  </xsd:complexType>
+
+  <!-- Data type for location elements -->
+  <xsd:complexType name="locationType">
+    <xsd:sequence>
+      <xsd:element name="link"
+                   type="locationLinkType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      <xsd:element name="property"
+                   type="propertyType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="id"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="name"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="xPosition"
+                   type="xsd:long"/>
+    <xsd:attribute name="yPosition"
+                   type="xsd:long"/>
+    <xsd:attribute name="zPosition"
+                   type="xsd:long"/>
+    <xsd:attribute name="type"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="locked"
+                   type="xsd:boolean"/>
+  </xsd:complexType>
+  
+  <!-- Data type for location link elements -->
+  <xsd:complexType name="locationLinkType">
+    <xsd:sequence>
+      <xsd:element name="allowedOperation"
+                   minOccurs="0"
+                   maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="name"
+                         type="xsd:string"
+                         use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="point"
+                   type="xsd:string"
+                   use="required"/>
+  </xsd:complexType>
+  
+  <!-- Data type for block elements -->
+  <xsd:complexType name="blockType">
+    <xsd:sequence>
+      <xsd:element name="member"
+                   minOccurs="0"
+                   maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="name"
+                         type="xsd:string"
+                         use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="property"
+                   type="propertyType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="id"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="name"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="type"
+                   type="blockTypeType"/>
+  </xsd:complexType>
+  
+  <xsd:simpleType name="blockTypeType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="SINGLE_VEHICLE_ONLY"/>
+      <xsd:enumeration value="SAME_DIRECTION_ONLY"/>
+    </xsd:restriction>
+  </xsd:simpleType>  
+  
+  <!-- Data type for group elements -->
+  <xsd:complexType name="groupType">
+    <xsd:sequence>
+      <xsd:element name="member"
+                   minOccurs="0"
+                   maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="name"
+                         type="xsd:string"
+                         use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="property"
+                   type="propertyType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="id"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="name"
+                   type="xsd:string"
+                   use="required"/>
+  </xsd:complexType>
+  
+  <!-- Data type for static route elements -->
+  <xsd:complexType name="staticRouteType">
+    <xsd:sequence>
+      <xsd:element name="hop"
+                   minOccurs="0"
+                   maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="name"
+                         type="xsd:string"
+                         use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="property"
+                   type="propertyType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="id"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="name"
+                   type="xsd:string"
+                   use="required"/>
+  </xsd:complexType>
+  
+  <xsd:complexType name="visualLayoutType">
+    <xsd:sequence>
+      <xsd:element name="color"
+                   type="colorType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      <xsd:element name="shapeLayoutElement"
+                   type="shapeLayoutElementType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      <xsd:element name="modelLayoutElement"
+                   type="modelLayoutElementType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      <xsd:element name="viewBookmark"
+                   type="viewBookmarkType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+      <xsd:element name="property"
+                   type="propertyType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+	
+    <xsd:attribute name="id"
+                   type="xsd:unsignedInt"/>
+    <xsd:attribute name="name"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="scaleX"
+                   type="xsd:float"
+                   use="required"/>
+    <xsd:attribute name="scaleY"
+                   type="xsd:float"
+                   use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="colorType">
+    <xsd:attribute name="name"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="redValue"
+                   type="xsd:unsignedInt"
+                   use="required"/>
+    <xsd:attribute name="greenValue"
+                   type="xsd:unsignedInt"
+                   use="required"/>
+    <xsd:attribute name="blueValue"
+                   type="xsd:unsignedInt"
+                   use="required"/>
+  </xsd:complexType>
+  
+  <xsd:complexType name="shapeLayoutElementType">
+    <xsd:sequence>
+      <xsd:element name="property"
+                   type="propertyType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="layer"
+                   type="xsd:unsignedInt"
+                   use="required"/>
+  </xsd:complexType>
+  
+  <xsd:complexType name="modelLayoutElementType">
+    <xsd:sequence>
+      <xsd:element name="property"
+                   type="propertyType"
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="visualizedObjectName"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="layer"
+                   type="xsd:unsignedInt"
+                   use="required"/>
+  </xsd:complexType>
+  
+  <xsd:complexType name="viewBookmarkType">
+    <xsd:attribute name="label"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="centerX"
+                   type="xsd:int"
+                   use="required"/>
+    <xsd:attribute name="centerY"
+                   type="xsd:int"
+                   use="required"/>
+    <xsd:attribute name="viewScaleX"
+                   type="xsd:float"
+                   use="required"/>
+    <xsd:attribute name="viewScaleY"
+                   type="xsd:float"
+                   use="required"/>
+    <xsd:attribute name="viewRotation"
+                   type="xsd:int"
+                   use="required"/>
+  </xsd:complexType>
+  
+
+  <!-- Data type for properties -->
+  <xsd:complexType name="propertyType">
+    <xsd:attribute name="name"
+                   type="xsd:string"
+                   use="required"/>
+    <xsd:attribute name="value"
+                   type="xsd:string"
+                   use="required"/>
+  </xsd:complexType>
+</xsd:schema>

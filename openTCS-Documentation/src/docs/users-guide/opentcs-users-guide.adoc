@@ -1,0 +1,27 @@
+= openTCS: User's Guide
+The openTCS developers
+:doctype: book
+:toc: left
+:toclevels: 3
+:sectnums: all
+:sectnumlevels: 6
+:imagesdir: images
+:icons: font
+:source-highlighter: coderay
+:coderay-linenums-mode: table
+:last-update-label!:
+:experimental:
+
+// TIP: Always have the comprehensive http://asciidoctor.org/docs/asciidoc-syntax-quick-reference[QuickReference] handy.
+
+include::01_introduction.adoc[]
+
+include::02_system-overview.adoc[]
+
+include::03_operating-opentcs.adoc[]
+
+include::04_default-strategies.adoc[]
+
+include::05_configuring-opentcs.adoc[]
+
+include::06_advanced-usage-examples.adoc[]

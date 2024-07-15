@@ -1,0 +1,13 @@
+apply from: "${rootDir}/gradle/java-project.gradle"
+apply from: "${rootDir}/gradle/java-codequality.gradle"
+apply from: "${rootDir}/gradle/publishing-java.gradle"
+
+dependencies {
+  api project(':openTCS-API-Base')
+
+  implementation group: 'com.github.gestalt-config', name: 'gestalt-core', version: '0.24.3'
+}
+
+task release {
+  dependsOn build
+}

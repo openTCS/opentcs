@@ -1,0 +1,46 @@
+apply from: "${rootDir}/gradle/publishing-common.gradle"
+
+// Enable javadoc and sources JARs to be created.
+java {
+  withJavadocJar()
+  withSourcesJar()
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from(components.java)
+
+      pom {
+        // Override artifactId since project.name is used by default and is mixed-case.
+        artifactId = project.name.toLowerCase()
+
+        name = project.name
+        description = project.name
+        url = "https://www.opentcs.org"
+
+        licenses {
+          license {
+            name = "MIT License"
+            url = "http://www.opensource.org/licenses/mit-license.php"
+          }
+        }
+
+        developers {
+          developer {
+            name = "The openTCS Authors"
+            email = "info@opentcs.org"
+            organization = "The open Transportation Control System"
+            organizationUrl = "https://www.opentcs.org/"
+          }
+        }
+
+        scm {
+          connection = "scm:git:git://github.com/opentcs/opentcs.git"
+          developerConnection = "scm:git:ssh://github.com:opentcs/opentcs.git"
+          url = "https://github.com/opentcs/opentcs"
+        }
+      }
+    }
+  }
+}

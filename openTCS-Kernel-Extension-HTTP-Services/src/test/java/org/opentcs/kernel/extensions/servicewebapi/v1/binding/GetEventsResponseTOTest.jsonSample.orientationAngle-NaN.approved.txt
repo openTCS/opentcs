@@ -1,0 +1,72 @@
+{
+  "timeStamp" : "1970-01-01T00:00:00Z",
+  "statusMessages" : [ {
+    "type" : "Vehicle",
+    "sequenceNumber" : 0,
+    "creationTimeStamp" : "1970-01-01T00:00:00Z",
+    "vehicleName" : "some-vehicle",
+    "transportOrderName" : "some-transport-order",
+    "position" : "some-point",
+    "precisePosition" : {
+      "x" : 1,
+      "y" : 2,
+      "z" : 3
+    },
+    "orientationAngle" : "NaN",
+    "paused" : false,
+    "state" : "IDLE",
+    "procState" : "IDLE",
+    "allocatedResources" : [ [ "some-path", "some-point" ], [ "some-other-path", "some-other-point" ] ],
+    "claimedResources" : [ [ "some-path", "some-point" ], [ "some-other-path", "some-other-point" ] ]
+  }, {
+    "type" : "TransportOrder",
+    "sequenceNumber" : 1,
+    "creationTimeStamp" : "1970-01-01T00:00:00Z",
+    "orderName" : "some-order",
+    "processingVehicleName" : "some-vehicle",
+    "orderState" : "BEING_PROCESSED",
+    "destinations" : [ {
+      "locationName" : "some-location",
+      "operation" : "some-operation",
+      "state" : "TRAVELLING",
+      "properties" : [ {
+        "key" : "some-key",
+        "value" : "some-value"
+      }, {
+        "key" : "some-other-key",
+        "value" : "some-other-value"
+      } ]
+    } ],
+    "properties" : [ {
+      "key" : "some-key",
+      "value" : "some-value"
+    }, {
+      "key" : "some-other-key",
+      "value" : "some-other-value"
+    } ]
+  }, {
+    "type" : "PeripheralJob",
+    "sequenceNumber" : 2,
+    "creationTimeStamp" : "1970-01-01T00:00:00Z",
+    "name" : "some-peripheral-job",
+    "reservationToken" : "some-token",
+    "relatedVehicle" : "some-vehicle",
+    "relatedTransportOrder" : "some-order",
+    "peripheralOperation" : {
+      "operation" : "some-operation",
+      "locationName" : "some-location",
+      "executionTrigger" : "AFTER_ALLOCATION",
+      "completionRequired" : true
+    },
+    "state" : "BEING_PROCESSED",
+    "creationTime" : "1970-01-01T00:00:00Z",
+    "finishedTime" : "+1000000000-12-31T23:59:59.999999999Z",
+    "properties" : [ {
+      "key" : "some-key",
+      "value" : "some-value"
+    }, {
+      "key" : "some-other-key",
+      "value" : "some-other-value"
+    } ]
+  } ]
+}

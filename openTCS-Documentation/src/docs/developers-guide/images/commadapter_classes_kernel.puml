@@ -1,0 +1,59 @@
+@startuml
+skinparam monochrome true
+'skinparam linetype ortho
+hide empty members
+'left to right direction
+
+together {
+  interface VehicleCommAdapterFactory
+
+  class "**CustomAdapterFactory**" as CustomAdapterFactory
+
+  VehicleCommAdapterFactory <|-- CustomAdapterFactory
+}
+
+together {
+  interface VehicleCommAdapter
+
+  abstract class BasicVehicleCommAdapter
+
+  class "**CustomAdapter**" as CustomAdapter
+
+  VehicleCommAdapter <|-- BasicVehicleCommAdapter
+  BasicVehicleCommAdapter <|-- CustomAdapter
+
+  note "Implements communication\nwith a single vehicle." as adapterNote
+  CustomAdapter .. adapterNote
+}
+
+together {
+  class VehicleProcessModel
+
+  class "**CustomProcessModel**" as CustomProcessModel
+
+  VehicleProcessModel <|-- CustomProcessModel
+}
+
+together {
+  abstract class VehicleCommAdapterDescription
+
+  class "**CustomDescription**" as CustomDescription
+
+  VehicleCommAdapterDescription <|-- CustomDescription
+}
+
+together {
+  class VehicleProcessModelTO
+
+  class "**CustomProcessModelTO**" as CustomProcessModelTO
+
+  VehicleProcessModelTO <|-- CustomProcessModelTO
+}
+
+CustomAdapterFactory ..> CustomAdapter : instantiates
+CustomAdapterFactory ..> CustomDescription : provides
+
+CustomAdapter ..> CustomProcessModelTO : produces
+
+CustomAdapter "1" --> "1" CustomProcessModel
+@enduml

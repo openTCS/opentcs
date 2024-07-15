@@ -1,0 +1,27 @@
+{
+  "name" : "some-vehicle",
+  "properties" : {
+    "some-key" : "some-value",
+    "some-other-key" : "some-other-value"
+  },
+  "length" : 1234,
+  "energyLevelGood" : 90,
+  "energyLevelCritical" : 30,
+  "energyLevel" : 48,
+  "integrationLevel" : "TO_BE_UTILIZED",
+  "paused" : false,
+  "procState" : "PROCESSING_ORDER",
+  "transportOrder" : "some-order",
+  "currentPosition" : "some-point",
+  "precisePosition" : {
+    "x" : 1,
+    "y" : 2,
+    "z" : 3
+  },
+  "orientationAngle" : "NaN",
+  "state" : "EXECUTING",
+  "allocatedResources" : [ [ "some-path", "some-point" ], [ "some-other-path", "some-other-point" ] ],
+  "claimedResources" : [ [ "some-path", "some-point" ], [ "some-other-path", "some-other-point" ] ],
+  "allowedOrderTypes" : [ "OrderType001", "OrderType002" ],
+  "envelopeKey" : "envelopeType-01"
+}

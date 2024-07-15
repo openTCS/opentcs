@@ -1,0 +1,36 @@
+
+== Generating an integration project
+
+openTCS integration projects for customer- or plant-specific distributions often have a very similar structure.
+The openTCS distribution provides a way to easily generate such integration projects.
+This way, a developer can get started with customizing and extending openTCS components quickly.
+
+To generate a template/skeleton for a new integration project, do the following:
+
+1. Download and unzip the integration project example from the openTCS homepage.
+2. Execute the following command from the example project's root directory:
+   `gradlew cloneProject`
+
+The integration project will be generated in the `build/` directory.
+(Make sure you copy it somewhere else before running the example project's `clean` task the next time.)
+
+The project and the included classes will have generic names.
+You can adjust their names by setting a couple of properties when running the above command.
+The following properties are looked at:
+
+* _integrationName_:
+  Used for the names of the project itself and the subprojects within it.
+* _classPrefix_:
+  Used for some classes within the subprojects.
+
+For instance, your command line could look like this:
+
+[source, shell]
+----
+gradlew -PintegrationName=MyGreatProject -PclassPrefix=Great cloneProject
+----
+
+This would include _MyGreatProject_ in the integration project name, and _Great_ in some class names.
+
+IMPORTANT: Inserting your own source code into a copy of the baseline openTCS project instead of creating a proper integration project as described above is not recommended.
+This is because, when integrating openTCS by copying its source code, you lose the ability to easily upgrade your code to more recent openTCS versions (for bugfixes or new features).

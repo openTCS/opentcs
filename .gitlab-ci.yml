@@ -1,0 +1,203 @@
+default:
+  image: eclipse-temurin:21-jdk-jammy
+  tags:
+    - opentcs-runner
+  before_script:
+    # Put GRADLE_USER_HOME into the cache directory so the wrapper and dependencies are not
+    # re-downloaded for every job.
+    - export GRADLE_USER_HOME=`pwd`/.gradle
+  timeout: 15 minutes
+
+include: '.gitlab/docker/codequality/version.yml'
+
+workflow:
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  DO_BUILD_CODEQUALITY_IMAGE:
+    value: "false"
+    description: "Whether ('true') or not ('false') to (re-)build the Docker image for code quality jobs."
+  DO_DEPLOY_PRIVATE:
+    value: "false"
+    description: "Whether ('true') or not ('false') to deploy artifacts to private (GitLab) repository."
+  DO_DEPLOY_PUBLIC:
+    value: "false"
+    description: "Whether ('true') or not ('false') to deploy artifacts to public repository, e.g. for release builds."
+  NO_BUILD_NUMBER:
+    value: "false"
+    description: "Whether ('true') or not ('false') to exclude the build number in the artifacts' version number, e.g. for release builds."
+  SIGNING_KEY:
+    value: ""
+    description: "The key to use for signing artifacts."
+  SIGNING_PASSWORD:
+    value: ""
+    description: "The password to use for signing artifacts."
+  DEPLOY_REPO_PUBLIC_URL:
+    value: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+    description: "URL of the public repository to deploy artifacts to."
+  DEPLOY_REPO_PUBLIC_USERNAME:
+    value: ""
+    description: "User name for logging in with the public repository."
+  DEPLOY_REPO_PUBLIC_PASSWORD:
+    value: ""
+    description: "Password for logging in with the public repository."
+
+stages:
+  - build
+  - test
+  - deploy
+
+build_code_quality_image:
+  stage: build
+  rules:
+    - if: $DO_BUILD_CODEQUALITY_IMAGE == "true"
+  image:
+    name: gcr.io/kaniko-project/executor:v1.9.1-debug
+    entrypoint: [""]
+  dependencies: []
+  script:
+    - echo "Building code quality image with tag ${CODEQUALITY_IMAGE_TAG}..."
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - '/kaniko/executor
+      --context "${CI_PROJECT_DIR}/.gitlab/docker/codequality"
+      --dockerfile "${CI_PROJECT_DIR}/.gitlab/docker/codequality/Dockerfile"
+      --destination "${CI_REGISTRY_IMAGE}/codequality:${CODEQUALITY_IMAGE_TAG}"'
+
+build:
+  stage: build
+  interruptible: true
+  dependencies: []
+  script:
+    - ./gradlew -x check release testClasses -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
+  artifacts:
+    paths:
+      - build/distributions/*.zip
+      - openTCS-*/build/classes/
+      - openTCS-*/build/docs/
+      - openTCS-*/build/generated/
+      - openTCS-*/build/libs/
+      - openTCS-*/build/resources/
+      - openTCS-*/build/tmp/
+    expire_in: 1 week
+  cache:
+    key: build_test_deploy-$(date +%Y-%m)
+    paths:
+      - .gradle
+
+test:
+  stage: test
+  interruptible: true
+  dependencies:
+    - build
+  script:
+    - echo "Running unit tests..."
+    - ./gradlew test jacocoLogAggregatedCoverage -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
+  coverage: '/Branch Coverage: ([0-9.]+)%/'
+  artifacts:
+    paths:
+      # Results of (failed) approval tests.
+      - openTCS-*/**/*.received.txt
+    reports:
+      junit: openTCS-*/build/test-results/test/TEST-*.xml
+    when: always
+    expire_in: 1 week
+  cache:
+    key: build_test_deploy-$(date +%Y-%m)
+    paths:
+      - .gradle
+
+lint-spotless:
+  stage: test
+  interruptible: true
+  dependencies:
+    - build
+  script:
+    - echo "Running Spotless check..."
+    - ./gradlew spotlessCheck
+  cache:
+    key: lint_spotless-$(date +%Y-%m)
+    paths:
+      - .gradle
+
+lint-checkstyle:
+  stage: test
+  interruptible: true
+  image: ${CI_REGISTRY_IMAGE}/codequality:${CODEQUALITY_IMAGE_TAG}
+  variables:
+    CHANGELOG_FILE: openTCS-Documentation/src/docs/release-notes/changelog.adoc
+    MALFORMED_HEADERS_FILE: malformed_section_headers.txt
+    CODE_CLIMATE_FILE: gl-code-quality-report.json
+  dependencies:
+    - build
+  script:
+    - echo "Checking for changelog headers that do not match 'Version x.y.z (yyyy-mm-dd)'..."
+    - '( grep --extended-regexp "^==[^=]" $CHANGELOG_FILE
+        | grep --invert-match --extended-regexp "^== Version [0-9]+\.[0-9]+(\.[0-9]+)? +\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\)$"
+        > $MALFORMED_HEADERS_FILE )
+      || true'
+    - 'if [ -s $MALFORMED_HEADERS_FILE -a $NO_BUILD_NUMBER = "true" ] ; then
+        echo "Found malformed changelog headers:" ;
+        cat $MALFORMED_HEADERS_FILE ;
+        exit 1 ;
+      fi'
+    - rm -f $MALFORMED_HEADERS_FILE
+    - echo "Running CheckStyle checks..."
+    - ./gradlew checkstyleMain checkstyleTest checkstyleGuiceConfig
+    - echo "Converting CheckStyle reports to CodeClimate report..."
+    - violations-command-line -cc $CODE_CLIMATE_FILE -print-violations false -diff-print-violations true -v "CHECKSTYLE" "." ".*checkstyle/.*\.xml$" "Checkstyle"
+    - sed -i.bak -e "s,$CI_PROJECT_DIR/,,g" $CODE_CLIMATE_FILE
+  artifacts:
+    reports:
+      codequality: $CODE_CLIMATE_FILE
+    when: always
+    expire_in: 1 week
+  cache:
+    key: lint_checkstyle-$(date +%Y-%m)
+    paths:
+      - .gradle
+
+deploy_private:
+  stage: deploy
+  rules:
+    - if: $DO_DEPLOY_PRIVATE == "true"
+  dependencies:
+    - build
+  script:
+    - './gradlew -x check publish
+        -PDO_DEPLOY_PRIVATE="true"
+        -PDO_DEPLOY_PUBLIC="false"
+        -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
+        -PSIGNING_KEY="$SIGNING_KEY"
+        -PSIGNING_PASSWORD="$SIGNING_PASSWORD"'
+  cache:
+    key: build_test_deploy-$(date +%Y-%m)
+    paths:
+      - .gradle
+    policy: pull
+
+deploy_public:
+  stage: deploy
+  rules:
+    - if: $DO_DEPLOY_PUBLIC == "true"
+  dependencies:
+    - build
+  script:
+    - './gradlew -x check publish
+        -PDO_DEPLOY_PRIVATE="false"
+        -PDO_DEPLOY_PUBLIC="true"
+        -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
+        -PSIGNING_KEY="$SIGNING_KEY"
+        -PSIGNING_PASSWORD="$SIGNING_PASSWORD"
+        -PDEPLOY_REPO_PUBLIC_URL="$DEPLOY_REPO_PUBLIC_URL"
+        -PDEPLOY_REPO_PUBLIC_USERNAME="$DEPLOY_REPO_PUBLIC_USERNAME"
+        -PDEPLOY_REPO_PUBLIC_PASSWORD="$DEPLOY_REPO_PUBLIC_PASSWORD"'
+  cache:
+    key: build_test_deploy-$(date +%Y-%m)
+    paths:
+      - .gradle
+    policy: pull

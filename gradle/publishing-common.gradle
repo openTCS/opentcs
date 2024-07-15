@@ -1,0 +1,58 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+publishing {
+  repositories {
+    if (Boolean.valueOf(project.findProperty('DO_DEPLOY_PRIVATE'))
+      && System.getenv('CI_API_V4_URL') != null
+      && System.getenv('CI_PROJECT_ID') != null
+      && System.getenv('CI_JOB_TOKEN') != null) {
+
+      maven {
+        name = 'deploy-repo-gitlab'
+        url = "${System.env.CI_API_V4_URL}/projects/${System.env.CI_PROJECT_ID}/packages/maven"
+
+        credentials(HttpHeaderCredentials) {
+          name = 'Job-Token'
+          value = "${System.env.CI_JOB_TOKEN}"
+        }
+        authentication {
+          header(HttpHeaderAuthentication)
+        }
+      }
+
+    }
+
+    if (Boolean.valueOf(project.findProperty('DO_DEPLOY_PUBLIC'))
+      && project.hasProperty('DEPLOY_REPO_PUBLIC_URL')
+      && project.hasProperty('DEPLOY_REPO_PUBLIC_USERNAME')
+      && project.hasProperty('DEPLOY_REPO_PUBLIC_PASSWORD')) {
+
+      maven {
+        name = 'deploy-repo-public'
+        url = project.property('DEPLOY_REPO_PUBLIC_URL')
+
+        credentials {
+          username project.property('DEPLOY_REPO_PUBLIC_USERNAME')
+          password project.property('DEPLOY_REPO_PUBLIC_PASSWORD')
+        }
+      }
+
+    }
+  }
+}
+
+signing {
+  useInMemoryPgpKeys(
+    project.hasProperty('SIGNING_KEY') ? project.property('SIGNING_KEY') : '',
+    project.hasProperty('SIGNING_PASSWORD') ? project.property('SIGNING_PASSWORD') : ''
+  )
+  sign publishing.publications
+}
+
+tasks.withType(Sign) {
+  onlyIf {
+    project.hasProperty('SIGNING_KEY') && !project.property('SIGNING_KEY').toString().isEmpty() \
+    && project.hasProperty('SIGNING_PASSWORD') && !project.property('SIGNING_PASSWORD').toString().isEmpty()
+  }
+}

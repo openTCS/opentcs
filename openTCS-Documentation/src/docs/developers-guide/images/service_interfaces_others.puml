@@ -1,0 +1,26 @@
+@startuml
+skinparam monochrome true
+'skinparam linetype ortho
+'left to right direction
+hide empty members
+
+interface QueryService
+interface InternalQueryService
+
+QueryService <|-- InternalQueryService
+
+interface PeripheralDispatcherService
+interface DispatcherService
+interface RouterService
+interface SchedulerService
+
+QueryService -right[hidden]-> PeripheralDispatcherService
+PeripheralDispatcherService -right[hidden]-> DispatcherService
+DispatcherService -right[hidden]-> RouterService
+RouterService -right[hidden]-> SchedulerService
+
+interface NotificationService
+
+InternalQueryService -right[hidden]-> NotificationService
+
+@enduml

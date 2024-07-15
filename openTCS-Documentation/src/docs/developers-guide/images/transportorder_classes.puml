@@ -1,0 +1,39 @@
+@startuml
+skinparam monochrome true
+'skinparam linetype ortho
+left to right direction
+
+Class TransportOrder {
+  -state : TransportOrder.State
+  -...
+}
+
+Class DriveOrder {
+  -state : DriveOrder.State
+  -...
+}
+
+Class "DriveOrder.Destination" as Destination {
+  -destination : TCSObjectReference
+  -operation : String
+  -properties : Map<String, String>
+}
+
+Class Route {
+  -costs : long
+  -...
+}
+
+note bottom of Route : Exists only if a route was\ncomputed for a vehicle.
+
+Class "Route.Step" as Step {
+  -path : Path
+  -sourcePoint : Point
+  -destinationPoint : Point
+}
+
+TransportOrder "1" *-- "1..*" DriveOrder
+DriveOrder "1" -- "1" Destination
+DriveOrder "1" -- "0..1" Route
+Route "1" *-- "1..*" Step
+@enduml

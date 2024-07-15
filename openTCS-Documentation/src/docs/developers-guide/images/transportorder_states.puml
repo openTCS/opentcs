@@ -1,0 +1,35 @@
+@startuml
+skinparam monochrome true
+
+' left to right direction
+
+RAW : The order parameters\nare being set up.
+ACTIVE : The order parameters\nare set up.
+DISPATCHABLE : Order parameters are valid.\nThe order is ready to be\nprocessed.
+BEING_PROCESSED : A vehicle is processing\nthe order.
+WITHDRAWN : The order was withdrawn. If a vehicle\nwas assigned to it, it is executing the\nleft-over commands already given.
+FINISHED : The order was processed\nsuccessfully.
+FAILED : Processing of the order could\nnot be finished successfully.
+UNROUTABLE : No complete route to process the\norder with a vehicle was found.
+
+[*] --> RAW
+
+RAW -right-> ACTIVE
+
+ACTIVE --> UNROUTABLE
+ACTIVE -right-> DISPATCHABLE
+
+UNROUTABLE --> [*]
+
+DISPATCHABLE --> BEING_PROCESSED
+DISPATCHABLE --> WITHDRAWN
+
+BEING_PROCESSED -right-> WITHDRAWN
+BEING_PROCESSED --> FAILED
+BEING_PROCESSED --> FINISHED
+
+WITHDRAWN --> FAILED
+
+FAILED --> [*]
+FINISHED --> [*]
+@enduml

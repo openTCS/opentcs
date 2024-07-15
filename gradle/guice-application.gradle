@@ -1,0 +1,26 @@
+apply from: "${rootDir}/gradle/guice-project.gradle"
+apply plugin: 'application'
+
+run {
+  dependsOn installDist
+  workingDir new File(new File(buildDir, 'install'), project.name)
+  enableAssertions true
+  classpath sourceSets.guiceConfig.output
+}
+
+task(debug, type:JavaExec) {
+  dependsOn installDist
+
+  doFirst {
+    workingDir = run.workingDir
+    enableAssertions = run.enableAssertions
+  
+    main = run.main
+    args = run.args
+    classpath = run.classpath
+    jvmArgs = run.jvmArgs
+    systemProperties = run.systemProperties
+
+    debug true
+  }
+}

@@ -1,0 +1,24 @@
+@startuml
+skinparam monochrome true
+'skinparam linetype ortho
+left to right direction
+
+Class MovementCommand {
+  -operation : String
+  -properties : Map<String, String>
+  -...
+}
+
+Class "Route.Step" as Step {
+  -path : Path
+  -sourcePoint : Point
+  -destinationPoint : Point
+}
+
+Class Location
+
+note bottom of Location : May not be present if the point of the transport\norder is only about moving the vehicle\nto a different position.
+
+MovementCommand "1" -- "1" Step
+MovementCommand "1" -- "0..1" Location
+@enduml

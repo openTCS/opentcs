@@ -1,0 +1,29 @@
+/**
+ * Copyright (c) The openTCS Authors.
+ *
+ * This program is free software and subject to the MIT license. (For details,
+ * see the licensing information (LICENSE.txt) you should have received with
+ * this copy of the software.)
+ */
+package org.opentcs.drivers.peripherals;
+
+import jakarta.annotation.Nonnull;
+import java.io.Serializable;
+
+/**
+ * A command a peripheral communication adapter may execute.
+ */
+public interface PeripheralAdapterCommand
+    extends
+      Serializable {
+
+  /**
+   * Executes the command.
+   *
+   * @param adapter The communication adapter to execute the command with.
+   */
+  void execute(
+      @Nonnull
+      PeripheralCommAdapter adapter
+  );
+}

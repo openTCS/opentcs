@@ -1,0 +1,3 @@
+org.opentcs.modeleditor.DefaultImportersExportersModule
+org.opentcs.modeleditor.PropertySuggestionsModule
+org.opentcs.modeleditor.transport.OrderTypeSuggestionsModule

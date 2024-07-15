@@ -1,0 +1,16 @@
+apply from: "${rootDir}/gradle/java-project.gradle"
+apply from: "${rootDir}/gradle/java-codequality.gradle"
+apply from: "${rootDir}/gradle/guice-project.gradle"
+apply from: "${rootDir}/gradle/publishing-java.gradle"
+
+dependencies {
+  api project(':openTCS-API-Injection')
+  api project(':openTCS-Common')
+
+  implementation group: 'org.jgrapht', name: 'jgrapht-core', version: '1.5.2'
+  implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.19.0'
+}
+
+task release {
+  dependsOn build
+}

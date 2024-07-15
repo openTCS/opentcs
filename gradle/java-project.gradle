@@ -1,0 +1,81 @@
+apply plugin: 'java-library'
+apply plugin: 'jacoco'
+apply plugin: 'com.diffplug.spotless'
+
+base.archivesName = name.toLowerCase()
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+dependencies {
+  implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.13'
+
+  compileOnly group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
+
+  compileOnly group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '3.0.0'
+  testCompileOnly group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '3.0.0'
+
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.2'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.10.2'
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.2'
+  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.10.2'
+
+  testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.11.0'
+  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.3'
+  testImplementation group: 'com.approvaltests', name: 'approvaltests', version: '23.0.0'
+
+  testRuntimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.13'
+}
+
+compileJava {
+  options.release = 21
+  options.compilerArgs << "-Xlint:all"
+  options.compilerArgs << "-Xlint:-serial"
+}
+
+compileTestJava {
+  options.release = 21
+  options.compilerArgs << "-Xlint:all"
+  options.compilerArgs << "-Xlint:-serial"
+}
+
+javadoc {
+  title = "openTCS ${project.version} API documentation: ${project.name}"
+
+  options {
+    header = "openTCS ${project.version}"
+    overview = "${projectDir}/src/main/java/overview.html"
+    addBooleanOption('Xdoclint:none', true)
+  }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates a jar from the source files.') {
+  archiveClassifier = 'sources'
+  from sourceSets.main.allSource
+}
+
+test {
+  useJUnitPlatform()
+  // ignoreFailures = true
+  systemProperties.put("java.awt.headless", "true")
+}
+
+ext {
+  // Attributes for the AsciiDoc documentation to include code from source files
+  javaSrcDir = sourceSets.main.java.srcDirs[0]
+  javaClassesDir = sourceSets.main.output.classesDirs
+  testSrcDir = sourceSets.test.java.srcDirs[0]
+}
+
+spotless {
+  java {
+    // Use the default import order configuration
+    importOrder()
+
+    // Use the Eclipse JDT formatter
+    eclipse('4.26').configFile("${rootDir}/config/eclipse-formatter-preferences.xml")
+  }
+}

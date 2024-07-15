@@ -1,0 +1,2 @@
+org.opentcs.kernelcontrolcenter.DefaultKernelControlCenterExtensionsModule
+org.opentcs.kernelcontrolcenter.LoopbackCommAdapterPanelsModule

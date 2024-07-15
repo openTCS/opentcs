@@ -1,0 +1,43 @@
+@startuml
+skinparam monochrome true
+'skinparam linetype ortho
+hide empty members
+'left to right direction
+
+together {
+  interface PeripheralCommAdapterPanelFactory
+
+  class "**CustomPanelFactory**" as CustomPanelFactory
+
+  PeripheralCommAdapterPanelFactory <|-- CustomPanelFactory
+}
+
+together {
+  abstract class PeripheralCommAdapterPanel
+
+  class "**CustomPanel**" as CustomPanel
+
+  PeripheralCommAdapterPanel <|-- CustomPanel
+}
+
+together {
+  abstract class PeripheralCommAdapterDescription
+
+  class "**CustomDescription**" as CustomDescription
+
+  PeripheralCommAdapterDescription <|-- CustomDescription
+}
+
+together {
+  class PeripheralProcessModel
+
+  class "**CustomProcessModel**" as CustomProcessModel
+
+  PeripheralProcessModel <|-- CustomProcessModel
+}
+
+CustomPanelFactory ..> CustomPanel : instantiates
+
+CustomPanel ..> CustomProcessModel : consumes
+
+@enduml

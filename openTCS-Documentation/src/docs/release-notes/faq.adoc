@@ -1,0 +1,122 @@
+= openTCS: Frequently Asked Questions
+The openTCS developers
+:doctype: article
+:toc: left
+:toclevels: 3
+:sectnums: all
+:sectnumlevels: 3
+:icons: font
+:source-highlighter: coderay
+:coderay-linenums-mode: table
+:last-update-label!:
+:experimental:
+
+== General questions about the software
+
+=== Which navigation principles are supported?
+
+openTCS works independently from specific navigation implementations, so any kind of navigation principle may be used.
+Locating and navigating are tasks usually performed on the vehicle side:
+The vehicle simply reports its current state, including its position, to the control system, and the control system orders the vehicle to move to a different position.
+
+Note that openTCS focuses on the dispatching of vehicles for transport orders.
+This task should not be confused with lower-level vehicle-side tasks like accelerating, decelerating and steering the vehicle, which are out of openTCS's scope.
+
+=== What are the requirements to manage a vehicle with openTCS?
+
+The requirements for this are minimal:
+
+1. Communication with the vehicle must be possible.
+   (This implies that the vehicle's communication interface must be specified and accessible.)
+   How this communication is implemented exactly is not really relevant as long as the communication hardware exists and can be used from Java software.
+   In many cases, standard Wi-Fi hardware is used.
+2. The vehicle must be able to report its current position/state.
+3. The vehicle must be able to perform movement orders from its current position to an adjacent position in the driving course/environment given by openTCS.
+
+=== How many vehicles can be managed at the same time?
+
+There is virtually no limit imposed by the design of the software.
+The hardware equipment used (CPU, RAM, communication bandwidth etc.) can, however, limit the system's effective performance.
+
+=== Which interfaces for transport orders exist?
+
+Transport orders can be created interactively by a user via the graphical user interface.
+
+To create transport orders from other systems, e.g. a warehouse management system, interfaces based on Java Remote Method Invocation (RMI) and webservices are included.
+These are documented in the developer's guide.
+Additional, custom interfaces for software that cannot use these interfaces can be added easily.
+
+== Plant models
+
+=== How can I migrate plant models created with openTCS before version 3.0?
+
+. Backup the contents of the kernel directory's `data/` subdirectory.
+It contains subdirectories with a plant model in a `model.xml` file each.
+. Clear the kernel's `data/` directory by removing all its subdirectories.
+. Copy one of the `model.xml` files from the backup directories back to the `data/` directory, so that it contains only this single plant model.
++
+_Example:
+Assuming your `data/` directory contains three model subdirectories `modelA`, `modelB` and `modelC`.
+After step one, the three model directories should have been copied to another location.
+After step two, the `data/` directory should be empty and after step three, it should contain only the `model.xml` from directory `modelA`._
+. Start the kernel and have it load your model.
+Then start the Model Editor application and select btn:[menu:File[Load current kernel model]] from its menu to read the model data from the kernel.
+. In the Model Editor application, select btn:[menu:File[Save Model]] or btn:[menu:File[Save Model As]] from the menu.
+The Model Editor application will persist the model data in a file with the given name and the extension `.xml`.
++
+_Example: Following the previous example a file with the name `modelA.xml` should exist now._
+. Delete the `model.xml` file you just moved to the `data/` directory of the kernel.
+The migration of this plant model is finished.
+. Shut down the kernel, go back to step three and repeat the procedure for the remaining models that you want to migrate.
++
+_Example: Follow steps 3 - 7 with `modelB` and `modelC` instead of `modelA`._
+
+=== Why are all transport orders marked `UNROUTABLE` when I only have reporting points in my model?
+
+Vehicles are not allowed to stop at reporting points.
+Hence at least the starting point and the endpoint (usually linked to a location) of a route must be halt points to make routing possible.
+
+=== How can I create curved paths between two points?
+
+Select btn:[Bezier] from the path tools and connect two points by clicking on the first point, dragging the mouse to the second point and releasing the mouse button there.
+Then activate the selection tool and click on the previously created bezier path.
+Two blue control points will appear.
+Drag the control points to change the shape of the path.
+
+=== Why do points have two sets of coordinates (model and layout)?
+
+The openTCS kernel itself works with a logical driving course model - geometric attributes of e.g. points and paths are not relevant for its core functionality.
+It may, however, have to provide (real/physical) coordinates of a destination point to a vehicle, depending on the way the vehicle's navigation works.
+With openTCS, these are called the __model coordinates__.
+
+The __layout coordinates__, on the other hand, are coordinates that are used merely for visualizing the driving course in the Model Editor and Operations Desk applications.
+These coordinates will probably be the same as the model coordinates in most cases, but they may differ, e.g. in cases where the driving course is supposed to be modelled/displayed in a distorted way.
+
+== Transport orders
+
+=== How can I set priorities for transport orders?
+
+With openTCS, transport orders do not have a priority attribute.
+That is because a transport order's priority may change over time or when other transport orders are added.
+
+In the end, a single transport order's effective priority depends on the dispatcher implementation used.
+With openTCS's default dispatcher, transport orders' __deadline__ attributes are intended to be used for prioritizing - the sooner the deadline, the higher an order's effective priority.
+To give a transport order a higher priority from the beginning, you can set its deadline to something earlier than all other orders' deadlines, e.g. to "right now" or a point of time in the past.
+
+== Vehicle drivers
+
+=== Which side (driver or vehicle) should be the client/server?
+
+This should be decided based on project-specific requirements.
+You are free to implement it either way.
+
+== Networking
+
+=== How do I enable access to the RMI interface for clients when the kernel is running on a host with multiple IP addresses?
+
+See https://docs.oracle.com/javase/8/docs/technotes/guides/rmi/faq.html#netmultihomed.
+
+=== Why does the communication between the openTCS kernel application and client applications take an extraordinary amount of time when SSL is enabled?
+
+This is probably because the kernel is running on a host with multiple IP addresses.
+See https://docs.oracle.com/javase/8/docs/technotes/guides/rmi/faq.html#netmultihomed.

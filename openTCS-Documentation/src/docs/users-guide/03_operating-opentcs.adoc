@@ -1,0 +1,340 @@
+
+== Operating the system
+
+To create or to edit the plant model of a transport system, use the Model Editor application.
+
+As a graphical frontend for a transportation control system based on an existing plant model, use the Operations Desk application.
+Note that the Operations Desk application always requires a running openTCS kernel that it can connect to.
+
+Starting an application is done by executing the respective Unix shell script (`\*.sh`) or Windows batch file (`*.bat`).
+
+=== Constructing a new plant model
+
+These instructions demonstrate how a new plant model is created and filled with driving course elements so that it can eventually be used for plant operation.
+
+==== Starting the Model Editor
+
+. Launch the Model Editor (`startModelEditor.bat/.sh`).
+. The Model Editor will start with a new, empty model, but you can also load a model from a file (btn:[menu:File[Load Model]]) or the current kernel model (btn:[menu:File[Load current kernel model]]).
+  The latter option requires a running kernel that the Model Editor client can connect to.
+. Use the graphical user interface of the Model Editor client to create an arbitrary driving course for your respective application/project.
+  How you can add elements like points, paths and vehicles to your driving course is explained in detail in the following section.
+  Whenever you want to start over, select btn:[menu:File[New Model]] from the main menu.
+
+==== Adding elements to the plant model
+
+.Control elements in the Model Editor client
+image::screenshot_modelling.png[]
+
+. Create three points by selecting the point tool from the driving course elements toolbar (see red frame in the screenshot above) and click on three positions on the drawing area.
+. Link the three points with paths to a closed loop by
+.. selecting the path tool from the driving course elements toolbar.
+.. clicking on a point, dragging the path to the next point and releasing the mouse button there.
+. Create two locations by selecting the location tool from the driving course elements toolbar and clicking on any two free positions on the drawing area.
+  As a location type does not yet exist in the plant model, a new one is created implicitly when creating the first location, which can be seen in the tree view to the left of the drawing area.
+. Link the two locations with (different) points by
+.. selecting the link tool from the driving course elements toolbar.
+.. clicking on a location, dragging the link to a point and releasing the mouse button.
+. Create a new vehicle by clicking on the vehicle button in the driving course elements toolbar.
+. Define the allowed operations for vehicles at the newly created locations by
+.. selecting the locations' type in the tree view to the left of the drawing area (see blue frame in the screenshot above).
+.. clicking the value cell labelled btn:[Supported vehicle operations] in the property window below the tree view.
+.. entering the allowed operations as arbitrary text in the dialog shown, for instance `"Load cargo"` and `"Unload cargo"`.
+.. Optionally, you can choose a symbol for locations of the selected type by editing the property `"Symbol"`.
+
+IMPORTANT: You will not be able to create any transport orders and assign them to vehicles when operating the system unless you create locations in your plant model, link these locations to points in the driving course and define the operations that vehicles may execute with the respective location types.
+
+===== Adding and configuring peripheral devices
+
+As described in <<Plant model elements>>, locations can be used to map peripheral devices.
+This means that, after executing the steps described above, there are now two locations available in the plant model that can potentially be used to integrate two peripheral devices.
+To integrate an exemplary peripheral device, the following additional steps are required:
+
+. Associate a location with a peripheral device by
+.. selecting the location in the tree view to the left of the drawing area (e.g. "Location-0001" in the screenshot above).
+.. clicking the value cell labelled btn:[Miscellaneous] in the property window below the tree view.
+.. adding a key-value pair with the key `tcs:loopbackPeripheral` and an empty value.
+. Define the allowed operations for the peripheral device associated with this location by
+.. selecting the locations' type in the tree view to the left of the drawing area (e.g. "LType-0001" in the screenshot above).
+.. clicking the value cell labelled btn:[Supported peripheral operations] in the property window below the tree view.
+.. entering the allowed operations as arbitrary text in the dialog shown, for instance `"Open door"` and `"Close door"`.
+. Optionally, define peripheral operations on paths by
+.. selecting a path in the tree view to the left of the drawing area (e.g. "Point-0001 --- Point-0002" in the screenshot above).
+.. clicking the value cell labelled btn:[Peripheral operations] in the property window below the tree view.
+.. configuring and adding peripheral operations via the dialog shown.
+
+NOTE: The steps above describe the process of associating a location with a virtual peripheral device that is controlled by the loopback peripheral driver.
+Unlike vehicles, which don't require any additional configuration for the loopback vehicle driver to be assigned to them, locations specifically require the aforementioned property for the peripheral loopback driver to be assigned to them.
+
+IMPORTANT: You will not be able to create any peripheral jobs and assign them to peripheral devices when operating the system unless you create locations in your plant model, associate these locations with peripheral devices and define the operations that peripheral devices may execute with the respective location types.
+
+==== Working with vehicle envelopes
+
+As described in <<Plant model elements>>, vehicle envelopes can be defined at points and paths.
+A vehicle envelope is a sequence of vertices (i.e., points with x and y coordinates) that, when connected in their defined order, represent the area that may be occupied by a vehicle.
+In addition to the sequence of vertices, an _envelope key_ is always assigned to a vehicle envelope.
+By referencing an envelope key, a vehicle indicates which envelopes (that may be defined at points or paths) should be considered when it allocates resources.
+(For more details on this, see <<Default scheduler>>.)
+With this, it is possible to prevent vehicles from allocating areas intersecting with areas already allocated by other vehicles.
+
+.Defining and editing vehicle envelopes for points and paths
+image::screenshot_envelope_editing.drawio.png[]
+
+.Setting an envelope key for vehicles
+image::screenshot_vehicle_envelope_key.drawio.png[]
+
+==== Working with layers and layer groups
+
+In addition to adding elements to the plant model, the Model Editor allows plant models to be created with different layers and layer groups.
+For more details on the properties of layers and layer groups see <<Layer>> and <<Layer group>>.
+
+NOTE: With the Operations Desk application it's only possible to show/hide layers and layer groups, but not to manipulate them.
+
+===== Layers
+
+A layer groups points, paths, locations and links and allows the driving course elements it contains to be shown or hidden on demand.
+Layers can be created, removed and edited using the panel shown in the screenshot below (see red frame).
+There are a few things to keep in mind when working with layers:
+
+* There always has to be at least one layer.
+* When adding a new layer, it always becomes the active layer.
+* Removing a layer results in the driving course elements it contains to be removed as well.
+* When adding model elements (i.e. points, paths, etc.) they are always placed on the active layer.
+* Links (between locations and points) are always placed on the same layer the respective location is placed on, regardless of the active layer.
+* When performing "copy & paste", "cut & paste" or "duplicate" operations on driving course elements, the copies are always placed on the active layer.
+
+NOTE: In the Operations Desk application the visibility of layers (and layer groups) also affects whether vehicle elements are displayed in the plant model or not.
+Vehicle elements inherit the visibility of the point at which they are reported.
+If a vehicle is reported at a point that is part of a hidden layer (or layer group), the vehicle element is not displayed in the plant model.
+
+.Layers panel (Toolbar buttons: Add layer, Remove (selected) layer, Move (selected) layer up, Move (selected) layer down)
+image::screenshot_layers_panel.png[]
+
+===== Layer groups
+
+A layer group groups, as the name implies, one or more layers and allows multiple layers to be shown or hidden at once.
+Layer groups can be created, removed and edited using the panel shown in the screenshot below (see red frame).
+There are a few things to keep in mind when working with layer groups:
+
+* There always has to be at least one layer group.
+* Removing a layer group results in all layers assigned to it to be removed as well.
+
+.Layer groups panel (Toolbar buttons: Add layer group, Remove (selected) layer group)
+image::screenshot_layer_groups_panel.png[]
+
+==== Saving the plant model
+
+You have two options to save the model: on your local hard drive or in a running kernel instance the Model Editor can connect to.
+
+===== Saving the model locally
+
+Select btn:[menu:File[Save Model]] or btn:[menu:File[Save Model As...]] and enter a file name for the model.
+
+===== Loading the model into a running kernel
+
+Select btn:[menu:File[Upload model to kernel]] and your model will be loaded into the kernel, letting you use it for operating a plant.
+This, though, requires you to save it locally first.
+Note that any model that was previously loaded in the kernel will be replaced, as the kernel can only store a single model at a time.
+
+=== Operating the plant
+
+These instructions explain how the newly created model that was loaded into the kernel can be used for plant operation, how vehicle drivers are used and how transport orders can be created and processed by a vehicle.
+
+==== Starting components for system operation
+
+.Operations Desk application displaying plant model
+image::screenshot_operations_desk.png[]
+
+. Start the kernel (`startKernel.bat/.sh`).
+.. If this is your first time running the kernel, you need to load an existing plant model from the Model Editor into the kernel first.
+(See <<Loading the model into a running kernel>>).
+. Start the Kernel Control Center application (`startKernelControlCenter.bat/.sh`)
+. Start the Operations Desk application (`startOperationsDesk.bat/.sh`)
+. In the Kernel Control Center, select the btn:[Vehicle driver] tab.
+Then select, configure and start driver for each vehicle in the model.
+.. The list on the left-hand side of the window shows all vehicles in the chosen model.
+.. A detailed view for a vehicle can be seen on the right-hand side of the driver panel after double-clicking on the vehicle name in the list.
+The specific design of this detailed view depends on the driver associated with the vehicle.
+Usually, status information sent by the vehicle (e.g. current position and mode of operation) is displayed and low-level settings (e.g. for the vehicle's IP address) are provided here.
+.. Right-clicking on the list of vehicles shows a popup menu that allows to attach drivers to selected vehicles.
+.. For a vehicle to be controlled by the system, a driver needs to be attached to the vehicle and enabled.
+(For testing purposes without real vehicles that could communicate with the system, the so-called loopback driver can be used, which provides a virtual vehicle that roughly simulates a real one.)
+How you attach and enable a vehicle driver is explained in detail in <<Configuring vehicle drivers>>.
+
+.Driver panel with detailed view of a vehicle
+image::screenshot_driver_panel.png[]
+
+==== Configuring vehicle drivers
+
+. Switch to the Kernel Control Center application.
+. Associate a vehicle with the loopback driver by right-clicking on the vehicle in the vehicle list of the driver panel and selecting the menu entry btn:[menu:Driver[Loopback adapter (virtual vehicle)]].
+. Open the detailed view of the vehicle by double-clicking on the vehicle's name in the list.
+. In the detailed view of the vehicle that is now shown to the right of the vehicle list, select the btn:[Loopback options] tab.
+. Enable the driver by ticking the checkbox btn:[Enable loopback adapter] in the btn:[Loopback options] tab or the checkbox in the btn:[Enabled?] column of the vehicle list.
+. In the btn:[Loopback options] tab or in the vehicles list, select a point from the plant model to have the loopback adapter report this point to the kernel as the (virtual) vehicle's current position.
+  In the btn:[Loopback options] tab, this can be done by clicking on the btn:[Position] text field.
+  (In a real-world application, a vehicle driver communicating with a real vehicle would automatically report the vehicle's current position to the kernel as soon as it is known.)
+. Switch to the Operations Desk client.
+  An icon representing the vehicle should now be shown at the point on which you placed it using the loopback driver.
+. Right-click on the vehicle and select btn:[menu:Context menu[Change integration level > ...to utilize this vehicle for transport orders]] to allow the kernel to dispatch the vehicle.
+  The vehicle is then available for processing orders, which is indicated by an integration level `TO_BE_UTILIZED` in the property panel at the bottom left of the Operations Desk application's window.
+  (You can revert this by right-clicking on the vehicle and selecting btn:[menu:Context menu[Change integration level > ...to respect this vehicle's position]] in the context menu.
+  The integration level shown is now `TO_BE_RESPECTED` and the vehicle will not be dispatched for transport orders any more.)
+
+==== Creating a transport order
+
+To create a transport order, the Operations Desk application provides a dialog window presented when selecting btn:[menu:Actions[Create transport order...]] from the menu.
+Transport orders are defined as a sequence of destination locations at which operations are to be performed by the vehicle processing the order.
+You can select a destination location and operation from a dropdown menu.
+You may also optionally select the vehicle intended to process this order.
+If none is explicitly selected, the control system automatically assigns the order to a vehicle according to its internal, configurable strategies (see <<Default dispatcher configuration entries>>).
+You may also optionally select or define a type for the transport order to be created.
+Furthermore, a transport order can be given a deadline specifying the point of time at which the order should be finished at the latest.
+This deadline will primarily be considered when there are multiple transport orders in the pool and openTCS needs to decide which to assign next.
+
+To create a new transport order, do the following:
+
+. Select the menu entry btn:[menu:Actions[Create transport order...]].
+. In the dialog shown, click the btn:[Add] button and select a location as the destination and an operation which the vehicle should perform there.
+  You can add an arbitrary number of destinations to the order this way.
+  They will be processed in the given order.
+. After creating the transport order with the given destinations by clicking btn:[OK], the kernel will look for a vehicle that can process the order.
+  If a vehicle is found, it is assigned the order immediately and the route computed for it will be highlighted in the Operations Desk application.
+  The loopback driver then simulates the vehicle's movement to the destinations and the execution of the operations.
+
+==== Withdrawing transport orders using the Operations Desk application
+
+A transport order can be withdrawn from a vehicle that is currently processing it.
+When withdrawing a transport order, its processing will be cancelled and the vehicle (driver) will not receive any further movement commands for it.
+A withdrawal can be issued by right-clicking on the respective vehicle in the Operations Desk application, selecting btn:[menu:Context menu[Withdraw transport order]] and then selecting one of the following actions:
+
+* '...and let the vehicle finish movement':
+  The vehicle will process any movement commands it has already received and will stop after processing them.
+  This type of withdrawal is what should normally be used for withdrawing a transport order from a vehicle.
+* '...and stop the vehicle immediately':
+  In addition to what happens in the case of a regular withdrawal, the vehicle is also asked to discard all movement commands it has already received.
+  (This _should_ make it come to a halt very soon in most cases.
+  However, if and how far exactly it will still move highly depends on the vehicle's type, its current situation and how communication between openTCS and this type of vehicle works.)
+  Furthermore, all reservations for resources on the withdrawn route (i.e. the next paths and points) except for the vehicle's currently reported position are cancelled, making these resources available to other vehicles.
+  This forced withdrawal should be used with great care and usually only when the vehicle is currently _not moving_!
+
+CAUTION: Since forced withdrawal frees paths and points previously reserved for the vehicle, it is possible that other vehicles acquire and use these resources themselves right after the withdrawal.
+At the same time, if the vehicle was moving when the withdrawal was issued, it may - depending on its type - not have come to a halt, yet, and still move along the route it had previously been ordered to follow.
+As the latter movement is not coordinated by openTCS, this can result in a _collision or deadlock_ between the vehicles!
+For this reason, it is highly recommended to issue a forced withdrawal only if it is required for some reason, and only if the vehicle has already come to a halt on a position in the driving course or if other vehicles need not be taken into account.
+In all other cases, the regular withdrawal should be used.
+
+Processing of a withdrawn transport order _cannot_ be resumed later.
+To resume a transportation process that was interrupted by withdrawing a transport order, you need to create a new transport order, which may, of course, contain the same destinations as the withdrawn one.
+Note, however, that the new transport order may not be created with the same name.
+The reason for this is:
+
+a. Names of transport orders need to be unique.
+b. Withdrawing a transport order only aborts its processing, but does not remove it from the kernel's memory, yet.
+   The transport order data is kept as historical information for a while before it is completely removed.
+   (For how long the old order is kept depends on the kernel application's configuration -- see <<Order pool configuration entries>>.)
+
+As a result, a name used for a transport order may eventually be reused, but only after the actual data of the old order has been removed.
+
+==== Continuous creation of transport orders
+
+NOTE: The Operations Desk application can easily be extended via custom plugins.
+As a reference, a simple load generator plugin is included which here also serves as a demonstration of how the system looks like during operation.
+Details about how custom plugins can be created and integrated into the Operations Desk application can be found in the developer's guide.
+
+. In the Operations Desk application, select btn:[menu:View[Plugins > Continuous load]] from the menu.
+. Choose a trigger for creating new transport orders:
+  New orders will either be created only once, or whenever the number of unprocessed orders in the system drops below a specified limit, or after a specified timeout has expired.
+. By using an order profile you may decide whether the transport orders`' destinations should be chosen randomly or whether you want to choose them yourself.
++
+Using btn:[Create orders randomly], you define the number of transport orders that are to be generated at a time, and the number of destinations a single transport order should contain.
+Since the destinations will be selected randomly, the orders created do not necessarily make sense for a real-world system.
++
+Using btn:[Create orders according to definition], you can define an arbitrary number of transport orders, each with an arbitrary number of destinations and properties, and save and load your list of transport orders.
+. Start the order generator by activating the corresponding checkbox at the bottom of the btn:[Continuous load] panel.
+  The load generator will then generate transport orders according to its configuration until the checkbox is deactivated or the panel is closed.
+
+==== Configuring peripheral device drivers
+
+NOTE: In order to perform the following steps, make sure you first associate a location with a peripheral device, as described in <<Adding and configuring peripheral devices>>.
+
+. Switch to the Kernel Control Center application.
+. Select the btn:[Peripheral driver] tab.
+** _A location should already be associated with the peripheral loopback driver._
+. Open the detailed view of the location by double-clicking on the location's name in the list.
+. In the detailed view of the location that is now shown to the right of the peripheral device list, select the btn:[Loopback options] tab.
+. Enable the driver by ticking the checkbox in the btn:[Enabled?] column of the peripheral device list.
+. Switch to the Operations Desk client.
+. The peripheral device is now available for processing peripheral jobs.
+
+==== Creating a peripheral job
+
+A peripheral job is defined as a single operation that is to be performed by the peripheral device processing the job.
+Peripheral jobs can be created either explicitly or implicitly; both ways are described in the following sections.
+
+NOTE: For information on how peripheral jobs are assigned to peripheral devices, see <<Default peripheral job dispatcher>>.
+For information on how the control system's internal strategies for assigning peripheral jobs can be configured, see <<Default peripheral job dispatcher configuration entries>>.
+
+===== Explicit creation of peripheral jobs
+
+To create a new peripheral job, do the following in the Operations Desk application:
+
+. Select the menu entry btn:[menu:Actions[Create peripheral job...]].
+. In the dialog shown, select the location associated with the peripheral device that should be assigned with the peripheral job and an operation which the peripheral device should perform.
+  Additionally, enter some arbitrary text for the reservation token.
+  (For the moment, the reservation token doesn't really matter.
+  The only important thing is that it is not empty.
+  For more details on the reservation token, see <<Default peripheral job dispatcher>>.)
+. After creating the peripheral job by clicking btn:[OK], the kernel will try to assign it to the peripheral device associated with the given location to process the job.
+  Once the peripheral job is assigned, the loopback driver simulates the peripheral devices's execution of the operation.
+
+NOTE: While it is fine to use this option for creating peripheral jobs, the next option is the preferred one as it allows direct interaction between vehicles and peripheral devices.
+
+===== Implicit creation of peripheral jobs
+
+NOTE: In order for implicit creation of peripheral jobs to work, make sure to first define peripheral operations on paths as described in <<Adding and configuring peripheral devices>>.
+
+Peripheral jobs can be created implicitly by vehicles as they traverse paths that have peripheral operations defined on them.
+When exactly a peripheral job is created for a peripheral operation defined on a path depends on the configuration of the peripheral operation itself.
+As described in <<Peripheral operation>>, the _execution trigger_ of a peripheral operation defines when the operation is to be performed by the peripheral device.
+Note the following regarding the creation time of the peripheral job belonging to a peripheral operation:
+
+* `AFTER_ALLOCATION` (previously named `BEFORE_MOVEMENT`): The peripheral job is created as soon as the resource for the corresponding path has been allocated for the vehicle.
+  This means that if a vehicle can accept multiple (points and) paths in advance, a peripheral job may be created before the vehicle even reaches the actual path.
+* `AFTER_MOVEMENT`: The peripheral job is created as soon as the vehicle has completely traversed the path and reported the corresponding movement command as executed (i.e. when the vehicle reached the respective end point of the path).
+
+==== Withdrawing peripheral jobs using the Operations Desk application
+
+How a peripheral job can be withdrawn depends on whether it is related to a transport order:
+
+* Peripheral jobs that are not related to transport orders and peripheral jobs that are related to transport orders in a final state (finished or failed) can be withdrawn by selecting them in the peripheral jobs table and clicking the withdrawal button shown above the table.
+* Peripheral jobs that are related to transport orders will implicitly be aborted when the respective transport order is withdrawn.
+  Withdrawing them independently from the related transport order is not supported (unless the related transport order is already in a final state -- see above.)
+** For transport orders that are withdrawn regularly, related peripheral jobs are aborted after the vehicle has completed its pending movements.
+** For transport orders that are withdrawn forcibly, related peripheral jobs are aborted immediately.
+
+===== Consequence of peripheral jobs failing
+
+When a peripheral job fails, the related transport order (if any) is implicitly withdrawn under the following circumstances:
+
+* The peripheral job was created implicitly by a vehicle traversing a path (see <<Implicit creation of peripheral jobs>>).
+* The _completion required_ flag of the peripheral job's peripheral operation is set to `true`.
+
+In such cases, it is not reasonable to continue the transport order, as the _completion required_ flag not only indicates that the vehicle should wait for the peripheral operation to be completed, but also for it to be completed _successfully_.
+Otherwise, the prerequisites for continuing driving / the transport order may not be met.
+
+==== Removing a vehicle from a running system
+
+There may be situations in which you want to remove a single vehicle from a system, e.g. because the vehicle temporarily cannot be used by openTCS due to a hardware defect that has to be dealt with first.
+The following steps will ensure that no further transport orders are assigned to the vehicle and that the resources it might still be occupying are freed for use by other vehicles.
+
+. In the Operations Desk application, right-click on the vehicle and select btn:[menu:Context menu[Change integration level > ...to ignore this vehicle]] to disable the vehicle for transport order processing and to free the point in the driving course that the vehicle is occupying.
+. In the Kernel Control Center application, disable the vehicle's driver by unticking the checkbox btn:[Enable loopback adapter] in the btn:[Loopback options] tab or the checkbox in the btn:[Enabled?] column of the vehicle list.
+
+==== Pausing and resuming the operation of vehicles
+
+The Operations Desk application provides two buttons with which the operation of vehicles can be paused or resumed.
+However, in order for these buttons to have any effect, the respective vehicle drivers for the vehicles in use have to implement and support this feature.
+
+.Pause and resume buttons in the Operations Desk application
+image::screenshot_operations_desk_pause_and_resume.png[]

@@ -1,0 +1,10 @@
+/.idea/*
+!/.idea/codeStyles
+!/.idea/runConfigurations
+/.gradle/
+/build/
+/openTCS-*/build/
+*~
+
+# Ignore approval test result files.
+*Test*.received.txt

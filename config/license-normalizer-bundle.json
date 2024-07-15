@@ -1,0 +1,10 @@
+{
+  "bundles": [
+  ],
+  "transformationRules": [
+    {
+      "bundleName": "LGPL-2.1-only",
+      "licenseNamePattern": "GNU Lesser General Public License Version 2.1, February 1999"
+    }
+  ]
+}

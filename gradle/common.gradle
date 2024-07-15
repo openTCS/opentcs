@@ -1,0 +1,38 @@
+//
+// This file is to be applied to every subproject.
+//
+
+// If we do not have a build number, we're building on a developer's system, so
+// mark the artifact as a snapshot build.
+def versionBuild = "SNAPSHOT"
+if (System.env.BUILD_NUMBER) {
+  versionBuild = "b" + System.env.BUILD_NUMBER
+}
+else if (System.env.CI_PIPELINE_IID) {
+  versionBuild = "b" + System.env.CI_PIPELINE_IID
+}
+
+// Semantic versioning:
+// - The major version number should be incremented with major API-breaking
+//   changes.
+// - The minor version number should be incremented when new feature were added.
+// - The patch level should be incremented with every small change to the code
+//   (e.g. bugfixes).
+project.version = "6.1.0"
+if (!(project.hasProperty("NO_BUILD_NUMBER")
+    && Boolean.valueOf(project.getProperties().get("NO_BUILD_NUMBER")))) {
+  project.version += "-$versionBuild"
+}
+
+project.ext.buildDate = new Date().format('yyyy-MM-dd HH:mm:ss')
+
+group = 'org.opentcs'
+
+task createFolders(description: 'Creates the source folders if they do not exist.') doLast {
+  sourceSets*.allSource*.srcDirs*.each { File srcDir ->
+    if (!srcDir.isDirectory()) {
+      println "Creating source folder: ${srcDir}"
+      srcDir.mkdirs()
+    }
+  }
+}

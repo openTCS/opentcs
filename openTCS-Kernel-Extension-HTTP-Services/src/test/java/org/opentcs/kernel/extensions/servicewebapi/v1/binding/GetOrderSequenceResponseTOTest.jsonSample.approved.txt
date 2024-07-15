@@ -1,0 +1,18 @@
+{
+  "name" : "some-order-sequence",
+  "type" : "Charge",
+  "orders" : [ "some-order", "another-order", "order-3" ],
+  "finishedIndex" : 3,
+  "complete" : false,
+  "finished" : false,
+  "failureFatal" : true,
+  "intendedVehicle" : "some-vehicle",
+  "processingVehicle" : null,
+  "properties" : [ {
+    "key" : "some-key",
+    "value" : "some-value"
+  }, {
+    "key" : "another-key",
+    "value" : "another-value"
+  } ]
+}

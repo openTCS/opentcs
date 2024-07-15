@@ -1,0 +1,30 @@
+@startuml
+skinparam monochrome true
+left to right direction
+
+object "Transport Order 1" as transportOrder1 {
+  dependencies = {}
+  wrappingSequence = null
+  processingVehicle = "Vehicle 3"
+}
+object "Transport Order 2" as transportOrder2 {
+  dependencies = {Transport Order 1}
+  wrappingSequence = null
+  processingVehicle = "Vehicle 1"
+}
+object "Transport Order 3" as transportOrder3 {
+  dependencies = {}
+  wrappingSequence = null
+  processingVehicle = "Vehicle 7"
+}
+object "Transport Order 4" as transportOrder4 {
+  dependencies = {Transport Order 2, Transport Order 3}
+  wrappingSequence = null
+  processingVehicle = "Vehicle 2"
+}
+
+transportOrder1 <-- transportOrder2
+
+transportOrder3 <-- transportOrder4
+transportOrder2 <-- transportOrder4
+@enduml

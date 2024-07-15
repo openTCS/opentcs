@@ -1,0 +1,315 @@
+
+[#section-kernel-api]
+== The kernel's Java API
+
+The interfaces and classes required to use the kernel API are part of the `opentcs-api-base` JAR file, so you should add that to your classpath/declare a dependency on it.
+(See <<Available artifacts and API compatibility>>.)
+The basic data structures for plant model components and transport orders you will encounter often are the following:
+
+.Basic data structures
+image::tcsobject_classes.png[]
+
+The service interfaces that are most often interacted with to fetch and manipulate such data structures are these:
+
+.TCSObject-related service interfaces
+image::service_interfaces_tcsobjects.png[]
+
+A few more interfaces are available to interact with various parts of the kernel, as shown in the following diagram:
+
+.Additional service interfaces
+image::service_interfaces_others.png[]
+
+NOTE: _Peripheral*_ are classes/interfaces related to experimental integration of peripheral devices.
+These features are not documented in detail, yet, and developers using any of them are on their own, for now.
+
+=== Acquiring service objects
+
+To use the services in code running inside the kernel JVM, e.g. a vehicle driver, simply request an instance of e.g. `PlantModelService` to be provided via dependency injection.
+You may also work with an instance of `InternalPlantModelService` here, which provides additional methods available only to kernel application components.
+
+To access the services from another JVM, e.g. in a client that is supposed to create transport orders or to receive status updates for transport orders or vehicles, you need to connect to them via Remote Method Invocation (RMI).
+The easiest way to do this is by creating an instance of the `KernelServicePortalBuilder` class and letting it build a `KernelServicePortal` instance for you.
+(For now, there isn't much support for user management, so it is recommended to ignore the methods that require user credentials.)
+After creating the `KernelServicePortal` instance, you can use it to get service instances and fetch kernel events from it.
+See also the class documentation for `KernelServicePortalBuilder` in the base API's JavaDoc documentation.
+
+// XXX Move this example into a test class.
+
+[source, java]
+----
+KernelServicePortal servicePortal = new KernelServicePortalBuilder().build();
+
+// Connect and log in with a kernel somewhere.
+servicePortal.login("someHost", 1099);
+
+// Get a reference to the plant model service...
+PlantModelService plantModelService = servicePortal.getPlantModelService();
+// ...and find out the name of the currently loaded model.
+String modelName = plantModelService.getLoadedModelName();
+
+// Poll events, waiting up to a second if none are currently there.
+// This should be done periodically, and probably in a separate thread.
+List<Object> events = servicePortal.fetchEvents(1000);
+----
+
+=== Working with transport orders
+
+A transport order, represented by an instance of the class `TransportOrder`, describes a process to be executed by a vehicle.
+Usually, this process is an actual transport of goods from one location to another.
+A `TransportOrder` may, however, also just describe a vehicle's movement to a destination position and an optional vehicle operation to be performed.
+
+All of the following are examples for "transport orders" in openTCS, even if nothing is actually being transported:
+
+* A classic order for transporting goods from somewhere to somewhere else:
+.. Move to location "A" and perform operation "Load cargo" there.
+.. Move to location "B" and perform operation "Unload cargo" there.
+* Manipulation of transported or stationary goods:
+.. Move to location "A" and perform operation "Drill" there.
+.. Move to location "B" and perform operation "Hammer" there.
+* An order to move the vehicle to a parking position:
+.. Move to point "Park 01" (without performing any specific operation).
+* An order to recharge the vehicle's battery:
+.. Move to location "Recharge station" and perform operation "Charge battery" there.
+
+==== A transport order's life cycle
+
+. When a transport order is created, its initial state is `RAW`.
+. A user/client sets parameters for the transport order that are supposed to influence the transport process.
+  These parameters may be e.g. the transport order's deadline, the vehicle that is supposed to process the transport order or a set of generic, usually project-specific properties.
+. The transport order is activated, i.e. parameter setup is finished.
+  Its state is set to `ACTIVE`.
+. The kernel's router checks whether routing between the transport order's destinations is possible at all.
+  If yes, its state is changed to `DISPATCHABLE`.
+  If routing is not possible, the transport order is marked as `UNROUTABLE` and not processed any further.
+. The kernel's dispatcher checks whether all requirements for executing the transport order are fulfilled and a vehicle is available for processing it.
+  As long as there are any requirements not yet fulfilled or no vehicle can execute it, the transport order is left waiting.
+. The kernel's dispatcher assigns the transport order to a vehicle for processing.
+  Its state is changed to `BEING_PROCESSED`.
+** If a transport order that is being processed is withdrawn (by a client/user), its state first changes to `WITHDRAWN` while the vehicle executes any orders that had already been sent to it.
+   Then the transport order's state changes to `FAILED`.
+   It is not processed any further.
+** If processing of the transport order fails for any reason, it is marked as `FAILED` and not processed any further.
+** If the vehicle successfully processes the transport order as a whole, it is marked as `FINISHED`.
+. Eventually -- after a longer while or when too many transport orders in a final state have accumulated in the kernel's order pool -- the kernel removes the transport order.
+
+The following state machine visualizes this life cycle:
+
+.Transport order states
+image::transportorder_states.png[]
+
+==== Structure and processing of transport orders
+
+.Transport order classes
+image::transportorder_classes.png[]
+
+A transport order is created by calling `TransportOrderService.createTransportOrder()`.
+As its parameter, it expects an instance of `TransportOrderCreationTO` containing the sequence of destinations to visit and the operations a vehicle is supposed to perform there.
+The kernel wraps each `Destination` in a newly-created `DriveOrder` instance.
+These ``DriveOrder``s are themselves wrapped by the kernel in a single, newly-created `TransportOrder` instance in their given order.
+
+Once a `TransportOrder` is being assigned to a vehicle by the `Dispatcher`, a `Route` is computed for each of its ``DriveOrder``s.
+These ``Route``s are then stored in the corresponding ``DriveOrder``s.
+
+image::transport_order_course.png[]
+
+As soon as a vehicle (driver) is able to process a `DriveOrder`, the single ``Step``s of its `Route` are mapped to ``MovementCommand``s.
+These ``MovementCommand``s contain all information the vehicle driver needs to reach the final destination and to perform the desired operation there.
+
+.MovementCommand-related classes
+image::movementcommand_classes.png[]
+
+The ``MovementCommand``s for the partial routes to be travelled are sent to the vehicle driver bit by bit.
+The kernel only sends as many ``MovementCommands``s in advance as is required for the vehicle driver to function properly.
+It does this to maintain fine-grained control over the paths/resources used by all vehicles.
+A vehicle driver may set the maximum number of ``MovementCommand``s it gets in advance by adjusting its command queue capacity.
+
+As soon as a `DriveOrder` is finished, the `Route` of the next `DriveOrder` is mapped to ``MovementCommand``s.
+Once the last `DriveOrder` of a `TransportOrder` is finished, the whole `TransportOrder` is finished, as well.
+
+==== How to create a transport order
+
+Create a list of destinations the vehicle is supposed to travel to.
+Every destination is described by the name of the destination location in the plant model and an operation the vehicle is supposed to perform there:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderTest.java[tags=createTransportOrder_createDestinations, indent=0]
+----
+
+Put as many destinations into the list as necessary.
+Then create a transport order description with a name for the new transport order and the list of destinations.
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderTest.java[tags=createTransportOrder_createTransportOrderCreationTO, indent=0]
+----
+
+Optionally, express that the full name of the order should be generated by the kernel.
+(If you do not do this, you need to ensure that the name of the transport order given above is unique.)
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderTest.java[tags=createTransportOrder_setIncompleteName, indent=0]
+----
+
+Optionally, set more parameters for the transport order, e.g. set a deadline for the order or assign a specific vehicle to it:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderTest.java[tags=createTransportOrder_setMoreOptionalParameters, indent=0]
+----
+
+Get a `TransportOrderService` (see <<Acquiring service objects>>) and ask it to create a transport order using the given description:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderTest.java[tags=createTransportOrder_useServiceToCreateOrder, indent=0]
+----
+
+Optionally, get a `DispatcherService` and trigger the kernel's dispatcher explicitly to have it check for a vehicle that can process the transport order.
+(You only need to do this if you need the dispatcher to be triggered immediately after creating the transport order.
+If you do not do this, the dispatcher will still be triggered periodically.)
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderTest.java[tags=createTransportOrder_triggerDispatcher, indent=0]
+----
+
+==== How to create a transport order that sends a vehicle to a point instead of a location 
+
+Create a list containing a single destination to a point, using `Destination.OP_MOVE` as the operation to be executed:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderTest.java[tags=createTransportOrderToPoint_createDestinations, indent=0]
+----
+
+Create a transport order description with a name for the new transport order and the (single-element) list of destinations:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderTest.java[tags=createTransportOrderToPoint_createTransportOrderCreationTO, indent=0]
+----
+
+Get a `TransportOrderService` (see <<Acquiring service objects>>) and ask it to create a transport order using the given description:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderTest.java[tags=createTransportOrderToPoint_useServiceToCreateOrder, indent=0]
+----
+
+Optionally, get a `DispatcherService` and trigger the kernel's dispatcher explicitly to have it check for a vehicle that can process the transport order.
+(You only need to do this if you need the dispatcher to be triggered immediately after creating the transport order.
+If you do not do this, the dispatcher will still be triggered periodically.)
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderTest.java[tags=createTransportOrderToPoint_triggerDispatcher, indent=0]
+----
+
+==== How to work with order sequences
+
+An order sequence can be used to force a single vehicle to process multiple transport orders in a given order.
+Some rules for using order sequences are described in the API documentation for `OrderSequence`, but here is what you would do in general.
+First, create an order sequence description, providing a name:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderSequenceTest.java[tags=createOrderSequence_createOrderSequenceCreationTO, indent=0]
+----
+
+Optionally, express that the full name of the sequence should be generated by the kernel.
+(If you do not do this, you need to ensure that the name of the order sequence given above is unique.)
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderSequenceTest.java[tags=createOrderSequence_setIncompleteName, indent=0]
+----
+
+Optionally, set the sequence's failure-fatal flag:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderSequenceTest.java[tags=createOrderSequence_setFailureFatal, indent=0]
+----
+
+Get a `TransportOrderService` (see <<Acquiring service objects>>) and ask it to create an order sequence using the given description:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderSequenceTest.java[tags=createOrderSequence_useServiceToCreateSequence, indent=0]
+----
+
+Create a description for the transport order as usual, but set the wrapping sequence's name via `withWrappingSequence()` to associate the transport order with the order sequence.
+Then, create the transport order using the `TransportOrderService`.
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderSequenceTest.java[tags=createOrderSequence_createTransportOrder, indent=0]
+----
+
+Create and add more orders to the order sequence as necessary.
+Eventually, set the order sequence's _complete_ flag to indicate that no further transport orders will be added to it:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderSequenceTest.java[tags=createOrderSequence_markSequenceComplete, indent=0]
+----
+
+As long as the sequence has not been marked as complete and finished completely, the vehicle selected for its first order will be tied to this sequence.
+It will not process any orders not belonging to the same sequence until the whole sequence has been finished.
+
+Once the _complete_ flag of the sequence has been set and all transport orders belonging to it have been processed, its _finished_ flag will be set by the kernel.
+
+==== How to withdraw a transport order
+
+To withdraw a transport order, get a `DispatcherService` (see <<Acquiring service objects>>) and ask it to withdraw the order, providing a reference to it:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/WithdrawTransportOrderTest.java[tags=documentation_withdrawTransportOrder, indent=0]
+----
+
+The second argument indicates whether the vehicle should finish the movements it is already assigned to (`false`) or abort immediately (`true`).
+
+==== How to withdraw a transport order via a vehicle reference
+
+To withdraw the transport order that a specific vehicle is currently processing, get a `DispatcherService` (see <<Acquiring service objects>>) and ask it to withdraw the order, providing a reference to the vehicle:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/WithdrawTransportOrderTest.java[tags=documentation_withdrawTransportOrderByVehicle, indent=0]
+----
+
+The second argument indicates whether the vehicle should finish the movements it is already assigned to (`false`) or abort immediately (`true`).
+
+=== Using the event bus
+
+Each of the main openTCS applications -- Kernel, Kernel Control Center, Model Editor and Operations Desk -- provides an event bus that can be used to receive or emit event objects application-wide.
+To acquire the respective application's event bus instance, request it to be provided via dependency injection.
+Any of the following three variants of constructor parameters are equivalent:
+
+[source, java]
+----
+public MyClass(@ApplicationEventBus EventHandler eventHandler) {
+  ...
+}
+----
+
+[source, java]
+----
+public MyClass(@ApplicationEventBus EventSource eventSource) {
+  ...
+}
+----
+
+[source, java]
+----
+public MyClass(@ApplicationEventBus EventBus eventBus) {
+  ...
+}
+----
+
+Having acquired the `EventHandler`, `EventSource` or `EventBus` instance that way, you can use it to emit event objects to it and/or subscribe to receive event objects.
+
+Note that, within the Kernel application, event objects should be emitted via the kernel executor to avoid concurrency issues -- see <<section-kernel-executor>>.

@@ -1,0 +1,25 @@
+apply from: "${rootDir}/gradle/java-project.gradle"
+apply from: "${rootDir}/gradle/java-codequality.gradle"
+apply from: "${rootDir}/gradle/guice-project.gradle"
+apply from: "${rootDir}/gradle/publishing-java.gradle"
+
+dependencies {
+  api project(':openTCS-API-Injection')
+  api project(':openTCS-Common')
+  api project(':openTCS-PlantOverview-Base')
+
+  // There does not seem to be an official binary release for JHotDraw...
+  api group: 'org.opentcs.thirdparty.jhotdraw', name: 'jhotdraw', version: '7.6.20190506'
+  // This preview version of Docking Frames is not in Maven Central, yet.
+  api group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-common', version: '1.1.2p11'
+  api group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-core', version: '1.1.2p11'
+}
+
+task release {
+  dependsOn build
+}
+
+javadoc {
+  // For now, suppress a bunch of JavaDoc warnings.
+  options.addStringOption('Xdoclint:none', '-quiet')
+}

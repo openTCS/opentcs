@@ -1,0 +1,13 @@
+apply from: "${rootDir}/gradle/java-project.gradle"
+apply from: "${rootDir}/gradle/java-codequality.gradle"
+apply from: "${rootDir}/gradle/guice-project.gradle"
+apply from: "${rootDir}/gradle/publishing-java.gradle"
+
+dependencies {
+  api project(':openTCS-API-Injection')
+  api project(':openTCS-Common')
+}
+
+task release {
+  dependsOn build
+}

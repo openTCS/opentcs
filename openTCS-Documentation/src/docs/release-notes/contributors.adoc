@@ -1,0 +1,35 @@
+= openTCS: Contributors List
+The openTCS developers
+:doctype: article
+:toc!:
+:sectnums!:
+:icons: font
+:source-highlighter: coderay
+:coderay-linenums-mode: table
+:last-update-label!:
+:experimental:
+
+== Contributors
+
+We are grateful for anyone helping us to improve openTCS by contributing code or documentation.
+So far, the developers involved were/are (in alphabetical order by last name):
+
+* Sebastian Bonna
+* Hubert Buechter
+* Iryna Felko
+* Martin Grzenia
+* Preity Gupta
+* Heinz Huber
+* Olaf Krause
+* Tobias Marquardt
+* Sebastian Naumann
+* Volkmar Pontow
+* Leonard Schüngel
+* Philipp Seifert
+* Andreas Trautmann
+* Stefan Walter
+* Mats Wilhelm
+* Mustafa Yalciner
+* Youssef Zaki
+
+If you have contributed to openTCS and we have missed you on this list, please accept our apologies and inform us about it.

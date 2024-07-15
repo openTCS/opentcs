@@ -1,0 +1,159 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+}
+
+plugins {
+  id 'org.barfuin.gradle.jacocolog' version '3.1.0'
+  id 'com.github.jk1.dependency-license-report' version '2.6'
+  id 'com.diffplug.spotless' version '6.25.0'
+}
+
+import com.github.jk1.license.filter.LicenseBundleNormalizer
+import com.github.jk1.license.render.CsvReportRenderer
+import com.github.jk1.license.render.InventoryHtmlReportRenderer
+
+apply plugin: 'base' // To add "clean" task to the root project.
+apply plugin: 'distribution'
+
+apply from: "${rootDir}/gradle/common.gradle"
+apply from: "${rootDir}/gradle/publishing-common.gradle"
+
+subprojects {
+  apply from: rootProject.file('gradle/common.gradle')
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+distributions {
+  main {
+    contents.from {
+      project(':openTCS-Kernel').ext.collectableDistDir
+    }
+    contents.from {
+      project(':openTCS-KernelControlCenter').ext.collectableDistDir
+    }
+    contents.from {
+      project(':openTCS-ModelEditor').ext.collectableDistDir
+    }
+    contents.from {
+      project(':openTCS-OperationsDesk').ext.collectableDistDir
+    }
+    contents.from {
+      project(':openTCS-Documentation').ext.collectableDistDir
+    }
+  }
+}
+
+task subDists {
+  dependsOn(':openTCS-Kernel:installDist')
+  dependsOn(':openTCS-KernelControlCenter:installDist')
+  dependsOn(':openTCS-ModelEditor:installDist')
+  dependsOn(':openTCS-OperationsDesk:installDist')
+  dependsOn(':openTCS-Documentation:installDist')
+}
+
+installDist.dependsOn subDists
+
+distZip {
+  archiveClassifier = 'bin'
+  dependsOn subDists
+}
+
+distTar {
+  enabled = false
+  archiveClassifier = 'bin'
+  dependsOn subDists
+}
+
+task distSrcZip(type: Zip) {
+  archiveClassifier = 'src'
+  from "${rootDir}"
+
+  includes << 'config/**'
+  includes << 'gradle/**'
+  includes << 'openTCS-*/**'
+  includes << 'src/**'
+  includes << '*.gradle'
+  includes << 'gradlew'
+  includes << 'gradlew.bat'
+
+  excludes << '.gitlab'
+  excludes << '.gitlab-ci.yml'
+  excludes << '.gradle'
+  excludes << '**/build'
+}
+
+artifacts {
+  archives distZip
+  archives distSrcZip
+}
+
+build {
+  subprojects.each { dependsOn("${it.name}:build") }
+  dependsOn installDist
+}
+
+task release {
+  dependsOn build
+  subprojects.each { dependsOn("${it.name}:release") }
+  dependsOn distZip
+  dependsOn distSrcZip
+}
+
+subprojects.each { publish.dependsOn("${it.name}:publish") }
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      artifact distZip
+      artifact distSrcZip
+
+      pom {
+        artifactId = 'opentcs'
+
+        name = project.name
+        description = project.name
+        url = "https://www.opentcs.org"
+
+        licenses {
+          license {
+            name = "MIT License"
+            url = "http://www.opensource.org/licenses/mit-license.php"
+          }
+        }
+
+        developers {
+          developer {
+            name = "The openTCS Authors"
+            email = "info@opentcs.org"
+            organization = "The open Transportation Control System"
+            organizationUrl = "https://www.opentcs.org/"
+          }
+        }
+
+        scm {
+          connection = "scm:git:git://github.com/opentcs/opentcs.git"
+          developerConnection = "scm:git:ssh://github.com:opentcs/opentcs.git"
+          url = "https://github.com/opentcs/opentcs"
+        }
+      }
+    }
+  }
+}
+
+licenseReport {
+  outputDir = "${buildDir}/license-report"
+  configurations = ['runtimeClasspath', 'guiceConfigRuntimeClasspath']
+  excludeBoms = true
+  filters = [new LicenseBundleNormalizer(bundlePath: "$projectDir/config/license-normalizer-bundle.json")]
+  renderers = [
+    new CsvReportRenderer('third-party-licenses.csv'),
+    new InventoryHtmlReportRenderer('third-party-licenses.html')
+  ]
+}

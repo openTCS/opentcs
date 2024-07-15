@@ -1,0 +1,2 @@
+org.opentcs.kernel.extensions.adminwebapi.AdminWebApiModule
+org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiModule

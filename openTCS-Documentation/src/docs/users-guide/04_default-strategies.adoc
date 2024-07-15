@@ -1,0 +1,235 @@
+
+== Default strategies
+
+openTCS comes with a default implementation for each of the strategy modules.
+These implementations can easily be replaced to adapt to project-specific requirements.
+(See developer's guide.)
+
+=== Default dispatcher
+
+When either a transport order or a vehicle becomes available, the dispatcher needs to decide what should happen with which transport order and which vehicle should do what.
+To make this decision, the default dispatcher takes the following steps:
+
+. New transport orders are prepared for processing.
+  This includes checking general routability and unfinished dependencies.
+. Updates of processes that are currently active are performed.
+  This includes:
+** Withdrawals of transport orders
+** Successful completion of transport orders
+** Assignment of subsequent transport orders for vehicles that are processing order sequences
+. Vehicles that are currently unoccupied are assigned to processable transport orders, if possible.
+** Criteria for a vehicle to be taken into account are:
+*** It must be at a known position in the driving course.
+*** It may not be assigned to a transport order, or the assigned transport order must be _dispensable_.
+    That is the case with parking orders, for instance, or with recharging orders if the vehicle's energy level is not critical.
+*** Its energy level must not be critical.
+** Criteria for a transport order to be taken into account are:
+*** It must be generally dispatchable.
+*** It must not be part of an order sequence that is already being processed by a vehicle.
+** The assignment mechanics are as following:
+*** If there are less unoccupied vehicles than processable transport orders, the list of vehicles is sorted by configurable criteria.
+    The default dispatcher then iterates over the sorted list and, for every vehicle, finds all orders processable by it, computes the required routes, sorts the candidates by configurable criteria and assigns the first one.
+*** If there are less processable transport orders than unocuppied vehicles, the list of transport orders is sorted by configurable criteria.
+    The default dispatcher then iterates over the sorted list and, for every transport order, finds all vehicles that could process it, computes the required routes, sorts the candidates by configurable criteria and assigns the first one.
+*** For configuration options regarding the sorting criteria, see <<Default dispatcher configuration entries>>.
+. Vehicles that are still unoccupied are sent to a recharging location, if possible.
+** Criteria for a vehicle to be taken into account are:
+*** It must be at a known position in the driving course.
+*** Its energy level is _degraded_.
+. Vehicles that are still unoccupied are sent to a parking position, if possible.
+** Criteria for a vehicle to be taken into account are:
+*** It must be at a known position in the driving course.
+*** It must not be at a parking position already.
+
+==== Default parking position selection
+
+When sending a vehicle to a parking position, the closest (according to the router) unoccupied position is selected by default.
+It is possible to assign fixed positions to vehicles instead, by setting properties with the following keys on them:
+
+* `tcs:preferredParkingPosition`:
+  Expected to be the name of a point in the model.
+  If this point is already occupied, the closest unoccupied parking position (if any) is selected instead.
+* `tcs:assignedParkingPosition`:
+  Expected to be the name of a point in the model.
+  If this point is already occupied, the vehicle is not sent to any other parking position, i.e. remains where it is.
+  Takes precedence over `tcs:preferredParkingPosition`.
+
+==== Optional parking position priorities
+
+Optionally (see <<Default dispatcher configuration entries>> for how to enable it), parking positions may be explicitly prioritized, and vehicles can be reparked in a kind of "parking position queues".
+This can be desirable e.g. to park vehicles close to locations that are frequent first destinations for transport orders.
+(For example, imagine a plant in which goods are transported from A to B all the time.
+Even if there currently aren't any transport orders, it might nevertheless be a good idea to prefer parking positions near A to reduce reaction times when transport orders arrive.)
+
+To assign a priority to a parking position, set a property with the key `tcs:parkingPositionPriority` on the point.
+The property's value should be a decimal integer, with lower values resulting in a higher priority for the parking position.
+
+==== Default recharging location selection
+
+When sending a vehicle to a recharge location, the closest (according to the router) unoccupied position is selected by default.
+It is possible to assign fixed positions to vehicles instead, by setting properties with the following keys on them:
+
+* `tcs:preferredRechargeLocation`:
+  Expected to be the name of a location.
+  If this location is already occupied, the closest unoccupied recharging location (if any) is selected instead.
+* `tcs:assignedRechargeLocation`:
+  Expected to be the name of a location.
+  If this location is already occupied, the vehicle is not sent to any other recharging location.
+  Takes precedence over `tcs:preferredRechargeLocation`.
+
+==== Immediate transport order assignment
+
+In addition to the _implicit_ assignment of transport orders according to the flow and rules described in the previous sections, transport orders can also be assigned _explicitly_ (i.e. immediately).
+Immediate assignment of transport orders is supported for transport orders that have their intended vehicle set.
+This can be helpful in situations where a transport order and its intended vehicle are generally in a state where an assignment would be possible, but is prevented by certain filter criteria in the regular dispatcher flow.
+
+Although the immediate assignment of transport orders bypasses some of the filter criteria in the regular dispatcher flow, it works only in specific situations.
+Regarding the transport order's state:
+
+* The transport order's state must be `DISPATCHABLE`.
+* The transport order must not be part of an order sequence.
+* The transport order's intended vehicle must be set.
+
+As for the (intended) vehicle's state:
+
+* The vehicle's processing state must be `IDLE`.
+* The vehicle's state must be `IDLE` or `CHARGING`.
+* The vehicle's integration level must be `TO_BE_UTILIZED`.
+* The vehicle must be reported at a known position.
+* The vehicle must not process an order sequence.
+
+NOTE: In addition to the state of the respective transport order and its intended vehicle, the dispatcher may have further implementation-specific reasons to reject an immediate assignment.
+
+=== Default router
+
+The default router finds the cheapest route from one position in the driving course to another one.
+(It uses an implementation of link:https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm[Dijkstra's algorithm] to do that.)
+It takes into account paths that have been locked, but not positions and/or assumed future behaviour of other vehicles.
+As a result, it does not route around slower or stopped vehicles blocking the way.
+
+==== Cost functions
+
+The cost function used for evaluating the paths in the driving course can be selected via configuration.
+(See <<Default router configuration entries>>, the relevant configuration entry is `defaultrouter.shortestpath.edgeEvaluators`.)
+The following cost functions/configuration options are available:
+
+* `DISTANCE` (default):
+  Routing costs are equal to the paths' lengths.
+* `TRAVELTIME`:
+  Routing costs are computed as the expected time to travel on the paths (in seconds), i.e. as path length divided by maximum allowed vehicle speed.
+* `EXPLICIT_PROPERTIES`:
+  Routing costs for a vehicle on a path are taken from path properties with keys `tcs:routingCostForward<GROUP>` and `tcs:routingCostReverse<GROUP>`.
+  The `<GROUP>` to be used is the vehicle's routing group (see <<Routing groups>>).
+  As an example, if a vehicle's routing group is set to "Example", routing costs for this vehicle would be taken from path properties with keys `tcs:routingCostForwardExample` and `tcs:routingCostReverseExample`.
+  This way, different routing costs can be assigned to a path, e.g. for different types of vehicles. +
+  Note that, for this cost function to work properly, the values of the routing cost properties should be decimal integers.
+* `HOPS`:
+  The routing costs for every path in the model is 1, which results in the route with the least paths/points being chosen.
+
+Developers can integrate additional custom cost functions using the openTCS API.
+
+More than one cost function can be selected in the configuration by listing them separated by commas.
+The costs computed by the respective functions are then added up.
+For example, when using `"DISTANCE, TRAVELTIME"`, costs for routes are computed as the sum of the paths' lengths and the time a vehicle needs to pass it.
+
+NOTE: Adding distances to durations obviously does not make sense.
+It is the user's responsibility to choose a configuration that is usable and appropriate for the respective use case.
+
+==== Routing groups
+
+It is possible to treat vehicles in a plant differently when computing their routes.
+This may be desirable if they have different characteristics and actually have different optimal routes through the driving course.
+For this to work, the paths in the model or the cost function used need to reflect this difference.
+This isn't done by default -- the default router computes routes for all vehicles the same way unless told otherwise.
+To let the router know that it should compute routes for a vehicle separately, set a property with the key `tcs:routingGroup` to an arbitrary string.
+(Vehicles that have the same value set share the same routing table, and the empty string is the default value for all vehicles.)
+
+==== Avoiding/Excluding resources when computing routes
+
+When computing a route for a transport order, it is possible to define a set of resources (i.e., points, paths or locations) that should be avoided by vehicles processing the respective transport order.
+For this, a property with the key `tcs:resourcesToAvoid` can be set on a transport order to a comma-separated list of resource names.
+
+=== Default scheduler
+
+The default scheduler implements a simple strategy for traffic management.
+It does this by allowing only mutually exclusive use of resources in the plant model (points, paths and locations), as described below.
+
+==== Allocating resources
+
+When an allocation of a set of resources for a vehicle is requested, the scheduler performs the following checks to determine whether the allocation can be granted immediately:
+
+. Check if the vehicle requesting the resources is _not_ paused.
+. Check if the requested resources are generally available for the vehicle.
+. Check if the requested resources are part of a block with the type `SINGLE_VEHICLE_ONLY`.
+  If not, skip this check.
+  If yes, expand the requested resource set to the effective resource set and check if the expanded resources are available for the vehicle.
+. Check if the requested resources are part of a block with the type `SAME_DIRECTION_ONLY`.
+  If not, skip this check.
+  If yes, check if the direction in which the vehicle intends to traverse the block is the same the block is already being traversed by other vehicles.
+. Check if the areas related to the requested resources are available for the vehicle and not allocated by other vehicles (provided that the vehicle requesting the resources references an envelope key and the requested resources define vehicle envelopes with that key).
+
+If all checks succeed, the allocation is made.
+If any of the checks fail, the allocation is queued for later.
+
+==== Freeing resources
+
+Whenever resources are freed (e.g. when a vehicle has finished its movement to the next point and the vehicle driver reports this to the kernel), the allocations waiting in the queue are checked (in the order the requests happened).
+Any allocations that can now be made are made.
+Allocations that cannot be made are kept waiting.
+
+==== Fairness of scheduling
+
+This strategy ensures that resources are used when they are available.
+It does not, however, strictly ensure fairness/avoid starvation:
+Vehicles waiting for allocation of a large resource set may theoretically wait forever if other vehicles can keep allocating subsets of those resources continuously.
+Such situations are likely a hint at problems in the plant model graph's topology, which is why this deficiency is considered acceptable for the default implementation.
+
+=== Default peripheral job dispatcher
+
+When either a peripheral job or a peripheral device becomes available, the peripheral job dispatcher needs to decide what should happen with which peripheral job and which peripheral device should do what.
+To make this decision, the default peripheral job dispatcher takes the following steps:
+
+. Peripheral devices that are currently unoccupied but have their reservation token set are assigned to processable peripheral jobs, if possible.
+** Criteria for a peripheral device to be taken into account are:
+*** It must not be assigned to a peripheral job.
+*** It must have its reservation token set.
+** Criteria for a periphreal job to be taken into account are:
+*** It must match the reservation token of a peripheral device.
+*** It must be processable by a peripheral device.
+** If there are multiple peripheral jobs that meet these criteria, the oldest one according to the creation time is assigned first.
+. Peripheral devices that could not be assigned to a peripheral job with a matching reservation token have their reservation released.
+** The release of reserved peripheral devices is performed via a replaceable strategy.
+   The default strategy releases peripheral devices according to the following rules:
+*** A peripheral devices's state must be `IDLE`.
+*** A peripheral devices's processing state must be `IDLE`.
+*** A peripheral devices's reservation token must be set.
+. Peripheral devices that are currently unoccupied and do not have their reservation token set are assigned to processable peripheral jobs, if possible.
+** Criteria for a peripheral device to be taken into account are:
+*** It must not be assigned to a peripheral job.
+*** It must not have its reservation token set.
+** Cirteria for a peripheral job to be taken into account are:
+*** It must be generally available to be processed by a peripheral device.
+*** It must be processable by a peripheral device.
+** The selection of a peripheral job for a peripheral device is performed via a replaceable strategy.
+   The default strategy selects peripheral jobs according to the following rules:
+*** The location of a peripheral job's operation must match the given location.
+*** If there are multiple peripheral jobs that meet these criteria, the oldest one according to the creation time is selected.
+
+==== Reservation token
+
+As described above, reservation tokens are relevant for the assignment of peripheral jobs to peripheral devices.
+This section describes the different types of reservation tokens:
+
+. Reservation tokens for transport orders.
+** Optionally, transport orders can be provided with a reservation token.
+** If a transport order's reservation token is set, it is used for peripheral jobs that are created in the context of the transport order (i.e., for peripheral jobs that are created implicitly by vehicles processing a transport order - see <<Implicit creation of peripheral jobs>>).
+. Reservation tokens for peripheral jobs.
+** Peripheral jobs must always be provided with a reservation token.
+** For peripheral jobs that are created implicitly by vehicles as they traverse paths that have peripheral operations defined on them, the reservation token is set to
+*** the reservation token of the transport order the corresponding vehicle is processing
+*** or the name of the vehicle, if the reservation token on the transport order is not set.
+. Reservation tokens for locations that represent peripheral devices.
+** Initially, the reservation token of a location representing a peripheral device is not set.
+   This indicates that the peripheral device is generally available to accept a peripheral job with any reservation token.
+** Once the peripheral device is assigned a peripheral job, the location's reservation token is set to the peripheral job's reservation token.
+   As a result, the peripheral device is only available for peripheral jobs with the same reservation token until the peripheral device's reservation is released (i.e., until the peripheral device's reservation token is reset).

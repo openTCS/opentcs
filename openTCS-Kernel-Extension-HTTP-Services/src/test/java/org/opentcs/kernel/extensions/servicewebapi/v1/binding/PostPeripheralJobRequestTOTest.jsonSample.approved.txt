@@ -1,0 +1,19 @@
+{
+  "incompleteName" : true,
+  "reservationToken" : "some-token",
+  "relatedVehicle" : "some-vehicle",
+  "relatedTransportOrder" : "some-order",
+  "peripheralOperation" : {
+    "operation" : "some-operation",
+    "locationName" : "some-location",
+    "executionTrigger" : "AFTER_ALLOCATION",
+    "completionRequired" : true
+  },
+  "properties" : [ {
+    "key" : "some-key",
+    "value" : "some-value"
+  }, {
+    "key" : "some-other-key",
+    "value" : "some-other-value"
+  } ]
+}

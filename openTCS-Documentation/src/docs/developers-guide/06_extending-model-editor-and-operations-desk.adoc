@@ -1,0 +1,100 @@
+
+== Customizing and extending the Model Editor and the Operations Desk applications
+
+NOTE: The process of customizing and extending the Model Editor and the Operations Desk is basically identical for both applications.
+For the sake of simplicity, this section describes the process using the Operations Desk application as an example.
+Where necessary, differences between the two applications are explicitly mentioned.
+
+=== Guice modules
+
+Analogous to the kernel application, the Operations Desk application uses Guice to configure its components.
+To modify the wiring of components within the application and to add your own components, you can register custom Guice modules.
+Modules are found and registered automatically via `java.util.ServiceLoader`.
+
+Basically, the following steps are required for customizing the application:
+
+. Build a JAR file for your custom injection module with the following content:
+.. A subclass of `PlantOverviewInjectionModule`, which can be found in the base library, must be contained.
+Configure your custom components or adjust the application's default wiring in this module.
+`PlantOverviewInjectionModule` provides a few supporting methods you can use.
+.. A plain text file named `META-INF/services/org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule` must also be contained.
+This file should contain a single line of text with the fully qualified class name of your module.
+. Ensure that the JAR file(s) containing your Guice modules and the implementation of your custom component(s) are part of the class path when you start the Operations Desk application.
+
+For more information on how the automatic registration works, see the documentation of `java.util.ServiceLoader` in the Java class library.
+For more information on how Guice works, see the Guice documentation.
+
+=== How to add import/export functionality for plant model data
+
+It is not uncommon for plant model data to be shared with other systems.
+For instance, it is possible that the navigation computer of a vehicle already has detailed information about the plant environment such as important positions and connections between them.
+Entering this data manually via the Model Editor application would be a tiresome and error-prone work.
+To help relieve users from such work, the Model Editor supports integrating components for importing plant model data from external resources -- e.g. files in a foreign file format -- or exporting plant model data to such resources.
+
+To integrate a model import component, do the following:
+
+. Create a class that implements the interface `PlantModelImporter` and implement the methods declared by it:
+.. In `importPlantModel()`, implement what is necessary to produce an instance of `PlantModelCreationTO` that describes the plant model.
+The actual steps necessary here may vary depending on the source and the type of model data to be imported.
+In most cases, however, the process will probably look like the following:
+... Show a dialog for the user to select the file to be imported.
+... Parse the content of the selected file according to its specific file format.
+... Convert the parsed model data to instances of `PointCreationTO`, `PathCreationTO` etc., and fill a newly created `PlantModelCreationTO` instance with them.
+... Return the `PlantModelCreationTO` instance.
+.. `getDescription()` should return a short description for your importer, for instance "Import from XYZ course data file".
+An entry with this text will be shown in the Model Editor's btn:[menu:File[Import plant model]] submenu, and clicking on this entry will result in your `importPlantModel()` implementation to be called.
+. Create a Guice module for registering your `PlantModelImporter` with openTCS by subclassing `PlantOverviewInjectionModule`.
+Implement the `configure()` method and add a binding to your `PlantModelImporter` using `plantModelImporterBinder()`.
+. Build and package the `PlantModelImporter` and Guice module into a JAR file.
+. In the JAR file, register the Guice module class as a service of type `PlantOverviewInjectionModule`.
+To do that, ensure that the JAR file contains a folder named `META-INF/services/` with a file named `org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule`.
+This file should consist of a single line of text holding simply the name of the Guice module class.
+(See <<How to create a plugin panel for the Operations Desk client>> for an example.)
+. Place the JAR file in the Model Editor application's class path (subdirectory `lib/openTCS-extensions/` of the application's installation directory) and start the application.
+
+To integrate a model _export_ component, you follow the same steps, but implement the interface `PlantModelExporter` instead of `PlantModelImporter`.
+
+=== How to create a plugin panel for the Operations Desk client
+
+The Operations Desk client offers to integrate custom panels providing project-specific functionality.
+
+. Implement a subclass of `PluggablePanel`.
+. Implement a `PluggablePanelFactory` that produces instances of your `PluggablePanel`.
++
+NOTE: The `PluggablePanelFactory.providesPanel(state)` method is used to determine which `Kernel.State` a factory provides panels for.
+For plugin panels that are intended to be used with the Model Editor application only, this method should return `true` for the kernel state `Kernel.State.MODELLING`.
+For plugin panels that are intended to be used with the Operations Desk application only, this method should return `true` for the kernel state `Kernel.State.OPERATING`.
+Otherwise the plugin panels won't be shown in the respective application.
+
+. Create a Guice module for your `PluggablePanelFactory` by subclassing `PlantOverviewInjectionModule`.
+Implement the `configure()` method and add a binding to your `PluggablePanelFactory` using `pluggablePanelFactoryBinder()`.
+For example, the load generator panel that is part of the openTCS distribution is registered with the following line in its module's `configure()` method:
++
+[source, java]
+----
+include::{loadGeneratorPanel-guiceSrc}/org/opentcs/guing/plugins/panels/loadgenerator/LoadGeneratorPanelModule.java[tags=documentation_createPluginPanelModule]
+----
+
+. Build and package the `PluggablePanel`, `PluggablePanelFactory` and Guice module into a JAR file.
+. In the JAR file, register the Guice module class as a service of type `PlantOverviewInjectionModule`.
+To do that, ensure that the JAR file contains a folder named `META-INF/services/` with a file named `org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule`.
+This file should consist of a single line of text holding simply the name of the Guice module class, e.g.:
++
+[source]
+----
+org.opentcs.guing.plugins.panels.loadgenerator.LoadGeneratorPanelModule
+----
+
+. Place the JAR file in the Operations Desk application's class path (subdirectory `lib/openTCS-extensions/` of the application's installation directory) and start the application.
+
+=== How to create a location/vehicle theme for openTCS
+
+Locations and vehicles are visualized in the Operations Desk client using configurable themes.
+To customize the appearance of locations and vehicles, new theme implementations can be created and integrated into the Operations Desk client.
+
+. Create a new class which implements `LocationTheme` or `VehicleTheme`.
+. Place the JAR file of your theme, containing all required resources, in the subdirectory `lib/openTCS-extensions/` of the openTCS Operations Desk application's installation directory _before_ the application is started.
+(The openTCS start scripts include all JAR files in that directory in the application's classpath.)
+. Set the `locationThemeClass` or `vehicleThemeClass` in the Operations Desk application's configuration file.
+
+Vehicles or locations in plant models are then rendered using your custom theme.

@@ -1,0 +1,19 @@
+apply from: "${rootDir}/gradle/java-project.gradle"
+apply from: "${rootDir}/gradle/java-codequality.gradle"
+apply from: "${rootDir}/gradle/guice-project.gradle"
+apply from: "${rootDir}/gradle/publishing-java.gradle"
+
+dependencies {
+  api project(':openTCS-API-Injection')
+  api project(':openTCS-Common')
+
+  api group: 'com.sparkjava', name: 'spark-core', version: '2.9.4'
+
+  api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.0'
+  api group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.17.0'
+  api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.0'
+}
+
+task release {
+  dependsOn build
+}

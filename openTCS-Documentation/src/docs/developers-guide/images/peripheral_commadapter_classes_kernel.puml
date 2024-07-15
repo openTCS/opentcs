@@ -1,0 +1,62 @@
+@startuml
+skinparam monochrome true
+'skinparam linetype ortho
+hide empty members
+'left to right direction
+
+together {
+  interface PeripheralCommAdapterFactory
+
+  class "**CustomAdapterFactory**" as CustomAdapterFactory
+
+  PeripheralCommAdapterFactory <|-- CustomAdapterFactory
+}
+
+together {
+  interface PeripheralCommAdapter
+
+  abstract class BasicPeripheralCommAdapter
+
+  class "**CustomAdapter**" as CustomAdapter
+
+  PeripheralCommAdapter <|-- BasicPeripheralCommAdapter
+  BasicPeripheralCommAdapter <|-- CustomAdapter
+
+  note "Implements communication\nwith a single peripheral device." as adapterNote
+  CustomAdapter .. adapterNote
+}
+
+together {
+  class PeripheralProcessModel
+
+  class "**CustomProcessModel**" as CustomProcessModel
+
+  PeripheralProcessModel <|-- CustomProcessModel
+}
+
+together {
+  abstract class PeripheralCommAdapterDescription
+
+  class "**CustomDescription**" as CustomDescription
+
+  PeripheralCommAdapterDescription <|-- CustomDescription
+}
+
+together {
+	interface LowLevelCommunicationEvent
+	
+	abstract class PeripheralCommAdapterEvent
+
+  class "**PeripheralProcessModelEvent**" as PeripheralProcessModelEvent
+
+  PeripheralCommAdapterEvent <|-- PeripheralProcessModelEvent
+	LowLevelCommunicationEvent <|-- PeripheralCommAdapterEvent
+}
+
+CustomAdapterFactory ..> CustomAdapter : instantiates
+CustomAdapterFactory ..> CustomDescription : provides
+
+CustomAdapter ..> PeripheralProcessModelEvent : produces
+
+CustomAdapter "1" --> "1" CustomProcessModel
+@enduml

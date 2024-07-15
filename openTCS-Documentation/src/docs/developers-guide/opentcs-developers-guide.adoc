@@ -1,0 +1,31 @@
+= openTCS: Developer's Guide
+The openTCS developers
+:doctype: book
+:toc: left
+:toclevels: 3
+:sectnums: all
+:sectnumlevels: 6
+:imagesdir: images
+:icons: font
+:source-highlighter: coderay
+:coderay-linenums-mode: table
+:last-update-label!:
+:experimental:
+ifdef::backend-pdf[:imagesdir: {imagesoutdir}]
+ifdef::backend-html5[:imagesdir: images]
+
+include::01_general-development.adoc[]
+
+include::02_kernel-api.adoc[]
+
+include::03_generate-integration-project.adoc[]
+
+include::04_extending-kernel.adoc[]
+
+include::05_extending-control-center.adoc[]
+
+include::06_extending-model-editor-and-operations-desk.adoc[]
+
+include::07_supplement-configuration.adoc[]
+
+include::08_translating.adoc[]
