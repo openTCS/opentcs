@@ -352,7 +352,7 @@ public class ModbusTCPVehicleCommAdapter
 
       // Assuming station names are in the format "MKxx" where xx is the station number
       int stationNumber = Integer.parseInt(stationName.substring(2));
-      int baseAddress = 1000 + (2 * stationNumber) -2;
+      int baseAddress = 1000 + (2 * stationNumber) - 2;
 
       // Create ModbusCommand for CMD1
       modbusCommands.add(new ModbusCommand("CMD1", cmds.getFirst().toInt(), baseAddress));
