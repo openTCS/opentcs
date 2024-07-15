@@ -17,6 +17,7 @@ import java.util.Set;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A point in the driving course at which a {@link Vehicle} may be located.
@@ -257,7 +258,12 @@ public class Point
    *
    * @return <code>true</code> if, and only if, halting is allowed on this
    * point.
+   * @deprecated Will be removed without replacement. With openTCS 6.0, the point type
+   * {@code REPORT_POSITION} was removed, which makes this method redundant, as all remaining point
+   * types allow halting.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public boolean isHaltingPosition() {
     return type.equals(Type.PARK_POSITION) || type.equals(Type.HALT_POSITION);
   }

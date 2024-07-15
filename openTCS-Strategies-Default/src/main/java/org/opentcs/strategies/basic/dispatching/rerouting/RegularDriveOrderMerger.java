@@ -15,6 +15,7 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route;
+import org.opentcs.strategies.basic.routing.ResourceAvoidanceExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,10 +36,14 @@ public class RegularDriveOrderMerger
    * Creates a new instance.
    *
    * @param router The router to use.
+   * @param resourceAvoidanceExtractor Extracts resources to be avoided from transport orders.
    */
   @Inject
-  public RegularDriveOrderMerger(Router router) {
-    super(router);
+  public RegularDriveOrderMerger(
+      Router router,
+      ResourceAvoidanceExtractor resourceAvoidanceExtractor
+  ) {
+    super(router, resourceAvoidanceExtractor);
   }
 
   @Override

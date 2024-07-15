@@ -32,6 +32,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PlantModelTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTopologyUpdateRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.BlockTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationTypeTO;
@@ -233,7 +234,25 @@ class PlantModelHandlerTest {
 
   @Test
   void requestTopologyUpdate() {
-    handler.requestTopologyUpdate();
+    handler.requestTopologyUpdate(
+        new PostTopologyUpdateRequestTO(List.of())
+    );
     then(routerService).should().updateRoutingTopology(Set.of());
+  }
+
+  @Test
+  void requestTopologyUpdateWithPath() {
+    Path path1 = new Path(
+        "path1",
+        new Point("source").getReference(),
+        new Point("dest").getReference()
+    );
+
+    given(orderService.fetchObject(Path.class, "path1")).willReturn(path1);
+
+    handler.requestTopologyUpdate(
+        new PostTopologyUpdateRequestTO(List.of("path1"))
+    );
+    then(routerService).should().updateRoutingTopology(Set.of(path1.getReference()));
   }
 }

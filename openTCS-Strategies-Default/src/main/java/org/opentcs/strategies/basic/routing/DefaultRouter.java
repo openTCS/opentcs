@@ -162,6 +162,26 @@ public class DefaultRouter
   }
 
   @Override
+  public boolean checkGeneralRoutability(TransportOrder order) {
+    requireNonNull(order, "order");
+
+    synchronized (this) {
+      List<DriveOrder> driveOrderList = order.getFutureDriveOrders();
+      DriveOrder[] driveOrders
+          = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
+
+      PointRouter generalPointRouter = pointRouterProvider.getGeneralPointRouter(order);
+
+      for (Point curStartPoint : getDestinationPoints(driveOrders[0])) {
+        if (!isRoutable(curStartPoint, driveOrders, 1, generalPointRouter)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
+  @Override
   public Optional<List<DriveOrder>> getRoute(
       Vehicle vehicle,
       Point sourcePoint,
@@ -414,9 +434,7 @@ public class DefaultRouter
       Point destPoint = objectService.fetchObject(Point.class, dest.getDestination().getName());
       requireNonNull(destPoint, "destPoint");
       final Set<Point> result = new HashSet<>();
-      if (destPoint.isHaltingPosition()) {
-        result.add(destPoint);
-      }
+      result.add(destPoint);
       return result;
     }
     // If it's a "normal" transport order, look for destination points adjacent
@@ -443,9 +461,7 @@ public class DefaultRouter
             || (curLink.getAllowedOperations().isEmpty()
                 && destLocType.isAllowedOperation(dest.getOperation()))) {
           Point destPoint = objectService.fetchObject(Point.class, curLink.getPoint());
-          if (destPoint.isHaltingPosition()) {
-            result.add(destPoint);
-          }
+          result.add(destPoint);
         }
       }
       return result;

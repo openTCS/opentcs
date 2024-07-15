@@ -163,6 +163,24 @@ public class PointRouterProvider {
     return Collections.unmodifiableMap(pointRoutersByVehicleGroup);
   }
 
+  /**
+   * Returns a general point router that is not affected by any path properties or any configured
+   * edge evaluators.
+   *
+   * @param order The transport order to create the point router for.
+   * @return A general point router.
+   */
+  public PointRouter getGeneralPointRouter(
+      @Nullable
+      TransportOrder order
+  ) {
+    ResourcesToAvoid resourcesToAvoid = resourceAvoidanceExtractor.extractResourcesToAvoid(order);
+    return pointRouterFactory.createGeneralPointRouter(
+        resourcesToAvoid.getPoints(),
+        resourcesToAvoid.getPaths()
+    );
+  }
+
   private void createMissingPointRouters() {
     Map<String, Vehicle> distinctRoutingGroups = new HashMap<>();
     for (Vehicle vehicle : objectService.fetchObjects(Vehicle.class)) {

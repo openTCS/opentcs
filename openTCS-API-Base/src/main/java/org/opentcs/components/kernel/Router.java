@@ -21,6 +21,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods a router module for the openTCS
@@ -73,7 +74,12 @@ public interface Router
   );
 
   /**
-   * Checks the general routability of a given transport order.
+   * Checks the routability of a given transport order.
+   * <p>
+   * The check for routability is affected by path properties and configured edge evaluators. This
+   * means that whether a transport order is considered routable <em>can</em> change between
+   * consecutive calls to this method.
+   * </p>
    * <p>
    * This method is supposed to be called only from the kernel executor thread.
    * </p>
@@ -87,6 +93,28 @@ public interface Router
       @Nonnull
       TransportOrder order
   );
+
+  /**
+   * Checks the general routability of a given transport order.
+   * <p>
+   * The check for general routability is <em>not</em> affected by any path properties or any
+   * configured edge evaluators. This means that whether a transport order is considered generally
+   * routable <em>will not</em> change between consecutive calls to this method.
+   * </p>
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
+   *
+   * @param order The transport order to check for routability.
+   * @return {@code true}, if the transport order is generally routable, otherwise {@code false}.
+   */
+  @ScheduledApiChange(when = "7.0", details = "Default implementation will be removed.")
+  default boolean checkGeneralRoutability(
+      @Nonnull
+      TransportOrder order
+  ) {
+    return false;
+  }
 
   /**
    * Returns a complete route for a given vehicle that starts on a specified

@@ -1543,7 +1543,6 @@ public class DefaultVehicleController
     }
 
     return futureMovementCommands.stream()
-        .filter(command -> command.getStep().getDestinationPoint().isHaltingPosition())
         .map(command -> getNeededResources(command))
         .collect(Collectors.toList());
   }

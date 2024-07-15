@@ -10,6 +10,7 @@ package org.opentcs.kernel.extensions.servicewebapi.v1;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.ObjectExistsException;
@@ -25,6 +26,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleAttachme
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PlantModelTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostOrderSequenceRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTopologyUpdateRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesResponseTO;
@@ -482,9 +484,18 @@ public class V1RequestHandler
   }
 
   private Object handlePostUpdateTopology(Request request, Response response)
-      throws KernelRuntimeException {
+      throws ObjectUnknownException,
+        KernelRuntimeException {
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    plantModelHandler.requestTopologyUpdate();
+    if (request.body().isBlank()) {
+      plantModelHandler.requestTopologyUpdate(new PostTopologyUpdateRequestTO(List.of()));
+    }
+    else {
+      plantModelHandler
+          .requestTopologyUpdate(
+              jsonBinder.fromJson(request.body(), PostTopologyUpdateRequestTO.class)
+          );
+    }
     return "";
   }
 
