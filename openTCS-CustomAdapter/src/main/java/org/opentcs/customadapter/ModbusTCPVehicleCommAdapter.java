@@ -74,6 +74,8 @@ public class ModbusTCPVehicleCommAdapter
   private final Map<Long, Pair<CMD1, CMD2>> stationCommandsMap = new ConcurrentHashMap<>();
   private TransportOrder currentTransportOrder;
   private final List<MovementCommand> allMovementCommands = new ArrayList<>();
+  private final List<ModbusCommand> positionModbusCommand = new ArrayList<>();
+  private final List<ModbusCommand> cmdModbusCommand = new ArrayList<>();
   /**
    * Represents a vehicle associated with a ModbusTCPVehicleCommAdapter.
    */
@@ -250,6 +252,20 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   @Override
+  protected void sendSpecificCommand(MovementCommand cmd) {
+    if (!isVehicleConnected()) {
+      LOG.warning("Not connected to Modbus TCP server. Cannot send command.");
+      return;
+    }
+
+    if (!allMovementCommands.contains(cmd)) {
+      LOG.warning(String.format("%s: Command is NOT in MovementCommands pool.", getName()));
+      // open this comment back after testing.
+      getProcessModel().commandFailed(cmd);
+    }
+  }
+
+  @Override
   public synchronized boolean enqueueCommand(MovementCommand newCommand) {
     requireNonNull(newCommand, "newCommand cannot be empty");
 
@@ -266,19 +282,6 @@ public class ModbusTCPVehicleCommAdapter
     }
     return true;
   }
-  private void queueNewCommand(MovementCommand newCommand) {
-    allMovementCommands.add(newCommand);
-
-    LOG.info(
-        String.format(
-            "%s: Custom Adding command: , Current Movement Pool Size: %d", getName(),
-            allMovementCommands.size()
-        )
-    );
-
-    getUnsentCommands().add(newCommand);
-    getProcessModel().commandEnqueued(newCommand);
-  }
   private void checkTransportOrderAndLog(MovementCommand newCommand) {
     if (currentTransportOrder == null || !currentTransportOrder.equals(
         newCommand.getTransportOrder()
@@ -292,19 +295,18 @@ public class ModbusTCPVehicleCommAdapter
       allMovementCommands.clear();
     }
   }
+  private void queueNewCommand(MovementCommand newCommand) {
+    allMovementCommands.add(newCommand);
 
-  @Override
-  protected void sendSpecificCommand(MovementCommand cmd) {
-    if (!isVehicleConnected()) {
-      LOG.warning("Not connected to Modbus TCP server. Cannot send command.");
-      return;
-    }
+    LOG.info(
+        String.format(
+            "%s: Custom Adding command: , Current Movement Pool Size: %d", getName(),
+            allMovementCommands.size()
+        )
+    );
 
-    if (!allMovementCommands.contains(cmd)) {
-      LOG.warning(String.format("%s: Command is NOT in MovementCommands pool.", getName()));
-      // open this comment back after testing.
-      getProcessModel().commandFailed(cmd);
-    }
+    getUnsentCommands().add(newCommand);
+    getProcessModel().commandEnqueued(newCommand);
   }
 
   private void processAllMovementCommands() {
@@ -314,37 +316,43 @@ public class ModbusTCPVehicleCommAdapter
                 .getName()
         )
     );
-    List<ModbusCommand> modbusCommands = convertMovementCommandsToModbusCommands(
-        allMovementCommands
-    );
-    writeAllModbusCommands(modbusCommands);
+    convertMovementCommandsToModbusCommands(allMovementCommands);
+    // TODO: re-write this method
+//    writeAllModbusCommands(modbusCommands);
     allMovementCommands.clear();
     currentTransportOrder = null;
   }
 
-  private List<ModbusCommand> convertMovementCommandsToModbusCommands(
+  /**
+   * Converts a list of MovementCommand objects to a list of ModbusCommand objects.
+   *
+   * @param commands The list of MovementCommand objects to be converted.
+   * @return The list of ModbusCommand objects generated from the MovementCommand objects.
+   */
+  private void convertMovementCommandsToModbusCommands(
       List<MovementCommand> commands
   ) {
     stationCommandsMap.clear();
-    List<ModbusCommand> modbusCommands = new ArrayList<>();
+    positionModbusCommand.clear();
+    cmdModbusCommand.clear();
     processMovementCommands(commands);
+    int positionBaseAddress = 1000;
+    int cmdBaseAddress = 1200;
 
     // Convert stationCommandsMap to ModbusCommand list
     for (Map.Entry<Long, Pair<CMD1, CMD2>> entry : stationCommandsMap.entrySet()) {
       long stationPosition = entry.getKey();
       Pair<CMD1, CMD2> cmds = entry.getValue();
+      int lowWord = (int) (stationPosition % 10000);
+      int highWord = (int) (stationPosition / 10000);
+      positionModbusCommand.add(new ModbusCommand("POSITION", lowWord, positionBaseAddress));
+      positionModbusCommand.add(new ModbusCommand("POSITION", highWord, positionBaseAddress + 1));
+      cmdModbusCommand.add(new ModbusCommand("CMD1", cmds.getFirst().toInt(), cmdBaseAddress));
+      cmdModbusCommand.add(new ModbusCommand("CMD2", cmds.getSecond().toInt(), cmdBaseAddress + 1));
 
-      // Assuming station names are in the format "MKxx" where xx is the station number
-      int baseAddress = 1000 + (2 * (int) stationPosition) - 2;
-
-
-      // Create ModbusCommand for CMD1
-      modbusCommands.add(new ModbusCommand("CMD1", cmds.getFirst().toInt(), baseAddress));
-
-      // Create ModbusCommand for CMD2
-      modbusCommands.add(new ModbusCommand("CMD2", cmds.getSecond().toInt(), baseAddress + 1));
+      positionBaseAddress += 2;
+      cmdBaseAddress += 2;
     }
-    return modbusCommands;
   }
 
   private void processMovementCommands(List<MovementCommand> commands) {
@@ -401,8 +409,7 @@ public class ModbusTCPVehicleCommAdapter
 
   private CMD2 createCMD2(MovementCommand cmd) {
     String switchOperation = "";
-    int horizontalCommand = 0;
-    int guideTimeoutCommand = 0;
+    int liftHeight = 0;
     int motionCommand = 0;
     List<PeripheralOperation> peripheralOperations = null;
 
@@ -417,7 +424,7 @@ public class ModbusTCPVehicleCommAdapter
       case "switchRight" -> 2;
       default -> 0;
     };
-    return new CMD2(horizontalCommand, guideTimeoutCommand, motionCommand);
+    return new CMD2(liftHeight, motionCommand);
   }
 
   private double getMaxAllowedSpeed(Path path) {
@@ -434,51 +441,51 @@ public class ModbusTCPVehicleCommAdapter
     };
   }
 
-  private void writeAllModbusCommands(List<ModbusCommand> commands) {
-    int startAddress = 1000;
-    int quantity = commands.size();
+//  private void writeAllModbusCommands(List<ModbusCommand> commands) {
+//    int startAddress = 1000;
+//    int quantity = commands.size();
+//
+//    ByteBuf values = Unpooled.buffer(quantity * 2);
+//
+//    for (ModbusCommand command : commands) {
+//      values.writeShort(command.value());
+//    }
+//
+//    WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(
+//        startAddress,
+//        quantity,
+//        values
+//    );
+//
+//    sendModbusRequest(request)
+//        .thenAccept(response -> {
+//          LOG.info("All commands written successfully");
+//          values.release();
+//        })
+//        .exceptionally(ex -> {
+//          LOG.severe("Failed to write commands: " + ex.getMessage());
+//          values.release();
+//          return null;
+//        });
+//  }
 
-    ByteBuf values = Unpooled.buffer(quantity * 2);
-
-    for (ModbusCommand command : commands) {
-      values.writeShort(command.value());
-    }
-
-    WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(
-        startAddress,
-        quantity,
-        values
-    );
-
-    sendModbusRequest(request)
-        .thenAccept(response -> {
-          LOG.info("All commands written successfully");
-          values.release();
-        })
-        .exceptionally(ex -> {
-          LOG.severe("Failed to write commands: " + ex.getMessage());
-          values.release();
-          return null;
-        });
-  }
-
-  private void sendModbusCommand(String command, int value) {
-    ModbusRegister register = REGISTER_MAP.get(command);
-    if (register == null || register.function() != ModbusFunction.WRITE_MULTIPLE_REGISTERS) {
-      LOG.warning("Invalid command or function: " + command);
-      return;
-    }
-
-    ByteBuf buffer = Unpooled.buffer(2);
-    buffer.writeShort(value);
-
-    sendModbusRequest(new WriteMultipleRegistersRequest(register.address(), 1, buffer))
-        .thenAccept(response -> LOG.info(command + " set successfully"))
-        .exceptionally(throwable -> {
-          LOG.log(Level.SEVERE, "Failed to set " + command, throwable);
-          return null;
-        });
-  }
+//  private void sendModbusCommand(String command, int value) {
+//    ModbusRegister register = REGISTER_MAP.get(command);
+//    if (register == null || register.function() != ModbusFunction.WRITE_MULTIPLE_REGISTERS) {
+//      LOG.warning("Invalid command or function: " + command);
+//      return;
+//    }
+//
+//    ByteBuf buffer = Unpooled.buffer(2);
+//    buffer.writeShort(value);
+//
+//    sendModbusRequest(new WriteMultipleRegistersRequest(register.address(), 1, buffer))
+//        .thenAccept(response -> LOG.info(command + " set successfully"))
+//        .exceptionally(throwable -> {
+//          LOG.log(Level.SEVERE, "Failed to set " + command, throwable);
+//          return null;
+//        });
+//  }
 
   @Override
   protected boolean performConnection() {
