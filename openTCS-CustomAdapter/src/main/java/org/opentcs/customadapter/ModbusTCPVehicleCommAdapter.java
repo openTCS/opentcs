@@ -13,7 +13,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -67,14 +66,14 @@ public class ModbusTCPVehicleCommAdapter
   /**
    * MAP1: absolute distance (mm) -> station name.
    */
-  private final Map<Integer, String> distanceToStation = new HashMap<>();
+//  private final Map<Integer, String> distanceToStation = new HashMap<>();
   private final Map<String, Integer> stationToDistance = new HashMap<>();
   /**
    * MAP2: station name -> <CMD1, CMD2>.
    */
-  private Map<String, Pair<CMD1, CMD2>> stationCommandsMap = new ConcurrentHashMap<>();
+  private final Map<Long, Pair<CMD1, CMD2>> stationCommandsMap = new ConcurrentHashMap<>();
   private TransportOrder currentTransportOrder;
-  private List<MovementCommand> allMovementCommands = new ArrayList<>();
+  private final List<MovementCommand> allMovementCommands = new ArrayList<>();
   /**
    * Represents a vehicle associated with a ModbusTCPVehicleCommAdapter.
    */
@@ -83,10 +82,6 @@ public class ModbusTCPVehicleCommAdapter
    * The vehicle's load state.
    */
   private LoadState loadState = LoadState.EMPTY;
-  /**
-   * Map that stores pairs of CMD1 and CMD2 objects associated with station names.
-   */
-  private final Map<String, Pair<CMD1, CMD2>> stationToCommands = new HashMap<>();
   /**
    * The host address for the TCP connection.
    */
@@ -99,14 +94,6 @@ public class ModbusTCPVehicleCommAdapter
    * Indicates whether the vehicle is currently connected.
    */
   private boolean isConnected;
-  /**
-   * The maximum velocity for the vehicle.
-   */
-  private int maxVelocity;
-  /**
-   * The current velocity of the vehicle.
-   */
-  private int currentVelocity;
   /**
    * Represents a Modbus TCP master used for communication with Modbus TCP devices.
    */
@@ -144,16 +131,7 @@ public class ModbusTCPVehicleCommAdapter
     this.port = port;
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.isConnected = false;
-    this.currentVelocity = 0;
     this.currentTransportOrder = null;
-
-    // Initialize VelocityController with default values unit: meter
-    // TODO: avoid magic number here.
-    double maxAcceleration = 1.6;
-    double maxDeceleration = -1.6;
-    double maxFwdVelocity = 2.4;
-    double maxRevVelocity = -2.4;
-
   }
 
   @Override
@@ -165,7 +143,7 @@ public class ModbusTCPVehicleCommAdapter
     initializeDistanceToStationMap();
     getProcessModel().setState(Vehicle.State.IDLE);
     getProcessModel().setLoadHandlingDevices(
-        Arrays.asList(new LoadHandlingDevice(LHD_NAME, false))
+        List.of(new LoadHandlingDevice(LHD_NAME, false))
     );
     initialized = true;
   }
@@ -191,6 +169,7 @@ public class ModbusTCPVehicleCommAdapter
    *
    * @param evt The property change event published by the model.
    */
+  @SuppressWarnings("checkstyle:TodoComment")
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
     super.propertyChange(evt);
@@ -203,7 +182,7 @@ public class ModbusTCPVehicleCommAdapter
         VehicleProcessModel.Attribute.LOAD_HANDLING_DEVICES.name()
     )) {
       if (!getProcessModel().getLoadHandlingDevices().isEmpty()
-          && getProcessModel().getLoadHandlingDevices().get(0).isFull()) {
+          && getProcessModel().getLoadHandlingDevices().getFirst().isFull()) {
         loadState = LoadState.FULL;
         // TODO: need change vehicle model size in future.
 //        getProcessModel().setLength(configuration.vehicleLengthLoaded());
@@ -222,13 +201,10 @@ public class ModbusTCPVehicleCommAdapter
    */
   // TODO: rename, can change the map definination using DI.
   private void initializeDistanceToStationMap() {
-//    for (int i = 1000; i <= 100000; i += 1000) {
-//      distanceToStation.put(i, "MK" + (i / 1000));
-//    }
     for (int i = 1000; i <= 100000; i += 1000) {
       stationToDistance.put("MK" + (i / 1000), i);
     }
-    LOG.info(String.format("Size of map: {}", stationToDistance.size()));
+    LOG.info(String.format("Size of map: %d", stationToDistance.size()));
   }
 
   /**
@@ -275,35 +251,46 @@ public class ModbusTCPVehicleCommAdapter
 
   @Override
   public synchronized boolean enqueueCommand(MovementCommand newCommand) {
-    requireNonNull(newCommand, "newCommand");
+    requireNonNull(newCommand, "newCommand cannot be empty");
 
     if (!canAcceptNextCommand()) {
       return false;
     }
 
-    if (currentTransportOrder == null || !currentTransportOrder.equals(
-        newCommand.getTransportOrder()
-    )) {
-      currentTransportOrder = newCommand.getTransportOrder();
-      allMovementCommands.clear();
-    }
-
-    allMovementCommands.add(newCommand);
-    LOG.info(
-        String.format(
-            "{}: Custom Adding command: {}, Current Movement Pool Size: {}", getName(), newCommand,
-            allMovementCommands.size()
-        )
-    );
-
-    getUnsentCommands().add(newCommand);
-    getProcessModel().commandEnqueued(newCommand);
+    checkTransportOrderAndLog(newCommand);
+    queueNewCommand(newCommand);
 
     if (newCommand.isFinalMovement()) {
       processAllMovementCommands();
       allMovementCommands.clear();
     }
     return true;
+  }
+  private void queueNewCommand(MovementCommand newCommand) {
+    allMovementCommands.add(newCommand);
+
+    LOG.info(
+        String.format(
+            "%s: Custom Adding command: , Current Movement Pool Size: %d", getName(),
+            allMovementCommands.size()
+        )
+    );
+
+    getUnsentCommands().add(newCommand);
+    getProcessModel().commandEnqueued(newCommand);
+  }
+  private void checkTransportOrderAndLog(MovementCommand newCommand) {
+    if (currentTransportOrder == null || !currentTransportOrder.equals(
+        newCommand.getTransportOrder()
+    )) {
+      LOG.info(
+          String.format(
+              "New Transport order (%s) has received.", newCommand.getTransportOrder().getName()
+          )
+      );
+      currentTransportOrder = newCommand.getTransportOrder();
+      allMovementCommands.clear();
+    }
   }
 
   @Override
@@ -314,9 +301,9 @@ public class ModbusTCPVehicleCommAdapter
     }
 
     if (!allMovementCommands.contains(cmd)) {
-      LOG.warning(String.format("{}: Command {} is NOT in MovementCommands pool.", getName(), cmd));
-      // TODO: open this comment back after testing.
-      // getProcessModel().commandFailed(cmd);
+      LOG.warning(String.format("%s: Command is NOT in MovementCommands pool.", getName()));
+      // open this comment back after testing.
+      getProcessModel().commandFailed(cmd);
     }
   }
 
@@ -335,24 +322,21 @@ public class ModbusTCPVehicleCommAdapter
     currentTransportOrder = null;
   }
 
-  // TODO: Important part of command converting.
   private List<ModbusCommand> convertMovementCommandsToModbusCommands(
       List<MovementCommand> commands
   ) {
     stationCommandsMap.clear();
-    String station = "";
-    String startPoint = "";
     List<ModbusCommand> modbusCommands = new ArrayList<>();
     processMovementCommands(commands);
 
     // Convert stationCommandsMap to ModbusCommand list
-    for (Map.Entry<String, Pair<CMD1, CMD2>> entry : stationCommandsMap.entrySet()) {
-      String stationName = entry.getKey();
+    for (Map.Entry<Long, Pair<CMD1, CMD2>> entry : stationCommandsMap.entrySet()) {
+      long stationPosition = entry.getKey();
       Pair<CMD1, CMD2> cmds = entry.getValue();
 
       // Assuming station names are in the format "MKxx" where xx is the station number
-      int stationNumber = Integer.parseInt(stationName.substring(2));
-      int baseAddress = 1000 + (2 * stationNumber) - 2;
+      int baseAddress = 1000 + (2 * (int) stationPosition) - 2;
+
 
       // Create ModbusCommand for CMD1
       modbusCommands.add(new ModbusCommand("CMD1", cmds.getFirst().toInt(), baseAddress));
@@ -365,6 +349,7 @@ public class ModbusTCPVehicleCommAdapter
 
   private void processMovementCommands(List<MovementCommand> commands) {
     String startPoint;
+    long startPosition;
     for (MovementCommand cmd : commands) {
       // If step doesn't have source point,
       // that means vehicle is start from the destination, no need to move.
@@ -379,10 +364,11 @@ public class ModbusTCPVehicleCommAdapter
               cmd.getStep().getSourcePoint().getName()
           )
       );
-      // TODO: make sure all points follow the TOYO naming style.
       startPoint = cmd.getStep().getSourcePoint().getName();
+      startPosition = cmd.getStep().getSourcePoint().getPose().getPosition().getX();
+
       Pair<CMD1, CMD2> pairCommands = new Pair<>(createCMD1(cmd), createCMD2(cmd));
-      stationCommandsMap.put(startPoint, pairCommands);
+      stationCommandsMap.put(startPosition, pairCommands);
     }
   }
 
@@ -414,7 +400,6 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private CMD2 createCMD2(MovementCommand cmd) {
-    // TODO: horizontalCommand & guideTimeoutCommand
     String switchOperation = "";
     int horizontalCommand = 0;
     int guideTimeoutCommand = 0;
@@ -428,7 +413,6 @@ public class ModbusTCPVehicleCommAdapter
       switchOperation = peripheralOperations.getFirst().getOperation();
     }
     motionCommand = switch (switchOperation) {
-      case "switchMiddle" -> 0;
       case "switchLeft" -> 1;
       case "switchRight" -> 2;
       default -> 0;
@@ -437,10 +421,9 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private double getMaxAllowedSpeed(Path path) {
-    double maxFwdVelocity = getProcessModel().getMaxFwdVelocity();
-    double maxRevVelocity = path.getMaxReverseVelocity();
-
-    return Math.min(maxFwdVelocity, maxRevVelocity);
+    double processModelMaxFwdVelocity = getProcessModel().getMaxFwdVelocity();
+    double maxPathVelocity = path.getMaxVelocity();
+    return Math.min(processModelMaxFwdVelocity, maxPathVelocity);
   }
 
   private static int getLiftCommand(String command) {
