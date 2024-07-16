@@ -50,4 +50,18 @@ public record CMD1(int liftCmd, int speed, int obstacleSensor, int direction) {
         value & 0xF
     );
   }
+
+  /**
+   * Returns a string representation of the CMD1 object in hexadecimal format.
+   *
+   * @return A string representation of the CMD1 object in hexadecimal format.
+   */
+  @Override
+  public String toString() {
+    String hexLiftCmd = Integer.toHexString(liftCmd).toUpperCase();
+    String hexSpeed = Integer.toHexString(speed).toUpperCase();
+    String hexObstacleSensor = Integer.toHexString(obstacleSensor).toUpperCase();
+    String hexDirection = Integer.toHexString(direction).toUpperCase();
+    return hexLiftCmd + hexSpeed + hexObstacleSensor + hexDirection;
+  }
 }

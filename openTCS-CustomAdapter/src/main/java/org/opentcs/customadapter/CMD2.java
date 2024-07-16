@@ -1,18 +1,17 @@
 package org.opentcs.customadapter;
 
-public record CMD2(int horizontal, int guideTimeout, int motion) {
+import static java.lang.Integer.toHexString;
+
+public record CMD2(int liftHeight, int motion) {
   /**
-   * Represents a CMD2 object that encapsulates horizontal, guideTimeout, and motion values.
+   * Represents a CMD2 object that encapsulates lift height and motion values.
    * The values must be within valid ranges, otherwise, an IllegalArgumentException is thrown.
    */
   public CMD2 {
-    if (horizontal < 0 || horizontal > 255) {
-      throw new IllegalArgumentException("Invalid horizontal");
+    if (liftHeight < 0 || liftHeight > 4095) {  // 4095 is 0xFFF in hexadecimal
+      throw new IllegalArgumentException("Invalid lift height");
     }
-    if (guideTimeout < 0 || guideTimeout > 5) {
-      throw new IllegalArgumentException("Invalid guideTimeout");
-    }
-    if (motion < 0 || motion > 6) {
+    if (motion < 0 || motion > 3) {  // Based on the image, motion range is 0-3
       throw new IllegalArgumentException("Invalid motion");
     }
   }
@@ -23,7 +22,7 @@ public record CMD2(int horizontal, int guideTimeout, int motion) {
    * @return The integer value representing the CMD2 object.
    */
   public int toInt() {
-    return (horizontal << 8) | (guideTimeout << 4) | motion;
+    return (liftHeight << 4) | motion;
   }
 
   /**
@@ -34,9 +33,20 @@ public record CMD2(int horizontal, int guideTimeout, int motion) {
    */
   public static CMD2 fromInt(int value) {
     return new CMD2(
-        (value >> 8) & 0xFF,
-        (value >> 4) & 0xF,
+        (value >> 4) & 0xFFF,
         value & 0xF
     );
+  }
+
+  /**
+   * Returns a string representation of the CMD2 object in hexadecimal format.
+   *
+   * @return A string representation of the CMD2 object in hexadecimal format.
+   */
+  @Override
+  public String toString() {
+    String hexLiftHeight = Integer.toHexString(liftHeight).toUpperCase();
+    String hexMotion = Integer.toHexString(motion).toUpperCase();
+    return hexLiftHeight + hexMotion;
   }
 }
