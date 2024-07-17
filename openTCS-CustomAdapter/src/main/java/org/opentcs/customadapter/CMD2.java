@@ -1,4 +1,5 @@
 package org.opentcs.customadapter;
+
 public record CMD2(int liftHeight, int motion) {
   /**
    * Represents a CMD2 object that encapsulates lift height and motion values.
