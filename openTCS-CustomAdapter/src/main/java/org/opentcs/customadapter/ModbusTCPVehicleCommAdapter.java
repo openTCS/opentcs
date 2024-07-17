@@ -2,6 +2,7 @@ package org.opentcs.customadapter;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import com.digitalpetri.modbus.master.ModbusTcpMaster;
 import com.digitalpetri.modbus.master.ModbusTcpMasterConfig;
 import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
@@ -23,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -107,6 +109,7 @@ public class ModbusTCPVehicleCommAdapter
    * Represents the state of a variable indicating whether it has been initialized.
    */
   private boolean initialized;
+  private final AtomicBoolean heartBeatToggle = new AtomicBoolean(false);
 
   /**
    * Initializes a new instance of ModbusTCPVehicleCommAdapter.
@@ -151,6 +154,7 @@ public class ModbusTCPVehicleCommAdapter
         List.of(new LoadHandlingDevice(LHD_NAME, false))
     );
     initialized = true;
+    startHeartBeat();  // Start the heartbeat mechanism
   }
 
   @Override
@@ -165,6 +169,44 @@ public class ModbusTCPVehicleCommAdapter
     }
     super.terminate();
     initialized = false;
+    stopHeartBeat();  // Stop the heartbeat mechanism
+  }
+
+  /**
+   * Starts a periodic heartbeat signal to the vehicle.
+   * The heartbeat signal is written to a specific register with a toggle value.
+   * This method schedules a task to run at a fixed rate, which executes the following steps:
+   * 1. Checks if the vehicle is connected.
+   * 2. Generates a heartbeat value based on the current toggle state.
+   * 3. Writes the heartbeat value to the specified register using the writeSingleRegister method.
+   * 4. Toggles the heartbeat state.
+   * 5. Handles exceptions and logs error messages.
+   * The task is scheduled to run every 500 milliseconds.
+   */
+  public void startHeartBeat() {
+    getExecutor().scheduleAtFixedRate(() -> {
+      if (isVehicleConnected()) {
+        int heartBeatValue = heartBeatToggle.get() ? 1 : 0;
+        writeSingleRegister(100, heartBeatValue)
+            .thenAccept(v -> heartBeatToggle.set(!heartBeatToggle.get()))
+            .exceptionally(ex -> {
+              LOG.severe("Failed to write heart beat: " + ex.getMessage());
+              return null;
+            });
+      }
+    }, 0, 500, TimeUnit.MILLISECONDS);
+  }
+
+  /**
+   * Stops the heartbeat of the vehicle.
+   *
+   * <p>
+   * This method shuts down the executor used for running scheduled tasks, effectively stopping
+   * the heartbeat.
+   * </p>
+   */
+  public void stopHeartBeat() {
+    getExecutor().shutdownNow();
   }
 
   /**
