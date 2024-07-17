@@ -37,6 +37,7 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.ExplainedBoolean;
 
+
 public class ModbusTCPVehicleCommAdapter
     extends
       CustomVehicleCommAdapter {
@@ -282,6 +283,7 @@ public class ModbusTCPVehicleCommAdapter
     }
     return true;
   }
+
   private void checkTransportOrderAndLog(MovementCommand newCommand) {
     if (currentTransportOrder == null || !currentTransportOrder.equals(
         newCommand.getTransportOrder()
@@ -295,6 +297,7 @@ public class ModbusTCPVehicleCommAdapter
       allMovementCommands.clear();
     }
   }
+
   private void queueNewCommand(MovementCommand newCommand) {
     allMovementCommands.add(newCommand);
 
@@ -327,7 +330,6 @@ public class ModbusTCPVehicleCommAdapter
    * Converts a list of MovementCommand objects to a list of ModbusCommand objects.
    *
    * @param commands The list of MovementCommand objects to be converted.
-   * @return The list of ModbusCommand objects generated from the MovementCommand objects.
    */
   private void convertMovementCommandsToModbusCommands(
       List<MovementCommand> commands
@@ -343,18 +345,35 @@ public class ModbusTCPVehicleCommAdapter
     for (Map.Entry<Long, Pair<CMD1, CMD2>> entry : stationCommandsMap.entrySet()) {
       long stationPosition = entry.getKey();
       Pair<CMD1, CMD2> cmds = entry.getValue();
-      int lowWord = (int) (stationPosition % 10000);
-      int highWord = (int) (stationPosition / 10000);
-      positionModbusCommand.add(new ModbusCommand("POSITION", lowWord, positionBaseAddress));
-      positionModbusCommand.add(new ModbusCommand("POSITION", highWord, positionBaseAddress + 1));
-      cmdModbusCommand.add(new ModbusCommand("CMD1", cmds.getFirst().toInt(), cmdBaseAddress));
-      cmdModbusCommand.add(new ModbusCommand("CMD2", cmds.getSecond().toInt(), cmdBaseAddress + 1));
+      positionModbusCommand.add(
+          new ModbusCommand(
+              "POSITION", (int) stationPosition, positionBaseAddress,
+              ModbusCommand.DataFormat.DECIMAL
+          )
+      );
+      cmdModbusCommand.add(
+          new ModbusCommand(
+              "CMD1", cmds.getFirst().toShort(), cmdBaseAddress,
+              ModbusCommand.DataFormat.HEXADECIMAL
+          )
+      );
+      cmdModbusCommand.add(
+          new ModbusCommand(
+              "CMD2", cmds.getSecond().toShort(), (cmdBaseAddress + 1),
+              ModbusCommand.DataFormat.HEXADECIMAL
+          )
+      );
 
       positionBaseAddress += 2;
       cmdBaseAddress += 2;
     }
   }
 
+  /**
+   * Processes the given list of movement commands.
+   *
+   * @param commands The list of movement commands to be processed.
+   */
   private void processMovementCommands(List<MovementCommand> commands) {
     String startPoint;
     long startPosition;
@@ -441,51 +460,51 @@ public class ModbusTCPVehicleCommAdapter
     };
   }
 
-//  private void writeAllModbusCommands(List<ModbusCommand> commands) {
-//    int startAddress = 1000;
-//    int quantity = commands.size();
-//
-//    ByteBuf values = Unpooled.buffer(quantity * 2);
-//
-//    for (ModbusCommand command : commands) {
-//      values.writeShort(command.value());
-//    }
-//
-//    WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(
-//        startAddress,
-//        quantity,
-//        values
-//    );
-//
-//    sendModbusRequest(request)
-//        .thenAccept(response -> {
-//          LOG.info("All commands written successfully");
-//          values.release();
-//        })
-//        .exceptionally(ex -> {
-//          LOG.severe("Failed to write commands: " + ex.getMessage());
-//          values.release();
-//          return null;
-//        });
-//  }
+  private void writeAllModbusCommands(List<ModbusCommand> commands) {
+    int startAddress = 1000;
+    int quantity = commands.size();
 
-//  private void sendModbusCommand(String command, int value) {
-//    ModbusRegister register = REGISTER_MAP.get(command);
-//    if (register == null || register.function() != ModbusFunction.WRITE_MULTIPLE_REGISTERS) {
-//      LOG.warning("Invalid command or function: " + command);
-//      return;
-//    }
-//
-//    ByteBuf buffer = Unpooled.buffer(2);
-//    buffer.writeShort(value);
-//
-//    sendModbusRequest(new WriteMultipleRegistersRequest(register.address(), 1, buffer))
-//        .thenAccept(response -> LOG.info(command + " set successfully"))
-//        .exceptionally(throwable -> {
-//          LOG.log(Level.SEVERE, "Failed to set " + command, throwable);
-//          return null;
-//        });
-//  }
+    ByteBuf values = Unpooled.buffer(quantity * 2);
+
+    for (ModbusCommand command : commands) {
+      values.writeShort(command.value());
+    }
+
+    WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(
+        startAddress,
+        quantity,
+        values
+    );
+
+    sendModbusRequest(request)
+        .thenAccept(response -> {
+          LOG.info("All commands written successfully");
+          values.release();
+        })
+        .exceptionally(ex -> {
+          LOG.severe("Failed to write commands: " + ex.getMessage());
+          values.release();
+          return null;
+        });
+  }
+
+  private void sendModbusCommand(String command, int value) {
+    ModbusRegister register = REGISTER_MAP.get(command);
+    if (register == null || register.function() != ModbusFunction.WRITE_MULTIPLE_REGISTERS) {
+      LOG.warning("Invalid command or function: " + command);
+      return;
+    }
+
+    ByteBuf buffer = Unpooled.buffer(2);
+    buffer.writeShort(value);
+
+    sendModbusRequest(new WriteMultipleRegistersRequest(register.address(), 1, buffer))
+        .thenAccept(response -> LOG.info(command + " set successfully"))
+        .exceptionally(throwable -> {
+          LOG.log(Level.SEVERE, "Failed to set " + command, throwable);
+          return null;
+        });
+  }
 
   @Override
   protected boolean performConnection() {
@@ -712,15 +731,35 @@ public class ModbusTCPVehicleCommAdapter
   private record ModbusRegister(int address, ModbusFunction function) {
   }
 
-  private record ModbusCommand(String name, int value, int address) {
+  private record ModbusCommand(String name, int value, int address, DataFormat format) {
+    public enum DataFormat {
+      DECIMAL,
+      HEXADECIMAL
+    }
+
     public ModbusCommand {
       if (value < 0) {
         throw new IllegalArgumentException("Value cannot be negative");
       }
     }
 
+    /**
+     * Returns the string representation of the value based on its format.
+     *
+     * @return A string representation of the value.
+     */
+    public String getFormattedValue() {
+      return switch (format) {
+        case DECIMAL -> String.valueOf(value);
+        case HEXADECIMAL -> String.format("%04X", value);
+      };
+    }
+
     public String toLogString() {
-      return String.format("ModbusCommand{name='%s', value=%d, address=%d}", name, value, address);
+      return String.format(
+          "ModbusCommand{name='%s', value=%s, address=%d, format=%s}",
+          name, getFormattedValue(), address, format
+      );
     }
   }
 
