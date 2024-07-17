@@ -2,11 +2,12 @@ package org.opentcs.customadapter;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import com.digitalpetri.modbus.master.ModbusTcpMaster;
 import com.digitalpetri.modbus.master.ModbusTcpMasterConfig;
+import com.digitalpetri.modbus.requests.ReadHoldingRegistersRequest;
 import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
 import com.digitalpetri.modbus.responses.ModbusResponse;
+import com.digitalpetri.modbus.responses.ReadHoldingRegistersResponse;
 import com.google.inject.assistedinject.Assisted;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -21,10 +22,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -32,7 +36,6 @@ import org.jgrapht.alg.util.Pair;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
@@ -110,6 +113,7 @@ public class ModbusTCPVehicleCommAdapter
    */
   private boolean initialized;
   private final AtomicBoolean heartBeatToggle = new AtomicBoolean(false);
+  private ScheduledFuture<?> heartBeatFuture;
 
   /**
    * Initializes a new instance of ModbusTCPVehicleCommAdapter.
@@ -154,7 +158,7 @@ public class ModbusTCPVehicleCommAdapter
         List.of(new LoadHandlingDevice(LHD_NAME, false))
     );
     initialized = true;
-    startHeartBeat();  // Start the heartbeat mechanism
+    startHeartbeat();  // Start the heartbeat mechanism
   }
 
   @Override
@@ -172,43 +176,31 @@ public class ModbusTCPVehicleCommAdapter
     stopHeartBeat();  // Stop the heartbeat mechanism
   }
 
-  /**
-   * Starts a periodic heartbeat signal to the vehicle.
-   * The heartbeat signal is written to a specific register with a toggle value.
-   * This method schedules a task to run at a fixed rate, which executes the following steps:
-   * 1. Checks if the vehicle is connected.
-   * 2. Generates a heartbeat value based on the current toggle state.
-   * 3. Writes the heartbeat value to the specified register using the writeSingleRegister method.
-   * 4. Toggles the heartbeat state.
-   * 5. Handles exceptions and logs error messages.
-   * The task is scheduled to run every 500 milliseconds.
-   */
-  public void startHeartBeat() {
+  private void startHeartbeat() {
     getExecutor().scheduleAtFixedRate(() -> {
-      if (isVehicleConnected()) {
-        int heartBeatValue = heartBeatToggle.get() ? 1 : 0;
-        writeSingleRegister(100, heartBeatValue)
-            .thenAccept(v -> heartBeatToggle.set(!heartBeatToggle.get()))
-            .exceptionally(ex -> {
-              LOG.severe("Failed to write heart beat: " + ex.getMessage());
-              return null;
-            });
-      }
+      boolean currentValue = heartBeatToggle.getAndSet(!heartBeatToggle.get());
+      writeSingleRegister(100, currentValue ? 1 : 0)
+          .thenCompose(v -> readSingleRegister(100))
+          .thenAccept(value -> {
+            if (value != (currentValue ? 1 : 0)) {
+              LOG.warning("Heartbeat value mismatch! Retrying...");
+              writeSingleRegister(100, currentValue ? 1 : 0);
+            }
+          })
+          .exceptionally(ex -> {
+            LOG.severe("Failed to write heartbeat: " + ex.getMessage());
+            return null;
+          });
     }, 0, 500, TimeUnit.MILLISECONDS);
   }
 
-  /**
-   * Stops the heartbeat of the vehicle.
-   *
-   * <p>
-   * This method shuts down the executor used for running scheduled tasks, effectively stopping
-   * the heartbeat.
-   * </p>
-   */
-  public void stopHeartBeat() {
-    getExecutor().shutdownNow();
-  }
 
+
+  private void stopHeartBeat() {
+    if (heartBeatFuture != null && !heartBeatFuture.isCancelled()) {
+      heartBeatFuture.cancel(true);
+    }
+  }
   /**
    * Processes updates of the {@link CustomProcessModel}.
    *
@@ -501,33 +493,36 @@ public class ModbusTCPVehicleCommAdapter
     };
   }
 
-  private void writeAllModbusCommands() {
-    writeSingleRegister(108, 0)
+  private CompletableFuture<Void> writeAllModbusCommands() {
+    return writeSingleRegister(108, 0)
         .thenCompose(v -> {
-          CompletableFuture<Void> positionFuture = CompletableFuture.completedFuture(null);
           if (!positionModbusCommand.isEmpty()) {
             try {
-              positionFuture = writeModbusCommands(positionModbusCommand, "Position");
+              return writeModbusCommands(positionModbusCommand, "Position");
             }
             catch (ExecutionException | InterruptedException e) {
               throw new RuntimeException(e);
             }
           }
-          return positionFuture;
+          else {
+            return CompletableFuture.completedFuture(null);
+          }
         })
         .thenCompose(v -> {
-          CompletableFuture<Void> cmdFuture = CompletableFuture.completedFuture(null);
           if (!cmdModbusCommand.isEmpty()) {
             try {
-              cmdFuture = writeModbusCommands(cmdModbusCommand, "CMD");
+              return writeModbusCommands(cmdModbusCommand, "CMD");
             }
             catch (ExecutionException | InterruptedException e) {
               throw new RuntimeException(e);
             }
           }
-          return cmdFuture;
+          else {
+            return CompletableFuture.completedFuture(null);
+          }
         })
         .thenCompose(v -> writeSingleRegister(108, 1))
+        .thenCompose(v -> readAndVerifyCommands())
         .exceptionally(ex -> {
           LOG.severe("Error in writeAllModbusCommands: " + ex.getMessage());
           return null;
@@ -541,17 +536,92 @@ public class ModbusTCPVehicleCommAdapter
 
     return sendModbusRequest(request)
         .thenAccept(response -> {
-          LOG.info(
-              "Successfully wrote register at address " + address + " with value " + value
-          );
-          buffer.release();
+          LOG.info("Successfully wrote register at address " + address + " with value " + value);
+        })
+        .exceptionally(ex -> {
+          LOG.severe("Failed to write register at address " + address + ": " + ex.getMessage());
+          return null;
+        })
+        .whenComplete((v, ex) -> buffer.release());
+  }
+
+  private CompletableFuture<Integer> readSingleRegister(int address) {
+    ReadHoldingRegistersRequest request = new ReadHoldingRegistersRequest(address, 1);
+    return sendModbusRequest(request)
+        .thenApply(response -> {
+          if (response instanceof ReadHoldingRegistersResponse) {
+            ReadHoldingRegistersResponse readResponse = (ReadHoldingRegistersResponse) response;
+            ByteBuf responseBuffer = readResponse.getRegisters();
+            return responseBuffer.readUnsignedShort();
+          }
+          throw new RuntimeException("Invalid response type");
+        });
+  }
+
+  private CompletableFuture<Void> readAndVerifyCommands() {
+    List<CompletableFuture<Boolean>> readFutures = cmdModbusCommand.stream()
+        .map(this::readAndCompareCommand)
+        .toList();
+
+    return CompletableFuture.allOf(readFutures.toArray(new CompletableFuture[0]))
+        .thenRun(() -> {
+          boolean allVerified = readFutures.stream().allMatch(future -> {
+            try {
+              return future.get();
+            }
+            catch (InterruptedException | ExecutionException e) {
+              LOG.severe("Error while verifying command: " + e.getMessage());
+              return false;
+            }
+          });
+          if (!allVerified) {
+            throw new CompletionException(new RuntimeException("Verification failed, retrying..."));
+          }
+        })
+        .exceptionally(ex -> {
+          LOG.warning("Verification failed, retrying: " + ex.getMessage());
+          return writeAllModbusCommands().thenRun(() -> {}).join();
+        });
+  }
+
+  private CompletableFuture<Boolean> readAndCompareCommand(ModbusCommand command) {
+    ReadHoldingRegistersRequest request = new ReadHoldingRegistersRequest(command.address(), 1);
+    return sendModbusRequest(request)
+        .thenApply(response -> {
+          if (response instanceof ReadHoldingRegistersResponse readResponse) {
+            ByteBuf registers = readResponse.getRegisters();
+            try {
+              if (registers.readableBytes() >= 2) {
+                int value = registers.readUnsignedShort();
+                boolean matches = value == command.value();
+                LOG.info(
+                    String.format(
+                        "Read and verified command at address %d: expected %d, got %d",
+                        command.address(), command.value(), value
+                    )
+                );
+                return matches;
+              }
+              else {
+                LOG.warning("Insufficient data returned for address " + command.address());
+                return false;
+              }
+            }
+            finally {
+              registers.release(); // 重要：釋放 ByteBuf
+            }
+          }
+          else {
+            LOG.warning("Unexpected response type for address " + command.address());
+            return false;
+          }
         })
         .exceptionally(ex -> {
           LOG.severe(
-              "Failed to write register at address " + address + ": " + ex.getMessage()
+              "Failed to read and compare command at address " + command.address() + ": " + ex
+                  .getMessage()
           );
-          buffer.release();
-          return null;
+          return false;
         });
   }
 
@@ -582,7 +652,7 @@ public class ModbusTCPVehicleCommAdapter
       int commandWordSize = getCommandWordSize(command);
       // If the word size of the current batch plus the new command exceeds the limit,
       // write the current batch and start a new batch
-      if (batchWordSize + commandWordSize >= 120) {
+      if (batchWordSize + commandWordSize >= maxBatchSize) {
         // Write the current batch into the chain call
         int finalStartAddress = startAddress;
         List<ModbusCommand> finalBatch = new ArrayList<>(batch);
@@ -638,12 +708,10 @@ public class ModbusTCPVehicleCommAdapter
       );
 
       return sendModbusRequest(request)
-          .thenAccept(response -> {
-            LOG.info(
-                "Successfully wrote " + batch.size() + " " + commandType
-                    + " registers starting at address " + startAddress
-            );
-          })
+          .thenAccept(response -> LOG.info(
+              "Successfully wrote " + batch.size() + " " + commandType
+                  + " registers starting at address " + startAddress
+          ))
           .exceptionally(ex -> {
             LOG.severe("Failed to write " + commandType + " registers: " + ex.getMessage());
             return null;
@@ -653,46 +721,6 @@ public class ModbusTCPVehicleCommAdapter
       values.release();
     }
   }
-
-//  private CompletableFuture<Void> writeBatch(
-//      List<ModbusCommand> batch, int startAddress,
-//      String commandType
-//  ) {
-//    ByteBuf values = Unpooled.buffer();
-//
-//    for (ModbusCommand command : batch) {
-//      if (command.format() == ModbusCommand.DataFormat.DECIMAL) {
-//        values.writeIntLE(command.value());
-//      }
-//      else {
-//        values.writeShortLE(command.value());
-//      }
-//      LOG.info("Writing " + commandType + " command: " + command.toLogString());
-//    }
-//
-//    try {
-//      WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(
-//          startAddress,
-//          values.readableBytes() / 2,  // Convert bytes to word count
-//          values
-//      );
-//
-//      return sendModbusRequest(request)
-//          .thenAccept(response -> {
-//            LOG.info(
-//                "Successfully wrote " + batch.size() + " " + commandType
-//                    + " registers starting at address " + startAddress
-//            );
-//          })
-//          .exceptionally(ex -> {
-//            LOG.severe("Failed to write " + commandType + " registers: " + ex.getMessage());
-//            return null;
-//          });
-//    }
-//    finally {
-//      values.release();
-//    }
-//  }
 
   @Override
   protected boolean performConnection() {
@@ -787,7 +815,9 @@ public class ModbusTCPVehicleCommAdapter
 
   @Override
   @Nonnull
-  public synchronized ExplainedBoolean canProcess(TransportOrder order) {
+  public synchronized ExplainedBoolean canProcess(
+      @Nonnull
+      TransportOrder order) {
     requireNonNull(order, "order");
 
     return canProcess(
@@ -800,7 +830,7 @@ public class ModbusTCPVehicleCommAdapter
   private ExplainedBoolean canProcess(List<String> operations) {
     requireNonNull(operations, "operations");
 
-    LOG.info(String.format("{}: Checking processability of {}...", getName(), operations));
+    LOG.info(String.format("%s: Checking process ability of %s...", getName(), operations));
     boolean canProcess = true;
     String reason = "";
 
@@ -868,12 +898,6 @@ public class ModbusTCPVehicleCommAdapter
         .setMaxDeceleration(getProcessModel().getMaxDecceleration())
         .setMaxFwdVelocity(getProcessModel().getMaxFwdVelocity())
         .setMaxRevVelocity(getProcessModel().getMaxRevVelocity());
-  }
-
-  private double maxVelocity(Route.Step step) {
-    return (step.getVehicleOrientation() == Vehicle.Orientation.BACKWARD)
-        ? (double) step.getPath().getMaxReverseVelocity()
-        : (double) step.getPath().getMaxVelocity();
   }
 
   static {
