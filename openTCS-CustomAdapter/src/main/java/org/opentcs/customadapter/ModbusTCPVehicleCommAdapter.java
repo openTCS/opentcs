@@ -177,7 +177,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private void startHeartbeat() {
-    getExecutor().scheduleAtFixedRate(() -> {
+    heartBeatFuture = getExecutor().scheduleAtFixedRate(() -> {
       boolean currentValue = heartBeatToggle.getAndSet(!heartBeatToggle.get());
       writeSingleRegister(100, currentValue ? 1 : 0)
           .thenCompose(v -> readSingleRegister(100))
@@ -194,13 +194,12 @@ public class ModbusTCPVehicleCommAdapter
     }, 0, 500, TimeUnit.MILLISECONDS);
   }
 
-
-
   private void stopHeartBeat() {
     if (heartBeatFuture != null && !heartBeatFuture.isCancelled()) {
       heartBeatFuture.cancel(true);
     }
   }
+
   /**
    * Processes updates of the {@link CustomProcessModel}.
    *
@@ -461,6 +460,7 @@ public class ModbusTCPVehicleCommAdapter
 
   private CMD2 createCMD2(MovementCommand cmd) {
     String switchOperation = "";
+    // TODO: change liftHeight according to the device.
     int liftHeight = 0;
     int motionCommand = 0;
     List<PeripheralOperation> peripheralOperations = null;
@@ -708,10 +708,12 @@ public class ModbusTCPVehicleCommAdapter
       );
 
       return sendModbusRequest(request)
-          .thenAccept(response -> LOG.info(
-              "Successfully wrote " + batch.size() + " " + commandType
-                  + " registers starting at address " + startAddress
-          ))
+          .thenAccept(
+              response -> LOG.info(
+                  "Successfully wrote " + batch.size() + " " + commandType
+                      + " registers starting at address " + startAddress
+              )
+          )
           .exceptionally(ex -> {
             LOG.severe("Failed to write " + commandType + " registers: " + ex.getMessage());
             return null;
@@ -817,7 +819,8 @@ public class ModbusTCPVehicleCommAdapter
   @Nonnull
   public synchronized ExplainedBoolean canProcess(
       @Nonnull
-      TransportOrder order) {
+      TransportOrder order
+  ) {
     requireNonNull(order, "order");
 
     return canProcess(
