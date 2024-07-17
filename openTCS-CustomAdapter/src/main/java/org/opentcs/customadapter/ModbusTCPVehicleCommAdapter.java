@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.digitalpetri.modbus.master.ModbusTcpMaster;
 import com.digitalpetri.modbus.master.ModbusTcpMasterConfig;
-import com.digitalpetri.modbus.requests.ModbusRequest;
 import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
 import com.digitalpetri.modbus.responses.ModbusResponse;
 import com.google.inject.assistedinject.Assisted;
@@ -790,7 +789,7 @@ public class ModbusTCPVehicleCommAdapter
       }
     }
     if (!canProcess) {
-      LOG.info(String.format("{}: Cannot process {}, reason: '{}'", getName(), operations, reason));
+      LOG.info(String.format("%s: Cannot process %s, reason: '%s'", getName(), operations, reason));
     }
     return new ExplainedBoolean(canProcess, reason);
   }
