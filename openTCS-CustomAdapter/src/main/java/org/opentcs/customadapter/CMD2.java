@@ -1,7 +1,4 @@
 package org.opentcs.customadapter;
-
-import static java.lang.Integer.toHexString;
-
 public record CMD2(int liftHeight, int motion) {
   /**
    * Represents a CMD2 object that encapsulates lift height and motion values.
@@ -48,5 +45,15 @@ public record CMD2(int liftHeight, int motion) {
     String hexLiftHeight = Integer.toHexString(liftHeight).toUpperCase();
     String hexMotion = Integer.toHexString(motion).toUpperCase();
     return hexLiftHeight + hexMotion;
+  }
+
+  /**
+   * Converts the CMD2 object to a 16-bit short value.
+   *
+   * @return The short value representing the CMD2 object.
+   */
+  public short toShort() {
+    int combinedValue = toInt();
+    return (short) combinedValue;
   }
 }

@@ -64,4 +64,14 @@ public record CMD1(int liftCmd, int speed, int obstacleSensor, int direction) {
     String hexDirection = Integer.toHexString(direction).toUpperCase();
     return hexLiftCmd + hexSpeed + hexObstacleSensor + hexDirection;
   }
+
+  /**
+   * Converts the CMD2 object to a 16-bit short value.
+   *
+   * @return The short value representing the CMD2 object.
+   */
+  public short toShort() {
+    int combinedValue = toInt();
+    return (short) combinedValue;
+  }
 }
