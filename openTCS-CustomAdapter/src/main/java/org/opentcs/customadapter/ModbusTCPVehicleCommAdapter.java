@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.digitalpetri.modbus.master.ModbusTcpMaster;
 import com.digitalpetri.modbus.master.ModbusTcpMasterConfig;
+import com.digitalpetri.modbus.requests.ModbusRequest;
 import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
 import com.digitalpetri.modbus.responses.ModbusResponse;
 import com.google.inject.assistedinject.Assisted;
@@ -13,6 +14,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -320,8 +323,7 @@ public class ModbusTCPVehicleCommAdapter
         )
     );
     convertMovementCommandsToModbusCommands(allMovementCommands);
-    // TODO: re-write this method
-//    writeAllModbusCommands(modbusCommands);
+    writeAllModbusCommands();
     allMovementCommands.clear();
     currentTransportOrder = null;
   }
@@ -359,7 +361,7 @@ public class ModbusTCPVehicleCommAdapter
       );
       cmdModbusCommand.add(
           new ModbusCommand(
-              "CMD2", cmds.getSecond().toShort(), (cmdBaseAddress + 1),
+              "CMD2", cmds.getSecond().toShort(), cmdBaseAddress + 1,
               ModbusCommand.DataFormat.HEXADECIMAL
           )
       );
@@ -375,7 +377,6 @@ public class ModbusTCPVehicleCommAdapter
    * @param commands The list of movement commands to be processed.
    */
   private void processMovementCommands(List<MovementCommand> commands) {
-    String startPoint;
     long startPosition;
     for (MovementCommand cmd : commands) {
       // If step doesn't have source point,
@@ -391,7 +392,6 @@ public class ModbusTCPVehicleCommAdapter
               cmd.getStep().getSourcePoint().getName()
           )
       );
-      startPoint = cmd.getStep().getSourcePoint().getName();
       startPosition = cmd.getStep().getSourcePoint().getPose().getPosition().getX();
 
       Pair<CMD1, CMD2> pairCommands = new Pair<>(createCMD1(cmd), createCMD2(cmd));
@@ -460,51 +460,198 @@ public class ModbusTCPVehicleCommAdapter
     };
   }
 
-  private void writeAllModbusCommands(List<ModbusCommand> commands) {
-    int startAddress = 1000;
-    int quantity = commands.size();
-
-    ByteBuf values = Unpooled.buffer(quantity * 2);
-
-    for (ModbusCommand command : commands) {
-      values.writeShort(command.value());
-    }
-
-    WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(
-        startAddress,
-        quantity,
-        values
-    );
-
-    sendModbusRequest(request)
-        .thenAccept(response -> {
-          LOG.info("All commands written successfully");
-          values.release();
+  private void writeAllModbusCommands() {
+    writeSingleRegister(108, 0)
+        .thenCompose(v -> {
+          CompletableFuture<Void> positionFuture = CompletableFuture.completedFuture(null);
+          if (!positionModbusCommand.isEmpty()) {
+            try {
+              positionFuture = writeModbusCommands(positionModbusCommand, "Position");
+            }
+            catch (ExecutionException | InterruptedException e) {
+              throw new RuntimeException(e);
+            }
+          }
+          return positionFuture;
         })
+        .thenCompose(v -> {
+          CompletableFuture<Void> cmdFuture = CompletableFuture.completedFuture(null);
+          if (!cmdModbusCommand.isEmpty()) {
+            try {
+              cmdFuture = writeModbusCommands(cmdModbusCommand, "CMD");
+            }
+            catch (ExecutionException | InterruptedException e) {
+              throw new RuntimeException(e);
+            }
+          }
+          return cmdFuture;
+        })
+        .thenCompose(v -> writeSingleRegister(108, 1))
         .exceptionally(ex -> {
-          LOG.severe("Failed to write commands: " + ex.getMessage());
-          values.release();
+          LOG.severe("Error in writeAllModbusCommands: " + ex.getMessage());
           return null;
         });
   }
 
-  private void sendModbusCommand(String command, int value) {
-    ModbusRegister register = REGISTER_MAP.get(command);
-    if (register == null || register.function() != ModbusFunction.WRITE_MULTIPLE_REGISTERS) {
-      LOG.warning("Invalid command or function: " + command);
-      return;
-    }
-
+  private CompletableFuture<Void> writeSingleRegister(int address, int value) {
     ByteBuf buffer = Unpooled.buffer(2);
     buffer.writeShort(value);
+    WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(address, 1, buffer);
 
-    sendModbusRequest(new WriteMultipleRegistersRequest(register.address(), 1, buffer))
-        .thenAccept(response -> LOG.info(command + " set successfully"))
-        .exceptionally(throwable -> {
-          LOG.log(Level.SEVERE, "Failed to set " + command, throwable);
+    return sendModbusRequest(request)
+        .thenAccept(response -> {
+          LOG.info(
+              "Successfully wrote register at address " + address + " with value " + value
+          );
+          buffer.release();
+        })
+        .exceptionally(ex -> {
+          LOG.severe(
+              "Failed to write register at address " + address + ": " + ex.getMessage()
+          );
+          buffer.release();
           return null;
         });
   }
+
+  /**
+   * Writes Modbus commands in batches to the specified command type.
+   *
+   * @param commands The list of ModbusCommand objects to be written.
+   * @param commandType The type of the command being written.
+   * @return A CompletableFuture representing the completion of the write operation.
+   * @throws ExecutionException If an execution error occurs during the write operation.
+   * @throws InterruptedException If the write operation is interrupted.
+   */
+  private CompletableFuture<Void> writeModbusCommands(
+      List<ModbusCommand> commands,
+      String commandType
+  )
+      throws ExecutionException,
+        InterruptedException {
+    commands.sort(Comparator.comparingInt(ModbusCommand::address));
+    CompletableFuture<Void> futureChain = CompletableFuture.completedFuture(null);
+    List<ModbusCommand> batch = new ArrayList<>();
+    int batchWordSize = 0;
+    int startAddress = commands.getFirst().address();
+    int maxBatchSize = 120;
+
+    for (ModbusCommand command : commands) {
+      // Get the word size of the command
+      int commandWordSize = getCommandWordSize(command);
+      // If the word size of the current batch plus the new command exceeds the limit,
+      // write the current batch and start a new batch
+      if (batchWordSize + commandWordSize >= 120) {
+        // Write the current batch into the chain call
+        int finalStartAddress = startAddress;
+        List<ModbusCommand> finalBatch = new ArrayList<>(batch);
+        futureChain = futureChain.thenCompose(
+            v -> writeBatch(
+                finalBatch, finalStartAddress, commandType
+            )
+        );
+        batch.clear();
+        startAddress = command.address() + commandWordSize;
+        batchWordSize = 0;
+      }
+      batch.add(command);
+      batchWordSize += commandWordSize;
+    }
+
+    // Write the last batch if it's not empty
+    if (!batch.isEmpty()) {
+      int finalStartAddress = startAddress;
+      List<ModbusCommand> finalBatch = new ArrayList<>(batch);
+      futureChain = futureChain.thenCompose(
+          v -> writeBatch(finalBatch, finalStartAddress, commandType)
+      );
+    }
+
+    return futureChain;
+  }
+
+  private int getCommandWordSize(ModbusCommand command) {
+    return command.format() == ModbusCommand.DataFormat.DECIMAL ? 2 : 1;
+  }
+
+  private CompletableFuture<Void> writeBatch(
+      List<ModbusCommand> batch, int startAddress, String commandType
+  ) {
+    ByteBuf values = Unpooled.buffer();
+
+    try {
+      for (ModbusCommand command : batch) {
+        if (command.format() == ModbusCommand.DataFormat.DECIMAL) {
+          values.writeIntLE(command.value());
+        }
+        else {
+          values.writeShortLE(command.value());
+        }
+        LOG.info("Writing " + commandType + " command: " + command.toLogString());
+      }
+
+      WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(
+          startAddress,
+          values.readableBytes() / 2,  // Convert bytes to word count
+          values
+      );
+
+      return sendModbusRequest(request)
+          .thenAccept(response -> {
+            LOG.info(
+                "Successfully wrote " + batch.size() + " " + commandType
+                    + " registers starting at address " + startAddress
+            );
+          })
+          .exceptionally(ex -> {
+            LOG.severe("Failed to write " + commandType + " registers: " + ex.getMessage());
+            return null;
+          });
+    }
+    finally {
+      values.release();
+    }
+  }
+
+//  private CompletableFuture<Void> writeBatch(
+//      List<ModbusCommand> batch, int startAddress,
+//      String commandType
+//  ) {
+//    ByteBuf values = Unpooled.buffer();
+//
+//    for (ModbusCommand command : batch) {
+//      if (command.format() == ModbusCommand.DataFormat.DECIMAL) {
+//        values.writeIntLE(command.value());
+//      }
+//      else {
+//        values.writeShortLE(command.value());
+//      }
+//      LOG.info("Writing " + commandType + " command: " + command.toLogString());
+//    }
+//
+//    try {
+//      WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(
+//          startAddress,
+//          values.readableBytes() / 2,  // Convert bytes to word count
+//          values
+//      );
+//
+//      return sendModbusRequest(request)
+//          .thenAccept(response -> {
+//            LOG.info(
+//                "Successfully wrote " + batch.size() + " " + commandType
+//                    + " registers starting at address " + startAddress
+//            );
+//          })
+//          .exceptionally(ex -> {
+//            LOG.severe("Failed to write " + commandType + " registers: " + ex.getMessage());
+//            return null;
+//          });
+//    }
+//    finally {
+//      values.release();
+//    }
+//  }
 
   @Override
   protected boolean performConnection() {
@@ -559,8 +706,43 @@ public class ModbusTCPVehicleCommAdapter
   private CompletableFuture<ModbusResponse> sendModbusRequest(
       com.digitalpetri.modbus.requests.ModbusRequest request
   ) {
-    return master.sendRequest(request, 0);
+    return master.sendRequest(request, 0)
+        .handle((response, ex) -> {
+          if (ex != null) {
+            LOG.severe("Failed to send Modbus request: " + ex.getMessage());
+            // 重試機制，嘗試最多3次，每次間隔1000毫秒
+            return retrySendModbusRequest(request, 3, 1000);
+          }
+          return CompletableFuture.completedFuture(response);
+        }).thenCompose(response -> response);
   }
+
+  private CompletableFuture<ModbusResponse> retrySendModbusRequest(
+      com.digitalpetri.modbus.requests.ModbusRequest request, int retries, int delay
+  ) {
+    if (retries <= 0) {
+      return CompletableFuture.failedFuture(new RuntimeException("Max retries reached"));
+    }
+
+    return CompletableFuture.supplyAsync(() -> {
+      try {
+        Thread.sleep(delay);
+      }
+      catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException(e);
+      }
+      return sendModbusRequest(request)
+          .handle((response, ex) -> {
+            if (ex != null) {
+              LOG.severe("Retry failed: " + ex.getMessage());
+              return retrySendModbusRequest(request, retries - 1, delay);
+            }
+            return CompletableFuture.completedFuture(response);
+          }).thenCompose(response -> response).join();
+    });
+  }
+
 
   @Override
   @Nonnull
