@@ -33,8 +33,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.jgrapht.alg.util.Pair;
+import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Path;
+import org.opentcs.data.model.PlantModel;
+import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
@@ -45,7 +49,6 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.ExplainedBoolean;
 
-
 public class ModbusTCPVehicleCommAdapter
     extends
       CustomVehicleCommAdapter {
@@ -53,8 +56,6 @@ public class ModbusTCPVehicleCommAdapter
    * The name of the load handling device set by this adapter.
    */
   public static final String LHD_NAME = "default";
-  private static final int POSITION_UPDATE_INTERVAL = 20; // ms
-  private static final int POSITION_REGISTER_ADDRESS = 110;
   /**
    * This class's Logger.
    */
@@ -70,23 +71,14 @@ public class ModbusTCPVehicleCommAdapter
    */
   private static final String UNLOAD_OPERATION_CONFLICT = "cannotUnloadWhenNotLoaded";
   /**
-   * Map of Modbus register address and function.
-   */
-  private static final Map<String, ModbusTCPVehicleCommAdapter.ModbusRegister> REGISTER_MAP
-      = new HashMap<>();
-  /**
-   * MAP1: absolute distance (mm) -> station name.
-   */
-//  private final Map<Integer, String> distanceToStation = new HashMap<>();
-  private final Map<String, Integer> stationToDistance = new HashMap<>();
-  /**
    * MAP2: station name -> <CMD1, CMD2>.
    */
   private final Map<Long, Pair<CMD1, CMD2>> stationCommandsMap = new ConcurrentHashMap<>();
-  private TransportOrder currentTransportOrder;
+  private final Map<Long, String> positionMap;
   private final List<MovementCommand> allMovementCommands = new ArrayList<>();
   private final List<ModbusCommand> positionModbusCommand = new ArrayList<>();
   private final List<ModbusCommand> cmdModbusCommand = new ArrayList<>();
+  private TransportOrder currentTransportOrder;
   /**
    * Represents a vehicle associated with a ModbusTCPVehicleCommAdapter.
    */
@@ -118,17 +110,21 @@ public class ModbusTCPVehicleCommAdapter
   private final AtomicBoolean heartBeatToggle = new AtomicBoolean(false);
   private ScheduledFuture<?> heartBeatFuture;
   private PositionUpdater positionUpdater;
+  private final PlantModelService plantModelService;
 
   /**
-   * Initializes a new instance of ModbusTCPVehicleCommAdapter.
+   * A communication adapter for ModbusTCP-based vehicle communication.
    *
-   * @param processModel The process model associated with the vehicle.
+   * Allows communication between the vehicle and the control system using the ModbusTCP protocol.
+   *
+   * @param processModel The process model of the vehicle.
    * @param rechargeOperation The name of the recharge operation.
-   * @param commandsCapacity The maximum capacity for storing commands.
-   * @param executor The executor for scheduled tasks.
-   * @param vehicle The vehicle this adapter is associated with.
-   * @param host The host address for the TCP connection.
-   * @param port The port number for the TCP connection.
+   * @param commandsCapacity The maximum capacity of the command queue.
+   * @param executor The executor for handling background tasks.
+   * @param vehicle The vehicle associated with this communication adapter.
+   * @param host The host IP address for the ModbusTCP connection.
+   * @param port The port number for the ModbusTCP connection.
+   * @param plantModelService The plant model service for accessing plant model information.
    */
   @SuppressWarnings("checkstyle:TodoComment")
   public ModbusTCPVehicleCommAdapter(
@@ -140,7 +136,8 @@ public class ModbusTCPVehicleCommAdapter
       @Assisted
       Vehicle vehicle,
       String host,
-      int port
+      int port,
+      PlantModelService plantModelService
   ) {
     super(processModel, rechargeOperation, commandsCapacity, executor);
     this.host = host;
@@ -148,6 +145,8 @@ public class ModbusTCPVehicleCommAdapter
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.isConnected = false;
     this.currentTransportOrder = null;
+    this.plantModelService = requireNonNull(plantModelService, "plantModelService");
+    this.positionMap = new HashMap<>();
   }
 
   @Override
@@ -156,11 +155,11 @@ public class ModbusTCPVehicleCommAdapter
       return;
     }
     super.initialize();
-    initializeDistanceToStationMap();
     getProcessModel().setState(Vehicle.State.IDLE);
     getProcessModel().setLoadHandlingDevices(
         List.of(new LoadHandlingDevice(LHD_NAME, false))
     );
+    initializePositionMap();
     this.positionUpdater = new PositionUpdater(getProcessModel(), getExecutor());
     positionUpdater.startPositionUpdates();
     startHeartbeat();  // Start the heartbeat mechanism
@@ -178,8 +177,9 @@ public class ModbusTCPVehicleCommAdapter
       return;
     }
     super.terminate();
-    initialized = false;
-    stopHeartBeat();  // Stop the heartbeat mechanism
+    positionUpdater.stopPositionUpdates();
+    stopHeartBeat();
+    initialized = false;// Stop the heartbeat mechanism
   }
 
   private void startHeartbeat() {
@@ -204,6 +204,33 @@ public class ModbusTCPVehicleCommAdapter
     if (heartBeatFuture != null && !heartBeatFuture.isCancelled()) {
       heartBeatFuture.cancel(true);
     }
+  }
+
+  private void initializePositionMap() {
+    try {
+      PlantModel plantModel = plantModelService.getPlantModel();
+      for (Point point : plantModel.getPoints()) {
+        String positionName = point.getName();
+        Long precisePosition = point.getPose().getPosition().getX();
+        positionMap.put( precisePosition, positionName);
+      }
+
+      LOG.info("Position map initialized with " + positionMap.size() + " entries.");
+    }
+    catch (KernelRuntimeException e) {
+      LOG.severe("Failed to initialize position map: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Retrieves the precise position for the given position.
+   *
+   * @param position The position for which to retrieve the precise position.
+   * @return The precise position as a Triple object. Returns null if the given position
+   *         does not have a precise position associated with it.
+   */
+  public String getPositionFromMap(Long position) {
+    return positionMap.getOrDefault(position, null);
   }
 
   /**
@@ -236,19 +263,6 @@ public class ModbusTCPVehicleCommAdapter
 //        getProcessModel().setLength(configuration.vehicleLengthUnloaded());
       }
     }
-  }
-
-  /**
-   * Initializes the map named map1 with integer keys and string values.
-   * The keys start from 1000 and increment by 1000 up to 100000, and the corresponding values are
-   * generated by concatenating "MK" with the key divided by 1000.
-   */
-  // TODO: rename, can change the map definination using DI.
-  private void initializeDistanceToStationMap() {
-    for (int i = 1000; i <= 100000; i += 1000) {
-      stationToDistance.put("MK" + (i / 1000), i);
-    }
-    LOG.info(String.format("Size of map: %d", stationToDistance.size()));
   }
 
   /**
@@ -567,8 +581,7 @@ public class ModbusTCPVehicleCommAdapter
   private CompletableFuture<Long> readDWordRegister(int startAddress) {
     return sendModbusRequest(new ReadHoldingRegistersRequest(startAddress, 2))
         .thenApply(response -> {
-          if (response instanceof ReadHoldingRegistersResponse) {
-            ReadHoldingRegistersResponse readResponse = (ReadHoldingRegistersResponse) response;
+          if (response instanceof ReadHoldingRegistersResponse readResponse) {
             ByteBuf registers = readResponse.getRegisters();
             try {
               // Read two 16-bit registers and combine into a 32-bit integer
@@ -932,84 +945,6 @@ public class ModbusTCPVehicleCommAdapter
         .setMaxRevVelocity(getProcessModel().getMaxRevVelocity());
   }
 
-  static {
-    // OHT movement handshake position - status (0x04)
-    REGISTER_MAP.put("HEART_BIT", new ModbusRegister(300, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("DIRECTION", new ModbusRegister(301, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("FORK", new ModbusRegister(302, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("SPEED", new ModbusRegister(303, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("OBSTACLE", new ModbusRegister(304, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("STATUS", new ModbusRegister(305, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("ERROR_CODE", new ModbusRegister(306, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("DESTINATION", new ModbusRegister(308, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("MARK_NO", new ModbusRegister(309, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("POSITION", new ModbusRegister(310, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("IO_IN", new ModbusRegister(318, ModbusFunction.READ_INPUT_REGISTERS));
-    REGISTER_MAP.put("IO_OUT", new ModbusRegister(319, ModbusFunction.READ_INPUT_REGISTERS));
-
-    // OHT movement handshake position - command (0x03, 0x10)
-    REGISTER_MAP.put(
-        "SET_HEART_BIT", new ModbusRegister(300, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
-    );
-    REGISTER_MAP.put(
-        "SET_DIRECTION", new ModbusRegister(301, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
-    );
-    REGISTER_MAP.put(
-        "SET_FORK", new ModbusRegister(
-            302,
-            ModbusFunction.WRITE_MULTIPLE_REGISTERS
-        )
-    );
-    REGISTER_MAP.put(
-        "SET_SPEED", new ModbusRegister(
-            303,
-            ModbusFunction.WRITE_MULTIPLE_REGISTERS
-        )
-    );
-    REGISTER_MAP.put(
-        "SET_OBSTACLE", new ModbusRegister(304, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
-    );
-    REGISTER_MAP.put(
-        "SET_COMMAND", new ModbusRegister(305, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
-    );
-    REGISTER_MAP.put(
-        "SET_MODE", new ModbusRegister(
-            306,
-            ModbusFunction.WRITE_MULTIPLE_REGISTERS
-        )
-    );
-    REGISTER_MAP.put(
-        "SET_DESTINATION", new ModbusRegister(308, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
-    );
-    REGISTER_MAP.put(
-        "SET_JOG_MOVE", new ModbusRegister(312, ModbusFunction.WRITE_MULTIPLE_REGISTERS)
-    );
-  }
-
-  private enum ModbusFunction {
-//    READ_COILS(0x01),
-//    READ_DISCRETE_INPUTS(0x02),
-//    READ_HOLDING_REGISTERS(0x03),
-    READ_INPUT_REGISTERS(0x04),
-//    WRITE_SINGLE_COIL(0x05),
-//    WRITE_SINGLE_REGISTER(0x06),
-//    WRITE_MULTIPLE_COILS(0x0F),
-    WRITE_MULTIPLE_REGISTERS(0x10);
-
-    private final int functionCode;
-
-    ModbusFunction(int functionCode) {
-      this.functionCode = functionCode;
-    }
-
-    public int getFunctionCode() {
-      return functionCode;
-    }
-  }
-
-  private record ModbusRegister(int address, ModbusFunction function) {
-  }
-
   private record ModbusCommand(String name, int value, int address, DataFormat format) {
     public enum DataFormat {
       DECIMAL,
@@ -1053,9 +988,11 @@ public class ModbusTCPVehicleCommAdapter
   public class PositionUpdater {
     private static final int UPDATE_INTERVAL = 20;
     private static final int MAX_INTERPOLATION_TIME = 500;
+    private static final int POSITION_REGISTER_ADDRESS = 110;
 
     private final VehicleProcessModel processModel;
     private final ScheduledExecutorService executor;
+    private ScheduledFuture<?> positionFuture;
 
     private long lastUpdateTime;
     private long lastPosition;
@@ -1088,7 +1025,18 @@ public class ModbusTCPVehicleCommAdapter
      * The initial delay is 0, and the update interval is configured by the UPDATE_INTERVAL field.
      */
     public void startPositionUpdates() {
-      executor.scheduleAtFixedRate(this::updatePosition, 0, UPDATE_INTERVAL, TimeUnit.MILLISECONDS);
+      positionFuture =
+          executor.scheduleAtFixedRate(
+              this::updatePosition,
+              0,
+              UPDATE_INTERVAL,
+              TimeUnit.MILLISECONDS);
+    }
+
+    private void stopPositionUpdates() {
+      if (positionFuture != null && !positionFuture.isCancelled()) {
+        positionFuture.cancel(true);
+      }
     }
 
     private void updatePosition() {
@@ -1115,14 +1063,11 @@ public class ModbusTCPVehicleCommAdapter
 
       String openTcsPosition = convertToOpenTcsPosition(newPosition);
       Triple precisePosition = convertToPrecisePosition(newPosition);
-      double orientation = extractOrientation(newPosition);
 
       processModel.setPosition(openTcsPosition);
       processModel.setPrecisePosition(precisePosition);
-      processModel.setOrientationAngle(orientation);
 
       lastPrecisePosition = precisePosition;
-      lastOrientation = orientation;
     }
 
     private void interpolatePosition() {
@@ -1140,11 +1085,9 @@ public class ModbusTCPVehicleCommAdapter
 
       String openTcsPosition = convertToOpenTcsPosition(interpolatedPosition);
       Triple interpolatedPrecisePosition = interpolatePrecisePosition(interpolationFactor);
-      double interpolatedOrientation = interpolateOrientation(interpolationFactor);
 
       processModel.setPosition(openTcsPosition);
       processModel.setPrecisePosition(interpolatedPrecisePosition);
-      processModel.setOrientationAngle(interpolatedOrientation);
     }
 
     private Triple interpolatePrecisePosition(double factor) {
@@ -1160,28 +1103,13 @@ public class ModbusTCPVehicleCommAdapter
       );
     }
 
-    private double interpolateOrientation(double factor) {
-      // It is assumed here that the direction change is linear,
-      // the actual situation may require more complex calculations
-      return lastOrientation;
-    }
-
     private String convertToOpenTcsPosition(long position) {
-      // Implement conversion from original position value to OpenTCS position format
-      return "Point-" + position;
+      return getPositionFromMap(position);
     }
 
     private Triple convertToPrecisePosition(long position) {
       // Implement conversion from original position value to Triple
-      int x = (int) (position % 1000000);
-      int y = (int) (position / 1000000);
-      return new Triple(x, y, 0);
-    }
-
-    private double extractOrientation(long position) {
-      // Extract direction angle from location data
-      // This needs to be implemented according to your data format
-      return 0.0;
+      return new Triple(position, 0, 0);
     }
   }
 }
