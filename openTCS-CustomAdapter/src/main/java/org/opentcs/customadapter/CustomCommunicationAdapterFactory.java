@@ -19,6 +19,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
+import org.opentcs.components.kernel.services.PlantModelService;
 
 @Singleton
 public class CustomCommunicationAdapterFactory
@@ -31,6 +32,7 @@ public class CustomCommunicationAdapterFactory
 
   private final CustomAdapterComponentsFactory adapterFactory;
   private final VehicleConfigurationProvider configProvider;
+  private final PlantModelService plantModelService;
   private boolean initialized;
 
 
@@ -44,10 +46,13 @@ public class CustomCommunicationAdapterFactory
    */
   @Inject
   public CustomCommunicationAdapterFactory(
-      CustomAdapterComponentsFactory adapterFactory, VehicleConfigurationProvider configProvider
+      CustomAdapterComponentsFactory adapterFactory,
+      VehicleConfigurationProvider configProvider,
+      PlantModelService plantModelService
   ) {
     this.adapterFactory = adapterFactory;
     this.configProvider = configProvider;
+    this.plantModelService = plantModelService;
   }
 
   @Override
@@ -122,15 +127,18 @@ class CommunicationStrategy
   private final Map<String, StrategyCreator> strategies = new HashMap<>();
   private final VehicleConfigurationProvider configProvider;
   private final ScheduledExecutorService executor;
+  private final PlantModelService plantModelService;
 
   @Inject
   CommunicationStrategy(
       @KernelExecutor
       ScheduledExecutorService executor,
-      VehicleConfigurationProvider configProvider
+      VehicleConfigurationProvider configProvider,
+      PlantModelService plantModelService
   ) {
     this.executor = executor;
     this.configProvider = configProvider;
+    this.plantModelService = plantModelService;
     initializeStrategies();
   }
 
@@ -155,7 +163,7 @@ class CommunicationStrategy
       creator = strategies.get("ModbusTCP");
     }
 
-    return creator.createAdapter(vehicle, config, executor);
+    return creator.createAdapter(vehicle, config, executor, plantModelService);
   }
 
   private VehicleConfiguration createConfigWithUserInput(Vehicle vehicle) {
@@ -219,7 +227,10 @@ class CommunicationStrategy
 
 interface StrategyCreator {
   CustomVehicleCommAdapter createAdapter(
-      Vehicle vehicle, VehicleConfiguration config, ScheduledExecutorService executor
+      Vehicle vehicle,
+      VehicleConfiguration config,
+      ScheduledExecutorService executor,
+      PlantModelService plantModelService
   );
 }
 
@@ -234,7 +245,10 @@ class ModbusTCPStrategy
 
   @Override
   public CustomVehicleCommAdapter createAdapter(
-      Vehicle vehicle, VehicleConfiguration config, ScheduledExecutorService executor
+      Vehicle vehicle,
+      VehicleConfiguration config,
+      ScheduledExecutorService executor,
+      PlantModelService plantModelService
   ) {
     return new ModbusTCPVehicleCommAdapter(
         new CustomProcessModel(vehicle),
@@ -243,7 +257,8 @@ class ModbusTCPStrategy
         executor,
         vehicle,
         config.host(),
-        config.port()
+        config.port(),
+        plantModelService
     );
   }
 }
