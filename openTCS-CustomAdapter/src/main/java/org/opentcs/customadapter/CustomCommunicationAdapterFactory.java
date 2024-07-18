@@ -14,12 +14,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
-import org.opentcs.components.kernel.services.PlantModelService;
 
 @Singleton
 public class CustomCommunicationAdapterFactory
@@ -37,12 +37,11 @@ public class CustomCommunicationAdapterFactory
 
 
   /**
-   * CustomCommunicationAdapterFactory constructor.
+   * Constructs a new CustomCommunicationAdapterFactory object.
    *
-   * @param adapterFactory - an instance of CustomAdapterComponentsFactory to initialize the
-   * adapterFactory field.
-   * @param configProvider - an instance of VehicleConfigurationProvider to initialize the
-   * configProvider field.
+   * @param adapterFactory The factory used to create adapter components.
+   * @param configProvider The provider used for vehicle configurations.
+   * @param plantModelService The service used for interacting with plant models.
    */
   @Inject
   public CustomCommunicationAdapterFactory(
