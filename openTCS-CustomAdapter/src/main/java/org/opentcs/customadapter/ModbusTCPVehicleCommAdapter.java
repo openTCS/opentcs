@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import org.jgrapht.alg.util.Pair;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Path;
+import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralOperation;
@@ -52,6 +53,8 @@ public class ModbusTCPVehicleCommAdapter
    * The name of the load handling device set by this adapter.
    */
   public static final String LHD_NAME = "default";
+  private static final int POSITION_UPDATE_INTERVAL = 20; // ms
+  private static final int POSITION_REGISTER_ADDRESS = 110;
   /**
    * This class's Logger.
    */
@@ -114,6 +117,7 @@ public class ModbusTCPVehicleCommAdapter
   private boolean initialized;
   private final AtomicBoolean heartBeatToggle = new AtomicBoolean(false);
   private ScheduledFuture<?> heartBeatFuture;
+  private PositionUpdater positionUpdater;
 
   /**
    * Initializes a new instance of ModbusTCPVehicleCommAdapter.
@@ -157,8 +161,10 @@ public class ModbusTCPVehicleCommAdapter
     getProcessModel().setLoadHandlingDevices(
         List.of(new LoadHandlingDevice(LHD_NAME, false))
     );
-    initialized = true;
+    this.positionUpdater = new PositionUpdater(getProcessModel(), getExecutor());
+    positionUpdater.startPositionUpdates();
     startHeartbeat();  // Start the heartbeat mechanism
+    initialized = true;
   }
 
   @Override
@@ -558,12 +564,34 @@ public class ModbusTCPVehicleCommAdapter
         });
   }
 
+  private CompletableFuture<Long> readDWordRegister(int startAddress) {
+    return sendModbusRequest(new ReadHoldingRegistersRequest(startAddress, 2))
+        .thenApply(response -> {
+          if (response instanceof ReadHoldingRegistersResponse) {
+            ReadHoldingRegistersResponse readResponse = (ReadHoldingRegistersResponse) response;
+            ByteBuf registers = readResponse.getRegisters();
+            try {
+              // Read two 16-bit registers and combine into a 32-bit integer
+              int lowWord = registers.readUnsignedShort();
+              int highWord = registers.readUnsignedShort();
+              // Use little endian combination
+              return (long) (highWord << 16 | lowWord);
+            } finally {
+              registers.release();
+            }
+          } else {
+            throw new IllegalArgumentException("Unexpected response type");
+          }
+        });
+  }
+
   private CompletableFuture<Void> readAndVerifyCommands() {
     List<CompletableFuture<Boolean>> readFutures = cmdModbusCommand.stream()
         .map(this::readAndCompareCommand)
         .toList();
+    CompletableFuture<?>[] futuresArray = readFutures.toArray(new CompletableFuture<?>[0]);
 
-    return CompletableFuture.allOf(readFutures.toArray(new CompletableFuture[0]))
+    return CompletableFuture.allOf(futuresArray)
         .thenRun(() -> {
           boolean allVerified = readFutures.stream().allMatch(future -> {
             try {
@@ -608,7 +636,7 @@ public class ModbusTCPVehicleCommAdapter
               }
             }
             finally {
-              registers.release(); // 重要：釋放 ByteBuf
+              registers.release();
             }
           }
           else {
@@ -781,7 +809,6 @@ public class ModbusTCPVehicleCommAdapter
         .handle((response, ex) -> {
           if (ex != null) {
             LOG.severe("Failed to send Modbus request: " + ex.getMessage());
-            // 重試機制，嘗試最多3次，每次間隔1000毫秒
             return retrySendModbusRequest(request, 3, 1000);
           }
           return CompletableFuture.completedFuture(response);
@@ -1019,5 +1046,140 @@ public class ModbusTCPVehicleCommAdapter
   private enum LoadState {
     EMPTY,
     FULL;
+  }
+
+  public class PositionUpdater {
+    private static final int UPDATE_INTERVAL = 20;
+    private static final int MAX_INTERPOLATION_TIME = 500;
+
+    private final VehicleProcessModel processModel;
+    private final ScheduledExecutorService executor;
+
+    private long lastUpdateTime;
+    private long lastPosition;
+    private Triple lastPrecisePosition;
+    private double lastOrientation;
+    private double estimatedSpeed; // mm/s
+
+    /**
+     * The PositionUpdater class is responsible for updating the position of a vehicle.
+     * It schedules regular updates of the vehicle position using a fixed rate.
+     * The position updates are executed by invoking the updatePosition() method.
+     * <p>
+     * public PositionUpdater(VehicleProcessModel processModel, ScheduledExecutorService executor)
+     * <p>
+     * Constructor for the PositionUpdater class. Initializes the PositionUpdater object
+     * with the provided processModel and executor objects.
+     *
+     * @param processModel The VehicleProcessModel object associated with the vehicle.
+     * @param executor The ScheduledExecutorService used to schedule position updates.
+     */
+    public PositionUpdater(VehicleProcessModel processModel, ScheduledExecutorService executor) {
+      this.processModel = processModel;
+      this.executor = executor;
+    }
+
+    /**
+     * Starts position updates for the vehicle.
+     * This method schedules regular updates of the vehicle position using a fixed rate.
+     * The position updates are executed by invoking the updatePosition() method.
+     * The initial delay is 0, and the update interval is configured by the UPDATE_INTERVAL field.
+     */
+    public void startPositionUpdates() {
+      executor.scheduleAtFixedRate(this::updatePosition, 0, UPDATE_INTERVAL, TimeUnit.MILLISECONDS);
+    }
+
+    private void updatePosition() {
+      readDWordRegister(POSITION_REGISTER_ADDRESS)
+          .thenAccept(this::processPositionUpdate)
+          .exceptionally(ex -> {
+            LOG.warning("Failed to update position: " + ex.getMessage());
+            interpolatePosition();
+            return null;
+          });
+    }
+
+    private void processPositionUpdate(long newPosition) {
+      long currentTime = System.currentTimeMillis();
+
+      if (lastUpdateTime > 0) {
+        long timeDiff = currentTime - lastUpdateTime;
+        long posDiff = newPosition - lastPosition;
+        estimatedSpeed = (double) posDiff / timeDiff * 1000;
+      }
+
+      lastPosition = newPosition;
+      lastUpdateTime = currentTime;
+
+      String openTcsPosition = convertToOpenTcsPosition(newPosition);
+      Triple precisePosition = convertToPrecisePosition(newPosition);
+      double orientation = extractOrientation(newPosition);
+
+      processModel.setPosition(openTcsPosition);
+      processModel.setPrecisePosition(precisePosition);
+      processModel.setOrientationAngle(orientation);
+
+      lastPrecisePosition = precisePosition;
+      lastOrientation = orientation;
+    }
+
+    private void interpolatePosition() {
+      long currentTime = System.currentTimeMillis();
+      long timeSinceLastUpdate = currentTime - lastUpdateTime;
+
+      if (timeSinceLastUpdate > MAX_INTERPOLATION_TIME) {
+        // If the maximum interpolation time is exceeded, no interpolation will be performed
+        return;
+      }
+
+      // Calculate the interpolated position
+      double interpolationFactor = (double) timeSinceLastUpdate / UPDATE_INTERVAL;
+      long interpolatedPosition = lastPosition + (long) (estimatedSpeed * interpolationFactor);
+
+      String openTcsPosition = convertToOpenTcsPosition(interpolatedPosition);
+      Triple interpolatedPrecisePosition = interpolatePrecisePosition(interpolationFactor);
+      double interpolatedOrientation = interpolateOrientation(interpolationFactor);
+
+      processModel.setPosition(openTcsPosition);
+      processModel.setPrecisePosition(interpolatedPrecisePosition);
+      processModel.setOrientationAngle(interpolatedOrientation);
+    }
+
+    private Triple interpolatePrecisePosition(double factor) {
+      if (lastPrecisePosition == null) {
+        return null;
+      }
+      long dx = (long) (estimatedSpeed * factor * Math.cos(Math.toRadians(lastOrientation)));
+      long dy = (long) (estimatedSpeed * factor * Math.sin(Math.toRadians(lastOrientation)));
+      return new Triple(
+          lastPrecisePosition.getX() + dx,
+          lastPrecisePosition.getY() + dy,
+          lastPrecisePosition.getZ()
+      );
+    }
+
+    private double interpolateOrientation(double factor) {
+      // It is assumed here that the direction change is linear,
+      // the actual situation may require more complex calculations
+      return lastOrientation;
+    }
+
+    private String convertToOpenTcsPosition(long position) {
+      // Implement conversion from original position value to OpenTCS position format
+      return "Point-" + position;
+    }
+
+    private Triple convertToPrecisePosition(long position) {
+      // Implement conversion from original position value to Triple
+      int x = (int) (position % 1000000);
+      int y = (int) (position / 1000000);
+      return new Triple(x, y, 0);
+    }
+
+    private double extractOrientation(long position) {
+      // Extract direction angle from location data
+      // This needs to be implemented according to your data format
+      return 0.0;
+    }
   }
 }
