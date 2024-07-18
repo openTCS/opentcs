@@ -212,7 +212,7 @@ public class ModbusTCPVehicleCommAdapter
       for (Point point : plantModel.getPoints()) {
         String positionName = point.getName();
         Long precisePosition = point.getPose().getPosition().getX();
-        positionMap.put( precisePosition, positionName);
+        positionMap.put(precisePosition, positionName);
       }
 
       LOG.info("Position map initialized with " + positionMap.size() + " entries.");
@@ -223,14 +223,23 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   /**
-   * Retrieves the precise position for the given position.
+   * Retrieves the position associated with the given precise position.
    *
-   * @param position The position for which to retrieve the precise position.
-   * @return The precise position as a Triple object. Returns null if the given position
-   *         does not have a precise position associated with it.
+   * @param precisePosition The precise position for which to retrieve the position.
+   * @return The position associated with the given precise position. Returns the last known
+   * position
+   * if no position is found in the map.
    */
-  public String getPositionFromMap(Long position) {
-    return positionMap.getOrDefault(position, null);
+  public String getPositionFromMap(Long precisePosition) {
+    String position = positionMap.get(precisePosition);
+    if (position != null) {
+      positionUpdater.lastKnownPosition = position;
+      getProcessModel().setPosition(position);
+      return position;
+    }
+    else {
+      return positionUpdater.lastKnownPosition;
+    }
   }
 
   /**
@@ -994,6 +1003,7 @@ public class ModbusTCPVehicleCommAdapter
     private final ScheduledExecutorService executor;
     private ScheduledFuture<?> positionFuture;
 
+    private String lastKnownPosition;
     private long lastUpdateTime;
     private long lastPosition;
     private Triple lastPrecisePosition;
@@ -1016,6 +1026,7 @@ public class ModbusTCPVehicleCommAdapter
     public PositionUpdater(VehicleProcessModel processModel, ScheduledExecutorService executor) {
       this.processModel = processModel;
       this.executor = executor;
+      this.lastKnownPosition = null;
     }
 
     /**
@@ -1025,12 +1036,12 @@ public class ModbusTCPVehicleCommAdapter
      * The initial delay is 0, and the update interval is configured by the UPDATE_INTERVAL field.
      */
     public void startPositionUpdates() {
-      positionFuture =
-          executor.scheduleAtFixedRate(
-              this::updatePosition,
-              0,
-              UPDATE_INTERVAL,
-              TimeUnit.MILLISECONDS);
+      positionFuture = executor.scheduleAtFixedRate(
+          this::updatePosition,
+          0,
+          UPDATE_INTERVAL,
+          TimeUnit.MILLISECONDS
+      );
     }
 
     private void stopPositionUpdates() {
