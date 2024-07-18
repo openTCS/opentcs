@@ -576,10 +576,12 @@ public class ModbusTCPVehicleCommAdapter
               int highWord = registers.readUnsignedShort();
               // Use little endian combination
               return (long) (highWord << 16 | lowWord);
-            } finally {
+            }
+            finally {
               registers.release();
             }
-          } else {
+          }
+          else {
             throw new IllegalArgumentException("Unexpected response type");
           }
         });
