@@ -11,22 +11,7 @@ dependencies {
   implementation 'com.digitalpetri.modbus:modbus-master-tcp:1.2.0'
   implementation 'com.google.code.gson:gson:2.10.1'
   implementation 'org.jgrapht:jgrapht-core:1.5.1'
-
-  // Ethernet communication dependency (if needed)
-  // implementation 'org.pcap4j:pcap4j-core:1.8.2'
-  // implementation 'org.pcap4j:pcap4j-packetfactory-static:1.8.2'
 }
-
-//processResources.doLast {
-//  // Write a properties file with the build version and date.
-//  def props = new Properties()
-//  props.setProperty('opentcs.version', version)
-//  props.setProperty('opentcs.builddate', project.ext.buildDate)
-//
-//  new File(sourceSets.main.output.resourcesDir, 'opentcs.properties').withWriter() {
-//    props.store(it, null)
-//  }
-//}
 
 task release {
   dependsOn build
