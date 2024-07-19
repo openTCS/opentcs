@@ -209,6 +209,14 @@ public class PlantModelManager
   public Path setPathLocked(TCSObjectReference<Path> ref, boolean newLocked)
       throws ObjectUnknownException {
     Path previousState = getObjectRepo().getObject(Path.class, ref);
+
+    LOG.debug(
+        "Path's locked state changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.isLocked(),
+        newLocked
+    );
+
     Path path = previousState.withLocked(newLocked);
     getObjectRepo().replaceObject(path.withLocked(newLocked));
     emitObjectEvent(
@@ -231,6 +239,14 @@ public class PlantModelManager
   public Location setLocationLocked(TCSObjectReference<Location> ref, boolean newLocked)
       throws ObjectUnknownException {
     Location previousState = getObjectRepo().getObject(Location.class, ref);
+
+    LOG.debug(
+        "Location's locked state changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.isLocked(),
+        newLocked
+    );
+
     Location location = previousState.withLocked(newLocked);
     getObjectRepo().replaceObject(location);
     emitObjectEvent(
@@ -252,6 +268,14 @@ public class PlantModelManager
   public Location setLocationReservationToken(TCSObjectReference<Location> ref, String newToken)
       throws ObjectUnknownException {
     Location previousState = getObjectRepo().getObject(Location.class, ref);
+
+    LOG.debug(
+        "Location's reservation token changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getPeripheralInformation().getReservationToken(),
+        newToken
+    );
+
     Location location = previousState.withPeripheralInformation(
         previousState.getPeripheralInformation().withReservationToken(newToken)
     );
@@ -278,6 +302,14 @@ public class PlantModelManager
   )
       throws ObjectUnknownException {
     Location previousState = getObjectRepo().getObject(Location.class, ref);
+
+    LOG.debug(
+        "Location's proc state changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getPeripheralInformation().getProcState(),
+        newState
+    );
+
     Location location = previousState.withPeripheralInformation(
         previousState.getPeripheralInformation().withProcState(newState)
     );
@@ -304,6 +336,14 @@ public class PlantModelManager
   )
       throws ObjectUnknownException {
     Location previousState = getObjectRepo().getObject(Location.class, ref);
+
+    LOG.debug(
+        "Location's state changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getPeripheralInformation().getState(),
+        newState
+    );
+
     Location location = previousState.withPeripheralInformation(
         previousState.getPeripheralInformation().withState(newState)
     );
@@ -330,6 +370,14 @@ public class PlantModelManager
   )
       throws ObjectUnknownException {
     Location previousState = getObjectRepo().getObject(Location.class, ref);
+
+    LOG.debug(
+        "Location's peripheral job changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getPeripheralInformation().getPeripheralJob(),
+        newJob
+    );
+
     Location location = previousState.withPeripheralInformation(
         previousState.getPeripheralInformation().withPeripheralJob(newJob)
     );
@@ -356,6 +404,14 @@ public class PlantModelManager
   )
       throws ObjectUnknownException {
     Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+
+    LOG.debug(
+        "Vehicle's energy level changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getEnergyLevel(),
+        energyLevel
+    );
+
     Vehicle vehicle = previousState.withEnergyLevel(energyLevel);
     getObjectRepo().replaceObject(vehicle);
     emitObjectEvent(
@@ -412,6 +468,14 @@ public class PlantModelManager
   )
       throws ObjectUnknownException {
     Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+
+    LOG.debug(
+        "Vehicle's load handling devices change: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getLoadHandlingDevices(),
+        devices
+    );
+
     Vehicle vehicle = previousState.withLoadHandlingDevices(devices);
     getObjectRepo().replaceObject(vehicle);
     emitObjectEvent(
@@ -719,6 +783,14 @@ public class PlantModelManager
   )
       throws ObjectUnknownException {
     Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+
+    LOG.debug(
+        "Vehicle's next position changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getNextPosition(),
+        newPosition
+    );
+
     Vehicle vehicle = previousState.withNextPosition(newPosition);
     getObjectRepo().replaceObject(vehicle);
     emitObjectEvent(
@@ -743,6 +815,14 @@ public class PlantModelManager
   )
       throws ObjectUnknownException {
     Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+
+    LOG.trace(
+        "Vehicle's precise position changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getPrecisePosition(),
+        newPosition
+    );
+
     Vehicle vehicle = previousState.withPrecisePosition(newPosition);
     getObjectRepo().replaceObject(vehicle);
     emitObjectEvent(
@@ -767,6 +847,14 @@ public class PlantModelManager
   )
       throws ObjectUnknownException {
     Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+
+    LOG.trace(
+        "Vehicle's orientation angle changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getOrientationAngle(),
+        angle
+    );
+
     Vehicle vehicle = previousState.withOrientationAngle(angle);
     getObjectRepo().replaceObject(vehicle);
     emitObjectEvent(
@@ -792,6 +880,14 @@ public class PlantModelManager
       throws ObjectUnknownException {
     Vehicle vehicle = getObjectRepo().getObject(Vehicle.class, vehicleRef);
     Vehicle previousState = vehicle;
+
+    LOG.debug(
+        "Vehicle's transport order changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getTransportOrder(),
+        orderRef
+    );
+
     if (orderRef == null) {
       vehicle = vehicle.withTransportOrder(null);
       getObjectRepo().replaceObject(vehicle);
@@ -824,6 +920,14 @@ public class PlantModelManager
       throws ObjectUnknownException {
     Vehicle vehicle = getObjectRepo().getObject(Vehicle.class, vehicleRef);
     Vehicle previousState = vehicle;
+
+    LOG.debug(
+        "Vehicle's order sequence changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getOrderSequence(),
+        seqRef
+    );
+
     if (seqRef == null) {
       vehicle = vehicle.withOrderSequence(null);
       getObjectRepo().replaceObject(vehicle);
@@ -855,6 +959,14 @@ public class PlantModelManager
   )
       throws ObjectUnknownException {
     Vehicle previousState = getObjectRepo().getObject(Vehicle.class, vehicleRef);
+
+    LOG.debug(
+        "Vehicle's claimed resources change: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getClaimedResources(),
+        resources
+    );
+
     Vehicle vehicle = previousState.withClaimedResources(unmodifiableCopy(resources));
     getObjectRepo().replaceObject(vehicle);
     emitObjectEvent(
@@ -879,6 +991,14 @@ public class PlantModelManager
   )
       throws ObjectUnknownException {
     Vehicle previousState = getObjectRepo().getObject(Vehicle.class, vehicleRef);
+
+    LOG.debug(
+        "Vehicle's allocated resources change: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getAllocatedResources(),
+        resources
+    );
+
     Vehicle vehicle = previousState.withAllocatedResources(unmodifiableCopy(resources));
     getObjectRepo().replaceObject(vehicle);
     emitObjectEvent(

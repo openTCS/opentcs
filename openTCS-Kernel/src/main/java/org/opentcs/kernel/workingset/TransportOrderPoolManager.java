@@ -276,6 +276,14 @@ public class TransportOrderPoolManager
       throws ObjectUnknownException,
         IllegalArgumentException {
     TransportOrder previousState = getObjectRepo().getObject(TransportOrder.class, orderRef);
+
+    LOG.debug(
+        "Transport order's drive orders change: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getAllDriveOrders(),
+        newOrders
+    );
+
     TransportOrder order = previousState.withDriveOrders(newOrders);
     getObjectRepo().replaceObject(order);
     emitObjectEvent(
@@ -367,6 +375,14 @@ public class TransportOrderPoolManager
   )
       throws ObjectUnknownException {
     TransportOrder previousState = getObjectRepo().getObject(TransportOrder.class, ref);
+
+    LOG.debug(
+        "Transport order's route step index changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getCurrentRouteStepIndex(),
+        index
+    );
+
     TransportOrder order = previousState.withCurrentRouteStepIndex(index);
     getObjectRepo().replaceObject(order);
     emitObjectEvent(
@@ -498,6 +514,14 @@ public class TransportOrderPoolManager
   )
       throws ObjectUnknownException {
     OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
+
+    LOG.debug(
+        "Order sequence's finished index changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getFinishedIndex(),
+        index
+    );
+
     OrderSequence sequence = previousState.withFinishedIndex(index);
     getObjectRepo().replaceObject(sequence);
     emitObjectEvent(
@@ -516,11 +540,12 @@ public class TransportOrderPoolManager
    * @throws ObjectUnknownException If the referenced transport order is not
    * in this pool.
    */
-  public OrderSequence setOrderSequenceComplete(
-      TCSObjectReference<OrderSequence> seqRef
-  )
+  public OrderSequence setOrderSequenceComplete(TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
     OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
+
+    LOG.info("Order sequence being marked as complete: {}", previousState.getName());
+
     OrderSequence sequence = previousState.withComplete(true);
     getObjectRepo().replaceObject(sequence);
     emitObjectEvent(
@@ -542,6 +567,9 @@ public class TransportOrderPoolManager
   public OrderSequence setOrderSequenceFinished(TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
     OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
+
+    LOG.info("Order sequence being marked as finished: {}", previousState.getName());
+
     OrderSequence sequence = previousState.withFinished(true);
     getObjectRepo().replaceObject(sequence);
     emitObjectEvent(
