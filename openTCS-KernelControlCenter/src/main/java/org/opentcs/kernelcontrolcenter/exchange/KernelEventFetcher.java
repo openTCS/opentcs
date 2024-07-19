@@ -43,7 +43,7 @@ public class KernelEventFetcher
   /**
    * The time to wait between event fetches with the service portal (in ms).
    */
-  private final long eventFetchInterval = 1;
+  private final long eventFetchInterval = 100;
   /**
    * The time to wait for events to arrive when fetching (in ms).
    */

@@ -12,8 +12,12 @@ import static org.opentcs.util.Assertions.checkArgument;
 
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
+import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.util.event.EventHandler;
 
 /**
@@ -26,7 +30,7 @@ public class EventBuffer
   /**
    * The buffered events.
    */
-  private final List<Object> events = new ArrayList<>();
+  private final Deque<Object> events = new LinkedList<>();
   /**
    * This buffer's event filter.
    */
@@ -54,9 +58,14 @@ public class EventBuffer
     requireNonNull(event, "event");
     synchronized (events) {
       if (eventFilter.test(event)) {
+        if (replacesLatestEvent(event)) {
+          // If the event is considered a replacement for the latest buffered event, simply remove
+          // the latest event (before adding the replacement to the queue of events).
+          events.removeLast();
+        }
         events.add(event);
-        // If the client is waiting for an event, wake it up, since there is one
-        // now.
+
+        // If the client is waiting for an event, wake it up, since there is one now.
         if (waitingClient) {
           events.notify();
         }
@@ -124,5 +133,22 @@ public class EventBuffer
     synchronized (events) {
       this.eventFilter = requireNonNull(eventFilter);
     }
+  }
+
+  private boolean replacesLatestEvent(Object event) {
+    if (!(event instanceof TCSObjectEvent currentEvent)
+        || !(events.peekLast() instanceof TCSObjectEvent latestEvent)) {
+      return false;
+    }
+
+    if (currentEvent.getType() != TCSObjectEvent.Type.OBJECT_MODIFIED
+        || latestEvent.getType() != TCSObjectEvent.Type.OBJECT_MODIFIED) {
+      return false;
+    }
+
+    return Objects.equals(
+        currentEvent.getCurrentObjectState().getReference(),
+        latestEvent.getCurrentObjectState().getReference()
+    );
   }
 }
