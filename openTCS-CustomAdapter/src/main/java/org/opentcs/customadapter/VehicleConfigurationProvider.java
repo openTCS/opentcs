@@ -11,8 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.opentcs.configuration.ConfigurationPrefix;
 
 @Singleton
+@ConfigurationPrefix("customvehicle")
 public class VehicleConfigurationProvider {
   private static final Logger LOG = Logger.getLogger(VehicleConfigurationProvider.class.getName());
   private static final String CONFIG_FILE = "vehicle_config.json";

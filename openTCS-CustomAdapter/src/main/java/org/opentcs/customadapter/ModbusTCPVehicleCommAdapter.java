@@ -8,6 +8,7 @@ import com.digitalpetri.modbus.requests.ReadHoldingRegistersRequest;
 import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
 import com.digitalpetri.modbus.responses.ModbusResponse;
 import com.digitalpetri.modbus.responses.ReadHoldingRegistersResponse;
+import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -127,6 +128,8 @@ public class ModbusTCPVehicleCommAdapter
    * @param plantModelService The plant model service for accessing plant model information.
    */
   @SuppressWarnings("checkstyle:TodoComment")
+
+  @Inject
   public ModbusTCPVehicleCommAdapter(
       VehicleProcessModel processModel,
       String rechargeOperation,
