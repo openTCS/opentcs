@@ -32,6 +32,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -106,7 +107,9 @@ public class ModbusTCPVehicleCommAdapter
    * Represents a Modbus TCP master used for communication with Modbus TCP devices.
    */
   private ModbusTcpMaster master;
-
+  private ModbusTcpMaster heartbeatMaster;
+  private ModbusTcpMaster statusMaster;
+  private ModbusTcpMaster taskMaster;
   /**
    * Represents the state of a variable indicating whether it has been initialized.
    */
@@ -574,7 +577,7 @@ public class ModbusTCPVehicleCommAdapter
     buffer.writeShort(value);
     WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(address, 1, buffer);
 
-    return sendModbusRequest(request)
+    return sendModbusRequest(request, address)
         .thenAccept(response -> {
           LOG.info("Successfully wrote register at address " + address + " with value " + value);
         })
@@ -587,22 +590,27 @@ public class ModbusTCPVehicleCommAdapter
 
   private CompletableFuture<Integer> readSingleRegister(int address) {
     ReadHoldingRegistersRequest request = new ReadHoldingRegistersRequest(address, 1);
-    return sendModbusRequest(request)
+    return sendModbusRequest(request, address)
         .thenApply(response -> {
           if (response instanceof ReadHoldingRegistersResponse) {
             ReadHoldingRegistersResponse readResponse = (ReadHoldingRegistersResponse) response;
             ByteBuf responseBuffer = readResponse.getRegisters();
-            LOG.info(
-                String.format("READ ADDRESS %d GOT %d", address, responseBuffer.readUnsignedShort())
-            );
-            return responseBuffer.readUnsignedShort();
+            try {
+              int result = responseBuffer.readUnsignedShort();
+              LOG.info(String.format("READ ADDRESS %d GOT %d", address, result));
+              return result;
+            }
+            finally {
+              responseBuffer.release();
+            }
           }
           throw new RuntimeException("Invalid response type");
         });
   }
 
+
   private CompletableFuture<Long> readDWordRegister(int startAddress) {
-    return sendModbusRequest(new ReadHoldingRegistersRequest(startAddress, 2))
+    return sendModbusRequest(new ReadHoldingRegistersRequest(startAddress, 2), startAddress)
         .thenApply(response -> {
           if (response instanceof ReadHoldingRegistersResponse readResponse) {
             ByteBuf registers = readResponse.getRegisters();
@@ -652,7 +660,7 @@ public class ModbusTCPVehicleCommAdapter
 
   private CompletableFuture<Boolean> readAndCompareCommand(ModbusCommand command) {
     ReadHoldingRegistersRequest request = new ReadHoldingRegistersRequest(command.address(), 1);
-    return sendModbusRequest(request)
+    return sendModbusRequest(request, command.address())
         .thenApply(response -> {
           if (response instanceof ReadHoldingRegistersResponse readResponse) {
             ByteBuf registers = readResponse.getRegisters();
@@ -773,7 +781,7 @@ public class ModbusTCPVehicleCommAdapter
           values
       );
 
-      return sendModbusRequest(request)
+      return sendModbusRequest(request, startAddress)
           .thenAccept(
               response -> LOG.info(
                   "Successfully wrote " + batch.size() + " " + commandType
@@ -793,69 +801,147 @@ public class ModbusTCPVehicleCommAdapter
   @Override
   protected boolean performConnection() {
     LOG.info("Connecting to Modbus TCP server at " + host + ":" + port);
+
+    CompletableFuture<ModbusTcpMaster> heartbeatFuture = createMaster("Heartbeat");
+    CompletableFuture<ModbusTcpMaster> statusFuture = createMaster("Status");
+    CompletableFuture<ModbusTcpMaster> taskFuture = createMaster("Task");
+
+    return CompletableFuture.allOf(heartbeatFuture, statusFuture, taskFuture)
+        .thenRun(() -> {
+          this.isConnected = true;
+          LOG.info("Successfully connected all Modbus TCP masters");
+          getProcessModel().setCommAdapterConnected(true);
+          startHeartbeat();
+          positionUpdater.startPositionUpdates();
+        })
+        .exceptionally(ex -> {
+          LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
+          this.isConnected = false;
+          return null;
+        })
+        .isDone();
+  }
+
+  private CompletableFuture<ModbusTcpMaster> createMaster(String type) {
     ModbusTcpMasterConfig config = new ModbusTcpMasterConfig.Builder(host)
         .setPort(port)
         .build();
 
-    try {
-      return CompletableFuture.supplyAsync(() -> {
-        LOG.info("Creating new ModbusTcpMaster instance");
-        return new ModbusTcpMaster(config);
-      })
-          .thenCompose(newMaster -> {
-            this.master = newMaster;
-            LOG.info("Initiating connection to Modbus TCP server");
-            return newMaster.connect();
-          })
-          .thenRun(() -> {
-            this.isConnected = true;
-            LOG.info("Successfully connected to Modbus TCP server");
-            getProcessModel().setCommAdapterConnected(true);
-            startHeartbeat();
-            positionUpdater.startPositionUpdates();
-          })
-          .exceptionally(ex -> {
-            LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
-            this.isConnected = false;
-            return null;
-          })
-          .isDone();
-    }
-    catch (Exception e) {
-      LOG.log(Level.SEVERE, "Unexpected error during connection attempt", e);
-      return false;
-    }
+    return CompletableFuture.supplyAsync(() -> {
+      LOG.info("Creating new ModbusTcpMaster instance for " + type);
+      return new ModbusTcpMaster(config);
+    }).thenCompose(newMaster -> {
+      switch (type) {
+        case "Heartbeat":
+          heartbeatMaster = newMaster;
+          break;
+        case "Status":
+          statusMaster = newMaster;
+          break;
+        case "Task":
+          taskMaster = newMaster;
+          break;
+        default:
+          throw new IllegalArgumentException("Invalid type: " + type);
+      }
+      return newMaster.connect();
+    });
   }
+
+  private ModbusTcpMaster selectAppropriatesMaster(int address) {
+    return switch (address) {
+      case 100 -> heartbeatMaster;
+      case 110 -> statusMaster;
+      default -> taskMaster;
+    };
+  }
+
+//  @Override
+//  protected boolean performDisconnection() {
+//    LOG.info("Disconnecting from Modbus TCP server");
+//    if (master != null) {
+//      return master.disconnect()
+//          .thenRun(() -> {
+//            LOG.info("Successfully disconnected from Modbus TCP server");
+//            this.isConnected = false;
+//            getProcessModel().setCommAdapterConnected(false);
+//            this.master = null;
+//          })
+//          .exceptionally(ex -> {
+//            LOG.log(Level.SEVERE, "Failed to disconnect from Modbus TCP server", ex);
+//            return null;
+//          })
+//          .isDone();
+//    }
+//    return true;
+//  }
 
   @Override
   protected boolean performDisconnection() {
-    LOG.info("Disconnecting from Modbus TCP server");
-    if (master != null) {
-      return master.disconnect()
-          .thenRun(() -> {
-            LOG.info("Successfully disconnected from Modbus TCP server");
-            this.isConnected = false;
-            getProcessModel().setCommAdapterConnected(false);
-            this.master = null;
-          })
-          .exceptionally(ex -> {
-            LOG.log(Level.SEVERE, "Failed to disconnect from Modbus TCP server", ex);
-            return null;
-          })
-          .isDone();
-    }
-    return true;
+    LOG.info("Disconnecting from Modbus TCP servers");
+
+    // Function to handle disconnect for each master
+    BiFunction<ModbusTcpMaster, String, CompletableFuture<Void>> disconnectMaster = (
+        master, masterName
+    ) -> {
+      if (master != null) {
+        return master.disconnect()
+            .thenRun(() -> {
+              LOG.info("Successfully disconnected from " + masterName);
+              getProcessModel().setCommAdapterConnected(false);
+            })
+            .exceptionally(ex -> {
+              LOG.log(Level.SEVERE, "Failed to disconnect from " + masterName, ex);
+              return null;
+            });
+      }
+      return CompletableFuture.completedFuture(null);
+    };
+
+    // Disconnect all masters
+    CompletableFuture<Void> disconnectHeartbeatMaster = disconnectMaster.apply(
+        heartbeatMaster, "Heartbeat Master"
+    );
+    CompletableFuture<Void> disconnectStatusMaster = disconnectMaster.apply(
+        statusMaster, "Status Master"
+    );
+    CompletableFuture<Void> disconnectTaskMaster = disconnectMaster.apply(
+        taskMaster, "Task Master"
+    );
+
+    // Combine all futures and wait for all to complete
+    CompletableFuture<Void> allDisconnections = CompletableFuture.allOf(
+        disconnectHeartbeatMaster,
+        disconnectStatusMaster,
+        disconnectTaskMaster
+    );
+
+    return allDisconnections
+        .thenRun(() -> {
+          this.isConnected = false;
+          this.heartbeatMaster = null;
+          this.statusMaster = null;
+          this.taskMaster = null;
+          LOG.info("All masters disconnected successfully");
+        })
+        .exceptionally(ex -> {
+          LOG.log(Level.SEVERE, "One or more masters failed to disconnect", ex);
+          return null;
+        })
+        .isDone();
   }
+
 
   @Override
   protected boolean isVehicleConnected() {
-    return isConnected && master != null;
+    return isConnected && heartbeatMaster != null && statusMaster != null && taskMaster != null;
   }
 
   private CompletableFuture<ModbusResponse> sendModbusRequest(
-      com.digitalpetri.modbus.requests.ModbusRequest request
+      com.digitalpetri.modbus.requests.ModbusRequest request,
+      int address
   ) {
-    if (master == null) {
+    if (selectAppropriatesMaster(address) == null) {
       return CompletableFuture.failedFuture(
           new IllegalStateException(
               "Modbus master is not initialized"
@@ -865,7 +951,7 @@ public class ModbusTCPVehicleCommAdapter
 
     return CompletableFuture.supplyAsync(() -> {
       try {
-        return master.sendRequest(request, 0).get(5, TimeUnit.SECONDS);
+        return selectAppropriatesMaster(address).sendRequest(request, 0).get(5, TimeUnit.SECONDS);
       }
       catch (InterruptedException e) {
         Thread.currentThread().interrupt();
@@ -882,7 +968,6 @@ public class ModbusTCPVehicleCommAdapter
       }
     }).thenApply(response -> {
       if (response instanceof ReadHoldingRegistersResponse) {
-        // 確保 ByteBuf 被正確釋放
         try {
           return response;
         }
@@ -893,14 +978,15 @@ public class ModbusTCPVehicleCommAdapter
       return response;
     }).exceptionally(ex -> {
       LOG.severe("Failed to send Modbus request: " + ex.getMessage());
-      return retrySendModbusRequest(request, 3, 1000).join();
+      return retrySendModbusRequest(request, 3, 1000, address).join();
     });
   }
 
   private CompletableFuture<ModbusResponse> retrySendModbusRequest(
       com.digitalpetri.modbus.requests.ModbusRequest request,
       int retries,
-      long delay
+      long delay,
+      int address
   ) {
     if (retries <= 0) {
       return CompletableFuture.failedFuture(new RuntimeException("Max retries reached"));
@@ -914,11 +1000,11 @@ public class ModbusTCPVehicleCommAdapter
         Thread.currentThread().interrupt();
         throw new CompletionException(e);
       }
-      return sendModbusRequest(request);
+      return sendModbusRequest(request, address);
     }, getExecutor()).thenCompose(future -> future.handle((response, ex) -> {
       if (ex != null) {
         LOG.warning("Retry failed: " + ex.toString() + ". Retries left: " + (retries - 1));
-        return retrySendModbusRequest(request, retries - 1, delay * 2);
+        return retrySendModbusRequest(request, retries - 1, delay * 2, address);
       }
       return CompletableFuture.completedFuture(response);
     })).thenCompose(innerFuture -> innerFuture);
