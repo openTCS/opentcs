@@ -17,7 +17,8 @@ import org.opentcs.configuration.ConfigurationPrefix;
 @ConfigurationPrefix("customvehicle")
 public class VehicleConfigurationProvider {
   private static final Logger LOG = Logger.getLogger(VehicleConfigurationProvider.class.getName());
-  private static final String CONFIG_FILE = "vehicle_config.json";
+  private static final String CONFIG_FILE
+      = "C:\\Users\\user\\Desktop\\OpenTCS\\idea\\opentcs\\config\\vehicle_config.json";
 
   private final Map<String, VehicleConfiguration> configurations = new HashMap<>();
 

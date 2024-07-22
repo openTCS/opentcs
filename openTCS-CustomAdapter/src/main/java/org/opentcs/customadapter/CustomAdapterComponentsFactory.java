@@ -13,5 +13,7 @@ public interface CustomAdapterComponentsFactory {
    * @param vehicle The vehicle.
    * @return A new CustomCommunicationAdapter for the given vehicle.
    */
-  CustomVehicleCommAdapter createCustomCommAdapter(Vehicle vehicle);
+  CustomVehicleCommAdapter createCustomCommAdapter(
+      Vehicle vehicle
+  );
 }

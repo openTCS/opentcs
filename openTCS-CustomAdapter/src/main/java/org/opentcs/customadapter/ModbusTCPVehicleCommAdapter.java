@@ -115,12 +115,9 @@ public class ModbusTCPVehicleCommAdapter
 
   /**
    * A communication adapter for ModbusTCP-based vehicle communication.
-   *
+   * <p>
    * Allows communication between the vehicle and the control system using the ModbusTCP protocol.
    *
-   * @param processModel The process model of the vehicle.
-   * @param rechargeOperation The name of the recharge operation.
-   * @param commandsCapacity The maximum capacity of the command queue.
    * @param executor The executor for handling background tasks.
    * @param vehicle The vehicle associated with this communication adapter.
    * @param host The host IP address for the ModbusTCP connection.
@@ -131,9 +128,6 @@ public class ModbusTCPVehicleCommAdapter
 
   @Inject
   public ModbusTCPVehicleCommAdapter(
-      VehicleProcessModel processModel,
-      String rechargeOperation,
-      int commandsCapacity,
       @KernelExecutor
       ScheduledExecutorService executor,
       @Assisted
@@ -142,13 +136,14 @@ public class ModbusTCPVehicleCommAdapter
       int port,
       PlantModelService plantModelService
   ) {
-    super(processModel, rechargeOperation, commandsCapacity, executor);
-    this.host = host;
-    this.port = port;
+    super(new CustomProcessModel(vehicle), "RECHARGE", 1000, executor);
+    this.host = "192.168.0.72";
+    this.port = 502;
     this.vehicle = requireNonNull(vehicle, "vehicle");
+    this.plantModelService = requireNonNull(plantModelService, "plantModelService");
+
     this.isConnected = false;
     this.currentTransportOrder = null;
-    this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.positionMap = new HashMap<>();
   }
 
@@ -832,6 +827,9 @@ public class ModbusTCPVehicleCommAdapter
   private CompletableFuture<ModbusResponse> sendModbusRequest(
       com.digitalpetri.modbus.requests.ModbusRequest request
   ) {
+    if (master == null) {
+      throw new IllegalStateException("Modbus master is not initialized");
+    }
     return master.sendRequest(request, 0)
         .handle((response, ex) -> {
           if (ex != null) {

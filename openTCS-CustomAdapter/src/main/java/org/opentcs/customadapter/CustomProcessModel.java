@@ -19,7 +19,9 @@ public class CustomProcessModel
    *
    * @param attachedVehicle the vehicle object that this process model is attached to
    */
-  public CustomProcessModel(Vehicle attachedVehicle) {
+  public CustomProcessModel(
+      Vehicle attachedVehicle
+  ) {
     super(attachedVehicle);
     this.velocityController = new VelocityController(
         1.6,

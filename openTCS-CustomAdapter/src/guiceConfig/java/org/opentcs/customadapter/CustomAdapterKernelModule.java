@@ -1,8 +1,9 @@
 package org.opentcs.customadapter;
 
-import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,21 +23,24 @@ public class CustomAdapterKernelModule
 
   @Override
   protected void configure() {
-    bind(CommunicationStrategy.class).in(Singleton.class);
-    bind(CustomAdapterComponentsFactory.class).to(CommunicationStrategy.class);
+    bind(ScheduledExecutorService.class).toInstance(Executors.newScheduledThreadPool(1));
+    bind(CustomCommunicationAdapterFactory.class).to(CustomCommunicationAdapterFactoryImpl.class);
+
+    vehicleCommAdaptersBinder().addBinding().to(CustomCommunicationAdapterFactory.class);
+
+    install(
+        new FactoryModuleBuilder()
+            .implement(CustomVehicleCommAdapter.class, ModbusTCPVehicleCommAdapter.class)
+            .build(CustomAdapterComponentsFactory.class)
+    );
 
     MapBinder<String, StrategyCreator> strategyBinder
         = MapBinder.newMapBinder(binder(), String.class, StrategyCreator.class);
     strategyBinder.addBinding("ModbusTCP").to(ModbusTCPStrategy.class);
 
-    bind(ModbusTCPVehicleCommAdapter.class);
+    bind(Boolean.class).toInstance(Boolean.FALSE);
+    bind(Integer.class).toInstance(0);
 
-    install(
-        new FactoryModuleBuilder()
-            .implement(CustomVehicleCommAdapter.class, ModbusTCPVehicleCommAdapter.class)
-            .build(CustomCommunicationAdapterFactory.class)
-    );
 
-    vehicleCommAdaptersBinder().addBinding().to(CustomCommunicationAdapterFactory.class);
   }
 }
