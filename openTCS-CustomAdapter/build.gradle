@@ -11,6 +11,7 @@ dependencies {
   implementation 'com.digitalpetri.modbus:modbus-master-tcp:1.2.0'
   implementation 'com.google.code.gson:gson:2.10.1'
   implementation 'org.jgrapht:jgrapht-core:1.5.1'
+  implementation group: 'io.netty', name: 'netty-all', version: '4.1.24.Final'
 }
 
 task release {

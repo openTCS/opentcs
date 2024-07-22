@@ -42,7 +42,7 @@ public class CommunicationStrategy
   ) {
     this.strategyProviders = strategyProviders;
     this.executor = executor;
-    this.configProvider = configProvider;
+    this.configProvider = new VehicleConfigurationProvider();
     this.plantModelService = plantModelService;
     this.vehicleService = vehicleService;
   }
@@ -60,10 +60,8 @@ public class CommunicationStrategy
     if (config == null) {
 //      config = createConfigWithUserInput(vehicle);
 //      configProvider.setConfiguration(vehicle.getName(), config);
-      configProvider.setConfiguration(
-          vehicle.getName(),
-          new VehicleConfiguration("ModbusTCP", "192.168.0.72", 502)
-      );
+      config = new VehicleConfiguration("ModbusTCP", "192.168.0.72", 502);
+      configProvider.setConfiguration(vehicle.getName(), config);
     }
 
     String strategyKey = config.currentStrategy();

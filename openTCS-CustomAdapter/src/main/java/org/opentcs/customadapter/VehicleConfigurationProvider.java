@@ -23,7 +23,12 @@ public class VehicleConfigurationProvider {
   private final Map<String, VehicleConfiguration> configurations = new HashMap<>();
 
   VehicleConfigurationProvider() {
+    LOG.info("Initializing VehicleConfigurationProvider");
     loadConfigurations();
+    LOG.info(
+        "VehicleConfigurationProvider initialized with "
+            + configurations.size() + " configurations"
+    );
   }
 
   /**
@@ -57,11 +62,27 @@ public class VehicleConfigurationProvider {
     try (FileReader reader = new FileReader(CONFIG_FILE)) {
       Type type = new TypeToken<HashMap<String, VehicleConfiguration>>() {}.getType();
       Map<String, VehicleConfiguration> loadedConfigs = new Gson().fromJson(reader, type);
-      if (loadedConfigs != null) {
+      if (loadedConfigs != null && !loadedConfigs.isEmpty()) {
         configurations.clear();
         configurations.putAll(loadedConfigs);
+
+        String specificVehicle = "SAA-mini-OHT-0001";
+        VehicleConfiguration config = loadedConfigs.get(specificVehicle);
+        if (config != null) {
+          LOG.info(
+              String.format(
+                  "Configuration for %s: currentStrategy: %s, host: %s, port: %d",
+                  specificVehicle, config.currentStrategy(), config.host(), config.port()
+              )
+          );
+        }
+        else {
+          LOG.warning("Configuration for " + specificVehicle + " not found.");
+        }
       }
-      LOG.info("Configurations loaded successfully.");
+      else {
+        LOG.warning("No configurations loaded or file is empty.");
+      }
     }
     catch (IOException e) {
       LOG.log(Level.WARNING, "Failed to load configurations. Using empty configuration.", e);

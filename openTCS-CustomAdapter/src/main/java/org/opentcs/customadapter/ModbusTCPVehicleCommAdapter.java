@@ -12,6 +12,7 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.handler.timeout.TimeoutException;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.beans.PropertyChangeEvent;
@@ -26,6 +27,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -104,6 +106,7 @@ public class ModbusTCPVehicleCommAdapter
    * Represents a Modbus TCP master used for communication with Modbus TCP devices.
    */
   private ModbusTcpMaster master;
+
   /**
    * Represents the state of a variable indicating whether it has been initialized.
    */
@@ -112,6 +115,7 @@ public class ModbusTCPVehicleCommAdapter
   private ScheduledFuture<?> heartBeatFuture;
   private PositionUpdater positionUpdater;
   private final PlantModelService plantModelService;
+  private final VehicleConfigurationProvider configProvider;
 
   /**
    * A communication adapter for ModbusTCP-based vehicle communication.
@@ -137,8 +141,11 @@ public class ModbusTCPVehicleCommAdapter
       PlantModelService plantModelService
   ) {
     super(new CustomProcessModel(vehicle), "RECHARGE", 1000, executor);
-    this.host = host;
-    this.port = port;
+    this.configProvider = new VehicleConfigurationProvider();
+    this.host = configProvider.getConfiguration(vehicle.getName()).host();
+    this.port = configProvider.getConfiguration(vehicle.getName()).port();
+
+    LOG.warning(String.format("DEVICE HOST:%s, PORT: %d", this.host, this.port));
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
 
@@ -156,14 +163,16 @@ public class ModbusTCPVehicleCommAdapter
     super.initialize();
     getProcessModel().setState(Vehicle.State.IDLE);
     LOG.warning("Device has been set to IDLE state");
+    ((ExecutorService) getExecutor()).submit(() -> getProcessModel().setPosition("Point-0026"));
+    LOG.warning("Device has been set to Point-0001");
     getProcessModel().setLoadHandlingDevices(
         List.of(new LoadHandlingDevice(LHD_NAME, false))
     );
     LOG.warning("Device has set load handling device");
     initializePositionMap();
     this.positionUpdater = new PositionUpdater(getProcessModel(), getExecutor());
-    positionUpdater.startPositionUpdates();
-    startHeartbeat();  // Start the heartbeat mechanism
+//    positionUpdater.startPositionUpdates();
+//    startHeartbeat();  // Start the heartbeat mechanism
     LOG.warning("Starting sending heart bit.");
     initialized = true;
   }
@@ -583,6 +592,9 @@ public class ModbusTCPVehicleCommAdapter
           if (response instanceof ReadHoldingRegistersResponse) {
             ReadHoldingRegistersResponse readResponse = (ReadHoldingRegistersResponse) response;
             ByteBuf responseBuffer = readResponse.getRegisters();
+            LOG.info(
+                String.format("READ ADDRESS %d GOT %d", address, responseBuffer.readUnsignedShort())
+            );
             return responseBuffer.readUnsignedShort();
           }
           throw new RuntimeException("Invalid response type");
@@ -785,22 +797,34 @@ public class ModbusTCPVehicleCommAdapter
         .setPort(port)
         .build();
 
-    return CompletableFuture.supplyAsync(() -> new ModbusTcpMaster(config))
-        .thenCompose(newMaster -> {
-          this.master = newMaster;
-          return newMaster.connect();
-        })
-        .thenRun(() -> {
-          this.isConnected = true;
-          LOG.info("Successfully connected to Modbus TCP server");
-          getProcessModel().setCommAdapterConnected(true);
-        })
-        .exceptionally(ex -> {
-          LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
-          this.isConnected = false;
-          return null;
-        })
-        .isDone();
+    try {
+      return CompletableFuture.supplyAsync(() -> {
+        LOG.info("Creating new ModbusTcpMaster instance");
+        return new ModbusTcpMaster(config);
+      })
+          .thenCompose(newMaster -> {
+            this.master = newMaster;
+            LOG.info("Initiating connection to Modbus TCP server");
+            return newMaster.connect();
+          })
+          .thenRun(() -> {
+            this.isConnected = true;
+            LOG.info("Successfully connected to Modbus TCP server");
+            getProcessModel().setCommAdapterConnected(true);
+            startHeartbeat();
+            positionUpdater.startPositionUpdates();
+          })
+          .exceptionally(ex -> {
+            LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
+            this.isConnected = false;
+            return null;
+          })
+          .isDone();
+    }
+    catch (Exception e) {
+      LOG.log(Level.SEVERE, "Unexpected error during connection attempt", e);
+      return false;
+    }
   }
 
   @Override
@@ -832,20 +856,51 @@ public class ModbusTCPVehicleCommAdapter
       com.digitalpetri.modbus.requests.ModbusRequest request
   ) {
     if (master == null) {
-      throw new IllegalStateException("Modbus master is not initialized");
+      return CompletableFuture.failedFuture(
+          new IllegalStateException(
+              "Modbus master is not initialized"
+          )
+      );
     }
-    return master.sendRequest(request, 0)
-        .handle((response, ex) -> {
-          if (ex != null) {
-            LOG.severe("Failed to send Modbus request: " + ex.getMessage());
-            return retrySendModbusRequest(request, 3, 1000);
-          }
-          return CompletableFuture.completedFuture(response);
-        }).thenCompose(response -> response);
+
+    return CompletableFuture.supplyAsync(() -> {
+      try {
+        return master.sendRequest(request, 0).get(5, TimeUnit.SECONDS);
+      }
+      catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new CompletionException("Request interrupted", e);
+      }
+      catch (ExecutionException e) {
+        throw new CompletionException("Request failed", e.getCause());
+      }
+      catch (TimeoutException e) {
+        throw new CompletionException("Request timed out", e);
+      }
+      catch (java.util.concurrent.TimeoutException e) {
+        throw new RuntimeException("Concurrent request timed out", e);
+      }
+    }).thenApply(response -> {
+      if (response instanceof ReadHoldingRegistersResponse) {
+        // 確保 ByteBuf 被正確釋放
+        try {
+          return response;
+        }
+        finally {
+          ((ReadHoldingRegistersResponse) response).getRegisters().release();
+        }
+      }
+      return response;
+    }).exceptionally(ex -> {
+      LOG.severe("Failed to send Modbus request: " + ex.getMessage());
+      return retrySendModbusRequest(request, 3, 1000).join();
+    });
   }
 
   private CompletableFuture<ModbusResponse> retrySendModbusRequest(
-      com.digitalpetri.modbus.requests.ModbusRequest request, int retries, int delay
+      com.digitalpetri.modbus.requests.ModbusRequest request,
+      int retries,
+      long delay
   ) {
     if (retries <= 0) {
       return CompletableFuture.failedFuture(new RuntimeException("Max retries reached"));
@@ -857,17 +912,16 @@ public class ModbusTCPVehicleCommAdapter
       }
       catch (InterruptedException e) {
         Thread.currentThread().interrupt();
-        throw new RuntimeException(e);
+        throw new CompletionException(e);
       }
-      return sendModbusRequest(request)
-          .handle((response, ex) -> {
-            if (ex != null) {
-              LOG.severe("Retry failed: " + ex.getMessage());
-              return retrySendModbusRequest(request, retries - 1, delay);
-            }
-            return CompletableFuture.completedFuture(response);
-          }).thenCompose(response -> response).join();
-    });
+      return sendModbusRequest(request);
+    }, getExecutor()).thenCompose(future -> future.handle((response, ex) -> {
+      if (ex != null) {
+        LOG.warning("Retry failed: " + ex.toString() + ". Retries left: " + (retries - 1));
+        return retrySendModbusRequest(request, retries - 1, delay * 2);
+      }
+      return CompletableFuture.completedFuture(response);
+    })).thenCompose(innerFuture -> innerFuture);
   }
 
 
