@@ -137,8 +137,8 @@ public class ModbusTCPVehicleCommAdapter
       PlantModelService plantModelService
   ) {
     super(new CustomProcessModel(vehicle), "RECHARGE", 1000, executor);
-    this.host = "192.168.0.72";
-    this.port = 502;
+    this.host = host;
+    this.port = port;
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
 
@@ -150,17 +150,21 @@ public class ModbusTCPVehicleCommAdapter
   @Override
   public void initialize() {
     if (isInitialized()) {
+      LOG.warning("Device has been initialized");
       return;
     }
     super.initialize();
     getProcessModel().setState(Vehicle.State.IDLE);
+    LOG.warning("Device has been set to IDLE state");
     getProcessModel().setLoadHandlingDevices(
         List.of(new LoadHandlingDevice(LHD_NAME, false))
     );
+    LOG.warning("Device has set load handling device");
     initializePositionMap();
     this.positionUpdater = new PositionUpdater(getProcessModel(), getExecutor());
     positionUpdater.startPositionUpdates();
     startHeartbeat();  // Start the heartbeat mechanism
+    LOG.warning("Starting sending heart bit.");
     initialized = true;
   }
 
