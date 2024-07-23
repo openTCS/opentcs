@@ -201,11 +201,15 @@ public class ModbusTCPVehicleCommAdapter
           .thenAccept(value -> {
             if (value != (currentValue ? 1 : 0)) {
               LOG.warning("Heartbeat value mismatch! Retrying...");
-              writeSingleRegister(100, currentValue ? 1 : 0);
+              writeSingleRegister(100, currentValue ? 1 : 0)
+                  .exceptionally(ex -> {
+                    LOG.severe("Failed to retry heartbeat write: " + ex.getMessage());
+                    return null;
+                  });
             }
           })
           .exceptionally(ex -> {
-            LOG.severe("Failed to write heartbeat: " + ex.getMessage());
+            LOG.severe("Failed to write or read heartbeat: " + ex.getMessage());
             return null;
           });
     }, 0, 500, TimeUnit.MILLISECONDS);
@@ -582,20 +586,29 @@ public class ModbusTCPVehicleCommAdapter
           LOG.severe("Failed to write register at address " + address + ": " + ex.getMessage());
           return null;
         })
-        .whenComplete((v, ex) -> buffer.release());
+        .whenComplete((v, ex) -> {
+          if (buffer.refCnt() > 0) {
+            buffer.release();
+          }
+        });
   }
 
   private CompletableFuture<Integer> readSingleRegister(int address) {
     ReadHoldingRegistersRequest request = new ReadHoldingRegistersRequest(address, 1);
     return sendModbusRequest(request)
         .thenApply(response -> {
-          if (response instanceof ReadHoldingRegistersResponse) {
-            ReadHoldingRegistersResponse readResponse = (ReadHoldingRegistersResponse) response;
+          if (response instanceof ReadHoldingRegistersResponse readResponse) {
             ByteBuf responseBuffer = readResponse.getRegisters();
-            LOG.info(
-                String.format("READ ADDRESS %d GOT %d", address, responseBuffer.readUnsignedShort())
-            );
-            return responseBuffer.readUnsignedShort();
+            try {
+              int value = responseBuffer.readUnsignedShort();
+              LOG.info(String.format("READ ADDRESS %d GOT %d", address, value));
+              return value;
+            }
+            finally {
+              if (responseBuffer.refCnt() > 0) {
+                responseBuffer.release();
+              }
+            }
           }
           throw new RuntimeException("Invalid response type");
         });
@@ -881,14 +894,10 @@ public class ModbusTCPVehicleCommAdapter
         throw new RuntimeException("Concurrent request timed out", e);
       }
     }).thenApply(response -> {
-      if (response instanceof ReadHoldingRegistersResponse) {
-        // 確保 ByteBuf 被正確釋放
-        try {
-          return response;
-        }
-        finally {
-          ((ReadHoldingRegistersResponse) response).getRegisters().release();
-        }
+      if (response instanceof ReadHoldingRegistersResponse readResponse) {
+        ByteBuf registers = readResponse.getRegisters();
+        registers.retain(); // Increment the reference count
+        return readResponse;
       }
       return response;
     }).exceptionally(ex -> {
