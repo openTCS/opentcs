@@ -337,7 +337,7 @@ public class ModbusTCPVehicleCommAdapter
     if (!allMovementCommands.contains(cmd)) {
       LOG.warning(String.format("%s: Command is NOT in MovementCommands pool.", getName()));
       // open this comment back after testing.
-      getProcessModel().commandFailed(cmd);
+//      getProcessModel().commandFailed(cmd);
     }
   }
 
@@ -812,7 +812,7 @@ public class ModbusTCPVehicleCommAdapter
             LOG.info("Successfully connected to Modbus TCP server");
             getProcessModel().setCommAdapterConnected(true);
             startHeartbeat();
-            positionUpdater.startPositionUpdates();
+//            positionUpdater.startPositionUpdates();
           })
           .exceptionally(ex -> {
             LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
@@ -1054,7 +1054,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   public class PositionUpdater {
-    private static final int UPDATE_INTERVAL = 20;
+    private static final int UPDATE_INTERVAL = 100;
     private static final int MAX_INTERPOLATION_TIME = 500;
     private static final int POSITION_REGISTER_ADDRESS = 110;
 
