@@ -18,7 +18,7 @@ import org.opentcs.configuration.ConfigurationPrefix;
 public class VehicleConfigurationProvider {
   private static final Logger LOG = Logger.getLogger(VehicleConfigurationProvider.class.getName());
   private static final String CONFIG_FILE
-      = "C:\\Users\\user\\Desktop\\OpenTCS\\idea\\opentcs\\config\\vehicle_config.json";
+      = "C:\\Users\\user\\Desktop\\minioht\\config\\vehicle_config.json";
 
   private final Map<String, VehicleConfiguration> configurations = new HashMap<>();
 
@@ -39,7 +39,9 @@ public class VehicleConfigurationProvider {
    * exist.
    */
   public VehicleConfiguration getConfiguration(String vehicleName) {
-    return configurations.getOrDefault(vehicleName, null);
+    return configurations.getOrDefault(
+        vehicleName, new VehicleConfiguration("ModbusTCP", "0.0.0.0", 502)
+    );
   }
 
   /**
