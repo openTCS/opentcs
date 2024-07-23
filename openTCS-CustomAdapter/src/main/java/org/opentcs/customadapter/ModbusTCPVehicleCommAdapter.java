@@ -202,21 +202,22 @@ public class ModbusTCPVehicleCommAdapter
   private void startHeartbeat() {
     heartBeatFuture = getExecutor().scheduleAtFixedRate(() -> {
       boolean currentValue = heartBeatToggle.getAndSet(!heartBeatToggle.get());
-      ModbusRequest writeRequest = new ModbusRequest(
-          new WriteMultipleRegistersRequest(
-              100, 1, Unpooled.buffer(2).writeShort(currentValue ? 1 : 0)
-          ),
-          100,
-          1
-      );
-      requestQueue.offer(writeRequest);
-
-      ModbusRequest readRequest = new ModbusRequest(
-          new ReadHoldingRegistersRequest(100, 1),
-          100,
-          2
-      );
-      requestQueue.offer(readRequest);
+      writeSingleRegister(100, currentValue ? 1 : 0)
+          .thenCompose(v -> readSingleRegister(100))
+          .thenAccept(value -> {
+            if (value != (currentValue ? 1 : 0)) {
+              LOG.warning("Heartbeat value mismatch! Retrying...");
+              writeSingleRegister(100, currentValue ? 1 : 0)
+                  .exceptionally(ex -> {
+                    LOG.severe("Failed to retry heartbeat write: " + ex.getMessage());
+                    return null;
+                  });
+            }
+          })
+          .exceptionally(ex -> {
+            LOG.severe("Failed to write or read heartbeat: " + ex.getMessage());
+            return null;
+          });
     }, 0, 500, TimeUnit.MILLISECONDS);
   }
 
@@ -362,7 +363,7 @@ public class ModbusTCPVehicleCommAdapter
     if (!allMovementCommands.contains(cmd)) {
       LOG.warning(String.format("%s: Command is NOT in MovementCommands pool.", getName()));
       // open this comment back after testing.
-      getProcessModel().commandFailed(cmd);
+//      getProcessModel().commandFailed(cmd);
     }
   }
 
@@ -607,23 +608,28 @@ public class ModbusTCPVehicleCommAdapter
           LOG.severe("Failed to write register at address " + address + ": " + ex.getMessage());
           return null;
         })
-        .whenComplete((v, ex) -> buffer.release());
+        .whenComplete((v, ex) -> {
+          if (buffer.refCnt() > 0) {
+            buffer.release();
+          }
+        });
   }
 
   private CompletableFuture<Integer> readSingleRegister(int address) {
     ReadHoldingRegistersRequest request = new ReadHoldingRegistersRequest(address, 1);
     return sendModbusRequest(request, address)
         .thenApply(response -> {
-          if (response instanceof ReadHoldingRegistersResponse) {
-            ReadHoldingRegistersResponse readResponse = (ReadHoldingRegistersResponse) response;
+          if (response instanceof ReadHoldingRegistersResponse readResponse) {
             ByteBuf responseBuffer = readResponse.getRegisters();
             try {
-              int result = responseBuffer.readUnsignedShort();
-              LOG.info(String.format("READ ADDRESS %d GOT %d", address, result));
-              return result;
+              int value = responseBuffer.readUnsignedShort();
+              LOG.info(String.format("READ ADDRESS %d GOT %d", address, value));
+              return value;
             }
             finally {
-              responseBuffer.release();
+              if (responseBuffer.refCnt() > 0) {
+                responseBuffer.release();
+              }
             }
           }
           throw new RuntimeException("Invalid response type");
@@ -828,17 +834,28 @@ public class ModbusTCPVehicleCommAdapter
     CompletableFuture<ModbusTcpMaster> taskFuture = createMaster("Task");
 
     try {
-      CompletableFuture.allOf(heartbeatFuture, statusFuture, taskFuture).get(30, TimeUnit.SECONDS);
-
-      this.isConnected = true;
-      LOG.info("Successfully connected all Modbus TCP masters");
-      getProcessModel().setCommAdapterConnected(true);
-      startHeartbeat();
-      LOG.warning("Starting sending heart bit.");
-      positionUpdater.startPositionUpdates();
-      LOG.warning("Starting updating position");
-
-      return true;
+      return CompletableFuture.supplyAsync(() -> {
+        LOG.info("Creating new ModbusTcpMaster instance");
+        return new ModbusTcpMaster(config);
+      })
+          .thenCompose(newMaster -> {
+            this.master = newMaster;
+            LOG.info("Initiating connection to Modbus TCP server");
+            return newMaster.connect();
+          })
+          .thenRun(() -> {
+            this.isConnected = true;
+            LOG.info("Successfully connected to Modbus TCP server");
+            getProcessModel().setCommAdapterConnected(true);
+            startHeartbeat();
+//            positionUpdater.startPositionUpdates();
+          })
+          .exceptionally(ex -> {
+            LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
+            this.isConnected = false;
+            return null;
+          })
+          .isDone();
     }
     catch (Exception ex) {
       LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
@@ -1039,14 +1056,20 @@ public class ModbusTCPVehicleCommAdapter
         Thread.currentThread().interrupt();
         throw new CompletionException("Request interrupted", e);
       }
-    }, getExecutor()).thenApply(response -> {
-      if (response instanceof ReadHoldingRegistersResponse) {
-        try {
-          return response;
-        }
-        finally {
-          ((ReadHoldingRegistersResponse) response).getRegisters().release();
-        }
+      catch (ExecutionException e) {
+        throw new CompletionException("Request failed", e.getCause());
+      }
+      catch (TimeoutException e) {
+        throw new CompletionException("Request timed out", e);
+      }
+      catch (java.util.concurrent.TimeoutException e) {
+        throw new RuntimeException("Concurrent request timed out", e);
+      }
+    }).thenApply(response -> {
+      if (response instanceof ReadHoldingRegistersResponse readResponse) {
+        ByteBuf registers = readResponse.getRegisters();
+        registers.retain(); // Increment the reference count
+        return readResponse;
       }
       return response;
     }).exceptionally(ex -> {
@@ -1213,7 +1236,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   public class PositionUpdater {
-    private static final int UPDATE_INTERVAL = 20;
+    private static final int UPDATE_INTERVAL = 100;
     private static final int MAX_INTERPOLATION_TIME = 500;
     private static final int POSITION_REGISTER_ADDRESS = 110;
 
