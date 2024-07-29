@@ -47,7 +47,6 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
@@ -166,10 +165,11 @@ public class ModbusTCPVehicleCommAdapter
     getProcessModel().setState(Vehicle.State.IDLE);
     LOG.warning("Device has been set to IDLE state");
     ((ExecutorService) getExecutor()).submit(() -> getProcessModel().setPosition("Point-0026"));
-    LOG.warning("Device has been set to Point-0001");
+    LOG.warning("Device has been set to Point-0026");
     getProcessModel().setLoadHandlingDevices(
         List.of(new LoadHandlingDevice(LHD_NAME, false))
     );
+    getProcessModel().setMaxFwdVelocity(vehicle.getMaxVelocity());
     LOG.warning("Device has set load handling device");
     initializePositionMap();
     this.positionUpdater = new PositionUpdater(getProcessModel(), getExecutor());
@@ -327,7 +327,8 @@ public class ModbusTCPVehicleCommAdapter
     if (!allMovementCommands.contains(cmd)) {
       LOG.warning(
           String.format(
-              "%s: Command is NOT in MovementCommands pool : %s.", getName(), cmd.getOperation()
+              "%s: Command is NOT in MovementCommands pool : %s.", getName(),
+              cmd.getStep().getDestinationPoint().getName()
           )
       );
       // open this comment back after testing.
@@ -347,6 +348,13 @@ public class ModbusTCPVehicleCommAdapter
     queueNewCommand(newCommand);
 
     if (newCommand.isFinalMovement()) {
+      LOG.info(
+          String.format(
+              "FINAL MOVEMENTCOMMAND DESTINATION: %s", newCommand.getStep().getDestinationPoint()
+                  .getName()
+          )
+      );
+      LOG.info("RECEIVED FINAL COMMAND, PROCESSING COMMANDS. ");
       processAllMovementCommands();
       allMovementCommands.clear();
     }
@@ -405,6 +413,8 @@ public class ModbusTCPVehicleCommAdapter
     stationCommandsMap.clear();
     positionModbusCommand.clear();
     cmdModbusCommand.clear();
+    LOG.info("ALL COMMAND BUFFER HAS BEEN CLEARED.");
+
     processMovementCommands(commands);
     int positionBaseAddress = 1000;
     int cmdBaseAddress = 1200;
@@ -459,6 +469,7 @@ public class ModbusTCPVehicleCommAdapter
           )
       );
       startPosition = cmd.getStep().getSourcePoint().getPose().getPosition().getX();
+      LOG.info(String.format("CREATING COMMAND FOR POSITION: %d", startPosition));
 
       Pair<CMD1, CMD2> pairCommands = new Pair<>(createCMD1(cmd), createCMD2(cmd));
       stationCommandsMap.put(startPosition, pairCommands);
@@ -471,12 +482,13 @@ public class ModbusTCPVehicleCommAdapter
     int speedLevel = 0;
     int obstacleSensor = 5;
     double maxSpeed = 0;
-    String command = cmd.getFinalOperation();
+    String command = cmd.getOperation();
     liftCmd = getLiftCommand(command);
     if (cmd.getStep().getPath() != null) {
       maxSpeed = getMaxAllowedSpeed(cmd.getStep().getPath());
+      LOG.info(String.format("GOT MAX SPEED: %f", maxSpeed));
     }
-    int speedCase = (int) (maxSpeed * 5);
+    int speedCase = (int) (maxSpeed * 0.005);
     speedLevel = switch (speedCase) {
       case 0 -> 1;
       case 3 -> 2;
@@ -494,28 +506,36 @@ public class ModbusTCPVehicleCommAdapter
 
   private CMD2 createCMD2(MovementCommand cmd) {
     String switchOperation = "";
-    // TODO: change liftHeight according to the device.
     int liftHeight = 0;
-    int motionCommand = 0;
-    List<PeripheralOperation> peripheralOperations = null;
+    int motionCommand;
+    Map<String, String> pathOperation = null;
 
-    if (cmd.getStep().getPath() != null) {
-      peripheralOperations = cmd.getStep().getPath().getPeripheralOperations();
+    if (cmd.getStep().getDestinationPoint().getName().equals("Sidefork")) {
+      liftHeight = 4095;
     }
-    if (peripheralOperations != null && !peripheralOperations.isEmpty()) {
-      switchOperation = peripheralOperations.getFirst().getOperation();
+    if (cmd.getStep().getPath() != null) {
+      pathOperation = cmd.getStep().getPath().getProperties();
+    }
+    if (pathOperation != null && !pathOperation.isEmpty()) {
+      switchOperation = pathOperation.get("switch");
     }
     motionCommand = switch (switchOperation) {
-      case "switchLeft" -> 1;
-      case "switchRight" -> 2;
-      default -> 0;
+      case "left" -> 1;
+      case "right" -> 2;
+      default -> 1;
     };
+    if (cmd.isFinalMovement()) {
+      motionCommand = 3;
+    }
     return new CMD2(liftHeight, motionCommand);
   }
 
   private double getMaxAllowedSpeed(Path path) {
     double processModelMaxFwdVelocity = getProcessModel().getMaxFwdVelocity();
+    LOG.info(String.format("processModelMaxFwdVelocity: %f", processModelMaxFwdVelocity));
     double maxPathVelocity = path.getMaxVelocity();
+    LOG.info(String.format("maxPathVelocity: %f", maxPathVelocity));
+
     return Math.min(processModelMaxFwdVelocity, maxPathVelocity);
   }
 
@@ -559,7 +579,7 @@ public class ModbusTCPVehicleCommAdapter
         .thenCompose(v -> readAndVerifyCommands())
         .exceptionally(ex -> {
           LOG.severe("Error in writeAllModbusCommands: " + ex.getMessage());
-          return null;
+          throw new CompletionException(ex);
         });
   }
 
@@ -627,15 +647,17 @@ public class ModbusTCPVehicleCommAdapter
 
     return CompletableFuture.allOf(futuresArray)
         .thenRun(() -> {
-          boolean allVerified = readFutures.stream().allMatch(future -> {
-            try {
-              return future.get();
-            }
-            catch (InterruptedException | ExecutionException e) {
-              LOG.severe("Error while verifying command: " + e.getMessage());
-              return false;
-            }
-          });
+//          boolean allVerified = readFutures.stream().allMatch(future -> {
+//            try {
+//              return future.get();
+//            }
+//            catch (InterruptedException | ExecutionException e) {
+//              LOG.severe("Error while verifying command: " + e.getMessage());
+//              return false;
+//            }
+//          });
+          boolean allVerified = readFutures.stream()
+              .allMatch(CompletableFuture::join);
           if (!allVerified) {
             throw new CompletionException(new RuntimeException("Verification failed, retrying..."));
           }
@@ -654,7 +676,7 @@ public class ModbusTCPVehicleCommAdapter
             ByteBuf registers = readResponse.getRegisters();
             if (registers.readableBytes() >= 2) {
               int value = registers.readUnsignedShort();
-              boolean matches = value == command.value();
+              boolean matches = (value == command.value());
               LOG.info(
                   String.format(
                       "Read and verified command at address %d: expected %d, got %d",
@@ -802,8 +824,8 @@ public class ModbusTCPVehicleCommAdapter
             this.isConnected = true;
             LOG.info("Successfully connected to Modbus TCP server");
             getProcessModel().setCommAdapterConnected(true);
-            startHeartbeat();
-            positionUpdater.startPositionUpdates();
+//            startHeartbeat();
+//            positionUpdater.startPositionUpdates();
           })
           .exceptionally(ex -> {
             LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
