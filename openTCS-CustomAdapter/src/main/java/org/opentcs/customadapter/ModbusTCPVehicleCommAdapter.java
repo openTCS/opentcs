@@ -11,9 +11,8 @@ import com.digitalpetri.modbus.responses.ReadHoldingRegistersResponse;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
+import io.netty.handler.timeout.TimeoutException;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.beans.PropertyChangeEvent;
@@ -29,15 +28,10 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.BiFunction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -111,9 +105,8 @@ public class ModbusTCPVehicleCommAdapter
   /**
    * Represents a Modbus TCP master used for communication with Modbus TCP devices.
    */
-  private ModbusTcpMaster heartbeatMaster;
-  private ModbusTcpMaster statusMaster;
-  private ModbusTcpMaster taskMaster;
+  private ModbusTcpMaster master;
+
   /**
    * Represents the state of a variable indicating whether it has been initialized.
    */
@@ -123,9 +116,6 @@ public class ModbusTCPVehicleCommAdapter
   private PositionUpdater positionUpdater;
   private final PlantModelService plantModelService;
   private final VehicleConfigurationProvider configProvider;
-  private final PriorityBlockingQueue<ModbusRequest> requestQueue = new PriorityBlockingQueue<>();
-  private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
-  private final ByteBufAllocator allocator = PooledByteBufAllocator.DEFAULT;
 
   /**
    * A communication adapter for ModbusTCP-based vehicle communication.
@@ -151,12 +141,14 @@ public class ModbusTCPVehicleCommAdapter
       PlantModelService plantModelService
   ) {
     super(new CustomProcessModel(vehicle), "RECHARGE", 1000, executor);
-    this.vehicle = requireNonNull(vehicle, "vehicle");
     this.configProvider = new VehicleConfigurationProvider();
     this.host = configProvider.getConfiguration(vehicle.getName()).host();
     this.port = configProvider.getConfiguration(vehicle.getName()).port();
+
     LOG.warning(String.format("DEVICE HOST:%s, PORT: %d", this.host, this.port));
+    this.vehicle = requireNonNull(vehicle, "vehicle");
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
+
     this.isConnected = false;
     this.currentTransportOrder = null;
     this.positionMap = new HashMap<>();
@@ -179,7 +171,7 @@ public class ModbusTCPVehicleCommAdapter
     LOG.warning("Device has set load handling device");
     initializePositionMap();
     this.positionUpdater = new PositionUpdater(getProcessModel(), getExecutor());
-    getExecutor().submit(this::processRequests);
+    LOG.warning("Starting sending heart bit.");
     initialized = true;
   }
 
@@ -243,25 +235,6 @@ public class ModbusTCPVehicleCommAdapter
     }
   }
 
-  /**
-   * Retrieves the position associated with the given precise position.
-   *
-   * @param precisePosition The precise position for which to retrieve the position.
-   * @return The position associated with the given precise position. Returns the last known
-   * position
-   * if no position is found in the map.
-   */
-  public String getPositionFromMap(Long precisePosition) {
-    String position = positionMap.get(precisePosition);
-    if (position != null) {
-      positionUpdater.lastKnownPosition = position;
-      getProcessModel().setPosition(position);
-      return position;
-    }
-    else {
-      return positionUpdater.lastKnownPosition;
-    }
-  }
 
   /**
    * Processes updates of the {@link CustomProcessModel}.
@@ -323,22 +296,6 @@ public class ModbusTCPVehicleCommAdapter
     if (!isEnabled()) {
       return;
     }
-
-    getExecutor().shutdownNow();
-    try {
-      getExecutor().awaitTermination(5, TimeUnit.SECONDS);
-    }
-    catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    }
-
-    stationCommandsMap.clear();
-    positionMap.clear();
-    allMovementCommands.clear();
-    positionModbusCommand.clear();
-    cmdModbusCommand.clear();
-    currentTransportOrder = null;
-
     super.disable();
   }
 
@@ -361,9 +318,13 @@ public class ModbusTCPVehicleCommAdapter
     }
 
     if (!allMovementCommands.contains(cmd)) {
-      LOG.warning(String.format("%s: Command is NOT in MovementCommands pool.", getName()));
+      LOG.warning(
+          String.format(
+              "%s: Command is NOT in MovementCommands pool : %s.", getName(), cmd.getOperation()
+          )
+      );
       // open this comment back after testing.
-//      getProcessModel().commandFailed(cmd);
+      // getProcessModel().commandFailed(cmd);
     }
   }
 
@@ -600,7 +561,7 @@ public class ModbusTCPVehicleCommAdapter
     buffer.writeShort(value);
     WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(address, 1, buffer);
 
-    return sendModbusRequest(request, address)
+    return sendModbusRequest(request)
         .thenAccept(response -> {
           LOG.info("Successfully wrote register at address " + address + " with value " + value);
         })
@@ -617,7 +578,7 @@ public class ModbusTCPVehicleCommAdapter
 
   private CompletableFuture<Integer> readSingleRegister(int address) {
     ReadHoldingRegistersRequest request = new ReadHoldingRegistersRequest(address, 1);
-    return sendModbusRequest(request, address)
+    return sendModbusRequest(request)
         .thenApply(response -> {
           if (response instanceof ReadHoldingRegistersResponse readResponse) {
             ByteBuf responseBuffer = readResponse.getRegisters();
@@ -637,7 +598,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private CompletableFuture<Long> readDWordRegister(int startAddress) {
-    return sendModbusRequest(new ReadHoldingRegistersRequest(startAddress, 2), startAddress)
+    return sendModbusRequest(new ReadHoldingRegistersRequest(startAddress, 2))
         .thenApply(response -> {
           if (response instanceof ReadHoldingRegistersResponse readResponse) {
             ByteBuf registers = readResponse.getRegisters();
@@ -687,7 +648,7 @@ public class ModbusTCPVehicleCommAdapter
 
   private CompletableFuture<Boolean> readAndCompareCommand(ModbusCommand command) {
     ReadHoldingRegistersRequest request = new ReadHoldingRegistersRequest(command.address(), 1);
-    return sendModbusRequest(request, command.address())
+    return sendModbusRequest(request)
         .thenApply(response -> {
           if (response instanceof ReadHoldingRegistersResponse readResponse) {
             ByteBuf registers = readResponse.getRegisters();
@@ -808,7 +769,7 @@ public class ModbusTCPVehicleCommAdapter
           values
       );
 
-      return sendModbusRequest(request, startAddress)
+      return sendModbusRequest(request)
           .thenAccept(
               response -> LOG.info(
                   "Successfully wrote " + batch.size() + " " + commandType
@@ -828,10 +789,9 @@ public class ModbusTCPVehicleCommAdapter
   @Override
   protected boolean performConnection() {
     LOG.info("Connecting to Modbus TCP server at " + host + ":" + port);
-
-    CompletableFuture<ModbusTcpMaster> heartbeatFuture = createMaster("Heartbeat");
-    CompletableFuture<ModbusTcpMaster> statusFuture = createMaster("Status");
-    CompletableFuture<ModbusTcpMaster> taskFuture = createMaster("Task");
+    ModbusTcpMasterConfig config = new ModbusTcpMasterConfig.Builder(host)
+        .setPort(port)
+        .build();
 
     try {
       return CompletableFuture.supplyAsync(() -> {
@@ -848,7 +808,7 @@ public class ModbusTCPVehicleCommAdapter
             LOG.info("Successfully connected to Modbus TCP server");
             getProcessModel().setCommAdapterConnected(true);
             startHeartbeat();
-//            positionUpdater.startPositionUpdates();
+            positionUpdater.startPositionUpdates();
           })
           .exceptionally(ex -> {
             LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
@@ -857,194 +817,45 @@ public class ModbusTCPVehicleCommAdapter
           })
           .isDone();
     }
-    catch (Exception ex) {
-      LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
-      this.isConnected = false;
+    catch (Exception e) {
+      LOG.log(Level.SEVERE, "Unexpected error during connection attempt", e);
       return false;
     }
   }
-
-  private CompletableFuture<ModbusTcpMaster> createMaster(String type) {
-    ModbusTcpMasterConfig config = new ModbusTcpMasterConfig.Builder(host)
-        .setPort(port)
-        .build();
-
-    return CompletableFuture.supplyAsync(() -> {
-      LOG.info("Creating new ModbusTcpMaster instance for " + type);
-      return new ModbusTcpMaster(config);
-    }).thenCompose(newMaster -> {
-      switch (type) {
-        case "Heartbeat":
-          heartbeatMaster = newMaster;
-          break;
-        case "Status":
-          statusMaster = newMaster;
-          break;
-        case "Task":
-          taskMaster = newMaster;
-          break;
-        default:
-          throw new IllegalArgumentException("Invalid type: " + type);
-      }
-      return newMaster.connect();
-    }).exceptionally(ex -> {
-      LOG.severe("Failed to create or connect " + type + " master: " + ex.getMessage());
-      throw new CompletionException(ex);
-    });
-  }
-
-  private ModbusTcpMaster selectAppropriatesMaster(int address) {
-    return switch (address) {
-      case 100 -> heartbeatMaster;
-      case 110 -> statusMaster;
-      default -> taskMaster;
-    };
-  }
-
-//  @Override
-//  protected boolean performDisconnection() {
-//    LOG.info("Disconnecting from Modbus TCP server");
-//    if (master != null) {
-//      return master.disconnect()
-//          .thenRun(() -> {
-//            LOG.info("Successfully disconnected from Modbus TCP server");
-//            this.isConnected = false;
-//            getProcessModel().setCommAdapterConnected(false);
-//            this.master = null;
-//          })
-//          .exceptionally(ex -> {
-//            LOG.log(Level.SEVERE, "Failed to disconnect from Modbus TCP server", ex);
-//            return null;
-//          })
-//          .isDone();
-//    }
-//    return true;
-//  }
 
   @Override
   protected boolean performDisconnection() {
-    LOG.info("Disconnecting from Modbus TCP servers");
-
-    // Stop the heartbeat mechanism
-    if (heartBeatFuture != null) {
-      heartBeatFuture.cancel(true);
-      heartBeatFuture = null;
+    LOG.info("Disconnecting from Modbus TCP server");
+    if (master != null) {
+      return master.disconnect()
+          .thenRun(() -> {
+            LOG.info("Successfully disconnected from Modbus TCP server");
+            this.isConnected = false;
+            getProcessModel().setCommAdapterConnected(false);
+            this.master = null;
+          })
+          .exceptionally(ex -> {
+            LOG.log(Level.SEVERE, "Failed to disconnect from Modbus TCP server", ex);
+            return null;
+          })
+          .isDone();
     }
-
-    // Stop position updates
-    if (positionUpdater != null) {
-      positionUpdater.stopPositionUpdates();
-    }
-
-    // Clear any pending requests
-    requestQueue.clear();
-
-    // Function to handle disconnect for each master
-    BiFunction<ModbusTcpMaster, String, CompletableFuture<Void>> disconnectMaster = (
-        master, masterName
-    ) -> {
-      if (master != null) {
-        return master.disconnect()
-            .thenRun(() -> {
-              LOG.info("Successfully disconnected from " + masterName);
-              getProcessModel().setCommAdapterConnected(false);
-            })
-            .exceptionally(ex -> {
-              LOG.log(Level.SEVERE, "Failed to disconnect from " + masterName, ex);
-              return null;
-            });
-      }
-      return CompletableFuture.completedFuture(null);
-    };
-
-    // Disconnect all masters
-    CompletableFuture<Void> disconnectHeartbeatMaster = disconnectMaster.apply(
-        heartbeatMaster, "Heartbeat Master"
-    );
-    CompletableFuture<Void> disconnectStatusMaster = disconnectMaster.apply(
-        statusMaster, "Status Master"
-    );
-    CompletableFuture<Void> disconnectTaskMaster = disconnectMaster.apply(
-        taskMaster, "Task Master"
-    );
-
-    // Combine all futures and wait for all to complete
-    CompletableFuture<Void> allDisconnections = CompletableFuture.allOf(
-        disconnectHeartbeatMaster,
-        disconnectStatusMaster,
-        disconnectTaskMaster
-    );
-
-    try {
-      allDisconnections.get(30, TimeUnit.SECONDS); // Wait for all disconnections to complete
-      this.isConnected = false;
-      this.heartbeatMaster = null;
-      this.statusMaster = null;
-      this.taskMaster = null;
-      LOG.info("All masters disconnected successfully");
-      return true;
-    }
-    catch (InterruptedException | ExecutionException | TimeoutException e) {
-      LOG.log(Level.SEVERE, "Failed to disconnect one or more masters", e);
-      return false;
-    }
+    return true;
   }
-
 
   @Override
   protected boolean isVehicleConnected() {
-    return isConnected && heartbeatMaster != null && statusMaster != null && taskMaster != null;
-  }
-
-  private void processRequests() {
-    while (!Thread.currentThread().isInterrupted()) {
-      try {
-        ModbusRequest request = requestQueue.take();
-        processRequest(request);
-      }
-      catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-      }
-    }
-  }
-
-  private void processRequest(ModbusRequest request) {
-    ByteBuf buffer = allocator.buffer();
-    try {
-      if (request.isReadOperation()) {
-        rwLock.readLock().lock();
-        try {
-          // 執行讀操作
-          sendModbusRequest(request.getRequest(), request.getAddress());
-        }
-        finally {
-          rwLock.readLock().unlock();
-        }
-      }
-      else {
-        rwLock.writeLock().lock();
-        try {
-          // 執行寫操作
-          sendModbusRequest(request.getRequest(), request.getAddress());
-        }
-        finally {
-          rwLock.writeLock().unlock();
-        }
-      }
-    }
-    finally {
-      buffer.release();
-    }
+    return isConnected && master != null;
   }
 
   private CompletableFuture<ModbusResponse> sendModbusRequest(
-      com.digitalpetri.modbus.requests.ModbusRequest request,
-      int address
+      com.digitalpetri.modbus.requests.ModbusRequest request
   ) {
-    ModbusTcpMaster master = selectAppropriatesMaster(address);
     if (master == null) {
       return CompletableFuture.failedFuture(
-          new IllegalStateException("Modbus master is not initialized")
+          new IllegalStateException(
+              "Modbus master is not initialized"
+          )
       );
     }
 
@@ -1052,7 +863,7 @@ public class ModbusTCPVehicleCommAdapter
       try {
         return master.sendRequest(request, 0).get(5, TimeUnit.SECONDS);
       }
-      catch (InterruptedException | ExecutionException | TimeoutException e) {
+      catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         throw new CompletionException("Request interrupted", e);
       }
@@ -1074,15 +885,14 @@ public class ModbusTCPVehicleCommAdapter
       return response;
     }).exceptionally(ex -> {
       LOG.severe("Failed to send Modbus request: " + ex.getMessage());
-      return retrySendModbusRequest(request, 3, 1000, address).join();
+      return retrySendModbusRequest(request, 3, 1000).join();
     });
   }
 
   private CompletableFuture<ModbusResponse> retrySendModbusRequest(
       com.digitalpetri.modbus.requests.ModbusRequest request,
       int retries,
-      long delay,
-      int address
+      long delay
   ) {
     if (retries <= 0) {
       return CompletableFuture.failedFuture(new RuntimeException("Max retries reached"));
@@ -1096,11 +906,11 @@ public class ModbusTCPVehicleCommAdapter
         Thread.currentThread().interrupt();
         throw new CompletionException(e);
       }
-      return sendModbusRequest(request, address);
+      return sendModbusRequest(request);
     }, getExecutor()).thenCompose(future -> future.handle((response, ex) -> {
       if (ex != null) {
         LOG.warning("Retry failed: " + ex.toString() + ". Retries left: " + (retries - 1));
-        return retrySendModbusRequest(request, retries - 1, delay * 2, address);
+        return retrySendModbusRequest(request, retries - 1, delay * 2);
       }
       return CompletableFuture.completedFuture(response);
     })).thenCompose(innerFuture -> innerFuture);
@@ -1236,9 +1046,9 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   public class PositionUpdater {
-    private static final int UPDATE_INTERVAL = 100;
+    private static final int UPDATE_INTERVAL = 500;
     private static final int MAX_INTERPOLATION_TIME = 500;
-    private static final int POSITION_REGISTER_ADDRESS = 110;
+    private static final int POSITION_REGISTER_ADDRESS = 109;
 
     private final VehicleProcessModel processModel;
     private final ScheduledExecutorService executor;
@@ -1292,11 +1102,12 @@ public class ModbusTCPVehicleCommAdapter
     }
 
     private void updatePosition() {
-      readDWordRegister(POSITION_REGISTER_ADDRESS)
+      // Reads the station MK instead of precise position.
+      readSingleRegister(POSITION_REGISTER_ADDRESS)
           .thenAccept(this::processPositionUpdate)
           .exceptionally(ex -> {
             LOG.warning("Failed to update position: " + ex.getMessage());
-            interpolatePosition();
+//            interpolatePosition();
             return null;
           });
     }
@@ -1356,46 +1167,46 @@ public class ModbusTCPVehicleCommAdapter
     }
 
     private String convertToOpenTcsPosition(long position) {
-      return getPositionFromMap(position);
+      LOG.info(
+          String.format(
+              "GOT POSITION FROM MAP: %s",
+              getPositionFromMap(getPositionFromPositionModbusCommand(position))
+          )
+      );
+
+      return getPositionFromMap(getPositionFromPositionModbusCommand(position));
+    }
+
+    private long getPositionFromPositionModbusCommand(long index) {
+      if (index < 0 || index >= positionModbusCommand.size()) {
+        throw new IllegalArgumentException("Index out of positionModbusCommand bounds");
+      }
+      return positionModbusCommand.get((int) index).value();
+    }
+
+    /**
+     * Retrieves the position associated with the given precise position.
+     *
+     * @param precisePosition The precise position for which to retrieve the position.
+     * @return The position associated with the given precise position. Returns the last known
+     * position
+     * if no position is found in the map.
+     */
+    private String getPositionFromMap(Long precisePosition) {
+      String position = positionMap.get(precisePosition);
+      if (position != null) {
+        positionUpdater.lastKnownPosition = position;
+        getProcessModel().setPosition(position);
+        return position;
+      }
+      else {
+        return positionUpdater.lastKnownPosition;
+      }
     }
 
     private Triple convertToPrecisePosition(long position) {
       // Implement conversion from original position value to Triple
       return new Triple(position, 0, 0);
-    }
-  }
-
-  private static class ModbusRequest
-      implements
-        Comparable<ModbusRequest> {
-    private final com.digitalpetri.modbus.requests.ModbusRequest request;
-    private final int address;
-    private final int priority;
-
-    ModbusRequest(
-        com.digitalpetri.modbus.requests.ModbusRequest request,
-        int address, int priority
-    ) {
-      this.request = request;
-      this.address = address;
-      this.priority = priority;
-    }
-
-    public com.digitalpetri.modbus.requests.ModbusRequest getRequest() {
-      return request;
-    }
-
-    public int getAddress() {
-      return address;
-    }
-
-    public boolean isReadOperation() {
-      return request instanceof ReadHoldingRegistersRequest;
-    }
-
-    @Override
-    public int compareTo(ModbusRequest other) {
-      return Integer.compare(other.priority, this.priority);
     }
   }
 }
