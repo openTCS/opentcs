@@ -1,0 +1,1 @@
+{"SAA-mini-OHT-Sensor0001":{"currentStrategy":"ModbusTCP","host":"192.168.0.71","port":502},"SAA-mini-OHT-Sensor0002":{"currentStrategy":"ModbusTCP","host":"0.0.0.0","port":502}}
