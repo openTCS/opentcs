@@ -5,9 +5,11 @@ import static java.util.Objects.requireNonNull;
 import com.digitalpetri.modbus.master.ModbusTcpMaster;
 import com.digitalpetri.modbus.master.ModbusTcpMasterConfig;
 import com.digitalpetri.modbus.requests.ReadHoldingRegistersRequest;
+import com.digitalpetri.modbus.requests.ReadInputRegistersRequest;
 import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
 import com.digitalpetri.modbus.responses.ModbusResponse;
 import com.digitalpetri.modbus.responses.ReadHoldingRegistersResponse;
+import com.digitalpetri.modbus.responses.ReadInputRegistersResponse;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import io.netty.buffer.ByteBuf;
@@ -193,6 +195,7 @@ public class ModbusTCPVehicleCommAdapter
 
   private void startHeartbeat() {
     heartBeatFuture = getExecutor().scheduleAtFixedRate(() -> {
+
       boolean currentValue = heartBeatToggle.getAndSet(!heartBeatToggle.get());
       writeSingleRegister(100, currentValue ? 1 : 0)
           .thenCompose(v -> readSingleRegister(100))
@@ -224,7 +227,9 @@ public class ModbusTCPVehicleCommAdapter
       PlantModel plantModel = plantModelService.getPlantModel();
       for (Point point : plantModel.getPoints()) {
         String positionName = point.getName();
+        LOG.info(String.format("positionName: %s", positionName));
         Long precisePosition = point.getPose().getPosition().getX();
+        LOG.info(String.format("precisePosition: %d", precisePosition));
         positionMap.put(precisePosition, positionName);
       }
 
@@ -296,6 +301,8 @@ public class ModbusTCPVehicleCommAdapter
     if (!isEnabled()) {
       return;
     }
+    positionUpdater.stopPositionUpdates();
+    stopHeartBeat();
     super.disable();
   }
 
@@ -577,21 +584,14 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private CompletableFuture<Integer> readSingleRegister(int address) {
-    ReadHoldingRegistersRequest request = new ReadHoldingRegistersRequest(address, 1);
+    ReadInputRegistersRequest request = new ReadInputRegistersRequest(address, 1);
     return sendModbusRequest(request)
         .thenApply(response -> {
-          if (response instanceof ReadHoldingRegistersResponse readResponse) {
+          if (response instanceof ReadInputRegistersResponse readResponse) {
             ByteBuf responseBuffer = readResponse.getRegisters();
-            try {
-              int value = responseBuffer.readUnsignedShort();
-              LOG.info(String.format("READ ADDRESS %d GOT %d", address, value));
-              return value;
-            }
-            finally {
-              if (responseBuffer.refCnt() > 0) {
-                responseBuffer.release();
-              }
-            }
+            int value = responseBuffer.readUnsignedShort();
+            LOG.info(String.format("READ ADDRESS %d GOT %d", address, value));
+            return value;
           }
           throw new RuntimeException("Invalid response type");
         });
@@ -652,25 +652,20 @@ public class ModbusTCPVehicleCommAdapter
         .thenApply(response -> {
           if (response instanceof ReadHoldingRegistersResponse readResponse) {
             ByteBuf registers = readResponse.getRegisters();
-            try {
-              if (registers.readableBytes() >= 2) {
-                int value = registers.readUnsignedShort();
-                boolean matches = value == command.value();
-                LOG.info(
-                    String.format(
-                        "Read and verified command at address %d: expected %d, got %d",
-                        command.address(), command.value(), value
-                    )
-                );
-                return matches;
-              }
-              else {
-                LOG.warning("Insufficient data returned for address " + command.address());
-                return false;
-              }
+            if (registers.readableBytes() >= 2) {
+              int value = registers.readUnsignedShort();
+              boolean matches = value == command.value();
+              LOG.info(
+                  String.format(
+                      "Read and verified command at address %d: expected %d, got %d",
+                      command.address(), command.value(), value
+                  )
+              );
+              return matches;
             }
-            finally {
-              registers.release();
+            else {
+              LOG.warning("Insufficient data returned for address " + command.address());
+              return false;
             }
           }
           else {
@@ -851,71 +846,153 @@ public class ModbusTCPVehicleCommAdapter
   private CompletableFuture<ModbusResponse> sendModbusRequest(
       com.digitalpetri.modbus.requests.ModbusRequest request
   ) {
+    return sendModbusRequestWithRetry(request, 3);
+  }
+
+  private CompletableFuture<ModbusResponse> sendModbusRequestWithRetry(
+      com.digitalpetri.modbus.requests.ModbusRequest request,
+      int retriesLeft
+  ) {
     if (master == null) {
       return CompletableFuture.failedFuture(
-          new IllegalStateException(
-              "Modbus master is not initialized"
-          )
+          new IllegalStateException("Modbus master is not initialized")
       );
     }
 
-    return CompletableFuture.supplyAsync(() -> {
-      try {
-        return master.sendRequest(request, 0).get(5, TimeUnit.SECONDS);
-      }
-      catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        throw new CompletionException("Request interrupted", e);
-      }
-      catch (ExecutionException e) {
-        throw new CompletionException("Request failed", e.getCause());
-      }
-      catch (TimeoutException e) {
-        throw new CompletionException("Request timed out", e);
-      }
-      catch (java.util.concurrent.TimeoutException e) {
-        throw new RuntimeException("Concurrent request timed out", e);
-      }
-    }).thenApply(response -> {
-      if (response instanceof ReadHoldingRegistersResponse readResponse) {
-        ByteBuf registers = readResponse.getRegisters();
-        registers.retain(); // Increment the reference count
-        return readResponse;
-      }
-      return response;
-    }).exceptionally(ex -> {
-      LOG.severe("Failed to send Modbus request: " + ex.getMessage());
-      return retrySendModbusRequest(request, 3, 1000).join();
-    });
+    return CompletableFuture.supplyAsync(() -> sendRequest(request), getExecutor())
+        .thenApply(this::processResponse)
+        .exceptionally(ex -> {
+          LOG.severe("Failed to send Modbus request: " + ex.getMessage());
+          return null;
+        }).thenCompose(response -> {
+          boolean shouldRetry = response == null && retriesLeft > 0;
+          if (shouldRetry) {
+            return CompletableFuture.runAsync(() -> {
+              try {
+                Thread.sleep(1000);
+              }
+              catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+              }
+            }, getExecutor())
+                .thenCompose(v -> sendModbusRequestWithRetry(request, retriesLeft - 1));
+          }
+          return CompletableFuture.completedFuture(response);
+        });
   }
 
-  private CompletableFuture<ModbusResponse> retrySendModbusRequest(
-      com.digitalpetri.modbus.requests.ModbusRequest request,
-      int retries,
-      long delay
-  ) {
-    if (retries <= 0) {
-      return CompletableFuture.failedFuture(new RuntimeException("Max retries reached"));
+  private ModbusResponse sendRequest(com.digitalpetri.modbus.requests.ModbusRequest request) {
+    try {
+      return master.sendRequest(request, 0).get(500, TimeUnit.MILLISECONDS);
     }
-
-    return CompletableFuture.supplyAsync(() -> {
-      try {
-        Thread.sleep(delay);
-      }
-      catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        throw new CompletionException(e);
-      }
-      return sendModbusRequest(request);
-    }, getExecutor()).thenCompose(future -> future.handle((response, ex) -> {
-      if (ex != null) {
-        LOG.warning("Retry failed: " + ex.toString() + ". Retries left: " + (retries - 1));
-        return retrySendModbusRequest(request, retries - 1, delay * 2);
-      }
-      return CompletableFuture.completedFuture(response);
-    })).thenCompose(innerFuture -> innerFuture);
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new CompletionException("Request interrupted", e);
+    }
+    catch (ExecutionException e) {
+      throw new CompletionException("Request failed", e.getCause());
+    }
+    catch (TimeoutException | java.util.concurrent.TimeoutException e) {
+      throw new CompletionException("Request timed out", e);
+    }
   }
 
+  private ModbusResponse processResponse(ModbusResponse response) {
+    if (response instanceof ReadHoldingRegistersResponse readResponse) {
+      ByteBuf registers = readResponse.getRegisters();
+      registers.retain();
+      return new ReadHoldingRegistersResponse(registers) {
+        @Override
+        public boolean release() {
+          boolean released = super.release();
+          if (released && registers.refCnt() > 0) {
+            return registers.release();
+          }
+          return released;
+        }
+
+        @Override
+        public boolean release(int decrement) {
+          boolean released = super.release(decrement);
+          if (released && registers.refCnt() > 0) {
+            return registers.release(decrement);
+          }
+          return released;
+        }
+      };
+    }
+    return response;
+  }
+//  private CompletableFuture<ModbusResponse> sendModbusRequest(
+//      com.digitalpetri.modbus.requests.ModbusRequest request
+//  ) {
+//    if (master == null) {
+//      return CompletableFuture.failedFuture(
+//          new IllegalStateException(
+//              "Modbus master is not initialized"
+//          )
+//      );
+//    }
+//
+//    return CompletableFuture.supplyAsync(() -> {
+//      try {
+//        return master.sendRequest(request, 0).get(500, TimeUnit.MILLISECONDS);
+//      }
+//      catch (InterruptedException e) {
+//        Thread.currentThread().interrupt();
+//        throw new CompletionException("Request interrupted", e);
+//      }
+//      catch (ExecutionException e) {
+//        throw new CompletionException("Request failed", e.getCause());
+//      }
+//      catch (TimeoutException e) {
+//        throw new CompletionException("Request timed out", e);
+//      }
+//      catch (java.util.concurrent.TimeoutException e) {
+//        throw new RuntimeException("Concurrent request timed out", e);
+//      }
+//    }, getExecutor()).thenApply(response -> {
+//      if (response instanceof ReadHoldingRegistersResponse readResponse) {
+//        ByteBuf registers = readResponse.getRegisters();
+//        try {
+//          return readResponse;
+//        } finally {
+//          registers.release();
+//        }
+//      }
+//      return response;
+//    }).exceptionally(ex -> {
+//      LOG.severe("Failed to send Modbus request: " + ex.getMessage());
+//      return null;
+//    });
+//  }
+//
+//  private CompletableFuture<ModbusResponse> retrySendModbusRequest(
+//      com.digitalpetri.modbus.requests.ModbusRequest request,
+//      int retries,
+//      long delay
+//  ) {
+//    if (retries <= 0) {
+//      return CompletableFuture.failedFuture(new RuntimeException("Max retries reached"));
+//    }
+//
+//    return CompletableFuture.supplyAsync(() -> {
+//      try {
+//        Thread.sleep(delay);
+//      }
+//      catch (InterruptedException e) {
+//        Thread.currentThread().interrupt();
+//        throw new CompletionException(e);
+//      }
+//      return sendModbusRequest(request);
+//    }, getExecutor()).thenCompose(future -> future.handle((response, ex) -> {
+//      if (ex != null) {
+//        LOG.warning("Retry failed: " + ex.toString() + ". Retries left: " + (retries - 1));
+//        return retrySendModbusRequest(request, retries - 1, delay * 2);
+//      }
+//      return CompletableFuture.completedFuture(response);
+//    })).thenCompose(innerFuture -> innerFuture);
+//  }
 
   @Override
   @Nonnull
@@ -1055,9 +1132,7 @@ public class ModbusTCPVehicleCommAdapter
     private ScheduledFuture<?> positionFuture;
 
     private String lastKnownPosition;
-    private long lastUpdateTime;
-    private long lastPosition = 0;
-//    private Triple lastPrecisePosition;
+    //    private Triple lastPrecisePosition;
 //    private double lastOrientation;
 //    private double estimatedSpeed; // mm/s
 
@@ -1125,8 +1200,6 @@ public class ModbusTCPVehicleCommAdapter
 //        estimatedSpeed = (double) posDiff / timeDiff * 1000;
 //      }
 
-      lastPosition = currentPosition;
-      lastUpdateTime = currentTime;
       processModel.setPosition(openTcsPosition);
       processModel.setPrecisePosition(precisePosition);
 
