@@ -27,15 +27,24 @@ public class Watchdog
    * The task to check for consistency of blocks.
    */
   private final BlockConsistencyCheck blockCheck;
+  /**
+   * The task to check for stranded vehicles.
+   */
+  private final StrandedVehicleCheck strandedVehicleCheck;
 
   /**
    * Creates a new instance.
    *
    * @param blockCheck The block check task.
+   * @param strandedVehicleCheck The stranded vehicle check task.
    */
   @Inject
-  public Watchdog(BlockConsistencyCheck blockCheck) {
+  public Watchdog(
+      BlockConsistencyCheck blockCheck,
+      StrandedVehicleCheck strandedVehicleCheck
+  ) {
     this.blockCheck = requireNonNull(blockCheck, "blockCheck");
+    this.strandedVehicleCheck = requireNonNull(strandedVehicleCheck, "strandedVehicleCheck");
   }
 
   @Override
@@ -45,6 +54,7 @@ public class Watchdog
     }
 
     blockCheck.initialize();
+    strandedVehicleCheck.initialize();
     initialized = true;
   }
 
@@ -60,6 +70,7 @@ public class Watchdog
     }
 
     blockCheck.terminate();
+    strandedVehicleCheck.terminate();
     initialized = false;
   }
 

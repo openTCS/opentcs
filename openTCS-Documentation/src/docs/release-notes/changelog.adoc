@@ -19,6 +19,7 @@ This change log lists the most relevant changes for past releases in reverse chr
    As paths locks and the results of edge evaluators may change during operation of a plant, it does not seem reasonable to consider them when checking for _general_ routability.
 ** Reduce the load on RMI clients by aggregating consecutive ``TCSObjectEvent``s for the same object into a single event.
 ** Reduce the load on the kernel induced by the Operations Desk and Kernel Control Center applications by moderately increasing the interval in which they fetch events form the kernel.
+** Add a watchdog task to the kernel which periodically monitors the state of vehicles in the plant model and publishes a user notification in case a vehicle is considered _stranded_ (e.g., in cases where a vehicle is idle but has been assigned a transport order and is therefore expected to do something).
 ** Update web API specification and implementation to version 1.8.0:
 *** The endpoint `POST /plantModel/topologyUpdateRequest` now also accepts an optional list of path names allowing the routing topology to be updated selectively.
 * Bugs fixed:

@@ -23,9 +23,26 @@ public interface WatchdogConfiguration {
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The interval in which to check for block consistency in milliseconds.",
+      description = "The interval (in milliseconds) in which to check for block consistency.",
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
       orderKey = "1_block"
   )
   int blockConsistencyCheckInterval();
+
+  @ConfigurationEntry(
+      type = "Integer",
+      description = "The interval (in milliseconds) in which to check for stranded vehicles.",
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "2_stranded_vehicle_0"
+  )
+  int strandedVehicleCheckInterval();
+
+  @ConfigurationEntry(
+      type = "Integer",
+      description = "The duration (in milliseconds) that a vehicle must be in a _stranded_ state "
+          + "to actually be considered stranded.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
+      orderKey = "2_stranded_vehicle_1"
+  )
+  int strandedVehicleDurationThreshold();
 }
