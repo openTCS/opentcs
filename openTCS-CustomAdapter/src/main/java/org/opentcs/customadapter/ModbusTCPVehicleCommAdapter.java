@@ -10,6 +10,8 @@ import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
 import com.digitalpetri.modbus.responses.ModbusResponse;
 import com.digitalpetri.modbus.responses.ReadHoldingRegistersResponse;
 import com.digitalpetri.modbus.responses.ReadInputRegistersResponse;
+import com.digitalpetri.modbus.responses.WriteMultipleRegistersResponse;
+import com.digitalpetri.modbus.responses.WriteSingleRegisterResponse;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import io.netty.buffer.ByteBuf;
@@ -777,40 +779,46 @@ public class ModbusTCPVehicleCommAdapter
       List<ModbusCommand> batch, int startAddress, String commandType
   ) {
     ByteBuf values = Unpooled.buffer();
+    int registerCount = 0;
 
-    try {
-      for (ModbusCommand command : batch) {
+    for (ModbusCommand command : batch) {
+      if ("Position".equalsIgnoreCase(commandType)) {
         values.writeIntLE(command.value());
-//        if (command.format() == ModbusCommand.DataFormat.DECIMAL) {
-//          values.writeIntLE(command.value());
-//        }
-//        else {
-//          values.writeShortLE(command.value());
-//        }
-        LOG.info("Writing " + commandType + " command: " + command.toLogString());
+        registerCount += 2;
       }
-
-      WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(
-          startAddress,
-          values.readableBytes() / 2,  // Convert bytes to word count
-          values
-      );
-
-      return sendModbusRequest(request)
-          .thenAccept(
-              response -> LOG.info(
-                  "Successfully wrote " + batch.size() + " " + commandType
-                      + " registers starting at address " + startAddress
-              )
-          )
-          .exceptionally(ex -> {
-            LOG.severe("Failed to write " + commandType + " registers: " + ex.getMessage());
-            return null;
-          });
+      else {
+        values.writeShort(command.value());
+        registerCount += 1;
+      }
+      LOG.info("Writing " + commandType + " command: " + command.toLogString());
     }
-    finally {
-      values.release();
-    }
+
+    WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(
+        startAddress,
+        registerCount,
+        values
+    );
+
+    int finalRegisterCount = registerCount;
+    return sendModbusRequest(request)
+        .thenAccept(response -> {
+          if (response instanceof WriteMultipleRegistersResponse) {
+            LOG.info(
+                "Successfully wrote " + batch.size() + " " + commandType
+                    + " commands (total " + finalRegisterCount + " registers) starting at address "
+                    + startAddress
+            );
+          }
+          else {
+            throw new CompletionException(
+                "Unexpected response type: " + response.getClass().getSimpleName(), null
+            );
+          }
+        })
+        .exceptionally(ex -> {
+          LOG.severe("Failed to write " + commandType + " registers: " + ex.getMessage());
+          throw new CompletionException(ex);
+        });
   }
 
   @Override
@@ -878,7 +886,11 @@ public class ModbusTCPVehicleCommAdapter
   private CompletableFuture<ModbusResponse> sendModbusRequest(
       com.digitalpetri.modbus.requests.ModbusRequest request
   ) {
-    return sendModbusRequestWithRetry(request, 3);
+    return sendModbusRequestWithRetry(request, 3)
+        .exceptionally(ex -> {
+          LOG.severe("All retries failed for Modbus request: " + ex.getMessage());
+          throw new CompletionException("Failed to send Modbus request after retries", ex);
+        });
   }
 
   private CompletableFuture<ModbusResponse> sendModbusRequestWithRetry(
@@ -931,31 +943,114 @@ public class ModbusTCPVehicleCommAdapter
 
   private ModbusResponse processResponse(ModbusResponse response) {
     if (response instanceof ReadHoldingRegistersResponse readResponse) {
-      ByteBuf registers = readResponse.getRegisters();
-      registers.retain();
-      return new ReadHoldingRegistersResponse(registers) {
-        @Override
-        public boolean release() {
-          boolean released = super.release();
-          if (released && registers.refCnt() > 0) {
-            return registers.release();
-          }
-          return released;
-        }
-
-        @Override
-        public boolean release(int decrement) {
-          boolean released = super.release(decrement);
-          if (released && registers.refCnt() > 0) {
-            return registers.release(decrement);
-          }
-          return released;
-        }
-      };
+      return handleReadHoldingRegistersResponse(readResponse);
+    }
+    else if (response instanceof WriteMultipleRegistersResponse writeResponse) {
+      LOG.info("instanceof WriteMultipleRegistersResponse writeResponse");
+      return handleWriteMultipleRegistersResponse(writeResponse);
+    }
+    else if (response instanceof ReadInputRegistersResponse readInputResponse) {
+      return handleReadInputRegistersResponse(readInputResponse);
+    }
+    else if (response instanceof WriteSingleRegisterResponse writeSingleResponse) {
+      return handleWriteSingleRegisterResponse(writeSingleResponse);
     }
     return response;
   }
-//  private CompletableFuture<ModbusResponse> sendModbusRequest(
+
+  private ReadHoldingRegistersResponse handleReadHoldingRegistersResponse(
+      ReadHoldingRegistersResponse readResponse
+  ) {
+    ByteBuf registers = readResponse.getRegisters();
+    registers.retain();
+    return new ReadHoldingRegistersResponse(registers) {
+      @Override
+      public boolean release() {
+        boolean released = super.release();
+        if (released && registers.refCnt() > 0) {
+          return registers.release();
+        }
+        return released;
+      }
+
+      @Override
+      public boolean release(int decrement) {
+        boolean released = super.release(decrement);
+        if (released && registers.refCnt() > 0) {
+          return registers.release(decrement);
+        }
+        return released;
+      }
+    };
+  }
+
+  private WriteMultipleRegistersResponse handleWriteMultipleRegistersResponse(
+      WriteMultipleRegistersResponse writeResponse
+  ) {
+    return writeResponse;
+  }
+
+  private ReadInputRegistersResponse handleReadInputRegistersResponse(
+      ReadInputRegistersResponse readInputResponse
+  ) {
+    ByteBuf registers = readInputResponse.getRegisters();
+    registers.retain();
+    return new ReadInputRegistersResponse(registers) {
+      @Override
+      public boolean release() {
+        boolean released = super.release();
+        if (released && registers.refCnt() > 0) {
+          return registers.release();
+        }
+        return released;
+      }
+
+      @Override
+      public boolean release(int decrement) {
+        boolean released = super.release(decrement);
+        if (released && registers.refCnt() > 0) {
+          return registers.release(decrement);
+        }
+        return released;
+      }
+    };
+  }
+
+  private WriteSingleRegisterResponse handleWriteSingleRegisterResponse(
+      WriteSingleRegisterResponse writeSingleResponse
+  ) {
+    return writeSingleResponse;
+  }
+
+//  private ModbusResponse processResponse(ModbusResponse response) {
+//    if (response instanceof ReadHoldingRegistersResponse readResponse) {
+//      ByteBuf registers = readResponse.getRegisters();
+//      registers.retain();
+//      return new ReadHoldingRegistersResponse(registers) {
+//        @Override
+//        public boolean release() {
+//          boolean released = super.release();
+//          if (released && registers.refCnt() > 0) {
+//            return registers.release();
+//          }
+//          return released;
+//        }
+//
+//        @Override
+//        public boolean release(int decrement) {
+//          boolean released = super.release(decrement);
+//          if (released && registers.refCnt() > 0) {
+//            return registers.release(decrement);
+//          }
+//          return released;
+//        }
+//      };
+//    }
+//    return response;
+//  }
+
+
+  //  private CompletableFuture<ModbusResponse> sendModbusRequest(
 //      com.digitalpetri.modbus.requests.ModbusRequest request
 //  ) {
 //    if (master == null) {
