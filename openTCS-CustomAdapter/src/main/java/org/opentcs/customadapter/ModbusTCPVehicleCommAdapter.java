@@ -1056,10 +1056,10 @@ public class ModbusTCPVehicleCommAdapter
 
     private String lastKnownPosition;
     private long lastUpdateTime;
-    private long lastPosition;
-    private Triple lastPrecisePosition;
-    private double lastOrientation;
-    private double estimatedSpeed; // mm/s
+    private long lastPosition = 0;
+//    private Triple lastPrecisePosition;
+//    private double lastOrientation;
+//    private double estimatedSpeed; // mm/s
 
     /**
      * The PositionUpdater class is responsible for updating the position of a vehicle.
@@ -1112,72 +1112,72 @@ public class ModbusTCPVehicleCommAdapter
           });
     }
 
-    private void processPositionUpdate(long newPosition) {
+    private void processPositionUpdate(long stationMark) {
       long currentTime = System.currentTimeMillis();
+      long currentPosition = getPositionFromStationModbusCommand(stationMark);
 
-      if (lastUpdateTime > 0) {
-        long timeDiff = currentTime - lastUpdateTime;
-        long posDiff = newPosition - lastPosition;
-        estimatedSpeed = (double) posDiff / timeDiff * 1000;
-      }
+      String openTcsPosition = convertToOpenTcsPosition(stationMark);
+      Triple precisePosition = convertToPrecisePosition(currentPosition);
 
-      lastPosition = newPosition;
+//      if (lastUpdateTime > 0) {
+//        long timeDiff = currentTime - lastUpdateTime;
+//        long posDiff = currentPosition - lastPosition;
+//        estimatedSpeed = (double) posDiff / timeDiff * 1000;
+//      }
+
+      lastPosition = currentPosition;
       lastUpdateTime = currentTime;
-
-      String openTcsPosition = convertToOpenTcsPosition(newPosition);
-      Triple precisePosition = convertToPrecisePosition(newPosition);
-
       processModel.setPosition(openTcsPosition);
       processModel.setPrecisePosition(precisePosition);
 
-      lastPrecisePosition = precisePosition;
+//      lastPrecisePosition = precisePosition;
     }
 
-    private void interpolatePosition() {
-      long currentTime = System.currentTimeMillis();
-      long timeSinceLastUpdate = currentTime - lastUpdateTime;
+//    private void interpolatePosition() {
+//      long currentTime = System.currentTimeMillis();
+//      long timeSinceLastUpdate = currentTime - lastUpdateTime;
+//
+//      if (timeSinceLastUpdate > MAX_INTERPOLATION_TIME) {
+//        // If the maximum interpolation time is exceeded, no interpolation will be performed
+//        return;
+//      }
+//
+//      // Calculate the interpolated position
+//      double interpolationFactor = (double) timeSinceLastUpdate / UPDATE_INTERVAL;
+//      long interpolatedPosition = lastPosition + (long) (estimatedSpeed * interpolationFactor);
+//
+//      String openTcsPosition = convertToOpenTcsPosition(interpolatedPosition);
+//      Triple interpolatedPrecisePosition = interpolatePrecisePosition(interpolationFactor);
+//
+//      processModel.setPosition(openTcsPosition);
+//      processModel.setPrecisePosition(interpolatedPrecisePosition);
+//    }
 
-      if (timeSinceLastUpdate > MAX_INTERPOLATION_TIME) {
-        // If the maximum interpolation time is exceeded, no interpolation will be performed
-        return;
-      }
-
-      // Calculate the interpolated position
-      double interpolationFactor = (double) timeSinceLastUpdate / UPDATE_INTERVAL;
-      long interpolatedPosition = lastPosition + (long) (estimatedSpeed * interpolationFactor);
-
-      String openTcsPosition = convertToOpenTcsPosition(interpolatedPosition);
-      Triple interpolatedPrecisePosition = interpolatePrecisePosition(interpolationFactor);
-
-      processModel.setPosition(openTcsPosition);
-      processModel.setPrecisePosition(interpolatedPrecisePosition);
-    }
-
-    private Triple interpolatePrecisePosition(double factor) {
-      if (lastPrecisePosition == null) {
-        return null;
-      }
-      long dx = (long) (estimatedSpeed * factor * Math.cos(Math.toRadians(lastOrientation)));
-      long dy = (long) (estimatedSpeed * factor * Math.sin(Math.toRadians(lastOrientation)));
-      return new Triple(
-          lastPrecisePosition.getX() + dx,
-          lastPrecisePosition.getY() + dy,
-          lastPrecisePosition.getZ()
-      );
-    }
+//    private Triple interpolatePrecisePosition(double factor) {
+//      if (lastPrecisePosition == null) {
+//        return null;
+//      }
+//      long dx = (long) (estimatedSpeed * factor * Math.cos(Math.toRadians(lastOrientation)));
+//      long dy = (long) (estimatedSpeed * factor * Math.sin(Math.toRadians(lastOrientation)));
+//      return new Triple(
+//          lastPrecisePosition.getX() + dx,
+//          lastPrecisePosition.getY() + dy,
+//          lastPrecisePosition.getZ()
+//      );
+//    }
 
     private String convertToOpenTcsPosition(long position) {
       LOG.info(
           String.format(
               "GOT POSITION FROM MAP: %s",
-              getPositionFromMap(getPositionFromPositionModbusCommand(position))
+              getPositionFromMap(getPositionFromStationModbusCommand(position))
           )
       );
 
-      return getPositionFromMap(getPositionFromPositionModbusCommand(position));
+      return getPositionFromMap(getPositionFromStationModbusCommand(position));
     }
 
-    private long getPositionFromPositionModbusCommand(long index) {
+    private long getPositionFromStationModbusCommand(long index) {
       if (index < 0 || index >= positionModbusCommand.size()) {
         throw new IllegalArgumentException("Index out of positionModbusCommand bounds");
       }
