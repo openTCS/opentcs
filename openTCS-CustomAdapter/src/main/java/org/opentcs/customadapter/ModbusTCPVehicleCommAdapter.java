@@ -22,12 +22,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -77,7 +77,7 @@ public class ModbusTCPVehicleCommAdapter
   /**
    * MAP2: station name -> <CMD1, CMD2>.
    */
-  private final Map<Long, Pair<CMD1, CMD2>> stationCommandsMap = new ConcurrentHashMap<>();
+  private final Map<Long, Pair<CMD1, CMD2>> stationCommandsMap = new LinkedHashMap<>();
   private final Map<Long, String> positionMap;
   private final List<MovementCommand> allMovementCommands = new ArrayList<>();
   private final List<ModbusCommand> positionModbusCommand = new ArrayList<>();
@@ -392,8 +392,8 @@ public class ModbusTCPVehicleCommAdapter
   private void processAllMovementCommands() {
     LOG.info(
         String.format(
-            "Processing all movement commands for TransportOrder: %s", currentTransportOrder
-                .getName()
+            "Processing all movement commands for TransportOrder: %s, POOL size: %d",
+            currentTransportOrder.getName(), allMovementCommands.size()
         )
     );
     convertMovementCommandsToModbusCommands(allMovementCommands);
@@ -729,11 +729,14 @@ public class ModbusTCPVehicleCommAdapter
     for (ModbusCommand command : commands) {
       // Get the word size of the command
       int commandWordSize = getCommandWordSize(command);
+      LOG.info(String.format("commandWordSize: %d", commandWordSize));
       // If the word size of the current batch plus the new command exceeds the limit,
       // write the current batch and start a new batch
       if (batchWordSize + commandWordSize >= maxBatchSize) {
         // Write the current batch into the chain call
         int finalStartAddress = startAddress;
+        LOG.info(String.format("finalStartAddress: %d", finalStartAddress));
+
         List<ModbusCommand> finalBatch = new ArrayList<>(batch);
         futureChain = futureChain.thenCompose(
             v -> writeBatch(
@@ -745,15 +748,21 @@ public class ModbusTCPVehicleCommAdapter
         batchWordSize = 0;
       }
       batch.add(command);
+      LOG.info(String.format("batch size: %d", batch.size()));
       batchWordSize += commandWordSize;
     }
 
     // Write the last batch if it's not empty
     if (!batch.isEmpty()) {
       int finalStartAddress = startAddress;
-      List<ModbusCommand> finalBatch = new ArrayList<>(batch);
+      LOG.info(
+          String.format(
+              "WRITING LAST BATCH, finalStartAddress: %d",
+              startAddress
+          )
+      );
       futureChain = futureChain.thenCompose(
-          v -> writeBatch(finalBatch, finalStartAddress, commandType)
+          v -> writeBatch(batch, finalStartAddress, commandType)
       );
     }
 
@@ -771,12 +780,13 @@ public class ModbusTCPVehicleCommAdapter
 
     try {
       for (ModbusCommand command : batch) {
-        if (command.format() == ModbusCommand.DataFormat.DECIMAL) {
-          values.writeIntLE(command.value());
-        }
-        else {
-          values.writeShortLE(command.value());
-        }
+        values.writeIntLE(command.value());
+//        if (command.format() == ModbusCommand.DataFormat.DECIMAL) {
+//          values.writeIntLE(command.value());
+//        }
+//        else {
+//          values.writeShortLE(command.value());
+//        }
         LOG.info("Writing " + commandType + " command: " + command.toLogString());
       }
 
