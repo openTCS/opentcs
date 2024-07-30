@@ -1771,7 +1771,11 @@ public class Vehicle
     /**
      * The vehicle is currently recharging its battery/refilling fuel.
      */
-    CHARGING
+    CHARGING,
+    /**
+     * The vehicle has completed current operation.
+     */
+    FINISHED
   }
 
   /**
