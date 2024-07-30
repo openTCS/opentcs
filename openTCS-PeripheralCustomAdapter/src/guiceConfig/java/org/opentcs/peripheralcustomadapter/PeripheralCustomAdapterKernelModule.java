@@ -26,7 +26,13 @@ public class PeripheralCustomAdapterKernelModule
   @Override
   protected void configure() {
     bind(ScheduledExecutorService.class).toInstance(Executors.newScheduledThreadPool(1));
+    bind(PeripheralCustomCommunicationAdapterFactory.class).to(
+        PeripheralCustomCommunicationAdapterIFactoryImpl.class
+    );
 
+    peripheralCommAdaptersBinder().addBinding().to(
+        PeripheralCustomCommunicationAdapterFactory.class
+    );
     install(
         new FactoryModuleBuilder()
             .implement(
