@@ -16,7 +16,9 @@ import org.opentcs.configuration.ConfigurationPrefix;
 @Singleton
 @ConfigurationPrefix("peripheraldevicecustom")
 public class PeripheralDeviceConfigurationProvider {
-  private static final Logger LOG = Logger.getLogger(PeripheralDeviceConfigurationProvider.class.getName());
+  private static final Logger LOG = Logger.getLogger(
+      PeripheralDeviceConfigurationProvider.class.getName()
+  );
   private static final String CONFIG_FILE
       = "C:\\Users\\user\\Desktop\\minioht\\config\\peripheral_config.json";
 
@@ -68,7 +70,7 @@ public class PeripheralDeviceConfigurationProvider {
         configurations.clear();
         configurations.putAll(loadedConfigs);
 
-        for (int i = 0;  i < 2; i++) {
+        for (int i = 0; i < 2; i++) {
           String specificVehicle = "";
           if (i == 0) {
             specificVehicle = "SAA-mini-OHT-Sensor0001";

@@ -20,8 +20,6 @@ public class PeripheralCustomCommunicationAdapterDescription
   @Nonnull
   @Override
   public String getDescription() {
-    {
-      return "Peripheral Custom Communication Adapter";
-    }
+    return "Peripheral Custom Communication Adapter";
   }
 }
