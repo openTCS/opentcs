@@ -117,9 +117,5 @@ public abstract class CustomVehicleCommAdapter
     // Implement message processing logic
   }
 
-  protected abstract void updateVehiclePosition(String position);
-
-  protected abstract void updateVehicleState();
-
   // You can add more abstract methods here if needed for specific implementations
 }

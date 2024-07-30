@@ -846,8 +846,8 @@ public class ModbusTCPVehicleCommAdapter
             this.isConnected = true;
             LOG.info("Successfully connected to Modbus TCP server");
             getProcessModel().setCommAdapterConnected(true);
-//            startHeartbeat();
-//            positionUpdater.startPositionUpdates();
+            startHeartbeat();
+            positionUpdater.startPositionUpdates();
           })
           .exceptionally(ex -> {
             LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
@@ -1186,22 +1186,6 @@ public class ModbusTCPVehicleCommAdapter
     // Implement specific message processing logic
   }
 
-  /**
-   * null.
-   */
-  @Override
-  protected void updateVehiclePosition(String position) {
-    getProcessModel().setPosition(position);
-  }
-
-  /**
-   * null.
-   */
-  @Override
-  protected void updateVehicleState() {
-
-  }
-
   @Override
   protected VehicleProcessModelTO createCustomTransferableProcessModel() {
     return new CustomProcessModelTO()
@@ -1255,17 +1239,12 @@ public class ModbusTCPVehicleCommAdapter
 
   public class PositionUpdater {
     private static final int UPDATE_INTERVAL = 500;
-    private static final int MAX_INTERPOLATION_TIME = 500;
     private static final int POSITION_REGISTER_ADDRESS = 109;
 
     private final VehicleProcessModel processModel;
     private final ScheduledExecutorService executor;
     private ScheduledFuture<?> positionFuture;
-
     private String lastKnownPosition;
-    //    private Triple lastPrecisePosition;
-//    private double lastOrientation;
-//    private double estimatedSpeed; // mm/s
 
     /**
      * The PositionUpdater class is responsible for updating the position of a vehicle.
@@ -1313,7 +1292,6 @@ public class ModbusTCPVehicleCommAdapter
           .thenAccept(this::processPositionUpdate)
           .exceptionally(ex -> {
             LOG.warning("Failed to update position: " + ex.getMessage());
-//            interpolatePosition();
             return null;
           });
     }
@@ -1336,39 +1314,6 @@ public class ModbusTCPVehicleCommAdapter
 
 //      lastPrecisePosition = precisePosition;
     }
-
-//    private void interpolatePosition() {
-//      long currentTime = System.currentTimeMillis();
-//      long timeSinceLastUpdate = currentTime - lastUpdateTime;
-//
-//      if (timeSinceLastUpdate > MAX_INTERPOLATION_TIME) {
-//        // If the maximum interpolation time is exceeded, no interpolation will be performed
-//        return;
-//      }
-//
-//      // Calculate the interpolated position
-//      double interpolationFactor = (double) timeSinceLastUpdate / UPDATE_INTERVAL;
-//      long interpolatedPosition = lastPosition + (long) (estimatedSpeed * interpolationFactor);
-//
-//      String openTcsPosition = convertToOpenTcsPosition(interpolatedPosition);
-//      Triple interpolatedPrecisePosition = interpolatePrecisePosition(interpolationFactor);
-//
-//      processModel.setPosition(openTcsPosition);
-//      processModel.setPrecisePosition(interpolatedPrecisePosition);
-//    }
-
-//    private Triple interpolatePrecisePosition(double factor) {
-//      if (lastPrecisePosition == null) {
-//        return null;
-//      }
-//      long dx = (long) (estimatedSpeed * factor * Math.cos(Math.toRadians(lastOrientation)));
-//      long dy = (long) (estimatedSpeed * factor * Math.sin(Math.toRadians(lastOrientation)));
-//      return new Triple(
-//          lastPrecisePosition.getX() + dx,
-//          lastPrecisePosition.getY() + dy,
-//          lastPrecisePosition.getZ()
-//      );
-//    }
 
     private String convertToOpenTcsPosition(long position) {
       LOG.info(
