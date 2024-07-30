@@ -118,7 +118,7 @@ public class ModbusTCPVehicleCommAdapter
   private ScheduledFuture<?> heartBeatFuture;
   private PositionUpdater positionUpdater;
   private final PlantModelService plantModelService;
-  private final VehicleConfigurationProvider configProvider;
+  private MovementHandler movementHandler;
 
   /**
    * A communication adapter for ModbusTCP-based vehicle communication.
@@ -127,8 +127,6 @@ public class ModbusTCPVehicleCommAdapter
    *
    * @param executor The executor for handling background tasks.
    * @param vehicle The vehicle associated with this communication adapter.
-   * @param host The host IP address for the ModbusTCP connection.
-   * @param port The port number for the ModbusTCP connection.
    * @param plantModelService The plant model service for accessing plant model information.
    */
   @SuppressWarnings("checkstyle:TodoComment")
@@ -139,12 +137,12 @@ public class ModbusTCPVehicleCommAdapter
       ScheduledExecutorService executor,
       @Assisted
       Vehicle vehicle,
-      String host,
-      int port,
+
       PlantModelService plantModelService
   ) {
     super(new CustomProcessModel(vehicle), "RECHARGE", 1000, executor);
-    this.configProvider = new VehicleConfigurationProvider();
+    VehicleConfigurationProvider configProvider = new VehicleConfigurationProvider();
+
     this.host = configProvider.getConfiguration(vehicle.getName()).host();
     this.port = configProvider.getConfiguration(vehicle.getName()).port();
 
@@ -175,6 +173,7 @@ public class ModbusTCPVehicleCommAdapter
     LOG.warning("Device has set load handling device");
     initializePositionMap();
     this.positionUpdater = new PositionUpdater(getProcessModel(), getExecutor());
+    this.movementHandler = new MovementHandler(getExecutor(), this);
     LOG.warning("Starting sending heart bit.");
     initialized = true;
   }
@@ -192,6 +191,7 @@ public class ModbusTCPVehicleCommAdapter
     super.terminate();
     positionUpdater.stopPositionUpdates();
     stopHeartBeat();
+    movementHandler.stopMonitoring();
     initialized = false;// Stop the heartbeat mechanism
   }
 
@@ -399,7 +399,15 @@ public class ModbusTCPVehicleCommAdapter
         )
     );
     convertMovementCommandsToModbusCommands(allMovementCommands);
-    writeAllModbusCommands();
+    writeAllModbusCommands()
+        .thenRun(() -> {
+          // Start monitoring vehicle movement after writing commands
+          movementHandler.startMonitoring(allMovementCommands);
+        })
+        .exceptionally(ex -> {
+          LOG.severe("Failed to write commands and start monitoring: " + ex.getMessage());
+          return null;
+        });
     allMovementCommands.clear();
     currentTransportOrder = null;
   }
@@ -605,7 +613,7 @@ public class ModbusTCPVehicleCommAdapter
         });
   }
 
-  private CompletableFuture<Integer> readSingleRegister(int address) {
+  CompletableFuture<Integer> readSingleRegister(int address) {
     ReadInputRegistersRequest request = new ReadInputRegistersRequest(address, 1);
     return sendModbusRequest(request)
         .thenApply(response -> {

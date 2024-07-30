@@ -29,8 +29,6 @@ public class ModbusTCPStrategy
     return new ModbusTCPVehicleCommAdapter(
         executor,
         vehicle,
-        config.host(),
-        config.port(),
         plantModelService
     );
   }
