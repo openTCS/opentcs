@@ -1,5 +1,6 @@
 package org.opentcs.peripheralcustomadapter;
 
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.PeripheralInformation;
@@ -34,7 +35,9 @@ public class PeripheralCustomProcessModel
   }
 
   @Override
-  public PeripheralCustomProcessModel withLocation(TCSResourceReference<Location> location) {
+  public PeripheralCustomProcessModel withLocation(
+      @Nonnull
+      TCSResourceReference<Location> location) {
     return new PeripheralCustomProcessModel(
         location,
         isCommAdapterEnabled(),
