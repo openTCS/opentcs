@@ -783,7 +783,11 @@ public class ModbusTCPVehicleCommAdapter
 
     for (ModbusCommand command : batch) {
       if ("Position".equalsIgnoreCase(commandType)) {
-        values.writeIntLE(command.value());
+        int lowWord = (command.value() >> 16) & 0xFFFF;
+        int highWord = command.value() & 0xFFFF;
+        values.writeShort(highWord);
+        values.writeShort(lowWord);
+
         registerCount += 2;
       }
       else {
