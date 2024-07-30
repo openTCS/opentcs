@@ -358,7 +358,6 @@ public class ModbusTCPVehicleCommAdapter
       );
       LOG.info("RECEIVED FINAL COMMAND, PROCESSING COMMANDS. ");
       processAllMovementCommands();
-      allMovementCommands.clear();
     }
     return true;
   }
@@ -379,7 +378,6 @@ public class ModbusTCPVehicleCommAdapter
 
   private void queueNewCommand(MovementCommand newCommand) {
     allMovementCommands.add(newCommand);
-
     LOG.info(
         String.format(
             "%s: Custom Adding command: , Current Movement Pool Size: %d", getName(),
@@ -401,14 +399,17 @@ public class ModbusTCPVehicleCommAdapter
     convertMovementCommandsToModbusCommands(allMovementCommands);
     writeAllModbusCommands()
         .thenRun(() -> {
-          // Start monitoring vehicle movement after writing commands
+          LOG.info(
+              String.format(
+                  "SIZE OF allMovementCommands BEFORE MONITORING: %d", allMovementCommands.size()
+              )
+          );
           movementHandler.startMonitoring(allMovementCommands);
         })
         .exceptionally(ex -> {
           LOG.severe("Failed to write commands and start monitoring: " + ex.getMessage());
           return null;
         });
-    allMovementCommands.clear();
     currentTransportOrder = null;
   }
 
@@ -423,8 +424,6 @@ public class ModbusTCPVehicleCommAdapter
     stationCommandsMap.clear();
     positionModbusCommand.clear();
     cmdModbusCommand.clear();
-    LOG.info("ALL COMMAND BUFFER HAS BEEN CLEARED.");
-
     processMovementCommands(commands);
     int positionBaseAddress = 1000;
     int cmdBaseAddress = 1200;
@@ -1311,14 +1310,8 @@ public class ModbusTCPVehicleCommAdapter
       String openTcsPosition = convertToOpenTcsPosition(stationMark);
       Triple precisePosition = convertToPrecisePosition(currentPosition);
 
-//      if (lastUpdateTime > 0) {
-//        long timeDiff = currentTime - lastUpdateTime;
-//        long posDiff = currentPosition - lastPosition;
-//        estimatedSpeed = (double) posDiff / timeDiff * 1000;
-//      }
-
-      processModel.setPosition(openTcsPosition);
-      processModel.setPrecisePosition(precisePosition);
+      getProcessModel().setPosition(openTcsPosition);
+      getProcessModel().setPrecisePosition(precisePosition);
 
 //      lastPrecisePosition = precisePosition;
     }
