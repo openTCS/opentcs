@@ -10,62 +10,62 @@ public class LocationSensor2Status {
   /**
    * The Status for the STK Port1.
    */
-  private boolean sTKPort1Status;
+  private boolean isMagazineInSTKPort1;
   /**
    * The Status for the STK Port2.
    */
-  private boolean sTKPort2Status;
+  private boolean isMagazineInSTKPort2;
   /**
    * The Status for the OHB1.
    */
-  private boolean oHB1Status;
+  private boolean isMagazineInOHB1;
   /**
    * The Status for the OHB2.
    */
-  private boolean oHB2Status;
+  private boolean isMagazineInOHB2;
   /**
    * The Status for the Side Fork1.
    */
-  private boolean sideFork1Status;
+  private boolean isMagazineInSideFork1;
   /**
    * The Status for the Side Fork2.
    */
-  private boolean sideFork2Status;
+  private boolean isMagazineInSideFork2;
 
   /**
    * Creates a new instance.
    */
   public LocationSensor2Status() {
-    sTKPort1Status = false;
-    sTKPort2Status = false;
-    oHB1Status = false;
-    oHB2Status = false;
-    sideFork1Status = false;
-    sideFork2Status = false;
+    isMagazineInSTKPort1 = false;
+    isMagazineInSTKPort2 = false;
+    isMagazineInOHB1 = false;
+    isMagazineInOHB2 = false;
+    isMagazineInSideFork1 = false;
+    isMagazineInSideFork2 = false;
   }
 
   public void setSTKPort1Status(boolean hasCargo) {
-    this.sTKPort1Status = hasCargo;
+    this.isMagazineInSTKPort1 = hasCargo;
   }
 
   public void setSTKPort2Status(boolean hasCargo) {
-    this.sTKPort2Status = hasCargo;
+    this.isMagazineInSTKPort2 = hasCargo;
   }
 
   public void setOHB1Status(boolean hasCargo) {
-    this.oHB1Status = hasCargo;
+    this.isMagazineInOHB1 = hasCargo;
   }
 
   public void setOHB2Status(boolean hasCargo) {
-    this.oHB2Status = hasCargo;
+    this.isMagazineInOHB2 = hasCargo;
   }
 
   public void setSideFork1Status(boolean hasCargo) {
-    this.sideFork1Status = hasCargo;
+    this.isMagazineInSideFork1 = hasCargo;
   }
 
   public void setSideFork2Status(boolean hasCargo) {
-    this.sideFork2Status = hasCargo;
+    this.isMagazineInSideFork2 = hasCargo;
   }
 
   /**
@@ -74,7 +74,7 @@ public class LocationSensor2Status {
    * @return STK Port1 Status.
    */
   public boolean hasMagazineSTKPort1() {
-    return this.sTKPort1Status;
+    return this.isMagazineInSTKPort1;
   }
 
   /**
@@ -83,7 +83,7 @@ public class LocationSensor2Status {
    * @return STK Port2 Status.
    */
   public boolean hasMagazineSTKPort2() {
-    return this.sTKPort2Status;
+    return this.isMagazineInSTKPort2;
   }
 
   /**
@@ -92,7 +92,7 @@ public class LocationSensor2Status {
    * @return OHB1 Status.
    */
   public boolean hasMagazineOHB1() {
-    return this.oHB1Status;
+    return this.isMagazineInOHB1;
   }
 
   /**
@@ -101,7 +101,7 @@ public class LocationSensor2Status {
    * @return OHB2 Status.
    */
   public boolean hasMagazineOHB2() {
-    return this.oHB2Status;
+    return this.isMagazineInOHB2;
   }
 
   /**
@@ -110,7 +110,7 @@ public class LocationSensor2Status {
    * @return Side Fork1 Status.
    */
   public boolean hasMagazineSTKSideFork1() {
-    return this.sideFork1Status;
+    return this.isMagazineInSideFork1;
   }
 
   /**
@@ -119,6 +119,6 @@ public class LocationSensor2Status {
    * @return Side Fork2 Status.
    */
   public boolean hasMagazineSideFork2() {
-    return this.sideFork2Status;
+    return this.isMagazineInSideFork2;
   }
 }
