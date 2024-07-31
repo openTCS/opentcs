@@ -46,8 +46,9 @@ public class PeripheralCommunicationStrategy
   ) {
     PeripheralDeviceConfiguration config = configProvider.getConfiguration(location.getName());
     if (config == null) {
-      if (String.CASE_INSENSITIVE_ORDER.compare(location.getName(), "SAA-mini-OHT-Sensor0001")
-          == 0) {
+      if (String.CASE_INSENSITIVE_ORDER.compare(location.getName(), "SAA-mini-OHT-Sensor0001-STK") == 0 ||
+          String.CASE_INSENSITIVE_ORDER.compare(location.getName(), "SAA-mini-OHT-Sensor0001-OHB") == 0 ||
+          String.CASE_INSENSITIVE_ORDER.compare(location.getName(), "SAA-mini-OHT-Sensor0001-SideFork") == 0) {
         config = new PeripheralDeviceConfiguration("ModbusTCP", "192.168.1.20", 502);
         configProvider.setConfiguration(location.getName(), config);
       }
