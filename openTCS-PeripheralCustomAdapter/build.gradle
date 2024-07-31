@@ -1,0 +1,19 @@
+apply from: "${rootDir}/gradle/java-project.gradle"
+apply from: "${rootDir}/gradle/java-codequality.gradle"
+apply from: "${rootDir}/gradle/guice-project.gradle"
+apply from: "${rootDir}/gradle/publishing-java.gradle"
+
+dependencies {
+  api project(':openTCS-API-Injection')
+  api project(':openTCS-Common')
+
+  // Modbus TCP dependency
+  implementation 'com.digitalpetri.modbus:modbus-master-tcp:1.2.0'
+  implementation 'com.google.code.gson:gson:2.10.1'
+  implementation 'org.jgrapht:jgrapht-core:1.5.1'
+  implementation group: 'io.netty', name: 'netty-all', version: '4.1.24.Final'
+}
+
+task release {
+  dependsOn build
+}

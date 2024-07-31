@@ -17,6 +17,7 @@ dependencies {
   api project(':openTCS-PeripheralCommAdapter-Loopback')
   api project(':openTCS-Impl-Configuration-gestalt')
   api project(':openTCS-CustomAdapter')
+  api project(':openTCS-PeripheralCustomAdapter')
 
   runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.13'
 }
