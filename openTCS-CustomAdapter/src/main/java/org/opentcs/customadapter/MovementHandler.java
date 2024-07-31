@@ -20,6 +20,12 @@ public class MovementHandler {
   private List<MovementCommand> pendingCommands;
   private int currentCommandIndex;
 
+  /**
+   * Handles the movement of a vehicle by executing a list of commands.
+   *
+   * @param executor The executor service used to schedule the execution of commands.
+   * @param adapter  The ModbusTCPVehicleCommAdapter used for communication with the vehicle.
+   */
   public MovementHandler(ScheduledExecutorService executor, ModbusTCPVehicleCommAdapter adapter) {
     this.executor = executor;
     this.adapter = adapter;
@@ -27,6 +33,11 @@ public class MovementHandler {
     this.currentCommandIndex = 0;
   }
 
+  /**
+   * Starts monitoring and executing a list of movement commands.
+   *
+   * @param commands The list of movement commands to monitor and execute.
+   */
   public void startMonitoring(List<MovementCommand> commands) {
     if (monitoringTask != null && !monitoringTask.isDone()) {
       LOG.info("Cancelling the old monitoring task");
@@ -117,7 +128,8 @@ public class MovementHandler {
       else {
         LOG.info(
             String.format(
-                "VEHICLE HAS NOT COMPLETED THE COMMAND, EXPECT: %s, CURRENTLY AT: %s, OPERATION: %s",
+                "VEHICLE HAS NOT COMPLETED THE COMMAND, "
+                    + "EXPECT: %s, CURRENTLY AT: %s, OPERATION: %s",
                 currentCommand.getStep().getDestinationPoint().getName(),
                 currentPosition,
                 currentCommand.getOperation()
