@@ -44,28 +44,28 @@ public class LocationSensor2Status {
     isMagazineInSideFork2 = false;
   }
 
-  public void setSTKPort1Status(boolean hasCargo) {
-    this.isMagazineInSTKPort1 = hasCargo;
+  public void setSTKPort1MagazineStatus(boolean hasMagazine) {
+    this.isMagazineInSTKPort1 = hasMagazine;
   }
 
-  public void setSTKPort2Status(boolean hasCargo) {
-    this.isMagazineInSTKPort2 = hasCargo;
+  public void setSTKPort2MagazineStatus(boolean hasMagazine) {
+    this.isMagazineInSTKPort2 = hasMagazine;
   }
 
-  public void setOHB1Status(boolean hasCargo) {
-    this.isMagazineInOHB1 = hasCargo;
+  public void setOHB1MagazineStatus(boolean hasMagazine) {
+    this.isMagazineInOHB1 = hasMagazine;
   }
 
-  public void setOHB2Status(boolean hasCargo) {
-    this.isMagazineInOHB2 = hasCargo;
+  public void setOHB2MagazineStatus(boolean hasMagazine) {
+    this.isMagazineInOHB2 = hasMagazine;
   }
 
-  public void setSideFork1Status(boolean hasCargo) {
-    this.isMagazineInSideFork1 = hasCargo;
+  public void setSideFork1MagazineStatus(boolean hasMagazine) {
+    this.isMagazineInSideFork1 = hasMagazine;
   }
 
-  public void setSideFork2Status(boolean hasCargo) {
-    this.isMagazineInSideFork2 = hasCargo;
+  public void setSideFork2MagazineStatus(boolean hasMagazine) {
+    this.isMagazineInSideFork2 = hasMagazine;
   }
 
   /**
