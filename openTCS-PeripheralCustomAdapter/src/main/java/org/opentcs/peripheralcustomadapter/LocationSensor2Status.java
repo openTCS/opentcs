@@ -71,7 +71,7 @@ public class LocationSensor2Status {
   /**
    * Is there Magazine in STK Port1.
    *
-   * @return STK Port1 Status.
+   * @return STK Port1 Magazine Status.
    */
   public boolean hasMagazineSTKPort1() {
     return this.isMagazineInSTKPort1;
@@ -80,7 +80,7 @@ public class LocationSensor2Status {
   /**
    * Is there Magazine in STK Port2.
    *
-   * @return STK Port2 Status.
+   * @return STK Port2 Magazine Status.
    */
   public boolean hasMagazineSTKPort2() {
     return this.isMagazineInSTKPort2;
@@ -89,7 +89,7 @@ public class LocationSensor2Status {
   /**
    * Is there Magazine in OHB1.
    *
-   * @return OHB1 Status.
+   * @return OHB1 Magazine Status.
    */
   public boolean hasMagazineOHB1() {
     return this.isMagazineInOHB1;
@@ -98,7 +98,7 @@ public class LocationSensor2Status {
   /**
    * Is there Magazine in OHB2.
    *
-   * @return OHB2 Status.
+   * @return OHB2 Magazine Status.
    */
   public boolean hasMagazineOHB2() {
     return this.isMagazineInOHB2;
@@ -107,7 +107,7 @@ public class LocationSensor2Status {
   /**
    * Is there Magazine in Side Fork1.
    *
-   * @return Side Fork1 Status.
+   * @return Side Fork1 Magazine Status.
    */
   public boolean hasMagazineSTKSideFork1() {
     return this.isMagazineInSideFork1;
@@ -116,7 +116,7 @@ public class LocationSensor2Status {
   /**
    * Is there Magazine in Side Fork2.
    *
-   * @return Side Fork2 Status.
+   * @return Side Fork2 Magazine Status.
    */
   public boolean hasMagazineSideFork2() {
     return this.isMagazineInSideFork2;

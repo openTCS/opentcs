@@ -15,7 +15,7 @@ public class LocationSensor1Status {
   /**
    * The Status for the STK Port2.
    */
-  private int eFEMMagazineNumber;
+  private int eFEMMagazineQantity;
   /**
    * The Status for the OHB1.
    */
@@ -26,7 +26,7 @@ public class LocationSensor1Status {
    */
   public LocationSensor1Status() {
     this.isMagazineInEFEM = false;
-    this.eFEMMagazineNumber = 0;
+    this.eFEMMagazineQantity = 0;
     this.eFEMStatus = EFEMStatus.Idle;
   }
 
@@ -34,29 +34,58 @@ public class LocationSensor1Status {
     this.isMagazineInEFEM = hasMagazine;
   }
 
-  public boolean hasMagazineEFEM(boolean hasMagazine) {
+  /**
+   * Is there Magazine in EFEM.
+   *
+   * @return EFEM Magazine Status.
+   */
+  public boolean hasMagazineEFEM() {
     return isMagazineInEFEM;
   }
 
-  public void setEFEMMagazineNumber(int number) {
-    this.eFEMMagazineNumber = number;
+  public void setEFEMMagazineNumber(int quantity) {
+    this.eFEMMagazineQantity = quantity;
   }
 
-  public int getEFEMMagazineNumber() {
-    return eFEMMagazineNumber;
+  /**
+   * Get EFEM Magazine Quantity.
+   *
+   * @return Magazine Quantity.
+   */
+  public int getEFEMMagazineQuantity() {
+    return eFEMMagazineQantity;
   }
 
+  /**
+   * Set EFEM Status.
+   *
+   */
   public void setEFEMStatus(int status) {
-    switch (status) {
-      case 1 -> this.eFEMStatus = EFEMStatus.Run;
-      case 2 -> this.eFEMStatus = EFEMStatus.Stop;
-      case 4 -> this.eFEMStatus = EFEMStatus.Idle;
-      case 8 -> this.eFEMStatus = EFEMStatus.Alarm;
-      case 16 -> this.eFEMStatus = EFEMStatus.Warning;
-      default -> throw new IllegalStateException("Unexpected value: " + status);
+    if (status == 1) {
+      this.eFEMStatus = EFEMStatus.Run;
+    }
+    else if (status == 2) {
+      this.eFEMStatus = EFEMStatus.Stop;
+    }
+    else if (status == 4) {
+      this.eFEMStatus = EFEMStatus.Idle;
+    }
+    else if (status == 8) {
+      this.eFEMStatus = EFEMStatus.Alarm;
+    }
+    else if (status == 16) {
+      this.eFEMStatus = EFEMStatus.Warning;
+    }
+    else {
+      throw new IllegalStateException("Unexpected value: " + status);
     }
   }
 
+  /**
+   * Get EFEM Status.
+   *
+   * @return EFEM Status.
+   */
   public EFEMStatus getEFEMStatus() {
     return eFEMStatus;
   }
