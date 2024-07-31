@@ -462,37 +462,45 @@ public class ModbusTCPVehicleCommAdapter
    * @param commands The list of movement commands to be processed.
    */
   private void processMovementCommands(List<MovementCommand> commands) {
-    long startPosition;
     for (MovementCommand cmd : commands) {
-      // If step doesn't have source point,
-      // that means vehicle is start from the destination, no need to move.
-      if (cmd.getStep().getSourcePoint() == null) {
-        LOG.warning(String.format("Vehicle %s don't need to move actually.", vehicle.getName()));
+      Point sourcePoint = cmd.getStep().getSourcePoint();
+      Point destPoint = cmd.getStep().getDestinationPoint();
+      long destPosition = destPoint.getPose().getPosition().getX();
+
+      if (sourcePoint == null) {
+        if (cmd.getOperation().isEmpty()) {
+          LOG.info(
+              String.format(
+                  "No operation for in-place command at position %d",
+                  destPoint.getPose().getPosition().getX()
+              )
+          );
+        }
+        Pair<CMD1, CMD2> operationCommands = createOperationCommands(cmd);
+        stationCommandsMap.put(destPosition, operationCommands);
         continue;
       }
-      LOG.info(
-          String.format(
-              "Vehicle %s got movements at Source point %s.",
-              vehicle.getName(),
-              cmd.getStep().getSourcePoint().getName()
-          )
-      );
-      startPosition = cmd.getStep().getSourcePoint().getPose().getPosition().getX();
-      LOG.info(String.format("CREATING COMMAND FOR POSITION: %d", startPosition));
 
-      Pair<CMD1, CMD2> pairCommands = new Pair<>(createCMD1(cmd), createCMD2(cmd));
-      stationCommandsMap.put(startPosition, pairCommands);
+      long sourcePosition = sourcePoint.getPose().getPosition().getX();
+      LOG.info(String.format("CREATING COMMAND FOR POSITION: %d", sourcePosition));
+      LOG.info(String.format("CREATING COMMAND FOR END POSITION: %d", destPosition));
+
+      if (!cmd.isFinalMovement()) {
+        Pair<CMD1, CMD2> pairCommands = new Pair<>(createCMD1(cmd), createCMD2(cmd));
+        stationCommandsMap.put(sourcePosition, pairCommands);
+        continue;
+      }
+
+      Pair<CMD1, CMD2> moveCommands = createDefaultCommands(cmd);
+      stationCommandsMap.put(sourcePosition, moveCommands);
+      Pair<CMD1, CMD2> operationCommands = createOperationCommands(cmd);
+      stationCommandsMap.put(destPosition, operationCommands);
     }
   }
 
-  @SuppressWarnings("checkstyle:TodoComment")
-  private CMD1 createCMD1(MovementCommand cmd) {
-    int liftCmd = 0;
-    int speedLevel = 0;
-    int obstacleSensor = 5;
+  private int getSpeedLevel(MovementCommand cmd) {
     double maxSpeed = 0;
-    String command = cmd.getOperation();
-    liftCmd = getLiftCommand(command);
+    int speedLevel = 0;
     if (cmd.getStep().getPath() != null) {
       maxSpeed = getMaxAllowedSpeed(cmd.getStep().getPath());
       LOG.info(String.format("GOT MAX SPEED: %f", maxSpeed));
@@ -506,6 +514,16 @@ public class ModbusTCPVehicleCommAdapter
       case 12 -> 5;
       default -> 1;
     };
+    return speedLevel;
+  }
+
+  @SuppressWarnings("checkstyle:TodoComment")
+  private CMD1 createCMD1(MovementCommand cmd) {
+    int liftCmd = 0;
+    int speedLevel = getSpeedLevel(cmd);
+    int obstacleSensor = 5;
+    String command = cmd.getOperation();
+    liftCmd = getLiftCommand(command);
     return new CMD1(
         liftCmd, speedLevel, obstacleSensor, 0
     );
@@ -539,6 +557,35 @@ public class ModbusTCPVehicleCommAdapter
     return new CMD2(liftHeight, motionCommand);
   }
 
+  private Pair<CMD1, CMD2> createDefaultCommands(MovementCommand cmd) {
+    return new Pair<>(createDefaultCMD1(cmd), createDefaultCMD2(cmd));
+  }
+
+  private CMD1 createDefaultCMD1(MovementCommand cmd) {
+    int speedLevel = getSpeedLevel(cmd);
+    return new CMD1(0, speedLevel, 5, 0);
+  }
+
+  private CMD2 createDefaultCMD2(MovementCommand cmd) {
+    return new CMD2(0, 1);
+  }
+
+  private Pair<CMD1, CMD2> createOperationCommands(MovementCommand cmd) {
+    return new Pair<>(createOperationCMD1(cmd), createOperationCMD2(cmd));
+  }
+
+  private CMD1 createOperationCMD1(MovementCommand cmd) {
+    return new CMD1(getLiftCommand(cmd.getOperation()), getSpeedLevel(cmd), 5, 0);
+  }
+
+  private CMD2 createOperationCMD2(MovementCommand cmd) {
+    int liftHeight = 0;
+    if (cmd.getStep().getDestinationPoint().getName().equals("Sidefork")) {
+      liftHeight = 4095;
+    }
+    return new CMD2(liftHeight, 3);
+  }
+
   private double getMaxAllowedSpeed(Path path) {
     double processModelMaxFwdVelocity = getProcessModel().getMaxFwdVelocity();
     LOG.info(String.format("processModelMaxFwdVelocity: %f", processModelMaxFwdVelocity));
@@ -552,7 +599,7 @@ public class ModbusTCPVehicleCommAdapter
     return switch (command) {
       case "Load" -> 2;
       case "Unload" -> 1;
-      default -> 1;
+      default -> 0;
     };
   }
 
