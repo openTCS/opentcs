@@ -53,16 +53,21 @@ public class MovementHandler {
   private void checkVehicleStatus() {
     CompletableFuture<Integer> vehicleStatusFuture = adapter.readSingleRegister(105);
     CompletableFuture<Integer> liftStatusFuture = adapter.readSingleRegister(106);
+    CompletableFuture<Integer> loadStatusFuture = adapter.readSingleRegister(107);
 
     CompletableFuture.allOf(vehicleStatusFuture, liftStatusFuture)
         .thenCompose(v -> CompletableFuture.supplyAsync(() -> {
           int vehicleStatus = vehicleStatusFuture.join();
           int liftStatus = liftStatusFuture.join();
-          return new int[]{vehicleStatus, liftStatus};
+          int loadStatus = loadStatusFuture.join();
+
+          return new int[]{vehicleStatus, liftStatus, loadStatus};
         }, executor))
         .thenAccept(statuses -> {
           LOG.info("Following messages come from MovementHandler.");
-          updateVehicleStatus(statuses[0], statuses[1], adapter.getProcessModel().getPosition());
+          updateVehicleStatus(
+              statuses[0], statuses[1], statuses[2], adapter.getProcessModel().getPosition()
+          );
         })
         .exceptionally(ex -> {
           LOG.severe("Failed to read vehicle status: " + ex.getMessage());
@@ -70,13 +75,16 @@ public class MovementHandler {
         });
   }
 
-  private void updateVehicleStatus(int vehicleStatus, int liftStatus, String currentPosition) {
+  private void updateVehicleStatus(
+      int vehicleStatus, int liftStatus, int loadStatus, String currentPosition
+  ) {
     LOG.info(
         "Updating vehicle status: vehicleStatus=" + vehicleStatus + ", liftStatus=" + liftStatus
+            + ", loadStatus=" + loadStatus
             + ", currentPosition=" + currentPosition
     );
 
-    updateVehicleState(vehicleStatus, liftStatus);
+    updateVehicleState(vehicleStatus, loadStatus);
     LOG.info("updateVehicleState HAS COMPLETED.");
 
     // Check if current movement command is completed
@@ -89,29 +97,30 @@ public class MovementHandler {
           )
       );
 
-      if (isCommandCompleted(currentCommand, currentPosition)) {
+      if (hasReachedDestination(currentCommand, currentPosition) &&
+          isOperationCompleted(currentCommand, liftStatus, loadStatus)) {
         LOG.info(
             String.format(
-                "CURRENT LOCATION MATCH THE DESTINATION: %s",
+                "CURRENT LOCATION MATCH THE DESTINATION AND OPERATION COMPLETED: %s",
                 currentPosition
             )
         );
-
         adapter.getProcessModel().commandExecuted(currentCommand);
         currentCommandIndex++;
 
         if (currentCommandIndex >= pendingCommands.size()) {
           LOG.info("All commands completed");
           monitoringTask.cancel(false);
-//          adapter.getProcessModel().setPosition(currentPosition);
           adapter.getProcessModel().setState(Vehicle.State.IDLE);
         }
       }
       else {
         LOG.info(
             String.format(
-                "VEHICLE HAS NOT REACH THE DESTINATION, EXPECT: %s, CURRENTLY: %s",
-                currentCommand.getStep().getDestinationPoint().getName(), currentPosition
+                "VEHICLE HAS NOT COMPLETED THE COMMAND, EXPECT: %s, CURRENTLY AT: %s, OPERATION: %s",
+                currentCommand.getStep().getDestinationPoint().getName(),
+                currentPosition,
+                currentCommand.getOperation()
             )
         );
       }
@@ -126,7 +135,22 @@ public class MovementHandler {
     }
   }
 
-  private void updateVehicleState(int vehicleStatus, int liftStatus) {
+  private boolean isOperationCompleted(MovementCommand command, int liftStatus, int loadStatus) {
+    String operation = command.getOperation();
+    if (operation.isEmpty()) {
+      return true;
+    }
+
+    if (operation.equalsIgnoreCase("Load")) {
+      return (liftStatus == 2 && loadStatus == 1);
+    }
+    else if (operation.equalsIgnoreCase("Unload")) {
+      return (liftStatus == 2 && loadStatus == 1);
+    }
+    return true;
+  }
+
+  private void updateVehicleState(int vehicleStatus, int loadStatus) {
     Vehicle.State vehicleState = switch (vehicleStatus) {
       case 0 -> Vehicle.State.IDLE;
       case 1 -> Vehicle.State.EXECUTING;
@@ -134,20 +158,16 @@ public class MovementHandler {
       default -> Vehicle.State.UNKNOWN;
     };
 
-    boolean loadState = switch (vehicleStatus) {
-      case 1, 2 -> true;
-      default -> false;
-    };
-
+    boolean liftState = (loadStatus == 2);
     adapter.getProcessModel().setState(vehicleState);
 
     // Update load handling devices based on lift status
     List<LoadHandlingDevice> devices = new ArrayList<>();
-    devices.add(new LoadHandlingDevice("default", loadState));
+    devices.add(new LoadHandlingDevice("default", liftState));
     adapter.getProcessModel().setLoadHandlingDevices(devices);
   }
 
-  private boolean isCommandCompleted(MovementCommand command, String currentPosition) {
+  private boolean hasReachedDestination(MovementCommand command, String currentPosition) {
     LOG.info(
         String.format(
             "CHECKING BETWEEN: %s & %s",
