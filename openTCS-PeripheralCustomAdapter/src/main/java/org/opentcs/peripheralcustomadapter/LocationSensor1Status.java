@@ -47,11 +47,10 @@ public class LocationSensor1Status {
   }
 
   public void setEFEMStatus(int status) {
-    switch (status)
-    {
+    switch (status) {
       case 1 -> this.eFEMStatus = EFEMStatus.Run;
       case 2 -> this.eFEMStatus = EFEMStatus.Stop;
-      case 4-> this.eFEMStatus = EFEMStatus.Idle;
+      case 4 -> this.eFEMStatus = EFEMStatus.Idle;
       case 8 -> this.eFEMStatus = EFEMStatus.Alarm;
       case 16 -> this.eFEMStatus = EFEMStatus.Warning;
       default -> throw new IllegalStateException("Unexpected value: " + status);
