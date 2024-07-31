@@ -69,56 +69,56 @@ public class LocationSensor2Status {
   }
 
   /**
-   * Is there Cargo in STK Port1.
+   * Is there Magazine in STK Port1.
    *
    * @return STK Port1 Status.
    */
-  public boolean hasCargoSTKPort1() {
+  public boolean hasMagazineSTKPort1() {
     return this.sTKPort1Status;
   }
 
   /**
-   * Is there Cargo in STK Port2.
+   * Is there Magazine in STK Port2.
    *
    * @return STK Port2 Status.
    */
-  public boolean hasCargoSTKPort2() {
+  public boolean hasMagazineSTKPort2() {
     return this.sTKPort2Status;
   }
 
   /**
-   * Is there Cargo in OHB1.
+   * Is there Magazine in OHB1.
    *
    * @return OHB1 Status.
    */
-  public boolean hasCargoOHB1() {
+  public boolean hasMagazineOHB1() {
     return this.oHB1Status;
   }
 
   /**
-   * Is there Cargo in OHB2.
+   * Is there Magazine in OHB2.
    *
    * @return OHB2 Status.
    */
-  public boolean hasCargoOHB2() {
+  public boolean hasMagazineOHB2() {
     return this.oHB2Status;
   }
 
   /**
-   * Is there Cargo in Side Fork1.
+   * Is there Magazine in Side Fork1.
    *
    * @return Side Fork1 Status.
    */
-  public boolean hasCargoSTKSideFork1() {
+  public boolean hasMagazineSTKSideFork1() {
     return this.sideFork1Status;
   }
 
   /**
-   * Is there Cargo in Side Fork2.
+   * Is there Magazine in Side Fork2.
    *
    * @return Side Fork2 Status.
    */
-  public boolean hasCargoSideFork2() {
+  public boolean hasMagazineSideFork2() {
     return this.sideFork2Status;
   }
 }
