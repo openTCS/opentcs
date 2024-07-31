@@ -15,7 +15,7 @@ import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 
 /**
- * An base class for remote service proxy implementations.
+ * A base class for remote service proxy implementations.
  *
  * @param <R> The remote service's type.
  */
@@ -34,12 +34,12 @@ abstract class AbstractRemoteServiceProxy<R extends Remote> {
    */
   private R remoteService;
   /**
-   * The the listener that is interested in updates of this service.
+   * The listener that is interested in updates of this service.
    */
   private ServiceListener serviceListener;
 
   /**
-   * Retruns the client id using this service.
+   * Returns the client id using this service.
    *
    * @return The client id using this service.
    */
@@ -61,7 +61,7 @@ abstract class AbstractRemoteServiceProxy<R extends Remote> {
   /**
    * Returns the remote service to delegate method invocations to.
    *
-   * @return The remote service to delegate method incocations to.
+   * @return The remote service to delegate method invocations to.
    */
   R getRemoteService() {
     return remoteService;
