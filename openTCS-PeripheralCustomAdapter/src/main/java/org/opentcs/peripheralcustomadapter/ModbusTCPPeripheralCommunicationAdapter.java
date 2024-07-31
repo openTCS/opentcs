@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.data.model.TCSResourceReference;
@@ -62,6 +63,7 @@ public class ModbusTCPPeripheralCommunicationAdapter
   private final TCSResourceReference<Location> location;
   private final LocationSensor1Status locationSensor1Status;
   private final LocationSensor2Status locationSensor2Status;
+  private final PeripheralService peripheralService;
 
   /**
    * Creates a new instance.
@@ -71,15 +73,17 @@ public class ModbusTCPPeripheralCommunicationAdapter
    * @param kernelExecutor The kernel's executor.
    * @param host The host IP address for the ModbusTCP connection.
    * @param port The port number for the ModbusTCP connection.
+   * @param peripheralService Peripheral Service.
    */
   public ModbusTCPPeripheralCommunicationAdapter(
       TCSResourceReference<Location> location,
       EventHandler eventHandler,
       ScheduledExecutorService kernelExecutor,
       String host,
-      int port
+      int port,
+      PeripheralService peripheralService
   ) {
-    super(location, eventHandler, kernelExecutor);
+    super(location, eventHandler, kernelExecutor, peripheralService);
     this.configProvider = new PeripheralDeviceConfigurationProvider();
     this.host = configProvider.getConfiguration(location.getName()).host();
     this.port = configProvider.getConfiguration(location.getName()).port();
@@ -88,6 +92,7 @@ public class ModbusTCPPeripheralCommunicationAdapter
     this.isConnected = false;
     this.locationSensor1Status = new LocationSensor1Status();
     this.locationSensor2Status = new LocationSensor2Status();
+    this.peripheralService = peripheralService;
   }
 
   @Override
@@ -184,6 +189,7 @@ public class ModbusTCPPeripheralCommunicationAdapter
             value -> IntStream.range(0, 3).forEachOrdered(i -> {
               switch (i) {
                 case 0 -> {
+
                   locationSensor1Status.setEFEMMagazineStatus(
                       value.get(address) == 1
                   );

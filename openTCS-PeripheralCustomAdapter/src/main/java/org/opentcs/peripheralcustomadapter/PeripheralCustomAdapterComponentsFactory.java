@@ -1,5 +1,6 @@
 package org.opentcs.peripheralcustomadapter;
 
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 
@@ -16,6 +17,7 @@ public interface PeripheralCustomAdapterComponentsFactory {
    */
 
   PeripheralCommunicationAdapter createPeripheralCustomCommAdapter(
-      TCSResourceReference<Location> location
+      TCSResourceReference<Location> location,
+      PeripheralService peripheralService
   );
 }

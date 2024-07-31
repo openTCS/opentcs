@@ -1,6 +1,7 @@
 package org.opentcs.peripheralcustomadapter;
 
 import java.util.concurrent.ScheduledExecutorService;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
@@ -15,12 +16,14 @@ public interface StrategyCreator {
    * @param eventHandler The handler used to send events to.
    * @param kernelExecutor The kernel's executor.
    * @param config The Peripheral Device Configuration.
+   * @param peripheralService The Peripheral Service.
    * @return A new instance of {@link PeripheralCommunicationAdapter}.
    */
   PeripheralCommunicationAdapter createAdapter(
       TCSResourceReference<Location> location,
       EventHandler eventHandler,
       ScheduledExecutorService kernelExecutor,
-      PeripheralDeviceConfiguration config
+      PeripheralDeviceConfiguration config,
+      PeripheralService peripheralService
   );
 }

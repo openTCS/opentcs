@@ -6,6 +6,7 @@ import com.google.inject.Singleton;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.logging.Logger;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.data.model.Location;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapter;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
@@ -27,6 +28,10 @@ public class PeripheralCustomCommunicationAdapterIFactoryImpl
    */
   private final PeripheralDeviceConfigurationProvider configProvider;
   /**
+   * The Peripheral Service
+   */
+  private final PeripheralService peripheralService;
+  /**
    * Indicates whether this component is initialized or not.
    */
   private boolean initialized;
@@ -40,10 +45,12 @@ public class PeripheralCustomCommunicationAdapterIFactoryImpl
   @Inject
   public PeripheralCustomCommunicationAdapterIFactoryImpl(
       PeripheralCustomAdapterComponentsFactory componentsFactory,
-      PeripheralDeviceConfigurationProvider configProvider
+      PeripheralDeviceConfigurationProvider configProvider,
+      PeripheralService peripheralService
   ) {
     this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
     this.configProvider = configProvider;
+    this.peripheralService = peripheralService;
   }
 
   @Override
@@ -94,6 +101,8 @@ public class PeripheralCustomCommunicationAdapterIFactoryImpl
   ) {
     requireNonNull(location, "location");
     LOG.info("Creating Peripheral adapter for Location: " + location.getName());
-    return componentsFactory.createPeripheralCustomCommAdapter(location.getReference());
+    return componentsFactory.createPeripheralCustomCommAdapter(
+        location.getReference(), peripheralService
+    );
   }
 }

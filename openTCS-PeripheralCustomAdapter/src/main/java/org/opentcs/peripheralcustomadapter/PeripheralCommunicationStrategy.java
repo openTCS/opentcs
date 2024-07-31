@@ -5,6 +5,7 @@ import com.google.inject.Provider;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
@@ -21,23 +22,27 @@ public class PeripheralCommunicationStrategy
   private final PeripheralDeviceConfigurationProvider configProvider;
   private final ScheduledExecutorService executor;
   private final EventHandler eventHandler;
+  private final PeripheralService peripheralService;
 
   @Inject
   PeripheralCommunicationStrategy(
       Map<String, Provider<StrategyCreator>> strategyProviders,
       @KernelExecutor
       ScheduledExecutorService executor,
-      EventHandler eventHandler
+      EventHandler eventHandler,
+      PeripheralService peripheralService
   ) {
     this.strategyProviders = strategyProviders;
     this.executor = executor;
     this.configProvider = new PeripheralDeviceConfigurationProvider();
     this.eventHandler = eventHandler;
+    this.peripheralService = peripheralService;
   }
 
   @Override
   public PeripheralCommunicationAdapter createPeripheralCustomCommAdapter(
-      TCSResourceReference<Location> location
+      TCSResourceReference<Location> location,
+      PeripheralService peripheralService
   ) {
     PeripheralDeviceConfiguration config = configProvider.getConfiguration(location.getName());
     if (config == null) {
@@ -60,6 +65,6 @@ public class PeripheralCommunicationStrategy
     }
 
     StrategyCreator creator = creatorProvider.get();
-    return creator.createAdapter(location, eventHandler, executor, config);
+    return creator.createAdapter(location, eventHandler, executor, config, peripheralService);
   }
 }

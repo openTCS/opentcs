@@ -5,6 +5,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Location;
@@ -34,6 +35,7 @@ public abstract class PeripheralCommunicationAdapter
    * @param location The reference to the location this adapter is attached to.
    * @param eventHandler The handler used to send events to.
    * @param kernelExecutor The kernel's executor.
+   * @param peripheralService Peripheral Service.
    */
   @Inject
   public PeripheralCommunicationAdapter(
@@ -42,7 +44,8 @@ public abstract class PeripheralCommunicationAdapter
       @ApplicationEventBus
       EventHandler eventHandler,
       @KernelExecutor
-      ScheduledExecutorService kernelExecutor
+      ScheduledExecutorService kernelExecutor,
+      PeripheralService peripheralService
   ) {
     super(new PeripheralCustomProcessModel(location), eventHandler);
   }
