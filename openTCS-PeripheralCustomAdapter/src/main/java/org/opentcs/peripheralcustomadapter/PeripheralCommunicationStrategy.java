@@ -65,6 +65,6 @@ public class PeripheralCommunicationStrategy
     }
 
     StrategyCreator creator = creatorProvider.get();
-    return creator.createAdapter(location, eventHandler, executor, config, peripheralService);
+    return creator.createAdapter(location, eventHandler, executor, peripheralService);
   }
 }

@@ -15,7 +15,6 @@ public interface StrategyCreator {
    * @param location The reference to the location this adapter is attached to.
    * @param eventHandler The handler used to send events to.
    * @param kernelExecutor The kernel's executor.
-   * @param config The Peripheral Device Configuration.
    * @param peripheralService The Peripheral Service.
    * @return A new instance of {@link PeripheralCommunicationAdapter}.
    */
@@ -23,7 +22,6 @@ public interface StrategyCreator {
       TCSResourceReference<Location> location,
       EventHandler eventHandler,
       ScheduledExecutorService kernelExecutor,
-      PeripheralDeviceConfiguration config,
       PeripheralService peripheralService
   );
 }

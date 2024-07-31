@@ -71,16 +71,12 @@ public class ModbusTCPPeripheralCommunicationAdapter
    * @param location The reference to the location this adapter is attached to.
    * @param eventHandler The handler used to send events to.
    * @param kernelExecutor The kernel's executor.
-   * @param host The host IP address for the ModbusTCP connection.
-   * @param port The port number for the ModbusTCP connection.
    * @param peripheralService Peripheral Service.
    */
   public ModbusTCPPeripheralCommunicationAdapter(
       TCSResourceReference<Location> location,
       EventHandler eventHandler,
       ScheduledExecutorService kernelExecutor,
-      String host,
-      int port,
       PeripheralService peripheralService
   ) {
     super(location, eventHandler, kernelExecutor, peripheralService);

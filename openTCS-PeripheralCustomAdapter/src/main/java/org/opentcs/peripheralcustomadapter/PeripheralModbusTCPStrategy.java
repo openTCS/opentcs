@@ -22,15 +22,12 @@ public class PeripheralModbusTCPStrategy
       TCSResourceReference<Location> location,
       EventHandler eventHandler,
       ScheduledExecutorService kernelExecutor,
-      PeripheralDeviceConfiguration config,
       PeripheralService peripheralService
   ) {
     return new ModbusTCPPeripheralCommunicationAdapter(
         location,
         eventHandler,
         kernelExecutor,
-        config.host(),
-        config.port(),
         peripheralService
     );
   }
