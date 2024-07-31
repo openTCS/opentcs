@@ -37,7 +37,8 @@ public class PeripheralCustomProcessModel
   @Override
   public PeripheralCustomProcessModel withLocation(
       @Nonnull
-      TCSResourceReference<Location> location) {
+      TCSResourceReference<Location> location
+  ) {
     return new PeripheralCustomProcessModel(
         location,
         isCommAdapterEnabled(),
