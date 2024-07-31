@@ -34,33 +34,33 @@ public class PeripheralDeviceConfigurationProvider {
   }
 
   /**
-   * Retrieves the configuration for a specific vehicle.
+   * Retrieves the configuration for a specific peripheral.
    *
-   * @param vehicleName The name of the vehicle.
-   * @return The configuration for the specified vehicle, or null if the configuration does not
+   * @param peripheralName The name of the peripheral.
+   * @return The configuration for the specified peripheral, or null if the configuration does not
    * exist.
    */
-  public PeripheralDeviceConfiguration getConfiguration(String vehicleName) {
+  public PeripheralDeviceConfiguration getConfiguration(String peripheralName) {
     return configurations.getOrDefault(
-        vehicleName, new PeripheralDeviceConfiguration("ModbusTCP", "0.0.0.0", 502)
+        peripheralName, new PeripheralDeviceConfiguration("ModbusTCP", "0.0.0.0", 502)
     );
   }
 
   /**
-   * Sets the configuration for a specific vehicle.
-   * The configuration is stored based on the vehicle name.
+   * Sets the configuration for a specific peripheral.
+   * The configuration is stored based on the peripheral name.
    * After setting the configuration, it is saved to a file.
    *
-   * @param vehicleName The name of the vehicle.
+   * @param peripheralName The name of the peripheral.
    * @param config The configuration to be set.
    */
-  public void setConfiguration(String vehicleName, PeripheralDeviceConfiguration config) {
-    configurations.put(vehicleName, config);
+  public void setConfiguration(String peripheralName, PeripheralDeviceConfiguration config) {
+    configurations.put(peripheralName, config);
     saveConfigurations();
   }
 
   /**
-   * Loads vehicle configurations from a JSON file.
+   * Loads peripheral configurations from a JSON file.
    */
   public void loadConfigurations() {
     try (FileReader reader = new FileReader(CONFIG_FILE)) {
