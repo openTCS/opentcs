@@ -199,32 +199,48 @@ public class ModbusTCPVehicleCommAdapter
 
   private void startHeartbeat() {
     heartBeatFuture = getExecutor().scheduleAtFixedRate(() -> {
-      boolean currentValue = heartBeatToggle.getAndSet(!heartBeatToggle.get());
-      writeSingleRegister(100, currentValue ? 1 : 0)
-          .thenCompose(v -> {
-            try {
-              Thread.sleep(200);
-            } catch (InterruptedException e) {
-              Thread.currentThread().interrupt();
-              return CompletableFuture.failedFuture(e);
-            }
-            return readSingleRegister(100);
-          })
-          .thenAccept(value -> {
-            if (value != (currentValue ? 1 : 0)) {
-              LOG.warning("Heartbeat value mismatch! Retrying...");
-              writeSingleRegister(100, currentValue ? 1 : 0)
-                  .exceptionally(ex -> {
-                    LOG.severe("Failed to retry heartbeat write: " + ex.getMessage());
-                    return null;
-                  });
-            }
-          })
+      boolean currentValue = toggleHeartbeatAndRegisterWriting();
+      addDelayAndReadRegister(currentValue)
+          .thenAccept(value -> handleHeartbeatValueMismatch(currentValue, value))
           .exceptionally(ex -> {
-            LOG.severe("Failed to write or read heartbeat: " + ex.getMessage());
+            logError("Failed to write or read heartbeat: ", ex);
             return null;
           });
     }, 0, 500, TimeUnit.MILLISECONDS);
+  }
+
+  private boolean toggleHeartbeatAndRegisterWriting() {
+    boolean currentValue = heartBeatToggle.getAndSet(!heartBeatToggle.get());
+    writeSingleRegister(100, currentValue ? 1 : 0);
+    return currentValue;
+  }
+
+  private CompletableFuture<Integer> addDelayAndReadRegister(boolean currentValue) {
+    try {
+      Thread.sleep(200);
+    }
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      logError("Failed to sleep thread: ", e);
+      writeSingleRegister(100, currentValue ? 1 : 0);
+      return CompletableFuture.completedFuture(-1);
+    }
+    return readSingleRegister(100);
+  }
+
+  private void handleHeartbeatValueMismatch(boolean currentValue, int value) {
+    if (value != (currentValue ? 1 : 0)) {
+      LOG.warning("Heartbeat value mismatch! Retrying...");
+      writeSingleRegister(100, currentValue ? 1 : 0)
+          .exceptionally(ex -> {
+            logError("Failed to retry heartbeat write: ", ex);
+            return null;
+          });
+    }
+  }
+
+  private void logError(String message, Throwable ex) {
+    LOG.severe(message + ex.getMessage());
   }
 
   private void stopHeartBeat() {
@@ -690,7 +706,6 @@ public class ModbusTCPVehicleCommAdapter
 
     return sendModbusRequest(request)
         .thenAccept(response -> {
-          LOG.info("Successfully wrote register at address " + address + " with value " + value);
         })
         .exceptionally(ex -> {
           LOG.severe("Failed to write register at address " + address + ": " + ex.getMessage());
@@ -709,9 +724,7 @@ public class ModbusTCPVehicleCommAdapter
         .thenApply(response -> {
           if (response instanceof ReadInputRegistersResponse readResponse) {
             ByteBuf responseBuffer = readResponse.getRegisters();
-            int value = responseBuffer.readUnsignedShort();
-            LOG.info(String.format("READ ADDRESS %d GOT %d", address, value));
-            return value;
+            return responseBuffer.readUnsignedShort();
           }
           throw new RuntimeException("Invalid response type");
         });
@@ -1048,7 +1061,6 @@ public class ModbusTCPVehicleCommAdapter
       return handleReadHoldingRegistersResponse(readResponse);
     }
     else if (response instanceof WriteMultipleRegistersResponse writeResponse) {
-      LOG.info("instanceof WriteMultipleRegistersResponse writeResponse");
       return handleWriteMultipleRegistersResponse(writeResponse);
     }
     else if (response instanceof ReadInputRegistersResponse readInputResponse) {
