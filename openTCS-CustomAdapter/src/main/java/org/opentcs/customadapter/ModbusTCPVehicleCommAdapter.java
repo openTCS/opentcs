@@ -199,10 +199,17 @@ public class ModbusTCPVehicleCommAdapter
 
   private void startHeartbeat() {
     heartBeatFuture = getExecutor().scheduleAtFixedRate(() -> {
-
       boolean currentValue = heartBeatToggle.getAndSet(!heartBeatToggle.get());
       writeSingleRegister(100, currentValue ? 1 : 0)
-          .thenCompose(v -> readSingleRegister(100))
+          .thenCompose(v -> {
+            try {
+              Thread.sleep(200);
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+              return CompletableFuture.failedFuture(e);
+            }
+            return readSingleRegister(100);
+          })
           .thenAccept(value -> {
             if (value != (currentValue ? 1 : 0)) {
               LOG.warning("Heartbeat value mismatch! Retrying...");

@@ -149,7 +149,7 @@ public class MovementHandler {
 
   private boolean isOperationCompleted(MovementCommand command, int liftStatus, int loadStatus) {
     String operation = command.getOperation();
-    if (operation.isEmpty()) {
+    if (operation.isEmpty() || operation.equals("NOP")) {
       return true;
     }
 
