@@ -77,7 +77,11 @@ public abstract class PeripheralCommunicationAdapter
       @Nonnull
       PeripheralJob job
   ) {
-    return null;
+    if (!isEnabled()) {
+      return new ExplainedBoolean(false, "Comm adapter not enabled.");
+    }
+
+    return new ExplainedBoolean(true, "");
   }
 
   @Override

@@ -178,67 +178,77 @@ public class ModbusTCPPeripheralCommunicationAdapter
 
   private void pollingSensorStatus() {
     pollingStatusFuture = executor.scheduleAtFixedRate(() -> {
-      int address = 301;
+      Location peripheralLocation = peripheralService.fetchObject(
+          Location.class, location.getName()
+      );
       if (String.CASE_INSENSITIVE_ORDER.compare(location.getName(), "SAA-mini-OHT-Sensor0001")
           == 0) {
-        readSingleRegister(address, 3).thenAccept(
-            value -> IntStream.range(0, 3).forEachOrdered(i -> {
-              switch (i) {
-                case 0 -> {
+        readSingleRegister(301, 3).thenAccept(
+            value -> {
+              IntStream.range(0, 3).forEachOrdered(i -> {
+                switch (i) {
+                  case 0 -> {
 
-                  locationSensor1Status.setEFEMMagazineStatus(
-                      value.get(address) == 1
-                  );
-                }
-                case 1 -> {
-                  locationSensor1Status.setEFEMMagazineNumber(
-                      value.get(address + i)
-                  );
-                }
-                case 2 -> {
-                  locationSensor1Status.setEFEMStatus(
-                      value.get(address + i)
-                  );
-                }
-                default -> throw new IllegalStateException("Unexpected value: " + i);
-              }
+                    locationSensor1Status.setEFEMMagazineStatus(
+                        value.get(301) == 1
+                    );
 
-            })
+                    peripheralLocation.withProperty(
+                        "tcs:defaultLocationSymbol", value.get(301) == 1 ? "Load" : "UnLoad"
+                    );
+                    getProcessModel().withLocation(peripheralLocation.getReference());
+                  }
+                  case 1 -> {
+                    locationSensor1Status.setEFEMMagazineNumber(
+                        value.get(301 + i)
+                    );
+                  }
+                  case 2 -> {
+                    locationSensor1Status.setEFEMStatus(
+                        value.get(301 + i)
+                    );
+                    switch (locationSensor1Status.getEFEMStatus()) {
+                      case Run -> getProcessModel().withState(
+                          PeripheralInformation.State.EXECUTING
+                      );
+                      case Stop -> getProcessModel().withState(
+                          PeripheralInformation.State.UNAVAILABLE
+                      );
+                      case Idle -> getProcessModel().withState(PeripheralInformation.State.IDLE);
+                      case Alarm, Warning -> getProcessModel().withState(
+                          PeripheralInformation.State.ERROR
+                      );
+                      default -> throw new IllegalStateException("Unexpected value: " + i);
+                    }
+                  }
+                  default -> throw new IllegalStateException("Unexpected value: " + i);
+                }
+
+              });
+            }
         );
       }
-      else if (String.CASE_INSENSITIVE_ORDER.compare(location.getName(), "SAA-mini-OHT-Sensor0002")
+      else if (String.CASE_INSENSITIVE_ORDER.compare(
+          location.getName(), "SAA-mini-OHT-Sensor0002-STK"
+      )
           == 0) {
-            readSingleRegister(address, 6).thenAccept(
-                value -> IntStream.range(0, 6).forEachOrdered(i -> {
+            readSingleRegister(301, 2).thenAccept(
+                value -> IntStream.range(0, 2).forEachOrdered(i -> {
                   switch (i) {
                     case 0 -> {
                       locationSensor2Status.setSTKPort1MagazineStatus(
-                          value.get(address) == 1
+                          value.get(301) == 1
+                      );
+                      peripheralLocation.withProperty(
+                          "tcs:defaultLocationSymbol", value.get(301) == 1 ? "Load" : "UnLoad"
                       );
                     }
                     case 1 -> {
                       locationSensor2Status.setSTKPort1MagazineStatus(
-                          value.get(address + i) == 1
+                          value.get(301 + i) == 1
                       );
-                    }
-                    case 2 -> {
-                      locationSensor2Status.setOHB1MagazineStatus(
-                          value.get(address + i) == 1
-                      );
-                    }
-                    case 3 -> {
-                      locationSensor2Status.setOHB2MagazineStatus(
-                          value.get(address + i) == 1
-                      );
-                    }
-                    case 4 -> {
-                      locationSensor2Status.setSideFork1MagazineStatus(
-                          value.get(address + i) == 1
-                      );
-                    }
-                    case 5 -> {
-                      locationSensor2Status.setSideFork2MagazineStatus(
-                          value.get(address + i) == 1
+                      peripheralLocation.withProperty(
+                          "tcs:defaultLocationSymbol", value.get(301 + i) == 1 ? "Load" : "UnLoad"
                       );
                     }
                     default -> throw new IllegalStateException("Unexpected value: " + i);
@@ -246,6 +256,62 @@ public class ModbusTCPPeripheralCommunicationAdapter
                 })
             );
           }
+      else if (String.CASE_INSENSITIVE_ORDER.compare(
+          location.getName(), "SAA-mini-OHT-Sensor0002-OHB"
+      )
+          == 0) {
+            readSingleRegister(303, 2).thenAccept(
+                value -> IntStream.range(0, 2).forEachOrdered(i -> {
+                  switch (i) {
+                    case 0 -> {
+                      locationSensor2Status.setOHB1MagazineStatus(
+                          value.get(303) == 1
+                      );
+                      peripheralLocation.withProperty(
+                          "tcs:defaultLocationSymbol", value.get(303) == 1 ? "Load" : "UnLoad"
+                      );
+                    }
+                    case 1 -> {
+                      locationSensor2Status.setOHB2MagazineStatus(
+                          value.get(303 + i) == 1
+                      );
+                      peripheralLocation.withProperty(
+                          "tcs:defaultLocationSymbol", value.get(303 + i) == 1 ? "Load" : "UnLoad"
+                      );
+                    }
+                    default -> throw new IllegalStateException("Unexpected value: " + i);
+                  }
+                })
+            );
+          }
+      else if (String.CASE_INSENSITIVE_ORDER.compare(
+          location.getName(), "SAA-mini-OHT-Sensor0002-SideFork"
+      ) == 0) {
+        readSingleRegister(305, 2).thenAccept(
+            value -> IntStream.range(0, 2).forEachOrdered(i -> {
+              switch (i) {
+                case 0 -> {
+                  locationSensor2Status.setSideFork1MagazineStatus(
+                      value.get(305) == 1
+                  );
+                  peripheralLocation.withProperty(
+                      "tcs:defaultLocationSymbol", value.get(305) == 1 ? "Load" : "UnLoad"
+                  );
+                }
+                case 1 -> {
+                  locationSensor2Status.setSideFork2MagazineStatus(
+                      value.get(305 + i) == 1
+                  );
+                  peripheralLocation.withProperty(
+                      "tcs:defaultLocationSymbol", value.get(305 + i) == 1 ? "Load" : "UnLoad"
+                  );
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + i);
+              }
+            })
+        );
+      }
+      getProcessModel().withLocation(peripheralLocation.getReference());
     }, 0, 500, TimeUnit.MILLISECONDS);
   }
 

@@ -59,6 +59,7 @@ public class LocationSensor1Status {
   /**
    * Set EFEM Status.
    *
+   * @param status EFEM Status.
    */
   public void setEFEMStatus(int status) {
     if (status == 1) {
