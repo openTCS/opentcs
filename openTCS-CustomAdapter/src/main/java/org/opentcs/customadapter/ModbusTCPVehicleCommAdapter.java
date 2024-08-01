@@ -166,8 +166,8 @@ public class ModbusTCPVehicleCommAdapter
     super.initialize();
     getProcessModel().setState(Vehicle.State.IDLE);
     LOG.warning("Device has been set to IDLE state");
-    ((ExecutorService) getExecutor()).submit(() -> getProcessModel().setPosition("Point-0026"));
-    LOG.warning("Device has been set to Point-0026");
+    ((ExecutorService) getExecutor()).submit(() -> getProcessModel().setPosition("Point-0013"));
+    LOG.warning("Device has been set to Point-0013");
     getProcessModel().setLoadHandlingDevices(
         List.of(new LoadHandlingDevice(LHD_NAME, false))
     );
@@ -616,7 +616,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private CMD1 createEmptyCMD1() {
-    return new CMD1(0, 0, 5, 0);
+    return new CMD1(0, 1, 5, 0);
   }
 
   private CMD2 createEmptyCMD2() {
