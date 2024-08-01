@@ -8,6 +8,8 @@ import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
 import com.digitalpetri.modbus.responses.ModbusResponse;
 import com.digitalpetri.modbus.responses.ReadHoldingRegistersResponse;
 import com.digitalpetri.modbus.responses.ReadInputRegistersResponse;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.timeout.TimeoutException;
@@ -24,6 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import org.opentcs.components.kernel.services.PeripheralService;
+import org.opentcs.customizations.ApplicationEventBus;
+import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.data.model.TCSResourceReference;
@@ -73,9 +77,13 @@ public class ModbusTCPPeripheralCommunicationAdapter
    * @param kernelExecutor The kernel's executor.
    * @param peripheralService Peripheral Service.
    */
+  @Inject
   public ModbusTCPPeripheralCommunicationAdapter(
+      @Assisted
       TCSResourceReference<Location> location,
+      @ApplicationEventBus
       EventHandler eventHandler,
+      @KernelExecutor
       ScheduledExecutorService kernelExecutor,
       PeripheralService peripheralService
   ) {

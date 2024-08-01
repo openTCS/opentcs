@@ -2,6 +2,8 @@ package org.opentcs.peripheralcustomadapter;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import com.google.inject.assistedinject.Assisted;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
@@ -11,6 +13,7 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.util.event.EventHandler;
 
+@Singleton
 public class PeripheralCommunicationStrategy
     implements
       PeripheralCustomAdapterComponentsFactory {
@@ -41,6 +44,7 @@ public class PeripheralCommunicationStrategy
 
   @Override
   public PeripheralCommunicationAdapter createPeripheralCustomCommAdapter(
+      @Assisted
       TCSResourceReference<Location> location,
       PeripheralService peripheralService
   ) {

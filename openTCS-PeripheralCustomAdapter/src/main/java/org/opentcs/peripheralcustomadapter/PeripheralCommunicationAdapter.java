@@ -9,6 +9,7 @@ import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Location;
+import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.drivers.peripherals.BasicPeripheralCommAdapter;
@@ -96,7 +97,7 @@ public abstract class PeripheralCommunicationAdapter
 
   @Override
   public void abortJob() {
-
+    setProcessModel(getProcessModel().withState(PeripheralInformation.State.IDLE));
   }
 
   @Override
@@ -104,6 +105,6 @@ public abstract class PeripheralCommunicationAdapter
       @Nonnull
       PeripheralAdapterCommand command
   ) {
-
+    command.execute(this);
   }
 }
