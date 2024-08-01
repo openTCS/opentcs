@@ -24,7 +24,7 @@ public class MovementHandler {
    * Handles the movement of a vehicle by executing a list of commands.
    *
    * @param executor The executor service used to schedule the execution of commands.
-   * @param adapter  The ModbusTCPVehicleCommAdapter used for communication with the vehicle.
+   * @param adapter The ModbusTCPVehicleCommAdapter used for communication with the vehicle.
    */
   public MovementHandler(ScheduledExecutorService executor, ModbusTCPVehicleCommAdapter adapter) {
     this.executor = executor;
@@ -153,13 +153,19 @@ public class MovementHandler {
       return true;
     }
 
+    if (adapter.getProcessModel().getState() != Vehicle.State.IDLE) {
+      return false;
+    }
+
     if (operation.equalsIgnoreCase("Load")) {
       return (liftStatus == 2 && loadStatus == 1);
     }
     else if (operation.equalsIgnoreCase("Unload")) {
-      return (liftStatus == 2 && loadStatus == 1);
+      return (liftStatus == 0 && loadStatus == 2);
     }
-    return true;
+    else {
+      return true;
+    }
   }
 
   private void updateVehicleState(int vehicleStatus, int loadStatus) {
@@ -170,7 +176,7 @@ public class MovementHandler {
       default -> Vehicle.State.UNKNOWN;
     };
 
-    boolean liftState = (loadStatus == 2);
+    boolean liftState = (loadStatus == 1);
     adapter.getProcessModel().setState(vehicleState);
 
     // Update load handling devices based on lift status
