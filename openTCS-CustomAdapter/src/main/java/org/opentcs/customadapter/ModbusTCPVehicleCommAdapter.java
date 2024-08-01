@@ -119,6 +119,7 @@ public class ModbusTCPVehicleCommAdapter
   private PositionUpdater positionUpdater;
   private final PlantModelService plantModelService;
   private MovementHandler movementHandler;
+  private int lastCommandSize;
 
   /**
    * A communication adapter for ModbusTCP-based vehicle communication.
@@ -153,6 +154,7 @@ public class ModbusTCPVehicleCommAdapter
     this.isConnected = false;
     this.currentTransportOrder = null;
     this.positionMap = new HashMap<>();
+    this.lastCommandSize = 0;
   }
 
   @Override
@@ -428,6 +430,8 @@ public class ModbusTCPVehicleCommAdapter
     int positionBaseAddress = 1000;
     int cmdBaseAddress = 1200;
 
+    int currentCommandSize = commands.size();
+
     // Convert stationCommandsMap to ModbusCommand list
     for (Map.Entry<Long, Pair<CMD1, CMD2>> entry : stationCommandsMap.entrySet()) {
       long stationPosition = entry.getKey();
@@ -454,6 +458,33 @@ public class ModbusTCPVehicleCommAdapter
       positionBaseAddress += 2;
       cmdBaseAddress += 2;
     }
+
+    if (currentCommandSize < lastCommandSize) {
+      for (int i = currentCommandSize; i < lastCommandSize; i++) {
+        positionModbusCommand.add(
+            new ModbusCommand(
+                "POSITION", 0, positionBaseAddress,
+                ModbusCommand.DataFormat.DECIMAL
+            )
+        );
+        cmdModbusCommand.add(
+            new ModbusCommand(
+                "CMD1", createEmptyCMD1().toShort(), cmdBaseAddress,
+                ModbusCommand.DataFormat.HEXADECIMAL
+            )
+        );
+        cmdModbusCommand.add(
+            new ModbusCommand(
+                "CMD2", createEmptyCMD2().toShort(), cmdBaseAddress + 1,
+                ModbusCommand.DataFormat.HEXADECIMAL
+            )
+        );
+
+        positionBaseAddress += 2;
+        cmdBaseAddress += 2;
+      }
+    }
+    lastCommandSize = commands.size();
   }
 
   /**
@@ -527,8 +558,6 @@ public class ModbusTCPVehicleCommAdapter
     return new CMD1(
         liftCmd, speedLevel, obstacleSensor, 0
     );
-    // cmd.getStep().getVehicleOrientation()
-    //            == Vehicle.Orientation.FORWARD ? 0 : 1
   }
 
   private CMD2 createCMD2(MovementCommand cmd) {
@@ -584,6 +613,14 @@ public class ModbusTCPVehicleCommAdapter
       liftHeight = 4095;
     }
     return new CMD2(liftHeight, 3);
+  }
+
+  private CMD1 createEmptyCMD1() {
+    return new CMD1(0, 0, 5, 0);
+  }
+
+  private CMD2 createEmptyCMD2() {
+    return new CMD2(0, 1);
   }
 
   private double getMaxAllowedSpeed(Path path) {
@@ -1375,10 +1412,10 @@ public class ModbusTCPVehicleCommAdapter
     }
 
     private long getPositionFromStationModbusCommand(long index) {
-      if (index < 0 || index >= positionModbusCommand.size()) {
+      if (index <= 0 || index > positionModbusCommand.size()) {
         throw new IllegalArgumentException("Index out of positionModbusCommand bounds");
       }
-      return positionModbusCommand.get((int) index).value();
+      return positionModbusCommand.get((int) index - 1).value();
     }
 
     /**
