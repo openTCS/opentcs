@@ -121,7 +121,6 @@ public class ModbusTCPVehicleCommAdapter
   private PositionUpdater positionUpdater;
   private final PlantModelService plantModelService;
   private MovementHandler movementHandler;
-  private int lastCommandSize;
   private boolean shouldAbort = false;
 
 
@@ -158,7 +157,6 @@ public class ModbusTCPVehicleCommAdapter
     this.isConnected = false;
     this.currentTransportOrder = null;
     this.positionMap = new HashMap<>();
-    this.lastCommandSize = 0;
   }
 
   @Override
@@ -287,19 +285,51 @@ public class ModbusTCPVehicleCommAdapter
     if (!((evt.getSource()) instanceof CustomProcessModel)) {
       return;
     }
+
+    if (evt.getPropertyName().equals(VehicleProcessModel.Attribute.STATE.name())) {
+      Vehicle.State newState = (Vehicle.State) evt.getNewValue();
+      handleVehicleStateChange(newState);
+    }
     if (Objects.equals(
         evt.getPropertyName(),
         VehicleProcessModel.Attribute.LOAD_HANDLING_DEVICES.name()
     )) {
-      if (!getProcessModel().getLoadHandlingDevices().isEmpty()
-          && getProcessModel().getLoadHandlingDevices().getFirst().isFull()) {
-        loadState = LoadState.FULL;
-        // TODO: need change vehicle model size in future.
-//        getProcessModel().setLength(configuration.vehicleLengthLoaded());
+      handleLoadHandlingDeviceChange();
+    }
+  }
+
+  private void handleLoadHandlingDeviceChange() {
+    if (!getProcessModel().getLoadHandlingDevices().isEmpty()
+        && getProcessModel().getLoadHandlingDevices().getFirst().isFull()) {
+      loadState = LoadState.FULL;
+      // TODO: need change vehicle model size in future.
+    }
+    else {
+      loadState = LoadState.EMPTY;
+    }
+  }
+
+  private void handleVehicleStateChange(Vehicle.State newState) {
+    getProcessModel().setState(newState);
+    if (newState == Vehicle.State.IDLE) {
+      checkAndHandleTrafficControl();
+    }
+  }
+
+  private void checkAndHandleTrafficControl() {
+    if (vehicle == null) {
+      LOG.warning("Unable to check ProcState: Vehicle reference is null");
+      return;
+    }
+
+    Vehicle.ProcState procState = vehicle.getProcState();
+    if (procState == Vehicle.ProcState.PROCESSING_ORDER) {
+      try {
+        writeSingleRegister(105, 0);
+        LOG.info("Traffic control: Vehicle stopped due to IDLE state while processing order.");
       }
-      else {
-        loadState = LoadState.EMPTY;
-//        getProcessModel().setLength(configuration.vehicleLengthUnloaded());
+      catch (Exception e) {
+        LOG.severe(String.format("Failed to write to register for traffic control %s", e));
       }
     }
   }
@@ -485,6 +515,7 @@ public class ModbusTCPVehicleCommAdapter
             currentTransportOrder.getName(), allMovementCommands.size()
         )
     );
+
     convertMovementCommandsToModbusCommands(allMovementCommands);
     writeAllModbusCommands()
         .thenRun(() -> {
@@ -570,7 +601,6 @@ public class ModbusTCPVehicleCommAdapter
       positionBaseAddress += 2;
       cmdBaseAddress += 2;
     }
-    lastCommandSize = commands.size();
   }
 
   /**
