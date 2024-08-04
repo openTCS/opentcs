@@ -63,33 +63,39 @@ public class PeripheralDeviceConfigurationProvider {
    * Loads peripheral configurations from a JSON file.
    */
   public void loadConfigurations() {
+
     try (FileReader reader = new FileReader(CONFIG_FILE)) {
       Type type = new TypeToken<HashMap<String, PeripheralDeviceConfiguration>>() {}.getType();
       Map<String, PeripheralDeviceConfiguration> loadedConfigs = new Gson().fromJson(reader, type);
       if (loadedConfigs != null && !loadedConfigs.isEmpty()) {
         configurations.clear();
         configurations.putAll(loadedConfigs);
-
-        for (int i = 0; i < 2; i++) {
-          String specificVehicle = "";
+        String specificPeripheral = "";
+        for (int i = 0; i < 4; i++) {
           if (i == 0) {
-            specificVehicle = "SAA-mini-OHT-Sensor0001";
+            specificPeripheral = "STK_IN";
+          }
+          else if (i == 1) {
+            specificPeripheral = "OHB";
+          }
+          else if (i == 2) {
+            specificPeripheral = "Sidefork";
           }
           else {
-            specificVehicle = "SAA-mini-OHT-Sensor0002";
+            specificPeripheral = "Magazine_loadport";
           }
-          PeripheralDeviceConfiguration config = loadedConfigs.get(specificVehicle);
+          PeripheralDeviceConfiguration config = loadedConfigs.get(specificPeripheral);
 
           if (config != null) {
             LOG.info(
                 String.format(
                     "Configuration for %s: currentStrategy: %s, host: %s, port: %d",
-                    specificVehicle, config.currentStrategy(), config.host(), config.port()
+                    specificPeripheral, config.currentStrategy(), config.host(), config.port()
                 )
             );
           }
           else {
-            LOG.warning("Configuration for " + specificVehicle + " not found.");
+            LOG.warning("Configuration for " + specificPeripheral + " not found.");
           }
         }
       }
