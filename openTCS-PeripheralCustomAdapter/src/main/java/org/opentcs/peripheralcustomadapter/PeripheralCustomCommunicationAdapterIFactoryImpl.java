@@ -28,7 +28,7 @@ public class PeripheralCustomCommunicationAdapterIFactoryImpl
    */
   private final PeripheralDeviceConfigurationProvider configProvider;
   /**
-   * The Peripheral Service
+   * The Peripheral Service.
    */
   private final PeripheralService peripheralService;
   /**
@@ -41,6 +41,7 @@ public class PeripheralCustomCommunicationAdapterIFactoryImpl
    *
    * @param componentsFactory The factory used to create adapter components.
    * @param configProvider The provider used for vehicle configurations.
+   * @param peripheralService The peripheral service.
    */
   @Inject
   public PeripheralCustomCommunicationAdapterIFactoryImpl(
@@ -50,7 +51,7 @@ public class PeripheralCustomCommunicationAdapterIFactoryImpl
   ) {
     this.componentsFactory = requireNonNull(componentsFactory, "componentsFactory");
     this.configProvider = configProvider;
-    this.peripheralService = peripheralService;
+    this.peripheralService = requireNonNull(peripheralService, "peripheralService");
   }
 
   @Override
