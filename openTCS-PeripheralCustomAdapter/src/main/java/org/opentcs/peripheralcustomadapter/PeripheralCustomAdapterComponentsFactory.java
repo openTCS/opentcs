@@ -13,6 +13,7 @@ public interface PeripheralCustomAdapterComponentsFactory {
    * Creates a new Peripheral communication adapter for the given location.
    *
    * @param location The location.
+   * @param peripheralService The Peripheral Services.
    * @return A Peripheral communication adapter instance.
    */
 
