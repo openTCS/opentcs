@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
 import org.opentcs.components.kernel.services.PeripheralService;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.TCSResourceReference;
@@ -32,6 +33,7 @@ public class PeripheralCommunicationStrategy
       Map<String, Provider<StrategyCreator>> strategyProviders,
       @KernelExecutor
       ScheduledExecutorService executor,
+      @ApplicationEventBus
       EventHandler eventHandler,
       PeripheralService peripheralService
   ) {
@@ -50,7 +52,7 @@ public class PeripheralCommunicationStrategy
   ) {
     PeripheralDeviceConfiguration config = configProvider.getConfiguration(location.getName());
     if (config == null) {
-      if (String.CASE_INSENSITIVE_ORDER.compare(location.getName(), "SAA-mini-OHT-Sensor0001-EFEM")
+      if (String.CASE_INSENSITIVE_ORDER.compare(location.getName(), "Magazine_loadport")
           == 0) {
         config = new PeripheralDeviceConfiguration("ModbusTCP", "192.168.1.20", 502);
         configProvider.setConfiguration(location.getName(), config);
