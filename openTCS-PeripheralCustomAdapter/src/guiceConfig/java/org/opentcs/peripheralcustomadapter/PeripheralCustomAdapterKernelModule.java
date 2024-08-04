@@ -2,6 +2,7 @@ package org.opentcs.peripheralcustomadapter;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
@@ -25,7 +26,9 @@ public class PeripheralCustomAdapterKernelModule
 
   @Override
   protected void configure() {
-    bind(ScheduledExecutorService.class).toInstance(Executors.newScheduledThreadPool(1));
+    bind(ScheduledExecutorService.class).annotatedWith(Names.named("executor2")).toInstance(
+        Executors.newScheduledThreadPool(1)
+    );
     bind(PeripheralCustomCommunicationAdapterFactory.class).to(
         PeripheralCustomCommunicationAdapterIFactoryImpl.class
     );
