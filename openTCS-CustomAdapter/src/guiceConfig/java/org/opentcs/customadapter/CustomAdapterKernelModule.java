@@ -2,6 +2,7 @@ package org.opentcs.customadapter;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
@@ -23,7 +24,9 @@ public class CustomAdapterKernelModule
 
   @Override
   protected void configure() {
-    bind(ScheduledExecutorService.class).toInstance(Executors.newScheduledThreadPool(1));
+    bind(ScheduledExecutorService.class).annotatedWith(Names.named("executor1")).toInstance(
+        Executors.newScheduledThreadPool(1)
+    );
     bind(CustomCommunicationAdapterFactory.class).to(CustomCommunicationAdapterFactoryImpl.class);
 
     vehicleCommAdaptersBinder().addBinding().to(CustomCommunicationAdapterFactory.class);
