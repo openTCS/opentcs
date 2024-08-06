@@ -170,8 +170,8 @@ public class ModbusTCPVehicleCommAdapter
     getProcessModel().setState(Vehicle.State.IDLE);
     LOG.warning("Device has been set to IDLE state");
 
-    ((ExecutorService) getExecutor()).submit(() -> getProcessModel().setPosition("Point-0013"));
-    LOG.warning("Device has been set to Point-0013");
+    ((ExecutorService) getExecutor()).submit(() -> getProcessModel().setPosition("Point-0003"));
+    LOG.warning("Device has been set to Point-0003");
     getProcessModel().setLoadHandlingDevices(
         List.of(new LoadHandlingDevice(LHD_NAME, false))
     );
@@ -179,7 +179,7 @@ public class ModbusTCPVehicleCommAdapter
     initializePositionMap();
     this.positionUpdater = new PositionUpdater(getProcessModel(), getExecutor());
     this.movementHandler = new MovementHandler(getExecutor(), this);
-    LOG.warning("Starting sending heart bit.");
+
     initialized = true;
   }
 
@@ -209,7 +209,7 @@ public class ModbusTCPVehicleCommAdapter
             logError("Failed to write or read heartbeat: ", ex);
             return null;
           });
-    }, 0, 500, TimeUnit.MILLISECONDS);
+    }, 0, 300, TimeUnit.MILLISECONDS);
   }
 
   private boolean toggleHeartbeatAndRegisterWriting() {
@@ -675,6 +675,33 @@ public class ModbusTCPVehicleCommAdapter
     return speedLevel;
   }
 
+  private int getStation(MovementCommand cmd) {
+    String locationNameFromDestinationPoint = getLocationNameFromDestinationPoint(cmd);
+    if (locationNameFromDestinationPoint != null && locationNameFromDestinationPoint.equals(
+        "Magazine_loadport"
+    )) {
+      return 1;
+    }
+    else if (locationNameFromDestinationPoint != null && locationNameFromDestinationPoint.equals(
+        "STK_IN"
+    )) {
+      return 2;
+    }
+    else if (locationNameFromDestinationPoint != null && locationNameFromDestinationPoint.equals(
+        "OHB"
+    )) {
+      return 3;
+    }
+    else if (locationNameFromDestinationPoint != null && locationNameFromDestinationPoint.equals(
+        "Sidefork"
+    )) {
+      return 4;
+    }
+
+    // TODO: Make sure 0 work here
+    return 0;
+  }
+
   @SuppressWarnings("checkstyle:TodoComment")
   private CMD1 createCMD1(MovementCommand cmd) {
     int liftCmd = 0;
@@ -690,6 +717,7 @@ public class ModbusTCPVehicleCommAdapter
   private CMD2 createCMD2(MovementCommand cmd) {
     String switchOperation = "";
     int liftHeight = 0;
+    int station = 0;
     int motionCommand;
     Map<String, String> pathOperation = null;
 
@@ -697,8 +725,10 @@ public class ModbusTCPVehicleCommAdapter
     if (locationNameFromDestinationPoint != null && locationNameFromDestinationPoint.equals(
         "Sidefork"
     )) {
-      liftHeight = 4095;
+      liftHeight = 255;
     }
+
+    station = getStation(cmd);
 
     if (cmd.getStep().getPath() != null) {
       pathOperation = cmd.getStep().getPath().getProperties();
@@ -714,7 +744,7 @@ public class ModbusTCPVehicleCommAdapter
     if (cmd.isFinalMovement()) {
       motionCommand = 3;
     }
-    return new CMD2(liftHeight, motionCommand);
+    return new CMD2(liftHeight, motionCommand, station);
   }
 
   private Pair<CMD1, CMD2> createDefaultCommands(MovementCommand cmd) {
@@ -727,7 +757,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private CMD2 createDefaultCMD2(MovementCommand cmd) {
-    return new CMD2(0, 1);
+    return new CMD2(0, 1, 0);
   }
 
   private Pair<CMD1, CMD2> createOperationCommands(MovementCommand cmd) {
@@ -740,14 +770,15 @@ public class ModbusTCPVehicleCommAdapter
 
   private CMD2 createOperationCMD2(MovementCommand cmd) {
     int liftHeight = 0;
-    LOG.info(
-        "getLocationNameFromDestinationPoint(cmd): " +
-            getLocationNameFromDestinationPoint(cmd)
-    );
-    if (getLocationNameFromDestinationPoint(cmd).equals("Sidefork")) {
-      liftHeight = 4095;
+    int station = 0;
+    String locationNameFromDestinationPoint = getLocationNameFromDestinationPoint(cmd);
+    if (locationNameFromDestinationPoint != null && locationNameFromDestinationPoint.equals(
+        "Sidefork"
+    )) {
+      liftHeight = 255;
     }
-    return new CMD2(liftHeight, 3);
+    station = getStation(cmd);
+    return new CMD2(liftHeight, 3, station);
   }
 
   private CMD1 createEmptyCMD1() {
@@ -755,7 +786,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private CMD2 createEmptyCMD2() {
-    return new CMD2(0, 1);
+    return new CMD2(0, 1, 0);
   }
 
   private double getMaxAllowedSpeed(Path path) {
@@ -818,6 +849,7 @@ public class ModbusTCPVehicleCommAdapter
 
     return sendModbusRequest(request)
         .thenAccept(response -> {
+//          LOG.info("Successfully wrote register at address " + address + " with value " + value);
         })
         .exceptionally(ex -> {
           LOG.severe("Failed to write register at address " + address + ": " + ex.getMessage());
@@ -836,6 +868,9 @@ public class ModbusTCPVehicleCommAdapter
         .thenApply(response -> {
           if (response instanceof ReadInputRegistersResponse readResponse) {
             ByteBuf responseBuffer = readResponse.getRegisters();
+//            int value = responseBuffer.readUnsignedShort();
+//            LOG.info(String.format("READ ADDRESS %d GOT %d", address, value));
+//            return value;
             return responseBuffer.readUnsignedShort();
           }
           throw new RuntimeException("Invalid response type");
@@ -1070,7 +1105,9 @@ public class ModbusTCPVehicleCommAdapter
             LOG.info("Successfully connected to Modbus TCP server");
             getProcessModel().setCommAdapterConnected(true);
             startHeartbeat();
+            LOG.warning("Starting sending heart bit.");
             positionUpdater.startPositionUpdates();
+            LOG.warning("Starting positioning.");
           })
           .exceptionally(ex -> {
             LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
