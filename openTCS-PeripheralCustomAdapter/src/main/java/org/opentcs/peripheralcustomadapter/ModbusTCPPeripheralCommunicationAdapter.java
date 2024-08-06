@@ -1,8 +1,9 @@
 package org.opentcs.peripheralcustomadapter;
 
+import static java.util.Objects.requireNonNull;
+
 import com.digitalpetri.modbus.master.ModbusTcpMaster;
 import com.digitalpetri.modbus.master.ModbusTcpMasterConfig;
-import com.digitalpetri.modbus.requests.ModbusRequest;
 import com.digitalpetri.modbus.requests.ReadInputRegistersRequest;
 import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
 import com.digitalpetri.modbus.responses.ModbusResponse;
@@ -22,6 +23,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -31,6 +33,7 @@ import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.data.model.TCSResourceReference;
+import org.opentcs.drivers.peripherals.PeripheralProcessModel;
 import org.opentcs.util.event.EventHandler;
 
 public class ModbusTCPPeripheralCommunicationAdapter
@@ -40,7 +43,6 @@ public class ModbusTCPPeripheralCommunicationAdapter
   private static final Logger LOG = Logger.getLogger(
       ModbusTCPPeripheralCommunicationAdapter.class.getName()
   );
-
 
   /**
    * The host address for the TCP connection.
@@ -61,12 +63,20 @@ public class ModbusTCPPeripheralCommunicationAdapter
   private final ScheduledExecutorService executor;
   private ModbusTcpMaster master;
   private final AtomicBoolean heartBeatToggle = new AtomicBoolean(false);
+  private final AtomicInteger heartBeatCount = new AtomicInteger(0);
+  private final AtomicBoolean heartBeatFail = new AtomicBoolean(false);
+  private final AtomicInteger loadingEFEMStatus = new AtomicInteger(0);
+  private final AtomicInteger eFEMQuantity = new AtomicInteger(0);
+  private final AtomicInteger eFEMStatus = new AtomicInteger(0);
+  private final AtomicInteger loadingZIP1Status = new AtomicInteger(0);
+  private final AtomicInteger loadingZIP2Status = new AtomicInteger(0);
+  private final AtomicInteger loadingOHBStatus = new AtomicInteger(0);
+  private final AtomicInteger loadingSideFork1Status = new AtomicInteger(0);
+  private final AtomicInteger loadingSideFork2Status = new AtomicInteger(0);
   private ScheduledFuture<?> heartBeatFuture;
   private ScheduledFuture<?> pollingStatusFuture;
   private final PeripheralDeviceConfigurationProvider configProvider;
-  private final TCSResourceReference<Location> location;
-  private final LocationSensor1Status locationSensor1Status;
-  private final LocationSensor2Status locationSensor2Status;
+  private TCSResourceReference<Location> location;
   private final PeripheralService peripheralService;
 
   /**
@@ -94,9 +104,7 @@ public class ModbusTCPPeripheralCommunicationAdapter
     this.executor = kernelExecutor;
     this.location = location;
     this.isConnected = false;
-    this.locationSensor1Status = new LocationSensor1Status();
-    this.locationSensor2Status = new LocationSensor2Status();
-    this.peripheralService = peripheralService;
+    this.peripheralService = requireNonNull(peripheralService, "peripheralService");
   }
 
   @Override
@@ -106,8 +114,8 @@ public class ModbusTCPPeripheralCommunicationAdapter
       return;
     }
     super.initialize();
-    getProcessModel().withState(PeripheralInformation.State.IDLE);
-    LOG.warning("Starting sending heart bit.");
+    setProcessModel(getProcessModel().withState(PeripheralInformation.State.IDLE));
+    sendProcessModelChangedEvent(PeripheralProcessModel.Attribute.STATE);
     initialized = true;
   }
 
@@ -150,6 +158,7 @@ public class ModbusTCPPeripheralCommunicationAdapter
             getProcessModel().withCommAdapterConnected(true);
             startHeartbeat();
             pollingSensorStatus();
+
           })
           .exceptionally(ex -> {
             LOG.log(Level.SEVERE, "Failed to connect to Modbus TCP server", ex);
@@ -174,6 +183,8 @@ public class ModbusTCPPeripheralCommunicationAdapter
             this.isConnected = false;
             getProcessModel().withCommAdapterConnected(false);
             this.master = null;
+            stopHeartBeat();
+            stopPollingSensor();
           })
           .exceptionally(ex -> {
             LOG.log(Level.SEVERE, "Failed to disconnect from Modbus TCP server", ex);
@@ -184,175 +195,250 @@ public class ModbusTCPPeripheralCommunicationAdapter
     return true;
   }
 
+  private void getEFEMInfo(Map<Integer, Integer> value, int index) {
+    switch (index) {
+      case 0 -> {
+        int newResult = value.get(301);
+        int oldResult = loadingEFEMStatus.getAndSet(newResult);
+        if (newResult != oldResult) {
+          if (newResult == 2) {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Load");
+            LOG.info("Peripheral :" + location.getName() + ", Current Status :Load");
+          }
+          else if (newResult == 1) {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Unload");
+            LOG.info("Peripheral :" + location.getName() + ", Current Status :Unload");
+          }
+          else {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Unknown");
+            LOG.info("Peripheral :" + location.getName() + ", Current Status :Unknown");
+          }
+        }
+      }
+      case 1 -> {
+        eFEMQuantity.set(value.get(301 + index));
+        peripheralService.updateObjectProperty(
+            location, "Magazine_Quantity ", String.valueOf(eFEMQuantity.get())
+        );
+        LOG.info("Peripheral :" + location.getName() + ", Count :" + eFEMQuantity.get());
+      }
+      case 2 -> {
+
+        eFEMStatus.set(value.get(301 + index));
+        if (eFEMStatus.get() == 1) {
+          setProcessModel(getProcessModel().withState(PeripheralInformation.State.EXECUTING));
+        }
+        else if (eFEMStatus.get() == 2) {
+          setProcessModel(getProcessModel().withState(PeripheralInformation.State.UNAVAILABLE));
+        }
+        else if (eFEMStatus.get() == 4) {
+          setProcessModel(getProcessModel().withState(PeripheralInformation.State.IDLE));
+        }
+        else if (eFEMStatus.get() == 8) {
+          setProcessModel(getProcessModel().withState(PeripheralInformation.State.ERROR));
+        }
+        else if (eFEMStatus.get() == 16) {
+          setProcessModel(getProcessModel().withState(PeripheralInformation.State.ERROR));
+        }
+        else {
+          setProcessModel(getProcessModel().withState(PeripheralInformation.State.UNKNOWN));
+        }
+        sendProcessModelChangedEvent(PeripheralProcessModel.Attribute.STATE);
+      }
+      default -> throw new IllegalStateException("Unexpected value: " + index);
+    }
+  }
+
+  private void getOHBInfo(Map<Integer, Integer> value) {
+    int newResult = value.get(303);
+    int oldResult = loadingOHBStatus.getAndSet(newResult);
+
+    if (newResult != oldResult) {
+      if (newResult == 2) {
+        peripheralService.updateObjectProperty(location, "LoadingStatus", "Load");
+        LOG.info("Peripheral : " + location.getName() + ", Current Status :Load");
+      }
+      else if (newResult == 1) {
+        peripheralService.updateObjectProperty(location, "LoadingStatus", "Unload");
+        LOG.info("Peripheral : " + location.getName() + ", Current Status :Unload");
+      }
+      else {
+        peripheralService.updateObjectProperty(location, "LoadingStatus", "Unknown");
+        LOG.info("Peripheral : " + location.getName() + ", Current Status :Unknown");
+      }
+    }
+  }
+
+  private void getSideForkInfo(Map<Integer, Integer> value, int index) {
+    switch (index) {
+      case 0 -> {
+        int newResult = value.get(305);
+        int oldResult = loadingSideFork1Status.getAndSet(newResult);
+        if (newResult != oldResult) {
+          if (newResult == 2) {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Load");
+            LOG.info("Peripheral :" + location.getName() + "#1, Current Status :Load");
+          }
+          else if (newResult == 1) {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Unload");
+            LOG.info("Peripheral :" + location.getName() + "#1, Current Status :Unload");
+          }
+          else {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Unknown");
+            LOG.info("Peripheral :" + location.getName() + "#1, Current Status :Unknown");
+          }
+        }
+      }
+      case 1 -> {
+        int newResult = value.get(305 + index);
+        int oldResult = loadingSideFork2Status.getAndSet(newResult);
+        if (newResult != oldResult) {
+          if (newResult == 2) {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Load");
+            LOG.info("Peripheral :" + location.getName() + "#2, Current Status :Load");
+          }
+          else if (newResult == 1) {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Unload");
+            LOG.info("Peripheral :" + location.getName() + "#2, Current Status :Unload");
+          }
+          else {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Unknown");
+            LOG.info("Peripheral :" + location.getName() + "#2, Current Status :Unknown");
+          }
+        }
+      }
+      default -> throw new IllegalStateException("Unexpected value: " + index);
+    }
+  }
+
+  private void getZIPInfo(Map<Integer, Integer> value, int index) {
+    switch (index) {
+      case 0 -> {
+        int newResult = value.get(301);
+        int oldResult = loadingZIP1Status.getAndSet(newResult);
+        if (newResult != oldResult) {
+          if (newResult == 2) {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Load");
+            LOG.info("Peripheral :" + location.getName() + "#1, Current Status :Load");
+          }
+          else if (newResult == 1) {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Unload");
+            LOG.info("Peripheral :" + location.getName() + "#1, Current Status :Unload");
+          }
+          else {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Unknown");
+            LOG.info("Peripheral :" + location.getName() + "#1, Current Status :Unknown");
+          }
+        }
+      }
+      case 1 -> {
+        int newResult = value.get(301 + index);
+        int oldResult = loadingZIP2Status.getAndSet(newResult);
+        if (newResult != oldResult) {
+          if (newResult == 2) {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Load");
+            LOG.info("Peripheral :" + location.getName() + "#2, Current Status :Load");
+          }
+          else if (newResult == 1) {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Unload");
+            LOG.info("Peripheral :" + location.getName() + "#2, Current Status :Unload");
+          }
+          else {
+            peripheralService.updateObjectProperty(location, "LoadingStatus", "Unknown");
+            LOG.info("Peripheral :" + location.getName() + "#2, Current Status :Unknown");
+          }
+        }
+      }
+      default -> throw new IllegalStateException("Unexpected value: " + index);
+    }
+  }
+
   private void pollingSensorStatus() {
     pollingStatusFuture = executor.scheduleAtFixedRate(() -> {
-      Location peripheralLocation = peripheralService.fetchObject(
-          Location.class, location.getName()
-      );
-      if (String.CASE_INSENSITIVE_ORDER.compare(location.getName(), "SAA-mini-OHT-Sensor0001")
-          == 0) {
-        readSingleRegister(301, 3).thenAccept(
-            value -> {
-              IntStream.range(0, 3).forEachOrdered(i -> {
-                switch (i) {
-                  case 0 -> {
-
-                    locationSensor1Status.setEFEMMagazineStatus(
-                        value.get(301) == 1
-                    );
-
-                    peripheralLocation.withProperty(
-                        "tcs:defaultLocationSymbol", value.get(301) == 1 ? "Load" : "UnLoad"
-                    );
-                    getProcessModel().withLocation(peripheralLocation.getReference());
-                  }
-                  case 1 -> {
-                    locationSensor1Status.setEFEMMagazineNumber(
-                        value.get(301 + i)
-                    );
-                  }
-                  case 2 -> {
-                    locationSensor1Status.setEFEMStatus(
-                        value.get(301 + i)
-                    );
-                    switch (locationSensor1Status.getEFEMStatus()) {
-                      case Run -> getProcessModel().withState(
-                          PeripheralInformation.State.EXECUTING
-                      );
-                      case Stop -> getProcessModel().withState(
-                          PeripheralInformation.State.UNAVAILABLE
-                      );
-                      case Idle -> getProcessModel().withState(PeripheralInformation.State.IDLE);
-                      case Alarm, Warning -> getProcessModel().withState(
-                          PeripheralInformation.State.ERROR
-                      );
-                      default -> throw new IllegalStateException("Unexpected value: " + i);
-                    }
-                  }
-                  default -> throw new IllegalStateException("Unexpected value: " + i);
-                }
-
-              });
-            }
-        );
-      }
-      else if (String.CASE_INSENSITIVE_ORDER.compare(
-          location.getName(), "SAA-mini-OHT-Sensor0002-STK"
-      )
-          == 0) {
-            readSingleRegister(301, 2).thenAccept(
-                value -> IntStream.range(0, 2).forEachOrdered(i -> {
-                  switch (i) {
-                    case 0 -> {
-                      locationSensor2Status.setSTKPort1MagazineStatus(
-                          value.get(301) == 1
-                      );
-                      peripheralLocation.withProperty(
-                          "tcs:defaultLocationSymbol", value.get(301) == 1 ? "Load" : "UnLoad"
-                      );
-                    }
-                    case 1 -> {
-                      locationSensor2Status.setSTKPort1MagazineStatus(
-                          value.get(301 + i) == 1
-                      );
-                      peripheralLocation.withProperty(
-                          "tcs:defaultLocationSymbol", value.get(301 + i) == 1 ? "Load" : "UnLoad"
-                      );
-                    }
-                    default -> throw new IllegalStateException("Unexpected value: " + i);
-                  }
-                })
-            );
-          }
-      else if (String.CASE_INSENSITIVE_ORDER.compare(
-          location.getName(), "SAA-mini-OHT-Sensor0002-OHB"
-      )
-          == 0) {
-            readSingleRegister(303, 2).thenAccept(
-                value -> IntStream.range(0, 2).forEachOrdered(i -> {
-                  switch (i) {
-                    case 0 -> {
-                      locationSensor2Status.setOHB1MagazineStatus(
-                          value.get(303) == 1
-                      );
-                      peripheralLocation.withProperty(
-                          "tcs:defaultLocationSymbol", value.get(303) == 1 ? "Load" : "UnLoad"
-                      );
-                    }
-                    case 1 -> {
-                      locationSensor2Status.setOHB2MagazineStatus(
-                          value.get(303 + i) == 1
-                      );
-                      peripheralLocation.withProperty(
-                          "tcs:defaultLocationSymbol", value.get(303 + i) == 1 ? "Load" : "UnLoad"
-                      );
-                    }
-                    default -> throw new IllegalStateException("Unexpected value: " + i);
-                  }
-                })
-            );
-          }
-      else if (String.CASE_INSENSITIVE_ORDER.compare(
-          location.getName(), "SAA-mini-OHT-Sensor0002-SideFork"
-      ) == 0) {
-        readSingleRegister(305, 2).thenAccept(
-            value -> IntStream.range(0, 2).forEachOrdered(i -> {
-              switch (i) {
-                case 0 -> {
-                  locationSensor2Status.setSideFork1MagazineStatus(
-                      value.get(305) == 1
-                  );
-                  peripheralLocation.withProperty(
-                      "tcs:defaultLocationSymbol", value.get(305) == 1 ? "Load" : "UnLoad"
-                  );
-                }
-                case 1 -> {
-                  locationSensor2Status.setSideFork2MagazineStatus(
-                      value.get(305 + i) == 1
-                  );
-                  peripheralLocation.withProperty(
-                      "tcs:defaultLocationSymbol", value.get(305 + i) == 1 ? "Load" : "UnLoad"
-                  );
-                }
-                default -> throw new IllegalStateException("Unexpected value: " + i);
+      if (!heartBeatFail.get()) {
+        if (String.CASE_INSENSITIVE_ORDER.compare(location.getName(), "Magazine_loadport")
+            == 0) {
+          readSingleRegister(301, 3).thenAccept(
+              value -> {
+                IntStream.range(0, 3).forEachOrdered(i -> {
+                  getEFEMInfo(value, i);
+                });
               }
-            })
-        );
+          );
+        }
+        else if (String.CASE_INSENSITIVE_ORDER.compare(
+            location.getName(), "STK_IN"
+        )
+            == 0) {
+              readSingleRegister(301, 2).thenAccept(
+                  value -> {
+                    IntStream.range(0, 2).forEachOrdered(i -> {
+                      getZIPInfo(value, i);
+                    });
+                  }
+              );
+            }
+        else if (String.CASE_INSENSITIVE_ORDER.compare(
+            location.getName(), "OHB"
+        )
+            == 0) {
+              readSingleRegister(303, 1).thenAccept(
+                  this::getOHBInfo
+              );
+            }
+        else if (String.CASE_INSENSITIVE_ORDER.compare(
+            location.getName(), "Sidefork"
+        ) == 0) {
+          readSingleRegister(305, 2).thenAccept(
+              value -> {
+                IntStream.range(0, 2).forEachOrdered(i -> {
+                  getSideForkInfo(value, i);
+                });
+              }
+          );
+        }
       }
-      getProcessModel().withLocation(peripheralLocation.getReference());
     }, 0, 500, TimeUnit.MILLISECONDS);
   }
 
   private void stopPollingSensor() {
     if (pollingStatusFuture != null && !pollingStatusFuture.isCancelled()) {
+      LOG.info("Stop Polling Sensor.");
       pollingStatusFuture.cancel(true);
     }
   }
 
   private void startHeartbeat() {
+    LOG.info("Starting sending heart bit, Peripheral Name : " + location.getName() + ".");
+
     heartBeatFuture = executor.scheduleAtFixedRate(() -> {
-      boolean currentValue = heartBeatToggle.getAndSet(!heartBeatToggle.get());
-      writeSingleRegister(300, currentValue ? 1 : 0)
-          .thenCompose(v -> readSingleRegister(300, 1))
-          .thenAccept(value -> {
-            if (value.get(300) != (currentValue ? 1 : 0)) {
-              LOG.warning("Heartbeat value mismatch! Retrying...");
-              writeSingleRegister(300, currentValue ? 1 : 0)
-                  .exceptionally(ex -> {
-                    LOG.severe("Failed to retry heartbeat write: " + ex.getMessage());
-                    return null;
-                  });
+      readSingleRegister(300, 1).thenAccept(
+          value -> {
+            boolean newHeartBit = value.get(300) == 1;
+            boolean oldHeartBit = heartBeatToggle.getAndSet(newHeartBit);
+            if (oldHeartBit == newHeartBit) {
+              if (heartBeatCount.get() >= 3) {
+                LOG.info(
+                    "The new heart bit and old heart bit is Same, Peripheral Name : " + location
+                        .getName() + "."
+                );
+                heartBeatFail.set(true);
+                setProcessModel(getProcessModel().withState(PeripheralInformation.State.ERROR));
+              }
+              heartBeatCount.addAndGet(1);
             }
-          })
-          .exceptionally(ex -> {
-            LOG.severe("Failed to write or read heartbeat: " + ex.getMessage());
-            return null;
-          });
-    }, 0, 500, TimeUnit.MILLISECONDS);
+            heartBeatCount.set(0);
+            heartBeatFail.set(false);
+            setProcessModel(getProcessModel().withState(PeripheralInformation.State.EXECUTING));
+            sendProcessModelChangedEvent(PeripheralProcessModel.Attribute.STATE);
+          }
+      );
+    }, 0, 200, TimeUnit.MILLISECONDS);
   }
 
   private void stopHeartBeat() {
     if (heartBeatFuture != null && !heartBeatFuture.isCancelled()) {
+      LOG.info("Stop sending heart bit.");
       heartBeatFuture.cancel(true);
     }
   }
@@ -384,11 +470,13 @@ public class ModbusTCPPeripheralCommunicationAdapter
           Map<Integer, Integer> result = new HashMap<>();
           if (response instanceof ReadInputRegistersResponse readResponse) {
             ByteBuf responseBuffer = readResponse.getRegisters();
+
             for (int i = 0; i < quantity; i++) {
               int value = responseBuffer.readUnsignedShort();
               result.put(address + i, value);
-              LOG.info(String.format("READ ADDRESS %d GOT %d", address + i, value));
+              //LOG.info(String.format("READ ADDRESS %d GOT %d", address + i, value));
             }
+
             return result;
           }
           throw new RuntimeException("Invalid response type");
@@ -396,13 +484,16 @@ public class ModbusTCPPeripheralCommunicationAdapter
   }
 
   private CompletableFuture<ModbusResponse> sendModbusRequest(
-      ModbusRequest request
+      com.digitalpetri.modbus.requests.ModbusRequest request
   ) {
-    return sendModbusRequestWithRetry(request, 3);
+    return sendModbusRequestWithRetry(request, 3).exceptionally(ex -> {
+      LOG.severe("All retries failed for Modbus request: " + ex.getMessage());
+      throw new CompletionException("Failed to send Modbus request after retries", ex);
+    });
   }
 
   private CompletableFuture<ModbusResponse> sendModbusRequestWithRetry(
-      ModbusRequest request,
+      com.digitalpetri.modbus.requests.ModbusRequest request,
       int retriesLeft
   ) {
     if (master == null) {
@@ -433,7 +524,7 @@ public class ModbusTCPPeripheralCommunicationAdapter
         });
   }
 
-  private ModbusResponse sendRequest(ModbusRequest request) {
+  private ModbusResponse sendRequest(com.digitalpetri.modbus.requests.ModbusRequest request) {
     try {
       return master.sendRequest(request, 0).get(500, TimeUnit.MILLISECONDS);
     }
