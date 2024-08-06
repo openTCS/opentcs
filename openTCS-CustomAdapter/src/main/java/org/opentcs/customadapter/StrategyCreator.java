@@ -1,6 +1,7 @@
 package org.opentcs.customadapter;
 
 import java.util.concurrent.ScheduledExecutorService;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.data.model.Vehicle;
 
@@ -12,12 +13,14 @@ public interface StrategyCreator {
    * @param config The configuration for the adapter.
    * @param executor The executor service used for executing tasks.
    * @param plantModelService The service providing the plant model.
+   * @param peripheralService The Peripheral Service.
    * @return A new instance of {@link CustomVehicleCommAdapter}.
    */
   CustomVehicleCommAdapter createAdapter(
       Vehicle vehicle,
       VehicleConfiguration config,
       ScheduledExecutorService executor,
-      PlantModelService plantModelService
+      PlantModelService plantModelService,
+      PeripheralService peripheralService
   );
 }

@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.kernel.KernelExecutor;
@@ -38,7 +39,8 @@ public class CommunicationStrategy
       ScheduledExecutorService executor,
       VehicleConfigurationProvider configProvider,
       PlantModelService plantModelService,
-      VehicleService vehicleService
+      VehicleService vehicleService,
+      PeripheralService peripheralService
   ) {
     this.strategyProviders = strategyProviders;
     this.executor = executor;
@@ -55,7 +57,7 @@ public class CommunicationStrategy
 
   @Override
   public CustomVehicleCommAdapter createCustomCommAdapter(@Assisted
-  Vehicle vehicle) {
+  Vehicle vehicle, PeripheralService peripheralService) {
     VehicleConfiguration config = configProvider.getConfiguration(vehicle.getName());
     if (config == null) {
 //      config = createConfigWithUserInput(vehicle);
@@ -72,7 +74,7 @@ public class CommunicationStrategy
     }
 
     StrategyCreator creator = creatorProvider.get();
-    return creator.createAdapter(vehicle, config, executor, plantModelService);
+    return creator.createAdapter(vehicle, config, executor, plantModelService, peripheralService);
   }
 
   private VehicleConfiguration createConfigWithUserInput(Vehicle vehicle) {

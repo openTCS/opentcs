@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.digitalpetri.modbus.master.ModbusTcpMaster;
 import com.digitalpetri.modbus.master.ModbusTcpMasterConfig;
+import com.digitalpetri.modbus.requests.ModbusRequest;
 import com.digitalpetri.modbus.requests.ReadHoldingRegistersRequest;
 import com.digitalpetri.modbus.requests.ReadInputRegistersRequest;
 import com.digitalpetri.modbus.requests.WriteMultipleRegistersRequest;
@@ -42,10 +43,12 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.jgrapht.alg.util.Pair;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
+import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.data.model.PlantModel;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
@@ -122,7 +125,7 @@ public class ModbusTCPVehicleCommAdapter
   private final PlantModelService plantModelService;
   private MovementHandler movementHandler;
   private boolean shouldAbort = false;
-
+  private final PeripheralService peripheralService;
 
   /**
    * A communication adapter for ModbusTCP-based vehicle communication.
@@ -132,6 +135,7 @@ public class ModbusTCPVehicleCommAdapter
    * @param executor The executor for handling background tasks.
    * @param vehicle The vehicle associated with this communication adapter.
    * @param plantModelService The plant model service for accessing plant model information.
+   * @param peripheralService The Peripheral Service.
    */
   @SuppressWarnings("checkstyle:TodoComment")
 
@@ -142,7 +146,8 @@ public class ModbusTCPVehicleCommAdapter
       @Assisted
       Vehicle vehicle,
 
-      PlantModelService plantModelService
+      PlantModelService plantModelService,
+      PeripheralService peripheralService
   ) {
     super(new CustomProcessModel(vehicle), "RECHARGE", 1000, executor);
     VehicleConfigurationProvider configProvider = new VehicleConfigurationProvider();
@@ -157,6 +162,7 @@ public class ModbusTCPVehicleCommAdapter
     this.isConnected = false;
     this.currentTransportOrder = null;
     this.positionMap = new HashMap<>();
+    this.peripheralService = peripheralService;
   }
 
   @Override
@@ -343,6 +349,35 @@ public class ModbusTCPVehicleCommAdapter
       return;
     }
     super.enable();
+    Location location = peripheralService.fetchObject(Location.class, "OHB");
+    PeripheralInformation.State state = location.getPeripheralInformation().getState();
+    String stateString = "";
+    switch (state) {
+      case NO_PERIPHERAL -> {
+        stateString = "NO_PERIPHERAL";
+      }
+      case UNKNOWN -> {
+        stateString = "UNKNOWN";
+      }
+      case UNAVAILABLE -> {
+        stateString = "UNAVAILABLE";
+      }
+      case ERROR -> {
+        stateString = "ERROR";
+      }
+      case IDLE -> {
+        stateString = "IDLE";
+      }
+      case EXECUTING -> {
+        stateString = "EXECUTING";
+      }
+
+      default -> throw new IllegalStateException("Unexpected value: " + state);
+    }
+
+    LOG.info("Location Name :" + location.getName());
+    LOG.info("Property :" + location.getProperty("LoadingStatus"));
+    LOG.info("State :" + stateString);
   }
 
   /**
@@ -1148,7 +1183,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private CompletableFuture<ModbusResponse> sendModbusRequest(
-      com.digitalpetri.modbus.requests.ModbusRequest request
+      ModbusRequest request
   ) {
     return sendModbusRequestWithRetry(request, 3)
         .exceptionally(ex -> {
@@ -1158,7 +1193,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private CompletableFuture<ModbusResponse> sendModbusRequestWithRetry(
-      com.digitalpetri.modbus.requests.ModbusRequest request,
+      ModbusRequest request,
       int retriesLeft
   ) {
     if (master == null) {
@@ -1189,7 +1224,7 @@ public class ModbusTCPVehicleCommAdapter
         });
   }
 
-  private ModbusResponse sendRequest(com.digitalpetri.modbus.requests.ModbusRequest request) {
+  private ModbusResponse sendRequest(ModbusRequest request) {
     try {
       return master.sendRequest(request, 0).get(500, TimeUnit.MILLISECONDS);
     }

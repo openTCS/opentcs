@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.assistedinject.Assisted;
 import java.util.concurrent.ScheduledExecutorService;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.data.model.Vehicle;
 
@@ -24,12 +25,14 @@ public class ModbusTCPStrategy
       Vehicle vehicle,
       VehicleConfiguration config,
       ScheduledExecutorService executor,
-      PlantModelService plantModelService
+      PlantModelService plantModelService,
+      PeripheralService peripheralService
   ) {
     return new ModbusTCPVehicleCommAdapter(
         executor,
         vehicle,
-        plantModelService
+        plantModelService,
+        peripheralService
     );
   }
 }

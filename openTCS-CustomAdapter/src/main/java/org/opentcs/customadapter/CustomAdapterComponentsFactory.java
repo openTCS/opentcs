@@ -1,5 +1,6 @@
 package org.opentcs.customadapter;
 
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.data.model.Vehicle;
 
 /**
@@ -11,9 +12,11 @@ public interface CustomAdapterComponentsFactory {
    * Creates a new CustomCommunicationAdapter for the given vehicle.
    *
    * @param vehicle The vehicle.
+   * @param peripheralService The Peripheral Service.
    * @return A new CustomCommunicationAdapter for the given vehicle.
    */
   CustomVehicleCommAdapter createCustomCommAdapter(
-      Vehicle vehicle
+      Vehicle vehicle,
+      PeripheralService peripheralService
   );
 }

@@ -7,6 +7,7 @@ import com.google.inject.Singleton;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.logging.Logger;
+import org.opentcs.components.kernel.services.PeripheralService;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -25,6 +26,7 @@ public class CustomCommunicationAdapterFactoryImpl
   private final VehicleConfigurationProvider configProvider;
   private final PlantModelService plantModelService;
   private boolean initialized;
+  private final PeripheralService peripheralService;
 
   /**
    * Constructs a new CustomCommunicationAdapterFactoryImpl object.
@@ -32,16 +34,19 @@ public class CustomCommunicationAdapterFactoryImpl
    * @param adapterFactory The factory used to create adapter components.
    * @param configProvider The provider used for vehicle configurations.
    * @param plantModelService The service used for interacting with plant models.
+   * @param peripheralService The Peripheral Service.
    */
   @Inject
   public CustomCommunicationAdapterFactoryImpl(
       CustomAdapterComponentsFactory adapterFactory,
       VehicleConfigurationProvider configProvider,
-      PlantModelService plantModelService
+      PlantModelService plantModelService,
+      PeripheralService peripheralService
   ) {
     this.adapterFactory = requireNonNull(adapterFactory, "componentsFactory");
     this.configProvider = configProvider;
     this.plantModelService = plantModelService;
+    this.peripheralService = peripheralService;
   }
 
   @Override
@@ -86,6 +91,8 @@ public class CustomCommunicationAdapterFactoryImpl
   public VehicleCommAdapter getAdapterFor(@Nonnull
   Vehicle vehicle) {
     LOG.info("Creating adapter for vehicle: " + vehicle.getName());
-    return adapterFactory.createCustomCommAdapter(vehicle);
+    return adapterFactory.createCustomCommAdapter(
+        vehicle, peripheralService
+    );
   }
 }
