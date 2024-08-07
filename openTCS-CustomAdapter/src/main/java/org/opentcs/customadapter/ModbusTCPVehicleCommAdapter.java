@@ -349,35 +349,6 @@ public class ModbusTCPVehicleCommAdapter
       return;
     }
     super.enable();
-    Location location = peripheralService.fetchObject(Location.class, "OHB");
-    PeripheralInformation.State state = location.getPeripheralInformation().getState();
-    String stateString = "";
-    switch (state) {
-      case NO_PERIPHERAL -> {
-        stateString = "NO_PERIPHERAL";
-      }
-      case UNKNOWN -> {
-        stateString = "UNKNOWN";
-      }
-      case UNAVAILABLE -> {
-        stateString = "UNAVAILABLE";
-      }
-      case ERROR -> {
-        stateString = "ERROR";
-      }
-      case IDLE -> {
-        stateString = "IDLE";
-      }
-      case EXECUTING -> {
-        stateString = "EXECUTING";
-      }
-
-      default -> throw new IllegalStateException("Unexpected value: " + state);
-    }
-
-    LOG.info("Location Name :" + location.getName());
-    LOG.info("Property :" + location.getProperty("LoadingStatus"));
-    LOG.info("State :" + stateString);
   }
 
   /**
@@ -435,56 +406,120 @@ public class ModbusTCPVehicleCommAdapter
   @Override
   public synchronized boolean enqueueCommand(MovementCommand newCommand) {
     requireNonNull(newCommand, "newCommand cannot be empty");
-
     if (!canAcceptNextCommand()) {
       return false;
     }
-
     checkTransportOrderAndLog(newCommand);
     queueNewCommand(newCommand);
-
     if (newCommand.isFinalMovement()) {
-      LOG.info(
-          String.format(
-              "FINAL MOVEMENTCOMMAND DESTINATION: %s", newCommand.getStep().getDestinationPoint()
-                  .getName()
-          )
-      );
-      LOG.info("RECEIVED FINAL COMMAND, PROCESSING COMMANDS. ");
-
-      CompletableFuture<Void> checkStatusFuture = CompletableFuture.allOf(
-          readSingleRegister(114).thenAccept(value -> checkAutoModeRegisterValue(114, value)),
-          readSingleRegister(115).thenAccept(value -> checkAutoModeRegisterValue(115, value))
-      );
-
-      checkStatusFuture.thenRun(() -> {
-        if (shouldAbort) {
-          LOG.warning("Aborting current transport order due to invalid vehicle status.");
-          abortCurrentTransportOrder(newCommand);
-        }
-        else {
-          LOG.info("Vehicle status is valid, processing commands.");
-          processAllMovementCommands();
-        }
-      }).exceptionally(ex -> {
-        LOG.severe("Error checking vehicle status: " + ex.getMessage());
-        abortCurrentTransportOrder(newCommand);
-        return null;
-      });
+      processFinalMovement(newCommand);
     }
     return true;
   }
 
-  private void checkAutoModeRegisterValue(int address, int value) {
+  private void processFinalMovement(MovementCommand newCommand) {
+    logFinalMovementInfo(newCommand);
+
+    CompletableFuture<Boolean> checkStatusFuture = checkVehicleStatus();
+    CompletableFuture<Boolean> checkLocationFuture = checkLocationStatus(newCommand);
+
+    CompletableFuture.allOf(checkStatusFuture, checkLocationFuture)
+        .thenRun(
+            () -> handleFinalMovementResult(checkStatusFuture, checkLocationFuture, newCommand)
+        )
+        .exceptionally(ex -> handleException(ex, newCommand));
+  }
+
+  private void logFinalMovementInfo(MovementCommand newCommand) {
+    LOG.info(
+        String.format(
+            "FINAL MOVEMENT COMMAND DESTINATION: %s",
+            newCommand.getStep().getDestinationPoint().getName()
+        )
+    );
+    LOG.info("RECEIVED FINAL COMMAND, PROCESSING COMMANDS.");
+  }
+
+  private CompletableFuture<Boolean> checkVehicleStatus() {
+    return readSingleRegister(114)
+        .thenCombine(readSingleRegister(115), (value114, value115) -> {
+          boolean isValid = isAutoModeEnabled(114, value114) && isAutoModeEnabled(115, value115);
+          shouldAbort = !isValid;
+          return isValid;
+        });
+  }
+
+  private boolean isAutoModeEnabled(int register, int value) {
     if (value != 2) {
       LOG.warning(
-          "Register "
-              + address
-              + " are not set to auto mode, current value: "
-              + value
+          String.format("Register %d is not set to auto mode, current value: %d", register, value)
       );
-      shouldAbort = true;
+      return false;
     }
+    return true;
+  }
+
+  private CompletableFuture<Boolean> checkLocationStatus(MovementCommand newCommand) {
+    return CompletableFuture.supplyAsync(() -> {
+      Location location = getLocationFromCommand(newCommand);
+      logLocationInfo(location);
+      return isLocationStatusValid(newCommand, location);
+    });
+  }
+
+  private Location getLocationFromCommand(MovementCommand newCommand) {
+    String locationName = getLocationNameFromDestinationPoint(newCommand);
+    return peripheralService.fetchObject(Location.class, locationName);
+  }
+
+  private void logLocationInfo(Location location) {
+    LOG.info(String.format("Location Name: %s", location.getName()));
+    LOG.info(String.format("Property: %s", location.getProperty("LoadingStatus")));
+    LOG.info(String.format("State: %s", getStateString(location)));
+  }
+
+  private boolean isLocationStatusValid(MovementCommand newCommand, Location location) {
+    if (isMagazineLoadport(newCommand) && hasLoadingStatusProperty(location)) {
+      String operation = newCommand.getFinalOperation();
+      String loadingStatus = location.getProperty("LoadingStatus");
+      return !(("Load".equals(operation) && "Unload".equals(loadingStatus)) ||
+          ("Unload".equals(operation) && "Load".equals(loadingStatus)));
+    }
+    return true;
+  }
+
+  private boolean isMagazineLoadport(MovementCommand newCommand) {
+    return newCommand.getFinalDestinationLocation() != null &&
+        "Magazine_loadport".equals(newCommand.getFinalDestinationLocation().getName());
+  }
+
+  private boolean hasLoadingStatusProperty(Location location) {
+    return location.getProperty("LoadingStatus") != null;
+  }
+
+  private void handleFinalMovementResult(
+      CompletableFuture<Boolean> vehicleStatusFuture,
+      CompletableFuture<Boolean> locationStatusFuture,
+      MovementCommand newCommand
+  ) {
+
+    boolean vehicleStatusValid = vehicleStatusFuture.join();
+    boolean locationStatusValid = locationStatusFuture.join();
+
+    if (!vehicleStatusValid || !locationStatusValid) {
+      LOG.warning("Aborting current transport order due to invalid status.");
+      abortCurrentTransportOrder(newCommand);
+    }
+    else {
+      LOG.info("Status is valid, processing commands.");
+      processAllMovementCommands();
+    }
+  }
+
+  private Void handleException(Throwable ex, MovementCommand newCommand) {
+    LOG.severe("Error processing final movement: " + ex.getMessage());
+    abortCurrentTransportOrder(newCommand);
+    return null;
   }
 
   public void abortCurrentTransportOrder(MovementCommand failedCommand) {
@@ -752,7 +787,7 @@ public class ModbusTCPVehicleCommAdapter
   private CMD2 createCMD2(MovementCommand cmd) {
     String switchOperation = "";
     int liftHeight = 0;
-    int station = 0;
+    int station;
     int motionCommand;
     Map<String, String> pathOperation = null;
 
@@ -762,9 +797,7 @@ public class ModbusTCPVehicleCommAdapter
     )) {
       liftHeight = 255;
     }
-
     station = getStation(cmd);
-
     if (cmd.getStep().getPath() != null) {
       pathOperation = cmd.getStep().getPath().getProperties();
     }
@@ -822,6 +855,34 @@ public class ModbusTCPVehicleCommAdapter
 
   private CMD2 createEmptyCMD2() {
     return new CMD2(0, 1, 0);
+  }
+
+  private static String getStateString(Location location) {
+    PeripheralInformation.State state = location.getPeripheralInformation().getState();
+    String stateString = "";
+    switch (state) {
+      case NO_PERIPHERAL -> {
+        stateString = "NO_PERIPHERAL";
+      }
+      case UNKNOWN -> {
+        stateString = "UNKNOWN";
+      }
+      case UNAVAILABLE -> {
+        stateString = "UNAVAILABLE";
+      }
+      case ERROR -> {
+        stateString = "ERROR";
+      }
+      case IDLE -> {
+        stateString = "IDLE";
+      }
+      case EXECUTING -> {
+        stateString = "EXECUTING";
+      }
+
+      default -> throw new IllegalStateException("Unexpected value: " + state);
+    }
+    return stateString;
   }
 
   private double getMaxAllowedSpeed(Path path) {
