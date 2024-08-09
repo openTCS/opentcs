@@ -1281,7 +1281,7 @@ public class DefaultVehicleController
     // Find out which resources are actually needed for the next command.
     pendingCommand = futureCommands.poll();
     pendingResources = getNeededResources(pendingCommand);
-    LOG.debug("{}: Allocating resources: {}", vehicle.getName(), pendingResources);
+    LOG.debug("{}: Requesting allocation of resources: {}", vehicle.getName(), pendingResources);
     scheduler.allocate(this, pendingResources);
   }
 
@@ -1354,7 +1354,7 @@ public class DefaultVehicleController
       // newly required resources.
       checkArgument(
           mayAllocateNow(requiredResource),
-          "%s: Current position may not be allocated now: %s",
+          "%s: Current position '%s' may not be allocated now - check other vehicles' allocations!",
           vehicle.getName(),
           point.getName()
       );
