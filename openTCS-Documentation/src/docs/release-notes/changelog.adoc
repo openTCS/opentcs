@@ -56,7 +56,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 == Version 5.17.1 (2024-06-19)
 
 * Bugs fixed:
-** Avoid `NullPointerException`s when rerouting vehicles that process transport orders containing drive order steps that don't have a path.
+** Avoid ``NullPointerException``s when rerouting vehicles that process transport orders containing drive order steps that don't have a path.
 
 == Version 5.17 (2024-05-21)
 
