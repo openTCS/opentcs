@@ -10,7 +10,6 @@ package org.opentcs.util.persistence.v004;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Objects;
-import org.opentcs.access.to.model.PlantModelCreationTO;
 
 /**
  * The parser for V004 models.
@@ -24,19 +23,6 @@ public class V004ModelParser {
   }
 
   /**
-   * Reads a model with the given reader and parses it to a {@link PlantModelCreationTO} instance.
-   *
-   * @param reader The reader to use.
-   * @param modelVersion The model version.
-   * @return The parsed {@link PlantModelCreationTO}.
-   * @throws IOException If there was an error reading the model.
-   */
-  public PlantModelCreationTO read(Reader reader, String modelVersion)
-      throws IOException {
-    return new V004TOMapper().map(readRaw(reader, modelVersion));
-  }
-
-  /**
    * Reads a model with the given reader and parses it to a {@link V004PlantModelTO} instance.
    *
    * @param reader The reader to use.
@@ -46,7 +32,7 @@ public class V004ModelParser {
    */
   public V004PlantModelTO readRaw(Reader reader, String modelVersion)
       throws IOException {
-    if (Objects.equals(modelVersion, V004TOMapper.VERSION_STRING)) {
+    if (Objects.equals(modelVersion, V004PlantModelTO.VERSION_STRING)) {
       return V004PlantModelTO.fromXml(reader);
     }
     else {

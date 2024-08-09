@@ -46,11 +46,6 @@ import org.opentcs.util.Colors;
 public class V005TOMapper {
 
   /**
-   * The file format version this mapper works with.
-   */
-  public static final String VERSION_STRING = "0.0.5";
-
-  /**
    * Creates a new instance.
    */
   public V005TOMapper() {
@@ -84,7 +79,7 @@ public class V005TOMapper {
     V005PlantModelTO result = new V005PlantModelTO();
 
     result.setName(model.getName());
-    result.setVersion(VERSION_STRING);
+    result.setVersion(V005PlantModelTO.VERSION_STRING);
     result.getPoints().addAll(toPointTO(model.getPoints(), model.getPaths()));
     result.getVehicles().addAll(toVehicleTO(model.getVehicles()));
     result.getPaths().addAll(toPathTO(model.getPaths()));

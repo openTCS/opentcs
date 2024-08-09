@@ -55,7 +55,7 @@ public class V005ModelParser {
    */
   public V005PlantModelTO readRaw(Reader reader, String modelVersion)
       throws IOException {
-    if (Objects.equals(modelVersion, V005TOMapper.VERSION_STRING)) {
+    if (Objects.equals(modelVersion, V005PlantModelTO.VERSION_STRING)) {
       return V005PlantModelTO.fromXml(reader);
     }
     else {

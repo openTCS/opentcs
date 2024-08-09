@@ -44,6 +44,11 @@ public class V004PlantModelTO
     extends
       BasePlantModelTO {
 
+  /**
+   * This plant model implementation's version string.
+   */
+  public static final String VERSION_STRING = "0.0.4";
+
   private String name = "";
   private List<PointTO> points = new ArrayList<>();
   private List<PathTO> paths = new ArrayList<>();
