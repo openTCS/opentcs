@@ -279,6 +279,10 @@ public class V1RequestHandler
         "/peripheralJobs/dispatcher/trigger",
         this::handlePostPeripheralJobsDispatchTrigger
     );
+    service.get(
+        "/vehicles/:NAME/loadHandlingDevices",
+        this::handleGetVehicleLoadHandlingDevices
+    );
   }
 
   private Object handlePostDispatcherTrigger(Request request, Response response)
@@ -664,6 +668,14 @@ public class V1RequestHandler
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     jobDispatcherHandler.triggerJobDispatcher();
     return "";
+  }
+
+  private Object handleGetVehicleLoadHandlingDevices(Request request, Response response)
+      throws ObjectUnknownException {
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return jsonBinder.toJson(
+        vehicleHandler.getVehicleLoadHandlingDevices(request.params(":NAME"))
+    );
   }
 
   private String valueIfKeyPresent(QueryParamsMap queryParams, String key) {

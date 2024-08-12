@@ -308,4 +308,17 @@ public class VehicleHandler {
       );
     });
   }
+
+  public List<LoadHandlingDeviceTO> getVehicleLoadHandlingDevices(String name)
+      throws ObjectUnknownException {
+    return executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, name);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + name);
+      }
+      return vehicle.getLoadHandlingDevices().stream()
+          .map(LoadHandlingDeviceTO::fromLoadHandlingDevice)
+          .collect(Collectors.toList());
+    });
+  }
 }
