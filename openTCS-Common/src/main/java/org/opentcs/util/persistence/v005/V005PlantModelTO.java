@@ -258,7 +258,7 @@ public class V005PlantModelTO
   private static Schema createSchema()
       throws SAXException {
     URL schemaUrl
-        = V005PlantModelTO.class.getResource("/org/opentcs/util/persistence/model-0.0.4.xsd");
+        = V005PlantModelTO.class.getResource("/org/opentcs/util/persistence/model-0.0.5.xsd");
     SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     return schemaFactory.newSchema(schemaUrl);
   }
