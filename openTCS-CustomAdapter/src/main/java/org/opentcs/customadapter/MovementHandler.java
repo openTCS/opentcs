@@ -178,7 +178,6 @@ public class MovementHandler {
 
     boolean liftState = (loadStatus == 1);
     adapter.getProcessModel().setState(vehicleState);
-
     // Update load handling devices based on lift status
     List<LoadHandlingDevice> devices = new ArrayList<>();
     devices.add(new LoadHandlingDevice("default", liftState));

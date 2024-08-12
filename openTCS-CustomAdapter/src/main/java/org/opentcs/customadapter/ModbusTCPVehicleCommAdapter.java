@@ -33,7 +33,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -176,7 +175,12 @@ public class ModbusTCPVehicleCommAdapter
     getProcessModel().setState(Vehicle.State.IDLE);
     LOG.warning("Device has been set to IDLE state");
 
-    ((ExecutorService) getExecutor()).submit(() -> getProcessModel().setPosition("Point-0003"));
+    if (vehicle.getName().equals("SAA-mini-OHT-0001")) {
+      (getExecutor()).submit(() -> getProcessModel().setPosition("Point-0003"));
+    }
+    else if (vehicle.getName().equals("SAA-mini-OHT-0002")) {
+      (getExecutor()).submit(() -> getProcessModel().setPosition("Point-0017"));
+    }
     LOG.warning("Device has been set to Point-0003");
     getProcessModel().setLoadHandlingDevices(
         List.of(new LoadHandlingDevice(LHD_NAME, false))
@@ -239,7 +243,12 @@ public class ModbusTCPVehicleCommAdapter
 
   private void handleHeartbeatValueMismatch(boolean currentValue, int value) {
     if (value != (currentValue ? 1 : 0)) {
-      LOG.warning("Heartbeat value mismatch! Retrying...");
+//      LOG.warning(
+//          String.format(
+//              "%s: Heartbeat value mismatch! Retrying..",
+//              vehicle.getName()
+//          )
+//      );
       writeSingleRegister(100, currentValue ? 1 : 0)
           .exceptionally(ex -> {
             logError("Failed to retry heartbeat write: ", ex);
@@ -490,7 +499,10 @@ public class ModbusTCPVehicleCommAdapter
 
   private boolean isMagazineLoadport(MovementCommand newCommand) {
     return newCommand.getFinalDestinationLocation() != null &&
-        "Magazine_loadport".equals(newCommand.getFinalDestinationLocation().getName());
+        ("Magazine_loadport".equals(newCommand.getFinalDestinationLocation().getName()) ||
+            "STK_2".equals(newCommand.getFinalDestinationLocation().getName()) ||
+            "sidefork".equals(newCommand.getFinalDestinationLocation().getName()) ||
+            "OHB".equals(newCommand.getFinalDestinationLocation().getName()));
   }
 
   private boolean hasLoadingStatusProperty(Location location) {
@@ -776,7 +788,7 @@ public class ModbusTCPVehicleCommAdapter
   private CMD1 createCMD1(MovementCommand cmd) {
     int liftCmd = 0;
     int speedLevel = getSpeedLevel(cmd);
-    int obstacleSensor = 5;
+    int obstacleSensor = 1;
     String command = cmd.getOperation();
     liftCmd = getLiftCommand(command);
     return new CMD1(
@@ -821,7 +833,7 @@ public class ModbusTCPVehicleCommAdapter
 
   private CMD1 createDefaultCMD1(MovementCommand cmd) {
     int speedLevel = getSpeedLevel(cmd);
-    return new CMD1(0, speedLevel, 5, 0);
+    return new CMD1(0, speedLevel, 1, 0);
   }
 
   private CMD2 createDefaultCMD2(MovementCommand cmd) {
@@ -833,7 +845,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private CMD1 createOperationCMD1(MovementCommand cmd) {
-    return new CMD1(getLiftCommand(cmd.getOperation()), getSpeedLevel(cmd), 5, 0);
+    return new CMD1(getLiftCommand(cmd.getOperation()), getSpeedLevel(cmd), 1, 0);
   }
 
   private CMD2 createOperationCMD2(MovementCommand cmd) {
@@ -850,7 +862,7 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   private CMD1 createEmptyCMD1() {
-    return new CMD1(0, 1, 5, 0);
+    return new CMD1(0, 1, 1, 0);
   }
 
   private CMD2 createEmptyCMD2() {
@@ -1545,7 +1557,13 @@ public class ModbusTCPVehicleCommAdapter
       readSingleRegister(POSITION_REGISTER_ADDRESS)
           .thenAccept(this::processPositionUpdate)
           .exceptionally(ex -> {
-            LOG.warning("Failed to update position: " + ex.getMessage());
+            LOG.warning(
+                String.format(
+                    "%s: Failed to update position: %s",
+                    vehicle.getName(),
+                    ex.getMessage()
+                )
+            );
             return null;
           });
     }
