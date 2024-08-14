@@ -40,7 +40,7 @@ public class VehicleConfigurationProvider {
    */
   public VehicleConfiguration getConfiguration(String vehicleName) {
     return configurations.getOrDefault(
-        vehicleName, new VehicleConfiguration("ModbusTCP", "0.0.0.0", 502)
+        vehicleName, new VehicleConfiguration("ModbusTCP", "0.0.0.0", 502, "")
     );
   }
 
@@ -73,8 +73,13 @@ public class VehicleConfigurationProvider {
         if (config != null) {
           LOG.info(
               String.format(
-                  "Configuration for %s: currentStrategy: %s, host: %s, port: %d",
-                  specificVehicle, config.currentStrategy(), config.host(), config.port()
+                  "Configuration for %s: currentStrategy: %s, host: %s, port: %d,"
+                      + "initialPose: %s",
+                  specificVehicle,
+                  config.currentStrategy(),
+                  config.host(),
+                  config.port(),
+                  config.initialPose()
               )
           );
         }
