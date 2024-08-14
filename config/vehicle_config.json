@@ -1,1 +1,1 @@
-{"SAA-mini-OHT-0001":{"currentStrategy":"ModbusTCP","host":"192.168.1.101","port":502},"SAA-mini-OHT-0002":{"currentStrategy":"ModbusTCP","host":"192.168.1.111","port":502}}
+{"SAA-mini-OHT-0001":{"currentStrategy":"ModbusTCP","host":"192.168.1.101","port":502,"initialPose":"Point-0034"},"SAA-mini-OHT-0002":{"currentStrategy":"ModbusTCP","host":"192.168.1.111","port":502,"initialPose":"Point-0047"}}
