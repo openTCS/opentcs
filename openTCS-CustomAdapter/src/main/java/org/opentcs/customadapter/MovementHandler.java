@@ -3,9 +3,11 @@ package org.opentcs.customadapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
@@ -19,6 +21,8 @@ public class MovementHandler {
   private ScheduledFuture<?> monitoringTask;
   private List<MovementCommand> pendingCommands;
   private int currentCommandIndex;
+  private final AtomicBoolean running = new AtomicBoolean(true);
+  private final CountDownLatch shutdownLatch = new CountDownLatch(1);
 
   /**
    * Handles the movement of a vehicle by executing a list of commands.
@@ -39,26 +43,29 @@ public class MovementHandler {
    * @param commands The list of movement commands to monitor and execute.
    */
   public void startMonitoring(List<MovementCommand> commands) {
+    running.set(true);
+
     if (monitoringTask != null && !monitoringTask.isDone()) {
       LOG.info("Cancelling the old monitoring task");
-      monitoringTask.cancel(false);
+      monitoringTask.cancel(true);
     }
 
     pendingCommands = new ArrayList<>(commands);
     LOG.info(String.format("SIZE OF pendingCommands: %d", pendingCommands.size()));
-
     currentCommandIndex = 0;
-    monitoringTask = executor.scheduleAtFixedRate(
-        () -> {
-          try {
-            checkVehicleStatus();
-          }
-          catch (Exception e) {
-            LOG.severe("Error in checkVehicleStatus: " + e.getMessage());
-          }
-        },
-        0, 1000, TimeUnit.MILLISECONDS
-    );
+
+    monitoringTask = executor.scheduleAtFixedRate(() -> {
+      if (!running.get() || Thread.currentThread().isInterrupted()) {
+        shutdownLatch.countDown();
+        return;
+      }
+      try {
+        checkVehicleStatus();
+      }
+      catch (Exception e) {
+        LOG.severe("Error in checkVehicleStatus: " + e.getMessage());
+      }
+    }, 0, 5000, TimeUnit.MILLISECONDS);
   }
 
   private void checkVehicleStatus() {
@@ -121,7 +128,10 @@ public class MovementHandler {
 
         if (currentCommandIndex >= pendingCommands.size()) {
           LOG.info("All commands completed");
-          monitoringTask.cancel(false);
+          stopMonitoring();
+//          executor.shutdown();
+//          monitoringTask.cancel(true);
+//          adapter.getPositionUpdater().stopPositionUpdates();
           adapter.getProcessModel().setState(Vehicle.State.IDLE);
         }
       }
@@ -153,7 +163,7 @@ public class MovementHandler {
       return true;
     }
 
-    if (adapter.getProcessModel().getState() != Vehicle.State.IDLE) {
+    if (adapter.getProcessModel().getState() != Vehicle.State.FINISHED) {
       return false;
     }
 
@@ -196,8 +206,23 @@ public class MovementHandler {
   }
 
   public void stopMonitoring() {
+    running.set(false);
     if (monitoringTask != null) {
-      monitoringTask.cancel(false);
+      monitoringTask.cancel(true);  // 嘗試中斷正在運行的任務
     }
+    executor.execute(() -> {
+      try {
+        shutdownLatch.await(5, TimeUnit.SECONDS);
+      }
+      catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+      // 清理操作
+    });
+
+    pendingCommands.clear();
+    currentCommandIndex = 0;
+
+    LOG.warning("MOVEMENT HANDLER HAS BEEN STOPPED");
   }
 }
