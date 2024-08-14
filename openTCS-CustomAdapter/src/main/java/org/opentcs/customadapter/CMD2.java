@@ -1,20 +1,18 @@
 package org.opentcs.customadapter;
 
-public record CMD2(int liftHeight, int motion, int station) {
+public record CMD2(int station, int motion) {
   /**
    * Represents a CMD2 object that encapsulates lift height and motion values.
    * The values must be within valid ranges, otherwise, an IllegalArgumentException is thrown.
    */
   public CMD2 {
-    if (liftHeight < 0 || liftHeight > 255) {  // 4095 is 0xFFF in hexadecimal
-      throw new IllegalArgumentException("Invalid lift height");
+    if (station < 0 || station > 6) {  // 15 is 0xF in hexadecimal
+      throw new IllegalArgumentException("Invalid station");
     }
     if (motion < 0 || motion > 3) {  // Based on the image, motion range is 0-3
       throw new IllegalArgumentException("Invalid motion");
     }
-    if (station < 0 || station > 4) {  // 15 is 0xF in hexadecimal
-      throw new IllegalArgumentException("Invalid station");
-    }
+
   }
 
   /**
@@ -23,7 +21,7 @@ public record CMD2(int liftHeight, int motion, int station) {
    * @return The integer value representing the CMD2 object.
    */
   public int toInt() {
-    return (liftHeight << 8) | (station << 4) | motion;
+    return (station << 4) | motion;
   }
 
   /**
@@ -34,9 +32,8 @@ public record CMD2(int liftHeight, int motion, int station) {
    */
   public static CMD2 fromInt(int value) {
     return new CMD2(
-        (value >> 8) & 0xFF,
-        value & 0xF,
-        (value >> 4) & 0xF
+        (value >> 4) & 0xF,
+        value & 0xF
     );
   }
 
@@ -47,10 +44,9 @@ public record CMD2(int liftHeight, int motion, int station) {
    */
   @Override
   public String toString() {
-    String hexLiftHeight = String.format("%02X", liftHeight);
     String hexStation = Integer.toHexString(station).toUpperCase();
     String hexMotion = Integer.toHexString(motion).toUpperCase();
-    return hexLiftHeight + hexStation + hexMotion;
+    return hexStation + hexMotion;
   }
 
   /**
