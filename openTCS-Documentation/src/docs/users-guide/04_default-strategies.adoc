@@ -123,6 +123,7 @@ The following cost functions/configuration options are available:
   As an example, if a vehicle's routing group is set to "Example", routing costs for this vehicle would be taken from path properties with keys `tcs:routingCostForwardExample` and `tcs:routingCostReverseExample`.
   This way, different routing costs can be assigned to a path, e.g. for different types of vehicles. +
   Note that, for this cost function to work properly, the values of the routing cost properties should be decimal integers.
+  An exception to this is the string `Infinity`, which the property value can be set to, indicating that the path may not be used by vehicles of the respective routing group at all.
 * `HOPS`:
   The routing costs for every path in the model is 1, which results in the route with the least paths/points being chosen.
 
