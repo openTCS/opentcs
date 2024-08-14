@@ -25,7 +25,7 @@ public class CustomAdapterKernelModule
   @Override
   protected void configure() {
     bind(ScheduledExecutorService.class).annotatedWith(Names.named("executor1")).toInstance(
-        Executors.newScheduledThreadPool(1)
+        Executors.newScheduledThreadPool(6)
     );
     bind(CustomCommunicationAdapterFactory.class).to(CustomCommunicationAdapterFactoryImpl.class);
 
