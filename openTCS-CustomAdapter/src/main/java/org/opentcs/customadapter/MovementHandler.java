@@ -65,7 +65,7 @@ public class MovementHandler {
       catch (Exception e) {
         LOG.severe("Error in checkVehicleStatus: " + e.getMessage());
       }
-    }, 0, 5000, TimeUnit.MILLISECONDS);
+    }, 0, 1000, TimeUnit.MILLISECONDS);
   }
 
   private void checkVehicleStatus() {
@@ -129,9 +129,12 @@ public class MovementHandler {
         if (currentCommandIndex >= pendingCommands.size()) {
           LOG.info("All commands completed");
           stopMonitoring();
-//          executor.shutdown();
-//          monitoringTask.cancel(true);
-//          adapter.getPositionUpdater().stopPositionUpdates();
+          adapter.getPositionUpdater().stopPositionUpdates()
+              .thenRun(() -> LOG.info("Position updates stopped successfully"))
+              .exceptionally(ex -> {
+                LOG.severe("Error stopping position updates: " + ex.getMessage());
+                return null;
+              });
           adapter.getProcessModel().setState(Vehicle.State.IDLE);
         }
       }
@@ -182,7 +185,7 @@ public class MovementHandler {
     Vehicle.State vehicleState = switch (vehicleStatus) {
       case 0 -> Vehicle.State.IDLE;
       case 1 -> Vehicle.State.EXECUTING;
-      case 2 -> Vehicle.State.FINISHED;
+      case 2 -> Vehicle.State.IDLE;
       default -> Vehicle.State.UNKNOWN;
     };
 
