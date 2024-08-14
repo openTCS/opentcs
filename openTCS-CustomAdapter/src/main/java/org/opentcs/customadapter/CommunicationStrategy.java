@@ -62,7 +62,7 @@ public class CommunicationStrategy
     if (config == null) {
 //      config = createConfigWithUserInput(vehicle);
 //      configProvider.setConfiguration(vehicle.getName(), config);
-      config = new VehicleConfiguration("ModbusTCP", "192.168.0.72", 502);
+      config = new VehicleConfiguration("ModbusTCP", "192.168.0.72", 502, "");
       configProvider.setConfiguration(vehicle.getName(), config);
     }
 
@@ -81,6 +81,7 @@ public class CommunicationStrategy
     String defaultHost = "localhost";
     int defaultPort = 502;
     String defaultStrategy = "ModbusTCP";
+    String defaultInitialPose = "";
 
     JTextField hostField = new JTextField(defaultHost, 10);
     JTextField portField = new JTextField(String.valueOf(defaultPort), 10);
@@ -106,8 +107,10 @@ public class CommunicationStrategy
     String host;
     int port;
     String strategy;
+    String initialPose;
 
     if (result == JOptionPane.OK_OPTION) {
+      initialPose = defaultInitialPose;
       host = hostField.getText().isEmpty() ? defaultHost : hostField.getText();
       try {
         port = Integer.parseInt(portField.getText());
@@ -130,8 +133,9 @@ public class CommunicationStrategy
       host = defaultHost;
       port = defaultPort;
       strategy = defaultStrategy;
+      initialPose = defaultInitialPose;
     }
 
-    return new VehicleConfiguration(strategy, host, port);
+    return new VehicleConfiguration(strategy, host, port, initialPose);
   }
 }
