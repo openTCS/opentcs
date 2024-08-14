@@ -32,6 +32,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -210,7 +211,12 @@ public class ModbusTCPVehicleCommAdapter
       return;
     }
     super.terminate();
-    positionUpdater.stopPositionUpdates();
+    positionUpdater.stopPositionUpdates()
+        .thenRun(() -> LOG.info("Position updates stopped successfully"))
+        .exceptionally(ex -> {
+          LOG.severe("Error stopping position updates: " + ex.getMessage());
+          return null;
+        });
     stopHeartBeat();
     movementHandler.stopMonitoring();
     initialized = false;// Stop the heartbeat mechanism
@@ -387,7 +393,12 @@ public class ModbusTCPVehicleCommAdapter
     if (!isEnabled()) {
       return;
     }
-    positionUpdater.stopPositionUpdates();
+    positionUpdater.stopPositionUpdates()
+        .thenRun(() -> LOG.info("Position updates stopped successfully"))
+        .exceptionally(ex -> {
+          LOG.severe("Error stopping position updates: " + ex.getMessage());
+          return null;
+        });
     stopHeartBeat();
     super.disable();
   }
@@ -426,7 +437,12 @@ public class ModbusTCPVehicleCommAdapter
   public synchronized boolean enqueueCommand(MovementCommand newCommand) {
     requireNonNull(newCommand, "newCommand cannot be empty");
     if (!canAcceptNextCommand()) {
-//      positionUpdater.stopPositionUpdates();
+      positionUpdater.stopPositionUpdates()
+          .thenRun(() -> LOG.info("Position updates stopped successfully"))
+          .exceptionally(ex -> {
+            LOG.severe("Error stopping position updates: " + ex.getMessage());
+            return null;
+          });
       return false;
     }
     checkTransportOrderAndLog(newCommand);
@@ -472,7 +488,13 @@ public class ModbusTCPVehicleCommAdapter
   private CompletableFuture<Boolean> checkVehicleStatus() {
     return readSingleRegister(114)
         .thenCombine(readSingleRegister(115), (value114, value115) -> {
-          boolean isValid = isAutoModeEnabled(114, value114);
+          return isAutoModeEnabled(114, value114) && isAutoModeEnabled(115, value115);
+        })
+        .thenCombine(readSingleRegister(105), (previousResult, value105) -> {
+          return previousResult && isValidValue(105, value105);
+        })
+        .thenCombine(readSingleRegister(106), (previousResult, value106) -> {
+          boolean isValid = previousResult && isValidValue(106, value106);
           shouldAbort = !isValid;
           return isValid;
         });
@@ -482,6 +504,16 @@ public class ModbusTCPVehicleCommAdapter
     if (value != 2) {
       LOG.warning(
           String.format("Register %d is not set to auto mode, current value: %d", register, value)
+      );
+      return false;
+    }
+    return true;
+  }
+
+  private boolean isValidValue(int register, int value) {
+    if (value != 0 && value != 2) {
+      LOG.warning(
+          String.format("Register %d has invalid value: %d. Expected 0 or 2.", register, value)
       );
       return false;
     }
@@ -587,7 +619,12 @@ public class ModbusTCPVehicleCommAdapter
     if (currentTransportOrder == null || !currentTransportOrder.equals(
         newCommand.getTransportOrder()
     )) {
-//      positionUpdater.stopPositionUpdates();
+      positionUpdater.stopPositionUpdates()
+          .thenRun(() -> LOG.info("Position updates stopped successfully"))
+          .exceptionally(ex -> {
+            LOG.severe("Error stopping position updates: " + ex.getMessage());
+            return null;
+          });
       LOG.info(
           String.format(
               "New Transport order (%s) has received.", newCommand.getTransportOrder().getName()
@@ -768,13 +805,13 @@ public class ModbusTCPVehicleCommAdapter
       maxSpeed = getMaxAllowedSpeed(cmd.getStep().getPath());
       LOG.info(String.format("GOT MAX SPEED: %f", maxSpeed));
     }
-    int speedCase = (int) (maxSpeed * 0.005);
+    int speedCase = (int) (maxSpeed * 0.001);
     speedLevel = switch (speedCase) {
-      case 0 -> 1;
-      case 3 -> 2;
-      case 6 -> 3;
-      case 9 -> 4;
-      case 12 -> 5;
+      case 1 -> 1;
+      case 2 -> 2;
+      case 3 -> 3;
+      case 4 -> 4;
+      case 5 -> 5;
       default -> 1;
     };
     return speedLevel;
@@ -1533,12 +1570,13 @@ public class ModbusTCPVehicleCommAdapter
   }
 
   public class PositionUpdater {
-    private static final int UPDATE_INTERVAL = 500;
+    private static final int UPDATE_INTERVAL = 1500;
     private static final int POSITION_REGISTER_ADDRESS = 109;
     private final ScheduledExecutorService executor;
     private ScheduledFuture<?> positionFuture;
     private String lastKnownPosition;
-
+    private final AtomicBoolean running = new AtomicBoolean(true);
+    private final CountDownLatch shutdownLatch = new CountDownLatch(1);
 
     /**
      * The PositionUpdater class is responsible for updating the position of a vehicle.
@@ -1565,22 +1603,44 @@ public class ModbusTCPVehicleCommAdapter
      * The initial delay is 0, and the update interval is configured by the UPDATE_INTERVAL field.
      */
     public void startPositionUpdates() {
+      running.set(true);
       positionFuture = executor.scheduleAtFixedRate(
-          this::updatePosition,
+          () -> {
+            if (!running.get()) {
+              shutdownLatch.countDown();
+              return;
+            }
+            updatePosition();
+          },
           0,
           UPDATE_INTERVAL,
           TimeUnit.MILLISECONDS
       );
     }
 
-    void stopPositionUpdates() {
-      if (positionFuture != null && !positionFuture.isCancelled()) {
-        positionFuture.cancel(true);
-      }
+
+    public CompletableFuture<Void> stopPositionUpdates() {
+      return CompletableFuture.runAsync(() -> {
+        running.set(false);
+        if (positionFuture != null) {
+          positionFuture.cancel(true);
+        }
+        try {
+          if (!shutdownLatch.await(5, TimeUnit.SECONDS)) {
+            LOG.warning("Timeout waiting for position updates to stop");
+          }
+        }
+        catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          LOG.warning("Interrupted while waiting for position updates to stop");
+        }
+      }, executor);
     }
 
     private void updatePosition() {
-      // Reads the station MK instead of precise position.
+      if (!running.get()) {
+        return;
+      }
       readSingleRegister(POSITION_REGISTER_ADDRESS)
           .thenAccept(this::processPositionUpdate)
           .exceptionally(ex -> {
