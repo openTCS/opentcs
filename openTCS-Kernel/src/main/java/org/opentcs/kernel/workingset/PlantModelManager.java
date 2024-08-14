@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.BlockCreationTO;
+import org.opentcs.access.to.model.BoundingBoxCreationTO;
+import org.opentcs.access.to.model.CoupleCreationTO;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
@@ -36,6 +38,8 @@ import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Block;
+import org.opentcs.data.model.BoundingBox;
+import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -519,38 +523,6 @@ public class PlantModelManager
   }
 
   /**
-   * Sets a vehicle's length.
-   *
-   * @param ref A reference to the vehicle to be modified.
-   * @param newLength The vehicle's new length.
-   * @return The modified vehicle.
-   * @throws ObjectUnknownException If the referenced vehicle does not exist.
-   */
-  public Vehicle setVehicleLength(
-      TCSObjectReference<Vehicle> ref,
-      int newLength
-  )
-      throws ObjectUnknownException {
-    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
-
-    LOG.debug(
-        "Vehicle's length changes: {} -- {} -> {}",
-        previousState.getName(),
-        previousState.getLength(),
-        newLength
-    );
-
-    Vehicle vehicle = previousState.withLength(newLength);
-    getObjectRepo().replaceObject(vehicle);
-    emitObjectEvent(
-        vehicle,
-        previousState,
-        TCSObjectEvent.Type.OBJECT_MODIFIED
-    );
-    return vehicle;
-  }
-
-  /**
    * Sets a vehicle integration level.
    *
    * @param ref A reference to the vehicle to be modified.
@@ -701,6 +673,38 @@ public class PlantModelManager
     );
 
     Vehicle vehicle = previousState.withEnvelopeKey(envelopeKey);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(
+        vehicle,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
+    return vehicle;
+  }
+
+  /**
+   * Sets a vehicle's bounding box.
+   *
+   * @param ref A reference to the vehicle to be modified.
+   * @param boundingBox The vehicle's new bounding box.
+   * @return The modified vehicle.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   */
+  public Vehicle setVehicleBoundingBox(
+      TCSObjectReference<Vehicle> ref,
+      BoundingBox boundingBox
+  )
+      throws ObjectUnknownException {
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+
+    LOG.debug(
+        "Vehicle's bounding box change: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getBoundingBox(),
+        boundingBox
+    );
+
+    Vehicle vehicle = previousState.withBoundingBox(boundingBox);
     getObjectRepo().replaceObject(vehicle);
     emitObjectEvent(
         vehicle,
@@ -1104,6 +1108,19 @@ public class PlantModelManager
               )
               .withType(curPoint.getType())
               .withVehicleEnvelopes(curPoint.getVehicleEnvelopes())
+              .withMaxVehicleBoundingBox(
+                  new BoundingBoxCreationTO(
+                      curPoint.getMaxVehicleBoundingBox().getLength(),
+                      curPoint.getMaxVehicleBoundingBox().getWidth(),
+                      curPoint.getMaxVehicleBoundingBox().getHeight()
+                  )
+                      .withReferenceOffset(
+                          new CoupleCreationTO(
+                              curPoint.getMaxVehicleBoundingBox().getReferenceOffset().getX(),
+                              curPoint.getMaxVehicleBoundingBox().getReferenceOffset().getY()
+                          )
+                      )
+              )
               .withProperties(curPoint.getProperties())
               .withLayout(
                   new PointCreationTO.Layout(
@@ -1178,7 +1195,19 @@ public class PlantModelManager
     for (Vehicle vehicle : vehicles) {
       result.add(
           new VehicleCreationTO(vehicle.getName())
-              .withLength(vehicle.getLength())
+              .withBoundingBox(
+                  new BoundingBoxCreationTO(
+                      vehicle.getBoundingBox().getLength(),
+                      vehicle.getBoundingBox().getWidth(),
+                      vehicle.getBoundingBox().getHeight()
+                  )
+                      .withReferenceOffset(
+                          new CoupleCreationTO(
+                              vehicle.getBoundingBox().getReferenceOffset().getX(),
+                              vehicle.getBoundingBox().getReferenceOffset().getY()
+                          )
+                      )
+              )
               .withEnergyLevelGood(vehicle.getEnergyLevelGood())
               .withEnergyLevelCritical(vehicle.getEnergyLevelCritical())
               .withEnergyLevelFullyRecharged(vehicle.getEnergyLevelFullyRecharged())
@@ -1356,6 +1385,19 @@ public class PlantModelManager
         .withPose(new Pose(to.getPose().getPosition(), to.getPose().getOrientationAngle()))
         .withType(to.getType())
         .withVehicleEnvelopes(to.getVehicleEnvelopes())
+        .withMaxVehicleBoundingBox(
+            new BoundingBox(
+                to.getMaxVehicleBoundingBox().getLength(),
+                to.getMaxVehicleBoundingBox().getWidth(),
+                to.getMaxVehicleBoundingBox().getHeight()
+            )
+                .withReferenceOffset(
+                    new Couple(
+                        to.getMaxVehicleBoundingBox().getReferenceOffset().getX(),
+                        to.getMaxVehicleBoundingBox().getReferenceOffset().getY()
+                    )
+                )
+        )
         .withProperties(to.getProperties())
         .withLayout(
             new Point.Layout(
@@ -1517,7 +1559,19 @@ public class PlantModelManager
   private Vehicle createVehicle(VehicleCreationTO to)
       throws ObjectExistsException {
     Vehicle newVehicle = new Vehicle(to.getName())
-        .withLength(to.getLength())
+        .withBoundingBox(
+            new BoundingBox(
+                to.getBoundingBox().getLength(),
+                to.getBoundingBox().getWidth(),
+                to.getBoundingBox().getHeight()
+            )
+                .withReferenceOffset(
+                    new Couple(
+                        to.getBoundingBox().getReferenceOffset().getX(),
+                        to.getBoundingBox().getReferenceOffset().getY()
+                    )
+                )
+        )
         .withEnergyLevelGood(to.getEnergyLevelGood())
         .withEnergyLevelCritical(to.getEnergyLevelCritical())
         .withEnergyLevelFullyRecharged(to.getEnergyLevelFullyRecharged())

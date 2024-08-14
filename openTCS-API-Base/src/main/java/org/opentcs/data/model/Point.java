@@ -59,7 +59,11 @@ public class Point
    */
   private final Map<String, Envelope> vehicleEnvelopes;
   /**
-   * The information regarding the grahical representation of this point.
+   * The maximum bounding box (in mm) that a vehicle at this point is allowed to have.
+   */
+  private final BoundingBox maxVehicleBoundingBox;
+  /**
+   * The information regarding the graphical representation of this point.
    */
   private final Layout layout;
 
@@ -77,6 +81,7 @@ public class Point
     this.attachedLinks = new HashSet<>();
     this.occupyingVehicle = null;
     this.vehicleEnvelopes = Map.of();
+    this.maxVehicleBoundingBox = new BoundingBox(1000, 1000, 1000);
     this.layout = new Layout();
   }
 
@@ -91,6 +96,7 @@ public class Point
       Set<Location.Link> attachedLinks,
       TCSObjectReference<Vehicle> occupyingVehicle,
       Map<String, Envelope> vehicleEnvelopes,
+      BoundingBox maxVehicleBoundingBox,
       Layout layout
   ) {
     super(name, properties, history);
@@ -101,6 +107,7 @@ public class Point
     this.attachedLinks = setWithoutNullValues(requireNonNull(attachedLinks, "attachedLinks"));
     this.occupyingVehicle = occupyingVehicle;
     this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
+    this.maxVehicleBoundingBox = requireNonNull(maxVehicleBoundingBox, "maxVehicleBoundingBox");
     this.layout = requireNonNull(layout, "layout");
   }
 
@@ -117,6 +124,7 @@ public class Point
         attachedLinks,
         occupyingVehicle,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -134,6 +142,7 @@ public class Point
         attachedLinks,
         occupyingVehicle,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -151,6 +160,7 @@ public class Point
         attachedLinks,
         occupyingVehicle,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -168,6 +178,7 @@ public class Point
         attachedLinks,
         occupyingVehicle,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -199,6 +210,7 @@ public class Point
         attachedLinks,
         occupyingVehicle,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -230,6 +242,7 @@ public class Point
         attachedLinks,
         occupyingVehicle,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -296,6 +309,7 @@ public class Point
         attachedLinks,
         occupyingVehicle,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -327,6 +341,7 @@ public class Point
         attachedLinks,
         occupyingVehicle,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -358,6 +373,7 @@ public class Point
         attachedLinks,
         occupyingVehicle,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -389,6 +405,7 @@ public class Point
         attachedLinks,
         occupyingVehicle,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -420,14 +437,61 @@ public class Point
         attachedLinks,
         occupyingVehicle,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
 
   /**
-   * Returns the information regarding the grahical representation of this point.
+   * Returns the maximum bounding box (in mm) that a vehicle at this point is allowed to have.
+   * <p>
+   * The bounding box is oriented according to the orientation angle of this point so that the
+   * longitudinal axis of the bounding box runs parallel to the longitudinal axis of a vehicle
+   * located at this point. For the reference point offset, positive x values indicate an offset
+   * in the forward direction of the vehicle, positive y values an offset towards the lefthand
+   * side.
+   * </p>
    *
-   * @return The information regarding the grahical representation of this point.
+   * @return The maximum bounding box (in mm) that a vehicle at this point is allowed to have.
+   */
+  public BoundingBox getMaxVehicleBoundingBox() {
+    return maxVehicleBoundingBox;
+  }
+
+  /**
+   * Creates a copy of this object, with the given maximum vehicle bounding box.
+   * <p>
+   * The bounding box is oriented according to the orientation angle of this point so that the
+   * longitudinal axis of the bounding box runs parallel to the longitudinal axis of a vehicle
+   * located at this point. For the reference point offset, positive x values indicate an offset
+   * in the forward direction of the vehicle, positive y values an offset towards the lefthand
+   * side.
+   * </p>
+   *
+   * @param maxVehicleBoundingBox The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Point withMaxVehicleBoundingBox(BoundingBox maxVehicleBoundingBox) {
+    return new Point(
+        getName(),
+        getProperties(),
+        getHistory(),
+        pose,
+        type,
+        incomingPaths,
+        outgoingPaths,
+        attachedLinks,
+        occupyingVehicle,
+        vehicleEnvelopes,
+        maxVehicleBoundingBox,
+        layout
+    );
+  }
+
+  /**
+   * Returns the information regarding the graphical representation of this point.
+   *
+   * @return The information regarding the graphical representation of this point.
    */
   public Layout getLayout() {
     return layout;
@@ -451,6 +515,7 @@ public class Point
         attachedLinks,
         occupyingVehicle,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -476,7 +541,7 @@ public class Point
   }
 
   /**
-   * Contains information regarding the grahical representation of a point.
+   * Contains information regarding the graphical representation of a point.
    */
   public static class Layout
       implements

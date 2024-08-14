@@ -109,7 +109,7 @@ public class VehicleProcessModel {
   ) {
     this.vehicle = requireNonNull(attachedVehicle, "attachedVehicle");
     this.vehicleReference = vehicle.getReference();
-    this.length = vehicle.getLength();
+    this.length = (int) vehicle.getBoundingBox().getLength();
   }
 
   /**

@@ -13,18 +13,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.opentcs.access.CredentialsException;
+import org.opentcs.access.to.model.BoundingBoxCreationTO;
+import org.opentcs.access.to.model.CoupleCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
+import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.base.components.properties.event.NullAttributesChangeListener;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
-import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.components.properties.type.PercentProperty;
 import org.opentcs.guing.base.components.properties.type.SpeedProperty;
 import org.opentcs.guing.base.components.properties.type.SpeedProperty.Unit;
+import org.opentcs.guing.base.model.BoundingBoxModel;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
@@ -60,7 +63,17 @@ public class VehicleAdapter
 
     try {
       model.getPropertyName().setText(vehicle.getName());
-      model.getPropertyLength().setValueAndUnit(vehicle.getLength(), LengthProperty.Unit.MM);
+      model.getPropertyBoundingBox().setValue(
+          new BoundingBoxModel(
+              vehicle.getBoundingBox().getLength(),
+              vehicle.getBoundingBox().getWidth(),
+              vehicle.getBoundingBox().getHeight(),
+              new Couple(
+                  vehicle.getBoundingBox().getReferenceOffset().getX(),
+                  vehicle.getBoundingBox().getReferenceOffset().getY()
+              )
+          )
+      );
       model.getPropertyMaxVelocity().setValueAndUnit(vehicle.getMaxVelocity(), Unit.MM_S);
       model.getPropertyMaxReverseVelocity().setValueAndUnit(
           vehicle.getMaxReverseVelocity(),
@@ -141,7 +154,7 @@ public class VehicleAdapter
     return plantModel
         .withVehicle(
             new VehicleCreationTO(vehicleModel.getName())
-                .withLength(getLength(vehicleModel))
+                .withBoundingBox(getBoundingBox(vehicleModel))
                 .withEnergyLevelCritical(getEnergyLevelCritical(vehicleModel))
                 .withEnergyLevelGood(getEnergyLevelGood(vehicleModel))
                 .withEnergyLevelFullyRecharged(getEnergyLevelFullyRecharged(vehicleModel))
@@ -231,9 +244,17 @@ public class VehicleAdapter
 
   }
 
-  private int getLength(VehicleModel model) {
-    return ((Double) model.getPropertyLength().getValueByUnit(LengthProperty.Unit.MM))
-        .intValue();
+  private BoundingBoxCreationTO getBoundingBox(VehicleModel model) {
+    return new BoundingBoxCreationTO(
+        model.getPropertyBoundingBox().getValue().getLength(),
+        model.getPropertyBoundingBox().getValue().getWidth(),
+        model.getPropertyBoundingBox().getValue().getHeight()
+    ).withReferenceOffset(
+        new CoupleCreationTO(
+            model.getPropertyBoundingBox().getValue().getReferenceOffset().getX(),
+            model.getPropertyBoundingBox().getValue().getReferenceOffset().getY()
+        )
+    );
   }
 
   private int getMaximumReverseVelocity(VehicleModel model) {

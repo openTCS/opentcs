@@ -8,7 +8,6 @@
 package org.opentcs.access.to.model;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkInRange;
 
 import jakarta.annotation.Nonnull;
@@ -17,6 +16,7 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.Map;
 import org.opentcs.access.to.CreationTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a block in the plant model.
@@ -28,9 +28,9 @@ public class VehicleCreationTO
       Serializable {
 
   /**
-   * The vehicle's length (in mm).
+   * The vehicle's bounding box (in mm).
    */
-  private final int length;
+  private final BoundingBoxCreationTO boundingBox;
   /**
    * The energy level value at/below which the vehicle should be recharged.
    */
@@ -60,7 +60,7 @@ public class VehicleCreationTO
    */
   private final String envelopeKey;
   /**
-   * The information regarding the grahical representation of this vehicle.
+   * The information regarding the graphical representation of this vehicle.
    */
   private final Layout layout;
 
@@ -74,7 +74,7 @@ public class VehicleCreationTO
       String name
   ) {
     super(name);
-    this.length = 1000;
+    this.boundingBox = new BoundingBoxCreationTO(1000, 1000, 1000);
     this.energyLevelCritical = 30;
     this.energyLevelGood = 90;
     this.energyLevelFullyRecharged = 90;
@@ -90,7 +90,8 @@ public class VehicleCreationTO
       String name,
       @Nonnull
       Map<String, String> properties,
-      int length,
+      @Nonnull
+      BoundingBoxCreationTO boundingBox,
       int energyLevelCritical,
       int energyLevelGood,
       int energyLevelFullyRecharged,
@@ -103,7 +104,7 @@ public class VehicleCreationTO
       Layout layout
   ) {
     super(name, properties);
-    this.length = length;
+    this.boundingBox = requireNonNull(boundingBox, "boundingBox");
     this.energyLevelCritical = energyLevelCritical;
     this.energyLevelGood = energyLevelGood;
     this.energyLevelFullyRecharged = energyLevelFullyRecharged;
@@ -128,7 +129,7 @@ public class VehicleCreationTO
     return new VehicleCreationTO(
         name,
         getModifiableProperties(),
-        length,
+        boundingBox,
         energyLevelCritical,
         energyLevelGood,
         energyLevelFullyRecharged,
@@ -154,7 +155,7 @@ public class VehicleCreationTO
     return new VehicleCreationTO(
         getName(),
         properties,
-        length,
+        boundingBox,
         energyLevelCritical,
         energyLevelGood,
         energyLevelFullyRecharged,
@@ -173,7 +174,7 @@ public class VehicleCreationTO
    * @param key the key.
    * @param value the value
    * @return A copy of this object that either
-   * includes the given entry in it's current properties, if value != null or
+   * includes the given entry in its current properties, if value != null or
    * excludes the entry otherwise.
    */
   @Override
@@ -186,7 +187,38 @@ public class VehicleCreationTO
     return new VehicleCreationTO(
         getName(),
         propertiesWith(key, value),
-        length,
+        boundingBox,
+        energyLevelCritical,
+        energyLevelGood,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        envelopeKey,
+        layout
+    );
+  }
+
+  /**
+   * Returns the vehicle's current bounding box (in mm).
+   *
+   * @return The vehicle's current bounding box (in mm).
+   */
+  public BoundingBoxCreationTO getBoundingBox() {
+    return boundingBox;
+  }
+
+  /**
+   * Creates a copy of this object, with the given bounding box (in mm).
+   *
+   * @param boundingBox The new bounding box.
+   * @return A copy of this object, differing in the given vehicle bounding box.
+   */
+  public VehicleCreationTO withBoundingBox(BoundingBoxCreationTO boundingBox) {
+    return new VehicleCreationTO(
+        getName(),
+        getModifiableProperties(),
+        boundingBox,
         energyLevelCritical,
         energyLevelGood,
         energyLevelFullyRecharged,
@@ -202,9 +234,12 @@ public class VehicleCreationTO
    * Returns the vehicle's length (in mm).
    *
    * @return The vehicle's length (in mm).
+   * @deprecated Use {@link #getBoundingBox()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public int getLength() {
-    return length;
+    return (int) boundingBox.getLength();
   }
 
   /**
@@ -212,22 +247,12 @@ public class VehicleCreationTO
    *
    * @param length The new length. Must be at least 1.
    * @return A copy of this object, differing in the given vehicle length.
+   * @deprecated Use {@link #withBoundingBox(BoundingBoxCreationTO)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public VehicleCreationTO withLength(int length) {
-    checkArgument(length >= 1, "length must be at least 1: " + length);
-    return new VehicleCreationTO(
-        getName(),
-        getModifiableProperties(),
-        length,
-        energyLevelCritical,
-        energyLevelGood,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
-        maxVelocity,
-        maxReverseVelocity,
-        envelopeKey,
-        layout
-    );
+    return withBoundingBox(boundingBox.withLength(length));
   }
 
   /**
@@ -253,7 +278,7 @@ public class VehicleCreationTO
     return new VehicleCreationTO(
         getName(),
         getModifiableProperties(),
-        length,
+        boundingBox,
         energyLevelCritical,
         energyLevelGood,
         energyLevelFullyRecharged,
@@ -290,7 +315,7 @@ public class VehicleCreationTO
     return new VehicleCreationTO(
         getName(),
         getModifiableProperties(),
-        length,
+        boundingBox,
         energyLevelCritical,
         energyLevelGood,
         energyLevelFullyRecharged,
@@ -324,7 +349,7 @@ public class VehicleCreationTO
     return new VehicleCreationTO(
         getName(),
         getModifiableProperties(),
-        length,
+        boundingBox,
         energyLevelCritical,
         energyLevelGood,
         energyLevelFullyRecharged,
@@ -360,7 +385,7 @@ public class VehicleCreationTO
     return new VehicleCreationTO(
         getName(),
         getModifiableProperties(),
-        length,
+        boundingBox,
         energyLevelCritical,
         energyLevelGood,
         energyLevelFullyRecharged,
@@ -387,7 +412,7 @@ public class VehicleCreationTO
     return new VehicleCreationTO(
         getName(),
         getModifiableProperties(),
-        length,
+        boundingBox,
         energyLevelCritical,
         energyLevelGood,
         energyLevelFullyRecharged,
@@ -414,7 +439,7 @@ public class VehicleCreationTO
     return new VehicleCreationTO(
         getName(),
         getModifiableProperties(),
-        length,
+        boundingBox,
         energyLevelCritical,
         energyLevelGood,
         energyLevelFullyRecharged,
@@ -450,7 +475,7 @@ public class VehicleCreationTO
     return new VehicleCreationTO(
         getName(),
         getModifiableProperties(),
-        length,
+        boundingBox,
         energyLevelCritical,
         energyLevelGood,
         energyLevelFullyRecharged,
@@ -463,9 +488,9 @@ public class VehicleCreationTO
   }
 
   /**
-   * Returns the information regarding the grahical representation of this vehicle.
+   * Returns the information regarding the graphical representation of this vehicle.
    *
-   * @return The information regarding the grahical representation of this vehicle.
+   * @return The information regarding the graphical representation of this vehicle.
    */
   public Layout getLayout() {
     return layout;
@@ -481,7 +506,7 @@ public class VehicleCreationTO
     return new VehicleCreationTO(
         getName(),
         getModifiableProperties(),
-        length,
+        boundingBox,
         energyLevelCritical,
         energyLevelGood,
         energyLevelFullyRecharged,
@@ -497,7 +522,7 @@ public class VehicleCreationTO
   public String toString() {
     return "VehicleCreationTO{"
         + "name=" + getName()
-        + ", length=" + length
+        + ", boundingBox=" + boundingBox
         + ", energyLevelCritical=" + energyLevelCritical
         + ", energyLevelGood=" + energyLevelGood
         + ", energyLevelFullyRecharged=" + energyLevelFullyRecharged
@@ -511,7 +536,7 @@ public class VehicleCreationTO
   }
 
   /**
-   * Contains information regarding the grahical representation of a vehicle.
+   * Contains information regarding the graphical representation of a vehicle.
    */
   public static class Layout
       implements

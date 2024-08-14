@@ -21,12 +21,14 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
+import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.base.components.properties.type.AbstractProperty;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.BooleanProperty;
+import org.opentcs.guing.base.components.properties.type.BoundingBoxProperty;
 import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.components.properties.type.LocationTypeProperty;
@@ -36,6 +38,7 @@ import org.opentcs.guing.base.components.properties.type.SpeedProperty;
 import org.opentcs.guing.base.components.properties.type.StringProperty;
 import org.opentcs.guing.base.components.properties.type.StringSetProperty;
 import org.opentcs.guing.base.components.properties.type.TripleProperty;
+import org.opentcs.guing.base.model.BoundingBoxModel;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.LayoutModel;
 import org.opentcs.guing.base.model.elements.LinkModel;
@@ -274,6 +277,12 @@ class ModelValidatorTest {
     addProperty(point, CoordinateProperty.class, PointModel.MODEL_Y_POSITION, "0");
     addProperty(point, StringProperty.class, ElementPropKeys.POINT_POS_X, "0");
     addProperty(point, StringProperty.class, ElementPropKeys.POINT_POS_Y, "0");
+    addProperty(
+        point,
+        BoundingBoxProperty.class,
+        PointModel.MAX_VEHICLE_BOUNDING_BOX,
+        new BoundingBoxModel(Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE, new Couple(0, 0))
+    );
     return point;
   }
 
@@ -358,7 +367,12 @@ class ModelValidatorTest {
    */
   private VehicleModel createVehicle(String name) {
     VehicleModel vehicle = createComponentWithName(VehicleModel.class, name);
-    addProperty(vehicle, LengthProperty.class, VehicleModel.LENGTH, 1.0);
+    addProperty(
+        vehicle,
+        BoundingBoxProperty.class,
+        VehicleModel.BOUNDING_BOX,
+        new BoundingBoxModel(1000, 1000, 1000, new Couple(0, 0))
+    );
     addProperty(vehicle, PercentProperty.class, VehicleModel.ENERGY_LEVEL_CRITICAL, 30);
     addProperty(vehicle, PercentProperty.class, VehicleModel.ENERGY_LEVEL_GOOD, 80);
     addProperty(vehicle, PercentProperty.class, VehicleModel.ENERGY_LEVEL, 60);

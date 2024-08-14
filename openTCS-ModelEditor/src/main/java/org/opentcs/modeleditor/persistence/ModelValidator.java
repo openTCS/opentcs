@@ -17,7 +17,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.opentcs.data.model.Couple;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
+import org.opentcs.guing.base.components.properties.type.BoundingBoxProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.components.properties.type.LocationTypeProperty;
@@ -26,6 +28,7 @@ import org.opentcs.guing.base.components.properties.type.Property;
 import org.opentcs.guing.base.components.properties.type.SpeedProperty;
 import org.opentcs.guing.base.components.properties.type.StringProperty;
 import org.opentcs.guing.base.components.properties.type.StringSetProperty;
+import org.opentcs.guing.base.model.BoundingBoxModel;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.LayoutModel;
@@ -241,6 +244,31 @@ public class ModelValidator {
     }
     point.setProperty(PointModel.VEHICLE_ORIENTATION_ANGLE, orientationProperty);
 
+    // Validate the maximum vehicle bounding box
+    BoundingBoxProperty boundingBoxProperty
+        = (BoundingBoxProperty) point.getProperty(PointModel.MAX_VEHICLE_BOUNDING_BOX);
+    if (boundingBoxProperty.getValue().getLength() < 1
+        || boundingBoxProperty.getValue().getWidth() < 1
+        || boundingBoxProperty.getValue().getHeight() < 1) {
+      LOG.warn(
+          "{}: Some bounding box property dimensions are smaller than 1 but have to be > 0. "
+              + "Setting them to 1.",
+          point.getName()
+      );
+      boundingBoxProperty.setValue(
+          new BoundingBoxModel(
+              Math.max(boundingBoxProperty.getValue().getLength(), 1),
+              Math.max(boundingBoxProperty.getValue().getWidth(), 1),
+              Math.max(boundingBoxProperty.getValue().getHeight(), 1),
+              new Couple(
+                  boundingBoxProperty.getValue().getReferenceOffset().getX(),
+                  boundingBoxProperty.getValue().getReferenceOffset().getY()
+              )
+          )
+      );
+      point.setProperty(PointModel.MAX_VEHICLE_BOUNDING_BOX, boundingBoxProperty);
+    }
+
     return valid;
   }
 
@@ -413,15 +441,28 @@ public class ModelValidator {
     boolean valid = true;
 
     //Validate that all properties needed exist
-    LengthProperty lengthProperty = (LengthProperty) vehicle.getProperty(VehicleModel.LENGTH);
-    if (((Double) lengthProperty.getValue()) < 1) {
+    BoundingBoxProperty boundingBoxProperty
+        = (BoundingBoxProperty) vehicle.getProperty(VehicleModel.BOUNDING_BOX);
+    if (boundingBoxProperty.getValue().getLength() < 1
+        || boundingBoxProperty.getValue().getWidth() < 1
+        || boundingBoxProperty.getValue().getHeight() < 1) {
       LOG.warn(
-          "{}: Length property is {} but has to be > 0. Setting it to 1.",
-          vehicle.getName(),
-          lengthProperty.getValue()
+          "{}: Some bounding box property dimensions are smaller than 1 but have to be > 0. "
+              + "Setting them to 1.",
+          vehicle.getName()
       );
-      lengthProperty.setValueAndUnit(1, LengthProperty.Unit.MM);
-      vehicle.setProperty(VehicleModel.LENGTH, lengthProperty);
+      boundingBoxProperty.setValue(
+          new BoundingBoxModel(
+              Math.max(boundingBoxProperty.getValue().getLength(), 1),
+              Math.max(boundingBoxProperty.getValue().getWidth(), 1),
+              Math.max(boundingBoxProperty.getValue().getHeight(), 1),
+              new Couple(
+                  boundingBoxProperty.getValue().getReferenceOffset().getX(),
+                  boundingBoxProperty.getValue().getReferenceOffset().getY()
+              )
+          )
+      );
+      vehicle.setProperty(VehicleModel.BOUNDING_BOX, boundingBoxProperty);
     }
 
     //Validate the critical energy level

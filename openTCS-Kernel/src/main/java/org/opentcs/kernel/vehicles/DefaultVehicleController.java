@@ -1222,7 +1222,12 @@ public class DefaultVehicleController
   }
 
   private void updateVehicleLength(int newLength) {
-    vehicleService.updateVehicleLength(vehicle.getReference(), newLength);
+    vehicleService.updateVehicleBoundingBox(
+        vehicle.getReference(),
+        vehicleService.fetchObject(Vehicle.class, vehicle.getReference())
+            .getBoundingBox()
+            .withLength(newLength)
+    );
   }
 
   /**

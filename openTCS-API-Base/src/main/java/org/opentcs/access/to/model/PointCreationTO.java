@@ -42,7 +42,11 @@ public class PointCreationTO
    */
   private final Map<String, Envelope> vehicleEnvelopes;
   /**
-   * The information regarding the grahical representation of this point.
+   * The maximum bounding box (in mm) that a vehicle at this point is allowed to have.
+   */
+  private final BoundingBoxCreationTO maxVehicleBoundingBox;
+  /**
+   * The information regarding the graphical representation of this point.
    */
   private final Layout layout;
 
@@ -59,6 +63,8 @@ public class PointCreationTO
     this.pose = new Pose(new Triple(0, 0, 0), Double.NaN);
     this.type = Point.Type.HALT_POSITION;
     this.vehicleEnvelopes = Map.of();
+    this.maxVehicleBoundingBox
+        = new BoundingBoxCreationTO(1000, 1000, 1000);
     this.layout = new Layout();
   }
 
@@ -74,12 +80,15 @@ public class PointCreationTO
       @Nonnull
       Map<String, Envelope> vehicleEnvelopes,
       @Nonnull
+      BoundingBoxCreationTO maxVehicleBoundingBox,
+      @Nonnull
       Layout layout
   ) {
     super(name, properties);
     this.pose = requireNonNull(pose, "pose");
     this.type = requireNonNull(type, "type");
     this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
+    this.maxVehicleBoundingBox = requireNonNull(maxVehicleBoundingBox, "maxVehicleBoundingBox");
     this.layout = requireNonNull(layout, "layout");
   }
 
@@ -100,6 +109,7 @@ public class PointCreationTO
         pose,
         type,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -130,6 +140,7 @@ public class PointCreationTO
         pose,
         type,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -160,6 +171,7 @@ public class PointCreationTO
         pose,
         type,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -181,6 +193,7 @@ public class PointCreationTO
         pose,
         type,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -192,7 +205,7 @@ public class PointCreationTO
    * @param key the key.
    * @param value the value
    * @return A copy of this object that either
-   * includes the given entry in it's current properties, if value != null or
+   * includes the given entry in its current properties, if value != null or
    * excludes the entry otherwise.
    */
   @Override
@@ -208,6 +221,7 @@ public class PointCreationTO
         pose,
         type,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -237,14 +251,42 @@ public class PointCreationTO
         pose,
         type,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
 
   /**
-   * Returns the information regarding the grahical representation of this point.
+   * Returns the maximum bounding box (in mm) that a vehicle at this point is allowed to have.
    *
-   * @return The information regarding the grahical representation of this point.
+   * @return The maximum bounding box (in mm) that a vehicle at this point is allowed to have.
+   */
+  public BoundingBoxCreationTO getMaxVehicleBoundingBox() {
+    return maxVehicleBoundingBox;
+  }
+
+  /**
+   * Creates a copy of this object, with the given maximum vehicle bounding box.
+   *
+   * @param maxVehicleBoundingBox The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public PointCreationTO withMaxVehicleBoundingBox(BoundingBoxCreationTO maxVehicleBoundingBox) {
+    return new PointCreationTO(
+        getName(),
+        getModifiableProperties(),
+        pose,
+        type,
+        vehicleEnvelopes,
+        maxVehicleBoundingBox,
+        layout
+    );
+  }
+
+  /**
+   * Returns the information regarding the graphical representation of this point.
+   *
+   * @return The information regarding the graphical representation of this point.
    */
   public Layout getLayout() {
     return layout;
@@ -263,6 +305,7 @@ public class PointCreationTO
         pose,
         type,
         vehicleEnvelopes,
+        maxVehicleBoundingBox,
         layout
     );
   }
@@ -275,12 +318,13 @@ public class PointCreationTO
         + ", type=" + type
         + ", vehicleEnvelopes=" + vehicleEnvelopes
         + ", layout=" + layout
+        + ", maxVehicleBoundingBox=" + maxVehicleBoundingBox
         + ", properties=" + getProperties()
         + '}';
   }
 
   /**
-   * Contains information regarding the grahical representation of a point.
+   * Contains information regarding the graphical representation of a point.
    */
   public static class Layout
       implements

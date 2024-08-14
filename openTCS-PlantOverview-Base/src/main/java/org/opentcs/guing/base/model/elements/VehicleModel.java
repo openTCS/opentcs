@@ -14,15 +14,16 @@ import jakarta.annotation.Nonnull;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.ResourceBundle;
+import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.BooleanProperty;
+import org.opentcs.guing.base.components.properties.type.BoundingBoxProperty;
 import org.opentcs.guing.base.components.properties.type.ColorProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
-import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.components.properties.type.OrderTypesProperty;
 import org.opentcs.guing.base.components.properties.type.PercentProperty;
 import org.opentcs.guing.base.components.properties.type.ResourceProperty;
@@ -31,6 +32,7 @@ import org.opentcs.guing.base.components.properties.type.SpeedProperty;
 import org.opentcs.guing.base.components.properties.type.StringProperty;
 import org.opentcs.guing.base.components.properties.type.TripleProperty;
 import org.opentcs.guing.base.model.AbstractModelComponent;
+import org.opentcs.guing.base.model.BoundingBoxModel;
 import org.opentcs.guing.base.model.DrawnModelComponent;
 
 /**
@@ -43,9 +45,9 @@ public class VehicleModel
       DrawnModelComponent {
 
   /**
-   * The name/key of the 'length' property.
+   * The name/key of the 'bounding box' property.
    */
-  public static final String LENGTH = "Length";
+  public static final String BOUNDING_BOX = "BoundingBox";
   /**
    * The name/key of the 'energy level critical' property.
    */
@@ -405,8 +407,8 @@ public class VehicleModel
     return bundle.getString("vehicleModel.description");
   }
 
-  public LengthProperty getPropertyLength() {
-    return (LengthProperty) getProperty(LENGTH);
+  public BoundingBoxProperty getPropertyBoundingBox() {
+    return (BoundingBoxProperty) getProperty(BOUNDING_BOX);
   }
 
   public ColorProperty getPropertyRouteColor() {
@@ -514,10 +516,13 @@ public class VehicleModel
     pName.setHelptext(bundle.getString("vehicleModel.property_name.helptext"));
     setProperty(NAME, pName);
 
-    LengthProperty pLength = new LengthProperty(this, 1000, LengthProperty.Unit.MM);
-    pLength.setDescription(bundle.getString("vehicleModel.property_length.description"));
-    pLength.setHelptext(bundle.getString("vehicleModel.property_length.helptext"));
-    setProperty(LENGTH, pLength);
+    BoundingBoxProperty pBoundingBox = new BoundingBoxProperty(
+        this,
+        new BoundingBoxModel(1000, 1000, 1000, new Couple(0, 0))
+    );
+    pBoundingBox.setDescription(bundle.getString("vehicleModel.property_boundingBox.description"));
+    pBoundingBox.setHelptext(bundle.getString("vehicleModel.property_boundingBox.helptext"));
+    setProperty(BOUNDING_BOX, pBoundingBox);
 
     ColorProperty pColor = new ColorProperty(this, Color.red);
     pColor.setDescription(bundle.getString("vehicleModel.property_routeColor.description"));

@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.util.persistence.v005;
+package org.opentcs.util.persistence.v6;
 
 import static org.opentcs.data.ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION;
 import static org.opentcs.data.ObjectPropConstants.LOC_DEFAULT_REPRESENTATION;
@@ -16,41 +16,55 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.data.model.visualization.LocationRepresentation;
-import org.opentcs.util.persistence.v004.V004ModelParser;
-import org.opentcs.util.persistence.v004.V004PlantModelTO;
+import org.opentcs.util.persistence.v005.V005ModelParser;
+import org.opentcs.util.persistence.v005.V005PlantModelTO;
 
 /**
- * The parser for V005 models.
+ * The parser for V6 models.
  */
-public class V005ModelParser {
+public class V6ModelParser {
 
   /**
    * Creates a new instance.
    */
-  public V005ModelParser() {
+  public V6ModelParser() {
   }
 
   /**
-   * Reads a model with the given reader and parses it to a {@link V005PlantModelTO} instance.
+   * Reads a model with the given reader and parses it to a {@link PlantModelCreationTO} instance.
    *
    * @param reader The reader to use.
    * @param modelVersion The model version.
-   * @return The parsed {@link V005PlantModelTO}.
+   * @return The parsed {@link PlantModelCreationTO}.
    * @throws IOException If there was an error reading the model.
    */
-  public V005PlantModelTO readRaw(Reader reader, String modelVersion)
+  public PlantModelCreationTO read(Reader reader, String modelVersion)
       throws IOException {
-    if (Objects.equals(modelVersion, V005PlantModelTO.VERSION_STRING)) {
-      return V005PlantModelTO.fromXml(reader);
+    return new V6TOMapper().map(readRaw(reader, modelVersion));
+  }
+
+  /**
+   * Reads a model with the given reader and parses it to a {@link V6PlantModelTO} instance.
+   *
+   * @param reader The reader to use.
+   * @param modelVersion The model version.
+   * @return The parsed {@link V6PlantModelTO}.
+   * @throws IOException If there was an error reading the model.
+   */
+  public V6PlantModelTO readRaw(Reader reader, String modelVersion)
+      throws IOException {
+    if (Objects.equals(modelVersion, V6PlantModelTO.VERSION_STRING)) {
+      return V6PlantModelTO.fromXml(reader);
     }
     else {
-      return convert(new V004ModelParser().readRaw(reader, modelVersion));
+      return convert(new V005ModelParser().readRaw(reader, modelVersion));
     }
   }
 
-  private V005PlantModelTO convert(V004PlantModelTO to) {
-    return new V005PlantModelTO()
+  private V6PlantModelTO convert(V005PlantModelTO to) {
+    return new V6PlantModelTO()
         .setName(to.getName())
         .setPoints(convertPoints(to))
         .setPaths(convertPaths(to))
@@ -63,14 +77,14 @@ public class V005ModelParser {
   }
 
   private List<PropertyTO> convertProperties(
-      List<org.opentcs.util.persistence.v004.PropertyTO> tos
+      List<org.opentcs.util.persistence.v005.PropertyTO> tos
   ) {
     return tos.stream()
         .map(property -> new PropertyTO().setName(property.getName()).setValue(property.getValue()))
         .toList();
   }
 
-  private List<PointTO> convertPoints(V004PlantModelTO to) {
+  private List<PointTO> convertPoints(V005PlantModelTO to) {
     return to.getPoints().stream()
         .map(point -> {
           PointTO result = new PointTO();
@@ -83,6 +97,14 @@ public class V005ModelParser {
               .setType(point.getType())
               .setVehicleEnvelopes(convertVehicleEnvelopes(point.getVehicleEnvelopes()))
               .setOutgoingPaths(convertOutgoingPaths(point))
+              .setMaxVehicleBoundingBox(
+                  new BoundingBoxTO()
+                      .setLength(1000)
+                      .setWidth(1000)
+                      .setHeight(1000)
+                      .setReferenceOffsetX(0)
+                      .setReferenceOffsetY(0)
+              )
               .setPointLayout(
                   new PointTO.PointLayout()
                       .setxPosition(point.getPointLayout().getxPosition())
@@ -96,7 +118,7 @@ public class V005ModelParser {
   }
 
   private List<VehicleEnvelopeTO> convertVehicleEnvelopes(
-      List<org.opentcs.util.persistence.v004.VehicleEnvelopeTO> tos
+      List<org.opentcs.util.persistence.v005.VehicleEnvelopeTO> tos
   ) {
     return tos.stream()
         .map(
@@ -116,24 +138,24 @@ public class V005ModelParser {
   }
 
   private Map<String, String> toPropertiesMap(
-      List<org.opentcs.util.persistence.v004.PropertyTO> properties
+      List<org.opentcs.util.persistence.v005.PropertyTO> properties
   ) {
     Map<String, String> result = new HashMap<>();
-    for (org.opentcs.util.persistence.v004.PropertyTO property : properties) {
+    for (org.opentcs.util.persistence.v005.PropertyTO property : properties) {
       result.put(property.getName(), property.getValue());
     }
     return result;
   }
 
   private List<PointTO.OutgoingPath> convertOutgoingPaths(
-      org.opentcs.util.persistence.v004.PointTO to
+      org.opentcs.util.persistence.v005.PointTO to
   ) {
     return to.getOutgoingPaths().stream()
         .map(path -> new PointTO.OutgoingPath().setName(path.getName()))
         .toList();
   }
 
-  private List<PathTO> convertPaths(V004PlantModelTO to) {
+  private List<PathTO> convertPaths(V005PlantModelTO to) {
     return to.getPaths().stream()
         .map(path -> {
           PathTO result = new PathTO();
@@ -166,7 +188,7 @@ public class V005ModelParser {
   }
 
   private List<PeripheralOperationTO> convertPeripheralOperations(
-      List<org.opentcs.util.persistence.v004.PeripheralOperationTO> tos
+      List<org.opentcs.util.persistence.v005.PeripheralOperationTO> tos
   ) {
     return tos.stream()
         .map(
@@ -183,20 +205,25 @@ public class V005ModelParser {
         .toList();
   }
 
-  private List<VehicleTO> convertVehicles(V004PlantModelTO to) {
+  private List<VehicleTO> convertVehicles(V005PlantModelTO to) {
     return to.getVehicles().stream()
         .map(vehicle -> {
           VehicleTO result = new VehicleTO();
           result.setName(vehicle.getName())
               .setProperties(convertProperties(vehicle.getProperties()));
-          result.setLength(vehicle.getLength())
-              .setEnergyLevelCritical(vehicle.getEnergyLevelCritical())
+          result.setEnergyLevelCritical(vehicle.getEnergyLevelCritical())
               .setEnergyLevelGood(vehicle.getEnergyLevelGood())
               .setEnergyLevelFullyRecharged(vehicle.getEnergyLevelFullyRecharged())
               .setEnergyLevelSufficientlyRecharged(vehicle.getEnergyLevelSufficientlyRecharged())
               .setMaxVelocity(vehicle.getMaxVelocity())
               .setMaxReverseVelocity(vehicle.getMaxReverseVelocity())
               .setEnvelopeKey(vehicle.getEnvelopeKey())
+              .setBoundingBox(
+                  new BoundingBoxTO()
+                      .setLength(vehicle.getLength())
+                      .setWidth(1000)
+                      .setHeight(1000)
+              )
               .setVehicleLayout(
                   new VehicleTO.VehicleLayout()
                       .setColor(vehicle.getVehicleLayout().getColor())
@@ -206,7 +233,7 @@ public class V005ModelParser {
         .toList();
   }
 
-  private List<LocationTypeTO> convertLocationTypes(V004PlantModelTO to) {
+  private List<LocationTypeTO> convertLocationTypes(V005PlantModelTO to) {
     return to.getLocationTypes().stream()
         .map(locationType -> {
           String locationRepresentation = toPropertiesMap(locationType.getProperties())
@@ -229,7 +256,7 @@ public class V005ModelParser {
   }
 
   private List<AllowedOperationTO> convertAllowedOperations(
-      List<org.opentcs.util.persistence.v004.AllowedOperationTO> tos
+      List<org.opentcs.util.persistence.v005.AllowedOperationTO> tos
   ) {
     return tos.stream()
         .map(allowedOperation -> {
@@ -242,7 +269,7 @@ public class V005ModelParser {
   }
 
   private List<AllowedPeripheralOperationTO> convertAllowedPeripheralOperations(
-      List<org.opentcs.util.persistence.v004.AllowedPeripheralOperationTO> tos
+      List<org.opentcs.util.persistence.v005.AllowedPeripheralOperationTO> tos
   ) {
     return tos.stream()
         .map(
@@ -256,7 +283,7 @@ public class V005ModelParser {
         .toList();
   }
 
-  private List<LocationTO> convertLocations(V004PlantModelTO to) {
+  private List<LocationTO> convertLocations(V005PlantModelTO to) {
     return to.getLocations().stream()
         .map(location -> {
           String locationRepresentation = toPropertiesMap(location.getProperties())
@@ -284,7 +311,7 @@ public class V005ModelParser {
         .toList();
   }
 
-  private List<LocationTO.Link> convertLinks(org.opentcs.util.persistence.v004.LocationTO to) {
+  private List<LocationTO.Link> convertLinks(org.opentcs.util.persistence.v005.LocationTO to) {
     return to.getLinks().stream()
         .map(link -> {
           return new LocationTO.Link()
@@ -294,7 +321,7 @@ public class V005ModelParser {
         .toList();
   }
 
-  private List<BlockTO> convertBlocks(V004PlantModelTO to) {
+  private List<BlockTO> convertBlocks(V005PlantModelTO to) {
     return to.getBlocks().stream()
         .map(block -> {
           BlockTO result = new BlockTO();
@@ -311,7 +338,7 @@ public class V005ModelParser {
         .toList();
   }
 
-  private List<MemberTO> convertMembers(List<org.opentcs.util.persistence.v004.MemberTO> tos) {
+  private List<MemberTO> convertMembers(List<org.opentcs.util.persistence.v005.MemberTO> tos) {
     return tos.stream()
         .map(member -> {
           MemberTO result = new MemberTO();
@@ -322,7 +349,7 @@ public class V005ModelParser {
         .toList();
   }
 
-  private VisualLayoutTO convertVisualLayout(V004PlantModelTO to) {
+  private VisualLayoutTO convertVisualLayout(V005PlantModelTO to) {
     VisualLayoutTO result = new VisualLayoutTO()
         .setScaleX(to.getVisualLayout().getScaleX())
         .setScaleY(to.getVisualLayout().getScaleY())

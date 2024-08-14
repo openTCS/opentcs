@@ -93,11 +93,11 @@ public interface VehicleService
    * kernel executor thread.
    * </p>
    *
-   * @see VehicleCommAdapter#execute(AdapterCommand)
    * @param ref A reference to the vehicle.
    * @param command The adapter command to send.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
+   * @see VehicleCommAdapter#execute(AdapterCommand)
    */
   void sendCommAdapterCommand(TCSObjectReference<Vehicle> ref, AdapterCommand command)
       throws ObjectUnknownException,
@@ -111,11 +111,11 @@ public interface VehicleService
    * to a vehicle, so it's entirely possible that the communication adapter receiving the message
    * does not understand it.
    *
-   * @see VehicleCommAdapter#processMessage(java.lang.Object)
    * @param ref The vehicle whose communication adapter shall receive the message.
    * @param message The message to be delivered.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws KernelRuntimeException If the calling client is not allowed to execute this method.
+   * @see VehicleCommAdapter#processMessage(java.lang.Object)
    */
   void sendCommAdapterMessage(TCSObjectReference<Vehicle> ref, Object message)
       throws ObjectUnknownException,
@@ -142,7 +142,7 @@ public interface VehicleService
   /**
    * Updates the vehicle's paused state.
    *
-   * @param ref A refrence to the vehicle.
+   * @param ref A reference to the vehicle.
    * @param paused The vehicle's new paused state.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.

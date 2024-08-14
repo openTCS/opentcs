@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentcs.access.to.model.BoundingBoxCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
@@ -37,7 +38,7 @@ public class VehicleConverter {
         .map(
             vehicle -> new VehicleCreationTO(vehicle.getName())
                 .withProperties(pConverter.toPropertyMap(vehicle.getProperties()))
-                .withLength(vehicle.getLength())
+                .withBoundingBox(new BoundingBoxCreationTO(vehicle.getLength(), 1000, 1000))
                 .withEnergyLevelCritical(vehicle.getEnergyLevelCritical())
                 .withEnergyLevelGood(vehicle.getEnergyLevelGood())
                 .withEnergyLevelFullyRecharged(
@@ -61,7 +62,7 @@ public class VehicleConverter {
     return vehicles.stream()
         .map(
             vehicle -> new VehicleTO(vehicle.getName())
-                .setLength(vehicle.getLength())
+                .setLength((int) vehicle.getBoundingBox().getLength())
                 .setEnergyLevelCritical(vehicle.getEnergyLevelCritical())
                 .setEnergyLevelGood(vehicle.getEnergyLevelGood())
                 .setEnergyLevelFullyRecharged(vehicle.getEnergyLevelFullyRecharged())

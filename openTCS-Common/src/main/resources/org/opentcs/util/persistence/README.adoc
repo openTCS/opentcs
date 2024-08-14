@@ -1,0 +1,21 @@
+= Information on openTCS plant model XML schemas
+
+== General information
+
+The openTCS plant model XML schemas adhere to link:https://semver.org/spec/v2.0.0.html[Semantic Versioning].
+
+This means:
+
+* If something is removed from the schema (e.g. a plant model element property that is no longer supported), the MAJOR version is incremented.
+* If something is added to the schema in a backward compatible manner (e.g. a new plant model element property), the MINOR version is incremented.
+* If something is fixed in the schema (e.g. a typo), the PATCH version is incremented.
+
+== Implementation remarks
+
+* For every MAJOR version, only _a single_ implementation is maintained here -- the one for the most recent MINOR/PATCH schema version.
+* If the MINOR or PATCH version changes, the version string in the corresponding implementation must be updated.
+* When reading a plant model file, an implementation must check whether the version that is read is compatible with the maximum version that the implementation supports.
+  If the version is not compatible (e.g. because it is a more recent MINOR/PATCH version than the one supported by the implementation), reading the respective plant model file must fail.
+* When writing a plant model file, an implementation must always apply the most recent MINOR/PATCH version for the MAJOR version it supports.
+* When a new MAJOR version is introduced, the previous MAJOR version's code for mapping to/from base API data structures can and should be removed, as it will no longer be used then.
+  (With the design applied at the time of this writing, this would be the `V6ModelParser` class's `read()` method and the class `V6TOMapper`.)

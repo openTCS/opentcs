@@ -19,9 +19,9 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import org.opentcs.access.to.model.PlantModelCreationTO;
-import org.opentcs.util.persistence.v005.V005ModelParser;
-import org.opentcs.util.persistence.v005.V005PlantModelTO;
-import org.opentcs.util.persistence.v005.V005TOMapper;
+import org.opentcs.util.persistence.v6.V6ModelParser;
+import org.opentcs.util.persistence.v6.V6PlantModelTO;
+import org.opentcs.util.persistence.v6.V6TOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +65,7 @@ public class ModelParser {
             CHARSET
         )
     )) {
-      return new V005ModelParser().read(reader, modelVersion);
+      return new V6ModelParser().read(reader, modelVersion);
     }
   }
 
@@ -84,8 +84,8 @@ public class ModelParser {
             CHARSET
         )
     )) {
-      V005TOMapper mapper = new V005TOMapper();
-      V005PlantModelTO mappedModel = mapper.map(model);
+      V6TOMapper mapper = new V6TOMapper();
+      V6PlantModelTO mappedModel = mapper.map(model);
       mappedModel.toXml(writer);
     }
   }

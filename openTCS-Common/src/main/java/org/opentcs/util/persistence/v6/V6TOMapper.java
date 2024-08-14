@@ -5,7 +5,7 @@
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
-package org.opentcs.util.persistence.v005;
+package org.opentcs.util.persistence.v6;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +18,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.BlockCreationTO;
+import org.opentcs.access.to.model.BoundingBoxCreationTO;
+import org.opentcs.access.to.model.CoupleCreationTO;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
@@ -40,15 +42,15 @@ import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.util.Colors;
 
 /**
- * Provides methods for mapping {@link PlantModelCreationTO} to {@link V005PlantModelTO} and
+ * Provides methods for mapping {@link PlantModelCreationTO} to {@link V6PlantModelTO} and
  * vice versa.
  */
-public class V005TOMapper {
+public class V6TOMapper {
 
   /**
    * Creates a new instance.
    */
-  public V005TOMapper() {
+  public V6TOMapper() {
   }
 
   /**
@@ -57,7 +59,7 @@ public class V005TOMapper {
    * @param model The model to map.
    * @return The mapped {@link PlantModelCreationTO} instance.
    */
-  public PlantModelCreationTO map(V005PlantModelTO model) {
+  public PlantModelCreationTO map(V6PlantModelTO model) {
     return new PlantModelCreationTO(model.getName())
         .withPoints(toPointCreationTO(model.getPoints()))
         .withVehicles(toVehicleCreationTO(model.getVehicles()))
@@ -70,16 +72,16 @@ public class V005TOMapper {
   }
 
   /**
-   * Maps the given model to a {@link V005PlantModelTO} instance.
+   * Maps the given model to a {@link V6PlantModelTO} instance.
    *
    * @param model The model to map.
-   * @return The mapped {@link V005PlantModelTO} instance.
+   * @return The mapped {@link V6PlantModelTO} instance.
    */
-  public V005PlantModelTO map(PlantModelCreationTO model) {
-    V005PlantModelTO result = new V005PlantModelTO();
+  public V6PlantModelTO map(PlantModelCreationTO model) {
+    V6PlantModelTO result = new V6PlantModelTO();
 
     result.setName(model.getName());
-    result.setVersion(V005PlantModelTO.VERSION_STRING);
+    result.setVersion(V6PlantModelTO.VERSION_STRING);
     result.getPoints().addAll(toPointTO(model.getPoints(), model.getPaths()));
     result.getVehicles().addAll(toVehicleTO(model.getVehicles()));
     result.getPaths().addAll(toPathTO(model.getPaths()));
@@ -107,6 +109,7 @@ public class V005TOMapper {
               )
               .withType(Point.Type.valueOf(point.getType()))
               .withVehicleEnvelopes(toEnvelopeMap(point.getVehicleEnvelopes()))
+              .withMaxVehicleBoundingBox(toBoundingBoxCreationTO(point.getMaxVehicleBoundingBox()))
               .withProperties(convertProperties(point.getProperties()))
               .withLayout(
                   new PointCreationTO.Layout(
@@ -133,7 +136,7 @@ public class V005TOMapper {
     for (VehicleTO vehicle : vehicles) {
       result.add(
           new VehicleCreationTO(vehicle.getName())
-              .withLength(vehicle.getLength().intValue())
+              .withBoundingBox(toBoundingBoxCreationTO(vehicle.getBoundingBox()))
               .withEnergyLevelCritical(vehicle.getEnergyLevelCritical().intValue())
               .withEnergyLevelGood(vehicle.getEnergyLevelGood().intValue())
               .withEnergyLevelFullyRecharged(vehicle.getEnergyLevelFullyRecharged().intValue())
@@ -392,6 +395,7 @@ public class V005TOMapper {
           .setType(point.getType().name())
           .setOutgoingPaths(getOutgoingPaths(point, paths))
           .setVehicleEnvelopes(toVehicleEnvelopeTOs(point.getVehicleEnvelopes()))
+          .setMaxVehicleBoundingBox(toBoundingBoxTO(point.getMaxVehicleBoundingBox()))
           .setPointLayout(
               new PointTO.PointLayout()
                   .setxPosition(point.getLayout().getPosition().getX())
@@ -416,7 +420,7 @@ public class V005TOMapper {
     for (VehicleCreationTO vehicle : vehicles) {
       VehicleTO vehicleTO = new VehicleTO();
       vehicleTO.setName(vehicle.getName());
-      vehicleTO.setLength((long) vehicle.getLength())
+      vehicleTO.setBoundingBox(toBoundingBoxTO(vehicle.getBoundingBox()))
           .setMaxVelocity(vehicle.getMaxVelocity())
           .setMaxReverseVelocity(vehicle.getMaxReverseVelocity())
           .setEnergyLevelGood((long) vehicle.getEnergyLevelGood())
@@ -734,5 +738,28 @@ public class V005TOMapper {
                 .setY(couple.getY())
         )
         .toList();
+  }
+
+  private BoundingBoxCreationTO toBoundingBoxCreationTO(BoundingBoxTO boundingBox) {
+    return new BoundingBoxCreationTO(
+        boundingBox.getLength(),
+        boundingBox.getWidth(),
+        boundingBox.getHeight()
+    )
+        .withReferenceOffset(
+            new CoupleCreationTO(
+                boundingBox.getReferenceOffsetX(),
+                boundingBox.getReferenceOffsetY()
+            )
+        );
+  }
+
+  private BoundingBoxTO toBoundingBoxTO(BoundingBoxCreationTO boundingBox) {
+    return new BoundingBoxTO()
+        .setLength(boundingBox.getLength())
+        .setWidth(boundingBox.getWidth())
+        .setHeight(boundingBox.getHeight())
+        .setReferenceOffsetX(boundingBox.getReferenceOffset().getX())
+        .setReferenceOffsetY(boundingBox.getReferenceOffset().getY());
   }
 }

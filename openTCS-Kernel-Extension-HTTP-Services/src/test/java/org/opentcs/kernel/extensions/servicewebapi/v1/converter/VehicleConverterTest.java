@@ -21,6 +21,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.VehicleCreationTO;
+import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
@@ -65,7 +66,7 @@ class VehicleConverterTest {
 
     assertThat(result, hasSize(1));
     assertThat(result.get(0).getName(), is("V1"));
-    assertThat(result.get(0).getLength(), is(1000));
+    assertThat(result.get(0).getBoundingBox().getLength(), is(1000L));
     assertThat(result.get(0).getEnergyLevelGood(), is(90));
     assertThat(result.get(0).getEnergyLevelCritical(), is(30));
     assertThat(result.get(0).getEnergyLevelFullyRecharged(), is(90));
@@ -80,7 +81,7 @@ class VehicleConverterTest {
   @Test
   void checkToVehicleTOs() {
     Vehicle vehicle = new Vehicle("V1")
-        .withLength(1000)
+        .withBoundingBox(new BoundingBox(1000, 1000, 1000))
         .withEnergyLevelGood(90)
         .withEnergyLevelCritical(30)
         .withEnergyLevelFullyRecharged(90)

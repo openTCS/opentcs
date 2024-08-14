@@ -19,10 +19,12 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.guing.base.AllocationState;
 import org.opentcs.guing.base.components.layer.NullLayerWrapper;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
+import org.opentcs.guing.base.components.properties.type.BoundingBoxProperty;
 import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.base.components.properties.type.EnvelopesProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
@@ -33,6 +35,7 @@ import org.opentcs.guing.base.components.properties.type.SelectionProperty;
 import org.opentcs.guing.base.components.properties.type.StringProperty;
 import org.opentcs.guing.base.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.base.model.AbstractModelComponent;
+import org.opentcs.guing.base.model.BoundingBoxModel;
 import org.opentcs.guing.base.model.FigureDecorationDetails;
 import org.opentcs.guing.base.model.PositionableModelComponent;
 
@@ -58,6 +61,10 @@ public class PointModel
    * Key for the vehicle envelopes at this point.
    */
   public static final String VEHICLE_ENVELOPES = "vehicleEnvelopes";
+  /**
+   * Key for the maximum bounding box that a vehicle at this point is allowed to have.
+   */
+  public static final String MAX_VEHICLE_BOUNDING_BOX = "maxVehicleBoundingBox";
   /**
    * The point's default position for both axes.
    */
@@ -110,6 +117,10 @@ public class PointModel
 
   public EnvelopesProperty getPropertyVehicleEnvelopes() {
     return (EnvelopesProperty) getProperty(VEHICLE_ENVELOPES);
+  }
+
+  public BoundingBoxProperty getPropertyMaxVehicleBoundingBox() {
+    return (BoundingBoxProperty) getProperty(MAX_VEHICLE_BOUNDING_BOX);
   }
 
   public KeyValueSetProperty getPropertyMiscellaneous() {
@@ -233,6 +244,18 @@ public class PointModel
     pEnvelope.setHelptext(bundle.getString("pointModel.property_vehicleEnvelopes.helptext"));
     pEnvelope.setModellingEditable(true);
     setProperty(VEHICLE_ENVELOPES, pEnvelope);
+
+    BoundingBoxProperty pMaxVehicleBoundingBox = new BoundingBoxProperty(
+        this,
+        new BoundingBoxModel(1000, 1000, 1000, new Couple(0, 0))
+    );
+    pMaxVehicleBoundingBox.setDescription(
+        bundle.getString("pointModel.property_maxVehicleBoundingBox.description")
+    );
+    pMaxVehicleBoundingBox.setHelptext(
+        bundle.getString("pointModel.property_maxVehicleBoundingBox.helptext")
+    );
+    setProperty(MAX_VEHICLE_BOUNDING_BOX, pMaxVehicleBoundingBox);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(

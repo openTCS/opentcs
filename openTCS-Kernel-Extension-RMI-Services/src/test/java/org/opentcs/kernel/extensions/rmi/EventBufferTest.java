@@ -18,6 +18,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.TCSObjectEvent;
+import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 
@@ -96,7 +97,7 @@ class EventBufferTest {
     Vehicle vehicle = new Vehicle("vehicle");
     Vehicle vehicleA = vehicle.withEnergyLevel(42);
     Vehicle vehicleB = vehicleA.withIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED);
-    Vehicle vehicleC = vehicleB.withLength(1382);
+    Vehicle vehicleC = vehicleB.withBoundingBox(new BoundingBox(1382, 1000, 1000));
 
     TCSObjectEvent event2 = new TCSObjectEvent(
         vehicleA,

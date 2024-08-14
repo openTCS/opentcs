@@ -24,6 +24,7 @@ import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.model.Block;
+import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.visualization.Layer;
@@ -35,6 +36,7 @@ import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.components.properties.type.PercentProperty;
 import org.opentcs.guing.base.components.properties.type.SpeedProperty;
+import org.opentcs.guing.base.model.BoundingBoxModel;
 import org.opentcs.guing.base.model.EnvelopeModel;
 import org.opentcs.guing.base.model.PeripheralOperationModel;
 import org.opentcs.guing.base.model.elements.BlockModel;
@@ -81,6 +83,18 @@ public class PlantModelElementConverter {
           new EnvelopeModel(entry.getKey(), entry.getValue().getVertices())
       );
     }
+
+    model.getPropertyMaxVehicleBoundingBox().setValue(
+        new BoundingBoxModel(
+            pointTO.getMaxVehicleBoundingBox().getLength(),
+            pointTO.getMaxVehicleBoundingBox().getWidth(),
+            pointTO.getMaxVehicleBoundingBox().getHeight(),
+            new Couple(
+                pointTO.getMaxVehicleBoundingBox().getReferenceOffset().getX(),
+                pointTO.getMaxVehicleBoundingBox().getReferenceOffset().getY()
+            )
+        )
+    );
 
     for (Map.Entry<String, String> property : pointTO.getProperties().entrySet()) {
       model.getPropertyMiscellaneous().addItem(
@@ -172,7 +186,17 @@ public class PlantModelElementConverter {
     VehicleModel model = new VehicleModel();
 
     model.setName(vehicleTO.getName());
-    model.getPropertyLength().setValueAndUnit(vehicleTO.getLength(), LengthProperty.Unit.MM);
+    model.getPropertyBoundingBox().setValue(
+        new BoundingBoxModel(
+            vehicleTO.getBoundingBox().getLength(),
+            vehicleTO.getBoundingBox().getWidth(),
+            vehicleTO.getBoundingBox().getHeight(),
+            new Couple(
+                vehicleTO.getBoundingBox().getReferenceOffset().getX(),
+                vehicleTO.getBoundingBox().getReferenceOffset().getY()
+            )
+        )
+    );
     model.getPropertyMaxVelocity().setValueAndUnit(
         ((double) vehicleTO.getMaxVelocity()),
         SpeedProperty.Unit.MM_S

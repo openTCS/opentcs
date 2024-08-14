@@ -19,6 +19,7 @@ import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
@@ -258,12 +259,18 @@ public class StandardVehicleService
   }
 
   @Override
+  @Deprecated
   public void updateVehicleLength(TCSObjectReference<Vehicle> ref, int length)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 
     synchronized (globalSyncObject) {
-      plantModelManager.setVehicleLength(ref, length);
+      plantModelManager.setVehicleBoundingBox(
+          ref,
+          plantModelManager.getObjectRepo().getObject(Vehicle.class, ref)
+              .getBoundingBox()
+              .withLength(length)
+      );
     }
   }
 
@@ -452,6 +459,18 @@ public class StandardVehicleService
       }
 
       plantModelManager.setVehicleEnvelopeKey(ref, envelopeKey);
+    }
+  }
+
+  @Override
+  public void updateVehicleBoundingBox(TCSObjectReference<Vehicle> ref, BoundingBox boundingBox)
+      throws ObjectUnknownException,
+        KernelRuntimeException {
+    requireNonNull(ref, "ref");
+    requireNonNull(boundingBox, "boundingBox");
+
+    synchronized (globalSyncObject) {
+      plantModelManager.setVehicleBoundingBox(ref, boundingBox);
     }
   }
 }

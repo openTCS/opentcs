@@ -11,6 +11,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentcs.access.to.model.BoundingBoxCreationTO;
+import org.opentcs.access.to.model.CoupleCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -24,6 +26,7 @@ import org.opentcs.guing.base.components.layer.LayerWrapper;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
+import org.opentcs.guing.base.model.BoundingBoxModel;
 import org.opentcs.guing.base.model.EnvelopeModel;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.LayoutModel;
@@ -76,6 +79,19 @@ public class PointAdapter
       );
     }
 
+    model.getPropertyMaxVehicleBoundingBox()
+        .setValue(
+            new BoundingBoxModel(
+                point.getMaxVehicleBoundingBox().getLength(),
+                point.getMaxVehicleBoundingBox().getWidth(),
+                point.getMaxVehicleBoundingBox().getHeight(),
+                new Couple(
+                    point.getMaxVehicleBoundingBox().getReferenceOffset().getX(),
+                    point.getMaxVehicleBoundingBox().getReferenceOffset().getY()
+                )
+            )
+        );
+
     updateMiscModelProperties(model, point);
     updateModelLayoutProperties(model, point, systemModel.getLayoutModel());
   }
@@ -97,6 +113,9 @@ public class PointAdapter
                 )
                 .withType(getKernelPointType((PointModel) modelComponent))
                 .withVehicleEnvelopes(getKernelVehicleEnvelopes((PointModel) modelComponent))
+                .withMaxVehicleBoundingBox(
+                    getKernelMaxVehicleBoundingBox((PointModel) modelComponent)
+                )
                 .withProperties(getKernelProperties(modelComponent))
                 .withLayout(getLayout((PointModel) modelComponent))
         );
@@ -154,6 +173,20 @@ public class PointAdapter
             Collectors.toMap(
                 EnvelopeModel::getKey,
                 envelopeModel -> new Envelope(envelopeModel.getVertices())
+            )
+        );
+  }
+
+  private BoundingBoxCreationTO getKernelMaxVehicleBoundingBox(PointModel model) {
+    return new BoundingBoxCreationTO(
+        model.getPropertyMaxVehicleBoundingBox().getValue().getLength(),
+        model.getPropertyMaxVehicleBoundingBox().getValue().getWidth(),
+        model.getPropertyMaxVehicleBoundingBox().getValue().getHeight()
+    )
+        .withReferenceOffset(
+            new CoupleCreationTO(
+                model.getPropertyMaxVehicleBoundingBox().getValue().getReferenceOffset().getX(),
+                model.getPropertyMaxVehicleBoundingBox().getValue().getReferenceOffset().getY()
             )
         );
   }

@@ -26,6 +26,7 @@ import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes a vehicle's current state.
@@ -42,9 +43,9 @@ public class Vehicle
    */
   public static final String PREFERRED_ADAPTER = "tcs:preferredAdapterClass";
   /**
-   * This vehicle's length (in mm).
+   * The vehicle's bounding box (in mm).
    */
-  private final int length;
+  private final BoundingBox boundingBox;
   /**
    * The value at/above which the vehicle's energy level is considered "good".
    */
@@ -142,7 +143,7 @@ public class Vehicle
    */
   private final String envelopeKey;
   /**
-   * The information regarding the grahical representation of this vehicle.
+   * The information regarding the graphical representation of this vehicle.
    */
   private final Layout layout;
 
@@ -153,7 +154,7 @@ public class Vehicle
    */
   public Vehicle(String name) {
     super(name);
-    this.length = 1000;
+    this.boundingBox = new BoundingBox(1000, 1000, 1000);
     this.energyLevelGood = 90;
     this.energyLevelCritical = 30;
     this.energyLevelFullyRecharged = 90;
@@ -184,7 +185,7 @@ public class Vehicle
       String name,
       Map<String, String> properties,
       ObjectHistory history,
-      int length,
+      BoundingBox boundingBox,
       int energyLevelGood,
       int energyLevelCritical,
       int energyLevelFullyRecharged,
@@ -211,7 +212,7 @@ public class Vehicle
       Layout layout
   ) {
     super(name, properties, history);
-    this.length = checkInRange(length, 1, Integer.MAX_VALUE, "length");
+    this.boundingBox = requireNonNull(boundingBox, "boundingBox");
     this.energyLevelGood = checkInRange(energyLevelGood, 0, 100, "energyLevelGood");
     this.energyLevelCritical = checkInRange(energyLevelCritical, 0, 100, "energyLevelCritical");
     this.energyLevelFullyRecharged = checkInRange(
@@ -269,7 +270,7 @@ public class Vehicle
         getName(),
         propertiesWith(key, value),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -303,7 +304,7 @@ public class Vehicle
         getName(),
         properties,
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -337,7 +338,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory().withEntryAppended(entry),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -371,7 +372,7 @@ public class Vehicle
         getName(),
         getProperties(),
         history,
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -419,7 +420,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -520,7 +521,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -570,7 +571,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -601,7 +602,7 @@ public class Vehicle
   /**
    * Returns this vehicle's energy level for being fully recharged (in percent of the maximum).
    *
-   * @return This vehicle's fully recharged treshold.
+   * @return This vehicle's fully recharged threshold.
    */
   public int getEnergyLevelFullyRecharged() {
     return energyLevelFullyRecharged;
@@ -618,7 +619,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -667,7 +668,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -717,7 +718,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -765,7 +766,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -813,7 +814,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -861,7 +862,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -920,7 +921,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -977,7 +978,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1025,7 +1026,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1076,7 +1077,65 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
+        energyLevelGood,
+        energyLevelCritical,
+        energyLevelFullyRecharged,
+        energyLevelSufficientlyRecharged,
+        maxVelocity,
+        maxReverseVelocity,
+        rechargeOperation,
+        procState,
+        transportOrder,
+        orderSequence,
+        allowedOrderTypes,
+        claimedResources,
+        allocatedResources,
+        state,
+        integrationLevel,
+        paused,
+        currentPosition,
+        nextPosition,
+        precisePosition,
+        orientationAngle,
+        energyLevel,
+        loadHandlingDevices,
+        envelopeKey,
+        layout
+    );
+  }
+
+  /**
+   * Returns the vehicle's current bounding box (in mm).
+   * <p>
+   * The bounding box is oriented so that its longitudinal axis runs parallel to the longitudinal
+   * axis of the vehicle. For the reference point offset, positive x values indicate an offset in
+   * the forward direction of the vehicle, positive y values an offset towards the lefthand side.
+   * </p>
+   *
+   * @return The vehicle's current bounding box (in mm).
+   */
+  public BoundingBox getBoundingBox() {
+    return boundingBox;
+  }
+
+  /**
+   * Creates a copy of this object, with the given bounding box (in mm).
+   * <p>
+   * The bounding box is oriented so that its longitudinal axis runs parallel to the longitudinal
+   * axis of the vehicle. For the reference point offset, positive x values indicate an offset in
+   * the forward direction of the vehicle, positive y values an offset towards the lefthand side.
+   * </p>
+   *
+   * @param boundingBox The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Vehicle withBoundingBox(BoundingBox boundingBox) {
+    return new Vehicle(
+        getName(),
+        getProperties(),
+        getHistory(),
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1108,9 +1167,12 @@ public class Vehicle
    * Returns this vehicle's current length.
    *
    * @return this vehicle's current length.
+   * @deprecated Use {@link #getBoundingBox()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public int getLength() {
-    return length;
+    return (int) boundingBox.getLength();
   }
 
   /**
@@ -1118,39 +1180,12 @@ public class Vehicle
    *
    * @param length The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withBoundingBox(BoundingBox)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public Vehicle withLength(int length) {
-    checkInRange(length, 1, Integer.MAX_VALUE, "length");
-    return new Vehicle(
-        getName(),
-        getProperties(),
-        getHistory(),
-        length,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
-        maxVelocity,
-        maxReverseVelocity,
-        rechargeOperation,
-        procState,
-        transportOrder,
-        orderSequence,
-        allowedOrderTypes,
-        claimedResources,
-        allocatedResources,
-        state,
-        integrationLevel,
-        paused,
-        currentPosition,
-        nextPosition,
-        precisePosition,
-        orientationAngle,
-        energyLevel,
-        loadHandlingDevices,
-        envelopeKey,
-        layout
-    );
+    return withBoundingBox(boundingBox.withLength(length));
   }
 
   /**
@@ -1176,7 +1211,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1227,7 +1262,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1275,7 +1310,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1323,7 +1358,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1371,7 +1406,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1421,7 +1456,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1471,7 +1506,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1521,7 +1556,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1571,7 +1606,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1623,7 +1658,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1652,9 +1687,9 @@ public class Vehicle
   }
 
   /**
-   * Returns the information regarding the grahical representation of this vehicle.
+   * Returns the information regarding the graphical representation of this vehicle.
    *
-   * @return The information regarding the grahical representation of this vehicle.
+   * @return The information regarding the graphical representation of this vehicle.
    */
   public Layout getLayout() {
     return layout;
@@ -1671,7 +1706,7 @@ public class Vehicle
         getName(),
         getProperties(),
         getHistory(),
-        length,
+        boundingBox,
         energyLevelGood,
         energyLevelCritical,
         energyLevelFullyRecharged,
@@ -1723,7 +1758,7 @@ public class Vehicle
         + ", orientationAngle=" + orientationAngle
         + ", nextPosition=" + nextPosition
         + ", loadHandlingDevices=" + loadHandlingDevices
-        + ", length=" + length
+        + ", boundingBox=" + boundingBox
         + ", transportOrder=" + transportOrder
         + ", claimedResources=" + claimedResources
         + ", allocatedResources=" + allocatedResources
@@ -1841,7 +1876,7 @@ public class Vehicle
   }
 
   /**
-   * Contains information regarding the grahical representation of a vehicle.
+   * Contains information regarding the graphical representation of a vehicle.
    */
   public static class Layout
       implements
