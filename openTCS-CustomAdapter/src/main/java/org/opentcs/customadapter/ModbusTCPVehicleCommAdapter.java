@@ -18,6 +18,7 @@ import com.google.inject.assistedinject.Assisted;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.timeout.TimeoutException;
+import io.netty.util.ReferenceCountUtil;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.beans.PropertyChangeEvent;
@@ -1020,7 +1021,6 @@ public class ModbusTCPVehicleCommAdapter
 
     return sendModbusRequest(request)
         .thenAccept(response -> {
-//          LOG.info("Successfully wrote register at address " + address + " with value " + value);
         })
         .exceptionally(ex -> {
           LOG.severe("Failed to write register at address " + address + ": " + ex.getMessage());
@@ -1209,49 +1209,60 @@ public class ModbusTCPVehicleCommAdapter
   ) {
     ByteBuf values = Unpooled.buffer();
     int registerCount = 0;
+    try {
+      for (ModbusCommand command : batch) {
+        if ("Position".equalsIgnoreCase(commandType)) {
+          int lowWord = (command.value() >> 16) & 0xFFFF;
+          int highWord = command.value() & 0xFFFF;
+          values.writeShort(highWord);
+          values.writeShort(lowWord);
 
-    for (ModbusCommand command : batch) {
-      if ("Position".equalsIgnoreCase(commandType)) {
-        int lowWord = (command.value() >> 16) & 0xFFFF;
-        int highWord = command.value() & 0xFFFF;
-        values.writeShort(highWord);
-        values.writeShort(lowWord);
+          registerCount += 2;
+        }
+        else {
+          values.writeShort(command.value());
+          registerCount += 1;
+        }
+        LOG.info("Writing " + commandType + " command: " + command.toLogString());
+      }
 
-        registerCount += 2;
-      }
-      else {
-        values.writeShort(command.value());
-        registerCount += 1;
-      }
-      LOG.info("Writing " + commandType + " command: " + command.toLogString());
+      WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(
+          startAddress,
+          registerCount,
+          values
+      );
+
+      int finalRegisterCount = registerCount;
+      return sendModbusRequest(request)
+          .thenAccept(response -> {
+            if (response instanceof WriteMultipleRegistersResponse) {
+              LOG.info(
+                  "Successfully wrote " + batch.size() + " " + commandType
+                      + " commands (total " + finalRegisterCount
+                      + " registers) starting at address "
+                      + startAddress
+              );
+            }
+            else {
+              throw new CompletionException(
+                  "Unexpected response type: " + response.getClass().getSimpleName(), null
+              );
+            }
+          })
+          .exceptionally(ex -> {
+            LOG.severe("Failed to write " + commandType + " registers: " + ex.getMessage());
+            throw new CompletionException(ex);
+          })
+          .whenComplete((v, ex) -> {
+            values.release();
+          });
+    }
+    catch (Exception e) {
+      values.release();
+      throw e;
     }
 
-    WriteMultipleRegistersRequest request = new WriteMultipleRegistersRequest(
-        startAddress,
-        registerCount,
-        values
-    );
 
-    int finalRegisterCount = registerCount;
-    return sendModbusRequest(request)
-        .thenAccept(response -> {
-          if (response instanceof WriteMultipleRegistersResponse) {
-            LOG.info(
-                "Successfully wrote " + batch.size() + " " + commandType
-                    + " commands (total " + finalRegisterCount + " registers) starting at address "
-                    + startAddress
-            );
-          }
-          else {
-            throw new CompletionException(
-                "Unexpected response type: " + response.getClass().getSimpleName(), null
-            );
-          }
-        })
-        .exceptionally(ex -> {
-          LOG.severe("Failed to write " + commandType + " registers: " + ex.getMessage());
-          throw new CompletionException(ex);
-        });
   }
 
   @Override
@@ -1318,10 +1329,13 @@ public class ModbusTCPVehicleCommAdapter
     return isConnected && master != null;
   }
 
-  private CompletableFuture<ModbusResponse> sendModbusRequest(
-      ModbusRequest request
-  ) {
+  private CompletableFuture<ModbusResponse> sendModbusRequest(ModbusRequest request) {
     return sendModbusRequestWithRetry(request, 3)
+        .whenComplete((response, ex) -> {
+          if (response != null) {
+            ReferenceCountUtil.release(response);
+          }
+        })
         .exceptionally(ex -> {
           LOG.severe("All retries failed for Modbus request: " + ex.getMessage());
           throw new CompletionException("Failed to send Modbus request after retries", ex);
@@ -1396,7 +1410,7 @@ public class ModbusTCPVehicleCommAdapter
       ReadHoldingRegistersResponse readResponse
   ) {
     ByteBuf registers = readResponse.getRegisters();
-    registers.retain();
+//    registers.retain();
     return new ReadHoldingRegistersResponse(registers) {
       @Override
       public boolean release() {
@@ -1428,7 +1442,7 @@ public class ModbusTCPVehicleCommAdapter
       ReadInputRegistersResponse readInputResponse
   ) {
     ByteBuf registers = readInputResponse.getRegisters();
-    registers.retain();
+//    registers.retain();
     return new ReadInputRegistersResponse(registers) {
       @Override
       public boolean release() {
