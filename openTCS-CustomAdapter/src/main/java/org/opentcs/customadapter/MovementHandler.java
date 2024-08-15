@@ -128,7 +128,7 @@ public class MovementHandler {
 
         if (currentCommandIndex >= pendingCommands.size()) {
           LOG.info("All commands completed");
-          stopMonitoring();
+//          stopMonitoring();
           adapter.getPositionUpdater().stopPositionUpdates()
               .thenRun(() -> LOG.info("Position updates stopped successfully"))
               .exceptionally(ex -> {
