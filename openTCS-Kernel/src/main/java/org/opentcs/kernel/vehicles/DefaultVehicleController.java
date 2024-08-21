@@ -184,6 +184,10 @@ public class DefaultVehicleController
    * The drive order that the vehicle currently has to process.
    */
   private volatile DriveOrder currentDriveOrder;
+  /**
+   * A flag indicating if the vehicle controller is allowed to send commands to the vehicle driver.
+   */
+  private boolean sendingCommandsAllowed;
 
   /**
    * Creates a new instance associated with the given vehicle.
@@ -288,6 +292,8 @@ public class DefaultVehicleController
 
     peripheralInteractor.initialize();
 
+    sendingCommandsAllowed = true;
+
     initialized = true;
   }
 
@@ -309,6 +315,8 @@ public class DefaultVehicleController
     updateVehicleState(Vehicle.State.UNKNOWN);
 
     eventBus.unsubscribe(this);
+
+    sendingCommandsAllowed = false;
 
     initialized = false;
   }
@@ -366,6 +374,7 @@ public class DefaultVehicleController
         || newOrder.getCurrentDriveOrderIndex() != transportOrder.getCurrentDriveOrderIndex()) {
       // We received either a new transport order or the same transport order for its next drive
       // order.
+      sendingCommandsAllowed = true;
       transportOrder = newOrder;
       setDriveOrder(transportOrder.getCurrentDriveOrder(), transportOrder.getProperties());
     }
@@ -383,6 +392,9 @@ public class DefaultVehicleController
         if (currVehicle.getCurrentPosition() == null) {
           throw new IllegalArgumentException("The vehicle's current position is unknown.");
         }
+
+        sendingCommandsAllowed = true;
+
         Point currPosition = vehicleService.fetchObject(
             Point.class,
             currVehicle.getCurrentPosition()
@@ -609,7 +621,7 @@ public class DefaultVehicleController
 
   private void discardProcessedFutureCommands() {
     MovementCommand lastCommandProcessed = lastCommandProcessed();
-    if (lastCommandProcessed == null) {
+    if (!isCommandFromDriveOrder(lastCommandProcessed, transportOrder.getCurrentDriveOrder())) {
       // There are no commands to be discarded.
       return;
     }
@@ -620,11 +632,20 @@ public class DefaultVehicleController
         lastCommandProcessed,
         futureCommands
     );
-    // Discard commands up to lastCommandSent...
-    while (!lastCommandProcessed.equalsInMovement(futureCommands.peek())) {
+    // Discard commands up to lastCommandProcessed...
+    while (!futureCommands.isEmpty()
+        && !lastCommandProcessed.equalsInMovement(futureCommands.peek())) {
       futureCommands.poll();
     }
-    // ...and also discard lastCommandSent itself.
+
+    checkState(
+        !futureCommands.isEmpty(),
+        "%s: Expected but did not find last command processed: %s",
+        vehicle.getName(),
+        lastCommandProcessed
+    );
+
+    // ...and also discard lastCommandProcessed itself.
     futureCommands.poll();
   }
 
@@ -833,7 +854,7 @@ public class DefaultVehicleController
       peripheralInteractor.prepareInteractions(transportOrder.getReference(), command);
       peripheralInteractor.startPreMovementInteractions(
           command,
-          () -> sendCommand(command),
+          () -> sendOrDiscardCommand(command),
           this::onPreMovementInteractionFailed
       );
     }
@@ -853,6 +874,20 @@ public class DefaultVehicleController
   @Override
   public String toString() {
     return "DefaultVehicleController{" + "vehicleName=" + vehicle.getName() + '}';
+  }
+
+  private void sendOrDiscardCommand(MovementCommand command) {
+    if (sendingCommandsAllowed) {
+      sendCommand(command);
+    }
+    else {
+      LOG.debug(
+          "{}: Sending commands not allowed. Discarding movement command: {}",
+          vehicle.getName(),
+          command
+      );
+      interactionsPendingCommand = null;
+    }
   }
 
   private void sendCommand(MovementCommand command)
@@ -1089,20 +1124,8 @@ public class DefaultVehicleController
         );
         updatePositionWithoutOrder(point);
       }
-      else if (commandsSent.isEmpty()) {
-        // We have a drive order, but can't remember sending a command to the
-        // vehicle. Just set the position without touching the resources, as
-        // that might cause even more damage when we actually send commands
-        // to the vehicle.
-        LOG.debug(
-            "{}: Reported new position {} and we didn't send any commands of drive order.",
-            vehicle.getName(),
-            point
-        );
-        updatePosition(toReference(point), null);
-      }
       else {
-        updatePositionWithOrder(position, point);
+        updatePositionWithOrder(point);
       }
     }
   }
@@ -1269,6 +1292,13 @@ public class DefaultVehicleController
       );
       return false;
     }
+    if (!sendingCommandsAllowed) {
+      LOG.debug(
+          "{}: Cannot send, unresolved report of an unexpected position.",
+          vehicle.getName()
+      );
+      return false;
+    }
     return true;
   }
 
@@ -1392,27 +1422,65 @@ public class DefaultVehicleController
     updatePosition(toReference(point), null);
   }
 
-  private void updatePositionWithOrder(String position, Point point) {
-    // If a drive order is being processed, check if the reported position
-    // is the one we expect.
-    MovementCommand moveCommand = commandsSent.getFirst();
-
-    if (position == null) {
-      LOG.info("{}: Resetting position for vehicle", vehicle.getName());
-    }
-    else {
-      Point dstPoint = moveCommand.getStep().getDestinationPoint();
-      if (!dstPoint.getName().equals(position)) {
+  private void updatePositionWithOrder(Point point) {
+    if (commandsSent.isEmpty()) {
+      if (pendingCommand != null) {
+        // While waiting for resource allocation, the vehicle unexpectedly moved to a different
+        // position. Prevent any further movement commands from being sent to it.
         LOG.warn(
-            "{}: Reported position: {}, expected: {}",
+            "{}: Reported new position {} but we are waiting for resource allocation for: {}",
             vehicle.getName(),
-            position,
-            dstPoint.getName()
+            point,
+            pendingCommand
         );
       }
-    }
+      else if (interactionsPendingCommand != null) {
+        // While waiting for peripheral interactions, the vehicle unexpectedly moved to a different
+        // position. Prevent any further movement commands from being sent to it.
+        LOG.warn(
+            "{}: Reported new position {} but we are waiting for peripheral interactions for: {}",
+            vehicle.getName(),
+            point,
+            interactionsPendingCommand
+        );
+      }
+      else {
+        LOG.warn(
+            "{}: Reported new position {} but we didn't send any commands of the drive order.",
+            vehicle.getName(),
+            point
+        );
+      }
 
-    updatePosition(toReference(point), extractNextPosition(findNextCommand()));
+      onUnexpectedPositionReported(point);
+
+      // We have a drive order, but can't remember sending a command to the vehicle. Just set the
+      // position without touching the resources, as that might cause even more damage when we
+      // actually send commands to the vehicle.
+      updatePosition(toReference(point), null);
+    }
+    else {
+      // If a drive order is being processed, check if the reported position is the one we expect.
+      MovementCommand moveCommand = commandsSent.getFirst();
+
+      if (point == null) {
+        LOG.info("{}: Resetting position for vehicle", vehicle.getName());
+      }
+      else {
+        Point dstPoint = moveCommand.getStep().getDestinationPoint();
+        if (!dstPoint.getName().equals(point.getName())) {
+          LOG.warn(
+              "{}: Reported position: {}, expected: {}",
+              vehicle.getName(),
+              point.getName(),
+              dstPoint.getName()
+          );
+          onUnexpectedPositionReported(point);
+        }
+      }
+
+      updatePosition(toReference(point), extractNextPosition(findNextCommand()));
+    }
   }
 
   private void updatePosition(
@@ -1539,8 +1607,7 @@ public class DefaultVehicleController
 
     // Commands that we have already processed should not be included in the remaining claim.
     MovementCommand lastCommandProcessed = lastCommandProcessed();
-    if (lastCommandProcessed != null
-        && Objects.equals(order.getCurrentDriveOrder(), lastCommandProcessed.getDriveOrder())) {
+    if (isCommandFromDriveOrder(lastCommandProcessed, order.getCurrentDriveOrder())) {
       futureMovementCommands = futureMovementCommands.stream()
           .dropWhile(command -> !command.equalsInMovement(lastCommandProcessed))
           .skip(1)
@@ -1553,14 +1620,6 @@ public class DefaultVehicleController
   }
 
   private boolean isForcedRerouting(DriveOrder newOrder) {
-    if (lastCommandExecutedRouteIndex == TransportOrder.ROUTE_STEP_INDEX_DEFAULT) {
-      LOG.debug(
-          "{}: No route progress, yet. Not considering rerouting as forced.",
-          vehicle.getName()
-      );
-      return false;
-    }
-
     // If it's a forced rerouting, the step after the one the vehicle executed last should be marked
     // accordingly.
     Step nextPendingStep = newOrder.getRoute().getSteps().get(lastCommandExecutedRouteIndex + 1);
@@ -1627,5 +1686,34 @@ public class DefaultVehicleController
     return resources.stream()
         .filter(resource -> resource instanceof Path)
         .collect(Collectors.toSet());
+  }
+
+  private boolean isCommandFromDriveOrder(
+      @Nullable
+      MovementCommand command,
+      @Nullable
+      DriveOrder driveOrder
+  ) {
+    return command != null && Objects.equals(driveOrder, command.getDriveOrder());
+  }
+
+  private void onUnexpectedPositionReported(
+      @Nullable
+      Point point
+  ) {
+    sendingCommandsAllowed = false;
+
+    notificationService.publishUserNotification(
+        new UserNotification(
+            vehicle.getName(),
+            String.format(
+                "Vehicle reported an unexpected position ('%s') while processing a transport order."
+                    + " Its vehicle driver won't receive further movement commands until the"
+                    + " vehicle is forcefully rerouted.",
+                point == null ? "null" : point.getName()
+            ),
+            UserNotification.Level.IMPORTANT
+        )
+    );
   }
 }

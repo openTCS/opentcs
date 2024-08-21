@@ -30,6 +30,7 @@ import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy;
@@ -116,6 +117,16 @@ public class RerouteUtil {
         vehicle.getTransportOrder()
     );
 
+    if (reroutingType == ReroutingType.FORCED
+        && isRelatedToUnfinishedPeripheralJobs(originalOrder)) {
+      LOG.warn(
+          "Cannot reroute {} when there are unfinished peripheral jobs "
+              + "related to the current transport order.",
+          vehicle.getName()
+      );
+      return;
+    }
+
     Optional<List<DriveOrder>> optOrders;
     if (reroutingStrategies.containsKey(reroutingType)) {
       optOrders = reroutingStrategies.get(reroutingType).reroute(vehicle);
@@ -127,6 +138,14 @@ public class RerouteUtil {
           reroutingType.name()
       );
       optOrders = Optional.empty();
+    }
+
+    if (reroutingType == ReroutingType.FORCED && vehicle.getState() != Vehicle.State.IDLE) {
+      LOG.warn(
+          "Forcefully rerouting {} although its state is not 'IDLE' but '{}'.",
+          vehicle.getName(),
+          vehicle.getState().name()
+      );
     }
 
     // Get the drive order with the new route or stick to the old one
@@ -282,6 +301,15 @@ public class RerouteUtil {
         .flatMap(steps -> steps.stream())
         .filter(step -> step.getPath() != null)
         .anyMatch(step -> step.getPath().isLocked());
+  }
+
+  private boolean isRelatedToUnfinishedPeripheralJobs(TransportOrder transportOrder) {
+    return !transportOrderService.fetchObjects(
+        PeripheralJob.class,
+        job -> Objects.equals(job.getRelatedTransportOrder(), transportOrder.getReference())
+            && job.getPeripheralOperation().isCompletionRequired()
+            && !job.getState().isFinalState()
+    ).isEmpty();
   }
 
   private class ExecutionTest

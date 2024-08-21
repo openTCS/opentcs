@@ -28,6 +28,12 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Bugs fixed:
 ** Correctly calculate the costs for new routes when rerouting transport orders for which resources to be avoided are defined.
 ** Use the correct XML schema for v0.0.5 plant model files.
+** Fix handling of forced rerouting:
+*** Prevent the kernel executor thread from getting stuck in a loop when forcefully rerouting a vehicle that has reported an unexpected position while waiting for a peripheral job to be finished.
+*** Fix an issue where a vehicle would not get rerouted correctly when forcefully rerouting it after it has reported an unexpected position.
+*** Prevent a vehicle driver from receiving any further ``MovementCommand``s when the vehicle reported an unexpected position while processing a transport order.
+    A vehicle driver will continue to receive ``MovementCommand``s after the vehicle has been forcefully rerouted.
+*** Prevent vehicles from being forcefully rerouted when there are unfinished peripheral jobs (that have the completion required flag set to `true`).
 * Changes affecting developers:
 ** Deprecate `Point.isHaltingPosition()`.
    With openTCS 6.0, the point type `REPORT_POSITION` was removed, which makes this method redundant, as all remaining point types allow halting.
