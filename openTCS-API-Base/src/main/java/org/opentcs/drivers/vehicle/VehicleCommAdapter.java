@@ -15,6 +15,7 @@ import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.ExplainedBoolean;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods that a driver communicating with and
@@ -63,29 +64,32 @@ public interface VehicleCommAdapter
   VehicleProcessModelTO createTransferableProcessModel();
 
   /**
-   * Returns this adapter's queue of unsent commands.
+   * Returns this adapter's unmodifiable queue of unsent commands.
    * <p>
    * Unsent {@link MovementCommand}s are commands that the comm adapter received from the
    * {@link VehicleController} it's associated with. When a command is sent to the vehicle, the
-   * command is removed from this queue and added to the {@link #getSentCommands() queue of sent
+   * command is removed from this unmodifiable queue and added to the {@link #getSentCommands()
+   * unmodifiable queue of sent
    * commands}.
    * </p>
    *
-   * @return This adapter's queue of unsent commands.
+   * @return This adapter's unmodifiable queue of unsent commands.
    * @see #getCommandsCapacity()
    */
+  @ScheduledApiChange(when = "7.0", details = "Will return a deque")
   Queue<MovementCommand> getUnsentCommands();
 
   /**
-   * Returns this adapter's queue of sent commands.
+   * Returns this adapter's unmodifiable queue of sent commands.
    * <p>
    * Sent {@link MovementCommand}s are commands that the comm adapter has sent to the vehicle
    * already but which have not yet been processed by it.
    * </p>
    *
-   * @return This adapter's queue of sent commands.
+   * @return This adapter's unmodifiable queue of sent commands.
    * @see #getCommandsCapacity()
    */
+  @ScheduledApiChange(when = "7.0", details = "Will return a deque")
   Queue<MovementCommand> getSentCommands();
 
   /**
