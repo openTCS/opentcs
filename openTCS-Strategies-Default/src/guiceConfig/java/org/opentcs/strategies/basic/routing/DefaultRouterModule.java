@@ -11,6 +11,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import jakarta.inject.Singleton;
 import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
+import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorBoundingBox;
 import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorComposite;
 import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorDistance;
 import org.opentcs.strategies.basic.routing.edgeevaluator.EdgeEvaluatorExplicitProperties;
@@ -106,6 +107,9 @@ public class DefaultRouterModule
     edgeEvaluatorBinder()
         .addBinding(EdgeEvaluatorTravelTime.CONFIGURATION_KEY)
         .to(EdgeEvaluatorTravelTime.class);
+    edgeEvaluatorBinder()
+        .addBinding(EdgeEvaluatorBoundingBox.CONFIGURATION_KEY)
+        .to(EdgeEvaluatorBoundingBox.class);
 
     bind(EdgeEvaluatorComposite.class)
         .in(Singleton.class);

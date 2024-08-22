@@ -9,7 +9,7 @@ openTCS consists of the following components running as separate processes and w
 ** Model editor for modelling the plant model
 ** Operations desk for visualizing the plant model during plant operation
 ** Kernel control center for controlling and monitoring the kernel, e.g. providing a detailed view of vehicles/their associated drivers
-** Arbitrary clients for comunicating with other systems, e.g. for process control or warehouse management
+** Arbitrary clients for communicating with other systems, e.g. for process control or warehouse management
 
 .openTCS system overview
 image::system_overview.png[]
@@ -64,13 +64,14 @@ A point carries the following attributes:
 ** _Reporting position_ (deprecated, scheduled for removal in openTCS 6.0):
    Indicates a position at which a vehicle is expected to report in _only_.
    Vehicles will not be ordered to a reporting position, and halting or even parking at such a position is not allowed.
-   Therefore a route that only consists of reporting points will be unroutable because the vehicle is not able to halt at any position.
+   Therefore, a route that only consists of reporting points will be unroutable because the vehicle is not able to halt at any position.
 ** _Park position_:
    Indicates a position at which a vehicle may halt for longer periods of time when it is not processing orders.
    The vehicle is also expected to report in when it arrives at such a position.
 * A _position_, i.e. the point's coordinates in the plant's coordinate system.
 * A _vehicle orientation angle_, which expresses the vehicle's assumed/expected orientation while it occupies the point.
 * A set of _vehicle envelopes_ describing the areas occupied by vehicles located at the point.
+* A _maximum vehicle bounding box_ describing the maximum bounding box that a vehicle located at the point may have (see <<Bounding box>> for more information).
 
 NOTE: In openTCS, an angle of 0 degrees is at the 3 o'clock position, and a positive value indicates a counter-clockwise rotation.
 
@@ -88,17 +89,80 @@ To synchronize the layout coordinates with the model coordinates or the other wa
 * Select btn:[menu:Actions[Copy model values to layout]] or btn:[menu:Actions[Copy layout values to model]] to synchronize them globally.
 * Select a single layout element, right click it and select btn:[menu:Context menu[Copy model values to layout]] or btn:[menu:Context menu[Copy layout values to model]] to synchronize them only for the selected element.
 
+===== Bounding box
+
+.A bounding box in openTCS
+image::bounding-box.drawio.png[]
+
+A bounding box is characterised by a reference point that is -- by default -- located in the center of the bounding box's base (i.e. at height 0), named _base center_ for the remainder of this section.
+The length and width of the bounding box are symmetrical in relation to the base center and the height is measured from the base of the bounding box.
+
+Optionally, a reference point offset describes the position of the reference point in relation to the base center.
+The coordinates of the reference point refer to a coordinate system whose origin is located at the base center and whose axes run along the longitudinal and transverse axes of the bounding box -- i.e. the x-axis runs along the length and the y-axis along the width of the bounding box.
+
+For a vehicle, the bounding box is oriented so that its longitudinal axis runs parallel to the longitudinal axis of the vehicle.
+For the reference point offset, positive x values indicate an offset in the forward direction of the vehicle, positive y values an offset towards the left-hand side.
+As an example, a vehicle's physical reference point -- i.e. the point which its reported coordinates refer to -- and the reference point of its bounding box are probably always aligned.
+
+For a point, the bounding box is oriented according to the orientation angle of the point so that the longitudinal axis of the bounding box runs parallel to the longitudinal axis of a vehicle located at the point.
+For the reference point offset, positive x values indicate an offset in the forward direction of the vehicle, positive y values an offset towards the left-hand side.
+
+The following figure shows examples of bounding boxes for a vehicle (on the left) and a point (on the right).
+(Although a bounding box is three-dimensional in openTCS, the example bounding boxes shown here are only two-dimensional for an easy-to-understand visualisation.)
+
+.Bounding boxes for vehicles and points
+image::bounding-box-for-vehicle-and-point.drawio.png[]
+
+In both cases, the blue dots represent the base centers of the respective bounding boxes and the green dots represent their reference points.
+The dashed line represents the perimeter of the respective bounding box.
+On the right, the orange dot represents the actual plant model point.
+In the example above, the bounding boxes have the following properties:
+
+[cols="1,1,1,1,1,1", options="header"]
+|===
+|Element
+|Length [mm]
+|Width [mm]
+|Height [mm]
+|Reference offset x [mm]
+|Reference offset y [mm]
+
+|Vehicle
+|1100
+|700
+|_omitted_
+|-300
+|0
+
+|Point
+|1700
+|1100
+|_omitted_
+|-500
+|-100
+|===
+
+As an additional example, the following figure shows the bounding boxes in relation to each other and what it would look like if the vehicle was located at the point.
+(Note that the reference points of both bounding boxes are aligned.)
+
+.Relation of vehicle and point bounding boxes
+image::bounding-box-vehicle-on-point.drawio.png[]
+
+In this example, the point's bounding box encloses the vehicle's bounding box completely.
+However, there may be situations where this is not the case and where the vehicle's bounding box would protrude beyond one or more sides of the point's bounding box.
+To prevent a vehicle from being sent to a point in such situations, the router provides a dedicated cost function -- see <<Default router>>.
+
 ==== Path
 
 Paths are connections between points that are navigable for vehicles.
 A path's main attributes, next to its source and destination point, are:
 
-* Its _length_, which may be a relevant information for a vehicle in plant operation mode.
+* Its _length_, which may be relevant information for a vehicle in plant operation mode.
   Depending on the router configuration, it may also be used for computing routing costs/finding an optimal route to a destination point.
-* A _maximum velocity_ and _maximum reverse velocity_, which may be a relevant information for a vehicle in plant operation mode.
+* A _maximum velocity_ and _maximum reverse velocity_, which may be relevant information for a vehicle in plant operation mode.
   Depending on the router configuration, it may also be used for computing routing costs/finding an optimal route to a destination point.
 * A _locked_ flag, which, when set, tells the router that the path may not be used when computing routes for vehicles.
-* A sequence of _peripheral operations_ describing operations that are to be perfomed by peripheral devices (in their given order) when a vehicle traverses the path.
+* A sequence of _peripheral operations_ describing operations that are to be performed by peripheral devices (in their given order) when a vehicle traverses the path.
 * A set of _vehicle envelopes_ describing the areas occupied by vehicles traversing the path.
 
 ===== Peripheral operation
@@ -156,7 +220,7 @@ A vehicle provides the following attributes:
   A vehicle's integration level can only be adjusted with the operations desk client, not with the model editor client.
   A vehicle can be
   ** ..._ignored_:
-     The vehicle and its reported position will be ignored completely, thus the vehicle will not be displayed in the operatiosn desk.
+     The vehicle and its reported position will be ignored completely, thus the vehicle will not be displayed in the operations desk.
      The vehicle is not available for transport orders.
   ** ..._noticed_:
      The vehicle will be displayed at its reported position in the operations desk, but no resources will be allocated in the system for that position.
@@ -175,6 +239,7 @@ A vehicle provides the following attributes:
   Also see <<Transport order>>.
 * A _route color_, which is the color used for visualizing the route the vehicle is taking to its destination.
 * An _envelope key_, indicating which envelopes (defined at points and paths) should be considered for the vehicle.
+* A _bounding box_ describing the physical dimensions of the vehicle (see <<Bounding box>> for more information).
 
 ==== Block
 

@@ -42,7 +42,10 @@ public interface ShortestPathConfiguration {
           "'TRAVELTIME': A route's cost equals the vehicle's expected travel time.",
           "'EXPLICIT_PROPERTIES': A route's cost equals the sum of the explicitly given costs "
               + "extracted from path properties.",
-          "'HOPS': A route's cost equals the number of paths it consists of."
+          "'HOPS': A route's cost equals the number of paths it consists of.",
+          "'BOUNDING_BOX': A route's cost equals 0 if the vehicle's bounding box does not protrude "
+              + "beyond _any_ bounding boxes of points along the route. Otherwise, a route's cost "
+              + "is considered infinitely high, resulting in the route to be effectively discarded."
       },
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START
   )

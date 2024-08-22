@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 import static org.opentcs.util.Assertions.checkInRange;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * A bounding box that can be used, for example, to describe an object's physical dimensions.
@@ -128,6 +129,26 @@ public class BoundingBox
    */
   public BoundingBox withReferenceOffset(Couple referenceOffset) {
     return new BoundingBox(length, width, height, referenceOffset);
+  }
+
+  @Override
+  public final boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (!(o instanceof BoundingBox other)) {
+      return false;
+    }
+
+    return length == other.length
+        && width == other.width
+        && height == other.height
+        && Objects.equals(referenceOffset, other.referenceOffset);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(length, width, height, referenceOffset);
   }
 
   @Override

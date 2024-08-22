@@ -29,7 +29,7 @@ To make this decision, the default dispatcher takes the following steps:
 ** The assignment mechanics are as following:
 *** If there are less unoccupied vehicles than processable transport orders, the list of vehicles is sorted by configurable criteria.
     The default dispatcher then iterates over the sorted list and, for every vehicle, finds all orders processable by it, computes the required routes, sorts the candidates by configurable criteria and assigns the first one.
-*** If there are less processable transport orders than unocuppied vehicles, the list of transport orders is sorted by configurable criteria.
+*** If there are less processable transport orders than unoccupied vehicles, the list of transport orders is sorted by configurable criteria.
     The default dispatcher then iterates over the sorted list and, for every transport order, finds all vehicles that could process it, computes the required routes, sorts the candidates by configurable criteria and assigns the first one.
 *** For configuration options regarding the sorting criteria, see <<Default dispatcher configuration entries>>.
 . Vehicles that are still unoccupied are sent to a recharging location, if possible.
@@ -126,6 +126,11 @@ The following cost functions/configuration options are available:
   An exception to this is the string `Infinity`, which the property value can be set to, indicating that the path may not be used by vehicles of the respective routing group at all.
 * `HOPS`:
   The routing costs for every path in the model is 1, which results in the route with the least paths/points being chosen.
+* `BOUNDING_BOX`:
+  Routing costs for a vehicle on a path are determined by comparing the vehicle's bounding box with the maximum allowed bounding box at the path's destination point -- see <<Bounding box>>.
+  If the vehicle's bounding box protrudes beyond a destination point's bounding box, the routing costs for the corresponding path are considered infinitely high, indicating that the path may not be used by the vehicle at all.
+  Otherwise, the routing costs for the corresponding path are 0.
+  This can be used to prevent vehicles from being routed to/through points where there is insufficient space available.
 
 Developers can integrate additional custom cost functions using the openTCS API.
 
@@ -194,21 +199,21 @@ To make this decision, the default peripheral job dispatcher takes the following
 ** Criteria for a peripheral device to be taken into account are:
 *** It must not be assigned to a peripheral job.
 *** It must have its reservation token set.
-** Criteria for a periphreal job to be taken into account are:
+** Criteria for a peripheral job to be taken into account are:
 *** It must match the reservation token of a peripheral device.
 *** It must be processable by a peripheral device.
 ** If there are multiple peripheral jobs that meet these criteria, the oldest one according to the creation time is assigned first.
 . Peripheral devices that could not be assigned to a peripheral job with a matching reservation token have their reservation released.
 ** The release of reserved peripheral devices is performed via a replaceable strategy.
    The default strategy releases peripheral devices according to the following rules:
-*** A peripheral devices's state must be `IDLE`.
-*** A peripheral devices's processing state must be `IDLE`.
-*** A peripheral devices's reservation token must be set.
+*** A peripheral device's state must be `IDLE`.
+*** A peripheral device's processing state must be `IDLE`.
+*** A peripheral device's reservation token must be set.
 . Peripheral devices that are currently unoccupied and do not have their reservation token set are assigned to processable peripheral jobs, if possible.
 ** Criteria for a peripheral device to be taken into account are:
 *** It must not be assigned to a peripheral job.
 *** It must not have its reservation token set.
-** Cirteria for a peripheral job to be taken into account are:
+** Criteria for a peripheral job to be taken into account are:
 *** It must be generally available to be processed by a peripheral device.
 *** It must be processable by a peripheral device.
 ** The selection of a peripheral job for a peripheral device is performed via a replaceable strategy.

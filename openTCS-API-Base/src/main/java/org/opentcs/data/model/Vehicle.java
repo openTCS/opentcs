@@ -1110,7 +1110,7 @@ public class Vehicle
    * <p>
    * The bounding box is oriented so that its longitudinal axis runs parallel to the longitudinal
    * axis of the vehicle. For the reference point offset, positive x values indicate an offset in
-   * the forward direction of the vehicle, positive y values an offset towards the lefthand side.
+   * the forward direction of the vehicle, positive y values an offset towards the left-hand side.
    * </p>
    *
    * @return The vehicle's current bounding box (in mm).
@@ -1124,7 +1124,7 @@ public class Vehicle
    * <p>
    * The bounding box is oriented so that its longitudinal axis runs parallel to the longitudinal
    * axis of the vehicle. For the reference point offset, positive x values indicate an offset in
-   * the forward direction of the vehicle, positive y values an offset towards the lefthand side.
+   * the forward direction of the vehicle, positive y values an offset towards the left-hand side.
    * </p>
    *
    * @param boundingBox The value to be set in the copy.

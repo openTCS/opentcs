@@ -23,6 +23,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Add support for specifying a bounding box for a vehicle via the Model Editor application.
    A vehicle's bounding box, which, among other things, is defined by a length, width and height, replaces the vehicle's "length" property, which could previously be specified for vehicles.
 ** Add support for specifying a maximum vehicle bounding box for a point via the Model Editor application.
+** Add an edge evaluator that prevents vehicles from being routed to/through points where there is not enough space available (according to the vehicle's bounding box and the maximum allowed bounding box at a point).
+  For more information, please refer to the user's guide.
 ** Update web API specification and implementation to version 1.8.0:
 *** The endpoint `POST /plantModel/topologyUpdateRequest` now also accepts an optional list of path names allowing the routing topology to be updated selectively.
 * Bugs fixed:
