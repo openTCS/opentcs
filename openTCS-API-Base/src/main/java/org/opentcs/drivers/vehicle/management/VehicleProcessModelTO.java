@@ -16,11 +16,13 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A serializable representation of a {@link VehicleProcessModel}.
@@ -43,7 +45,7 @@ public class VehicleProcessModelTO
   private int energyLevel;
   private List<LoadHandlingDevice> loadHandlingDevices = new ArrayList<>();
   private Vehicle.State state = Vehicle.State.UNKNOWN;
-  private int length;
+  private BoundingBox boundingBox = new BoundingBox(1000, 1000, 1000);
 
   /**
    * Creates a new instance.
@@ -164,12 +166,28 @@ public class VehicleProcessModelTO
     return this;
   }
 
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public int getLength() {
-    return length;
+    return (int) boundingBox.getLength();
   }
 
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public VehicleProcessModelTO setLength(int length) {
-    this.length = length;
+    setBoundingBox(getBoundingBox().withLength(length));
+    return this;
+  }
+
+  public BoundingBox getBoundingBox() {
+    return boundingBox;
+  }
+
+  public VehicleProcessModelTO setBoundingBox(
+      @Nonnull
+      BoundingBox boundingBox
+  ) {
+    this.boundingBox = requireNonNull(boundingBox, "boundingBox");
     return this;
   }
 }

@@ -21,9 +21,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * An observable model of a vehicle's and its comm adapter's attributes.
@@ -94,9 +96,9 @@ public class VehicleProcessModel {
    */
   private Vehicle.State state = Vehicle.State.UNKNOWN;
   /**
-   * The vehicle's current length.
+   * The vehicle's current bounding box.
    */
-  private int length;
+  private BoundingBox boundingBox;
 
   /**
    * Creates a new instance.
@@ -109,7 +111,7 @@ public class VehicleProcessModel {
   ) {
     this.vehicle = requireNonNull(attachedVehicle, "attachedVehicle");
     this.vehicleReference = vehicle.getReference();
-    this.length = (int) vehicle.getBoundingBox().getLength();
+    this.boundingBox = vehicle.getBoundingBox();
   }
 
   /**
@@ -471,24 +473,59 @@ public class VehicleProcessModel {
    * Returns the vehicle's current length.
    *
    * @return The vehicle's current length.
+   * @deprecated Use {@link #getBoundingBox()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public int getLength() {
-    return length;
+    return (int) boundingBox.getLength();
   }
 
   /**
    * Sets the vehicle's current length.
    *
    * @param length The new length.
+   * @deprecated Use {@link #setBoundingBox(BoundingBox)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public void setLength(int length) {
-    int oldValue = this.length;
-    this.length = length;
+    setBoundingBox(getBoundingBox().withLength(length));
+  }
+
+  /**
+   * Returns the vehicle's current bounding box.
+   *
+   * @return The vehicle's current bounding box.
+   */
+  @Nonnull
+  public BoundingBox getBoundingBox() {
+    return boundingBox;
+  }
+
+  /**
+   * Sets the vehicle's current bounding box.
+   *
+   * @param boundingBox The new bounding box.
+   */
+  public void setBoundingBox(
+      @Nonnull
+      BoundingBox boundingBox
+  ) {
+    requireNonNull(boundingBox, "boundingBox");
+
+    BoundingBox oldValue = this.boundingBox;
+    this.boundingBox = boundingBox;
 
     getPropertyChangeSupport().firePropertyChange(
-        Attribute.LENGTH.name(),
+        Attribute.BOUNDING_BOX.name(),
         oldValue,
-        length
+        boundingBox
+    );
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.LENGTH.name(),
+        oldValue.getLength(),
+        boundingBox.getLength()
     );
   }
 
@@ -752,7 +789,13 @@ public class VehicleProcessModel {
     /**
      * Indicates a change of the vehicle's length.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
     LENGTH,
+    /**
+     * Indicates a change of the vehicle's bounding box.
+     */
+    BOUNDING_BOX,
     /**
      * Indicates a new user notification was published.
      */

@@ -39,6 +39,7 @@ import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
@@ -285,7 +286,7 @@ public class DefaultVehicleController
         commAdapter.getProcessModel().getLoadHandlingDevices()
     );
     updateVehicleState(commAdapter.getProcessModel().getState());
-    updateVehicleLength(commAdapter.getProcessModel().getLength());
+    updateVehicleBoundingBox(commAdapter.getProcessModel().getBoundingBox());
 
     claimedResources.clear();
     allocatedResources.clear();
@@ -985,8 +986,11 @@ public class DefaultVehicleController
     else if (Objects.equals(evt.getPropertyName(), VehicleProcessModel.Attribute.STATE.name())) {
       updateVehicleState((Vehicle.State) evt.getNewValue());
     }
-    else if (Objects.equals(evt.getPropertyName(), VehicleProcessModel.Attribute.LENGTH.name())) {
-      updateVehicleLength((int) evt.getNewValue());
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.BOUNDING_BOX.name()
+    )) {
+      updateVehicleBoundingBox((BoundingBox) evt.getNewValue());
     }
     else if (Objects.equals(
         evt.getPropertyName(),
@@ -1170,7 +1174,7 @@ public class DefaultVehicleController
               = ResourceMath.freeableResourceSetCount(
                   SplitResources.from(allocatedResources, Set.of(currentVehiclePosition))
                       .getResourcesPassed(),
-                  commAdapter.getProcessModel().getLength()
+                  commAdapter.getProcessModel().getBoundingBox().getLength()
               );
           for (int i = 0; i < freeableResourceSetCount; i++) {
             Set<TCSResource<?>> oldResources = allocatedResources.poll();
@@ -1244,13 +1248,9 @@ public class DefaultVehicleController
     vehicleService.updateVehicleState(vehicle.getReference(), newState);
   }
 
-  private void updateVehicleLength(int newLength) {
-    vehicleService.updateVehicleBoundingBox(
-        vehicle.getReference(),
-        vehicleService.fetchObject(Vehicle.class, vehicle.getReference())
-            .getBoundingBox()
-            .withLength(newLength)
-    );
+  private void updateVehicleBoundingBox(BoundingBox newBoundingBox) {
+    requireNonNull(newBoundingBox, "newBoundingBox");
+    vehicleService.updateVehicleBoundingBox(vehicle.getReference(), newBoundingBox);
   }
 
   /**

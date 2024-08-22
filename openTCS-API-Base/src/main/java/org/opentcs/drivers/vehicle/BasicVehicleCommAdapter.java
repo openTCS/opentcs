@@ -206,7 +206,7 @@ public abstract class BasicVehicleCommAdapter
         .setPrecisePosition(getProcessModel().getPrecisePosition())
         .setPosition(getProcessModel().getPosition())
         .setState(getProcessModel().getState())
-        .setLength(getProcessModel().getLength());
+        .setBoundingBox(getProcessModel().getBoundingBox());
   }
 
   @Override

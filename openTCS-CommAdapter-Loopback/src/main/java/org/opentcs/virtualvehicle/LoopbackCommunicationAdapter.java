@@ -162,11 +162,15 @@ public class LoopbackCommunicationAdapter
       if (!getProcessModel().getLoadHandlingDevices().isEmpty()
           && getProcessModel().getLoadHandlingDevices().get(0).isFull()) {
         loadState = LoadState.FULL;
-        getProcessModel().setLength(configuration.vehicleLengthLoaded());
+        getProcessModel().setBoundingBox(
+            getProcessModel().getBoundingBox().withLength(configuration.vehicleLengthLoaded())
+        );
       }
       else {
         loadState = LoadState.EMPTY;
-        getProcessModel().setLength(configuration.vehicleLengthUnloaded());
+        getProcessModel().setBoundingBox(
+            getProcessModel().getBoundingBox().withLength(configuration.vehicleLengthUnloaded())
+        );
       }
     }
     if (Objects.equals(

@@ -42,7 +42,7 @@ public class ResourceMath {
   public static int freeableResourceSetCount(
       @Nonnull
       List<Set<TCSResource<?>>> resourcesPassed,
-      int vehicleLength
+      long vehicleLength
   ) {
     requireNonNull(resourcesPassed, "resourcesPassed");
     checkArgument(vehicleLength > 0, "vehicleLength <= 0");
@@ -52,7 +52,7 @@ public class ResourceMath {
     List<Set<TCSResource<?>>> reversedPassedResources = new ArrayList<>(resourcesPassed);
     Collections.reverse(reversedPassedResources);
 
-    int remainingRequiredLength = vehicleLength;
+    long remainingRequiredLength = vehicleLength;
     int result = 0;
     for (Set<TCSResource<?>> curSet : reversedPassedResources) {
       if (remainingRequiredLength > 0) {
@@ -66,11 +66,10 @@ public class ResourceMath {
     return result;
   }
 
-  private static int requiredLength(Set<TCSResource<?>> resources) {
+  private static long requiredLength(Set<TCSResource<?>> resources) {
     return resources.stream()
         .filter(resource -> resource instanceof Path)
         .mapToLong(resource -> ((Path) resource).getLength())
-        .mapToInt(length -> (int) length)
         .sum();
   }
 
