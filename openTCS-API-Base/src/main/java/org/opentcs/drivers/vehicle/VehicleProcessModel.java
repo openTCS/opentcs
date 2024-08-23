@@ -561,9 +561,6 @@ public class VehicleProcessModel {
 
   /**
    * Notifies observers that the given command has been added to the comm adapter's command queue.
-   * <p>
-   * Do not call this from the communication adapter!
-   * </p>
    *
    * @param enqueuedCommand The command that has been added to the queue.
    */
@@ -580,9 +577,6 @@ public class VehicleProcessModel {
 
   /**
    * Notifies observers that the given command has been sent to the associated vehicle.
-   * <p>
-   * Do not call this from the communication adapter!
-   * </p>
    *
    * @param sentCommand The command that has been sent to the vehicle.
    */
@@ -599,10 +593,6 @@ public class VehicleProcessModel {
 
   /**
    * Notifies observers that the given command has been executed by the comm adapter/vehicle.
-   * <p>
-   * Do not call this from the communication adapter anymore! Instead call
-   * {@link BasicVehicleCommAdapter#commandExecuted(MovementCommand)}.
-   * </p>
    *
    * @param executedCommand The command that has been executed.
    */
@@ -619,10 +609,6 @@ public class VehicleProcessModel {
 
   /**
    * Notifies observers that the given command could not be executed by the comm adapter/vehicle.
-   * <p>
-   * Do not call this from the communication adapter anymore! Instead call
-   * {@link BasicVehicleCommAdapter#commandFailed(MovementCommand)}.
-   * </p>
    *
    * @param failedCommand The command that could not be executed.
    */

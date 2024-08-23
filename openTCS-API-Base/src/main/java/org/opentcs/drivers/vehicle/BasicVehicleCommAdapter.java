@@ -9,15 +9,14 @@ package org.opentcs.drivers.vehicle;
 
 import static java.util.Objects.requireNonNull;
 import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_ENQUEUED;
-import static org.opentcs.util.Assertions.checkArgument;
+import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_EXECUTED;
 import static org.opentcs.util.Assertions.checkInRange;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Deque;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
@@ -76,12 +75,12 @@ public abstract class BasicVehicleCommAdapter
   /**
    * This adapter's command queue.
    */
-  private final Deque<MovementCommand> commandQueue = new LinkedBlockingDeque<>();
+  private final Queue<MovementCommand> commandQueue = new LinkedBlockingQueue<>();
   /**
    * Contains the orders which have been sent to the vehicle but which haven't
    * been executed by it, yet.
    */
-  private final Deque<MovementCommand> sentQueue = new LinkedBlockingDeque<>();
+  private final Queue<MovementCommand> sentQueue = new LinkedBlockingQueue<>();
 
   /**
    * Creates a new instance.
@@ -211,12 +210,12 @@ public abstract class BasicVehicleCommAdapter
 
   @Override
   public synchronized Queue<MovementCommand> getUnsentCommands() {
-    return new UnmodifiableDeque<>(commandQueue);
+    return commandQueue;
   }
 
   @Override
   public synchronized Queue<MovementCommand> getSentCommands() {
-    return new UnmodifiableDeque<>(sentQueue);
+    return sentQueue;
   }
 
   @Override
@@ -270,7 +269,8 @@ public abstract class BasicVehicleCommAdapter
    */
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
-    if (Objects.equals(evt.getPropertyName(), COMMAND_ENQUEUED.name())) {
+    if (Objects.equals(evt.getPropertyName(), COMMAND_ENQUEUED.name())
+        || Objects.equals(evt.getPropertyName(), COMMAND_EXECUTED.name())) {
       executor.execute(commandDispatcherTask);
     }
   }
@@ -363,56 +363,6 @@ public abstract class BasicVehicleCommAdapter
    */
   protected VehicleProcessModelTO createCustomTransferableProcessModel() {
     return new VehicleProcessModelTO();
-  }
-
-  /**
-   * Handles the report of the given movement command's execution.
-   * <p>
-   * The movement command will be removed from this communication adapter's queue of
-   * {@link #getSentCommands() sent commands}.
-   * </p>
-   *
-   * @param command The command reported to be executed.
-   * @throws IllegalArgumentException If the given command is not the command expected to be
-   * executed next.
-   */
-  protected synchronized void commandExecuted(MovementCommand command) {
-    requireNonNull(command, "command");
-
-    checkArgument(
-        isExpectedToBeExecutedNext(command),
-        "Not next expected command: %s",
-        command
-    );
-
-    LOG.debug("{}: Removing command: {}", getName(), command);
-    sentQueue.remove();
-    getProcessModel().commandExecuted(command);
-    executor.execute(commandDispatcherTask);
-  }
-
-  /**
-   * Handles the report of the given movement command's failure.
-   *
-   * @param command The command reported to have failed.
-   * @throws IllegalArgumentException If the given command is not the command expected to be
-   * executed next.
-   */
-  protected synchronized void commandFailed(MovementCommand command) {
-    requireNonNull(command, "command");
-
-    checkArgument(
-        isExpectedToBeExecutedNext(command),
-        "Not next expected command: %s",
-        command
-    );
-
-    LOG.debug("{}: Marking command as failed: {}", getName(), command);
-    getProcessModel().commandFailed(command);
-  }
-
-  private boolean isExpectedToBeExecutedNext(MovementCommand command) {
-    return sentQueue.peek().equals(command);
   }
 
   /**
