@@ -89,6 +89,7 @@ public class V005ModelParser {
                       .setyPosition(point.getPointLayout().getyPosition())
                       .setxLabelOffset(point.getPointLayout().getxLabelOffset())
                       .setyLabelOffset(point.getPointLayout().getyLabelOffset())
+                      .setLayerId(point.getPointLayout().getLayerId())
               );
           return result;
         })
@@ -159,6 +160,7 @@ public class V005ModelParser {
                               )
                               .toList()
                       )
+                      .setLayerId(path.getPathLayout().getLayerId())
               );
           return result;
         })
@@ -278,6 +280,7 @@ public class V005ModelParser {
                       .setxLabelOffset(location.getLocationLayout().getxLabelOffset())
                       .setyLabelOffset(location.getLocationLayout().getyLabelOffset())
                       .setLocationRepresentation(locationRepresentation)
+                      .setLayerId(location.getLocationLayout().getLayerId())
               );
           return result;
         })

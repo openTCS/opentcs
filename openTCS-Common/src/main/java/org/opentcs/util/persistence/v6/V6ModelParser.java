@@ -111,6 +111,7 @@ public class V6ModelParser {
                       .setyPosition(point.getPointLayout().getyPosition())
                       .setxLabelOffset(point.getPointLayout().getxLabelOffset())
                       .setyLabelOffset(point.getPointLayout().getyLabelOffset())
+                      .setLayerId(point.getPointLayout().getLayerId())
               );
           return result;
         })
@@ -181,6 +182,7 @@ public class V6ModelParser {
                               )
                               .toList()
                       )
+                      .setLayerId(path.getPathLayout().getLayerId())
               );
           return result;
         })
@@ -305,6 +307,7 @@ public class V6ModelParser {
                       .setxLabelOffset(location.getLocationLayout().getxLabelOffset())
                       .setyLabelOffset(location.getLocationLayout().getyLabelOffset())
                       .setLocationRepresentation(locationRepresentation)
+                      .setLayerId(location.getLocationLayout().getLayerId())
               );
           return result;
         })
