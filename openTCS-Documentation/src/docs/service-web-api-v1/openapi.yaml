@@ -2323,6 +2323,9 @@ components:
               allowedOperations:
                 - Load cargo
                 - Unload cargo
+              allowedPeripheralOperations:
+                - Open door
+                - Close door
               layout:
                 locationRepresentation: "LOAD_TRANSFER_GENERIC"
               properties:
@@ -3009,13 +3012,13 @@ components:
           example:
             - Point-C
             - Point-D
-            - Point-E   
+            - Point-E
         resourcesToAvoid:
           type: array
           description: The resources to be avoided for each route.
           example:
             - Path-CA
-            - Point-B     
+            - Point-B
       required:
         - destinationPoints
     RoutesResponse:
