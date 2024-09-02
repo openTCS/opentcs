@@ -32,21 +32,9 @@ public class VehicleCreationTO
    */
   private final BoundingBoxCreationTO boundingBox;
   /**
-   * The energy level value at/below which the vehicle should be recharged.
+   * Contains information regarding the energy level threshold values of the vehicle.
    */
-  private final int energyLevelCritical;
-  /**
-   * The energy level value at/above which the vehicle can be dispatched again when charging.
-   */
-  private final int energyLevelGood;
-  /**
-   * The energy level value at/above which the vehicle is considered fully recharged.
-   */
-  private final int energyLevelFullyRecharged;
-  /**
-   * The energy level value at/above which the vehicle is considered sufficiently recharged.
-   */
-  private final int energyLevelSufficientlyRecharged;
+  private final EnergyLevelThresholdSet energyLevelThresholdSet;
   /**
    * The vehicle's maximum velocity (in mm/s).
    */
@@ -75,10 +63,7 @@ public class VehicleCreationTO
   ) {
     super(name);
     this.boundingBox = new BoundingBoxCreationTO(1000, 1000, 1000);
-    this.energyLevelCritical = 30;
-    this.energyLevelGood = 90;
-    this.energyLevelFullyRecharged = 90;
-    this.energyLevelSufficientlyRecharged = 30;
+    this.energyLevelThresholdSet = new EnergyLevelThresholdSet(30, 90, 30, 90);
     this.maxVelocity = 1000;
     this.maxReverseVelocity = 1000;
     this.envelopeKey = null;
@@ -92,10 +77,8 @@ public class VehicleCreationTO
       Map<String, String> properties,
       @Nonnull
       BoundingBoxCreationTO boundingBox,
-      int energyLevelCritical,
-      int energyLevelGood,
-      int energyLevelFullyRecharged,
-      int energyLevelSufficientlyRecharged,
+      @Nonnull
+      EnergyLevelThresholdSet energyLevelThresholdSet,
       int maxVelocity,
       int maxReverseVelocity,
       @Nullable
@@ -105,10 +88,8 @@ public class VehicleCreationTO
   ) {
     super(name, properties);
     this.boundingBox = requireNonNull(boundingBox, "boundingBox");
-    this.energyLevelCritical = energyLevelCritical;
-    this.energyLevelGood = energyLevelGood;
-    this.energyLevelFullyRecharged = energyLevelFullyRecharged;
-    this.energyLevelSufficientlyRecharged = energyLevelSufficientlyRecharged;
+    this.energyLevelThresholdSet
+        = requireNonNull(energyLevelThresholdSet, "energyLevelThresholdSet");
     this.maxVelocity = maxVelocity;
     this.maxReverseVelocity = maxReverseVelocity;
     this.envelopeKey = envelopeKey;
@@ -130,10 +111,7 @@ public class VehicleCreationTO
         name,
         getModifiableProperties(),
         boundingBox,
-        energyLevelCritical,
-        energyLevelGood,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         envelopeKey,
@@ -156,10 +134,7 @@ public class VehicleCreationTO
         getName(),
         properties,
         boundingBox,
-        energyLevelCritical,
-        energyLevelGood,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         envelopeKey,
@@ -188,10 +163,7 @@ public class VehicleCreationTO
         getName(),
         propertiesWith(key, value),
         boundingBox,
-        energyLevelCritical,
-        energyLevelGood,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         envelopeKey,
@@ -219,10 +191,7 @@ public class VehicleCreationTO
         getName(),
         getModifiableProperties(),
         boundingBox,
-        energyLevelCritical,
-        energyLevelGood,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         envelopeKey,
@@ -260,9 +229,12 @@ public class VehicleCreationTO
    * The critical energy level is the one at/below which the vehicle should be recharged.
    *
    * @return This vehicle's critical energy level.
+   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public int getEnergyLevelCritical() {
-    return energyLevelCritical;
+    return energyLevelThresholdSet.getEnergyLevelCritical();
   }
 
   /**
@@ -272,21 +244,13 @@ public class VehicleCreationTO
    * @param energyLevelCritical The new critical energy level. Must not be smaller than 0 or
    * greater than 100.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public VehicleCreationTO withEnergyLevelCritical(int energyLevelCritical) {
-    checkInRange(energyLevelCritical, 0, 100);
-    return new VehicleCreationTO(
-        getName(),
-        getModifiableProperties(),
-        boundingBox,
-        energyLevelCritical,
-        energyLevelGood,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
-        maxVelocity,
-        maxReverseVelocity,
-        envelopeKey,
-        layout
+    return withEnergyLevelThresholdSet(
+        getEnergyLevelThresholdSet().withEnergyLevelCritical(energyLevelCritical)
     );
   }
 
@@ -296,9 +260,12 @@ public class VehicleCreationTO
    * charging.
    *
    * @return This vehicle's good energy level.
+   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public int getEnergyLevelGood() {
-    return energyLevelGood;
+    return energyLevelThresholdSet.getEnergyLevelGood();
   }
 
   /**
@@ -309,21 +276,13 @@ public class VehicleCreationTO
    * @param energyLevelGood The new good energy level. Must not be smaller than 0 or greater than
    * 100.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public VehicleCreationTO withEnergyLevelGood(int energyLevelGood) {
-    checkInRange(energyLevelGood, 0, 100);
-    return new VehicleCreationTO(
-        getName(),
-        getModifiableProperties(),
-        boundingBox,
-        energyLevelCritical,
-        energyLevelGood,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
-        maxVelocity,
-        maxReverseVelocity,
-        envelopeKey,
-        layout
+    return withEnergyLevelThresholdSet(
+        getEnergyLevelThresholdSet().withEnergyLevelGood(energyLevelGood)
     );
   }
 
@@ -331,9 +290,12 @@ public class VehicleCreationTO
    * Returns this vehicle's fully recharged energy level (in percent of the maximum).
    *
    * @return This vehicle's fully recharged energy level.
+   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public int getEnergyLevelFullyRecharged() {
-    return energyLevelFullyRecharged;
+    return energyLevelThresholdSet.getEnergyLevelFullyRecharged();
   }
 
   /**
@@ -343,21 +305,13 @@ public class VehicleCreationTO
    * @param energyLevelFullyRecharged The new fully recharged energy level.
    * Must not be smaller than 0 or greater than 100.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public VehicleCreationTO withEnergyLevelFullyRecharged(int energyLevelFullyRecharged) {
-    checkInRange(energyLevelFullyRecharged, 0, 100);
-    return new VehicleCreationTO(
-        getName(),
-        getModifiableProperties(),
-        boundingBox,
-        energyLevelCritical,
-        energyLevelGood,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
-        maxVelocity,
-        maxReverseVelocity,
-        envelopeKey,
-        layout
+    return withEnergyLevelThresholdSet(
+        getEnergyLevelThresholdSet().withEnergyLevelFullyRecharged(energyLevelFullyRecharged)
     );
   }
 
@@ -365,9 +319,12 @@ public class VehicleCreationTO
    * Returns this vehicle's sufficiently recharged energy level (in percent of the maximum).
    *
    * @return This vehicle's sufficiently recharged energy level.
+   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public int getEnergyLevelSufficientlyRecharged() {
-    return energyLevelSufficientlyRecharged;
+    return energyLevelThresholdSet.getEnergyLevelSufficientlyRecharged();
   }
 
   /**
@@ -377,19 +334,44 @@ public class VehicleCreationTO
    * @param energyLevelSufficientlyRecharged The new sufficiently recharged energy level.
    * Must not be smaller than 0 or greater than 100.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public VehicleCreationTO withEnergyLevelSufficientlyRecharged(
       int energyLevelSufficientlyRecharged
   ) {
-    checkInRange(energyLevelSufficientlyRecharged, 0, 100);
+    return withEnergyLevelThresholdSet(
+        getEnergyLevelThresholdSet()
+            .withEnergyLevelSufficientlyRecharged(energyLevelSufficientlyRecharged)
+    );
+  }
+
+  /**
+   * Returns this vehicle's energy level threshold set.
+   *
+   * @return This vehicle's energy level threshold set.
+   */
+  @Nonnull
+  public EnergyLevelThresholdSet getEnergyLevelThresholdSet() {
+    return energyLevelThresholdSet;
+  }
+
+  /**
+   * Creates a copy of this object, with the given EnergyLevelThresholdSet.
+   *
+   * @param energyLevelThresholdSet The new EnergyLevelThresholdSet.
+   * @return A copy of this object, differing in the given value.
+   */
+  public VehicleCreationTO withEnergyLevelThresholdSet(
+      @Nonnull
+      EnergyLevelThresholdSet energyLevelThresholdSet
+  ) {
     return new VehicleCreationTO(
         getName(),
         getModifiableProperties(),
         boundingBox,
-        energyLevelCritical,
-        energyLevelGood,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         envelopeKey,
@@ -413,10 +395,7 @@ public class VehicleCreationTO
         getName(),
         getModifiableProperties(),
         boundingBox,
-        energyLevelCritical,
-        energyLevelGood,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         envelopeKey,
@@ -440,10 +419,7 @@ public class VehicleCreationTO
         getName(),
         getModifiableProperties(),
         boundingBox,
-        energyLevelCritical,
-        energyLevelGood,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         envelopeKey,
@@ -476,10 +452,7 @@ public class VehicleCreationTO
         getName(),
         getModifiableProperties(),
         boundingBox,
-        energyLevelCritical,
-        energyLevelGood,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         envelopeKey,
@@ -507,10 +480,7 @@ public class VehicleCreationTO
         getName(),
         getModifiableProperties(),
         boundingBox,
-        energyLevelCritical,
-        energyLevelGood,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         envelopeKey,
@@ -523,10 +493,7 @@ public class VehicleCreationTO
     return "VehicleCreationTO{"
         + "name=" + getName()
         + ", boundingBox=" + boundingBox
-        + ", energyLevelCritical=" + energyLevelCritical
-        + ", energyLevelGood=" + energyLevelGood
-        + ", energyLevelFullyRecharged=" + energyLevelFullyRecharged
-        + ", energyLevelSufficientlyRecharged=" + energyLevelSufficientlyRecharged
+        + ", energyLevelThresholdSet=" + energyLevelThresholdSet
         + ", maxVelocity=" + maxVelocity
         + ", maxReverseVelocity=" + maxReverseVelocity
         + ", envelopeKey=" + envelopeKey
@@ -586,6 +553,179 @@ public class VehicleCreationTO
     public String toString() {
       return "Layout{"
           + "routeColor=" + routeColor
+          + '}';
+    }
+  }
+
+  /**
+   * Contains information regarding the energy level threshold values of a vehicle.
+   */
+  public static class EnergyLevelThresholdSet
+      implements
+        Serializable {
+
+    private final int energyLevelCritical;
+    private final int energyLevelGood;
+    private final int energyLevelSufficientlyRecharged;
+    private final int energyLevelFullyRecharged;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param energyLevelCritical The value at/below which the vehicle's energy level is considered
+     * "critical".
+     * @param energyLevelGood The value at/above which the vehicle's energy level is considered
+     * "good".
+     * @param energyLevelSufficientlyRecharged The value at/above which the vehicle's energy level
+     * is considered fully recharged.
+     * @param energyLevelFullyRecharged The value at/above which the vehicle's energy level is
+     * considered sufficiently recharged.
+     */
+    public EnergyLevelThresholdSet(
+        int energyLevelCritical,
+        int energyLevelGood,
+        int energyLevelSufficientlyRecharged,
+        int energyLevelFullyRecharged
+    ) {
+      this.energyLevelCritical = checkInRange(
+          energyLevelCritical,
+          0,
+          100,
+          "energyLevelCritical"
+      );
+      this.energyLevelGood = checkInRange(
+          energyLevelGood,
+          0,
+          100,
+          "energyLevelGood"
+      );
+      this.energyLevelSufficientlyRecharged = checkInRange(
+          energyLevelSufficientlyRecharged,
+          0,
+          100,
+          "energyLevelSufficientlyRecharged"
+      );
+      this.energyLevelFullyRecharged = checkInRange(
+          energyLevelFullyRecharged,
+          0,
+          100,
+          "energyLevelFullyRecharged"
+      );
+    }
+
+    /**
+     * Returns the vehicle's critical energy level (in percent of the maximum).
+     * <p>
+     * The critical energy level is the one at/below which the vehicle should be recharged.
+     * </p>
+     *
+     * @return The vehicle's critical energy level.
+     */
+    public int getEnergyLevelCritical() {
+      return energyLevelCritical;
+    }
+
+    /**
+     * Creates a copy of this object, with the given critical energy level.
+     *
+     * @param energyLevelCritical The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public EnergyLevelThresholdSet withEnergyLevelCritical(int energyLevelCritical) {
+      return new EnergyLevelThresholdSet(
+          energyLevelCritical,
+          energyLevelGood,
+          energyLevelSufficientlyRecharged,
+          energyLevelFullyRecharged
+      );
+    }
+
+    /**
+     * Returns the vehicle's good energy level (in percent of the maximum).
+     * <p>
+     * The good energy level is the one at/above which the vehicle can be dispatched again when
+     * charging.
+     * </p>
+     *
+     * @return The vehicle's good energy level.
+     */
+    public int getEnergyLevelGood() {
+      return energyLevelGood;
+    }
+
+    /**
+     * Creates a copy of this object, with the given good energy level.
+     *
+     * @param energyLevelGood The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public EnergyLevelThresholdSet withEnergyLevelGood(int energyLevelGood) {
+      return new EnergyLevelThresholdSet(
+          energyLevelCritical,
+          energyLevelGood,
+          energyLevelSufficientlyRecharged,
+          energyLevelFullyRecharged
+      );
+    }
+
+    /**
+     * Returns the vehicle's energy level for being sufficiently recharged (in percent of the
+     * maximum).
+     *
+     * @return This vehicle's sufficiently recharged energy level.
+     */
+    public int getEnergyLevelSufficientlyRecharged() {
+      return energyLevelSufficientlyRecharged;
+    }
+
+    /**
+     * Creates a copy of this object, with the given sufficiently recharged energy level.
+     *
+     * @param energyLevelSufficientlyRecharged The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public EnergyLevelThresholdSet withEnergyLevelSufficientlyRecharged(
+        int energyLevelSufficientlyRecharged
+    ) {
+      return new EnergyLevelThresholdSet(
+          energyLevelCritical,
+          energyLevelGood,
+          energyLevelSufficientlyRecharged,
+          energyLevelFullyRecharged
+      );
+    }
+
+    /**
+     * Returns the vehicle's energy level for being fully recharged (in percent of the maximum).
+     *
+     * @return The vehicle's fully recharged threshold.
+     */
+    public int getEnergyLevelFullyRecharged() {
+      return energyLevelFullyRecharged;
+    }
+
+    /**
+     * Creates a copy of this object, with the given fully recharged energy level.
+     *
+     * @param energyLevelFullyRecharged The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public EnergyLevelThresholdSet withEnergyLevelFullyRecharged(int energyLevelFullyRecharged) {
+      return new EnergyLevelThresholdSet(
+          energyLevelCritical,
+          energyLevelGood,
+          energyLevelSufficientlyRecharged,
+          energyLevelFullyRecharged
+      );
+    }
+
+    @Override
+    public String toString() {
+      return "EnergyLevelThresholdSet{"
+          + "energyLevelCritical=" + energyLevelCritical
+          + ", energyLevelGood=" + energyLevelGood
+          + ", energyLevelSufficientlyRecharged=" + energyLevelSufficientlyRecharged
+          + ", energyLevelFullyRecharged=" + energyLevelFullyRecharged
           + '}';
     }
   }

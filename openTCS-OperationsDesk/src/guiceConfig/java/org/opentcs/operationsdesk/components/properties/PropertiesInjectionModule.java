@@ -13,6 +13,7 @@ import com.google.inject.multibindings.MapBinder;
 import jakarta.inject.Singleton;
 import org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule;
 import org.opentcs.guing.base.components.properties.type.AbstractComplexProperty;
+import org.opentcs.guing.base.components.properties.type.EnergyLevelThresholdSetProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.LinkActionsProperty;
@@ -23,6 +24,7 @@ import org.opentcs.guing.base.components.properties.type.SymbolProperty;
 import org.opentcs.guing.common.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.common.components.properties.PropertiesComponentsFactory;
 import org.opentcs.guing.common.components.properties.SelectionPropertiesComponent;
+import org.opentcs.guing.common.components.properties.panel.EnergyLevelThresholdSetPropertyEditorPanel;
 import org.opentcs.guing.common.components.properties.panel.KeyValuePropertyEditorPanel;
 import org.opentcs.guing.common.components.properties.panel.KeyValueSetPropertyViewerEditorPanel;
 import org.opentcs.guing.common.components.properties.panel.LinkActionsEditorPanel;
@@ -78,6 +80,9 @@ public class PropertiesInjectionModule
     dialogContentMapBinder
         .addBinding(OrderTypesProperty.class)
         .to(OrderTypesPropertyEditorPanel.class);
+    dialogContentMapBinder
+        .addBinding(EnergyLevelThresholdSetProperty.class)
+        .to(EnergyLevelThresholdSetPropertyEditorPanel.class);
     dialogContentMapBinder
         .addBinding(ResourceProperty.class)
         .to(ResourcePropertyViewerEditorPanel.class);

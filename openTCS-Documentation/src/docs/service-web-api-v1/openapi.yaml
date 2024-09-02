@@ -683,6 +683,47 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/energyLevelThresholdSet":
+    put:
+      tags:
+        - Vehicles
+      summary: Sets energy level threshold values for the named vehicle (in percent).
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnergyLevelThresholdSet"
+        description: The new set of energy level thresholds.
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: The submitted data is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
   "/vehicles/{NAME}/commAdapter/attachmentInformation":
     get:
       tags:
@@ -1595,6 +1636,39 @@ components:
           example: [ "Park", "Load cargo", "Unload cargo" ]
       required:
         - orderTypes
+    EnergyLevelThresholdSet:
+      title: Energy Level Threshold Set
+      type: object
+      properties:
+        energyLevelCritical:
+          description: The energy level value (in %) at/below which the vehicle _must_ be recharged.
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 15
+        energyLevelGood:
+          description: The energy level value (in %) at/above which the vehicle _should not_ be recharged.
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 60
+        energyLevelSufficientlyRecharged:
+          description: The energy level value (in %) at/above which the vehicle is considered sufficiently recharged, i.e. _may_ stop recharging.
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 50
+        energyLevelFullyRecharged:
+          description: The energy level value (in %) at/above which the vehicle is considered fully recharged, i.e. _should_ stop recharging.
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 90
+      required:
+        - energyLevelCritical
+        - energyLevelGood
+        - energyLevelSufficientlyRecharged
+        - energyLevelFullyRecharged
     OrderSequenceState:
       title: Order Sequence State
       type: object
@@ -2572,7 +2646,7 @@ components:
             $ref: "#/components/schemas/PlantModelEnvelope"
         layout:
           type: object
-          description: The information regarding the grahical representation of this path.
+          description: The information regarding the graphical representation of this path.
           properties:
             connectionType:
               type: string
@@ -2619,7 +2693,7 @@ components:
             example: [ "some peripheral operation", "another peripheral operation" ]
         layout:
           type: object
-          description: The information regarding the grahical representation of this location type.
+          description: The information regarding the graphical representation of this location type.
           properties:
             locationRepresentation:
               type: string
@@ -2680,7 +2754,7 @@ components:
           description: A flag for marking this location as locked (i.e. to prevent vehicles from using it).
         layout:
           type: object
-          description: The information regarding the grahical representation of this location.
+          description: The information regarding the graphical representation of this location.
           properties:
             position:
               $ref: "#/components/schemas/PlantModelCouple"
@@ -2737,7 +2811,7 @@ components:
           example: [ "Path-AB", "Path-BC" ]
         layout:
           type: object
-          description: The information regarding the grahical representation of this block.
+          description: The information regarding the graphical representation of this block.
           properties:
             color:
               type: string
@@ -2764,19 +2838,19 @@ components:
           example: 1000
         energyLevelCritical:
           type: integer
-          description: The energy level value (in %) at/below which the vehicle should be recharged.
+          description: The energy level value (in %) at/below which the vehicle _must_ be recharged.
           example: 15
         energyLevelGood:
           type: integer
-          description: The energy level value (in %) at/above which the vehicle can be dispatched again when charging.
+          description: The energy level value (in %) at/above which the vehicle _should not_ be recharged.
           example: 60
         energyLevelFullyRecharged:
           type: integer
-          description: The energy level value (in %) at/above which the vehicle is considered fully recharged.
+          description: The energy level value (in %) at/above which the vehicle is considered fully recharged, i.e. _should_ stop recharging.
           example: 90
         energyLevelSufficientlyRecharged:
           type: integer
-          description: The energy level value (in %) at/above which the vehicle is considered sufficiently recharged.
+          description: The energy level value (in %) at/above which the vehicle is considered sufficiently recharged, i.e. _may_ stop recharging.
           example: 50
         maxVelocity:
           type: integer
@@ -2788,7 +2862,7 @@ components:
           example: 733
         layout:
           type: object
-          description: The information regarding the grahical representation of this vehicle.
+          description: The information regarding the graphical representation of this vehicle.
           properties:
             routeColor:
               type: string

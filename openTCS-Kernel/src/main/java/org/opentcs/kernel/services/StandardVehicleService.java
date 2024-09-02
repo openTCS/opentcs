@@ -24,6 +24,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.AdapterCommand;
@@ -423,6 +424,20 @@ public class StandardVehicleService
       plantModelManager.setVehiclePaused(ref, paused);
 
       vehicleControllerPool.getVehicleController(ref.getName()).onVehiclePaused(paused);
+    }
+  }
+
+  @Override
+  public void updateVehicleEnergyLevelThresholdSet(
+      TCSObjectReference<Vehicle> ref,
+      EnergyLevelThresholdSet energyLevelThresholdSet
+  )
+      throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(energyLevelThresholdSet, "energyLevelThresholdSet");
+
+    synchronized (globalSyncObject) {
+      plantModelManager.setVehicleEnergyLevelThresholdSet(ref, energyLevelThresholdSet);
     }
   }
 

@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
@@ -47,21 +48,9 @@ public class Vehicle
    */
   private final BoundingBox boundingBox;
   /**
-   * The value at/above which the vehicle's energy level is considered "good".
+   * Contains information regarding the energy level threshold values of the vehicle.
    */
-  private final int energyLevelGood;
-  /**
-   * The value at/below which the vehicle's energy level is considered "critical".
-   */
-  private final int energyLevelCritical;
-  /**
-   * The value at/above which the vehicle's energy level is considered fully recharged.
-   */
-  private final int energyLevelFullyRecharged;
-  /**
-   * The value at/above which the vehicle's energy level is considered sufficiently recharged.
-   */
-  private final int energyLevelSufficientlyRecharged;
+  private final EnergyLevelThresholdSet energyLevelThresholdSet;
   /**
    * This vehicle's remaining energy (in percent of the maximum).
    */
@@ -155,10 +144,7 @@ public class Vehicle
   public Vehicle(String name) {
     super(name);
     this.boundingBox = new BoundingBox(1000, 1000, 1000);
-    this.energyLevelGood = 90;
-    this.energyLevelCritical = 30;
-    this.energyLevelFullyRecharged = 90;
-    this.energyLevelSufficientlyRecharged = 30;
+    this.energyLevelThresholdSet = new EnergyLevelThresholdSet(30, 90, 30, 90);
     this.maxVelocity = 1000;
     this.maxReverseVelocity = 1000;
     this.rechargeOperation = "CHARGE";
@@ -186,10 +172,7 @@ public class Vehicle
       Map<String, String> properties,
       ObjectHistory history,
       BoundingBox boundingBox,
-      int energyLevelGood,
-      int energyLevelCritical,
-      int energyLevelFullyRecharged,
-      int energyLevelSufficientlyRecharged,
+      EnergyLevelThresholdSet energyLevelThresholdSet,
       int maxVelocity,
       int maxReverseVelocity,
       String rechargeOperation,
@@ -213,19 +196,22 @@ public class Vehicle
   ) {
     super(name, properties, history);
     this.boundingBox = requireNonNull(boundingBox, "boundingBox");
-    this.energyLevelGood = checkInRange(energyLevelGood, 0, 100, "energyLevelGood");
-    this.energyLevelCritical = checkInRange(energyLevelCritical, 0, 100, "energyLevelCritical");
-    this.energyLevelFullyRecharged = checkInRange(
-        energyLevelFullyRecharged,
-        0,
-        100,
-        "energyLevelFullyRecharged"
+    this.energyLevelThresholdSet = requireNonNull(
+        energyLevelThresholdSet, "energyLevelThresholdSet"
     );
-    this.energyLevelSufficientlyRecharged = checkInRange(
-        energyLevelSufficientlyRecharged,
-        0,
-        100,
-        "energyLevelSufficientlyRecharged"
+    checkArgument(
+        energyLevelThresholdSet.getEnergyLevelCritical()
+            <= energyLevelThresholdSet.getEnergyLevelGood(),
+        "energyLevelCritical (%s) not <= energyLevelGood (%s)",
+        energyLevelThresholdSet.getEnergyLevelCritical(),
+        energyLevelThresholdSet.getEnergyLevelGood()
+    );
+    checkArgument(
+        energyLevelThresholdSet.getEnergyLevelSufficientlyRecharged()
+            <= energyLevelThresholdSet.getEnergyLevelFullyRecharged(),
+        "energyLevelSufficientlyRecharged (%s) not <= energyLevelFullyRecharged (%s)",
+        energyLevelThresholdSet.getEnergyLevelSufficientlyRecharged(),
+        energyLevelThresholdSet.getEnergyLevelFullyRecharged()
     );
     this.maxVelocity = checkInRange(maxVelocity, 0, Integer.MAX_VALUE, "maxVelocity");
     this.maxReverseVelocity = checkInRange(
@@ -271,10 +257,7 @@ public class Vehicle
         propertiesWith(key, value),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -305,10 +288,7 @@ public class Vehicle
         properties,
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -339,10 +319,7 @@ public class Vehicle
         getProperties(),
         getHistory().withEntryAppended(entry),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -373,10 +350,7 @@ public class Vehicle
         getProperties(),
         history,
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -421,10 +395,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -455,7 +426,7 @@ public class Vehicle
    * critical.
    */
   public boolean isEnergyLevelCritical() {
-    return energyLevel <= energyLevelCritical;
+    return energyLevel <= energyLevelThresholdSet.getEnergyLevelCritical();
   }
 
   /**
@@ -466,7 +437,7 @@ public class Vehicle
    * degraded.
    */
   public boolean isEnergyLevelDegraded() {
-    return energyLevel <= energyLevelGood;
+    return energyLevel <= energyLevelThresholdSet.getEnergyLevelGood();
   }
 
   /**
@@ -476,7 +447,7 @@ public class Vehicle
    * good.
    */
   public boolean isEnergyLevelGood() {
-    return energyLevel > energyLevelGood;
+    return energyLevel > energyLevelThresholdSet.getEnergyLevelGood();
   }
 
   /**
@@ -486,7 +457,7 @@ public class Vehicle
    * fully recharged.
    */
   public boolean isEnergyLevelFullyRecharged() {
-    return energyLevel >= energyLevelFullyRecharged;
+    return energyLevel >= energyLevelThresholdSet.getEnergyLevelFullyRecharged();
   }
 
   /**
@@ -496,7 +467,7 @@ public class Vehicle
    * sufficiently recharged.
    */
   public boolean isEnergyLevelSufficientlyRecharged() {
-    return energyLevel >= energyLevelSufficientlyRecharged;
+    return energyLevel >= energyLevelThresholdSet.getEnergyLevelSufficientlyRecharged();
   }
 
   /**
@@ -505,9 +476,12 @@ public class Vehicle
    * recharged.
    *
    * @return This vehicle's critical energy level.
+   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public int getEnergyLevelCritical() {
-    return energyLevelCritical;
+    return energyLevelThresholdSet.getEnergyLevelCritical();
   }
 
   /**
@@ -515,37 +489,13 @@ public class Vehicle
    *
    * @param energyLevelCritical The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public Vehicle withEnergyLevelCritical(int energyLevelCritical) {
-    return new Vehicle(
-        getName(),
-        getProperties(),
-        getHistory(),
-        boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
-        maxVelocity,
-        maxReverseVelocity,
-        rechargeOperation,
-        procState,
-        transportOrder,
-        orderSequence,
-        allowedOrderTypes,
-        claimedResources,
-        allocatedResources,
-        state,
-        integrationLevel,
-        paused,
-        currentPosition,
-        nextPosition,
-        precisePosition,
-        orientationAngle,
-        energyLevel,
-        loadHandlingDevices,
-        envelopeKey,
-        layout
+    return withEnergyLevelThresholdSet(
+        getEnergyLevelThresholdSet().withEnergyLevelCritical(energyLevelCritical)
     );
   }
 
@@ -555,9 +505,12 @@ public class Vehicle
    * dispatched again when charging.
    *
    * @return This vehicle's good energy level.
+   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public int getEnergyLevelGood() {
-    return energyLevelGood;
+    return energyLevelThresholdSet.getEnergyLevelGood();
   }
 
   /**
@@ -565,37 +518,13 @@ public class Vehicle
    *
    * @param energyLevelGood The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public Vehicle withEnergyLevelGood(int energyLevelGood) {
-    return new Vehicle(
-        getName(),
-        getProperties(),
-        getHistory(),
-        boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
-        maxVelocity,
-        maxReverseVelocity,
-        rechargeOperation,
-        procState,
-        transportOrder,
-        orderSequence,
-        allowedOrderTypes,
-        claimedResources,
-        allocatedResources,
-        state,
-        integrationLevel,
-        paused,
-        currentPosition,
-        nextPosition,
-        precisePosition,
-        orientationAngle,
-        energyLevel,
-        loadHandlingDevices,
-        envelopeKey,
-        layout
+    return withEnergyLevelThresholdSet(
+        getEnergyLevelThresholdSet().withEnergyLevelGood(energyLevelGood)
     );
   }
 
@@ -603,9 +532,12 @@ public class Vehicle
    * Returns this vehicle's energy level for being fully recharged (in percent of the maximum).
    *
    * @return This vehicle's fully recharged threshold.
+   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public int getEnergyLevelFullyRecharged() {
-    return energyLevelFullyRecharged;
+    return energyLevelThresholdSet.getEnergyLevelFullyRecharged();
   }
 
   /**
@@ -613,37 +545,13 @@ public class Vehicle
    *
    * @param energyLevelFullyRecharged The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public Vehicle withEnergyLevelFullyRecharged(int energyLevelFullyRecharged) {
-    return new Vehicle(
-        getName(),
-        getProperties(),
-        getHistory(),
-        boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
-        maxVelocity,
-        maxReverseVelocity,
-        rechargeOperation,
-        procState,
-        transportOrder,
-        orderSequence,
-        allowedOrderTypes,
-        claimedResources,
-        allocatedResources,
-        state,
-        integrationLevel,
-        paused,
-        currentPosition,
-        nextPosition,
-        precisePosition,
-        orientationAngle,
-        energyLevel,
-        loadHandlingDevices,
-        envelopeKey,
-        layout
+    return withEnergyLevelThresholdSet(
+        getEnergyLevelThresholdSet().withEnergyLevelFullyRecharged(energyLevelFullyRecharged)
     );
   }
 
@@ -652,9 +560,12 @@ public class Vehicle
    * maximum).
    *
    * @return This vehicle's sufficiently recharged energy level.
+   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public int getEnergyLevelSufficientlyRecharged() {
-    return energyLevelSufficientlyRecharged;
+    return energyLevelThresholdSet.getEnergyLevelSufficientlyRecharged();
   }
 
   /**
@@ -662,17 +573,39 @@ public class Vehicle
    *
    * @param energyLevelSufficientlyRecharged The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public Vehicle withEnergyLevelSufficientlyRecharged(int energyLevelSufficientlyRecharged) {
+    return withEnergyLevelThresholdSet(
+        getEnergyLevelThresholdSet()
+            .withEnergyLevelSufficientlyRecharged(energyLevelSufficientlyRecharged)
+    );
+  }
+
+  /**
+   * Returns this vehicle's energy level threshold set.
+   *
+   * @return This vehicle's energy level threshold set.
+   */
+  public EnergyLevelThresholdSet getEnergyLevelThresholdSet() {
+    return energyLevelThresholdSet;
+  }
+
+  /**
+   * Creates a copy of this object, with the given EnergyLevelThresholdSet.
+   *
+   * @param energyLevelThresholdSet The new EnergyLevelThresholdSet.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Vehicle withEnergyLevelThresholdSet(EnergyLevelThresholdSet energyLevelThresholdSet) {
     return new Vehicle(
         getName(),
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -719,10 +652,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -767,10 +697,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -815,10 +742,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -863,10 +787,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -922,10 +843,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -979,10 +897,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1027,10 +942,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1078,10 +990,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1136,10 +1045,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1212,10 +1118,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1263,10 +1166,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1311,10 +1211,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1359,10 +1256,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1407,10 +1301,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1457,10 +1348,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1507,10 +1395,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1557,10 +1442,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1607,10 +1489,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1659,10 +1538,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1707,10 +1583,7 @@ public class Vehicle
         getProperties(),
         getHistory(),
         boundingBox,
-        energyLevelGood,
-        energyLevelCritical,
-        energyLevelFullyRecharged,
-        energyLevelSufficientlyRecharged,
+        energyLevelThresholdSet,
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
@@ -1763,10 +1636,7 @@ public class Vehicle
         + ", claimedResources=" + claimedResources
         + ", allocatedResources=" + allocatedResources
         + ", orderSequence=" + orderSequence
-        + ", energyLevelGood=" + energyLevelGood
-        + ", energyLevelCritical=" + energyLevelCritical
-        + ", energyLevelFullyRecharged=" + energyLevelFullyRecharged
-        + ", energyLevelSufficientlyRecharged=" + energyLevelSufficientlyRecharged
+        + ", energyLevelThresholdSet=" + energyLevelThresholdSet
         + ", maxVelocity=" + maxVelocity
         + ", maxReverseVelocity=" + maxReverseVelocity
         + ", rechargeOperation=" + rechargeOperation
@@ -1920,6 +1790,204 @@ public class Vehicle
      */
     public Layout withRouteColor(Color routeColor) {
       return new Layout(routeColor);
+    }
+  }
+
+  /**
+   * Contains information regarding the energy level threshold values of a vehicle.
+   */
+  public static class EnergyLevelThresholdSet
+      implements
+        Serializable {
+
+    private final int energyLevelCritical;
+    private final int energyLevelGood;
+    private final int energyLevelSufficientlyRecharged;
+    private final int energyLevelFullyRecharged;
+
+    /**
+     * Creates a new instance.
+     *
+     * @param energyLevelCritical The value at/below which the vehicle's energy level is considered
+     * "critical".
+     * @param energyLevelGood The value at/above which the vehicle's energy level is considered
+     * "good".
+     * @param energyLevelSufficientlyRecharged The value at/above which the vehicle's energy level
+     * is considered fully recharged.
+     * @param energyLevelFullyRecharged The value at/above which the vehicle's energy level is
+     * considered sufficiently recharged.
+     */
+    public EnergyLevelThresholdSet(
+        int energyLevelCritical,
+        int energyLevelGood,
+        int energyLevelSufficientlyRecharged,
+        int energyLevelFullyRecharged
+    ) {
+      this.energyLevelCritical = checkInRange(
+          energyLevelCritical,
+          0,
+          100,
+          "energyLevelCritical"
+      );
+      this.energyLevelGood = checkInRange(
+          energyLevelGood,
+          0,
+          100,
+          "energyLevelGood"
+      );
+      this.energyLevelSufficientlyRecharged = checkInRange(
+          energyLevelSufficientlyRecharged,
+          0,
+          100,
+          "energyLevelSufficientlyRecharged"
+      );
+      this.energyLevelFullyRecharged = checkInRange(
+          energyLevelFullyRecharged,
+          0,
+          100,
+          "energyLevelFullyRecharged"
+      );
+    }
+
+    /**
+     * Returns the vehicle's critical energy level (in percent of the maximum).
+     * <p>
+     * The critical energy level is the one at/below which the vehicle should be recharged.
+     * </p>
+     *
+     * @return The vehicle's critical energy level.
+     */
+    public int getEnergyLevelCritical() {
+      return energyLevelCritical;
+    }
+
+    /**
+     * Creates a copy of this object, with the given critical energy level.
+     *
+     * @param energyLevelCritical The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public EnergyLevelThresholdSet withEnergyLevelCritical(int energyLevelCritical) {
+      return new EnergyLevelThresholdSet(
+          energyLevelCritical,
+          energyLevelGood,
+          energyLevelSufficientlyRecharged,
+          energyLevelFullyRecharged
+      );
+    }
+
+    /**
+     * Returns the vehicle's good energy level (in percent of the maximum).
+     * <p>
+     * The good energy level is the one at/above which the vehicle can be dispatched again when
+     * charging.
+     * </p>
+     *
+     * @return The vehicle's good energy level.
+     */
+    public int getEnergyLevelGood() {
+      return energyLevelGood;
+    }
+
+    /**
+     * Creates a copy of this object, with the given good energy level.
+     *
+     * @param energyLevelGood The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public EnergyLevelThresholdSet withEnergyLevelGood(int energyLevelGood) {
+      return new EnergyLevelThresholdSet(
+          energyLevelCritical,
+          energyLevelGood,
+          energyLevelSufficientlyRecharged,
+          energyLevelFullyRecharged
+      );
+    }
+
+    /**
+     * Returns the vehicle's energy level for being sufficiently recharged (in percent of the
+     * maximum).
+     *
+     * @return This vehicle's sufficiently recharged energy level.
+     */
+    public int getEnergyLevelSufficientlyRecharged() {
+      return energyLevelSufficientlyRecharged;
+    }
+
+    /**
+     * Creates a copy of this object, with the given sufficiently recharged energy level.
+     *
+     * @param energyLevelSufficientlyRecharged The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public EnergyLevelThresholdSet withEnergyLevelSufficientlyRecharged(
+        int energyLevelSufficientlyRecharged
+    ) {
+      return new EnergyLevelThresholdSet(
+          energyLevelCritical,
+          energyLevelGood,
+          energyLevelSufficientlyRecharged,
+          energyLevelFullyRecharged
+      );
+    }
+
+    /**
+     * Returns the vehicle's energy level for being fully recharged (in percent of the maximum).
+     *
+     * @return The vehicle's fully recharged threshold.
+     */
+    public int getEnergyLevelFullyRecharged() {
+      return energyLevelFullyRecharged;
+    }
+
+    /**
+     * Creates a copy of this object, with the given fully recharged energy level.
+     *
+     * @param energyLevelFullyRecharged The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public EnergyLevelThresholdSet withEnergyLevelFullyRecharged(int energyLevelFullyRecharged) {
+      return new EnergyLevelThresholdSet(
+          energyLevelCritical,
+          energyLevelGood,
+          energyLevelSufficientlyRecharged,
+          energyLevelFullyRecharged
+      );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o == this) {
+        return true;
+      }
+      if (!(o instanceof EnergyLevelThresholdSet other)) {
+        return false;
+      }
+
+      return energyLevelCritical == other.getEnergyLevelCritical()
+          && energyLevelGood == other.getEnergyLevelGood()
+          && energyLevelSufficientlyRecharged == other.getEnergyLevelSufficientlyRecharged()
+          && energyLevelFullyRecharged == other.getEnergyLevelFullyRecharged();
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(
+          energyLevelCritical,
+          energyLevelGood,
+          energyLevelSufficientlyRecharged,
+          energyLevelFullyRecharged
+      );
+    }
+
+    @Override
+    public String toString() {
+      return "EnergyLevelThresholdSet{"
+          + "energyLevelCritical=" + energyLevelCritical
+          + ", energyLevelGood=" + energyLevelGood
+          + ", energyLevelSufficientlyRecharged=" + energyLevelSufficientlyRecharged
+          + ", energyLevelFullyRecharged=" + energyLevelFullyRecharged
+          + '}';
     }
   }
 }

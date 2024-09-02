@@ -50,6 +50,7 @@ import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
@@ -417,6 +418,38 @@ public class PlantModelManager
     );
 
     Vehicle vehicle = previousState.withEnergyLevel(energyLevel);
+    getObjectRepo().replaceObject(vehicle);
+    emitObjectEvent(
+        vehicle,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
+    return vehicle;
+  }
+
+  /**
+   * Sets the energy level threshold set for a given vehicle.
+   *
+   * @param ref Reference to the vehicle.
+   * @param energyLevelThresholdSet The energy level threshold set.
+   * @return The modified vehicle.
+   * @throws ObjectUnknownException The vehicle reference is not known.
+   */
+  public Vehicle setVehicleEnergyLevelThresholdSet(
+      TCSObjectReference<Vehicle> ref,
+      EnergyLevelThresholdSet energyLevelThresholdSet
+  )
+      throws ObjectUnknownException {
+    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
+
+    LOG.info(
+        "Vehicle's energy level threshold set changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getEnergyLevelThresholdSet(),
+        energyLevelThresholdSet
+    );
+
+    Vehicle vehicle = previousState.withEnergyLevelThresholdSet(energyLevelThresholdSet);
     getObjectRepo().replaceObject(vehicle);
     emitObjectEvent(
         vehicle,
@@ -1208,10 +1241,14 @@ public class PlantModelManager
                           )
                       )
               )
-              .withEnergyLevelGood(vehicle.getEnergyLevelGood())
-              .withEnergyLevelCritical(vehicle.getEnergyLevelCritical())
-              .withEnergyLevelFullyRecharged(vehicle.getEnergyLevelFullyRecharged())
-              .withEnergyLevelSufficientlyRecharged(vehicle.getEnergyLevelSufficientlyRecharged())
+              .withEnergyLevelThresholdSet(
+                  new VehicleCreationTO.EnergyLevelThresholdSet(
+                      vehicle.getEnergyLevelThresholdSet().getEnergyLevelCritical(),
+                      vehicle.getEnergyLevelThresholdSet().getEnergyLevelGood(),
+                      vehicle.getEnergyLevelThresholdSet().getEnergyLevelSufficientlyRecharged(),
+                      vehicle.getEnergyLevelThresholdSet().getEnergyLevelFullyRecharged()
+                  )
+              )
               .withMaxVelocity(vehicle.getMaxVelocity())
               .withMaxReverseVelocity(vehicle.getMaxReverseVelocity())
               .withEnvelopeKey(vehicle.getEnvelopeKey())
@@ -1572,10 +1609,14 @@ public class PlantModelManager
                     )
                 )
         )
-        .withEnergyLevelGood(to.getEnergyLevelGood())
-        .withEnergyLevelCritical(to.getEnergyLevelCritical())
-        .withEnergyLevelFullyRecharged(to.getEnergyLevelFullyRecharged())
-        .withEnergyLevelSufficientlyRecharged(to.getEnergyLevelSufficientlyRecharged())
+        .withEnergyLevelThresholdSet(
+            new EnergyLevelThresholdSet(
+                to.getEnergyLevelThresholdSet().getEnergyLevelCritical(),
+                to.getEnergyLevelThresholdSet().getEnergyLevelGood(),
+                to.getEnergyLevelThresholdSet().getEnergyLevelSufficientlyRecharged(),
+                to.getEnergyLevelThresholdSet().getEnergyLevelFullyRecharged()
+            )
+        )
         .withMaxVelocity(to.getMaxVelocity())
         .withMaxReverseVelocity(to.getMaxReverseVelocity())
         .withEnvelopeKey(to.getEnvelopeKey())

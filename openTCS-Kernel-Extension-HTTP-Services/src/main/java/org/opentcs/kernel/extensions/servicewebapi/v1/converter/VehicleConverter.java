@@ -39,13 +39,13 @@ public class VehicleConverter {
             vehicle -> new VehicleCreationTO(vehicle.getName())
                 .withProperties(pConverter.toPropertyMap(vehicle.getProperties()))
                 .withBoundingBox(new BoundingBoxCreationTO(vehicle.getLength(), 1000, 1000))
-                .withEnergyLevelCritical(vehicle.getEnergyLevelCritical())
-                .withEnergyLevelGood(vehicle.getEnergyLevelGood())
-                .withEnergyLevelFullyRecharged(
-                    vehicle.getEnergyLevelFullyRecharged()
-                )
-                .withEnergyLevelSufficientlyRecharged(
-                    vehicle.getEnergyLevelSufficientlyRecharged()
+                .withEnergyLevelThresholdSet(
+                    new VehicleCreationTO.EnergyLevelThresholdSet(
+                        vehicle.getEnergyLevelCritical(),
+                        vehicle.getEnergyLevelGood(),
+                        vehicle.getEnergyLevelSufficientlyRecharged(),
+                        vehicle.getEnergyLevelFullyRecharged()
+                    )
                 )
                 .withMaxVelocity(vehicle.getMaxVelocity())
                 .withMaxReverseVelocity(vehicle.getMaxReverseVelocity())
@@ -63,11 +63,15 @@ public class VehicleConverter {
         .map(
             vehicle -> new VehicleTO(vehicle.getName())
                 .setLength((int) vehicle.getBoundingBox().getLength())
-                .setEnergyLevelCritical(vehicle.getEnergyLevelCritical())
-                .setEnergyLevelGood(vehicle.getEnergyLevelGood())
-                .setEnergyLevelFullyRecharged(vehicle.getEnergyLevelFullyRecharged())
+                .setEnergyLevelCritical(
+                    vehicle.getEnergyLevelThresholdSet().getEnergyLevelCritical()
+                )
+                .setEnergyLevelGood(vehicle.getEnergyLevelThresholdSet().getEnergyLevelGood())
+                .setEnergyLevelFullyRecharged(
+                    vehicle.getEnergyLevelThresholdSet().getEnergyLevelFullyRecharged()
+                )
                 .setEnergyLevelSufficientlyRecharged(
-                    vehicle.getEnergyLevelSufficientlyRecharged()
+                    vehicle.getEnergyLevelThresholdSet().getEnergyLevelSufficientlyRecharged()
                 )
                 .setMaxVelocity(vehicle.getMaxVelocity())
                 .setMaxReverseVelocity(vehicle.getMaxReverseVelocity())

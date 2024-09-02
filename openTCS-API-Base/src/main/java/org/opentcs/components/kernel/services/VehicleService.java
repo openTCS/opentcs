@@ -12,11 +12,13 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides methods concerning {@link Vehicle}s.
@@ -153,6 +155,24 @@ public interface VehicleService
   )
       throws ObjectUnknownException,
         KernelRuntimeException;
+
+  /**
+   * Updates the vehicle's energy level threshold set.
+   *
+   * @param ref A reference to the vehicle to be modified.
+   * @param energyLevelThresholdSet The vehicle's new energy level threshold set.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  @ScheduledApiChange(when = "7.0", details = "Default implementation will be removed.")
+  default void updateVehicleEnergyLevelThresholdSet(
+      TCSObjectReference<Vehicle> ref,
+      EnergyLevelThresholdSet energyLevelThresholdSet
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
+    throw new UnsupportedOperationException("Not yet implemented.");
+  }
 
   /**
    * Updates the types of transport orders a vehicle is allowed to process.

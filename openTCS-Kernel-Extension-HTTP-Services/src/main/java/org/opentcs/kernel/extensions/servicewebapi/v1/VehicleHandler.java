@@ -27,6 +27,7 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.data.order.Route;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
@@ -34,6 +35,7 @@ import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleEnergyLevelThresholdSetTO;
 
 /**
  * Handles requests related to vehicles.
@@ -230,6 +232,32 @@ public class VehicleHandler {
       }
       vehicleService.updateVehicleAllowedOrderTypes(
           vehicle.getReference(), new HashSet<>(allowedOrderTypes.getOrderTypes())
+      );
+    });
+  }
+
+  public void putVehicleEnergyLevelThresholdSet(
+      String name,
+      PutVehicleEnergyLevelThresholdSetTO energyLevelThresholdSet
+  )
+      throws ObjectUnknownException {
+    requireNonNull(name, "name");
+    requireNonNull(energyLevelThresholdSet, "energyLevelThresholdSet");
+
+    executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, name);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + name);
+      }
+
+      vehicleService.updateVehicleEnergyLevelThresholdSet(
+          vehicle.getReference(),
+          new EnergyLevelThresholdSet(
+              energyLevelThresholdSet.getEnergyLevelCritical(),
+              energyLevelThresholdSet.getEnergyLevelGood(),
+              energyLevelThresholdSet.getEnergyLevelSufficientlyRecharged(),
+              energyLevelThresholdSet.getEnergyLevelFullyRecharged()
+          )
       );
     });
   }

@@ -14,10 +14,12 @@ import org.opentcs.access.rmi.ClientID;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods provided by the {@link VehicleService} via RMI.
@@ -87,6 +89,16 @@ public interface RemoteVehicleService
       boolean paused
   )
       throws RemoteException;
+
+  @ScheduledApiChange(when = "7.0", details = "Default implementation will be removed.")
+  default void updateVehicleEnergyLevelThresholdSet(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      EnergyLevelThresholdSet energyLevelThresholdSet
+  )
+      throws RemoteException {
+    throw new UnsupportedOperationException("Not yet implemented.");
+  }
 
   void updateVehicleAllowedOrderTypes(
       ClientID clientId,

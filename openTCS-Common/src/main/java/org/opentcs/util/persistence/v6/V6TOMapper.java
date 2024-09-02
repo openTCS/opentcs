@@ -137,12 +137,7 @@ public class V6TOMapper {
       result.add(
           new VehicleCreationTO(vehicle.getName())
               .withBoundingBox(toBoundingBoxCreationTO(vehicle.getBoundingBox()))
-              .withEnergyLevelCritical(vehicle.getEnergyLevelCritical().intValue())
-              .withEnergyLevelGood(vehicle.getEnergyLevelGood().intValue())
-              .withEnergyLevelFullyRecharged(vehicle.getEnergyLevelFullyRecharged().intValue())
-              .withEnergyLevelSufficientlyRecharged(
-                  vehicle.getEnergyLevelSufficientlyRecharged().intValue()
-              )
+              .withEnergyLevelThresholdSet(toEnergyLevelThresholdSetCreationTO(vehicle))
               .withMaxReverseVelocity(vehicle.getMaxReverseVelocity())
               .withMaxVelocity(vehicle.getMaxVelocity())
               .withEnvelopeKey(vehicle.getEnvelopeKey())
@@ -423,10 +418,16 @@ public class V6TOMapper {
       vehicleTO.setBoundingBox(toBoundingBoxTO(vehicle.getBoundingBox()))
           .setMaxVelocity(vehicle.getMaxVelocity())
           .setMaxReverseVelocity(vehicle.getMaxReverseVelocity())
-          .setEnergyLevelGood((long) vehicle.getEnergyLevelGood())
-          .setEnergyLevelCritical((long) vehicle.getEnergyLevelCritical())
-          .setEnergyLevelFullyRecharged((long) vehicle.getEnergyLevelFullyRecharged())
-          .setEnergyLevelSufficientlyRecharged((long) vehicle.getEnergyLevelSufficientlyRecharged())
+          .setEnergyLevelGood((long) vehicle.getEnergyLevelThresholdSet().getEnergyLevelGood())
+          .setEnergyLevelCritical(
+              (long) vehicle.getEnergyLevelThresholdSet().getEnergyLevelCritical()
+          )
+          .setEnergyLevelFullyRecharged(
+              (long) vehicle.getEnergyLevelThresholdSet().getEnergyLevelFullyRecharged()
+          )
+          .setEnergyLevelSufficientlyRecharged(
+              (long) vehicle.getEnergyLevelThresholdSet().getEnergyLevelSufficientlyRecharged()
+          )
           .setEnvelopeKey(vehicle.getEnvelopeKey())
           .setVehicleLayout(
               new VehicleTO.VehicleLayout()
@@ -752,6 +753,17 @@ public class V6TOMapper {
                 boundingBox.getReferenceOffsetY()
             )
         );
+  }
+
+  private VehicleCreationTO.EnergyLevelThresholdSet toEnergyLevelThresholdSetCreationTO(
+      VehicleTO vehicle
+  ) {
+    return new VehicleCreationTO.EnergyLevelThresholdSet(
+        vehicle.getEnergyLevelCritical().intValue(),
+        vehicle.getEnergyLevelGood().intValue(),
+        vehicle.getEnergyLevelSufficientlyRecharged().intValue(),
+        vehicle.getEnergyLevelFullyRecharged().intValue()
+    );
   }
 
   private BoundingBoxTO toBoundingBoxTO(BoundingBoxCreationTO boundingBox) {

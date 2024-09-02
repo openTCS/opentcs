@@ -23,6 +23,8 @@ import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.BooleanProperty;
 import org.opentcs.guing.base.components.properties.type.BoundingBoxProperty;
 import org.opentcs.guing.base.components.properties.type.ColorProperty;
+import org.opentcs.guing.base.components.properties.type.EnergyLevelThresholdSetModel;
+import org.opentcs.guing.base.components.properties.type.EnergyLevelThresholdSetProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.OrderTypesProperty;
 import org.opentcs.guing.base.components.properties.type.PercentProperty;
@@ -49,22 +51,9 @@ public class VehicleModel
    */
   public static final String BOUNDING_BOX = "BoundingBox";
   /**
-   * The name/key of the 'energy level critical' property.
+   * The name/key of the 'energyLevelThresholdSet' property.
    */
-  public static final String ENERGY_LEVEL_CRITICAL = "EnergyLevelCritical";
-  /**
-   * The name/key of the 'energy level good' property.
-   */
-  public static final String ENERGY_LEVEL_GOOD = "EnergyLevelGood";
-  /**
-   * The name/key of the 'energy level fully recharged' property.
-   */
-  public static final String ENERGY_LEVEL_FULLY_RECHARGED = "EnergyLevelFullyRecharged";
-  /**
-   * The name/key of the 'energy level sufficiently recharged' property.
-   */
-  public static final String ENERGY_LEVEL_SUFFICIENTLY_RECHARGED
-      = "EnergyLevelSufficientlyRecharged";
+  public static final String ENERGY_LEVEL_THRESHOLD_SET = "EnergyLevelThresholdSet";
   /**
    * The name/key of the 'loaded' property.
    */
@@ -423,20 +412,8 @@ public class VehicleModel
     return (SpeedProperty) getProperty(MAXIMUM_REVERSE_VELOCITY);
   }
 
-  public PercentProperty getPropertyEnergyLevelCritical() {
-    return (PercentProperty) getProperty(ENERGY_LEVEL_CRITICAL);
-  }
-
-  public PercentProperty getPropertyEnergyLevelGood() {
-    return (PercentProperty) getProperty(ENERGY_LEVEL_GOOD);
-  }
-
-  public PercentProperty getPropertyEnergyLevelFullyRecharged() {
-    return (PercentProperty) getProperty(ENERGY_LEVEL_FULLY_RECHARGED);
-  }
-
-  public PercentProperty getPropertyEnergyLevelSufficientlyRecharged() {
-    return (PercentProperty) getProperty(ENERGY_LEVEL_SUFFICIENTLY_RECHARGED);
+  public EnergyLevelThresholdSetProperty getPropertyEnergyLevelThresholdSet() {
+    return (EnergyLevelThresholdSetProperty) getProperty(ENERGY_LEVEL_THRESHOLD_SET);
   }
 
   public PercentProperty getPropertyEnergyLevel() {
@@ -529,63 +506,6 @@ public class VehicleModel
     pColor.setHelptext(bundle.getString("vehicleModel.property_routeColor.helptext"));
     setProperty(ElementPropKeys.VEHICLE_ROUTE_COLOR, pColor);
 
-    PercentProperty pEnergyLevelCritical = new PercentProperty(
-        this,
-        30,
-        PercentProperty.Unit.PERCENT,
-        true
-    );
-    pEnergyLevelCritical.setDescription(
-        bundle.getString("vehicleModel.property_energyLevelCritical.description")
-    );
-    pEnergyLevelCritical.setHelptext(
-        bundle.getString("vehicleModel.property_energyLevelCritical.helptext")
-    );
-    setProperty(ENERGY_LEVEL_CRITICAL, pEnergyLevelCritical);
-
-    PercentProperty pEnergyLevelGood = new PercentProperty(
-        this,
-        90,
-        PercentProperty.Unit.PERCENT,
-        true
-    );
-    pEnergyLevelGood.setDescription(
-        bundle.getString("vehicleModel.property_energyLevelGood.description")
-    );
-    pEnergyLevelGood.setHelptext(
-        bundle.getString("vehicleModel.property_energyLevelGood.helptext")
-    );
-    setProperty(ENERGY_LEVEL_GOOD, pEnergyLevelGood);
-
-    PercentProperty pEnergyLevelFullyRecharged = new PercentProperty(
-        this,
-        95,
-        PercentProperty.Unit.PERCENT,
-        true
-    );
-    pEnergyLevelFullyRecharged.setDescription(
-        bundle.getString("vehicleModel.property_energyLevelFullyRecharged.description")
-    );
-    pEnergyLevelFullyRecharged.setHelptext(
-        bundle.getString("vehicleModel.property_energyLevelFullyRecharged.helptext")
-    );
-    setProperty(ENERGY_LEVEL_FULLY_RECHARGED, pEnergyLevelFullyRecharged);
-
-    PercentProperty pEnergyLevelSufficientlyRecharged
-        = new PercentProperty(
-            this,
-            40,
-            PercentProperty.Unit.PERCENT,
-            true
-        );
-    pEnergyLevelSufficientlyRecharged.setDescription(
-        bundle.getString("vehicleModel.property_energyLevelSufficientlyRecharged.description")
-    );
-    pEnergyLevelSufficientlyRecharged.setHelptext(
-        bundle.getString("vehicleModel.property_energyLevelSufficientlyRecharged.helptext")
-    );
-    setProperty(ENERGY_LEVEL_SUFFICIENTLY_RECHARGED, pEnergyLevelSufficientlyRecharged);
-
     SpeedProperty pMaximumVelocity = new SpeedProperty(this, 1000, SpeedProperty.Unit.MM_S);
     pMaximumVelocity.setDescription(
         bundle.getString("vehicleModel.property_maximumVelocity.description")
@@ -603,6 +523,19 @@ public class VehicleModel
         bundle.getString("vehicleModel.property_maximumReverseVelocity.helptext")
     );
     setProperty(MAXIMUM_REVERSE_VELOCITY, pMaximumReverseVelocity);
+
+    EnergyLevelThresholdSetProperty pEnergyLevelThresholdSet = new EnergyLevelThresholdSetProperty(
+        this, new EnergyLevelThresholdSetModel(30, 90, 40, 95)
+    );
+    pEnergyLevelThresholdSet.setDescription(
+        bundle.getString("vehicleModel.property_energyLevelThresholdSet.description")
+    );
+    pEnergyLevelThresholdSet.setHelptext(
+        bundle.getString("vehicleModel.property_energyLevelThresholdSet.helptext")
+    );
+    pEnergyLevelThresholdSet.setModellingEditable(true);
+    pEnergyLevelThresholdSet.setOperatingEditable(true);
+    setProperty(ENERGY_LEVEL_THRESHOLD_SET, pEnergyLevelThresholdSet);
 
     PercentProperty pEnergyLevel = new PercentProperty(this, true);
     pEnergyLevel.setDescription(bundle.getString("vehicleModel.property_energyLevel.description"));

@@ -32,9 +32,9 @@ import org.opentcs.data.model.visualization.LayerGroup;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.base.components.layer.LayerWrapper;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
+import org.opentcs.guing.base.components.properties.type.EnergyLevelThresholdSetModel;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
-import org.opentcs.guing.base.components.properties.type.PercentProperty;
 import org.opentcs.guing.base.components.properties.type.SpeedProperty;
 import org.opentcs.guing.base.model.BoundingBoxModel;
 import org.opentcs.guing.base.model.EnvelopeModel;
@@ -204,19 +204,14 @@ public class PlantModelElementConverter {
     model.getPropertyMaxReverseVelocity().setValueAndUnit(
         ((double) vehicleTO.getMaxReverseVelocity()), SpeedProperty.Unit.MM_S
     );
-    model.getPropertyEnergyLevelCritical().setValueAndUnit(
-        vehicleTO.getEnergyLevelCritical(),
-        PercentProperty.Unit.PERCENT
-    );
-    model.getPropertyEnergyLevelGood().setValueAndUnit(
-        vehicleTO.getEnergyLevelGood(),
-        PercentProperty.Unit.PERCENT
-    );
-    model.getPropertyEnergyLevelFullyRecharged().setValueAndUnit(
-        vehicleTO.getEnergyLevelFullyRecharged(), PercentProperty.Unit.PERCENT
-    );
-    model.getPropertyEnergyLevelSufficientlyRecharged().setValueAndUnit(
-        vehicleTO.getEnergyLevelSufficientlyRecharged(), PercentProperty.Unit.PERCENT
+
+    model.getPropertyEnergyLevelThresholdSet().setValue(
+        new EnergyLevelThresholdSetModel(
+            vehicleTO.getEnergyLevelThresholdSet().getEnergyLevelCritical(),
+            vehicleTO.getEnergyLevelThresholdSet().getEnergyLevelGood(),
+            vehicleTO.getEnergyLevelThresholdSet().getEnergyLevelSufficientlyRecharged(),
+            vehicleTO.getEnergyLevelThresholdSet().getEnergyLevelFullyRecharged()
+        )
     );
 
     model.getPropertyEnvelopeKey().setText(vehicleTO.getEnvelopeKey());

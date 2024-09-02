@@ -31,6 +31,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrder
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleEnergyLevelThresholdSetTO;
 import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
@@ -158,6 +159,10 @@ public class V1RequestHandler
     service.put(
         "/vehicles/:NAME/allowedOrderTypes",
         this::handlePutVehicleAllowedOrderTypes
+    );
+    service.put(
+        "/vehicles/:NAME/energyLevelThresholdSet",
+        this::handlePutVehicleEnergyLevelThresholdSet
     );
     service.put(
         "/vehicles/:NAME/envelopeKey",
@@ -573,6 +578,17 @@ public class V1RequestHandler
     vehicleHandler.putVehicleAllowedOrderTypes(
         request.params(":NAME"),
         jsonBinder.fromJson(request.body(), PutVehicleAllowedOrderTypesTO.class)
+    );
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handlePutVehicleEnergyLevelThresholdSet(Request request, Response response)
+      throws ObjectUnknownException,
+        IllegalArgumentException {
+    vehicleHandler.putVehicleEnergyLevelThresholdSet(
+        request.params(":NAME"),
+        jsonBinder.fromJson(request.body(), PutVehicleEnergyLevelThresholdSetTO.class)
     );
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";

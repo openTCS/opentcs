@@ -14,6 +14,7 @@ import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
@@ -161,6 +162,27 @@ class RemoteVehicleServiceProxy
 
     try {
       getRemoteService().updateVehiclePaused(getClientId(), ref, paused);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public void updateVehicleEnergyLevelThresholdSet(
+      TCSObjectReference<Vehicle> ref,
+      EnergyLevelThresholdSet energyLevelThresholdSet
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().updateVehicleEnergyLevelThresholdSet(
+          getClientId(),
+          ref,
+          energyLevelThresholdSet
+      );
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 import org.opentcs.util.Colors;
@@ -67,10 +68,12 @@ class VehicleConverterTest {
     assertThat(result, hasSize(1));
     assertThat(result.get(0).getName(), is("V1"));
     assertThat(result.get(0).getBoundingBox().getLength(), is(1000L));
-    assertThat(result.get(0).getEnergyLevelGood(), is(90));
-    assertThat(result.get(0).getEnergyLevelCritical(), is(30));
-    assertThat(result.get(0).getEnergyLevelFullyRecharged(), is(90));
-    assertThat(result.get(0).getEnergyLevelSufficientlyRecharged(), is(30));
+    assertThat(result.get(0).getEnergyLevelThresholdSet().getEnergyLevelGood(), is(90));
+    assertThat(result.get(0).getEnergyLevelThresholdSet().getEnergyLevelCritical(), is(30));
+    assertThat(result.get(0).getEnergyLevelThresholdSet().getEnergyLevelFullyRecharged(), is(90));
+    assertThat(
+        result.get(0).getEnergyLevelThresholdSet().getEnergyLevelSufficientlyRecharged(), is(30)
+    );
     assertThat(result.get(0).getMaxVelocity(), is(1000));
     assertThat(result.get(0).getMaxReverseVelocity(), is(1000));
     assertThat(result.get(0).getLayout().getRouteColor(), is(Colors.decodeFromHexRGB("#00FF00")));
@@ -82,10 +85,7 @@ class VehicleConverterTest {
   void checkToVehicleTOs() {
     Vehicle vehicle = new Vehicle("V1")
         .withBoundingBox(new BoundingBox(1000, 1000, 1000))
-        .withEnergyLevelGood(90)
-        .withEnergyLevelCritical(30)
-        .withEnergyLevelFullyRecharged(90)
-        .withEnergyLevelSufficientlyRecharged(30)
+        .withEnergyLevelThresholdSet(new EnergyLevelThresholdSet(30, 90, 30, 90))
         .withMaxVelocity(1000)
         .withMaxReverseVelocity(1000)
         .withLayout(new Vehicle.Layout())

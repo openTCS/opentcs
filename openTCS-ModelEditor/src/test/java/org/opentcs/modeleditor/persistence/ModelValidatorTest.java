@@ -30,6 +30,8 @@ import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.BooleanProperty;
 import org.opentcs.guing.base.components.properties.type.BoundingBoxProperty;
 import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
+import org.opentcs.guing.base.components.properties.type.EnergyLevelThresholdSetModel;
+import org.opentcs.guing.base.components.properties.type.EnergyLevelThresholdSetProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.components.properties.type.LocationTypeProperty;
 import org.opentcs.guing.base.components.properties.type.PercentProperty;
@@ -373,13 +375,18 @@ class ModelValidatorTest {
         VehicleModel.BOUNDING_BOX,
         new BoundingBoxModel(1000, 1000, 1000, new Couple(0, 0))
     );
-    addProperty(vehicle, PercentProperty.class, VehicleModel.ENERGY_LEVEL_CRITICAL, 30);
-    addProperty(vehicle, PercentProperty.class, VehicleModel.ENERGY_LEVEL_GOOD, 80);
+    addProperty(
+        vehicle,
+        EnergyLevelThresholdSetProperty.class,
+        VehicleModel.ENERGY_LEVEL_THRESHOLD_SET,
+        new EnergyLevelThresholdSetModel(30, 80, 0, 0)
+    );
     addProperty(vehicle, PercentProperty.class, VehicleModel.ENERGY_LEVEL, 60);
     addProperty(vehicle, SelectionProperty.class, VehicleModel.PROC_STATE, Vehicle.ProcState.IDLE);
     addProperty(vehicle, SelectionProperty.class, VehicleModel.STATE, Vehicle.State.IDLE);
     addProperty(
-        vehicle, SelectionProperty.class,
+        vehicle,
+        SelectionProperty.class,
         VehicleModel.INTEGRATION_LEVEL,
         Vehicle.IntegrationLevel.TO_BE_RESPECTED
     );

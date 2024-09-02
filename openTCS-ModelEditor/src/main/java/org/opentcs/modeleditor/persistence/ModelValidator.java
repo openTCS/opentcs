@@ -20,6 +20,8 @@ import java.util.Set;
 import org.opentcs.data.model.Couple;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.BoundingBoxProperty;
+import org.opentcs.guing.base.components.properties.type.EnergyLevelThresholdSetModel;
+import org.opentcs.guing.base.components.properties.type.EnergyLevelThresholdSetProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.components.properties.type.LocationTypeProperty;
@@ -465,48 +467,90 @@ public class ModelValidator {
       vehicle.setProperty(VehicleModel.BOUNDING_BOX, boundingBoxProperty);
     }
 
-    //Validate the critical energy level
-    PercentProperty energyCriticalProperty
-        = (PercentProperty) vehicle.getProperty(VehicleModel.ENERGY_LEVEL_CRITICAL);
-    if (((int) energyCriticalProperty.getValue()) < 0
-        || ((int) energyCriticalProperty.getValue()) > 100) {
+    EnergyLevelThresholdSetProperty energyLevelThresholdSetProperty
+        = (EnergyLevelThresholdSetProperty) vehicle.getProperty(
+            VehicleModel.ENERGY_LEVEL_THRESHOLD_SET
+        );
+    // Validate the critical energy level
+    if (energyLevelThresholdSetProperty.getValue().getEnergyLevelCritical() < 0
+        || energyLevelThresholdSetProperty.getValue().getEnergyLevelCritical() > 100) {
       LOG.warn(
           "{}: Energy level critical is {}, should be in [0..100]. Setting to 0.",
           vehicle.getName(),
-          energyCriticalProperty.getValue()
+          energyLevelThresholdSetProperty.getValue().getEnergyLevelCritical()
       );
-      energyCriticalProperty.setValueAndUnit(0, PercentProperty.Unit.PERCENT);
-      vehicle.setProperty(VehicleModel.ENERGY_LEVEL_CRITICAL, energyCriticalProperty);
+      energyLevelThresholdSetProperty.setValue(
+          new EnergyLevelThresholdSetModel(
+              0,
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelGood(),
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelSufficientlyRecharged(),
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelFullyRecharged()
+          )
+      );
+      vehicle.setProperty(VehicleModel.ENERGY_LEVEL_THRESHOLD_SET, energyLevelThresholdSetProperty);
     }
 
-    //Validate the good energy level
-    PercentProperty energyGoodProperty
-        = (PercentProperty) vehicle.getProperty(VehicleModel.ENERGY_LEVEL_GOOD);
-    if (((int) energyGoodProperty.getValue()) < 0 || ((int) energyGoodProperty.getValue()) > 100) {
+    // Validate the good energy level
+    if (energyLevelThresholdSetProperty.getValue().getEnergyLevelGood() < 0
+        || energyLevelThresholdSetProperty.getValue().getEnergyLevelGood() > 100) {
       LOG.warn(
           "{}: Energy level good is {}, should be in [0..100]. Setting to 100.",
           vehicle.getName(),
-          energyGoodProperty.getValue()
+          energyLevelThresholdSetProperty.getValue().getEnergyLevelGood()
       );
-      energyGoodProperty.setValueAndUnit(100, PercentProperty.Unit.PERCENT);
-      vehicle.setProperty(VehicleModel.ENERGY_LEVEL_GOOD, energyGoodProperty);
+      energyLevelThresholdSetProperty.setValue(
+          new EnergyLevelThresholdSetModel(
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelCritical(),
+              100,
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelSufficientlyRecharged(),
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelFullyRecharged()
+          )
+      );
+      vehicle.setProperty(VehicleModel.ENERGY_LEVEL_THRESHOLD_SET, energyLevelThresholdSetProperty);
     }
 
-    //Validate that the good energy level is greater equals than the critical energy level
-    if (((int) energyGoodProperty.getValue()) < ((int) energyCriticalProperty.getValue())) {
+    // Validate that the good energy level is greater than or equals the critical energy level
+    if (energyLevelThresholdSetProperty.getValue().getEnergyLevelGood()
+        < energyLevelThresholdSetProperty.getValue().getEnergyLevelCritical()) {
       LOG.warn(
-          "{}: Energy level good ('{}') not >= energy level critical ('{}'). Setting to {}.",
+          "{}: Energy level good ({}) not >= energy level critical ({}). Setting to {}.",
           vehicle.getName(),
-          energyGoodProperty.getValue(),
-          energyCriticalProperty.getValue(),
-          energyCriticalProperty.getValue()
+          energyLevelThresholdSetProperty.getValue().getEnergyLevelGood(),
+          energyLevelThresholdSetProperty.getValue().getEnergyLevelCritical(),
+          energyLevelThresholdSetProperty.getValue().getEnergyLevelCritical()
       );
-      energyGoodProperty
-          .setValueAndUnit(
-              energyCriticalProperty.getValueByUnit(PercentProperty.Unit.PERCENT),
-              PercentProperty.Unit.PERCENT
-          );
-      vehicle.setProperty(VehicleModel.ENERGY_LEVEL_GOOD, energyGoodProperty);
+      energyLevelThresholdSetProperty.setValue(
+          new EnergyLevelThresholdSetModel(
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelCritical(),
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelCritical(),
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelSufficientlyRecharged(),
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelFullyRecharged()
+          )
+      );
+      vehicle.setProperty(VehicleModel.ENERGY_LEVEL_THRESHOLD_SET, energyLevelThresholdSetProperty);
+    }
+
+    // Validate that the fully recharged energy level is greater than or equals the sufficiently
+    // recharged energy level
+    if (energyLevelThresholdSetProperty.getValue().getEnergyLevelFullyRecharged()
+        < energyLevelThresholdSetProperty.getValue().getEnergyLevelSufficientlyRecharged()) {
+      LOG.warn(
+          "{}: Energy level fully recharged ({}) not >= energy level sufficiently recharged ({})."
+              + " Setting to {}.",
+          vehicle.getName(),
+          energyLevelThresholdSetProperty.getValue().getEnergyLevelFullyRecharged(),
+          energyLevelThresholdSetProperty.getValue().getEnergyLevelSufficientlyRecharged(),
+          energyLevelThresholdSetProperty.getValue().getEnergyLevelSufficientlyRecharged()
+      );
+      energyLevelThresholdSetProperty.setValue(
+          new EnergyLevelThresholdSetModel(
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelCritical(),
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelGood(),
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelSufficientlyRecharged(),
+              energyLevelThresholdSetProperty.getValue().getEnergyLevelSufficientlyRecharged()
+          )
+      );
+      vehicle.setProperty(VehicleModel.ENERGY_LEVEL_THRESHOLD_SET, energyLevelThresholdSetProperty);
     }
 
     //Validate the current energy level

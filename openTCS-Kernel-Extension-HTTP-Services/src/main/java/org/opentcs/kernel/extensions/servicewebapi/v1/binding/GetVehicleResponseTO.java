@@ -247,8 +247,10 @@ public class GetVehicleResponseTO {
     vehicleState.setName(vehicle.getName());
     vehicleState.setProperties(vehicle.getProperties());
     vehicleState.setLength((int) vehicle.getBoundingBox().getLength());
-    vehicleState.setEnergyLevelGood(vehicle.getEnergyLevelGood());
-    vehicleState.setEnergyLevelCritical(vehicle.getEnergyLevelCritical());
+    vehicleState.setEnergyLevelCritical(
+        vehicle.getEnergyLevelThresholdSet().getEnergyLevelCritical()
+    );
+    vehicleState.setEnergyLevelGood(vehicle.getEnergyLevelThresholdSet().getEnergyLevelGood());
     vehicleState.setEnergyLevel(vehicle.getEnergyLevel());
     vehicleState.setIntegrationLevel(vehicle.getIntegrationLevel());
     vehicleState.setPaused(vehicle.isPaused());

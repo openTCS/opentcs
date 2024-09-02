@@ -23,6 +23,7 @@ import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.base.components.properties.event.NullAttributesChangeListener;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
+import org.opentcs.guing.base.components.properties.type.EnergyLevelThresholdSetModel;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.PercentProperty;
 import org.opentcs.guing.base.components.properties.type.SpeedProperty;
@@ -79,27 +80,18 @@ public class VehicleAdapter
           vehicle.getMaxReverseVelocity(),
           Unit.MM_S
       );
-      model.getPropertyEnergyLevelCritical().setValueAndUnit(
-          vehicle.getEnergyLevelCritical(),
-          PercentProperty.Unit.PERCENT
-      );
-      model.getPropertyEnergyLevelGood().setValueAndUnit(
-          vehicle.getEnergyLevelGood(),
-          PercentProperty.Unit.PERCENT
-      );
-      model.getPropertyEnergyLevelFullyRecharged()
-          .setValueAndUnit(
-              vehicle.getEnergyLevelFullyRecharged(),
-              PercentProperty.Unit.PERCENT
-          );
-      model.getPropertyEnergyLevelSufficientlyRecharged()
-          .setValueAndUnit(
-              vehicle.getEnergyLevelSufficientlyRecharged(),
-              PercentProperty.Unit.PERCENT
-          );
       model.getPropertyEnergyLevel().setValueAndUnit(
           vehicle.getEnergyLevel(),
           PercentProperty.Unit.PERCENT
+      );
+
+      model.getPropertyEnergyLevelThresholdSet().setValue(
+          new EnergyLevelThresholdSetModel(
+              vehicle.getEnergyLevelThresholdSet().getEnergyLevelCritical(),
+              vehicle.getEnergyLevelThresholdSet().getEnergyLevelGood(),
+              vehicle.getEnergyLevelThresholdSet().getEnergyLevelSufficientlyRecharged(),
+              vehicle.getEnergyLevelThresholdSet().getEnergyLevelFullyRecharged()
+          )
       );
 
       model.getPropertyLoaded().setValue(
@@ -155,12 +147,7 @@ public class VehicleAdapter
         .withVehicle(
             new VehicleCreationTO(vehicleModel.getName())
                 .withBoundingBox(getBoundingBox(vehicleModel))
-                .withEnergyLevelCritical(getEnergyLevelCritical(vehicleModel))
-                .withEnergyLevelGood(getEnergyLevelGood(vehicleModel))
-                .withEnergyLevelFullyRecharged(getEnergyLevelFullyRecharged(vehicleModel))
-                .withEnergyLevelSufficientlyRecharged(
-                    getEnergyLevelSufficientlyRecharged(vehicleModel)
-                )
+                .withEnergyLevelThresholdSet(getEnergyLevelThresholdSet(vehicleModel))
                 .withMaxVelocity(getMaximumVelocity(vehicleModel))
                 .withMaxReverseVelocity(getMaximumReverseVelocity(vehicleModel))
                 .withEnvelopeKey(getEnvelopeKey(vehicleModel))
@@ -267,20 +254,13 @@ public class VehicleAdapter
         .intValue();
   }
 
-  private int getEnergyLevelCritical(VehicleModel model) {
-    return (Integer) model.getPropertyEnergyLevelCritical().getValue();
-  }
-
-  private int getEnergyLevelGood(VehicleModel model) {
-    return (Integer) model.getPropertyEnergyLevelGood().getValue();
-  }
-
-  private int getEnergyLevelFullyRecharged(VehicleModel model) {
-    return (Integer) model.getPropertyEnergyLevelFullyRecharged().getValue();
-  }
-
-  private int getEnergyLevelSufficientlyRecharged(VehicleModel model) {
-    return (Integer) model.getPropertyEnergyLevelSufficientlyRecharged().getValue();
+  private VehicleCreationTO.EnergyLevelThresholdSet getEnergyLevelThresholdSet(VehicleModel model) {
+    return new VehicleCreationTO.EnergyLevelThresholdSet(
+        model.getPropertyEnergyLevelThresholdSet().getValue().getEnergyLevelCritical(),
+        model.getPropertyEnergyLevelThresholdSet().getValue().getEnergyLevelGood(),
+        model.getPropertyEnergyLevelThresholdSet().getValue().getEnergyLevelSufficientlyRecharged(),
+        model.getPropertyEnergyLevelThresholdSet().getValue().getEnergyLevelFullyRecharged()
+    );
   }
 
   private String getEnvelopeKey(VehicleModel model) {
