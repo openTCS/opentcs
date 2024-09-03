@@ -18,6 +18,7 @@ import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.common.KernelClientApplication;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.TCSObjectEvent;
@@ -51,6 +52,10 @@ public class PeripheralJobsContainer
    */
   private final SharedKernelServicePortalProvider portalProvider;
   /**
+   * The kernel client application.
+   */
+  private final KernelClientApplication kernelClientApplication;
+  /**
    * The peripheral jobs.
    */
   private final Map<String, PeripheralJob> peripheralJobs = new HashMap<>();
@@ -67,16 +72,20 @@ public class PeripheralJobsContainer
    * Creates a new instance.
    *
    * @param eventBus Where this instance subscribes for events.
-   * @param portalProvider Provides a access to a portal.
+   * @param portalProvider Provides access to a portal.
+   * @param kernelClientApplication The kernel client application.
    */
   @Inject
   public PeripheralJobsContainer(
       @ApplicationEventBus
       EventBus eventBus,
-      SharedKernelServicePortalProvider portalProvider
+      SharedKernelServicePortalProvider portalProvider,
+      KernelClientApplication kernelClientApplication
   ) {
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
+    this.kernelClientApplication
+        = requireNonNull(kernelClientApplication, "kernelClientApplication");
   }
 
   @Override
@@ -180,7 +189,7 @@ public class PeripheralJobsContainer
   }
 
   private Set<PeripheralJob> fetchJobsIfOnline() {
-    if (portalProvider.portalShared()) {
+    if (kernelClientApplication.isOnline()) {
       try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
         return sharedPortal.getPortal().getPeripheralJobService().fetchObjects(PeripheralJob.class);
       }

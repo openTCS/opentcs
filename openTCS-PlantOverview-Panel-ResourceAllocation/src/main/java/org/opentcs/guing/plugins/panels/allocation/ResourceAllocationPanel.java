@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.SwingUtilities;
-import org.opentcs.access.Kernel;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
@@ -143,18 +142,7 @@ public class ResourceAllocationPanel
       LOG.debug("TCSObjectEvent is not about a Vehicle, ignoring.");
       return;
     }
-    //Check if we have access to the kernel
-    if (portalProvider == null || !portalProvider.portalShared()) {
-      LOG.debug("No connection to the kernel but received an event.");
-      return;
-    }
 
-    // Ignore events if we're not operating or connected.
-    // (Vehicle objects may change a lot in modelling mode.)
-    if (sharedPortal.getPortal().getState() != Kernel.State.OPERATING) {
-      LOG.debug("Kernel is not in operating mode - skipping.");
-      return;
-    }
     SwingUtilities.invokeLater(
         () -> handleVehicleStateChange((Vehicle) tcsObjectEvent.getCurrentOrPreviousObjectState())
     );

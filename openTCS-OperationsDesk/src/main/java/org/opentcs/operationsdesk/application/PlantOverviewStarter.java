@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
 import org.jhotdraw.app.Application;
+import org.opentcs.common.KernelClientApplication;
 import org.opentcs.guing.common.application.ProgressIndicator;
 import org.opentcs.guing.common.application.StartupProgressStatus;
 import org.opentcs.guing.common.event.EventLogger;
@@ -51,7 +52,13 @@ public class PlantOverviewStarter {
    * Dispatches openTCS event from kernel objects to corresponding model components.
    */
   private final OpenTCSEventDispatcher eventDispatcher;
-
+  /**
+   * Responsible for connections to a kernel.
+   */
+  private final KernelClientApplication kernelClientApplication;
+  /**
+   * Handles registering of model attribute adapters.
+   */
   private final AttributeAdapterRegistry attributeAdapterRegistry;
   /**
    * Maintains a set of all transport orders existing on the kernel side.
@@ -81,6 +88,7 @@ public class PlantOverviewStarter {
    * the local event bus.
    * @param eventDispatcher Dispatches openTCS event from kernel objects to corresponding model
    * components.
+   * @param kernelClientApplication Responsible for connections to a kernel.
    * @param attributeAdapterRegistry Handles registering of model attribute adapters.
    * @param transportOrdersContainer Maintains a set of all transport orders existing on the kernel
    * side.
@@ -98,6 +106,7 @@ public class PlantOverviewStarter {
       EventLogger eventLogger,
       KernelEventFetcher kernelEventFetcher,
       OpenTCSEventDispatcher eventDispatcher,
+      KernelClientApplication kernelClientApplication,
       AttributeAdapterRegistry attributeAdapterRegistry,
       TransportOrdersContainer transportOrdersContainer,
       PeripheralJobsContainer peripheralJobsContainer,
@@ -110,6 +119,9 @@ public class PlantOverviewStarter {
     this.eventLogger = requireNonNull(eventLogger, "eventLogger");
     this.kernelEventFetcher = requireNonNull(kernelEventFetcher, "kernelEventFetcher");
     this.eventDispatcher = requireNonNull(eventDispatcher, "eventDispatcher");
+    this.kernelClientApplication = requireNonNull(
+        kernelClientApplication, "kernelClientApplication"
+    );
     this.attributeAdapterRegistry = requireNonNull(
         attributeAdapterRegistry,
         "attributeAdapterRegistry"
@@ -149,6 +161,7 @@ public class PlantOverviewStarter {
     opentcsView.setApplication(application);
     // Start the view.
     application.show(opentcsView);
+    kernelClientApplication.initialize();
     progressIndicator.terminate();
   }
 }

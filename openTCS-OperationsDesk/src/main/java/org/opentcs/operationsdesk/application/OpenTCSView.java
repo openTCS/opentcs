@@ -466,7 +466,7 @@ public class OpenTCSView
     viewManager.init();
     createEmptyModel();
 
-    switchToOperatingState();
+    setOperatingState();
   }
 
   @Override // AbstractView
@@ -971,6 +971,9 @@ public class OpenTCSView
   private void handleKernelStateChangeEvent(KernelStateChangeEvent event) {
     closeOpenedPluginPanels();
     switch (event.getNewState()) {
+      case LOGGED_IN:
+        handleKernelConnection();
+        break;
       case MODELLING:
         handleKernelInModellingMode();
         break;
@@ -986,6 +989,7 @@ public class OpenTCSView
       case SHUTDOWN:
       default:
         handleNoKernelConnection();
+        handleKernelInModellingMode();
     }
   }
 
@@ -994,27 +998,18 @@ public class OpenTCSView
       sharedPortal.close();
       sharedPortal = null;
     }
-    JOptionPane.showMessageDialog(
-        fFrame,
-        bundle.getFormatted("openTcsView.optionPane_kernelConnectionLost.message"),
-        bundle.getFormatted("openTcsView.optionPane_kernelConnectionLost.title"),
-        JOptionPane.ERROR_MESSAGE
+    statusPanel.setLogMessage(
+        Level.INFO,
+        bundle.getFormatted(
+            "openTcsView.message_disconnectedFromKernel.text",
+            fModelManager.getModel().getName()
+        )
     );
-    // XXX We should actually initiate a reconnect attempt here.
-    System.exit(1);
   }
 
-  /**
-   * Switches the plant overview state.
-   */
-  private void switchToOperatingState() {
+  private void handleKernelConnection() {
     try {
       sharedPortal = portalProvider.register();
-      if (sharedPortal.getPortal().getState() != Kernel.State.OPERATING) {
-        handleKernelInModellingMode();
-      }
-      setOperatingState();
-      SwingUtilities.invokeLater(() -> loadCurrentKernelModel());
     }
     catch (ServiceUnavailableException exc) {
       handleNoKernelConnection();

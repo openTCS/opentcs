@@ -8,6 +8,7 @@
 package org.opentcs.operationsdesk.application.action;
 
 import static java.util.Objects.requireNonNull;
+import static org.opentcs.operationsdesk.event.KernelStateChangeEvent.State.LOGGED_IN;
 
 import jakarta.inject.Inject;
 import java.net.URL;
@@ -36,6 +37,7 @@ import org.opentcs.operationsdesk.application.action.actions.PauseAllVehiclesAct
 import org.opentcs.operationsdesk.application.action.actions.ResumeAllVehiclesAction;
 import org.opentcs.operationsdesk.application.toolbar.MultipleSelectionTool;
 import org.opentcs.operationsdesk.application.toolbar.SelectionToolFactory;
+import org.opentcs.operationsdesk.event.KernelStateChangeEvent;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.draw.SelectSameAction;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
@@ -134,6 +136,7 @@ public class ToolBarManager
     // --- Create Transport Order (only in Operating mode) ---
     buttonCreateOrder = new JButton(actionMap.get(CreateTransportOrderAction.ID));
     buttonCreateOrder.setText(null);
+    buttonCreateOrder.setEnabled(false);
     toolBarCreation.add(buttonCreateOrder);
 
     toolBarCreation.addSeparator();
@@ -141,6 +144,7 @@ public class ToolBarManager
     // --- Find Vehicle (only in Operating mode) ---
     buttonFindVehicle = new JButton(actionMap.get(FindVehicleAction.ID));
     buttonFindVehicle.setText(null);
+    buttonFindVehicle.setEnabled(false);
     toolBarCreation.add(buttonFindVehicle);
 
     toolBarCreation.addSeparator();
@@ -148,11 +152,13 @@ public class ToolBarManager
     // --- Pause All Vehicles (only in Operating mode) ---
     buttonPauseAllVehicles = new JButton(actionMap.get(PauseAllVehiclesAction.ID));
     buttonPauseAllVehicles.setText(null);
+    buttonPauseAllVehicles.setEnabled(false);
     toolBarCreation.add(buttonPauseAllVehicles);
 
     // --- Resume All Vehicles (only in Operating mode) ---
     buttonResumeAllVehicles = new JButton(actionMap.get(ResumeAllVehiclesAction.ID));
     buttonResumeAllVehicles.setText(null);
+    buttonResumeAllVehicles.setEnabled(false);
     toolBarCreation.add(buttonResumeAllVehicles);
 
     toolBarCreation.setName(labels.getString("toolBarManager.toolbar_drawing.title"));
@@ -177,13 +183,23 @@ public class ToolBarManager
 
   @Override
   public void onEvent(Object event) {
-    if (event instanceof ResetInteractionToolCommand) {
-      handleToolReset((ResetInteractionToolCommand) event);
+    if (event instanceof ResetInteractionToolCommand resetInteractionToolCommand) {
+      handleToolReset(resetInteractionToolCommand);
+    }
+    else if (event instanceof KernelStateChangeEvent kernelStateChangeEvent) {
+      handleKernelStateChangeEvent(kernelStateChangeEvent);
     }
   }
 
   private void handleToolReset(ResetInteractionToolCommand evt) {
     selectionToolButton.setSelected(true);
+  }
+
+  private void handleKernelStateChangeEvent(KernelStateChangeEvent event) {
+    buttonCreateOrder.setEnabled(event.getNewState() == LOGGED_IN);
+    buttonFindVehicle.setEnabled(event.getNewState() == LOGGED_IN);
+    buttonPauseAllVehicles.setEnabled(event.getNewState() == LOGGED_IN);
+    buttonResumeAllVehicles.setEnabled(event.getNewState() == LOGGED_IN);
   }
 
   /**

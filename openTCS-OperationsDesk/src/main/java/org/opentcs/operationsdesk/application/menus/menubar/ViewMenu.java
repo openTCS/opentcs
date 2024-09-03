@@ -8,10 +8,12 @@
 package org.opentcs.operationsdesk.application.menus.menubar;
 
 import static java.util.Objects.requireNonNull;
+import static org.opentcs.operationsdesk.event.KernelStateChangeEvent.State.LOGGED_IN;
 
 import jakarta.inject.Inject;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.guing.common.application.OperationMode;
 import org.opentcs.guing.common.application.menus.menubar.ViewPluginPanelsMenu;
 import org.opentcs.operationsdesk.application.action.ViewActionMap;
@@ -20,15 +22,20 @@ import org.opentcs.operationsdesk.application.action.view.AddPeripheralJobViewAc
 import org.opentcs.operationsdesk.application.action.view.AddTransportOrderSequenceViewAction;
 import org.opentcs.operationsdesk.application.action.view.AddTransportOrderViewAction;
 import org.opentcs.operationsdesk.application.action.view.RestoreDockingLayoutAction;
+import org.opentcs.operationsdesk.event.KernelStateChangeEvent;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
+import org.opentcs.util.event.EventHandler;
+import org.opentcs.util.event.EventSource;
 
 /**
  * The application's menu for view-related operations.
  */
 public class ViewMenu
     extends
-      JMenu {
+      JMenu
+    implements
+      EventHandler {
 
   /**
    * A menu item for adding a drawing view.
@@ -65,7 +72,9 @@ public class ViewMenu
   @SuppressWarnings("this-escape")
   public ViewMenu(
       ViewActionMap actionMap,
-      ViewPluginPanelsMenu menuPluginPanels
+      ViewPluginPanelsMenu menuPluginPanels,
+      @ApplicationEventBus
+      EventSource eventSource
   ) {
     requireNonNull(actionMap, "actionMap");
     requireNonNull(menuPluginPanels, "menuPluginPanels");
@@ -97,6 +106,7 @@ public class ViewMenu
     // Menu item View -> Plugins
     this.menuPluginPanels = menuPluginPanels;
     menuPluginPanels.setOperationMode(OperationMode.OPERATING);
+    menuPluginPanels.setEnabled(false);
     add(menuPluginPanels);
 
     // Menu item View -> Restore docking layout
@@ -105,5 +115,18 @@ public class ViewMenu
         labels.getString("viewMenu.menuItem_restoreWindowArrangement.text")
     );
     add(menuItemRestoreDockingLayout);
+
+    eventSource.subscribe(this);
+  }
+
+  @Override
+  public void onEvent(Object event) {
+    if (event instanceof KernelStateChangeEvent kernelStateChangeEvent) {
+      handleKernelStateChangeEvent(kernelStateChangeEvent);
+    }
+  }
+
+  private void handleKernelStateChangeEvent(KernelStateChangeEvent event) {
+    menuPluginPanels.setEnabled(event.getNewState() == LOGGED_IN);
   }
 }

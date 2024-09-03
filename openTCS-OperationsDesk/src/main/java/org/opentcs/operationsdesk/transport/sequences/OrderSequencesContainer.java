@@ -18,6 +18,7 @@ import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.common.KernelClientApplication;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.TCSObjectEvent;
@@ -51,6 +52,10 @@ public class OrderSequencesContainer
    */
   private final SharedKernelServicePortalProvider portalProvider;
   /**
+   * The kernel client application.
+   */
+  private final KernelClientApplication kernelClientApplication;
+  /**
    * The order sequences.
    */
   private final Map<String, OrderSequence> orderSequences = new HashMap<>();
@@ -67,10 +72,13 @@ public class OrderSequencesContainer
   public OrderSequencesContainer(
       @ApplicationEventBus
       EventBus eventBus,
-      SharedKernelServicePortalProvider portalProvider
+      SharedKernelServicePortalProvider portalProvider,
+      KernelClientApplication kernelClientApplication
   ) {
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
+    this.kernelClientApplication
+        = requireNonNull(kernelClientApplication, "kernelClientApplication");
   }
 
   @Override
@@ -120,7 +128,7 @@ public class OrderSequencesContainer
   }
 
   private Set<OrderSequence> fetchSequencesIfOnline() {
-    if (portalProvider.portalShared()) {
+    if (kernelClientApplication.isOnline()) {
       try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
         return sharedPortal.getPortal().getTransportOrderService()
             .fetchObjects(OrderSequence.class);

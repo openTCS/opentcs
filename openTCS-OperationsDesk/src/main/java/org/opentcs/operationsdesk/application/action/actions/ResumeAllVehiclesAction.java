@@ -8,8 +8,6 @@
 package org.opentcs.operationsdesk.application.action.actions;
 
 import static java.util.Objects.requireNonNull;
-import static javax.swing.Action.LARGE_ICON_KEY;
-import static javax.swing.Action.SMALL_ICON;
 import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.TOOLBAR_PATH;
 
 import jakarta.inject.Inject;
@@ -90,18 +88,12 @@ public class ResumeAllVehiclesAction
   }
 
   private void resumeVehicles(KernelServicePortal portal) {
-    if (portal == null) {
-      return;
-    }
-    ModelComponent folder
-        = modelManager.getModel().getMainFolder(SystemModel.FolderKey.VEHICLES);
+    ModelComponent folder = modelManager.getModel().getMainFolder(SystemModel.FolderKey.VEHICLES);
 
-    if (portalProvider.portalShared()) {
-      for (ModelComponent component : folder.getChildComponents()) {
-        VehicleModel vModel = (VehicleModel) component;
-        LOG.info("Resuming vehicle {}...", vModel.getVehicle().getName());
-        portal.getVehicleService().updateVehiclePaused(vModel.getVehicle().getReference(), false);
-      }
+    for (ModelComponent component : folder.getChildComponents()) {
+      VehicleModel vModel = (VehicleModel) component;
+      LOG.info("Resuming vehicle {}...", vModel.getVehicle().getName());
+      portal.getVehicleService().updateVehiclePaused(vModel.getVehicle().getReference(), false);
     }
   }
 }

@@ -14,7 +14,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import java.util.ResourceBundle;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
 
@@ -26,13 +25,9 @@ public class ContinuousLoadPanelFactory
       PluggablePanelFactory {
 
   /**
-   * This classe's bundle.
+   * This class's bundle.
    */
   private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
-  /**
-   * A reference to the shared portal provider.
-   */
-  private final SharedKernelServicePortalProvider portalProvider;
   /**
    * A provider for the actual panels.
    */
@@ -41,15 +36,10 @@ public class ContinuousLoadPanelFactory
   /**
    * Creates a new instance.
    *
-   * @param portalProvider The application's portal provider.
    * @param panelProvider A provider for the actual panels.
    */
   @Inject
-  public ContinuousLoadPanelFactory(
-      SharedKernelServicePortalProvider portalProvider,
-      Provider<ContinuousLoadPanel> panelProvider
-  ) {
-    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
+  public ContinuousLoadPanelFactory(Provider<ContinuousLoadPanel> panelProvider) {
     this.panelProvider = requireNonNull(panelProvider, "panelProvider");
   }
 
@@ -69,6 +59,6 @@ public class ContinuousLoadPanelFactory
 
   @Override
   public boolean providesPanel(Kernel.State state) {
-    return portalProvider != null && Kernel.State.OPERATING.equals(state);
+    return Kernel.State.OPERATING.equals(state);
   }
 }

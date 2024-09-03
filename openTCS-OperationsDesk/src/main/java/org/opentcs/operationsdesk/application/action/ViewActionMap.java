@@ -11,12 +11,15 @@ import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
 import javax.swing.ActionMap;
+import org.opentcs.common.KernelClientApplication;
 import org.opentcs.guing.common.application.action.file.ModelPropertiesAction;
 import org.opentcs.guing.common.application.action.file.SaveModelAction;
 import org.opentcs.guing.common.application.action.file.SaveModelAsAction;
 import org.opentcs.operationsdesk.application.OpenTCSView;
+import org.opentcs.operationsdesk.application.action.actions.ConnectToKernelAction;
 import org.opentcs.operationsdesk.application.action.actions.CreatePeripheralJobAction;
 import org.opentcs.operationsdesk.application.action.actions.CreateTransportOrderAction;
+import org.opentcs.operationsdesk.application.action.actions.DisconnectFromKernelAction;
 import org.opentcs.operationsdesk.application.action.actions.FindVehicleAction;
 import org.opentcs.operationsdesk.application.action.actions.PauseAllVehiclesAction;
 import org.opentcs.operationsdesk.application.action.actions.ResumeAllVehiclesAction;
@@ -43,6 +46,7 @@ public class ViewActionMap
    *
    * @param view The openTCS view
    * @param undoRedoManager The undo redo manager
+   * @param kernelClientApplication The kernel-client application
    * @param actionFactory The action factory
    * @param createTransportOrderAction The action to create transport orders
    * @param findVehicleAction The action to find vehicles
@@ -57,6 +61,7 @@ public class ViewActionMap
   public ViewActionMap(
       OpenTCSView view,
       UndoRedoManager undoRedoManager,
+      KernelClientApplication kernelClientApplication,
       ActionFactory actionFactory,
       CreateTransportOrderAction createTransportOrderAction,
       FindVehicleAction findVehicleAction,
@@ -68,6 +73,7 @@ public class ViewActionMap
   ) {
     requireNonNull(view, "view");
     requireNonNull(undoRedoManager, "undoRedoManager");
+    requireNonNull(kernelClientApplication, "kernelClientApplication");
     requireNonNull(actionFactory, "actionFactory");
     requireNonNull(createTransportOrderAction, "createTransportOrderAction");
     requireNonNull(findVehicleAction, "findVehicleAction");
@@ -81,6 +87,8 @@ public class ViewActionMap
     put(SaveModelAsAction.ID, new SaveModelAsAction(view));
     put(ModelPropertiesAction.ID, modelPropertiesAction);
     put(CloseFileAction.ID, new CloseFileAction(view));
+    put(ConnectToKernelAction.ID, new ConnectToKernelAction(kernelClientApplication));
+    put(DisconnectFromKernelAction.ID, new DisconnectFromKernelAction(kernelClientApplication));
 
     // --- Menu Edit ---
     // Undo, Redo

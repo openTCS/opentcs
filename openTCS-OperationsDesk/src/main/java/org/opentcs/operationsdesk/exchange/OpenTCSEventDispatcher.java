@@ -23,8 +23,6 @@ import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.base.model.ModelComponent;
-import org.opentcs.guing.common.application.OperationMode;
-import org.opentcs.guing.common.event.OperationModeChangeEvent;
 import org.opentcs.guing.common.exchange.adapter.ProcessAdapter;
 import org.opentcs.guing.common.exchange.adapter.ProcessAdapterUtil;
 import org.opentcs.guing.common.persistence.ModelManager;
@@ -126,13 +124,7 @@ public class OpenTCSEventDispatcher
     }
 
     LOG.debug("EventDispatcher {} registering with portal...", this);
-    if (!portalProvider.portalShared()) {
-      LOG.warn("No shared portal to register with, aborting.");
-      return;
-    }
-
     sharedPortal = portalProvider.register();
-
   }
 
   private void release() {
@@ -141,59 +133,67 @@ public class OpenTCSEventDispatcher
     }
 
     LOG.debug("EventDispatcher {} unregistering with portal...", this);
-    if (!portalProvider.portalShared() || sharedPortal == null) {
-      LOG.warn("No shared portal to unregister with, aborting.");
-      return;
-    }
-
     sharedPortal.close();
     sharedPortal = null;
   }
 
   @Override
   public void onEvent(Object event) {
-    if (event instanceof TCSObjectEvent) {
-      processObjectEvent((TCSObjectEvent) event);
+    if (event instanceof TCSObjectEvent tcsObjectEvent) {
+      processObjectEvent(tcsObjectEvent);
     }
-    else if (event instanceof KernelStateTransitionEvent) {
-      KernelStateTransitionEvent kse = (KernelStateTransitionEvent) event;
-
+    else if (event instanceof KernelStateTransitionEvent kernelStateTransitionEvent) {
       // React instantly on SHUTDOWN of the kernel, otherwise wait for
       // the transition to finish
-      if (kse.isTransitionFinished()
-          || kse.getEnteredState() == Kernel.State.SHUTDOWN) {
+      if (kernelStateTransitionEvent.isTransitionFinished()
+          || kernelStateTransitionEvent.getEnteredState() == Kernel.State.SHUTDOWN) {
         eventBus.onEvent(
             new KernelStateChangeEvent(
                 this,
-                KernelStateChangeEvent.convertKernelState(kse.getEnteredState())
+                KernelStateChangeEvent.convertKernelState(
+                    kernelStateTransitionEvent.getEnteredState()
+                )
             )
         );
       }
     }
-    else if (event instanceof OperationModeChangeEvent) {
-      handleOperationModeChange((OperationModeChangeEvent) event);
-    }
-    else if (event == ClientConnectionMode.OFFLINE) {
-      eventBus.onEvent(
-          new KernelStateChangeEvent(
-              this,
-              KernelStateChangeEvent.State.DISCONNECTED
-          )
-      );
+    else if (event instanceof ClientConnectionMode connectionMode) {
+      switch (connectionMode) {
+        case ONLINE:
+          handleKernelConnect();
+          break;
+        case OFFLINE:
+          handleKernelDisconnect();
+          break;
+        default:
+          // Do nothing.
+      }
     }
   }
 
-  private void handleOperationModeChange(OperationModeChangeEvent evt) {
-    // If the application switches to OPERATING, we want to register with the kernel.
-    // If the application switches to any state other than OPERATING, we will
-    // not be able to permanently communicate with the kernel any more, so
-    // unregister from it.
-    if (evt.getNewMode() == OperationMode.OPERATING) {
-      register();
-    }
-    else {
-      release();
-    }
+  private void handleKernelConnect() {
+    register();
+
+    eventBus.onEvent(
+        new KernelStateChangeEvent(this, KernelStateChangeEvent.State.LOGGED_IN)
+    );
+    eventBus.onEvent(
+        new KernelStateChangeEvent(
+            this,
+            KernelStateChangeEvent.convertKernelState(sharedPortal.getPortal().getState())
+        )
+    );
+  }
+
+  private void handleKernelDisconnect() {
+    release();
+
+    eventBus.onEvent(
+        new KernelStateChangeEvent(
+            this,
+            KernelStateChangeEvent.State.DISCONNECTED
+        )
+    );
   }
 
   private void processObjectEvent(TCSObjectEvent objectEvent) {

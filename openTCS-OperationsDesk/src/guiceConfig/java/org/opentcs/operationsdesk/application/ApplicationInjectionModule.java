@@ -12,6 +12,7 @@ import jakarta.inject.Singleton;
 import java.awt.Component;
 import javax.swing.JFrame;
 import org.jhotdraw.app.Application;
+import org.opentcs.common.KernelClientApplication;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.common.application.ApplicationState;
 import org.opentcs.guing.common.application.ComponentsManager;
@@ -79,6 +80,9 @@ public class ApplicationInjectionModule
     bind(GuiManager.class).to(OpenTCSView.class);
     bind(ComponentsManager.class).to(OpenTCSView.class);
     bind(PluginPanelManager.class).to(OpenTCSView.class);
+    bind(KernelClientApplication.class)
+        .to(OperationsDeskApplication.class)
+        .in(Singleton.class);
   }
 
 }

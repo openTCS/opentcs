@@ -19,6 +19,7 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.NotificationPublicationEvent;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
+import org.opentcs.common.KernelClientApplication;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.notification.UserNotification;
@@ -52,6 +53,10 @@ public class UserNotificationsContainer
    */
   private final SharedKernelServicePortalProvider portalProvider;
   /**
+   * The kernel client application.
+   */
+  private final KernelClientApplication kernelClientApplication;
+  /**
    * The user notifications.
    */
   private final List<UserNotification> userNotifications = new LinkedList<>();
@@ -74,6 +79,7 @@ public class UserNotificationsContainer
    *
    * @param eventBus Where this instance subscribes for events.
    * @param portalProvider Provides access to a portal.
+   * @param kernelClientApplication The kernel client application.
    * @param configuration The operations desk application's configuration.
    */
   @Inject
@@ -81,10 +87,13 @@ public class UserNotificationsContainer
       @ApplicationEventBus
       EventBus eventBus,
       SharedKernelServicePortalProvider portalProvider,
+      KernelClientApplication kernelClientApplication,
       OperationsDeskConfiguration configuration
   ) {
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
+    this.kernelClientApplication
+        = requireNonNull(kernelClientApplication, "kernelClientApplication");
     this.capacity = requireNonNull(configuration, "configuration").userNotificationDisplayCount();
   }
 
@@ -167,7 +176,7 @@ public class UserNotificationsContainer
   }
 
   private List<UserNotification> fetchNotificationsIfOnLine() {
-    if (portalProvider.portalShared()) {
+    if (kernelClientApplication.isOnline()) {
       try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
         return sharedPortal.getPortal().getNotificationService()
             .fetchUserNotifications(null);

@@ -18,11 +18,10 @@ import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.KernelStateTransitionEvent;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
-import org.opentcs.common.ClientConnectionMode;
+import org.opentcs.common.KernelClientApplication;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
-import org.opentcs.guing.common.application.OperationMode;
-import org.opentcs.guing.common.event.OperationModeChangeEvent;
+import org.opentcs.operationsdesk.event.KernelStateChangeEvent;
 import org.opentcs.util.CyclicTask;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
@@ -59,6 +58,10 @@ public class KernelEventFetcher
    */
   private final SharedKernelServicePortalProvider servicePortalProvider;
   /**
+   * The kernel client application.
+   */
+  private final KernelClientApplication kernelClientApplication;
+  /**
    * The shared portal
    */
   private SharedKernelServicePortal sharedServicePortal;
@@ -80,15 +83,19 @@ public class KernelEventFetcher
    *
    * @param eventBus Where this instance sends events.
    * @param servicePortalProvider Provides a shared portal instance.
+   * @param kernelClientApplication The kernel client application.
    */
   @Inject
   public KernelEventFetcher(
       @ApplicationEventBus
       EventBus eventBus,
-      SharedKernelServicePortalProvider servicePortalProvider
+      SharedKernelServicePortalProvider servicePortalProvider,
+      KernelClientApplication kernelClientApplication
   ) {
     this.eventBus = requireNonNull(eventBus, "eventBus");
     this.servicePortalProvider = requireNonNull(servicePortalProvider, "servicePortalProvider");
+    this.kernelClientApplication
+        = requireNonNull(kernelClientApplication, "kernelClientApplication");
   }
 
   @Override
@@ -122,17 +129,17 @@ public class KernelEventFetcher
 
   @Override
   public void onEvent(Object event) {
-    if (event instanceof OperationModeChangeEvent) {
-      handleOperationModeChange((OperationModeChangeEvent) event);
-    }
-  }
-
-  private void handleOperationModeChange(OperationModeChangeEvent event) {
-    if (event.getNewMode() == OperationMode.OPERATING) {
-      handleKernelConnect();
-    }
-    else {
-      handleKernelDisconnect();
+    if (event instanceof KernelStateChangeEvent kernelStateChangeEvent) {
+      switch (kernelStateChangeEvent.getNewState()) {
+        case LOGGED_IN:
+          handleKernelConnect();
+          break;
+        case DISCONNECTED:
+          handleKernelDisconnect();
+          break;
+        default:
+          // Do nothing.
+      }
     }
   }
 
@@ -210,7 +217,7 @@ public class KernelEventFetcher
       }
 
       if (shutDown) {
-        eventBus.onEvent(ClientConnectionMode.OFFLINE);
+        kernelClientApplication.offline();
       }
     }
   }

@@ -26,6 +26,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Add an edge evaluator that prevents vehicles from being routed to/through points where there is not enough space available (according to the vehicle's bounding box and the maximum allowed bounding box at a point).
    For more information, please refer to the user's guide.
 ** Allow a vehicle's set of energy level thresholds to be modified during runtime via the Operations Desk application.
+** Allow the user to actively connect/disconnect the Operations Desk application to/from a kernel.
+   Add corresponding entries to the application's _File_ menu, which make it possible to change between different kernels during runtime.
 ** Update web API specification and implementation to version 1.8.0:
 *** The endpoint `POST /plantModel/topologyUpdateRequest` now also accepts an optional list of path names allowing the routing topology to be updated selectively.
 *** Add an endpoint `PUT /vehicles/:NAME/energyLevelThresholdSet`, which allows a vehicle's set of energy level thresholds to be modified during runtime.

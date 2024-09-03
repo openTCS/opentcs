@@ -14,7 +14,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import java.util.ResourceBundle;
 import org.opentcs.access.Kernel;
-import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
 
@@ -27,13 +26,9 @@ public class ResourceAllocationPanelFactory
       PluggablePanelFactory {
 
   /**
-   * This classe's bundle.
+   * This class's bundle.
    */
   private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
-  /**
-   * The provider for the portal.
-   */
-  private final SharedKernelServicePortalProvider portalProvider;
 
   /**
    * The provider for the panel this factory wants to create.
@@ -43,22 +38,16 @@ public class ResourceAllocationPanelFactory
   /**
    * Creates a new instance.
    *
-   * @param portalProvider the provider for access to the kernel
    * @param panelProvider the provider for the panel
    */
   @Inject
-  public ResourceAllocationPanelFactory(
-      SharedKernelServicePortalProvider portalProvider,
-      Provider<ResourceAllocationPanel> panelProvider
-  ) {
-    this.portalProvider = requireNonNull(portalProvider, "portalProvider");
+  public ResourceAllocationPanelFactory(Provider<ResourceAllocationPanel> panelProvider) {
     this.panelProvider = requireNonNull(panelProvider, "panelProvider");
   }
 
   @Override
   public boolean providesPanel(Kernel.State state) {
     return (state == Kernel.State.OPERATING);
-
   }
 
   @Override
@@ -68,13 +57,10 @@ public class ResourceAllocationPanelFactory
 
   @Override
   public PluggablePanel createPanel(Kernel.State state) {
-    if (state != Kernel.State.OPERATING) {
+    if (!providesPanel(state)) {
       return null;
     }
-    if (portalProvider == null || !portalProvider.portalShared()) {
-      return null;
-    }
+
     return panelProvider.get();
   }
-
 }
