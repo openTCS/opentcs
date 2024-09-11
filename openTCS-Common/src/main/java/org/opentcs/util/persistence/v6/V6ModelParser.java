@@ -90,9 +90,9 @@ public class V6ModelParser {
           PointTO result = new PointTO();
           result.setName(point.getName())
               .setProperties(convertProperties(point.getProperties()));
-          result.setxPosition(point.getxPosition())
-              .setyPosition(point.getyPosition())
-              .setzPosition(point.getzPosition())
+          result.setPositionX(point.getxPosition())
+              .setPositionY(point.getyPosition())
+              .setPositionZ(point.getzPosition())
               .setVehicleOrientationAngle(point.getVehicleOrientationAngle())
               .setType(point.getType())
               .setVehicleEnvelopes(convertVehicleEnvelopes(point.getVehicleEnvelopes()))
@@ -107,10 +107,10 @@ public class V6ModelParser {
               )
               .setPointLayout(
                   new PointTO.PointLayout()
-                      .setxPosition(point.getPointLayout().getxPosition())
-                      .setyPosition(point.getPointLayout().getyPosition())
-                      .setxLabelOffset(point.getPointLayout().getxLabelOffset())
-                      .setyLabelOffset(point.getPointLayout().getyLabelOffset())
+                      .setPositionX(point.getPointLayout().getxPosition())
+                      .setPositionY(point.getPointLayout().getyPosition())
+                      .setLabelOffsetX(point.getPointLayout().getxLabelOffset())
+                      .setLabelOffsetY(point.getPointLayout().getyLabelOffset())
                       .setLayerId(point.getPointLayout().getLayerId())
               );
           return result;
@@ -294,18 +294,18 @@ public class V6ModelParser {
           LocationTO result = new LocationTO();
           result.setName(location.getName())
               .setProperties(convertProperties(location.getProperties()));
-          result.setxPosition(location.getxPosition())
-              .setyPosition(location.getyPosition())
-              .setzPosition(location.getzPosition())
+          result.setPositionX(location.getxPosition())
+              .setPositionY(location.getyPosition())
+              .setPositionZ(location.getzPosition())
               .setType(location.getType())
               .setLinks(convertLinks(location))
               .setLocked(location.isLocked())
               .setLocationLayout(
                   new LocationTO.LocationLayout()
-                      .setxPosition(location.getLocationLayout().getxPosition())
-                      .setyPosition(location.getLocationLayout().getyPosition())
-                      .setxLabelOffset(location.getLocationLayout().getxLabelOffset())
-                      .setyLabelOffset(location.getLocationLayout().getyLabelOffset())
+                      .setPositionX(location.getLocationLayout().getxPosition())
+                      .setPositionY(location.getLocationLayout().getyPosition())
+                      .setLabelOffsetX(location.getLocationLayout().getxLabelOffset())
+                      .setLabelOffsetY(location.getLocationLayout().getyLabelOffset())
                       .setLocationRepresentation(locationRepresentation)
                       .setLayerId(location.getLocationLayout().getLayerId())
               );

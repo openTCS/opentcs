@@ -103,7 +103,7 @@ public class V6TOMapper {
           new PointCreationTO(point.getName())
               .withPose(
                   new Pose(
-                      new Triple(point.getxPosition(), point.getyPosition(), point.getzPosition()),
+                      new Triple(point.getPositionX(), point.getPositionY(), point.getPositionZ()),
                       point.getVehicleOrientationAngle().doubleValue()
                   )
               )
@@ -114,12 +114,12 @@ public class V6TOMapper {
               .withLayout(
                   new PointCreationTO.Layout(
                       new Couple(
-                          point.getPointLayout().getxPosition(),
-                          point.getPointLayout().getyPosition()
+                          point.getPointLayout().getPositionX(),
+                          point.getPointLayout().getPositionY()
                       ),
                       new Couple(
-                          point.getPointLayout().getxLabelOffset(),
-                          point.getPointLayout().getyLabelOffset()
+                          point.getPointLayout().getLabelOffsetX(),
+                          point.getPointLayout().getLabelOffsetY()
                       ),
                       point.getPointLayout().getLayerId()
                   )
@@ -238,9 +238,9 @@ public class V6TOMapper {
               location.getName(),
               location.getType(),
               new Triple(
-                  location.getxPosition(),
-                  location.getyPosition(),
-                  location.getzPosition()
+                  location.getPositionX(),
+                  location.getPositionY(),
+                  location.getPositionZ()
               )
           )
               .withLinks(getLinks(location))
@@ -249,12 +249,12 @@ public class V6TOMapper {
               .withLayout(
                   new LocationCreationTO.Layout(
                       new Couple(
-                          location.getLocationLayout().getxPosition(),
-                          location.getLocationLayout().getyPosition()
+                          location.getLocationLayout().getPositionX(),
+                          location.getLocationLayout().getPositionY()
                       ),
                       new Couple(
-                          location.getLocationLayout().getxLabelOffset(),
-                          location.getLocationLayout().getyLabelOffset()
+                          location.getLocationLayout().getLabelOffsetX(),
+                          location.getLocationLayout().getLabelOffsetY()
                       ),
                       LocationRepresentation.valueOf(
                           location.getLocationLayout().getLocationRepresentation()
@@ -384,8 +384,8 @@ public class V6TOMapper {
     for (PointCreationTO point : points) {
       PointTO pointTO = new PointTO();
       pointTO.setName(point.getName());
-      pointTO.setxPosition(point.getPose().getPosition().getX())
-          .setyPosition(point.getPose().getPosition().getY())
+      pointTO.setPositionX(point.getPose().getPosition().getX())
+          .setPositionY(point.getPose().getPosition().getY())
           .setVehicleOrientationAngle((float) point.getPose().getOrientationAngle())
           .setType(point.getType().name())
           .setOutgoingPaths(getOutgoingPaths(point, paths))
@@ -393,10 +393,10 @@ public class V6TOMapper {
           .setMaxVehicleBoundingBox(toBoundingBoxTO(point.getMaxVehicleBoundingBox()))
           .setPointLayout(
               new PointTO.PointLayout()
-                  .setxPosition(point.getLayout().getPosition().getX())
-                  .setyPosition(point.getLayout().getPosition().getY())
-                  .setxLabelOffset(point.getLayout().getLabelOffset().getX())
-                  .setyLabelOffset(point.getLayout().getLabelOffset().getY())
+                  .setPositionX(point.getLayout().getPosition().getX())
+                  .setPositionY(point.getLayout().getPosition().getY())
+                  .setLabelOffsetX(point.getLayout().getLabelOffset().getX())
+                  .setLabelOffsetY(point.getLayout().getLabelOffset().getY())
                   .setLayerId(point.getLayout().getLayerId())
           )
           .setProperties(convertProperties(point.getProperties()));
@@ -531,17 +531,17 @@ public class V6TOMapper {
     for (LocationCreationTO location : locations) {
       LocationTO locationTO = new LocationTO();
       locationTO.setName(location.getName());
-      locationTO.setxPosition(location.getPosition().getX())
-          .setyPosition(location.getPosition().getY())
+      locationTO.setPositionX(location.getPosition().getX())
+          .setPositionY(location.getPosition().getY())
           .setType(location.getTypeName())
           .setLinks(toLocationTOLinks(location.getLinks()))
           .setLocked(location.isLocked())
           .setLocationLayout(
               new LocationTO.LocationLayout()
-                  .setxPosition(location.getLayout().getPosition().getX())
-                  .setyPosition(location.getLayout().getPosition().getY())
-                  .setxLabelOffset(location.getLayout().getLabelOffset().getX())
-                  .setyLabelOffset(location.getLayout().getLabelOffset().getY())
+                  .setPositionX(location.getLayout().getPosition().getX())
+                  .setPositionY(location.getLayout().getPosition().getY())
+                  .setLabelOffsetX(location.getLayout().getLabelOffset().getX())
+                  .setLabelOffsetY(location.getLayout().getLabelOffset().getY())
                   .setLocationRepresentation(
                       location.getLayout().getLocationRepresentation().name()
                   )

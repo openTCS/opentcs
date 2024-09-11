@@ -87,13 +87,13 @@
     <xsd:attribute name="name"
                    type="xsd:string"
                    use="required"/>
-    <xsd:attribute name="xPosition"
+    <xsd:attribute name="positionX"
                    type="xsd:long"
                    use="required"/>
-    <xsd:attribute name="yPosition"
+    <xsd:attribute name="positionY"
                    type="xsd:long"
                    use="required"/>
-    <xsd:attribute name="zPosition"
+    <xsd:attribute name="positionZ"
                    type="xsd:long"/>
     <xsd:attribute name="vehicleOrientationAngle"
                    type="xsd:float"/>
@@ -104,16 +104,16 @@
 
   <!-- Data type for point layout type elements -->
   <xsd:complexType name="pointLayoutType">
-    <xsd:attribute name="xPosition"
+    <xsd:attribute name="positionX"
                    type="xsd:long"
                    use="required"/>
-    <xsd:attribute name="yPosition"
+    <xsd:attribute name="positionY"
                    type="xsd:long"
                    use="required"/>
-    <xsd:attribute name="xLabelOffset"
+    <xsd:attribute name="labelOffsetX"
                    type="xsd:long"
                    use="required"/>
-    <xsd:attribute name="yLabelOffset"
+    <xsd:attribute name="labelOffsetY"
                    type="xsd:long"
                    use="required"/>
     <xsd:attribute name="layerId"
@@ -371,11 +371,11 @@
     <xsd:attribute name="name"
                    type="xsd:string"
                    use="required"/>
-    <xsd:attribute name="xPosition"
+    <xsd:attribute name="positionX"
                    type="xsd:long"/>
-    <xsd:attribute name="yPosition"
+    <xsd:attribute name="positionY"
                    type="xsd:long"/>
-    <xsd:attribute name="zPosition"
+    <xsd:attribute name="positionZ"
                    type="xsd:long"/>
     <xsd:attribute name="type"
                    type="xsd:string"
@@ -405,16 +405,16 @@
 
   <!-- Data type for location layout type elements -->
   <xsd:complexType name="locationLayoutType">
-    <xsd:attribute name="xPosition"
+    <xsd:attribute name="positionX"
                    type="xsd:long"
                    use="required"/>
-    <xsd:attribute name="yPosition"
+    <xsd:attribute name="positionY"
                    type="xsd:long"
                    use="required"/>
-    <xsd:attribute name="xLabelOffset"
+    <xsd:attribute name="labelOffsetX"
                    type="xsd:long"
                    use="required"/>
-    <xsd:attribute name="yLabelOffset"
+    <xsd:attribute name="labelOffsetY"
                    type="xsd:long"
                    use="required"/>
     <xsd:attribute name="locationRepresentation"

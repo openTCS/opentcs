@@ -22,16 +22,16 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(
-    propOrder = {"name", "xPosition", "yPosition", "zPosition", "links", "locked",
+    propOrder = {"name", "positionX", "positionY", "positionZ", "links", "locked",
         "properties", "locationLayout"}
 )
 public class LocationTO
     extends
       PlantModelElementTO {
 
-  private Long xPosition = 0L;
-  private Long yPosition = 0L;
-  private Long zPosition = 0L;
+  private Long positionX = 0L;
+  private Long positionY = 0L;
+  private Long positionZ = 0L;
   private String type = "";
   private List<Link> links = new ArrayList<>();
   private Boolean locked = false;
@@ -44,44 +44,44 @@ public class LocationTO
   }
 
   @XmlAttribute
-  public Long getxPosition() {
-    return xPosition;
+  public Long getPositionX() {
+    return positionX;
   }
 
-  public LocationTO setxPosition(
+  public LocationTO setPositionX(
       @Nonnull
-      Long xPosition
+      Long positionX
   ) {
-    requireNonNull(xPosition, "xPosition");
-    this.xPosition = xPosition;
+    requireNonNull(positionX, "positionX");
+    this.positionX = positionX;
     return this;
   }
 
   @XmlAttribute
-  public Long getyPosition() {
-    return yPosition;
+  public Long getPositionY() {
+    return positionY;
   }
 
-  public LocationTO setyPosition(
+  public LocationTO setPositionY(
       @Nonnull
-      Long yPosition
+      Long positionY
   ) {
-    requireNonNull(yPosition, "yPosition");
-    this.yPosition = yPosition;
+    requireNonNull(positionY, "positionY");
+    this.positionY = positionY;
     return this;
   }
 
   @XmlAttribute
-  public Long getzPosition() {
-    return zPosition;
+  public Long getPositionZ() {
+    return positionZ;
   }
 
-  public LocationTO setzPosition(
+  public LocationTO setPositionZ(
       @Nonnull
-      Long zPosition
+      Long positionZ
   ) {
-    requireNonNull(zPosition, "zPosition");
-    this.zPosition = zPosition;
+    requireNonNull(positionZ, "positionZ");
+    this.positionZ = positionZ;
     return this;
   }
 
@@ -180,15 +180,15 @@ public class LocationTO
 
   @XmlAccessorType(XmlAccessType.PROPERTY)
   @XmlType(
-      propOrder = {"xPosition", "yPosition", "xLabelOffset", "yLabelOffset",
+      propOrder = {"positionX", "positionY", "labelOffsetX", "labelOffsetY",
           "locationRepresentation", "layerId"}
   )
   public static class LocationLayout {
 
-    private Long xPosition = 0L;
-    private Long yPosition = 0L;
-    private Long xLabelOffset = 0L;
-    private Long yLabelOffset = 0L;
+    private Long positionX = 0L;
+    private Long positionY = 0L;
+    private Long labelOffsetX = 0L;
+    private Long labelOffsetY = 0L;
     private String locationRepresentation = "";
     private Integer layerId = 0;
 
@@ -199,42 +199,42 @@ public class LocationTO
     }
 
     @XmlAttribute(required = true)
-    public Long getxPosition() {
-      return xPosition;
+    public Long getPositionX() {
+      return positionX;
     }
 
-    public LocationLayout setxPosition(Long xPosition) {
-      this.xPosition = requireNonNull(xPosition, "xPosition");
+    public LocationLayout setPositionX(Long positionX) {
+      this.positionX = requireNonNull(positionX, "positionX");
       return this;
     }
 
     @XmlAttribute(required = true)
-    public Long getyPosition() {
-      return yPosition;
+    public Long getPositionY() {
+      return positionY;
     }
 
-    public LocationLayout setyPosition(Long yPosition) {
-      this.yPosition = requireNonNull(yPosition, "yPosition");
+    public LocationLayout setPositionY(Long positionY) {
+      this.positionY = requireNonNull(positionY, "positionY");
       return this;
     }
 
     @XmlAttribute(required = true)
-    public Long getxLabelOffset() {
-      return xLabelOffset;
+    public Long getLabelOffsetX() {
+      return labelOffsetX;
     }
 
-    public LocationLayout setxLabelOffset(Long xLabelOffset) {
-      this.xLabelOffset = requireNonNull(xLabelOffset, "xLabelOffset");
+    public LocationLayout setLabelOffsetX(Long labelOffsetX) {
+      this.labelOffsetX = requireNonNull(labelOffsetX, "labelOffsetX");
       return this;
     }
 
     @XmlAttribute(required = true)
-    public Long getyLabelOffset() {
-      return yLabelOffset;
+    public Long getLabelOffsetY() {
+      return labelOffsetY;
     }
 
-    public LocationLayout setyLabelOffset(Long yLabelOffset) {
-      this.yLabelOffset = requireNonNull(yLabelOffset, "yLabelOffset");
+    public LocationLayout setLabelOffsetY(Long labelOffsetY) {
+      this.labelOffsetY = requireNonNull(labelOffsetY, "labelOffsetY");
       return this;
     }
 

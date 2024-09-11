@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.PROPERTY)
 @XmlType(
-    propOrder = {"name", "xPosition", "yPosition", "zPosition", "vehicleOrientationAngle",
+    propOrder = {"name", "positionX", "positionY", "positionZ", "vehicleOrientationAngle",
         "type", "maxVehicleBoundingBox", "vehicleEnvelopes", "outgoingPaths", "properties",
         "pointLayout"}
 )
@@ -30,9 +30,9 @@ public class PointTO
     extends
       PlantModelElementTO {
 
-  private Long xPosition = 0L;
-  private Long yPosition = 0L;
-  private Long zPosition = 0L;
+  private Long positionX = 0L;
+  private Long positionY = 0L;
+  private Long positionZ = 0L;
   private Float vehicleOrientationAngle = 0.0F;
   private String type = "HALT_POSITION";
   private BoundingBoxTO maxVehicleBoundingBox = new BoundingBoxTO();
@@ -47,44 +47,44 @@ public class PointTO
   }
 
   @XmlAttribute(required = true)
-  public Long getxPosition() {
-    return xPosition;
+  public Long getPositionX() {
+    return positionX;
   }
 
-  public PointTO setxPosition(
+  public PointTO setPositionX(
       @Nonnull
-      Long xPosition
+      Long positionX
   ) {
-    requireNonNull(xPosition, "xPosition");
-    this.xPosition = xPosition;
+    requireNonNull(positionX, "positionX");
+    this.positionX = positionX;
     return this;
   }
 
   @XmlAttribute(required = true)
-  public Long getyPosition() {
-    return yPosition;
+  public Long getPositionY() {
+    return positionY;
   }
 
-  public PointTO setyPosition(
+  public PointTO setPositionY(
       @Nonnull
-      Long yPosition
+      Long positionY
   ) {
-    requireNonNull(yPosition, "yPosition");
-    this.yPosition = yPosition;
+    requireNonNull(positionY, "positionY");
+    this.positionY = positionY;
     return this;
   }
 
   @XmlAttribute
-  public Long getzPosition() {
-    return zPosition;
+  public Long getPositionZ() {
+    return positionZ;
   }
 
-  public PointTO setzPosition(
+  public PointTO setPositionZ(
       @Nonnull
-      Long zPosition
+      Long positionZ
   ) {
-    requireNonNull(zPosition, "zPosition");
-    this.zPosition = zPosition;
+    requireNonNull(positionZ, "positionZ");
+    this.positionZ = positionZ;
     return this;
   }
 
@@ -197,13 +197,13 @@ public class PointTO
   }
 
   @XmlAccessorType(XmlAccessType.PROPERTY)
-  @XmlType(propOrder = {"xPosition", "yPosition", "xLabelOffset", "yLabelOffset", "layerId"})
+  @XmlType(propOrder = {"positionX", "positionY", "labelOffsetX", "labelOffsetY", "layerId"})
   public static class PointLayout {
 
-    private Long xPosition = 0L;
-    private Long yPosition = 0L;
-    private Long xLabelOffset = 0L;
-    private Long yLabelOffset = 0L;
+    private Long positionX = 0L;
+    private Long positionY = 0L;
+    private Long labelOffsetX = 0L;
+    private Long labelOffsetY = 0L;
     private Integer layerId = 0;
 
     /**
@@ -213,54 +213,54 @@ public class PointTO
     }
 
     @XmlAttribute(required = true)
-    public Long getxPosition() {
-      return xPosition;
+    public Long getPositionX() {
+      return positionX;
     }
 
-    public PointLayout setxPosition(
+    public PointLayout setPositionX(
         @Nonnull
-        Long xPosition
+        Long positionX
     ) {
-      this.xPosition = requireNonNull(xPosition, "xPosition");
+      this.positionX = requireNonNull(positionX, "positionX");
       return this;
     }
 
     @XmlAttribute(required = true)
-    public Long getyPosition() {
-      return yPosition;
+    public Long getPositionY() {
+      return positionY;
     }
 
-    public PointLayout setyPosition(
+    public PointLayout setPositionY(
         @Nonnull
-        Long yPosition
+        Long positionY
     ) {
-      this.yPosition = requireNonNull(yPosition, "yPosition");
+      this.positionY = requireNonNull(positionY, "positionY");
       return this;
     }
 
     @XmlAttribute(required = true)
-    public Long getxLabelOffset() {
-      return xLabelOffset;
+    public Long getLabelOffsetX() {
+      return labelOffsetX;
     }
 
-    public PointLayout setxLabelOffset(
+    public PointLayout setLabelOffsetX(
         @Nonnull
-        Long xLabelOffset
+        Long labelOffsetX
     ) {
-      this.xLabelOffset = requireNonNull(xLabelOffset, "xLabelOffset");
+      this.labelOffsetX = requireNonNull(labelOffsetX, "labelOffsetX");
       return this;
     }
 
     @XmlAttribute(required = true)
-    public Long getyLabelOffset() {
-      return yLabelOffset;
+    public Long getLabelOffsetY() {
+      return labelOffsetY;
     }
 
-    public PointLayout setyLabelOffset(
+    public PointLayout setLabelOffsetY(
         @Nonnull
-        Long yLabelOffset
+        Long labelOffsetY
     ) {
-      this.yLabelOffset = requireNonNull(yLabelOffset, "yLabelOffset");
+      this.labelOffsetY = requireNonNull(labelOffsetY, "labelOffsetY");
       return this;
     }
 
