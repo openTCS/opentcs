@@ -24,9 +24,9 @@ variables:
   DO_DEPLOY_PRIVATE:
     value: "false"
     description: "Whether ('true') or not ('false') to deploy artifacts to private (GitLab) repository."
-  DO_DEPLOY_PUBLIC:
+  DO_DEPLOY_OSSRH:
     value: "false"
-    description: "Whether ('true') or not ('false') to deploy artifacts to public repository, e.g. for release builds."
+    description: "Whether ('true') or not ('false') to deploy artifacts to the public OSSRH repository, e.g. for release builds."
   NO_BUILD_NUMBER:
     value: "false"
     description: "Whether ('true') or not ('false') to exclude the build number in the artifacts' version number, e.g. for release builds."
@@ -36,15 +36,12 @@ variables:
   SIGNING_PASSWORD:
     value: ""
     description: "The password to use for signing artifacts."
-  DEPLOY_REPO_PUBLIC_URL:
-    value: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-    description: "URL of the public repository to deploy artifacts to."
-  DEPLOY_REPO_PUBLIC_USERNAME:
+  DEPLOY_REPO_OSSRH_USERNAME:
     value: ""
-    description: "User name for logging in with the public repository."
-  DEPLOY_REPO_PUBLIC_PASSWORD:
+    description: "User name for logging in with the public OSSRH repository."
+  DEPLOY_REPO_OSSRH_PASSWORD:
     value: ""
-    description: "Password for logging in with the public repository."
+    description: "Password for logging in with the public OSSRH repository."
 
 stages:
   - build
@@ -170,7 +167,7 @@ deploy_private:
   script:
     - './gradlew -x check publish
         -PDO_DEPLOY_PRIVATE="true"
-        -PDO_DEPLOY_PUBLIC="false"
+        -PDO_DEPLOY_OSSRH="false"
         -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
         -PSIGNING_KEY="$SIGNING_KEY"
         -PSIGNING_PASSWORD="$SIGNING_PASSWORD"'
@@ -180,22 +177,21 @@ deploy_private:
       - .gradle
     policy: pull
 
-deploy_public:
+deploy_ossrh:
   stage: deploy
   rules:
-    - if: $DO_DEPLOY_PUBLIC == "true"
+    - if: $DO_DEPLOY_OSSRH == "true"
   dependencies:
     - build
   script:
-    - './gradlew -x check publish
+    - './gradlew -x check publishToSonatype closeAndReleaseStagingRepositories
         -PDO_DEPLOY_PRIVATE="false"
-        -PDO_DEPLOY_PUBLIC="true"
+        -PDO_DEPLOY_OSSRH="true"
         -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
         -PSIGNING_KEY="$SIGNING_KEY"
         -PSIGNING_PASSWORD="$SIGNING_PASSWORD"
-        -PDEPLOY_REPO_PUBLIC_URL="$DEPLOY_REPO_PUBLIC_URL"
-        -PDEPLOY_REPO_PUBLIC_USERNAME="$DEPLOY_REPO_PUBLIC_USERNAME"
-        -PDEPLOY_REPO_PUBLIC_PASSWORD="$DEPLOY_REPO_PUBLIC_PASSWORD"'
+        -PDEPLOY_REPO_OSSRH_USERNAME="$DEPLOY_REPO_OSSRH_USERNAME"
+        -PDEPLOY_REPO_OSSRH_PASSWORD="$DEPLOY_REPO_OSSRH_PASSWORD"'
   cache:
     key: build_test_deploy-$(date +%Y-%m)
     paths:

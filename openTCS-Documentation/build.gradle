@@ -122,7 +122,7 @@ task asciidoctorReleaseNotes(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
   // Document type: article (default), book, inline, manpage)
   options doctype: 'article'
   // Where to look for AsciiDoc files. Default: src/docs/asciidoc
-  sourceDir = file("src/docs/release-notes")  
+  sourceDir = file("src/docs/release-notes")
   baseDirFollowsSourceDir()
   // Where to put the rendered documents. Default: $buildDir/asciidoc.
   outputDir = releaseNotesDir
@@ -138,11 +138,11 @@ task asciidoctorReleaseNotes(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
     // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
     backends = ['html5']
   }
-  // Attributes specific to the HTML output 
+  // Attributes specific to the HTML output
   attributes 'webfonts': false, // Disable webfonts
              'iconfont-remote': false, // Disable remote icon fonts
              'docinfo': "${file('src/docs/release-notes/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
-             
+
 }
 
 task asciidoctorUsersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
@@ -168,7 +168,7 @@ task asciidoctorUsersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
              'webfonts': false, // Disable webfonts
              'iconfont-remote': false, // Disable remote icon fonts
              'docinfo': "${file('src/docs/users-guide/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
-             
+
   resources {
     from(sourceDir) {
       include '**/*.jpg'
@@ -295,9 +295,5 @@ task configdocgen {
 }
 
 publishing {
-  publications {
-    mavenJava(MavenPublication) {
-      artifact distZip
-    }
-  }
+  ((MavenPublication) publications.getByName(project.name + '_mavenJava')).artifact(distZip)
 }

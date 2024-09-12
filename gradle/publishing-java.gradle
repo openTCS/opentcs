@@ -1,4 +1,4 @@
-apply from: "${rootDir}/gradle/publishing-common.gradle"
+apply from: "${rootDir}/gradle/signing.gradle"
 
 // Enable javadoc and sources JARs to be created.
 java {
@@ -8,7 +8,7 @@ java {
 
 publishing {
   publications {
-    mavenJava(MavenPublication) {
+    create(project.name + '_mavenJava', MavenPublication) {
       from(components.java)
 
       pom {
@@ -17,12 +17,12 @@ publishing {
 
         name = project.name
         description = project.name
-        url = "https://www.opentcs.org"
+        url = "https://www.opentcs.org/"
 
         licenses {
           license {
             name = "MIT License"
-            url = "http://www.opensource.org/licenses/mit-license.php"
+            url = "https://opensource.org/license/mit"
           }
         }
 

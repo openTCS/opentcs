@@ -1,0 +1,15 @@
+nexusPublishing {
+  if (Boolean.valueOf(project.findProperty('DO_DEPLOY_OSSRH'))
+      && project.hasProperty('DEPLOY_REPO_OSSRH_USERNAME')
+      && project.hasProperty('DEPLOY_REPO_OSSRH_PASSWORD')) {
+    repositories {
+      sonatype {
+        nexusUrl.set(uri('https://s01.oss.sonatype.org/service/local/'))
+        snapshotRepositoryUrl.set(uri('https://s01.oss.sonatype.org/content/repositories/snapshots/'))
+
+        username = project.property('DEPLOY_REPO_OSSRH_USERNAME')
+        password = project.property('DEPLOY_REPO_OSSRH_PASSWORD')
+      }
+    }
+  }
+}

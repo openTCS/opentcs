@@ -6,9 +6,12 @@ buildscript {
 }
 
 plugins {
+  id 'maven-publish'
+  id 'signing'
   id 'org.barfuin.gradle.jacocolog' version '3.1.0'
   id 'com.github.jk1.dependency-license-report' version '2.6'
   id 'com.diffplug.spotless' version '6.25.0'
+  id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
 }
 
 import com.github.jk1.license.filter.LicenseBundleNormalizer
@@ -19,7 +22,8 @@ apply plugin: 'base' // To add "clean" task to the root project.
 apply plugin: 'distribution'
 
 apply from: "${rootDir}/gradle/common.gradle"
-apply from: "${rootDir}/gradle/publishing-common.gradle"
+apply from: "${rootDir}/gradle/publishing-gitlab.gradle"
+apply from: "${rootDir}/gradle/publishing-ossrh.gradle"
 
 subprojects {
   apply from: rootProject.file('gradle/common.gradle')
@@ -89,11 +93,6 @@ task distSrcZip(type: Zip) {
   excludes << '**/build'
 }
 
-artifacts {
-  archives distZip
-  archives distSrcZip
-}
-
 build {
   subprojects.each { dependsOn("${it.name}:build") }
   dependsOn installDist
@@ -104,47 +103,6 @@ task release {
   subprojects.each { dependsOn("${it.name}:release") }
   dependsOn distZip
   dependsOn distSrcZip
-}
-
-subprojects.each { publish.dependsOn("${it.name}:publish") }
-
-publishing {
-  publications {
-    maven(MavenPublication) {
-      artifact distZip
-      artifact distSrcZip
-
-      pom {
-        artifactId = 'opentcs'
-
-        name = project.name
-        description = project.name
-        url = "https://www.opentcs.org"
-
-        licenses {
-          license {
-            name = "MIT License"
-            url = "http://www.opensource.org/licenses/mit-license.php"
-          }
-        }
-
-        developers {
-          developer {
-            name = "The openTCS Authors"
-            email = "info@opentcs.org"
-            organization = "The open Transportation Control System"
-            organizationUrl = "https://www.opentcs.org/"
-          }
-        }
-
-        scm {
-          connection = "scm:git:git://github.com/opentcs/opentcs.git"
-          developerConnection = "scm:git:ssh://github.com:opentcs/opentcs.git"
-          url = "https://github.com/opentcs/opentcs"
-        }
-      }
-    }
-  }
 }
 
 licenseReport {
