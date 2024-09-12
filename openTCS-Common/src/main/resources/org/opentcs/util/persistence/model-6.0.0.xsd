@@ -94,7 +94,8 @@
                    type="xsd:long"
                    use="required"/>
     <xsd:attribute name="positionZ"
-                   type="xsd:long"/>
+                   type="xsd:long"
+                   use="required"/>
     <xsd:attribute name="vehicleOrientationAngle"
                    type="xsd:float"/>
     <xsd:attribute name="type"
@@ -173,7 +174,7 @@
                    use="required"/>
     <xsd:attribute name="length"
                    type="xsd:unsignedInt"
-                   use="optional"/>
+                   use="required"/>
     <xsd:attribute name="maxVelocity"
                    type="xsd:unsignedInt"
                    use="required"/>
@@ -269,19 +270,26 @@
                    type="xsd:string"
                    use="required"/>
     <xsd:attribute name="energyLevelCritical"
-                   type="xsd:unsignedInt"/>
+                   type="xsd:unsignedInt"
+                   use="required"/>
     <xsd:attribute name="energyLevelGood"
-                   type="xsd:unsignedInt"/>
+                   type="xsd:unsignedInt"
+                   use="required"/>
     <xsd:attribute name="energyLevelFullyRecharged"
-                   type="xsd:unsignedInt"/>
+                   type="xsd:unsignedInt"
+                   use="required"/>
     <xsd:attribute name="energyLevelSufficientlyRecharged"
-                   type="xsd:unsignedInt"/>
+                   type="xsd:unsignedInt"
+                   use="required"/>
     <xsd:attribute name="maxVelocity"
-                   type="xsd:unsignedInt"/>
+                   type="xsd:unsignedInt"
+                   use="required"/>
     <xsd:attribute name="maxReverseVelocity"
-                   type="xsd:unsignedInt"/>
+                   type="xsd:unsignedInt"
+                   use="required"/>
     <xsd:attribute name="envelopeKey"
-                   type="xsd:string"/>
+                   type="xsd:string"
+                   use="optional"/>
   </xsd:complexType>
 
   <!-- Data type for vehicle layout type elements -->
@@ -372,11 +380,14 @@
                    type="xsd:string"
                    use="required"/>
     <xsd:attribute name="positionX"
-                   type="xsd:long"/>
+                   type="xsd:long"
+                   use="required"/>
     <xsd:attribute name="positionY"
-                   type="xsd:long"/>
+                   type="xsd:long"
+                   use="required"/>
     <xsd:attribute name="positionZ"
-                   type="xsd:long"/>
+                   type="xsd:long"
+                   use="required"/>
     <xsd:attribute name="type"
                    type="xsd:string"
                    use="required"/>
@@ -469,7 +480,8 @@
                    type="xsd:string"
                    use="required"/>
     <xsd:attribute name="type"
-                   type="blockTypeType"/>
+                   type="blockTypeType"
+                   use="required"/>
   </xsd:complexType>
 
   <!-- Data type for block layout type elements -->

@@ -48,7 +48,7 @@ public class VehicleTO
   public VehicleTO() {
   }
 
-  @XmlAttribute
+  @XmlAttribute(required = true)
   @XmlSchemaType(name = "unsignedInt")
   public Long getEnergyLevelCritical() {
     return energyLevelCritical;
@@ -63,7 +63,7 @@ public class VehicleTO
     return this;
   }
 
-  @XmlAttribute
+  @XmlAttribute(required = true)
   @XmlSchemaType(name = "unsignedInt")
   public Long getEnergyLevelGood() {
     return energyLevelGood;
@@ -78,7 +78,7 @@ public class VehicleTO
     return this;
   }
 
-  @XmlAttribute
+  @XmlAttribute(required = true)
   @XmlSchemaType(name = "unsignedInt")
   public Long getEnergyLevelFullyRecharged() {
     return energyLevelFullyRecharged;
@@ -93,7 +93,7 @@ public class VehicleTO
     return this;
   }
 
-  @XmlAttribute
+  @XmlAttribute(required = true)
   @XmlSchemaType(name = "unsignedInt")
   public Long getEnergyLevelSufficientlyRecharged() {
     return energyLevelSufficientlyRecharged;
@@ -108,7 +108,7 @@ public class VehicleTO
     return this;
   }
 
-  @XmlAttribute
+  @XmlAttribute(required = true)
   @XmlSchemaType(name = "unsignedInt")
   public int getMaxVelocity() {
     return maxVelocity;
@@ -122,7 +122,7 @@ public class VehicleTO
     return this;
   }
 
-  @XmlAttribute
+  @XmlAttribute(required = true)
   @XmlSchemaType(name = "unsignedInt")
   public int getMaxReverseVelocity() {
     return maxReverseVelocity;

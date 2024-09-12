@@ -74,7 +74,7 @@ public class PointTO
     return this;
   }
 
-  @XmlAttribute
+  @XmlAttribute(required = true)
   public Long getPositionZ() {
     return positionZ;
   }

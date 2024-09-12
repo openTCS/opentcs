@@ -83,7 +83,7 @@ public class PathTO
     return this;
   }
 
-  @XmlAttribute
+  @XmlAttribute(required = true)
   @XmlSchemaType(name = "unsignedInt")
   public Long getLength() {
     return length;

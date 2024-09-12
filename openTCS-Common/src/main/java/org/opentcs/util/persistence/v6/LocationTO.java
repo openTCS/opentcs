@@ -43,7 +43,7 @@ public class LocationTO
   public LocationTO() {
   }
 
-  @XmlAttribute
+  @XmlAttribute(required = true)
   public Long getPositionX() {
     return positionX;
   }
@@ -57,7 +57,7 @@ public class LocationTO
     return this;
   }
 
-  @XmlAttribute
+  @XmlAttribute(required = true)
   public Long getPositionY() {
     return positionY;
   }
@@ -71,7 +71,7 @@ public class LocationTO
     return this;
   }
 
-  @XmlAttribute
+  @XmlAttribute(required = true)
   public Long getPositionZ() {
     return positionZ;
   }
