@@ -107,6 +107,12 @@ The virtual peripheral (peripheral loopback communication adapter) can be config
 
 include::{configdoc}/VirtualPeripheralConfigurationEntries.adoc[]
 
+==== Watchdog configuration entries
+
+The watchdog can be configured using the following configuration entries:
+
+include::{configdoc}/WatchdogConfigurationEntries.adoc[]
+
 === Kernel Control Center configuration
 
 The kernel control center application reads its configuration data from the following files:

@@ -272,6 +272,9 @@ task configdocgen {
         "org.opentcs.commadapter.peripheral.loopback.VirtualPeripheralConfiguration",
         "${configDocDir}/VirtualPeripheralConfigurationEntries.adoc",
 
+        "org.opentcs.kernel.extensions.watchdog.WatchdogConfiguration",
+        "${configDocDir}/WatchdogConfigurationEntries.adoc",
+
         "org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration",
         "${configDocDir}/KernelControlCenterApplicationConfigurationEntries.adoc",
 
