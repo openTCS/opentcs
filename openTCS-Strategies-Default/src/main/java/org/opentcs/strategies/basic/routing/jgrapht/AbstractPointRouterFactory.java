@@ -10,6 +10,7 @@ package org.opentcs.strategies.basic.routing.jgrapht;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import org.jgrapht.Graph;
@@ -121,7 +122,8 @@ public abstract class AbstractPointRouterFactory
   );
 
   private PointRouter createPointRouter(GraphResult graphResult) {
-    Set<Point> points = graphResult.getPointBase();
+    Set<Point> points = new HashSet<>(graphResult.getPointBase());
+    points.removeAll(graphResult.getExcludedPoints());
 
     PointRouter router = new ShortestPathPointRouter(
         createShortestPathAlgorithm(graphResult.getGraph()),

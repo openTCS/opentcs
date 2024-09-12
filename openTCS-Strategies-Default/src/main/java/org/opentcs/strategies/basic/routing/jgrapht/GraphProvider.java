@@ -12,13 +12,13 @@ import static java.util.Objects.requireNonNull;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.WeakHashMap;
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -38,10 +38,25 @@ public class GraphProvider {
   private final ModelGraphMapper defaultModelGraphMapper;
   private final ModelGraphMapper generalModelGraphMapper;
   private final GroupMapper routingGroupMapper;
+  private final GraphMutator graphMutator;
   /**
    * Contains {@link GraphResult}s mapped to (vehicle) routing groups.
    */
   private final Map<String, GraphResult> graphResultsByRoutingGroup = new HashMap<>();
+  /**
+   * A cache for derived {@link GraphResult}s.
+   */
+  private final Map<String, GraphResult> derivedGraphResults = new WeakHashMap<>();
+  /**
+   * The set of points that is currently used for computing routing graphs.
+   */
+  private final HashedResourceSet<Point> currentPointBase
+      = new HashedResourceSet<>(this::pointsHashCode);
+  /**
+   * The set of paths that is currently used for computing routing graphs.
+   */
+  private final HashedResourceSet<Path> currentPathBase
+      = new HashedResourceSet<>(this::pathsHashCode);
   /**
    * The general {@link GraphResult}.
    */
@@ -54,6 +69,7 @@ public class GraphProvider {
    * @param defaultModelGraphMapper Maps the points and paths to a graph.
    * @param generalModelGraphMapper Maps the points and paths to a graph.
    * @param routingGroupMapper Used to map vehicles to their routing groups.
+   * @param graphMutator Provides methods for mutating {@link GraphResult}s.
    */
   @Inject
   public GraphProvider(
@@ -64,7 +80,9 @@ public class GraphProvider {
       @Nonnull
       DefaultModelGraphMapper defaultModelGraphMapper,
       @Nonnull
-      GroupMapper routingGroupMapper
+      GroupMapper routingGroupMapper,
+      @Nonnull
+      GraphMutator graphMutator
   ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.defaultModelGraphMapper = requireNonNull(
@@ -76,13 +94,17 @@ public class GraphProvider {
         "generalModelGraphMapper"
     );
     this.routingGroupMapper = requireNonNull(routingGroupMapper, "routingGroupMapper");
+    this.graphMutator = requireNonNull(graphMutator, "graphMutator");
   }
 
   /**
    * Invalidates any graphs that have already been calculated.
    */
   public void invalidate() {
+    currentPointBase.clear();
+    currentPathBase.clear();
     graphResultsByRoutingGroup.clear();
+    derivedGraphResults.clear();
     generalGraphResult = null;
   }
 
@@ -95,16 +117,18 @@ public class GraphProvider {
   public GraphResult getGraphResult(Vehicle vehicle) {
     return graphResultsByRoutingGroup.computeIfAbsent(
         routingGroupMapper.apply(vehicle),
-        routingGroup -> {
-          Set<Point> points = objectService.fetchObjects(Point.class);
-          Set<Path> paths = objectService.fetchObjects(Path.class);
-          return new GraphResult(
-              vehicle,
-              points,
-              paths,
-              defaultModelGraphMapper.translateModel(points, paths, vehicle)
-          );
-        }
+        routingGroup -> new GraphResult(
+            vehicle,
+            getCurrentPointBase().getResources(),
+            getCurrentPathBase().getResources(),
+            Set.of(),
+            Set.of(),
+            defaultModelGraphMapper.translateModel(
+                getCurrentPointBase().getResources(),
+                getCurrentPathBase().getResources(),
+                vehicle
+            )
+        )
     );
   }
 
@@ -116,13 +140,17 @@ public class GraphProvider {
    */
   public GraphResult getGeneralGraphResult() {
     if (generalGraphResult == null) {
-      Set<Point> points = objectService.fetchObjects(Point.class);
-      Set<Path> paths = objectService.fetchObjects(Path.class);
       generalGraphResult = new GraphResult(
           new Vehicle("Dummy"),
-          points,
-          paths,
-          generalModelGraphMapper.translateModel(points, paths, new Vehicle("Dummy"))
+          getCurrentPointBase().getResources(),
+          getCurrentPathBase().getResources(),
+          Set.of(),
+          Set.of(),
+          generalModelGraphMapper.translateModel(
+              getCurrentPointBase().getResources(),
+              getCurrentPathBase().getResources(),
+              new Vehicle("Dummy")
+          )
       );
     }
 
@@ -146,7 +174,14 @@ public class GraphProvider {
       @Nonnull
       Set<Path> pathsToExclude
   ) {
-    return deriveGraph(vehicle, pointsToExclude, pathsToExclude, getGraphResult(vehicle));
+    requireNonNull(vehicle, "vehicle");
+    requireNonNull(pointsToExclude, "pointsToExclude");
+    requireNonNull(pathsToExclude, "pathsToExclude");
+
+    return derivedGraphResults.computeIfAbsent(
+        derivedGraphResultCacheKey(vehicle, pointsToExclude, pathsToExclude),
+        key -> graphMutator.deriveGraph(pointsToExclude, pathsToExclude, getGraphResult(vehicle))
+    );
   }
 
   /**
@@ -163,12 +198,10 @@ public class GraphProvider {
       @Nonnull
       Set<Path> pathsToExclude
   ) {
-    return deriveGraph(
-        new Vehicle("Dummy"),
-        pointsToExclude,
-        pathsToExclude,
-        getGeneralGraphResult()
-    );
+    requireNonNull(pointsToExclude, "pointsToExclude");
+    requireNonNull(pathsToExclude, "pathsToExclude");
+
+    return graphMutator.deriveGraph(pointsToExclude, pathsToExclude, getGeneralGraphResult());
   }
 
   /**
@@ -186,85 +219,77 @@ public class GraphProvider {
   ) {
     requireNonNull(paths, "paths");
 
-    if (paths.isEmpty() || graphResultsByRoutingGroup.isEmpty()) {
+    if (paths.isEmpty()) {
       return;
     }
 
-    for (String routingGroup : Set.copyOf(graphResultsByRoutingGroup.keySet())) {
-      GraphResult graphResult = graphResultsByRoutingGroup.get(routingGroup);
+    // Ensure the path base is up-to-date.
+    getCurrentPathBase().updateResources(paths);
 
-      // Ensure the new graph result's path base is up-to-date.
-      Set<Path> updatedPathBase = new HashSet<>(graphResult.getPathBase());
-      updatedPathBase.removeAll(paths);
-      updatedPathBase.addAll(paths);
-
+    for (Map.Entry<String, GraphResult> entry : Set.copyOf(graphResultsByRoutingGroup.entrySet())) {
       graphResultsByRoutingGroup.put(
-          routingGroup,
+          entry.getKey(),
           new GraphResult(
-              graphResult.getVehicle(),
-              graphResult.getPointBase(),
-              updatedPathBase,
+              entry.getValue().getVehicle(),
+              entry.getValue().getPointBase(),
+              getCurrentPathBase().getResources(),
+              Set.of(),
+              Set.of(),
               defaultModelGraphMapper.updateGraph(
                   paths,
-                  graphResult.getVehicle(),
-                  graphResult.getGraph()
+                  entry.getValue().getVehicle(),
+                  entry.getValue().getGraph()
               )
           )
       );
     }
   }
 
-  private GraphResult deriveGraph(
-      @Nonnull
+  private String derivedGraphResultCacheKey(
       Vehicle vehicle,
-      @Nonnull
       Set<Point> pointsToExclude,
-      @Nonnull
-      Set<Path> pathsToExclude,
-      @Nonnull
-      GraphResult baseGraph
+      Set<Path> pathsToExclude
   ) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(pointsToExclude, "pointsToExclude");
-    requireNonNull(pathsToExclude, "pathsToExclude");
-    requireNonNull(baseGraph, "baseGraph");
+    // Concat the different hash code values (e.g. instead of simply calculating the sum) to
+    // minimize risk of hash collisions.
+    return String.format(
+        "routingGroup(%s)_pointBase(%s)_pathBase(%s)_excludedPoints(%s)_excludedPaths(%s)",
+        routingGroupMapper.apply(vehicle).hashCode(),
+        getCurrentPointBase().getHash(),
+        getCurrentPathBase().getHash(),
+        pointsHashCode(pointsToExclude),
+        pathsHashCode(pathsToExclude)
+    );
+  }
 
-    // Determine the derived point base and path base.
-    Set<Point> derivedPointBase = new HashSet<>(baseGraph.getPointBase());
-    derivedPointBase.removeAll(pointsToExclude);
-    Set<Path> derivedPathBase = new HashSet<>(baseGraph.getPathBase());
-    derivedPathBase.removeAll(pathsToExclude);
+  private HashedResourceSet<Point> getCurrentPointBase() {
+    if (currentPointBase.isEmpty()) {
+      currentPointBase.overrideResources(objectService.fetchObjects(Point.class));
+    }
 
-    Graph<String, Edge> derivedGraph = new DirectedWeightedMultigraph<>(Edge.class);
+    return currentPointBase;
+  }
 
-    // Determine the vertices that should be included and add them to the derived graph.
-    Set<String> pointsToIncludeByName = derivedPointBase.stream()
-        .map(Point::getName)
-        .collect(Collectors.toSet());
-    baseGraph.getGraph().vertexSet().stream()
-        .filter(vertex -> pointsToIncludeByName.contains(vertex))
-        .forEach(vertex -> derivedGraph.addVertex(vertex));
+  private HashedResourceSet<Path> getCurrentPathBase() {
+    if (currentPathBase.isEmpty()) {
+      currentPathBase.overrideResources(objectService.fetchObjects(Path.class));
+    }
 
-    // Determine the edges that should be included and add them to the derived graph.
-    Set<String> pathsToIncludeByName = derivedPathBase.stream()
-        .map(Path::getName)
-        .collect(Collectors.toSet());
-    baseGraph.getGraph().edgeSet().stream()
-        .filter(edge -> pathsToIncludeByName.contains(edge.getPath().getName()))
-        // Ensure that edges are only added if their source and target vertices are contained in the
-        // derived graph. This is relevant when there are points to be excluded from the derived
-        // graph, as adding an edge whose source or target vertex is not present in the graph will
-        // result in an IllegalArgumentException.
-        .filter(
-            edge -> pointsToIncludeByName.contains(edge.getSourceVertex())
-                && pointsToIncludeByName.contains(edge.getTargetVertex())
-        )
-        .forEach(edge -> {
-          derivedGraph.addEdge(edge.getSourceVertex(), edge.getTargetVertex(), edge);
-          derivedGraph.setEdgeWeight(edge, baseGraph.getGraph().getEdgeWeight(edge));
-        });
+    return currentPathBase;
+  }
 
-    return new GraphResult(vehicle, derivedPointBase, derivedPathBase, derivedGraph);
+  private int pointsHashCode(Set<Point> points) {
+    return points.hashCode();
+  }
+
+  private int pathsHashCode(Set<Path> paths) {
+    int result = 0;
+
+    for (Path path : paths) {
+      result += Objects.hash(path.getName(), path.isLocked(), path.getProperties());
+    }
+
+    return result;
   }
 
   /**
@@ -275,6 +300,8 @@ public class GraphProvider {
     private final Vehicle vehicle;
     private final Set<Point> pointBase;
     private final Set<Path> pathBase;
+    private final Set<Point> excludedPoints;
+    private final Set<Path> excludedPaths;
     private final Graph<String, Edge> graph;
 
     /**
@@ -283,16 +310,24 @@ public class GraphProvider {
      * @param vehicle The vehicle for which the given graph was computed.
      * @param pointBase The set of points that was used to compute the given graph.
      * @param pathBase The set of paths that was used to compute the given graph.
+     * @param excludedPoints The set of points that were excluded when computing the given graph.
+     * @param excludedPaths The set of paths that were excluded when computing the given graph.
      * @param graph The computed graph.
      */
     public GraphResult(
         Vehicle vehicle,
         Set<Point> pointBase,
         Set<Path> pathBase,
+        Set<Point> excludedPoints,
+        Set<Path> excludedPaths,
         Graph<String, Edge> graph
     ) {
-      this.pointBase = requireNonNull(pointBase, "pointBase");
-      this.pathBase = requireNonNull(pathBase, "pathBase");
+      this.pointBase = Collections.unmodifiableSet(requireNonNull(pointBase, "pointBase"));
+      this.pathBase = Collections.unmodifiableSet(requireNonNull(pathBase, "pathBase"));
+      this.excludedPoints
+          = Collections.unmodifiableSet(requireNonNull(excludedPoints, "excludedPoints"));
+      this.excludedPaths
+          = Collections.unmodifiableSet(requireNonNull(excludedPaths, "excludedPaths"));
       this.graph = requireNonNull(graph, "graph");
       this.vehicle = requireNonNull(vehicle, "vehicle");
     }
@@ -324,6 +359,14 @@ public class GraphProvider {
       return pathBase;
     }
 
+    public Set<Point> getExcludedPoints() {
+      return excludedPoints;
+    }
+
+    public Set<Path> getExcludedPaths() {
+      return excludedPaths;
+    }
+
     /**
      * Returns the computed graph.
      *
@@ -333,4 +376,5 @@ public class GraphProvider {
       return graph;
     }
   }
+
 }
