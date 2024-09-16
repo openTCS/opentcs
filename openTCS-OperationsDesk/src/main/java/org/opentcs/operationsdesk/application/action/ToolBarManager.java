@@ -196,10 +196,22 @@ public class ToolBarManager
   }
 
   private void handleKernelStateChangeEvent(KernelStateChangeEvent event) {
-    buttonCreateOrder.setEnabled(event.getNewState() == LOGGED_IN);
-    buttonFindVehicle.setEnabled(event.getNewState() == LOGGED_IN);
-    buttonPauseAllVehicles.setEnabled(event.getNewState() == LOGGED_IN);
-    buttonResumeAllVehicles.setEnabled(event.getNewState() == LOGGED_IN);
+    switch (event.getNewState()) {
+      case LOGGED_IN:
+        buttonCreateOrder.setEnabled(true);
+        buttonFindVehicle.setEnabled(true);
+        buttonPauseAllVehicles.setEnabled(true);
+        buttonResumeAllVehicles.setEnabled(true);
+        break;
+      case DISCONNECTED:
+        buttonCreateOrder.setEnabled(false);
+        buttonFindVehicle.setEnabled(false);
+        buttonPauseAllVehicles.setEnabled(false);
+        buttonResumeAllVehicles.setEnabled(false);
+        break;
+      default:
+        // Do nothing.
+    }
   }
 
   /**

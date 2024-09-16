@@ -16,6 +16,11 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 ...
 
+== Version 6.1.1 (2024-09-16)
+
+* Bugs fixes:
+** Correctly enable/disable controls in the Operations Desk application when it is connected to / disconnected from the kernel.
+
 == Version 6.1 (2024-09-12)
 
 * New features and enhancements:

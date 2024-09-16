@@ -126,7 +126,17 @@ public class FileMenu
   }
 
   private void handleKernelStateChangeEvent(KernelStateChangeEvent event) {
-    menuItemConnect.setEnabled(event.getNewState() != LOGGED_IN);
-    menuItemDisconnect.setEnabled(event.getNewState() == LOGGED_IN);
+    switch (event.getNewState()) {
+      case LOGGED_IN:
+        menuItemConnect.setEnabled(false);
+        menuItemDisconnect.setEnabled(true);
+        break;
+      case DISCONNECTED:
+        menuItemConnect.setEnabled(true);
+        menuItemDisconnect.setEnabled(false);
+        break;
+      default:
+        // Do nothing.
+    }
   }
 }
