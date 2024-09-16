@@ -150,8 +150,19 @@ public class ActionsMenu
   }
 
   private void handleKernelStateChangeEvent(KernelStateChangeEvent event) {
-    menuItemCreateTransportOrder.setEnabled(event.getNewState() == LOGGED_IN);
-    menuItemCreatePeripheralJob.setEnabled(event.getNewState() == LOGGED_IN);
-    menuItemFindVehicle.setEnabled(event.getNewState() == LOGGED_IN);
+    switch (event.getNewState()) {
+      case LOGGED_IN:
+        menuItemCreateTransportOrder.setEnabled(true);
+        menuItemCreatePeripheralJob.setEnabled(true);
+        menuItemFindVehicle.setEnabled(true);
+        break;
+      case DISCONNECTED:
+        menuItemCreateTransportOrder.setEnabled(false);
+        menuItemCreatePeripheralJob.setEnabled(false);
+        menuItemFindVehicle.setEnabled(false);
+        break;
+      default:
+        // Do nothing.
+    }
   }
 }

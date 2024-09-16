@@ -127,6 +127,15 @@ public class ViewMenu
   }
 
   private void handleKernelStateChangeEvent(KernelStateChangeEvent event) {
-    menuPluginPanels.setEnabled(event.getNewState() == LOGGED_IN);
+    switch (event.getNewState()) {
+      case LOGGED_IN:
+        menuPluginPanels.setEnabled(true);
+        break;
+      case DISCONNECTED:
+        menuPluginPanels.setEnabled(false);
+        break;
+      default:
+        // Do nothing.
+    }
   }
 }
