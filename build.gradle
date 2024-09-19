@@ -37,29 +37,29 @@ repositories {
 distributions {
   main {
     contents.from {
-      project(':openTCS-Kernel').ext.collectableDistDir
+      project(':opentcs-kernel').ext.collectableDistDir
     }
     contents.from {
-      project(':openTCS-KernelControlCenter').ext.collectableDistDir
+      project(':opentcs-kernelcontrolcenter').ext.collectableDistDir
     }
     contents.from {
-      project(':openTCS-ModelEditor').ext.collectableDistDir
+      project(':opentcs-modeleditor').ext.collectableDistDir
     }
     contents.from {
-      project(':openTCS-OperationsDesk').ext.collectableDistDir
+      project(':opentcs-operationsdesk').ext.collectableDistDir
     }
     contents.from {
-      project(':openTCS-Documentation').ext.collectableDistDir
+      project(':opentcs-documentation').ext.collectableDistDir
     }
   }
 }
 
 task subDists {
-  dependsOn(':openTCS-Kernel:installDist')
-  dependsOn(':openTCS-KernelControlCenter:installDist')
-  dependsOn(':openTCS-ModelEditor:installDist')
-  dependsOn(':openTCS-OperationsDesk:installDist')
-  dependsOn(':openTCS-Documentation:installDist')
+  dependsOn(':opentcs-kernel:installDist')
+  dependsOn(':opentcs-kernelcontrolcenter:installDist')
+  dependsOn(':opentcs-modeleditor:installDist')
+  dependsOn(':opentcs-operationsdesk:installDist')
+  dependsOn(':opentcs-documentation:installDist')
 }
 
 installDist.dependsOn subDists
