@@ -9,7 +9,6 @@ package org.opentcs.strategies.basic.routing.edgeevaluator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +19,6 @@ import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.strategies.basic.routing.edgeevaluator.BoundingBoxProtrusionCheck.BoundingBoxProtrusion;
 
 /**
  * Tests for {@link EdgeEvaluatorBoundingBox}.
@@ -34,47 +32,91 @@ class EdgeEvaluatorBoundingBoxTest {
   @BeforeEach
   void setUp() {
     objectService = mock();
-    protrusionCheck = mock();
+    protrusionCheck = new BoundingBoxProtrusionCheck();
     edgeEvaluator = new EdgeEvaluatorBoundingBox(objectService, protrusionCheck);
   }
 
   @Test
-  void excludePathWhenVehicleBondingBoxProtrudesPointBoundingBox() {
-    BoundingBox pointBoundingBox = new BoundingBox(1, 1, 1);
-    Point destPoint = new Point("2").withMaxVehicleBoundingBox(pointBoundingBox);
-    Path path = new Path("1 -- 2", new Point("1").getReference(), destPoint.getReference());
+  void excludeForwardEdge() {
+    Point srcPoint = new Point("1").withMaxVehicleBoundingBox(new BoundingBox(5, 5, 5));
+    Point destPoint = new Point("2").withMaxVehicleBoundingBox(new BoundingBox(1, 1, 1));
+    Path path = new Path("1 -- 2", srcPoint.getReference(), destPoint.getReference());
     Edge edge = new Edge(path, false);
-
-    BoundingBox vehicleBoundingBox = new BoundingBox(3, 3, 3);
-    Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(vehicleBoundingBox);
-
-    when(objectService.fetchObject(Point.class, destPoint.getReference())).thenReturn(destPoint);
-    when(protrusionCheck.checkProtrusion(vehicleBoundingBox, pointBoundingBox))
-        .thenReturn(new BoundingBoxProtrusion(1, 1, 1, 1, 1));
+    Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(new BoundingBox(3, 3, 3));
+    when(objectService.fetchObject(Point.class, "2")).thenReturn(destPoint);
 
     double result = edgeEvaluator.computeWeight(edge, vehicle);
 
     assertThat(result).isEqualTo(Double.POSITIVE_INFINITY);
-    verify(protrusionCheck).checkProtrusion(vehicleBoundingBox, pointBoundingBox);
   }
 
   @Test
-  void includePathWhenVehicleBondingBoxDoesNotProtrudePointBoundingBox() {
-    BoundingBox pointBoundingBox = new BoundingBox(3, 3, 3);
-    Point destPoint = new Point("2").withMaxVehicleBoundingBox(pointBoundingBox);
-    Path path = new Path("1 -- 2", new Point("1").getReference(), destPoint.getReference());
+  void includeForwardEdge() {
+    Point srcPoint = new Point("1").withMaxVehicleBoundingBox(new BoundingBox(5, 5, 5));
+    Point destPoint = new Point("2").withMaxVehicleBoundingBox(new BoundingBox(5, 5, 5));
+    Path path = new Path("1 -- 2", srcPoint.getReference(), destPoint.getReference());
     Edge edge = new Edge(path, false);
-
-    BoundingBox vehicleBoundingBox = new BoundingBox(1, 1, 1);
-    Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(vehicleBoundingBox);
-
-    when(objectService.fetchObject(Point.class, destPoint.getReference())).thenReturn(destPoint);
-    when(protrusionCheck.checkProtrusion(vehicleBoundingBox, pointBoundingBox))
-        .thenReturn(new BoundingBoxProtrusion(0, 0, 0, 0, 0));
+    Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(new BoundingBox(3, 3, 3));
+    when(objectService.fetchObject(Point.class, "2")).thenReturn(destPoint);
 
     double result = edgeEvaluator.computeWeight(edge, vehicle);
 
-    assertThat(result).isEqualTo(0);
-    verify(protrusionCheck).checkProtrusion(vehicleBoundingBox, pointBoundingBox);
+    assertThat(result).isZero();
+  }
+
+  @Test
+  void ignoreBoundingBoxProtrusionAtSourceVertexWithForwardEdge() {
+    Point srcPoint = new Point("1").withMaxVehicleBoundingBox(new BoundingBox(1, 1, 1));
+    Point destPoint = new Point("2").withMaxVehicleBoundingBox(new BoundingBox(5, 5, 5));
+    Path path = new Path("1 -- 2", srcPoint.getReference(), destPoint.getReference());
+    Edge edge = new Edge(path, false);
+    Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(new BoundingBox(3, 3, 3));
+    when(objectService.fetchObject(Point.class, "2")).thenReturn(destPoint);
+
+    double result = edgeEvaluator.computeWeight(edge, vehicle);
+
+    assertThat(result).isZero();
+  }
+
+  @Test
+  void excludeReverseEdge() {
+    Point srcPoint = new Point("1").withMaxVehicleBoundingBox(new BoundingBox(1, 1, 1));
+    Point destPoint = new Point("2").withMaxVehicleBoundingBox(new BoundingBox(5, 5, 5));
+    Path path = new Path("1 -- 2", srcPoint.getReference(), destPoint.getReference());
+    Edge edge = new Edge(path, true);
+    Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(new BoundingBox(3, 3, 3));
+    when(objectService.fetchObject(Point.class, "1")).thenReturn(srcPoint);
+
+    double result = edgeEvaluator.computeWeight(edge, vehicle);
+
+    assertThat(result).isEqualTo(Double.POSITIVE_INFINITY);
+  }
+
+  @Test
+  void includeReverseEdge() {
+    Point srcPoint = new Point("1").withMaxVehicleBoundingBox(new BoundingBox(5, 5, 5));
+    Point destPoint = new Point("2").withMaxVehicleBoundingBox(new BoundingBox(5, 5, 5));
+    Path path = new Path("1 -- 2", srcPoint.getReference(), destPoint.getReference());
+    Edge edge = new Edge(path, true);
+    Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(new BoundingBox(3, 3, 3));
+    when(objectService.fetchObject(Point.class, "1")).thenReturn(srcPoint);
+
+    double result = edgeEvaluator.computeWeight(edge, vehicle);
+
+    assertThat(result).isZero();
+  }
+
+  @Test
+  void ignoreBoundingBoxProtrusionAtSourceVertexWithReverseEdge() {
+    Point srcPoint = new Point("1").withMaxVehicleBoundingBox(new BoundingBox(5, 5, 5));
+    Point destPoint = new Point("2").withMaxVehicleBoundingBox(new BoundingBox(1, 1, 1));
+    Path path = new Path("1 -- 2", srcPoint.getReference(), destPoint.getReference());
+    Edge edge = new Edge(path, true);
+    Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(new BoundingBox(3, 3, 3));
+    when(objectService.fetchObject(Point.class, "1")).thenReturn(srcPoint);
+
+    double result = edgeEvaluator.computeWeight(edge, vehicle);
+
+    assertThat(result).isZero();
   }
 }

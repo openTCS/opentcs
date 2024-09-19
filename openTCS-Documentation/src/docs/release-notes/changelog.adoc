@@ -12,9 +12,15 @@ The openTCS developers
 
 This change log lists the most relevant changes for past releases in reverse chronological order.
 
+== Unreleased
+
+* Bugs fixed:
+** Properly handle paths that are being traversed in reverse direction in the bounding box edge evaluator.
+   For such paths, the bounding box at the path's source point is now correctly considered (and not the one at its destination point).
+
 == Version 6.1.1 (2024-09-16)
 
-* Bugs fixes:
+* Bugs fixed:
 ** Correctly enable/disable controls in the Operations Desk application when it is connected to / disconnected from the kernel.
 
 == Version 6.1 (2024-09-12)

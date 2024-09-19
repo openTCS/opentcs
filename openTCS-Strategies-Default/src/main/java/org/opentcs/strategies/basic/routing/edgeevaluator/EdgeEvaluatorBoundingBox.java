@@ -75,19 +75,19 @@ public class EdgeEvaluatorBoundingBox
       @Nonnull
       Vehicle vehicle
   ) {
-    Point destPoint = objectService.fetchObject(Point.class, edge.getPath().getDestinationPoint());
+    Point targetPoint = objectService.fetchObject(Point.class, edge.getTargetVertex());
     BoundingBoxProtrusion protrusion = protrusionCheck.checkProtrusion(
-        vehicle.getBoundingBox(), destPoint.getMaxVehicleBoundingBox()
+        vehicle.getBoundingBox(), targetPoint.getMaxVehicleBoundingBox()
     );
 
     if (protrusion.protrudesAnywhere()) {
       LOG.debug(
-          "Excluding path '{}'. Bounding box of '{}' > max bounding box at '{}': {} > {}",
-          edge.getPath().getName(),
+          "Excluding edge '{}'. Bounding box of '{}' > max bounding box at '{}': {} > {}",
+          edge,
           vehicle.getName(),
-          destPoint.getName(),
+          targetPoint.getName(),
           vehicle.getBoundingBox(),
-          destPoint.getMaxVehicleBoundingBox()
+          targetPoint.getMaxVehicleBoundingBox()
       );
       return Double.POSITIVE_INFINITY;
     }
