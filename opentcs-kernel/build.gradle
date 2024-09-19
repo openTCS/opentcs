@@ -1,0 +1,54 @@
+apply from: "${rootDir}/gradle/java-project.gradle"
+apply from: "${rootDir}/gradle/java-codequality.gradle"
+apply from: "${rootDir}/gradle/guice-application.gradle"
+apply from: "${rootDir}/gradle/publishing-java.gradle"
+
+if (!hasProperty('mainClass')) {
+  ext.mainClass = 'org.opentcs.kernel.RunKernel'
+}
+application.mainClass = ext.mainClass
+
+ext.collectableDistDir = new File(buildDir, 'install')
+
+dependencies {
+  api project(':opentcs-api-injection')
+  api project(':opentcs-common')
+  api project(':opentcs-commadapter-loopback')
+  api project(':opentcs-peripheralcommadapter-loopback')
+  api project(':opentcs-strategies-default')
+  api project(':opentcs-impl-configuration-gestalt')
+  api project(':opentcs-kernel-extension-http-services')
+  api project(':opentcs-kernel-extension-rmi-services')
+
+  implementation group: 'de.huxhorn.sulky', name: 'de.huxhorn.sulky.ulid', version: '8.3.0'
+
+  runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.13'
+}
+
+distributions {
+  main {
+    contents {
+      from "${sourceSets.main.resources.srcDirs[0]}/org/opentcs/kernel/distribution"
+    }
+  }
+}
+
+// For now, we're using hand-crafted start scripts, so disable the application
+// plugin's start script generation.
+startScripts.enabled = false
+
+distTar.enabled = false
+
+task release {
+  dependsOn build
+  dependsOn installDist
+}
+
+run {
+  systemProperties(['java.util.logging.config.file':'./config/logging.config',\
+                    'opentcs.base':'.',\
+                    'opentcs.home':'.',\
+                    'opentcs.configuration.reload.interval':'10000',\
+                    'opentcs.configuration.provider':'gestalt'])
+  jvmArgs('-XX:-OmitStackTraceInFastThrow')
+}

@@ -3,7 +3,7 @@
 !/.idea/runConfigurations
 /.gradle/
 /build/
-/openTCS-*/build/
+/opentcs-*/build/
 *~
 
 # Ignore approval test result files.

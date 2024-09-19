@@ -1,0 +1,302 @@
+plugins {
+  id 'org.hidetake.swagger.generator' version '2.19.2'
+  // To use AsciiDoctor for documentation
+  id 'org.asciidoctor.jvm.convert' version '3.3.2'
+  id 'org.asciidoctor.jvm.pdf' version '3.3.2'
+}
+
+evaluationDependsOn(':opentcs-api-base')
+evaluationDependsOn(':opentcs-api-injection')
+evaluationDependsOn(':opentcs-common')
+evaluationDependsOn(':opentcs-kernel')
+evaluationDependsOn(':opentcs-kernelcontrolcenter')
+evaluationDependsOn(':opentcs-modeleditor')
+evaluationDependsOn(':opentcs-operationsdesk')
+evaluationDependsOn(':opentcs-peripheralcommadapter-loopback')
+evaluationDependsOn(':opentcs-plantoverview-panel-loadgenerator')
+
+apply from: "${rootDir}/gradle/java-project.gradle"
+apply from: "${rootDir}/gradle/java-codequality.gradle"
+apply from: "${rootDir}/gradle/publishing-java.gradle"
+
+apply plugin: 'distribution'
+
+def baseApiDir = file("$buildDir/api-base")
+def injectionApiDir = file("$buildDir/api-injection")
+def webApiDir = file("$buildDir/swagger-ui-servicewebapiv1")
+def configDocDir = file("$buildDir/configdoc")
+def userManualDir = file("$buildDir/users-guide")
+def devManualDir = file("$buildDir/developers-guide")
+def devManualImagesDir = file("$devManualDir/images")
+def releaseNotesDir = file("$buildDir/release-notes")
+def assetsDir = file("src/docs/_assets")
+
+ext.collectableDistDir = file("$buildDir/install")
+
+configurations {
+  schemagen
+  configdocgen
+}
+
+swaggerSources {
+  servicewebapiv1 {
+    inputFile = file("src/docs/service-web-api-v1/openapi.yaml")
+  }
+}
+
+dependencies {
+  api project(':opentcs-common')
+  api project(':opentcs-kernel')
+
+  schemagen project(':opentcs-kernel')
+  schemagen project(':opentcs-modeleditor')
+  schemagen project(':opentcs-operationsdesk')
+  schemagen jar.outputs.files
+
+  configdocgen project(':opentcs-kernel')
+  configdocgen project(':opentcs-kernelcontrolcenter')
+  configdocgen project(':opentcs-modeleditor')
+  configdocgen project(':opentcs-operationsdesk')
+  configdocgen jar.outputs.files
+
+  swaggerUI group: 'org.webjars', name: 'swagger-ui', version: '3.52.5'
+}
+
+distributions {
+  main {
+    contents.from(project(':opentcs-api-base').javadoc.destinationDir) {
+      into('developer/api-base')
+    }
+    contents.from(project(':opentcs-api-injection').javadoc.destinationDir) {
+      into('developer/api-injection')
+    }
+    contents.from(webApiDir) {
+      into('developer/service-web-api-v1')
+    }
+    contents.from(devManualDir) {
+      into('developer/developers-guide')
+    }
+    contents.from(userManualDir) {
+      into('user')
+    }
+    contents.from(releaseNotesDir)
+    contents.from(assetsDir) {
+      into('_assets')
+    }
+  }
+}
+
+task renderDocs {
+  dependsOn project(':opentcs-api-base').javadoc
+  dependsOn project(':opentcs-api-injection').javadoc
+  dependsOn 'asciidoctor'
+  dependsOn 'generateSwaggerUI'
+}
+
+installDist.dependsOn renderDocs
+
+distTar {
+  enabled = false
+  dependsOn renderDocs
+  archiveBaseName = archiveBaseName.get().toLowerCase()
+}
+
+distZip {
+  dependsOn renderDocs
+  archiveBaseName = archiveBaseName.get().toLowerCase()
+}
+
+task release {
+  dependsOn build
+  dependsOn installDist
+}
+
+asciidoctor {
+  dependsOn 'asciidoctorUsersGuide'
+  dependsOn 'asciidoctorDevelopersGuide'
+  dependsOn 'asciidoctorReleaseNotes'
+  enabled = false
+}
+
+task asciidoctorReleaseNotes(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
+  // Document type: article (default), book, inline, manpage)
+  options doctype: 'article'
+  // Where to look for AsciiDoc files. Default: src/docs/asciidoc
+  sourceDir = file("src/docs/release-notes")
+  baseDirFollowsSourceDir()
+  // Where to put the rendered documents. Default: $buildDir/asciidoc.
+  outputDir = releaseNotesDir
+  sources {
+    include 'index.adoc'
+    include 'changelog.adoc'
+    include 'contributors.adoc'
+    include 'faq.adoc'
+  }
+  outputOptions {
+    // Whether to put backends' outputs into separate subdirectories
+    separateOutputDirs = false
+    // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
+    backends = ['html5']
+  }
+  // Attributes specific to the HTML output
+  attributes 'webfonts': false, // Disable webfonts
+             'iconfont-remote': false, // Disable remote icon fonts
+             'docinfo': "${file('src/docs/release-notes/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
+
+}
+
+task asciidoctorUsersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
+  dependsOn 'configdocgen'
+  // Document type: article (default), book, inline, manpage)
+  options doctype: 'book'
+  // Where to look for AsciiDoc files. Default: src/docs/asciidoc
+  sourceDir = file("src/docs/users-guide")
+  baseDirFollowsSourceDir()
+  // Where to put the rendered documents. Default: $buildDir/asciidoc.
+  outputDir = userManualDir
+  sources {
+    include 'opentcs-users-guide.adoc'
+  }
+  outputOptions{
+    // Whether to put backends' outputs into separate subdirectories
+    separateOutputDirs = false
+    // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
+    backends = ['html5', 'pdf']
+  }
+  attributes 'configdoc': configDocDir,
+             // Attributes specific to the HTML output
+             'webfonts': false, // Disable webfonts
+             'iconfont-remote': false, // Disable remote icon fonts
+             'docinfo': "${file('src/docs/users-guide/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
+
+  resources {
+    from(sourceDir) {
+      include '**/*.jpg'
+      include '**/*.png'
+      include '**/*.svg'
+      exclude 'themes'
+    }
+  }
+}
+
+task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
+  // Document type: article (default), book, inline, manpage)
+  options doctype: 'book'
+  // Where to look for AsciiDoc files. Default: src/docs/asciidoc
+  sourceDir = file("src/docs/developers-guide")
+  baseDirFollowsSourceDir()
+  // Where to put the rendered documents. Default: $buildDir/asciidoc.
+  outputDir = devManualDir
+  sources {
+    include 'opentcs-developers-guide.adoc'
+  }
+  outputOptions{
+    // Whether to put backends' outputs into separate subdirectories
+    separateOutputDirs = false
+    // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
+    backends = ['html5', 'pdf']
+  }
+  attributes 'documentation-testSrc': project.testSrcDir,
+             'loopback-guiceSrc': project(':opentcs-commadapter-loopback').guiceSrcDir,
+             'peripheral-loopback-guiceSrc': project(':opentcs-peripheralcommadapter-loopback').guiceSrcDir,
+             'controlCenter-guiceSrc': project(':opentcs-kernelcontrolcenter').guiceSrcDir,
+             'loadGeneratorPanel-guiceSrc': project(':opentcs-plantoverview-panel-loadgenerator').guiceSrcDir,
+             'imagesoutdir': devManualImagesDir, // Set the images directory for the output of asciidoctor-diagram
+             // Attributes specific to the HTML output
+             'webfonts': false, // Disable webfonts
+             'iconfont-remote': false, // Disable remote icon fonts
+             'docinfo': "${file('src/docs/developers-guide/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
+
+             // 'docinfo': "${file('src/docs/docinfo.html')}, shared", // doesn't seem to work
+             //'docinfodir': file('src/docs'),
+  resources {
+    from(sourceDir) {
+      include '**/*.png'
+    }
+  }
+  doLast{
+    delete "$devManualDir/.asciidoctor"
+  }
+}
+
+task configdocgen {
+  dependsOn 'jar'
+  dependsOn ':opentcs-kernel:jar'
+  dependsOn ':opentcs-kernelcontrolcenter:jar'
+  dependsOn ':opentcs-modeleditor:jar'
+  dependsOn ':opentcs-operationsdesk:jar'
+
+  doLast {
+    mkdir(configDocDir)
+
+    javaexec {
+      classpath configurations.configdocgen
+      mainClass = "org.opentcs.documentation.ConfigDocGenerator"
+      args = [
+        "org.opentcs.kernel.KernelApplicationConfiguration",
+        "${configDocDir}/KernelApplicationConfigurationEntries.adoc",
+
+        "org.opentcs.kernel.OrderPoolConfiguration",
+        "${configDocDir}/OrderPoolConfigurationEntries.adoc",
+
+        "org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration",
+        "${configDocDir}/DefaultDispatcherConfigurationEntries.adoc",
+
+        "org.opentcs.strategies.basic.routing.DefaultRouterConfiguration",
+        "${configDocDir}/DefaultRouterConfigurationEntries.adoc",
+
+        "org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration",
+        "${configDocDir}/ShortestPathConfigurationEntries.adoc",
+
+        "org.opentcs.strategies.basic.routing.edgeevaluator.ExplicitPropertiesConfiguration",
+        "${configDocDir}/ExplicitPropertiesConfigurationEntries.adoc",
+
+        "org.opentcs.strategies.basic.peripherals.dispatching.DefaultPeripheralJobDispatcherConfiguration",
+        "${configDocDir}/DefaultPeripheralJobDispatcherConfigurationEntries.adoc",
+
+        "org.opentcs.kernel.extensions.adminwebapi.AdminWebApiConfiguration",
+        "${configDocDir}/AdminWebApiConfigurationEntries.adoc",
+
+        "org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration",
+        "${configDocDir}/ServiceWebApiConfigurationEntries.adoc",
+
+        "org.opentcs.kernel.extensions.rmi.RmiKernelInterfaceConfiguration",
+        "${configDocDir}/RmiKernelInterfaceConfigurationEntries.adoc",
+
+        "org.opentcs.kernel.SslConfiguration",
+        "${configDocDir}/KernelSslConfigurationEntries.adoc",
+
+        "org.opentcs.virtualvehicle.VirtualVehicleConfiguration",
+        "${configDocDir}/VirtualVehicleConfigurationEntries.adoc",
+
+        "org.opentcs.commadapter.peripheral.loopback.VirtualPeripheralConfiguration",
+        "${configDocDir}/VirtualPeripheralConfigurationEntries.adoc",
+
+        "org.opentcs.kernel.extensions.watchdog.WatchdogConfiguration",
+        "${configDocDir}/WatchdogConfigurationEntries.adoc",
+
+        "org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration",
+        "${configDocDir}/KernelControlCenterApplicationConfigurationEntries.adoc",
+
+        "org.opentcs.kernelcontrolcenter.exchange.SslConfiguration",
+        "${configDocDir}/KccSslConfigurationEntries.adoc",
+
+        "org.opentcs.guing.common.exchange.SslConfiguration",
+        "${configDocDir}/PoSslConfigurationEntries.adoc",
+
+        "org.opentcs.modeleditor.util.ModelEditorConfiguration",
+        "${configDocDir}/ModelEditorConfigurationEntries.adoc",
+
+        "org.opentcs.modeleditor.util.ElementNamingSchemeConfiguration",
+        "${configDocDir}/PO_ElementNamingSchemeConfigurationEntries.adoc",
+
+        "org.opentcs.operationsdesk.util.OperationsDeskConfiguration",
+        "${configDocDir}/OperationsDeskConfigurationEntries.adoc"
+      ]
+    }
+  }
+}
+
+publishing {
+  ((MavenPublication) publications.getByName(project.name + '_mavenJava')).artifact(distZip)
+}
