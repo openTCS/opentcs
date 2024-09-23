@@ -81,7 +81,7 @@ task distSrcZip(type: Zip) {
 
   includes << 'config/**'
   includes << 'gradle/**'
-  includes << 'openTCS-*/**'
+  includes << 'opentcs-*/**'
   includes << 'src/**'
   includes << '*.gradle'
   includes << 'gradlew'

@@ -10,7 +10,7 @@ For this, please always create an issue and/or a pull request, and follow our st
 
 ## Changelog
 
-We document changes in the [changelog](openTCS-Documentation/src/docs/release-notes/changelog.adoc).
+We document changes in the [changelog](opentcs-documentation/src/docs/release-notes/changelog.adoc).
 
 ## Issues
 

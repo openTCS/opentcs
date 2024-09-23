@@ -3,7 +3,7 @@
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
 * Homepage: https://www.opentcs.org/
-* Changelog: [changelog.adoc](./openTCS-Documentation/src/docs/release-notes/changelog.adoc)
+* Changelog: [changelog.adoc](./opentcs-documentation/src/docs/release-notes/changelog.adoc)
 
 openTCS (short for _open Transportation Control System_) is a free platform for controlling fleets of [automated guided vehicles (AGVs)](https://en.wikipedia.org/wiki/Automated_guided_vehicle) and mobile robots.
 It should generally be possible to control any automatic vehicle with communication capabilities with it, but AGVs are the main target.
