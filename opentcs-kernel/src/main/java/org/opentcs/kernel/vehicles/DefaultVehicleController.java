@@ -18,8 +18,8 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
@@ -40,8 +40,6 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.BoundingBox;
-import org.opentcs.data.model.Location;
-import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
@@ -118,53 +116,6 @@ public class DefaultVehicleController
    */
   private volatile boolean initialized;
   /**
-   * A list of commands that still need to be sent to the communication adapter.
-   */
-  private final Deque<MovementCommand> futureCommands = new ArrayDeque<>();
-  /**
-   * A command for which a resource allocation is pending and which has not yet been sent to the
-   * adapter.
-   */
-  private volatile MovementCommand pendingCommand;
-  /**
-   * A set of resources for which allocation is pending.
-   */
-  private volatile Set<TCSResource<?>> pendingResources;
-  /**
-   * A command for which the execution of peripheral operations is pending.
-   */
-  private volatile MovementCommand interactionsPendingCommand;
-  /**
-   * A list of commands that have been sent to the communication adapter.
-   */
-  private final Deque<MovementCommand> commandsSent = new ArrayDeque<>();
-  /**
-   * The last command that has been executed.
-   */
-  private MovementCommand lastCommandExecuted;
-  /**
-   * The route index of the last command that has been executed.
-   */
-  private int lastCommandExecutedRouteIndex = TransportOrder.ROUTE_STEP_INDEX_DEFAULT;
-  /**
-   * The resources this controller has claimed for future allocation.
-   * <p>
-   * For every movement command, a single element is added to this queue containing all resources
-   * associated with the respective movement command (i.e., a path (if any), a point and a
-   * location (if any)).
-   * </p>
-   */
-  private final Deque<Set<TCSResource<?>>> claimedResources = new ArrayDeque<>();
-  /**
-   * The resources this controller has allocated for each command.
-   * <p>
-   * For every movement command, two elements are added to this queue - one element containing only
-   * the path (if any) associated with the respective movement command, and another element
-   * containing the point and the location (if any) associated with the respective movement command.
-   * </p>
-   */
-  private final Deque<Set<TCSResource<?>>> allocatedResources = new ArrayDeque<>();
-  /**
    * Manages interactions with peripheral devices that are to be performed before or after the
    * execution of movement commands.
    */
@@ -189,6 +140,10 @@ public class DefaultVehicleController
    * A flag indicating if the vehicle controller is allowed to send commands to the vehicle driver.
    */
   private boolean sendingCommandsAllowed;
+  /**
+   * Tracks processing of movement commands.
+   */
+  private final CommandProcessingTracker commandProcessingTracker;
 
   /**
    * Creates a new instance associated with the given vehicle.
@@ -204,6 +159,7 @@ public class DefaultVehicleController
    * @param componentsFactory A factory for various components related to a vehicle controller.
    * @param movementCommandMapper Maps drive orders to movement commands.
    * @param configuration The configuration to use.
+   * @param commandProcessingTracker Track processing of movement commands.
    */
   @Inject
   public DefaultVehicleController(
@@ -231,7 +187,9 @@ public class DefaultVehicleController
       @Nonnull
       MovementCommandMapper movementCommandMapper,
       @Nonnull
-      KernelApplicationConfiguration configuration
+      KernelApplicationConfiguration configuration,
+      @Nonnull
+      CommandProcessingTracker commandProcessingTracker
   ) {
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.commAdapter = requireNonNull(adapter, "adapter");
@@ -246,6 +204,8 @@ public class DefaultVehicleController
         = componentsFactory.createPeripheralInteractor(vehicle.getReference());
     this.movementCommandMapper = requireNonNull(movementCommandMapper, "movementCommandMapper");
     this.configuration = requireNonNull(configuration, "configuration");
+    this.commandProcessingTracker
+        = requireNonNull(commandProcessingTracker, "commandProcessingTracker");
   }
 
   @Override
@@ -288,8 +248,7 @@ public class DefaultVehicleController
     updateVehicleState(commAdapter.getProcessModel().getState());
     updateVehicleBoundingBox(commAdapter.getProcessModel().getBoundingBox());
 
-    claimedResources.clear();
-    allocatedResources.clear();
+    commandProcessingTracker.clear();
 
     peripheralInteractor.initialize();
 
@@ -400,7 +359,7 @@ public class DefaultVehicleController
             Point.class,
             currVehicle.getCurrentPosition()
         );
-        // Before interacting with the scheduler in any way, ensure that the we will be able to
+        // Before interacting with the scheduler in any way, ensure that we will be able to
         // allocate the required resources.
         if (!mayAllocateNow(Set.of(currPosition))) {
           throw new IllegalArgumentException(
@@ -412,10 +371,10 @@ public class DefaultVehicleController
         try {
           // Allocate the resources for the vehicle's current position.
           scheduler.allocateNow(this, Set.of(currPosition));
-          allocatedResources.add(Set.of(currPosition));
+          commandProcessingTracker.allocationReset(Set.of(currPosition));
           vehicleService.updateVehicleAllocatedResources(
               vehicle.getReference(),
-              toListOfResourceSets(allocatedResources)
+              toListOfResourceSets(commandProcessingTracker.getAllocatedResources())
           );
         }
         catch (ResourceAllocationException ex) {
@@ -455,20 +414,19 @@ public class DefaultVehicleController
       LOG.debug("{}: Setting drive order: {}", vehicle.getName(), newOrder);
 
       currentDriveOrder = newOrder;
-      lastCommandExecutedRouteIndex = TransportOrder.ROUTE_STEP_INDEX_DEFAULT;
+
+      commandProcessingTracker.driveOrderUpdated(
+          movementCommandMapper.toMovementCommands(newOrder, transportOrder)
+      );
 
       // Set the claim for (the remainder of) this transport order.
-      List<Set<TCSResource<?>>> claim = remainingRequiredClaim(transportOrder);
+      List<Set<TCSResource<?>>> claim = currentClaim(transportOrder);
       scheduler.claim(this, claim);
-      claimedResources.clear();
-      claimedResources.addAll(claim);
 
       vehicleService.updateVehicleClaimedResources(
           vehicle.getReference(),
-          toListOfResourceSets(claimedResources)
+          toListOfResourceSets(claim)
       );
-
-      futureCommands.addAll(movementCommandMapper.toMovementCommands(newOrder, transportOrder));
 
       if (canSendNextCommand()) {
         allocateForNextCommand();
@@ -500,21 +458,18 @@ public class DefaultVehicleController
       // There is a new drive order, so discard all the future/scheduled commands of the old one.
       discardFutureCommands();
 
+      commandProcessingTracker.driveOrderUpdated(
+          movementCommandMapper.toMovementCommands(newOrder, transportOrder)
+      );
+
       // Update the claim.
-      List<Set<TCSResource<?>>> claim = remainingRequiredClaim(transportOrder);
+      List<Set<TCSResource<?>>> claim = currentClaim(transportOrder);
       scheduler.claim(this, claim);
-      claimedResources.clear();
-      claimedResources.addAll(claim);
 
       vehicleService.updateVehicleClaimedResources(
           vehicle.getReference(),
-          toListOfResourceSets(claimedResources)
+          toListOfResourceSets(claim)
       );
-
-      futureCommands.addAll(movementCommandMapper.toMovementCommands(newOrder, transportOrder));
-      // The current drive order got updated but our queue of future commands now contains commands
-      // that have already been processed, so discard these.
-      discardProcessedFutureCommands();
 
       // The vehicle may now process previously restricted steps.
       if (canSendNextCommand()) {
@@ -529,7 +484,7 @@ public class DefaultVehicleController
         vehicle.getName(), oldOrder, newOrder
     );
 
-    if (lastCommandExecutedRouteIndex == TransportOrder.ROUTE_STEP_INDEX_DEFAULT) {
+    if (getLastCommandExecutedRouteIndex() == TransportOrder.ROUTE_STEP_INDEX_DEFAULT) {
       LOG.debug("{}: Drive orders continuous: No route progress, yet.", vehicle.getName());
       return true;
     }
@@ -538,8 +493,8 @@ public class DefaultVehicleController
     List<Step> newSteps = newOrder.getRoute().getSteps();
 
     // Compare already processed steps (up to and including the last executed command) for equality.
-    List<Step> oldProcessedSteps = oldSteps.subList(0, lastCommandExecutedRouteIndex + 1);
-    List<Step> newProcessedSteps = newSteps.subList(0, lastCommandExecutedRouteIndex + 1);
+    List<Step> oldProcessedSteps = oldSteps.subList(0, getLastCommandExecutedRouteIndex() + 1);
+    List<Step> newProcessedSteps = newSteps.subList(0, getLastCommandExecutedRouteIndex() + 1);
     LOG.debug(
         "{}: Comparing already processed steps for equality: {} (old) and {} (new)",
         vehicle.getName(),
@@ -562,11 +517,11 @@ public class DefaultVehicleController
     // Compare pending steps (after the last executed command) for equality.
     int futureOrCurrentPositionIndex = getFutureOrCurrentPositionIndex();
     List<Step> oldPendingSteps = oldSteps.subList(
-        lastCommandExecutedRouteIndex + 1,
+        getLastCommandExecutedRouteIndex() + 1,
         futureOrCurrentPositionIndex + 1
     );
     List<Step> newPendingSteps = newSteps.subList(
-        lastCommandExecutedRouteIndex + 1,
+        getLastCommandExecutedRouteIndex() + 1,
         futureOrCurrentPositionIndex + 1
     );
     LOG.debug(
@@ -588,25 +543,26 @@ public class DefaultVehicleController
   }
 
   private int getFutureOrCurrentPositionIndex() {
-    if (commandsSent.isEmpty() && getInteractionsPendingCommand().isEmpty()) {
+    if (commandProcessingTracker.getSentCommands().isEmpty()
+        && getInteractionsPendingCommand().isEmpty()) {
       LOG.debug(
           "{}: No commands expected to be executed. Last executed command route index: {}",
           vehicle.getName(),
-          lastCommandExecutedRouteIndex
+          getLastCommandExecutedRouteIndex()
       );
-      return lastCommandExecutedRouteIndex;
+      return getLastCommandExecutedRouteIndex();
     }
 
     if (getInteractionsPendingCommand().isPresent()) {
       LOG.debug(
           "{}: Command with pending peripheral operations present. Route index: {}",
           vehicle.getName(),
-          getInteractionsPendingCommand().get().getStep().getRouteIndex()
+          getInteractionsPendingCommand().orElseThrow().getStep().getRouteIndex()
       );
-      return getInteractionsPendingCommand().get().getStep().getRouteIndex();
+      return getInteractionsPendingCommand().orElseThrow().getStep().getRouteIndex();
     }
 
-    MovementCommand lastCommandSent = commandsSent.getLast();
+    MovementCommand lastCommandSent = commandProcessingTracker.getSentCommands().getLast();
     LOG.debug(
         "{}: Using the last command sent to the communication adapter. Route index: {}",
         vehicle.getName(),
@@ -616,38 +572,7 @@ public class DefaultVehicleController
   }
 
   private void discardFutureCommands() {
-    futureCommands.clear();
     withdrawPendingResourceAllocations();
-  }
-
-  private void discardProcessedFutureCommands() {
-    MovementCommand lastCommandProcessed = lastCommandProcessed();
-    if (!isCommandFromDriveOrder(lastCommandProcessed, transportOrder.getCurrentDriveOrder())) {
-      // There are no commands to be discarded.
-      return;
-    }
-
-    LOG.debug(
-        "{}: Discarding future commands up to '{}' (inclusively): {}",
-        vehicle.getName(),
-        lastCommandProcessed,
-        futureCommands
-    );
-    // Discard commands up to lastCommandProcessed...
-    while (!futureCommands.isEmpty()
-        && !lastCommandProcessed.equalsInMovement(futureCommands.peek())) {
-      futureCommands.poll();
-    }
-
-    checkState(
-        !futureCommands.isEmpty(),
-        "%s: Expected but did not find last command processed: %s",
-        vehicle.getName(),
-        lastCommandProcessed
-    );
-
-    // ...and also discard lastCommandProcessed itself.
-    futureCommands.poll();
   }
 
   @Override
@@ -658,33 +583,24 @@ public class DefaultVehicleController
 
         withdrawPendingResourceAllocations();
 
-        claimedResources.clear();
         scheduler.claim(this, List.of());
       }
       else {
         abortDriveOrder();
 
-        List<Set<TCSResource<?>>> newClaim
-            = pendingResources == null
-                ? List.of()
-                : List.of(pendingResources);
-
         withdrawPendingResourceAllocations();
 
-        claimedResources.clear();
-        claimedResources.addAll(newClaim);
-        scheduler.claim(this, newClaim);
+        commandProcessingTracker.driveOrderAborted(false);
+
+        scheduler.claim(this, List.of());
 
         checkForPendingCommands();
       }
 
-      vehicleService.updateVehicleClaimedResources(
-          vehicle.getReference(),
-          toListOfResourceSets(claimedResources)
-      );
+      vehicleService.updateVehicleClaimedResources(vehicle.getReference(), List.of());
       vehicleService.updateVehicleAllocatedResources(
           vehicle.getReference(),
-          toListOfResourceSets(allocatedResources)
+          toListOfResourceSets(commandProcessingTracker.getAllocatedResources())
       );
     }
   }
@@ -692,10 +608,6 @@ public class DefaultVehicleController
   private void clearDriveOrder() {
     synchronized (commAdapter) {
       currentDriveOrder = null;
-
-      // XXX May be removed after this method has been made private / integrated into
-      // abortTransportOrder().
-      resetPendingResourceAllocations();
 
       clearCommandQueue();
     }
@@ -707,49 +619,22 @@ public class DefaultVehicleController
         LOG.debug("{}: No drive order to be aborted", vehicle.getName());
         return;
       }
-      futureCommands.clear();
     }
   }
 
   private void clearCommandQueue() {
     synchronized (commAdapter) {
       commAdapter.clearCommandQueue();
-      commandsSent.clear();
-      futureCommands.clear();
-      // XXX May be removed after this method has been made private / integrated into
-      // abortTransportOrder().
-      resetPendingResourceAllocations();
-      interactionsPendingCommand = null;
+
+      Collection<Set<TCSResource<?>>> resourceToBeFreed
+          = commandProcessingTracker.getAllocatedResourcesAhead();
+      commandProcessingTracker.driveOrderAborted(true);
+
       peripheralInteractor.clear();
 
-      // Free all resource sets that were reserved for future commands, except the current one and
-      // the ones the vehicle is still covering with its length.
-      SplitResources splitResources;
-      if (lastCommandExecuted != null) {
-        splitResources = SplitResources.from(
-            allocatedResources,
-            Set.of(lastCommandExecuted.getStep().getDestinationPoint())
-        );
-      }
-      else {
-        // Happens if the very first transport order was withdrawn before the vehicle has made
-        // any movement. Ensure the resources for the current command/position are retained.
-        splitResources = SplitResources.from(
-            allocatedResources,
-            Set.of(
-                allocatedResources.stream()
-                    .flatMap(resSet -> resSet.stream())
-                    .filter(res -> res instanceof Point)
-                    .findFirst()
-                    .get()
-            )
-        );
-      }
-      for (Set<TCSResource<?>> resSet : splitResources.getResourcesAhead()) {
+      for (Set<TCSResource<?>> resSet : resourceToBeFreed) {
         scheduler.free(this, resSet);
       }
-      allocatedResources.clear();
-      allocatedResources.addAll(splitResources.getResourcesPassed());
     }
   }
 
@@ -789,12 +674,12 @@ public class DefaultVehicleController
 
   @Override
   public Queue<MovementCommand> getCommandsSent() {
-    return new ArrayDeque<>(commandsSent);
+    return commandProcessingTracker.getSentCommands();
   }
 
   @Override
   public Optional<MovementCommand> getInteractionsPendingCommand() {
-    return Optional.ofNullable(interactionsPendingCommand);
+    return commandProcessingTracker.getSendingPendingCommand();
   }
 
   @Override
@@ -823,39 +708,38 @@ public class DefaultVehicleController
     synchronized (commAdapter) {
       // Check if we've actually been waiting for these resources now. If not,
       // let the scheduler know that we don't want them.
-      if (!Objects.equals(resources, pendingResources)) {
+      if (!Objects.equals(
+          resources,
+          commandProcessingTracker.getAllocationPendingResources().orElse(null)
+      )) {
         LOG.warn(
             "{}: Allocated resources ({}) != pending resources ({}), refusing them",
             vehicle.getName(),
             resources,
-            pendingResources
+            commandProcessingTracker.getAllocationPendingResources()
         );
         return false;
       }
 
       LOG.debug("{}: Accepting allocated resources: {}", vehicle.getName(), resources);
-      allocatedResources.add(extractPath(resources));
-      allocatedResources.add(extractPointAndLocation(resources));
-      claimedResources.poll();
 
-      MovementCommand command = pendingCommand;
-      resetPendingResourceAllocations();
+      commandProcessingTracker.allocationConfirmed(resources);
+
+      MovementCommand command = commandProcessingTracker.getSendingPendingCommand().orElseThrow();
 
       vehicleService.updateVehicleClaimedResources(
           vehicle.getReference(),
-          toListOfResourceSets(claimedResources)
+          toListOfResourceSets(currentClaim(transportOrder))
       );
       vehicleService.updateVehicleAllocatedResources(
           vehicle.getReference(),
-          toListOfResourceSets(allocatedResources)
+          toListOfResourceSets(commandProcessingTracker.getAllocatedResources())
       );
-
-      interactionsPendingCommand = command;
 
       peripheralInteractor.prepareInteractions(transportOrder.getReference(), command);
       peripheralInteractor.startPreMovementInteractions(
           command,
-          () -> sendOrDiscardCommand(command),
+          () -> sendCommandOrStopSending(command),
           this::onPreMovementInteractionFailed
       );
     }
@@ -877,7 +761,7 @@ public class DefaultVehicleController
     return "DefaultVehicleController{" + "vehicleName=" + vehicle.getName() + '}';
   }
 
-  private void sendOrDiscardCommand(MovementCommand command) {
+  private void sendCommandOrStopSending(MovementCommand command) {
     if (sendingCommandsAllowed) {
       sendCommand(command);
     }
@@ -887,7 +771,7 @@ public class DefaultVehicleController
           vehicle.getName(),
           command
       );
-      interactionsPendingCommand = null;
+      commandProcessingTracker.commandSendingStopped(command);
     }
   }
 
@@ -899,8 +783,7 @@ public class DefaultVehicleController
         commAdapter.enqueueCommand(command),
         "Comm adapter did not accept command"
     );
-    commandsSent.add(command);
-    interactionsPendingCommand = null;
+    commandProcessingTracker.commandSent(command);
 
     // Check if the communication adapter has capacity for another command.
     if (canSendNextCommand()) {
@@ -915,16 +798,13 @@ public class DefaultVehicleController
 
     // With a failed pre-movement interaction, the movement command for the latest allocated
     // resources will not be sent to the vehicle. Therefore, free these resources.
-    Set<TCSResource<?>> res = allocatedResources.pollLast();
+    Set<TCSResource<?>> res = commandProcessingTracker.getAllocatedResources().peekLast();
     scheduler.free(this, res);
+    commandProcessingTracker.allocationRevoked(res);
     vehicleService.updateVehicleAllocatedResources(
         vehicle.getReference(),
-        toListOfResourceSets(allocatedResources)
+        toListOfResourceSets(commandProcessingTracker.getAllocatedResources())
     );
-
-    // Ensure there is no command with pending interactions that would otherwise prevent the vehicle
-    // state from being set properly in checkForPendingCommands().
-    interactionsPendingCommand = null;
 
     dispatcherService.withdrawByVehicle(vehicle.getReference(), false);
   }
@@ -933,10 +813,6 @@ public class DefaultVehicleController
     // Implementation remark: This method is called only for interactions where a peripheral job
     // with the completion required flag set has failed.
     LOG.warn("{}: Post-movement interaction failed.", vehicle.getName());
-
-    // Ensure there is no command with pending interactions that would otherwise prevent the vehicle
-    // state from being set properly in checkForPendingCommands().
-    interactionsPendingCommand = null;
 
     dispatcherService.withdrawByVehicle(vehicle.getReference(), false);
   }
@@ -1061,21 +937,6 @@ public class DefaultVehicleController
 
   private void withdrawPendingResourceAllocations() {
     scheduler.clearPendingAllocations(this);
-    resetPendingResourceAllocations();
-  }
-
-  private void resetPendingResourceAllocations() {
-    pendingResources = null;
-    pendingCommand = null;
-  }
-
-  /**
-   * Indicates whether we're currently waiting for resources to be allocated by the scheduler.
-   *
-   * @return <code>true</code> if we're currently waiting for resources to be allocated.
-   */
-  private boolean isWaitingForAllocation() {
-    return pendingResources != null;
   }
 
   private void updateVehiclePrecisePosition(Triple precisePosition)
@@ -1144,27 +1005,18 @@ public class DefaultVehicleController
     );
 
     synchronized (commAdapter) {
-      // Check if the executed command is the one we expect at this point.
-      MovementCommand expectedCommand = commandsSent.peek();
-      checkArgument(
-          Objects.equals(expectedCommand, executedCommand),
-          "%s: Communication adapter executed unexpected command: %s != %s",
-          vehicle.getName(),
-          executedCommand,
-          expectedCommand
-      );
+      commandProcessingTracker.commandExecuted(executedCommand);
 
-      // Remove the command from the queue, since it has been processed successfully.
-      lastCommandExecuted = commandsSent.remove();
-      lastCommandExecutedRouteIndex = lastCommandExecuted.getStep().getRouteIndex();
-
-      Point currentVehiclePosition = lastCommandExecuted.getStep().getDestinationPoint();
+      Point currentVehiclePosition = executedCommand.getStep().getDestinationPoint();
+      Deque<Set<TCSResource<?>>> allocatedResources
+          = commandProcessingTracker.getAllocatedResources();
       switch (configuration.vehicleResourceManagementType()) {
         case LENGTH_IGNORED:
           while (!allocatedResources.peek().contains(currentVehiclePosition)) {
             Set<TCSResource<?>> oldResources = allocatedResources.poll();
             LOG.debug("{}: Freeing resources: {}", vehicle.getName(), oldResources);
             scheduler.free(this, oldResources);
+            commandProcessingTracker.allocationReleased(oldResources);
           }
           break;
         case LENGTH_RESPECTED:
@@ -1180,6 +1032,7 @@ public class DefaultVehicleController
             Set<TCSResource<?>> oldResources = allocatedResources.poll();
             LOG.debug("{}: Freeing resources: {}", vehicle.getName(), oldResources);
             scheduler.free(this, oldResources);
+            commandProcessingTracker.allocationReleased(oldResources);
           }
           break;
         default:
@@ -1191,7 +1044,7 @@ public class DefaultVehicleController
 
       vehicleService.updateVehicleAllocatedResources(
           vehicle.getReference(),
-          toListOfResourceSets(allocatedResources)
+          toListOfResourceSets(commandProcessingTracker.getAllocatedResources())
       );
 
       transportOrderService.updateTransportOrderCurrentRouteStepIndex(
@@ -1218,14 +1071,12 @@ public class DefaultVehicleController
 
   private void checkForPendingCommands() {
     // Check if there are more commands to be processed for the current drive order.
-    if (interactionsPendingCommand == null
-        && !isWaitingForAllocation()
-        && futureCommands.isEmpty()) {
+    if (!commandProcessingTracker.hasCommandsToBeSent()) {
       LOG.debug("{}: No more commands in current drive order", vehicle.getName());
       // Check if there are still commands that have been sent to the communication adapter but
       // not yet executed. If not, the whole order has been executed completely - let the kernel
       // know about that so it can give us the next drive order.
-      if (commandsSent.isEmpty()) {
+      if (commandProcessingTracker.isDriveOrderFinished()) {
         LOG.debug("{}: Current drive order processed", vehicle.getName());
         currentDriveOrder = null;
         // Let the kernel/dispatcher know that the drive order has been processed completely (by
@@ -1261,10 +1112,6 @@ public class DefaultVehicleController
    * @return <code>true</code> if, and only if, we can send another command.
    */
   private boolean canSendNextCommand() {
-    if (futureCommands.isEmpty()) {
-      LOG.debug("{}: Cannot send, no commands to be sent.", vehicle.getName());
-      return false;
-    }
     if (!commAdapter.canAcceptNextCommand()) {
       LOG.debug(
           "{}: Cannot send, comm adapter cannot accept any further commands.",
@@ -1272,17 +1119,24 @@ public class DefaultVehicleController
       );
       return false;
     }
-    if (!futureCommands.peek().getStep().isExecutionAllowed()) {
-      LOG.debug("{}: Cannot send, movement execution is not allowed", vehicle.getName());
-      return false;
-    }
-    if (isWaitingForAllocation()) {
+    if (commandProcessingTracker.isWaitingForAllocation()) {
       LOG.debug(
           "{}: Cannot send, resource allocation is pending for: {}",
           vehicle.getName(),
-          pendingCommand
+          commandProcessingTracker.getAllocationPendingResources().orElse(null)
       );
       return false;
+    }
+    if (commandProcessingTracker.getNextAllocationCommand().isEmpty()) {
+      LOG.debug("{}: Cannot send, no commands to be sent.", vehicle.getName());
+      return false;
+    }
+    else {
+      if (!commandProcessingTracker.getNextAllocationCommand().orElseThrow()
+          .getStep().isExecutionAllowed()) {
+        LOG.debug("{}: Cannot send, movement execution is not allowed", vehicle.getName());
+        return false;
+      }
     }
     if (peripheralInteractor.isWaitingForMovementInteractionsToFinish()) {
       LOG.debug(
@@ -1307,17 +1161,18 @@ public class DefaultVehicleController
    */
   private void allocateForNextCommand() {
     checkState(
-        !isWaitingForAllocation(),
+        !commandProcessingTracker.isWaitingForAllocation(),
         "%s: Already waiting for allocation: %s",
         vehicle.getName(),
-        pendingResources
+        commandProcessingTracker.getAllocationPendingResources().orElse(null)
     );
 
     // Find out which resources are actually needed for the next command.
-    pendingCommand = futureCommands.poll();
-    pendingResources = getNeededResources(pendingCommand);
-    LOG.debug("{}: Requesting allocation of resources: {}", vehicle.getName(), pendingResources);
-    scheduler.allocate(this, pendingResources);
+    Set<TCSResource<?>> nextAllocation
+        = commandProcessingTracker.getNextAllocationResources().orElseThrow();
+    LOG.debug("{}: Requesting allocation of resources: {}", vehicle.getName(), nextAllocation);
+    scheduler.allocate(this, nextAllocation);
+    commandProcessingTracker.allocationRequested(nextAllocation);
   }
 
   /**
@@ -1347,7 +1202,7 @@ public class DefaultVehicleController
    */
   private void freeAllResources() {
     scheduler.freeAll(this);
-    allocatedResources.clear();
+    commandProcessingTracker.allocationReset(Set.of());
     vehicleService.updateVehicleAllocatedResources(vehicle.getReference(), List.of());
   }
 
@@ -1357,24 +1212,13 @@ public class DefaultVehicleController
    * @return The next command expected to be executed by the vehicle.
    */
   private MovementCommand findNextCommand() {
-    MovementCommand nextCommand = commandsSent.stream()
+    return commandProcessingTracker.getSentCommands().stream()
         .skip(1)
-        .filter(cmd -> cmd != null)
         .findFirst()
+        .or(commandProcessingTracker::getSendingPendingCommand)
+        .or(commandProcessingTracker::getAllocationPendingCommand)
+        .or(commandProcessingTracker::getNextAllocationCommand)
         .orElse(null);
-
-    if (nextCommand == null) {
-      nextCommand = pendingCommand;
-    }
-
-    if (nextCommand == null) {
-      nextCommand = futureCommands.stream()
-          .filter(cmd -> cmd != null)
-          .findFirst()
-          .orElse(null);
-    }
-
-    return nextCommand;
   }
 
   private void updatePositionWithoutOrder(Point point)
@@ -1396,7 +1240,7 @@ public class DefaultVehicleController
       freeAllResources();
       try {
         scheduler.allocateNow(this, requiredResource);
-        allocatedResources.add(requiredResource);
+        commandProcessingTracker.allocationReset(requiredResource);
       }
       catch (ResourceAllocationException exc) {
         // May never happen. After a successful call to `mayAllocateNow` the allocation should
@@ -1415,7 +1259,7 @@ public class DefaultVehicleController
       }
       vehicleService.updateVehicleAllocatedResources(
           vehicle.getReference(),
-          toListOfResourceSets(allocatedResources)
+          toListOfResourceSets(commandProcessingTracker.getAllocatedResources())
       );
     }
 
@@ -1423,25 +1267,21 @@ public class DefaultVehicleController
   }
 
   private void updatePositionWithOrder(Point point) {
-    if (commandsSent.isEmpty()) {
-      if (pendingCommand != null) {
-        // While waiting for resource allocation, the vehicle unexpectedly moved to a different
-        // position. Prevent any further movement commands from being sent to it.
+    if (commandProcessingTracker.getSentCommands().isEmpty()) {
+      if (commandProcessingTracker.getAllocationPendingCommand().isPresent()) {
         LOG.warn(
             "{}: Reported new position {} but we are waiting for resource allocation for: {}",
             vehicle.getName(),
             point,
-            pendingCommand
+            commandProcessingTracker.getAllocationPendingCommand().orElse(null)
         );
       }
-      else if (interactionsPendingCommand != null) {
-        // While waiting for peripheral interactions, the vehicle unexpectedly moved to a different
-        // position. Prevent any further movement commands from being sent to it.
+      else if (commandProcessingTracker.getSendingPendingCommand().isPresent()) {
         LOG.warn(
-            "{}: Reported new position {} but we are waiting for peripheral interactions for: {}",
+            "{}: Reported new position {} but we are waiting for command to be sent: {}",
             vehicle.getName(),
             point,
-            interactionsPendingCommand
+            commandProcessingTracker.getSendingPendingCommand().orElse(null)
         );
       }
       else {
@@ -1461,7 +1301,7 @@ public class DefaultVehicleController
     }
     else {
       // If a drive order is being processed, check if the reported position is the one we expect.
-      MovementCommand moveCommand = commandsSent.getFirst();
+      MovementCommand moveCommand = commandProcessingTracker.getSentCommands().getFirst();
 
       if (point == null) {
         LOG.info("{}: Resetting position for vehicle", vehicle.getName());
@@ -1534,10 +1374,10 @@ public class DefaultVehicleController
     synchronized (commAdapter) {
       checkState(currentDriveOrder == null, "%s: Vehicle has a drive order", vehicle.getName());
       checkState(
-          !isWaitingForAllocation(),
+          !commandProcessingTracker.isWaitingForAllocation(),
           "%s: Vehicle is waiting for resource allocation (%s)",
           vehicle.getName(),
-          pendingResources
+          commandProcessingTracker.getAllocationPendingResources()
       );
 
       setVehiclePosition(null);
@@ -1548,7 +1388,7 @@ public class DefaultVehicleController
     VehicleProcessModel processModel = commAdapter.getProcessModel();
     // We don't want to set the vehicle position right away, since the vehicle's currently
     // allocated resources would be freed in the first place. We need to check, if the vehicle's
-    // current position is already part of it's allocated resoruces.
+    // current position is already part of it's allocated resources.
     if (!alreadyAllocated(processModel.getPosition())) {
       // Set vehicle's position to allocate the resources
       setVehiclePosition(processModel.getPosition());
@@ -1560,7 +1400,7 @@ public class DefaultVehicleController
   }
 
   private boolean alreadyAllocated(String position) {
-    return allocatedResources.stream()
+    return commandProcessingTracker.getAllocatedResources().stream()
         .filter(resources -> resources != null)
         .flatMap(resources -> resources.stream())
         .anyMatch(resource -> resource.getName().equals(position));
@@ -1595,34 +1435,42 @@ public class DefaultVehicleController
     return result;
   }
 
-  private List<Set<TCSResource<?>>> remainingRequiredClaim(
-      @Nonnull
-      TransportOrder order
+  private static List<Set<TCSResourceReference<?>>> toListOfResourceSets(
+      List<Set<TCSResource<?>>> resources
   ) {
-    List<MovementCommand> futureMovementCommands = order.getAllDriveOrders().stream()
-        .skip(order.getCurrentDriveOrderIndex())
-        .map(driveOrder -> movementCommandMapper.toMovementCommands(driveOrder, order))
-        .flatMap(movementCommandQueue -> movementCommandQueue.stream())
-        .collect(Collectors.toList());
+    List<Set<TCSResourceReference<?>>> result = new ArrayList<>(resources.size());
 
-    // Commands that we have already processed should not be included in the remaining claim.
-    MovementCommand lastCommandProcessed = lastCommandProcessed();
-    if (isCommandFromDriveOrder(lastCommandProcessed, order.getCurrentDriveOrder())) {
-      futureMovementCommands = futureMovementCommands.stream()
-          .dropWhile(command -> !command.equalsInMovement(lastCommandProcessed))
-          .skip(1)
-          .collect(Collectors.toCollection(ArrayList::new));
+    for (Set<TCSResource<?>> resourceSet : resources) {
+      result.add(
+          resourceSet.stream()
+              .map(TCSResource::getReference)
+              .collect(Collectors.toSet())
+      );
     }
 
-    return futureMovementCommands.stream()
-        .map(command -> getNeededResources(command))
-        .collect(Collectors.toList());
+    return result;
+  }
+
+  private List<Set<TCSResource<?>>> currentClaim(TransportOrder order) {
+    List<Set<TCSResource<?>>> claim = new ArrayList<>();
+    claim.addAll(commandProcessingTracker.getClaimedResources());
+    claim.addAll(requiredClaimForFutureDriveOrders(transportOrder));
+    return claim;
+  }
+
+  private List<Set<TCSResource<?>>> requiredClaimForFutureDriveOrders(TransportOrder order) {
+    return order.getFutureDriveOrders().stream()
+        .map(driveOrder -> movementCommandMapper.toMovementCommands(driveOrder, order))
+        .flatMap(Collection::stream)
+        .map(this::getNeededResources)
+        .toList();
   }
 
   private boolean isForcedRerouting(DriveOrder newOrder) {
     // If it's a forced rerouting, the step after the one the vehicle executed last should be marked
     // accordingly.
-    Step nextPendingStep = newOrder.getRoute().getSteps().get(lastCommandExecutedRouteIndex + 1);
+    Step nextPendingStep
+        = newOrder.getRoute().getSteps().get(getLastCommandExecutedRouteIndex() + 1);
     if (nextPendingStep.getReroutingType() == ReroutingType.FORCED) {
       return true;
     }
@@ -1630,71 +1478,20 @@ public class DefaultVehicleController
     return false;
   }
 
-  /**
-   * Returns the last movement command that has been processed by this vehicle controller in a way
-   * that is relevant in the context of rerouting.
-   * <p>
-   * Generally, a movement command is processed in multiple stages. It is:
-   * <ol>
-   * <li>Added to the <code>futureCommands</code> queue (when a transport order for the vehicle
-   * associated with this controller is set or updated).</li>
-   * <li>Removed from the <code>futureCommands</code> queue and set as the
-   * <code>pendingCommand</code> (when allocating the resources needed for executing the next
-   * command).</li>
-   * <li>Unset as the <code>pendingCommand</code> and set as the
-   * <code>interactionPendingCommand</code> (when the resources have been allocated successfully).
-   * </li>
-   * <li>Unset as the <code>interactionPendingCommand</code> and added to the
-   * <code>commandsSent</code> queue (when interactions related to the command have been reported
-   * as finished and the command has been handed over to the vehicle driver).</li>
-   * <li>Removed from the <code>commandsSent</code> queue and set as the
-   * <code>lastCommandExecuted</code> (when the driver reports that the command has been executed)
-   * </li>
-   * </ol>
-   * </p>
-   * <p>
-   * The earliest stage a movement command can be in that is relevant in the context of rerouting is
-   * when it is set as the <code>interactionPendingCommand</code>. At this stage, the resources for
-   * the command have already been (successfully) allocated, and it will either be handed over to
-   * the vehicle driver if the associated peripheral interactions are successfully finished, or
-   * otherwise discarded. Rerouting should therefore take place from this command (or rather the
-   * respective step) at the earliest.
-   * </p>
-   * <p>
-   * <code>pendingCommand</code> (as well as everything prior to that) is not relevant here, as the
-   * allocation for corresponding resources is still pending at this stage, and all pending
-   * allocations are cleared upon rerouting.
-   * </p>
-   *
-   * @return A movement command or {@code null} if there is no movement command that has been
-   * processed by this vehicle controller in a way that is relevant in the context of rerouting.
-   */
-  @Nullable
-  private MovementCommand lastCommandProcessed() {
-    return Optional.ofNullable(interactionsPendingCommand)
-        .or(() -> Optional.ofNullable(commandsSent.peekLast()))
-        .orElse(lastCommandExecuted);
-  }
+  private int getLastCommandExecutedRouteIndex() {
+    if (commandProcessingTracker.getLastCommandExecuted().isEmpty()) {
+      return TransportOrder.ROUTE_STEP_INDEX_DEFAULT;
+    }
 
-  private Set<TCSResource<?>> extractPointAndLocation(Set<TCSResource<?>> resources) {
-    return resources.stream()
-        .filter(resource -> resource instanceof Point || resource instanceof Location)
-        .collect(Collectors.toSet());
-  }
+    if (!Objects.equals(
+        currentDriveOrder,
+        commandProcessingTracker.getLastCommandExecuted().orElseThrow().getDriveOrder()
+    )) {
+      return TransportOrder.ROUTE_STEP_INDEX_DEFAULT;
+    }
 
-  private Set<TCSResource<?>> extractPath(Set<TCSResource<?>> resources) {
-    return resources.stream()
-        .filter(resource -> resource instanceof Path)
-        .collect(Collectors.toSet());
-  }
-
-  private boolean isCommandFromDriveOrder(
-      @Nullable
-      MovementCommand command,
-      @Nullable
-      DriveOrder driveOrder
-  ) {
-    return command != null && Objects.equals(driveOrder, command.getDriveOrder());
+    return commandProcessingTracker.getLastCommandExecuted().orElseThrow()
+        .getStep().getRouteIndex();
   }
 
   private void onUnexpectedPositionReported(

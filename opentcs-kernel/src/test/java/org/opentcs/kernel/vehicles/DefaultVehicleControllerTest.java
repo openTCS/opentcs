@@ -130,7 +130,8 @@ class DefaultVehicleControllerTest {
         eventBus,
         componentsFactory,
         mock(MovementCommandMapper.class),
-        mock(KernelApplicationConfiguration.class)
+        mock(KernelApplicationConfiguration.class),
+        new CommandProcessingTracker()
     );
     stdVehicleController.initialize();
   }
@@ -143,7 +144,7 @@ class DefaultVehicleControllerTest {
 
   // Test cases for implementation of interface VehicleManager start here.
   @Test
-  void shouldFowardPositionChangeToKernel() {
+  void shouldForwardPositionChangeToKernel() {
     Point point = dataObjectFactory.createPoint();
     doReturn(point).when(vehicleService).fetchObject(Point.class, point.getName());
 
