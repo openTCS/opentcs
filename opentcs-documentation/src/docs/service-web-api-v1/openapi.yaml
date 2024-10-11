@@ -18,7 +18,7 @@ info:
     Optionally, an access key can be set in the kernel configuration.
     The configured value is then expected to be sent by the client in an HTTP header named `X-Api-Access-Key`.
   # IMPORTANT: When updating this version number, remember to mention that in the changelog, too!
-  version: 1.8.0
+  version: 1.8.1
   title: openTCS web API specification
 servers:
   - url: http://localhost:55200/v1
@@ -157,6 +157,7 @@ paths:
             type: string
             example: TOrder-002
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -397,6 +398,7 @@ paths:
             type: string
             example: OrderSequence-01
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -655,6 +657,7 @@ paths:
           schema:
             type: string
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -696,6 +699,7 @@ paths:
           schema:
             type: string
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -843,6 +847,7 @@ paths:
           schema:
             type: string
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -1005,6 +1010,7 @@ paths:
           schema:
             type: string
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -1209,6 +1215,7 @@ paths:
         - Plant models
       summary: Uploads a new plant model with the given information.
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -1453,6 +1460,10 @@ components:
           type: string
           description: The description class name of the vehicle driver currently attached to this vehicle.
           example: org.opentcs.someVehicle.driver001
+      required:
+        - vehicleName
+        - availableCommAdapters
+        - attachedCommAdapter
     TransportOrderState:
       title: Transport Order State
       type: object
@@ -1506,6 +1517,16 @@ components:
           items:
             $ref: "#/components/schemas/DestinationState"
           description: The sequence of destinations of the transport order.
+      required:
+        - dispensable
+        - name
+        - type
+        - state
+        - intendedVehicle
+        - processingVehicle
+        - peripheralReservationToken
+        - wrappingSequence
+        - destinations
     DestinationState:
       type: object
       additionalProperties: false
@@ -1722,6 +1743,17 @@ components:
           items:
             $ref: "#/components/schemas/Property"
           description: The order sequences properties
+      required:
+        - name
+        - type
+        - orders
+        - finishedIndex
+        - complete
+        - finished
+        - failureFatal
+        - intendedVehicle
+        - processingVehicle
+        - properties
     OrderSequence:
       title: Order Sequence
       type: object
@@ -1752,6 +1784,9 @@ components:
           items:
             $ref: "#/components/schemas/Property"
           description: The order sequence's properties
+      required:
+        - type
+        - properties
     VehicleState:
       title: Vehicle State
       type: object
@@ -2069,6 +2104,9 @@ components:
               default: PeripheralJob
             sequenceNumber:
               example: 126
+          required:
+            - type
+            - sequenceNumber
     Property:
       type: object
       additionalProperties: false
@@ -2249,6 +2287,9 @@ components:
           type: string
           description: The description class name of the peripheral driver currently attached to this location.
           example: org.opentcs.somePeripheral.driver001
+      required:
+        - locationReference
+        - attachedCommAdapter
     PlantModel:
       title: Plant model
       type: object
@@ -2636,6 +2677,9 @@ components:
                   - AFTER_MOVEMENT
               completionRequired:
                 type: boolean
+            required:
+              - operation
+              - locationName
         locked:
           type: boolean
           description: A flag for marking this path as locked (i.e. to prevent vehicles from using it).
@@ -3020,6 +3064,9 @@ components:
               y: 1820
             - x: 1700
               y: 1890
+      required:
+        - envelopeKey
+        - vertices
     Route:
       title: Route
       type: object
