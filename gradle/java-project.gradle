@@ -17,15 +17,15 @@ dependencies {
   compileOnly group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '3.0.0'
   testCompileOnly group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '3.0.0'
 
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.2'
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.10.2'
-  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.2'
-  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.10.2'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.11.2'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.11.2'
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.11.2'
+  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.11.2'
 
-  testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.11.0'
-  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.25.3'
-  testImplementation group: 'com.approvaltests', name: 'approvaltests', version: '23.0.0'
+  testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '3.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.2'
+  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
+  testImplementation group: 'com.approvaltests', name: 'approvaltests', version: '24.8.0'
 
   testRuntimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.13'
 }
