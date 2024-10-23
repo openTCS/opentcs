@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.logging.Level;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.KernelServicePortal;
@@ -24,6 +25,7 @@ import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.plantoverview.PlantModelExporter;
 import org.opentcs.components.plantoverview.PlantModelImporter;
 import org.opentcs.customizations.ApplicationHome;
+import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.guing.common.application.ProgressIndicator;
 import org.opentcs.guing.common.application.StatusPanel;
 import org.opentcs.guing.common.exchange.adapter.ProcessAdapterUtil;
@@ -77,6 +79,7 @@ public class OpenTCSModelManagerModeling
   /**
    * Creates a new instance.
    *
+   * @param applicationFrame The application's main frame.
    * @param crsObjFactory A course object factory to be used.
    * @param modelComponentFactory The model component factory to be used.
    * @param procAdapterUtil A utility class for process adapters.
@@ -92,6 +95,8 @@ public class OpenTCSModelManagerModeling
    */
   @Inject
   public OpenTCSModelManagerModeling(
+      @ApplicationFrame
+      JFrame applicationFrame,
       CourseObjectFactory crsObjFactory,
       ModelComponentFactory modelComponentFactory,
       ProcessAdapterUtil procAdapterUtil,
@@ -107,6 +112,7 @@ public class OpenTCSModelManagerModeling
       ProgressIndicator progressIndicator
   ) {
     super(
+        applicationFrame,
         crsObjFactory,
         modelComponentFactory,
         procAdapterUtil,
@@ -169,7 +175,7 @@ public class OpenTCSModelManagerModeling
     catch (IOException | IllegalArgumentException ex) {
       getStatusPanel().setLogMessage(
           Level.SEVERE,
-          ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.STATUS_PATH)
+          ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MISC_PATH)
               .getFormatted(
                   "openTcsModelManagerModeling.message_notLoaded.text",
                   file.getName()
@@ -199,7 +205,7 @@ public class OpenTCSModelManagerModeling
     catch (IOException | IllegalArgumentException ex) {
       getStatusPanel().setLogMessage(
           Level.SEVERE,
-          ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.STATUS_PATH)
+          ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MISC_PATH)
               .getFormatted("openTcsModelManagerModeling.message_notImported.text")
       );
       LOG.warn("Exception importing model", ex);
@@ -217,7 +223,7 @@ public class OpenTCSModelManagerModeling
     catch (IllegalStateException | CredentialsException e) {
       getStatusPanel().setLogMessage(
           Level.SEVERE,
-          ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.STATUS_PATH)
+          ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MISC_PATH)
               .getString("openTcsModelManagerModeling.message_notSaved.text")
       );
       LOG.warn("Exception persisting model", e);
@@ -244,7 +250,7 @@ public class OpenTCSModelManagerModeling
     catch (IOException | IllegalArgumentException ex) {
       getStatusPanel().setLogMessage(
           Level.SEVERE,
-          ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.STATUS_PATH)
+          ResourceBundleUtil.getBundle(I18nPlantOverviewModeling.MISC_PATH)
               .getString("openTcsModelManagerModeling.message_notExported.text")
       );
       LOG.warn("Exception exporting model", ex);
@@ -289,7 +295,8 @@ public class OpenTCSModelManagerModeling
     if (!modelReaderFileChooser.getCurrentDirectory().isDirectory()) {
       modelReaderFileChooser.getCurrentDirectory().mkdir();
     }
-    if (modelReaderFileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
+    if (modelReaderFileChooser.showOpenDialog(getApplicationFrame())
+        != JFileChooser.APPROVE_OPTION) {
       return null;
     }
     return modelReaderFileChooser.getSelectedFile();

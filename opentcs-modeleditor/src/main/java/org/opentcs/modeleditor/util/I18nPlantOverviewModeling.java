@@ -33,10 +33,6 @@ public interface I18nPlantOverviewModeling {
    */
   String MISC_PATH = "i18n.org.opentcs.plantoverview.modeling.miscellaneous";
   /**
-   * Path to the resources related to status messages.
-   */
-  String STATUS_PATH = "i18n.org.opentcs.plantoverview.modeling.panels.status";
-  /**
    * Path to the resources related to the system.
    */
   String SYSTEM_PATH = "i18n.org.opentcs.plantoverview.modeling.system";

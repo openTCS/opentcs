@@ -8,7 +8,7 @@
 package org.opentcs.guing.common.persistence;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentcs.guing.common.util.I18nPlantOverview.STATUS_PATH;
+import static org.opentcs.guing.common.util.I18nPlantOverview.MISC_PATH;
 import static org.opentcs.util.Assertions.checkState;
 
 import com.google.common.base.Strings;
@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.access.Kernel;
@@ -32,6 +33,7 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.customizations.ApplicationHome;
+import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Location;
@@ -97,6 +99,14 @@ public class OpenTCSModelManager
    */
   private static final Logger LOG = LoggerFactory.getLogger(OpenTCSModelManager.class);
   /**
+   * Provides string localization.
+   */
+  private static final ResourceBundleUtil BUNDLE = ResourceBundleUtil.getBundle(MISC_PATH);
+  /**
+   * The application's main frame.
+   */
+  private final JFrame applicationFrame;
+  /**
    * The StatusPanel at the bottom to log messages.
    */
   private final StatusPanel statusPanel;
@@ -148,6 +158,7 @@ public class OpenTCSModelManager
   /**
    * Creates a new instance.
    *
+   * @param applicationFrame The application's main frame.
    * @param crsObjFactory A course object factory to be used.
    * @param modelComponentFactory The model component factory to be used.
    * @param procAdapterUtil A utility class for process adapters.
@@ -161,6 +172,8 @@ public class OpenTCSModelManager
   @Inject
   @SuppressWarnings("this-escape")
   public OpenTCSModelManager(
+      @ApplicationFrame
+      JFrame applicationFrame,
       CourseObjectFactory crsObjFactory,
       ModelComponentFactory modelComponentFactory,
       ProcessAdapterUtil procAdapterUtil,
@@ -172,6 +185,7 @@ public class OpenTCSModelManager
       ModelExportAdapter modelExportAdapter,
       ProgressIndicator progressIndicator
   ) {
+    this.applicationFrame = requireNonNull(applicationFrame, "applicationFrame");
     this.crsObjFactory = requireNonNull(crsObjFactory, "crsObjFactory");
     this.modelComponentFactory = requireNonNull(modelComponentFactory, "modelComponentFactory");
     this.procAdapterUtil = requireNonNull(procAdapterUtil, "procAdapterUtil");
@@ -232,8 +246,7 @@ public class OpenTCSModelManager
     catch (IOException e) {
       statusPanel.setLogMessage(
           Level.SEVERE,
-          ResourceBundleUtil.getBundle(STATUS_PATH)
-              .getString("openTcsModelManager.message_notSaved.text")
+          BUNDLE.getString("openTcsModelManager.message_notSaved.text")
       );
       LOG.warn("Exception persisting model", e);
       return false;
@@ -256,9 +269,8 @@ public class OpenTCSModelManager
    * Persist model with the persistor.
    *
    * @param systemModel The system model to be persisted.
+   * @param file The file to persist the system model into.
    * @param persistor The persistor to be used.
-   * @param ignoreError whether the model should be persisted when duplicates exist
-   * @return Whether the model was actually saved.
    */
   private boolean persistModel(
       SystemModel systemModel,
@@ -868,12 +880,26 @@ public class OpenTCSModelManager
     if (!modelPersistorFileChooser.getCurrentDirectory().isDirectory()) {
       modelPersistorFileChooser.getCurrentDirectory().mkdir();
     }
-    if (modelPersistorFileChooser.showSaveDialog(null) != JFileChooser.APPROVE_OPTION) {
+    if (modelPersistorFileChooser.showSaveDialog(applicationFrame) != JFileChooser.APPROVE_OPTION) {
       fModelName = Kernel.DEFAULT_MODEL_NAME;
       return null;
     }
 
-    File selectedFile = modelPersistorFileChooser.getSelectedFile();
+    File selectedFile = ensureXmlExtensionIsPresent(modelPersistorFileChooser.getSelectedFile());
+
+    if (selectedFile.exists()) {
+      int response = JOptionPane.showConfirmDialog(
+          applicationFrame,
+          BUNDLE.getString("openTcsModelManager.optionPane_fileExists.message"),
+          BUNDLE.getString("openTcsModelManager.optionPane_fileExists.title"),
+          JOptionPane.YES_NO_OPTION,
+          JOptionPane.WARNING_MESSAGE
+      );
+
+      if (response != JOptionPane.YES_OPTION) {
+        return null;
+      }
+    }
 
     // Extract the model name from the file name, but without the extension.
     fModelName = selectedFile.getName().replaceFirst("[.][^.]+$", "");
@@ -883,6 +909,15 @@ public class OpenTCSModelManager
     }
 
     return selectedFile;
+  }
+
+  private File ensureXmlExtensionIsPresent(File file) {
+    String fileName = file.getName();
+
+    if (!fileName.endsWith(".xml")) {
+      return new File(file.getParent(), fileName + ".xml");
+    }
+    return file;
   }
 
   /**
@@ -1002,6 +1037,10 @@ public class OpenTCSModelManager
 
   protected void setCurrentModelFile(File currentModelFile) {
     this.currentModelFile = currentModelFile;
+  }
+
+  protected JFrame getApplicationFrame() {
+    return applicationFrame;
   }
 
   protected StatusPanel getStatusPanel() {

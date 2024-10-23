@@ -41,10 +41,6 @@ public interface I18nPlantOverview {
    */
   String PROPERTIES_PATH = "i18n.org.opentcs.plantoverview.panels.propertyEditing";
   /**
-   * Path to the resources related to status messages.
-   */
-  String STATUS_PATH = "i18n.org.opentcs.plantoverview.panels.status";
-  /**
    * Path to the resources related to the tree view.
    */
   String TREEVIEW_PATH = "i18n.org.opentcs.plantoverview.panels.componentTrees";
