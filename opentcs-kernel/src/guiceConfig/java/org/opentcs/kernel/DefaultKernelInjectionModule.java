@@ -71,6 +71,8 @@ import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
 import org.opentcs.kernel.vehicles.VehicleControllerComponentsFactory;
 import org.opentcs.kernel.vehicles.VehicleControllerFactory;
+import org.opentcs.kernel.vehicles.transformers.CoordinateSystemTransformerFactory;
+import org.opentcs.kernel.vehicles.transformers.DefaultVehicleDataTransformerFactory;
 import org.opentcs.kernel.workingset.CreationTimeThreshold;
 import org.opentcs.kernel.workingset.NotificationBuffer;
 import org.opentcs.kernel.workingset.PeripheralJobPoolManager;
@@ -151,6 +153,11 @@ public class DefaultKernelInjectionModule
         .in(Singleton.class);
     bind(LocalKernel.class)
         .to(StandardKernel.class);
+
+    vehicleDataTransformersBinder().addBinding().to(DefaultVehicleDataTransformerFactory.class);
+    // tag::documentation_registerTransformerFactory[]
+    vehicleDataTransformersBinder().addBinding().to(CoordinateSystemTransformerFactory.class);
+    // end::documentation_registerTransformerFactory[]
 
     configureKernelStatesDependencies();
     configureKernelStarterDependencies();

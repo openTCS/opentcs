@@ -45,6 +45,31 @@ Components may be injected and used at multiple places within the kernel applica
 If they were not bound as singletons, a new instance would be created for every injection, each of them with their own, separate internal state.
 Build custom components with that in mind, and implement their `initialize()` and `terminate()` methods appropriately!
 
+=== Customizing transformation of data sent to / received from vehicles
+
+For transforming data sent to / received from vehicles, the following interfaces in the openTCS API are used:
+
+* A `MovementCommandTransformer` transforms ``MovementCommand``s before they are sent to the vehicle, e.g. to adjust coordinates in the ``Point``s it contains for the vehicle's coordinate system.
+* An `IncomingPoseTransformer` transforms ``Pose``s received by the vehicle, e.g. to adjust coordinates for the plant model coordinate system.
+* A `VehicleDataTransformerFactory` provides matching instances of `MovementCommandTransformer` and `IncomingPoseTransformer`.
+
+To integrate your own transformation implementations, do the following:
+
+. Create custom implementations of `MovementCommandTransformer` and `IncomingPoseTransformer` that perform the actual custom transformations.
+. Create an implementation of `VehicleDataTransformerFactory` that provides instances of your transformer implementations.
+
+image::transformer_classes.png[]
+
+To make your factory implementation usable in the kernel, register it as a binding for `VehicleDataTransformerFactory` in your `KernelInjectionModule` implementation.
+For example, the transformer factory the kernel already comes with is registered with the following line:
+
+[source, java]
+----
+include::{kernel-guiceSrc}/org/opentcs/kernel/DefaultKernelInjectionModule.java[tags=documentation_registerTransformerFactory]
+----
+
+Finally, to select your transformer (factory) to be used for a specific vehicle, set a property on the vehicle element in the plant model with key `tcs:vehicleDataTransformer` to the value that your factory's `getName()` method provides.
+
 === Developing vehicle drivers
 
 openTCS supports integration of custom vehicle drivers that implement vehicle-specific communication protocols and thus mediate between the kernel and the vehicle.

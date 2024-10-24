@@ -21,6 +21,7 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
@@ -51,13 +53,16 @@ import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.AdapterCommand;
+import org.opentcs.drivers.vehicle.IncomingPoseTransformer;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
+import org.opentcs.drivers.vehicle.MovementCommandTransformer;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.ProcessModelEvent;
 import org.opentcs.kernel.KernelApplicationConfiguration;
+import org.opentcs.kernel.vehicles.transformers.VehicleDataTransformerRegistry;
 import org.opentcs.util.ExplainedBoolean;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
@@ -144,6 +149,19 @@ public class DefaultVehicleController
    * Tracks processing of movement commands.
    */
   private final CommandProcessingTracker commandProcessingTracker;
+  /**
+   * A transformer transforming movement commands.
+   */
+  private final MovementCommandTransformer movementCommandTransformer;
+  /**
+   * A transformer transforming incoming poses.
+   */
+  private final IncomingPoseTransformer incomingPoseTransformer;
+  /**
+   * A map of transformed movement commands to their corresponding original ones.
+   */
+  private final Map<MovementCommand, MovementCommand> transformedToOriginalCommands
+      = new HashMap<>();
 
   /**
    * Creates a new instance associated with the given vehicle.
@@ -160,6 +178,7 @@ public class DefaultVehicleController
    * @param movementCommandMapper Maps drive orders to movement commands.
    * @param configuration The configuration to use.
    * @param commandProcessingTracker Track processing of movement commands.
+   * @param dataTransformerRegistry A registry for data transformer factories.
    */
   @Inject
   public DefaultVehicleController(
@@ -189,7 +208,9 @@ public class DefaultVehicleController
       @Nonnull
       KernelApplicationConfiguration configuration,
       @Nonnull
-      CommandProcessingTracker commandProcessingTracker
+      CommandProcessingTracker commandProcessingTracker,
+      @Nonnull
+      VehicleDataTransformerRegistry dataTransformerRegistry
   ) {
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.commAdapter = requireNonNull(adapter, "adapter");
@@ -206,6 +227,15 @@ public class DefaultVehicleController
     this.configuration = requireNonNull(configuration, "configuration");
     this.commandProcessingTracker
         = requireNonNull(commandProcessingTracker, "commandProcessingTracker");
+    requireNonNull(dataTransformerRegistry, "dataTransformerRegistry");
+    this.movementCommandTransformer
+        = dataTransformerRegistry
+            .findFactoryFor(vehicle)
+            .createMovementCommandTransformer(vehicle);
+    this.incomingPoseTransformer
+        = dataTransformerRegistry
+            .findFactoryFor(vehicle)
+            .createIncomingPoseTransformer(vehicle);
   }
 
   @Override
@@ -229,14 +259,8 @@ public class DefaultVehicleController
 
     // Initialize standard attributes once.
     setVehiclePosition(commAdapter.getProcessModel().getPosition());
-    vehicleService.updateVehiclePrecisePosition(
-        vehicle.getReference(),
-        commAdapter.getProcessModel().getPrecisePosition()
-    );
-    vehicleService.updateVehicleOrientationAngle(
-        vehicle.getReference(),
-        commAdapter.getProcessModel().getOrientationAngle()
-    );
+    updateVehiclePrecisePosition(commAdapter.getProcessModel().getPrecisePosition());
+    updateVehicleOrientationAngle(commAdapter.getProcessModel().getOrientationAngle());
     vehicleService.updateVehicleEnergyLevel(
         vehicle.getReference(),
         commAdapter.getProcessModel().getEnergyLevel()
@@ -268,7 +292,7 @@ public class DefaultVehicleController
     commAdapter.getProcessModel().removePropertyChangeListener(this);
     // Reset the vehicle's position.
     updatePosition(null, null);
-    vehicleService.updateVehiclePrecisePosition(vehicle.getReference(), null);
+    updateVehiclePrecisePosition(null);
     // Free all allocated resources.
     freeAllResources();
 
@@ -335,6 +359,7 @@ public class DefaultVehicleController
       // We received either a new transport order or the same transport order for its next drive
       // order.
       sendingCommandsAllowed = true;
+      transformedToOriginalCommands.clear();
       transportOrder = newOrder;
       setDriveOrder(transportOrder.getCurrentDriveOrder(), transportOrder.getProperties());
     }
@@ -354,6 +379,7 @@ public class DefaultVehicleController
         }
 
         sendingCommandsAllowed = true;
+        transformedToOriginalCommands.clear();
 
         Point currPosition = vehicleService.fetchObject(
             Point.class,
@@ -778,11 +804,14 @@ public class DefaultVehicleController
   private void sendCommand(MovementCommand command)
       throws IllegalStateException {
     LOG.debug("{}: Enqueuing movement command with comm adapter: {}", vehicle.getName(), command);
+
+    MovementCommand transformedCommand = movementCommandTransformer.apply(command);
     // Send the command to the communication adapter.
     checkState(
-        commAdapter.enqueueCommand(command),
+        commAdapter.enqueueCommand(transformedCommand),
         "Comm adapter did not accept command"
     );
+    transformedToOriginalCommands.put(transformedCommand, command);
     commandProcessingTracker.commandSent(command);
 
     // Check if the communication adapter has capacity for another command.
@@ -839,10 +868,7 @@ public class DefaultVehicleController
         evt.getPropertyName(),
         VehicleProcessModel.Attribute.ORIENTATION_ANGLE.name()
     )) {
-      vehicleService.updateVehicleOrientationAngle(
-          vehicle.getReference(),
-          (Double) evt.getNewValue()
-      );
+      updateVehicleOrientationAngle((Double) evt.getNewValue());
     }
     else if (Objects.equals(
         evt.getPropertyName(),
@@ -941,12 +967,28 @@ public class DefaultVehicleController
 
   private void updateVehiclePrecisePosition(Triple precisePosition)
       throws ObjectUnknownException {
+    if (precisePosition == null) {
+      vehicleService.updateVehiclePrecisePosition(vehicle.getReference(), null);
+      return;
+    }
+
     // Get an up-to-date copy of the vehicle
     Vehicle currVehicle = vehicleService.fetchObject(Vehicle.class, vehicle.getReference());
-
     if (currVehicle.getIntegrationLevel() != Vehicle.IntegrationLevel.TO_BE_IGNORED) {
-      vehicleService.updateVehiclePrecisePosition(vehicle.getReference(), precisePosition);
+      vehicleService.updateVehiclePrecisePosition(
+          vehicle.getReference(),
+          incomingPoseTransformer.apply(new Pose(precisePosition, Double.NaN)).getPosition()
+      );
     }
+  }
+
+  private void updateVehicleOrientationAngle(double orientationAngle) {
+    vehicleService.updateVehicleOrientationAngle(
+        vehicle.getReference(),
+        incomingPoseTransformer
+            .apply(new Pose(new Triple(0, 0, 0), orientationAngle))
+            .getOrientationAngle()
+    );
   }
 
   private void updateVehiclePosition(String position) {
@@ -998,16 +1040,24 @@ public class DefaultVehicleController
   private void commandExecuted(MovementCommand executedCommand) {
     requireNonNull(executedCommand, "executedCommand");
 
-    LOG.debug(
-        "{}: Communication adapter reports movement command as executed: {}",
-        vehicle.getName(),
-        executedCommand
-    );
 
     synchronized (commAdapter) {
-      commandProcessingTracker.commandExecuted(executedCommand);
+      checkArgument(
+          transformedToOriginalCommands.containsKey(executedCommand),
+          "Unknown command reported as executed: %s",
+          executedCommand
+      );
+      MovementCommand originalCommand = transformedToOriginalCommands.remove(executedCommand);
 
-      Point currentVehiclePosition = executedCommand.getStep().getDestinationPoint();
+      LOG.debug(
+          "{}: Communication adapter reports movement command as executed: {}",
+          vehicle.getName(),
+          originalCommand
+      );
+
+      commandProcessingTracker.commandExecuted(originalCommand);
+
+      Point currentVehiclePosition = originalCommand.getStep().getDestinationPoint();
       Deque<Set<TCSResource<?>>> allocatedResources
           = commandProcessingTracker.getAllocatedResources();
       switch (configuration.vehicleResourceManagementType()) {
@@ -1049,11 +1099,11 @@ public class DefaultVehicleController
 
       transportOrderService.updateTransportOrderCurrentRouteStepIndex(
           transportOrder.getReference(),
-          executedCommand.getStep().getRouteIndex()
+          originalCommand.getStep().getRouteIndex()
       );
 
       peripheralInteractor.startPostMovementInteractions(
-          executedCommand,
+          originalCommand,
           this::checkForPendingCommands,
           this::onPostMovementInteractionFailed
       );
@@ -1342,7 +1392,7 @@ public class DefaultVehicleController
       if (currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_IGNORED) {
         // Reset the vehicle's position to free all allocated resources
         resetVehiclePosition();
-        vehicleService.updateVehiclePrecisePosition(vehicle.getReference(), null);
+        updateVehiclePrecisePosition(null);
       }
       else if (currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_NOTICED) {
         // Reset the vehicle's position to free all allocated resources
@@ -1354,10 +1404,7 @@ public class DefaultVehicleController
           Point point = vehicleService.fetchObject(Point.class, processModel.getPosition());
           vehicleService.updateVehiclePosition(vehicle.getReference(), point.getReference());
         }
-        vehicleService.updateVehiclePrecisePosition(
-            vehicle.getReference(),
-            processModel.getPrecisePosition()
-        );
+        updateVehiclePrecisePosition(processModel.getPrecisePosition());
       }
       else if ((currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_RESPECTED
           || currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_UTILIZED)
@@ -1392,10 +1439,7 @@ public class DefaultVehicleController
     if (!alreadyAllocated(processModel.getPosition())) {
       // Set vehicle's position to allocate the resources
       setVehiclePosition(processModel.getPosition());
-      vehicleService.updateVehiclePrecisePosition(
-          vehicle.getReference(),
-          processModel.getPrecisePosition()
-      );
+      updateVehiclePrecisePosition(processModel.getPrecisePosition());
     }
   }
 

@@ -16,6 +16,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 == Unreleased
 
 * New features and enhancements:
+** Add support for pluggable transformation of data sent to / received from vehicles, e.g. for conversion between the coordinate system in the plant model and a vehicle-specific one.
 ** Update web API specification and implementation to version 1.8.1:
 *** Add missing _required_ markers for request and response bodies.
 * Bugs fixed:

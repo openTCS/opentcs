@@ -54,6 +54,26 @@ The loopback driver interprets properties with the following keys:
   When the virtual vehicle executes an operation, the loopback adapter will simulate an operating time accordingly.
   (Default value: 5000)
 
+=== Transforming coordinates sent to / received from vehicles
+
+It is possible that not all vehicles managed by an openTCS kernel instance are using the same coordinate system as the one in the plant model.
+To ease integration with such situations, the kernel can transform coordinates when they are sent to / received from vehicles.
+
+Out of the box, the kernel can apply offsets to coordinate and orientation angle values.
+To make use of this, do the following:
+
+1. On a vehicle element in the plant model, set a property with key `tcs:vehicleDataTransformer` to value `OFFSET_TRANSFORMER`.
+2. Set a property with key `tcs:offsetTransformer.x` to an offset value, e.g. 10.
+   The value is expected to be an integer in millimeters and may also be negative.
+3. Also set properties with keys `tcs:offsetTransformer.y` and `tcs:offsetTransformer.z` for offsets on the other two axes.
+4. Also set a property with key `tcs:offsetTransformer.orientation` for an orientation angle offset.
+   The value is expected to be a floating-point value in degrees and may also be negative.
+
+With this configuration, the given offset values will be added to coordinate and orientation angle values that are sent to the vehicle, and will be subtracted from coordinate and orientation angle values that are received by the vehicle.
+
+NOTE: This mechanism is extensible:
+Developers can integrate their own transformation components with the openTCS kernel to apply custom, complex transformations to data sent to / received from vehicles.
+
 === Running kernel and its clients on separate systems
 
 The kernel and its clients (the Model Editor, Operations Desk and Kernel Control Center applications) communicate via the Java Remote Method Invocation (RMI) mechanism.

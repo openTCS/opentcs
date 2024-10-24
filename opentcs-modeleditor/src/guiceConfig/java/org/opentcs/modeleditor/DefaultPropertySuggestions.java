@@ -14,6 +14,7 @@ import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.plantoverview.PropertySuggestions;
+import org.opentcs.data.ObjectPropConstants;
 
 /**
  * The default property suggestions of the baseline plant overview.
@@ -42,6 +43,7 @@ public class DefaultPropertySuggestions
     keySuggestions.add(LoopbackAdapterConstants.PROPKEY_UNLOAD_OPERATION);
     keySuggestions.add(LoopbackAdapterConstants.PROPKEY_ACCELERATION);
     keySuggestions.add(LoopbackAdapterConstants.PROPKEY_DECELERATION);
+    keySuggestions.add(ObjectPropConstants.VEHICLE_DATA_TRANSFORMER);
   }
 
   @Override

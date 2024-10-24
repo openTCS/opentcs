@@ -9,6 +9,7 @@ package org.opentcs.data;
 
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
+import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.data.order.TransportOrder;
 
@@ -49,4 +50,11 @@ public interface ObjectPropConstants {
    * </p>
    */
   String TRANSPORT_ORDER_RESOURCES_TO_AVOID = "tcs:resourcesToAvoid";
+  /**
+   * A property key for {@link Vehicle} instances used to select the data transformer to be used.
+   * <p>
+   * Type: String (the name of a data transformer factory)
+   * </p>
+   */
+  String VEHICLE_DATA_TRANSFORMER = "tcs:vehicleDataTransformer";
 }

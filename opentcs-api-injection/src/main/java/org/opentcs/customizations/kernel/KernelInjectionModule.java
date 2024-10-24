@@ -23,6 +23,7 @@ import org.opentcs.components.kernel.routing.EdgeEvaluator;
 import org.opentcs.customizations.ConfigurableInjectionModule;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterFactory;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
+import org.opentcs.drivers.vehicle.VehicleDataTransformerFactory;
 
 /**
  * A base class for Guice modules adding or customizing bindings for the kernel application.
@@ -103,6 +104,15 @@ public abstract class KernelInjectionModule
    */
   protected Multibinder<VehicleCommAdapterFactory> vehicleCommAdaptersBinder() {
     return Multibinder.newSetBinder(binder(), VehicleCommAdapterFactory.class);
+  }
+
+  /**
+   * Returns a multibinder that can be used to register vehicle data transformer factories.
+   *
+   * @return The multibinder.
+   */
+  protected Multibinder<VehicleDataTransformerFactory> vehicleDataTransformersBinder() {
+    return Multibinder.newSetBinder(binder(), VehicleDataTransformerFactory.class);
   }
 
   /**

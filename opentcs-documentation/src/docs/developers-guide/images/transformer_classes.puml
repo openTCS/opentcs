@@ -1,0 +1,32 @@
+@startuml
+skinparam monochrome true
+hide empty members
+
+interface MovementCommandTransformer {
+  +apply(MovementCommand) : MovementCommand
+}
+
+interface IncomingPoseTransformer {
+  +apply(Pose) : Pose
+}
+
+interface VehicleDataTransformerFactory {
+  +getName() : String
+  +createMovementCommandTransformer(Vehicle) : MovementCommandTransformer
+  +createIncomingPoseTransformer(Vehicle) : IncomingPoseTransformer
+  +providesTransformersFor(Vehicle) : boolean
+}
+
+class "**MyMovementCommandTransformer**" as MyMovementCommandTransformer
+MovementCommandTransformer <|.. MyMovementCommandTransformer
+
+class "**MyIncomingPoseTransformer**" as MyIncomingPoseTransformer
+IncomingPoseTransformer <|.. MyIncomingPoseTransformer
+
+class "**MyVehicleDataTransformerFactory**" as MyVehicleDataTransformerFactory
+VehicleDataTransformerFactory <|.. MyVehicleDataTransformerFactory
+
+MyVehicleDataTransformerFactory ..> MovementCommandTransformer : <<create>>
+MyVehicleDataTransformerFactory ..> IncomingPoseTransformer : <<create>>
+
+@enduml

@@ -10,14 +10,19 @@ package org.opentcs.kernel.vehicles;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,17 +36,23 @@ import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.drivers.vehicle.IncomingPoseTransformer;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
+import org.opentcs.drivers.vehicle.MovementCommand;
+import org.opentcs.drivers.vehicle.MovementCommandTransformer;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
+import org.opentcs.drivers.vehicle.VehicleDataTransformerFactory;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.kernel.KernelApplicationConfiguration;
+import org.opentcs.kernel.vehicles.transformers.VehicleDataTransformerRegistry;
 import org.opentcs.strategies.basic.scheduling.DummyScheduler;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.SimpleEventBus;
@@ -89,6 +100,22 @@ class DefaultVehicleControllerTest {
    */
   private VehicleControllerComponentsFactory componentsFactory;
   /**
+   * A (mocked) vehicle data transformer registry.
+   */
+  private VehicleDataTransformerRegistry dataTransformerRegistry;
+  /**
+   * A (mocked) vehicle data transformer factory.
+   */
+  private VehicleDataTransformerFactory dataTransformerFactory;
+  /**
+   * A (mocked) incoming pose transformer.
+   */
+  private IncomingPoseTransformer poseTransformer;
+  /**
+   * A (mocked) movement command transformer.
+   */
+  private MovementCommandTransformer movementCommandTransformer;
+  /**
    * A (mocked) peripheral interactor.
    */
   private PeripheralInteractor peripheralInteractor;
@@ -99,13 +126,29 @@ class DefaultVehicleControllerTest {
 
   @BeforeEach
   void setUp() {
-    vehicle = dataObjectFactory.createVehicle();
+    vehicle = dataObjectFactory
+        .createVehicle()
+        .withProperties(Map.of("tcs:vehicleDataTransformer", "dummyFactory"));
     vehicleModel = new VehicleProcessModel(vehicle);
     vehicleModelTO = new VehicleProcessModelTO();
     commAdapter = mock(VehicleCommAdapter.class);
     vehicleService = mock(InternalVehicleService.class);
     componentsFactory = mock(VehicleControllerComponentsFactory.class);
     peripheralInteractor = mock(PeripheralInteractor.class);
+    dataTransformerFactory = mock(VehicleDataTransformerFactory.class);
+    poseTransformer = mock(IncomingPoseTransformer.class);
+    movementCommandTransformer = mock(MovementCommandTransformer.class);
+    dataTransformerRegistry = new VehicleDataTransformerRegistry(Set.of(dataTransformerFactory));
+
+    doReturn("dummyFactory").when(dataTransformerFactory).getName();
+    doReturn(poseTransformer).when(dataTransformerFactory).createIncomingPoseTransformer(vehicle);
+    doReturn(movementCommandTransformer)
+        .when(dataTransformerFactory).createMovementCommandTransformer(vehicle);
+    doReturn(true).when(dataTransformerFactory).providesTransformersFor(vehicle);
+    when(poseTransformer.apply(any(Pose.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
+    when(movementCommandTransformer.apply(any(MovementCommand.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
 
     doReturn(RECHARGE_OP).when(commAdapter).getRechargeOperation();
     doReturn(vehicleModel).when(commAdapter).getProcessModel();
@@ -131,7 +174,8 @@ class DefaultVehicleControllerTest {
         componentsFactory,
         mock(MovementCommandMapper.class),
         mock(KernelApplicationConfiguration.class),
-        new CommandProcessingTracker()
+        new CommandProcessingTracker(),
+        dataTransformerRegistry
     );
     stdVehicleController.initialize();
   }
@@ -176,6 +220,18 @@ class DefaultVehicleControllerTest {
         vehicle.getReference(),
         newAngle
     );
+  }
+
+  @Test
+  void shouldTransformPoseWhenUsingDifferentCoordinateSystems() {
+    // The initial call to the transformer should have already been made during initialization.
+    verify(poseTransformer, times(1)).apply(any(Pose.class));
+
+    vehicleModel.setPrecisePosition(new Triple(211, 391, 0));
+    verify(poseTransformer, times(2)).apply(any(Pose.class));
+
+    vehicleModel.setOrientationAngle(33);
+    verify(poseTransformer, times(3)).apply(any(Pose.class));
   }
 
   @Test

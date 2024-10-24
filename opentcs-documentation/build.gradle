@@ -200,6 +200,7 @@ task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask
              'loopback-guiceSrc': project(':opentcs-commadapter-loopback').guiceSrcDir,
              'peripheral-loopback-guiceSrc': project(':opentcs-peripheralcommadapter-loopback').guiceSrcDir,
              'controlCenter-guiceSrc': project(':opentcs-kernelcontrolcenter').guiceSrcDir,
+             'kernel-guiceSrc': project(':opentcs-kernel').guiceSrcDir,
              'loadGeneratorPanel-guiceSrc': project(':opentcs-plantoverview-panel-loadgenerator').guiceSrcDir,
              'imagesoutdir': devManualImagesDir, // Set the images directory for the output of asciidoctor-diagram
              // Attributes specific to the HTML output
