@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
 /**
  * Components needed for processing information related to comm adapters.
  */

@@ -1,2 +1,5 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: MIT
+
 org.opentcs.kernelcontrolcenter.DefaultKernelControlCenterExtensionsModule
 org.opentcs.kernelcontrolcenter.LoopbackCommAdapterPanelsModule

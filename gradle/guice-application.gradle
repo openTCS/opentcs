@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
+
 apply from: "${rootDir}/gradle/guice-project.gradle"
 apply plugin: 'application'
 
@@ -14,7 +17,7 @@ task(debug, type:JavaExec) {
   doFirst {
     workingDir = run.workingDir
     enableAssertions = run.enableAssertions
-  
+
     main = run.main
     args = run.args
     classpath = run.classpath

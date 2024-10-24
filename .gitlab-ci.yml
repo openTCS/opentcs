@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: MIT
+
 default:
   image: eclipse-temurin:21-jdk-jammy
   tags:
@@ -157,6 +160,15 @@ lint-checkstyle:
     key: lint_checkstyle-$(date +%Y-%m)
     paths:
       - .gradle
+
+lint-reuse:
+  stage: test
+  interruptible: true
+  image:
+    name: fsfe/reuse:4.0.3
+    entrypoint: [""]
+  script:
+    - reuse lint
 
 deploy_private:
   stage: deploy

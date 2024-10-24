@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: MIT
+
 org.opentcs.operationsdesk.DefaultImportersExportersModule
 org.opentcs.operationsdesk.PropertySuggestionsModule
 org.opentcs.operationsdesk.transport.OrderTypeSuggestionsModule

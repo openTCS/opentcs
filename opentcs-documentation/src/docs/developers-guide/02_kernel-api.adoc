@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: CC-BY-4.0
 
 [#section-kernel-api]
 == The kernel's Java API
@@ -175,7 +177,7 @@ If you do not do this, the dispatcher will still be triggered periodically.)
 include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/CreateTransportOrderTest.java[tags=createTransportOrder_triggerDispatcher, indent=0]
 ----
 
-==== How to create a transport order that sends a vehicle to a point instead of a location 
+==== How to create a transport order that sends a vehicle to a point instead of a location
 
 Create a list containing a single destination to a point, using `Destination.OP_MOVE` as the operation to be executed:
 

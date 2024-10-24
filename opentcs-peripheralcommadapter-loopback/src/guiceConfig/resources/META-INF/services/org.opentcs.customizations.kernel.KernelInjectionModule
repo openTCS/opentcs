@@ -1,1 +1,4 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: MIT
+
 org.opentcs.commadapter.peripheral.loopback.LoopbackPeripheralKernelModule

@@ -1,6 +1,6 @@
-/**
- * (c): IML, JHotDraw.
- */
+// SPDX-FileCopyrightText: The original authors of JHotDraw and all its contributors
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
 package org.opentcs.thirdparty.modeleditor.jhotdraw.application.action;
 
 import java.awt.BasicStroke;

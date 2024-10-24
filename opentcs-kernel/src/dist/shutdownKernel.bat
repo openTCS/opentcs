@@ -1,4 +1,6 @@
 @echo off
+rem SPDX-FileCopyrightText: The openTCS Authors
+rem SPDX-License-Identifier: MIT
 rem
 rem Shut down the openTCS kernel.
 rem

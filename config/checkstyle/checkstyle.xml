@@ -2,6 +2,10 @@
 <!DOCTYPE module PUBLIC
     "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
     "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+<!--
+SPDX-FileCopyrightText: The openTCS Authors
+SPDX-License-Identifier: CC0-1.0
+-->
 
 <!-- See http://checkstyle.sourceforge.net/checks.html for all checks + descriptions. -->
 <module name="Checker">
@@ -34,12 +38,6 @@
   <property name="severity" value="warning"/>
 
   <property name="fileExtensions" value="java, properties"/>
-
-  <module name="Header">
-    <property name="headerFile" value="${config_loc}/java.header"/>
-    <property name="fileExtensions" value="java"/>
-    <property name="severity" value="error"/>
-  </module>
 
   <module name="FileLength">
     <property name="max" value="2000"/>

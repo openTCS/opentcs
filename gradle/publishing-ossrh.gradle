@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
+
 nexusPublishing {
   if (Boolean.valueOf(project.findProperty('DO_DEPLOY_OSSRH'))
       && project.hasProperty('DEPLOY_REPO_OSSRH_USERNAME')

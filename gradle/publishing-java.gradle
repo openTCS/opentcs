@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
+
 apply from: "${rootDir}/gradle/signing.gradle"
 
 // Enable javadoc and sources JARs to be created.

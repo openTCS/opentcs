@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: CC-BY-4.0
+
 = openTCS: User's Guide
 The openTCS developers
 :doctype: book

@@ -1,4 +1,6 @@
 @echo off
+rem SPDX-FileCopyrightText: The openTCS Authors
+rem SPDX-License-Identifier: MIT
 rem
 rem Start SSL keystore and truststore generation.
 rem

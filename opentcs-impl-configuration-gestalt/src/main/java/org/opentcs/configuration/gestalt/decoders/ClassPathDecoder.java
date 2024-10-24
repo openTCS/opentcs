@@ -1,10 +1,5 @@
-/**
- * Copyright (c) The openTCS Authors.
- *
- * This program is free software and subject to the MIT license. (For details,
- * see the licensing information (LICENSE.txt) you should have received with
- * this copy of the software.)
- */
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
 package org.opentcs.configuration.gestalt.decoders;
 
 import org.github.gestalt.config.decoder.Decoder;

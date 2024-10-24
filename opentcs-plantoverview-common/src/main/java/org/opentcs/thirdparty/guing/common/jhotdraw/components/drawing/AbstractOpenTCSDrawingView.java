@@ -1,18 +1,6 @@
-/**
- * (c): IML, JHotDraw.
- *
- *
- * Extended by IML: 1. Show Blocks and Pathes as overlay 2. Switch labels on/off
- *
- * @(#)DefaultDrawingView.java
- *
- * Copyright (c) 1996-2010 by the original authors of JHotDraw and all its
- * contributors. All rights reserved.
- *
- * You may not use, copy or modify this file, except in compliance with the
- * license agreement you entered into with the copyright holders. For details
- * see accompanying license terms.
- */
+// SPDX-FileCopyrightText: The original authors of JHotDraw and all its contributors
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
 package org.opentcs.thirdparty.guing.common.jhotdraw.components.drawing;
 
 import static java.util.Objects.requireNonNull;

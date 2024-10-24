@@ -1,3 +1,5 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: CC-BY-4.0
 
 == Customizing and extending the Model Editor and the Operations Desk applications
 

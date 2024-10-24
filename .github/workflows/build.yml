@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: MIT
+
 name: Gradle Build
 
 on: [push, pull_request]

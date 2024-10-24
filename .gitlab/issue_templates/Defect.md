@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: The openTCS Authors
+SPDX-License-Identifier: CC-BY-4.0
+-->
+
 ## Defect
 
 <!-- A template to be used for reporting bugs/defects/problems -->

@@ -1,4 +1,7 @@
 @startuml
+' SPDX-FileCopyrightText: The openTCS Authors
+' SPDX-License-Identifier: CC-BY-4.0
+
 skinparam monochrome true
 'skinparam linetype ortho
 hide empty members
@@ -44,7 +47,7 @@ together {
 
 together {
 	interface LowLevelCommunicationEvent
-	
+
 	abstract class PeripheralCommAdapterEvent
 
   class "**PeripheralProcessModelEvent**" as PeripheralProcessModelEvent

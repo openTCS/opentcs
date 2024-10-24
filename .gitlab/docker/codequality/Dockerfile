@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: MIT
+
 #
 # Remember to update version.yml when you change the image contents here!
 #

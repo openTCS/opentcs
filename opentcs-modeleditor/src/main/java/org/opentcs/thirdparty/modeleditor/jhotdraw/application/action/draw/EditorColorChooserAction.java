@@ -1,18 +1,6 @@
-/**
- * (c): IML, JHotDraw.
- *
- * Changed by IML to allow access to ResourceBundle.
- *
- *
- * @(#)EditorColorChooserAction.java
- *
- * Copyright (c) 1996-2010 by the original authors of JHotDraw and all its
- * contributors. All rights reserved.
- *
- * You may not use, copy or modify this file, except in compliance with the
- * license agreement you entered into with the copyright holders. For details
- * see accompanying license terms.
- */
+// SPDX-FileCopyrightText: The original authors of JHotDraw and all its contributors
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
 package org.opentcs.thirdparty.modeleditor.jhotdraw.application.action.draw;
 
 import java.awt.Color;

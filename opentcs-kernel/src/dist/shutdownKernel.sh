@@ -1,4 +1,6 @@
 #!/bin/sh
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: MIT
 #
 # Shut down the openTCS kernel.
 #

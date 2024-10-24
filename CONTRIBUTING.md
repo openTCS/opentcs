@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: The openTCS Authors
+SPDX-License-Identifier: CC-BY-4.0
+-->
+
 # Contributing to openTCS
 
 The following is a set of guidelines for contributing to openTCS.

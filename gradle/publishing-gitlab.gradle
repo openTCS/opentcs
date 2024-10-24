@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
+
 publishing {
   repositories {
     if (Boolean.valueOf(project.findProperty('DO_DEPLOY_PRIVATE'))

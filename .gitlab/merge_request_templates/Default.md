@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: The openTCS Authors
+SPDX-License-Identifier: CC-BY-4.0
+-->
+
 ## Related issues
 
 <!-- Issues that are closed by or related to this merge request, e.g. "Closes #x" -->

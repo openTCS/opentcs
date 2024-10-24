@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: The openTCS Authors
+SPDX-License-Identifier: CC-BY-4.0
+-->
+
 # openTCS
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
@@ -26,13 +31,15 @@ These documents are included in the binary distribution and can also be read onl
 
 ## Licensing
 
-### Code
+This work is licensed under multiple licences.
+Because keeping this section up-to-date is challenging, here is a brief summary as of November 2024:
 
-All of this software project's source code, including scripts and configuration files, is distributed under the [MIT License](LICENSE.txt).
+* All original source code is licensed under [MIT](./LICENSES/MIT.txt).
+* All original assets, including documentation, is licensed under [CC-BY-4.0](./LICENSES/CC-BY-4.0.txt).
+* Some configuration and data files are licensed under [CC0-1.0](./LICENSES/CC0-1.0.txt).
+* Some third-party assets are licensed under [Apache-2.0](./LICENSES/Apache-2.0.txt) or [OFL-1.1](./LICENSES/OFL-1.1.txt).
 
-### Assets
-
-Unless stated otherwise, all of this software project's documentation, resource bundles and media files are distributed under the [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE.assets.txt) license.
+For more accurate information, check the individual files as well as the `REUSE.toml` files.
 
 ## Contributing
 

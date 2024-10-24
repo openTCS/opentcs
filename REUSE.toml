@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC0-1.0
+
+version = 1
+
+[[annotations]]
+path = ["**/gradle.properties"]
+precedence = "closest"
+SPDX-FileCopyrightText = "The openTCS Authors"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = ["**/*Test*.approved.txt"]
+precedence = "closest"
+SPDX-FileCopyrightText = "The openTCS Authors"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = ["**/*.form"]
+precedence = "closest"
+SPDX-FileCopyrightText = "The openTCS Authors"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = [".idea/**"]
+precedence = "closest"
+SPDX-FileCopyrightText = "The openTCS Authors"
+SPDX-License-Identifier = "CC0-1.0"
