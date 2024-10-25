@@ -41,6 +41,8 @@ class GetVehicleResponseTOTest {
             .setLength(1234)
             .setEnergyLevelGood(90)
             .setEnergyLevelCritical(30)
+            .setEnergyLevelSufficientlyRecharged(30)
+            .setEnergyLevelFullyRecharged(90)
             .setEnergyLevel(48)
             .setIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED)
             .setPaused(false)

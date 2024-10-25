@@ -32,6 +32,10 @@ public class GetVehicleResponseTO {
 
   private int energyLevelCritical;
 
+  private int energyLevelSufficientlyRecharged;
+
+  private int energyLevelFullyRecharged;
+
   private int energyLevel;
 
   private IntegrationLevel integrationLevel = IntegrationLevel.TO_BE_RESPECTED;
@@ -94,6 +98,26 @@ public class GetVehicleResponseTO {
 
   public GetVehicleResponseTO setEnergyLevelCritical(int energyLevelCritical) {
     this.energyLevelCritical = energyLevelCritical;
+    return this;
+  }
+
+  public int getEnergyLevelSufficientlyRecharged() {
+    return energyLevelSufficientlyRecharged;
+  }
+
+  public GetVehicleResponseTO setEnergyLevelSufficientlyRecharged(
+      int energyLevelSufficientlyRecharged
+  ) {
+    this.energyLevelSufficientlyRecharged = energyLevelSufficientlyRecharged;
+    return this;
+  }
+
+  public int getEnergyLevelFullyRecharged() {
+    return energyLevelFullyRecharged;
+  }
+
+  public GetVehicleResponseTO setEnergyLevelFullyRecharged(int energyLevelFullyRecharged) {
+    this.energyLevelFullyRecharged = energyLevelFullyRecharged;
     return this;
   }
 
@@ -246,6 +270,12 @@ public class GetVehicleResponseTO {
         vehicle.getEnergyLevelThresholdSet().getEnergyLevelCritical()
     );
     vehicleState.setEnergyLevelGood(vehicle.getEnergyLevelThresholdSet().getEnergyLevelGood());
+    vehicleState.setEnergyLevelSufficientlyRecharged(
+        vehicle.getEnergyLevelThresholdSet().getEnergyLevelSufficientlyRecharged()
+    );
+    vehicleState.setEnergyLevelFullyRecharged(
+        vehicle.getEnergyLevelThresholdSet().getEnergyLevelFullyRecharged()
+    );
     vehicleState.setEnergyLevel(vehicle.getEnergyLevel());
     vehicleState.setIntegrationLevel(vehicle.getIntegrationLevel());
     vehicleState.setPaused(vehicle.isPaused());

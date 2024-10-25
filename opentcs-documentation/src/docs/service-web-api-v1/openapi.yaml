@@ -21,7 +21,7 @@ info:
     Optionally, an access key can be set in the kernel configuration.
     The configured value is then expected to be sent by the client in an HTTP header named `X-Api-Access-Key`.
   # IMPORTANT: When updating this version number, remember to mention that in the changelog, too!
-  version: 1.8.1
+  version: 1.9.0
   title: openTCS web API specification
 servers:
   - url: http://localhost:55200/v1
@@ -1818,6 +1818,16 @@ components:
           description: The value (in %) at/below which the vehicle's energy level is considered
             'critical'.
           example: 30
+        energyLevelSufficientlyRecharged:
+          type: integer
+          description: The value (in %) at/below which the vehicle's energy level is considered
+            'sufficiently recharged'.
+          example: 30
+        energyLevelFullyRecharged:
+          type: integer
+          description: The value (in %) at/below which the vehicle's energy level is considered
+            'fully recharged'.
+          example: 90
         energyLevel:
           type: integer
           description: The vehicle's remaining energy (in %).
@@ -1894,12 +1904,22 @@ components:
           description: The envelope key for this vehicle.
           example: envelopeType-01
       required:
+        - name
+        - properties
         - length
         - energyLevelGood
         - energyLevelCritical
+        - energyLevelSufficientlyRecharged
+        - energyLevelFullyRecharged
         - energyLevel
+        - integrationLevel
+        - paused
+        - procState
+        - orientationAngle
+        - state
         - allocatedResources
         - claimedResources
+        - allowedOrderTypes
     ResourceSet:
       type: array
       items:

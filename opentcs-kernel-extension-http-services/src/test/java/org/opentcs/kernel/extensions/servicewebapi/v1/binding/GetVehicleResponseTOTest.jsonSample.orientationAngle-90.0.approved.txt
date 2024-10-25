@@ -7,6 +7,8 @@
   "length" : 1234,
   "energyLevelGood" : 90,
   "energyLevelCritical" : 30,
+  "energyLevelSufficientlyRecharged" : 30,
+  "energyLevelFullyRecharged" : 90,
   "energyLevel" : 48,
   "integrationLevel" : "TO_BE_UTILIZED",
   "paused" : false,

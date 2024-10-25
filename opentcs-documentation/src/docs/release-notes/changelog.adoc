@@ -20,8 +20,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * New features and enhancements:
 ** Add support for pluggable transformation of data sent to / received from vehicles, e.g. for conversion between the coordinate system in the plant model and a vehicle-specific one.
-** Update web API specification and implementation to version 1.8.1:
+** Update web API specification and implementation to version 1.9.0:
 *** Add missing _required_ markers for request and response bodies.
+*** Include a vehicle's 'sufficiently recharged' and 'fully recharged' energy levels when requesting vehicle data.
 * Bugs fixed:
 ** Ask user for confirmation before overwriting files when using the _Save Model As..._ menu item in the Model Editor application.
 * Changes affecting developers:
