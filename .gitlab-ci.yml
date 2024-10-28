@@ -75,14 +75,18 @@ build:
   script:
     - ./gradlew -x check release testClasses -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
   artifacts:
+    name: 'opentcs-build-b$CI_PIPELINE_IID'
     paths:
-      - build/distributions/*.zip
+      - .gradle
       - opentcs-*/build/classes/
-      - opentcs-*/build/docs/
       - opentcs-*/build/generated/
       - opentcs-*/build/libs/
       - opentcs-*/build/resources/
       - opentcs-*/build/tmp/
+    exclude:
+      - .gradle/.tmp/**/*
+      - .gradle/caches/**/*
+      - .gradle/wrapper/**/*
     expire_in: 1 week
   cache:
     key: build_test_deploy-$(date +%Y-%m)
@@ -95,10 +99,14 @@ test:
   dependencies:
     - build
   script:
+    - echo "Touching build results to prevent Gradle rebuilding them..."
+    - find .gradle | xargs touch
+    - find . -regex '\./opentcs-[^/]+/build/.*' | xargs touch
     - echo "Running unit tests..."
     - ./gradlew test jacocoLogAggregatedCoverage -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
   coverage: '/Branch Coverage: ([0-9.]+)%/'
   artifacts:
+    name: 'opentcs-test-b$CI_PIPELINE_IID'
     paths:
       # Results of (failed) approval tests.
       - opentcs-*/**/*.received.txt
@@ -114,8 +122,7 @@ test:
 lint-spotless:
   stage: test
   interruptible: true
-  dependencies:
-    - build
+  dependencies: []
   script:
     - echo "Running Spotless check..."
     - ./gradlew spotlessCheck
@@ -135,6 +142,9 @@ lint-checkstyle:
   dependencies:
     - build
   script:
+    - echo "Touching build results to prevent Gradle rebuilding them..."
+    - find .gradle | xargs touch
+    - find . -regex '\./opentcs-[^/]+/build/.*' | xargs touch
     - echo "Checking for changelog headers that do not match 'Version x.y.z (yyyy-mm-dd)'..."
     - '( grep --extended-regexp "^==[^=]" $CHANGELOG_FILE
         | grep --invert-match --extended-regexp "^== Version [0-9]+\.[0-9]+(\.[0-9]+)? +\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\)$"
@@ -164,6 +174,7 @@ lint-checkstyle:
 lint-reuse:
   stage: test
   interruptible: true
+  dependencies: []
   image:
     name: fsfe/reuse:4.0.3
     entrypoint: [""]
