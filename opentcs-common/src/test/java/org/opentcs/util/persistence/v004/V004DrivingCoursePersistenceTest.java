@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: The openTCS Authors
 // SPDX-License-Identifier: MIT
-package org.opentcs.util.persistence;
+package org.opentcs.util.persistence.v004;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -15,21 +15,6 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentcs.util.persistence.v004.AllowedOperationTO;
-import org.opentcs.util.persistence.v004.AllowedPeripheralOperationTO;
-import org.opentcs.util.persistence.v004.BlockTO;
-import org.opentcs.util.persistence.v004.CoupleTO;
-import org.opentcs.util.persistence.v004.LocationTO;
-import org.opentcs.util.persistence.v004.LocationTypeTO;
-import org.opentcs.util.persistence.v004.MemberTO;
-import org.opentcs.util.persistence.v004.PathTO;
-import org.opentcs.util.persistence.v004.PeripheralOperationTO;
-import org.opentcs.util.persistence.v004.PointTO;
-import org.opentcs.util.persistence.v004.PropertyTO;
-import org.opentcs.util.persistence.v004.V004PlantModelTO;
-import org.opentcs.util.persistence.v004.VehicleEnvelopeTO;
-import org.opentcs.util.persistence.v004.VehicleTO;
-import org.opentcs.util.persistence.v004.VisualLayoutTO;
 
 /**
  */
