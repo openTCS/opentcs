@@ -1,8 +1,0 @@
-<!--
-SPDX-FileCopyrightText: The openTCS Authors
-SPDX-License-Identifier: CC-BY-4.0
--->
-
-# Changelog
-
-The changelog is maintained in [opentcs-documentation/src/docs/release-notes/changelog.adoc](./opentcs-documentation/src/docs/release-notes/changelog.adoc).
