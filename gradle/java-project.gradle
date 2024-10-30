@@ -53,7 +53,8 @@ javadoc {
   options {
     header = "openTCS ${project.version}"
     overview = "${projectDir}/src/main/java/overview.html"
-    addBooleanOption('Xdoclint:none', true)
+    addBooleanOption('Werror', true)
+    addBooleanOption('Xdoclint:all,-missing', true)
   }
 }
 

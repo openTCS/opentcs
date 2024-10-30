@@ -43,7 +43,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
  * actions, so that the user can close views that he/she created:
  * {@link NewFileAction}, {@link NewWindowAction},
  * {@link OpenFileAction}, {@link OpenDirectoryAction}.
- * <p>
  *
  * @author Werner Randelshofer
  */

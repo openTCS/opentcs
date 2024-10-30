@@ -88,12 +88,12 @@ public interface VehicleCommAdapter
    * <p>
    * This capacity considers both the {@link #getUnsentCommands() queue of unsent commands} and the
    * {@link #getSentCommands() queue of sent commands}. This means that:
+   * </p>
    * <ul>
    * <li>The number of elements in both queues combined must not exceed this number.</li>
    * <li>The vehicle will have at most this number of (not yet completed) commands at any given
    * point of time.</li>
    * </ul>
-   * </p>
    *
    * @return The number of commands this comm adapter accepts.
    */
