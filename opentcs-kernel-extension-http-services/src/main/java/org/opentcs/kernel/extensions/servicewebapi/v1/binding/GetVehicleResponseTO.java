@@ -17,6 +17,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.IntegrationLevel;
 import org.opentcs.data.model.Vehicle.ProcState;
 import org.opentcs.data.model.Vehicle.State;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  */
@@ -238,11 +239,13 @@ public class GetVehicleResponseTO {
     return this;
   }
 
+  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
   @Nullable
   public String getEnvelopeKey() {
     return envelopeKey;
   }
 
+  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
   public GetVehicleResponseTO setEnvelopeKey(
       @Nullable
       String envelopeKey

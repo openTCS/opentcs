@@ -79,6 +79,8 @@ By referencing an envelope key, a vehicle indicates which envelopes (that may be
 (For more details on this, see <<Default scheduler>>.)
 With this, it is possible to prevent vehicles from allocating areas intersecting with areas already allocated by other vehicles.
 
+NOTE: If an envelope key is set for a vehicle, but no envelope with the respective key is defined at a specific resource (i.e. point or path), no envelope will be considered for the vehicle when it allocates that resource.
+
 .Defining and editing vehicle envelopes for points and paths
 image::screenshot_envelope_editing.drawio.png[]
 

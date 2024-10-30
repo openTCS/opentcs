@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  */
@@ -131,12 +132,14 @@ public class VehicleTO
     return this;
   }
 
+  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
   @XmlAttribute
   @Nullable
   public String getEnvelopeKey() {
     return envelopeKey;
   }
 
+  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
   public VehicleTO setEnvelopeKey(
       @Nullable
       String envelopeKey

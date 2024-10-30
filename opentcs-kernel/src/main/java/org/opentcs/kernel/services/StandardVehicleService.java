@@ -33,6 +33,7 @@ import org.opentcs.kernel.extensions.controlcenter.vehicles.VehicleEntryPool;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
 import org.opentcs.kernel.workingset.PlantModelManager;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -451,6 +452,7 @@ public class StandardVehicleService
   }
 
   @Override
+  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
   public void updateVehicleEnvelopeKey(TCSObjectReference<Vehicle> ref, String envelopeKey)
       throws ObjectUnknownException,
         IllegalArgumentException,

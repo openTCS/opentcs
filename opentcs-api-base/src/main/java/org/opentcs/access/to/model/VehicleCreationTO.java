@@ -427,6 +427,7 @@ public class VehicleCreationTO
    *
    * @return The key for selecting the envelope to be used for resources the vehicle occupies.
    */
+  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
   @Nullable
   public String getEnvelopeKey() {
     return envelopeKey;
@@ -439,6 +440,7 @@ public class VehicleCreationTO
    * @param envelopeKey The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
+  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
   public VehicleCreationTO withEnvelopeKey(
       @Nullable
       String envelopeKey
