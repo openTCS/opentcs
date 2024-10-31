@@ -196,24 +196,13 @@ class DefaultVehicleControllerTest {
   }
 
   @Test
-  void shouldForwardPrecisePositionChangeToKernel() {
-    Triple newPos = new Triple(211, 391, 0);
-    vehicleModel.setPrecisePosition(newPos);
+  void shouldForwardPoseChangeToKernel() {
+    Pose newPose = new Pose(new Triple(211, 391, 0), 7.5);
+    vehicleModel.setPose(newPose);
 
-    verify(vehicleService).updateVehiclePrecisePosition(
+    verify(vehicleService).updateVehiclePose(
         vehicle.getReference(),
-        newPos
-    );
-  }
-
-  @Test
-  void shouldForwardAngleChangeToKernel() {
-    double newAngle = 7.5;
-    vehicleModel.setOrientationAngle(newAngle);
-
-    verify(vehicleService).updateVehicleOrientationAngle(
-        vehicle.getReference(),
-        newAngle
+        newPose
     );
   }
 
@@ -222,10 +211,10 @@ class DefaultVehicleControllerTest {
     // The initial call to the transformer should have already been made during initialization.
     verify(poseTransformer, times(1)).apply(any(Pose.class));
 
-    vehicleModel.setPrecisePosition(new Triple(211, 391, 0));
+    vehicleModel.setPose(new Pose(new Triple(211, 391, 0), Double.NaN));
     verify(poseTransformer, times(2)).apply(any(Pose.class));
 
-    vehicleModel.setOrientationAngle(33);
+    vehicleModel.setPose(new Pose(null, 33.0));
     verify(poseTransformer, times(3)).apply(any(Pose.class));
   }
 

@@ -285,16 +285,19 @@ public class GetVehicleResponseTO {
     vehicleState.setProcState(vehicle.getProcState());
     vehicleState.setTransportOrder(nameOfNullableReference(vehicle.getTransportOrder()));
     vehicleState.setCurrentPosition(nameOfNullableReference(vehicle.getCurrentPosition()));
-    if (vehicle.getPrecisePosition() != null) {
+    if (vehicle.getPose().getPosition() != null) {
       vehicleState.setPrecisePosition(
           new PrecisePosition(
-              vehicle.getPrecisePosition().getX(),
-              vehicle.getPrecisePosition().getY(),
-              vehicle.getPrecisePosition().getZ()
+              vehicle.getPose().getPosition().getX(),
+              vehicle.getPose().getPosition().getY(),
+              vehicle.getPose().getPosition().getZ()
           )
       );
     }
-    vehicleState.setOrientationAngle(vehicle.getOrientationAngle());
+    else {
+      vehicleState.setPrecisePosition(null);
+    }
+    vehicleState.setOrientationAngle(vehicle.getPose().getOrientationAngle());
     vehicleState.setState(vehicle.getState());
     vehicleState.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
     vehicleState.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));

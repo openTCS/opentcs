@@ -5,6 +5,7 @@ package org.opentcs.kernel.vehicles.transformers;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
+import java.util.Optional;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
 import org.opentcs.drivers.vehicle.IncomingPoseTransformer;
@@ -34,16 +35,21 @@ public class CoordinateSystemIncomingPoseTransformer
     requireNonNull(pose, "pose");
 
     return pose
-        .withPosition(
-            new Triple(
-                pose.getPosition().getX() - transformation.getOffsetX(),
-                pose.getPosition().getY() - transformation.getOffsetY(),
-                pose.getPosition().getZ() - transformation.getOffsetZ()
-            )
-        )
+        .withPosition(transformTriple(pose.getPosition()))
         .withOrientationAngle(
             (pose.getOrientationAngle() - transformation.getOffsetOrientation()) % 360.0
         );
   }
 
+  private Triple transformTriple(Triple triple) {
+    return Optional.ofNullable(triple)
+        .map(
+            originalTriple -> new Triple(
+                originalTriple.getX() - transformation.getOffsetX(),
+                originalTriple.getY() - transformation.getOffsetY(),
+                originalTriple.getZ() - transformation.getOffsetZ()
+            )
+        )
+        .orElse(null);
+  }
 }

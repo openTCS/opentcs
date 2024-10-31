@@ -93,11 +93,7 @@ public class CoordinateSystemMovementCommandTransformer
         .map(
             originalPoint -> originalPoint.withPose(
                 new Pose(
-                    new Triple(
-                        originalPoint.getPose().getPosition().getX() + transformation.getOffsetX(),
-                        originalPoint.getPose().getPosition().getY() + transformation.getOffsetY(),
-                        originalPoint.getPose().getPosition().getZ() + transformation.getOffsetZ()
-                    ),
+                    transformTriple(originalPoint.getPose().getPosition()),
                     (originalPoint.getPose().getOrientationAngle() + transformation
                         .getOffsetOrientation()) % 360.0
                 )
@@ -110,11 +106,19 @@ public class CoordinateSystemMovementCommandTransformer
     return Optional.ofNullable(location)
         .map(
             originalLocation -> originalLocation.withPosition(
-                new Triple(
-                    originalLocation.getPosition().getX() + transformation.getOffsetX(),
-                    originalLocation.getPosition().getX() + transformation.getOffsetY(),
-                    originalLocation.getPosition().getX() + transformation.getOffsetZ()
-                )
+                transformTriple(originalLocation.getPosition())
+            )
+        )
+        .orElse(null);
+  }
+
+  private Triple transformTriple(Triple triple) {
+    return Optional.ofNullable(triple)
+        .map(
+            originalTriple -> new Triple(
+                originalTriple.getX() + transformation.getOffsetX(),
+                originalTriple.getY() + transformation.getOffsetY(),
+                originalTriple.getZ() + transformation.getOffsetZ()
             )
         )
         .orElse(null);

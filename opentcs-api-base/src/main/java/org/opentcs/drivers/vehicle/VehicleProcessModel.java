@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.Queue;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.BoundingBox;
+import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
@@ -71,13 +72,9 @@ public class VehicleProcessModel {
    */
   private final Queue<UserNotification> notifications = new ArrayDeque<>();
   /**
-   * The vehicle's precise position.
+   * The vehicle's pose.
    */
-  private Triple precisePosition;
-  /**
-   * The vehicle's orientation angle.
-   */
-  private double orientationAngle = Double.NaN;
+  private Pose pose = new Pose(null, Double.NaN);
   /**
    * The vehicle's energy level.
    */
@@ -282,30 +279,28 @@ public class VehicleProcessModel {
    * Returns the vehicle's precise position.
    *
    * @return The vehicle's precise position.
+   * @deprecated Use {@link #getPose()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   @Nullable
   public Triple getPrecisePosition() {
-    return precisePosition;
+    return pose.getPosition();
   }
 
   /**
    * Sets the vehicle's precise position.
    *
    * @param position The new position.
+   * @deprecated Use {@link #setPose(Pose)}} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public void setPrecisePosition(
       @Nullable
       Triple position
   ) {
-    // Otherwise update the position, notify listeners and let the kernel know.
-    Triple oldValue = this.precisePosition;
-    this.precisePosition = position;
-
-    getPropertyChangeSupport().firePropertyChange(
-        Attribute.PRECISE_POSITION.name(),
-        oldValue,
-        position
-    );
+    setPose(pose.withPosition(position));
   }
 
   /**
@@ -313,24 +308,63 @@ public class VehicleProcessModel {
    *
    * @return The vehicle's current orientation angle.
    * @see Vehicle#getOrientationAngle()
+   * @deprecated Use {@link #getPose()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public double getOrientationAngle() {
-    return orientationAngle;
+    return pose.getOrientationAngle();
   }
 
   /**
    * Sets the vehicle's current orientation angle.
    *
    * @param angle The new angle
+   * @deprecated Use {@link #setPose(Pose)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public void setOrientationAngle(double angle) {
-    double oldValue = this.orientationAngle;
-    this.orientationAngle = angle;
+    setPose(pose.withOrientationAngle(angle));
+  }
 
+  /**
+   * Returns the vehicle's pose.
+   *
+   * @return The vehicle's pose.
+   */
+  @Nonnull
+  public Pose getPose() {
+    return pose;
+  }
+
+  /**
+   * Sets the vehicle's pose.
+   *
+   * @param pose The new pose
+   */
+  public void setPose(
+      @Nonnull
+      Pose pose
+  ) {
+    requireNonNull(pose, "pose");
+
+    Pose oldPose = this.pose;
+    this.pose = pose;
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.POSE.name(),
+        oldPose,
+        pose
+    );
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.PRECISE_POSITION.name(),
+        oldPose.getPosition(),
+        pose.getPosition()
+    );
     getPropertyChangeSupport().firePropertyChange(
         Attribute.ORIENTATION_ANGLE.name(),
-        oldValue,
-        angle
+        oldPose.getOrientationAngle(),
+        pose.getOrientationAngle()
     );
   }
 
@@ -750,11 +784,19 @@ public class VehicleProcessModel {
     /**
      * Indicates a change of the vehicle's precise position.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
     PRECISE_POSITION,
     /**
      * Indicates a change of the vehicle's orientation angle.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
     ORIENTATION_ANGLE,
+    /**
+     * Indicates a change of the vehicle's pose.
+     */
+    POSE,
     /**
      * Indicates a change of the vehicle's energy level.
      */

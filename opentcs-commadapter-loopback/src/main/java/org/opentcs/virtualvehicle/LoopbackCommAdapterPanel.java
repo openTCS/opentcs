@@ -197,15 +197,10 @@ public class LoopbackCommAdapterPanel
     }
     else if (Objects.equals(
         attributeChanged,
-        VehicleProcessModel.Attribute.PRECISE_POSITION.name()
+        VehicleProcessModel.Attribute.POSE.name()
     )) {
-      updatePrecisePosition(processModel.getPrecisePosition());
-    }
-    else if (Objects.equals(
-        attributeChanged,
-        VehicleProcessModel.Attribute.ORIENTATION_ANGLE.name()
-    )) {
-      updateOrientationAngle(processModel.getOrientationAngle());
+      updatePrecisePosition(processModel.getPose().getPosition());
+      updateOrientationAngle(processModel.getPose().getOrientationAngle());
     }
     else if (Objects.equals(
         attributeChanged,
@@ -1064,7 +1059,7 @@ public class LoopbackCommAdapterPanel
 
   private void precisePosTextAreaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_precisePosTextAreaMouseClicked
     if (precisePosTextArea.isEnabled()) {
-      Triple pos = processModel.getPrecisePosition();
+      Triple pos = processModel.getPose().getPosition();
       // Create panel and dialog
       TripleTextInputPanel.Builder builder
           = new TripleTextInputPanel.Builder(
@@ -1194,7 +1189,7 @@ public class LoopbackCommAdapterPanel
       return;
     }
 
-    double currentAngle = processModel.getOrientationAngle();
+    double currentAngle = processModel.getPose().getOrientationAngle();
     String initialValue = (Double.isNaN(currentAngle) ? "" : Double.toString(currentAngle));
     // Create dialog and panel
     InputPanel panel = new SingleTextInputPanel.Builder(
@@ -1214,7 +1209,7 @@ public class LoopbackCommAdapterPanel
       String input = (String) dialog.getInput();
       if (input == null) {
         // The reset button was pressed
-        if (!Double.isNaN(processModel.getOrientationAngle())) {
+        if (!Double.isNaN(processModel.getPose().getOrientationAngle())) {
           sendCommAdapterCommand(new SetOrientationAngleCommand(Double.NaN));
         }
       }

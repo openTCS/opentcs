@@ -40,7 +40,6 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
-import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.data.order.DriveOrder;
@@ -254,8 +253,7 @@ public class DefaultVehicleController
 
     // Initialize standard attributes once.
     setVehiclePosition(commAdapter.getProcessModel().getPosition());
-    updateVehiclePrecisePosition(commAdapter.getProcessModel().getPrecisePosition());
-    updateVehicleOrientationAngle(commAdapter.getProcessModel().getOrientationAngle());
+    updateVehiclePose(commAdapter.getProcessModel().getPose());
     vehicleService.updateVehicleEnergyLevel(
         vehicle.getReference(),
         commAdapter.getProcessModel().getEnergyLevel()
@@ -287,7 +285,7 @@ public class DefaultVehicleController
     commAdapter.getProcessModel().removePropertyChangeListener(this);
     // Reset the vehicle's position.
     updatePosition(null, null);
-    updateVehiclePrecisePosition(null);
+    updateVehiclePose(new Pose(null, Double.NaN));
     // Free all allocated resources.
     freeAllResources();
 
@@ -855,15 +853,12 @@ public class DefaultVehicleController
     }
     else if (Objects.equals(
         evt.getPropertyName(),
-        VehicleProcessModel.Attribute.PRECISE_POSITION.name()
+        VehicleProcessModel.Attribute.POSE.name()
     )) {
-      updateVehiclePrecisePosition((Triple) evt.getNewValue());
-    }
-    else if (Objects.equals(
-        evt.getPropertyName(),
-        VehicleProcessModel.Attribute.ORIENTATION_ANGLE.name()
-    )) {
-      updateVehicleOrientationAngle((Double) evt.getNewValue());
+      if (vehicleService.fetchObject(Vehicle.class, vehicle.getReference()).getIntegrationLevel()
+          != Vehicle.IntegrationLevel.TO_BE_IGNORED) {
+        updateVehiclePose((Pose) evt.getNewValue());
+      }
     }
     else if (Objects.equals(
         evt.getPropertyName(),
@@ -960,30 +955,13 @@ public class DefaultVehicleController
     scheduler.clearPendingAllocations(this);
   }
 
-  private void updateVehiclePrecisePosition(Triple precisePosition)
+  private void updateVehiclePose(
+      @Nonnull
+      Pose pose
+  )
       throws ObjectUnknownException {
-    if (precisePosition == null) {
-      vehicleService.updateVehiclePrecisePosition(vehicle.getReference(), null);
-      return;
-    }
-
-    // Get an up-to-date copy of the vehicle
-    Vehicle currVehicle = vehicleService.fetchObject(Vehicle.class, vehicle.getReference());
-    if (currVehicle.getIntegrationLevel() != Vehicle.IntegrationLevel.TO_BE_IGNORED) {
-      vehicleService.updateVehiclePrecisePosition(
-          vehicle.getReference(),
-          incomingPoseTransformer.apply(new Pose(precisePosition, Double.NaN)).getPosition()
-      );
-    }
-  }
-
-  private void updateVehicleOrientationAngle(double orientationAngle) {
-    vehicleService.updateVehicleOrientationAngle(
-        vehicle.getReference(),
-        incomingPoseTransformer
-            .apply(new Pose(new Triple(0, 0, 0), orientationAngle))
-            .getOrientationAngle()
-    );
+    requireNonNull(pose, "pose");
+    vehicleService.updateVehiclePose(vehicle.getReference(), incomingPoseTransformer.apply(pose));
   }
 
   private void updateVehiclePosition(String position) {
@@ -1034,7 +1012,6 @@ public class DefaultVehicleController
 
   private void commandExecuted(MovementCommand executedCommand) {
     requireNonNull(executedCommand, "executedCommand");
-
 
     synchronized (commAdapter) {
       checkArgument(
@@ -1387,7 +1364,7 @@ public class DefaultVehicleController
       if (currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_IGNORED) {
         // Reset the vehicle's position to free all allocated resources
         resetVehiclePosition();
-        updateVehiclePrecisePosition(null);
+        updateVehiclePose(new Pose(null, Double.NaN));
       }
       else if (currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_NOTICED) {
         // Reset the vehicle's position to free all allocated resources
@@ -1399,7 +1376,7 @@ public class DefaultVehicleController
           Point point = vehicleService.fetchObject(Point.class, processModel.getPosition());
           vehicleService.updateVehiclePosition(vehicle.getReference(), point.getReference());
         }
-        updateVehiclePrecisePosition(processModel.getPrecisePosition());
+        updateVehiclePose(processModel.getPose());
       }
       else if ((currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_RESPECTED
           || currIntegrationLevel == Vehicle.IntegrationLevel.TO_BE_UTILIZED)
@@ -1434,7 +1411,7 @@ public class DefaultVehicleController
     if (!alreadyAllocated(processModel.getPosition())) {
       // Set vehicle's position to allocate the resources
       setVehiclePosition(processModel.getPosition());
-      updateVehiclePrecisePosition(processModel.getPrecisePosition());
+      updateVehiclePose(processModel.getPose());
     }
   }
 

@@ -16,6 +16,7 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
@@ -156,13 +157,15 @@ public class StandardVehicleService
     }
   }
 
+  @Deprecated
   @Override
   public void updateVehicleOrientationAngle(TCSObjectReference<Vehicle> ref, double angle)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 
     synchronized (globalSyncObject) {
-      plantModelManager.setVehicleOrientationAngle(ref, angle);
+      Vehicle previousState = plantModelManager.getObjectRepo().getObject(Vehicle.class, ref);
+      plantModelManager.setVehiclePose(ref, previousState.getPose().withOrientationAngle(angle));
     }
   }
 
@@ -180,13 +183,26 @@ public class StandardVehicleService
     }
   }
 
+  @Deprecated
   @Override
   public void updateVehiclePrecisePosition(TCSObjectReference<Vehicle> ref, Triple position)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
 
     synchronized (globalSyncObject) {
-      plantModelManager.setVehiclePrecisePosition(ref, position);
+      Vehicle previousState = plantModelManager.getObjectRepo().getObject(Vehicle.class, ref);
+      plantModelManager.setVehiclePose(ref, previousState.getPose().withPosition(position));
+    }
+  }
+
+  @Override
+  public void updateVehiclePose(TCSObjectReference<Vehicle> ref, Pose pose)
+      throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(pose, "pose");
+
+    synchronized (globalSyncObject) {
+      plantModelManager.setVehiclePose(ref, pose);
     }
   }
 

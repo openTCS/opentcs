@@ -167,19 +167,22 @@ public class VehicleStatusMessage
     vehicleMessage.setPosition(
         vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName()
     );
-    vehicleMessage.setOrientationAngle(vehicle.getOrientationAngle());
     vehicleMessage.setPaused(vehicle.isPaused());
     vehicleMessage.setState(vehicle.getState());
     vehicleMessage.setProcState(vehicle.getProcState());
-    if (vehicle.getPrecisePosition() != null) {
+    if (vehicle.getPose().getPosition() != null) {
       vehicleMessage.setPrecisePosition(
           new PrecisePosition(
-              vehicle.getPrecisePosition().getX(),
-              vehicle.getPrecisePosition().getY(),
-              vehicle.getPrecisePosition().getZ()
+              vehicle.getPose().getPosition().getX(),
+              vehicle.getPose().getPosition().getY(),
+              vehicle.getPose().getPosition().getZ()
           )
       );
     }
+    else {
+      vehicleMessage.setPrecisePosition(null);
+    }
+    vehicleMessage.setOrientationAngle(vehicle.getPose().getOrientationAngle());
     vehicleMessage.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
     vehicleMessage.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));
     return vehicleMessage;

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import org.opentcs.data.model.BoundingBox;
+import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
@@ -35,8 +36,7 @@ public class VehicleProcessModelTO
   private boolean commAdapterConnected;
   private String position;
   private Queue<UserNotification> notifications = new ArrayDeque<>();
-  private Triple precisePosition;
-  private double orientationAngle = Double.NaN;
+  private Pose pose = new Pose(null, Double.NaN);
   private int energyLevel;
   private List<LoadHandlingDevice> loadHandlingDevices = new ArrayList<>();
   private Vehicle.State state = Vehicle.State.UNKNOWN;
@@ -104,25 +104,46 @@ public class VehicleProcessModelTO
     return this;
   }
 
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   @Nullable
   public Triple getPrecisePosition() {
-    return precisePosition;
+    return pose.getPosition();
   }
 
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public VehicleProcessModelTO setPrecisePosition(
       @Nullable
       Triple precisePosition
   ) {
-    this.precisePosition = precisePosition;
+    this.pose = pose.withPosition(precisePosition);
     return this;
   }
 
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public double getOrientationAngle() {
-    return orientationAngle;
+    return pose.getOrientationAngle();
   }
 
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public VehicleProcessModelTO setOrientationAngle(double orientationAngle) {
-    this.orientationAngle = orientationAngle;
+    this.pose = pose.withOrientationAngle(orientationAngle);
+    return this;
+  }
+
+  @Nonnull
+  public Pose getPose() {
+    return pose;
+  }
+
+  public VehicleProcessModelTO setPose(
+      @Nonnull
+      Pose pose
+  ) {
+    this.pose = requireNonNull(pose, "pose");
     return this;
   }
 

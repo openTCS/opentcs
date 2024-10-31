@@ -196,8 +196,7 @@ public abstract class BasicVehicleCommAdapter
         .setEnergyLevel(getProcessModel().getEnergyLevel())
         .setLoadHandlingDevices(getProcessModel().getLoadHandlingDevices())
         .setNotifications(getProcessModel().getNotifications())
-        .setOrientationAngle(getProcessModel().getOrientationAngle())
-        .setPrecisePosition(getProcessModel().getPrecisePosition())
+        .setPose(getProcessModel().getPose())
         .setPosition(getProcessModel().getPosition())
         .setState(getProcessModel().getState())
         .setBoundingBox(getProcessModel().getBoundingBox());

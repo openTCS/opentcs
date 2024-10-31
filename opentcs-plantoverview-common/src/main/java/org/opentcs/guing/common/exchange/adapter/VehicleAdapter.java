@@ -100,14 +100,14 @@ public class VehicleAdapter
       updateModelCurrentPoint(model, vehicle, systemModel);
       updateModelNextPoint(model, vehicle, systemModel);
 
-      model.getPropertyPrecisePosition().setValue(vehicle.getPrecisePosition());
-      model.setPrecisePosition(vehicle.getPrecisePosition());
+      model.getPropertyPrecisePosition().setValue(vehicle.getPose().getPosition());
+      model.setPrecisePosition(vehicle.getPose().getPosition());
 
       model.getPropertyOrientationAngle().setValueAndUnit(
-          vehicle.getOrientationAngle(),
+          vehicle.getPose().getOrientationAngle(),
           AngleProperty.Unit.DEG
       );
-      model.setOrientationAngle(vehicle.getOrientationAngle());
+      model.setOrientationAngle(vehicle.getPose().getOrientationAngle());
 
       updateCurrentTransportName(vehicle, model);
       updateCurrentOrderSequenceName(vehicle, model);

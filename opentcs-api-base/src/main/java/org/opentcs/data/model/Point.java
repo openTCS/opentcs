@@ -96,6 +96,7 @@ public class Point
   ) {
     super(name, properties, history);
     this.pose = requireNonNull(pose, "pose");
+    requireNonNull(pose.getPosition(), "A point requires a pose with a position.");
     this.type = requireNonNull(type, "type");
     this.incomingPaths = setWithoutNullValues(requireNonNull(incomingPaths, "incomingPaths"));
     this.outgoingPaths = setWithoutNullValues(requireNonNull(outgoingPaths, "outgoingPaths"));

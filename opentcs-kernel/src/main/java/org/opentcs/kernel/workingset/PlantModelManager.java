@@ -43,7 +43,6 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
-import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.data.model.visualization.VisualLayout;
@@ -834,60 +833,31 @@ public class PlantModelManager
   }
 
   /**
-   * Sets a vehicle's precise position.
+   * Sets a vehicle's pose.
    *
    * @param ref A reference to the vehicle to be modified.
-   * @param newPosition The vehicle's precise position.
+   * @param pose The vehicle's pose.
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
-  public Vehicle setVehiclePrecisePosition(
+  public Vehicle setVehiclePose(
       TCSObjectReference<Vehicle> ref,
-      Triple newPosition
+      @Nonnull
+      Pose pose
   )
       throws ObjectUnknownException {
+    requireNonNull(pose, "pose");
+
     Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
 
     LOG.trace(
-        "Vehicle's precise position changes: {} -- {} -> {}",
+        "Vehicle's pose changes: {} -- {} -> {}",
         previousState.getName(),
-        previousState.getPrecisePosition(),
-        newPosition
+        previousState.getPose(),
+        pose
     );
 
-    Vehicle vehicle = previousState.withPrecisePosition(newPosition);
-    getObjectRepo().replaceObject(vehicle);
-    emitObjectEvent(
-        vehicle,
-        previousState,
-        TCSObjectEvent.Type.OBJECT_MODIFIED
-    );
-    return vehicle;
-  }
-
-  /**
-   * Sets a vehicle's current orientation angle.
-   *
-   * @param ref A reference to the vehicle to be modified.
-   * @param angle The vehicle's orientation angle.
-   * @return The modified vehicle.
-   * @throws ObjectUnknownException If the referenced vehicle does not exist.
-   */
-  public Vehicle setVehicleOrientationAngle(
-      TCSObjectReference<Vehicle> ref,
-      double angle
-  )
-      throws ObjectUnknownException {
-    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
-
-    LOG.trace(
-        "Vehicle's orientation angle changes: {} -- {} -> {}",
-        previousState.getName(),
-        previousState.getOrientationAngle(),
-        angle
-    );
-
-    Vehicle vehicle = previousState.withOrientationAngle(angle);
+    Vehicle vehicle = previousState.withPose(pose);
     getObjectRepo().replaceObject(vehicle);
     emitObjectEvent(
         vehicle,

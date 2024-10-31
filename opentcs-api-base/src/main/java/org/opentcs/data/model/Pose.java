@@ -2,10 +2,9 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.data.model;
 
-import static java.util.Objects.requireNonNull;
 import static org.opentcs.util.Assertions.checkArgument;
 
-import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -33,11 +32,11 @@ public class Pose
    * unknown/undefined.
    */
   public Pose(
-      @Nonnull
+      @Nullable
       Triple position,
       double orientationAngle
   ) {
-    this.position = requireNonNull(position, "position");
+    this.position = position;
     checkArgument(
         Double.isNaN(orientationAngle)
             || (orientationAngle >= -360.0 && orientationAngle <= 360.0),
@@ -52,7 +51,7 @@ public class Pose
    *
    * @return The position/coordinates in mm.
    */
-  @Nonnull
+  @Nullable
   public Triple getPosition() {
     return position;
   }
@@ -64,7 +63,7 @@ public class Pose
    * @return A copy of this object, differing in the given value.
    */
   public Pose withPosition(
-      @Nonnull
+      @Nullable
       Triple position
   ) {
     return new Pose(position, orientationAngle);

@@ -81,6 +81,7 @@ public class PointCreationTO
   ) {
     super(name, properties);
     this.pose = requireNonNull(pose, "pose");
+    requireNonNull(pose.getPosition(), "A point requires a pose with a position.");
     this.type = requireNonNull(type, "type");
     this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     this.maxVehicleBoundingBox = requireNonNull(maxVehicleBoundingBox, "maxVehicleBoundingBox");

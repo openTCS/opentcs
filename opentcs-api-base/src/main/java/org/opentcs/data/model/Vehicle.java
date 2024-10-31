@@ -6,6 +6,7 @@ import static java.util.Objects.requireNonNull;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkInRange;
 
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.awt.Color;
 import java.io.Serializable;
@@ -112,16 +113,9 @@ public class Vehicle
    */
   private final TCSObjectReference<Point> nextPosition;
   /**
-   * The vehicle's precise position in world coordinates [mm], independent from logical
-   * positions/point names.
-   * Set to <code>null</code> if the vehicle hasn't provided a precise position.
+   * The vehicle's pose containing its precise position and current orientation angle.
    */
-  private final Triple precisePosition;
-  /**
-   * The vehicle's current orientation angle (-360..360).
-   * Set to <code>Double.NaN</code> if the vehicle hasn't provided an orientation angle.
-   */
-  private final double orientationAngle;
+  private final Pose pose;
   /**
    * The key for selecting the envelope to be used for resources the vehicle occupies.
    */
@@ -154,8 +148,7 @@ public class Vehicle
     this.paused = false;
     this.currentPosition = null;
     this.nextPosition = null;
-    this.precisePosition = null;
-    this.orientationAngle = Double.NaN;
+    this.pose = new Pose(null, Double.NaN);
     this.energyLevel = 100;
     this.loadHandlingDevices = List.of();
     this.envelopeKey = null;
@@ -182,8 +175,7 @@ public class Vehicle
       boolean paused,
       TCSObjectReference<Point> currentPosition,
       TCSObjectReference<Point> nextPosition,
-      Triple precisePosition,
-      double orientationAngle,
+      Pose pose,
       int energyLevel,
       List<LoadHandlingDevice> loadHandlingDevices,
       String envelopeKey,
@@ -227,13 +219,7 @@ public class Vehicle
     this.paused = paused;
     this.currentPosition = currentPosition;
     this.nextPosition = nextPosition;
-    this.precisePosition = precisePosition;
-    checkArgument(
-        Double.isNaN(orientationAngle) || (orientationAngle >= -360.0 && orientationAngle <= 360.0),
-        "Illegal orientation angle: %s",
-        orientationAngle
-    );
-    this.orientationAngle = orientationAngle;
+    this.pose = requireNonNull(pose, "pose");
     this.energyLevel = checkInRange(energyLevel, 0, 100, "energyLevel");
     this.loadHandlingDevices = listWithoutNullValues(
         requireNonNull(
@@ -267,8 +253,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -298,8 +283,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -329,8 +313,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -360,8 +343,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -405,8 +387,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -615,8 +596,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -662,8 +642,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -707,8 +686,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -752,8 +730,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -797,8 +774,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -853,8 +829,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -907,8 +882,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -952,8 +926,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -1000,8 +973,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -1055,8 +1027,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -1128,8 +1099,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -1176,8 +1146,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -1221,8 +1190,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -1266,8 +1234,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -1311,8 +1278,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -1358,8 +1324,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -1405,8 +1370,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -1420,9 +1384,12 @@ public class Vehicle
    * hasn't provided a precise position.
    *
    * @return The vehicle's precise position in mm.
+   * @deprecated Use {@link #getPose()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public Triple getPrecisePosition() {
-    return precisePosition;
+    return pose.getPosition();
   }
 
   /**
@@ -1430,35 +1397,12 @@ public class Vehicle
    *
    * @param precisePosition The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withPose(Pose)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public Vehicle withPrecisePosition(Triple precisePosition) {
-    return new Vehicle(
-        getName(),
-        getProperties(),
-        getHistory(),
-        boundingBox,
-        energyLevelThresholdSet,
-        maxVelocity,
-        maxReverseVelocity,
-        rechargeOperation,
-        procState,
-        transportOrder,
-        orderSequence,
-        allowedOrderTypes,
-        claimedResources,
-        allocatedResources,
-        state,
-        integrationLevel,
-        paused,
-        currentPosition,
-        nextPosition,
-        precisePosition,
-        orientationAngle,
-        energyLevel,
-        loadHandlingDevices,
-        envelopeKey,
-        layout
-    );
+    return withPose(pose.withPosition(precisePosition));
   }
 
   /**
@@ -1467,9 +1411,12 @@ public class Vehicle
    * orientation angle.
    *
    * @return The vehicle's current orientation angle.
+   * @deprecated Use {@link #getPose()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public double getOrientationAngle() {
-    return orientationAngle;
+    return pose.getOrientationAngle();
   }
 
   /**
@@ -1477,8 +1424,34 @@ public class Vehicle
    *
    * @param orientationAngle The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withPose(Pose)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public Vehicle withOrientationAngle(double orientationAngle) {
+    return withPose(pose.withOrientationAngle(orientationAngle));
+  }
+
+  /**
+   * Returns the vehicle's pose containing the precise position and orientation angle.
+   *
+   * @return The vehicle's pose.
+   */
+  @Nonnull
+  public Pose getPose() {
+    return pose;
+  }
+
+  /**
+   * Creates a copy of this object, with the given pose.
+   *
+   * @param pose The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Vehicle withPose(
+      @Nonnull
+      Pose pose
+  ) {
     return new Vehicle(
         getName(),
         getProperties(),
@@ -1499,8 +1472,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -1550,8 +1522,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -1595,8 +1566,7 @@ public class Vehicle
         paused,
         currentPosition,
         nextPosition,
-        precisePosition,
-        orientationAngle,
+        pose,
         energyLevel,
         loadHandlingDevices,
         envelopeKey,
@@ -1624,8 +1594,7 @@ public class Vehicle
         + ", state=" + state
         + ", energyLevel=" + energyLevel
         + ", currentPosition=" + currentPosition
-        + ", precisePosition=" + precisePosition
-        + ", orientationAngle=" + orientationAngle
+        + ", pose=" + pose
         + ", nextPosition=" + nextPosition
         + ", loadHandlingDevices=" + loadHandlingDevices
         + ", boundingBox=" + boundingBox
