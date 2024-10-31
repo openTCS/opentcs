@@ -53,12 +53,9 @@ public class EventBuffer
     requireNonNull(event, "event");
     synchronized (events) {
       if (eventFilter.test(event)) {
-        if (replacesLatestEvent(event)) {
-          // If the event is considered a replacement for the latest buffered event, simply remove
-          // the latest event (before adding the replacement to the queue of events).
-          events.removeLast();
+        if (!tryMergeWithPreviousEvent(event)) {
+          events.add(event);
         }
-        events.add(event);
 
         // If the client is waiting for an event, wake it up, since there is one now.
         if (waitingClient) {
@@ -130,20 +127,39 @@ public class EventBuffer
     }
   }
 
-  private boolean replacesLatestEvent(Object event) {
+  /**
+   * If possible, merge the given new event with the previous one in the buffer.
+   *
+   * @param event The new event.
+   * @return <code>true</code> if the new event was merged with the previous one.
+   */
+  private boolean tryMergeWithPreviousEvent(Object event) {
     if (!(event instanceof TCSObjectEvent currentEvent)
-        || !(events.peekLast() instanceof TCSObjectEvent latestEvent)) {
+        || !(events.peekLast() instanceof TCSObjectEvent previousEvent)) {
       return false;
     }
 
     if (currentEvent.getType() != TCSObjectEvent.Type.OBJECT_MODIFIED
-        || latestEvent.getType() != TCSObjectEvent.Type.OBJECT_MODIFIED) {
+        || previousEvent.getType() != TCSObjectEvent.Type.OBJECT_MODIFIED) {
       return false;
     }
 
-    return Objects.equals(
+    if (!Objects.equals(
         currentEvent.getCurrentObjectState().getReference(),
-        latestEvent.getCurrentObjectState().getReference()
+        previousEvent.getCurrentObjectState().getReference()
+    )) {
+      return false;
+    }
+
+    events.removeLast();
+    events.add(
+        new TCSObjectEvent(
+            currentEvent.getCurrentObjectState(),
+            previousEvent.getPreviousObjectState(),
+            TCSObjectEvent.Type.OBJECT_MODIFIED
+        )
     );
+
+    return true;
   }
 }

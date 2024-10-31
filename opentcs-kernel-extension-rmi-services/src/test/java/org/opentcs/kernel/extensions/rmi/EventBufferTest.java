@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.theInstance;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.List;
@@ -119,9 +120,25 @@ class EventBufferTest {
 
     List<Object> result = eventBuffer.getEvents(0);
     assertThat(result, hasSize(3));
-    assertThat(result.get(0), is(equalTo(event1)));
-    assertThat(result.get(1), is(equalTo(event4)));
-    assertThat(result.get(2), is(equalTo(event6)));
+    assertThat(result.get(0), is(theInstance(event1)));
+
+    assertThat(
+        ((TCSObjectEvent) result.get(1)).getPreviousObjectState(),
+        is(theInstance(vehicle))
+    );
+    assertThat(
+        ((TCSObjectEvent) result.get(1)).getCurrentObjectState(),
+        is(theInstance(vehicleC))
+    );
+
+    assertThat(
+        ((TCSObjectEvent) result.get(2)).getPreviousObjectState(),
+        is(theInstance(pointA))
+    );
+    assertThat(
+        ((TCSObjectEvent) result.get(2)).getCurrentObjectState(),
+        is(theInstance(pointC))
+    );
   }
 
   @Test
