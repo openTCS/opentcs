@@ -1322,20 +1322,21 @@ public class DefaultVehicleController
       updatePosition(toReference(point), null);
     }
     else {
-      // If a drive order is being processed, check if the reported position is the one we expect.
-      MovementCommand moveCommand = commandProcessingTracker.getSentCommands().getFirst();
-
       if (point == null) {
         LOG.info("{}: Resetting position for vehicle", vehicle.getName());
       }
       else {
-        Point dstPoint = moveCommand.getStep().getDestinationPoint();
-        if (!dstPoint.getName().equals(point.getName())) {
+        // Check if the reported position belongs to any of the commands we sent.
+        List<Point> expectedPoints = commandProcessingTracker.getSentCommands().stream()
+            .map(cmd -> cmd.getStep().getDestinationPoint())
+            .collect(Collectors.toList());
+
+        if (!expectedPoints.contains(point)) {
           LOG.warn(
-              "{}: Reported position: {}, expected: {}",
+              "{}: Reported position: {}, expected one of: {}",
               vehicle.getName(),
               point.getName(),
-              dstPoint.getName()
+              expectedPoints
           );
           onUnexpectedPositionReported(point);
         }

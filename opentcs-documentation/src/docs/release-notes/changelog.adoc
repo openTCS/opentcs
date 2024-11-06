@@ -25,6 +25,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 *** Add missing _required_ markers for request and response bodies.
 *** Include a vehicle's 'sufficiently recharged' and 'fully recharged' energy levels when requesting vehicle data.
 * Bugs fixed:
+** When receiving a position update from a vehicle, accept any position belonging to the movement commands sent to the vehicle, not just the next one.
+   This is necessary to support cases in which a vehicle has completed more than one movement command during state/position updates.
 ** When aggregating ``TCSObjectEvent``s for RMI clients, actually aggregate the oldest and youngest events properly instead of keeping only the youngest one.
 ** Ask user for confirmation before overwriting files when using the _Save Model As..._ menu item in the Model Editor application.
 ** Allow the position in `org.opentcs.data.model.Pose` to be `null`.
