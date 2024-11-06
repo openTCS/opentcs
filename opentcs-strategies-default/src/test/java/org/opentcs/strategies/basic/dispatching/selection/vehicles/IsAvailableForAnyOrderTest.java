@@ -104,13 +104,6 @@ class IsAvailableForAnyOrderTest {
   }
 
   @Test
-  void checkVehicleHasCriticalEnergyLevel() {
-    Vehicle vehicle = vehicleAvailableForAnyOrder.withEnergyLevel(0);
-
-    assertFalse(isAvailableForAnyOrder.test(vehicle));
-  }
-
-  @Test
   void checkVehicleNeedsMoreCharging() {
     Vehicle vehicle = vehicleAvailableForAnyOrder
         .withEnergyLevel(10)

@@ -62,7 +62,6 @@ public class IsAvailableForAnyOrder
     return vehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
         && vehicle.getCurrentPosition() != null
         && vehicle.getOrderSequence() == null
-        && !vehicle.isEnergyLevelCritical()
         && !needsMoreCharging(vehicle)
         && (processesNoOrder(vehicle)
             || processesDispensableOrder(vehicle))

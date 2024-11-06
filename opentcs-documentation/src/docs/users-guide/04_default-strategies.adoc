@@ -25,6 +25,7 @@ To make this decision, the default dispatcher takes the following steps:
 *** It may not be assigned to a transport order, or the assigned transport order must be _dispensable_.
     That is the case with parking orders, for instance, or with recharging orders if the vehicle's energy level is not critical.
 *** Its energy level must not be critical.
+    (Vehicles with critical energy level are taken into account only for transport orders with which the first destination operation is a recharge operation.)
 ** Criteria for a transport order to be taken into account are:
 *** It must be generally dispatchable.
 *** It must not be part of an order sequence that is already being processed by a vehicle.

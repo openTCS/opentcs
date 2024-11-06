@@ -171,6 +171,7 @@ public class OrderAssigner {
         = availableOrders.stream()
             .filter(
                 order -> (!assignmentState.wasAssignedToVehicle(order)
+                    && vehicleCanTakeOrder(vehicle, order)
                     && orderAssignableToVehicle(order, vehicle))
             )
             .map(order -> computeCandidate(vehicle, vehiclePosition, order))
@@ -206,6 +207,7 @@ public class OrderAssigner {
         = availableVehicles.stream()
             .filter(
                 vehicle -> (!assignmentState.wasAssignedToOrder(vehicle)
+                    && vehicleCanTakeOrder(vehicle, order)
                     && orderAssignableToVehicle(order, vehicle))
             )
             .map(
@@ -284,6 +286,14 @@ public class OrderAssigner {
   ) {
     return router.getRoute(vehicle, vehiclePosition, order)
         .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders));
+  }
+
+  private boolean vehicleCanTakeOrder(Vehicle vehicle, TransportOrder order) {
+    return !vehicle.isEnergyLevelCritical()
+        || Objects.equals(
+            order.getAllDriveOrders().getFirst().getDestination().getOperation(),
+            vehicle.getRechargeOperation()
+        );
   }
 
   private boolean orderAssignableToVehicle(TransportOrder order, Vehicle vehicle) {
