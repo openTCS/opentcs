@@ -51,6 +51,12 @@ stages:
   - test
   - deploy
 
+
+.touch-gradle-build-results: &touch-gradle-build-results
+  - echo "Touching build results to prevent Gradle rebuilding them..."
+  - find .gradle | xargs touch
+  - find . -regex '\./opentcs-[^/]+/build/.*' | xargs touch
+
 build_code_quality_image:
   stage: build
   rules:
@@ -99,9 +105,7 @@ test:
   dependencies:
     - build
   script:
-    - echo "Touching build results to prevent Gradle rebuilding them..."
-    - find .gradle | xargs touch
-    - find . -regex '\./opentcs-[^/]+/build/.*' | xargs touch
+    - *touch-gradle-build-results
     - echo "Running unit tests..."
     - ./gradlew test jacocoLogAggregatedCoverage -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
   coverage: '/Branch Coverage: ([0-9.]+)%/'
@@ -142,9 +146,7 @@ lint-checkstyle:
   dependencies:
     - build
   script:
-    - echo "Touching build results to prevent Gradle rebuilding them..."
-    - find .gradle | xargs touch
-    - find . -regex '\./opentcs-[^/]+/build/.*' | xargs touch
+    - *touch-gradle-build-results
     - echo "Checking for changelog headers that do not match 'Version x.y.z (yyyy-mm-dd)'..."
     - '( grep --extended-regexp "^==[^=]" $CHANGELOG_FILE
         | grep --invert-match --extended-regexp "^== Version [0-9]+\.[0-9]+(\.[0-9]+)? +\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\)$"
@@ -188,12 +190,18 @@ deploy_private:
   dependencies:
     - build
   script:
-    - './gradlew -x check publish
+    - *touch-gradle-build-results
+    - './gradlew -x check release publish
         -PDO_DEPLOY_PRIVATE="true"
         -PDO_DEPLOY_OSSRH="false"
         -PNO_BUILD_NUMBER="$NO_BUILD_NUMBER"
         -PSIGNING_KEY="$SIGNING_KEY"
         -PSIGNING_PASSWORD="$SIGNING_PASSWORD"'
+  artifacts:
+    name: 'opentcs-deploy-b$CI_PIPELINE_IID'
+    paths:
+      - build/distributions/*.zip
+    expire_in: 1 week
   cache:
     key: build_test_deploy-$(date +%Y-%m)
     paths:
@@ -207,6 +215,7 @@ deploy_ossrh:
   dependencies:
     - build
   script:
+    - *touch-gradle-build-results
     - './gradlew -x check publishToSonatype closeAndReleaseStagingRepositories
         -PDO_DEPLOY_PRIVATE="false"
         -PDO_DEPLOY_OSSRH="true"
