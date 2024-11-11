@@ -15,13 +15,16 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentcs.access.to.model.CoupleCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
+import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PointTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.EnvelopeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
@@ -64,6 +67,10 @@ class PointConverterTest {
         .withPose(new Pose(new Triple(1, 1, 1), 0.5))
         .withType(Point.Type.HALT_POSITION)
         .withVehicleEnvelopes(envelopeMap)
+        .withMaxVehicleBoundingBox(
+            new BoundingBox(1000, 2000, 3000)
+                .withReferenceOffset(new Couple(4, 5))
+        )
         .withLayout(new Point.Layout(new Couple(3, 3), new Couple(4, 4), 7))
         .withProperties(propertyMap);
 
@@ -76,6 +83,13 @@ class PointConverterTest {
     assertThat(result.get(0).getType(), is(Point.Type.HALT_POSITION.name()));
     assertThat(result.get(0).getVehicleEnvelopes(), hasSize(1));
     assertThat(result.get(0).getVehicleEnvelopes(), is(envelopeList));
+    assertThat(result.get(0).getMaxVehicleBoundingBox().getLength(), is(1000L));
+    assertThat(result.get(0).getMaxVehicleBoundingBox().getWidth(), is(2000L));
+    assertThat(result.get(0).getMaxVehicleBoundingBox().getHeight(), is(3000L));
+    assertThat(
+        result.get(0).getMaxVehicleBoundingBox().getReferenceOffset(),
+        samePropertyValuesAs(new CoupleTO(4, 5))
+    );
     assertThat(result.get(0).getLayout().getPosition(), samePropertyValuesAs(new CoupleTO(3, 3)));
     assertThat(
         result.get(0).getLayout().getLabelOffset(),
@@ -93,6 +107,9 @@ class PointConverterTest {
         .setVehicleOrientationAngle(0.8)
         .setType(Point.Type.HALT_POSITION.name())
         .setVehicleEnvelopes(envelopeList)
+        .setMaxVehicleBoundingBox(
+            new BoundingBoxTO(1000, 2000, 3000, new CoupleTO(4, 5))
+        )
         .setLayout(
             new PointTO.Layout()
                 .setPosition(new CoupleTO(3, 3))
@@ -109,6 +126,13 @@ class PointConverterTest {
     assertThat(result.get(0).getType(), is(Point.Type.HALT_POSITION));
     assertThat(result.get(0).getVehicleEnvelopes(), is(aMapWithSize(1)));
     assertThat(result.get(0).getVehicleEnvelopes(), is(envelopeMap));
+    assertThat(result.get(0).getMaxVehicleBoundingBox().getLength(), is(1000L));
+    assertThat(result.get(0).getMaxVehicleBoundingBox().getWidth(), is(2000L));
+    assertThat(result.get(0).getMaxVehicleBoundingBox().getHeight(), is(3000L));
+    assertThat(
+        result.get(0).getMaxVehicleBoundingBox().getReferenceOffset(),
+        samePropertyValuesAs(new CoupleCreationTO(4, 5))
+    );
     assertThat(result.get(0).getLayout().getPosition(), samePropertyValuesAs(new Couple(3, 3)));
     assertThat(result.get(0).getLayout().getLabelOffset(), samePropertyValuesAs(new Couple(4, 4)));
     assertThat(result.get(0).getLayout().getLayerId(), is(9));

@@ -28,6 +28,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update web API specification and implementation to version 1.9.0:
 *** Add missing _required_ markers for request and response bodies.
 *** Include a vehicle's 'sufficiently recharged' and 'fully recharged' energy levels when requesting vehicle data.
+*** Add support for specifying bounding boxes for vehicles and maximum vehicle bounding boxes for points via the web API.
 * Bugs fixed:
 ** When receiving a position update from a vehicle, accept any position belonging to the movement commands sent to the vehicle, not just the next one.
    This is necessary to support cases in which a vehicle has completed more than one movement command during state/position updates.

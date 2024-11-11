@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
 import org.opentcs.data.model.Point;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.EnvelopeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
@@ -24,6 +25,8 @@ public class PointTO {
   private String type = Point.Type.HALT_POSITION.name();
   private Layout layout = new Layout();
   private List<EnvelopeTO> vehicleEnvelopes = List.of();
+  private BoundingBoxTO maxVehicleBoundingBox
+      = new BoundingBoxTO(1000, 1000, 1000, new CoupleTO(0, 0));
   private List<PropertyTO> properties = List.of();
 
   @JsonCreator
@@ -119,6 +122,15 @@ public class PointTO {
       List<EnvelopeTO> vehicleEnvelopes
   ) {
     this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
+    return this;
+  }
+
+  public BoundingBoxTO getMaxVehicleBoundingBox() {
+    return maxVehicleBoundingBox;
+  }
+
+  public PointTO setMaxVehicleBoundingBox(BoundingBoxTO maxVehicleBoundingBoxTO) {
+    this.maxVehicleBoundingBox = requireNonNull(maxVehicleBoundingBoxTO, "maxVehicleBoundingBox");
     return this;
   }
 

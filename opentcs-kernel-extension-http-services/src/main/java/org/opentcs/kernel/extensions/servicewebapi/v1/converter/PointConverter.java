@@ -10,12 +10,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentcs.access.to.model.BoundingBoxCreationTO;
+import org.opentcs.access.to.model.CoupleCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PointTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.TripleTO;
 
@@ -47,6 +50,17 @@ public class PointConverter {
                 .setType(point.getType().name())
                 .setVehicleOrientationAngle(point.getPose().getOrientationAngle())
                 .setVehicleEnvelopes(envelopeConverter.toEnvelopeTOs(point.getVehicleEnvelopes()))
+                .setMaxVehicleBoundingBox(
+                    new BoundingBoxTO(
+                        point.getMaxVehicleBoundingBox().getLength(),
+                        point.getMaxVehicleBoundingBox().getWidth(),
+                        point.getMaxVehicleBoundingBox().getHeight(),
+                        new CoupleTO(
+                            point.getMaxVehicleBoundingBox().getReferenceOffset().getX(),
+                            point.getMaxVehicleBoundingBox().getReferenceOffset().getY()
+                        )
+                    )
+                )
                 .setProperties(pConverter.toPropertyTOs(point.getProperties()))
                 .setLayout(
                     new PointTO.Layout()
@@ -101,6 +115,19 @@ public class PointConverter {
                 .withVehicleEnvelopes(
                     envelopeConverter
                         .toVehicleEnvelopeMap(point.getVehicleEnvelopes())
+                )
+                .withMaxVehicleBoundingBox(
+                    new BoundingBoxCreationTO(
+                        point.getMaxVehicleBoundingBox().getLength(),
+                        point.getMaxVehicleBoundingBox().getWidth(),
+                        point.getMaxVehicleBoundingBox().getHeight()
+                    )
+                        .withReferenceOffset(
+                            new CoupleCreationTO(
+                                point.getMaxVehicleBoundingBox().getReferenceOffset().getX(),
+                                point.getMaxVehicleBoundingBox().getReferenceOffset().getY()
+                            )
+                        )
                 )
         )
         .collect(Collectors.toCollection(ArrayList::new));

@@ -18,6 +18,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.Periphe
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PointTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VisualLayoutTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.EnvelopeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
@@ -57,6 +58,9 @@ class PlantModelTOTest {
                             )
                         )
                     )
+                    .setMaxVehicleBoundingBox(
+                        new BoundingBoxTO(1500, 2000, 3000, new CoupleTO(10, 20))
+                    )
                     .setLayout(
                         new PointTO.Layout()
                             .setPosition(new CoupleTO(25000, -15000))
@@ -66,6 +70,9 @@ class PlantModelTOTest {
                 new PointTO("some-point2")
                     .setProperties(List.of(new PropertyTO("point-prop", "point-value")))
                     .setPosition(new TripleTO(18000, -15000, 0))
+                    .setMaxVehicleBoundingBox(
+                        new BoundingBoxTO(1500, 2000, 3000, new CoupleTO(10, 20))
+                    )
                     .setLayout(
                         new PointTO.Layout()
                             .setPosition(new CoupleTO(18000, -15000))
@@ -75,6 +82,9 @@ class PlantModelTOTest {
                 new PointTO("some-point3")
                     .setProperties(List.of(new PropertyTO("point-prop", "point-value")))
                     .setPosition(new TripleTO(25000, -9000, 0))
+                    .setMaxVehicleBoundingBox(
+                        new BoundingBoxTO(1500, 2000, 3000, new CoupleTO(10, 20))
+                    )
                     .setLayout(
                         new PointTO.Layout()
                             .setPosition(new CoupleTO(25000, -9000))
@@ -174,7 +184,7 @@ class PlantModelTOTest {
             List.of(
                 new VehicleTO("some-vehicle")
                     .setProperties(List.of(new PropertyTO("vehicle-prop", "vehicle-value")))
-                    .setLength(1456)
+                    .setBoundingBox(new BoundingBoxTO(150, 200, 300, new CoupleTO(10, 20)))
                     .setEnergyLevelCritical(10)
                     .setEnergyLevelGood(30)
                     .setEnergyLevelSufficientlyRecharged(60)

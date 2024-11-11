@@ -11,6 +11,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 
 /**
  * Unit tests for {@link GetVehicleResponseTO}.
@@ -38,7 +40,7 @@ class GetVehicleResponseTOTest {
                     )
                 )
             )
-            .setLength(1234)
+            .setBoundingBox(new BoundingBoxTO(50, 40, 30, new CoupleTO(0, 0)))
             .setEnergyLevelGood(90)
             .setEnergyLevelCritical(30)
             .setEnergyLevelSufficientlyRecharged(30)

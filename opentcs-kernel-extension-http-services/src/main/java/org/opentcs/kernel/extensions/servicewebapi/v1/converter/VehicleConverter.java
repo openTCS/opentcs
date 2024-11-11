@@ -11,9 +11,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.BoundingBoxCreationTO;
+import org.opentcs.access.to.model.CoupleCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.util.Colors;
 
 /**
@@ -33,7 +36,18 @@ public class VehicleConverter {
         .map(
             vehicle -> new VehicleCreationTO(vehicle.getName())
                 .withProperties(pConverter.toPropertyMap(vehicle.getProperties()))
-                .withBoundingBox(new BoundingBoxCreationTO(vehicle.getLength(), 1000, 1000))
+                .withBoundingBox(
+                    new BoundingBoxCreationTO(
+                        vehicle.getBoundingBox().getLength(),
+                        vehicle.getBoundingBox().getWidth(),
+                        vehicle.getBoundingBox().getHeight()
+                    ).withReferenceOffset(
+                        new CoupleCreationTO(
+                            vehicle.getBoundingBox().getReferenceOffset().getX(),
+                            vehicle.getBoundingBox().getReferenceOffset().getY()
+                        )
+                    )
+                )
                 .withEnergyLevelThresholdSet(
                     new VehicleCreationTO.EnergyLevelThresholdSet(
                         vehicle.getEnergyLevelCritical(),
@@ -57,7 +71,17 @@ public class VehicleConverter {
     return vehicles.stream()
         .map(
             vehicle -> new VehicleTO(vehicle.getName())
-                .setLength((int) vehicle.getBoundingBox().getLength())
+                .setBoundingBox(
+                    new BoundingBoxTO(
+                        vehicle.getBoundingBox().getLength(),
+                        vehicle.getBoundingBox().getWidth(),
+                        vehicle.getBoundingBox().getHeight(),
+                        new CoupleTO(
+                            vehicle.getBoundingBox().getReferenceOffset().getX(),
+                            vehicle.getBoundingBox().getReferenceOffset().getY()
+                        )
+                    )
+                )
                 .setEnergyLevelCritical(
                     vehicle.getEnergyLevelThresholdSet().getEnergyLevelCritical()
                 )

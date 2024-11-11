@@ -20,6 +20,8 @@ import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 import org.opentcs.util.Colors;
 
@@ -48,7 +50,7 @@ class VehicleConverterTest {
   @Test
   void checkToVehicleCreationTOs() {
     VehicleTO vehicleTo = new VehicleTO("V1")
-        .setLength(1000)
+        .setBoundingBox(new BoundingBoxTO(500, 100, 700, new CoupleTO(0, 0)))
         .setEnergyLevelGood(90)
         .setEnergyLevelCritical(30)
         .setEnergyLevelFullyRecharged(90)
@@ -62,7 +64,11 @@ class VehicleConverterTest {
 
     assertThat(result, hasSize(1));
     assertThat(result.get(0).getName(), is("V1"));
-    assertThat(result.get(0).getBoundingBox().getLength(), is(1000L));
+    assertThat(result.get(0).getBoundingBox().getLength(), is(500L));
+    assertThat(result.get(0).getBoundingBox().getWidth(), is(100L));
+    assertThat(result.get(0).getBoundingBox().getHeight(), is(700L));
+    assertThat(result.get(0).getBoundingBox().getReferenceOffset().getX(), is(0L));
+    assertThat(result.get(0).getBoundingBox().getReferenceOffset().getY(), is(0L));
     assertThat(result.get(0).getEnergyLevelThresholdSet().getEnergyLevelGood(), is(90));
     assertThat(result.get(0).getEnergyLevelThresholdSet().getEnergyLevelCritical(), is(30));
     assertThat(result.get(0).getEnergyLevelThresholdSet().getEnergyLevelFullyRecharged(), is(90));
@@ -79,7 +85,7 @@ class VehicleConverterTest {
   @Test
   void checkToVehicleTOs() {
     Vehicle vehicle = new Vehicle("V1")
-        .withBoundingBox(new BoundingBox(1000, 1000, 1000))
+        .withBoundingBox(new BoundingBox(500, 100, 700))
         .withEnergyLevelThresholdSet(new EnergyLevelThresholdSet(30, 90, 30, 90))
         .withMaxVelocity(1000)
         .withMaxReverseVelocity(1000)
@@ -90,7 +96,11 @@ class VehicleConverterTest {
 
     assertThat(result, hasSize(1));
     assertThat(result.get(0).getName(), is("V1"));
-    assertThat(result.get(0).getLength(), is(1000));
+    assertThat(result.get(0).getBoundingBox().getLength(), is(500L));
+    assertThat(result.get(0).getBoundingBox().getWidth(), is(100L));
+    assertThat(result.get(0).getBoundingBox().getHeight(), is(700L));
+    assertThat(result.get(0).getBoundingBox().getReferenceOffset().getX(), is(0L));
+    assertThat(result.get(0).getBoundingBox().getReferenceOffset().getY(), is(0L));
     assertThat(result.get(0).getEnergyLevelGood(), is(90));
     assertThat(result.get(0).getEnergyLevelCritical(), is(30));
     assertThat(result.get(0).getEnergyLevelFullyRecharged(), is(90));

@@ -1808,6 +1808,9 @@ components:
           type: integer
           description: The vehicle's length (in mm).
           example: 1000
+          deprecated: true
+        boundingBox:
+          $ref: "#/components/schemas/BoundingBox"
         energyLevelGood:
           type: integer
           description: The value (in %) at/above which the vehicle's energy level is considered
@@ -1907,6 +1910,7 @@ components:
         - name
         - properties
         - length
+        - boundingBox
         - energyLevelGood
         - energyLevelCritical
         - energyLevelSufficientlyRecharged
@@ -2165,6 +2169,32 @@ components:
         - x
         - y
         - z
+    BoundingBox:
+      type: object
+      additionalProperties: false
+      properties:
+        length:
+          type: integer
+          format: int64
+          description: The bounding box length
+          example: 60
+        width:
+          type: integer
+          format: int64
+          description: The bounding box width
+          example: 40
+        height:
+          type: integer
+          format: int64
+          description: The bounding box height
+          example: 50
+        referenceOffset:
+          $ref: "#/components/schemas/PlantModelCouple"
+      required:
+        - length
+        - width
+        - height
+        - referenceOffset
     PeripheralJobState:
       title: Peripheral Job State
       type: object
@@ -2342,6 +2372,13 @@ components:
                   x: 10
                   y: 10
                 layerId: 0
+              maxVehicleBoundingBox:
+                length: 1000
+                width: 1000
+                height: 1000
+                referenceOffset:
+                  x: 0
+                  y: 0
               properties:
                 - name: isExampleProperty
                   value: true
@@ -2360,6 +2397,13 @@ components:
                   x: 10
                   y: 10
                 layerId: 0
+              maxVehicleBoundingBox:
+                length: 1000
+                width: 1000
+                height: 1000
+                referenceOffset:
+                  x: 0
+                  y: 0
               properties:
                 - name: isExampleProperty
                   value: true
@@ -2378,6 +2422,13 @@ components:
                   x: 10
                   y: 10
                 layerId: 0
+              maxVehicleBoundingBox:
+                length: 1000
+                width: 1000
+                height: 1000
+                referenceOffset:
+                  x: 0
+                  y: 0
             - name: "Point-D"
               position:
                 x: 25000
@@ -2393,6 +2444,13 @@ components:
                   x: 10
                   y: 10
                 layerId: 0
+              maxVehicleBoundingBox:
+                length: 1000
+                width: 1000
+                height: 1000
+                referenceOffset:
+                  x: 0
+                  y: 0
         paths:
           type: array
           description: The plant model's paths.
@@ -2571,6 +2629,13 @@ components:
           example:
             - name: "Vehicle-01"
               length: 1000
+              boundingBox:
+                length: 1000
+                width: 1000
+                height: 1000
+                referenceOffset:
+                  x: 0
+                  y: 0
               energyLevelCritical: 15
               energyLevelGood: 50
               energyLevelFullyRecharged: 97
@@ -2581,6 +2646,13 @@ components:
                 routeColor: "#00FF00"
             - name: "Vehicle-02"
               length: 1000
+              boundingBox:
+                length: 1000
+                width: 1000
+                height: 1000
+                referenceOffset:
+                  x: 0
+                  y: 0
               energyLevelCritical: 15
               energyLevelGood: 50
               energyLevelFullyRecharged: 97
@@ -2630,6 +2702,8 @@ components:
           description: A map of envelope keys to envelopes that vehicles located at this point may occupy.
           items:
             $ref: "#/components/schemas/PlantModelEnvelope"
+        maxVehicleBoundingBox:
+          $ref: "#/components/schemas/BoundingBox"
         layout:
           type: object
           description: Describes the graphical representation of this point.
@@ -2903,6 +2977,9 @@ components:
           type: integer
           description: The vehicle's length (in mm).
           example: 1000
+          deprecated: true
+        boundingBox:
+          $ref: "#/components/schemas/BoundingBox"
         energyLevelCritical:
           type: integer
           description: The energy level value (in %) at/below which the vehicle _must_ be recharged.

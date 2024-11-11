@@ -4,7 +4,16 @@
     "some-key" : "some-value",
     "some-other-key" : "some-other-value"
   },
-  "length" : 1234,
+  "length" : 50,
+  "boundingBox" : {
+    "length" : 50,
+    "width" : 40,
+    "height" : 30,
+    "referenceOffset" : {
+      "x" : 0,
+      "y" : 0
+    }
+  },
   "energyLevelGood" : 90,
   "energyLevelCritical" : 30,
   "energyLevelSufficientlyRecharged" : 30,

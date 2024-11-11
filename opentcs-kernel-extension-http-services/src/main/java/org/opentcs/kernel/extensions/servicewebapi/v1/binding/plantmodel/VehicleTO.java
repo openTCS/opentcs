@@ -6,16 +6,26 @@ import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import java.util.List;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 
 /**
  */
+@JsonPropertyOrder(
+  {
+      "name", "length", "boundingBox", "energyLevelCritical", "energyLevelGood",
+      "energyLevelFullyRecharged", "energyLevelFullyRecharged", "energyLevelSufficientlyRecharged",
+      "maxVelocity", "maxReverseVelocity", "layout", "properties"
+  }
+)
 public class VehicleTO {
 
   private String name;
-  private int length = 1000;
+  private BoundingBoxTO boundingBox = new BoundingBoxTO(1000, 1000, 1000, new CoupleTO(0, 0));
   private int energyLevelCritical = 30;
   private int energyLevelGood = 90;
   private int energyLevelFullyRecharged = 90;
@@ -60,12 +70,27 @@ public class VehicleTO {
     return this;
   }
 
+  @Deprecated
   public int getLength() {
-    return length;
+    return (int) boundingBox.getLength();
   }
 
+  @Deprecated
   public VehicleTO setLength(int length) {
-    this.length = length;
+    this.boundingBox = boundingBox.setLength(length);
+    return this;
+  }
+
+  @Nonnull
+  public BoundingBoxTO getBoundingBox() {
+    return boundingBox;
+  }
+
+  public VehicleTO setBoundingBox(
+      @Nonnull
+      BoundingBoxTO boundingBox
+  ) {
+    this.boundingBox = requireNonNull(boundingBox, "boundingBox");
     return this;
   }
 

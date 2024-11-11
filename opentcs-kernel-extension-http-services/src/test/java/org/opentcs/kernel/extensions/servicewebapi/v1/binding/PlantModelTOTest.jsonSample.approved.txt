@@ -36,6 +36,15 @@
         "y" : -15500
       } ]
     } ],
+    "maxVehicleBoundingBox" : {
+      "length" : 1500,
+      "width" : 2000,
+      "height" : 3000,
+      "referenceOffset" : {
+        "x" : 10,
+        "y" : 20
+      }
+    },
     "properties" : [ {
       "name" : "point-prop",
       "value" : "point-value"
@@ -61,6 +70,15 @@
       "layerId" : 0
     },
     "vehicleEnvelopes" : [ ],
+    "maxVehicleBoundingBox" : {
+      "length" : 1500,
+      "width" : 2000,
+      "height" : 3000,
+      "referenceOffset" : {
+        "x" : 10,
+        "y" : 20
+      }
+    },
     "properties" : [ {
       "name" : "point-prop",
       "value" : "point-value"
@@ -86,6 +104,15 @@
       "layerId" : 0
     },
     "vehicleEnvelopes" : [ ],
+    "maxVehicleBoundingBox" : {
+      "length" : 1500,
+      "width" : 2000,
+      "height" : 3000,
+      "referenceOffset" : {
+        "x" : 10,
+        "y" : 20
+      }
+    },
     "properties" : [ {
       "name" : "point-prop",
       "value" : "point-value"
@@ -206,7 +233,16 @@
   } ],
   "vehicles" : [ {
     "name" : "some-vehicle",
-    "length" : 1456,
+    "length" : 150,
+    "boundingBox" : {
+      "length" : 150,
+      "width" : 200,
+      "height" : 300,
+      "referenceOffset" : {
+        "x" : 10,
+        "y" : 20
+      }
+    },
     "energyLevelCritical" : 10,
     "energyLevelGood" : 30,
     "energyLevelFullyRecharged" : 90,

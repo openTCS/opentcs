@@ -4,6 +4,8 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
 import static java.util.Objects.requireNonNull;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,17 +19,33 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.IntegrationLevel;
 import org.opentcs.data.model.Vehicle.ProcState;
 import org.opentcs.data.model.Vehicle.State;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  */
+@JsonPropertyOrder(
+  {
+      "name", "properties", "length", "boundingBox", "energyLevelGood", "energyLevelCritical",
+      "energyLevelSufficientlyRecharged", "energyLevelFullyRecharged", "energyLevel",
+      "integrationLevel", "paused", "procState", "transportOrder", "currentPosition",
+      "precisePosition", "orientationAngle", "state", "allocatedResources", "claimedResources",
+      "allowedOrderTypes", "envelopeKey"
+  }
+)
 public class GetVehicleResponseTO {
 
-  private String name;
+  private String name = "";
 
   private Map<String, String> properties = new HashMap<>();
 
-  private int length;
+  private BoundingBoxTO boundingBox = new BoundingBoxTO(
+      1000,
+      1000,
+      1000,
+      new CoupleTO(0, 0)
+  );
 
   private int energyLevelGood;
 
@@ -66,21 +84,40 @@ public class GetVehicleResponseTO {
   public GetVehicleResponseTO() {
   }
 
+  @Nonnull
   public String getName() {
     return name;
   }
 
-  public GetVehicleResponseTO setName(String name) {
+  public GetVehicleResponseTO setName(
+      @Nonnull
+      String name
+  ) {
     this.name = requireNonNull(name, "name");
     return this;
   }
 
+  @Deprecated
   public int getLength() {
-    return length;
+    return (int) boundingBox.getLength();
   }
 
+  @Deprecated
   public GetVehicleResponseTO setLength(int length) {
-    this.length = length;
+    this.boundingBox = boundingBox.setLength(length);
+    return this;
+  }
+
+  @Nonnull
+  public BoundingBoxTO getBoundingBox() {
+    return boundingBox;
+  }
+
+  public GetVehicleResponseTO setBoundingBox(
+      @Nonnull
+      BoundingBoxTO boundingBox
+  ) {
+    this.boundingBox = requireNonNull(boundingBox, "boundingBox");
     return this;
   }
 
@@ -268,7 +305,17 @@ public class GetVehicleResponseTO {
     GetVehicleResponseTO vehicleState = new GetVehicleResponseTO();
     vehicleState.setName(vehicle.getName());
     vehicleState.setProperties(vehicle.getProperties());
-    vehicleState.setLength((int) vehicle.getBoundingBox().getLength());
+    vehicleState.setBoundingBox(
+        new BoundingBoxTO(
+            vehicle.getBoundingBox().getLength(),
+            vehicle.getBoundingBox().getWidth(),
+            vehicle.getBoundingBox().getHeight(),
+            new CoupleTO(
+                vehicle.getBoundingBox().getReferenceOffset().getX(),
+                vehicle.getBoundingBox().getReferenceOffset().getY()
+            )
+        )
+    );
     vehicleState.setEnergyLevelCritical(
         vehicle.getEnergyLevelThresholdSet().getEnergyLevelCritical()
     );
