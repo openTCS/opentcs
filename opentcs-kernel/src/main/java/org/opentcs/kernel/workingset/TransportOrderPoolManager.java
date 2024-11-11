@@ -132,9 +132,9 @@ public class TransportOrderPoolManager
         .withProperties(to.getProperties());
 
     LOG.info(
-        "Transport order is being created: {} -- {}",
+        "Transport order is being created: {} -- details: {}",
         newOrder.getName(),
-        newOrder.getAllDriveOrders()
+        newOrder
     );
 
     getObjectRepo().addObject(newOrder);
