@@ -230,4 +230,17 @@ public class VisualLayout
         layerGroups
     );
   }
+
+  @Override
+  public String toString() {
+    return "VisualLayout{"
+        + "name=" + getName()
+        + ", scaleX=" + scaleX
+        + ", scaleY=" + scaleY
+        + ", layers=" + layers
+        + ", layerGroups=" + layerGroups
+        + ", properties=" + getProperties()
+        + ", history=" + getHistory()
+        + '}';
+  }
 }

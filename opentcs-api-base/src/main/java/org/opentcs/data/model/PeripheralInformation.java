@@ -153,6 +153,16 @@ public class PeripheralInformation
     return new PeripheralInformation(reservationToken, state, procState, peripheralJob);
   }
 
+  @Override
+  public String toString() {
+    return "PeripheralInformation{"
+        + "reservationToken=" + reservationToken
+        + ", state=" + state
+        + ", procState=" + procState
+        + ", peripheralJob=" + peripheralJob
+        + '}';
+  }
+
   /**
    * The elements of this enumeration describe the various possible states of a peripheral device.
    */

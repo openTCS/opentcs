@@ -490,6 +490,24 @@ public class Path
     }
   }
 
+  @Override
+  public String toString() {
+    return "Path{"
+        + "name=" + getName()
+        + ", sourcePoint=" + sourcePoint
+        + ", destinationPoint=" + destinationPoint
+        + ", length=" + length
+        + ", maxVelocity=" + maxVelocity
+        + ", maxReverseVelocity=" + maxReverseVelocity
+        + ", peripheralOperations=" + peripheralOperations
+        + ", locked=" + locked
+        + ", vehicleEnvelopes=" + vehicleEnvelopes
+        + ", layout=" + layout
+        + ", properties=" + getProperties()
+        + ", history=" + getHistory()
+        + '}';
+  }
+
   /**
    * Contains information regarding the grahical representation of a path.
    */

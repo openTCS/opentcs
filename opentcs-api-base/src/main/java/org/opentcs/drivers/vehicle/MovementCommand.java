@@ -517,15 +517,15 @@ public class MovementCommand {
   @Override
   public String toString() {
     return "MovementCommand{"
-        + "transportOrder=" + getTransportOrder()
-        + ", driveOrder=" + getDriveOrder()
-        + ", step=" + getStep()
+        + "step=" + getStep()
         + ", operation=" + getOperation()
         + ", opLocation=" + getOpLocation()
         + ", finalMovement=" + isFinalMovement()
         + ", finalDestination=" + getFinalDestination()
-        + ", finalDestinationLocation=" + getFinalDestinationLocation()
         + ", finalOperation=" + getFinalOperation()
+        + ", finalDestinationLocation=" + getFinalDestinationLocation()
+        + ", driveOrder=" + getDriveOrder()
+        + ", transportOrder=" + getTransportOrder()
         + ", properties=" + getProperties()
         + '}';
   }

@@ -209,6 +209,18 @@ public class LocationType
     );
   }
 
+  @Override
+  public String toString() {
+    return "LocationType{"
+        + "name=" + getName()
+        + ", allowedOperations=" + allowedOperations
+        + ", allowedPeripheralOperations=" + allowedPeripheralOperations
+        + ", layout=" + layout
+        + ", properties=" + getProperties()
+        + ", history=" + getHistory()
+        + '}';
+  }
+
   /**
    * Contains information regarding the grahical representation of a location type.
    */

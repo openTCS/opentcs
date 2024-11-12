@@ -482,7 +482,11 @@ public class TransportOrderPoolManager
         .withFailureFatal(to.isFailureFatal())
         .withProperties(to.getProperties());
 
-    LOG.info("Order sequence is being created: {}", newSequence.getName());
+    LOG.info(
+        "Order sequence is being created: {} -- details: {}",
+        newSequence.getName(),
+        newSequence
+    );
 
     getObjectRepo().addObject(newSequence);
     emitObjectEvent(

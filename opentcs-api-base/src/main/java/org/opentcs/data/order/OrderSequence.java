@@ -497,6 +497,23 @@ public class OrderSequence
     );
   }
 
+  @Override
+  public String toString() {
+    return "OrderSequence{"
+        + "name=" + getName()
+        + ", type=" + type
+        + ", failureFatal=" + failureFatal
+        + ", complete=" + complete
+        + ", finished=" + finished
+        + ", finishedIndex=" + finishedIndex
+        + ", intendedVehicle=" + intendedVehicle
+        + ", processingVehicle=" + processingVehicle
+        + ", orders=" + orders
+        + ", properties=" + getProperties()
+        + ", history=" + getHistory()
+        + '}';
+  }
+
   private List<TCSObjectReference<TransportOrder>> ordersWithAppended(
       @Nonnull
       TCSObjectReference<TransportOrder> order

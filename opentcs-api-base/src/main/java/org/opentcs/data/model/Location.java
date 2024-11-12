@@ -322,6 +322,21 @@ public class Location
     );
   }
 
+  @Override
+  public String toString() {
+    return "Location{"
+        + "name=" + getName()
+        + ", type=" + type
+        + ", position=" + position
+        + ", attachedLinks=" + attachedLinks
+        + ", locked=" + locked
+        + ", peripheralInformation=" + peripheralInformation
+        + ", layout=" + layout
+        + ", properties=" + getProperties()
+        + ", history=" + getHistory()
+        + '}';
+  }
+
   /**
    * A link connecting a point and a location, expressing that the location is
    * reachable from the point.

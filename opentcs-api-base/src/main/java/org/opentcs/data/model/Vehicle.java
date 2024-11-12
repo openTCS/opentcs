@@ -1588,14 +1588,14 @@ public class Vehicle
   public String toString() {
     return "Vehicle{"
         + "name=" + getName()
-        + ", procState=" + procState
-        + ", integrationLevel=" + integrationLevel
-        + ", paused=" + paused
-        + ", state=" + state
-        + ", energyLevel=" + energyLevel
         + ", currentPosition=" + currentPosition
         + ", pose=" + pose
         + ", nextPosition=" + nextPosition
+        + ", state=" + state
+        + ", energyLevel=" + energyLevel
+        + ", integrationLevel=" + integrationLevel
+        + ", paused=" + paused
+        + ", procState=" + procState
         + ", loadHandlingDevices=" + loadHandlingDevices
         + ", boundingBox=" + boundingBox
         + ", transportOrder=" + transportOrder
@@ -1608,6 +1608,8 @@ public class Vehicle
         + ", rechargeOperation=" + rechargeOperation
         + ", allowedOrderTypes=" + allowedOrderTypes
         + ", envelopeKey=" + envelopeKey
+        + ", properties=" + getProperties()
+        + ", history=" + getHistory()
         + '}';
   }
 

@@ -403,13 +403,15 @@ public class PeripheralJob
   public String toString() {
     return "PeripheralJob{"
         + "name=" + getName()
+        + ", peripheralOperation=" + peripheralOperation
         + ", reservationToken=" + reservationToken
         + ", relatedVehicle=" + relatedVehicle
         + ", relatedTransportOrder=" + relatedTransportOrder
-        + ", peripheralOperation=" + peripheralOperation
         + ", state=" + state
         + ", creationTime=" + creationTime
         + ", finishedTime=" + finishedTime
+        + ", properties=" + getProperties()
+        + ", history=" + getHistory()
         + '}';
   }
 

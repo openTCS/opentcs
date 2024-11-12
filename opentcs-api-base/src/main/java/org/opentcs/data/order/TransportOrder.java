@@ -946,20 +946,22 @@ public class TransportOrder
   public String toString() {
     return "TransportOrder{"
         + "name=" + getName()
+        + ", wrappingSequence=" + wrappingSequence
+        + ", type=" + type
         + ", state=" + state
         + ", intendedVehicle=" + intendedVehicle
         + ", processingVehicle=" + processingVehicle
         + ", creationTime=" + creationTime
         + ", deadline=" + deadline
         + ", finishedTime=" + finishedTime
-        + ", wrappingSequence=" + wrappingSequence
         + ", dispensable=" + dispensable
-        + ", type=" + type
         + ", peripheralReservationToken=" + peripheralReservationToken
         + ", dependencies=" + dependencies
         + ", driveOrders=" + driveOrders
         + ", currentDriveOrderIndex=" + currentDriveOrderIndex
         + ", currentRouteStepIndex=" + currentRouteStepIndex
+        + ", properties=" + getProperties()
+        + ", history=" + getHistory()
         + '}';
   }
 

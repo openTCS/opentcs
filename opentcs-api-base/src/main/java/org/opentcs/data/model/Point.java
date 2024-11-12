@@ -516,6 +516,24 @@ public class Point
     );
   }
 
+  @Override
+  public String toString() {
+    return "Point{"
+        + "name=" + getName()
+        + ", pose=" + pose
+        + ", type=" + type
+        + ", incomingPaths=" + incomingPaths
+        + ", outgoingPaths=" + outgoingPaths
+        + ", attachedLinks=" + attachedLinks
+        + ", occupyingVehicle=" + occupyingVehicle
+        + ", vehicleEnvelopes=" + vehicleEnvelopes
+        + ", maxVehicleBoundingBox=" + maxVehicleBoundingBox
+        + ", layout=" + layout
+        + ", properties=" + getProperties()
+        + ", history=" + getHistory()
+        + '}';
+  }
+
   /**
    * Describes the types of positions in a driving course.
    */

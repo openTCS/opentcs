@@ -189,6 +189,18 @@ public class Block
     );
   }
 
+  @Override
+  public String toString() {
+    return "Block{"
+        + "name=" + getName()
+        + ", type=" + type
+        + ", members=" + members
+        + ", layout=" + layout
+        + ", properties=" + getProperties()
+        + ", history=" + getHistory()
+        + '}';
+  }
+
   /**
    * Describes the types of blocks in a driving course.
    */
