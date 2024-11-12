@@ -46,6 +46,7 @@ public class IsParkable
     return vehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
         && vehicle.hasProcState(Vehicle.ProcState.IDLE)
         && vehicle.hasState(Vehicle.State.IDLE)
+        && vehicle.getCurrentPosition() != null
         && !isParkingPosition(vehicle.getCurrentPosition())
         && vehicle.getOrderSequence() == null
         && hasAllowedOrderTypesForParking(vehicle);

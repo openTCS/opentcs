@@ -65,6 +65,11 @@ class IsParkableTest {
   }
 
   @Test
+  void checkVehiclePositionIsUnknown() {
+    assertThat(isParkable.apply(parkableVehicle.withCurrentPosition(null)), hasSize(1));
+  }
+
+  @Test
   void checkVehicleHasParkingPosition() {
     p1 = p1.withType(Point.Type.PARK_POSITION);
     Vehicle vehicle = parkableVehicle.withCurrentPosition(p1.getReference());
