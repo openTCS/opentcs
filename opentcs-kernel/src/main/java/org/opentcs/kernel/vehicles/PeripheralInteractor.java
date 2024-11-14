@@ -428,7 +428,17 @@ public class PeripheralInteractor
 
     // With a peripheral job failed, an associated interaction might now be failed as well. If
     // that's the case, forget the interaction.
-    preMovementInteractions.entrySet().removeIf(entry -> entry.getValue().isFailed());
+    preMovementInteractions.entrySet().stream()
+        .filter(entry -> entry.getValue().isFailed())
+        .findAny()
+        .ifPresent(entry -> {
+          preMovementInteractions.remove(entry.getKey());
+          // With a failed pre-movement interaction, a post-movement interaction (if any) is also
+          // considered failed (since the corresponding movement command is not sent to the vehicle
+          // and therefore the post-movement interaction will never be started). Therefore, forget
+          // the post-movement interaction in this case, too.
+          postMovementInteractions.remove(entry.getKey());
+        });
     postMovementInteractions.entrySet().removeIf(entry -> entry.getValue().isFailed());
   }
 

@@ -20,6 +20,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * Bugs fixed:
 ** Avoid a `NullPointerException` when trying to park a vehicle whose current position is not known.
+** Ensure vehicles can process newly assigned transport orders after a peripheral job (created in the context of a previous transport order) has failed.
+   Previously, failed peripheral jobs with the `AFTER_ALLOCATION` execution trigger could prevent vehicles from properly processing transport orders in some situations.
 
 == Version 6.2 (2024-11-06)
 
