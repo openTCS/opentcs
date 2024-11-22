@@ -13,6 +13,7 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 
 /**
  * An abstract base class for parking position suppliers.
@@ -30,6 +31,10 @@ public abstract class AbstractParkingPositionSupplier
    */
   private final Router router;
   /**
+   * Finds all points which are currently targeted by vehicles.
+   */
+  private final TargetedPointsSupplier targetedPointsSupplier;
+  /**
    * Indicates whether this component is initialized.
    */
   private boolean initialized;
@@ -39,13 +44,16 @@ public abstract class AbstractParkingPositionSupplier
    *
    * @param plantModelService The plant model service.
    * @param router A router for computing distances to parking positions.
+   * @param targetedPointsSupplier Finds all points which are currently targeted by vehicles.
    */
   protected AbstractParkingPositionSupplier(
       InternalPlantModelService plantModelService,
-      Router router
+      Router router,
+      TargetedPointsSupplier targetedPointsSupplier
   ) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.router = requireNonNull(router, "router");
+    this.targetedPointsSupplier = requireNonNull(targetedPointsSupplier, "targetedPointsSupplier");
   }
 
   @Override
@@ -97,12 +105,12 @@ public abstract class AbstractParkingPositionSupplier
    * @return The set of usable parking positions.
    */
   protected Set<Point> findUsableParkingPositions(Vehicle vehicle) {
-    // Find out which points are destination points of the current routes of
-    // all vehicles, and keep them. (Multiple lookups ahead.)
-    Set<Point> targetedPoints = getRouter().getTargetedPoints();
-
     return fetchAllParkingPositions().stream()
-        .filter(point -> isPointUnoccupiedFor(point, vehicle, targetedPoints))
+        .filter(
+            point -> isPointUnoccupiedFor(
+                point, vehicle, targetedPointsSupplier.getTargetedPoints()
+            )
+        )
         .collect(Collectors.toSet());
   }
 

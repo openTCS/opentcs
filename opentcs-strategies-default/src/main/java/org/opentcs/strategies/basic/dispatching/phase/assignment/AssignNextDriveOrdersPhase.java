@@ -110,8 +110,6 @@ public class AssignNextDriveOrdersPhase
       // Update the vehicle's procState, implicitly dispatching it again.
       vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.IDLE);
       vehicleService.updateVehicleTransportOrder(vehicle.getReference(), null);
-      // Let the router know that the vehicle doesn't have a route any more.
-      router.selectRoute(vehicle, null);
       // Update transport orders that are dispatchable now that this one has been finished.
       transportOrderUtil.markNewDispatchableOrders();
     }

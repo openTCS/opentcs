@@ -23,6 +23,7 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder.Destination;
+import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 
 /**
  * Tests for {@link DefaultRechargePositionSupplier}.
@@ -39,6 +40,7 @@ class DefaultRechargePositionSupplierTest {
 
   private InternalPlantModelService plantModelService;
   private Router router;
+  private TargetedPointsSupplier targetedPointsSupplier;
   private DefaultRechargePositionSupplier rechargePosSupplier;
 
   @BeforeEach
@@ -72,7 +74,12 @@ class DefaultRechargePositionSupplierTest {
 
     plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
-    rechargePosSupplier = new DefaultRechargePositionSupplier(plantModelService, router);
+    targetedPointsSupplier = mock(TargetedPointsSupplier.class);
+    rechargePosSupplier = new DefaultRechargePositionSupplier(
+        plantModelService,
+        router,
+        targetedPointsSupplier
+    );
 
     when(plantModelService.fetchObject(Point.class, currentPosition.getReference()))
         .thenReturn(currentPosition);

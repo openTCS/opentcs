@@ -199,7 +199,11 @@ public interface Router
    * @param driveOrders The drive orders encapsulating the route being selected,
    * or <code>null</code>, if no route is being selected for the vehicle (i.e.
    * an existing entry for the given vehicle would be removed).
+   * @deprecated Will be removed without replacement. A vehicle's selected route (i.e. the list of
+   * drive orders) is already contained in the transport order assigned to it.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   void selectRoute(
       @Nonnull
       Vehicle vehicle,
@@ -216,7 +220,11 @@ public interface Router
    * </p>
    *
    * @return An unmodifiable view on the selected routes the router knows about.
+   * @deprecated Will be removed without replacement. A vehicle's selected route (i.e. the list of
+   * drive orders) is already contained in the transport order assigned to it.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   @Nonnull
   Map<Vehicle, List<DriveOrder>> getSelectedRoutes();
 
@@ -227,7 +235,11 @@ public interface Router
    * </p>
    *
    * @return A set of all points currently targeted by any vehicle.
+   * @deprecated Will be removed without replacement. The points targeted by vehicles can be
+   * retrieved via the transport orders assigned to them.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   @Nonnull
   Set<Point> getTargetedPoints();
 }

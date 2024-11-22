@@ -23,6 +23,7 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 
 /**
  * Tests for {@link AbstractParkingPositionSupplier}.
@@ -32,6 +33,7 @@ class AbstractParkingPositionSupplierTest {
   private InternalPlantModelService plantModelService;
   private Router router;
   private AbstractParkingPositionSupplierImpl supplier;
+  private TargetedPointsSupplier targetedPointsSupplier;
 
   AbstractParkingPositionSupplierTest() {
   }
@@ -40,7 +42,12 @@ class AbstractParkingPositionSupplierTest {
   void setUp() {
     plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
-    supplier = new AbstractParkingPositionSupplierImpl(plantModelService, router);
+    targetedPointsSupplier = mock(TargetedPointsSupplier.class);
+    supplier = new AbstractParkingPositionSupplierImpl(
+        plantModelService, router, targetedPointsSupplier
+    );
+    when(targetedPointsSupplier.getTargetedPoints()).thenReturn(Set.of());
+
 
   }
 
@@ -56,7 +63,6 @@ class AbstractParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(router.getTargetedPoints()).thenReturn(new HashSet<>());
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
     when(plantModelService.expandResources(Collections.singleton(point2.getReference())))
         .thenReturn(Collections.singleton(point2));
@@ -77,7 +83,6 @@ class AbstractParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(router.getTargetedPoints()).thenReturn(new HashSet<>());
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
     when(plantModelService.expandResources(Collections.singleton(point2.getReference())))
         .thenReturn(Collections.singleton(point2));
@@ -127,9 +132,10 @@ class AbstractParkingPositionSupplierTest {
 
     AbstractParkingPositionSupplierImpl(
         InternalPlantModelService plantModelService,
-        Router router
+        Router router,
+        TargetedPointsSupplier targetedPointsSupplier
     ) {
-      super(plantModelService, router);
+      super(plantModelService, router, targetedPointsSupplier);
     }
 
     @Override

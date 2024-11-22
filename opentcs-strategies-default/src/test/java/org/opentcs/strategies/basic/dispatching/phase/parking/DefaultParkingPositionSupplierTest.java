@@ -24,6 +24,7 @@ import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 
 /**
  */
@@ -33,13 +34,19 @@ class DefaultParkingPositionSupplierTest {
   private Router router;
   private Vehicle vehicle;
   private DefaultParkingPositionSupplier supplier;
+  private TargetedPointsSupplier targetedPointsSupplier;
 
   @BeforeEach
   void setUp() {
     plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
+    targetedPointsSupplier = mock(TargetedPointsSupplier.class);
+
     vehicle = new Vehicle("vehicle");
-    supplier = new DefaultParkingPositionSupplier(plantModelService, router);
+    supplier = new DefaultParkingPositionSupplier(
+        plantModelService, router, targetedPointsSupplier
+    );
+    when(targetedPointsSupplier.getTargetedPoints()).thenReturn(Set.of());
   }
 
   @AfterEach
@@ -84,7 +91,6 @@ class DefaultParkingPositionSupplierTest {
         .withType(Point.Type.PARK_POSITION);
     vehicle = new Vehicle("vehicle").withCurrentPosition(point1.getReference());
 
-    when(router.getTargetedPoints()).thenReturn(new HashSet<>());
     when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
     when(router.getCosts(vehicle, point1, point2, Set.of())).thenReturn(10L);

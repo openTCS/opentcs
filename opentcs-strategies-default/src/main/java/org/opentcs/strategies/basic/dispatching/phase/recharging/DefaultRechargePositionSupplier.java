@@ -22,6 +22,7 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
+import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 
 /**
  * Finds assigned, preferred or (routing-wise) cheapest recharge locations for vehicles.
@@ -39,6 +40,10 @@ public class DefaultRechargePositionSupplier
    */
   private final Router router;
   /**
+   * Finds all points which are currently targeted by vehicles.
+   */
+  private final TargetedPointsSupplier targetedPointsSupplier;
+  /**
    * Indicates whether this component is enabled.
    */
   private boolean initialized;
@@ -48,14 +53,17 @@ public class DefaultRechargePositionSupplier
    *
    * @param plantModelService The plant model service.
    * @param router The router to use.
+   * @param targetedPointsSupplier Finds all points which are currently targeted by vehicles.
    */
   @Inject
   public DefaultRechargePositionSupplier(
       InternalPlantModelService plantModelService,
-      Router router
+      Router router,
+      TargetedPointsSupplier targetedPointsSupplier
   ) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.router = requireNonNull(router, "router");
+    this.targetedPointsSupplier = requireNonNull(targetedPointsSupplier, "targetedPointsSupplier");
   }
 
   @Override
@@ -93,7 +101,7 @@ public class DefaultRechargePositionSupplier
         = findLocationsForOperation(
             vehicle.getRechargeOperation(),
             vehicle,
-            router.getTargetedPoints()
+            targetedPointsSupplier.getTargetedPoints()
         );
 
     String assignedRechargeLocationName = vehicle.getProperty(PROPKEY_ASSIGNED_RECHARGE_LOCATION);

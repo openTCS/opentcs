@@ -250,6 +250,7 @@ public class DefaultRouter
     }
   }
 
+  @Deprecated
   @Override
   public void selectRoute(Vehicle vehicle, List<DriveOrder> driveOrders) {
     requireNonNull(vehicle, "vehicle");
@@ -265,6 +266,7 @@ public class DefaultRouter
     }
   }
 
+  @Deprecated
   @Override
   public Map<Vehicle, List<DriveOrder>> getSelectedRoutes() {
     synchronized (this) {
@@ -272,6 +274,7 @@ public class DefaultRouter
     }
   }
 
+  @Deprecated
   @Override
   public Set<Point> getTargetedPoints() {
     synchronized (this) {

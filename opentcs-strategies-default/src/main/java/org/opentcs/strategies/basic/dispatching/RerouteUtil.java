@@ -206,9 +206,6 @@ public class RerouteUtil {
           transportOrderService.fetchObject(TransportOrder.class, originalOrder.getReference())
       );
     }
-
-    // Let the router know the vehicle selected another route
-    router.selectRoute(vehicle, newOrders);
   }
 
   private List<DriveOrder> updatePathLocks(List<DriveOrder> orders) {

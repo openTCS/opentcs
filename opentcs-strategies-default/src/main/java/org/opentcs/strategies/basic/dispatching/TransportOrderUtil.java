@@ -7,7 +7,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.opentcs.components.Lifecycle;
@@ -213,8 +212,6 @@ public class TransportOrderUtil
           .updateOrderSequenceProcessingVehicle(transportOrder.getWrappingSequence(), vehicleRef);
     }
     transportOrderService.updateTransportOrderProcessingVehicle(orderRef, vehicleRef, driveOrders);
-    // Let the router know about the route chosen.
-    router.selectRoute(vehicle, Collections.unmodifiableList(driveOrders));
     // Update the transport order's copy.
     TransportOrder updatedOrder = transportOrderService.fetchObject(TransportOrder.class, orderRef);
     // If the drive order must be assigned, do so.
@@ -324,9 +321,6 @@ public class TransportOrderUtil
 
     vehicleService.updateVehicleProcState(vehicle.getReference(), Vehicle.ProcState.IDLE);
     vehicleService.updateVehicleTransportOrder(vehicle.getReference(), null);
-
-    // Let the router know that the vehicle doesn't have a route any more.
-    router.selectRoute(vehicle, null);
   }
 
   /**

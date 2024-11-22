@@ -14,6 +14,7 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,13 +37,15 @@ public class DefaultParkingPositionSupplier
    *
    * @param plantModelService The plant model service.
    * @param router A router for computing travel costs to parking positions.
+   * @param targetedPointsSupplier Finds all points which are currently targeted by vehicles.
    */
   @Inject
   public DefaultParkingPositionSupplier(
       InternalPlantModelService plantModelService,
-      Router router
+      Router router,
+      TargetedPointsSupplier targetedPointsSupplier
   ) {
-    super(plantModelService, router);
+    super(plantModelService, router, targetedPointsSupplier);
   }
 
   @Override

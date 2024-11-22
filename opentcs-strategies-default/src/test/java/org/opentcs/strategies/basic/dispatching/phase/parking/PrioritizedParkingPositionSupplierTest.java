@@ -21,6 +21,7 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 
 /**
  * Tests for {@link PrioritizedParkingPositionSupplier}.
@@ -31,13 +32,21 @@ class PrioritizedParkingPositionSupplierTest {
   private InternalPlantModelService plantModelService;
   private Router router;
   private ParkingPositionToPriorityFunction priorityFunction;
+  private TargetedPointsSupplier targetedPointsSupplier;
 
   @BeforeEach
   void setUp() {
     plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
     priorityFunction = new ParkingPositionToPriorityFunction();
-    supplier = new PrioritizedParkingPositionSupplier(plantModelService, router, priorityFunction);
+    targetedPointsSupplier = mock(TargetedPointsSupplier.class);
+    supplier = new PrioritizedParkingPositionSupplier(
+        plantModelService,
+        router,
+        priorityFunction,
+        targetedPointsSupplier
+    );
+    when(targetedPointsSupplier.getTargetedPoints()).thenReturn(Set.of());
   }
 
   @Test
@@ -51,7 +60,6 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(router.getTargetedPoints()).thenReturn(new HashSet<>());
     when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
     when(router.getCosts(vehicle, point1, point3, Set.of())).thenReturn(1L);
@@ -73,7 +81,6 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(router.getTargetedPoints()).thenReturn(new HashSet<>());
     when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
     when(router.getCosts(vehicle, point1, point2, Set.of())).thenReturn(10L);
@@ -98,7 +105,6 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(router.getTargetedPoints()).thenReturn(new HashSet<>());
     when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
     when(router.getCosts(vehicle, point1, point3, Set.of())).thenReturn(1L);
@@ -122,7 +128,6 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(router.getTargetedPoints()).thenReturn(new HashSet<>());
     when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
 
@@ -144,7 +149,6 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(router.getTargetedPoints()).thenReturn(new HashSet<>());
     when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
 
@@ -162,7 +166,6 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(router.getTargetedPoints()).thenReturn(new HashSet<>());
     when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
 
