@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.Route;
 import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 
 /**
@@ -60,9 +62,28 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
+    when(router.getRoute(vehicle, point1, point3, Set.of()))
+        .thenReturn(
+            Optional.of(
+                new Route(
+                    List.of(
+                        new Route.Step(null, point1, point3, Vehicle.Orientation.FORWARD, 0, 10)
+                    )
+                )
+            )
+        );
+    when(router.getRoute(vehicle, point1, point2, Set.of()))
+        .thenReturn(
+            Optional.of(
+                new Route(
+                    List.of(
+                        new Route.Step(null, point1, point2, Vehicle.Orientation.FORWARD, 0, 10)
+                    )
+                )
+            )
+        );
     when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
-    when(router.getCosts(vehicle, point1, point3, Set.of())).thenReturn(1L);
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
     assertTrue(result.isPresent());
@@ -81,10 +102,28 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
+    when(router.getRoute(vehicle, point1, point3, Set.of()))
+        .thenReturn(
+            Optional.of(
+                new Route(
+                    List.of(
+                        new Route.Step(null, point1, point3, Vehicle.Orientation.FORWARD, 0, 10)
+                    )
+                )
+            )
+        );
+    when(router.getRoute(vehicle, point1, point2, Set.of()))
+        .thenReturn(
+            Optional.of(
+                new Route(
+                    List.of(
+                        new Route.Step(null, point1, point2, Vehicle.Orientation.FORWARD, 0, 30)
+                    )
+                )
+            )
+        );
     when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
-    when(router.getCosts(vehicle, point1, point2, Set.of())).thenReturn(10L);
-    when(router.getCosts(vehicle, point1, point3, Set.of())).thenReturn(1L);
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
     assertTrue(result.isPresent());
@@ -105,9 +144,28 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
+    when(router.getRoute(vehicle, point1, point3, Set.of()))
+        .thenReturn(
+            Optional.of(
+                new Route(
+                    List.of(
+                        new Route.Step(null, point1, point3, Vehicle.Orientation.FORWARD, 0, 10)
+                    )
+                )
+            )
+        );
+    when(router.getRoute(vehicle, point1, point2, Set.of()))
+        .thenReturn(
+            Optional.of(
+                new Route(
+                    List.of(
+                        new Route.Step(null, point1, point2, Vehicle.Orientation.FORWARD, 0, 10)
+                    )
+                )
+            )
+        );
     when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
     when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
-    when(router.getCosts(vehicle, point1, point3, Set.of())).thenReturn(1L);
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
     assertTrue(result.isPresent());

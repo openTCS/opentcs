@@ -118,7 +118,8 @@ public class ShortestPathPointRouter
               sourcePoint,
               destPoint,
               orientation(edge, sourcePoint),
-              routeIndex
+              routeIndex,
+              (long) graphPath.getGraph().getEdgeWeight(edge)
           )
       );
       routeIndex++;

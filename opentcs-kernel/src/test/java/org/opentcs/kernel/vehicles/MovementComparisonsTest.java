@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -25,8 +24,8 @@ class MovementComparisonsTest {
   @Test
   void considerIdenticalStepsEqual() {
     List<Step> stepsA = List.of(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null)
+        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 2),
+        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, 2)
     );
     List<Step> stepsB = new ArrayList<>(stepsA);
 
@@ -36,12 +35,13 @@ class MovementComparisonsTest {
   @Test
   void considerStepsWithDifferentReroutingTypeEqual() {
     List<Step> stepsA = List.of(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null)
+        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 2),
+        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, 2)
     );
     List<Step> stepsB = List.of(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, ReroutingType.REGULAR)
+        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 2),
+        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, 2)
+            .withReroutingType(ReroutingType.REGULAR)
     );
 
     assertTrue(MovementComparisons.equalsInMovement(stepsA, stepsB));
@@ -50,12 +50,27 @@ class MovementComparisonsTest {
   @Test
   void considerStepsWithDifferentExecutionAllowedEqual() {
     List<Step> stepsA = List.of(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null)
+        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 2),
+        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, 2)
     );
     List<Step> stepsB = List.of(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, false, null)
+        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 2),
+        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, 2)
+            .withExecutionAllowed(false)
+    );
+
+    assertTrue(MovementComparisons.equalsInMovement(stepsA, stepsB));
+  }
+
+  @Test
+  void considerStepsWithDifferentCostsEqual() {
+    List<Step> stepsA = List.of(
+        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 2),
+        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, 2)
+    );
+    List<Step> stepsB = List.of(
+        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 3),
+        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, 3)
     );
 
     assertTrue(MovementComparisons.equalsInMovement(stepsA, stepsB));
@@ -64,16 +79,16 @@ class MovementComparisonsTest {
   @Test
   void considerDivergingStepsNotEqual() {
     List<Step> stepsA = List.of(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null),
-        createStep("C", "D", Vehicle.Orientation.FORWARD, 2, true, null),
-        createStep("D", "E", Vehicle.Orientation.FORWARD, 3, true, null)
+        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 2),
+        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, 2),
+        createStep("C", "D", Vehicle.Orientation.FORWARD, 2, 2),
+        createStep("D", "E", Vehicle.Orientation.FORWARD, 3, 2)
     );
     List<Step> stepsB = List.of(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null),
-        createStep("C", "Y", Vehicle.Orientation.FORWARD, 2, true, null),
-        createStep("Y", "Z", Vehicle.Orientation.FORWARD, 3, true, null)
+        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 2),
+        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, 2),
+        createStep("C", "Y", Vehicle.Orientation.FORWARD, 2, 2),
+        createStep("Y", "Z", Vehicle.Orientation.FORWARD, 3, 2)
     );
 
     assertFalse(MovementComparisons.equalsInMovement(stepsA, stepsB));
@@ -82,12 +97,12 @@ class MovementComparisonsTest {
   @Test
   void considerStepsWithDifferentPointsNotEqual() {
     List<Step> stepsA = List.of(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null)
+        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 2),
+        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, 2)
     );
     List<Step> stepsB = List.of(
-        createStep("X", "Y", Vehicle.Orientation.FORWARD, 0, true, null),
-        createStep("Y", "Z", Vehicle.Orientation.FORWARD, 1, true, null)
+        createStep("X", "Y", Vehicle.Orientation.FORWARD, 0, 2),
+        createStep("Y", "Z", Vehicle.Orientation.FORWARD, 1, 2)
     );
 
     assertFalse(MovementComparisons.equalsInMovement(stepsA, stepsB));
@@ -96,12 +111,12 @@ class MovementComparisonsTest {
   @Test
   void considerStepsWithDifferentOrientationAngleNotEqual() {
     List<Step> stepsA = List.of(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null)
+        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 2),
+        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, 2)
     );
     List<Step> stepsB = List.of(
-        createStep("A", "B", Vehicle.Orientation.BACKWARD, 0, true, null),
-        createStep("B", "C", Vehicle.Orientation.BACKWARD, 1, true, null)
+        createStep("A", "B", Vehicle.Orientation.BACKWARD, 0, 2),
+        createStep("B", "C", Vehicle.Orientation.BACKWARD, 1, 2)
     );
 
     assertFalse(MovementComparisons.equalsInMovement(stepsA, stepsB));
@@ -110,12 +125,12 @@ class MovementComparisonsTest {
   @Test
   void considerStepsWithDifferentRouteIndicesNotEqual() {
     List<Step> stepsA = List.of(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, true, null),
-        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, true, null)
+        createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 2),
+        createStep("B", "C", Vehicle.Orientation.FORWARD, 1, 2)
     );
     List<Step> stepsB = List.of(
-        createStep("A", "B", Vehicle.Orientation.FORWARD, 5, true, null),
-        createStep("B", "C", Vehicle.Orientation.FORWARD, 6, true, null)
+        createStep("A", "B", Vehicle.Orientation.FORWARD, 5, 2),
+        createStep("B", "C", Vehicle.Orientation.FORWARD, 6, 2)
     );
 
     assertFalse(MovementComparisons.equalsInMovement(stepsA, stepsB));
@@ -129,9 +144,7 @@ class MovementComparisonsTest {
       @Nonnull
       Vehicle.Orientation orientation,
       int routeIndex,
-      boolean executionAllowed,
-      @Nullable
-      ReroutingType reroutingType
+      long cost
   ) {
     requireNonNull(srcPointName, "srcPointName");
     requireNonNull(destPointName, "destPointName");
@@ -151,8 +164,7 @@ class MovementComparisonsTest {
         destPoint,
         orientation,
         routeIndex,
-        executionAllowed,
-        reroutingType
+        cost
     );
   }
 }

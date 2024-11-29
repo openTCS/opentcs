@@ -2,15 +2,12 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.strategies.basic.dispatching.rerouting;
 
-import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.opentcs.components.kernel.Router;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route;
-import org.opentcs.strategies.basic.routing.ResourceAvoidanceExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,16 +26,8 @@ public class RegularDriveOrderMerger
 
   /**
    * Creates a new instance.
-   *
-   * @param router The router to use.
-   * @param resourceAvoidanceExtractor Extracts resources to be avoided from transport orders.
    */
-  @Inject
-  public RegularDriveOrderMerger(
-      Router router,
-      ResourceAvoidanceExtractor resourceAvoidanceExtractor
-  ) {
-    super(router, resourceAvoidanceExtractor);
+  public RegularDriveOrderMerger() {
   }
 
   @Override
@@ -57,19 +46,8 @@ public class RegularDriveOrderMerger
     mergedSteps.addAll(stepsA.subList(0, divergingIndex));
 
     // Set the rerouting type for the first step in the new route.
-    Route.Step firstStepOfNewRoute = stepsB.get(0);
     List<Route.Step> modifiedStepsB = new ArrayList<>(stepsB);
-    modifiedStepsB.set(
-        0, new Route.Step(
-            firstStepOfNewRoute.getPath(),
-            firstStepOfNewRoute.getSourcePoint(),
-            firstStepOfNewRoute.getDestinationPoint(),
-            firstStepOfNewRoute.getVehicleOrientation(),
-            firstStepOfNewRoute.getRouteIndex(),
-            firstStepOfNewRoute.isExecutionAllowed(),
-            ReroutingType.REGULAR
-        )
-    );
+    modifiedStepsB.set(0, stepsB.getFirst().withReroutingType(ReroutingType.REGULAR));
 
     mergedSteps.addAll(modifiedStepsB);
 

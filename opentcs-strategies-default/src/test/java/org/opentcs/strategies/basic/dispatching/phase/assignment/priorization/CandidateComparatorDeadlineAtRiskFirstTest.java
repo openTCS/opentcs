@@ -65,12 +65,13 @@ class CandidateComparatorDeadlineAtRiskFirstTest {
         = new TransportOrder("Some order", new ArrayList<>()).withDeadline(time);
     Route.Step dummyStep = new Route.Step(
         null,
-        null,
         new Point("Point1"),
+        new Point("Point2"),
         Vehicle.Orientation.FORWARD,
-        1
+        1,
+        10
     );
-    Route route = new Route(Arrays.asList(dummyStep), 10);
+    Route route = new Route(Arrays.asList(dummyStep));
     List<DriveOrder> driveOrders = Arrays.asList(
         new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))
             .withRoute(route)

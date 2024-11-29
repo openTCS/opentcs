@@ -69,23 +69,16 @@ public class CoordinateSystemMovementCommandTransformer
             originalRoute -> new Route(
                 originalRoute.getSteps().stream()
                     .map(step -> transformStep(step))
-                    .collect(Collectors.toList()),
-                originalRoute.getCosts()
+                    .collect(Collectors.toList())
             )
         )
         .orElse(null);
   }
 
   private Step transformStep(Step oldStep) {
-    return new Step(
-        oldStep.getPath(),
-        transformPoint(oldStep.getSourcePoint()),
-        transformPoint(oldStep.getDestinationPoint()),
-        oldStep.getVehicleOrientation(),
-        oldStep.getRouteIndex(),
-        oldStep.isExecutionAllowed(),
-        oldStep.getReroutingType()
-    );
+    return oldStep
+        .withSourcePoint(transformPoint(oldStep.getSourcePoint()))
+        .withDestinationPoint(transformPoint(oldStep.getDestinationPoint()));
   }
 
   private Point transformPoint(Point point) {

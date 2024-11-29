@@ -188,7 +188,7 @@ class PeripheralInteractionTest {
         srcPoint.getReference(),
         destPoint.getReference()
     );
-    Route.Step step = new Route.Step(path, srcPoint, destPoint, Vehicle.Orientation.FORWARD, 0);
+    Route.Step step = new Route.Step(path, srcPoint, destPoint, Vehicle.Orientation.FORWARD, 0, 10);
 
     return new MovementCommand(
         new TransportOrder("dummy-transport-order", List.of()),

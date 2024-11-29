@@ -15,6 +15,7 @@ import java.util.Objects;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A route for a {@link Vehicle}, consisting of a sequence of steps (pairs of {@link Path}s and
@@ -38,7 +39,10 @@ public class Route
    *
    * @param routeSteps The sequence of steps this route consists of.
    * @param routeCosts The costs for travelling this route.
+   * @deprecated Use {@link #Route(java.util.List)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public Route(
       @Nonnull
       List<Step> routeSteps,
@@ -48,6 +52,21 @@ public class Route
     checkArgument(!routeSteps.isEmpty(), "routeSteps may not be empty");
     steps = Collections.unmodifiableList(new ArrayList<>(routeSteps));
     costs = routeCosts;
+  }
+
+  /**
+   * Creates a new Route.
+   *
+   * @param routeSteps The sequence of steps this route consists of.
+   */
+  public Route(
+      @Nonnull
+      List<Step> routeSteps
+  ) {
+    requireNonNull(routeSteps, "routeSteps");
+    checkArgument(!routeSteps.isEmpty(), "routeSteps may not be empty");
+    steps = Collections.unmodifiableList(new ArrayList<>(routeSteps));
+    costs = routeSteps.stream().mapToLong(step -> step.getCosts()).sum();
   }
 
   /**
@@ -130,6 +149,10 @@ public class Route
      */
     private final int routeIndex;
     /**
+     * The costs for travelling the path.
+     */
+    private final long costs;
+    /**
      * Whether execution of this step is allowed.
      */
     private final boolean executionAllowed;
@@ -151,7 +174,12 @@ public class Route
      * @param routeIndex This step's index in the vehicle's route.
      * @param executionAllowed Whether execution of this step is allowed.
      * @param reroutingType Marks this step as the origin of a recalculated route.
+     * @deprecated Use {@link #Step(Path, Point, Point, Vehicle.Orientation, int, long)} in
+     * combination with {@link #withExecutionAllowed(boolean)} and
+     * {@link #withReroutingType(ReroutingType)} instead.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
     public Step(
         @Nullable
         Path path,
@@ -166,13 +194,10 @@ public class Route
         @Nullable
         ReroutingType reroutingType
     ) {
-      this.path = path;
-      this.sourcePoint = srcPoint;
-      this.destinationPoint = requireNonNull(destPoint, "destPoint");
-      this.vehicleOrientation = requireNonNull(orientation, "orientation");
-      this.routeIndex = routeIndex;
-      this.executionAllowed = executionAllowed;
-      this.reroutingType = reroutingType;
+      this(
+          path, srcPoint, destPoint, orientation, routeIndex, 0, executionAllowed,
+          reroutingType
+      );
     }
 
     /**
@@ -184,7 +209,11 @@ public class Route
      * @param orientation The vehicle's orientation on this step.
      * @param routeIndex This step's index in the vehicle's route.
      * @param executionAllowed Whether execution of this step is allowed.
+     * @deprecated Use {@link #Step(Path, Point, Point, Vehicle.Orientation, int, long)} in
+     * combination with {@link #withExecutionAllowed(boolean)} instead.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
     public Step(
         @Nullable
         Path path,
@@ -197,7 +226,9 @@ public class Route
         int routeIndex,
         boolean executionAllowed
     ) {
-      this(path, srcPoint, destPoint, orientation, routeIndex, executionAllowed, null);
+      this(
+          path, srcPoint, destPoint, orientation, routeIndex, 0, executionAllowed, null
+      );
     }
 
     /**
@@ -208,7 +239,10 @@ public class Route
      * @param destPoint The point that is reached by travelling the path.
      * @param orientation The vehicle's orientation on this step.
      * @param routeIndex This step's index in the vehicle's route.
+     * @deprecated Use {@link #Step(Path, Point, Point, Vehicle.Orientation, int, long)} instead.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
     public Step(
         @Nullable
         Path path,
@@ -220,7 +254,73 @@ public class Route
         Vehicle.Orientation orientation,
         int routeIndex
     ) {
-      this(path, srcPoint, destPoint, orientation, routeIndex, true, null);
+      this(path, srcPoint, destPoint, orientation, routeIndex, 0, true, null);
+    }
+
+    /**
+     * Creates a new instance.
+     * <p>
+     * The created step will have its {@code executionAllowed} flag set to {@code true} and its
+     * {@code reroutingType} set to {@code null}.
+     * </p>
+     *
+     * @param path The path to travel.
+     * @param srcPoint The point that the vehicle is starting from.
+     * @param destPoint The point that is reached by travelling the path.
+     * @param orientation The vehicle's orientation on this step.
+     * @param routeIndex This step's index in the vehicle's route.
+     * @param costs The costs for travelling the path.
+     */
+    public Step(
+        @Nullable
+        Path path,
+        @Nullable
+        Point srcPoint,
+        @Nonnull
+        Point destPoint,
+        @Nonnull
+        Vehicle.Orientation orientation,
+        int routeIndex,
+        long costs
+    ) {
+      this(path, srcPoint, destPoint, orientation, routeIndex, costs, true, null);
+    }
+
+    /**
+     * Creates a new instance.
+     *
+     * @param path The path to travel.
+     * @param srcPoint The point that the vehicle is starting from.
+     * @param destPoint The point that is reached by travelling the path.
+     * @param orientation The vehicle's orientation on this step.
+     * @param routeIndex This step's index in the vehicle's route.
+     * @param costs The costs for travelling the path.
+     * @param executionAllowed Whether execution of this step is allowed.
+     * @param reroutingType Marks this step as the origin of a recalculated route.
+     */
+    private Step(
+        @Nullable
+        Path path,
+        @Nullable
+        Point srcPoint,
+        @Nonnull
+        Point destPoint,
+        @Nonnull
+        Vehicle.Orientation orientation,
+        int routeIndex,
+        long costs,
+        boolean executionAllowed,
+        @Nullable
+        ReroutingType reroutingType
+    ) {
+      this.path = path;
+      this.sourcePoint = srcPoint;
+      this.destinationPoint = requireNonNull(destPoint, "destPoint");
+      this.vehicleOrientation = requireNonNull(orientation, "orientation");
+      this.routeIndex = routeIndex;
+      this.costs = costs;
+      this.executionAllowed = executionAllowed;
+      this.reroutingType = reroutingType;
     }
 
     /**
@@ -235,6 +335,28 @@ public class Route
     }
 
     /**
+     * Creates a copy of this object, with the given path.
+     *
+     * @param path The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Route.Step withPath(
+        @Nullable
+        Path path
+    ) {
+      return new Route.Step(
+          path,
+          sourcePoint,
+          destinationPoint,
+          vehicleOrientation,
+          routeIndex,
+          costs,
+          executionAllowed,
+          reroutingType
+      );
+    }
+
+    /**
      * Returns the point that the vehicle is starting from.
      *
      * @return The point that the vehicle is starting from.
@@ -243,6 +365,28 @@ public class Route
     @Nullable
     public Point getSourcePoint() {
       return sourcePoint;
+    }
+
+    /**
+     * Creates a copy of this object, with the given source point.
+     *
+     * @param sourcePoint The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Route.Step withSourcePoint(
+        @Nullable
+        Point sourcePoint
+    ) {
+      return new Route.Step(
+          path,
+          sourcePoint,
+          destinationPoint,
+          vehicleOrientation,
+          routeIndex,
+          costs,
+          executionAllowed,
+          reroutingType
+      );
     }
 
     /**
@@ -256,6 +400,28 @@ public class Route
     }
 
     /**
+     * Creates a copy of this object, with the given destination point.
+     *
+     * @param destinationPoint The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Route.Step withDestinationPoint(
+        @Nonnull
+        Point destinationPoint
+    ) {
+      return new Route.Step(
+          path,
+          sourcePoint,
+          destinationPoint,
+          vehicleOrientation,
+          routeIndex,
+          costs,
+          executionAllowed,
+          reroutingType
+      );
+    }
+
+    /**
      * Returns the direction into which the vehicle is supposed to travel.
      *
      * @return The direction into which the vehicle is supposed to travel.
@@ -263,6 +429,28 @@ public class Route
     @Nonnull
     public Vehicle.Orientation getVehicleOrientation() {
       return vehicleOrientation;
+    }
+
+    /**
+     * Creates a copy of this object, with the given vehicle orientation.
+     *
+     * @param vehicleOrientation The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Route.Step withVehicleOrientation(
+        @Nonnull
+        Vehicle.Orientation vehicleOrientation
+    ) {
+      return new Route.Step(
+          path,
+          sourcePoint,
+          destinationPoint,
+          vehicleOrientation,
+          routeIndex,
+          costs,
+          executionAllowed,
+          reroutingType
+      );
     }
 
     /**
@@ -275,6 +463,53 @@ public class Route
     }
 
     /**
+     * Creates a copy of this object, with the given route index.
+     *
+     * @param routeIndex The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Route.Step withRouteIndex(int routeIndex) {
+      return new Route.Step(
+          path,
+          sourcePoint,
+          destinationPoint,
+          vehicleOrientation,
+          routeIndex,
+          costs,
+          executionAllowed,
+          reroutingType
+      );
+    }
+
+    /**
+     * Returns the costs for travelling the path.
+     *
+     * @return The costs for travelling the path.
+     */
+    public long getCosts() {
+      return costs;
+    }
+
+    /**
+     * Creates a copy of this object, with the given costs.
+     *
+     * @param costs The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Route.Step withCosts(long costs) {
+      return new Route.Step(
+          path,
+          sourcePoint,
+          destinationPoint,
+          vehicleOrientation,
+          routeIndex,
+          costs,
+          executionAllowed,
+          reroutingType
+      );
+    }
+
+    /**
      * Returns whether execution of this step is allowed.
      *
      * @return {@code true}, if execution of this step is allowed, otherwise {@code false}.
@@ -284,9 +519,28 @@ public class Route
     }
 
     /**
+     * Creates a copy of this object, with the given execution allowed flag.
+     *
+     * @param executionAllowed The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Route.Step withExecutionAllowed(boolean executionAllowed) {
+      return new Route.Step(
+          path,
+          sourcePoint,
+          destinationPoint,
+          vehicleOrientation,
+          routeIndex,
+          costs,
+          executionAllowed,
+          reroutingType
+      );
+    }
+
+    /**
      * Returns the {@link ReroutingType} of this step.
      * <p>
-     * Idicates whether this step is the origin of a recalculated route, and if so, which
+     * Indicates whether this step is the origin of a recalculated route, and if so, which
      * {@link ReroutingType} was used to determine the (new) route.
      * <p>
      * Might return {@code null}, if this step is not the origin of a recalculated route.
@@ -298,6 +552,28 @@ public class Route
       return reroutingType;
     }
 
+    /**
+     * Creates a copy of this object, with the given rerouting type.
+     *
+     * @param reroutingType The value to be set in the copy.
+     * @return A copy of this object, differing in the given value.
+     */
+    public Route.Step withReroutingType(
+        @Nullable
+        ReroutingType reroutingType
+    ) {
+      return new Route.Step(
+          path,
+          sourcePoint,
+          destinationPoint,
+          vehicleOrientation,
+          routeIndex,
+          costs,
+          executionAllowed,
+          reroutingType
+      );
+    }
+
     @Override
     public boolean equals(Object o) {
       if (!(o instanceof Step)) {
@@ -307,6 +583,7 @@ public class Route
       return Objects.equals(path, other.path)
           && Objects.equals(sourcePoint, other.sourcePoint)
           && Objects.equals(destinationPoint, other.destinationPoint)
+          && costs == other.getCosts()
           && Objects.equals(vehicleOrientation, other.vehicleOrientation)
           && routeIndex == other.routeIndex
           && executionAllowed == other.executionAllowed
@@ -334,7 +611,7 @@ public class Route
     @Override
     public int hashCode() {
       return Objects.hash(
-          path, sourcePoint, destinationPoint, vehicleOrientation, routeIndex,
+          path, sourcePoint, destinationPoint, vehicleOrientation, routeIndex, costs,
           executionAllowed, reroutingType
       );
     }

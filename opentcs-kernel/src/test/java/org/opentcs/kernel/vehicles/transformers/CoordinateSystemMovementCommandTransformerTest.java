@@ -48,8 +48,8 @@ public class CoordinateSystemMovementCommandTransformerTest {
             null,
             pointDestStep,
             Vehicle.Orientation.FORWARD,
-            1, true,
-            null
+            1,
+            10
         ),
         MovementCommand.MOVE_OPERATION,
         null,

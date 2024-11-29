@@ -54,10 +54,9 @@ public class TargetedPointsSupplierTest {
             ).withRoute(
                 new Route(
                     List.of(
-                        new Step(null, null, point2, Vehicle.Orientation.FORWARD, 0, true, null),
-                        new Step(null, null, point1, Vehicle.Orientation.FORWARD, 0, true, null)
-                    ),
-                    1
+                        new Step(null, null, point2, Vehicle.Orientation.FORWARD, 0, 1),
+                        new Step(null, null, point1, Vehicle.Orientation.FORWARD, 0, 1)
+                    )
                 )
             )
         )
@@ -71,10 +70,9 @@ public class TargetedPointsSupplierTest {
             ).withRoute(
                 new Route(
                     List.of(
-                        new Step(null, null, point3, Vehicle.Orientation.FORWARD, 0, true, null),
-                        new Step(null, null, point4, Vehicle.Orientation.FORWARD, 0, true, null)
-                    ),
-                    1
+                        new Step(null, null, point3, Vehicle.Orientation.FORWARD, 0, 1),
+                        new Step(null, null, point4, Vehicle.Orientation.FORWARD, 0, 1)
+                    )
                 )
             ),
             new DriveOrder(
@@ -82,10 +80,9 @@ public class TargetedPointsSupplierTest {
             ).withRoute(
                 new Route(
                     List.of(
-                        new Step(null, null, point5, Vehicle.Orientation.FORWARD, 0, true, null),
-                        new Step(null, null, point6, Vehicle.Orientation.FORWARD, 0, true, null)
-                    ),
-                    1
+                        new Step(null, null, point5, Vehicle.Orientation.FORWARD, 0, 1),
+                        new Step(null, null, point6, Vehicle.Orientation.FORWARD, 0, 1)
+                    )
                 )
             )
         )

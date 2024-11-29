@@ -8,13 +8,11 @@ import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opentcs.components.kernel.Router;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.strategies.basic.routing.ResourceAvoidanceExtractor;
 
 /**
  * An abstract implementation of {@link DriveOrderMerger} defining the basic merging algorithm.
@@ -23,22 +21,10 @@ public abstract class AbstractDriveOrderMerger
     implements
       DriveOrderMerger {
 
-  private final Router router;
-  private final ResourceAvoidanceExtractor resourceAvoidanceExtractor;
-
   /**
    * Creates a new instance.
-   *
-   * @param router The router to use.
-   * @param resourceAvoidanceExtractor Extracts resources to be avoided from transport orders.
    */
-  protected AbstractDriveOrderMerger(
-      Router router,
-      ResourceAvoidanceExtractor resourceAvoidanceExtractor
-  ) {
-    this.router = requireNonNull(router, "router");
-    this.resourceAvoidanceExtractor
-        = requireNonNull(resourceAvoidanceExtractor, "resourceAvoidanceExtractor");
+  protected AbstractDriveOrderMerger() {
   }
 
   @Override
@@ -87,23 +73,11 @@ public abstract class AbstractDriveOrderMerger
       int currentRouteStepIndex,
       Vehicle vehicle
   ) {
-    // Merge the route steps
-    List<Route.Step> mergedSteps = mergeSteps(
-        routeA.getSteps(),
-        routeB.getSteps(),
-        currentRouteStepIndex
-    );
-
-    // Calculate the costs for merged route
     return new Route(
-        mergedSteps,
-        router.getCosts(
-            vehicle,
-            mergedSteps.get(0).getSourcePoint(),
-            mergedSteps.get(mergedSteps.size() - 1).getDestinationPoint(),
-            resourceAvoidanceExtractor
-                .extractResourcesToAvoid(originalOrder)
-                .toResourceReferenceSet()
+        mergeSteps(
+            routeA.getSteps(),
+            routeB.getSteps(),
+            currentRouteStepIndex
         )
     );
   }
@@ -125,18 +99,7 @@ public abstract class AbstractDriveOrderMerger
   protected List<Route.Step> updateRouteIndices(List<Route.Step> steps) {
     List<Route.Step> updatedSteps = new ArrayList<>();
     for (int i = 0; i < steps.size(); i++) {
-      Route.Step currStep = steps.get(i);
-      updatedSteps.add(
-          new Route.Step(
-              currStep.getPath(),
-              currStep.getSourcePoint(),
-              currStep.getDestinationPoint(),
-              currStep.getVehicleOrientation(),
-              i,
-              currStep.isExecutionAllowed(),
-              currStep.getReroutingType()
-          )
-      );
+      updatedSteps.add(steps.get(i).withRouteIndex(i));
     }
     return updatedSteps;
   }

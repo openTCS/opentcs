@@ -54,11 +54,13 @@ class CandidateComparatorByCompleteRoutingCostsTest {
     TransportOrder trasportOrder = new TransportOrder("TOrder1", new ArrayList<>());
     Route.Step dummyStep = new Route.Step(
         null,
-        null,
         new Point("Point1"),
-        Vehicle.Orientation.FORWARD, 1
+        new Point("Point2"),
+        Vehicle.Orientation.FORWARD,
+        1,
+        cost
     );
-    Route route = new Route(Arrays.asList(dummyStep), cost);
+    Route route = new Route(Arrays.asList(dummyStep));
     List<DriveOrder> driveOrders = List.of(
         new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))
             .withRoute(route)

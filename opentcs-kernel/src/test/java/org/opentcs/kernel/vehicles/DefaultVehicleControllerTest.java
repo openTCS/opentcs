@@ -289,11 +289,11 @@ class DefaultVehicleControllerTest {
     Point dstPoint = dataObjectFactory.createPoint();
     Path stepPath = dataObjectFactory.createPath(dstPoint.getReference());
     List<Route.Step> steps = List.of(
-        new Route.Step(stepPath, null, dstPoint, Vehicle.Orientation.FORWARD, 0)
+        new Route.Step(stepPath, null, dstPoint, Vehicle.Orientation.FORWARD, 0, 1)
     );
 
     DriveOrder driveOrder = new DriveOrder(new DriveOrder.Destination(location.getReference()))
-        .withRoute(new Route(steps, 1));
+        .withRoute(new Route(steps));
 
     TransportOrder transportOrder
         = new TransportOrder("some-transport-order", List.of(driveOrder))

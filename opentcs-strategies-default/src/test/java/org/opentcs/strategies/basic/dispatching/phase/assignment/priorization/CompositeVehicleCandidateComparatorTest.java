@@ -152,8 +152,15 @@ class CompositeVehicleCandidateComparatorTest {
 
   private List<DriveOrder> buildDriveOrders(long routingCost) {
     Route.Step dummyStep
-        = new Route.Step(null, null, new Point("Point1"), Vehicle.Orientation.FORWARD, 1);
-    Route route = new Route(Arrays.asList(dummyStep), routingCost);
+        = new Route.Step(
+            null,
+            new Point("Point1"),
+            new Point("Point2"),
+            Vehicle.Orientation.FORWARD,
+            1,
+            routingCost
+        );
+    Route route = new Route(Arrays.asList(dummyStep));
     List<DriveOrder> driveOrders = List.of(
         new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))
             .withRoute(route)

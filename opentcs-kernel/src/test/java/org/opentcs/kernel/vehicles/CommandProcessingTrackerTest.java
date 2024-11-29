@@ -64,9 +64,9 @@ class CommandProcessingTrackerTest {
   void regularProcessingOfDriveOrder() {
     List<MovementCommand> movementCommands = createMovementCommandList(
         List.of(
-            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0),
-            new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1),
-            new Route.Step(pathCD, pointC, pointD, Vehicle.Orientation.FORWARD, 2)
+            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0, 1),
+            new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1, 1),
+            new Route.Step(pathCD, pointC, pointD, Vehicle.Orientation.FORWARD, 2, 1)
         )
     );
 
@@ -211,9 +211,9 @@ class CommandProcessingTrackerTest {
   void processingOfDriveOrderWithNewRoute() {
     List<MovementCommand> movementCommands = createMovementCommandList(
         List.of(
-            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0),
-            new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1),
-            new Route.Step(pathCD, pointC, pointD, Vehicle.Orientation.FORWARD, 2)
+            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0, 1),
+            new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1, 1),
+            new Route.Step(pathCD, pointC, pointD, Vehicle.Orientation.FORWARD, 2, 1)
         )
     );
 
@@ -242,9 +242,9 @@ class CommandProcessingTrackerTest {
     // Then, a drive order update (with a new route) is received
     movementCommands = createMovementCommandList(
         List.of(
-            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0),
-            new Route.Step(pathBC, pointB, pointC2, Vehicle.Orientation.FORWARD, 1),
-            new Route.Step(pathC2D, pointC2, pointD, Vehicle.Orientation.FORWARD, 2)
+            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0, 1),
+            new Route.Step(pathBC, pointB, pointC2, Vehicle.Orientation.FORWARD, 1, 1),
+            new Route.Step(pathC2D, pointC2, pointD, Vehicle.Orientation.FORWARD, 2, 1)
         )
     );
     commandProcessingTracker.driveOrderUpdated(movementCommands);
@@ -308,9 +308,9 @@ class CommandProcessingTrackerTest {
   void processingOfRegularDriveOrderAbortion() {
     List<MovementCommand> movementCommands = createMovementCommandList(
         List.of(
-            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0),
-            new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1),
-            new Route.Step(pathCD, pointC, pointD, Vehicle.Orientation.FORWARD, 2)
+            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0, 1),
+            new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1, 1),
+            new Route.Step(pathCD, pointC, pointD, Vehicle.Orientation.FORWARD, 2, 1)
         )
     );
 
@@ -363,9 +363,9 @@ class CommandProcessingTrackerTest {
   void processingOfImmediateDriveOrderAbortion() {
     List<MovementCommand> movementCommands = createMovementCommandList(
         List.of(
-            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0),
-            new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1),
-            new Route.Step(pathCD, pointC, pointD, Vehicle.Orientation.FORWARD, 2)
+            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0, 1),
+            new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1, 1),
+            new Route.Step(pathCD, pointC, pointD, Vehicle.Orientation.FORWARD, 2, 1)
         )
     );
 
@@ -405,9 +405,9 @@ class CommandProcessingTrackerTest {
   void processingOfDriveOrderWithRevokedAllocation() {
     List<MovementCommand> movementCommands = createMovementCommandList(
         List.of(
-            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0),
-            new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1),
-            new Route.Step(pathCD, pointC, pointD, Vehicle.Orientation.FORWARD, 2)
+            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0, 1),
+            new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1, 1),
+            new Route.Step(pathCD, pointC, pointD, Vehicle.Orientation.FORWARD, 2, 1)
         )
     );
 
@@ -451,9 +451,9 @@ class CommandProcessingTrackerTest {
   void processingOfDriveOrderWhereSendingIsAborted() {
     List<MovementCommand> movementCommands = createMovementCommandList(
         List.of(
-            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0),
-            new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1),
-            new Route.Step(pathCD, pointC, pointD, Vehicle.Orientation.FORWARD, 2)
+            new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0, 1),
+            new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1, 1),
+            new Route.Step(pathCD, pointC, pointD, Vehicle.Orientation.FORWARD, 2, 1)
         )
     );
 
@@ -501,7 +501,7 @@ class CommandProcessingTrackerTest {
     Point finalDestinationPoint = steps.getLast().getDestinationPoint();
     DriveOrder driveOrder = new DriveOrder(
         new DriveOrder.Destination(finalDestinationPoint.getReference())
-    ).withRoute(new Route(steps, steps.size()));
+    ).withRoute(new Route(steps));
     TransportOrder transportOrder = new TransportOrder(
         String.format(
             "%s-to-%s",

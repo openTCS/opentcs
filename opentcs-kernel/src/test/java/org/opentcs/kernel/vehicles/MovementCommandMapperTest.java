@@ -56,9 +56,9 @@ class MovementCommandMapperTest {
     when(objectService.fetchObject(eq(Location.class), eq("location")))
         .thenReturn(destinationLocation);
 
-    Route.Step stepAB = new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0);
-    Route.Step stepBC = new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1);
-    Route route = new Route(List.of(stepAB, stepBC), 1L);
+    Route.Step stepAB = new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0, 1);
+    Route.Step stepBC = new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1, 1);
+    Route route = new Route(List.of(stepAB, stepBC));
     DriveOrder driveOrder
         = new DriveOrder(
             new DriveOrder.Destination(destinationLocation.getReference())

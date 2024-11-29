@@ -205,7 +205,9 @@ public abstract class AbstractParkingPositionSupplier
   ) {
     return new PointCandidate(
         destPosition,
-        router.getCosts(vehicle, srcPosition, destPosition, Set.of())
+        router.getRoute(vehicle, srcPosition, destPosition, Set.of())
+            .map(route -> route.getCosts())
+            .orElse(Long.MAX_VALUE)
     );
   }
 

@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +17,6 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
-import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
 
@@ -38,12 +36,8 @@ public class MovementCommandTest {
 
   @Test
   void considerIdenticalMovementCommandsEqual() {
-    Route.Step stepAB = createStep(
-        "A", "B",
-        Vehicle.Orientation.FORWARD,
-        0, true, null
-    );
-    Route route = new Route(List.of(stepAB), 22);
+    Route.Step stepAB = createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 22);
+    Route route = new Route(List.of(stepAB));
 
     DriveOrder driveOrder
         = new DriveOrder(new DriveOrder.Destination(destinationPoint.getReference()))
@@ -68,12 +62,8 @@ public class MovementCommandTest {
 
   @Test
   void considerMovementCommandsWithDifferentStepsNotEqual() {
-    Route.Step stepAB = createStep(
-        "A", "B",
-        Vehicle.Orientation.FORWARD,
-        0, true, null
-    );
-    Route route = new Route(List.of(stepAB), 22);
+    Route.Step stepAB = createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 22);
+    Route route = new Route(List.of(stepAB));
 
     DriveOrder driveOrder
         = new DriveOrder(new DriveOrder.Destination(destinationPoint.getReference()))
@@ -93,12 +83,8 @@ public class MovementCommandTest {
         Map.of("a", "b")
     );
 
-    Route.Step stepBC = createStep(
-        "B", "C",
-        Vehicle.Orientation.FORWARD,
-        0, true, null
-    );
-    Route route2 = new Route(List.of(stepBC), 22);
+    Route.Step stepBC = createStep("B", "C", Vehicle.Orientation.FORWARD, 0, 22);
+    Route route2 = new Route(List.of(stepBC));
 
     driveOrder
         = new DriveOrder(new DriveOrder.Destination(destinationPoint.getReference()))
@@ -123,12 +109,8 @@ public class MovementCommandTest {
 
   @Test
   void considerMovementCommandsWithOperationNotEqual() {
-    Route.Step stepAB = createStep(
-        "A", "B",
-        Vehicle.Orientation.FORWARD,
-        0, true, null
-    );
-    Route route = new Route(List.of(stepAB), 22);
+    Route.Step stepAB = createStep("A", "B", Vehicle.Orientation.FORWARD, 0, 22);
+    Route route = new Route(List.of(stepAB));
 
     DriveOrder driveOrder
         = new DriveOrder(new DriveOrder.Destination(destinationPoint.getReference()))
@@ -172,9 +154,7 @@ public class MovementCommandTest {
       @Nonnull
       Vehicle.Orientation orientation,
       int routeIndex,
-      boolean executionAllowed,
-      @Nullable
-      ReroutingType reroutingType
+      long cost
   ) {
     requireNonNull(srcPointName, "srcPointName");
     requireNonNull(destPointName, "destPointName");
@@ -194,8 +174,7 @@ public class MovementCommandTest {
         destPoint,
         orientation,
         routeIndex,
-        executionAllowed,
-        reroutingType
+        cost
     );
   }
 }

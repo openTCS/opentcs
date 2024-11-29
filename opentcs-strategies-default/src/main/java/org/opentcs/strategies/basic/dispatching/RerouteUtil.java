@@ -4,8 +4,6 @@ package org.opentcs.strategies.basic.dispatching;
 
 import static java.util.Objects.requireNonNull;
 import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.IGNORE_PATH_LOCKS;
-import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.PAUSE_AT_PATH_LOCK;
-import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.PAUSE_IMMEDIATELY;
 
 import jakarta.inject.Inject;
 import java.util.ArrayList;
@@ -217,12 +215,8 @@ public class RerouteUtil {
       for (Step step : order.getRoute().getSteps()) {
         if (step.getPath() != null) {
           updatedSteps.add(
-              new Route.Step(
-                  transportOrderService.fetchObject(Path.class, step.getPath().getReference()),
-                  step.getSourcePoint(),
-                  step.getDestinationPoint(),
-                  step.getVehicleOrientation(),
-                  step.getRouteIndex()
+              step.withPath(
+                  transportOrderService.fetchObject(Path.class, step.getPath().getReference())
               )
           );
         }
@@ -233,7 +227,7 @@ public class RerouteUtil {
         }
       }
 
-      Route updatedRoute = new Route(updatedSteps, order.getRoute().getCosts());
+      Route updatedRoute = new Route(updatedSteps);
 
       DriveOrder updatedOrder = new DriveOrder(order.getDestination())
           .withRoute(updatedRoute)
@@ -263,19 +257,10 @@ public class RerouteUtil {
       for (Step step : order.getRoute().getSteps()) {
         boolean executionAllowed = executionTest.test(step);
         LOG.debug("Marking path '{}' allowed: {}", step.getPath(), executionAllowed);
-        updatedSteps.add(
-            new Step(
-                step.getPath(),
-                step.getSourcePoint(),
-                step.getDestinationPoint(),
-                step.getVehicleOrientation(),
-                step.getRouteIndex(),
-                executionAllowed
-            )
-        );
+        updatedSteps.add(step.withExecutionAllowed(executionAllowed));
       }
 
-      Route updatedRoute = new Route(updatedSteps, order.getRoute().getCosts());
+      Route updatedRoute = new Route(updatedSteps);
 
       DriveOrder updatedOrder = new DriveOrder(order.getDestination())
           .withRoute(updatedRoute)
@@ -322,7 +307,7 @@ public class RerouteUtil {
     private boolean executionAllowed = true;
 
     /**
-     * Creates a new intance.
+     * Creates a new instance.
      *
      * @param strategy The current fallback strategy.
      * @param source The (earliest) point from which execution may not be allowed.

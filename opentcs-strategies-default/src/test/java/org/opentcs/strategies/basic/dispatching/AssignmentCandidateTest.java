@@ -72,13 +72,13 @@ class AssignmentCandidateTest {
     Point point1 = new Point("point1");
     Point point2 = new Point("point2");
     Route.Step step1 = new Route.Step(
-        null, null, point1, Vehicle.Orientation.FORWARD, 0, true, null
+        null, new Point("sourcePoint"), point1, Vehicle.Orientation.FORWARD, 0, 1234
     );
     Route.Step step2 = new Route.Step(
-        null, null, point2, Vehicle.Orientation.FORWARD, 0, true, null
+        null, new Point("sourcePoint"), point2, Vehicle.Orientation.FORWARD, 0, 5678
     );
-    Route route1 = new Route(List.of(step1), 1234);
-    Route route2 = new Route(List.of(step2), 5678);
+    Route route1 = new Route(List.of(step1));
+    Route route2 = new Route(List.of(step2));
     DriveOrder driveOrder1 = new DriveOrder(new DriveOrder.Destination(point1.getReference()));
     DriveOrder driveOrder2 = new DriveOrder(new DriveOrder.Destination(point2.getReference()));
     driveOrder1 = driveOrder1.withRoute(route1);

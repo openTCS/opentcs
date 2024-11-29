@@ -226,12 +226,9 @@ public class DefaultRechargePositionSupplier
         .map(
             point -> new LocationCandidate(
                 location,
-                router.getCosts(
-                    vehicle,
-                    srcPosition,
-                    point,
-                    Set.of()
-                )
+                router.getRoute(vehicle, srcPosition, point, Set.of())
+                    .map(route -> route.getCosts())
+                    .orElse(Long.MAX_VALUE)
             )
         )
         .min(Comparator.comparingLong(candidate -> candidate.costs));

@@ -217,20 +217,20 @@ public class DefaultRouter
     synchronized (this) {
       PointRouter pointRouter = pointRouterProvider
           .getPointRouterForVehicle(vehicle, resourcesToAvoid);
-      long costs = pointRouter.getCosts(sourcePoint, destinationPoint);
-      if (costs == INFINITE_COSTS) {
+      List<Route.Step> steps = pointRouter.getRouteSteps(sourcePoint, destinationPoint);
+      if (steps == null) {
         return Optional.empty();
       }
-      List<Route.Step> steps = pointRouter.getRouteSteps(sourcePoint, destinationPoint);
       if (steps.isEmpty()) {
         // If the list of steps is empty, we're already at the destination point
         // Create a single step without a path.
-        steps.add(new Route.Step(null, null, sourcePoint, Vehicle.Orientation.UNDEFINED, 0));
+        steps.add(new Route.Step(null, null, sourcePoint, Vehicle.Orientation.UNDEFINED, 0, 0));
       }
-      return Optional.of(new Route(steps, costs));
+      return Optional.of(new Route(steps));
     }
   }
 
+  @Deprecated
   @Override
   public long getCosts(
       Vehicle vehicle,
@@ -373,18 +373,10 @@ public class DefaultRouter
           // destination point of the drive order - create a single step
           // without a path.
           steps = new ArrayList<>(1);
-          steps.add(
-              new Route.Step(
-                  null,
-                  null,
-                  startPoint,
-                  Vehicle.Orientation.UNDEFINED,
-                  0
-              )
-          );
+          steps.add(new Route.Step(null, null, startPoint, Vehicle.Orientation.UNDEFINED, 0, 0));
         }
         // Create a route from the list of steps gathered.
-        Route hopRoute = new Route(steps, hopCosts);
+        Route hopRoute = new Route(steps);
         // Copy the current drive order, add the computed route to it and
         // place it in the result struct.
         DriveOrder hopOrder = params.driveOrders[hopIndex].withRoute(hopRoute);

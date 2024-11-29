@@ -177,7 +177,10 @@ public interface Router
    * @param resourcesToAvoid Resources to avoid when calculating the route.
    * @return The costs of the route, or <code>Long.MAX_VALUE</code>, if no such
    * route exists.
+   * @deprecated Use {@link #getRoute(Vehicle, Point, Point, Set) } instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   long getCosts(
       @Nonnull
       Vehicle vehicle,

@@ -50,10 +50,17 @@ class CandidateComparatorIdleFirstTest {
   }
 
   private AssignmentCandidate candidateWithVehicleState(Vehicle.State vehicleState) {
-    TransportOrder trasportOrder = new TransportOrder("TOrder1", new ArrayList<>());
+    TransportOrder transportOrder = new TransportOrder("TOrder1", new ArrayList<>());
     Route.Step dummyStep
-        = new Route.Step(null, null, new Point("Point1"), Vehicle.Orientation.FORWARD, 1);
-    Route route = new Route(Arrays.asList(dummyStep), 10);
+        = new Route.Step(
+            null,
+            new Point("Point1"),
+            new Point("Point2"),
+            Vehicle.Orientation.FORWARD,
+            1,
+            10
+        );
+    Route route = new Route(Arrays.asList(dummyStep));
     List<DriveOrder> driveOrders = List.of(
         new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))
             .withRoute(route)
@@ -61,7 +68,7 @@ class CandidateComparatorIdleFirstTest {
 
     return new AssignmentCandidate(
         new Vehicle("Vehicle1").withState(vehicleState),
-        trasportOrder,
+        transportOrder,
         driveOrders
     );
   }

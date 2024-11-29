@@ -11,6 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,7 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder.Destination;
+import org.opentcs.data.order.Route;
 import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 
 /**
@@ -91,6 +93,23 @@ class DefaultRechargePositionSupplierTest {
         .thenReturn(Set.of(rechargeLoc1, rechargeLoc2, rechargeLoc3));
     when(plantModelService.expandResources(Set.of(locationAccessPoint.getReference())))
         .thenReturn(Set.of(locationAccessPoint));
+    when(router.getRoute(vehicle, currentPosition, locationAccessPoint, Set.of()))
+        .thenReturn(
+            Optional.of(
+                new Route(
+                    List.of(
+                        new Route.Step(
+                            null,
+                            currentPosition,
+                            locationAccessPoint,
+                            Vehicle.Orientation.FORWARD,
+                            0,
+                            10
+                        )
+                    )
+                )
+            )
+        );
 
     rechargePosSupplier.initialize();
   }
