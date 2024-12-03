@@ -110,7 +110,7 @@ public class OpsDeskVehicleAdapter
   }
 
   private PathModel getCurrentDriveOrderPath(Vehicle vehicle, SystemModel systemModel) {
-    if (!vehicle.isProcessingOrder()) {
+    if (!vehicle.isProcessingOrder() || vehicle.getCurrentPosition() == null) {
       return null;
     }
 
