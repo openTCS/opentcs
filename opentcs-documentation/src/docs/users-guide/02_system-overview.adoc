@@ -58,16 +58,12 @@ Points are logical mappings of discrete vehicle positions in the driving course.
 In plant operation mode, vehicles are ordered (and thus move) from one point to another in the model.
 A point carries the following attributes:
 
-* A _type_, which is one of these three:
+* A _type_, which is one of these:
 ** _Halt position_:
    Indicates a position at which a vehicle may halt temporarily while processing an order, e.g. for executing an operation.
    The vehicle is expected to report in when it arrives at such a position.
    It may not remain here for longer than necessary, though.
    Halt position is the default type for points when modelling with the model editor client.
-** _Reporting position_ (deprecated, scheduled for removal in openTCS 6.0):
-   Indicates a position at which a vehicle is expected to report in _only_.
-   Vehicles will not be ordered to a reporting position, and halting or even parking at such a position is not allowed.
-   Therefore, a route that only consists of reporting points will be unroutable because the vehicle is not able to halt at any position.
 ** _Park position_:
    Indicates a position at which a vehicle may halt for longer periods of time when it is not processing orders.
    The vehicle is also expected to report in when it arrives at such a position.

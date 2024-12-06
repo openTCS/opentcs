@@ -75,7 +75,11 @@ public class V005ModelParser {
               .setyPosition(point.getyPosition())
               .setzPosition(point.getzPosition())
               .setVehicleOrientationAngle(point.getVehicleOrientationAngle())
-              .setType(point.getType())
+              .setType(
+                  point.getType().equals("REPORT_POSITION")
+                      ? "HALT_POSITION"
+                      : point.getType()
+              )
               .setVehicleEnvelopes(convertVehicleEnvelopes(point.getVehicleEnvelopes()))
               .setOutgoingPaths(convertOutgoingPaths(point))
               .setPointLayout(
