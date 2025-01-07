@@ -10,7 +10,13 @@ SPDX-FileCopyrightText = "The openTCS Authors"
 SPDX-License-Identifier = "CC0-1.0"
 
 [[annotations]]
-path = ["**/*Test*.approved.txt"]
+path = ["**/test/**/*.approved.*"]
+precedence = "closest"
+SPDX-FileCopyrightText = "The openTCS Authors"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = ["**/test/**/*.sample.*"]
 precedence = "closest"
 SPDX-FileCopyrightText = "The openTCS Authors"
 SPDX-License-Identifier = "CC-BY-4.0"

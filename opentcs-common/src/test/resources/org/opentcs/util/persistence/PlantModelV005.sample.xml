@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model version="0.0.5" name="PlantModelV005">
+    <point name="Point-0001" xPosition="5000" yPosition="5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+        <outgoingPath name="Point-0001 --- Point-0002"/>
+        <pointLayout xPosition="5000" yPosition="5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+    </point>
+    <point name="Point-0002" xPosition="10000" yPosition="10000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+        <pointLayout xPosition="10000" yPosition="10000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+    </point>
+    <point name="Point-0003" xPosition="10000" yPosition="5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+        <outgoingPath name="Point-0003 --- Point-0004"/>
+        <pointLayout xPosition="10000" yPosition="5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+    </point>
+    <point name="Point-0004" xPosition="15000" yPosition="10000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+        <pointLayout xPosition="15000" yPosition="10000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+    </point>
+    <point name="Point-0005" xPosition="15000" yPosition="5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+        <outgoingPath name="Point-0005 --- Point-0006"/>
+        <pointLayout xPosition="15000" yPosition="5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+    </point>
+    <point name="Point-0006" xPosition="20000" yPosition="10000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+        <pointLayout xPosition="20000" yPosition="10000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+    </point>
+    <point name="Point-0007" xPosition="20000" yPosition="5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+        <outgoingPath name="Point-0007 --- Point-0008"/>
+        <pointLayout xPosition="20000" yPosition="5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+    </point>
+    <point name="Point-0008" xPosition="25000" yPosition="10000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+        <pointLayout xPosition="25000" yPosition="10000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+    </point>
+    <point name="Point-0009" xPosition="25000" yPosition="5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+        <outgoingPath name="Point-0009 --- Point-0010"/>
+        <pointLayout xPosition="25000" yPosition="5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+    </point>
+    <point name="Point-0010" xPosition="30000" yPosition="10000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+        <pointLayout xPosition="30000" yPosition="10000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+    </point>
+    <point name="Point-0011" xPosition="30000" yPosition="5000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+        <outgoingPath name="Point-0011 --- Point-0012"/>
+        <pointLayout xPosition="30000" yPosition="5000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+    </point>
+    <point name="Point-0012" xPosition="35000" yPosition="10000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+        <pointLayout xPosition="35000" yPosition="10000" xLabelOffset="-10" yLabelOffset="-20" layerId="0"/>
+    </point>
+    <point name="Point-0013" xPosition="5000" yPosition="15000" zPosition="0" vehicleOrientationAngle="90.0" type="HALT_POSITION">
+        <vehicleEnvelope key="env-key">
+            <vertex x="0" y="0"/>
+            <vertex x="100" y="0"/>
+            <vertex x="100" y="100"/>
+            <vertex x="0" y="100"/>
+            <vertex x="0" y="0"/>
+        </vehicleEnvelope>
+        <outgoingPath name="Point-0013 --- Point-0014"/>
+        <property name="p-key" value="p-value"/>
+        <pointLayout xPosition="5000" yPosition="15000" xLabelOffset="-10" yLabelOffset="-20" layerId="1"/>
+    </point>
+    <point name="Point-0014" xPosition="10000" yPosition="15000" zPosition="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
+        <pointLayout xPosition="10000" yPosition="15000" xLabelOffset="-10" yLabelOffset="-20" layerId="1"/>
+    </point>
+    <point name="Point-0015" xPosition="15000" yPosition="15000" zPosition="0" vehicleOrientationAngle="NaN" type="PARK_POSITION">
+        <pointLayout xPosition="15000" yPosition="15000" xLabelOffset="-10" yLabelOffset="-20" layerId="1"/>
+    </point>
+    <path name="Point-0001 --- Point-0002" sourcePoint="Point-0001" destinationPoint="Point-0002" length="7071" maxVelocity="1000" maxReverseVelocity="0" locked="false">
+        <pathLayout connectionType="DIRECT" layerId="0"/>
+    </path>
+    <path name="Point-0003 --- Point-0004" sourcePoint="Point-0003" destinationPoint="Point-0004" length="7071" maxVelocity="1000" maxReverseVelocity="0" locked="false">
+        <pathLayout connectionType="ELBOW" layerId="0"/>
+    </path>
+    <path name="Point-0005 --- Point-0006" sourcePoint="Point-0005" destinationPoint="Point-0006" length="7071" maxVelocity="1000" maxReverseVelocity="0" locked="false">
+        <pathLayout connectionType="SLANTED" layerId="0"/>
+    </path>
+    <path name="Point-0007 --- Point-0008" sourcePoint="Point-0007" destinationPoint="Point-0008" length="7071" maxVelocity="1000" maxReverseVelocity="0" locked="false">
+        <pathLayout connectionType="POLYPATH" layerId="0">
+            <controlPoint x="460" y="-120"/>
+            <controlPoint x="490" y="-150"/>
+        </pathLayout>
+    </path>
+    <path name="Point-0009 --- Point-0010" sourcePoint="Point-0009" destinationPoint="Point-0010" length="7071" maxVelocity="1000" maxReverseVelocity="0" locked="false">
+        <pathLayout connectionType="BEZIER" layerId="0">
+            <controlPoint x="558" y="-108"/>
+            <controlPoint x="589" y="-139"/>
+        </pathLayout>
+    </path>
+    <path name="Point-0011 --- Point-0012" sourcePoint="Point-0011" destinationPoint="Point-0012" length="7071" maxVelocity="1000" maxReverseVelocity="0" locked="false">
+        <pathLayout connectionType="BEZIER_3" layerId="0">
+            <controlPoint x="628" y="-110"/>
+            <controlPoint x="615" y="-164"/>
+            <controlPoint x="659" y="-140"/>
+            <controlPoint x="678" y="-130"/>
+            <controlPoint x="690" y="-160"/>
+        </pathLayout>
+    </path>
+    <path name="Point-0013 --- Point-0014" sourcePoint="Point-0013" destinationPoint="Point-0014" length="5000" maxVelocity="1500" maxReverseVelocity="1500" locked="true">
+        <peripheralOperation completionRequired="false" executionTrigger="AFTER_ALLOCATION" locationName="Location-0001" name="p-operation"/>
+        <peripheralOperation completionRequired="true" executionTrigger="AFTER_MOVEMENT" locationName="Location-0001" name="p-operation"/>
+        <vehicleEnvelope key="env-key">
+            <vertex x="0" y="0"/>
+            <vertex x="200" y="0"/>
+            <vertex x="200" y="200"/>
+            <vertex x="0" y="200"/>
+            <vertex x="0" y="0"/>
+        </vehicleEnvelope>
+        <property name="p-key" value="p-value"/>
+        <pathLayout connectionType="DIRECT" layerId="1"/>
+    </path>
+    <vehicle name="Vehicle-0001" length="1500" energyLevelCritical="25" energyLevelGood="80" energyLevelFullyRecharged="90" energyLevelSufficientlyRecharged="30" maxVelocity="1500" maxReverseVelocity="1500" envelopeKey="env-key">
+        <property name="v-key" value="v-value"/>
+        <vehicleLayout color="#FF9900"/>
+    </vehicle>
+    <locationType name="LType-0001">
+        <allowedOperation name="v-operation"/>
+        <allowedPeripheralOperation name="p-operation"/>
+        <property name="lt-key" value="lt-value"/>
+        <property name="tcs:defaultLocationTypeSymbol" value="LOAD_TRANSFER_GENERIC"/>
+        <locationTypeLayout locationRepresentation="LOAD_TRANSFER_GENERIC"/>
+    </locationType>
+    <location name="Location-0001" xPosition="5000" yPosition="20000" zPosition="0" locked="false" type="LType-0001">
+        <link point="Point-0013">
+            <allowedOperation name="v-operation"/>
+        </link>
+        <property name="l-key" value="l-value"/>
+        <property name="tcs:defaultLocationSymbol" value="DEFAULT"/>
+        <locationLayout xPosition="5000" yPosition="20000" xLabelOffset="-10" yLabelOffset="-20" locationRepresentation="DEFAULT" layerId="1"/>
+    </location>
+    <location name="Location-0002" xPosition="10000" yPosition="20000" zPosition="0" locked="true" type="LType-0001">
+        <property name="tcs:defaultLocationSymbol" value="WORKING_GENERIC"/>
+        <locationLayout xPosition="10000" yPosition="20000" xLabelOffset="-10" yLabelOffset="-20" locationRepresentation="WORKING_GENERIC" layerId="1"/>
+    </location>
+    <block name="Block-0001" type="SINGLE_VEHICLE_ONLY">
+        <member name="Location-0001"/>
+        <member name="Point-0013"/>
+        <member name="Point-0013 --- Point-0014"/>
+        <property name="b-key" value="b-value"/>
+        <blockLayout color="#33CC00"/>
+    </block>
+    <block name="Block-0002" type="SAME_DIRECTION_ONLY">
+        <blockLayout color="#3333FF"/>
+    </block>
+    <visualLayout name="VLayout" scaleX="50.0" scaleY="50.0">
+        <layer id="0" ordinal="0" visible="true" name="Default layer" groupId="0"/>
+        <layer id="1" ordinal="1" visible="true" name="Layer 1" groupId="0"/>
+        <layer id="2" ordinal="2" visible="false" name="Layer 2" groupId="1"/>
+        <layerGroup id="0" name="Default layer group" visible="true"/>
+        <layerGroup id="1" name="Group 1" visible="false"/>
+        <property name="vl-key" value="vl-value"/>
+    </visualLayout>
+    <property name="tcs:modelFileLastModified" value="2024-11-21T13:01:21Z"/>
+</model>
