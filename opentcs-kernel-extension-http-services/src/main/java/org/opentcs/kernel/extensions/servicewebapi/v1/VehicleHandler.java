@@ -17,6 +17,7 @@ import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
@@ -29,8 +30,10 @@ import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAcceptableOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleEnergyLevelThresholdSetTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.VehicleConverter;
 
 /**
  * Handles requests related to vehicles.
@@ -40,6 +43,7 @@ public class VehicleHandler {
   private final VehicleService vehicleService;
   private final RouterService routerService;
   private final KernelExecutorWrapper executorWrapper;
+  private final VehicleConverter vehicleConverter;
 
   /**
    * Creates a new instance.
@@ -47,16 +51,19 @@ public class VehicleHandler {
    * @param vehicleService Used to update vehicle instances.
    * @param routerService Used to get information about potential routes.
    * @param executorWrapper Executes calls via the kernel executor and waits for the outcome.
+   * @param vehicleConverter Provides methods for converting vehicle data.
    */
   @Inject
   public VehicleHandler(
       VehicleService vehicleService,
       RouterService routerService,
-      KernelExecutorWrapper executorWrapper
+      KernelExecutorWrapper executorWrapper,
+      VehicleConverter vehicleConverter
   ) {
     this.vehicleService = requireNonNull(vehicleService, "vehicleService");
     this.routerService = requireNonNull(routerService, "routerService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
+    this.vehicleConverter = requireNonNull(vehicleConverter, "vehicleConverter");
   }
 
   /**
@@ -79,7 +86,7 @@ public class VehicleHandler {
 
       return vehicleService.fetchObjects(Vehicle.class, Filters.vehicleWithProcState(pState))
           .stream()
-          .map(GetVehicleResponseTO::fromVehicle)
+          .map(vehicleConverter::toGetVehicleResponseTO)
           .sorted(Comparator.comparing(GetVehicleResponseTO::getName))
           .collect(Collectors.toList());
     });
@@ -98,7 +105,7 @@ public class VehicleHandler {
 
     return executorWrapper.callAndWait(() -> {
       return Optional.ofNullable(vehicleService.fetchObject(Vehicle.class, name))
-          .map(GetVehicleResponseTO::fromVehicle)
+          .map(vehicleConverter::toGetVehicleResponseTO)
           .orElseThrow(() -> new ObjectUnknownException("Unknown vehicle: " + name));
     });
   }
@@ -212,6 +219,7 @@ public class VehicleHandler {
     });
   }
 
+  @Deprecated
   public void putVehicleAllowedOrderTypes(
       String name,
       PutVehicleAllowedOrderTypesTO allowedOrderTypes
@@ -227,6 +235,34 @@ public class VehicleHandler {
       }
       vehicleService.updateVehicleAllowedOrderTypes(
           vehicle.getReference(), new HashSet<>(allowedOrderTypes.getOrderTypes())
+      );
+    });
+  }
+
+  public void putVehicleAcceptableOrderTypes(
+      String name,
+      PutVehicleAcceptableOrderTypesTO acceptableOrderTypes
+  )
+      throws ObjectUnknownException {
+    requireNonNull(name, "name");
+    requireNonNull(acceptableOrderTypes, "acceptableOrderTypes");
+
+    executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, name);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + name);
+      }
+
+      vehicleService.updateVehicleAcceptableOrderTypes(
+          vehicle.getReference(),
+          acceptableOrderTypes.getAcceptableOrderTypes().stream()
+              .map(
+                  acceptableOrderType -> new AcceptableOrderType(
+                      acceptableOrderType.getName(),
+                      acceptableOrderType.getPriority()
+                  )
+              )
+              .collect(Collectors.toSet())
       );
     });
   }

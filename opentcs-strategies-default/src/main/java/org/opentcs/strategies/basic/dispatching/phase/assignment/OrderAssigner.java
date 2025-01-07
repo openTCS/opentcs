@@ -299,7 +299,10 @@ public class OrderAssigner {
   private boolean orderAssignableToVehicle(TransportOrder order, Vehicle vehicle) {
     return (order.getIntendedVehicle() == null
         || Objects.equals(order.getIntendedVehicle(), vehicle.getReference()))
-        && (vehicle.getAllowedOrderTypes().contains(order.getType())
-            || vehicle.getAllowedOrderTypes().contains(OrderConstants.TYPE_ANY));
+        && (vehicle.getAcceptableOrderTypes().stream()
+            .anyMatch(
+                orderType -> orderType.getName().equals(order.getType())
+                    || orderType.getName().equals(OrderConstants.TYPE_ANY)
+            ));
   }
 }

@@ -73,13 +73,16 @@ public class IsProcessable
     requireNonNull(order, "order");
 
     // Check for matching order types
-    if (!vehicle.getAllowedOrderTypes().contains(OrderConstants.TYPE_ANY)
-        && !vehicle.getAllowedOrderTypes().contains(order.getType())) {
+    if (vehicle.getAcceptableOrderTypes().stream()
+        .noneMatch(
+            orderType -> orderType.getName().equals(OrderConstants.TYPE_ANY)
+                || orderType.getName().equals(order.getType())
+        )) {
       LOG.debug(
-          "Type '{}' of order '{}' not in allowed types '{}' of vehicle '{}'.",
+          "Type '{}' of order '{}' not in acceptable types '{}' of vehicle '{}'.",
           order.getType(),
           order.getName(),
-          vehicle.getAllowedOrderTypes(),
+          vehicle.getAcceptableOrderTypes(),
           vehicle.getName()
       );
       return new ExplainedBoolean(false, ORDER_TYPE_CONFLICT);

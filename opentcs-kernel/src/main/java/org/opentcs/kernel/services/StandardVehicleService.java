@@ -7,6 +7,7 @@ import static java.util.Objects.requireNonNull;
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -14,6 +15,7 @@ import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
@@ -454,6 +456,7 @@ public class StandardVehicleService
   }
 
   @Override
+  @Deprecated
   public void updateVehicleAllowedOrderTypes(
       TCSObjectReference<Vehicle> ref,
       Set<String> allowedOrderTypes
@@ -463,7 +466,26 @@ public class StandardVehicleService
     requireNonNull(allowedOrderTypes, "allowedOrderTypes");
 
     synchronized (globalSyncObject) {
-      plantModelManager.setVehicleAllowedOrderTypes(ref, allowedOrderTypes);
+      plantModelManager.setVehicleAcceptableOrderTypes(
+          ref,
+          allowedOrderTypes.stream()
+              .map(orderType -> new AcceptableOrderType(orderType, 0))
+              .collect(Collectors.toSet())
+      );
+    }
+  }
+
+  @Override
+  public void updateVehicleAcceptableOrderTypes(
+      TCSObjectReference<Vehicle> ref,
+      Set<AcceptableOrderType> acceptableOrderTypes
+  )
+      throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(acceptableOrderTypes, "acceptableOrderTypes");
+
+    synchronized (globalSyncObject) {
+      plantModelManager.setVehicleAcceptableOrderTypes(ref, acceptableOrderTypes);
     }
   }
 

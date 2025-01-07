@@ -12,6 +12,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Set;
@@ -27,6 +28,7 @@ import org.mockito.ArgumentMatchers;
 import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -37,7 +39,10 @@ import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAcceptableOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.AcceptableOrderTypeTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.VehicleConverter;
 
 /**
  * Unit tests for {@link VehicleHandler}.
@@ -46,6 +51,7 @@ class VehicleHandlerTest {
 
   private VehicleService vehicleService;
   private RouterService routerService;
+  private VehicleConverter vehicleConverter;
   private KernelExecutorWrapper executorWrapper;
 
   private VehicleHandler handler;
@@ -58,9 +64,10 @@ class VehicleHandlerTest {
   void setUp() {
     vehicleService = mock();
     routerService = mock();
+    vehicleConverter = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
 
-    handler = new VehicleHandler(vehicleService, routerService, executorWrapper);
+    handler = new VehicleHandler(vehicleService, routerService, executorWrapper, vehicleConverter);
 
     vehicle = new Vehicle("some-vehicle");
     adapterDescriptionMock = new MockVehicleCommAdapterDescription();
@@ -171,6 +178,10 @@ class VehicleHandlerTest {
 
   @Test
   void retrieveVehicleByName() {
+    when(vehicleConverter.toGetVehicleResponseTO(any(Vehicle.class))).thenReturn(
+        new GetVehicleResponseTO()
+    );
+
     // Act & Assert: happy path
     GetVehicleResponseTO result = handler.getVehicleStateByName("some-vehicle");
     MatcherAssert.assertThat(result, is(notNullValue()));
@@ -254,6 +265,7 @@ class VehicleHandlerTest {
   }
 
   @Test
+  @Deprecated
   void updateVehicleAllowedOrderTypes() {
     // Act
     handler.putVehicleAllowedOrderTypes(
@@ -273,12 +285,51 @@ class VehicleHandlerTest {
   }
 
   @Test
+  @Deprecated
   void throwOnUpdateAllowedOrderTypesForUnknownVehicle() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(
             () -> handler.putVehicleAllowedOrderTypes(
                 "some-unknown-vehicle",
                 new PutVehicleAllowedOrderTypesTO(List.of())
+            )
+        );
+  }
+
+  @Test
+  void updateVehicleAcceptableOrderTypes() {
+    // Act
+    handler.putVehicleAcceptableOrderTypes(
+        "some-vehicle",
+        new PutVehicleAcceptableOrderTypesTO(
+            List.of(
+                new AcceptableOrderTypeTO("some-order-type", 0),
+                new AcceptableOrderTypeTO("some-other-order-type", 1)
+            )
+        )
+    );
+
+    // Assert
+    @SuppressWarnings("unchecked")
+    ArgumentCaptor<Set<AcceptableOrderType>> captor = ArgumentCaptor.forClass(Set.class);
+    then(vehicleService)
+        .should()
+        .updateVehicleAcceptableOrderTypes(eq(vehicle.getReference()), captor.capture());
+    assertThat(captor.getValue())
+        .hasSize(2)
+        .contains(
+            new AcceptableOrderType("some-order-type", 0),
+            new AcceptableOrderType("some-other-order-type", 1)
+        );
+  }
+
+  @Test
+  void throwOnUpdateAcceptableOrderTypesForUnknownVehicle() {
+    assertThatExceptionOfType(ObjectUnknownException.class)
+        .isThrownBy(
+            () -> handler.putVehicleAcceptableOrderTypes(
+                "some-unknown-vehicle",
+                new PutVehicleAcceptableOrderTypesTO(List.of())
             )
         );
   }

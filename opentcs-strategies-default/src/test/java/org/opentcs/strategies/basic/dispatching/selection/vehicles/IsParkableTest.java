@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderConstants;
@@ -39,7 +40,9 @@ class IsParkableTest {
         .withState(Vehicle.State.IDLE)
         .withProcState(Vehicle.ProcState.IDLE)
         .withCurrentPosition(p1.getReference())
-        .withAllowedOrderTypes(Set.of(OrderConstants.TYPE_ANY));
+        .withAcceptableOrderTypes(
+            Set.of(new AcceptableOrderType(OrderConstants.TYPE_ANY, 0))
+        );
 
     given(objectService.fetchObject(Point.class, p1.getReference()))
         .willReturn(p1);
@@ -49,7 +52,7 @@ class IsParkableTest {
   @ValueSource(strings = {OrderConstants.TYPE_ANY, OrderConstants.TYPE_PARK})
   void checkVehicleIsParkable(String type) {
     Vehicle vehicle = parkableVehicle
-        .withAllowedOrderTypes(Set.of(type));
+        .withAcceptableOrderTypes(Set.of(new AcceptableOrderType(type, 0)));
     assertThat(isParkable.apply(vehicle), hasSize(0));
   }
 
@@ -113,7 +116,9 @@ class IsParkableTest {
   @Test
   void checkVehicleIsNotAllowedToPark() {
     Vehicle vehicle = parkableVehicle
-        .withAllowedOrderTypes(Set.of(OrderConstants.TYPE_CHARGE));
+        .withAcceptableOrderTypes(
+            Set.of(new AcceptableOrderType(OrderConstants.TYPE_CHARGE, 0))
+        );
 
     assertThat(isParkable.apply(vehicle), hasSize(1));
   }

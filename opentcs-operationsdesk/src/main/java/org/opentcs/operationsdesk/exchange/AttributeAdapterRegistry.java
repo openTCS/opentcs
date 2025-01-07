@@ -15,7 +15,7 @@ import org.opentcs.guing.common.event.SystemModelTransitionEvent;
 import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.operationsdesk.exchange.adapter.LocationLockAdapter;
 import org.opentcs.operationsdesk.exchange.adapter.PathLockAdapter;
-import org.opentcs.operationsdesk.exchange.adapter.VehicleAllowedOrderTypesAdapter;
+import org.opentcs.operationsdesk.exchange.adapter.VehicleAcceptableOrderTypesAdapter;
 import org.opentcs.operationsdesk.exchange.adapter.VehicleEnergyLevelThresholdSetAdapter;
 import org.opentcs.operationsdesk.exchange.adapter.VehicleEnvelopeKeyAdapter;
 import org.opentcs.operationsdesk.exchange.adapter.VehiclePausedAdapter;
@@ -101,7 +101,7 @@ public class AttributeAdapterRegistry
   private void registerAdapters() {
     for (VehicleModel model : modelManager.getModel().getVehicleModels()) {
       model.addAttributesChangeListener(
-          new VehicleAllowedOrderTypesAdapter(
+          new VehicleAcceptableOrderTypesAdapter(
               portalProvider,
               model
           )

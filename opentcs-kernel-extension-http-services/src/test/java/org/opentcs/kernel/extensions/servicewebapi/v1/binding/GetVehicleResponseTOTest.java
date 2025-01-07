@@ -11,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.AcceptableOrderTypeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 
@@ -67,10 +68,10 @@ class GetVehicleResponseTOTest {
                     List.of("some-other-path", "some-other-point")
                 )
             )
-            .setAllowedOrderTypes(
+            .setAcceptableOrderTypes(
                 List.of(
-                    "OrderType001",
-                    "OrderType002"
+                    new AcceptableOrderTypeTO("OrderType001", 23),
+                    new AcceptableOrderTypeTO("OrderType002", 42)
                 )
             );
 

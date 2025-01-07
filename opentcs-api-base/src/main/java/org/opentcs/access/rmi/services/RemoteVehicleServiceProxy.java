@@ -8,12 +8,14 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * The default implementation of the vehicle service.
@@ -185,6 +187,8 @@ class RemoteVehicleServiceProxy
   }
 
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public void updateVehicleAllowedOrderTypes(
       TCSObjectReference<Vehicle> ref,
       Set<String> allowedOrderTypes
@@ -198,6 +202,27 @@ class RemoteVehicleServiceProxy
           getClientId(),
           ref,
           allowedOrderTypes
+      );
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public void updateVehicleAcceptableOrderTypes(
+      TCSObjectReference<Vehicle> ref,
+      Set<AcceptableOrderType> acceptableOrderTypes
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().updateVehicleAcceptableOrderTypes(
+          getClientId(),
+          ref,
+          acceptableOrderTypes
       );
     }
     catch (RemoteException ex) {

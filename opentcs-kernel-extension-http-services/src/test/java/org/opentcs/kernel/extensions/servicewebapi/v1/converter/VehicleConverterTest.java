@@ -16,10 +16,17 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.VehicleCreationTO;
+import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.BoundingBox;
+import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Pose;
+import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
+import org.opentcs.data.order.TransportOrder;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.AcceptableOrderTypeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
@@ -31,18 +38,21 @@ import org.opentcs.util.Colors;
 class VehicleConverterTest {
 
   private VehicleConverter vehicleConverter;
-  private PropertyConverter propertyConverter;
 
   private Map<String, String> propertyMap;
   private List<PropertyTO> propertyList;
 
   @BeforeEach
   void setUp() {
-    propertyConverter = mock();
-    vehicleConverter = new VehicleConverter(propertyConverter);
+    PropertyConverter propertyConverter = mock();
+    vehicleConverter = new VehicleConverter(propertyConverter, new AcceptableOrderTypeConverter());
 
     propertyMap = Map.of("some-key", "some-value");
     propertyList = List.of(new PropertyTO("some-key", "some-value"));
+    Set<AcceptableOrderType> acceptableOrderTypes = Set.of(new AcceptableOrderType("order-1", 0));
+    List<AcceptableOrderTypeTO> acceptableOrderTypeList = List.of(
+        new AcceptableOrderTypeTO("order-1", 0)
+    );
     when(propertyConverter.toPropertyTOs(propertyMap)).thenReturn(propertyList);
     when(propertyConverter.toPropertyMap(propertyList)).thenReturn(propertyMap);
   }
@@ -110,5 +120,61 @@ class VehicleConverterTest {
     assertThat(result.get(0).getLayout().getRouteColor(), is(Colors.encodeToHexRGB(Color.RED)));
     assertThat(result.get(0).getProperties(), hasSize(1));
     assertThat(result.get(0).getProperties(), is(propertyList));
+  }
+
+  @Test
+  void checkToGetVehicleResponseTO() {
+    Vehicle vehicle = new Vehicle("V1")
+        .withBoundingBox(new BoundingBox(500, 100, 700))
+        .withEnergyLevelThresholdSet(new EnergyLevelThresholdSet(30, 90, 30, 90))
+        .withEnergyLevel(50)
+        .withIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED)
+        .withPaused(true)
+        .withProcState(Vehicle.ProcState.PROCESSING_ORDER)
+        .withTransportOrder(new TransportOrder("some-order", List.of()).getReference())
+        .withCurrentPosition(new Point("some-point").getReference())
+        .withPose(new Pose(new Triple(1, 2, 3), 4))
+        .withState(Vehicle.State.EXECUTING)
+        .withAllocatedResources(List.of(Set.of(new Point("some-other-point").getReference())))
+        .withClaimedResources(List.of(Set.of(new Point("yet-another-point").getReference())))
+        .withEnvelopeKey("some-key")
+        .withAcceptableOrderTypes(Set.of(new AcceptableOrderType("some-type", 3)))
+        .withMaxVelocity(1000)
+        .withMaxReverseVelocity(1000)
+        .withLayout(new Vehicle.Layout())
+        .withProperties(propertyMap);
+
+    GetVehicleResponseTO result = vehicleConverter.toGetVehicleResponseTO(vehicle);
+
+    assertThat(result.getName(), is("V1"));
+    assertThat(result.getBoundingBox().getLength(), is(500L));
+    assertThat(result.getBoundingBox().getWidth(), is(100L));
+    assertThat(result.getBoundingBox().getHeight(), is(700L));
+    assertThat(result.getBoundingBox().getReferenceOffset().getX(), is(0L));
+    assertThat(result.getBoundingBox().getReferenceOffset().getY(), is(0L));
+    assertThat(result.getEnergyLevelGood(), is(90));
+    assertThat(result.getEnergyLevelCritical(), is(30));
+    assertThat(result.getEnergyLevelFullyRecharged(), is(90));
+    assertThat(result.getEnergyLevelSufficientlyRecharged(), is(30));
+    assertThat(result.getEnergyLevel(), is(50));
+    assertThat(result.getIntegrationLevel(), is(Vehicle.IntegrationLevel.TO_BE_UTILIZED));
+    assertThat(result.isPaused(), is(true));
+    assertThat(result.getProcState(), is(Vehicle.ProcState.PROCESSING_ORDER));
+    assertThat(result.getTransportOrder(), is("some-order"));
+    assertThat(result.getCurrentPosition(), is("some-point"));
+    assertThat(result.getPrecisePosition().getX(), is(1L));
+    assertThat(result.getPrecisePosition().getY(), is(2L));
+    assertThat(result.getPrecisePosition().getZ(), is(3L));
+    assertThat(result.getOrientationAngle(), is(4.0));
+    assertThat(result.getState(), is(Vehicle.State.EXECUTING));
+    assertThat(result.getAllocatedResources(), is(List.of(List.of("some-other-point"))));
+    assertThat(result.getClaimedResources(), is(List.of(List.of("yet-another-point"))));
+    assertThat(result.getEnvelopeKey(), is("some-key"));
+    assertThat(
+        result.getAcceptableOrderTypes(),
+        is(List.of(new AcceptableOrderTypeTO("some-type", 3)))
+    );
+    assertThat(result.getProperties(), is(aMapWithSize(1)));
+    assertThat(result.getProperties(), is(propertyMap));
   }
 }

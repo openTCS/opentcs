@@ -11,19 +11,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.IntegrationLevel;
 import org.opentcs.data.model.Vehicle.ProcState;
 import org.opentcs.data.model.Vehicle.State;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.AcceptableOrderTypeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
+ * The current state of a vehicle.
  */
 @JsonPropertyOrder(
   {
@@ -31,7 +30,7 @@ import org.opentcs.util.annotations.ScheduledApiChange;
       "energyLevelSufficientlyRecharged", "energyLevelFullyRecharged", "energyLevel",
       "integrationLevel", "paused", "procState", "transportOrder", "currentPosition",
       "precisePosition", "orientationAngle", "state", "allocatedResources", "claimedResources",
-      "allowedOrderTypes", "envelopeKey"
+      "allowedOrderTypes", "acceptableOrderTypes", "envelopeKey"
   }
 )
 public class GetVehicleResponseTO {
@@ -77,7 +76,7 @@ public class GetVehicleResponseTO {
 
   private List<List<String>> claimedResources = new ArrayList<>();
 
-  private List<String> allowedOrderTypes = new ArrayList<>();
+  private List<AcceptableOrderTypeTO> acceptableOrderTypes = new ArrayList<>();
 
   private String envelopeKey;
 
@@ -267,12 +266,21 @@ public class GetVehicleResponseTO {
     return this;
   }
 
+  @Deprecated
   public List<String> getAllowedOrderTypes() {
-    return allowedOrderTypes;
+    return getAcceptableOrderTypes().stream()
+        .map(AcceptableOrderTypeTO::getName)
+        .collect(Collectors.toList());
   }
 
-  public GetVehicleResponseTO setAllowedOrderTypes(List<String> allowedOrderTypes) {
-    this.allowedOrderTypes = requireNonNull(allowedOrderTypes, "allowedOrderTypes");
+  public List<AcceptableOrderTypeTO> getAcceptableOrderTypes() {
+    return acceptableOrderTypes;
+  }
+
+  public GetVehicleResponseTO setAcceptableOrderTypes(
+      List<AcceptableOrderTypeTO> acceptableOrderTypes
+  ) {
+    this.acceptableOrderTypes = requireNonNull(acceptableOrderTypes, "acceptableOrderTypes");
     return this;
   }
 
@@ -289,96 +297,6 @@ public class GetVehicleResponseTO {
   ) {
     this.envelopeKey = envelopeKey;
     return this;
-  }
-
-  /**
-   * Creates a <Code>VehicleState</Code> instance from a <Code>Vehicle</Code> instance.
-   *
-   * @param vehicle The vehicle whose properties will be used to create a <Code>VehicleState</Code>
-   * instance.
-   * @return A new <Code>VehicleState</Code> instance filled with data from the given vehicle.
-   */
-  public static GetVehicleResponseTO fromVehicle(Vehicle vehicle) {
-    if (vehicle == null) {
-      return null;
-    }
-    GetVehicleResponseTO vehicleState = new GetVehicleResponseTO();
-    vehicleState.setName(vehicle.getName());
-    vehicleState.setProperties(vehicle.getProperties());
-    vehicleState.setBoundingBox(
-        new BoundingBoxTO(
-            vehicle.getBoundingBox().getLength(),
-            vehicle.getBoundingBox().getWidth(),
-            vehicle.getBoundingBox().getHeight(),
-            new CoupleTO(
-                vehicle.getBoundingBox().getReferenceOffset().getX(),
-                vehicle.getBoundingBox().getReferenceOffset().getY()
-            )
-        )
-    );
-    vehicleState.setEnergyLevelCritical(
-        vehicle.getEnergyLevelThresholdSet().getEnergyLevelCritical()
-    );
-    vehicleState.setEnergyLevelGood(vehicle.getEnergyLevelThresholdSet().getEnergyLevelGood());
-    vehicleState.setEnergyLevelSufficientlyRecharged(
-        vehicle.getEnergyLevelThresholdSet().getEnergyLevelSufficientlyRecharged()
-    );
-    vehicleState.setEnergyLevelFullyRecharged(
-        vehicle.getEnergyLevelThresholdSet().getEnergyLevelFullyRecharged()
-    );
-    vehicleState.setEnergyLevel(vehicle.getEnergyLevel());
-    vehicleState.setIntegrationLevel(vehicle.getIntegrationLevel());
-    vehicleState.setPaused(vehicle.isPaused());
-    vehicleState.setProcState(vehicle.getProcState());
-    vehicleState.setTransportOrder(nameOfNullableReference(vehicle.getTransportOrder()));
-    vehicleState.setCurrentPosition(nameOfNullableReference(vehicle.getCurrentPosition()));
-    if (vehicle.getPose().getPosition() != null) {
-      vehicleState.setPrecisePosition(
-          new PrecisePosition(
-              vehicle.getPose().getPosition().getX(),
-              vehicle.getPose().getPosition().getY(),
-              vehicle.getPose().getPosition().getZ()
-          )
-      );
-    }
-    else {
-      vehicleState.setPrecisePosition(null);
-    }
-    vehicleState.setOrientationAngle(vehicle.getPose().getOrientationAngle());
-    vehicleState.setState(vehicle.getState());
-    vehicleState.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
-    vehicleState.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));
-    vehicleState.setEnvelopeKey(vehicle.getEnvelopeKey());
-    vehicleState.setAllowedOrderTypes(
-        vehicle.getAllowedOrderTypes()
-            .stream()
-            .sorted()
-            .collect(Collectors.toCollection(ArrayList::new))
-    );
-    return vehicleState;
-  }
-
-  private static String nameOfNullableReference(
-      @Nullable
-      TCSObjectReference<?> reference
-  ) {
-    return reference == null ? null : reference.getName();
-  }
-
-  private static List<List<String>> toListOfListOfNames(
-      List<Set<TCSResourceReference<?>>> resources
-  ) {
-    List<List<String>> result = new ArrayList<>(resources.size());
-
-    for (Set<TCSResourceReference<?>> resSet : resources) {
-      result.add(
-          resSet.stream()
-              .map(resRef -> resRef.getName())
-              .collect(Collectors.toList())
-      );
-    }
-
-    return result;
   }
 
   /**

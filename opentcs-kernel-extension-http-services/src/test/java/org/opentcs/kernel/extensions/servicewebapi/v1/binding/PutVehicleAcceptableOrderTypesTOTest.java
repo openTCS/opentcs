@@ -7,11 +7,12 @@ import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.AcceptableOrderTypeTO;
 
 /**
- * Tests for {@link PutVehicleAllowedOrderTypesTO}.
+ * Tests for {@link PutVehicleAcceptableOrderTypesTO}.
  */
-class PutVehicleAllowedOrderTypesTOTest {
+class PutVehicleAcceptableOrderTypesTOTest {
 
   private JsonBinder jsonBinder;
 
@@ -22,12 +23,12 @@ class PutVehicleAllowedOrderTypesTOTest {
 
   @Test
   void jsonSample() {
-    PutVehicleAllowedOrderTypesTO to
-        = new PutVehicleAllowedOrderTypesTO(
+    PutVehicleAcceptableOrderTypesTO to
+        = new PutVehicleAcceptableOrderTypesTO(
             List.of(
-                "some-orderType",
-                "another-orderType",
-                "orderType-3"
+                new AcceptableOrderTypeTO("some-orderType", 0),
+                new AcceptableOrderTypeTO("another-orderType", 1),
+                new AcceptableOrderTypeTO("orderType-3", 2)
             )
         );
 

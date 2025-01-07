@@ -20,7 +20,7 @@ public interface DefaultDispatcherConfiguration {
   @ConfigurationEntry(
       type = "Comma-separated list of strings",
       description = {"Keys by which to prioritize transport orders for assignment.",
-          "Possible values:",
+          "Possible keys:",
           "BY_AGE: Sort by age, oldest first.",
           "BY_DEADLINE: Sort by deadline, most urgent first.",
           "DEADLINE_AT_RISK_FIRST: Sort orders with deadlines at risk first.",
@@ -33,7 +33,7 @@ public interface DefaultDispatcherConfiguration {
   @ConfigurationEntry(
       type = "Comma-separated list of strings",
       description = {"Keys by which to prioritize vehicles for assignment.",
-          "Possible values:",
+          "Possible keys:",
           "BY_ENERGY_LEVEL: Sort by energy level, highest first.",
           "IDLE_FIRST: Sort vehicles with state IDLE first.",
           "BY_NAME: Sort by name, lexicographically."},
@@ -45,12 +45,14 @@ public interface DefaultDispatcherConfiguration {
   @ConfigurationEntry(
       type = "Comma-separated list of strings",
       description = {"Keys by which to prioritize vehicle candidates for assignment.",
-          "Possible values:",
+          "Possible keys:",
           "BY_ENERGY_LEVEL: Sort by energy level of the vehicle, highest first.",
           "IDLE_FIRST: Sort vehicles with state IDLE first.",
           "BY_COMPLETE_ROUTING_COSTS: Sort by complete routing costs, lowest first.",
           "BY_INITIAL_ROUTING_COSTS: Sort by routing costs for the first destination.",
-          "BY_VEHICLE_NAME: Sort by vehicle name, lexicographically."},
+          "BY_VEHICLE_NAME: Sort by vehicle name, lexicographically.",
+          "BY_ORDER_TYPE_PRIORITY: Sort by priority of the order types configured for the vehicle, "
+              + "highest (i.e. lowest integer value) first."},
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
       orderKey = "0_assign"
   )
@@ -59,13 +61,15 @@ public interface DefaultDispatcherConfiguration {
   @ConfigurationEntry(
       type = "Comma-separated list of strings",
       description = {"Keys by which to prioritize transport order candidates for assignment.",
-          "Possible values:",
+          "Possible keys:",
           "BY_AGE: Sort by transport order age, oldest first.",
           "BY_DEADLINE: Sort by transport order deadline, most urgent first.",
           "DEADLINE_AT_RISK_FIRST: Sort orders with deadlines at risk first.",
           "BY_COMPLETE_ROUTING_COSTS: Sort by complete routing costs, lowest first.",
           "BY_INITIAL_ROUTING_COSTS: Sort by routing costs for the first destination.",
-          "BY_ORDER_NAME: Sort by transport order name, lexicographically."},
+          "BY_ORDER_NAME: Sort by transport order name, lexicographically.",
+          "BY_ORDER_TYPE_PRIORITY: Sort by priority of the order type configured for the vehicles, "
+              + "highest (i.e. lowest integer value) first."},
       changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
       orderKey = "0_assign"
   )

@@ -25,6 +25,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTopologyUpdate
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAcceptableOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleEnergyLevelThresholdSetTO;
 import spark.QueryParamsMap;
@@ -154,6 +155,10 @@ public class V1RequestHandler
     service.put(
         "/vehicles/:NAME/allowedOrderTypes",
         this::handlePutVehicleAllowedOrderTypes
+    );
+    service.put(
+        "/vehicles/:NAME/acceptableOrderTypes",
+        this::handlePutVehicleAcceptableOrderTypes
     );
     service.put(
         "/vehicles/:NAME/energyLevelThresholdSet",
@@ -567,12 +572,24 @@ public class V1RequestHandler
     return "";
   }
 
+  @Deprecated
   private Object handlePutVehicleAllowedOrderTypes(Request request, Response response)
       throws ObjectUnknownException,
         IllegalArgumentException {
     vehicleHandler.putVehicleAllowedOrderTypes(
         request.params(":NAME"),
         jsonBinder.fromJson(request.body(), PutVehicleAllowedOrderTypesTO.class)
+    );
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handlePutVehicleAcceptableOrderTypes(Request request, Response response)
+      throws ObjectUnknownException,
+        IllegalArgumentException {
+    vehicleHandler.putVehicleAcceptableOrderTypes(
+        request.params(":NAME"),
+        jsonBinder.fromJson(request.body(), PutVehicleAcceptableOrderTypesTO.class)
     );
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";

@@ -5,23 +5,31 @@ package org.opentcs.guing.common.components.properties.panel;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
-import java.util.Enumeration;
-import java.util.Set;
-import java.util.TreeSet;
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.ListModel;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableRowSorter;
+import org.opentcs.data.order.OrderConstants;
 import org.opentcs.guing.base.components.properties.type.OrderTypesProperty;
 import org.opentcs.guing.base.components.properties.type.Property;
+import org.opentcs.guing.base.model.AcceptableOrderTypeModel;
 import org.opentcs.guing.common.components.dialogs.DetailsDialogContent;
+import org.opentcs.guing.common.components.dialogs.StandardContentDialog;
 import org.opentcs.guing.common.transport.OrderTypeSuggestionsPool;
 import org.opentcs.guing.common.util.I18nPlantOverview;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 
 /**
- * User interface to edit a set of order type strings.
+ * User interface to edit a set of order types.
  */
 public class OrderTypesPropertyEditorPanel
     extends
@@ -53,32 +61,18 @@ public class OrderTypesPropertyEditorPanel
   public OrderTypesPropertyEditorPanel(OrderTypeSuggestionsPool typeSuggestionsPool) {
     this.typeSuggestionsPool = requireNonNull(typeSuggestionsPool, "typeSuggestionsPool");
     initComponents();
-    initCategoryCombobox();
+    initTable();
   }
 
   @Override
   public void setProperty(Property property) {
     fProperty = (OrderTypesProperty) property;
-    DefaultListModel<String> model = new DefaultListModel<>();
-
-    for (String item : fProperty.getItems()) {
-      model.addElement(item);
-    }
-
-    itemsList.setModel(model);
+    getTableModel().setValues(fProperty.getItems());
   }
 
   @Override
   public void updateValues() {
-    Set<String> items = new TreeSet<>();
-    ListModel<String> model = itemsList.getModel();
-    int size = model.getSize();
-
-    for (int i = 0; i < size; i++) {
-      items.add(model.getElementAt(i));
-    }
-
-    fProperty.setItems(items);
+    fProperty.setItems(getTableModel().getValues());
   }
 
   @Override
@@ -91,49 +85,33 @@ public class OrderTypesPropertyEditorPanel
     return fProperty;
   }
 
-  /**
-   * Adds a new entry. Also adds the category to the pool.
-   */
-  protected void add() {
-    DefaultListModel<String> model = (DefaultListModel<String>) itemsList.getModel();
-    String category = typeComboBox.getSelectedItem().toString();
-
-    // Check for already added categories
-    Enumeration<String> entries = model.elements();
-    while (entries.hasMoreElements()) {
-      String entry = entries.nextElement();
-      if (entry.equals(category)) {
-        JOptionPane.showMessageDialog(
-            this,
-            bundle.getString(
-                "orderTypesPropertyEditorPanel.optionPane_typeAlreadyPresentError.message"
-            )
-        );
-        return;
-      }
+  private void initTable() {
+    TableRowSorter<OrderTypeTableModel> sorter = new TableRowSorter<>(getTableModel());
+    // Explicitly override the default comparator for the "name" column, which otherwise would be
+    // a locale-specific Collator instance, which does not necessarily sort in natural order.
+    sorter.setComparator(OrderTypeTableModel.COLUMN_NAME, Comparator.naturalOrder());
+    // Sort the table first by order type priority and then by order type name...
+    sorter.setSortKeys(
+        Arrays.asList(
+            new RowSorter.SortKey(OrderTypeTableModel.COLUMN_PRIORITY, SortOrder.ASCENDING),
+            new RowSorter.SortKey(OrderTypeTableModel.COLUMN_NAME, SortOrder.ASCENDING)
+        )
+    );
+    // ...but prevent manual sorting.
+    for (int i = 0; i < orderTypesTable.getColumnCount(); i++) {
+      sorter.setSortable(i, false);
     }
-
-    model.addElement(category);
-
-    typeSuggestionsPool.addTypeSuggestion(category);
-    // Re-initialize the combo box since there may be a new entry
-    initCategoryCombobox();
+    sorter.setSortsOnUpdates(true);
+    orderTypesTable.setRowSorter(sorter);
   }
 
-  /**
-   * Returns the list with the values.
-   *
-   * @return The list with the values.
-   */
-  protected JList<String> getItemsList() {
-    return itemsList;
+  private OrderTypeTableModel getTableModel() {
+    return (OrderTypeTableModel) orderTypesTable.getModel();
   }
 
-  private void initCategoryCombobox() {
-    typeComboBox.removeAllItems();
-    for (String suggestion : typeSuggestionsPool.getTypeSuggestions()) {
-      typeComboBox.addItem(suggestion);
-    }
+  private boolean orderTypeExistsInTable(AcceptableOrderTypeModel orderType) {
+    return getTableModel().getValues().stream()
+        .anyMatch(tableType -> Objects.equals(tableType.getName(), orderType.getName()));
   }
 
   // FORMATTER:OFF
@@ -147,33 +125,29 @@ public class OrderTypesPropertyEditorPanel
   private void initComponents() {
     java.awt.GridBagConstraints gridBagConstraints;
 
-    itemsScrollPane = new javax.swing.JScrollPane();
-    itemsList = new javax.swing.JList<>();
-    typeComboBox = new javax.swing.JComboBox<>();
+    orderTypesScrollPane = new javax.swing.JScrollPane();
+    orderTypesTable = new javax.swing.JTable();
+    controlPanel = new javax.swing.JPanel();
     addButton = new javax.swing.JButton();
+    editButton = new javax.swing.JButton();
     removeButton = new javax.swing.JButton();
+    controlFiller = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0));
 
     setPreferredSize(new java.awt.Dimension(300, 250));
     setLayout(new java.awt.GridBagLayout());
 
-    itemsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-    itemsScrollPane.setViewportView(itemsList);
+    orderTypesTable.setModel(new OrderTypeTableModel());
+    orderTypesScrollPane.setViewportView(orderTypesTable);
 
-    gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-    gridBagConstraints.weightx = 1.0;
-    gridBagConstraints.weighty = 1.0;
-    add(itemsScrollPane, gridBagConstraints);
-
-    typeComboBox.setEditable(true);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
-    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.insets = new java.awt.Insets(0, 0, 3, 0);
-    add(typeComboBox, gridBagConstraints);
+    gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    add(orderTypesScrollPane, gridBagConstraints);
+
+    controlPanel.setLayout(new java.awt.GridBagLayout());
 
     addButton.setFont(addButton.getFont());
     java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("i18n/org/opentcs/plantoverview/panels/propertyEditing"); // NOI18N
@@ -184,11 +158,24 @@ public class OrderTypesPropertyEditorPanel
       }
     });
     gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 0;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 3, 0);
-    add(addButton, gridBagConstraints);
+    controlPanel.add(addButton, gridBagConstraints);
+
+    editButton.setText(bundle.getString("orderTypesPropertyEditorPanel.button_edit.text")); // NOI18N
+    editButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        editButtonActionPerformed(evt);
+      }
+    });
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.insets = new java.awt.Insets(0, 3, 3, 0);
+    controlPanel.add(editButton, gridBagConstraints);
 
     removeButton.setFont(removeButton.getFont());
     removeButton.setText(bundle.getString("orderTypesPropertyEditorPanel.button_remove.text")); // NOI18N
@@ -198,39 +185,230 @@ public class OrderTypesPropertyEditorPanel
       }
     });
     gridBagConstraints = new java.awt.GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 1;
-    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
-    add(removeButton, gridBagConstraints);
+    controlPanel.add(removeButton, gridBagConstraints);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 3;
+    gridBagConstraints.weightx = 1.0;
+    gridBagConstraints.weighty = 1.0;
+    controlPanel.add(controlFiller, gridBagConstraints);
+
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+    add(controlPanel, gridBagConstraints);
   }// </editor-fold>//GEN-END:initComponents
   // CHECKSTYLE:ON
   // FORMATTER:ON
 
   private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-    String value = itemsList.getSelectedValue();
-
-    if (value == null) {
+    int selectedRow = orderTypesTable.getSelectedRow();
+    if (selectedRow == -1) {
       return;
     }
 
-    DefaultListModel<String> model = (DefaultListModel<String>) itemsList.getModel();
-    model.removeElement(value);
+    getTableModel().remove(orderTypesTable.convertRowIndexToModel(selectedRow));
   }//GEN-LAST:event_removeButtonActionPerformed
 
   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-    add();
+    OrderTypePanel content = new OrderTypePanel(
+        new AcceptableOrderTypeModel(OrderConstants.TYPE_ANY, 0),
+        typeSuggestionsPool
+    );
+    StandardContentDialog dialog = new StandardContentDialog(this, content);
+    dialog.setLocationRelativeTo(this);
+    dialog.setVisible(true);
+
+    if (dialog.getReturnStatus() != StandardContentDialog.RET_OK) {
+      return;
+    }
+
+    AcceptableOrderTypeModel newType = content.getAcceptableOrderTypeModel();
+    if (orderTypeExistsInTable(newType)) {
+      JOptionPane.showMessageDialog(
+          this,
+          bundle.getString(
+              "orderTypesPropertyEditorPanel.optionPane_typeAlreadyPresentError.message"
+          )
+      );
+      return;
+    }
+
+    getTableModel().add(newType);
+    typeSuggestionsPool.addTypeSuggestion(newType.getName());
   }//GEN-LAST:event_addButtonActionPerformed
+
+  private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
+    int selectedRow = orderTypesTable.getSelectedRow();
+    if (selectedRow == -1) {
+      return;
+    }
+
+    AcceptableOrderTypeModel oldType = getTableModel().getValueAt(
+        orderTypesTable.convertRowIndexToModel(selectedRow)
+    );
+    OrderTypePanel content = new OrderTypePanel(oldType, typeSuggestionsPool);
+    StandardContentDialog dialog = new StandardContentDialog(this, content);
+    dialog.setLocationRelativeTo(this);
+    dialog.setVisible(true);
+
+    if (dialog.getReturnStatus() != StandardContentDialog.RET_OK) {
+      return;
+    }
+
+    // First, remove the old type.
+    getTableModel().remove(orderTypesTable.convertRowIndexToModel(selectedRow));
+
+    // Then, check if a type with the new type's name already exists.
+    AcceptableOrderTypeModel newType = content.getAcceptableOrderTypeModel();
+    if (orderTypeExistsInTable(newType)) {
+      // If a type with the new type's name already exists, restore the old type.
+      getTableModel().add(oldType);
+      JOptionPane.showMessageDialog(
+          this,
+          bundle.getString(
+              "orderTypesPropertyEditorPanel.optionPane_typeAlreadyPresentError.message"
+          )
+      );
+      return;
+    }
+
+    getTableModel().add(newType);
+    typeSuggestionsPool.addTypeSuggestion(newType.getName());
+  }//GEN-LAST:event_editButtonActionPerformed
 
   // FORMATTER:OFF
   // CHECKSTYLE:OFF
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JButton addButton;
-  private javax.swing.JList<String> itemsList;
-  private javax.swing.JScrollPane itemsScrollPane;
+  private javax.swing.Box.Filler controlFiller;
+  private javax.swing.JPanel controlPanel;
+  private javax.swing.JButton editButton;
+  private javax.swing.JScrollPane orderTypesScrollPane;
+  private javax.swing.JTable orderTypesTable;
   private javax.swing.JButton removeButton;
-  private javax.swing.JComboBox<String> typeComboBox;
   // End of variables declaration//GEN-END:variables
   // CHECKSTYLE:ON
   // FORMATTER:ON
+
+  private class OrderTypeTableModel
+      extends
+        AbstractTableModel {
+
+    /**
+     * The number of the "Name" column.
+     */
+    public static final int COLUMN_NAME = 0;
+    /**
+     * The number of the "Priority" column.
+     */
+    public static final int COLUMN_PRIORITY = 1;
+    /**
+     * The column names.
+     */
+    private final String[] columnNames
+        = new String[]{
+            bundle.getString(
+                "orderTypesPropertyEditorPanel.table_orderTypes.column_name.headerText"
+            ),
+            bundle.getString(
+                "orderTypesPropertyEditorPanel.table_orderTypes.column_priority.headerText"
+            )
+        };
+    /**
+     * Column classes.
+     */
+    private final Class<?>[] columnClasses
+        = new Class<?>[]{
+            String.class,
+            Integer.class
+        };
+    /**
+     * The values in this model.
+     */
+    private final List<AcceptableOrderTypeModel> values = new ArrayList<>();
+
+    OrderTypeTableModel() {
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+      return columnClasses[columnIndex];
+    }
+
+    @Override
+    public String getColumnName(int columnIndex) {
+      return columnNames[columnIndex];
+    }
+
+    @Override
+    public int getRowCount() {
+      return values.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+      return columnNames.length;
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+      if (!rowInBounds(rowIndex)) {
+        return null;
+      }
+
+      AcceptableOrderTypeModel entry = values.get(rowIndex);
+      switch (columnIndex) {
+        case COLUMN_NAME:
+          return entry.getName();
+        case COLUMN_PRIORITY:
+          return entry.getPriority();
+        default:
+          throw new IllegalArgumentException("Invalid column index: " + columnIndex);
+      }
+    }
+
+    public void setValues(Collection<AcceptableOrderTypeModel> values) {
+      requireNonNull(values, "values");
+
+      this.values.clear();
+      this.values.addAll(values);
+      fireTableDataChanged();
+    }
+
+    public List<AcceptableOrderTypeModel> getValues() {
+      return Collections.unmodifiableList(values);
+    }
+
+    public AcceptableOrderTypeModel getValueAt(int row) {
+      return values.get(row);
+    }
+
+    public boolean add(AcceptableOrderTypeModel envelopeModel) {
+      values.add(envelopeModel);
+      fireTableRowsInserted(values.size() - 1, values.size() - 1);
+      return true;
+    }
+
+    public boolean remove(int row) {
+      if (!rowInBounds(row)) {
+        return false;
+      }
+
+      values.remove(row);
+      fireTableRowsDeleted(row, row);
+      return true;
+    }
+
+    private boolean rowInBounds(int row) {
+      if (values.isEmpty()) {
+        return false;
+      }
+
+      return row >= 0 && row <= values.size() - 1;
+    }
+  }
 }

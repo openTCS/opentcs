@@ -19,12 +19,14 @@ import org.opentcs.access.rmi.services.RemoteVehicleService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -309,6 +311,8 @@ public class StandardRemoteVehicleService
   }
 
   @Override
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public void updateVehicleAllowedOrderTypes(
       ClientID clientId, TCSObjectReference<Vehicle> ref,
       Set<String> allowedOrderTypes
@@ -318,6 +322,25 @@ public class StandardRemoteVehicleService
     try {
       kernelExecutor.submit(
           () -> vehicleService.updateVehicleAllowedOrderTypes(ref, allowedOrderTypes)
+      )
+          .get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
+
+  @Override
+  public void updateVehicleAcceptableOrderTypes(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      Set<AcceptableOrderType> acceptableOrderTypes
+  ) {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
+
+    try {
+      kernelExecutor.submit(
+          () -> vehicleService.updateVehicleAcceptableOrderTypes(ref, acceptableOrderTypes)
       )
           .get();
     }

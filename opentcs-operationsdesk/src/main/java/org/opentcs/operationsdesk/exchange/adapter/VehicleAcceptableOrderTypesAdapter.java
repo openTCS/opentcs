@@ -5,11 +5,13 @@ package org.opentcs.operationsdesk.exchange.adapter;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.kernel.services.ServiceUnavailableException;
+import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeListener;
@@ -18,16 +20,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Updates a vehicle's allowed order types with the kernel when it changes.
+ * Updates a vehicle's acceptable order types with the kernel when it changes.
  */
-public class VehicleAllowedOrderTypesAdapter
+public class VehicleAcceptableOrderTypesAdapter
     implements
       AttributesChangeListener {
 
   /**
    * This class's logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(VehicleAllowedOrderTypesAdapter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(
+      VehicleAcceptableOrderTypesAdapter.class
+  );
   /**
    * The vehicle model.
    */
@@ -37,9 +41,9 @@ public class VehicleAllowedOrderTypesAdapter
    */
   private final SharedKernelServicePortalProvider portalProvider;
   /**
-   * The vehicle's allowed order types the last time we checked them.
+   * The vehicle's acceptable order types the last time we checked them.
    */
-  private Set<String> previousAllowedOrderTypes;
+  private Set<AcceptableOrderType> previousAcceptableOrderTypes;
 
   /**
    * Creates a new instance.
@@ -47,13 +51,13 @@ public class VehicleAllowedOrderTypesAdapter
    * @param portalProvider A kernel provider.
    * @param model The vehicle model.
    */
-  public VehicleAllowedOrderTypesAdapter(
+  public VehicleAcceptableOrderTypesAdapter(
       SharedKernelServicePortalProvider portalProvider,
       VehicleModel model
   ) {
     this.portalProvider = requireNonNull(portalProvider, "portalProvider");
     this.model = requireNonNull(model, "model");
-    this.previousAllowedOrderTypes = getAllowedOrderTypes();
+    this.previousAcceptableOrderTypes = getAcceptableOrderTypes();
   }
 
   @Override
@@ -62,34 +66,36 @@ public class VehicleAllowedOrderTypesAdapter
       return;
     }
 
-    Set<String> allowedOrderTypes = getAllowedOrderTypes();
-    if (previousAllowedOrderTypes.equals(allowedOrderTypes)) {
-      LOG.debug("Ignoring vehicle properties update as the allowed order types did not change");
+    Set<AcceptableOrderType> acceptableOrderTypes = getAcceptableOrderTypes();
+    if (previousAcceptableOrderTypes.equals(acceptableOrderTypes)) {
+      LOG.debug("Ignoring vehicle properties update as the acceptable order types did not change");
       return;
     }
 
-    previousAllowedOrderTypes = allowedOrderTypes;
-    new Thread(() -> updateAllowedOrderTypesInKernel(allowedOrderTypes)).start();
+    previousAcceptableOrderTypes = acceptableOrderTypes;
+    new Thread(() -> updateAcceptableOrderTypesInKernel(acceptableOrderTypes)).start();
   }
 
-  private Set<String> getAllowedOrderTypes() {
-    return model.getPropertyAllowedOrderTypes().getItems();
+  private Set<AcceptableOrderType> getAcceptableOrderTypes() {
+    return model.getPropertyAcceptableOrderTypes().getItems().stream()
+        .map(orderType -> new AcceptableOrderType(orderType.getName(), orderType.getPriority()))
+        .collect(Collectors.toSet());
   }
 
-  private void updateAllowedOrderTypesInKernel(Set<String> allowedOrderTypes) {
+  private void updateAcceptableOrderTypesInKernel(Set<AcceptableOrderType> acceptableOrderTypes) {
     try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
       KernelServicePortal portal = sharedPortal.getPortal();
       // Check if the kernel is in operating mode, too.
       if (portal.getState() == Kernel.State.OPERATING) {
         Vehicle vehicle = portal.getVehicleService().fetchObject(Vehicle.class, model.getName());
-        if (vehicle.getAllowedOrderTypes().size() == allowedOrderTypes.size()
-            && vehicle.getAllowedOrderTypes().containsAll(allowedOrderTypes)) {
+        if (vehicle.getAcceptableOrderTypes().size() == acceptableOrderTypes.size()
+            && vehicle.getAcceptableOrderTypes().containsAll(acceptableOrderTypes)) {
           LOG.debug("Ignoring vehicle properties update. Already up do date.");
           return;
         }
-        portal.getVehicleService().updateVehicleAllowedOrderTypes(
+        portal.getVehicleService().updateVehicleAcceptableOrderTypes(
             vehicle.getReference(),
-            allowedOrderTypes
+            acceptableOrderTypes
         );
       }
 

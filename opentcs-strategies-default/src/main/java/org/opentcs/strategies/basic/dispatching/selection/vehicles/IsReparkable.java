@@ -48,7 +48,7 @@ public class IsReparkable
         && vehicle.hasState(Vehicle.State.IDLE)
         && isParkingPosition(vehicle.getCurrentPosition())
         && vehicle.getOrderSequence() == null
-        && hasAllowedOrderTypesForParking(vehicle);
+        && hasAcceptableOrderTypesForParking(vehicle);
   }
 
   private boolean isParkingPosition(TCSObjectReference<Point> positionRef) {
@@ -60,8 +60,11 @@ public class IsReparkable
     return position.isParkingPosition();
   }
 
-  private boolean hasAllowedOrderTypesForParking(Vehicle vehicle) {
-    return vehicle.getAllowedOrderTypes().contains(OrderConstants.TYPE_PARK)
-        || vehicle.getAllowedOrderTypes().contains(OrderConstants.TYPE_ANY);
+  private boolean hasAcceptableOrderTypesForParking(Vehicle vehicle) {
+    return vehicle.getAcceptableOrderTypes().stream()
+        .anyMatch(
+            orderType -> orderType.getName().equals(OrderConstants.TYPE_PARK)
+                || orderType.getName().equals(OrderConstants.TYPE_ANY)
+        );
   }
 }

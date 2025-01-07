@@ -34,11 +34,14 @@ public class IsIdleAndDegraded
         && vehicle.getCurrentPosition() != null
         && vehicle.getOrderSequence() == null
         && vehicle.isEnergyLevelDegraded()
-        && hasAllowedOrderTypesForCharging(vehicle);
+        && hasAcceptableOrderTypesForCharging(vehicle);
   }
 
-  private boolean hasAllowedOrderTypesForCharging(Vehicle vehicle) {
-    return vehicle.getAllowedOrderTypes().contains(OrderConstants.TYPE_CHARGE)
-        || vehicle.getAllowedOrderTypes().contains(OrderConstants.TYPE_ANY);
+  private boolean hasAcceptableOrderTypesForCharging(Vehicle vehicle) {
+    return vehicle.getAcceptableOrderTypes().stream()
+        .anyMatch(
+            orderType -> orderType.getName().equals(OrderConstants.TYPE_CHARGE)
+                || orderType.getName().equals(OrderConstants.TYPE_ANY)
+        );
   }
 }

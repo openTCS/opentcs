@@ -32,6 +32,7 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Couple;
@@ -646,28 +647,28 @@ public class PlantModelManager
   }
 
   /**
-   * Sets the allowed order types for a given vehicle.
+   * Sets the acceptable order types for a given vehicle.
    *
    * @param ref Reference to the vehicle.
-   * @param allowedOrderTypes Set of allowed order types.
+   * @param acceptableOrderTypes Set of allowed order types.
    * @return The vehicle with the allowed order types.
    * @throws ObjectUnknownException The vehicle reference is not known.
    */
-  public Vehicle setVehicleAllowedOrderTypes(
+  public Vehicle setVehicleAcceptableOrderTypes(
       TCSObjectReference<Vehicle> ref,
-      Set<String> allowedOrderTypes
+      Set<AcceptableOrderType> acceptableOrderTypes
   )
       throws ObjectUnknownException {
     Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
 
     LOG.info(
-        "Vehicle's allowed order types change: {} -- {} -> {}",
+        "Vehicle's acceptable order types change: {} -- {} -> {}",
         previousState.getName(),
-        previousState.getAllowedOrderTypes(),
-        allowedOrderTypes
+        previousState.getAcceptableOrderTypes(),
+        acceptableOrderTypes
     );
 
-    Vehicle vehicle = previousState.withAllowedOrderTypes(allowedOrderTypes);
+    Vehicle vehicle = previousState.withAcceptableOrderTypes(acceptableOrderTypes);
     getObjectRepo().replaceObject(vehicle);
     emitObjectEvent(
         vehicle,

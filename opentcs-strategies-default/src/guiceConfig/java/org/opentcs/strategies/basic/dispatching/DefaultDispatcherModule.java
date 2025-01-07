@@ -25,6 +25,7 @@ import org.opentcs.strategies.basic.dispatching.priorization.candidate.Candidate
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByInitialRoutingCosts;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByOrderAge;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByOrderName;
+import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByOrderTypePriority;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorByVehicleName;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorDeadlineAtRiskFirst;
 import org.opentcs.strategies.basic.dispatching.priorization.candidate.CandidateComparatorIdleFirst;
@@ -194,6 +195,9 @@ public class DefaultDispatcherModule
     candidateComparatorBinder
         .addBinding(CandidateComparatorIdleFirst.CONFIGURATION_KEY)
         .to(CandidateComparatorIdleFirst.class);
+    candidateComparatorBinder
+        .addBinding(CandidateComparatorByOrderTypePriority.CONFIGURATION_KEY)
+        .to(CandidateComparatorByOrderTypePriority.class);
 
     bind(CompositeVehicleComparator.class)
         .in(Singleton.class);

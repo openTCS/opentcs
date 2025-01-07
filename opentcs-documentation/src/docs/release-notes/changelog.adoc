@@ -18,6 +18,14 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
+* New features and enhancements:
+** Add support for transport order type priorities.
+   For vehicle elements, every transport order type (that a vehicle is allowed to process) can now be assigned a priority.
+** Add a new key `BY_ORDER_TYPE_PRIORITY` that can be configured for the kernel configuration entries `defaultdispatcher.orderCandidatePriorities` and `defaultdispatcher.vehicleCandidatePriorities`.
+   With this key configured, the priorities of a vehicle's acceptable order types are considered when assigning transport order to it.
+** Update web API specification and implementation to version 1.10.0:
+*** Add an endpoint `PUT /vehicles/{NAME}/acceptableOrderTypes`, which allows a vehicle's set of acceptable order types to be modified during runtime.
+    This endpoint replaces `PUT /vehicles/{NAME}/allowedOrderTypes`, which is now deprecated.
 * Bugs fixed:
 ** Avoid a `NullPointerException` when trying to park a vehicle whose current position is not known.
 ** Ensure vehicles can process newly assigned transport orders after a peripheral job (created in the context of a previous transport order) has failed.

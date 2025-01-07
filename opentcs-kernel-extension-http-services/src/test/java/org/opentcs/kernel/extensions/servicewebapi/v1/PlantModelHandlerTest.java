@@ -37,6 +37,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.Vehicle
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VisualLayoutTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.TripleTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.AcceptableOrderTypeConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.BlockConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.EnvelopeConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.LocationConverter;
@@ -64,6 +65,7 @@ class PlantModelHandlerTest {
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
     EnvelopeConverter envelopeConverter = new EnvelopeConverter();
     PropertyConverter propertyConverter = new PropertyConverter();
+    AcceptableOrderTypeConverter orderTypeConverter = new AcceptableOrderTypeConverter();
     routerService = mock();
 
     handler = new PlantModelHandler(
@@ -78,7 +80,7 @@ class PlantModelHandlerTest {
         new LocationTypeConverter(propertyConverter),
         new LocationConverter(propertyConverter),
         new BlockConverter(propertyConverter),
-        new VehicleConverter(propertyConverter),
+        new VehicleConverter(propertyConverter, orderTypeConverter),
         new VisualLayoutConverter(propertyConverter),
         propertyConverter,
         routerService

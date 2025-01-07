@@ -21,7 +21,7 @@ info:
     Optionally, an access key can be set in the kernel configuration.
     The configured value is then expected to be sent by the client in an HTTP header named `X-Api-Access-Key`.
   # IMPORTANT: When updating this version number, remember to mention that in the changelog, too!
-  version: 1.9.0
+  version: 1.10.0
   title: openTCS web API specification
 servers:
   - url: http://localhost:55200/v1
@@ -649,9 +649,11 @@ paths:
                   example: Could not find vehicle 'Vehicle-0001'.
   "/vehicles/{NAME}/allowedOrderTypes":
     put:
+      deprecated: true
       tags:
         - Vehicles
       summary: Sets the allowed order types for the named vehicle.
+      description: Deprecated - Use `PUT /vehicles/{NAME}/acceptableOrderTypes` instead.
       parameters:
         - name: NAME
           in: path
@@ -666,6 +668,48 @@ paths:
             schema:
               $ref: "#/components/schemas/AllowedOrderTypes"
         description: The list of all order types to be allowed.
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: The submitted data is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/acceptableOrderTypes":
+    put:
+      tags:
+        - Vehicles
+      summary: Sets the acceptable order types for the named vehicle.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptableOrderTypes"
+        description: The list of all acceptable order types with priorities.
       responses:
         "200":
           description: Successful operation
@@ -1660,6 +1704,27 @@ components:
           example: [ "Park", "Load cargo", "Unload cargo" ]
       required:
         - orderTypes
+    AcceptableOrderTypes:
+      title: Acceptable Order Types
+      type: object
+      properties:
+        acceptableOrderTypes:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The name of the order type.
+              priority:
+                type: integer
+                description: The priority of the order type, with a lower value indicating a higher priority.
+            required:
+              - name
+              - priority
+          example: [ { "name": "Park", "priority": 0 }, { "name": "Load cargo", "priority": 0 }, { "name": "Unload cargo", "priority": 0 } ]
+      required:
+        - acceptableOrderTypes
     EnergyLevelThresholdSet:
       title: Energy Level Threshold Set
       type: object

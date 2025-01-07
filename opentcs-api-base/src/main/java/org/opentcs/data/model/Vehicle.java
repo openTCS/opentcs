@@ -10,12 +10,11 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.awt.Color;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -93,9 +92,9 @@ public class Vehicle
    */
   private final TCSObjectReference<OrderSequence> orderSequence;
   /**
-   * The set of transport order types this vehicle is allowed to process.
+   * The set of transport order types this vehicle is allowed to process, and their priorities.
    */
-  private final Set<String> allowedOrderTypes;
+  private final Set<AcceptableOrderType> acceptableOrderTypes;
   /**
    * The resources this vehicle has claimed for future allocation.
    */
@@ -140,7 +139,7 @@ public class Vehicle
     this.procState = ProcState.IDLE;
     this.transportOrder = null;
     this.orderSequence = null;
-    this.allowedOrderTypes = new HashSet<>(Arrays.asList(OrderConstants.TYPE_ANY));
+    this.acceptableOrderTypes = Set.of(new AcceptableOrderType(OrderConstants.TYPE_ANY, 0));
     this.claimedResources = List.of();
     this.allocatedResources = List.of();
     this.state = State.UNKNOWN;
@@ -167,7 +166,7 @@ public class Vehicle
       ProcState procState,
       TCSObjectReference<TransportOrder> transportOrder,
       TCSObjectReference<OrderSequence> orderSequence,
-      Set<String> allowedOrderTypes,
+      Set<AcceptableOrderType> acceptableOrderTypes,
       List<Set<TCSResourceReference<?>>> claimedResources,
       List<Set<TCSResourceReference<?>>> allocatedResources,
       State state,
@@ -211,7 +210,7 @@ public class Vehicle
     this.procState = requireNonNull(procState, "procState");
     this.transportOrder = transportOrder;
     this.orderSequence = orderSequence;
-    this.allowedOrderTypes = requireNonNull(allowedOrderTypes, "allowedOrderTypes");
+    this.acceptableOrderTypes = requireNonNull(acceptableOrderTypes, "acceptableOrderTypes");
     this.claimedResources = requireNonNull(claimedResources, "claimedResources");
     this.allocatedResources = requireNonNull(allocatedResources, "allocatedResources");
     this.state = requireNonNull(state, "state");
@@ -245,7 +244,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -275,7 +274,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -305,7 +304,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -335,7 +334,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -379,7 +378,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -588,7 +587,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -634,7 +633,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -678,7 +677,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -722,7 +721,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -766,7 +765,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -821,7 +820,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -874,7 +873,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -918,7 +917,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -965,7 +964,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -1019,7 +1018,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -1091,7 +1090,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -1138,7 +1137,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -1158,9 +1157,14 @@ public class Vehicle
    * Returns the set of order types this vehicle is allowed to process.
    *
    * @return The set of order types this vehicle is allowed to process.
+   * @deprecated Use {@link #getAcceptableOrderTypes()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed")
   public Set<String> getAllowedOrderTypes() {
-    return allowedOrderTypes;
+    return acceptableOrderTypes.stream()
+        .map(AcceptableOrderType::getName)
+        .collect(Collectors.toSet());
   }
 
   /**
@@ -1168,8 +1172,34 @@ public class Vehicle
    *
    * @param allowedOrderTypes The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link #withAcceptableOrderTypes(Set)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public Vehicle withAllowedOrderTypes(Set<String> allowedOrderTypes) {
+    return withAcceptableOrderTypes(
+        allowedOrderTypes.stream()
+            .map(type -> new AcceptableOrderType(type, 0))
+            .collect(Collectors.toSet())
+    );
+  }
+
+  /**
+   * Returns the set of order types this vehicle is allowed to process.
+   *
+   * @return The set of order types this vehicle is allowed to process, and their priorities.
+   */
+  public Set<AcceptableOrderType> getAcceptableOrderTypes() {
+    return acceptableOrderTypes;
+  }
+
+  /**
+   * Creates a copy of this object, with the given set of acceptable order types.
+   *
+   * @param acceptableOrderTypes The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public Vehicle withAcceptableOrderTypes(Set<AcceptableOrderType> acceptableOrderTypes) {
     return new Vehicle(
         getName(),
         getProperties(),
@@ -1182,7 +1212,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -1226,7 +1256,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -1270,7 +1300,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -1316,7 +1346,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -1362,7 +1392,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -1464,7 +1494,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -1514,7 +1544,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -1558,7 +1588,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        allowedOrderTypes,
+        acceptableOrderTypes,
         claimedResources,
         allocatedResources,
         state,
@@ -1606,7 +1636,7 @@ public class Vehicle
         + ", maxVelocity=" + maxVelocity
         + ", maxReverseVelocity=" + maxReverseVelocity
         + ", rechargeOperation=" + rechargeOperation
-        + ", allowedOrderTypes=" + allowedOrderTypes
+        + ", acceptableOrderTypes=" + acceptableOrderTypes
         + ", envelopeKey=" + envelopeKey
         + ", properties=" + getProperties()
         + ", history=" + getHistory()

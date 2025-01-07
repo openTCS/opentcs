@@ -106,9 +106,9 @@ public class VehicleModel
    */
   public static final String MAXIMUM_REVERSE_VELOCITY = "MaximumReverseVelocity";
   /**
-   * The name/key of the 'allowed order types' property.
+   * The name/key of the 'acceptable order types' property.
    */
-  public static final String ALLOWED_ORDER_TYPES = "AllowedOrderTypes";
+  public static final String ACCEPTABLE_ORDER_TYPES = "AcceptableOrderTypes";
   /**
    * The name/key of the 'allocated resources' property.
    */
@@ -462,8 +462,8 @@ public class VehicleModel
     return (StringProperty) getProperty(CURRENT_SEQUENCE_NAME);
   }
 
-  public OrderTypesProperty getPropertyAllowedOrderTypes() {
-    return (OrderTypesProperty) getProperty(ALLOWED_ORDER_TYPES);
+  public OrderTypesProperty getPropertyAcceptableOrderTypes() {
+    return (OrderTypesProperty) getProperty(ACCEPTABLE_ORDER_TYPES);
   }
 
   public StringProperty getPropertyEnvelopeKey() {
@@ -657,16 +657,16 @@ public class VehicleModel
     curOrderSequenceName.setModellingEditable(false);
     setProperty(CURRENT_SEQUENCE_NAME, curOrderSequenceName);
 
-    OrderTypesProperty pAllowedOrderTypes = new OrderTypesProperty(this);
-    pAllowedOrderTypes.setDescription(
-        bundle.getString("vehicleModel.property_allowedOrderTypes.description")
+    OrderTypesProperty pAcceptableOrderTypes = new OrderTypesProperty(this);
+    pAcceptableOrderTypes.setDescription(
+        bundle.getString("vehicleModel.property_acceptableOrderTypes.description")
     );
-    pAllowedOrderTypes.setHelptext(
-        bundle.getString("vehicleModel.property_allowedOrderTypes.helptext")
+    pAcceptableOrderTypes.setHelptext(
+        bundle.getString("vehicleModel.property_acceptableOrderTypes.helptext")
     );
-    pAllowedOrderTypes.setModellingEditable(false);
-    pAllowedOrderTypes.setOperatingEditable(true);
-    setProperty(ALLOWED_ORDER_TYPES, pAllowedOrderTypes);
+    pAcceptableOrderTypes.setModellingEditable(false);
+    pAcceptableOrderTypes.setOperatingEditable(true);
+    setProperty(ACCEPTABLE_ORDER_TYPES, pAcceptableOrderTypes);
 
     ResourceProperty allocatedResources = new ResourceProperty(this);
     allocatedResources.setDescription(

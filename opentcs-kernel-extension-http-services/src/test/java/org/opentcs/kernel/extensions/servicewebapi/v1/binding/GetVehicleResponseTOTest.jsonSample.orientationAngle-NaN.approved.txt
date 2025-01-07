@@ -34,5 +34,12 @@
   "allocatedResources" : [ [ "some-path", "some-point" ], [ "some-other-path", "some-other-point" ] ],
   "claimedResources" : [ [ "some-path", "some-point" ], [ "some-other-path", "some-other-point" ] ],
   "allowedOrderTypes" : [ "OrderType001", "OrderType002" ],
+  "acceptableOrderTypes" : [ {
+    "name" : "OrderType001",
+    "priority" : 23
+  }, {
+    "name" : "OrderType002",
+    "priority" : 42
+  } ],
   "envelopeKey" : "envelopeType-01"
 }

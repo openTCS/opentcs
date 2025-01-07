@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderConstants;
@@ -33,14 +34,16 @@ class IsIdleAndDegradedTest {
         .withProcState(Vehicle.ProcState.IDLE)
         .withCurrentPosition(new Point("p1").getReference())
         .withEnergyLevel(10)
-        .withAllowedOrderTypes(Set.of(OrderConstants.TYPE_ANY));
+        .withAcceptableOrderTypes(
+            Set.of(new AcceptableOrderType(OrderConstants.TYPE_ANY, 0))
+        );
   }
 
   @ParameterizedTest
   @ValueSource(strings = {OrderConstants.TYPE_ANY, OrderConstants.TYPE_CHARGE})
   void checkVehicleIsIdleAndDegraded(String type) {
     Vehicle vehicle = idleAndDegradedVehicle
-        .withAllowedOrderTypes(Set.of(type));
+        .withAcceptableOrderTypes(Set.of(new AcceptableOrderType(type, 0)));
     assertThat(isIdleAndDegraded.apply(vehicle), hasSize(0));
   }
 
@@ -103,7 +106,9 @@ class IsIdleAndDegradedTest {
   @Test
   void checkVehicleIsNotAllowedToCharge() {
     Vehicle vehicle = idleAndDegradedVehicle
-        .withAllowedOrderTypes(Set.of(OrderConstants.TYPE_PARK));
+        .withAcceptableOrderTypes(
+            Set.of(new AcceptableOrderType(OrderConstants.TYPE_PARK, 0))
+        );
 
     assertThat(isIdleAndDegraded.apply(vehicle), hasSize(1));
   }

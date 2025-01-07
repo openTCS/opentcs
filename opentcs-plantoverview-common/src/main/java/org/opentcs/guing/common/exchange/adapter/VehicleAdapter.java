@@ -7,6 +7,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.to.model.BoundingBoxCreationTO;
 import org.opentcs.access.to.model.CoupleCreationTO;
@@ -23,6 +24,7 @@ import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.PercentProperty;
 import org.opentcs.guing.base.components.properties.type.SpeedProperty;
 import org.opentcs.guing.base.components.properties.type.SpeedProperty.Unit;
+import org.opentcs.guing.base.model.AcceptableOrderTypeModel;
 import org.opentcs.guing.base.model.BoundingBoxModel;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.PointModel;
@@ -112,7 +114,16 @@ public class VehicleAdapter
       updateCurrentTransportName(vehicle, model);
       updateCurrentOrderSequenceName(vehicle, model);
 
-      model.getPropertyAllowedOrderTypes().setItems(vehicle.getAllowedOrderTypes());
+      model.getPropertyAcceptableOrderTypes().setItems(
+          vehicle.getAcceptableOrderTypes().stream()
+              .map(
+                  orderType -> new AcceptableOrderTypeModel(
+                      orderType.getName(),
+                      orderType.getPriority()
+                  )
+              )
+              .collect(Collectors.toSet())
+      );
       model.setVehicle(vehicle);
 
       model.getPropertyEnvelopeKey().setText(vehicle.getEnvelopeKey());

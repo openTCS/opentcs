@@ -6,6 +6,7 @@ import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.drivers.vehicle.AdapterCommand;
@@ -176,13 +177,33 @@ public interface VehicleService
    * @param allowedOrderTypes A set of transport order types.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
+   * @deprecated Use {@link #updateVehicleAcceptableOrderTypes(TCSObjectReference, Set)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   void updateVehicleAllowedOrderTypes(
       TCSObjectReference<Vehicle> ref,
       Set<String> allowedOrderTypes
   )
       throws ObjectUnknownException,
         KernelRuntimeException;
+
+  /**
+   * Updates the types of transport orders a vehicle is allowed to process.
+   *
+   * @param ref A reference to the vehicle to be modified.
+   * @param acceptableOrderTypes A set of transport order types and their priorities.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   */
+  default void updateVehicleAcceptableOrderTypes(
+      TCSObjectReference<Vehicle> ref,
+      Set<AcceptableOrderType> acceptableOrderTypes
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
+    throw new UnsupportedOperationException("Not yet implemented.");
+  }
 
   /**
    * Updates the vehicle's envelope key.

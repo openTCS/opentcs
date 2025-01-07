@@ -8,6 +8,7 @@ import java.util.Set;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.drivers.vehicle.AdapterCommand;
@@ -95,12 +96,23 @@ public interface RemoteVehicleService
     throw new UnsupportedOperationException("Not yet implemented.");
   }
 
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   void updateVehicleAllowedOrderTypes(
       ClientID clientId,
       TCSObjectReference<Vehicle> ref,
       Set<String> allowedOrderTypes
   )
       throws RemoteException;
+
+  default void updateVehicleAcceptableOrderTypes(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      Set<AcceptableOrderType> acceptableOrderTypes
+  )
+      throws RemoteException {
+    throw new UnsupportedOperationException("Not yet implemented.");
+  }
 
   void updateVehicleEnvelopeKey(
       ClientID clientId,
