@@ -172,11 +172,11 @@ A peripheral operation's attributes are:
 * The actual _operation_ to be performed by the peripheral device.
 * An _execution trigger_ defining the moment at which the operation is to be performed.
   The supported values are:
-  ** `BEFORE_MOVEMENT`: The execution of the operation should be triggered _before_ a vehicle traverses the path.
-  ** `AFTER_MOVEMENT`: The execution of the operation should be triggered _after_ a vehicle has traversed the path.
+  ** `AFTER_ALLOCATION`: The execution of the operation should be triggered after a vehicle _has allocated_ the path.
+  ** `AFTER_MOVEMENT`: The execution of the operation should be triggered after a vehicle _has traversed_ the path.
 * A _completion required_ flag, which, when set, requires the operation to be completed to allow a vehicle to continue driving.
   This flag works in combination with the execution trigger.
-  With the `BEFORE_MOVEMENT` execution trigger and the completion required flag set to `true`, a vehicle has to wait at the path's source point until the operation is completed.
+  With the `AFTER_ALLOCATION` execution trigger and the completion required flag set to `true`, a vehicle has to wait at the path's source point until the operation is completed.
   With the `AFTER_MOVEMENT` execution trigger and the completion required flag set to `true`, a vehicle has to wait at the path's destination point until the operation is completed.
 
 ==== Location

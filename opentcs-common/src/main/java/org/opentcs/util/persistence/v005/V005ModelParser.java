@@ -176,7 +176,11 @@ public class V005ModelParser {
               result.setName(peripheralOperation.getName())
                   .setProperties(convertProperties(peripheralOperation.getProperties()));
               result.setLocationName(peripheralOperation.getLocationName())
-                  .setExecutionTrigger(peripheralOperation.getExecutionTrigger())
+                  .setExecutionTrigger(
+                      peripheralOperation.getExecutionTrigger().equals("BEFORE_MOVEMENT")
+                          ? "AFTER_ALLOCATION"
+                          : peripheralOperation.getExecutionTrigger()
+                  )
                   .setCompletionRequired(peripheralOperation.isCompletionRequired());
               return result;
             }
