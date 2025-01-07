@@ -110,6 +110,11 @@ public class RerouteUtil {
         vehicle.getTransportOrder()
     );
 
+    if (originalOrder.hasState(TransportOrder.State.WITHDRAWN)) {
+      LOG.warn("{} can't be rerouted when its transport order was withdrawn.", vehicle.getName());
+      return;
+    }
+
     if (reroutingType == ReroutingType.FORCED
         && isRelatedToUnfinishedPeripheralJobs(originalOrder)) {
       LOG.warn(

@@ -32,6 +32,8 @@ This change log lists the most relevant changes for past releases in reverse chr
    Previously, failed peripheral jobs with the `AFTER_ALLOCATION` execution trigger could prevent vehicles from properly processing transport orders in some situations.
 ** When loading v0.0.4 plant model files, points of type `REPORT_POSITION` will now be automatically converted to points of type `HALT_POSITION`, as support for ``REPORT_POSITION``s has been removed with openTCS 6.0.
 ** When loading v0.0.4 plant model files, peripheral operations with the `BEFORE_MOVEMENT` execution trigger will now be automatically converted to peripheral operations with the `AFTER_ALLOCATION` execution trigger, as support for the `BEFORE_MOVEMENT` execution trigger has been removed with openTCS 6.0.
+** Prevent vehicles whose transport order was withdrawn from being rerouted.
+   This ensures that vehicles can finish their movement commands correctly in such cases.
 * Changes affecting developers:
 ** Deprecate methods in the `Router` interface that are technically outside its scope.
 ** Deprecate `Router.getCost(Vehicle, Point, Point, Set<TCSResourceReference<?>>)` as `Router.getRoute(Vehicle, Point, Point, Set<TCSResourceReference<?>>)` already provides a way to retrieve the costs of a route.
