@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.routing.Edge;
+import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -23,10 +24,13 @@ class EdgeEvaluatorExplicitPropertiesTest {
 
   private ExplicitPropertiesConfiguration configuration;
 
+  private GroupMapper routingGroupMapper;
+
   @BeforeEach
   void setUp() {
     configuration = mock(ExplicitPropertiesConfiguration.class);
-    edgeEvaluator = new EdgeEvaluatorExplicitProperties(configuration);
+    routingGroupMapper = mock(GroupMapper.class);
+    edgeEvaluator = new EdgeEvaluatorExplicitProperties(configuration, routingGroupMapper);
   }
 
   @Test
@@ -41,8 +45,8 @@ class EdgeEvaluatorExplicitPropertiesTest {
             .withProperty(Router.PROPKEY_ROUTING_COST_REVERSE + "XYZ", "5678"),
         false
     );
-    Vehicle vehicle = new Vehicle("someVehicle")
-        .withProperty(Router.PROPKEY_ROUTING_GROUP, "XYZ");
+    Vehicle vehicle = new Vehicle("someVehicle");
+    when(routingGroupMapper.apply(vehicle)).thenReturn("XYZ");
 
     assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(1234.0));
 
@@ -60,8 +64,8 @@ class EdgeEvaluatorExplicitPropertiesTest {
                  new Point("dstPoint").getReference()),
         false
     );
-    Vehicle vehicle = new Vehicle("someVehicle")
-        .withProperty(Router.PROPKEY_ROUTING_GROUP, "XYZ");
+    Vehicle vehicle = new Vehicle("someVehicle");
+    when(routingGroupMapper.apply(vehicle)).thenReturn("XYZ");
 
     assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(123.456));
 
@@ -79,8 +83,8 @@ class EdgeEvaluatorExplicitPropertiesTest {
                  new Point("dstPoint").getReference()),
         false
     );
-    Vehicle vehicle = new Vehicle("someVehicle")
-        .withProperty(Router.PROPKEY_ROUTING_GROUP, "XYZ");
+    Vehicle vehicle = new Vehicle("someVehicle");
+    when(routingGroupMapper.apply(vehicle)).thenReturn("XYZ");
 
     assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(Double.POSITIVE_INFINITY));
 

@@ -5,11 +5,11 @@ package org.opentcs.strategies.basic.routing.edgeevaluator;
 import static java.util.Objects.requireNonNull;
 import static org.opentcs.components.kernel.Router.PROPKEY_ROUTING_COST_FORWARD;
 import static org.opentcs.components.kernel.Router.PROPKEY_ROUTING_COST_REVERSE;
-import static org.opentcs.components.kernel.Router.PROPKEY_ROUTING_GROUP;
 
 import jakarta.inject.Inject;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
+import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Vehicle;
 import org.slf4j.Logger;
@@ -35,10 +35,18 @@ public class EdgeEvaluatorExplicitProperties
    * This class's configuration.
    */
   private final ExplicitPropertiesConfiguration configuration;
+  /**
+   * Used to map vehicles to their routing groups.
+   */
+  private final GroupMapper routingGroupMapper;
 
   @Inject
-  public EdgeEvaluatorExplicitProperties(ExplicitPropertiesConfiguration configuration) {
+  public EdgeEvaluatorExplicitProperties(
+      ExplicitPropertiesConfiguration configuration,
+      GroupMapper routingGroupMapper
+  ) {
     this.configuration = requireNonNull(configuration, "configuration");
+    this.routingGroupMapper = requireNonNull(routingGroupMapper, "routingGroupMapper");
   }
 
   @Override
@@ -54,7 +62,7 @@ public class EdgeEvaluatorExplicitProperties
     requireNonNull(edge, "edge");
     requireNonNull(vehicle, "vehicle");
 
-    String group = extractVehicleGroup(vehicle);
+    String group = routingGroupMapper.apply(vehicle);
 
     if (edge.isTravellingReverse()) {
       return parseCosts(
@@ -72,12 +80,6 @@ public class EdgeEvaluatorExplicitProperties
           )
       );
     }
-  }
-
-  private String extractVehicleGroup(Vehicle vehicle) {
-    String group = vehicle.getProperty(PROPKEY_ROUTING_GROUP);
-
-    return group == null ? "" : group;
   }
 
   private String extractRoutingCostString(Path path, String propertyKey) {

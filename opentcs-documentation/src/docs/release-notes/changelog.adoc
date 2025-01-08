@@ -34,6 +34,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** When loading v0.0.4 plant model files, peripheral operations with the `BEFORE_MOVEMENT` execution trigger will now be automatically converted to peripheral operations with the `AFTER_ALLOCATION` execution trigger, as support for the `BEFORE_MOVEMENT` execution trigger has been removed with openTCS 6.0.
 ** Prevent vehicles whose transport order was withdrawn from being rerouted.
    This ensures that vehicles can finish their movement commands correctly in such cases.
+** Properly consider the `GroupMapper` implementation that is configured via dependency injection in the `EXPLICIT_PROPERTIES` edge evaluator.
 * Changes affecting developers:
 ** Deprecate methods in the `Router` interface that are technically outside its scope.
 ** Deprecate `Router.getCost(Vehicle, Point, Point, Set<TCSResourceReference<?>>)` as `Router.getRoute(Vehicle, Point, Point, Set<TCSResourceReference<?>>)` already provides a way to retrieve the costs of a route.
