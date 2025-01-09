@@ -207,17 +207,19 @@ public class OpenTCSModelManager
 
   @Override
   public boolean saveModelToFile(boolean chooseName) {
-    fModelName = systemModel.getName();
     if (chooseName
         || currentModelFile == null
-        || fModelName == null
-        || fModelName.isEmpty()
-        || fModelName.equals(Kernel.DEFAULT_MODEL_NAME)) {
+        || systemModel.getName() == null
+        || systemModel.getName().isEmpty()
+        || systemModel.getName().equals(Kernel.DEFAULT_MODEL_NAME)) {
       File selectedFile = showSaveDialog();
       if (selectedFile == null) {
         return false;
       }
       currentModelFile = selectedFile;
+      // Set the system model's name to the name of the selected file.
+      systemModel.setName(extractModelName(selectedFile));
+      fModelName = systemModel.getName();
     }
     try {
       statusPanel.clear();
@@ -281,7 +283,6 @@ public class OpenTCSModelManager
       return false;
     }
 
-    systemModel.setName(fModelName);
     return true;
   }
 
@@ -335,8 +336,8 @@ public class OpenTCSModelManager
 
     createEmptyModel();
 
-    fModelName = portal.getPlantModelService().getModelName();
-    systemModel.getPropertyName().setText(fModelName);
+    systemModel.setName(portal.getPlantModelService().getModelName());
+    fModelName = systemModel.getName();
     portal.getPlantModelService().getModelProperties().entrySet().stream()
         .forEach(
             entry -> systemModel.getPropertyMiscellaneous().addItem(
@@ -876,7 +877,6 @@ public class OpenTCSModelManager
       modelPersistorFileChooser.getCurrentDirectory().mkdir();
     }
     if (modelPersistorFileChooser.showSaveDialog(applicationFrame) != JFileChooser.APPROVE_OPTION) {
-      fModelName = Kernel.DEFAULT_MODEL_NAME;
       return null;
     }
 
@@ -896,13 +896,6 @@ public class OpenTCSModelManager
       }
     }
 
-    // Extract the model name from the file name, but without the extension.
-    fModelName = selectedFile.getName().replaceFirst("[.][^.]+$", "");
-    if (fModelName.isEmpty()) {
-      fModelName = Kernel.DEFAULT_MODEL_NAME;
-      return null;
-    }
-
     return selectedFile;
   }
 
@@ -913,6 +906,20 @@ public class OpenTCSModelManager
       return new File(file.getParent(), fileName + ".xml");
     }
     return file;
+  }
+
+  private String extractModelName(File file) {
+    if (file == null) {
+      return Kernel.DEFAULT_MODEL_NAME;
+    }
+
+    // Extract the model name from the file name, but without the extension.
+    String modelName = file.getName().replaceFirst("[.][^.]+$", "");
+    if (modelName.isEmpty()) {
+      return Kernel.DEFAULT_MODEL_NAME;
+    }
+
+    return modelName;
   }
 
   /**

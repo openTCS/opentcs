@@ -32,6 +32,7 @@ This change log lists the most relevant changes for past releases in reverse chr
    Previously, failed peripheral jobs with the `AFTER_ALLOCATION` execution trigger could prevent vehicles from properly processing transport orders in some situations.
 ** When loading v0.0.4 plant model files, points of type `REPORT_POSITION` will now be automatically converted to points of type `HALT_POSITION`, as support for ``REPORT_POSITION``s has been removed with openTCS 6.0.
 ** When loading v0.0.4 plant model files, peripheral operations with the `BEFORE_MOVEMENT` execution trigger will now be automatically converted to peripheral operations with the `AFTER_ALLOCATION` execution trigger, as support for the `BEFORE_MOVEMENT` execution trigger has been removed with openTCS 6.0.
+** When saving a plant model via the Model Editor application with a new name, correctly set that name in the new plant model file.
 ** Prevent vehicles whose transport order was withdrawn from being rerouted.
    This ensures that vehicles can finish their movement commands correctly in such cases.
 ** Properly consider the `GroupMapper` implementation that is configured via dependency injection in the `EXPLICIT_PROPERTIES` edge evaluator.
