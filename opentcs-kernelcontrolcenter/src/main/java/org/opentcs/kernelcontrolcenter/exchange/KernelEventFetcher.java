@@ -7,6 +7,7 @@ import static org.opentcs.util.Assertions.checkInRange;
 
 import jakarta.inject.Inject;
 import java.util.List;
+import javax.swing.SwingUtilities;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.KernelStateTransitionEvent;
@@ -191,8 +192,10 @@ public class KernelEventFetcher
 
         for (Object event : events) {
           LOG.debug("Processing fetched event: {}", event);
-          // Forward received events to all registered listeners.
-          eventBus.onEvent(event);
+          // Forward received events to all registered listeners, but do that on the event
+          // dispatcher thread. This ensures that GUI-/drawing-related code is executed on the
+          // correct thread.
+          SwingUtilities.invokeLater(() -> eventBus.onEvent(event));
 
           // Check if the kernel notifies us about a state change.
           if (event instanceof KernelStateTransitionEvent) {

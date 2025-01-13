@@ -36,6 +36,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Prevent vehicles whose transport order was withdrawn from being rerouted.
    This ensures that vehicles can finish their movement commands correctly in such cases.
 ** Properly consider the `GroupMapper` implementation that is configured via dependency injection in the `EXPLICIT_PROPERTIES` edge evaluator.
+** Avoid ``ConcurrentModificationException``s in the Operations Desk that could occur particularly in situations where vehicle updates are received at high frequency.
 * Changes affecting developers:
 ** Deprecate methods in the `Router` interface that are technically outside its scope.
 ** Deprecate `Router.getCost(Vehicle, Point, Point, Set<TCSResourceReference<?>>)` as `Router.getRoute(Vehicle, Point, Point, Set<TCSResourceReference<?>>)` already provides a way to retrieve the costs of a route.
