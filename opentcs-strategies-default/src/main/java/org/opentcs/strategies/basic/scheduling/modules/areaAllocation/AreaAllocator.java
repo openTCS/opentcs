@@ -21,6 +21,7 @@ public class AreaAllocator
 
   private final AreaProvider areaProvider;
   private final AreaAllocations areaAllocations;
+  private final BlockAreaAllocations blockAreaAllocations;
   private boolean initialized;
 
   /**
@@ -28,11 +29,18 @@ public class AreaAllocator
    *
    * @param areaProvider Provides areas related to resources.
    * @param areaAllocations Keeps track of areas allocated by vehicles.
+   * @param blockAreaAllocations Ensures that areas related to blocks are allocated by one vehicle
+   * at a time.
    */
   @Inject
-  public AreaAllocator(AreaProvider areaProvider, AreaAllocations areaAllocations) {
+  public AreaAllocator(
+      AreaProvider areaProvider,
+      AreaAllocations areaAllocations,
+      BlockAreaAllocations blockAreaAllocations
+  ) {
     this.areaProvider = requireNonNull(areaProvider, "areaProvider");
     this.areaAllocations = requireNonNull(areaAllocations, "areaAllocations");
+    this.blockAreaAllocations = requireNonNull(blockAreaAllocations, "blockAreaAllocations");
   }
 
   @Override
@@ -42,6 +50,8 @@ public class AreaAllocator
     }
 
     areaProvider.initialize();
+    areaAllocations.initialize();
+    blockAreaAllocations.initialize();
 
     initialized = true;
   }
@@ -58,7 +68,8 @@ public class AreaAllocator
     }
 
     areaProvider.terminate();
-    areaAllocations.clearAreaAllocations();
+    areaAllocations.terminate();
+    blockAreaAllocations.terminate();
 
     initialized = false;
   }
@@ -70,7 +81,7 @@ public class AreaAllocator
    * @param vehicleRef The vehicle reference.
    * @param envelopeKey The envelope key.
    * @param resources The set of resources.
-   * @return {@code true}, if the areas realted to the given envelope key and the given set of
+   * @return {@code true}, if the areas related to the given envelope key and the given set of
    * resources are not allocated by any vehicle other than the given one, otherwise {@code false}.
    */
   public boolean mayAllocateAreas(
@@ -92,7 +103,7 @@ public class AreaAllocator
     return areaAllocations.isAreaAllocationAllowed(
         vehicleRef,
         areaProvider.getAreas(envelopeKey, resources)
-    );
+    ) && blockAreaAllocations.isAreaAllocationAllowed(vehicleRef, envelopeKey, resources);
   }
 
   /**

@@ -10,7 +10,6 @@ import org.opentcs.strategies.basic.scheduling.modules.PausedVehicleModule;
 import org.opentcs.strategies.basic.scheduling.modules.SameDirectionBlockModule;
 import org.opentcs.strategies.basic.scheduling.modules.SingleVehicleBlockModule;
 import org.opentcs.strategies.basic.scheduling.modules.areaAllocation.AreaAllocationModule;
-import org.opentcs.strategies.basic.scheduling.modules.areaAllocation.AreaAllocations;
 import org.opentcs.strategies.basic.scheduling.modules.areaAllocation.AreaProvider;
 import org.opentcs.strategies.basic.scheduling.modules.areaAllocation.CachingAreaProvider;
 
@@ -45,6 +44,5 @@ public class DefaultSchedulerModule
     bind(AreaProvider.class)
         .to(CachingAreaProvider.class)
         .in(Singleton.class);
-    bind(AreaAllocations.class).in(Singleton.class);
   }
 }

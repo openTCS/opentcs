@@ -176,6 +176,7 @@ When an allocation of a set of resources for a vehicle is requested, the schedul
   If not, skip this check.
   If yes, check if the direction in which the vehicle intends to traverse the block is the same the block is already being traversed by other vehicles.
 . Check if the areas related to the requested resources are available for the vehicle and not allocated by other vehicles (provided that the vehicle requesting the resources references an envelope key and the requested resources define vehicle envelopes with that key).
+  In case requested resources or resources occupied by other vehicles are part of blocks, the checked areas are expanded to include the envelopes of all resources in these blocks (while considering the envelope keys of the respective vehicles involved).
 
 If all checks succeed, the allocation is made.
 If any of the checks fail, the allocation is queued for later.

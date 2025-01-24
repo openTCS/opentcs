@@ -23,6 +23,8 @@ This change log lists the most relevant changes for past releases in reverse chr
    For vehicle elements, every transport order type (that a vehicle is allowed to process) can now be assigned a priority.
 ** Add a new key `BY_ORDER_TYPE_PRIORITY` that can be configured for the kernel configuration entries `defaultdispatcher.orderCandidatePriorities` and `defaultdispatcher.vehicleCandidatePriorities`.
    With this key configured, the priorities of a vehicle's acceptable order types are considered when assigning transport order to it.
+** Improve the integration of envelopes in combination with blocks.
+   If blocks are involved when allocating resources, consider the envelopes of all resources in these blocks.
 ** Update web API specification and implementation to version 1.10.0:
 *** Add an endpoint `PUT /vehicles/{NAME}/acceptableOrderTypes`, which allows a vehicle's set of acceptable order types to be modified during runtime.
     This endpoint replaces `PUT /vehicles/{NAME}/allowedOrderTypes`, which is now deprecated.

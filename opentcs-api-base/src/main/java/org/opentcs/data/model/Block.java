@@ -164,9 +164,9 @@ public class Block
   }
 
   /**
-   * Returns the information regarding the grahical representation of this block.
+   * Returns the information regarding the graphical representation of this block.
    *
-   * @return The information regarding the grahical representation of this block.
+   * @return The information regarding the graphical representation of this block.
    */
   public Layout getLayout() {
     return layout;
