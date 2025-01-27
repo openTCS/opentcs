@@ -25,9 +25,11 @@ This change log lists the most relevant changes for past releases in reverse chr
    With this key configured, the priorities of a vehicle's acceptable order types are considered when assigning transport order to it.
 ** Improve the integration of envelopes in combination with blocks.
    If blocks are involved when allocating resources, consider the envelopes of all resources in these blocks.
+** Add a creation time and finished time property to order sequences.
 ** Update web API specification and implementation to version 1.10.0:
 *** Add an endpoint `PUT /vehicles/{NAME}/acceptableOrderTypes`, which allows a vehicle's set of acceptable order types to be modified during runtime.
     This endpoint replaces `PUT /vehicles/{NAME}/allowedOrderTypes`, which is now deprecated.
+*** Extend the endpoints for retrieving order sequences to include an order sequence's creation time and finished time.
 * Bugs fixed:
 ** Avoid a `NullPointerException` when trying to park a vehicle whose current position is not known.
 ** Ensure vehicles can process newly assigned transport orders after a peripheral job (created in the context of a previous transport order) has failed.

@@ -1777,6 +1777,16 @@ components:
           items:
             type: string
             description: The sequence of orders of the order sequence.
+        creationTime:
+          type: string
+          format: date-time
+          description: The point of time at which this order sequence was created (expressed according to ISO 8601).
+          example: "2022-01-01T12:00:00Z"
+        finishedTime:
+          type: string
+          format: date-time
+          description: The point of time at which this order sequence has been processed completely (expressed according to ISO 8601).
+          example: "2022-01-01T12:00:00Z"
         finishedIndex:
           type: integer
           description: >-
@@ -1815,6 +1825,8 @@ components:
         - name
         - type
         - orders
+        - creationTime
+        - finishedTime
         - finishedIndex
         - complete
         - finished

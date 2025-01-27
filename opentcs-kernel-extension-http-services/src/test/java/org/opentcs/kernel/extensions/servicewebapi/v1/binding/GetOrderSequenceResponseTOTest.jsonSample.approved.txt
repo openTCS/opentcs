@@ -6,6 +6,8 @@
   "complete" : false,
   "finished" : false,
   "failureFatal" : true,
+  "creationTime" : "1970-01-01T00:00:00Z",
+  "finishedTime" : "+1000000000-12-31T23:59:59.999999999Z",
   "intendedVehicle" : "some-vehicle",
   "processingVehicle" : null,
   "properties" : [ {

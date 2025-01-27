@@ -13,6 +13,7 @@ import static org.opentcs.util.Assertions.checkInRange;
 
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -91,6 +92,14 @@ public class OrderSequence
    * assigned to it, yet.
    */
   private final TCSObjectReference<Vehicle> processingVehicle;
+  /**
+   * The point of time at which this order sequence was created.
+   */
+  private final Instant creationTime;
+  /**
+   * The point of time at which this order sequence has been processed completely.
+   */
+  private final Instant finishedTime;
 
   /**
    * Creates a new OrderSequence.
@@ -105,10 +114,12 @@ public class OrderSequence
     );
     this.type = OrderConstants.TYPE_NONE;
     this.orders = List.of();
+    this.creationTime = Instant.EPOCH;
     this.finishedIndex = -1;
     this.complete = false;
     this.finished = false;
     this.failureFatal = false;
+    this.finishedTime = Instant.MAX;
     this.intendedVehicle = null;
     this.processingVehicle = null;
   }
@@ -120,20 +131,24 @@ public class OrderSequence
       String type,
       TCSObjectReference<Vehicle> intendedVehicle,
       List<TCSObjectReference<TransportOrder>> orders,
+      Instant creationTime,
       int finishedIndex,
       boolean complete,
       boolean failureFatal,
       boolean finished,
+      Instant finishedTime,
       TCSObjectReference<Vehicle> processingVehicle
   ) {
     super(name, properties, history);
     this.type = requireNonNull(type, "type");
     this.intendedVehicle = intendedVehicle;
     this.orders = new ArrayList<>(requireNonNull(orders, "orders"));
+    this.creationTime = requireNonNull(creationTime, "creationTime");
     this.finishedIndex = finishedIndex;
     this.complete = complete;
     this.failureFatal = failureFatal;
     this.finished = finished;
+    this.finishedTime = requireNonNull(finishedTime, "finishedTime");
     this.processingVehicle = processingVehicle;
   }
 
@@ -146,10 +161,12 @@ public class OrderSequence
         type,
         intendedVehicle,
         orders,
+        creationTime,
         finishedIndex,
         complete,
         failureFatal,
         finished,
+        finishedTime,
         processingVehicle
     );
   }
@@ -163,10 +180,12 @@ public class OrderSequence
         type,
         intendedVehicle,
         orders,
+        creationTime,
         finishedIndex,
         complete,
         failureFatal,
         finished,
+        finishedTime,
         processingVehicle
     );
   }
@@ -180,10 +199,12 @@ public class OrderSequence
         type,
         intendedVehicle,
         orders,
+        creationTime,
         finishedIndex,
         complete,
         failureFatal,
         finished,
+        finishedTime,
         processingVehicle
     );
   }
@@ -197,10 +218,12 @@ public class OrderSequence
         type,
         intendedVehicle,
         orders,
+        creationTime,
         finishedIndex,
         complete,
         failureFatal,
         finished,
+        finishedTime,
         processingVehicle
     );
   }
@@ -229,10 +252,12 @@ public class OrderSequence
         type,
         intendedVehicle,
         orders,
+        creationTime,
         finishedIndex,
         complete,
         failureFatal,
         finished,
+        finishedTime,
         processingVehicle
     );
   }
@@ -263,10 +288,49 @@ public class OrderSequence
         type,
         intendedVehicle,
         ordersWithAppended(order),
+        creationTime,
         finishedIndex,
         complete,
         failureFatal,
         finished,
+        finishedTime,
+        processingVehicle
+    );
+  }
+
+  /**
+   * Returns this order sequence's creation time.
+   *
+   * @return This order sequence's creation time.
+   */
+  @Nonnull
+  public Instant getCreationTime() {
+    return creationTime;
+  }
+
+  /**
+   * Creates a copy of this object, with the given creation time.
+   *
+   * @param creationTime The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public OrderSequence withCreationTime(
+      @Nonnull
+      Instant creationTime
+  ) {
+    return new OrderSequence(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        intendedVehicle,
+        orders,
+        creationTime,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        finishedTime,
         processingVehicle
     );
   }
@@ -320,10 +384,12 @@ public class OrderSequence
         type,
         intendedVehicle,
         orders,
+        creationTime,
         finishedIndex,
         complete,
         failureFatal,
         finished,
+        finishedTime,
         processingVehicle
     );
   }
@@ -353,10 +419,12 @@ public class OrderSequence
         type,
         intendedVehicle,
         orders,
+        creationTime,
         finishedIndex,
         complete,
         failureFatal,
         finished,
+        finishedTime,
         processingVehicle
     );
   }
@@ -388,10 +456,12 @@ public class OrderSequence
         type,
         intendedVehicle,
         orders,
+        creationTime,
         finishedIndex,
         complete,
         failureFatal,
         finished,
+        finishedTime,
         processingVehicle
     );
   }
@@ -422,10 +492,51 @@ public class OrderSequence
         type,
         intendedVehicle,
         orders,
+        creationTime,
         finishedIndex,
         complete,
         failureFatal,
         finished,
+        finishedTime,
+        processingVehicle
+    );
+  }
+
+  /**
+   * Returns the point of time at which this order sequence has been processed completely.
+   * If the order sequence has not been finished, yet, {@link Instant#MAX} is returned.
+   *
+   * @return The point of time at which this order sequence has been processed competely,
+   * or {@link Instant#MAX}, if the order sequence has not been processed completely, yet.
+   */
+  @Nonnull
+  public Instant getFinishedTime() {
+    return finishedTime;
+  }
+
+  /**
+   * Creates a copy of this object, with the given finished time.
+   *
+   * @param finishedTime The value to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public OrderSequence withFinishedTime(
+      @Nonnull
+      Instant finishedTime
+  ) {
+    return new OrderSequence(
+        getName(),
+        getProperties(),
+        getHistory(),
+        type,
+        intendedVehicle,
+        orders,
+        creationTime,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        finishedTime,
         processingVehicle
     );
   }
@@ -456,10 +567,12 @@ public class OrderSequence
         type,
         intendedVehicle,
         orders,
+        creationTime,
         finishedIndex,
         complete,
         failureFatal,
         finished,
+        finishedTime,
         processingVehicle
     );
   }
@@ -489,10 +602,12 @@ public class OrderSequence
         type,
         intendedVehicle,
         orders,
+        creationTime,
         finishedIndex,
         complete,
         failureFatal,
         finished,
+        finishedTime,
         processingVehicle
     );
   }

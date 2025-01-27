@@ -478,6 +478,7 @@ public class TransportOrderPoolManager
         ObjectUnknownException {
     OrderSequence newSequence = new OrderSequence(nameFor(to))
         .withType(to.getType())
+        .withCreationTime(Instant.now())
         .withIntendedVehicle(toVehicleReference(to.getIntendedVehicleName()))
         .withFailureFatal(to.isFailureFatal())
         .withProperties(to.getProperties());
@@ -569,7 +570,7 @@ public class TransportOrderPoolManager
 
     LOG.info("Order sequence being marked as finished: {}", previousState.getName());
 
-    OrderSequence sequence = previousState.withFinished(true);
+    OrderSequence sequence = previousState.withFinished(true).withFinishedTime(Instant.now());
     getObjectRepo().replaceObject(sequence);
     emitObjectEvent(
         sequence,

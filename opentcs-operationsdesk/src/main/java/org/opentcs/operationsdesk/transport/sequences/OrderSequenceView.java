@@ -136,6 +136,16 @@ public class OrderSequenceView
 
     textType.setText(getOrderSequence().getType());
 
+    textCreationTime.setText(
+        TIMESTAMP_FORMAT.format(Date.from(getOrderSequence().getCreationTime()))
+    );
+
+    if (getOrderSequence().isFinished()) {
+      textFinishedTime.setText(
+          TIMESTAMP_FORMAT.format(Date.from(getOrderSequence().getFinishedTime()))
+      );
+    }
+
     DefaultTableModel tableModel = new UneditableTableModel();
     tableModel.setColumnIdentifiers(new String[]{"Name"});
 
@@ -226,6 +236,10 @@ public class OrderSequenceView
     textFieldProcessingVehicle = new javax.swing.JTextField();
     labelType = new javax.swing.JLabel();
     textType = new javax.swing.JTextField();
+    labelCreationTime = new javax.swing.JLabel();
+    textCreationTime = new javax.swing.JTextField();
+    labelFinishedTime = new javax.swing.JLabel();
+    textFinishedTime = new javax.swing.JTextField();
     jPanel2 = new javax.swing.JPanel();
     checkBoxComplete = new javax.swing.JCheckBox();
     checkBoxFinished = new javax.swing.JCheckBox();
@@ -348,6 +362,40 @@ public class OrderSequenceView
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.weightx = 0.5;
     jPanel1.add(textType, gridBagConstraints);
+
+    labelCreationTime.setText(bundle.getString("orderSequenceView.panel_general.label_creationTime.text")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 5;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
+    jPanel1.add(labelCreationTime, gridBagConstraints);
+
+    textCreationTime.setEditable(false);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 5;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.5;
+    jPanel1.add(textCreationTime, gridBagConstraints);
+
+    labelFinishedTime.setText(bundle.getString("orderSequenceView.panel_general.label_finishedTime.text")); // NOI18N
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 6;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+    gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
+    jPanel1.add(labelFinishedTime, gridBagConstraints);
+
+    textFinishedTime.setEditable(false);
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 6;
+    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.weightx = 0.5;
+    jPanel1.add(textFinishedTime, gridBagConstraints);
 
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -517,7 +565,9 @@ public class OrderSequenceView
   private javax.swing.JTable historyTable;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel2;
+  private javax.swing.JLabel labelCreationTime;
   private javax.swing.JLabel labelFinishedIndex;
+  private javax.swing.JLabel labelFinishedTime;
   private javax.swing.JLabel labelIntendedVehicle;
   private javax.swing.JLabel labelName;
   private javax.swing.JLabel labelProcessingVehicle;
@@ -525,10 +575,12 @@ public class OrderSequenceView
   private javax.swing.JPanel propertiesPanel;
   private javax.swing.JScrollPane propertiesScrollPane;
   private javax.swing.JTable propertiesTable;
+  private javax.swing.JTextField textCreationTime;
   private javax.swing.JTextField textFieldFinishedIndex;
   private javax.swing.JTextField textFieldIntendedVehicle;
   private javax.swing.JTextField textFieldName;
   private javax.swing.JTextField textFieldProcessingVehicle;
+  private javax.swing.JTextField textFinishedTime;
   private javax.swing.JTextField textType;
   private javax.swing.JPanel transportOrdersPanel;
   private javax.swing.JScrollPane transportOrdersScrollPane;

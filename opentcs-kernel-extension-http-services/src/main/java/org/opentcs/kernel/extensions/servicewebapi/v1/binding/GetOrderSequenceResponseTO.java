@@ -6,6 +6,7 @@ import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,6 +36,10 @@ public class GetOrderSequenceResponseTO {
   private boolean finished;
 
   private boolean failureFatal;
+
+  private Instant creationTime;
+
+  private Instant finishedTime;
 
   @Nullable
   private String intendedVehicle;
@@ -127,6 +132,24 @@ public class GetOrderSequenceResponseTO {
     return this;
   }
 
+  public Instant getCreationTime() {
+    return creationTime;
+  }
+
+  public GetOrderSequenceResponseTO setCreationTime(Instant creationTime) {
+    this.creationTime = creationTime;
+    return this;
+  }
+
+  public Instant getFinishedTime() {
+    return finishedTime;
+  }
+
+  public GetOrderSequenceResponseTO setFinishedTime(Instant finishedTime) {
+    this.finishedTime = finishedTime;
+    return this;
+  }
+
   @Nullable
   public String getIntendedVehicle() {
     return intendedVehicle;
@@ -172,6 +195,8 @@ public class GetOrderSequenceResponseTO {
         .setFailureFatal(orderSequence.isFailureFatal())
         .setFinished(orderSequence.isFinished())
         .setFinishedIndex(orderSequence.getFinishedIndex())
+        .setCreationTime(orderSequence.getCreationTime())
+        .setFinishedTime(orderSequence.getFinishedTime())
         .setType(orderSequence.getType())
         .setOrders(
             orderSequence.getOrders()
