@@ -33,7 +33,11 @@ public class VehicleStatusMessage
 
   private Vehicle.State state;
 
+  private Instant stateTimestamp = Instant.EPOCH;
+
   private Vehicle.ProcState procState;
+
+  private Instant procStateTimestamp = Instant.EPOCH;
 
   private List<List<String>> allocatedResources = new ArrayList<>();
 
@@ -118,12 +122,30 @@ public class VehicleStatusMessage
     return this;
   }
 
+  public Instant getStateTimestamp() {
+    return stateTimestamp;
+  }
+
+  public VehicleStatusMessage setStateTimestamp(Instant stateTimestamp) {
+    this.stateTimestamp = requireNonNull(stateTimestamp, "stateTimestamp");
+    return this;
+  }
+
   public Vehicle.ProcState getProcState() {
     return procState;
   }
 
   public VehicleStatusMessage setProcState(Vehicle.ProcState procState) {
     this.procState = procState;
+    return this;
+  }
+
+  public Instant getProcStateTimestamp() {
+    return procStateTimestamp;
+  }
+
+  public VehicleStatusMessage setProcStateTimestamp(Instant procStateTimestamp) {
+    this.procStateTimestamp = requireNonNull(procStateTimestamp, "procStateTimestamp");
     return this;
   }
 
@@ -169,7 +191,9 @@ public class VehicleStatusMessage
     );
     vehicleMessage.setPaused(vehicle.isPaused());
     vehicleMessage.setState(vehicle.getState());
+    vehicleMessage.setStateTimestamp(vehicle.getStateTimestamp());
     vehicleMessage.setProcState(vehicle.getProcState());
+    vehicleMessage.setProcStateTimestamp(vehicle.getProcStateTimestamp());
     if (vehicle.getPose().getPosition() != null) {
       vehicleMessage.setPrecisePosition(
           new PrecisePosition(

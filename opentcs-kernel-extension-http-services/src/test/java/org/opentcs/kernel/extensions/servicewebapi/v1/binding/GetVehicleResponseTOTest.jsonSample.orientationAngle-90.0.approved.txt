@@ -22,6 +22,7 @@
   "integrationLevel" : "TO_BE_UTILIZED",
   "paused" : false,
   "procState" : "PROCESSING_ORDER",
+  "procStateTimestamp" : "2025-01-29T11:41:17Z",
   "transportOrder" : "some-order",
   "currentPosition" : "some-point",
   "precisePosition" : {
@@ -31,6 +32,7 @@
   },
   "orientationAngle" : 90.0,
   "state" : "EXECUTING",
+  "stateTimestamp" : "2025-01-29T11:48:37Z",
   "allocatedResources" : [ [ "some-path", "some-point" ], [ "some-other-path", "some-other-point" ] ],
   "claimedResources" : [ [ "some-path", "some-point" ], [ "some-other-path", "some-other-point" ] ],
   "allowedOrderTypes" : [ "OrderType001", "OrderType002" ],

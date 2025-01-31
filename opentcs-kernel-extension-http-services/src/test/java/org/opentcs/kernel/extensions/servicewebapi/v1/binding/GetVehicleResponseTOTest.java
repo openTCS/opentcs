@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -50,11 +51,13 @@ class GetVehicleResponseTOTest {
             .setIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED)
             .setPaused(false)
             .setProcState(Vehicle.ProcState.PROCESSING_ORDER)
+            .setProcStateTimestamp(Instant.parse("2025-01-29T11:41:17.000Z"))
             .setTransportOrder("some-order")
             .setCurrentPosition("some-point")
             .setPrecisePosition(new GetVehicleResponseTO.PrecisePosition(1, 2, 3))
             .setOrientationAngle(orientationAngle)
             .setState(Vehicle.State.EXECUTING)
+            .setStateTimestamp(Instant.parse("2025-01-29T11:48:37.000Z"))
             .setEnvelopeKey("envelopeType-01")
             .setAllocatedResources(
                 List.of(

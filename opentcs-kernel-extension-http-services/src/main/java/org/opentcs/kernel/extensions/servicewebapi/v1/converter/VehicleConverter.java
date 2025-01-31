@@ -154,6 +154,7 @@ public class VehicleConverter {
     to.setIntegrationLevel(vehicle.getIntegrationLevel());
     to.setPaused(vehicle.isPaused());
     to.setProcState(vehicle.getProcState());
+    to.setProcStateTimestamp(vehicle.getProcStateTimestamp());
     to.setTransportOrder(nameOfNullableReference(vehicle.getTransportOrder()));
     to.setCurrentPosition(nameOfNullableReference(vehicle.getCurrentPosition()));
     if (vehicle.getPose().getPosition() != null) {
@@ -170,6 +171,7 @@ public class VehicleConverter {
     }
     to.setOrientationAngle(vehicle.getPose().getOrientationAngle());
     to.setState(vehicle.getState());
+    to.setStateTimestamp(vehicle.getStateTimestamp());
     to.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
     to.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));
     to.setEnvelopeKey(vehicle.getEnvelopeKey());

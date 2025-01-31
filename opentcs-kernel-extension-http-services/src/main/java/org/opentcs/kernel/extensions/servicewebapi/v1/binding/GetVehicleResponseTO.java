@@ -7,6 +7,7 @@ import static java.util.Objects.requireNonNull;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,9 +29,10 @@ import org.opentcs.util.annotations.ScheduledApiChange;
   {
       "name", "properties", "length", "boundingBox", "energyLevelGood", "energyLevelCritical",
       "energyLevelSufficientlyRecharged", "energyLevelFullyRecharged", "energyLevel",
-      "integrationLevel", "paused", "procState", "transportOrder", "currentPosition",
-      "precisePosition", "orientationAngle", "state", "allocatedResources", "claimedResources",
-      "allowedOrderTypes", "acceptableOrderTypes", "envelopeKey"
+      "integrationLevel", "paused", "procState", "procStateTimestamp", "transportOrder",
+      "currentPosition", "precisePosition", "orientationAngle", "state", "stateTimestamp",
+      "allocatedResources", "claimedResources", "allowedOrderTypes", "acceptableOrderTypes",
+      "envelopeKey"
   }
 )
 public class GetVehicleResponseTO {
@@ -62,6 +64,8 @@ public class GetVehicleResponseTO {
 
   private ProcState procState = ProcState.IDLE;
 
+  private Instant procStateTimestamp = Instant.EPOCH;
+
   private String transportOrder;
 
   private String currentPosition;
@@ -71,6 +75,8 @@ public class GetVehicleResponseTO {
   private double orientationAngle;
 
   private State state = State.UNKNOWN;
+
+  private Instant stateTimestamp = Instant.EPOCH;
 
   private List<List<String>> allocatedResources = new ArrayList<>();
 
@@ -194,6 +200,15 @@ public class GetVehicleResponseTO {
     return this;
   }
 
+  public Instant getProcStateTimestamp() {
+    return procStateTimestamp;
+  }
+
+  public GetVehicleResponseTO setProcStateTimestamp(Instant procStateTimestamp) {
+    this.procStateTimestamp = requireNonNull(procStateTimestamp, "procStateTimestamp");
+    return this;
+  }
+
   public String getTransportOrder() {
     return transportOrder;
   }
@@ -236,6 +251,15 @@ public class GetVehicleResponseTO {
 
   public GetVehicleResponseTO setState(State state) {
     this.state = requireNonNull(state, "state");
+    return this;
+  }
+
+  public Instant getStateTimestamp() {
+    return stateTimestamp;
+  }
+
+  public GetVehicleResponseTO setStateTimestamp(Instant stateTimestamp) {
+    this.stateTimestamp = requireNonNull(stateTimestamp, "stateTimestamp");
     return this;
   }
 

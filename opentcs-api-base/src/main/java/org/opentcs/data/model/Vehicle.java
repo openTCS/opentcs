@@ -10,6 +10,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.awt.Color;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,11 +71,11 @@ public class Vehicle
   /**
    * This vehicle's current state.
    */
-  private final State state;
+  private final TimestampedAttribute<State> state;
   /**
    * This vehicle's current processing state.
    */
-  private final ProcState procState;
+  private final TimestampedAttribute<ProcState> procState;
   /**
    * This vehicle's integration level.
    */
@@ -136,13 +137,13 @@ public class Vehicle
     this.maxVelocity = 1000;
     this.maxReverseVelocity = 1000;
     this.rechargeOperation = "CHARGE";
-    this.procState = ProcState.IDLE;
+    this.procState = new TimestampedAttribute<>(ProcState.IDLE, Instant.now());
     this.transportOrder = null;
     this.orderSequence = null;
     this.acceptableOrderTypes = Set.of(new AcceptableOrderType(OrderConstants.TYPE_ANY, 0));
     this.claimedResources = List.of();
     this.allocatedResources = List.of();
-    this.state = State.UNKNOWN;
+    this.state = new TimestampedAttribute<>(State.UNKNOWN, Instant.now());
     this.integrationLevel = IntegrationLevel.TO_BE_RESPECTED;
     this.paused = false;
     this.currentPosition = null;
@@ -163,13 +164,13 @@ public class Vehicle
       int maxVelocity,
       int maxReverseVelocity,
       String rechargeOperation,
-      ProcState procState,
+      TimestampedAttribute<ProcState> procState,
       TCSObjectReference<TransportOrder> transportOrder,
       TCSObjectReference<OrderSequence> orderSequence,
       Set<AcceptableOrderType> acceptableOrderTypes,
       List<Set<TCSResourceReference<?>>> claimedResources,
       List<Set<TCSResourceReference<?>>> allocatedResources,
-      State state,
+      TimestampedAttribute<State> state,
       IntegrationLevel integrationLevel,
       boolean paused,
       TCSObjectReference<Point> currentPosition,
@@ -787,7 +788,16 @@ public class Vehicle
    * @return This vehicle's current state.
    */
   public State getState() {
-    return state;
+    return state.attribute();
+  }
+
+  /**
+   * Returns the time at which the vehicle has entered its current state.
+   *
+   * @return The time at which the vehicle has entered its current state.
+   */
+  public Instant getStateTimestamp() {
+    return state.timestamp();
   }
 
   /**
@@ -798,7 +808,7 @@ public class Vehicle
    * vehicle's one.
    */
   public boolean hasState(State otherState) {
-    return state.equals(otherState);
+    return state.attribute().equals(otherState);
   }
 
   /**
@@ -823,7 +833,7 @@ public class Vehicle
         acceptableOrderTypes,
         claimedResources,
         allocatedResources,
-        state,
+        new TimestampedAttribute<>(state, Instant.now()),
         integrationLevel,
         paused,
         currentPosition,
@@ -842,7 +852,16 @@ public class Vehicle
    * @return This vehicle's current processing state.
    */
   public ProcState getProcState() {
-    return procState;
+    return procState.attribute();
+  }
+
+  /**
+   * Returns the time at which the vehicle has entered its current processing state.
+   *
+   * @return The time at which the vehicle has entered its current processing state.
+   */
+  public Instant getProcStateTimestamp() {
+    return procState.timestamp();
   }
 
   /**
@@ -942,7 +961,7 @@ public class Vehicle
    * vehicle's one.
    */
   public boolean hasProcState(ProcState otherState) {
-    return procState.equals(otherState);
+    return procState.attribute().equals(otherState);
   }
 
   /**
@@ -961,7 +980,7 @@ public class Vehicle
         maxVelocity,
         maxReverseVelocity,
         rechargeOperation,
-        procState,
+        new TimestampedAttribute<>(procState, Instant.now()),
         transportOrder,
         orderSequence,
         acceptableOrderTypes,
@@ -1621,11 +1640,13 @@ public class Vehicle
         + ", currentPosition=" + currentPosition
         + ", pose=" + pose
         + ", nextPosition=" + nextPosition
-        + ", state=" + state
+        + ", state=" + state.attribute()
+        + ", stateTimestamp=" + state.timestamp()
         + ", energyLevel=" + energyLevel
         + ", integrationLevel=" + integrationLevel
         + ", paused=" + paused
-        + ", procState=" + procState
+        + ", procState=" + procState.attribute()
+        + ", procStateTimestamp=" + procState.timestamp()
         + ", loadHandlingDevices=" + loadHandlingDevices
         + ", boundingBox=" + boundingBox
         + ", transportOrder=" + transportOrder
@@ -1988,4 +2009,16 @@ public class Vehicle
           + '}';
     }
   }
+
+  /**
+   * Contains an attribute and complements it with a timestamp that refers to the time at which the
+   * attribute was set.
+   *
+   * @param attribute The attribute.
+   * @param timestamp The time at which the attribute was set.
+   * @param <T> The type of the attribute
+   */
+  private record TimestampedAttribute<T>(T attribute, Instant timestamp)
+      implements
+        Serializable {}
 }

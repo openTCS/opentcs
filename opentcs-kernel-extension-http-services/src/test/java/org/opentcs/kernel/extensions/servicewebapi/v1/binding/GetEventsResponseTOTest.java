@@ -61,7 +61,9 @@ class GetEventsResponseTOTest {
         .setPrecisePosition(new VehicleStatusMessage.PrecisePosition(1, 2, 3))
         .setPaused(false)
         .setState(Vehicle.State.IDLE)
+        .setStateTimestamp(Instant.parse("2025-01-29T11:12:43.000Z"))
         .setProcState(Vehicle.ProcState.IDLE)
+        .setProcStateTimestamp(Instant.parse("2025-01-29T11:58:02.000Z"))
         .setAllocatedResources(
             List.of(
                 List.of("some-path", "some-point"),
