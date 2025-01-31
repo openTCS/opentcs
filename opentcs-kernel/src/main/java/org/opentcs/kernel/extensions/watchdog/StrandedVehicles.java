@@ -15,6 +15,7 @@ import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.util.TimeProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +72,7 @@ public class StrandedVehicles
       return;
     }
 
-    long currentTime = timeProvider.getCurrentTime();
+    long currentTime = timeProvider.getCurrentTimeEpochMillis();
     objectService.fetchObjects(Vehicle.class).forEach(vehicle -> {
       VehicleSnapshot vehicleSnapshot = new VehicleSnapshot(vehicle);
       vehicleSnapshot.setLastRelevantStateChange(currentTime);

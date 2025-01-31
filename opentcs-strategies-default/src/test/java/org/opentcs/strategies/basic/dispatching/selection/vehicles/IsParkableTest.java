@@ -19,6 +19,8 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.OrderSequence;
+import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
+import org.opentcs.util.TimeProvider;
 
 /**
  * Test for {@link IsParkable}.
@@ -26,6 +28,8 @@ import org.opentcs.data.order.OrderSequence;
 class IsParkableTest {
 
   private TCSObjectService objectService;
+  private DefaultDispatcherConfiguration configuration;
+  private TimeProvider timeProvider;
   private IsParkable isParkable;
   private Vehicle parkableVehicle;
   private Point p1;
@@ -33,7 +37,9 @@ class IsParkableTest {
   @BeforeEach
   void setUp() {
     objectService = mock();
-    isParkable = new IsParkable(objectService);
+    configuration = mock();
+    timeProvider = mock();
+    isParkable = new IsParkable(objectService, configuration, timeProvider);
     p1 = new Point("p1");
     parkableVehicle = new Vehicle("V1")
         .withIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED)
@@ -46,6 +52,10 @@ class IsParkableTest {
 
     given(objectService.fetchObject(Point.class, p1.getReference()))
         .willReturn(p1);
+    long parkIdleVehiclesDelay = 60000;
+    given(configuration.parkIdleVehiclesDelay()).willReturn(parkIdleVehiclesDelay);
+    given(timeProvider.getCurrentTimeInstant())
+        .willReturn(parkableVehicle.getProcStateTimestamp().plusMillis(parkIdleVehiclesDelay + 1));
   }
 
   @ParameterizedTest
@@ -121,5 +131,12 @@ class IsParkableTest {
         );
 
     assertThat(isParkable.apply(vehicle), hasSize(1));
+  }
+
+  @Test
+  void checkVehicleIsNotIdleLongEnough() {
+    given(timeProvider.getCurrentTimeInstant())
+        .willReturn(parkableVehicle.getProcStateTimestamp().plusMillis(30000));
+    assertThat(isParkable.apply(parkableVehicle), hasSize(1));
   }
 }

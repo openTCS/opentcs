@@ -26,6 +26,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Improve the integration of envelopes in combination with blocks.
    If blocks are involved when allocating resources, consider the envelopes of all resources in these blocks.
 ** Add a creation time and finished time property to order sequences.
+** Allow automatic creation of parking and recharge orders to be delayed.
+   The delay is configurable via the `defaultdispatcher.parkIdleVehiclesDelay` and `defaultdispatcher.rechargeIdleVehiclesDelay` kernel configuration entries.
 ** Update web API specification and implementation to version 1.10.0:
 *** Add an endpoint `PUT /vehicles/{NAME}/acceptableOrderTypes`, which allows a vehicle's set of acceptable order types to be modified during runtime.
     This endpoint replaces `PUT /vehicles/{NAME}/allowedOrderTypes`, which is now deprecated.

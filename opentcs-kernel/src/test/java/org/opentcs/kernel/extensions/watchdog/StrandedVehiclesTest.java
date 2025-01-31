@@ -19,6 +19,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.extensions.watchdog.StrandedVehicles.VehicleSnapshot;
+import org.opentcs.util.TimeProvider;
 
 /**
  * Tests for {@link StrandedVehicles}.
@@ -49,7 +50,7 @@ public class StrandedVehiclesTest {
         .thenReturn(parkingPoint);
     when(objectService.fetchObject(Point.class, noParkingPoint.getReference()))
         .thenReturn(noParkingPoint);
-    when(timeProvider.getCurrentTime()).thenReturn(0L);
+    when(timeProvider.getCurrentTimeEpochMillis()).thenReturn(0L);
 
     stranded = new StrandedVehicles(objectService, timeProvider);
   }

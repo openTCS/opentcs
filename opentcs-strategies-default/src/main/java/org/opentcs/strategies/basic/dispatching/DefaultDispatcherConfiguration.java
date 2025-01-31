@@ -125,10 +125,18 @@ public interface DefaultDispatcherConfiguration {
   boolean parkIdleVehicles();
 
   @ConfigurationEntry(
+      type = "Integer",
+      description = "The time (in ms) to wait before creating parking orders for idle vehicles.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
+      orderKey = "2_park_1"
+  )
+  long parkIdleVehiclesDelay();
+
+  @ConfigurationEntry(
       type = "Boolean",
       description = "Whether to consider parking position priorities when creating parking orders.",
       changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
-      orderKey = "2_park_1"
+      orderKey = "2_park_2"
   )
   boolean considerParkingPositionPriorities();
 
@@ -136,7 +144,7 @@ public interface DefaultDispatcherConfiguration {
       type = "Boolean",
       description = "Whether to repark vehicles to parking positions with higher priorities.",
       changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
-      orderKey = "2_park_2"
+      orderKey = "2_park_3"
   )
   boolean reparkVehiclesToHigherPriorityPositions();
 
@@ -149,17 +157,25 @@ public interface DefaultDispatcherConfiguration {
   boolean rechargeIdleVehicles();
 
   @ConfigurationEntry(
+      type = "Integer",
+      description = "The time (in ms) to wait before creating recharge orders for idle vehicles.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
+      orderKey = "3_recharge_1"
+  )
+  long rechargeIdleVehiclesDelay();
+
+  @ConfigurationEntry(
       type = "Boolean",
       description = {"Whether vehicles must be recharged until they are fully charged.",
           "If false, vehicle must only be recharged until sufficiently charged."},
       changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
-      orderKey = "3_recharge_1"
+      orderKey = "3_recharge_2"
   )
   boolean keepRechargingUntilFullyCharged();
 
   @ConfigurationEntry(
       type = "Integer",
-      description = "The interval between redispatching of vehicles.",
+      description = "The interval (in ms) between redispatching of vehicles.",
       changesApplied = ConfigurationEntry.ChangesApplied.ON_NEW_PLANT_MODEL,
       orderKey = "9_misc"
   )
