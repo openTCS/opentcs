@@ -28,6 +28,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Add a creation time and finished time property to order sequences.
 ** Allow automatic creation of parking and recharge orders to be delayed.
    The delay is configurable via the `defaultdispatcher.parkIdleVehiclesDelay` and `defaultdispatcher.rechargeIdleVehiclesDelay` kernel configuration entries.
+** Improve performance for updating transport orders, order sequences and peripheral jobs in the respective Ops Desk tables.
 ** Update web API specification and implementation to version 1.10.0:
 *** Add an endpoint `PUT /vehicles/{NAME}/acceptableOrderTypes`, which allows a vehicle's set of acceptable order types to be modified during runtime.
     This endpoint replaces `PUT /vehicles/{NAME}/allowedOrderTypes`, which is now deprecated.

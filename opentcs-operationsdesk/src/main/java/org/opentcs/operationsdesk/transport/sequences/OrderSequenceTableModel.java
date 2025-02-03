@@ -12,6 +12,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
+import org.opentcs.operationsdesk.util.ListSearchUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,7 +162,8 @@ public class OrderSequenceTableModel
     requireNonNull(sequence, "sequence");
 
     SwingUtilities.invokeLater(() -> {
-      int sequenceIndex = entries.indexOf(sequence);
+      int sequenceIndex
+          = ListSearchUtil.binarySearch(entries, sequence, OrderSequence::getCreationTime);
       if (sequenceIndex == -1) {
         LOG.warn("Unknown order sequence: {}. Ignoring order sequence update.", sequence.getName());
         return;
@@ -175,7 +177,8 @@ public class OrderSequenceTableModel
   public void orderSequenceRemoved(OrderSequence sequence) {
     requireNonNull(sequence, "sequence");
     SwingUtilities.invokeLater(() -> {
-      int sequenceIndex = entries.indexOf(sequence);
+      int sequenceIndex
+          = ListSearchUtil.binarySearch(entries, sequence, OrderSequence::getCreationTime);
       if (sequenceIndex == -1) {
         LOG.warn(
             "Unknown order sequence: {}. Ignoring order sequence removal.",

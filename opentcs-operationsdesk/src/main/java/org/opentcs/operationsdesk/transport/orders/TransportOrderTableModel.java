@@ -15,6 +15,7 @@ import javax.swing.table.AbstractTableModel;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
+import org.opentcs.operationsdesk.util.ListSearchUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -201,7 +202,7 @@ public class TransportOrderTableModel
     requireNonNull(order, "order");
 
     SwingUtilities.invokeLater(() -> {
-      int orderIndex = entries.indexOf(order);
+      int orderIndex = ListSearchUtil.binarySearch(entries, order, TransportOrder::getCreationTime);
       if (orderIndex == -1) {
         LOG.warn("Unknown transport order: {}. Ignoring order update.", order.getName());
         return;
@@ -216,7 +217,7 @@ public class TransportOrderTableModel
     requireNonNull(order, "order");
 
     SwingUtilities.invokeLater(() -> {
-      int orderIndex = entries.indexOf(order);
+      int orderIndex = ListSearchUtil.binarySearch(entries, order, TransportOrder::getCreationTime);
       if (orderIndex == -1) {
         LOG.warn("Unknown transport order: {}. Ignoring order removal.", order.getName());
         return;

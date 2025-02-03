@@ -15,6 +15,7 @@ import javax.swing.table.AbstractTableModel;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
+import org.opentcs.operationsdesk.util.ListSearchUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,7 +175,7 @@ class PeripheralJobTableModel
     requireNonNull(job, "job");
 
     SwingUtilities.invokeLater(() -> {
-      int jobIndex = entries.indexOf(job);
+      int jobIndex = ListSearchUtil.binarySearch(entries, job, PeripheralJob::getCreationTime);
       if (jobIndex == -1) {
         LOG.warn("Unknown job: {}. Ignoring job update.", job.getName());
         return;
@@ -190,7 +191,7 @@ class PeripheralJobTableModel
     requireNonNull(job, "job");
 
     SwingUtilities.invokeLater(() -> {
-      int jobIndex = entries.indexOf(job);
+      int jobIndex = ListSearchUtil.binarySearch(entries, job, PeripheralJob::getCreationTime);
       if (jobIndex == -1) {
         LOG.warn("Unknown job: {}. Ignoring job removal.", job.getName());
         return;
