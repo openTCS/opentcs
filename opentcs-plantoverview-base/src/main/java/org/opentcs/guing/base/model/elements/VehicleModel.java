@@ -18,7 +18,6 @@ import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.BooleanProperty;
 import org.opentcs.guing.base.components.properties.type.BoundingBoxProperty;
 import org.opentcs.guing.base.components.properties.type.ColorProperty;
-import org.opentcs.guing.base.components.properties.type.EnergyLevelThresholdSetModel;
 import org.opentcs.guing.base.components.properties.type.EnergyLevelThresholdSetProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.OrderTypesProperty;
@@ -31,6 +30,7 @@ import org.opentcs.guing.base.components.properties.type.TripleProperty;
 import org.opentcs.guing.base.model.AbstractModelComponent;
 import org.opentcs.guing.base.model.BoundingBoxModel;
 import org.opentcs.guing.base.model.DrawnModelComponent;
+import org.opentcs.guing.base.model.EnergyLevelThresholdSetModel;
 
 /**
  * Basic implementation of a vehicle. A vehicle has an unique number.

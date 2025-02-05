@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: The openTCS Authors
 // SPDX-License-Identifier: MIT
-package org.opentcs.guing.base.components.properties.type;
+package org.opentcs.guing.base.model;
 
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 

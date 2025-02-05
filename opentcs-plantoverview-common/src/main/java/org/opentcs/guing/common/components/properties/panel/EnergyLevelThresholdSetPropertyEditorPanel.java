@@ -6,9 +6,9 @@ import static java.util.Objects.requireNonNull;
 import static org.opentcs.util.Assertions.checkInRange;
 
 import javax.swing.JOptionPane;
-import org.opentcs.guing.base.components.properties.type.EnergyLevelThresholdSetModel;
 import org.opentcs.guing.base.components.properties.type.EnergyLevelThresholdSetProperty;
 import org.opentcs.guing.base.components.properties.type.Property;
+import org.opentcs.guing.base.model.EnergyLevelThresholdSetModel;
 import org.opentcs.guing.common.components.dialogs.DetailsDialogContent;
 import org.opentcs.guing.common.util.I18nPlantOverview;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;

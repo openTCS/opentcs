@@ -4,6 +4,7 @@ package org.opentcs.guing.base.components.properties.type;
 
 import static org.opentcs.util.Assertions.checkArgument;
 
+import org.opentcs.guing.base.model.EnergyLevelThresholdSetModel;
 import org.opentcs.guing.base.model.ModelComponent;
 
 /**
