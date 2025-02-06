@@ -35,6 +35,8 @@ jobs:
         run: ./gradlew build
       - name: Check code formatting
         run: ./gradlew spotlessCheck
+      - name: REUSE Compliance Check
+        uses: fsfe/reuse-action@v4
       - name: Cleanup Gradle Cache
         # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
         # Restoring these files from a GitHub Actions cache might cause problems for future builds.
