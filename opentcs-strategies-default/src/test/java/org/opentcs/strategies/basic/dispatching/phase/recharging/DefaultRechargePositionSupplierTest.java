@@ -11,12 +11,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.Dispatcher;
+import org.opentcs.components.kernel.RouteSelector;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Location;
@@ -25,6 +25,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.Route;
+import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 
 /**
@@ -43,6 +44,7 @@ class DefaultRechargePositionSupplierTest {
   private InternalPlantModelService plantModelService;
   private Router router;
   private TargetedPointsSupplier targetedPointsSupplier;
+  private DefaultDispatcherConfiguration configuration;
   private DefaultRechargePositionSupplier rechargePosSupplier;
 
   @BeforeEach
@@ -77,10 +79,14 @@ class DefaultRechargePositionSupplierTest {
     plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
     targetedPointsSupplier = mock(TargetedPointsSupplier.class);
+    configuration = mock(DefaultDispatcherConfiguration.class);
+
     rechargePosSupplier = new DefaultRechargePositionSupplier(
         plantModelService,
         router,
-        targetedPointsSupplier
+        targetedPointsSupplier,
+        configuration,
+        mock(RouteSelector.class)
     );
 
     when(plantModelService.fetchObject(Point.class, currentPosition.getReference()))
@@ -93,9 +99,10 @@ class DefaultRechargePositionSupplierTest {
         .thenReturn(Set.of(rechargeLoc1, rechargeLoc2, rechargeLoc3));
     when(plantModelService.expandResources(Set.of(locationAccessPoint.getReference())))
         .thenReturn(Set.of(locationAccessPoint));
-    when(router.getRoute(vehicle, currentPosition, locationAccessPoint, Set.of()))
+    when(configuration.maxRoutesToConsider()).thenReturn(1);
+    when(router.getRoutes(vehicle, currentPosition, locationAccessPoint, Set.of(), 1))
         .thenReturn(
-            Optional.of(
+            Set.of(
                 new Route(
                     List.of(
                         new Route.Step(

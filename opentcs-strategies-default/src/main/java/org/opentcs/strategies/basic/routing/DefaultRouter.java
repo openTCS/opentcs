@@ -4,10 +4,10 @@ package org.opentcs.strategies.basic.routing;
 
 import static java.util.Objects.requireNonNull;
 import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
+import static org.opentcs.util.Assertions.checkArgument;
 
 import jakarta.inject.Inject;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -176,6 +176,7 @@ public class DefaultRouter
     }
   }
 
+  @Deprecated
   @Override
   public Optional<List<DriveOrder>> getRoute(
       Vehicle vehicle,
@@ -187,21 +188,22 @@ public class DefaultRouter
     requireNonNull(transportOrder, "transportOrder");
 
     synchronized (this) {
-      List<DriveOrder> driveOrderList = transportOrder.getFutureDriveOrders();
-      DriveOrder[] driveOrders = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
-      PointRouter pointRouter = pointRouterProvider.getPointRouterForVehicle(
-          vehicle,
-          transportOrder
-      );
-      OrderRouteParameterStruct params = new OrderRouteParameterStruct(driveOrders, pointRouter);
-      OrderRouteResultStruct resultStruct = new OrderRouteResultStruct(driveOrderList.size());
-      computeCheapestOrderRoute(sourcePoint, params, 0, resultStruct);
-      return (resultStruct.bestCosts == Long.MAX_VALUE)
-          ? Optional.empty()
-          : Optional.of(Arrays.asList(resultStruct.bestRoute));
+      return getRoutes(vehicle, sourcePoint, transportOrder, 1).stream().findFirst()
+          .map(routeList -> {
+            List<DriveOrder> driveOrdersWithoutRoutes = transportOrder.getFutureDriveOrders();
+            List<DriveOrder> driveOrdersWithRoutes
+                = new ArrayList<>(driveOrdersWithoutRoutes.size());
+            for (int i = 0; i < driveOrdersWithoutRoutes.size(); i++) {
+              driveOrdersWithRoutes.add(
+                  driveOrdersWithoutRoutes.get(i).withRoute(routeList.get(i))
+              );
+            }
+            return driveOrdersWithRoutes;
+          });
     }
   }
 
+  @Deprecated
   @Override
   public Optional<Route> getRoute(
       Vehicle vehicle,
@@ -215,18 +217,77 @@ public class DefaultRouter
     requireNonNull(resourcesToAvoid, "resourcesToAvoid");
 
     synchronized (this) {
-      PointRouter pointRouter = pointRouterProvider
-          .getPointRouterForVehicle(vehicle, resourcesToAvoid);
-      List<Route.Step> steps = pointRouter.getRouteSteps(sourcePoint, destinationPoint);
-      if (steps == null) {
-        return Optional.empty();
-      }
-      if (steps.isEmpty()) {
-        // If the list of steps is empty, we're already at the destination point
-        // Create a single step without a path.
-        steps.add(new Route.Step(null, null, sourcePoint, Vehicle.Orientation.UNDEFINED, 0, 0));
-      }
-      return Optional.of(new Route(steps));
+      return getRoutes(vehicle, sourcePoint, destinationPoint, resourcesToAvoid, 1)
+          .stream().findFirst();
+    }
+  }
+
+  @Override
+  public Set<List<Route>> getRoutes(
+      Vehicle vehicle,
+      Point sourcePoint,
+      TransportOrder transportOrder,
+      int maxRouteCount
+  ) {
+    requireNonNull(vehicle, "vehicle");
+    requireNonNull(sourcePoint, "sourcePoint");
+    requireNonNull(transportOrder, "transportOrder");
+    checkArgument(maxRouteCount > 0, "maxRouteCount must be greater than zero");
+
+    synchronized (this) {
+      // TODO: Once maxRouteCount is actually used, ensure to cap it at
+      //       DefaultRouterConfiguration.routeComputationLimit() using Math.min().
+      List<DriveOrder> driveOrderList = transportOrder.getFutureDriveOrders();
+      DriveOrder[] driveOrders = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
+      PointRouter pointRouter = pointRouterProvider.getPointRouterForVehicle(
+          vehicle,
+          transportOrder
+      );
+      OrderRouteParameterStruct params = new OrderRouteParameterStruct(driveOrders, pointRouter);
+      OrderRouteResultStruct resultStruct = new OrderRouteResultStruct(driveOrderList.size());
+      computeCheapestOrderRoute(sourcePoint, params, 0, resultStruct);
+      return (resultStruct.bestCosts == Long.MAX_VALUE)
+          ? Set.of()
+          : Set.of(List.of(resultStruct.bestRoute));
+    }
+  }
+
+  @Override
+  public Set<Route> getRoutes(
+      Vehicle vehicle,
+      Point sourcePoint,
+      Point destinationPoint,
+      Set<TCSResourceReference<?>> resourcesToAvoid,
+      int maxRouteCount
+  ) {
+    requireNonNull(vehicle, "vehicle");
+    requireNonNull(sourcePoint, "sourcePoint");
+    requireNonNull(destinationPoint, "destinationPoint");
+    requireNonNull(resourcesToAvoid, "resourcesToAvoid");
+    checkArgument(maxRouteCount > 0, "maxRouteCount must be greater than zero");
+
+    synchronized (this) {
+      // TODO: Once maxRouteCount is actually used, ensure to cap it at
+      //       DefaultRouterConfiguration.routeComputationLimit() using Math.min().
+      return Optional.ofNullable(
+          pointRouterProvider.getPointRouterForVehicle(vehicle, resourcesToAvoid)
+              .getRouteSteps(sourcePoint, destinationPoint)
+      )
+          .map(steps -> {
+            if (steps.isEmpty()) {
+              return List.of(
+                  // If the list of steps is empty, we're already at the destination point create a
+                  // single step without a path.
+                  new Route.Step(null, null, sourcePoint, Vehicle.Orientation.UNDEFINED, 0, 0)
+              );
+            }
+            else {
+              return steps;
+            }
+          })
+          .map(Route::new)
+          .map(Set::of)
+          .orElse(Set.of());
     }
   }
 
@@ -377,10 +438,8 @@ public class DefaultRouter
         }
         // Create a route from the list of steps gathered.
         Route hopRoute = new Route(steps);
-        // Copy the current drive order, add the computed route to it and
-        // place it in the result struct.
-        DriveOrder hopOrder = params.driveOrders[hopIndex].withRoute(hopRoute);
-        result.currentRoute[hopIndex] = hopOrder;
+        // Place the computed route in the result struct.
+        result.currentRoute[hopIndex] = hopRoute;
         // Calculate the costs for the route so far, too.
         result.currentCosts = currentRouteCosts + hopRoute.getCosts();
         computeCheapestOrderRoute(curDestPoint, params, hopIndex + 1, result);
@@ -515,7 +574,7 @@ public class DefaultRouter
     /**
      * The (possibly partial) route currently being examined.
      */
-    private DriveOrder[] currentRoute;
+    private Route[] currentRoute;
     /**
      * The costs of the route currently being examined.
      */
@@ -523,7 +582,7 @@ public class DefaultRouter
     /**
      * The best route found so far.
      */
-    private DriveOrder[] bestRoute;
+    private Route[] bestRoute;
     /**
      * The costs of the best route found so far.
      */
@@ -537,9 +596,9 @@ public class DefaultRouter
      * routing result.
      */
     OrderRouteResultStruct(int driveOrderCount) {
-      currentRoute = new DriveOrder[driveOrderCount];
+      currentRoute = new Route[driveOrderCount];
       currentCosts = 0;
-      bestRoute = new DriveOrder[driveOrderCount];
+      bestRoute = new Route[driveOrderCount];
       bestCosts = Long.MAX_VALUE;
     }
   }

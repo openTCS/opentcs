@@ -364,7 +364,8 @@ class VehicleHandlerTest {
             vehicle.getReference(),
             vehiclePosition.getReference(),
             Set.of(destinationPoint1.getReference(), destinationPoint2.getReference()),
-            Set.of()
+            Set.of(),
+            1
         );
 
     // Act & Assert: nonexistent vehicle
@@ -424,7 +425,8 @@ class VehicleHandlerTest {
             vehicle.getReference(),
             sourcePoint.getReference(),
             Set.of(destinationPoint1.getReference(), destinationPoint2.getReference()),
-            Set.of()
+            Set.of(),
+            1
         );
 
     // Act & Assert: nonexistent source point
@@ -489,7 +491,8 @@ class VehicleHandlerTest {
                 pointToAvoid.getReference(),
                 pathToAvoid.getReference(),
                 locationToAvoid.getReference()
-            )
+            ),
+            1
         );
 
     // Act & Assert: nonexistent resource to avoid

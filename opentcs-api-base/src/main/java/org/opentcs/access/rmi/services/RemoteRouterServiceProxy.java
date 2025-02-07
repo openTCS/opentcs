@@ -44,6 +44,7 @@ class RemoteRouterServiceProxy
   }
 
   @Override
+  @Deprecated
   public Map<TCSObjectReference<Point>, Route> computeRoutes(
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<Point> sourcePointRef,
@@ -60,6 +61,32 @@ class RemoteRouterServiceProxy
           sourcePointRef,
           destinationPointRefs,
           resourcesToAvoid
+      );
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public Map<TCSObjectReference<Point>, Set<Route>> computeRoutes(
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<Point> sourcePointRef,
+      Set<TCSObjectReference<Point>> destinationPointRefs,
+      Set<TCSResourceReference<?>> resourcesToAvoid,
+      int maxRoutesPerDestinationPoint
+  )
+      throws KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      return getRemoteService().computeRoutes(
+          getClientId(),
+          vehicleRef,
+          sourcePointRef,
+          destinationPointRefs,
+          resourcesToAvoid,
+          maxRoutesPerDestinationPoint
       );
     }
     catch (RemoteException ex) {

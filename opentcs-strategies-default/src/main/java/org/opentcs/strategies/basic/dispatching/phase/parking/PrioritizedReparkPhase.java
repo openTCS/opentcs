@@ -5,11 +5,11 @@ package org.opentcs.strategies.basic.dispatching.phase.parking;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
-import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
+import org.opentcs.strategies.basic.dispatching.DriveOrderRouteAssigner;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
 import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAssignmentCandidateSelectionFilter;
 import org.opentcs.strategies.basic.dispatching.selection.vehicles.CompositeReparkVehicleSelectionFilter;
@@ -36,20 +36,20 @@ public class PrioritizedReparkPhase
   public PrioritizedReparkPhase(
       InternalTransportOrderService orderService,
       PrioritizedParkingPositionSupplier parkingPosSupplier,
-      Router router,
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       TransportOrderUtil transportOrderUtil,
       DefaultDispatcherConfiguration configuration,
       CompositeReparkVehicleSelectionFilter vehicleSelectionFilter,
-      ParkingPositionPriorityComparator priorityComparator
+      ParkingPositionPriorityComparator priorityComparator,
+      DriveOrderRouteAssigner driveOrderRouteAssigner
   ) {
     super(
         orderService,
         parkingPosSupplier,
-        router,
         assignmentCandidateSelectionFilter,
         transportOrderUtil,
-        configuration
+        configuration,
+        driveOrderRouteAssigner
     );
     this.vehicleSelectionFilter = requireNonNull(vehicleSelectionFilter, "vehicleSelectionFilter");
     this.priorityComparator = requireNonNull(priorityComparator, "priorityComparator");

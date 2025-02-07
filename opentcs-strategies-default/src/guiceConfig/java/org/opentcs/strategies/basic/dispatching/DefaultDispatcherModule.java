@@ -7,6 +7,7 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import jakarta.inject.Singleton;
 import java.util.Comparator;
+import org.opentcs.components.kernel.RouteSelector;
 import org.opentcs.customizations.kernel.KernelInjectionModule;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.ReroutingType;
@@ -209,6 +210,10 @@ public class DefaultDispatcherModule
         .in(Singleton.class);
 
     bind(TransportOrderUtil.class)
+        .in(Singleton.class);
+
+    bind(RouteSelector.class)
+        .to(LowestCostRouteSelector.class)
         .in(Singleton.class);
 
     configureRerouteComponents();

@@ -172,6 +172,7 @@ public class StandardRemoteRouterService
   }
 
   @Override
+  @Deprecated
   public Map<TCSObjectReference<Point>, Route> computeRoutes(
       ClientID clientId,
       TCSObjectReference<Vehicle> vehicleRef,
@@ -188,6 +189,35 @@ public class StandardRemoteRouterService
               sourcePointRef,
               destinationPointRefs,
               resourcesToAvoid
+          )
+      )
+          .get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
+
+  @Override
+  public Map<TCSObjectReference<Point>, Set<Route>> computeRoutes(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> vehicleRef,
+      TCSObjectReference<Point> sourcePointRef,
+      Set<TCSObjectReference<Point>> destinationPointRefs,
+      Set<TCSResourceReference<?>> resourcesToAvoid,
+      int maxRoutesPerDestinationPoint
+  )
+      throws RemoteException {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_MODEL);
+
+    try {
+      return kernelExecutor.submit(
+          () -> routerService.computeRoutes(
+              vehicleRef,
+              sourcePointRef,
+              destinationPointRefs,
+              resourcesToAvoid,
+              maxRoutesPerDestinationPoint
           )
       )
           .get();

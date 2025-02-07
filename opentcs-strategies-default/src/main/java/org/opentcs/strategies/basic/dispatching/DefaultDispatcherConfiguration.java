@@ -84,6 +84,15 @@ public interface DefaultDispatcherConfiguration {
   long deadlineAtRiskPeriod();
 
   @ConfigurationEntry(
+      type = "Integer",
+      description = "The maximum number of routes to consider when assigning transport orders to"
+          + " vehicles.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
+      orderKey = "0_assign_special_1"
+  )
+  int maxRoutesToConsider();
+
+  @ConfigurationEntry(
       type = "Boolean",
       description = "Whether orders to the current position with no operation should be assigned.",
       changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,

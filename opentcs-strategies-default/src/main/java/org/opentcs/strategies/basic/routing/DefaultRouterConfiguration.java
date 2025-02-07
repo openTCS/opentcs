@@ -17,10 +17,17 @@ public interface DefaultRouterConfiguration {
   String PREFIX = "defaultrouter";
 
   @ConfigurationEntry(
+      type = "Integer",
+      description = "The maximum number of routes that the router will ever compute for a single"
+          + " request.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY
+  )
+  int routeComputationLimit();
+
+  @ConfigurationEntry(
       type = "Boolean",
       description = "Whether to compute a route even if the vehicle is already at the destination.",
       changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY
   )
   boolean routeToCurrentPosition();
-
 }

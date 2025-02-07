@@ -17,12 +17,14 @@ import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentcs.components.kernel.RouteSelector;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 
 /**
@@ -34,6 +36,8 @@ class AbstractParkingPositionSupplierTest {
   private Router router;
   private AbstractParkingPositionSupplierImpl supplier;
   private TargetedPointsSupplier targetedPointsSupplier;
+  private DefaultDispatcherConfiguration configuration;
+  private RouteSelector routeSelector;
 
   AbstractParkingPositionSupplierTest() {
   }
@@ -43,8 +47,10 @@ class AbstractParkingPositionSupplierTest {
     plantModelService = mock(InternalPlantModelService.class);
     router = mock(Router.class);
     targetedPointsSupplier = mock(TargetedPointsSupplier.class);
+    configuration = mock(DefaultDispatcherConfiguration.class);
+    routeSelector = mock(RouteSelector.class);
     supplier = new AbstractParkingPositionSupplierImpl(
-        plantModelService, router, targetedPointsSupplier
+        plantModelService, router, targetedPointsSupplier, configuration, routeSelector
     );
     when(targetedPointsSupplier.getTargetedPoints()).thenReturn(Set.of());
 
@@ -133,9 +139,11 @@ class AbstractParkingPositionSupplierTest {
     AbstractParkingPositionSupplierImpl(
         InternalPlantModelService plantModelService,
         Router router,
-        TargetedPointsSupplier targetedPointsSupplier
+        TargetedPointsSupplier targetedPointsSupplier,
+        DefaultDispatcherConfiguration configuration,
+        RouteSelector routeSelector
     ) {
-      super(plantModelService, router, targetedPointsSupplier);
+      super(plantModelService, router, targetedPointsSupplier, configuration, routeSelector);
     }
 
     @Override

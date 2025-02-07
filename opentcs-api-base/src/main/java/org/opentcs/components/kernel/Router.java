@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
@@ -128,7 +129,10 @@ public interface Router
    * @return A list of drive orders containing the complete calculated route for
    * the given transport order, passable the given vehicle and starting on the
    * given point, or the empty optional, if no such route exists.
+   * @deprecated Use {@link #getRoutes(Vehicle, Point, TransportOrder, int)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   @Nonnull
   Optional<List<DriveOrder>> getRoute(
       @Nonnull
@@ -151,7 +155,10 @@ public interface Router
    * @param resourcesToAvoid Resources to avoid when calculating the route.
    * @return The calculated route, or the empty optional, if a route between the
    * given points does not exist.
+   * @deprecated Use {@link #getRoutes(Vehicle, Point, Point, Set, int)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   @Nonnull
   Optional<Route> getRoute(
       @Nonnull
@@ -163,6 +170,78 @@ public interface Router
       @Nonnull
       Set<TCSResourceReference<?>> resourcesToAvoid
   );
+
+  /**
+   * Returns possible complete route sequences for a given vehicle that start on a specified point
+   * and allow the vehicle to process a given transport order.
+   * <p>
+   * The routes in a route sequence (as well as their order) correspond to the drive orders that
+   * the given transport order is composed of.
+   * </p>
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
+   *
+   * @param vehicle The vehicle for which the calculated routes must be passable.
+   * @param sourcePoint The position at which the vehicle would start processing the transport order
+   * (e.g. the vehicle's current position).
+   * @param transportOrder The transport order to be processed by the vehicle.
+   * @param maxRouteCount The maximum number of route sequences to return.
+   * @return A set of route sequences that allow the given vehicle to process the given transport
+   * order, or an empty set, if no such route exists.
+   */
+  @ScheduledApiChange(when = "7.0", details = "Default implementation will be removed.")
+  @Nonnull
+  default Set<List<Route>> getRoutes(
+      @Nonnull
+      Vehicle vehicle,
+      @Nonnull
+      Point sourcePoint,
+      @Nonnull
+      TransportOrder transportOrder,
+      int maxRouteCount
+  ) {
+    return getRoute(vehicle, sourcePoint, transportOrder)
+        .map(
+            driveOrderList -> Set.of(
+                driveOrderList.stream()
+                    .map(driveOrder -> driveOrder.getRoute())
+                    .collect(Collectors.toList())
+            )
+        )
+        .orElse(Set.of());
+  }
+
+  /**
+   * Returns possible routes from one point to another, passable by a given vehicle.
+   * <p>
+   * This method is supposed to be called only from the kernel executor thread.
+   * </p>
+   *
+   * @param vehicle The vehicle for which the calculated routes must be passable.
+   * @param sourcePoint The starting point of the routes to calculate.
+   * @param destinationPoint The end point of the routes to calculate.
+   * @param resourcesToAvoid Resources to avoid when calculating the routes.
+   * @param maxRouteCount The maximum number of routes to return.
+   * @return A set of routes, or an empty set, if no routes between the given points exist.
+   */
+  @ScheduledApiChange(when = "7.0", details = "Default implementation will be removed.")
+  @Nonnull
+  default Set<Route> getRoutes(
+      @Nonnull
+      Vehicle vehicle,
+      @Nonnull
+      Point sourcePoint,
+      @Nonnull
+      Point destinationPoint,
+      @Nonnull
+      Set<TCSResourceReference<?>> resourcesToAvoid,
+      int maxRouteCount
+  ) {
+    return getRoute(vehicle, sourcePoint, destinationPoint, resourcesToAvoid)
+        .map(route -> Set.of(route))
+        .orElse(Set.of());
+  }
 
   /**
    * Returns the costs for travelling a route from one point to another with a

@@ -12,10 +12,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentcs.components.kernel.RouteSelector;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,15 +48,19 @@ public class PrioritizedParkingPositionSupplier
    * @param router A router for computing travel costs to parking positions.
    * @param priorityFunction A function computing the priority of a parking position.
    * @param targetedPointsSupplier Returns all points which are currently targeted by vehicles.
+   * @param configuration The dispatcher configuration.
+   * @param routeSelector Selects a route from a set of routes.
    */
   @Inject
   public PrioritizedParkingPositionSupplier(
       InternalPlantModelService plantModelService,
       Router router,
       ParkingPositionToPriorityFunction priorityFunction,
-      TargetedPointsSupplier targetedPointsSupplier
+      TargetedPointsSupplier targetedPointsSupplier,
+      DefaultDispatcherConfiguration configuration,
+      RouteSelector routeSelector
   ) {
-    super(plantModelService, router, targetedPointsSupplier);
+    super(plantModelService, router, targetedPointsSupplier, configuration, routeSelector);
     this.priorityFunction = requireNonNull(priorityFunction, "priorityFunction");
   }
 

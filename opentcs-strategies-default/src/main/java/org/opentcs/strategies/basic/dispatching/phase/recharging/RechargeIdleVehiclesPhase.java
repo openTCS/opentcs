@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
-import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -19,6 +18,7 @@ import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
+import org.opentcs.strategies.basic.dispatching.DriveOrderRouteAssigner;
 import org.opentcs.strategies.basic.dispatching.Phase;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
 import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAssignmentCandidateSelectionFilter;
@@ -46,10 +46,6 @@ public class RechargeIdleVehiclesPhase
    */
   private final RechargePositionSupplier rechargePosSupplier;
   /**
-   * The Router instance calculating route costs.
-   */
-  private final Router router;
-  /**
    * A collection of predicates for filtering assignment candidates.
    */
   private final CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter;
@@ -62,6 +58,10 @@ public class RechargeIdleVehiclesPhase
    */
   private final DefaultDispatcherConfiguration configuration;
   /**
+   * Assigns routes to drive orders.
+   */
+  private final DriveOrderRouteAssigner driveOrderRouteAssigner;
+  /**
    * Indicates whether this component is initialized.
    */
   private boolean initialized;
@@ -70,13 +70,12 @@ public class RechargeIdleVehiclesPhase
   public RechargeIdleVehiclesPhase(
       InternalTransportOrderService orderService,
       RechargePositionSupplier rechargePosSupplier,
-      Router router,
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       CompositeRechargeVehicleSelectionFilter vehicleSelectionFilter,
       TransportOrderUtil transportOrderUtil,
-      DefaultDispatcherConfiguration configuration
+      DefaultDispatcherConfiguration configuration,
+      DriveOrderRouteAssigner driveOrderRouteAssigner
   ) {
-    this.router = requireNonNull(router, "router");
     this.orderService = requireNonNull(orderService, "orderService");
     this.rechargePosSupplier = requireNonNull(rechargePosSupplier, "rechargePosSupplier");
     this.assignmentCandidateSelectionFilter = requireNonNull(
@@ -86,6 +85,10 @@ public class RechargeIdleVehiclesPhase
     this.vehicleSelectionFilter = requireNonNull(vehicleSelectionFilter, "vehicleSelectionFilter");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
     this.configuration = requireNonNull(configuration, "configuration");
+    this.driveOrderRouteAssigner = requireNonNull(
+        driveOrderRouteAssigner,
+        "driveOrderRouteAssigner"
+    );
   }
 
   @Override
@@ -152,10 +155,9 @@ public class RechargeIdleVehiclesPhase
             .withType(OrderConstants.TYPE_CHARGE)
     );
 
-    Point vehiclePosition = orderService.fetchObject(Point.class, vehicle.getCurrentPosition());
     Optional<AssignmentCandidate> candidate = computeCandidate(
         vehicle,
-        vehiclePosition,
+        orderService.fetchObject(Point.class, vehicle.getCurrentPosition()),
         rechargeOrder
     )
         .filter(c -> assignmentCandidateSelectionFilter.apply(c).isEmpty());
@@ -181,7 +183,7 @@ public class RechargeIdleVehiclesPhase
       Point vehiclePosition,
       TransportOrder order
   ) {
-    return router.getRoute(vehicle, vehiclePosition, order)
+    return driveOrderRouteAssigner.tryAssignRoutes(order, vehicle, vehiclePosition)
         .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders));
   }
 }

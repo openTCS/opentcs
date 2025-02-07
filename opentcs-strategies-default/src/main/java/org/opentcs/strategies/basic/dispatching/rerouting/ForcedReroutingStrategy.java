@@ -7,13 +7,13 @@ import static java.util.Objects.requireNonNull;
 import jakarta.inject.Inject;
 import java.util.Optional;
 import java.util.Set;
-import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
+import org.opentcs.strategies.basic.dispatching.DriveOrderRouteAssigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * The {@link ReroutingStrategy} implementation for {@link ReroutingType#FORCED}.
  * <p>
  * Reroutes a {@link Vehicle} from its current position, but only if the vehicle is allowed to
- * allocated the resources for that position.
+ * allocate the resources for that position.
  */
 public class ForcedReroutingStrategy
     extends
@@ -33,12 +33,12 @@ public class ForcedReroutingStrategy
 
   @Inject
   public ForcedReroutingStrategy(
-      Router router,
       InternalTransportOrderService transportOrderService,
       VehicleControllerPool vehicleControllerPool,
-      ForcedDriveOrderMerger driveOrderMerger
+      ForcedDriveOrderMerger driveOrderMerger,
+      DriveOrderRouteAssigner driveOrderRouteAssigner
   ) {
-    super(router, transportOrderService, driveOrderMerger);
+    super(transportOrderService, driveOrderMerger, driveOrderRouteAssigner);
     this.transportOrderService = requireNonNull(transportOrderService, "transportOrderService");
     this.vehicleControllerPool = requireNonNull(vehicleControllerPool, "vehicleControllerPool");
   }

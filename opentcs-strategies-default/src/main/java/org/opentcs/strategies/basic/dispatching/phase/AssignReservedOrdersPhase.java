@@ -7,12 +7,12 @@ import static java.util.Objects.requireNonNull;
 import jakarta.inject.Inject;
 import java.util.Objects;
 import java.util.Optional;
-import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
+import org.opentcs.strategies.basic.dispatching.DriveOrderRouteAssigner;
 import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
 import org.opentcs.strategies.basic.dispatching.Phase;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
@@ -31,10 +31,6 @@ public class AssignReservedOrdersPhase
    */
   private final TCSObjectService objectService;
   /**
-   * The Router instance calculating route costs.
-   */
-  private final Router router;
-  /**
    * A collection of predicates for filtering assignment candidates.
    */
   private final CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter;
@@ -45,6 +41,10 @@ public class AssignReservedOrdersPhase
 
   private final TransportOrderUtil transportOrderUtil;
   /**
+   * Assigns routes to drive orders.
+   */
+  private final DriveOrderRouteAssigner driveOrderRouteAssigner;
+  /**
    * Indicates whether this component is initialized.
    */
   private boolean initialized;
@@ -52,12 +52,11 @@ public class AssignReservedOrdersPhase
   @Inject
   public AssignReservedOrdersPhase(
       TCSObjectService objectService,
-      Router router,
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       OrderReservationPool orderReservationPool,
-      TransportOrderUtil transportOrderUtil
+      TransportOrderUtil transportOrderUtil,
+      DriveOrderRouteAssigner driveOrderRouteAssigner
   ) {
-    this.router = requireNonNull(router, "router");
     this.objectService = requireNonNull(objectService, "objectService");
     this.assignmentCandidateSelectionFilter = requireNonNull(
         assignmentCandidateSelectionFilter,
@@ -65,6 +64,10 @@ public class AssignReservedOrdersPhase
     );
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
+    this.driveOrderRouteAssigner = requireNonNull(
+        driveOrderRouteAssigner,
+        "driveOrderRouteAssigner"
+    );
   }
 
   @Override
@@ -115,10 +118,7 @@ public class AssignReservedOrdersPhase
         .map(
             order -> computeCandidate(
                 vehicle,
-                objectService.fetchObject(
-                    Point.class,
-                    vehicle.getCurrentPosition()
-                ),
+                objectService.fetchObject(Point.class, vehicle.getCurrentPosition()),
                 order
             )
         )
@@ -162,7 +162,7 @@ public class AssignReservedOrdersPhase
       Point vehiclePosition,
       TransportOrder order
   ) {
-    return router.getRoute(vehicle, vehiclePosition, order)
+    return driveOrderRouteAssigner.tryAssignRoutes(order, vehicle, vehiclePosition)
         .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders));
   }
 }

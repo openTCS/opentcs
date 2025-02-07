@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.dispatching.DriveOrderRouteAssigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,25 +25,28 @@ public abstract class AbstractReroutingStrategy
       ReroutingStrategy {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractReroutingStrategy.class);
-  private final Router router;
   private final TCSObjectService objectService;
   private final DriveOrderMerger driveOrderMerger;
+  private final DriveOrderRouteAssigner driveOrderRouteAssigner;
 
   /**
    * Creates a new instance.
    *
-   * @param router The router to use.
    * @param objectService The object service to use.
    * @param driveOrderMerger Used to restore drive order history for a newly computed route.
+   * @param driveOrderRouteAssigner Assigns routes to drive orders.
    */
   protected AbstractReroutingStrategy(
-      Router router,
       TCSObjectService objectService,
-      DriveOrderMerger driveOrderMerger
+      DriveOrderMerger driveOrderMerger,
+      DriveOrderRouteAssigner driveOrderRouteAssigner
   ) {
-    this.router = requireNonNull(router, "router");
     this.objectService = requireNonNull(objectService, "objectService");
     this.driveOrderMerger = requireNonNull(driveOrderMerger, "driveOrderMerger");
+    this.driveOrderRouteAssigner = requireNonNull(
+        driveOrderRouteAssigner,
+        "driveOrderRouteAssigner"
+    );
   }
 
   @Override
@@ -94,7 +97,7 @@ public abstract class AbstractReroutingStrategy
    * Determines the {@link Point} that should be the source point for the rerouting.
    *
    * @param vehicle The vehicle to determine the reroute source point for.
-   * @return The {@link Point} wrapped in an {@link Optional} or {@link Optional#EMPTY}, if a
+   * @return The {@link Point} wrapped in an {@link Optional} or {@link Optional#empty()}, if a
    * source point for the rerouting could not be determined.
    */
   protected abstract Optional<Point> determineRerouteSource(Vehicle vehicle);
@@ -119,7 +122,7 @@ public abstract class AbstractReroutingStrategy
    * @param driveOrders The drive orders for which to get a new route.
    * @param sourcePoint The source point to reroute from.
    * @return If rerouting is possible, an {@link Optional} containing the rerouted list of drive
-   * orders, otherwise {@link Optional#EMPTY}.
+   * orders, otherwise {@link Optional#empty()}.
    */
   private Optional<List<DriveOrder>> tryReroute(
       Vehicle vehicle,
@@ -136,11 +139,12 @@ public abstract class AbstractReroutingStrategy
         TransportOrder.class,
         vehicle.getTransportOrder()
     );
-    return router.getRoute(
-        vehicle,
-        sourcePoint,
+
+    return driveOrderRouteAssigner.tryAssignRoutes(
         new TransportOrder("reroute-dummy", driveOrders)
-            .withProperties(vehicleOrder.getProperties())
+            .withProperties(vehicleOrder.getProperties()),
+        vehicle,
+        sourcePoint
     );
   }
 

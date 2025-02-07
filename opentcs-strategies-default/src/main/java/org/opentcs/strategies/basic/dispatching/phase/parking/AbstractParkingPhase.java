@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
-import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.data.model.Point;
@@ -19,6 +18,7 @@ import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
+import org.opentcs.strategies.basic.dispatching.DriveOrderRouteAssigner;
 import org.opentcs.strategies.basic.dispatching.Phase;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
 import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAssignmentCandidateSelectionFilter;
@@ -45,10 +45,6 @@ public abstract class AbstractParkingPhase
    */
   private final ParkingPositionSupplier parkingPosSupplier;
   /**
-   * The Router instance calculating route costs.
-   */
-  private final Router router;
-  /**
    * A collection of predicates for filtering assignment candidates.
    */
   private final CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter;
@@ -61,6 +57,10 @@ public abstract class AbstractParkingPhase
    */
   private final DefaultDispatcherConfiguration configuration;
   /**
+   * Assigns routes to drive orders.
+   */
+  private final DriveOrderRouteAssigner driveOrderRouteAssigner;
+  /**
    * Indicates whether this component is initialized.
    */
   private boolean initialized;
@@ -68,12 +68,11 @@ public abstract class AbstractParkingPhase
   public AbstractParkingPhase(
       InternalTransportOrderService orderService,
       ParkingPositionSupplier parkingPosSupplier,
-      Router router,
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       TransportOrderUtil transportOrderUtil,
-      DefaultDispatcherConfiguration configuration
+      DefaultDispatcherConfiguration configuration,
+      DriveOrderRouteAssigner driveOrderRouteAssigner
   ) {
-    this.router = requireNonNull(router, "router");
     this.orderService = requireNonNull(orderService, "orderService");
     this.parkingPosSupplier = requireNonNull(parkingPosSupplier, "parkingPosSupplier");
     this.assignmentCandidateSelectionFilter = requireNonNull(
@@ -82,6 +81,10 @@ public abstract class AbstractParkingPhase
     );
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
     this.configuration = requireNonNull(configuration, "configuration");
+    this.driveOrderRouteAssigner = requireNonNull(
+        driveOrderRouteAssigner,
+        "driveOrderRouteAssigner"
+    );
   }
 
   @Override
@@ -120,8 +123,6 @@ public abstract class AbstractParkingPhase
   }
 
   protected void createParkingOrder(Vehicle vehicle) {
-    Point vehiclePosition = orderService.fetchObject(Point.class, vehicle.getCurrentPosition());
-
     // Get a suitable parking position for the vehicle.
     Optional<Point> parkPos = parkingPosSupplier.findParkingPosition(vehicle);
     LOG.debug("Parking position for {}: {}", vehicle, parkPos);
@@ -142,7 +143,11 @@ public abstract class AbstractParkingPhase
             .withIntendedVehicleName(vehicle.getName())
             .withType(OrderConstants.TYPE_PARK)
     );
-    Optional<AssignmentCandidate> candidate = computeCandidate(vehicle, vehiclePosition, parkOrder)
+    Optional<AssignmentCandidate> candidate = computeCandidate(
+        vehicle,
+        orderService.fetchObject(Point.class, vehicle.getCurrentPosition()),
+        parkOrder
+    )
         .filter(c -> assignmentCandidateSelectionFilter.apply(c).isEmpty());
     // XXX Change this to Optional.ifPresentOrElse() once we're at Java 9+.
     if (candidate.isPresent()) {
@@ -163,7 +168,7 @@ public abstract class AbstractParkingPhase
       Point vehiclePosition,
       TransportOrder order
   ) {
-    return router.getRoute(vehicle, vehiclePosition, order)
+    return driveOrderRouteAssigner.tryAssignRoutes(order, vehicle, vehiclePosition)
         .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders));
   }
 }

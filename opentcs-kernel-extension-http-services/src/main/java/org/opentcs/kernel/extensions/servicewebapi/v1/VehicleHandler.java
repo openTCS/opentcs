@@ -7,6 +7,7 @@ import static java.util.Objects.requireNonNull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -363,8 +364,18 @@ public class VehicleHandler {
           vehicle.getReference(),
           sourcePointRef,
           destinationPointRefs,
-          resourcesToAvoid
-      );
+          resourcesToAvoid,
+          1
+      ).entrySet()
+          .stream()
+          .collect(
+              HashMap::new,
+              (map, entry) -> map.put(
+                  entry.getKey(),
+                  entry.getValue().stream().findAny().orElse(null)
+              ),
+              HashMap::putAll
+          );
     });
   }
 }

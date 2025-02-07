@@ -8,7 +8,6 @@ import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
@@ -17,6 +16,7 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.strategies.basic.dispatching.DriveOrderRouteAssigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,12 +37,12 @@ public class RegularReroutingStrategy
 
   @Inject
   public RegularReroutingStrategy(
-      Router router,
       TCSObjectService objectService,
       RegularDriveOrderMerger driveOrderMerger,
-      VehiclePositionResolver vehiclePositionResolver
+      VehiclePositionResolver vehiclePositionResolver,
+      DriveOrderRouteAssigner driveOrderRouteAssigner
   ) {
-    super(router, objectService, driveOrderMerger);
+    super(objectService, driveOrderMerger, driveOrderRouteAssigner);
     this.vehiclePositionResolver = requireNonNull(
         vehiclePositionResolver,
         "vehiclePositionResolver"

@@ -6,13 +6,13 @@ import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
 import java.util.Optional;
-import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
+import org.opentcs.strategies.basic.dispatching.DriveOrderRouteAssigner;
 import org.opentcs.strategies.basic.dispatching.Phase;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
 import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAssignmentCandidateSelectionFilter;
@@ -29,15 +29,15 @@ public class AssignSequenceSuccessorsPhase
    */
   private final TCSObjectService objectService;
   /**
-   * The Router instance calculating route costs.
-   */
-  private final Router router;
-  /**
    * A collection of predicates for filtering assignment candidates.
    */
   private final CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter;
 
   private final TransportOrderUtil transportOrderUtil;
+  /**
+   * Assigns routes to drive orders.
+   */
+  private final DriveOrderRouteAssigner driveOrderRouteAssigner;
   /**
    * Indicates whether this component is initialized.
    */
@@ -46,17 +46,20 @@ public class AssignSequenceSuccessorsPhase
   @Inject
   public AssignSequenceSuccessorsPhase(
       TCSObjectService objectService,
-      Router router,
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
-      TransportOrderUtil transportOrderUtil
+      TransportOrderUtil transportOrderUtil,
+      DriveOrderRouteAssigner driveOrderRouteAssigner
   ) {
-    this.router = requireNonNull(router, "router");
     this.objectService = requireNonNull(objectService, "objectService");
     this.assignmentCandidateSelectionFilter = requireNonNull(
         assignmentCandidateSelectionFilter,
         "assignmentCandidateSelectionFilter"
     );
     this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
+    this.driveOrderRouteAssigner = requireNonNull(
+        driveOrderRouteAssigner,
+        "driveOrderRouteAssigner"
+    );
   }
 
   @Override
@@ -92,7 +95,13 @@ public class AssignSequenceSuccessorsPhase
 
   private void tryAssignNextOrderInSequence(Vehicle vehicle) {
     nextOrderInCurrentSequence(vehicle)
-        .map(order -> computeCandidate(vehicle, order))
+        .map(
+            order -> computeCandidate(
+                vehicle,
+                objectService.fetchObject(Point.class, vehicle.getCurrentPosition()),
+                order
+            )
+        )
         .filter(candidate -> assignmentCandidateSelectionFilter.apply(candidate).isEmpty())
         .ifPresent(
             candidate -> transportOrderUtil.assignTransportOrder(
@@ -103,12 +112,12 @@ public class AssignSequenceSuccessorsPhase
         );
   }
 
-  private AssignmentCandidate computeCandidate(Vehicle vehicle, TransportOrder order) {
-    return router.getRoute(
-        vehicle,
-        objectService.fetchObject(Point.class, vehicle.getCurrentPosition()),
-        order
-    )
+  private AssignmentCandidate computeCandidate(
+      Vehicle vehicle,
+      Point vehiclePosition,
+      TransportOrder order
+  ) {
+    return driveOrderRouteAssigner.tryAssignRoutes(order, vehicle, vehiclePosition)
         .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders))
         .orElse(null);
   }

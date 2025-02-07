@@ -5,6 +5,7 @@ package org.opentcs.strategies.basic.routing;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -18,10 +19,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.data.model.Location;
+import org.opentcs.data.model.Location.Link;
+import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
+import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.routing.jgrapht.PointRouterProvider;
 
@@ -107,5 +112,63 @@ class DefaultRouterTest {
     when(pointRouter.getCosts(any(Point.class), any(Point.class))).thenReturn(50L);
 
     assertThat(defaultRouter.checkGeneralRoutability(order), is(true));
+  }
+
+  @Test
+  void provideRouteSequenceForTransportOrder() {
+    Vehicle vehicle = new Vehicle("V1");
+    Point pointA = new Point("A").withProperty("cost", "10");
+    Point pointB = new Point("B").withProperty("cost", "11");
+    Point pointC = new Point("C").withProperty("cost", "12");
+    Point pointD = new Point("D").withProperty("cost", "13");
+    LocationType type1 = new LocationType("some-type");
+    Location locationBC = new Location("L1", type1.getReference());
+    locationBC = locationBC.withAttachedLinks(
+        Set.of(
+            new Link(locationBC.getReference(), pointB.getReference()),
+            new Link(locationBC.getReference(), pointC.getReference())
+        )
+    );
+
+    TransportOrder transportOrder = new TransportOrder(
+        "T-1",
+        List.of(
+            new DriveOrder(new Destination(locationBC.getReference())),
+            new DriveOrder(
+                new Destination(pointD.getReference()).withOperation(Destination.OP_MOVE)
+            )
+        )
+    );
+
+    when(pointRouterProvider.getPointRouterForVehicle(vehicle, transportOrder))
+        .thenReturn(pointRouter);
+    when(pointRouter.getRouteSteps(any(Point.class), any(Point.class)))
+        .thenAnswer(
+            invocation -> {
+              Point dest = invocation.getArgument(1);
+              return List.of(
+                  new Route.Step(
+                      null,
+                      null,
+                      dest,
+                      Vehicle.Orientation.UNDEFINED,
+                      0,
+                      Integer.parseInt(dest.getProperty("cost"))
+                  )
+              );
+            }
+        );
+    when(objectService.fetchObject(Point.class, "D")).thenReturn(pointD);
+    when(objectService.fetchObject(Point.class, pointB.getReference())).thenReturn(pointB);
+    when(objectService.fetchObject(Point.class, pointC.getReference())).thenReturn(pointC);
+    when(objectService.fetchObject(Location.class, "L1")).thenReturn(locationBC);
+    when(objectService.fetchObject(LocationType.class, type1.getReference())).thenReturn(type1);
+
+    Set<List<Route>> orderRoutes = defaultRouter
+        .getRoutes(vehicle, pointA, transportOrder, 1);
+
+    assertThat(orderRoutes, hasSize(1));
+    assertThat(orderRoutes.stream().findFirst().get().get(0).getCosts(), is(11L));
+    assertThat(orderRoutes.stream().findFirst().get().get(1).getCosts(), is(13L));
   }
 }

@@ -23,6 +23,8 @@ import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
+import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
+import org.opentcs.strategies.basic.dispatching.LowestCostRouteSelector;
 import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 
 /**
@@ -35,6 +37,7 @@ class PrioritizedParkingPositionSupplierTest {
   private Router router;
   private ParkingPositionToPriorityFunction priorityFunction;
   private TargetedPointsSupplier targetedPointsSupplier;
+  private DefaultDispatcherConfiguration configuration;
 
   @BeforeEach
   void setUp() {
@@ -42,13 +45,17 @@ class PrioritizedParkingPositionSupplierTest {
     router = mock(Router.class);
     priorityFunction = new ParkingPositionToPriorityFunction();
     targetedPointsSupplier = mock(TargetedPointsSupplier.class);
+    configuration = mock(DefaultDispatcherConfiguration.class);
     supplier = new PrioritizedParkingPositionSupplier(
         plantModelService,
         router,
         priorityFunction,
-        targetedPointsSupplier
+        targetedPointsSupplier,
+        configuration,
+        new LowestCostRouteSelector()
     );
     when(targetedPointsSupplier.getTargetedPoints()).thenReturn(Set.of());
+    when(configuration.maxRoutesToConsider()).thenReturn(1);
   }
 
   @Test
@@ -62,9 +69,9 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(router.getRoute(vehicle, point1, point3, Set.of()))
+    when(router.getRoutes(vehicle, point1, point3, Set.of(), 1))
         .thenReturn(
-            Optional.of(
+            Set.of(
                 new Route(
                     List.of(
                         new Route.Step(null, point1, point3, Vehicle.Orientation.FORWARD, 0, 10)
@@ -72,9 +79,9 @@ class PrioritizedParkingPositionSupplierTest {
                 )
             )
         );
-    when(router.getRoute(vehicle, point1, point2, Set.of()))
+    when(router.getRoutes(vehicle, point1, point2, Set.of(), 1))
         .thenReturn(
-            Optional.of(
+            Set.of(
                 new Route(
                     List.of(
                         new Route.Step(null, point1, point2, Vehicle.Orientation.FORWARD, 0, 10)
@@ -102,9 +109,9 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(router.getRoute(vehicle, point1, point3, Set.of()))
+    when(router.getRoutes(vehicle, point1, point3, Set.of(), 1))
         .thenReturn(
-            Optional.of(
+            Set.of(
                 new Route(
                     List.of(
                         new Route.Step(null, point1, point3, Vehicle.Orientation.FORWARD, 0, 10)
@@ -112,9 +119,9 @@ class PrioritizedParkingPositionSupplierTest {
                 )
             )
         );
-    when(router.getRoute(vehicle, point1, point2, Set.of()))
+    when(router.getRoutes(vehicle, point1, point2, Set.of(), 1))
         .thenReturn(
-            Optional.of(
+            Set.of(
                 new Route(
                     List.of(
                         new Route.Step(null, point1, point2, Vehicle.Orientation.FORWARD, 0, 30)
@@ -144,9 +151,9 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(router.getRoute(vehicle, point1, point3, Set.of()))
+    when(router.getRoutes(vehicle, point1, point3, Set.of(), 1))
         .thenReturn(
-            Optional.of(
+            Set.of(
                 new Route(
                     List.of(
                         new Route.Step(null, point1, point3, Vehicle.Orientation.FORWARD, 0, 10)
@@ -154,9 +161,9 @@ class PrioritizedParkingPositionSupplierTest {
                 )
             )
         );
-    when(router.getRoute(vehicle, point1, point2, Set.of()))
+    when(router.getRoutes(vehicle, point1, point2, Set.of(), 1))
         .thenReturn(
-            Optional.of(
+            Set.of(
                 new Route(
                     List.of(
                         new Route.Step(null, point1, point2, Vehicle.Orientation.FORWARD, 0, 10)

@@ -18,7 +18,10 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
-...
+* Changes affecting developers:
+** Allow the router to provide multiple (alternative) routes instead of just a single one.
+   This allows the components that use the router to decide for themselves which route to choose.
+   (A routing algorithm that actually provides multiple routes has not yet been implemented, i.e. the router will continue to provide only one route for the time being.)
 
 == Version 6.3 (2025-02-04)
 

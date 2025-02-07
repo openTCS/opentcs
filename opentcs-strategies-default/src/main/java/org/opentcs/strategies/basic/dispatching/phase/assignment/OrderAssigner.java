@@ -12,13 +12,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
+import org.opentcs.strategies.basic.dispatching.DriveOrderRouteAssigner;
 import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
 import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
 import org.opentcs.strategies.basic.dispatching.phase.AssignmentState;
@@ -44,10 +44,6 @@ public class OrderAssigner {
    * The object service.
    */
   private final TCSObjectService objectService;
-  /**
-   * The Router instance calculating route costs.
-   */
-  private final Router router;
   /**
    * Stores reservations of orders for vehicles.
    */
@@ -78,11 +74,14 @@ public class OrderAssigner {
    * Provides methods to check and update the dispatching status of transport orders.
    */
   private final DispatchingStatusMarker dispatchingStatusMarker;
+  /**
+   * Assigns routes to drive orders.
+   */
+  private final DriveOrderRouteAssigner driveOrderRouteAssigner;
 
   @Inject
   public OrderAssigner(
       TCSObjectService objectService,
-      Router router,
       OrderReservationPool orderReservationPool,
       CompositeVehicleComparator vehicleComparator,
       CompositeOrderComparator orderComparator,
@@ -90,9 +89,9 @@ public class OrderAssigner {
       CompositeVehicleCandidateComparator vehicleCandidateComparator,
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       TransportOrderUtil transportOrderUtil,
-      DispatchingStatusMarker dispatchingStatusMarker
+      DispatchingStatusMarker dispatchingStatusMarker,
+      DriveOrderRouteAssigner driveOrderRouteAssigner
   ) {
-    this.router = requireNonNull(router, "router");
     this.objectService = requireNonNull(objectService, "objectService");
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
     this.vehicleComparator = requireNonNull(vehicleComparator, "vehicleComparator");
@@ -114,10 +113,14 @@ public class OrderAssigner {
         dispatchingStatusMarker,
         "dispatchingStatusMarker"
     );
+    this.driveOrderRouteAssigner = requireNonNull(
+        driveOrderRouteAssigner,
+        "driveOrderRouteAssigner"
+    );
   }
 
   /**
-   * Tries to assign the given tranpsort orders to the given vehicles.
+   * Tries to assign the given transport orders to the given vehicles.
    *
    * @param availableVehicles The vehicles available for order assignment.
    * @param availableOrders The transport order available to be assigned to a vehicle.
@@ -284,7 +287,7 @@ public class OrderAssigner {
       Point vehiclePosition,
       TransportOrder order
   ) {
-    return router.getRoute(vehicle, vehiclePosition, order)
+    return driveOrderRouteAssigner.tryAssignRoutes(order, vehicle, vehiclePosition)
         .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders));
   }
 

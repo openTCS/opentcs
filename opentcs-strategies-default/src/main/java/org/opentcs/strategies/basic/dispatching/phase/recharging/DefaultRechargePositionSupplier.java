@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentcs.components.kernel.RouteSelector;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Location;
@@ -22,6 +23,7 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
+import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
 
 /**
@@ -44,6 +46,14 @@ public class DefaultRechargePositionSupplier
    */
   private final TargetedPointsSupplier targetedPointsSupplier;
   /**
+   * The dispatcher configuration.
+   */
+  private final DefaultDispatcherConfiguration configuration;
+  /**
+   * Selects a route from a set of routes.
+   */
+  private final RouteSelector routeSelector;
+  /**
    * Indicates whether this component is enabled.
    */
   private boolean initialized;
@@ -54,16 +64,22 @@ public class DefaultRechargePositionSupplier
    * @param plantModelService The plant model service.
    * @param router The router to use.
    * @param targetedPointsSupplier Finds all points which are currently targeted by vehicles.
+   * @param configuration The dispatcher configuration.
+   * @param routeSelector Selects a route from a set of routes.
    */
   @Inject
   public DefaultRechargePositionSupplier(
       InternalPlantModelService plantModelService,
       Router router,
-      TargetedPointsSupplier targetedPointsSupplier
+      TargetedPointsSupplier targetedPointsSupplier,
+      DefaultDispatcherConfiguration configuration,
+      RouteSelector routeSelector
   ) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.router = requireNonNull(router, "router");
     this.targetedPointsSupplier = requireNonNull(targetedPointsSupplier, "targetedPointsSupplier");
+    this.configuration = requireNonNull(configuration, "configuration");
+    this.routeSelector = requireNonNull(routeSelector, "routeSelector");
   }
 
   @Override
@@ -226,7 +242,16 @@ public class DefaultRechargePositionSupplier
         .map(
             point -> new LocationCandidate(
                 location,
-                router.getRoute(vehicle, srcPosition, point, Set.of())
+                routeSelector
+                    .select(
+                        router.getRoutes(
+                            vehicle,
+                            srcPosition,
+                            point,
+                            Set.of(),
+                            configuration.maxRoutesToConsider()
+                        )
+                    )
                     .map(route -> route.getCosts())
                     .orElse(Long.MAX_VALUE)
             )
