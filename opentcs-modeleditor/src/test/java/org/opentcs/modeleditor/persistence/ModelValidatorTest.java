@@ -51,12 +51,6 @@ import org.opentcs.guing.common.model.SystemModel;
  */
 class ModelValidatorTest {
 
-  private static final String LAYOUT_NAME = "VLayout-001";
-
-  private static final String LOCATION_THEME_NAME = "Loc-Theme-001";
-
-  private static final String VEHICLE_THEME_NAME = "Vehicle-Theme-001";
-
   private static final String POINT_NAME = "Point-001";
 
   private static final String POINT_NAME_2 = "Point-002";
@@ -205,17 +199,9 @@ class ModelValidatorTest {
   }
 
   @Test
-  void testVehicleInvalidNextPosition() {
-    VehicleModel vehicle = createVehicle(VEHICLE_NAME);
-    when(model.getModelComponent(POINT_NAME)).thenReturn(components.get(POINT_NAME));
-    assertFalse(validator.isValidWith(model, vehicle));
-  }
-
-  @Test
   void testVehicleValidWithNullPoints() {
     VehicleModel vehicle = createVehicle(VEHICLE_NAME);
     addProperty(vehicle, StringProperty.class, VehicleModel.POINT, "null");
-    addProperty(vehicle, StringProperty.class, VehicleModel.NEXT_POINT, "null");
     assertTrue(validator.isValidWith(model, vehicle));
   }
 
@@ -387,12 +373,10 @@ class ModelValidatorTest {
     );
     addProperty(vehicle, BooleanProperty.class, VehicleModel.LOADED, Boolean.FALSE);
     addProperty(vehicle, StringProperty.class, VehicleModel.POINT, POINT_NAME);
-    addProperty(vehicle, StringProperty.class, VehicleModel.NEXT_POINT, POINT_NAME_2);
     addProperty(vehicle, TripleProperty.class, VehicleModel.PRECISE_POSITION, new Triple(0, 0, 0));
     addProperty(vehicle, AngleProperty.class, VehicleModel.ORIENTATION_ANGLE, 0.0);
 
     components.put(POINT_NAME, createPointModel(POINT_NAME));
-    components.put(POINT_NAME_2, createPointModel(POINT_NAME_2));
     return vehicle;
   }
 

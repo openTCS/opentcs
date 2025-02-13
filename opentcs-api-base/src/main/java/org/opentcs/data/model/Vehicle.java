@@ -109,10 +109,6 @@ public class Vehicle
    */
   private final TCSObjectReference<Point> currentPosition;
   /**
-   * A reference to the point which this vehicle is expected to be seen at next.
-   */
-  private final TCSObjectReference<Point> nextPosition;
-  /**
    * The vehicle's pose containing its precise position and current orientation angle.
    */
   private final Pose pose;
@@ -147,7 +143,6 @@ public class Vehicle
     this.integrationLevel = IntegrationLevel.TO_BE_RESPECTED;
     this.paused = false;
     this.currentPosition = null;
-    this.nextPosition = null;
     this.pose = new Pose(null, Double.NaN);
     this.energyLevel = 100;
     this.loadHandlingDevices = List.of();
@@ -174,7 +169,6 @@ public class Vehicle
       IntegrationLevel integrationLevel,
       boolean paused,
       TCSObjectReference<Point> currentPosition,
-      TCSObjectReference<Point> nextPosition,
       Pose pose,
       int energyLevel,
       List<LoadHandlingDevice> loadHandlingDevices,
@@ -218,7 +212,6 @@ public class Vehicle
     this.integrationLevel = requireNonNull(integrationLevel, "integrationLevel");
     this.paused = paused;
     this.currentPosition = currentPosition;
-    this.nextPosition = nextPosition;
     this.pose = requireNonNull(pose, "pose");
     this.energyLevel = checkInRange(energyLevel, 0, 100, "energyLevel");
     this.loadHandlingDevices = listWithoutNullValues(
@@ -252,7 +245,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -282,7 +274,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -312,7 +303,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -342,7 +332,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -386,7 +375,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -595,7 +583,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -641,7 +628,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -685,7 +671,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -729,7 +714,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -773,7 +757,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -837,7 +820,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -899,7 +881,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -943,7 +924,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -990,7 +970,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -1044,7 +1023,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -1116,7 +1094,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -1163,7 +1140,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -1238,7 +1214,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -1282,7 +1257,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -1326,7 +1300,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -1372,7 +1345,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -1387,9 +1359,21 @@ public class Vehicle
    *
    * @return A reference to the point this vehicle is expected to be seen at
    * next, or <code>null</code>, if this vehicle's next position is unknown.
+   * @deprecated Extract a vehicle's next position from {@link #getAllocatedResources()} instead.
+   * In this list, the next position is the one after {@link #getCurrentPosition()}.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
+  @SuppressWarnings("unchecked")
   public TCSObjectReference<Point> getNextPosition() {
-    return nextPosition;
+    return getAllocatedResources().stream()
+        .flatMap(Set::stream)
+        .filter(point -> point.getReferentClass().equals(Point.class))
+        .dropWhile(point -> !point.equals(currentPosition))
+        .skip(1)
+        .map(point -> (TCSObjectReference<Point>) point)
+        .findFirst()
+        .orElse(null);
   }
 
   /**
@@ -1397,39 +1381,17 @@ public class Vehicle
    *
    * @param nextPosition The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Will be removed without replacement.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed")
   public Vehicle withNextPosition(TCSObjectReference<Point> nextPosition) {
-    return new Vehicle(
-        getName(),
-        getProperties(),
-        getHistory(),
-        boundingBox,
-        energyLevelThresholdSet,
-        maxVelocity,
-        maxReverseVelocity,
-        rechargeOperation,
-        procState,
-        transportOrder,
-        orderSequence,
-        acceptableOrderTypes,
-        claimedResources,
-        allocatedResources,
-        state,
-        integrationLevel,
-        paused,
-        currentPosition,
-        nextPosition,
-        pose,
-        energyLevel,
-        loadHandlingDevices,
-        envelopeKey,
-        layout
-    );
+    return this;
   }
 
   /**
    * Returns the vehicle's position in world coordinates [mm], independent
-   * from logical positions/point names. May be <code>null</code> if the vehicle
+   * of logical positions/point names. May be <code>null</code> if the vehicle
    * hasn't provided a precise position.
    *
    * @return The vehicle's precise position in mm.
@@ -1520,7 +1482,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -1570,7 +1531,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -1614,7 +1574,6 @@ public class Vehicle
         integrationLevel,
         paused,
         currentPosition,
-        nextPosition,
         pose,
         energyLevel,
         loadHandlingDevices,
@@ -1639,7 +1598,6 @@ public class Vehicle
         + "name=" + getName()
         + ", currentPosition=" + currentPosition
         + ", pose=" + pose
-        + ", nextPosition=" + nextPosition
         + ", state=" + state.attribute()
         + ", stateTimestamp=" + state.timestamp()
         + ", energyLevel=" + energyLevel

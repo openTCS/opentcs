@@ -56,7 +56,10 @@ public interface InternalVehicleService
    * @param vehicleRef A reference to the vehicle to be modified.
    * @param pointRef A reference to the point which the vehicle is expected to occupy next.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Will be removed without replacement.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   void updateVehicleNextPosition(
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<Point> pointRef

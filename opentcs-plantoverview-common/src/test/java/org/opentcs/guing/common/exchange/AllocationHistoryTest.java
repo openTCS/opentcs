@@ -88,7 +88,6 @@ class AllocationHistoryTest {
   void returnCorrectlyDividedAllocationsAheadOrBehind() {
     vehicle = vehicle
         .withCurrentPosition(point2.getReference())
-        .withNextPosition(point3.getReference())
         .withAllocatedResources(
             List.of(
                 Set.of(point1.getReference()),

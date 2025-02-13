@@ -134,6 +134,7 @@ public class StandardVehicleService
   }
 
   @Override
+  @Deprecated
   public void updateVehicleNextPosition(
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<Point> pointRef

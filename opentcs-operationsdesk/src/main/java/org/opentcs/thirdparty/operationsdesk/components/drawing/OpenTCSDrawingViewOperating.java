@@ -21,7 +21,6 @@ import java.util.Set;
 import org.jhotdraw.draw.DefaultDrawingView;
 import org.jhotdraw.draw.Figure;
 import org.opentcs.guing.base.model.ModelComponent;
-import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.application.ApplicationState;
 import org.opentcs.guing.common.components.drawing.figures.OriginFigure;
@@ -167,24 +166,6 @@ public class OpenTCSDrawingViewOperating
   }
 
   @Override
-  protected Rectangle2D.Double computeBounds(Figure figure) {
-    Rectangle2D.Double bounds = super.computeBounds(figure);
-
-    if (figure instanceof VehicleFigure) {
-      // Also show the target point
-      VehicleModel vehicleModel = ((VehicleFigure) figure).getModel();
-      PointModel pointModel = vehicleModel.getNextPoint();
-
-      if (pointModel != null) {
-        Figure pointFigure = getModelManager().getModel().getFigure(pointModel);
-        bounds.add(pointFigure.getBounds());
-      }
-    }
-
-    return bounds;
-  }
-
-  @Override
   public void delete(Set<ModelComponent> components) {
   }
 
@@ -230,66 +211,6 @@ public class OpenTCSDrawingViewOperating
     gVehicle.setPaint(paint);
     gVehicle.fillRect(0, 0, getWidth(), getHeight());
     gVehicle.dispose();
-
-    // radial gradient for the next position
-    PointModel pointModel = fFocusVehicle.getNextPoint();
-
-    if (pointModel != null) {
-      Figure nextPoint = getModelManager().getModel().getFigure(pointModel);
-      bounds = nextPoint.getBounds();
-      xCenter = bounds.getCenterX();
-      yCenter = bounds.getCenterY();
-      pCenterView = new Point2D.Double(xCenter, yCenter);
-      pCenterDrawing = drawingToView(pCenterView);
-      center = new Point2D.Float((float) pCenterDrawing.x, (float) pCenterDrawing.y);
-
-      radius = 20;
-      Color[] colorsGreen = {
-          new Color(1.0f, 1.0f, 1.0f, 0.0f), // Focus: 100% transparent
-          new Color(1.0f, 1.0f, 1.0f, 0.0f),
-          new Color(0.0f, 1.0f, 0.0f, 0.7f), // Circle: green
-          new Color(0f, 0f, 0f, 0f) // Background
-      };
-      paint = new RadialGradientPaint(
-          center, radius, dist, colorsGreen,
-          MultipleGradientPaint.CycleMethod.NO_CYCLE
-      );
-
-      Graphics2D gNextPosition = (Graphics2D) g2d.create();
-      gNextPosition.setPaint(paint);
-      gNextPosition.fillRect(0, 0, getWidth(), getHeight());
-      gNextPosition.dispose();
-    }
-
-    // radial gradient for last position
-    pointModel = fFocusVehicle.getPoint();
-
-    if (pointModel != null && fFocusVehicle.getPrecisePosition() != null) {
-      Figure lastPoint = getModelManager().getModel().getFigure(pointModel);
-      bounds = lastPoint.getBounds();
-      xCenter = bounds.getCenterX();
-      yCenter = bounds.getCenterY();
-      pCenterView = new Point2D.Double(xCenter, yCenter);
-      pCenterDrawing = drawingToView(pCenterView);
-      center = new Point2D.Float((float) pCenterDrawing.x, (float) pCenterDrawing.y);
-
-      radius = 20;
-      Color[] colorsBlue = {
-          new Color(1.0f, 1.0f, 1.0f, 0.0f), // Focus: 100% transparent
-          new Color(1.0f, 1.0f, 1.0f, 0.0f),
-          new Color(0.0f, 0.0f, 1.0f, 0.7f), // Circle: blue
-          new Color(0f, 0f, 0f, 0f) // Background
-      };
-      paint = new RadialGradientPaint(
-          center, radius, dist, colorsBlue,
-          MultipleGradientPaint.CycleMethod.NO_CYCLE
-      );
-
-      Graphics2D gCurrentPosition = (Graphics2D) g2d.create();
-      gCurrentPosition.setPaint(paint);
-      gCurrentPosition.fillRect(0, 0, getWidth(), getHeight());
-      gCurrentPosition.dispose();
-    }
 
     // After drawing the RadialGradientPaint the drawing area needs to
     // repainted, otherwise the GradientPaint isn't drawn correctly or

@@ -284,7 +284,7 @@ public class DefaultVehicleController
 
     commAdapter.getProcessModel().removePropertyChangeListener(this);
     // Reset the vehicle's position.
-    updatePosition(null, null);
+    vehicleService.updateVehiclePosition(vehicle.getReference(), null);
     updateVehiclePose(new Pose(null, Double.NaN));
     // Free all allocated resources.
     freeAllResources();
@@ -450,13 +450,6 @@ public class DefaultVehicleController
       if (canSendNextCommand()) {
         allocateForNextCommand();
       }
-
-      // Set the vehicle's next expected position.
-      Point nextPoint = newOrder.getRoute().getSteps().get(0).getDestinationPoint();
-      vehicleService.updateVehicleNextPosition(
-          vehicle.getReference(),
-          nextPoint.getReference()
-      );
     }
   }
 
@@ -1284,8 +1277,7 @@ public class DefaultVehicleController
           toListOfResourceSets(commandProcessingTracker.getAllocatedResources())
       );
     }
-
-    updatePosition(toReference(point), null);
+    vehicleService.updateVehiclePosition(vehicle.getReference(), toReference(point));
   }
 
   private void updatePositionWithOrder(Point point) {
@@ -1319,7 +1311,7 @@ public class DefaultVehicleController
       // We have a drive order, but can't remember sending a command to the vehicle. Just set the
       // position without touching the resources, as that might cause even more damage when we
       // actually send commands to the vehicle.
-      updatePosition(toReference(point), null);
+      vehicleService.updateVehiclePosition(vehicle.getReference(), toReference(point));
     }
     else {
       if (point == null) {
@@ -1342,16 +1334,8 @@ public class DefaultVehicleController
         }
       }
 
-      updatePosition(toReference(point), extractNextPosition(findNextCommand()));
+      vehicleService.updateVehiclePosition(vehicle.getReference(), toReference(point));
     }
-  }
-
-  private void updatePosition(
-      TCSObjectReference<Point> posRef,
-      TCSObjectReference<Point> nextPosRef
-  ) {
-    vehicleService.updateVehiclePosition(vehicle.getReference(), posRef);
-    vehicleService.updateVehicleNextPosition(vehicle.getReference(), nextPosRef);
   }
 
   private void onIntegrationLevelChange(
@@ -1375,7 +1359,7 @@ public class DefaultVehicleController
         VehicleProcessModel processModel = commAdapter.getProcessModel();
         if (processModel.getPosition() != null) {
           Point point = vehicleService.fetchObject(Point.class, processModel.getPosition());
-          vehicleService.updateVehiclePosition(vehicle.getReference(), point.getReference());
+          vehicleService.updateVehiclePosition(vehicle.getReference(), toReference(point));
         }
         updateVehiclePose(processModel.getPose());
       }

@@ -3,8 +3,6 @@ Vehicle <b>Vehicle-001</b>
 <hr>
 Current point: ?
 <br>
-Next point: ?
-<br>
 State: <font color=orange>UNKNOWN</font>
 <br>
 Processing state: IDLE

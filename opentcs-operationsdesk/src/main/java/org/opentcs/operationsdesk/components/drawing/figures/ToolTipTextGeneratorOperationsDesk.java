@@ -143,10 +143,6 @@ public class ToolTipTextGeneratorOperationsDesk
     sb.append(model.getPropertyPoint().getDescription()).append(": ")
         .append(model.getPoint() != null ? model.getPoint().getName() : "?")
         .append('\n');
-    sb.append("<br>\n");
-    sb.append(model.getPropertyNextPoint().getDescription()).append(": ")
-        .append(model.getNextPoint() != null ? model.getNextPoint().getName() : "?")
-        .append('\n');
 
     sb.append("<br>\n");
     sb.append(model.getPropertyState().getDescription())

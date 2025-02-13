@@ -74,10 +74,6 @@ public class VehicleModel
    */
   public static final String POINT = "Point";
   /**
-   * The name/key of the 'next point' property.
-   */
-  public static final String NEXT_POINT = "NextPoint";
-  /**
    * The name/key of the 'precise position' property.
    */
   public static final String PRECISE_POSITION = "PrecisePosition";
@@ -125,15 +121,10 @@ public class VehicleModel
    * This class's resource bundle.
    */
   private final ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_PATH);
-
   /**
    * The point the vehicle currently remains on.
    */
   private PointModel fPoint;
-  /**
-   * The point the vehicle will drive to next.
-   */
-  private PointModel fNextPoint;
   /**
    * The current position (x,y,z) the vehicle driver reported.
    */
@@ -191,24 +182,6 @@ public class VehicleModel
    */
   public PointModel getPoint() {
     return fPoint;
-  }
-
-  /**
-   * Returns the point the vehicle will drive to next.
-   *
-   * @return The next point.
-   */
-  public PointModel getNextPoint() {
-    return fNextPoint;
-  }
-
-  /**
-   * Sets the point the vehicle will drive to next.
-   *
-   * @param point The next point.
-   */
-  public void setNextPoint(PointModel point) {
-    fNextPoint = point;
   }
 
   /**
@@ -446,10 +419,6 @@ public class VehicleModel
     return (StringProperty) getProperty(POINT);
   }
 
-  public StringProperty getPropertyNextPoint() {
-    return (StringProperty) getProperty(NEXT_POINT);
-  }
-
   public BooleanProperty getPropertyLoaded() {
     return (BooleanProperty) getProperty(LOADED);
   }
@@ -595,12 +564,6 @@ public class VehicleModel
     pPoint.setHelptext(bundle.getString("vehicleModel.property_currentPoint.helptext"));
     pPoint.setModellingEditable(false);
     setProperty(POINT, pPoint);
-
-    StringProperty pNextPoint = new StringProperty(this);
-    pNextPoint.setDescription(bundle.getString("vehicleModel.property_nextPoint.description"));
-    pNextPoint.setHelptext(bundle.getString("vehicleModel.property_nextPoint.helptext"));
-    pNextPoint.setModellingEditable(false);
-    setProperty(NEXT_POINT, pNextPoint);
 
     TripleProperty pPrecisePosition = new TripleProperty(this);
     pPrecisePosition.setDescription(

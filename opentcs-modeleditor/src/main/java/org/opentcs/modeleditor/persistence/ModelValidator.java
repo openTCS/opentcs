@@ -577,17 +577,6 @@ public class ModelValidator {
       );
       valid = false;
     }
-    //Validate whether the next point exists
-    StringProperty nextPointProperty
-        = (StringProperty) vehicle.getProperty(VehicleModel.NEXT_POINT);
-    String nextPoint = nextPointProperty.getText();
-    if (!isNullOrEmptyPoint(nextPoint) && !nameExists(model, nextPoint)) {
-      errorOccurred(
-          vehicle, "modelValidator.error_vehicleNextPointNotExisting.text",
-          nextPointProperty.getText()
-      );
-      valid = false;
-    }
     return valid;
   }
 

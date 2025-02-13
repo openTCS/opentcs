@@ -318,7 +318,6 @@ public class VehicleFigure
 
   private void alignVehicleToNextPoint() {
     VehicleModel model = getModel();
-    PointModel nextPoint = model.getNextPoint();
     PointModel currentPoint = model.getPoint();
 
     AbstractConnection connection;
@@ -326,17 +325,12 @@ public class VehicleFigure
       connection = model.getCurrentDriveOrderPath();
     }
     else {
-      if (nextPoint != null) {
-        connection = currentPoint.getConnectionTo(nextPoint);
-      }
-      else {
-        // No destination point, use a random point connected to the current point.
-        connection = currentPoint.getConnections().stream()
-            .filter(con -> con instanceof PathModel)
-            .filter(con -> Objects.equals(con.getStartComponent(), currentPoint))
-            .findFirst()
-            .orElse(null);
-      }
+      // No destination point, use a random point connected to the current point.
+      connection = currentPoint.getConnections().stream()
+          .filter(con -> con instanceof PathModel)
+          .filter(con -> Objects.equals(con.getStartComponent(), currentPoint))
+          .findFirst()
+          .orElse(null);
     }
 
     if (connection != null) {

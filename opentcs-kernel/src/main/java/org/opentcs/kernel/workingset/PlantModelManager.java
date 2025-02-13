@@ -808,7 +808,9 @@ public class PlantModelManager
    * occupy next.
    * @return The modified vehicle.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @deprecated Will be removed without replacement.
    */
+  @Deprecated
   public Vehicle setVehicleNextPosition(
       TCSObjectReference<Vehicle> ref,
       TCSObjectReference<Point> newPosition
@@ -822,7 +824,6 @@ public class PlantModelManager
         previousState.getNextPosition(),
         newPosition
     );
-
     Vehicle vehicle = previousState.withNextPosition(newPosition);
     getObjectRepo().replaceObject(vehicle);
     emitObjectEvent(
@@ -1137,7 +1138,6 @@ public class PlantModelManager
   /**
    * Returns a list of {@link PathCreationTO Paths} for all paths in a model.
    *
-   * @param model The model data.
    * @return A list of {@link PathCreationTO Paths} for all paths in a model.
    */
   private List<PathCreationTO> getPaths() {
@@ -1184,7 +1184,6 @@ public class PlantModelManager
   /**
    * Returns a list of {@link VehicleCreationTO Vehicles} for all vehicles in a model.
    *
-   * @param model The model data.
    * @return A list of {@link VehicleCreationTO Vehicles} for all vehicles in a model.
    */
   private List<VehicleCreationTO> getVehicles() {
@@ -1230,7 +1229,6 @@ public class PlantModelManager
    * Returns a list of {@link LocationTypeCreationTO LocationTypes} for all location types in a
    * model.
    *
-   * @param model The model data.
    * @return A list of {@link LocationTypeCreationTO LocationTypes} for all location types in a
    * model.
    */
@@ -1256,7 +1254,6 @@ public class PlantModelManager
   /**
    * Returns a list of {@link LocationCreationTO Locations} for all locations in a model.
    *
-   * @param model The model data.
    * @return A list of {@link LocationCreationTO Locations} for all locations in a model.
    */
   private List<LocationCreationTO> getLocations() {
@@ -1298,7 +1295,6 @@ public class PlantModelManager
   /**
    * Returns a list of {@link BlockCreationTO Blocks} for all blocks in a model.
    *
-   * @param model The model data.
    * @return A list of {@link BlockCreationTO Blocks} for all blocks in a model.
    */
   private List<BlockCreationTO> getBlocks() {
@@ -1325,7 +1321,6 @@ public class PlantModelManager
   /**
    * Returns a {@link VisualLayoutCreationTO} for the visual layouts in a model.
    *
-   * @param model The model data.
    * @return A {@link VisualLayoutCreationTO} for the visual layouts in a model.
    */
   private VisualLayoutCreationTO getVisualLayout() {

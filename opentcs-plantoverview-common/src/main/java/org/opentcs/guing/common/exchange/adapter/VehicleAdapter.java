@@ -100,7 +100,6 @@ public class VehicleAdapter
       model.getPropertyPaused().setValue(vehicle.isPaused());
 
       updateModelCurrentPoint(model, vehicle, systemModel);
-      updateModelNextPoint(model, vehicle, systemModel);
 
       model.getPropertyPrecisePosition().setValue(vehicle.getPose().getPosition());
       model.setPrecisePosition(vehicle.getPose().getPosition());
@@ -171,22 +170,6 @@ public class VehicleAdapter
       throws CredentialsException {
     vehicleModel.setDriveOrderDestination(null);
     vehicleModel.setCurrentDriveOrderPath(null);
-  }
-
-  private void updateModelNextPoint(
-      VehicleModel vehicleModel,
-      Vehicle vehicle,
-      SystemModel systemModel
-  ) {
-    if (vehicle.getNextPosition() != null) {
-      PointModel pointModel = systemModel.getPointModel(vehicle.getNextPosition().getName());
-      vehicleModel.setNextPoint(pointModel);
-      vehicleModel.getPropertyNextPoint().setText(vehicle.getNextPosition().getName());
-    }
-    else {
-      vehicleModel.setNextPoint(null);
-      vehicleModel.getPropertyNextPoint().setText("null");
-    }
   }
 
   private void updateModelCurrentPoint(
