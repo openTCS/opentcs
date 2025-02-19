@@ -58,7 +58,10 @@ public class DefaultLocationTheme
   ) {
     requireNonNull(representation, "representation");
 
-    return symbolMap.get(representation);
+    return symbolMap.getOrDefault(
+        representation,
+        loadImageFromPath(LOCTYPE_REPRESENTATION_SYMBOLS[3])
+    );
   }
 
   @Override

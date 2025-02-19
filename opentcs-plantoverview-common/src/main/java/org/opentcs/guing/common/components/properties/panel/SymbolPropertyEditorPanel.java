@@ -100,6 +100,12 @@ public class SymbolPropertyEditorPanel
 
   private void init() {
     for (LocationRepresentation cur : LocationRepresentation.values()) {
+      if (cur == LocationRepresentation.DEFAULT) {
+        // Skip the default location representation as it is handled separately in this class (and
+        // not as a regular location representation).
+        continue;
+      }
+
       fRepresentations.add(cur);
       fSymbols.add(new ImageIcon(locationTheme.getImageFor(cur)));
     }
