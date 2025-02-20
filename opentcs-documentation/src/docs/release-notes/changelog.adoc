@@ -18,6 +18,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
+* New features and enhancements:
+** Update web API specification and implementation to version 1.11.0:
+*** Include a transport order's key-value properties in responses when requesting transport order data.
 * Changes affecting developers:
 ** Allow the router to provide multiple (alternative) routes instead of just a single one.
    This allows the components that use the router to decide for themselves which route to choose.

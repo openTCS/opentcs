@@ -18,5 +18,12 @@
       "key" : "some-other-key",
       "value" : "some-other-value"
     } ]
+  } ],
+  "properties" : [ {
+    "key" : "some-key",
+    "value" : "some-value"
+  }, {
+    "key" : "another-key",
+    "value" : "another-value"
   } ]
 }

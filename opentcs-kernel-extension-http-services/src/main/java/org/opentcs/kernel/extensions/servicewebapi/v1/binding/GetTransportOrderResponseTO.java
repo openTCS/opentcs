@@ -4,13 +4,16 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
 import static java.util.Objects.requireNonNull;
 
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DestinationState;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  */
@@ -33,6 +36,9 @@ public class GetTransportOrderResponseTO {
   private String processingVehicle;
 
   private List<DestinationState> destinations = new ArrayList<>();
+
+  @Nonnull
+  private List<Property> properties = List.of();
 
   public GetTransportOrderResponseTO() {
   }
@@ -120,6 +126,19 @@ public class GetTransportOrderResponseTO {
     return this;
   }
 
+  @Nonnull
+  public List<Property> getProperties() {
+    return properties;
+  }
+
+  public GetTransportOrderResponseTO setProperties(
+      @Nonnull
+      List<Property> properties
+  ) {
+    this.properties = requireNonNull(properties, "properties");
+    return this;
+  }
+
   /**
    * Creates a new instance from a <code>TransportOrder</code>.
    *
@@ -153,6 +172,7 @@ public class GetTransportOrderResponseTO {
         nameOfNullableReference(transportOrder.getProcessingVehicle())
     );
     transportOrderState.setState(transportOrder.getState());
+    transportOrderState.setProperties(convertProperties(transportOrder.getProperties()));
     return transportOrderState;
   }
 
@@ -161,5 +181,11 @@ public class GetTransportOrderResponseTO {
       TCSObjectReference<?> reference
   ) {
     return reference == null ? null : reference.getName();
+  }
+
+  private static List<Property> convertProperties(Map<String, String> properties) {
+    return properties.entrySet().stream()
+        .map(property -> new Property(property.getKey(), property.getValue()))
+        .collect(Collectors.toList());
   }
 }

@@ -48,6 +48,12 @@ class GetTransportOrderResponseTOTest {
                             )
                         )
                 )
+            )
+            .setProperties(
+                List.of(
+                    new Property("some-key", "some-value"),
+                    new Property("another-key", "another-value")
+                )
             );
 
     Approvals.verify(jsonBinder.toJson(to));
