@@ -81,7 +81,7 @@ public class LocationTypeTO
   @XmlAccessorType(XmlAccessType.PROPERTY)
   public static class LocationTypeLayout {
 
-    private String locationRepresentation = "";
+    private LocationRepresentation locationRepresentation = LocationRepresentation.NONE;
 
     /**
      * Creates a new instance.
@@ -90,13 +90,13 @@ public class LocationTypeTO
     }
 
     @XmlAttribute(required = true)
-    public String getLocationRepresentation() {
+    public LocationRepresentation getLocationRepresentation() {
       return locationRepresentation;
     }
 
     public LocationTypeLayout setLocationRepresentation(
         @Nonnull
-        String locationRepresentation
+        LocationRepresentation locationRepresentation
     ) {
       this.locationRepresentation = requireNonNull(
           locationRepresentation,

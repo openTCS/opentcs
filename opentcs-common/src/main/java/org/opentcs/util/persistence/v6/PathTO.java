@@ -173,7 +173,7 @@ public class PathTO
   @XmlType(propOrder = {"connectionType", "layerId", "controlPoints"})
   public static class PathLayout {
 
-    private String connectionType = "";
+    private ConnectionType connectionType = ConnectionType.DIRECT;
     private Integer layerId = 0;
     private List<ControlPoint> controlPoints = new ArrayList<>();
 
@@ -184,13 +184,13 @@ public class PathTO
     }
 
     @XmlAttribute(required = true)
-    public String getConnectionType() {
+    public ConnectionType getConnectionType() {
       return connectionType;
     }
 
     public PathLayout setConnectionType(
         @Nonnull
-        String connectionType
+        ConnectionType connectionType
     ) {
       this.connectionType = requireNonNull(connectionType, "connectionType");
       return this;
@@ -220,6 +220,18 @@ public class PathTO
     ) {
       this.controlPoints = requireNonNull(controlPoints, "controlPoints");
       return this;
+    }
+
+    @XmlType
+    public enum ConnectionType {
+      // CHECKSTYLE:OFF
+      DIRECT,
+      ELBOW,
+      SLANTED,
+      POLYPATH,
+      BEZIER,
+      BEZIER_3;
+      // CHECKSTYLE:ON
     }
   }
 

@@ -59,7 +59,7 @@ public class V6DrivingCoursePersistenceTest {
     plantModel.getPoints().get(0).setPositionY(2L);
     plantModel.getPoints().get(0).setPositionZ(3L);
     plantModel.getPoints().get(0).setVehicleOrientationAngle(12.34f);
-    plantModel.getPoints().get(0).setType("PARK_POSITION");
+    plantModel.getPoints().get(0).setType(PointTO.Type.PARK_POSITION);
     plantModel.getPoints().get(0).setMaxVehicleBoundingBox(
         new BoundingBoxTO()
             .setLength(100)
@@ -106,7 +106,7 @@ public class V6DrivingCoursePersistenceTest {
     assertThat(parsedModel.getPoints().get(0).getPositionY(), is(2L));
     assertThat(parsedModel.getPoints().get(0).getPositionZ(), is(3L));
     assertThat(parsedModel.getPoints().get(0).getVehicleOrientationAngle(), is(12.34f));
-    assertThat(parsedModel.getPoints().get(0).getType(), is(equalTo("PARK_POSITION")));
+    assertThat(parsedModel.getPoints().get(0).getType(), is(equalTo(PointTO.Type.PARK_POSITION)));
     assertThat(parsedModel.getPoints().get(0).getMaxVehicleBoundingBox().getLength(), is(100L));
     assertThat(parsedModel.getPoints().get(0).getMaxVehicleBoundingBox().getWidth(), is(200L));
     assertThat(parsedModel.getPoints().get(0).getMaxVehicleBoundingBox().getHeight(), is(150L));
@@ -159,7 +159,7 @@ public class V6DrivingCoursePersistenceTest {
     plantModel.getPaths().get(0).getPeripheralOperations().add(
         new PeripheralOperationTO()
             .setLocationName("some-loc-name")
-            .setExecutionTrigger("AFTER_ALLOCATION")
+            .setExecutionTrigger(PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION)
             .setCompletionRequired(true)
     );
     plantModel.getPaths().get(0).getVehicleEnvelopes().add(
@@ -180,7 +180,7 @@ public class V6DrivingCoursePersistenceTest {
     );
     plantModel.getPaths().get(0).setPathLayout(
         new PathLayout()
-            .setConnectionType("POLYPATH")
+            .setConnectionType(PathTO.PathLayout.ConnectionType.POLYPATH)
             .setLayerId(1)
             .setControlPoints(
                 List.of(
@@ -211,7 +211,7 @@ public class V6DrivingCoursePersistenceTest {
     );
     assertThat(
         parsedModel.getPaths().get(0).getPeripheralOperations().get(0).getExecutionTrigger(),
-        is(equalTo("AFTER_ALLOCATION"))
+        is(equalTo(PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION))
     );
     assertThat(
         parsedModel.getPaths().get(0).getPeripheralOperations().get(0).isCompletionRequired(),
@@ -234,7 +234,10 @@ public class V6DrivingCoursePersistenceTest {
     assertThat(parsedModel.getPaths().get(0).getProperties(), hasSize(1));
     assertThat(parsedModel.getPaths().get(0).getProperties().get(0).getName(), is("some-name"));
     assertThat(parsedModel.getPaths().get(0).getProperties().get(0).getValue(), is("some-value"));
-    assertThat(parsedModel.getPaths().get(0).getPathLayout().getConnectionType(), is("POLYPATH"));
+    assertThat(
+        parsedModel.getPaths().get(0).getPathLayout().getConnectionType(),
+        is(PathTO.PathLayout.ConnectionType.POLYPATH)
+    );
     assertThat(parsedModel.getPaths().get(0).getPathLayout().getLayerId(), is(1));
     assertThat(parsedModel.getPaths().get(0).getPathLayout().getControlPoints(), hasSize(1));
     assertThat(
@@ -262,7 +265,7 @@ public class V6DrivingCoursePersistenceTest {
     );
     plantModel.getLocationTypes().get(0).setLocationTypeLayout(
         new LocationTypeLayout()
-            .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
+            .setLocationRepresentation(LocationRepresentation.LOAD_TRANSFER_GENERIC)
     );
 
     // Write to XML...
@@ -291,7 +294,7 @@ public class V6DrivingCoursePersistenceTest {
     );
     assertThat(
         parsedModel.getLocationTypes().get(0).getLocationTypeLayout().getLocationRepresentation(),
-        is("LOAD_TRANSFER_GENERIC")
+        is(LocationRepresentation.LOAD_TRANSFER_GENERIC)
     );
   }
 
@@ -326,7 +329,9 @@ public class V6DrivingCoursePersistenceTest {
             .setPositionY(30L)
             .setLabelOffsetX(10L)
             .setLabelOffsetY(20L)
-            .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
+            .setLocationRepresentation(
+                org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_GENERIC
+            )
             .setLayerId(11)
     );
 
@@ -366,7 +371,7 @@ public class V6DrivingCoursePersistenceTest {
     assertThat(parsedModel.getLocations().get(0).getLocationLayout().getLabelOffsetY(), is(20L));
     assertThat(
         parsedModel.getLocations().get(0).getLocationLayout().getLocationRepresentation(),
-        is("LOAD_TRANSFER_GENERIC")
+        is(LocationRepresentation.LOAD_TRANSFER_GENERIC)
     );
     assertThat(parsedModel.getLocations().get(0).getLocationLayout().getLayerId(), is(11));
   }
@@ -375,7 +380,7 @@ public class V6DrivingCoursePersistenceTest {
   void persistAndMaterializeBlocks()
       throws IOException {
     plantModel.getBlocks().get(0).setName("my-block");
-    plantModel.getBlocks().get(0).setType("SAME_DIRECTION_ONLY");
+    plantModel.getBlocks().get(0).setType(BlockTO.Type.SAME_DIRECTION_ONLY);
     plantModel.getBlocks().get(0).getMembers().add(
         (MemberTO) new MemberTO().setName("some-member")
     );
@@ -393,7 +398,10 @@ public class V6DrivingCoursePersistenceTest {
 
     assertThat(parsedModel.getBlocks(), hasSize(1));
     assertThat(parsedModel.getBlocks().get(0).getName(), is(equalTo("my-block")));
-    assertThat(parsedModel.getBlocks().get(0).getType(), is(equalTo("SAME_DIRECTION_ONLY")));
+    assertThat(
+        parsedModel.getBlocks().get(0).getType(),
+        is(equalTo(BlockTO.Type.SAME_DIRECTION_ONLY))
+    );
     assertThat(parsedModel.getBlocks().get(0).getMembers(), hasSize(1));
     assertThat(
         parsedModel.getBlocks().get(0).getMembers().get(0).getName(),
@@ -465,6 +473,7 @@ public class V6DrivingCoursePersistenceTest {
     return writer.toString();
   }
 
+  @SuppressWarnings("checkstyle:LineLength")
   private V6PlantModelTO createPlantModel() {
     return (V6PlantModelTO) new V6PlantModelTO()
         .setName(UUID.randomUUID().toString())
@@ -500,7 +509,7 @@ public class V6DrivingCoursePersistenceTest {
                     (PathTO) new PathTO()
                         .setPathLayout(
                             new PathTO.PathLayout()
-                                .setConnectionType("DIRECT")
+                                .setConnectionType(PathTO.PathLayout.ConnectionType.DIRECT)
                                 .setLayerId(0)
                         )
                         .setName(UUID.randomUUID().toString())
@@ -513,7 +522,9 @@ public class V6DrivingCoursePersistenceTest {
                     (LocationTypeTO) new LocationTypeTO()
                         .setLocationTypeLayout(
                             new LocationTypeTO.LocationTypeLayout()
-                                .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
+                                .setLocationRepresentation(
+                                    LocationRepresentation.LOAD_TRANSFER_GENERIC
+                                )
                         )
                         .setName(UUID.randomUUID().toString())
                 )
@@ -528,7 +539,9 @@ public class V6DrivingCoursePersistenceTest {
                             .setPositionY(200L)
                             .setLabelOffsetX(20L)
                             .setLabelOffsetY(20L)
-                            .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
+                            .setLocationRepresentation(
+                                org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_GENERIC
+                            )
                             .setLayerId(0)
                     )
                     .setName(UUID.randomUUID().toString())

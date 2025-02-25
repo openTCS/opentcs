@@ -52,7 +52,7 @@ class V005DrivingCoursePersistenceTest {
     plantModel.getPoints().get(0).setyPosition(2L);
     plantModel.getPoints().get(0).setzPosition(3L);
     plantModel.getPoints().get(0).setVehicleOrientationAngle(12.34f);
-    plantModel.getPoints().get(0).setType("PARK_POSITION");
+    plantModel.getPoints().get(0).setType(PointTO.Type.PARK_POSITION);
     plantModel.getPoints().get(0).getOutgoingPaths()
         .add(new PointTO.OutgoingPath().setName("some-path"));
 
@@ -67,7 +67,7 @@ class V005DrivingCoursePersistenceTest {
     assertThat(parsedModel.getPoints().get(0).getyPosition(), is(2L));
     assertThat(parsedModel.getPoints().get(0).getzPosition(), is(3L));
     assertThat(parsedModel.getPoints().get(0).getVehicleOrientationAngle(), is(12.34f));
-    assertThat(parsedModel.getPoints().get(0).getType(), is(equalTo("PARK_POSITION")));
+    assertThat(parsedModel.getPoints().get(0).getType(), is(equalTo(PointTO.Type.PARK_POSITION)));
     assertThat(parsedModel.getPoints().get(0).getOutgoingPaths(), hasSize(1));
     assertThat(
         parsedModel.getPoints().get(0).getOutgoingPaths().get(0).getName(),
@@ -88,7 +88,7 @@ class V005DrivingCoursePersistenceTest {
     plantModel.getPaths().get(0).getPeripheralOperations().add(
         new PeripheralOperationTO()
             .setLocationName("some-loc-name")
-            .setExecutionTrigger("AFTER_ALLOCATION")
+            .setExecutionTrigger(PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION)
             .setCompletionRequired(true)
     );
     plantModel.getPaths().get(0).getVehicleEnvelopes().add(
@@ -123,7 +123,7 @@ class V005DrivingCoursePersistenceTest {
     );
     assertThat(
         parsedModel.getPaths().get(0).getPeripheralOperations().get(0).getExecutionTrigger(),
-        is(equalTo("AFTER_ALLOCATION"))
+        is(equalTo(PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION))
     );
     assertThat(
         parsedModel.getPaths().get(0).getPeripheralOperations().get(0).isCompletionRequired(),
@@ -219,7 +219,7 @@ class V005DrivingCoursePersistenceTest {
   void persistAndMaterializeBlocks()
       throws IOException {
     plantModel.getBlocks().get(0).setName("my-block");
-    plantModel.getBlocks().get(0).setType("SAME_DIRECTION_ONLY");
+    plantModel.getBlocks().get(0).setType(BlockTO.Type.SAME_DIRECTION_ONLY);
     plantModel.getBlocks().get(0).getMembers().add(
         (MemberTO) new MemberTO().setName("some-member")
     );
@@ -231,7 +231,10 @@ class V005DrivingCoursePersistenceTest {
 
     assertThat(parsedModel.getBlocks(), hasSize(1));
     assertThat(parsedModel.getBlocks().get(0).getName(), is(equalTo("my-block")));
-    assertThat(parsedModel.getBlocks().get(0).getType(), is(equalTo("SAME_DIRECTION_ONLY")));
+    assertThat(
+        parsedModel.getBlocks().get(0).getType(),
+        is(equalTo(BlockTO.Type.SAME_DIRECTION_ONLY))
+    );
     assertThat(parsedModel.getBlocks().get(0).getMembers(), hasSize(1));
     assertThat(
         parsedModel.getBlocks().get(0).getMembers().get(0).getName(),
@@ -274,6 +277,7 @@ class V005DrivingCoursePersistenceTest {
     return writer.toString();
   }
 
+  @SuppressWarnings("checkstyle:LineLength")
   private V005PlantModelTO createPlantModel() {
     return (V005PlantModelTO) new V005PlantModelTO()
         .setName(UUID.randomUUID().toString())
@@ -309,7 +313,7 @@ class V005DrivingCoursePersistenceTest {
                     (PathTO) new PathTO()
                         .setPathLayout(
                             new PathTO.PathLayout()
-                                .setConnectionType("DIRECT")
+                                .setConnectionType(PathTO.PathLayout.ConnectionType.DIRECT)
                                 .setLayerId(0)
                         )
                         .setName(UUID.randomUUID().toString())
@@ -322,7 +326,9 @@ class V005DrivingCoursePersistenceTest {
                     (LocationTypeTO) new LocationTypeTO()
                         .setLocationTypeLayout(
                             new LocationTypeTO.LocationTypeLayout()
-                                .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
+                                .setLocationRepresentation(
+                                    LocationRepresentation.LOAD_TRANSFER_GENERIC
+                                )
                         )
                         .setName(UUID.randomUUID().toString())
                 )
@@ -337,7 +343,9 @@ class V005DrivingCoursePersistenceTest {
                             .setyPosition(200L)
                             .setxLabelOffset(20L)
                             .setyLabelOffset(20L)
-                            .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
+                            .setLocationRepresentation(
+                                org.opentcs.util.persistence.v005.LocationRepresentation.WORKING_ALT_1
+                            )
                             .setLayerId(0)
                     )
                     .setName(UUID.randomUUID().toString())

@@ -184,7 +184,7 @@ public class LocationTO
     private Long yPosition = 0L;
     private Long xLabelOffset = 0L;
     private Long yLabelOffset = 0L;
-    private String locationRepresentation = "";
+    private LocationRepresentation locationRepresentation = LocationRepresentation.DEFAULT;
     private Integer layerId = 0;
 
     /**
@@ -234,11 +234,11 @@ public class LocationTO
     }
 
     @XmlAttribute(required = true)
-    public String getLocationRepresentation() {
+    public LocationRepresentation getLocationRepresentation() {
       return locationRepresentation;
     }
 
-    public LocationLayout setLocationRepresentation(String locationRepresentation) {
+    public LocationLayout setLocationRepresentation(LocationRepresentation locationRepresentation) {
       this.locationRepresentation = requireNonNull(
           locationRepresentation,
           "locationRepresentation"

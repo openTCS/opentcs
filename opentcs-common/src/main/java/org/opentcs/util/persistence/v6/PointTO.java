@@ -29,7 +29,7 @@ public class PointTO
   private Long positionY = 0L;
   private Long positionZ = 0L;
   private Float vehicleOrientationAngle = 0.0F;
-  private String type = "HALT_POSITION";
+  private Type type = Type.HALT_POSITION;
   private BoundingBoxTO maxVehicleBoundingBox = new BoundingBoxTO();
   private List<VehicleEnvelopeTO> vehicleEnvelopes = new ArrayList<>();
   private List<OutgoingPath> outgoingPaths = new ArrayList<>();
@@ -98,13 +98,13 @@ public class PointTO
   }
 
   @XmlAttribute(required = true)
-  public String getType() {
+  public Type getType() {
     return type;
   }
 
   public PointTO setType(
       @Nonnull
-      String type
+      Type type
   ) {
     requireNonNull(type, "type");
     this.type = type;
@@ -163,6 +163,14 @@ public class PointTO
   ) {
     this.pointLayout = requireNonNull(pointLayout, "pointLayout");
     return this;
+  }
+
+  @XmlType(name = "Type")
+  public enum Type {
+    // CHECKSTYLE:OFF
+    HALT_POSITION,
+    PARK_POSITION;
+    // CHECKSTYLE:ON
   }
 
   @XmlAccessorType(XmlAccessType.PROPERTY)

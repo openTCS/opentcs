@@ -102,7 +102,7 @@ public class V6TOMapper {
                       point.getVehicleOrientationAngle().doubleValue()
                   )
               )
-              .withType(Point.Type.valueOf(point.getType()))
+              .withType(toPointType(point.getType()))
               .withVehicleEnvelopes(toEnvelopeMap(point.getVehicleEnvelopes()))
               .withMaxVehicleBoundingBox(toBoundingBoxCreationTO(point.getMaxVehicleBoundingBox()))
               .withProperties(convertProperties(point.getProperties()))
@@ -169,7 +169,7 @@ public class V6TOMapper {
               .withProperties(convertProperties(path.getProperties()))
               .withLayout(
                   new PathCreationTO.Layout(
-                      Path.Layout.ConnectionType.valueOf(path.getPathLayout().getConnectionType()),
+                      toConnectionType(path.getPathLayout().getConnectionType()),
                       path.getPathLayout().getControlPoints().stream()
                           .map(controlPoint -> new Couple(controlPoint.getX(), controlPoint.getY()))
                           .toList(),
@@ -189,7 +189,7 @@ public class V6TOMapper {
         .map(
             to -> new PeripheralOperationCreationTO(to.getName(), to.getLocationName())
                 .withExecutionTrigger(
-                    PeripheralOperation.ExecutionTrigger.valueOf(to.getExecutionTrigger())
+                    toExecutionTrigger(to.getExecutionTrigger())
                 )
                 .withCompletionRequired(to.isCompletionRequired())
         )
@@ -213,7 +213,7 @@ public class V6TOMapper {
               .withProperties(convertProperties(locationType.getProperties()))
               .withLayout(
                   new LocationTypeCreationTO.Layout(
-                      LocationRepresentation.valueOf(
+                      toLocationRepresentation(
                           locationType.getLocationTypeLayout().getLocationRepresentation()
                       )
                   )
@@ -251,7 +251,7 @@ public class V6TOMapper {
                           location.getLocationLayout().getLabelOffsetX(),
                           location.getLocationLayout().getLabelOffsetY()
                       ),
-                      LocationRepresentation.valueOf(
+                      toLocationRepresentation(
                           location.getLocationLayout().getLocationRepresentation()
                       ),
                       location.getLocationLayout().getLayerId()
@@ -269,7 +269,7 @@ public class V6TOMapper {
     for (BlockTO block : blocks) {
       result.add(
           new BlockCreationTO(block.getName())
-              .withType(Block.Type.valueOf(block.getType()))
+              .withType(toBlockType(block.getType()))
               .withMemberNames(
                   block.getMembers().stream()
                       .map(member -> member.getName())
@@ -382,7 +382,7 @@ public class V6TOMapper {
       pointTO.setPositionX(point.getPose().getPosition().getX())
           .setPositionY(point.getPose().getPosition().getY())
           .setVehicleOrientationAngle((float) point.getPose().getOrientationAngle())
-          .setType(point.getType().name())
+          .setType(toPointTOType(point.getType()))
           .setOutgoingPaths(getOutgoingPaths(point, paths))
           .setVehicleEnvelopes(toVehicleEnvelopeTOs(point.getVehicleEnvelopes()))
           .setMaxVehicleBoundingBox(toBoundingBoxTO(point.getMaxVehicleBoundingBox()))
@@ -454,7 +454,7 @@ public class V6TOMapper {
           .setVehicleEnvelopes(toVehicleEnvelopeTOs(path.getVehicleEnvelopes()))
           .setPathLayout(
               new PathTO.PathLayout()
-                  .setConnectionType(path.getLayout().getConnectionType().name())
+                  .setConnectionType(toPathTOConnectionType(path.getLayout().getConnectionType()))
                   .setControlPoints(
                       path.getLayout().getControlPoints().stream()
                           .map(controlPoint -> {
@@ -483,7 +483,9 @@ public class V6TOMapper {
         .map(
             to -> (PeripheralOperationTO) new PeripheralOperationTO()
                 .setLocationName(to.getLocationName())
-                .setExecutionTrigger(to.getExecutionTrigger().name())
+                .setExecutionTrigger(
+                    toPeripheralOperationTOExecutionTrigger(to.getExecutionTrigger())
+                )
                 .setCompletionRequired(to.isCompletionRequired())
                 .setName(to.getOperation())
         )
@@ -507,7 +509,9 @@ public class V6TOMapper {
           .setLocationTypeLayout(
               new LocationTypeTO.LocationTypeLayout()
                   .setLocationRepresentation(
-                      locationType.getLayout().getLocationRepresentation().name()
+                      toLocationTOLocationRepresentation(
+                          locationType.getLayout().getLocationRepresentation()
+                      )
                   )
           )
           .setProperties(convertProperties(locationType.getProperties()));
@@ -538,7 +542,9 @@ public class V6TOMapper {
                   .setLabelOffsetX(location.getLayout().getLabelOffset().getX())
                   .setLabelOffsetY(location.getLayout().getLabelOffset().getY())
                   .setLocationRepresentation(
-                      location.getLayout().getLocationRepresentation().name()
+                      toLocationTOLocationRepresentation(
+                          location.getLayout().getLocationRepresentation()
+                      )
                   )
                   .setLayerId(location.getLayout().getLayerId())
           )
@@ -558,7 +564,7 @@ public class V6TOMapper {
     for (BlockCreationTO block : blocks) {
       BlockTO blockTO = new BlockTO();
       blockTO.setName(block.getName());
-      blockTO.setType(block.getType().name())
+      blockTO.setType(toBlockTOType(block.getType()))
           .setMembers(toMemberTOs(block.getMemberNames()))
           .setBlockLayout(
               new BlockTO.BlockLayout()
@@ -768,5 +774,191 @@ public class V6TOMapper {
         .setHeight(boundingBox.getHeight())
         .setReferenceOffsetX(boundingBox.getReferenceOffset().getX())
         .setReferenceOffsetY(boundingBox.getReferenceOffset().getY());
+  }
+
+  private Point.Type toPointType(PointTO.Type type) {
+    switch (type) {
+      case PointTO.Type.HALT_POSITION:
+        return Point.Type.HALT_POSITION;
+      case PointTO.Type.PARK_POSITION:
+        return Point.Type.PARK_POSITION;
+      default:
+        throw new IllegalArgumentException(type.name() + " does not exist");
+    }
+  }
+
+  private Path.Layout.ConnectionType toConnectionType(
+      PathTO.PathLayout.ConnectionType connectionType
+  ) {
+    switch (connectionType) {
+      case PathTO.PathLayout.ConnectionType.BEZIER:
+        return Path.Layout.ConnectionType.BEZIER;
+      case PathTO.PathLayout.ConnectionType.BEZIER_3:
+        return Path.Layout.ConnectionType.BEZIER_3;
+      case PathTO.PathLayout.ConnectionType.DIRECT:
+        return Path.Layout.ConnectionType.DIRECT;
+      case PathTO.PathLayout.ConnectionType.ELBOW:
+        return Path.Layout.ConnectionType.ELBOW;
+      case PathTO.PathLayout.ConnectionType.POLYPATH:
+        return Path.Layout.ConnectionType.POLYPATH;
+      case PathTO.PathLayout.ConnectionType.SLANTED:
+        return Path.Layout.ConnectionType.SLANTED;
+      default:
+        throw new IllegalArgumentException(connectionType.name() + " does not exist");
+    }
+  }
+
+  private PeripheralOperation.ExecutionTrigger toExecutionTrigger(
+      PeripheralOperationTO.ExecutionTrigger executionTrigger
+  ) {
+    switch (executionTrigger) {
+      case PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION:
+        return PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION;
+      case PeripheralOperationTO.ExecutionTrigger.AFTER_MOVEMENT:
+        return PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT;
+      default:
+        throw new IllegalArgumentException(executionTrigger.name() + " does not exist");
+    }
+  }
+
+  private LocationRepresentation toLocationRepresentation(
+      org.opentcs.util.persistence.v6.LocationRepresentation locRepresentation
+  ) {
+    switch (locRepresentation) {
+      case org.opentcs.util.persistence.v6.LocationRepresentation.DEFAULT:
+        return LocationRepresentation.DEFAULT;
+      case org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_1:
+        return LocationRepresentation.LOAD_TRANSFER_ALT_1;
+      case org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_2:
+        return LocationRepresentation.LOAD_TRANSFER_ALT_2;
+      case org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_3:
+        return LocationRepresentation.LOAD_TRANSFER_ALT_3;
+      case org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_4:
+        return LocationRepresentation.LOAD_TRANSFER_ALT_4;
+      case org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_5:
+        return LocationRepresentation.LOAD_TRANSFER_ALT_5;
+      case org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_GENERIC:
+        return LocationRepresentation.LOAD_TRANSFER_GENERIC;
+      case org.opentcs.util.persistence.v6.LocationRepresentation.NONE:
+        return LocationRepresentation.NONE;
+      case org.opentcs.util.persistence.v6.LocationRepresentation.RECHARGE_ALT_1:
+        return LocationRepresentation.RECHARGE_ALT_1;
+      case org.opentcs.util.persistence.v6.LocationRepresentation.RECHARGE_ALT_2:
+        return LocationRepresentation.RECHARGE_ALT_2;
+      case org.opentcs.util.persistence.v6.LocationRepresentation.RECHARGE_GENERIC:
+        return LocationRepresentation.RECHARGE_GENERIC;
+      case org.opentcs.util.persistence.v6.LocationRepresentation.WORKING_ALT_1:
+        return LocationRepresentation.WORKING_ALT_1;
+      case org.opentcs.util.persistence.v6.LocationRepresentation.WORKING_ALT_2:
+        return LocationRepresentation.WORKING_ALT_2;
+      case org.opentcs.util.persistence.v6.LocationRepresentation.WORKING_GENERIC:
+        return LocationRepresentation.WORKING_GENERIC;
+      default:
+        throw new IllegalArgumentException(locRepresentation.name() + " does not exist");
+    }
+  }
+
+  private Block.Type toBlockType(BlockTO.Type type) {
+    switch (type) {
+      case BlockTO.Type.SAME_DIRECTION_ONLY:
+        return Block.Type.SAME_DIRECTION_ONLY;
+      case BlockTO.Type.SINGLE_VEHICLE_ONLY:
+        return Block.Type.SINGLE_VEHICLE_ONLY;
+      default:
+        throw new IllegalArgumentException(type.name() + " does not exist");
+    }
+  }
+
+  private PointTO.Type toPointTOType(Point.Type type) {
+    switch (type) {
+      case Point.Type.HALT_POSITION:
+        return PointTO.Type.HALT_POSITION;
+      case Point.Type.PARK_POSITION:
+        return PointTO.Type.PARK_POSITION;
+      default:
+        throw new IllegalArgumentException(type.name() + " does not exist");
+    }
+  }
+
+  private PathTO.PathLayout.ConnectionType toPathTOConnectionType(
+      Path.Layout.ConnectionType connectionType
+  ) {
+    switch (connectionType) {
+      case Path.Layout.ConnectionType.BEZIER:
+        return PathTO.PathLayout.ConnectionType.BEZIER;
+      case Path.Layout.ConnectionType.BEZIER_3:
+        return PathTO.PathLayout.ConnectionType.BEZIER_3;
+      case Path.Layout.ConnectionType.DIRECT:
+        return PathTO.PathLayout.ConnectionType.DIRECT;
+      case Path.Layout.ConnectionType.ELBOW:
+        return PathTO.PathLayout.ConnectionType.ELBOW;
+      case Path.Layout.ConnectionType.POLYPATH:
+        return PathTO.PathLayout.ConnectionType.POLYPATH;
+      case Path.Layout.ConnectionType.SLANTED:
+        return PathTO.PathLayout.ConnectionType.SLANTED;
+      default:
+        throw new IllegalArgumentException(connectionType.name() + " does not exist");
+    }
+  }
+
+  private PeripheralOperationTO.ExecutionTrigger toPeripheralOperationTOExecutionTrigger(
+      PeripheralOperation.ExecutionTrigger executionTrigger
+  ) {
+    switch (executionTrigger) {
+      case PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION:
+        return PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION;
+      case PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT:
+        return PeripheralOperationTO.ExecutionTrigger.AFTER_MOVEMENT;
+      default:
+        throw new IllegalArgumentException(executionTrigger.name() + " does not exist");
+    }
+  }
+
+  private org.opentcs.util.persistence.v6.LocationRepresentation toLocationTOLocationRepresentation(
+      LocationRepresentation locRepresentation
+  ) {
+    switch (locRepresentation) {
+      case LocationRepresentation.DEFAULT:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.DEFAULT;
+      case LocationRepresentation.LOAD_TRANSFER_ALT_1:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_1;
+      case LocationRepresentation.LOAD_TRANSFER_ALT_2:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_2;
+      case LocationRepresentation.LOAD_TRANSFER_ALT_3:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_3;
+      case LocationRepresentation.LOAD_TRANSFER_ALT_4:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_4;
+      case LocationRepresentation.LOAD_TRANSFER_ALT_5:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_5;
+      case LocationRepresentation.LOAD_TRANSFER_GENERIC:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_GENERIC;
+      case LocationRepresentation.NONE:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.NONE;
+      case LocationRepresentation.RECHARGE_ALT_1:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.RECHARGE_ALT_1;
+      case LocationRepresentation.RECHARGE_ALT_2:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.RECHARGE_ALT_2;
+      case LocationRepresentation.RECHARGE_GENERIC:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.RECHARGE_GENERIC;
+      case LocationRepresentation.WORKING_ALT_1:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.WORKING_ALT_1;
+      case LocationRepresentation.WORKING_ALT_2:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.WORKING_ALT_2;
+      case LocationRepresentation.WORKING_GENERIC:
+        return org.opentcs.util.persistence.v6.LocationRepresentation.WORKING_GENERIC;
+      default:
+        throw new IllegalArgumentException(locRepresentation.name() + " does not exist");
+    }
+  }
+
+  private BlockTO.Type toBlockTOType(Block.Type type) {
+    switch (type) {
+      case Block.Type.SAME_DIRECTION_ONLY:
+        return BlockTO.Type.SAME_DIRECTION_ONLY;
+      case Block.Type.SINGLE_VEHICLE_ONLY:
+        return BlockTO.Type.SINGLE_VEHICLE_ONLY;
+      default:
+        throw new IllegalArgumentException(type.name() + " does not exist");
+    }
   }
 }

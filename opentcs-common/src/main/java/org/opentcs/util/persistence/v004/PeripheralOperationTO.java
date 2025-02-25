@@ -7,6 +7,7 @@ import static java.util.Objects.requireNonNull;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  */
@@ -16,7 +17,7 @@ public class PeripheralOperationTO
       PlantModelElementTO {
 
   private String locationName = "";
-  private String executionTrigger = "";
+  private ExecutionTrigger executionTrigger = ExecutionTrigger.BEFORE_MOVEMENT;
   private boolean completionRequired;
 
   /**
@@ -36,11 +37,11 @@ public class PeripheralOperationTO
   }
 
   @XmlAttribute(required = true)
-  public String getExecutionTrigger() {
+  public ExecutionTrigger getExecutionTrigger() {
     return executionTrigger;
   }
 
-  public PeripheralOperationTO setExecutionTrigger(String executionTrigger) {
+  public PeripheralOperationTO setExecutionTrigger(ExecutionTrigger executionTrigger) {
     this.executionTrigger = requireNonNull(executionTrigger, "executionTrigger");
     return this;
   }
@@ -53,6 +54,15 @@ public class PeripheralOperationTO
   public PeripheralOperationTO setCompletionRequired(boolean completionRequired) {
     this.completionRequired = completionRequired;
     return this;
+  }
+
+  @XmlType
+  public enum ExecutionTrigger {
+    // CHECKSTYLE:OFF
+    AFTER_ALLOCATION,
+    BEFORE_MOVEMENT,
+    AFTER_MOVEMENT;
+    // CHECKSTYLE:ON
   }
 
 }

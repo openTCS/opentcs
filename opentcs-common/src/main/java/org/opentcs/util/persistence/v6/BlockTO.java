@@ -21,7 +21,7 @@ public class BlockTO
     extends
       PlantModelElementTO {
 
-  private String type = "SINGLE_VEHICLE_ONLY";
+  private Type type = Type.SINGLE_VEHICLE_ONLY;
   private List<MemberTO> members = new ArrayList<>();
   private BlockLayout blockLayout = new BlockLayout();
 
@@ -32,13 +32,13 @@ public class BlockTO
   }
 
   @XmlAttribute(required = true)
-  public String getType() {
+  public Type getType() {
     return type;
   }
 
   public BlockTO setType(
       @Nonnull
-      String type
+      Type type
   ) {
     requireNonNull(type, "type");
     this.type = type;
@@ -70,6 +70,14 @@ public class BlockTO
   ) {
     this.blockLayout = requireNonNull(blockLayout, "blockLayout");
     return this;
+  }
+
+  @XmlType
+  public enum Type {
+    // CHECKSTYLE:OFF
+    SINGLE_VEHICLE_ONLY,
+    SAME_DIRECTION_ONLY;
+    // CHECKSTYLE:ON
   }
 
   @XmlAccessorType(XmlAccessType.PROPERTY)
