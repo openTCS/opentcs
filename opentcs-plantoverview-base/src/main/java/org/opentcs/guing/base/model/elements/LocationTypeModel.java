@@ -5,7 +5,6 @@ package org.opentcs.guing.base.model.elements;
 import static org.opentcs.guing.base.I18nPlantOverviewBase.BUNDLE_PATH;
 
 import java.util.ResourceBundle;
-import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
@@ -27,9 +26,13 @@ public class LocationTypeModel
    */
   public static final String ALLOWED_OPERATIONS = "AllowedOperations";
   /**
-   * The key fo the poissible peripheral actions on this type.
+   * The key fo the possible peripheral actions on this type.
    */
   public static final String ALLOWED_PERIPHERAL_OPERATIONS = "AllowedPeripheralOperations";
+  /**
+   * The key for this location type's symbol.
+   */
+  public static final String SYMBOL = "Symbol";
   /**
    * This class's resource bundle.
    */
@@ -72,7 +75,7 @@ public class LocationTypeModel
   }
 
   public SymbolProperty getPropertyDefaultRepresentation() {
-    return (SymbolProperty) getProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION);
+    return (SymbolProperty) getProperty(SYMBOL);
   }
 
   private void createProperties() {
@@ -103,7 +106,7 @@ public class LocationTypeModel
     pSymbol.setLocationRepresentation(LocationRepresentation.NONE);
     pSymbol.setDescription(bundle.getString("locationTypeModel.property_symbol.description"));
     pSymbol.setHelptext(bundle.getString("locationTypeModel.property_symbol.helptext"));
-    setProperty(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION, pSymbol);
+    setProperty(SYMBOL, pSymbol);
 
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(

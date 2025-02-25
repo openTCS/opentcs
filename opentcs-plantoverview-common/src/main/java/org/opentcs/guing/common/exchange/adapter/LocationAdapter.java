@@ -3,22 +3,16 @@
 package org.opentcs.guing.common.exchange.adapter;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentcs.data.ObjectPropConstants.LOC_DEFAULT_REPRESENTATION;
 
-import java.util.Map;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.TCSObjectService;
-import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Triple;
-import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.base.components.layer.LayerWrapper;
 import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
-import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
-import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.LayoutModel;
@@ -88,8 +82,6 @@ public class LocationAdapter
       // Misc properties
       updateMiscModelProperties(model, location);
       updateModelLayoutProperties(model, location, systemModel.getLayoutModel());
-      // look for label and symbol
-      updateRepresentation(model, model.getPropertyMiscellaneous());
 
       model.setLocation(location);
       model.propertiesChanged(model);
@@ -122,33 +114,6 @@ public class LocationAdapter
     unmarkAllPropertiesChanged(modelComponent);
 
     return result;
-  }
-
-  @Override
-  protected Map<String, String> getKernelProperties(ModelComponent model) {
-    Map<String, String> result = super.getKernelProperties(model);
-
-    LocationRepresentation locationRepresentation
-        = ((LocationModel) model).getPropertyDefaultRepresentation().getLocationRepresentation();
-
-    if (locationRepresentation != null) {
-      result.put(LOC_DEFAULT_REPRESENTATION, locationRepresentation.name());
-    }
-
-    return result;
-  }
-
-  private void updateRepresentation(LocationModel model, KeyValueSetProperty miscellaneous) {
-    for (KeyValueProperty kvp : miscellaneous.getItems()) {
-      switch (kvp.getKey()) {
-        case ObjectPropConstants.LOC_DEFAULT_REPRESENTATION:
-          model.getPropertyDefaultRepresentation().setLocationRepresentation(
-              LocationRepresentation.valueOf(kvp.getValue())
-          );
-          break;
-        default:
-      }
-    }
   }
 
   private void updateModelLayoutProperties(

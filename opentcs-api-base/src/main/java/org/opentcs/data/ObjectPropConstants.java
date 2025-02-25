@@ -7,6 +7,7 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Defines some reserved/commonly used property keys and values.
@@ -27,6 +28,8 @@ public interface ObjectPropConstants {
    * Type: String (any element of {@link LocationRepresentation})
    * </p>
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed without replacement.")
   String LOCTYPE_DEFAULT_REPRESENTATION = "tcs:defaultLocationTypeSymbol";
   /**
    * A property key for {@link Location} instances used to provide a hint for the visualization how
@@ -35,6 +38,8 @@ public interface ObjectPropConstants {
    * Type: String (any element of {@link LocationRepresentation})
    * </p>
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed without replacement.")
   String LOC_DEFAULT_REPRESENTATION = "tcs:defaultLocationSymbol";
   /**
    * A property key for {@link TransportOrder} instances used to define resources (i.e., points,

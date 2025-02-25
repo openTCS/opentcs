@@ -14,7 +14,6 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableModel;
-import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.Property;
@@ -254,15 +253,6 @@ public class KeyValueSetPropertyEditorPanel
   private void updateView() {
     final TableModel model = itemsTable.getModel();
     boolean selectedAreEditable = true;
-
-    for (int selRowIndex : itemsTable.getSelectedRows()) {
-      String key = (String) model.getValueAt(selRowIndex, 0);
-      if (key.equals(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION)
-          || key.equals(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)) {
-        selectedAreEditable = false;
-        break;
-      }
-    }
 
     boolean enableEditing = false;
     boolean enableRemoval = false;

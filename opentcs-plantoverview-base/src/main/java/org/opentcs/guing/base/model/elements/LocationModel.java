@@ -14,7 +14,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.LocationRepresentation;
@@ -53,6 +52,10 @@ public class LocationModel
    * Key for the locked state.
    */
   public static final String LOCKED = "locked";
+  /**
+   * The key for this location's symbol.
+   */
+  public static final String SYMBOL = "Symbol";
   /**
    * Key for the reservation token.
    */
@@ -199,7 +202,7 @@ public class LocationModel
   }
 
   public SymbolProperty getPropertyDefaultRepresentation() {
-    return (SymbolProperty) getProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION);
+    return (SymbolProperty) getProperty(SYMBOL);
   }
 
   public StringProperty getPropertyLayoutPositionX() {
@@ -324,7 +327,7 @@ public class LocationModel
     pSymbol.setDescription(bundle.getString("locationModel.property_symbol.description"));
     pSymbol.setHelptext(bundle.getString("locationModel.property_symbol.helptext"));
     pSymbol.setCollectiveEditable(true);
-    setProperty(ObjectPropConstants.LOC_DEFAULT_REPRESENTATION, pSymbol);
+    setProperty(SYMBOL, pSymbol);
 
     StringProperty pLocPosX = new StringProperty(this);
     pLocPosX.setDescription(bundle.getString("locationModel.property_positionX.description"));

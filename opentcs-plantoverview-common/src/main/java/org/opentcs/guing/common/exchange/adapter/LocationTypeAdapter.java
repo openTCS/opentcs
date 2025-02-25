@@ -3,19 +3,14 @@
 package org.opentcs.guing.common.exchange.adapter;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentcs.data.ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.TCSObjectService;
-import org.opentcs.data.ObjectPropConstants;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.LocationType;
-import org.opentcs.data.model.visualization.LocationRepresentation;
-import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.LocationTypeModel;
 import org.opentcs.guing.common.model.SystemModel;
@@ -53,14 +48,6 @@ public class LocationTypeAdapter
     updateMiscModelProperties(model, locationType);
     updateModelLayoutProperties(model, locationType);
     model.setLocationType(locationType);
-
-    for (KeyValueProperty next : model.getPropertyMiscellaneous().getItems()) {
-      if (next.getKey().equals(ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION)) {
-        model.getPropertyDefaultRepresentation()
-            .setLocationRepresentation(LocationRepresentation.valueOf(next.getValue()));
-        break;
-      }
-    }
   }
 
   @Override
@@ -102,21 +89,5 @@ public class LocationTypeAdapter
     return new LocationTypeCreationTO.Layout(
         model.getPropertyDefaultRepresentation().getLocationRepresentation()
     );
-  }
-
-  @Override
-  protected Map<String, String> getKernelProperties(ModelComponent model) {
-    Map<String, String> result = super.getKernelProperties(model);
-    LocationTypeModel locationTypeModel = (LocationTypeModel) model;
-
-    // Add the location representation (symbol) from the model.
-    LocationRepresentation locationRepresentation
-        = locationTypeModel.getPropertyDefaultRepresentation().getLocationRepresentation();
-
-    if (locationRepresentation != null) {
-      result.put(LOCTYPE_DEFAULT_REPRESENTATION, locationRepresentation.name());
-    }
-
-    return result;
   }
 }

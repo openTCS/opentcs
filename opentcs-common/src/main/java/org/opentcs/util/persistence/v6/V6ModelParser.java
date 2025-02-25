@@ -3,8 +3,6 @@
 package org.opentcs.util.persistence.v6;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentcs.data.ObjectPropConstants.LOCTYPE_DEFAULT_REPRESENTATION;
-import static org.opentcs.data.ObjectPropConstants.LOC_DEFAULT_REPRESENTATION;
 
 import jakarta.annotation.Nonnull;
 import java.io.IOException;
@@ -261,12 +259,6 @@ public class V6ModelParser {
   private List<LocationTypeTO> convertLocationTypes(V005PlantModelTO to) {
     return to.getLocationTypes().stream()
         .map(locationType -> {
-          String locationRepresentation = toPropertiesMap(locationType.getProperties())
-              .getOrDefault(
-                  LOCTYPE_DEFAULT_REPRESENTATION,
-                  org.opentcs.data.model.visualization.LocationRepresentation.NONE.name()
-              );
-
           LocationTypeTO result = new LocationTypeTO();
           result.setName(locationType.getName())
               .setProperties(convertProperties(locationType.getProperties()));
@@ -278,8 +270,7 @@ public class V6ModelParser {
                   new LocationTypeTO.LocationTypeLayout()
                       .setLocationRepresentation(
                           convertLocationRepresentation(
-                              org.opentcs.util.persistence.v005.LocationRepresentation
-                                  .valueOf(locationRepresentation)
+                              locationType.getLocationTypeLayout().getLocationRepresentation()
                           )
                       )
               );
@@ -319,12 +310,6 @@ public class V6ModelParser {
   private List<LocationTO> convertLocations(V005PlantModelTO to) {
     return to.getLocations().stream()
         .map(location -> {
-          String locationRepresentation = toPropertiesMap(location.getProperties())
-              .getOrDefault(
-                  LOC_DEFAULT_REPRESENTATION,
-                  org.opentcs.data.model.visualization.LocationRepresentation.DEFAULT.name()
-              );
-
           LocationTO result = new LocationTO();
           result.setName(location.getName())
               .setProperties(convertProperties(location.getProperties()));
@@ -342,8 +327,7 @@ public class V6ModelParser {
                       .setLabelOffsetY(location.getLocationLayout().getyLabelOffset())
                       .setLocationRepresentation(
                           convertLocationRepresentation(
-                              org.opentcs.util.persistence.v005.LocationRepresentation
-                                  .valueOf(locationRepresentation)
+                              location.getLocationLayout().getLocationRepresentation()
                           )
                       )
                       .setLayerId(location.getLocationLayout().getLayerId())
