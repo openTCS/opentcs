@@ -1,0 +1,212 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    Property:
+      type: object
+      additionalProperties: false
+      properties:
+        key:
+          type: string
+          description: The property's key
+          example: key1
+        value:
+          type: string
+          description: The property's value
+          example: value1
+      required:
+        - key
+        - value
+    BoundingBox:
+      type: object
+      additionalProperties: false
+      properties:
+        length:
+          type: integer
+          format: int64
+          description: The bounding box length
+          example: 60
+        width:
+          type: integer
+          format: int64
+          description: The bounding box width
+          example: 40
+        height:
+          type: integer
+          format: int64
+          description: The bounding box height
+          example: 50
+        referenceOffset:
+          $ref: "#/components/schemas/PlantModelCouple"
+      required:
+        - length
+        - width
+        - height
+        - referenceOffset
+    ResourceSet:
+      type: array
+      items:
+        type: string
+        description: Name of the resource
+      example: [ Point-0042, Path-0041--0042 ]
+    PrecisePosition:
+      type: object
+      additionalProperties: false
+      properties:
+        x:
+          type: integer
+          description: The position's X coordinate
+          example: 60
+        y:
+          type: integer
+          description: The position's Y coordinate
+          example: 40
+        z:
+          type: integer
+          description: The position's Z coordinate
+          example: 0
+      required:
+        - x
+        - y
+        - z
+    DestinationState:
+      type: object
+      additionalProperties: false
+      properties:
+        locationName:
+          type: string
+          description: The name of the destination location
+          example: Storage 01
+        operation:
+          type: string
+          description: The destination operation
+          example: Store
+        state:
+          type: string
+          enum:
+            - PRISTINE
+            - ACTIVE
+            - TRAVELLING
+            - OPERATING
+            - FINISHED
+            - FAILED
+          description: The drive order's state
+        properties:
+          type: array
+          minItems: 0
+          maxItems: 2147483647
+          items:
+            $ref: "#/components/schemas/Property"
+          description: The drive order's properties
+      required:
+        - locationName
+        - operation
+        - state
+    PeripheralJobState:
+      title: Peripheral Job State
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          description: The name of the peripheral job.
+          example: PJob-01
+        reservationToken:
+          type: string
+          description: >-
+            A token that may be used to reserve a peripheral device.
+            A peripheral device that is reserved for a specific token can only process jobs which match that reservation token.
+          example: Vehicle-0001
+        relatedVehicle:
+          type: string
+          description: >-
+            The name of the vehicle for which the peripheral job was created.
+            May be `null`, if the job wasn't created in the context of a transport order being processed by a vehicle.
+          example: Vehicle-0001
+        relatedTransportOrder:
+          type: string
+          description: >-
+            The name of the transport order for which the peripheral job was created.
+            May be `null`, if the job wasn't created in the context of a transport order being processed by a vehicle.
+          example: TOrder-01
+        peripheralOperation:
+          $ref: "#/components/schemas/PeripheralOperation"
+        state:
+          type: string
+          description: The peripheral job's current state.
+          enum:
+            - TO_BE_PROCESSED
+            - BEING_PROCESSED
+            - FINISHED
+            - FAILED
+        creationTime:
+          type: string
+          format: date-time
+          description: The point of time at which this peripheral job was created (expressed according to ISO 8601).
+          example: "2022-01-01T12:00:00Z"
+        finishedTime:
+          type: string
+          format: date-time
+          description: The point of time at which processing of this peripheral job was finished (expressed according to ISO 8601).
+          example: "2022-01-01T12:00:00Z"
+        properties:
+          type: array
+          items:
+            $ref: "../schemas/common.yaml#/components/schemas/Property"
+          description: The peripheral job's properties.
+      required:
+        - name
+        - reservationToken
+        - relatedVehicle
+        - relatedTransportOrder
+        - peripheralOperation
+        - state
+        - creationTime
+        - finishedTime
+    PeripheralOperation:
+      title: Peripheral Operation
+      description: An operation that is to be executed by a peripheral device.
+      type: object
+      additionalProperties: false
+      properties:
+        operation:
+          type: string
+          description: The operation to be performed by the peripheral device.
+          example: Open door
+        locationName:
+          type: string
+          description: The name of the location the peripheral device is associated with.
+          example: Loading Bay
+        executionTrigger:
+          type: string
+          description: The moment at which this operation is to be performed.
+          enum:
+            - AFTER_ALLOCATION
+            - AFTER_MOVEMENT
+            - IMMEDIATE
+          default: IMMEDIATE
+        completionRequired:
+          type: boolean
+          description: Whether the completion of this operation is required to allow a vehicle to continue driving.
+          default: false
+      required:
+        - operation
+        - locationName
+    PlantModelCouple:
+      title: Couple
+      type: object
+      properties:
+        x:
+          type: integer
+          format: int64
+          description: The Couple's x value.
+          example: 1500
+        y:
+          type: integer
+          format: int64
+          description: The Couple's y value.
+          example: 2000
+      required:
+        - x
+        - y

@@ -3,6 +3,7 @@
 
 plugins {
   id 'org.hidetake.swagger.generator' version '2.19.2'
+  id "org.openapi.generator" version "7.10.0"
   // To use AsciiDoctor for documentation
   id 'org.asciidoctor.jvm.convert' version '3.3.2'
   id 'org.asciidoctor.jvm.pdf' version '3.3.2'
@@ -26,6 +27,7 @@ apply plugin: 'distribution'
 
 def baseApiDir = file("$buildDir/api-base")
 def injectionApiDir = file("$buildDir/api-injection")
+def generatedOpenApiDir = file("$buildDir/generated-openapi")
 def webApiDir = file("$buildDir/swagger-ui-servicewebapiv1")
 def configDocDir = file("$buildDir/configdoc")
 def userManualDir = file("$buildDir/users-guide")
@@ -43,7 +45,7 @@ configurations {
 
 swaggerSources {
   servicewebapiv1 {
-    inputFile = file("src/docs/service-web-api-v1/openapi.yaml")
+    inputFile = file("$generatedOpenApiDir/openapi.json")
   }
 }
 
@@ -63,6 +65,7 @@ dependencies {
   configdocgen jar.outputs.files
 
   swaggerUI group: 'org.webjars', name: 'swagger-ui', version: '3.52.5'
+  swaggerUI group: 'org.openapitools', name: 'openapi-generator-cli', version: '3.3.4'
 }
 
 distributions {
@@ -95,8 +98,14 @@ task renderDocs {
   dependsOn 'asciidoctor'
   dependsOn 'generateSwaggerUI'
 }
-
 installDist.dependsOn renderDocs
+
+task bundleOpenApiSpecFiles(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+  generatorName = "openapi"
+  inputSpec = file("src/docs/service-web-api-v1/openapi.yaml").toString()
+  outputDir = generatedOpenApiDir.toString()
+}
+generateSwaggerUIServicewebapiv1.dependsOn bundleOpenApiSpecFiles
 
 distTar {
   enabled = false

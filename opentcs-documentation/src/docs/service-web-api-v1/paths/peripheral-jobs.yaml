@@ -1,0 +1,216 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /peripheralJobs:
+    get:
+      tags:
+        - Peripheral jobs
+      summary: Retrieves a set of peripheral jobs.
+      description: ""
+      parameters:
+        - name: relatedVehicle
+          in: query
+          description: >-
+            The name of the vehicle for which the peripheral jobs to be retrieved were created.
+          required: false
+          schema:
+            type: string
+            default: null
+        - name: relatedTransportOrder
+          in: query
+          description: >-
+            The name of the transport order for which the peripheral jobs to be retrieved were created.
+          required: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: ArrayOfPeripheralJobs
+                type: array
+                items:
+                  $ref: "../schemas/common.yaml#/components/schemas/PeripheralJobState"
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find the related vehicle 'Vehicle-0001'.
+  "/peripheralJobs/{NAME}":
+    get:
+      tags:
+        - Peripheral jobs
+      summary: Retrieves a single named peripheral job.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the peripheral job to be retrieved.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "../schemas/common.yaml#/components/schemas/PeripheralJobState"
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find peripheral job 'PJob-01'.
+    post:
+      tags:
+        - Peripheral jobs
+      summary: Creates a new peripheral job with the given name.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the peripheral job to be created.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PeripheralJob"
+        description: >-
+          The details of the peripheral job to be created.
+          Currently, values provided for `executionTrigger` and `completionRequired` are ignored.
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "../schemas/common.yaml#/components/schemas/PeripheralJobState"
+        "400":
+          description: The submitted data is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find related vehicle 'Vehicle-0001'.
+        "409":
+          description: An object with the same name already exists in the model.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Peripheral job 'PJob-01' already exists.
+  "/peripheralJobs/{NAME}/withdrawal":
+    post:
+      tags:
+        - Peripheral jobs
+      summary: Withdraws the peripheral job with the given name.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the peripheral job to be withdrawn.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find peripheral job 'PJob-01'.
+  /peripheralJobs/dispatcher/trigger:
+    post:
+      tags:
+        - Peripheral jobs
+      summary: Explicitly triggers dispatching of peripheral jobs.
+      description: >-
+        Triggers the kernel's dispatcher to assign peripheral jobs to peripheral devices.
+        This usually happens automatically, but depending on the kernel configuration, explicitly triggering it may be necessary.
+      responses:
+        "200":
+          description: Successful response
+components:
+  schemas:
+    PeripheralJob:
+      title: Peripheral Job
+      type: object
+      additionalProperties: false
+      properties:
+        incompleteName:
+          type: boolean
+          description: >-
+            Whether the name of the peripheral job is considered to be incomplete.
+            If set, the kernel will complete the name according to its configuration, e.g. by appending a suffix to it.
+            It is recommended to set this, as names generated by the kernel can be guaranteed to be unique, while clients typically cannot guarantee this.
+          default: false
+        reservationToken:
+          type: string
+          description: >-
+            The token that may be used to reserve a peripheral device.
+            A peripheral device that is reserved for a specific token can only process jobs which match that reservation token.
+            The reservation token may not be empty.
+        relatedVehicle:
+          type: string
+          description: >-
+            The name of the vehicle for which the peripheral job was created.
+            May be `null`, if the job wasn't created in the context of a transport order being processed by a vehicle.
+          default: null
+        relatedTransportOrder:
+          type: string
+          description: >-
+            The name of the transport order for which the peripheral job was created.
+            May be `null`, if the job wasn't created in the context of a transport order being processed by a vehicle.
+          default: null
+        peripheralOperation:
+          $ref: "../schemas/common.yaml#/components/schemas/PeripheralOperation"
+        properties:
+          type: array
+          minItems: 0
+          maxItems: 2147483647
+          items:
+            $ref: "../schemas/common.yaml#/components/schemas/Property"
+          description: The peripheral jobs's properties.
+      required:
+        - reservationToken
+        - peripheralOperation

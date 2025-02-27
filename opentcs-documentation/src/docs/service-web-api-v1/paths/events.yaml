@@ -1,0 +1,266 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /events:
+    get:
+      tags:
+        - Status
+      summary: Retrieves a list of events.
+      description: >-
+        This operation uses *long polling* to avoid excessive load on the server:
+        Set the *timeout* parameter to a value that indicates how long the operation may wait if there currently aren't any events to be returned.
+      parameters:
+        - name: minSequenceNo
+          in: query
+          description: >-
+            The minimum sequence number of events to be retrieved.
+            Can/Should be used to filter out events that have already been retrieved.
+            (Set this to the maximum sequence number already seen, incremented by 1.)
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 0
+        - name: maxSequenceNo
+          in: query
+          description: >-
+            The maximum sequence number of events to be retrieved.
+            Can/Should be used to limit the number of events retrieved.
+            (Set this to e.g. *minSequenceNo* + 100.)
+          required: false
+          schema:
+            type: integer
+            format: int64
+            # NOTE: Encoding this value as a string is a workaround to prevent the Swagger UI/JavaScript from rounding it.
+            default: '9223372036854775807'
+        - name: timeout
+          in: query
+          description: >-
+            The time (in milliseconds) to wait for events to arrive if there currently are not any events to be returned.
+            May not be greater than 10000.
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 1000
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusMessageList"
+        "400":
+          description: Invalid parameter value(s).
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Parameter 'timeout' is not in the correct range.
+components:
+  schemas:
+    StatusMessageList:
+      title: Status Message List
+      type: object
+      additionalProperties: false
+      properties:
+        timeStamp:
+          type: string
+          format: date-time
+          description: The point of time at which this data structure was created
+        statusMessages:
+          type: array
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/OrderStatusMessage"
+              - $ref: "#/components/schemas/VehicleStatusMessage"
+              - $ref: "#/components/schemas/PeripheralJobStatusMessage"
+          description: The status messages
+      required:
+        - timeStamp
+        - statusMessages
+    OrderStatusMessage:
+      title: OrderStatusMessage
+      type: object
+      additionalProperties: false
+      allOf:
+        - $ref: "#/components/schemas/StatusMessage"
+        - properties:
+            type:
+              type: string
+              enum:
+                - TransportOrder
+              default: TransportOrder
+            sequenceNumber:
+              example: 124
+            orderName:
+              type: string
+              description: The (optional) transport order name
+              example: TOrder-0001
+            processingVehicleName:
+              type: string
+              description: The processing vehicle's name
+              example: Vehicle-0001
+            orderState:
+              type: string
+              enum:
+                - RAW
+                - ACTIVE
+                - DISPATCHABLE
+                - BEING_PROCESSED
+                - WITHDRAWN
+                - FINISHED
+                - FAILED
+                - UNROUTABLE
+              description: The transport order's current state
+            destinations:
+              type: array
+              minItems: 1
+              maxItems: 2147483647
+              items:
+                $ref: "../schemas/common.yaml#/components/schemas/DestinationState"
+              description: The transport order's destinations
+            properties:
+              type: array
+              items:
+                $ref: "../schemas/common.yaml#/components/schemas/Property"
+              description: The transport order's properties
+      required:
+        - type
+    VehicleStatusMessage:
+      type: object
+      additionalProperties: false
+      allOf:
+        - $ref: "#/components/schemas/StatusMessage"
+        - properties:
+            type:
+              type: string
+              enum:
+                - Vehicle
+              default: Vehicle
+            sequenceNumber:
+              example: 125
+            vehicleName:
+              type: string
+              description: The vehicle's name
+              example: Vehicle-0001
+            transportOrderName:
+              type: string
+              description: The name of the transport order the vehicle currently processes
+              example: TOrder-0001
+            position:
+              type: string
+              description: The name of the point the vehicle currently occupies
+              example: Point-0001
+            precisePosition:
+              $ref: "../schemas/common.yaml#/components/schemas/PrecisePosition"
+            vehicleOrientationAngle:
+              oneOf:
+                - type: string
+                - type: number
+                  format: double
+              description: >-
+                The vehicle's current orientation angle (-360..360).
+                May be a string ("NaN") if the vehicle hasn't provided an orientation angle.
+              example: 90.0
+            paused:
+              type: boolean
+              description: Whether the vehicle is paused.
+              example: false
+            state:
+              type: string
+              enum:
+                - UNKNOWN
+                - UNAVAILABLE
+                - ERROR
+                - IDLE
+                - EXECUTING
+                - CHARGING
+              description: The vehicle's current state
+            stateTimestamp:
+              type: string
+              format: date-time
+              description: The time at which the vehicle has entered its current state (expressed according to ISO 8601).
+              example: 2018-05-14T07:42:00.343Z
+            procState:
+              type: string
+              enum:
+                - UNAVAILABLE
+                - IDLE
+                - AWAITING_ORDER
+                - PROCESSING_ORDER
+              description: The vehicle's current processing state
+            procStateTimestamp:
+              type: string
+              format: date-time
+              description: The time at which the vehicle has entered its current processing state (expressed according to ISO 8601).
+              example: 2018-05-14T07:42:00.343Z
+            allocatedResources:
+              type: array
+              items:
+                $ref: "../schemas/common.yaml#/components/schemas/ResourceSet"
+              description: The resources already allocated by the vehicle.
+              example: [ [ "Path-0039--0040", "Point-0040" ], [ "Path-0040--0041", "Point-0041" ] ]
+            claimedResources:
+              type: array
+              items:
+                $ref: "../schemas/common.yaml#/components/schemas/ResourceSet"
+              description: The resources claimed - i.e. not yet allocated - for the vehicle's route.
+              example: [ [ "Path-0041--0042", "Point-0042" ], [ "Path-0042--0043", "Point-0043", "Location-2345" ] ]
+      title: VehicleStatusMessage
+      required:
+        - type
+        - vehicleName
+        - state
+        - stateTimestamp
+        - procState
+        - procStateTimestamp
+        - allocatedResources
+        - claimedResources
+    PeripheralJobStatusMessage:
+      title: PeripheralJobStatusMessage
+      type: object
+      additionalProperties: false
+      allOf:
+        - $ref: "#/components/schemas/StatusMessage"
+        - $ref: "../schemas/common.yaml#/components/schemas/PeripheralJobState"
+        - properties:
+            type:
+              type: string
+              enum:
+                - PeripheralJob
+              default: PeripheralJob
+            sequenceNumber:
+              example: 126
+          required:
+            - type
+            - sequenceNumber
+    StatusMessage:
+      title: AbstractStatusMessage
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - TransportOrder
+            - Vehicle
+            - PeripheralJob
+        sequenceNumber:
+          type: integer
+          description: The (unique) sequence number of this status message
+          example: 123
+        creationTimeStamp:
+          type: string
+          format: date-time
+          description: When this status message was created
+          example: 2018-05-14T07:42:00.343Z
+      discriminator:
+        propertyName: type
+      required:
+        - type
+        - sequenceNumber
+        - creationTimeStamp
