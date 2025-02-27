@@ -5,7 +5,6 @@ package org.opentcs.strategies.basic.dispatching.phase;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
-import java.util.Optional;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -87,14 +86,16 @@ public class AssignSequenceSuccessorsPhase
   public void run() {
     for (Vehicle vehicle : objectService.fetchObjects(
         Vehicle.class,
-        this::readyForNextInSequence
+        vehicle -> isFullyIntegratedWithOrderSequence(vehicle)
+            && (readyForNextInSequence(vehicle)
+                || processingSkippableOrderInSequence(vehicle))
     )) {
       tryAssignNextOrderInSequence(vehicle);
     }
   }
 
   private void tryAssignNextOrderInSequence(Vehicle vehicle) {
-    nextOrderInCurrentSequence(vehicle)
+    transportOrderUtil.nextDispatchableOrderInSequence(vehicle.getOrderSequence())
         .map(
             order -> computeCandidate(
                 vehicle,
@@ -122,27 +123,32 @@ public class AssignSequenceSuccessorsPhase
         .orElse(null);
   }
 
-  private Optional<TransportOrder> nextOrderInCurrentSequence(Vehicle vehicle) {
-    OrderSequence seq = objectService.fetchObject(OrderSequence.class, vehicle.getOrderSequence());
-
-    // If the order sequence's next order is not available, yet, the vehicle should wait for it.
-    if (seq.getNextUnfinishedOrder() == null) {
-      return Optional.empty();
-    }
-
-    // Return the next order to be processed for the sequence.
-    return Optional.of(
-        objectService.fetchObject(
-            TransportOrder.class,
-            seq.getNextUnfinishedOrder()
-        )
-    );
+  private boolean readyForNextInSequence(Vehicle vehicle) {
+    return vehicle.hasProcState(Vehicle.ProcState.IDLE)
+        && (vehicle.hasState(Vehicle.State.IDLE) || vehicle.hasState(Vehicle.State.CHARGING));
   }
 
-  private boolean readyForNextInSequence(Vehicle vehicle) {
+  private boolean processingSkippableOrderInSequence(Vehicle vehicle) {
+    if (vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)
+        && (vehicle.hasState(Vehicle.State.IDLE)
+            || vehicle.hasState(Vehicle.State.EXECUTING)
+            || vehicle.hasState(Vehicle.State.CHARGING))) {
+      TransportOrder currentOrder
+          = objectService.fetchObject(TransportOrder.class, vehicle.getTransportOrder());
+      if (!currentOrder.isDispensable()) {
+        return false;
+      }
+      OrderSequence seq
+          = objectService.fetchObject(OrderSequence.class, vehicle.getOrderSequence());
+      return !currentOrder.getReference().equals(seq.getOrders().getLast());
+    }
+    else {
+      return false;
+    }
+  }
+
+  private boolean isFullyIntegratedWithOrderSequence(Vehicle vehicle) {
     return vehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
-        && vehicle.hasProcState(Vehicle.ProcState.IDLE)
-        && vehicle.hasState(Vehicle.State.IDLE)
         && vehicle.getCurrentPosition() != null
         && vehicle.getOrderSequence() != null;
   }

@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.OrderReservationPool;
@@ -61,12 +62,12 @@ public class IsAvailableForAnyOrder
   public boolean test(Vehicle vehicle) {
     return vehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
         && vehicle.getCurrentPosition() != null
-        && vehicle.getOrderSequence() == null
         && !needsMoreCharging(vehicle)
-        && (processesNoOrder(vehicle)
-            || processesDispensableOrder(vehicle))
         && !hasOrderReservation(vehicle)
-        && !vehicle.isPaused();
+        && !vehicle.isPaused()
+        && processesNoOrDispensableOrder(vehicle)
+        && (vehicle.getOrderSequence() == null
+            || processesDispensableLastOrderInOrderSequence(vehicle));
   }
 
   private boolean needsMoreCharging(Vehicle vehicle) {
@@ -80,16 +81,26 @@ public class IsAvailableForAnyOrder
         : vehicle.isEnergyLevelSufficientlyRecharged();
   }
 
-  private boolean processesNoOrder(Vehicle vehicle) {
+  private boolean processesNoOrDispensableOrder(Vehicle vehicle) {
     return vehicle.hasProcState(Vehicle.ProcState.IDLE)
-        && (vehicle.hasState(Vehicle.State.IDLE)
-            || vehicle.hasState(Vehicle.State.CHARGING));
+        && (vehicle.hasState(Vehicle.State.IDLE) || vehicle.hasState(Vehicle.State.CHARGING))
+        || vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)
+            && objectService.fetchObject(TransportOrder.class, vehicle.getTransportOrder())
+                .isDispensable();
   }
 
-  private boolean processesDispensableOrder(Vehicle vehicle) {
-    return vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)
-        && objectService.fetchObject(TransportOrder.class, vehicle.getTransportOrder())
-            .isDispensable();
+  private boolean processesDispensableLastOrderInOrderSequence(Vehicle vehicle) {
+    if (vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)
+        && vehicle.getOrderSequence() != null) {
+      OrderSequence seq = objectService.fetchObject(
+          OrderSequence.class, vehicle.getOrderSequence()
+      );
+      return seq.isComplete()
+          && seq.getOrders().getLast().equals(vehicle.getTransportOrder())
+          && objectService.fetchObject(TransportOrder.class, vehicle.getTransportOrder())
+              .isDispensable();
+    }
+    return false;
   }
 
   private boolean hasOrderReservation(Vehicle vehicle) {

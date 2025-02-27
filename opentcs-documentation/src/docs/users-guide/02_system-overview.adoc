@@ -336,7 +336,7 @@ An order sequence carries the following attributes:
 * A sequence of _transport orders_, which may be extended as long the complete flag (see below) is not set, yet.
 * A _complete_ flag, indicating that no further transport orders will be added to the sequence.
   This cannot be reset.
-* A _failure fatal_ flag, indicating that, if one transport order in the sequence fails, all orders following it should immediately be considered as failed, too.
+* A _failure fatal_ flag, indicating that, if one transport order in the sequence fails, all orders following it should immediately be considered as failed too, unless the failed transport order is marked as dispensable.
 * A _finished_ flag, indicating that the order sequence has been processed (and the vehicle is not bound to it, anymore).
   An order sequence can only be marked as finished if it has been marked as complete before.
 * An optional _type_ -- see <<Transport order>>.

@@ -33,10 +33,11 @@ class IsAvailableForAnyOrderTest {
   private TransportOrder transportOrder;
   private OrderReservationPool orderReservationPool;
   private List<TCSObjectReference<TransportOrder>> reservationsList;
+  private TCSObjectService objectService;
 
   @BeforeEach
   void setUp() {
-    TCSObjectService objectService = mock();
+    objectService = mock();
     DefaultDispatcherConfiguration configuration = mock();
     orderReservationPool = mock();
 
@@ -66,6 +67,26 @@ class IsAvailableForAnyOrderTest {
   @Test
   void checkVehicleIsAvailable() {
     Vehicle vehicle = vehicleAvailableForAnyOrder;
+
+    assertTrue(isAvailableForAnyOrder.test(vehicle));
+  }
+
+  @Test
+  void checkVehicleProcessesDispensableLastOrderInSequence() {
+    transportOrder = transportOrder.withDispensable(true);
+    OrderSequence seq = new OrderSequence("OS")
+        .withOrder(transportOrder.getReference())
+        .withComplete(true);
+    Vehicle vehicle = vehicleAvailableForAnyOrder
+        .withOrderSequence(seq.getReference())
+        .withTransportOrder(transportOrder.getReference())
+        .withProcState(Vehicle.ProcState.PROCESSING_ORDER);
+
+    given(objectService.fetchObject(TransportOrder.class, transportOrder.getReference()))
+        .willReturn(transportOrder);
+
+    given(objectService.fetchObject(OrderSequence.class, seq.getReference()))
+        .willReturn(seq);
 
     assertTrue(isAvailableForAnyOrder.test(vehicle));
   }

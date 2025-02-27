@@ -24,6 +24,7 @@ To make this decision, the default dispatcher takes the following steps:
 *** It must be at a known position in the driving course.
 *** It may not be assigned to a transport order, or the assigned transport order must be _dispensable_.
     That is the case with parking orders, for instance, or with recharging orders if the vehicle's energy level is not critical.
+*** It may not be processing an order sequence; alternatively, the currently processed transport order must be _dispensable_ and must be the last order in an order sequence that is marked as _complete_.
 *** Its energy level must not be critical.
     (Vehicles with critical energy level are taken into account only for transport orders with which the first destination operation is a recharge operation.)
 ** Criteria for a transport order to be taken into account are:

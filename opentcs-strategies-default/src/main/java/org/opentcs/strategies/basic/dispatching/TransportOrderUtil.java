@@ -172,7 +172,8 @@ public class TransportOrderUtil
         markOrderAndSequenceAsFinished(ref);
         break;
       case FAILED:
-        markOrderAndSequenceAsFailed(ref);
+        transportOrderService.updateTransportOrderState(ref, TransportOrder.State.FAILED);
+        updateSequenceOfFailedTransportOrder(ref);
         break;
       default:
         // Set the transport order's state.
@@ -305,6 +306,55 @@ public class TransportOrderUtil
     }
   }
 
+  /**
+   * Skips all transport orders in the given order sequence until the first transport order that
+   * should be dispatched/executed is found.
+   * A transport order should be dispatched if it is not dispensable or
+   * if it is the last order in the sequence.
+   *
+   * @param sequenceRef The reference to the order sequence
+   * @return The next transport order that should be dispatched/executed or Optional.empty()
+   */
+  public Optional<TransportOrder> nextDispatchableOrderInSequence(
+      TCSObjectReference<OrderSequence> sequenceRef
+  ) {
+    OrderSequence seq = transportOrderService.fetchObject(OrderSequence.class, sequenceRef);
+    // If the order sequence's next order is not available, yet, the vehicle should wait for it.
+    if (seq.getNextUnfinishedOrder() == null) {
+      return Optional.empty();
+    }
+
+    TransportOrder nextUnfinishedOrder
+        = transportOrderService.fetchObject(TransportOrder.class, seq.getNextUnfinishedOrder());
+
+    // If the order sequence's next order is not available because it was not properly finished.
+    if (nextUnfinishedOrder.hasState(TransportOrder.State.WITHDRAWN)) {
+      return Optional.empty();
+    }
+
+    while (nextUnfinishedOrder.isDispensable()
+        && !nextUnfinishedOrder.getReference().equals(seq.getOrders().getLast())) {
+      //If the transport order is dispensable and not the last order in the sequence,
+      //it should be skipped.
+      skipOrderInSequence(nextUnfinishedOrder);
+
+      //Look for next orders, using an up-to-date copy of the sequence.
+      seq = transportOrderService
+          .fetchObject(OrderSequence.class, nextUnfinishedOrder.getWrappingSequence());
+      if (seq.getNextUnfinishedOrder() == null) {
+        return Optional.empty();
+      }
+
+      nextUnfinishedOrder
+          = transportOrderService.fetchObject(TransportOrder.class, seq.getNextUnfinishedOrder());
+      if (nextUnfinishedOrder.hasState(TransportOrder.State.WITHDRAWN)) {
+        return Optional.empty();
+      }
+    }
+    // Return the next order to be processed for the sequence.
+    return Optional.of(nextUnfinishedOrder);
+  }
+
   public void finishAbortion(Vehicle vehicle) {
     finishAbortion(vehicle.getTransportOrder(), vehicle);
   }
@@ -363,6 +413,46 @@ public class TransportOrderUtil
   }
 
   /**
+   * Skips the given order in its wrapping sequence.
+   *
+   * @param order The transport order to be skipped. Must be part of an order sequence and must be
+   * the next order that sequence.
+   * @throws IllegalArgumentException If the given order is not part of an order sequence or not the
+   * next order in the sequence.
+   */
+  private void skipOrderInSequence(TransportOrder order)
+      throws IllegalArgumentException {
+    requireNonNull(order, "order");
+
+    OrderSequence seq = extractWrappingSequence(order)
+        .orElseThrow(
+            () -> new IllegalArgumentException(order.getName() + ": Not part of a sequence")
+        );
+    checkArgument(
+        seq.getNextUnfinishedOrder().equals(order.getReference()),
+        "%s: Not next order in sequence: %s",
+        order.getName(),
+        seq.getName()
+    );
+
+    if (order.getProcessingVehicle() == null) {
+      transportOrderService.updateTransportOrderState(
+          order.getReference(),
+          TransportOrder.State.FAILED
+      );
+      updateSequenceOfFailedTransportOrder(order.getReference());
+      markNewDispatchableOrders();
+    }
+    else {
+      abortAssignedOrder(
+          order,
+          vehicleService.fetchObject(Vehicle.class, order.getProcessingVehicle()),
+          false
+      );
+    }
+  }
+
+  /**
    * Properly marks a transport order as FINISHED, also updating its wrapping sequence, if any.
    *
    * @param ref A reference to the transport order to be modified.
@@ -403,19 +493,19 @@ public class TransportOrderUtil
   }
 
   /**
-   * Properly marks a transport order as FAILED, also updating its wrapping sequence, if any.
+   * Updates the order sequence of a failed transport order, if it has one.
    *
-   * @param ref A reference to the transport order to be modified.
+   * @param ref A reference to the failed transport order.
    */
-  private void markOrderAndSequenceAsFailed(TCSObjectReference<TransportOrder> ref) {
+  private void updateSequenceOfFailedTransportOrder(TCSObjectReference<TransportOrder> ref) {
     requireNonNull(ref, "ref");
 
     TransportOrder failedOrder = transportOrderService.fetchObject(TransportOrder.class, ref);
-    transportOrderService.updateTransportOrderState(ref, TransportOrder.State.FAILED);
 
     Optional<OrderSequence> osOpt = extractWrappingSequence(failedOrder);
     osOpt.ifPresent(seq -> {
-      if (seq.isFailureFatal()) {
+      if (seq.isFailureFatal()
+          && !failedOrder.isDispensable()) {
         // Mark the sequence as complete to make sure no further orders are added.
         transportOrderService.markOrderSequenceComplete(seq.getReference());
         // Mark all orders of the sequence that are not in a final state as FAILED.
@@ -435,12 +525,14 @@ public class TransportOrderUtil
         );
       }
       else {
-        // Since failure of an order in the sequence is not fatal, increment the
-        // finished index of the sequence by one to move to the next order.
-        transportOrderService.updateOrderSequenceFinishedIndex(
-            seq.getReference(),
-            seq.getFinishedIndex() + 1
-        );
+        // (Only) If the failed order is the next unfinished order in the sequence, increment
+        // the sequence's finished index to process the next order.
+        if (failedOrder.getReference().equals(seq.getNextUnfinishedOrder())) {
+          transportOrderService.updateOrderSequenceFinishedIndex(
+              seq.getReference(),
+              seq.getFinishedIndex() + 1
+          );
+        }
       }
 
       // Finish the order sequence, using an up-to-date copy.

@@ -19,6 +19,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 == Unreleased
 
 * New features and enhancements:
+** Properly handle the interaction of order sequences and the dispensable flag of transport orders.
+   A transport order whose dispensable flag is set and which is also part of an order sequence will be skipped/aborted when another transport order was added to the sequence.
+   Additionally, when a vehicle is processing the last transport order of a complete order sequence and that transport order is also dispensable, the vehicle is considered available for another transport order / order sequence.
 ** Update web API specification and implementation to version 1.11.0:
 *** Include a transport order's key-value properties in responses when requesting transport order data.
 * Changes affecting developers:

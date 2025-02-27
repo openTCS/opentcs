@@ -11,8 +11,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.Phase;
+import org.opentcs.strategies.basic.dispatching.TransportOrderUtil;
 import org.opentcs.strategies.basic.dispatching.phase.OrderFilterResult;
 import org.opentcs.strategies.basic.dispatching.phase.VehicleFilterResult;
 import org.opentcs.strategies.basic.dispatching.selection.orders.CompositeTransportOrderSelectionFilter;
@@ -55,6 +57,10 @@ public class AssignFreeOrdersPhase
    */
   private final OrderAssigner orderAssigner;
   /**
+   * Provides service functions for working with transport orders and their states.
+   */
+  private final TransportOrderUtil transportOrderUtil;
+  /**
    * Provides methods to check and update the dispatching status of transport orders.
    */
   private final DispatchingStatusMarker dispatchingStatusMarker;
@@ -71,7 +77,8 @@ public class AssignFreeOrdersPhase
       IsFreelyDispatchableToAnyVehicle isFreelyDispatchableToAnyVehicle,
       CompositeTransportOrderSelectionFilter transportOrderSelectionFilter,
       OrderAssigner orderAssigner,
-      DispatchingStatusMarker dispatchingStatusMarker
+      DispatchingStatusMarker dispatchingStatusMarker,
+      TransportOrderUtil transportOrderUtil
   ) {
     this.objectService = requireNonNull(objectService, "objectService");
     this.vehicleSelectionFilter = requireNonNull(vehicleSelectionFilter, "vehicleSelectionFilter");
@@ -89,6 +96,7 @@ public class AssignFreeOrdersPhase
         dispatchingStatusMarker,
         "dispatchingStatusMarker"
     );
+    this.transportOrderUtil = requireNonNull(transportOrderUtil, "transportOrderUtil");
   }
 
   @Override
@@ -129,6 +137,9 @@ public class AssignFreeOrdersPhase
       return;
     }
 
+    //Make sure all order sequences have their first really dispatchable order
+    //marked as such and skip all skippable orders.
+    markFirstDispatchableOrderInUnassignedSequences();
     // Select only dispatchable orders first, then apply the composite filter, handle
     // the orders that can be tried as usual and mark the others as filtered (if they aren't, yet).
     Map<Boolean, List<OrderFilterResult>> ordersSplitByFilter
@@ -147,6 +158,21 @@ public class AssignFreeOrdersPhase
     );
   }
 
+  private void markFirstDispatchableOrderInUnassignedSequences() {
+    objectService.fetchObjects(
+        TransportOrder.class,
+        order -> order.hasState(TransportOrder.State.DISPATCHABLE)
+            && order.getWrappingSequence() != null
+            && !partOfAnyVehiclesSequence(order)
+    )
+        .forEach(
+            order -> {
+              transportOrderUtil
+                  .nextDispatchableOrderInSequence(order.getWrappingSequence());
+            }
+        );
+  }
+
   private void markNewlyFilteredOrders(Collection<OrderFilterResult> filterResults) {
     filterResults.stream()
         .filter(
@@ -156,5 +182,10 @@ public class AssignFreeOrdersPhase
                 || dispatchingStatusMarker.haveDeferralReasonsForOrderChanged(filterResult))
         )
         .forEach(dispatchingStatusMarker::markOrderAsDeferred);
+  }
+
+  private boolean partOfAnyVehiclesSequence(TransportOrder order) {
+    return objectService.fetchObject(OrderSequence.class, order.getWrappingSequence())
+        .getProcessingVehicle() != null;
   }
 }
