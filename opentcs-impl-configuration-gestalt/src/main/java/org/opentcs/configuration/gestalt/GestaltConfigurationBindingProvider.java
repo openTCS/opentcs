@@ -19,10 +19,10 @@ import org.github.gestalt.config.reload.TimedConfigReloadStrategy;
 import org.github.gestalt.config.source.ConfigSource;
 import org.github.gestalt.config.source.ConfigSourcePackage;
 import org.github.gestalt.config.source.FileConfigSourceBuilder;
+import org.github.gestalt.config.tag.Tags;
 import org.opentcs.configuration.ConfigurationBindingProvider;
 import org.opentcs.configuration.ConfigurationException;
 import org.opentcs.configuration.gestalt.decoders.ClassPathDecoder;
-import org.opentcs.configuration.gestalt.decoders.MapLiteralDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +96,6 @@ public class GestaltConfigurationBindingProvider
           .useCacheDecorator(true)
           .addDefaultDecoders()
           .addDecoder(new ClassPathDecoder())
-          .addDecoder(new MapLiteralDecoder())
           .addSources(buildSources())
           .build();
       provider.loadConfigs();
@@ -163,7 +162,8 @@ public class GestaltConfigurationBindingProvider
       sources.add(
           new ConfigSourcePackage(
               source,
-              List.of(new TimedConfigReloadStrategy(reloadInterval))
+              List.of(new TimedConfigReloadStrategy(reloadInterval)),
+              Tags.of()
           )
       );
     }

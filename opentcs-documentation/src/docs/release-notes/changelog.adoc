@@ -29,6 +29,7 @@ This change log lists the most relevant changes for past releases in reverse chr
    This allows the components that use the router to decide for themselves which route to choose.
    (A routing algorithm that actually provides multiple routes has not yet been implemented, i.e. the router will continue to provide only one route for the time being.)
 ** Deprecate `Vehicle.getNextPosition()` and `Vehicle.withNextPosition()` which are effectively no longer used.
+** Update Gestalt to 0.35.2.
 * Bugs fixed:
 ** Avoid `NullPointerException` when trying to edit the symbol of locations or location types.
 

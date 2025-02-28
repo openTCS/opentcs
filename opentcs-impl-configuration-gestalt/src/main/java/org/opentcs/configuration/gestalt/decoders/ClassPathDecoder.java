@@ -11,7 +11,7 @@ import org.github.gestalt.config.node.ConfigNode;
 import org.github.gestalt.config.node.NodeType;
 import org.github.gestalt.config.reflect.TypeCapture;
 import org.github.gestalt.config.tag.Tags;
-import org.github.gestalt.config.utils.ValidateOf;
+import org.github.gestalt.config.utils.GResultOf;
 
 /**
  * A decoder to decode fully qualified class names to their representative class object.
@@ -46,7 +46,7 @@ public class ClassPathDecoder
   }
 
   @Override
-  public ValidateOf<Class<?>> decode(
+  public GResultOf<Class<?>> decode(
       String path,
       Tags tags,
       ConfigNode node,
@@ -56,7 +56,7 @@ public class ClassPathDecoder
     // This decoder only decodes nodes of type leaf. For other types the default decoders
     // `ArrayDecoder` and `ObjectDecoder` will eventually call this decoder if necessary.
     if (node.getNodeType() != NodeType.LEAF) {
-      return ValidateOf.inValid(
+      return GResultOf.errors(
           new ValidationError.DecodingExpectedLeafNodeType(path, node, this.name())
       );
     }
@@ -66,19 +66,19 @@ public class ClassPathDecoder
       try {
         Class<?> configuredClass = Class.forName(className);
         if (type.getFirstParameterType().isAssignableFrom(configuredClass)) {
-          return ValidateOf.<Class<?>>valid(configuredClass);
+          return GResultOf.<Class<?>>result(configuredClass);
         }
         else {
-          return ValidateOf.<Class<?>>inValid(
+          return GResultOf.<Class<?>>errors(
               new CannotCast(className, type.getFirstParameterType().getName())
           );
         }
       }
       catch (ClassNotFoundException e) {
-        return ValidateOf.<Class<?>>inValid(new ClassNotFound(className));
+        return GResultOf.<Class<?>>errors(new ClassNotFound(className));
       }
     }).orElse(
-        ValidateOf.<Class<?>>inValid(
+        GResultOf.<Class<?>>errors(
             new ValidationError.DecodingLeafMissingValue(path, this.name())
         )
     );
