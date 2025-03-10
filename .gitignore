@@ -10,4 +10,5 @@
 *~
 
 # Ignore approval test result files.
+**/.approval_tests_temp/
 *Test*.received.txt
