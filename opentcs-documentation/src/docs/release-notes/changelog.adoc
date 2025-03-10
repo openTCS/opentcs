@@ -27,6 +27,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update SLF4J to 2.0.17.
 ** Update Spotless to 7.0.2.
 ** Update Checkstyle to 10.21.4.
+** Update Gradle wrapper to 8.13.
 
 == Version 6.4 (2025-03-10)
 
