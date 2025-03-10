@@ -16,7 +16,7 @@ The openTCS developers
 This change log lists the most relevant changes for past releases in reverse chronological order.
 (Note that the openTCS project adheres to https://semver.org/[Semantic Versioning].)
 
-== Unreleased
+== Version 6.4 (2025-03-10)
 
 * New features and enhancements:
 ** Properly handle the interaction of order sequences and the dispensable flag of transport orders.
@@ -24,14 +24,14 @@ This change log lists the most relevant changes for past releases in reverse chr
    Additionally, when a vehicle is processing the last transport order of a complete order sequence and that transport order is also dispensable, the vehicle is considered available for another transport order / order sequence.
 ** Update web API specification and implementation to version 1.11.0:
 *** Include a transport order's key-value properties in responses when requesting transport order data.
+* Bugs fixed:
+** Avoid `NullPointerException` when trying to edit the symbol of locations or location types.
 * Changes affecting developers:
 ** Allow the router to provide multiple (alternative) routes instead of just a single one.
    This allows the components that use the router to decide for themselves which route to choose.
    (A routing algorithm that actually provides multiple routes has not yet been implemented, i.e. the router will continue to provide only one route for the time being.)
 ** Deprecate `Vehicle.getNextPosition()` and `Vehicle.withNextPosition()` which are effectively no longer used.
 ** Update Gestalt to 0.35.2.
-* Bugs fixed:
-** Avoid `NullPointerException` when trying to edit the symbol of locations or location types.
 
 == Version 6.3 (2025-02-04)
 
