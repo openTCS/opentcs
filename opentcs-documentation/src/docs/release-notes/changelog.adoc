@@ -25,6 +25,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update Mockito to 5.16.0.
 ** Update Jackson to 2.18.3.
 ** Update SLF4J to 2.0.17.
+** Update Spotless to 7.0.2.
+** Update Checkstyle to 10.21.4.
 
 == Version 6.4 (2025-03-10)
 
