@@ -10,20 +10,20 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # (=v4.1.1)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # (=v4.2.2)
       - name: Set up JDK 21
-        uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # (=v4.0.0)
+        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # (=v4.7.0)
         with:
           java-version: '21'
           distribution: 'temurin'
       - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@699bb18358f12c5b78b37bb0111d3a0e2276e0e2 # (=v2.1.1)
+        uses: gradle/actions/wrapper-validation@94baf225fe0a508e581a564467443d0e2379123b # (=v4.3.0)
       - name: Cache Gradle packages
-        uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # (=v4.0.0)
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # (=v4.2.2)
         with:
           path: |
             ~/.gradle/caches
@@ -36,7 +36,7 @@ jobs:
       - name: Check code formatting
         run: ./gradlew spotlessCheck
       - name: REUSE Compliance Check
-        uses: fsfe/reuse-action@v4
+        uses: fsfe/reuse-action@bb774aa972c2a89ff34781233d275075cbddf542 # (=v5.0.0)
       - name: Cleanup Gradle Cache
         # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
         # Restoring these files from a GitHub Actions cache might cause problems for future builds.
