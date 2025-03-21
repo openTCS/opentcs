@@ -131,7 +131,7 @@ components:
             May be `null`, if the job wasn't created in the context of a transport order being processed by a vehicle.
           example: TOrder-01
         peripheralOperation:
-          $ref: "#/components/schemas/PeripheralOperation"
+          $ref: "#/components/schemas/PeripheralOperationState"
         state:
           type: string
           description: The peripheral job's current state.
@@ -193,6 +193,37 @@ components:
       required:
         - operation
         - locationName
+    PeripheralOperationState:
+      title: Peripheral Operation
+      description: An operation that is to be executed by a peripheral device.
+      type: object
+      additionalProperties: false
+      properties:
+        operation:
+          type: string
+          description: The operation to be performed by the peripheral device.
+          example: Open door
+        locationName:
+          type: string
+          description: The name of the location the peripheral device is associated with.
+          example: Loading Bay
+        executionTrigger:
+          type: string
+          description: The moment at which this operation is to be performed.
+          enum:
+            - AFTER_ALLOCATION
+            - AFTER_MOVEMENT
+            - IMMEDIATE
+          default: IMMEDIATE
+        completionRequired:
+          type: boolean
+          description: Whether the completion of this operation is required to allow a vehicle to continue driving.
+          default: false
+      required:
+        - operation
+        - locationName
+        - executionTrigger
+        - completionRequired
     PlantModelCouple:
       title: Couple
       type: object
