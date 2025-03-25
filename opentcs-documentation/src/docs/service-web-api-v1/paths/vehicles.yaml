@@ -127,7 +127,11 @@ paths:
             type: string
         - name: forced
           in: query
-          description: Whether the vehicle should be rerouted even if it's not where it is expected to be.
+          description: |
+            Whether the vehicle should be rerouted even if it's not where it is expected to be.
+
+            Forced rerouting of a vehicle from its current position can disrupt traffic management if used inappropriately.
+            Only do this if you are sure it is necessary and safe, and only if the vehicle is not moving!
           required: false
           schema:
             type: boolean

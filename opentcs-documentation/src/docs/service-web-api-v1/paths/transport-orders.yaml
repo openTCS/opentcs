@@ -174,7 +174,12 @@ paths:
             type: string
         - name: immediate
           in: query
-          description: Whether the transport order should be aborted as quickly as possible.
+          description: |
+            Whether the transport order should be aborted as quickly as possible.
+
+            Withdrawing a vehicle's transport order immediately should be used carefully:
+            * It can lead to collisions or deadlocks if the vehicle is not currently halted on a point.
+            * It aborts all peripheral jobs related to this transport order that may still be pending.
           required: false
           schema:
             type: boolean
