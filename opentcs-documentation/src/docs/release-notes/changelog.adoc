@@ -37,6 +37,7 @@ This change log lists the most relevant changes for past releases in reverse chr
    Additionally, when a vehicle is processing the last transport order of a complete order sequence and that transport order is also dispensable, the vehicle is considered available for another transport order / order sequence.
 ** Update web API specification and implementation to version 1.11.0:
 *** Include a transport order's key-value properties in responses when requesting transport order data.
+*** Extend the endpoint `POST /vehicles/NAME/routeComputationQuery` by an optional parameter which specifies the maximum number of routes to compute for one destination point.
 * Bugs fixed:
 ** Avoid `NullPointerException` when trying to edit the symbol of locations or location types.
 * Changes affecting developers:

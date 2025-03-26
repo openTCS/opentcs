@@ -353,6 +353,7 @@ class VehicleHandlerTest {
     // Act & Assert: happy path
     handler.getVehicleRoutes(
         "some-vehicle",
+        2,
         new PostVehicleRoutesRequestTO(
             List.of("some-destination-point", "some-destination-point-2")
         )
@@ -365,7 +366,7 @@ class VehicleHandlerTest {
             vehiclePosition.getReference(),
             Set.of(destinationPoint1.getReference(), destinationPoint2.getReference()),
             Set.of(),
-            1
+            2
         );
 
     // Act & Assert: nonexistent vehicle
@@ -373,6 +374,7 @@ class VehicleHandlerTest {
         .isThrownBy(
             () -> handler.getVehicleRoutes(
                 "some-unknown-vehicle",
+                1,
                 new PostVehicleRoutesRequestTO(List.of("some-destination-point"))
             )
         );
@@ -382,6 +384,7 @@ class VehicleHandlerTest {
         .isThrownBy(
             () -> handler.getVehicleRoutes(
                 "some-vehicle",
+                1,
                 new PostVehicleRoutesRequestTO(List.of("some-unknown-destination-point"))
             )
         );
@@ -393,6 +396,7 @@ class VehicleHandlerTest {
         .isThrownBy(
             () -> handler.getVehicleRoutes(
                 "some-vehicle",
+                1,
                 new PostVehicleRoutesRequestTO(List.of("some-destination-point"))
             )
         );
@@ -414,6 +418,7 @@ class VehicleHandlerTest {
     // Act & Assert: happy path
     handler.getVehicleRoutes(
         "some-vehicle",
+        1,
         new PostVehicleRoutesRequestTO(
             List.of("some-destination-point", "some-destination-point-2")
         ).setSourcePoint("some-source-point")
@@ -434,6 +439,7 @@ class VehicleHandlerTest {
         .isThrownBy(
             () -> handler.getVehicleRoutes(
                 "some-vehicle",
+                1,
                 new PostVehicleRoutesRequestTO(List.of("some-destination-point"))
                     .setSourcePoint("some-unknown-source-point")
             )
@@ -472,6 +478,7 @@ class VehicleHandlerTest {
     // Act & Assert: happy path
     handler.getVehicleRoutes(
         "some-vehicle",
+        1,
         new PostVehicleRoutesRequestTO(
             List.of("some-destination-point", "some-destination-point-2")
         )
@@ -500,6 +507,7 @@ class VehicleHandlerTest {
         .isThrownBy(
             () -> handler.getVehicleRoutes(
                 "some-vehicle",
+                1,
                 new PostVehicleRoutesRequestTO(List.of("some-destination-point"))
                     .setSourcePoint("some-source-point")
                     .setResourcesToAvoid(List.of("some-unknown-resource"))

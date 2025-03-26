@@ -338,6 +338,7 @@ public class V1RequestHandler
         PostVehicleRoutesResponseTO.fromMap(
             vehicleHandler.getVehicleRoutes(
                 request.params(":NAME"),
+                maxRoutePerDestinationPoint(request),
                 jsonBinder.fromJson(request.body(), PostVehicleRoutesRequestTO.class)
             )
         )
@@ -700,6 +701,18 @@ public class V1RequestHandler
     }
     else {
       return null;
+    }
+  }
+
+  private int maxRoutePerDestinationPoint(Request request)
+      throws IllegalArgumentException {
+    String param
+        = request.queryParamOrDefault("maxRoutePerDestinationPoint", "1");
+    try {
+      return Integer.parseInt(param);
+    }
+    catch (NumberFormatException exc) {
+      throw new IllegalArgumentException("Malformed maxRoutesPerDestinationPoint: " + param);
     }
   }
 

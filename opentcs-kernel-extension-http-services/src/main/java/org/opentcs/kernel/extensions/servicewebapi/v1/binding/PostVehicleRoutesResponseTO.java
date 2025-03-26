@@ -7,6 +7,7 @@ import static java.util.Objects.requireNonNull;
 import jakarta.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
@@ -39,28 +40,32 @@ public class PostVehicleRoutesResponseTO {
   }
 
   public static PostVehicleRoutesResponseTO fromMap(
-      Map<TCSObjectReference<Point>, Route> routeMap
+      Map<TCSObjectReference<Point>, Set<Route>> routeMap
   ) {
     return new PostVehicleRoutesResponseTO()
         .setRoutes(
             routeMap.entrySet().stream()
-                .map(PostVehicleRoutesResponseTO::toRouteTO)
+                .flatMap(entry -> toRouteTOs(entry).stream())
                 .collect(Collectors.toList())
         );
   }
 
-  private static RouteTO toRouteTO(Map.Entry<TCSObjectReference<Point>, Route> entry) {
-    if (entry.getValue() == null) {
-      return new RouteTO()
-          .setDestinationPoint(entry.getKey().getName())
-          .setCosts(-1)
-          .setSteps(null);
+  private static List<RouteTO> toRouteTOs(Map.Entry<TCSObjectReference<Point>, Set<Route>> entry) {
+    if (entry.getValue().isEmpty()) {
+      return List.of(
+          new RouteTO()
+              .setDestinationPoint(entry.getKey().getName())
+              .setCosts(-1)
+              .setSteps(null)
+      );
     }
 
-    return new RouteTO()
-        .setDestinationPoint(entry.getKey().getName())
-        .setCosts(entry.getValue().getCosts())
-        .setSteps(toSteps(entry.getValue().getSteps()));
+    return entry.getValue().stream().map(
+        route -> new RouteTO()
+            .setDestinationPoint(entry.getKey().getName())
+            .setCosts(route.getCosts())
+            .setSteps(toSteps(route.getSteps()))
+    ).toList();
   }
 
   private static List<RouteTO.Step> toSteps(List<Step> steps) {
