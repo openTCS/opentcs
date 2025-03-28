@@ -11,7 +11,7 @@ dependencies {
   api group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.3'
   api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.9'
 
-  implementation group: 'org.semver4j', name: 'semver4j', version: '5.4.0'
+  implementation group: 'org.semver4j', name: 'semver4j', version: '5.6.0'
 }
 
 processResources.doLast {
