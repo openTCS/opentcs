@@ -30,6 +30,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update Gradle wrapper to 8.13.
 ** Update Semver4J to 5.6.0.
 ** Update JTS Topology Suite to 1.20.0.
+** Update Asciidoctor Gradle plugins to 4.0.4.
 
 == Version 6.4 (2025-03-10)
 
