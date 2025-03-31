@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.util.persistence.v004;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
 
 /**
  */

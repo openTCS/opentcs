@@ -4,8 +4,8 @@ package org.opentcs.guing.plugins.panels.loadgenerator.xmlbinding;
 
 import static java.util.Objects.requireNonNull;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * Stores a drive order definition for XML marshalling/unmarshalling.
