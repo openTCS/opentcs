@@ -23,6 +23,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostOrderSequenceR
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTopologyUpdateRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleCommAdapterMessageRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAcceptableOrderTypesTO;
@@ -135,6 +136,10 @@ public class V1RequestHandler
     service.put(
         "/vehicles/:NAME/commAdapter/enabled",
         this::handlePutVehicleCommAdapterEnabled
+    );
+    service.post(
+        "/vehicles/:NAME/commAdapter/message",
+        this::handlePostVehicleCommAdapterMessage
     );
     service.put(
         "/vehicles/:NAME/paused",
@@ -312,6 +317,17 @@ public class V1RequestHandler
     vehicleHandler.putVehicleCommAdapterEnabled(
         request.params(":NAME"),
         valueIfKeyPresent(request.queryMap(), "newValue")
+    );
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
+
+  private Object handlePostVehicleCommAdapterMessage(Request request, Response response)
+      throws ObjectUnknownException,
+        IllegalArgumentException {
+    vehicleHandler.postVehicleCommAdapterMessage(
+        request.params(":NAME"),
+        jsonBinder.fromJson(request.body(), PostVehicleCommAdapterMessageRequestTO.class)
     );
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";

@@ -13,6 +13,7 @@ import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.MovementCommand;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.util.ExplainedBoolean;
 import org.slf4j.Logger;
@@ -75,12 +76,22 @@ public class NullVehicleController
   }
 
   @Override
+  @Deprecated
   public void sendCommAdapterMessage(Object message) {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
   }
 
   @Override
+  @Deprecated
   public void sendCommAdapterCommand(AdapterCommand command) {
+    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
+  }
+
+  @Override
+  public void sendCommAdapterMessage(
+      @Nonnull
+      VehicleCommAdapterMessage message
+  ) {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
   }
 

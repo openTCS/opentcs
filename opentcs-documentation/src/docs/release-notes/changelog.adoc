@@ -18,7 +18,11 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
+* New features and enhancements:
+** Update web API specification and implementation to version 1.12.0:
+*** Add an endpoint `POST /vehicles/{NAME}/commAdapter/message`, which allows sending messages to the communication adapter that is attached to a vehicle.
 * Changes affecting developers:
+** Deprecate `VehicleCommAdapter.processMessage(Object)`, `VehicleCommAdapter.execute(AdapterCommads)` and related code in favor of `VehicleCommAdapter.processMessage(VehicleCommAdapterMessage)`, which provides a generic one-way communication channel to the comm adapter.
 ** Update JUnit to 5.12.0.
 ** Update ApprovalTests to 24.17.0.
 ** Update AssertJ to 3.27.3.

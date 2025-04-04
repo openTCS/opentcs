@@ -12,6 +12,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import jakarta.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterFactory;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.kernel.KernelApplicationConfiguration;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
@@ -221,7 +223,15 @@ class AttachmentManagerTest {
     }
 
     @Override
+    @Deprecated
     public void processMessage(Object o) {
+    }
+
+    @Override
+    public void processMessage(
+        @Nonnull
+        VehicleCommAdapterMessage message
+    ) {
     }
 
     @Override

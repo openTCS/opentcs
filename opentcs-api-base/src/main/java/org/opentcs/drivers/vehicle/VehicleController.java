@@ -12,6 +12,7 @@ import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.util.ExplainedBoolean;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Provides high-level methods for the kernel to control a vehicle.
@@ -90,7 +91,10 @@ public interface VehicleController
    * Delivers a generic message to the communication adapter.
    *
    * @param message The message to be delivered.
+   * @deprecated Use {@link #sendCommAdapterMessage(VehicleCommAdapterMessage)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   void sendCommAdapterMessage(
       @Nullable
       Object message
@@ -100,11 +104,26 @@ public interface VehicleController
    * Sends a {@link AdapterCommand} to the communication adapter.
    *
    * @param command The adapter command to be sent.
+   * @deprecated Use {@link #sendCommAdapterMessage(VehicleCommAdapterMessage)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   void sendCommAdapterCommand(
       @Nonnull
       AdapterCommand command
   );
+
+  /**
+   * Sends a {@link VehicleCommAdapterMessage} to the communication adapter.
+   *
+   * @param message The message to be sent.
+   */
+  @ScheduledApiChange(when = "7.0", details = "Default implementation will be removed.")
+  default void sendCommAdapterMessage(
+      @Nonnull
+      VehicleCommAdapterMessage message
+  ) {
+  }
 
   /**
    * Returns a list of {@link MovementCommand}s that have been sent to the communication adapter.

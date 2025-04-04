@@ -454,6 +454,38 @@ paths:
                   type: string
                   description: Details on the actual error.
                   example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/commAdapter/message":
+    post:
+        tags:
+            - Vehicles
+        summary: Sends a message to the named vehicle's driver.
+        description: ""
+        parameters:
+          - name: NAME
+            in: path
+            description: The name of the vehicle.
+            required: true
+            schema:
+                type: string
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VehicleCommAdapterMessage"
+        responses:
+          "200":
+            description: Successful operation
+          "404":
+            description: Referencing object that could not be found.
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: string
+                    description: Details on the actual error.
+                    example: Could not find vehicle 'Vehicle-0001'.
   "/vehicles/{NAME}/routeComputationQuery":
     post:
       tags:
@@ -906,3 +938,22 @@ components:
       required:
         - destinationPoint
         - vehicleOrientation
+    VehicleCommAdapterMessage:
+      title: Vehicle Comm Adapter Message
+      type: object
+      properties:
+        type:
+          type: string
+          description: The message's type
+          example: "tcs:virtualVehicle:setPosition"
+        parameters:
+          type: array
+          description: The message's parameters.
+          items:
+            $ref: "../schemas/common.yaml#/components/schemas/Property"
+          example:
+            - key: "position"
+              value: "Point-0001"
+      required:
+        - type
+        - parameters

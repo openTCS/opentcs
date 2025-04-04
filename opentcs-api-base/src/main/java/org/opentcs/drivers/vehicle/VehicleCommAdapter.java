@@ -10,6 +10,7 @@ import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.ExplainedBoolean;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * This interface declares the methods that a driver communicating with and
@@ -185,7 +186,10 @@ public interface VehicleCommAdapter
    * </em></p>
    *
    * @param message The message to be processed.
+   * @deprecated Use {@link #processMessage(VehicleCommAdapterMessage)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   void processMessage(
       @Nullable
       Object message
@@ -195,9 +199,41 @@ public interface VehicleCommAdapter
    * Executes the given {@link AdapterCommand}.
    *
    * @param command The command to execute.
+   * @deprecated Use {@link #processMessage(VehicleCommAdapterMessage)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   void execute(
       @Nonnull
       AdapterCommand command
   );
+
+  /**
+   * Processes the given {@link VehicleCommAdapterMessage}
+   * <p>
+   * This method provides a generic one-way communication channel to the comm adapter. Since
+   * {@link VehicleService#sendCommAdapterMessage(org.opentcs.data.TCSObjectReference,
+   * VehicleCommAdapterMessage)} provides a way to send a message from outside the kernel, it can
+   * basically originate from any source. The message thus does not necessarily have to be
+   * meaningful to the concrete comm adapter implementation at all.
+   * </p>
+   * <p>
+   * <em>
+   * Implementation notes:
+   * Meaningless messages should simply be ignored and not result in exceptions being thrown.
+   * If a comm adapter implementation does not support processing messages, it should simply provide
+   * an empty implementation.
+   * A call to this method should return quickly, i.e. this method should not execute long
+   * computations directly but start them in a separate thread.
+   * </em>
+   * </p>
+   *
+   * @param message The message to process.
+   */
+  @ScheduledApiChange(when = "7.0", details = "Default implementation will be removed.")
+  default void processMessage(
+      @Nonnull
+      VehicleCommAdapterMessage message
+  ) {
+  }
 }

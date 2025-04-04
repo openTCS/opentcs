@@ -8,12 +8,18 @@ import jakarta.annotation.Nonnull;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.SimVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A command for initializing the comm adapter's position.
+ *
+ * @deprecated Use communication adapter-specific
+ * {@link org.opentcs.drivers.vehicle.VehicleCommAdapterMessage}s instead.
  */
+@Deprecated
+@ScheduledApiChange(when = "7.0", details = "Will be removed.")
 public class InitPositionCommand
     implements
       AdapterCommand {

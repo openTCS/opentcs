@@ -7,6 +7,7 @@ import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_
 import static org.opentcs.drivers.vehicle.VehicleProcessModel.Attribute.COMMAND_EXECUTED;
 import static org.opentcs.util.Assertions.checkInRange;
 
+import jakarta.annotation.Nonnull;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Objects;
@@ -248,8 +249,16 @@ public abstract class BasicVehicleCommAdapter
   }
 
   @Override
+  @Deprecated
   public void execute(AdapterCommand command) {
     command.execute(this);
+  }
+
+  @Override
+  public void processMessage(
+      @Nonnull
+      VehicleCommAdapterMessage message
+  ) {
   }
 
   /**

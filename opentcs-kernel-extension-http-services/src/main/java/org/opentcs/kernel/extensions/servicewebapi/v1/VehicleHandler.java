@@ -7,6 +7,7 @@ import static java.util.Objects.requireNonNull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -26,13 +27,16 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.data.order.Route;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleCommAdapterMessageRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAcceptableOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleEnergyLevelThresholdSetTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.VehicleConverter;
 
 /**
@@ -219,6 +223,30 @@ public class VehicleHandler {
     });
   }
 
+  public void postVehicleCommAdapterMessage(
+      String name,
+      PostVehicleCommAdapterMessageRequestTO request
+  )
+      throws ObjectUnknownException {
+    requireNonNull(name, "name");
+    requireNonNull(request, "request");
+
+    executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, name);
+      if (vehicle == null) {
+        throw new ObjectUnknownException("Unknown vehicle: " + name);
+      }
+
+      vehicleService.sendCommAdapterMessage(
+          vehicle.getReference(),
+          new VehicleCommAdapterMessage(
+              request.getType(),
+              toParameterMap(request.getParameters())
+          )
+      );
+    });
+  }
+
   @Deprecated
   public void putVehicleAllowedOrderTypes(
       String name,
@@ -368,5 +396,15 @@ public class VehicleHandler {
           maxRoutesPerDestinationPoint
       );
     });
+  }
+
+  private Map<String, String> toParameterMap(List<Property> parameters) {
+    Map<String, String> result = new HashMap<>();
+    if (parameters != null) {
+      for (Property param : parameters) {
+        result.put(param.getKey(), param.getValue());
+      }
+    }
+    return result;
   }
 }

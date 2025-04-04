@@ -3,20 +3,54 @@
 package org.opentcs.virtualvehicle;
 
 import static java.util.Objects.requireNonNull;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.CURRENT_MOVEMENT_COMMAND_FAILED;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.INIT_POSITION;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.INIT_POSITION_PARAM_POSITION;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.PUBLISH_EVENT;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.PUBLISH_EVENT_PARAM_APPENDIX;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.RESET_POSITION;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.RESET_PRECISE_POSITION;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.RESET_PROPERTY;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.RESET_PROPERTY_PARAM_KEY;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_ENERGY_LEVEL;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_ENERGY_LEVEL_PARAM_LEVEL;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_LOADED;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_LOADED_PARAM_LOADED;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_ORIENTATION_ANGLE;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_ORIENTATION_ANGLE_PARAM_ANGLE;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_PAUSED;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_PAUSED_PARAM_PAUSED;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_POSITION;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_POSITION_PARAM_POSITION;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_PRECISE_POSITION;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_PRECISE_POSITION_PARAM_X;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_PRECISE_POSITION_PARAM_Y;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_PRECISE_POSITION_PARAM_Z;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_PROPERTY;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_PROPERTY_PARAM_KEY;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_PROPERTY_PARAM_VALUE;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_SINGLE_STEP_MODE_ENABLED;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_SINGLE_STEP_MODE_ENABLED_PARAM_ENABLED;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_STATE;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.SET_STATE_PARAM_STATE;
+import static org.opentcs.virtualvehicle.LoopbackCommAdapterMessages.TRIGGER_SINGLE_STEP;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.opentcs.common.LoopbackAdapterConstants;
 import org.opentcs.customizations.kernel.KernelExecutor;
+import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
@@ -25,9 +59,12 @@ import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.SimVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.ExplainedBoolean;
+import org.opentcs.util.MapValueExtractor;
 import org.opentcs.virtualvehicle.VelocityController.WayEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +106,10 @@ public class LoopbackCommunicationAdapter
    */
   private final VirtualVehicleConfiguration configuration;
   /**
+   * Extracts values from maps.
+   */
+  private final MapValueExtractor mapValueExtractor;
+  /**
    * Indicates whether the vehicle simulation is running or not.
    */
   private volatile boolean isSimulationRunning;
@@ -89,12 +130,14 @@ public class LoopbackCommunicationAdapter
    * Creates a new instance.
    *
    * @param configuration This class's configuration.
+   * @param mapValueExtractor Extracts values from maps.
    * @param vehicle The vehicle this adapter is associated with.
    * @param kernelExecutor The kernel's executor.
    */
   @Inject
   public LoopbackCommunicationAdapter(
       VirtualVehicleConfiguration configuration,
+      MapValueExtractor mapValueExtractor,
       @Assisted
       Vehicle vehicle,
       @KernelExecutor
@@ -108,6 +151,8 @@ public class LoopbackCommunicationAdapter
     );
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.configuration = requireNonNull(configuration, "configuration");
+    this.mapValueExtractor
+        = requireNonNull(mapValueExtractor, "mapValueExtractor");
   }
 
   @Override
@@ -233,7 +278,36 @@ public class LoopbackCommunicationAdapter
   }
 
   @Override
+  @Deprecated
   public void processMessage(Object message) {
+  }
+
+  @Override
+  public void processMessage(
+      @Nonnull
+      VehicleCommAdapterMessage message
+  ) {
+    switch (message.getType()) {
+      case INIT_POSITION -> handleInitPosition(message);
+      case CURRENT_MOVEMENT_COMMAND_FAILED -> handleCurrentMovementCommandFailed(message);
+      case PUBLISH_EVENT -> handlePublishEvent(message);
+      case SET_ENERGY_LEVEL -> handleSetEnergyLevel(message);
+      case SET_LOADED -> handleSetLoaded(message);
+      case SET_ORIENTATION_ANGLE -> handleSetOrientationAngle(message);
+      case SET_POSITION -> handleSetPosition(message);
+      case RESET_POSITION -> handleResetPosition(message);
+      case SET_PRECISE_POSITION -> handleSetPrecisePosition(message);
+      case RESET_PRECISE_POSITION -> handleResetPrecisePosition(message);
+      case SET_STATE -> handleSetState(message);
+      case SET_PAUSED -> handleSetPaused(message);
+      case SET_PROPERTY -> handleSetProperty(message);
+      case RESET_PROPERTY -> handleResetProperty(message);
+      case SET_SINGLE_STEP_MODE_ENABLED -> handleSetSingleStepModeEnabled(message);
+      case TRIGGER_SINGLE_STEP -> handleTriggerSingleStep(message);
+      default -> {
+        // Do nothing.
+      }
+    }
   }
 
   @Override
@@ -547,6 +621,144 @@ public class LoopbackCommunicationAdapter
 
   private int getSimulationTimeStep() {
     return (int) (SIMULATION_PERIOD * configuration.simulationTimeFactor());
+  }
+
+  private void handleInitPosition(VehicleCommAdapterMessage message) {
+    mapValueExtractor.extractString(
+        INIT_POSITION_PARAM_POSITION,
+        message.getParameters()
+    )
+        .ifPresent(this::initVehiclePosition);
+  }
+
+  private void handleCurrentMovementCommandFailed(VehicleCommAdapterMessage message) {
+    MovementCommand failedCommand = getSentCommands().peek();
+    if (failedCommand != null) {
+      getProcessModel().commandFailed(failedCommand);
+    }
+  }
+
+  private void handlePublishEvent(VehicleCommAdapterMessage message) {
+    getProcessModel().publishEvent(
+        new VehicleCommAdapterEvent(
+            getName(),
+            mapValueExtractor.extractString(
+                PUBLISH_EVENT_PARAM_APPENDIX,
+                message.getParameters()
+            )
+                .orElse(null)
+        )
+    );
+  }
+
+  private void handleSetEnergyLevel(VehicleCommAdapterMessage message) {
+    mapValueExtractor.extractInteger(
+        SET_ENERGY_LEVEL_PARAM_LEVEL,
+        message.getParameters()
+    )
+        .ifPresent(energyLevel -> getProcessModel().setEnergyLevel(energyLevel));
+  }
+
+  private void handleSetLoaded(VehicleCommAdapterMessage message) {
+    mapValueExtractor.extractBoolean(SET_LOADED_PARAM_LOADED, message.getParameters())
+        .ifPresent(
+            loaded -> getProcessModel().setLoadHandlingDevices(
+                List.of(new LoadHandlingDevice(LHD_NAME, loaded))
+            )
+        );
+  }
+
+  private void handleSetOrientationAngle(VehicleCommAdapterMessage message) {
+    mapValueExtractor.extractDouble(
+        SET_ORIENTATION_ANGLE_PARAM_ANGLE,
+        message.getParameters()
+    )
+        .ifPresent(
+            orientationAngle -> getProcessModel().setPose(
+                getProcessModel().getPose().withOrientationAngle(orientationAngle)
+            )
+        );
+  }
+
+  private void handleSetPosition(VehicleCommAdapterMessage message) {
+    mapValueExtractor.extractString(SET_POSITION_PARAM_POSITION, message.getParameters())
+        .ifPresent(position -> getProcessModel().setPosition(position));
+  }
+
+  private void handleResetPosition(VehicleCommAdapterMessage message) {
+    getProcessModel().setPosition(null);
+  }
+
+  private void handleSetPrecisePosition(VehicleCommAdapterMessage message) {
+    Optional<Long> x = mapValueExtractor.extractLong(
+        SET_PRECISE_POSITION_PARAM_X,
+        message.getParameters()
+    );
+    Optional<Long> y = mapValueExtractor.extractLong(
+        SET_PRECISE_POSITION_PARAM_Y,
+        message.getParameters()
+    );
+    Optional<Long> z = mapValueExtractor.extractLong(
+        SET_PRECISE_POSITION_PARAM_Z,
+        message.getParameters()
+    );
+
+    if (x.isPresent() && y.isPresent() && z.isPresent()) {
+      getProcessModel().setPose(
+          getProcessModel().getPose().withPosition(new Triple(x.get(), y.get(), z.get()))
+      );
+    }
+  }
+
+  private void handleResetPrecisePosition(VehicleCommAdapterMessage message) {
+    getProcessModel().setPose(getProcessModel().getPose().withPosition(null));
+  }
+
+  private void handleSetState(VehicleCommAdapterMessage message) {
+    mapValueExtractor.extractEnum(
+        SET_STATE_PARAM_STATE,
+        message.getParameters(),
+        Vehicle.State.class
+    )
+        .ifPresent(state -> getProcessModel().setState(state));
+  }
+
+  private void handleSetPaused(VehicleCommAdapterMessage message) {
+    mapValueExtractor.extractBoolean(SET_PAUSED_PARAM_PAUSED, message.getParameters())
+        .ifPresent(paused -> getProcessModel().setVehiclePaused(paused));
+  }
+
+  private void handleSetProperty(VehicleCommAdapterMessage message) {
+    Optional<String> key = mapValueExtractor.extractString(
+        SET_PROPERTY_PARAM_KEY,
+        message.getParameters()
+    );
+    Optional<String> value = mapValueExtractor.extractString(
+        SET_PROPERTY_PARAM_VALUE,
+        message.getParameters()
+    );
+    if (key.isPresent() && value.isPresent()) {
+      getProcessModel().setProperty(key.get(), value.get());
+    }
+  }
+
+  private void handleResetProperty(VehicleCommAdapterMessage message) {
+    mapValueExtractor.extractString(
+        RESET_PROPERTY_PARAM_KEY,
+        message.getParameters()
+    ).ifPresent(key -> getProcessModel().setProperty(key, null));
+  }
+
+  private void handleSetSingleStepModeEnabled(VehicleCommAdapterMessage message) {
+    mapValueExtractor.extractBoolean(
+        SET_SINGLE_STEP_MODE_ENABLED_PARAM_ENABLED,
+        message.getParameters()
+    )
+        .ifPresent(enabled -> getProcessModel().setSingleStepModeEnabled(enabled));
+  }
+
+  private void handleTriggerSingleStep(VehicleCommAdapterMessage message) {
+    trigger();
   }
 
   /**

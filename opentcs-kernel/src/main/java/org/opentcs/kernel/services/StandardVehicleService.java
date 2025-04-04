@@ -28,6 +28,7 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.kernel.extensions.controlcenter.vehicles.AttachmentManager;
@@ -376,6 +377,7 @@ public class StandardVehicleService
   }
 
   @Override
+  @Deprecated
   public void sendCommAdapterCommand(TCSObjectReference<Vehicle> ref, AdapterCommand command)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
@@ -389,9 +391,26 @@ public class StandardVehicleService
   }
 
   @Override
+  @Deprecated
   public void sendCommAdapterMessage(TCSObjectReference<Vehicle> ref, Object message)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
+
+    synchronized (globalSyncObject) {
+      vehicleControllerPool
+          .getVehicleController(ref.getName())
+          .sendCommAdapterMessage(message);
+    }
+  }
+
+  @Override
+  public void sendCommAdapterMessage(
+      TCSObjectReference<Vehicle> ref,
+      VehicleCommAdapterMessage message
+  )
+      throws ObjectUnknownException {
+    requireNonNull(ref, "ref");
+    requireNonNull(message, "message");
 
     synchronized (globalSyncObject) {
       vehicleControllerPool

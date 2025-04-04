@@ -154,7 +154,7 @@ org.opentcs.virtualvehicle.LoopbackCommAdapterModule
 ----
 NOTE: Background: openTCS uses `java.util.ServiceLoader` to automatically find Guice modules on startup, which depends on this file (with this name) being present.
 See the JDK's API documentation for more information about how this mechanism works.
-. Place the JAR file of your driver including all neccessary resources in the subdirectory `lib/openTCS-extensions/` of the openTCS kernel application's installation directory _before_ the kernel is started.
+. Place the JAR file of your driver including all necessary resources in the subdirectory `lib/openTCS-extensions/` of the openTCS kernel application's installation directory _before_ the kernel is started.
 (The openTCS start scripts include all JAR files in that directory in the application's classpath.)
 
 Drivers meeting these requirements are found automatically when you start the kernel.
@@ -162,9 +162,9 @@ Drivers meeting these requirements are found automatically when you start the ke
 === Sending messages to communication adapters
 
 Sometimes it is required to have some influence on the behaviour of a communication adapter (and thus the vehicle it is associated with) directly from a kernel client - to send a special telegram to the vehicle, for instance.
-For these cases, `VehicleService.sendCommAdapterMessage(TCSObjectReference<Vehicle>, Object)` provides a one-way communication channel for a client to send a message object to a communication adapter currently associated with a vehicle.
-A comm adapter implementing `processMessage()` may interpret message objects sent to it and react in an appropriate way.
-Note that the client sending the message may not know which communication adapter implementation is currently associated with the vehicle, so the adapter may or may not be able to understand the message.
+For these cases, `VehicleService.sendCommAdapterMessage(TCSObjectReference<Vehicle>, VehicleCommAdapterMessage)` provides a one-way communication channel for a client to send a message object to a communication adapter currently associated with a vehicle.
+A comm adapter implementing `processMessage(VehicleCommAdapterMessage)` may interpret message objects sent to it and react in an appropriate way.
+Note that the adapter implementation may or may not be able to understand the message.
 
 === Acquiring data from communication adapters
 

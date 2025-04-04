@@ -12,6 +12,7 @@ import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.annotations.ScheduledApiChange;
@@ -96,7 +97,11 @@ public interface VehicleService
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    * @see VehicleCommAdapter#execute(AdapterCommand)
+   * @deprecated Use {@link #sendCommAdapterMessage(TCSObjectReference, VehicleCommAdapterMessage)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   void sendCommAdapterCommand(TCSObjectReference<Vehicle> ref, AdapterCommand command)
       throws ObjectUnknownException,
         KernelRuntimeException;
@@ -114,10 +119,36 @@ public interface VehicleService
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws KernelRuntimeException If the calling client is not allowed to execute this method.
    * @see VehicleCommAdapter#processMessage(java.lang.Object)
+   * @deprecated Use {@link #sendCommAdapterMessage(TCSObjectReference, VehicleCommAdapterMessage)}
+   * instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   void sendCommAdapterMessage(TCSObjectReference<Vehicle> ref, Object message)
       throws ObjectUnknownException,
         KernelRuntimeException;
+
+  /**
+   * Sends a message to the communication adapter associated with the referenced vehicle.
+   * <p>
+   * This method provides a generic one-way communication channel to the communication adapter of a
+   * vehicle. Note that there is no return value and no guarantee that the communication adapter
+   * will understand the message.
+   * </p>
+   *
+   * @param ref The vehicle whose communication adapter shall receive the message.
+   * @param message The message to be delivered.
+   * @throws ObjectUnknownException If the referenced vehicle does not exist.
+   * @throws KernelRuntimeException In case there is an exception executing this method.
+   * @see VehicleCommAdapter#processMessage(VehicleCommAdapterMessage)
+   */
+  default void sendCommAdapterMessage(
+      TCSObjectReference<Vehicle> ref,
+      VehicleCommAdapterMessage message
+  )
+      throws ObjectUnknownException,
+        KernelRuntimeException {
+  }
 
   /**
    * Updates the vehicle's integration level.

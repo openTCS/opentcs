@@ -24,6 +24,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.annotations.ScheduledApiChange;
@@ -222,6 +223,7 @@ public class StandardRemoteVehicleService
   }
 
   @Override
+  @Deprecated
   public void sendCommAdapterCommand(
       ClientID clientId,
       TCSObjectReference<Vehicle> ref,
@@ -238,10 +240,27 @@ public class StandardRemoteVehicleService
   }
 
   @Override
+  @Deprecated
   public void sendCommAdapterMessage(
       ClientID clientId,
       TCSObjectReference<Vehicle> vehicleRef,
       Object message
+  ) {
+    userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
+
+    try {
+      kernelExecutor.submit(() -> vehicleService.sendCommAdapterMessage(vehicleRef, message)).get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
+
+  @Override
+  public void sendCommAdapterMessage(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> vehicleRef,
+      VehicleCommAdapterMessage message
   ) {
     userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
 

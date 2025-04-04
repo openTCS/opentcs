@@ -13,6 +13,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.annotations.ScheduledApiChange;
@@ -107,6 +108,7 @@ class RemoteVehicleServiceProxy
   }
 
   @Override
+  @Deprecated
   public void sendCommAdapterCommand(TCSObjectReference<Vehicle> ref, AdapterCommand command)
       throws ObjectUnknownException,
         KernelRuntimeException {
@@ -121,7 +123,25 @@ class RemoteVehicleServiceProxy
   }
 
   @Override
+  @Deprecated
   public void sendCommAdapterMessage(TCSObjectReference<Vehicle> ref, Object message)
+      throws ObjectUnknownException,
+        KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      getRemoteService().sendCommAdapterMessage(getClientId(), ref, message);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public void sendCommAdapterMessage(
+      TCSObjectReference<Vehicle> ref,
+      VehicleCommAdapterMessage message
+  )
       throws ObjectUnknownException,
         KernelRuntimeException {
     checkServiceAvailability();

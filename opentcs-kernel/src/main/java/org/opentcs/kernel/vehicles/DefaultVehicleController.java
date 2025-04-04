@@ -52,6 +52,7 @@ import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.MovementCommandTransformer;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.ProcessModelEvent;
@@ -668,6 +669,7 @@ public class DefaultVehicleController
   }
 
   @Override
+  @Deprecated
   public void sendCommAdapterMessage(
       @Nullable
       Object message
@@ -678,9 +680,21 @@ public class DefaultVehicleController
   }
 
   @Override
+  @Deprecated
   public void sendCommAdapterCommand(AdapterCommand command) {
     synchronized (commAdapter) {
       commAdapter.execute(command);
+    }
+  }
+
+  @Override
+  public void sendCommAdapterMessage(
+      @Nonnull
+      VehicleCommAdapterMessage message
+  ) {
+    synchronized (commAdapter) {
+      requireNonNull(message, "message");
+      commAdapter.processMessage(message);
     }
   }
 

@@ -21,7 +21,7 @@ info:
     Optionally, an access key can be set in the kernel configuration.
     The configured value is then expected to be sent by the client in an HTTP header named `X-Api-Access-Key`.
   # IMPORTANT: When updating this version number, remember to mention that in the changelog, too!
-  version: 1.11.0
+  version: 1.12.0
   title: openTCS web API specification
 servers:
   - url: http://localhost:55200/v1
@@ -86,6 +86,8 @@ paths:
     $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1commAdapter~1attachment'
   "/vehicles/{NAME}/commAdapter/enabled":
     $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1commAdapter~1enabled'
+  "/vehicles/{NAME}/commAdapter/message":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1commAdapter~1message'
   "/vehicles/{NAME}/routeComputationQuery":
     $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1routeComputationQuery'
   "/vehicles/{NAME}/envelopeKey":

@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import javax.swing.SwingUtilities;
@@ -21,27 +23,14 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
-import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.VehicleCommAdapterPanel;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.CallWrapper;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.gui.StringListCellRenderer;
-import org.opentcs.virtualvehicle.commands.CurrentMovementCommandFailedCommand;
-import org.opentcs.virtualvehicle.commands.PublishEventCommand;
-import org.opentcs.virtualvehicle.commands.SetEnergyLevelCommand;
-import org.opentcs.virtualvehicle.commands.SetLoadHandlingDevicesCommand;
-import org.opentcs.virtualvehicle.commands.SetOrientationAngleCommand;
-import org.opentcs.virtualvehicle.commands.SetPositionCommand;
-import org.opentcs.virtualvehicle.commands.SetPrecisePositionCommand;
-import org.opentcs.virtualvehicle.commands.SetSingleStepModeEnabledCommand;
-import org.opentcs.virtualvehicle.commands.SetStateCommand;
-import org.opentcs.virtualvehicle.commands.SetVehiclePausedCommand;
-import org.opentcs.virtualvehicle.commands.SetVehiclePropertyCommand;
-import org.opentcs.virtualvehicle.commands.TriggerCommand;
 import org.opentcs.virtualvehicle.inputcomponents.DropdownListInputPanel;
 import org.opentcs.virtualvehicle.inputcomponents.InputDialog;
 import org.opentcs.virtualvehicle.inputcomponents.InputPanel;
@@ -335,13 +324,13 @@ public class LoopbackCommAdapterPanel
         .getReference();
   }
 
-  private void sendCommAdapterCommand(AdapterCommand command) {
+  private void sendCommAdapterMessage(VehicleCommAdapterMessage message) {
     try {
       TCSObjectReference<Vehicle> vehicleRef = getVehicleReference();
-      callWrapper.call(() -> vehicleService.sendCommAdapterCommand(vehicleRef, command));
+      callWrapper.call(() -> vehicleService.sendCommAdapterMessage(vehicleRef, message));
     }
     catch (Exception ex) {
-      LOG.warn("Error sending comm adapter command '{}'", command, ex);
+      LOG.warn("Error sending comm adapter message '{}'", message, ex);
     }
   }
 
@@ -1020,7 +1009,15 @@ public class LoopbackCommAdapterPanel
     if (singleModeRadioButton.isSelected()) {
       triggerButton.setEnabled(true);
 
-      sendCommAdapterCommand(new SetSingleStepModeEnabledCommand(true));
+      sendCommAdapterMessage(
+          new VehicleCommAdapterMessage(
+              LoopbackCommAdapterMessages.SET_SINGLE_STEP_MODE_ENABLED,
+              Map.of(
+                  LoopbackCommAdapterMessages.SET_SINGLE_STEP_MODE_ENABLED_PARAM_ENABLED,
+                  "true"
+              )
+          )
+      );
     }
   }//GEN-LAST:event_singleModeRadioButtonActionPerformed
 
@@ -1028,12 +1025,25 @@ public class LoopbackCommAdapterPanel
     if (flowModeRadioButton.isSelected()) {
       triggerButton.setEnabled(false);
 
-      sendCommAdapterCommand(new SetSingleStepModeEnabledCommand(false));
+      sendCommAdapterMessage(
+          new VehicleCommAdapterMessage(
+              LoopbackCommAdapterMessages.SET_SINGLE_STEP_MODE_ENABLED,
+              Map.of(
+                  LoopbackCommAdapterMessages.SET_SINGLE_STEP_MODE_ENABLED_PARAM_ENABLED,
+                  "false"
+              )
+          )
+      );
     }
   }//GEN-LAST:event_flowModeRadioButtonActionPerformed
 
   private void triggerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_triggerButtonActionPerformed
-    sendCommAdapterCommand(new TriggerCommand());
+    sendCommAdapterMessage(
+        new VehicleCommAdapterMessage(
+            LoopbackCommAdapterMessages.TRIGGER_SINGLE_STEP,
+            Map.of()
+        )
+    );
   }//GEN-LAST:event_triggerButtonActionPerformed
 
   private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkBoxEnableActionPerformed
@@ -1083,7 +1093,12 @@ public class LoopbackCommAdapterPanel
       if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
         if (dialog.getInput() == null) {
           // Clear precise position
-          sendCommAdapterCommand(new SetPrecisePositionCommand(null));
+          sendCommAdapterMessage(
+              new VehicleCommAdapterMessage(
+                  LoopbackCommAdapterMessages.RESET_PRECISE_POSITION,
+                  Map.of()
+              )
+          );
         }
         else {
           // Set new precise position
@@ -1100,8 +1115,20 @@ public class LoopbackCommAdapterPanel
             return;
           }
 
-          sendCommAdapterCommand(new SetPrecisePositionCommand(new Triple(x, y, z)));
+          sendCommAdapterMessage(
+              new VehicleCommAdapterMessage(
+                  LoopbackCommAdapterMessages.SET_PRECISE_POSITION,
+                  Map.of(
+                      LoopbackCommAdapterMessages.SET_PRECISE_POSITION_PARAM_X, String.valueOf(x),
+                      LoopbackCommAdapterMessages.SET_PRECISE_POSITION_PARAM_Y, String.valueOf(y),
+                      LoopbackCommAdapterMessages.SET_PRECISE_POSITION_PARAM_Z, String.valueOf(z)
+                  )
+              )
+          );
+
         }
+
+
       }
     }
   }//GEN-LAST:event_precisePosTextAreaMouseClicked
@@ -1123,11 +1150,16 @@ public class LoopbackCommAdapterPanel
         .build();
     InputDialog dialog = new InputDialog(panel);
     dialog.setVisible(true);
-    // Get dialog results and set vahicle stare
+    // Get dialog results and set vehicle state.
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
       Vehicle.State newState = (Vehicle.State) dialog.getInput();
       if (newState != currentState) {
-        sendCommAdapterCommand(new SetStateCommand(newState));
+        sendCommAdapterMessage(
+            new VehicleCommAdapterMessage(
+                LoopbackCommAdapterMessages.SET_STATE,
+                Map.of(LoopbackCommAdapterMessages.SET_STATE_PARAM_STATE, newState.name())
+            )
+        );
       }
     }
   }//GEN-LAST:event_stateTxtMouseClicked
@@ -1176,10 +1208,23 @@ public class LoopbackCommAdapterPanel
     if (dialog.getReturnStatus() == InputDialog.ReturnStatus.ACCEPTED) {
       Object item = dialog.getInput();
       if (item == null) {
-        sendCommAdapterCommand(new SetPositionCommand(null));
+        sendCommAdapterMessage(
+            new VehicleCommAdapterMessage(
+                LoopbackCommAdapterMessages.RESET_POSITION,
+                Map.of()
+            )
+        );
       }
       else {
-        sendCommAdapterCommand(new SetPositionCommand(((Point) item).getName()));
+        sendCommAdapterMessage(
+            new VehicleCommAdapterMessage(
+                LoopbackCommAdapterMessages.SET_POSITION,
+                Map.of(
+                    LoopbackCommAdapterMessages.SET_POSITION_PARAM_POSITION,
+                    ((Point) item).getName()
+                )
+            )
+        );
       }
     }
   }//GEN-LAST:event_positionTxtMouseClicked
@@ -1210,7 +1255,15 @@ public class LoopbackCommAdapterPanel
       if (input == null) {
         // The reset button was pressed
         if (!Double.isNaN(processModel.getPose().getOrientationAngle())) {
-          sendCommAdapterCommand(new SetOrientationAngleCommand(Double.NaN));
+          sendCommAdapterMessage(
+              new VehicleCommAdapterMessage(
+                  LoopbackCommAdapterMessages.SET_ORIENTATION_ANGLE,
+                  Map.of(
+                      LoopbackCommAdapterMessages.SET_ORIENTATION_ANGLE_PARAM_ANGLE,
+                      String.valueOf(Double.NaN)
+                  )
+              )
+          );
         }
       }
       else {
@@ -1224,17 +1277,35 @@ public class LoopbackCommAdapterPanel
           return;
         }
 
-        sendCommAdapterCommand(new SetOrientationAngleCommand(angle));
+        sendCommAdapterMessage(
+            new VehicleCommAdapterMessage(
+                LoopbackCommAdapterMessages.SET_ORIENTATION_ANGLE,
+                Map.of(
+                    LoopbackCommAdapterMessages.SET_ORIENTATION_ANGLE_PARAM_ANGLE,
+                    String.valueOf(angle)
+                )
+            )
+        );
       }
     }
   }//GEN-LAST:event_orientationAngleTxtMouseClicked
 
   private void pauseVehicleCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_pauseVehicleCheckBoxItemStateChanged
     if (evt.getStateChange() == java.awt.event.ItemEvent.SELECTED) {
-      sendCommAdapterCommand(new SetVehiclePausedCommand(true));
+      sendCommAdapterMessage(
+          new VehicleCommAdapterMessage(
+              LoopbackCommAdapterMessages.SET_PAUSED,
+              Map.of(LoopbackCommAdapterMessages.SET_PAUSED_PARAM_PAUSED, "true")
+          )
+      );
     }
     else if (evt.getStateChange() == java.awt.event.ItemEvent.DESELECTED) {
-      sendCommAdapterCommand(new SetVehiclePausedCommand(false));
+      sendCommAdapterMessage(
+          new VehicleCommAdapterMessage(
+              LoopbackCommAdapterMessages.SET_PAUSED,
+              Map.of(LoopbackCommAdapterMessages.SET_PAUSED_PARAM_PAUSED, "false")
+          )
+      );
     }
   }//GEN-LAST:event_pauseVehicleCheckBoxItemStateChanged
 
@@ -1265,7 +1336,15 @@ public class LoopbackCommAdapterPanel
         return;
       }
 
-      sendCommAdapterCommand(new SetEnergyLevelCommand(energy));
+      sendCommAdapterMessage(
+          new VehicleCommAdapterMessage(
+              LoopbackCommAdapterMessages.SET_ENERGY_LEVEL,
+              Map.of(
+                  LoopbackCommAdapterMessages.SET_ENERGY_LEVEL_PARAM_LEVEL,
+                  String.valueOf(energy)
+              )
+          )
+      );
     }
   }//GEN-LAST:event_energyLevelTxtMouseClicked
 
@@ -1275,25 +1354,47 @@ public class LoopbackCommAdapterPanel
 
   private void dispatchEventButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dispatchEventButtonActionPerformed
     String appendix = includeAppendixCheckBox.isSelected() ? appendixTxt.getText() : null;
-    VehicleCommAdapterEvent event = new VehicleCommAdapterEvent(
-        processModel.getName(),
-        appendix
+    sendCommAdapterMessage(
+        new VehicleCommAdapterMessage(
+            LoopbackCommAdapterMessages.PUBLISH_EVENT,
+            Optional.ofNullable(appendix)
+                .map(app -> Map.of(LoopbackCommAdapterMessages.PUBLISH_EVENT_PARAM_APPENDIX, app))
+                .orElse(Map.of())
+        )
     );
-    sendCommAdapterCommand(new PublishEventCommand(event));
   }//GEN-LAST:event_dispatchEventButtonActionPerformed
 
   private void dispatchCommandFailedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dispatchCommandFailedButtonActionPerformed
-    sendCommAdapterCommand(new CurrentMovementCommandFailedCommand());
+    sendCommAdapterMessage(
+        new VehicleCommAdapterMessage(
+            LoopbackCommAdapterMessages.CURRENT_MOVEMENT_COMMAND_FAILED,
+            Map.of()
+        )
+    );
   }//GEN-LAST:event_dispatchCommandFailedButtonActionPerformed
 
   private void propSetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_propSetButtonActionPerformed
-    sendCommAdapterCommand(
-        new SetVehiclePropertyCommand(
-            keyTextField.getText(),
-            setPropValueRadioBtn.isSelected()
-                ? valueTextField.getText() : null
-        )
-    );
+    if (setPropValueRadioBtn.isSelected()) {
+      sendCommAdapterMessage(
+          new VehicleCommAdapterMessage(
+              LoopbackCommAdapterMessages.SET_PROPERTY,
+              Map.of(
+                  LoopbackCommAdapterMessages.SET_PROPERTY_PARAM_KEY, keyTextField.getText(),
+                  LoopbackCommAdapterMessages.SET_PROPERTY_PARAM_VALUE, valueTextField.getText()
+              )
+          )
+      );
+    }
+    else {
+      sendCommAdapterMessage(
+          new VehicleCommAdapterMessage(
+              LoopbackCommAdapterMessages.RESET_PROPERTY,
+              Map.of(
+                  LoopbackCommAdapterMessages.RESET_PROPERTY_PARAM_KEY, keyTextField.getText()
+              )
+          )
+      );
+    }
   }//GEN-LAST:event_propSetButtonActionPerformed
 
   private void removePropRadioBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removePropRadioBtnActionPerformed
@@ -1305,10 +1406,15 @@ public class LoopbackCommAdapterPanel
   }//GEN-LAST:event_setPropValueRadioBtnActionPerformed
 
   private void lHDCheckboxClicked(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lHDCheckboxClicked
-    List<LoadHandlingDevice> devices = Arrays.asList(
-        new LoadHandlingDevice(LoopbackCommunicationAdapter.LHD_NAME, lHDCheckbox.isSelected())
+    sendCommAdapterMessage(
+        new VehicleCommAdapterMessage(
+            LoopbackCommAdapterMessages.SET_LOADED,
+            Map.of(
+                LoopbackCommAdapterMessages.SET_LOADED_PARAM_LOADED,
+                String.valueOf(lHDCheckbox.isSelected())
+            )
+        )
     );
-    sendCommAdapterCommand(new SetLoadHandlingDevicesCommand(devices));
   }//GEN-LAST:event_lHDCheckboxClicked
 
   /**
@@ -1316,9 +1422,7 @@ public class LoopbackCommAdapterPanel
    * of the formatting. If any of the parameters is null all values will be set
    * to the "clear"-value.
    *
-   * @param x x-position
-   * @param y y-position
-   * @param z z-poition
+   * @param precisePos The precise position.
    */
   private void setPrecisePosText(Triple precisePos) {
     // Convert values to strings

@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -32,7 +33,7 @@ import org.opentcs.components.kernelcontrolcenter.ControlCenterPanel;
 import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.data.model.Point;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
-import org.opentcs.drivers.vehicle.commands.InitPositionCommand;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.kernelcontrolcenter.util.SingleCellEditor;
@@ -40,6 +41,7 @@ import org.opentcs.util.CallWrapper;
 import org.opentcs.util.Comparators;
 import org.opentcs.util.gui.BoundsPopupMenuListener;
 import org.opentcs.util.gui.StringListCellRenderer;
+import org.opentcs.virtualvehicle.LoopbackCommAdapterMessages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -299,9 +301,15 @@ public class DriverGUI
           LocalVehicleEntry vehicleEntry = vehicleEntryPool.getEntryFor(getSelectedVehicleName());
           if (vehicleEntry.getAttachedCommAdapterDescription().isSimVehicleCommAdapter()) {
             callWrapper.call(
-                () -> servicePortal.getVehicleService().sendCommAdapterCommand(
+                () -> servicePortal.getVehicleService().sendCommAdapterMessage(
                     vehicleEntry.getAttachmentInformation().getVehicleReference(),
-                    new InitPositionCommand(newPoint.getName())
+                    new VehicleCommAdapterMessage(
+                        LoopbackCommAdapterMessages.INIT_POSITION,
+                        Map.of(
+                            LoopbackCommAdapterMessages.INIT_POSITION_PARAM_POSITION,
+                            newPoint.getName()
+                        )
+                    )
                 )
             );
           }

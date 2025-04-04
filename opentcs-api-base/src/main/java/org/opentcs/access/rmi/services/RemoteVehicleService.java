@@ -13,6 +13,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
+import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.util.annotations.ScheduledApiChange;
@@ -58,6 +59,7 @@ public interface RemoteVehicleService
   VehicleProcessModelTO fetchProcessModel(ClientID clientId, TCSObjectReference<Vehicle> ref)
       throws RemoteException;
 
+  @Deprecated
   void sendCommAdapterCommand(
       ClientID clientId,
       TCSObjectReference<Vehicle> ref,
@@ -65,12 +67,21 @@ public interface RemoteVehicleService
   )
       throws RemoteException;
 
+  @Deprecated
   void sendCommAdapterMessage(
       ClientID clientId,
       TCSObjectReference<Vehicle> vehicleRef,
       Object message
   )
       throws RemoteException;
+
+  default void sendCommAdapterMessage(
+      ClientID clientId,
+      TCSObjectReference<Vehicle> ref,
+      VehicleCommAdapterMessage message
+  )
+      throws RemoteException {
+  }
 
   void updateVehicleIntegrationLevel(
       ClientID clientId,
