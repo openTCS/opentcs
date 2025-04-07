@@ -7,6 +7,7 @@ import static java.util.Objects.requireNonNull;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.VehicleStatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
@@ -179,6 +181,72 @@ public class VehicleConverter {
         orderTypeConverter.toAcceptableOrderTypeTOs(vehicle.getAcceptableOrderTypes())
     );
     return to;
+  }
+
+  public VehicleStatusMessage toVehicleStatusMessage(
+      Vehicle vehicle,
+      long sequenceNumber,
+      Instant creationTimeStamp
+  ) {
+    VehicleStatusMessage vehicleMessage = new VehicleStatusMessage();
+    vehicleMessage.setSequenceNumber(sequenceNumber);
+    vehicleMessage.setCreationTimeStamp(creationTimeStamp);
+    vehicleMessage.setVehicleName(vehicle.getName());
+    vehicleMessage.setProperties(pConverter.toProperties(vehicle.getProperties()));
+    vehicleMessage.setTransportOrderName(
+        vehicle.getTransportOrder() == null ? null : vehicle.getTransportOrder().getName()
+    );
+    vehicleMessage.setBoundingBox(
+        new BoundingBoxTO(
+            vehicle.getBoundingBox().getLength(),
+            vehicle.getBoundingBox().getWidth(),
+            vehicle.getBoundingBox().getHeight(),
+            new CoupleTO(
+                vehicle.getBoundingBox().getReferenceOffset().getX(),
+                vehicle.getBoundingBox().getReferenceOffset().getY()
+            )
+        )
+    );
+    vehicleMessage.setEnergyLevelCritical(
+        vehicle.getEnergyLevelThresholdSet().getEnergyLevelCritical()
+    );
+    vehicleMessage.setEnergyLevelGood(vehicle.getEnergyLevelThresholdSet().getEnergyLevelGood());
+    vehicleMessage.setEnergyLevelSufficientlyRecharged(
+        vehicle.getEnergyLevelThresholdSet().getEnergyLevelSufficientlyRecharged()
+    );
+    vehicleMessage.setEnergyLevelFullyRecharged(
+        vehicle.getEnergyLevelThresholdSet().getEnergyLevelFullyRecharged()
+    );
+    vehicleMessage.setEnergyLevel(vehicle.getEnergyLevel());
+    vehicleMessage.setIntegrationLevel(vehicle.getIntegrationLevel());
+    vehicleMessage.setPosition(
+        vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName()
+    );
+    vehicleMessage.setPaused(vehicle.isPaused());
+    vehicleMessage.setState(vehicle.getState());
+    vehicleMessage.setStateTimestamp(vehicle.getStateTimestamp());
+    vehicleMessage.setProcState(vehicle.getProcState());
+    vehicleMessage.setProcStateTimestamp(vehicle.getProcStateTimestamp());
+    if (vehicle.getPose().getPosition() != null) {
+      vehicleMessage.setPrecisePosition(
+          new VehicleStatusMessage.PrecisePosition(
+              vehicle.getPose().getPosition().getX(),
+              vehicle.getPose().getPosition().getY(),
+              vehicle.getPose().getPosition().getZ()
+          )
+      );
+    }
+    else {
+      vehicleMessage.setPrecisePosition(null);
+    }
+    vehicleMessage.setOrientationAngle(vehicle.getPose().getOrientationAngle());
+    vehicleMessage.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
+    vehicleMessage.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));
+    vehicleMessage.setEnvelopeKey(vehicle.getEnvelopeKey());
+    vehicleMessage.setAcceptableOrderTypes(
+        orderTypeConverter.toAcceptableOrderTypeTOs(vehicle.getAcceptableOrderTypes())
+    );
+    return vehicleMessage;
   }
 
   private String nameOfNullableReference(

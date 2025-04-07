@@ -24,6 +24,7 @@ import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralJobConverter;
 
 /**
  * Handles requests related to peripheral jobs.
@@ -33,6 +34,7 @@ public class PeripheralJobHandler {
   private final PeripheralJobService jobService;
   private final PeripheralDispatcherService jobDispatcherService;
   private final KernelExecutorWrapper executorWrapper;
+  private final PeripheralJobConverter peripheralJobConverter;
 
   /**
    * Creates a new instance.
@@ -45,11 +47,13 @@ public class PeripheralJobHandler {
   public PeripheralJobHandler(
       PeripheralJobService jobService,
       PeripheralDispatcherService jobDispatcherService,
-      KernelExecutorWrapper executorWrapper
+      KernelExecutorWrapper executorWrapper,
+      PeripheralJobConverter peripheralJobConverter
   ) {
     this.jobService = requireNonNull(jobService, "jobService");
     this.jobDispatcherService = requireNonNull(jobDispatcherService, "jobDispatcherService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
+    this.peripheralJobConverter = requireNonNull(peripheralJobConverter, "peripheralJobConverter");
   }
 
   public PeripheralJob createPeripheralJob(String name, PostPeripheralJobRequestTO job) {
@@ -160,7 +164,7 @@ public class PeripheralJobHandler {
               .and(Filters.peripheralJobWithRelatedTransportOrder(relatedOrderRef))
       )
           .stream()
-          .map(GetPeripheralJobResponseTO::fromPeripheralJob)
+          .map(peripheralJob -> peripheralJobConverter.toGetPeripheralJobResponseTO(peripheralJob))
           .sorted(Comparator.comparing(GetPeripheralJobResponseTO::getName))
           .collect(Collectors.toList());
     });
@@ -184,7 +188,7 @@ public class PeripheralJobHandler {
         throw new ObjectUnknownException("Unknown peripheral job: " + name);
       }
 
-      return GetPeripheralJobResponseTO.fromPeripheralJob(job);
+      return peripheralJobConverter.toGetPeripheralJobResponseTO(job);
     });
   }
 }

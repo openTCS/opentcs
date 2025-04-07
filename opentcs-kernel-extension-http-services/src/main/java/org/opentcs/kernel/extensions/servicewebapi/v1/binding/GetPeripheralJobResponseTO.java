@@ -4,8 +4,6 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralJob.State;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PeripheralOperationDescription;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
@@ -117,26 +115,5 @@ public class GetPeripheralJobResponseTO {
   public GetPeripheralJobResponseTO setProperties(List<Property> properties) {
     this.properties = properties;
     return this;
-  }
-
-  public static GetPeripheralJobResponseTO fromPeripheralJob(PeripheralJob job) {
-    GetPeripheralJobResponseTO state = new GetPeripheralJobResponseTO();
-    state.name = job.getName();
-    state.reservationToken = job.getReservationToken();
-    if (job.getRelatedVehicle() != null) {
-      state.relatedVehicle = job.getRelatedVehicle().getName();
-    }
-    if (job.getRelatedTransportOrder() != null) {
-      state.relatedTransportOrder = job.getRelatedTransportOrder().getName();
-    }
-    state.peripheralOperation
-        = PeripheralOperationDescription.fromPeripheralOperation(job.getPeripheralOperation());
-    state.state = job.getState();
-    state.creationTime = job.getCreationTime();
-    state.finishedTime = job.getFinishedTime();
-    state.properties = job.getProperties().entrySet().stream()
-        .map(entry -> new Property(entry.getKey(), entry.getValue()))
-        .collect(Collectors.toList());
-    return state;
   }
 }

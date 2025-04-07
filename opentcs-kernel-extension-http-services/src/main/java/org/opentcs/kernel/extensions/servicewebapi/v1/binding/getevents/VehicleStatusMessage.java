@@ -4,13 +4,15 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents;
 
 import static java.util.Objects.requireNonNull;
 
+import jakarta.annotation.Nonnull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.AcceptableOrderTypeTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
  * A status message containing information about a vehicle.
@@ -21,7 +23,28 @@ public class VehicleStatusMessage
 
   private String vehicleName = "";
 
+  private List<Property> properties = new ArrayList<>();
+
   private String transportOrderName = "";
+
+  private BoundingBoxTO boundingBox = new BoundingBoxTO(
+      1000,
+      1000,
+      1000,
+      new CoupleTO(0, 0)
+  );
+
+  private int energyLevelGood;
+
+  private int energyLevelCritical;
+
+  private int energyLevelSufficientlyRecharged;
+
+  private int energyLevelFullyRecharged;
+
+  private int energyLevel;
+
+  private Vehicle.IntegrationLevel integrationLevel = Vehicle.IntegrationLevel.TO_BE_RESPECTED;
 
   private String position;
 
@@ -42,6 +65,10 @@ public class VehicleStatusMessage
   private List<List<String>> allocatedResources = new ArrayList<>();
 
   private List<List<String>> claimedResources = new ArrayList<>();
+
+  private List<AcceptableOrderTypeTO> acceptableOrderTypes = new ArrayList<>();
+
+  private String envelopeKey;
 
   /**
    * Creates a new instance.
@@ -68,12 +95,90 @@ public class VehicleStatusMessage
     return this;
   }
 
+  public List<Property> getProperties() {
+    return properties;
+  }
+
+  public VehicleStatusMessage setProperties(List<Property> properties) {
+    this.properties = properties;
+    return this;
+  }
+
   public String getTransportOrderName() {
     return transportOrderName;
   }
 
   public VehicleStatusMessage setTransportOrderName(String transportOrderName) {
     this.transportOrderName = transportOrderName;
+    return this;
+  }
+
+  @Nonnull
+  public BoundingBoxTO getBoundingBox() {
+    return boundingBox;
+  }
+
+  public VehicleStatusMessage setBoundingBox(
+      @Nonnull
+      BoundingBoxTO boundingBox
+  ) {
+    this.boundingBox = requireNonNull(boundingBox, "boundingBox");
+    return this;
+  }
+
+  public int getEnergyLevelGood() {
+    return energyLevelGood;
+  }
+
+  public VehicleStatusMessage setEnergyLevelGood(int energyLevelGood) {
+    this.energyLevelGood = energyLevelGood;
+    return this;
+  }
+
+  public int getEnergyLevelCritical() {
+    return energyLevelCritical;
+  }
+
+  public VehicleStatusMessage setEnergyLevelCritical(int energyLevelCritical) {
+    this.energyLevelCritical = energyLevelCritical;
+    return this;
+  }
+
+  public int getEnergyLevelSufficientlyRecharged() {
+    return energyLevelSufficientlyRecharged;
+  }
+
+  public VehicleStatusMessage setEnergyLevelSufficientlyRecharged(
+      int energyLevelSufficientlyRecharged
+  ) {
+    this.energyLevelSufficientlyRecharged = energyLevelSufficientlyRecharged;
+    return this;
+  }
+
+  public int getEnergyLevelFullyRecharged() {
+    return energyLevelFullyRecharged;
+  }
+
+  public VehicleStatusMessage setEnergyLevelFullyRecharged(int energyLevelFullyRecharged) {
+    this.energyLevelFullyRecharged = energyLevelFullyRecharged;
+    return this;
+  }
+
+  public int getEnergyLevel() {
+    return energyLevel;
+  }
+
+  public VehicleStatusMessage setEnergyLevel(int energyLevel) {
+    this.energyLevel = energyLevel;
+    return this;
+  }
+
+  public Vehicle.IntegrationLevel getIntegrationLevel() {
+    return integrationLevel;
+  }
+
+  public VehicleStatusMessage setIntegrationLevel(Vehicle.IntegrationLevel integrationLevel) {
+    this.integrationLevel = requireNonNull(integrationLevel, "integrationLevel");
     return this;
   }
 
@@ -167,65 +272,28 @@ public class VehicleStatusMessage
     return this;
   }
 
-  public static VehicleStatusMessage fromVehicle(
-      Vehicle vehicle,
-      long sequenceNumber
-  ) {
-    return fromVehicle(vehicle, sequenceNumber, Instant.now());
+  public List<AcceptableOrderTypeTO> getAcceptableOrderTypes() {
+    return acceptableOrderTypes;
   }
 
-  public static VehicleStatusMessage fromVehicle(
-      Vehicle vehicle,
-      long sequenceNumber,
-      Instant creationTimeStamp
+  public VehicleStatusMessage setAcceptableOrderTypes(
+      List<AcceptableOrderTypeTO> acceptableOrderTypes
   ) {
-    VehicleStatusMessage vehicleMessage = new VehicleStatusMessage();
-    vehicleMessage.setSequenceNumber(sequenceNumber);
-    vehicleMessage.setCreationTimeStamp(creationTimeStamp);
-    vehicleMessage.setVehicleName(vehicle.getName());
-    vehicleMessage.setTransportOrderName(
-        vehicle.getTransportOrder() == null ? null : vehicle.getTransportOrder().getName()
-    );
-    vehicleMessage.setPosition(
-        vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName()
-    );
-    vehicleMessage.setPaused(vehicle.isPaused());
-    vehicleMessage.setState(vehicle.getState());
-    vehicleMessage.setStateTimestamp(vehicle.getStateTimestamp());
-    vehicleMessage.setProcState(vehicle.getProcState());
-    vehicleMessage.setProcStateTimestamp(vehicle.getProcStateTimestamp());
-    if (vehicle.getPose().getPosition() != null) {
-      vehicleMessage.setPrecisePosition(
-          new PrecisePosition(
-              vehicle.getPose().getPosition().getX(),
-              vehicle.getPose().getPosition().getY(),
-              vehicle.getPose().getPosition().getZ()
-          )
-      );
-    }
-    else {
-      vehicleMessage.setPrecisePosition(null);
-    }
-    vehicleMessage.setOrientationAngle(vehicle.getPose().getOrientationAngle());
-    vehicleMessage.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
-    vehicleMessage.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));
-    return vehicleMessage;
+    this.acceptableOrderTypes = requireNonNull(acceptableOrderTypes, "acceptableOrderTypes");
+    return this;
   }
 
-  private static List<List<String>> toListOfListOfNames(
-      List<Set<TCSResourceReference<?>>> resources
+  @Nonnull
+  public String getEnvelopeKey() {
+    return envelopeKey;
+  }
+
+  public VehicleStatusMessage setEnvelopeKey(
+      @Nonnull
+      String envelopeKey
   ) {
-    List<List<String>> result = new ArrayList<>(resources.size());
-
-    for (Set<TCSResourceReference<?>> resSet : resources) {
-      result.add(
-          resSet.stream()
-              .map(resRef -> resRef.getName())
-              .collect(Collectors.toList())
-      );
-    }
-
-    return result;
+    this.envelopeKey = envelopeKey;
+    return this;
   }
 
   /**

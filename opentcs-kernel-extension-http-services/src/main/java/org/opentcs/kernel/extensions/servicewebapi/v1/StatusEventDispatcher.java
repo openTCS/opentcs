@@ -6,6 +6,7 @@ import static java.util.Objects.requireNonNull;
 import static org.opentcs.util.Assertions.checkInRange;
 
 import jakarta.inject.Inject;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -20,10 +21,10 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetEventsResponseTO;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.OrderStatusMessage;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.PeripheralJobStatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.StatusMessage;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.VehicleStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralJobConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.TransportOrderConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.VehicleConverter;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;
 import org.slf4j.Logger;
@@ -50,6 +51,18 @@ public class StatusEventDispatcher
    */
   private final EventSource eventSource;
   /**
+   * Converts different vehicle classes.
+   */
+  private final VehicleConverter vehicleConverter;
+  /**
+   * Converts different transport order classes.
+   */
+  private final TransportOrderConverter transportOrderConverter;
+  /**
+   * Converts different peripheral job classes.
+   */
+  private final PeripheralJobConverter peripheralJobConverter;
+  /**
    * The events collected.
    */
   private final SortedMap<Long, StatusMessage> events = new TreeMap<>();
@@ -70,10 +83,18 @@ public class StatusEventDispatcher
   public StatusEventDispatcher(
       ServiceWebApiConfiguration configuration,
       @ApplicationEventBus
-      EventSource eventSource
+      EventSource eventSource,
+      VehicleConverter vehicleConverter,
+      TransportOrderConverter transportOrderConverter,
+      PeripheralJobConverter peripheralJobConverter
   ) {
     this.configuration = requireNonNull(configuration, "configuration");
     this.eventSource = requireNonNull(eventSource, "eventSource");
+    this.vehicleConverter = requireNonNull(vehicleConverter, "vehicleConverter");
+    this.transportOrderConverter
+        = requireNonNull(transportOrderConverter, "transportOrderConverter");
+    this.peripheralJobConverter
+        = requireNonNull(peripheralJobConverter, "peripheralJobConverter");
   }
 
   @Override
@@ -193,15 +214,27 @@ public class StatusEventDispatcher
   }
 
   private void addOrderStatusMessage(TransportOrder order, long sequenceNumber) {
-    events.put(sequenceNumber, OrderStatusMessage.fromTransportOrder(order, sequenceNumber));
+    events.put(
+        sequenceNumber,
+        transportOrderConverter.toOrderStatusMessage(order, sequenceNumber, Instant.now())
+    );
   }
 
   private void addVehicleStatusMessage(Vehicle vehicle, long sequenceNumber) {
-    events.put(sequenceNumber, VehicleStatusMessage.fromVehicle(vehicle, sequenceNumber));
+    events.put(
+        sequenceNumber, vehicleConverter.toVehicleStatusMessage(
+            vehicle,
+            sequenceNumber,
+            Instant.now()
+        )
+    );
   }
 
   private void addPeripheralStatusMessage(PeripheralJob job, long sequenceNumber) {
-    events.put(sequenceNumber, PeripheralJobStatusMessage.fromPeripheralJob(job, sequenceNumber));
+    events.put(
+        sequenceNumber,
+        peripheralJobConverter.toPeripheralJobStatusMessage(job, sequenceNumber, Instant.now())
+    );
   }
 
   private void cleanUpEvents() {

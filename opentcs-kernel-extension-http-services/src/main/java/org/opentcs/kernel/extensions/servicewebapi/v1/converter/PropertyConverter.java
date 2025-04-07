@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 
 /**
@@ -20,6 +21,13 @@ public class PropertyConverter {
     return properties.entrySet().stream()
         .map(property -> new PropertyTO(property.getKey(), property.getValue()))
         .sorted(Comparator.comparing(PropertyTO::getName))
+        .collect(Collectors.toList());
+  }
+
+  public List<Property> toProperties(Map<String, String> properties) {
+    return properties.entrySet().stream()
+        .map(property -> new Property(property.getKey(), property.getValue()))
+        .sorted(Comparator.comparing(Property::getKey))
         .collect(Collectors.toList());
   }
 

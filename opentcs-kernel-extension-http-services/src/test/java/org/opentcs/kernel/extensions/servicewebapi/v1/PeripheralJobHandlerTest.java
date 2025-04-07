@@ -34,6 +34,8 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobRe
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PeripheralOperationDescription;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralJobConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralOperationConverter;
 
 /**
  * Unit tests for {@link PeripheralJobHandler}.
@@ -43,6 +45,7 @@ class PeripheralJobHandlerTest {
   private PeripheralJobService jobService;
   private PeripheralDispatcherService jobDispatcherService;
   private KernelExecutorWrapper executorWrapper;
+  private PeripheralJobConverter peripheralJobConverter;
 
   private PeripheralJobHandler handler;
 
@@ -51,11 +54,13 @@ class PeripheralJobHandlerTest {
     jobService = mock();
     jobDispatcherService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
+    peripheralJobConverter = new PeripheralJobConverter(new PeripheralOperationConverter());
 
     handler = new PeripheralJobHandler(
         jobService,
         jobDispatcherService,
-        executorWrapper
+        executorWrapper,
+        peripheralJobConverter
     );
   }
 

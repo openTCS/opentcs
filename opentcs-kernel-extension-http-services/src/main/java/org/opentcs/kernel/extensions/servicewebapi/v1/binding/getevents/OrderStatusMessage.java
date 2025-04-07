@@ -5,8 +5,6 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DestinationState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
@@ -19,6 +17,16 @@ public class OrderStatusMessage
       StatusMessage {
 
   private String orderName;
+
+  private boolean dispensable;
+
+  private String peripheralReservationToken;
+
+  private String wrappingSequence;
+
+  private String orderType = "";
+
+  private String intendedVehicle;
 
   private String processingVehicleName;
 
@@ -50,6 +58,53 @@ public class OrderStatusMessage
 
   public OrderStatusMessage setOrderName(String orderName) {
     this.orderName = orderName;
+    return this;
+  }
+
+  public boolean isDispensable() {
+    return dispensable;
+  }
+
+  public OrderStatusMessage setDispensable(boolean dispensable) {
+    this.dispensable = dispensable;
+    return this;
+  }
+
+  public String getPeripheralReservationToken() {
+    return peripheralReservationToken;
+  }
+
+  public OrderStatusMessage setPeripheralReservationToken(
+      String peripheralReservationToken
+  ) {
+    this.peripheralReservationToken = peripheralReservationToken;
+    return this;
+  }
+
+  public String getWrappingSequence() {
+    return wrappingSequence;
+  }
+
+  public OrderStatusMessage setWrappingSequence(String wrappingSequence) {
+    this.wrappingSequence = wrappingSequence;
+    return this;
+  }
+
+  public String getOrderType() {
+    return orderType;
+  }
+
+  public OrderStatusMessage setOrderType(String orderType) {
+    this.orderType = orderType;
+    return this;
+  }
+
+  public String getIntendedVehicle() {
+    return intendedVehicle;
+  }
+
+  public OrderStatusMessage setIntendedVehicle(String intendedVehicle) {
+    this.intendedVehicle = intendedVehicle;
     return this;
   }
 
@@ -87,35 +142,6 @@ public class OrderStatusMessage
   public OrderStatusMessage setProperties(List<Property> properties) {
     this.properties = properties;
     return this;
-  }
-
-  public static OrderStatusMessage fromTransportOrder(
-      TransportOrder order,
-      long sequenceNumber
-  ) {
-    return fromTransportOrder(order, sequenceNumber, Instant.now());
-  }
-
-  public static OrderStatusMessage fromTransportOrder(
-      TransportOrder order,
-      long sequenceNumber,
-      Instant creationTimeStamp
-  ) {
-    OrderStatusMessage orderMessage = new OrderStatusMessage();
-    orderMessage.setSequenceNumber(sequenceNumber);
-    orderMessage.setCreationTimeStamp(creationTimeStamp);
-    orderMessage.setOrderName(order.getName());
-    orderMessage.setProcessingVehicleName(
-        order.getProcessingVehicle() == null ? null : order.getProcessingVehicle().getName()
-    );
-    orderMessage.setOrderState(OrderState.fromTransportOrderState(order.getState()));
-    for (DriveOrder curDriveOrder : order.getAllDriveOrders()) {
-      orderMessage.getDestinations().add(DestinationState.fromDriveOrder(curDriveOrder));
-    }
-    for (Map.Entry<String, String> mapEntry : order.getProperties().entrySet()) {
-      orderMessage.getProperties().add(new Property(mapEntry.getKey(), mapEntry.getValue()));
-    }
-    return orderMessage;
   }
 
   /**

@@ -5,12 +5,8 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DestinationState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
@@ -137,55 +133,5 @@ public class GetTransportOrderResponseTO {
   ) {
     this.properties = requireNonNull(properties, "properties");
     return this;
-  }
-
-  /**
-   * Creates a new instance from a <code>TransportOrder</code>.
-   *
-   * @param transportOrder The transport order to create an instance from.
-   * @return A new instance containing the data from the given transport order.
-   */
-  public static GetTransportOrderResponseTO fromTransportOrder(TransportOrder transportOrder) {
-    if (transportOrder == null) {
-      return null;
-    }
-    GetTransportOrderResponseTO transportOrderState = new GetTransportOrderResponseTO();
-    transportOrderState.setDispensable(transportOrder.isDispensable());
-    transportOrderState.setName(transportOrder.getName());
-    transportOrderState.setPeripheralReservationToken(
-        transportOrder.getPeripheralReservationToken()
-    );
-    transportOrderState.setWrappingSequence(
-        nameOfNullableReference(transportOrder.getWrappingSequence())
-    );
-    transportOrderState.setType(transportOrder.getType());
-    transportOrderState.setDestinations(
-        transportOrder.getAllDriveOrders()
-            .stream()
-            .map(driveOrder -> DestinationState.fromDriveOrder(driveOrder))
-            .collect(Collectors.toList())
-    );
-    transportOrderState.setIntendedVehicle(
-        nameOfNullableReference(transportOrder.getIntendedVehicle())
-    );
-    transportOrderState.setProcessingVehicle(
-        nameOfNullableReference(transportOrder.getProcessingVehicle())
-    );
-    transportOrderState.setState(transportOrder.getState());
-    transportOrderState.setProperties(convertProperties(transportOrder.getProperties()));
-    return transportOrderState;
-  }
-
-  private static String nameOfNullableReference(
-      @Nullable
-      TCSObjectReference<?> reference
-  ) {
-    return reference == null ? null : reference.getName();
-  }
-
-  private static List<Property> convertProperties(Map<String, String> properties) {
-    return properties.entrySet().stream()
-        .map(property -> new Property(property.getKey(), property.getValue()))
-        .collect(Collectors.toList());
   }
 }

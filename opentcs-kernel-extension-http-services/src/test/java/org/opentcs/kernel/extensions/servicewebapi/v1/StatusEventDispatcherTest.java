@@ -25,6 +25,12 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetEventsResponseT
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.OrderStatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.PeripheralJobStatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.VehicleStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.AcceptableOrderTypeConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralJobConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralOperationConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PropertyConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.TransportOrderConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.VehicleConverter;
 import org.opentcs.util.event.EventSource;
 import org.opentcs.util.event.SimpleEventBus;
 
@@ -36,12 +42,24 @@ class StatusEventDispatcherTest {
   private ServiceWebApiConfiguration configuration;
   private EventSource eventSource;
   private StatusEventDispatcher statusEventDispatcher;
+  private VehicleConverter vehicleConverter;
+  private TransportOrderConverter transportOrderConverter;
+  private PeripheralJobConverter peripheralJobConverter;
 
   @BeforeEach
   void setUp() {
     configuration = mock(ServiceWebApiConfiguration.class);
     eventSource = new SimpleEventBus();
-    statusEventDispatcher = new StatusEventDispatcher(configuration, eventSource);
+    vehicleConverter = new VehicleConverter(
+        new PropertyConverter(),
+        new AcceptableOrderTypeConverter()
+    );
+    transportOrderConverter = new TransportOrderConverter();
+    peripheralJobConverter = new PeripheralJobConverter(new PeripheralOperationConverter());
+    statusEventDispatcher = new StatusEventDispatcher(
+        configuration, eventSource, vehicleConverter, transportOrderConverter,
+        peripheralJobConverter
+    );
 
     given(configuration.statusEventsCapacity())
         .willReturn(10);

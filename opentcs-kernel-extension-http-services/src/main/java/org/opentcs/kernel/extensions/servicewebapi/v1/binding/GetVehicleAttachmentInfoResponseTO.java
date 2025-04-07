@@ -5,8 +5,6 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 
 /**
  * Arranges the data from a vehicle's <code>AttachmentInformation</code> for transferring.
@@ -56,40 +54,5 @@ public class GetVehicleAttachmentInfoResponseTO {
 
   public String getAttachedCommAdapter() {
     return attachedCommAdapter;
-  }
-
-  /**
-   * Creates a new instance from <code>AttachmentInformation</code>.
-   *
-   * @param attachmentInformation The <code>AttachmentInformation</code> to create an
-   * instance from.
-   * @return A new instance containing the data from the given <code>AttachmentInformation</code>.
-   */
-  public static GetVehicleAttachmentInfoResponseTO fromAttachmentInformation(
-      VehicleAttachmentInformation attachmentInformation
-  ) {
-    if (attachmentInformation == null) {
-      return null;
-    }
-    GetVehicleAttachmentInfoResponseTO attachmentInformationTO
-        = new GetVehicleAttachmentInfoResponseTO();
-
-    attachmentInformationTO.setVehicleName(
-        attachmentInformation.getVehicleReference()
-            .getName()
-    );
-    attachmentInformationTO.setAvailableCommAdapters(
-        attachmentInformation.getAvailableCommAdapters()
-            .stream()
-            .map(description -> description.getClass().getName())
-            .collect(Collectors.toList())
-    );
-    attachmentInformationTO.setAttachedCommAdapter(
-        attachmentInformation.getAttachedCommAdapter()
-            .getClass()
-            .getName()
-    );
-
-    return attachmentInformationTO;
   }
 }

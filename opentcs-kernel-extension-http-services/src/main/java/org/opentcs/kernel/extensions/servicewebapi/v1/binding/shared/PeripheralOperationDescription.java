@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared;
 
-import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.data.peripherals.PeripheralOperation.ExecutionTrigger;
 
 /**
@@ -56,16 +55,4 @@ public class PeripheralOperationDescription {
     this.completionRequired = completionRequired;
     return this;
   }
-
-  public static PeripheralOperationDescription fromPeripheralOperation(
-      PeripheralOperation operation
-  ) {
-    PeripheralOperationDescription state = new PeripheralOperationDescription();
-    state.operation = operation.getOperation();
-    state.locationName = operation.getLocation().getName();
-    state.executionTrigger = operation.getExecutionTrigger();
-    state.completionRequired = operation.isCompletionRequired();
-    return state;
-  }
-
 }

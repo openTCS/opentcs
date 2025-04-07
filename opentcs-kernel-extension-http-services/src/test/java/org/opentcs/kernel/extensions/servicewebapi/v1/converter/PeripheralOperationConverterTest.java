@@ -15,6 +15,7 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PeripheralOperationTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PeripheralOperationDescription;
 
 /**
  * Tests for {@link PeripheralOperationConverter}.
@@ -67,5 +68,26 @@ class PeripheralOperationConverterTest {
         is(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION.name())
     );
     assertTrue(result.get(0).isCompletionRequired());
+  }
+
+  @Test
+  void checkToPeripheralOperationDescription() {
+    PeripheralOperation peripheralOp = new PeripheralOperation(
+        new Location("L1", new LocationType("LT1").getReference()).getReference(),
+        "operation",
+        PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION,
+        true
+    );
+
+    PeripheralOperationDescription description
+        = peripheralOpConverter.toPeripheralOperationDescription(peripheralOp);
+
+    assertThat(description.getOperation(), is("operation"));
+    assertThat(description.getLocationName(), is("L1"));
+    assertThat(
+        description.getExecutionTrigger(),
+        is(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION)
+    );
+    assertTrue(description.isCompletionRequired());
   }
 }

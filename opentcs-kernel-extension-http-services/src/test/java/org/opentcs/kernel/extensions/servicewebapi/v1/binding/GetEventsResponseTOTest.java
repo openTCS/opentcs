@@ -15,6 +15,9 @@ import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.OrderStatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.PeripheralJobStatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.VehicleStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.AcceptableOrderTypeTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DestinationState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PeripheralOperationDescription;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
@@ -56,7 +59,15 @@ class GetEventsResponseTOTest {
         .setSequenceNumber(sequenceNo)
         .setCreationTimeStamp(Instant.EPOCH)
         .setVehicleName("some-vehicle")
+        .setProperties(List.of(new Property("some-key", "some-value")))
         .setTransportOrderName("some-transport-order")
+        .setBoundingBox(new BoundingBoxTO(500, 400, 500, new CoupleTO(20, 20)))
+        .setEnergyLevelGood(95)
+        .setEnergyLevelCritical(20)
+        .setEnergyLevelSufficientlyRecharged(40)
+        .setEnergyLevelFullyRecharged(80)
+        .setEnergyLevel(70)
+        .setIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED)
         .setPosition("some-point")
         .setPrecisePosition(new VehicleStatusMessage.PrecisePosition(1, 2, 3))
         .setPaused(false)
@@ -75,16 +86,23 @@ class GetEventsResponseTOTest {
                 List.of("some-path", "some-point"),
                 List.of("some-other-path", "some-other-point")
             )
-        );
+        )
+        .setAcceptableOrderTypes(List.of(new AcceptableOrderTypeTO("some-order-type", 1)))
+        .setEnvelopeKey("some-envelope-key");
   }
 
   private OrderStatusMessage createOrderStatusMessage(long sequenceNo) {
     return new OrderStatusMessage()
         .setSequenceNumber(sequenceNo)
+        .setDispensable(true)
         .setCreationTimeStamp(Instant.EPOCH)
         .setOrderName("some-order")
-        .setProcessingVehicleName("some-vehicle")
+        .setOrderType("some-order-type")
         .setOrderState(OrderStatusMessage.OrderState.BEING_PROCESSED)
+        .setIntendedVehicle("some-intended-vehicle")
+        .setProcessingVehicleName("some-vehicle")
+        .setPeripheralReservationToken("some-peripheral-reservation-token")
+        .setWrappingSequence("some-wrapping-sequence")
         .setDestinations(
             List.of(
                 new DestinationState()

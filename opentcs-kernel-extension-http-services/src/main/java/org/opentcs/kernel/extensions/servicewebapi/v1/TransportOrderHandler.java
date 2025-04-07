@@ -35,6 +35,8 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostOrderSequenceR
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.posttransportorder.Destination;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.OrderSequenceConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.TransportOrderConverter;
 
 /**
  * Handles requests related to transport orders and order sequences.
@@ -43,6 +45,8 @@ public class TransportOrderHandler {
 
   private final TransportOrderService orderService;
   private final KernelExecutorWrapper executorWrapper;
+  private final OrderSequenceConverter orderSequenceConverter;
+  private final TransportOrderConverter transportOrderConverter;
 
   /**
    * Creates a new instance.
@@ -53,10 +57,16 @@ public class TransportOrderHandler {
   @Inject
   public TransportOrderHandler(
       TransportOrderService orderService,
-      KernelExecutorWrapper executorWrapper
+      KernelExecutorWrapper executorWrapper,
+      OrderSequenceConverter orderSequenceConverter,
+      TransportOrderConverter transportOrderConverter
   ) {
     this.orderService = requireNonNull(orderService, "orderService");
     this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
+    this.orderSequenceConverter
+        = requireNonNull(orderSequenceConverter, "orderSequenceConverter");
+    this.transportOrderConverter
+        = requireNonNull(transportOrderConverter, "transportOrderConverter");
   }
 
   public TransportOrder createOrder(String name, PostTransportOrderRequestTO order)
@@ -140,7 +150,7 @@ public class TransportOrderHandler {
           Filters.transportOrderWithIntendedVehicle(intendedVehicleRef)
       )
           .stream()
-          .map(GetTransportOrderResponseTO::fromTransportOrder)
+          .map(order -> transportOrderConverter.toGetTransportOrderResponse(order))
           .sorted(Comparator.comparing(GetTransportOrderResponseTO::getName))
           .collect(Collectors.toList());
     });
@@ -159,7 +169,7 @@ public class TransportOrderHandler {
 
     return executorWrapper.callAndWait(() -> {
       return Optional.ofNullable(orderService.fetchObject(TransportOrder.class, name))
-          .map(GetTransportOrderResponseTO::fromTransportOrder)
+          .map(order -> transportOrderConverter.toGetTransportOrderResponse(order))
           .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + name));
     });
   }
@@ -218,7 +228,7 @@ public class TransportOrderHandler {
           Filters.orderSequenceWithIntendedVehicle(intendedVehicleRef)
       )
           .stream()
-          .map(GetOrderSequenceResponseTO::fromOrderSequence)
+          .map(sequence -> orderSequenceConverter.toGetOrderSequenceResponseTO(sequence))
           .sorted(Comparator.comparing(GetOrderSequenceResponseTO::getName))
           .collect(Collectors.toList());
     });
@@ -230,7 +240,7 @@ public class TransportOrderHandler {
 
     return executorWrapper.callAndWait(() -> {
       return Optional.ofNullable(orderService.fetchObject(OrderSequence.class, name))
-          .map(GetOrderSequenceResponseTO::fromOrderSequence)
+          .map(sequence -> orderSequenceConverter.toGetOrderSequenceResponseTO(sequence))
           .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + name));
     });
   }

@@ -13,11 +13,6 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.kernel.extensions.servicewebapi.HttpConstants;
 import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.RequestHandler;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetOrderSequenceResponseTO;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralAttachmentInfoResponseTO;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobResponseTO;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetTransportOrderResponseTO;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleAttachmentInfoResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PlantModelTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostOrderSequenceRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
@@ -29,6 +24,11 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesR
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAcceptableOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleEnergyLevelThresholdSetTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.OrderSequenceConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralAttachmentInformationConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralJobConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.TransportOrderConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.VehicleAttachmentInformationConverter;
 import spark.QueryParamsMap;
 import spark.Request;
 import spark.Response;
@@ -52,6 +52,11 @@ public class V1RequestHandler
   private final PathHandler pathHandler;
   private final LocationHandler locationHandler;
   private final PeripheralHandler peripheralHandler;
+  private final OrderSequenceConverter orderSequenceConverter;
+  private final PeripheralJobConverter peripheralJobConverter;
+  private final TransportOrderConverter transportOrderConverter;
+  private final PeripheralAttachmentInformationConverter peripheralAttachmentInformationConverter;
+  private final VehicleAttachmentInformationConverter vehicleAttachmentInformationConverter;
 
   private boolean initialized;
 
@@ -67,7 +72,12 @@ public class V1RequestHandler
       VehicleHandler vehicleHandler,
       PathHandler pathHandler,
       LocationHandler locationHandler,
-      PeripheralHandler peripheralHandler
+      PeripheralHandler peripheralHandler,
+      OrderSequenceConverter orderSequenceConverter,
+      PeripheralJobConverter peripheralJobConverter,
+      TransportOrderConverter transportOrderConverter,
+      PeripheralAttachmentInformationConverter peripheralAttachmentInformationConverter,
+      VehicleAttachmentInformationConverter vehicleAttachmentInformationConverter
   ) {
     this.jsonBinder = requireNonNull(jsonBinder, "jsonBinder");
     this.statusEventDispatcher = requireNonNull(statusEventDispatcher, "statusEventDispatcher");
@@ -80,6 +90,17 @@ public class V1RequestHandler
     this.pathHandler = requireNonNull(pathHandler, "pathHandler");
     this.locationHandler = requireNonNull(locationHandler, "locationHandler");
     this.peripheralHandler = requireNonNull(peripheralHandler, "peripheralHandler");
+    this.orderSequenceConverter = requireNonNull(orderSequenceConverter, "orderSequenceConverter");
+    this.peripheralJobConverter = requireNonNull(peripheralJobConverter, "peripheralJobConverter");
+    this.transportOrderConverter = requireNonNull(
+        transportOrderConverter, "transportOrderConverter"
+    );
+    this.peripheralAttachmentInformationConverter = requireNonNull(
+        peripheralAttachmentInformationConverter, "peripheralAttachmentInformationConverter"
+    );
+    this.vehicleAttachmentInformationConverter = requireNonNull(
+        vehicleAttachmentInformationConverter, "vehicleAttachmentInformationConverter"
+    );
   }
 
   @Override
@@ -338,7 +359,7 @@ public class V1RequestHandler
         IllegalArgumentException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
-        GetVehicleAttachmentInfoResponseTO.fromAttachmentInformation(
+        vehicleAttachmentInformationConverter.toGetVehicleAttachmentInfoResponseTO(
             vehicleHandler.getVehicleCommAdapterAttachmentInformation(
                 request.params(":NAME")
             )
@@ -379,7 +400,7 @@ public class V1RequestHandler
         IllegalStateException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
-        GetTransportOrderResponseTO.fromTransportOrder(
+        transportOrderConverter.toGetTransportOrderResponse(
             transportOrderHandler.createOrder(
                 request.params(":NAME"),
                 jsonBinder.fromJson(request.body(), PostTransportOrderRequestTO.class)
@@ -405,7 +426,7 @@ public class V1RequestHandler
         IllegalStateException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
-        GetOrderSequenceResponseTO.fromOrderSequence(
+        orderSequenceConverter.toGetOrderSequenceResponseTO(
             transportOrderHandler.createOrderSequence(
                 request.params(":NAME"),
                 jsonBinder.fromJson(request.body(), PostOrderSequenceRequestTO.class)
@@ -657,7 +678,7 @@ public class V1RequestHandler
         IllegalArgumentException {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
-        GetPeripheralAttachmentInfoResponseTO.fromAttachmentInformation(
+        peripheralAttachmentInformationConverter.toGetPeripheralAttachmentInfoResponseTO(
             peripheralHandler.getPeripheralCommAdapterAttachmentInformation(
                 request.params(":NAME")
             )
@@ -696,7 +717,7 @@ public class V1RequestHandler
   private Object handlePostPeripheralJobsByName(Request request, Response response) {
     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     return jsonBinder.toJson(
-        GetPeripheralJobResponseTO.fromPeripheralJob(
+        peripheralJobConverter.toGetPeripheralJobResponseTO(
             peripheralJobHandler.createPeripheralJob(
                 request.params(":NAME"),
                 jsonBinder.fromJson(request.body(), PostPeripheralJobRequestTO.class)

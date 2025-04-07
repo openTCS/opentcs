@@ -5,7 +5,26 @@
     "sequenceNumber" : 0,
     "creationTimeStamp" : "1970-01-01T00:00:00Z",
     "vehicleName" : "some-vehicle",
+    "properties" : [ {
+      "key" : "some-key",
+      "value" : "some-value"
+    } ],
     "transportOrderName" : "some-transport-order",
+    "boundingBox" : {
+      "length" : 500,
+      "width" : 400,
+      "height" : 500,
+      "referenceOffset" : {
+        "x" : 20,
+        "y" : 20
+      }
+    },
+    "energyLevelGood" : 95,
+    "energyLevelCritical" : 20,
+    "energyLevelSufficientlyRecharged" : 40,
+    "energyLevelFullyRecharged" : 80,
+    "energyLevel" : 70,
+    "integrationLevel" : "TO_BE_UTILIZED",
     "position" : "some-point",
     "precisePosition" : {
       "x" : 1,
@@ -19,12 +38,22 @@
     "procState" : "IDLE",
     "procStateTimestamp" : "2025-01-29T11:58:02Z",
     "allocatedResources" : [ [ "some-path", "some-point" ], [ "some-other-path", "some-other-point" ] ],
-    "claimedResources" : [ [ "some-path", "some-point" ], [ "some-other-path", "some-other-point" ] ]
+    "claimedResources" : [ [ "some-path", "some-point" ], [ "some-other-path", "some-other-point" ] ],
+    "acceptableOrderTypes" : [ {
+      "name" : "some-order-type",
+      "priority" : 1
+    } ],
+    "envelopeKey" : "some-envelope-key"
   }, {
     "type" : "TransportOrder",
     "sequenceNumber" : 1,
     "creationTimeStamp" : "1970-01-01T00:00:00Z",
     "orderName" : "some-order",
+    "dispensable" : true,
+    "peripheralReservationToken" : "some-peripheral-reservation-token",
+    "wrappingSequence" : "some-wrapping-sequence",
+    "orderType" : "some-order-type",
+    "intendedVehicle" : "some-intended-vehicle",
     "processingVehicleName" : "some-vehicle",
     "orderState" : "BEING_PROCESSED",
     "destinations" : [ {

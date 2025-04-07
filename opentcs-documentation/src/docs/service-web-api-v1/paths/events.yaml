@@ -97,14 +97,18 @@ components:
               default: TransportOrder
             sequenceNumber:
               example: 124
+            dispensable:
+              type: boolean
+              description: Whether this order is dispensable (may be withdrawn automatically).
+              example: false
             orderName:
               type: string
               description: The (optional) transport order name
               example: TOrder-0001
-            processingVehicleName:
+            orderType:
               type: string
-              description: The processing vehicle's name
-              example: Vehicle-0001
+              description: The type of the transport order.
+              example: Park
             orderState:
               type: string
               enum:
@@ -117,6 +121,25 @@ components:
                 - FAILED
                 - UNROUTABLE
               description: The transport order's current state
+            intendedVehicle:
+              type: string
+              description: The name of the vehicle that is intended to process the transport
+                order.
+              example: Vehicle-0001
+            processingVehicleName:
+              type: string
+              description: The processing vehicle's name
+              example: Vehicle-0001
+            peripheralReservationToken:
+              type: string
+              description: An (optional) token for reserving peripheral devices while processing this transport order.
+              example: Token-001
+            wrappingSequence:
+              type: string
+              description: >-
+                The order sequence this transport order belongs to.
+                May be `null` in case this order isn't part of any sequence.
+              example: OrderSequence-01
             destinations:
               type: array
               minItems: 1
@@ -131,6 +154,16 @@ components:
               description: The transport order's properties
       required:
         - type
+        - dispensable
+        - orderName
+        - orderType
+        - orderState
+        - intendedVehicle
+        - processingVehicleName
+        - peripheralReservationToken
+        - wrappingSequence
+        - destinations
+        - properties
     VehicleStatusMessage:
       type: object
       additionalProperties: false
@@ -148,6 +181,62 @@ components:
               type: string
               description: The vehicle's name
               example: Vehicle-0001
+            properties:
+              type: array
+              items:
+                $ref: "../schemas/common.yaml#/components/schemas/Property"
+              description: The vehicle's properties
+            boundingBox:
+              $ref: "../schemas/common.yaml#/components/schemas/BoundingBox"
+            energyLevelGood:
+              type: integer
+              description: The value (in %) at/above which the vehicle's energy level is considered
+                'good'.
+              example: 90
+            energyLevelCritical:
+              type: integer
+              description: The value (in %) at/below which the vehicle's energy level is considered
+                'critical'.
+              example: 30
+            energyLevelSufficientlyRecharged:
+              type: integer
+              description: The value (in %) at/below which the vehicle's energy level is considered
+                'sufficiently recharged'.
+              example: 30
+            energyLevelFullyRecharged:
+              type: integer
+              description: The value (in %) at/below which the vehicle's energy level is considered
+                'fully recharged'.
+              example: 90
+            energyLevel:
+              type: integer
+              description: The vehicle's remaining energy (in %).
+              example: 60
+            integrationLevel:
+              type: string
+              enum:
+                - TO_BE_IGNORED
+                - TO_BE_NOTICED
+                - TO_BE_RESPECTED
+                - TO_BE_UTILIZED
+              description: The vehicle's integration level.
+            paused:
+              type: boolean
+              description: Whether the vehicle is paused.
+              example: false
+            procState:
+              type: string
+              enum:
+                - UNAVAILABLE
+                - IDLE
+                - AWAITING_ORDER
+                - PROCESSING_ORDER
+              description: The vehicle's current processing state
+            procStateTimestamp:
+              type: string
+              format: date-time
+              description: The time at which the vehicle has entered its current processing state (expressed according to ISO 8601).
+              example: 2018-05-14T07:42:00.343Z
             transportOrderName:
               type: string
               description: The name of the transport order the vehicle currently processes
@@ -167,10 +256,6 @@ components:
                 The vehicle's current orientation angle (-360..360).
                 May be a string ("NaN") if the vehicle hasn't provided an orientation angle.
               example: 90.0
-            paused:
-              type: boolean
-              description: Whether the vehicle is paused.
-              example: false
             state:
               type: string
               enum:
@@ -186,19 +271,6 @@ components:
               format: date-time
               description: The time at which the vehicle has entered its current state (expressed according to ISO 8601).
               example: 2018-05-14T07:42:00.343Z
-            procState:
-              type: string
-              enum:
-                - UNAVAILABLE
-                - IDLE
-                - AWAITING_ORDER
-                - PROCESSING_ORDER
-              description: The vehicle's current processing state
-            procStateTimestamp:
-              type: string
-              format: date-time
-              description: The time at which the vehicle has entered its current processing state (expressed according to ISO 8601).
-              example: 2018-05-14T07:42:00.343Z
             allocatedResources:
               type: array
               items:
@@ -211,16 +283,61 @@ components:
                 $ref: "../schemas/common.yaml#/components/schemas/ResourceSet"
               description: The resources claimed - i.e. not yet allocated - for the vehicle's route.
               example: [ [ "Path-0041--0042", "Point-0042" ], [ "Path-0042--0043", "Point-0043", "Location-2345" ] ]
+            acceptableOrderTypes:
+              type: array
+              items:
+                $ref: "#/components/schemas/AcceptableOrderTypes"
+                description: The acceptable order types for this vehicle.
+            envelopeKey:
+              type: string
+              description: The envelope key for this vehicle.
+              example: envelopeType-01
       title: VehicleStatusMessage
       required:
         - type
         - vehicleName
-        - state
-        - stateTimestamp
+        - properties
+        - boundingBox
+        - energyLevelGood
+        - energyLevelCritical
+        - energyLevelSufficientlyRecharged
+        - energyLevelFullyRecharged
+        - energyLevel
+        - integrationLevel
+        - paused
         - procState
         - procStateTimestamp
+        - transportOrderName
+        - position
+        - precisePosition
+        - orientationAngle
+        - state
+        - stateTimestamp
         - allocatedResources
         - claimedResources
+        - acceptableOrderTypes
+        - envelopeKey
+    AcceptableOrderTypes:
+      title: Acceptable Order Types
+      type: object
+      properties:
+        acceptableOrderTypes:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The name of the order type.
+              priority:
+                type: integer
+                description: The priority of the order type, with a lower value indicating a higher priority.
+            required:
+              - name
+              - priority
+          example: [ { "name": "Park", "priority": 0 }, { "name": "Load cargo", "priority": 0 }, { "name": "Unload cargo", "priority": 0 } ]
+      required:
+        - acceptableOrderTypes
     PeripheralJobStatusMessage:
       title: PeripheralJobStatusMessage
       type: object

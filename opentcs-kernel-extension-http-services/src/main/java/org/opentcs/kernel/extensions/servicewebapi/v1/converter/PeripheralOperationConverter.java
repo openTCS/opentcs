@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PeripheralOperationTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PeripheralOperationDescription;
 
 /**
  * Includes the conversion methods for all PeripheralOperation classes.
@@ -50,5 +51,15 @@ public class PeripheralOperationConverter {
                 )
         )
         .collect(Collectors.toList());
+  }
+
+  public PeripheralOperationDescription toPeripheralOperationDescription(
+      PeripheralOperation operation
+  ) {
+    return new PeripheralOperationDescription()
+        .setOperation(operation.getOperation())
+        .setLocationName(operation.getLocation().getName())
+        .setExecutionTrigger(operation.getExecutionTrigger())
+        .setCompletionRequired(operation.isCompletionRequired());
   }
 }

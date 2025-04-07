@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 
 /**
@@ -35,6 +36,16 @@ class PropertyConverterTest {
 
     assertThat(result, hasSize(1));
     assertThat(result.get(0), samePropertyValuesAs(new PropertyTO("P1", "1")));
+  }
+
+  @Test
+  void checkToProperties() {
+    Map<String, String> property = Map.of("P1", "1");
+
+    List<Property> result = propertyConverter.toProperties(property);
+
+    assertThat(result, hasSize(1));
+    assertThat(result.getFirst(), samePropertyValuesAs(new Property("P1", "1")));
   }
 
   @Test

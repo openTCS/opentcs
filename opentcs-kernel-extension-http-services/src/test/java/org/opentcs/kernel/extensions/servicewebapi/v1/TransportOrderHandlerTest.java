@@ -39,6 +39,8 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostOrderSequenceR
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.posttransportorder.Destination;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.OrderSequenceConverter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.converter.TransportOrderConverter;
 
 /**
  * Unit tests for {@link TransportOrderHandler}.
@@ -48,13 +50,19 @@ class TransportOrderHandlerTest {
   private TransportOrderService orderService;
   private KernelExecutorWrapper executorWrapper;
   private TransportOrderHandler handler;
+  private OrderSequenceConverter orderSequenceConverter;
+  private TransportOrderConverter transportOrderConverter;
 
   @BeforeEach
   void setUp() {
     orderService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
+    orderSequenceConverter = new OrderSequenceConverter();
+    transportOrderConverter = new TransportOrderConverter();
 
-    handler = new TransportOrderHandler(orderService, executorWrapper);
+    handler = new TransportOrderHandler(
+        orderService, executorWrapper, orderSequenceConverter, transportOrderConverter
+    );
   }
 
   @Test

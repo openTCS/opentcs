@@ -4,8 +4,6 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralJob.State;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PeripheralOperationDescription;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
@@ -132,44 +130,5 @@ public class PeripheralJobStatusMessage
   public PeripheralJobStatusMessage setProperties(List<Property> properties) {
     this.properties = properties;
     return this;
-  }
-
-  public static PeripheralJobStatusMessage fromPeripheralJob(
-      PeripheralJob job,
-      long sequenceNumber
-  ) {
-    return fromPeripheralJob(job, sequenceNumber, Instant.now());
-  }
-
-  public static PeripheralJobStatusMessage fromPeripheralJob(
-      PeripheralJob job,
-      long sequenceNumber,
-      Instant creationTimestamp
-  ) {
-    PeripheralJobStatusMessage message = new PeripheralJobStatusMessage();
-    message.setSequenceNumber(sequenceNumber);
-    message.setCreationTimeStamp(creationTimestamp);
-
-    message.setName(job.getName());
-    message.setReservationToken(job.getReservationToken());
-    if (job.getRelatedVehicle() != null) {
-      message.setRelatedVehicle(job.getRelatedVehicle().getName());
-    }
-    if (job.getRelatedTransportOrder() != null) {
-      message.setRelatedTransportOrder(job.getRelatedTransportOrder().getName());
-    }
-    message.setPeripheralOperation(
-        PeripheralOperationDescription.fromPeripheralOperation(job.getPeripheralOperation())
-    );
-    message.setState(job.getState());
-    message.setCreationTime(job.getCreationTime());
-    message.setFinishedTime(job.getFinishedTime());
-    message.setProperties(
-        job.getProperties().entrySet().stream()
-            .map(entry -> new Property(entry.getKey(), entry.getValue()))
-            .collect(Collectors.toList())
-    );
-
-    return message;
   }
 }

@@ -5,10 +5,7 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformation;
 
 /**
  */
@@ -73,25 +70,5 @@ public class GetPeripheralAttachmentInfoResponseTO {
   ) {
     this.attachedCommAdapter = requireNonNull(attachedCommAdapter, "attachedCommAdapter");
     return this;
-  }
-
-  public static GetPeripheralAttachmentInfoResponseTO fromAttachmentInformation(
-      @Nullable
-      PeripheralAttachmentInformation peripheralAttachmentInfo
-  ) {
-    if (peripheralAttachmentInfo == null) {
-      return null;
-    }
-
-    List<String> availableAdapters = peripheralAttachmentInfo.getAvailableCommAdapters()
-        .stream()
-        .map(description -> description.getClass().getName())
-        .collect(Collectors.toList());
-
-    return new GetPeripheralAttachmentInfoResponseTO(
-        peripheralAttachmentInfo.getLocationReference().getName(),
-        peripheralAttachmentInfo.getAttachedCommAdapter().getClass().getName(),
-        availableAdapters
-    );
   }
 }
