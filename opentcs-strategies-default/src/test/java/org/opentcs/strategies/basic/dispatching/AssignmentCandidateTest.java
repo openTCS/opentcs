@@ -30,7 +30,7 @@ class AssignmentCandidateTest {
     vehicle = new Vehicle("vehicle1");
     Point point = new Point("point");
     DriveOrder.Destination destination = new DriveOrder.Destination(point.getReference());
-    DriveOrder driveOrder = new DriveOrder(destination);
+    DriveOrder driveOrder = new DriveOrder("order1", destination);
     driveOrders = List.of(driveOrder);
     transportOrder = new TransportOrder("transportOrder1", driveOrders);
   }
@@ -79,8 +79,12 @@ class AssignmentCandidateTest {
     );
     Route route1 = new Route(List.of(step1));
     Route route2 = new Route(List.of(step2));
-    DriveOrder driveOrder1 = new DriveOrder(new DriveOrder.Destination(point1.getReference()));
-    DriveOrder driveOrder2 = new DriveOrder(new DriveOrder.Destination(point2.getReference()));
+    DriveOrder driveOrder1 = new DriveOrder(
+        "order1", new DriveOrder.Destination(point1.getReference())
+    );
+    DriveOrder driveOrder2 = new DriveOrder(
+        "order2", new DriveOrder.Destination(point2.getReference())
+    );
     driveOrder1 = driveOrder1.withRoute(route1);
     driveOrder2 = driveOrder2.withRoute(route2);
     driveOrders = List.of(driveOrder1, driveOrder2);

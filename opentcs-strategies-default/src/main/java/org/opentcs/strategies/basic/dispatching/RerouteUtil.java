@@ -234,7 +234,7 @@ public class RerouteUtil {
 
       Route updatedRoute = new Route(updatedSteps);
 
-      DriveOrder updatedOrder = new DriveOrder(order.getDestination())
+      DriveOrder updatedOrder = new DriveOrder(order.getName(), order.getDestination())
           .withRoute(updatedRoute)
           .withState(order.getState())
           .withTransportOrder(order.getTransportOrder());
@@ -267,7 +267,7 @@ public class RerouteUtil {
 
       Route updatedRoute = new Route(updatedSteps);
 
-      DriveOrder updatedOrder = new DriveOrder(order.getDestination())
+      DriveOrder updatedOrder = new DriveOrder(order.getName(), order.getDestination())
           .withRoute(updatedRoute)
           .withState(order.getState())
           .withTransportOrder(order.getTransportOrder());

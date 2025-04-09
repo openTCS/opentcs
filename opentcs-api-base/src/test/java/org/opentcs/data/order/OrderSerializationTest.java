@@ -63,12 +63,14 @@ class OrderSerializationTest {
     Location location2 = new Location("Location2", mock(TCSObjectReference.class));
     driveOrders.add(
         new DriveOrder(
+            "driveOrder1",
             new DriveOrder.Destination(location1.getReference())
                 .withOperation("someOperation1")
         )
     );
     driveOrders.add(
         new DriveOrder(
+            "driveOrder2",
             new DriveOrder.Destination(location2.getReference())
                 .withOperation("someOperation2")
         )

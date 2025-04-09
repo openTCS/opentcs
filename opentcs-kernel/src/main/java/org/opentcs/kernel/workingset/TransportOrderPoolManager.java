@@ -117,9 +117,10 @@ public class TransportOrderPoolManager
       throws ObjectUnknownException,
         ObjectExistsException,
         IllegalArgumentException {
+    String transportOrderName = nameFor(to);
     TransportOrder newOrder = new TransportOrder(
-        nameFor(to),
-        toDriveOrders(to.getDestinations())
+        transportOrderName,
+        toDriveOrders(to.getDestinations(), transportOrderName)
     )
         .withCreationTime(Instant.now())
         .withPeripheralReservationToken(to.getPeripheralReservationToken())
@@ -715,11 +716,14 @@ public class TransportOrderPoolManager
     return vehicle.getReference();
   }
 
-  private List<DriveOrder> toDriveOrders(List<DestinationCreationTO> dests)
+  private List<DriveOrder> toDriveOrders(
+      List<DestinationCreationTO> dests, String transportOrderName
+  )
       throws ObjectUnknownException,
         IllegalArgumentException {
     List<DriveOrder> result = new ArrayList<>(dests.size());
-    for (DestinationCreationTO destTo : dests) {
+    for (int i = 0; i < dests.size(); i++) {
+      DestinationCreationTO destTo = dests.get(i);
       TCSObject<?> destObject = getObjectRepo().getObjectOrNull(destTo.getDestLocationName());
 
       if (destObject instanceof Point) {
@@ -741,8 +745,10 @@ public class TransportOrderPoolManager
       else {
         throw new ObjectUnknownException(destTo.getDestLocationName());
       }
+
       result.add(
           new DriveOrder(
+              transportOrderName + "-drive-order-" + i,
               new DriveOrder.Destination(destObject.getReference())
                   .withOperation(destTo.getDestOperation())
                   .withProperties(destTo.getProperties())

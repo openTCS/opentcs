@@ -39,8 +39,12 @@ class DriveOrderRouteAssignerTest {
   void assignRoutesToDriveOrders() {
     Point pointA = new Point("A");
     Point pointB = new Point("B");
-    DriveOrder driveOrderToA = new DriveOrder(new DriveOrder.Destination(pointA.getReference()));
-    DriveOrder driveOrderToB = new DriveOrder(new DriveOrder.Destination(pointB.getReference()));
+    DriveOrder driveOrderToA = new DriveOrder(
+        "order1", new DriveOrder.Destination(pointA.getReference())
+    );
+    DriveOrder driveOrderToB = new DriveOrder(
+        "order2", new DriveOrder.Destination(pointB.getReference())
+    );
     List<DriveOrder> driveOrdersWithoutRoutes = List.of(driveOrderToA, driveOrderToB);
     TransportOrder order = new TransportOrder("order", driveOrdersWithoutRoutes);
     Vehicle vehicle = new Vehicle("vehicle");

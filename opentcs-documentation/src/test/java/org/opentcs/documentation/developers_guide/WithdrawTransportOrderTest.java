@@ -61,6 +61,7 @@ class WithdrawTransportOrderTest {
         "Transportorder",
         Collections.singletonList(
             new DriveOrder(
+                "some-order",
                 new DriveOrder.Destination(getSampleDestinationLocation().getReference())
                     .withOperation("some-operation")
             )

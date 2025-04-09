@@ -16,6 +16,7 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes a sequence of movements and an optional operation at the end that a {@link Vehicle} is
@@ -28,38 +29,59 @@ public class DriveOrder
       Serializable {
 
   /**
+   * This drive order's name.
+   */
+  private final String name;
+  /**
    * This drive order's destination.
    */
   private final Destination destination;
   /**
    * A back-reference to the transport order this drive order belongs to.
    */
-  private TCSObjectReference<TransportOrder> transportOrder;
+  private final TCSObjectReference<TransportOrder> transportOrder;
   /**
    * This drive order's route.
    */
-  private Route route;
+  private final Route route;
   /**
    * This drive order's current state.
    */
-  private State state;
+  private final State state;
 
   /**
    * Creates a new DriveOrder.
    *
    * @param destination This drive order's destination.
+   * @deprecated Use {@link #DriveOrder(String, Destination)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed")
   public DriveOrder(
       @Nonnull
       Destination destination
   ) {
-    this.destination = requireNonNull(destination, "destination");
-    this.transportOrder = null;
-    this.route = null;
-    this.state = State.PRISTINE;
+    this("", destination);
+  }
+
+  /**
+   * Creates a new DriveOrder.
+   *
+   * @param name This drive order's name.
+   * @param destination This drive order's destination.
+   */
+  public DriveOrder(
+      @Nonnull
+      String name,
+      @Nonnull
+      Destination destination
+  ) {
+    this(name, destination, null, null, State.PRISTINE);
   }
 
   private DriveOrder(
+      @Nonnull
+      String name,
       @Nonnull
       Destination destination,
       @Nullable
@@ -69,10 +91,21 @@ public class DriveOrder
       @Nonnull
       State state
   ) {
+    this.name = requireNonNull(name, "name");
     this.destination = requireNonNull(destination, "destination");
     this.transportOrder = transportOrder;
     this.route = route;
     this.state = requireNonNull(state, "state");
+  }
+
+  /**
+   * Returns this drive order's name.
+   *
+   * @return This drive order's name.
+   */
+  @Nonnull
+  public String getName() {
+    return name;
   }
 
   /**
@@ -105,7 +138,7 @@ public class DriveOrder
       @Nullable
       TCSObjectReference<TransportOrder> transportOrder
   ) {
-    return new DriveOrder(destination, transportOrder, route, state);
+    return new DriveOrder(name, destination, transportOrder, route, state);
   }
 
   /**
@@ -129,7 +162,7 @@ public class DriveOrder
       @Nullable
       Route route
   ) {
-    return new DriveOrder(destination, transportOrder, route, state);
+    return new DriveOrder(name, destination, transportOrder, route, state);
   }
 
   /**
@@ -152,7 +185,7 @@ public class DriveOrder
       @Nonnull
       State state
   ) {
-    return new DriveOrder(destination, transportOrder, route, state);
+    return new DriveOrder(name, destination, transportOrder, route, state);
   }
 
   @Override
@@ -162,18 +195,25 @@ public class DriveOrder
     }
 
     final DriveOrder other = (DriveOrder) obj;
-    return Objects.equals(destination, other.destination)
+    return Objects.equals(name, other.name)
+        && Objects.equals(destination, other.destination)
         && Objects.equals(transportOrder, other.transportOrder);
   }
 
   @Override
   public int hashCode() {
-    return destination.hashCode() ^ transportOrder.hashCode();
+    return name.hashCode() ^ destination.hashCode() ^ transportOrder.hashCode();
   }
 
   @Override
   public String toString() {
-    return route + " -> " + destination;
+    return "DriveOrder{" +
+        "name=" + name +
+        ", destination=" + destination +
+        ", transportOrder=" + transportOrder +
+        ", state=" + state +
+        ", route=" + route +
+        '}';
   }
 
   /**

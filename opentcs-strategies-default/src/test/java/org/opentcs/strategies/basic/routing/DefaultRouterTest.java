@@ -63,10 +63,12 @@ class DefaultRouterTest {
         "t1",
         List.of(
             new DriveOrder(
+                "o1",
                 new Destination(point1.getReference())
                     .withOperation(Destination.OP_MOVE)
             ),
             new DriveOrder(
+                "o2",
                 new Destination(point2.getReference())
                     .withOperation(Destination.OP_MOVE)
             )
@@ -133,8 +135,9 @@ class DefaultRouterTest {
     TransportOrder transportOrder = new TransportOrder(
         "T-1",
         List.of(
-            new DriveOrder(new Destination(locationBC.getReference())),
+            new DriveOrder("o1", new Destination(locationBC.getReference())),
             new DriveOrder(
+                "o2",
                 new Destination(pointD.getReference()).withOperation(Destination.OP_MOVE)
             )
         )

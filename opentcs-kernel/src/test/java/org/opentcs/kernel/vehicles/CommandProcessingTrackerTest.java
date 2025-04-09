@@ -500,6 +500,7 @@ class CommandProcessingTrackerTest {
   private List<MovementCommand> createMovementCommandList(List<Route.Step> steps) {
     Point finalDestinationPoint = steps.getLast().getDestinationPoint();
     DriveOrder driveOrder = new DriveOrder(
+        "some-order",
         new DriveOrder.Destination(finalDestinationPoint.getReference())
     ).withRoute(new Route(steps));
     TransportOrder transportOrder = new TransportOrder(

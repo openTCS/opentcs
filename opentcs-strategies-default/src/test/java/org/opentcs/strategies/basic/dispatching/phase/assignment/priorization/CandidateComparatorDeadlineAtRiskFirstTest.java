@@ -73,7 +73,7 @@ class CandidateComparatorDeadlineAtRiskFirstTest {
     );
     Route route = new Route(Arrays.asList(dummyStep));
     List<DriveOrder> driveOrders = Arrays.asList(
-        new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))
+        new DriveOrder("order1", new DriveOrder.Destination(new Point("Point2").getReference()))
             .withRoute(route)
     );
 

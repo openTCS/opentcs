@@ -79,12 +79,12 @@ class ContainsLockedTargetLocationsTest {
     Location location = new Location("Location-1", locationType.getReference());
     localObjectPool.put(location.getReference(), location);
     DriveOrder.Destination destination = new DriveOrder.Destination(location.getReference());
-    driveOrders.add(new DriveOrder(destination));
+    driveOrders.add(new DriveOrder("order1", destination));
 
     location = new Location("Location-2", locationType.getReference()).withLocked(true);
     localObjectPool.put(location.getReference(), location);
     destination = new DriveOrder.Destination(location.getReference());
-    driveOrders.add(new DriveOrder(destination));
+    driveOrders.add(new DriveOrder("order2", destination));
 
     return new TransportOrder("TransportOrder-1", driveOrders);
   }
@@ -96,12 +96,12 @@ class ContainsLockedTargetLocationsTest {
     Location location = new Location("Location-1", locationType.getReference());
     localObjectPool.put(location.getReference(), location);
     DriveOrder.Destination destination = new DriveOrder.Destination(location.getReference());
-    driveOrders.add(new DriveOrder(destination));
+    driveOrders.add(new DriveOrder("order1", destination));
 
     location = new Location("Location-2", locationType.getReference());
     localObjectPool.put(location.getReference(), location);
     destination = new DriveOrder.Destination(location.getReference());
-    driveOrders.add(new DriveOrder(destination));
+    driveOrders.add(new DriveOrder("order2", destination));
 
     return new TransportOrder("TransportOrder-1", driveOrders);
   }
@@ -112,7 +112,7 @@ class ContainsLockedTargetLocationsTest {
     Point point = new Point("Point-1");
     localObjectPool.put(point.getReference(), point);
     DriveOrder.Destination destination = new DriveOrder.Destination(point.getReference());
-    driveOrders.add(new DriveOrder(destination));
+    driveOrders.add(new DriveOrder("order1", destination));
 
     return new TransportOrder("TransportOrder-1", driveOrders);
   }

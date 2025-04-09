@@ -62,7 +62,7 @@ class CandidateComparatorByEnergyLevelTest {
     );
     Route route = new Route(Arrays.asList(dummyStep));
     List<DriveOrder> driveOrders = List.of(
-        new DriveOrder(new DriveOrder.Destination(new Point("Point-001").getReference()))
+        new DriveOrder("order1", new DriveOrder.Destination(new Point("Point-001").getReference()))
             .withRoute(route)
     );
 

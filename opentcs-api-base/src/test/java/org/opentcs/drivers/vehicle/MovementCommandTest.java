@@ -40,7 +40,10 @@ public class MovementCommandTest {
     Route route = new Route(List.of(stepAB));
 
     DriveOrder driveOrder
-        = new DriveOrder(new DriveOrder.Destination(destinationPoint.getReference()))
+        = new DriveOrder(
+            "some-order",
+            new DriveOrder.Destination(destinationPoint.getReference())
+        )
             .withRoute(route);
     TransportOrder transportOrder = new TransportOrder("some-order", List.of(driveOrder));
 
@@ -66,7 +69,10 @@ public class MovementCommandTest {
     Route route = new Route(List.of(stepAB));
 
     DriveOrder driveOrder
-        = new DriveOrder(new DriveOrder.Destination(destinationPoint.getReference()))
+        = new DriveOrder(
+            "some-order",
+            new DriveOrder.Destination(destinationPoint.getReference())
+        )
             .withRoute(route);
     TransportOrder transportOrder = new TransportOrder("some-order", List.of(driveOrder));
 
@@ -87,7 +93,10 @@ public class MovementCommandTest {
     Route route2 = new Route(List.of(stepBC));
 
     driveOrder
-        = new DriveOrder(new DriveOrder.Destination(destinationPoint.getReference()))
+        = new DriveOrder(
+            "some-order",
+            new DriveOrder.Destination(destinationPoint.getReference())
+        )
             .withRoute(route2);
     transportOrder = new TransportOrder("some-order", List.of(driveOrder));
 
@@ -113,7 +122,10 @@ public class MovementCommandTest {
     Route route = new Route(List.of(stepAB));
 
     DriveOrder driveOrder
-        = new DriveOrder(new DriveOrder.Destination(destinationPoint.getReference()))
+        = new DriveOrder(
+            "some-order",
+            new DriveOrder.Destination(destinationPoint.getReference())
+        )
             .withRoute(route);
     TransportOrder transportOrder = new TransportOrder("some-order", List.of(driveOrder));
 

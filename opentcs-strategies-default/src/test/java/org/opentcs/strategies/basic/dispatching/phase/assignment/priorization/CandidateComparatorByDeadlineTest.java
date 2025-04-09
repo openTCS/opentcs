@@ -62,7 +62,9 @@ class CandidateComparatorByDeadlineTest {
         );
     Route route = new Route(Arrays.asList(dummyStep));
     List<DriveOrder> driveOrders = List.of(
-        new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))
+        new DriveOrder(
+            "some-drive-order", new DriveOrder.Destination(new Point("Point2").getReference())
+        )
             .withRoute(route)
     );
 

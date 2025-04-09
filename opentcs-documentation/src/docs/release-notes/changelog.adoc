@@ -24,6 +24,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 *** The `GET /events` endpoint now returns status messages of transport orders and vehicles that contain the same information as the transport orders and vehicles returned via the `GET /transportOrders` and `GET /vehicles` endpoints.
 * Changes affecting developers:
 ** Deprecate `VehicleCommAdapter.processMessage(Object)`, `VehicleCommAdapter.execute(AdapterCommads)` and related code in favor of `VehicleCommAdapter.processMessage(VehicleCommAdapterMessage)`, which provides a generic one-way communication channel to the comm adapter.
+** Provide `DriveOrder` with a name, which helps with identifying and comparing `DriveOrder` instances. 
+   For this, introduce a new constructor `DriveOrder(String, Destination)` and deprecate `DriveOrder(Destination)`.
 ** Update JUnit to 5.12.0.
 ** Update ApprovalTests to 24.17.0.
 ** Update AssertJ to 3.27.3.

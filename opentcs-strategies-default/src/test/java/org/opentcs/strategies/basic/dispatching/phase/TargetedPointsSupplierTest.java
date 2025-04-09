@@ -50,6 +50,7 @@ public class TargetedPointsSupplierTest {
         "T1",
         List.of(
             new DriveOrder(
+                "order1",
                 new Destination(point1.getReference())
             ).withRoute(
                 new Route(
@@ -66,6 +67,7 @@ public class TargetedPointsSupplierTest {
         "T2",
         List.of(
             new DriveOrder(
+                "order2",
                 new Destination(point4.getReference())
             ).withRoute(
                 new Route(
@@ -76,6 +78,7 @@ public class TargetedPointsSupplierTest {
                 )
             ),
             new DriveOrder(
+                "order3",
                 new Destination(point6.getReference())
             ).withRoute(
                 new Route(

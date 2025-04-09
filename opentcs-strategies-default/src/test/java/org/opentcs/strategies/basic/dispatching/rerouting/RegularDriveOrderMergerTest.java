@@ -60,7 +60,9 @@ class RegularDriveOrderMergerTest {
     }
     DriveOrder.Destination dest
         = new DriveOrder.Destination(points.get(points.size() - 1).getReference());
-    return new DriveOrder(dest).withRoute(createRoute(new Point(startPoint), points, stepCost));
+    return new DriveOrder("order1", dest).withRoute(
+        createRoute(new Point(startPoint), points, stepCost)
+    );
   }
 
   private Route createRoute(Point startPoint, List<Point> points, int costPerStep) {

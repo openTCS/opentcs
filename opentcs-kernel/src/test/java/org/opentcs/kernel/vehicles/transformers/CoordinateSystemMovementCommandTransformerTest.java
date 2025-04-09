@@ -42,7 +42,7 @@ public class CoordinateSystemMovementCommandTransformerTest {
         .withPosition(new Triple(35, 35, 35));
     command = new MovementCommand(
         new TransportOrder("T1", List.of()),
-        new DriveOrder(new Destination(pointDestDriveOrder.getReference())),
+        new DriveOrder("some-order", new Destination(pointDestDriveOrder.getReference())),
         new Route.Step(
             null,
             null,

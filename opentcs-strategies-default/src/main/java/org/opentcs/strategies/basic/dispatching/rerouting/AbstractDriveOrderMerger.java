@@ -42,7 +42,7 @@ public abstract class AbstractDriveOrderMerger
     requireNonNull(orderB, "orderB");
     requireNonNull(originalOrder, "originalOrder");
 
-    return new DriveOrder(orderA.getDestination())
+    return new DriveOrder(orderA.getName(), orderA.getDestination())
         .withState(orderA.getState())
         .withTransportOrder(orderA.getTransportOrder())
         .withRoute(

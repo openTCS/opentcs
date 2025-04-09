@@ -192,7 +192,7 @@ class PeripheralInteractionTest {
 
     return new MovementCommand(
         new TransportOrder("dummy-transport-order", List.of()),
-        new DriveOrder(new DriveOrder.Destination(destPoint.getReference())),
+        new DriveOrder("some-order", new DriveOrder.Destination(destPoint.getReference())),
         step,
         MovementCommand.MOVE_OPERATION,
         null,

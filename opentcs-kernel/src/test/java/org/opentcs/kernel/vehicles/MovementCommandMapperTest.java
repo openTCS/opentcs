@@ -61,6 +61,7 @@ class MovementCommandMapperTest {
     Route route = new Route(List.of(stepAB, stepBC));
     DriveOrder driveOrder
         = new DriveOrder(
+            "some-order",
             new DriveOrder.Destination(destinationLocation.getReference())
                 .withOperation("operation")
                 .withProperties(Map.of("key1", "value1"))

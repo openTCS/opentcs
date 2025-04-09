@@ -43,6 +43,7 @@ class CreateTransportOrderTest {
                 "Transportorder",
                 Collections.singletonList(
                     new DriveOrder(
+                        "some-order",
                         new Destination(someDestinationLocation().getReference())
                             .withOperation(getDestinationOperation())
                     )

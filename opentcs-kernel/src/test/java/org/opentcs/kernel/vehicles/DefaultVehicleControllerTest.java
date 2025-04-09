@@ -292,7 +292,10 @@ class DefaultVehicleControllerTest {
         new Route.Step(stepPath, null, dstPoint, Vehicle.Orientation.FORWARD, 0, 1)
     );
 
-    DriveOrder driveOrder = new DriveOrder(new DriveOrder.Destination(location.getReference()))
+    DriveOrder driveOrder = new DriveOrder(
+        "some-order",
+        new DriveOrder.Destination(location.getReference())
+    )
         .withRoute(new Route(steps));
 
     TransportOrder transportOrder

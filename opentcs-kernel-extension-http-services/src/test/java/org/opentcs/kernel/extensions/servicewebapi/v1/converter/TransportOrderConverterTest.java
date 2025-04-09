@@ -28,7 +28,7 @@ public class TransportOrderConverterTest {
     TransportOrder t1
         = new TransportOrder(
             "T1", List.of(
-                new DriveOrder(new DriveOrder.Destination(new Point("P1").getReference()))
+                new DriveOrder("O1", new DriveOrder.Destination(new Point("P1").getReference()))
             )
         )
             .withDispensable(true)
@@ -64,7 +64,7 @@ public class TransportOrderConverterTest {
     TransportOrder t1
         = new TransportOrder(
             "T1", List.of(
-                new DriveOrder(new DriveOrder.Destination(new Point("P1").getReference()))
+                new DriveOrder("O1", new DriveOrder.Destination(new Point("P1").getReference()))
             )
         )
             .withDispensable(true)

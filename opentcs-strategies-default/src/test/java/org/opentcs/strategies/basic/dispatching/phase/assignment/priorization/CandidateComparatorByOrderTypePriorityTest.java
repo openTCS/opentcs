@@ -209,7 +209,8 @@ public class CandidateComparatorByOrderTypePriorityTest {
         = new Route.Step(null, null, destPoint, Vehicle.Orientation.FORWARD, 1, 10);
     Route dummyRoute = new Route(List.of(dummyStep));
     return List.of(
-        new DriveOrder(new DriveOrder.Destination(destPoint.getReference())).withRoute(dummyRoute)
+        new DriveOrder("some-order", new DriveOrder.Destination(destPoint.getReference()))
+            .withRoute(dummyRoute)
     );
   }
 }

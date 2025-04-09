@@ -158,7 +158,7 @@ class CompositeOrderCandidateComparatorTest {
         );
     Route route = new Route(Arrays.asList(dummyStep));
     List<DriveOrder> driveOrders = List.of(
-        new DriveOrder(new DriveOrder.Destination(new Point("Point2").getReference()))
+        new DriveOrder("order1", new DriveOrder.Destination(new Point("Point2").getReference()))
             .withRoute(route)
     );
     return driveOrders;
