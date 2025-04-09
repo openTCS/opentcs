@@ -703,11 +703,19 @@ components:
           description: The resources claimed - i.e. not yet allocated - for the vehicle's route.
           example: [ [ "Path-0041--0042", "Point-0042" ], [ "Path-0042--0043", "Point-0043", "Location-2345" ] ]
         allowedOrderTypes:
+          deprecated: true
+          description: Deprecated and will be removed in favor of the `acceptableOrderTypes` property.
           type: array
           items:
             type: string
             description: The allowed order types for this vehicle.
           example: [ "OrderType001", "OrderType002" ]
+        acceptableOrderTypes:
+          type: array
+          items:
+            $ref: "#/components/schemas/AcceptableOrderTypes"
+          description: The acceptable order types with priorities for this vehicle.
+          example: [ { "name": "Park", "priority": 0 }, { "name": "Load cargo", "priority": 0 } ]
         envelopeKey:
           type: string
           description: The envelope key for this vehicle.
@@ -730,6 +738,7 @@ components:
         - state
         - stateTimestamp
         - allocatedResources
+        - acceptableOrderTypes
         - claimedResources
         - allowedOrderTypes
     AllowedOrderTypes:
