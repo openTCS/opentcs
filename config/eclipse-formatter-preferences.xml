@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <profiles version="23">
   <profile kind="CodeFormatterProfile" name="openTCS" version="23">
+    <setting id="org.eclipse.jdt.core.formatter.align_arrows_in_switch_on_columns" value="false"/>
     <setting id="org.eclipse.jdt.core.formatter.align_assignment_statements_on_columns" value="false"/>
     <setting id="org.eclipse.jdt.core.formatter.align_fields_grouping_blank_lines" value="1"/>
     <setting id="org.eclipse.jdt.core.formatter.align_selector_in_method_invocation_on_expression_first_line" value="false"/>
@@ -31,8 +32,8 @@
     <setting id="org.eclipse.jdt.core.formatter.alignment_for_enum_constants" value="49"/>
     <setting id="org.eclipse.jdt.core.formatter.alignment_for_expressions_in_array_initializer" value="16"/>
     <setting id="org.eclipse.jdt.core.formatter.alignment_for_expressions_in_for_loop_header" value="18"/>
-    <setting id="org.eclipse.jdt.core.formatter.alignment_for_expressions_in_switch_case_with_arrow" value="1"/>
-    <setting id="org.eclipse.jdt.core.formatter.alignment_for_expressions_in_switch_case_with_colon" value="0"/>
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_expressions_in_switch_case_with_arrow" value="18"/>
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_expressions_in_switch_case_with_colon" value="18"/>
     <setting id="org.eclipse.jdt.core.formatter.alignment_for_logical_operator" value="16"/>
     <setting id="org.eclipse.jdt.core.formatter.alignment_for_method_declaration" value="16"/>
     <setting id="org.eclipse.jdt.core.formatter.alignment_for_module_statements" value="0"/>
@@ -52,7 +53,7 @@
     <setting id="org.eclipse.jdt.core.formatter.alignment_for_superinterfaces_in_enum_declaration" value="65"/>
     <setting id="org.eclipse.jdt.core.formatter.alignment_for_superinterfaces_in_record_declaration" value="65"/>
     <setting id="org.eclipse.jdt.core.formatter.alignment_for_superinterfaces_in_type_declaration" value="65"/>
-    <setting id="org.eclipse.jdt.core.formatter.alignment_for_switch_case_with_arrow" value="0"/>
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_switch_case_with_arrow" value="4"/>
     <setting id="org.eclipse.jdt.core.formatter.alignment_for_throws_clause_in_constructor_declaration" value="65"/>
     <setting id="org.eclipse.jdt.core.formatter.alignment_for_throws_clause_in_method_declaration" value="65"/>
     <setting id="org.eclipse.jdt.core.formatter.alignment_for_type_annotations" value="49"/>
@@ -78,6 +79,7 @@
     <setting id="org.eclipse.jdt.core.formatter.brace_position_for_array_initializer" value="end_of_line"/>
     <setting id="org.eclipse.jdt.core.formatter.brace_position_for_block" value="end_of_line"/>
     <setting id="org.eclipse.jdt.core.formatter.brace_position_for_block_in_case" value="end_of_line"/>
+    <setting id="org.eclipse.jdt.core.formatter.brace_position_for_block_in_case_after_arrow" value="end_of_line"/>
     <setting id="org.eclipse.jdt.core.formatter.brace_position_for_constructor_declaration" value="end_of_line"/>
     <setting id="org.eclipse.jdt.core.formatter.brace_position_for_enum_constant" value="end_of_line"/>
     <setting id="org.eclipse.jdt.core.formatter.brace_position_for_enum_declaration" value="end_of_line"/>
@@ -333,6 +335,7 @@
     <setting id="org.eclipse.jdt.core.formatter.insert_space_between_empty_parens_in_enum_constant" value="do not insert"/>
     <setting id="org.eclipse.jdt.core.formatter.insert_space_between_empty_parens_in_method_declaration" value="do not insert"/>
     <setting id="org.eclipse.jdt.core.formatter.insert_space_between_empty_parens_in_method_invocation" value="do not insert"/>
+    <setting id="org.eclipse.jdt.core.formatter.join_line_comments" value="false"/>
     <setting id="org.eclipse.jdt.core.formatter.join_lines_in_comments" value="false"/>
     <setting id="org.eclipse.jdt.core.formatter.join_wrapped_lines" value="false"/>
     <setting id="org.eclipse.jdt.core.formatter.keep_annotation_declaration_on_one_line" value="one_line_preserve"/>
