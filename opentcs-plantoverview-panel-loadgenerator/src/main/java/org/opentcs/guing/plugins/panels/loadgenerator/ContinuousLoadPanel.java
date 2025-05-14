@@ -15,6 +15,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -33,6 +34,7 @@ import org.opentcs.components.kernel.services.ServiceUnavailableException;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.components.plantoverview.PluggablePanel;
 import org.opentcs.customizations.ApplicationEventBus;
+import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
@@ -382,16 +384,36 @@ public class ContinuousLoadPanel
   private void buildTableModels(TransportOrderData transportOrder) {
     requireNonNull(transportOrder, "transportOrder");
 
+    // Deselect the table model to ensure that no previously selected entries
+    // get unwillingly modified by the locationsComboBox's ItemListener.
+    doTable.clearSelection();
+
     // Drive orders
     locationsComboBox.removeAllItems();
     operationTypesComboBox.removeAllItems();
+
+    doTable.setModel(new DriveOrderTableModel(transportOrder.getDriveOrders()));
+
+    Set<TCSObjectReference<LocationType>> suitableLocationTypeRefs
+        = objectService.fetchObjects(LocationType.class)
+            .stream()
+            .filter(locationType -> !locationType.getAllowedOperations().isEmpty())
+            .map(TCSObject::getReference)
+            .collect(Collectors.toSet());
+
     SortedSet<Location> sortedLocationSet = new TreeSet<>(Comparators.objectsByName());
-    sortedLocationSet.addAll(objectService.fetchObjects(Location.class));
+    sortedLocationSet.addAll(
+        objectService.fetchObjects(Location.class)
+            .stream()
+            .filter(
+                loc -> !loc.getAttachedLinks().isEmpty()
+                    && suitableLocationTypeRefs.contains(loc.getType())
+            ).collect(Collectors.toSet())
+    );
     for (Location i : sortedLocationSet) {
       locationsComboBox.addItem(i.getReference());
     }
-    locationsComboBox.addItemListener((ItemEvent e) -> locationsComboBoxItemStateChanged(e));
-    doTable.setModel(new DriveOrderTableModel(transportOrder.getDriveOrders()));
+
     doTable.setDefaultEditor(TCSObjectReference.class, new DefaultCellEditor(locationsComboBox));
     doTable.setDefaultEditor(String.class, new DefaultCellEditor(operationTypesComboBox));
 

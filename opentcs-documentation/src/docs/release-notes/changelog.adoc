@@ -22,6 +22,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update web API specification and implementation to version 1.12.0:
 *** Add an endpoint `POST /vehicles/{NAME}/commAdapter/message`, which allows sending messages to the communication adapter that is attached to a vehicle.
 *** The `GET /events` endpoint now returns status messages of transport orders and vehicles that contain the same information as the transport orders and vehicles returned via the `GET /transportOrders` and `GET /vehicles` endpoints.
+* Bugs fixed:
+** Avoid `NullPointerException` when trying to save transport order definitions in the continuous load panel.
 * Changes affecting developers:
 ** Deprecate `VehicleCommAdapter.processMessage(Object)`, `VehicleCommAdapter.execute(AdapterCommads)` and related code in favor of `VehicleCommAdapter.processMessage(VehicleCommAdapterMessage)`, which provides a generic one-way communication channel to the comm adapter.
 ** Provide `DriveOrder` with a name, which helps with identifying and comparing `DriveOrder` instances. 
