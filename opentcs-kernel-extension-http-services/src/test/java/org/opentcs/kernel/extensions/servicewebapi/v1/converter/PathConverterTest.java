@@ -128,7 +128,7 @@ class PathConverterTest {
     assertThat(result.get(0).getLayout().getLayerId(), is(4));
     assertThat(
         result.get(0).getLayout().getConnectionType(),
-        is(Path.Layout.ConnectionType.POLYPATH.name())
+        is(PathTO.Layout.ConnectionType.POLYPATH.name())
     );
     assertThat(result.get(0).getLayout().getControlPoints(), hasSize(1));
     assertThat(

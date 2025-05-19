@@ -10,8 +10,8 @@ import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.opentcs.data.model.Vehicle;
 import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.AcceptableOrderTypeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
@@ -48,15 +48,15 @@ class GetVehicleResponseTOTest {
             .setEnergyLevelSufficientlyRecharged(30)
             .setEnergyLevelFullyRecharged(90)
             .setEnergyLevel(48)
-            .setIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED)
+            .setIntegrationLevel(VehicleTO.IntegrationLevel.TO_BE_UTILIZED)
             .setPaused(false)
-            .setProcState(Vehicle.ProcState.PROCESSING_ORDER)
+            .setProcState(VehicleTO.ProcState.PROCESSING_ORDER)
             .setProcStateTimestamp(Instant.parse("2025-01-29T11:41:17.000Z"))
             .setTransportOrder("some-order")
             .setCurrentPosition("some-point")
             .setPrecisePosition(new GetVehicleResponseTO.PrecisePosition(1, 2, 3))
             .setOrientationAngle(orientationAngle)
-            .setState(Vehicle.State.EXECUTING)
+            .setState(VehicleTO.State.EXECUTING)
             .setStateTimestamp(Instant.parse("2025-01-29T11:48:37.000Z"))
             .setEnvelopeKey("envelopeType-01")
             .setAllocatedResources(

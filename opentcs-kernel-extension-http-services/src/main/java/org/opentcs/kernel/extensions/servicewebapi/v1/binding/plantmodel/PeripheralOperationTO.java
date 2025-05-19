@@ -7,7 +7,6 @@ import static java.util.Objects.requireNonNull;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
-import org.opentcs.data.peripherals.PeripheralOperation;
 
 /**
  */
@@ -15,7 +14,7 @@ public class PeripheralOperationTO {
 
   private String operation;
   private String locationName;
-  private String executionTrigger = PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION.name();
+  private String executionTrigger = ExecutionTrigger.AFTER_ALLOCATION.name();
   private boolean completionRequired;
 
   @JsonCreator
@@ -79,4 +78,12 @@ public class PeripheralOperationTO {
     return this;
   }
 
+  // CHECKSTYLE:OFF
+  public enum ExecutionTrigger {
+
+    IMMEDIATE,
+    AFTER_ALLOCATION,
+    AFTER_MOVEMENT;
+  }
+  // CHECKSTYLE:ON
 }

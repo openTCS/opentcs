@@ -32,6 +32,7 @@ import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PeripheralOperationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PeripheralOperationDescription;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralJobConverter;
@@ -103,7 +104,7 @@ class PeripheralJobHandlerTest {
                 new PeripheralOperationDescription()
                     .setLocationName("some-location")
                     .setOperation("some-operation")
-                    .setExecutionTrigger(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION)
+                    .setExecutionTrigger(PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION)
                     .setCompletionRequired(true)
             )
             .setRelatedVehicle("some-vehicle")

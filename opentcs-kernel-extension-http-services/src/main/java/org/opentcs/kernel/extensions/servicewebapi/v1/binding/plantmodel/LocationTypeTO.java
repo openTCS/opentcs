@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 
 /**
@@ -100,7 +99,7 @@ public class LocationTypeTO {
 
   public static class Layout {
 
-    private String locationRepresentation = LocationRepresentation.NONE.name();
+    private String locationRepresentation = LocationRepresentationTO.NONE.name();
 
     public Layout() {
 

@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.LinkTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
@@ -135,7 +134,7 @@ public class LocationTO {
 
     private CoupleTO position = new CoupleTO(0, 0);
     private CoupleTO labelOffset = new CoupleTO(0, 0);
-    private String locationRepresentation = LocationRepresentation.DEFAULT.name();
+    private String locationRepresentation = LocationRepresentationTO.DEFAULT.name();
     private int layerId;
 
     public Layout() {

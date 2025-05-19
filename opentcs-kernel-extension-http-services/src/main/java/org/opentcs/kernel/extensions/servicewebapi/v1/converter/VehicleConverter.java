@@ -153,9 +153,9 @@ public class VehicleConverter {
         vehicle.getEnergyLevelThresholdSet().getEnergyLevelFullyRecharged()
     );
     to.setEnergyLevel(vehicle.getEnergyLevel());
-    to.setIntegrationLevel(vehicle.getIntegrationLevel());
+    to.setIntegrationLevel(toVehicleIntegrationLevel(vehicle.getIntegrationLevel()));
     to.setPaused(vehicle.isPaused());
-    to.setProcState(vehicle.getProcState());
+    to.setProcState(toVehicleProcState(vehicle.getProcState()));
     to.setProcStateTimestamp(vehicle.getProcStateTimestamp());
     to.setTransportOrder(nameOfNullableReference(vehicle.getTransportOrder()));
     to.setCurrentPosition(nameOfNullableReference(vehicle.getCurrentPosition()));
@@ -172,7 +172,7 @@ public class VehicleConverter {
       to.setPrecisePosition(null);
     }
     to.setOrientationAngle(vehicle.getPose().getOrientationAngle());
-    to.setState(vehicle.getState());
+    to.setState(toVehicleState(vehicle.getState()));
     to.setStateTimestamp(vehicle.getStateTimestamp());
     to.setAllocatedResources(toListOfListOfNames(vehicle.getAllocatedResources()));
     to.setClaimedResources(toListOfListOfNames(vehicle.getClaimedResources()));
@@ -218,14 +218,14 @@ public class VehicleConverter {
         vehicle.getEnergyLevelThresholdSet().getEnergyLevelFullyRecharged()
     );
     vehicleMessage.setEnergyLevel(vehicle.getEnergyLevel());
-    vehicleMessage.setIntegrationLevel(vehicle.getIntegrationLevel());
+    vehicleMessage.setIntegrationLevel(toVehicleIntegrationLevel(vehicle.getIntegrationLevel()));
     vehicleMessage.setPosition(
         vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName()
     );
     vehicleMessage.setPaused(vehicle.isPaused());
-    vehicleMessage.setState(vehicle.getState());
+    vehicleMessage.setState(toVehicleState(vehicle.getState()));
     vehicleMessage.setStateTimestamp(vehicle.getStateTimestamp());
-    vehicleMessage.setProcState(vehicle.getProcState());
+    vehicleMessage.setProcState(toVehicleProcState(vehicle.getProcState()));
     vehicleMessage.setProcStateTimestamp(vehicle.getProcStateTimestamp());
     if (vehicle.getPose().getPosition() != null) {
       vehicleMessage.setPrecisePosition(
@@ -247,6 +247,36 @@ public class VehicleConverter {
         orderTypeConverter.toAcceptableOrderTypeTOs(vehicle.getAcceptableOrderTypes())
     );
     return vehicleMessage;
+  }
+
+  private VehicleTO.IntegrationLevel toVehicleIntegrationLevel(
+      Vehicle.IntegrationLevel integrationLevel
+  ) {
+    return switch (integrationLevel) {
+      case TO_BE_IGNORED -> VehicleTO.IntegrationLevel.TO_BE_IGNORED;
+      case TO_BE_NOTICED -> VehicleTO.IntegrationLevel.TO_BE_NOTICED;
+      case TO_BE_UTILIZED -> VehicleTO.IntegrationLevel.TO_BE_UTILIZED;
+      case TO_BE_RESPECTED -> VehicleTO.IntegrationLevel.TO_BE_RESPECTED;
+    };
+  }
+
+  private VehicleTO.State toVehicleState(Vehicle.State state) {
+    return switch (state) {
+      case IDLE -> VehicleTO.State.IDLE;
+      case CHARGING -> VehicleTO.State.CHARGING;
+      case EXECUTING -> VehicleTO.State.EXECUTING;
+      case UNKNOWN -> VehicleTO.State.UNKNOWN;
+      case UNAVAILABLE -> VehicleTO.State.UNAVAILABLE;
+      case ERROR -> VehicleTO.State.ERROR;
+    };
+  }
+
+  private VehicleTO.ProcState toVehicleProcState(Vehicle.ProcState procState) {
+    return switch (procState) {
+      case IDLE -> VehicleTO.ProcState.IDLE;
+      case AWAITING_ORDER -> VehicleTO.ProcState.AWAITING_ORDER;
+      case PROCESSING_ORDER -> VehicleTO.ProcState.PROCESSING_ORDER;
+    };
   }
 
   private String nameOfNullableReference(

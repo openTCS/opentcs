@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared;
 
-import org.opentcs.data.peripherals.PeripheralOperation.ExecutionTrigger;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PeripheralOperationTO;
 
 /**
  * Describes a peripheral operation.
@@ -13,7 +13,7 @@ public class PeripheralOperationDescription {
 
   private String locationName;
 
-  private ExecutionTrigger executionTrigger;
+  private PeripheralOperationTO.ExecutionTrigger executionTrigger;
 
   private boolean completionRequired;
 
@@ -38,11 +38,13 @@ public class PeripheralOperationDescription {
     return this;
   }
 
-  public ExecutionTrigger getExecutionTrigger() {
+  public PeripheralOperationTO.ExecutionTrigger getExecutionTrigger() {
     return executionTrigger;
   }
 
-  public PeripheralOperationDescription setExecutionTrigger(ExecutionTrigger executionTrigger) {
+  public PeripheralOperationDescription setExecutionTrigger(
+      PeripheralOperationTO.ExecutionTrigger executionTrigger
+  ) {
     this.executionTrigger = executionTrigger;
     return this;
   }

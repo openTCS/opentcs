@@ -16,6 +16,8 @@ import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.PeripheralJobStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PeripheralJobStateTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PeripheralOperationTO;
 
 /**
  * Tests for {@link PeripheralJobConverter}.
@@ -53,11 +55,13 @@ public class PeripheralJobConverterTest {
     assertThat(statusMessage.getPeripheralOperation().getLocationName(), is("L1"));
     assertThat(
         statusMessage.getPeripheralOperation().getExecutionTrigger(), is(
-            PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION
+            PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION
         )
     );
     assertThat(statusMessage.getPeripheralOperation().isCompletionRequired(), is(true));
-    assertThat(statusMessage.getState(), is(PeripheralJob.State.TO_BE_PROCESSED));
+    assertThat(
+        statusMessage.getState(), is(PeripheralJobStateTO.TO_BE_PROCESSED)
+    );
     assertThat(statusMessage.getRelatedVehicle(), is("V1"));
     assertThat(statusMessage.getRelatedTransportOrder(), is("T1"));
     assertThat(statusMessage.getCreationTime(), is(Instant.EPOCH));
@@ -93,11 +97,11 @@ public class PeripheralJobConverterTest {
     assertThat(response.getPeripheralOperation().getLocationName(), is("L1"));
     assertThat(
         response.getPeripheralOperation().getExecutionTrigger(), is(
-            PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION
+            PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION
         )
     );
     assertThat(response.getPeripheralOperation().isCompletionRequired(), is(true));
-    assertThat(response.getState(), is(PeripheralJob.State.TO_BE_PROCESSED));
+    assertThat(response.getState(), is(PeripheralJobStateTO.TO_BE_PROCESSED));
     assertThat(response.getRelatedVehicle(), is("V1"));
     assertThat(response.getRelatedTransportOrder(), is("T1"));
     assertThat(response.getCreationTime(), is(Instant.EPOCH));

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
 import java.util.Set;
-import org.opentcs.data.model.Block;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 
 /**
@@ -17,7 +16,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 public class BlockTO {
 
   private String name;
-  private String type = Block.Type.SINGLE_VEHICLE_ONLY.name();
+  private String type = Type.SINGLE_VEHICLE_ONLY.name();
   private Layout layout = new Layout();
   private Set<String> memberNames = Set.of();
   private List<PropertyTO> properties = List.of();
@@ -95,6 +94,13 @@ public class BlockTO {
     this.memberNames = requireNonNull(memberNames, "memberNames");
     return this;
   }
+
+  // CHECKSTYLE:OFF
+  public enum Type {
+
+    SINGLE_VEHICLE_ONLY,
+  }
+  // CHECKSTYLE:ON
 
   public static class Layout {
 

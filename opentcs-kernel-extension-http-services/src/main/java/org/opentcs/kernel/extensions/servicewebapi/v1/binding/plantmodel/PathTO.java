@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import org.opentcs.data.model.Path;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.EnvelopeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
@@ -175,7 +174,7 @@ public class PathTO {
 
   public static class Layout {
 
-    private String connectionType = Path.Layout.ConnectionType.DIRECT.name();
+    private String connectionType = ConnectionType.DIRECT.name();
     private List<CoupleTO> controlPoints = List.of();
     private int layerId;
 
@@ -218,6 +217,12 @@ public class PathTO {
       return this;
     }
 
-  }
+    // CHECKSTYLE:OFF
+    public enum ConnectionType {
 
+      DIRECT,
+      POLYPATH,
+    }
+    // CHECKSTYLE:ON
+  }
 }

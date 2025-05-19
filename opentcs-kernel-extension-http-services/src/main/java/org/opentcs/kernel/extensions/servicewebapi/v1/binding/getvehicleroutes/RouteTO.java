@@ -7,7 +7,7 @@ import static java.util.Objects.requireNonNull;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.List;
-import org.opentcs.data.model.Vehicle;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
 
 /**
  * The web API representation of a route.
@@ -57,7 +57,7 @@ public class RouteTO {
     private String path;
     private String sourcePoint;
     private String destinationPoint = "";
-    private String vehicleOrientation = Vehicle.Orientation.UNDEFINED.name();
+    private String vehicleOrientation = VehicleTO.Orientation.UNDEFINED.name();
 
     public Step() {
     }

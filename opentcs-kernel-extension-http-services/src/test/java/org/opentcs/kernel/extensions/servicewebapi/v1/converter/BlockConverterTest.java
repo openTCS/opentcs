@@ -48,7 +48,7 @@ class BlockConverterTest {
   @Test
   void checkToBlockCreationTOs() {
     BlockTO blockTO = new BlockTO("block1")
-        .setType(Block.Type.SINGLE_VEHICLE_ONLY.name())
+        .setType(BlockTO.Type.SINGLE_VEHICLE_ONLY.name())
         .setMemberNames(Set.of("member1"))
         .setLayout(new BlockTO.Layout())
         .setProperties(propertyList);

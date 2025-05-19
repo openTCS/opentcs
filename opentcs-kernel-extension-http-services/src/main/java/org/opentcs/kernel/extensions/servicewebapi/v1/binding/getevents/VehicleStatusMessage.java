@@ -8,7 +8,7 @@ import jakarta.annotation.Nonnull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentcs.data.model.Vehicle;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.AcceptableOrderTypeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
@@ -44,7 +44,7 @@ public class VehicleStatusMessage
 
   private int energyLevel;
 
-  private Vehicle.IntegrationLevel integrationLevel = Vehicle.IntegrationLevel.TO_BE_RESPECTED;
+  private VehicleTO.IntegrationLevel integrationLevel = VehicleTO.IntegrationLevel.TO_BE_RESPECTED;
 
   private String position;
 
@@ -54,11 +54,11 @@ public class VehicleStatusMessage
 
   private boolean paused;
 
-  private Vehicle.State state;
+  private VehicleTO.State state;
 
   private Instant stateTimestamp = Instant.EPOCH;
 
-  private Vehicle.ProcState procState;
+  private VehicleTO.ProcState procState;
 
   private Instant procStateTimestamp = Instant.EPOCH;
 
@@ -173,11 +173,11 @@ public class VehicleStatusMessage
     return this;
   }
 
-  public Vehicle.IntegrationLevel getIntegrationLevel() {
+  public VehicleTO.IntegrationLevel getIntegrationLevel() {
     return integrationLevel;
   }
 
-  public VehicleStatusMessage setIntegrationLevel(Vehicle.IntegrationLevel integrationLevel) {
+  public VehicleStatusMessage setIntegrationLevel(VehicleTO.IntegrationLevel integrationLevel) {
     this.integrationLevel = requireNonNull(integrationLevel, "integrationLevel");
     return this;
   }
@@ -218,11 +218,11 @@ public class VehicleStatusMessage
     return this;
   }
 
-  public Vehicle.State getState() {
+  public VehicleTO.State getState() {
     return state;
   }
 
-  public VehicleStatusMessage setState(Vehicle.State state) {
+  public VehicleStatusMessage setState(VehicleTO.State state) {
     this.state = state;
     return this;
   }
@@ -236,11 +236,11 @@ public class VehicleStatusMessage
     return this;
   }
 
-  public Vehicle.ProcState getProcState() {
+  public VehicleTO.ProcState getProcState() {
     return procState;
   }
 
-  public VehicleStatusMessage setProcState(Vehicle.ProcState procState) {
+  public VehicleStatusMessage setProcState(VehicleTO.ProcState procState) {
     this.procState = procState;
     return this;
   }

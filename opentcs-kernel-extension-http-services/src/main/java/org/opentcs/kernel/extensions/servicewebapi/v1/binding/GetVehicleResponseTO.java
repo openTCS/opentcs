@@ -13,10 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.model.Vehicle.IntegrationLevel;
-import org.opentcs.data.model.Vehicle.ProcState;
-import org.opentcs.data.model.Vehicle.State;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.AcceptableOrderTypeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
@@ -58,11 +55,11 @@ public class GetVehicleResponseTO {
 
   private int energyLevel;
 
-  private IntegrationLevel integrationLevel = IntegrationLevel.TO_BE_RESPECTED;
+  private VehicleTO.IntegrationLevel integrationLevel = VehicleTO.IntegrationLevel.TO_BE_RESPECTED;
 
   private boolean paused;
 
-  private ProcState procState = ProcState.IDLE;
+  private VehicleTO.ProcState procState = VehicleTO.ProcState.IDLE;
 
   private Instant procStateTimestamp = Instant.EPOCH;
 
@@ -74,7 +71,7 @@ public class GetVehicleResponseTO {
 
   private double orientationAngle;
 
-  private State state = State.UNKNOWN;
+  private VehicleTO.State state = VehicleTO.State.UNKNOWN;
 
   private Instant stateTimestamp = Instant.EPOCH;
 
@@ -173,11 +170,11 @@ public class GetVehicleResponseTO {
     return this;
   }
 
-  public IntegrationLevel getIntegrationLevel() {
+  public VehicleTO.IntegrationLevel getIntegrationLevel() {
     return integrationLevel;
   }
 
-  public GetVehicleResponseTO setIntegrationLevel(IntegrationLevel integrationLevel) {
+  public GetVehicleResponseTO setIntegrationLevel(VehicleTO.IntegrationLevel integrationLevel) {
     this.integrationLevel = requireNonNull(integrationLevel, "integrationLevel");
     return this;
   }
@@ -191,11 +188,11 @@ public class GetVehicleResponseTO {
     return this;
   }
 
-  public ProcState getProcState() {
+  public VehicleTO.ProcState getProcState() {
     return procState;
   }
 
-  public GetVehicleResponseTO setProcState(Vehicle.ProcState procState) {
+  public GetVehicleResponseTO setProcState(VehicleTO.ProcState procState) {
     this.procState = requireNonNull(procState, "procState");
     return this;
   }
@@ -245,11 +242,11 @@ public class GetVehicleResponseTO {
     return this;
   }
 
-  public State getState() {
+  public VehicleTO.State getState() {
     return state;
   }
 
-  public GetVehicleResponseTO setState(State state) {
+  public GetVehicleResponseTO setState(VehicleTO.State state) {
     this.state = requireNonNull(state, "state");
     return this;
   }

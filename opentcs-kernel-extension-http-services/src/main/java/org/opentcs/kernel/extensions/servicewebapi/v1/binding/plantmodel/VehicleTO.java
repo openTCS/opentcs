@@ -161,6 +161,44 @@ public class VehicleTO {
     return this;
   }
 
+  // CHECKSTYLE:OFF
+  public enum State {
+
+    UNKNOWN,
+    UNAVAILABLE,
+    ERROR,
+    IDLE,
+    EXECUTING,
+    CHARGING
+  }
+  // CHECKSTYLE:ON
+
+  // CHECKSTYLE:OFF
+  public enum IntegrationLevel {
+
+    TO_BE_IGNORED,
+    TO_BE_NOTICED,
+    TO_BE_RESPECTED,
+    TO_BE_UTILIZED
+  }
+  // CHECKSTYLE:ON
+
+  // CHECKSTYLE:OFF
+  public enum ProcState {
+
+    IDLE,
+    AWAITING_ORDER,
+    PROCESSING_ORDER
+  }
+  // CHECKSTYLE:ON
+
+  // CHECKSTYLE:OFF
+  public enum Orientation {
+
+    UNDEFINED
+  }
+  // CHECKSTYLE:ON
+
   public static class Layout {
 
     private String routeColor = "#00FF00";

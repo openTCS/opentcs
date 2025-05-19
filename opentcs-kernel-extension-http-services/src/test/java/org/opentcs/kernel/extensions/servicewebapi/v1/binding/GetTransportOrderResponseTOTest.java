@@ -6,7 +6,6 @@ import java.util.List;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DestinationState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
@@ -32,7 +31,7 @@ class GetTransportOrderResponseTOTest {
             .setPeripheralReservationToken("some-token")
             .setWrappingSequence("some-sequence")
             .setType("some-type")
-            .setState(TransportOrder.State.BEING_PROCESSED)
+            .setState(GetTransportOrderResponseTO.State.BEING_PROCESSED)
             .setIntendedVehicle("some-vehicle")
             .setProcessingVehicle("some-vehicle")
             .setDestinations(

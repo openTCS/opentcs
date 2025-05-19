@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.visualization.LocationRepresentation;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationTypeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 
@@ -50,7 +51,7 @@ class LocationTypeConverterTest {
         .setAllowedPeripheralOperations(List.of("PO1"))
         .setLayout(
             new LocationTypeTO.Layout()
-                .setLocationRepresentation(LocationRepresentation.RECHARGE_ALT_1.name())
+                .setLocationRepresentation(LocationRepresentationTO.RECHARGE_ALT_1.name())
         )
         .setProperties(propertyList);
 
@@ -92,7 +93,7 @@ class LocationTypeConverterTest {
     assertThat(result.get(0).getAllowedPeripheralOperations(), contains("PO1"));
     assertThat(
         result.get(0).getLayout().getLocationRepresentation(),
-        is(LocationRepresentation.LOAD_TRANSFER_GENERIC.name())
+        is(LocationRepresentationTO.LOAD_TRANSFER_GENERIC.name())
     );
     assertThat(result.get(0).getProperties(), hasSize(1));
     assertThat(result.get(0).getProperties(), is(propertyList));

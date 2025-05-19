@@ -8,13 +8,13 @@ import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.peripherals.PeripheralJob;
-import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.OrderStatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.PeripheralJobStatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.VehicleStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PeripheralJobStateTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PeripheralOperationTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VehicleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.AcceptableOrderTypeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
@@ -67,13 +67,13 @@ class GetEventsResponseTOTest {
         .setEnergyLevelSufficientlyRecharged(40)
         .setEnergyLevelFullyRecharged(80)
         .setEnergyLevel(70)
-        .setIntegrationLevel(Vehicle.IntegrationLevel.TO_BE_UTILIZED)
+        .setIntegrationLevel(VehicleTO.IntegrationLevel.TO_BE_UTILIZED)
         .setPosition("some-point")
         .setPrecisePosition(new VehicleStatusMessage.PrecisePosition(1, 2, 3))
         .setPaused(false)
-        .setState(Vehicle.State.IDLE)
+        .setState(VehicleTO.State.IDLE)
         .setStateTimestamp(Instant.parse("2025-01-29T11:12:43.000Z"))
-        .setProcState(Vehicle.ProcState.IDLE)
+        .setProcState(VehicleTO.ProcState.IDLE)
         .setProcStateTimestamp(Instant.parse("2025-01-29T11:58:02.000Z"))
         .setAllocatedResources(
             List.of(
@@ -137,10 +137,10 @@ class GetEventsResponseTOTest {
             new PeripheralOperationDescription()
                 .setOperation("some-operation")
                 .setLocationName("some-location")
-                .setExecutionTrigger(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION)
+                .setExecutionTrigger(PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION)
                 .setCompletionRequired(true)
         )
-        .setState(PeripheralJob.State.BEING_PROCESSED)
+        .setState(PeripheralJobStateTO.BEING_PROCESSED)
         .setCreationTime(Instant.EPOCH)
         .setFinishedTime(Instant.MAX)
         .setProperties(

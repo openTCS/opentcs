@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nonnull;
 import java.util.List;
-import org.opentcs.data.model.Point;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.EnvelopeTO;
@@ -22,7 +21,7 @@ public class PointTO {
   private String name;
   private TripleTO position = new TripleTO(0, 0, 0);
   private double vehicleOrientationAngle = Double.NaN;
-  private String type = Point.Type.HALT_POSITION.name();
+  private String type = Type.HALT_POSITION.name();
   private Layout layout = new Layout();
   private List<EnvelopeTO> vehicleEnvelopes = List.of();
   private BoundingBoxTO maxVehicleBoundingBox
@@ -133,6 +132,13 @@ public class PointTO {
     this.maxVehicleBoundingBox = requireNonNull(maxVehicleBoundingBoxTO, "maxVehicleBoundingBox");
     return this;
   }
+
+  // CHECKSTYLE:OFF
+  public enum Type {
+
+    HALT_POSITION,
+  }
+  // CHECKSTYLE:ON
 
   public static class Layout {
 

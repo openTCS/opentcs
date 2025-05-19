@@ -87,7 +87,7 @@ public class TransportOrderConverterTest {
     assertThat(response.getType(), is("some type"));
     assertThat(response.getIntendedVehicle(), is("V1"));
     assertThat(response.getProcessingVehicle(), is("V2"));
-    assertThat(response.getState(), is(TransportOrder.State.DISPATCHABLE));
+    assertThat(response.getState(), is(GetTransportOrderResponseTO.State.DISPATCHABLE));
     assertThat(response.getProperties().size(), is(1));
     assertThat(response.getProperties().getFirst().getKey(), is("some-key"));
     assertThat(response.getProperties().getFirst().getValue(), is("some-value"));

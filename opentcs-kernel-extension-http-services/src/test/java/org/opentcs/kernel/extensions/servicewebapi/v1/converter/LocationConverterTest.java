@@ -26,6 +26,7 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.visualization.LocationRepresentation;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.LinkTO;
@@ -72,7 +73,7 @@ class LocationConverterTest {
                 .setPosition(new CoupleTO(2, 2))
                 .setLabelOffset(new CoupleTO(3, 3))
                 .setLayerId(4)
-                .setLocationRepresentation(LocationRepresentation.LOAD_TRANSFER_GENERIC.name())
+                .setLocationRepresentation(LocationRepresentationTO.LOAD_TRANSFER_GENERIC.name())
         )
         .setProperties(propertyList);
 
@@ -141,7 +142,7 @@ class LocationConverterTest {
     );
     assertThat(
         result.get(0).getLayout().getLocationRepresentation(),
-        is(LocationRepresentation.LOAD_TRANSFER_GENERIC.name())
+        is(LocationRepresentationTO.LOAD_TRANSFER_GENERIC.name())
     );
     assertThat(result.get(0).getLayout().getLayerId(), is(3));
     assertThat(result.get(0).getProperties(), hasSize(1));

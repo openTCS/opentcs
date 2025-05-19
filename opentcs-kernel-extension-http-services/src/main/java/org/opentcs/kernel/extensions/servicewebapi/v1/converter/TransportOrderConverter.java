@@ -84,9 +84,22 @@ public class TransportOrderConverter {
     transportOrderState.setProcessingVehicle(
         nameOfNullableReference(transportOrder.getProcessingVehicle())
     );
-    transportOrderState.setState(transportOrder.getState());
+    transportOrderState.setState(convertState(transportOrder.getState()));
     transportOrderState.setProperties(convertProperties(transportOrder.getProperties()));
     return transportOrderState;
+  }
+
+  private GetTransportOrderResponseTO.State convertState(TransportOrder.State state) {
+    return switch (state) {
+      case UNROUTABLE -> GetTransportOrderResponseTO.State.UNROUTABLE;
+      case ACTIVE -> GetTransportOrderResponseTO.State.ACTIVE;
+      case BEING_PROCESSED -> GetTransportOrderResponseTO.State.BEING_PROCESSED;
+      case DISPATCHABLE -> GetTransportOrderResponseTO.State.DISPATCHABLE;
+      case RAW -> GetTransportOrderResponseTO.State.RAW;
+      case WITHDRAWN -> GetTransportOrderResponseTO.State.WITHDRAWN;
+      case FINISHED -> GetTransportOrderResponseTO.State.FINISHED;
+      case FAILED -> GetTransportOrderResponseTO.State.FAILED;
+    };
   }
 
   private static String nameOfNullableReference(

@@ -59,7 +59,17 @@ public class PeripheralOperationConverter {
     return new PeripheralOperationDescription()
         .setOperation(operation.getOperation())
         .setLocationName(operation.getLocation().getName())
-        .setExecutionTrigger(operation.getExecutionTrigger())
+        .setExecutionTrigger(toExecutionTrigger(operation.getExecutionTrigger()))
         .setCompletionRequired(operation.isCompletionRequired());
+  }
+
+  private PeripheralOperationTO.ExecutionTrigger toExecutionTrigger(
+      PeripheralOperation.ExecutionTrigger trigger
+  ) {
+    return switch (trigger) {
+      case IMMEDIATE -> PeripheralOperationTO.ExecutionTrigger.IMMEDIATE;
+      case AFTER_ALLOCATION -> PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION;
+      case AFTER_MOVEMENT -> PeripheralOperationTO.ExecutionTrigger.AFTER_MOVEMENT;
+    };
   }
 }

@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetPeripheralJobResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.PeripheralJobStatusMessage;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PeripheralJobStateTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
@@ -45,7 +46,7 @@ public class PeripheralJobConverter {
     message.setPeripheralOperation(
         peripheralOperationConverter.toPeripheralOperationDescription(job.getPeripheralOperation())
     );
-    message.setState(job.getState());
+    message.setState(toPeripheralJobStateTO(job.getState()));
     message.setCreationTime(job.getCreationTime());
     message.setFinishedTime(job.getFinishedTime());
     message.setProperties(
@@ -67,7 +68,7 @@ public class PeripheralJobConverter {
                 job.getPeripheralOperation()
             )
         )
-        .setState(job.getState())
+        .setState(toPeripheralJobStateTO(job.getState()))
         .setCreationTime(job.getCreationTime())
         .setFinishedTime(job.getFinishedTime())
         .setProperties(
@@ -82,5 +83,16 @@ public class PeripheralJobConverter {
       state = state.setRelatedTransportOrder(job.getRelatedTransportOrder().getName());
     }
     return state;
+  }
+
+  private PeripheralJobStateTO toPeripheralJobStateTO(
+      PeripheralJob.State state
+  ) {
+    return switch (state) {
+      case TO_BE_PROCESSED -> PeripheralJobStateTO.TO_BE_PROCESSED;
+      case BEING_PROCESSED -> PeripheralJobStateTO.BEING_PROCESSED;
+      case FINISHED -> PeripheralJobStateTO.FINISHED;
+      case FAILED -> PeripheralJobStateTO.FAILED;
+    };
   }
 }

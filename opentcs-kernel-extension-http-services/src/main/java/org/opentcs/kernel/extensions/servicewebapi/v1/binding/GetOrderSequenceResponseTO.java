@@ -8,7 +8,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.List;
-import org.opentcs.data.order.OrderConstants;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.OrderConstantsTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
@@ -20,7 +20,7 @@ public class GetOrderSequenceResponseTO {
   private String name;
 
   @Nonnull
-  private String type = OrderConstants.TYPE_NONE;
+  private String type = OrderConstantsTO.TYPE_NONE;
 
   @Nonnull
   private List<String> orders = List.of();

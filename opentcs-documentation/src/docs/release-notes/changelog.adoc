@@ -28,6 +28,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Deprecate `VehicleCommAdapter.processMessage(Object)`, `VehicleCommAdapter.execute(AdapterCommads)` and related code in favor of `VehicleCommAdapter.processMessage(VehicleCommAdapterMessage)`, which provides a generic one-way communication channel to the comm adapter.
 ** Provide `DriveOrder` with a name, which helps with identifying and comparing `DriveOrder` instances. 
    For this, introduce a new constructor `DriveOrder(String, Destination)` and deprecate `DriveOrder(Destination)`.
+** Remove dependencies to the base API data structures in the web API data structures to ensure that they are not directly impacted by changes in the base API.
 ** Update JUnit to 5.12.0.
 ** Update ApprovalTests to 24.17.0.
 ** Update AssertJ to 3.27.3.

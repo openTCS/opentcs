@@ -6,8 +6,8 @@ import java.util.List;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PeripheralOperationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PeripheralOperationDescription;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
@@ -35,7 +35,7 @@ class PostPeripheralJobRequestTOTest {
                 new PeripheralOperationDescription()
                     .setOperation("some-operation")
                     .setLocationName("some-location")
-                    .setExecutionTrigger(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION)
+                    .setExecutionTrigger(PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION)
                     .setCompletionRequired(true)
             )
             .setProperties(

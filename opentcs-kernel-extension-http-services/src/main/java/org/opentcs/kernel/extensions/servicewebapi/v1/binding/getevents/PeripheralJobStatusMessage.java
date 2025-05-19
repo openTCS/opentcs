@@ -4,7 +4,7 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents;
 
 import java.time.Instant;
 import java.util.List;
-import org.opentcs.data.peripherals.PeripheralJob.State;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PeripheralJobStateTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PeripheralOperationDescription;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
@@ -25,7 +25,7 @@ public class PeripheralJobStatusMessage
 
   private PeripheralOperationDescription peripheralOperation;
 
-  private State state;
+  private PeripheralJobStateTO state;
 
   private Instant creationTime;
 
@@ -96,11 +96,11 @@ public class PeripheralJobStatusMessage
     return this;
   }
 
-  public State getState() {
+  public PeripheralJobStateTO getState() {
     return state;
   }
 
-  public PeripheralJobStatusMessage setState(State state) {
+  public PeripheralJobStatusMessage setState(PeripheralJobStateTO state) {
     this.state = state;
     return this;
   }

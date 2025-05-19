@@ -7,7 +7,6 @@ import static java.util.Objects.requireNonNull;
 import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DestinationState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
@@ -25,7 +24,7 @@ public class GetTransportOrderResponseTO {
 
   private String type = "";
 
-  private TransportOrder.State state = TransportOrder.State.RAW;
+  private State state = State.RAW;
 
   private String intendedVehicle;
 
@@ -86,11 +85,11 @@ public class GetTransportOrderResponseTO {
     return this;
   }
 
-  public TransportOrder.State getState() {
+  public State getState() {
     return state;
   }
 
-  public GetTransportOrderResponseTO setState(TransportOrder.State state) {
+  public GetTransportOrderResponseTO setState(State state) {
     this.state = requireNonNull(state, "state");
     return this;
   }
@@ -134,4 +133,18 @@ public class GetTransportOrderResponseTO {
     this.properties = requireNonNull(properties, "properties");
     return this;
   }
+
+  // CHECKSTYLE:OFF
+  public enum State {
+
+    RAW,
+    ACTIVE,
+    DISPATCHABLE,
+    BEING_PROCESSED,
+    WITHDRAWN,
+    FINISHED,
+    FAILED,
+    UNROUTABLE
+  }
+  // CHECKSTYLE:ON
 }

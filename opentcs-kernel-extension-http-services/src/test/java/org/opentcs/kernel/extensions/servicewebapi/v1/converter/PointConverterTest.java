@@ -80,7 +80,7 @@ class PointConverterTest {
     assertThat(result.get(0).getName(), is("P1"));
     assertThat(result.get(0).getPosition(), samePropertyValuesAs(new TripleTO(1, 1, 1)));
     assertThat(result.get(0).getVehicleOrientationAngle(), is(0.5));
-    assertThat(result.get(0).getType(), is(Point.Type.HALT_POSITION.name()));
+    assertThat(result.get(0).getType(), is(PointTO.Type.HALT_POSITION.name()));
     assertThat(result.get(0).getVehicleEnvelopes(), hasSize(1));
     assertThat(result.get(0).getVehicleEnvelopes(), is(envelopeList));
     assertThat(result.get(0).getMaxVehicleBoundingBox().getLength(), is(1000L));
