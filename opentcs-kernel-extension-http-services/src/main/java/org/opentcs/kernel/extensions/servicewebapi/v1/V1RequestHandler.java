@@ -744,7 +744,7 @@ public class V1RequestHandler
   private int maxRoutePerDestinationPoint(Request request)
       throws IllegalArgumentException {
     String param
-        = request.queryParamOrDefault("maxRoutePerDestinationPoint", "1");
+        = request.queryParamOrDefault("maxRoutesPerDestinationPoint", "1");
     try {
       return Integer.parseInt(param);
     }
