@@ -4,6 +4,8 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared;
 
 import static java.util.Objects.requireNonNull;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -14,7 +16,13 @@ public class AcceptableOrderTypeTO
   private final String name;
   private final int priority;
 
-  public AcceptableOrderTypeTO(String name, int priority) {
+  @JsonCreator
+  public AcceptableOrderTypeTO(
+      @JsonProperty(value = "name", required = true)
+      String name,
+      @JsonProperty(value = "priority", required = true)
+      int priority
+  ) {
     this.name = requireNonNull(name, "name");
     this.priority = priority;
   }
