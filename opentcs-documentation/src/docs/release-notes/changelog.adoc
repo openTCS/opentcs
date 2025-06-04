@@ -19,6 +19,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 == Unreleased
 
 * New features and enhancements:
+** Reduce the time it takes to persist large plant models into the kernel.
 ** Update web API specification and implementation to version 1.12.0:
 *** Extend the endpoint `POST /vehicles/NAME/routeComputationQuery` by an optional parameter which specifies the maximum number of routes to compute for one destination point.
 *** Add an endpoint `POST /vehicles/{NAME}/commAdapter/message`, which allows sending messages to the communication adapter that is attached to a vehicle.

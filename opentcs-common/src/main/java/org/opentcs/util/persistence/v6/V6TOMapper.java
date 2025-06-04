@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.BlockCreationTO;
@@ -376,6 +375,11 @@ public class V6TOMapper {
   private List<PointTO> toPointTO(List<PointCreationTO> points, List<PathCreationTO> paths) {
     List<PointTO> result = new ArrayList<>();
 
+    // Group paths by their source point (i.e. map points to their respective outgoing paths) and
+    // avoid iterating over all paths repeatedly.
+    Map<String, List<PathCreationTO>> pathsBySourcePoint = paths.stream()
+        .collect(Collectors.groupingBy(PathCreationTO::getSrcPointName));
+
     for (PointCreationTO point : points) {
       PointTO pointTO = new PointTO();
       pointTO.setName(point.getName());
@@ -383,7 +387,7 @@ public class V6TOMapper {
           .setPositionY(point.getPose().getPosition().getY())
           .setVehicleOrientationAngle((float) point.getPose().getOrientationAngle())
           .setType(toPointTOType(point.getType()))
-          .setOutgoingPaths(getOutgoingPaths(point, paths))
+          .setOutgoingPaths(getOutgoingPaths(point, pathsBySourcePoint))
           .setVehicleEnvelopes(toVehicleEnvelopeTOs(point.getVehicleEnvelopes()))
           .setMaxVehicleBoundingBox(toBoundingBoxTO(point.getMaxVehicleBoundingBox()))
           .setPointLayout(
@@ -627,14 +631,12 @@ public class V6TOMapper {
 
   private List<PointTO.OutgoingPath> getOutgoingPaths(
       PointCreationTO point,
-      List<PathCreationTO> paths
+      Map<String, List<PathCreationTO>> pathsBySourcePoint
   ) {
     List<PointTO.OutgoingPath> result = new ArrayList<>();
 
-    for (PathCreationTO path : paths) {
-      if (Objects.equals(path.getSrcPointName(), point.getName())) {
-        result.add(new PointTO.OutgoingPath().setName(path.getName()));
-      }
+    for (PathCreationTO path : pathsBySourcePoint.getOrDefault(point.getName(), List.of())) {
+      result.add(new PointTO.OutgoingPath().setName(path.getName()));
     }
 
     Collections.sort(result, Comparators.outgoingPathsByName());
