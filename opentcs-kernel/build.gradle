@@ -23,9 +23,9 @@ dependencies {
   api project(':opentcs-kernel-extension-http-services')
   api project(':opentcs-kernel-extension-rmi-services')
 
-  implementation group: 'de.huxhorn.sulky', name: 'de.huxhorn.sulky.ulid', version: '8.3.0'
+  implementation libs.huxhorn.sulky.ulid
 
-  runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.17'
+  runtimeOnly libs.slf4j.jdk14
 }
 
 distributions {

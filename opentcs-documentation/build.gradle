@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 plugins {
-  id 'org.hidetake.swagger.generator' version '2.19.2'
-  id "org.openapi.generator" version "7.12.0"
+  alias(libs.plugins.hidetake.swagger.generator)
+  alias(libs.plugins.openapi.generator)
   // To use AsciiDoctor for documentation
-  id 'org.asciidoctor.jvm.convert' version '4.0.4'
-  id 'org.asciidoctor.jvm.pdf' version '4.0.4'
+  alias(libs.plugins.asciidocor.jvm.convert)
+  alias(libs.plugins.asciidocor.jvm.pdf)
 }
 
 evaluationDependsOn(':opentcs-api-base')
@@ -64,8 +64,8 @@ dependencies {
   configdocgen project(':opentcs-operationsdesk')
   configdocgen jar.outputs.files
 
-  swaggerUI group: 'org.webjars', name: 'swagger-ui', version: '5.20.1'
-  swaggerUI group: 'org.openapitools', name: 'openapi-generator-cli', version: '7.12.0'
+  swaggerUI libs.swagger.ui
+  swaggerUI libs.openapi.generator.cli
 }
 
 distributions {

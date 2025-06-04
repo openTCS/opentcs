@@ -8,9 +8,9 @@ apply from: "${rootDir}/gradle/publishing-java.gradle"
 dependencies {
   api project(':opentcs-api-base')
 
-  api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
+  api libs.jaxb.runtime
 
-  implementation group: 'org.semver4j', name: 'semver4j', version: '5.6.0'
+  implementation libs.semver4j
 }
 
 processResources.doLast {

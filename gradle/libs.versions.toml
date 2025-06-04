@@ -1,0 +1,81 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: MIT
+
+[versions]
+# Other dependency versions
+checkstyle = "10.21.4"
+dockingframes = "1.1.2p11"
+gestalt = "0.35.4"
+guice = "7.0.0"
+huxhorn-sulky-ulid = "8.3.0"
+jackson = "2.18.3"
+jakarta-annotation = "3.0.0"
+jakarta-inject = "2.0.1"
+jaxb = "4.0.5"
+jgrapht-core = "1.5.2"
+jhotdraw = "7.6.20190506"
+jts-core = "1.20.0"
+openapi-generator-cli = "7.12.0"
+semver4j = "5.6.0"
+slf4j = "2.0.17"
+spark-core = "2.9.4"
+swagger-ui = "5.20.1"
+# Test dependency versions
+approvaltests = "24.17.0"
+assertj = "3.27.3"
+hamcrest = "3.0"
+junit = "5.12.0"
+junit-platform-launcher = "1.12.0"
+mockito = "5.16.0"
+# Plugin versions
+asciidoctor = "4.0.4"
+dependency-license-report = "2.9"
+jacocolog = "3.1.0"
+openapi-generator = "7.12.0"
+gradle-nexus-publish-plugin = "2.0.0"
+spotless = "7.0.2"
+swagger-generator = "2.19.2"
+
+[libraries]
+# Other dependencies
+dockingframes-common = { group = "org.opentcs.thirdparty.dockingframes", name = "docking-frames-common", version.ref = "dockingframes" }
+dockingframes-core = { group = "org.opentcs.thirdparty.dockingframes", name = "docking-frames-core", version.ref = "dockingframes" }
+gestalt-core = {group = "com.github.gestalt-config", name = "gestalt-core", version.ref = "gestalt" }
+guice = { group = "com.google.inject", name = "guice", version.ref = "guice" }
+guice-assistedinject = { group = "com.google.inject.extensions", name = "guice-assistedinject", version.ref = "guice" }
+huxhorn-sulky-ulid = { group = "de.huxhorn.sulky", name = "de.huxhorn.sulky.ulid", version.ref = "huxhorn-sulky-ulid" }
+jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
+jackson-datatype-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson" }
+jackson-module-jsonSchema = { group = "com.fasterxml.jackson.module", name = "jackson-module-jsonSchema", version.ref = "jackson" }
+jakarta-annotation = { group = "jakarta.annotation", name = "jakarta.annotation-api", version.ref = "jakarta-annotation" }
+jakarta-inject = { group = "jakarta.inject", name = "jakarta.inject-api", version.ref = "jakarta-inject" }
+jaxb-runtime = { group = "org.glassfish.jaxb", name = "jaxb-runtime", version.ref = "jaxb" }
+jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jgrapht-core" }
+jhotdraw = { group = "org.opentcs.thirdparty.jhotdraw", name = "jhotdraw", version.ref = "jhotdraw" }
+jts-core = { group = "org.locationtech.jts", name = "jts-core", version.ref = "jts-core" }
+openapi-generator-cli = { group = "org.openapitools", name = "openapi-generator-cli", version.ref = "openapi-generator-cli" }
+semver4j = { group = "org.semver4j", name = "semver4j", version.ref = "semver4j" }
+slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j" }
+slf4j-jdk14 = { group = "org.slf4j", name = "slf4j-jdk14", version.ref = "slf4j" }
+spark-core = {group = "com.sparkjava", name = "spark-core", version.ref = "spark-core" }
+swagger-ui = { group = "org.webjars", name = "swagger-ui", version.ref = "swagger-ui" }
+# Test dependencies
+approvaltests = { group = "com.approvaltests", name = "approvaltests", version.ref = "approvaltests" }
+assertj = { group = "org.assertj", name = "assertj-core", version.ref = "assertj" }
+hamcrest = { group = "org.hamcrest", name = "hamcrest", version.ref = 'hamcrest' }
+junit-jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit" }
+junit-jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
+junit-jupiter-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit" }
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junit-platform-launcher" }
+mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+
+[plugins]
+asciidocor-jvm-convert = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor" }
+asciidocor-jvm-pdf = { id = "org.asciidoctor.jvm.pdf", version.ref = "asciidoctor" }
+dependency-license-report = { id = "com.github.jk1.dependency-license-report", version.ref = "dependency-license-report" }
+gradle-nexus-publish-plugin = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "gradle-nexus-publish-plugin" }
+hidetake-swagger-generator = { id = "org.hidetake.swagger.generator", version.ref = "swagger-generator" }
+jacocolog = { id = "org.barfuin.gradle.jacocolog", version.ref = "jacocolog" }
+openapi-generator = { id = "org.openapi.generator", version.ref = "openapi-generator" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+

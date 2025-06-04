@@ -10,11 +10,11 @@ dependencies {
   api project(':opentcs-api-injection')
   api project(':opentcs-common')
 
-  api group: 'com.sparkjava', name: 'spark-core', version: '2.9.4'
+  api libs.spark.core
 
-  api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'
-  api group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.18.3'
-  api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.3'
+  api libs.jackson.databind
+  api libs.jackson.module.jsonSchema
+  api libs.jackson.datatype.jsr310
 }
 
 task release {

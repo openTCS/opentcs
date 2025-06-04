@@ -12,10 +12,10 @@ dependencies {
   api project(':opentcs-plantoverview-base')
 
   // There does not seem to be an official binary release for JHotDraw...
-  api group: 'org.opentcs.thirdparty.jhotdraw', name: 'jhotdraw', version: '7.6.20190506'
+  api libs.jhotdraw
   // This preview version of Docking Frames is not in Maven Central, yet.
-  api group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-common', version: '1.1.2p11'
-  api group: 'org.opentcs.thirdparty.dockingframes', name: 'docking-frames-core', version: '1.1.2p11'
+  api libs.dockingframes.common
+  api libs.dockingframes.core
 }
 
 task release {

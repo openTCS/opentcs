@@ -8,7 +8,7 @@ apply from: "${rootDir}/gradle/publishing-java.gradle"
 dependencies {
   api project(':opentcs-api-base')
 
-  implementation group: 'com.github.gestalt-config', name: 'gestalt-core', version: '0.35.4'
+  implementation libs.gestalt.core
 }
 
 task release {

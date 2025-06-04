@@ -21,7 +21,7 @@ dependencies {
   api project(':opentcs-plantoverview-panel-resourceallocation')
   api project(':opentcs-plantoverview-themes-default')
 
-  runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.17'
+  runtimeOnly libs.slf4j.jdk14
 }
 
 compileJava {

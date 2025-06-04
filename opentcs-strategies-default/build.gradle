@@ -10,8 +10,8 @@ dependencies {
   api project(':opentcs-api-injection')
   api project(':opentcs-common')
 
-  implementation group: 'org.jgrapht', name: 'jgrapht-core', version: '1.5.2'
-  implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.20.0'
+  implementation libs.jgrapht.core
+  implementation libs.jts.core
 }
 
 task release {
