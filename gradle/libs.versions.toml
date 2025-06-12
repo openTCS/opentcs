@@ -3,7 +3,7 @@
 
 [versions]
 # Other dependency versions
-checkstyle = "10.21.4"
+checkstyle = "10.25.0"
 dockingframes = "1.1.2p11"
 gestalt = "0.35.4"
 guice = "7.0.0"
@@ -33,7 +33,7 @@ dependency-license-report = "2.9"
 jacocolog = "3.1.0"
 openapi-generator = "7.12.0"
 gradle-nexus-publish-plugin = "2.0.0"
-spotless = "7.0.2"
+spotless = "7.0.4"
 swagger-generator = "2.19.2"
 
 [libraries]

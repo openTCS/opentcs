@@ -38,8 +38,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update Mockito to 5.16.0.
 ** Update Jackson to 2.18.3.
 ** Update SLF4J to 2.0.17.
-** Update Spotless to 7.0.2.
-** Update Checkstyle to 10.21.4.
+** Update Spotless to 7.0.4.
+** Update Checkstyle to 10.25.0.
 ** Update Gradle wrapper to 8.13.
 ** Update Semver4J to 5.6.0.
 ** Update JTS Topology Suite to 1.20.0.

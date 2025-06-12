@@ -264,7 +264,7 @@ SPDX-License-Identifier: CC0-1.0
     </module>
 
     <module name="JavadocVariable">
-      <property name="scope" value="public"/>
+      <property name="accessModifiers" value="public"/>
       <property name="severity" value="error"/>
     </module>
 
