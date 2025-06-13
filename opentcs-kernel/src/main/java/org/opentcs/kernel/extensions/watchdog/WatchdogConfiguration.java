@@ -40,4 +40,12 @@ public interface WatchdogConfiguration {
       orderKey = "2_stranded_vehicle_1"
   )
   int strandedVehicleDurationThreshold();
+
+  @ConfigurationEntry(
+      type = "Integer",
+      description = "The interval (in milliseconds) in which to check/log the kernel's heartbeat.",
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "3_kernel_heartbeat"
+  )
+  int heartbeatLogInterval();
 }

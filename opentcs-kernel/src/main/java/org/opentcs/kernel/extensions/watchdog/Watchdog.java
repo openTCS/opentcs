@@ -26,20 +26,27 @@ public class Watchdog
    * The task to check for stranded vehicles.
    */
   private final StrandedVehicleCheck strandedVehicleCheck;
+  /**
+   * The task to log the heartbeat for the kernel.
+   */
+  private final KernelHeartbeatLogger kernelHeartbeatLogger;
 
   /**
    * Creates a new instance.
    *
    * @param blockCheck The block check task.
    * @param strandedVehicleCheck The stranded vehicle check task.
+   * @param kernelHeartbeatLogger The kernel heartbeat logger.
    */
   @Inject
   public Watchdog(
       BlockConsistencyCheck blockCheck,
-      StrandedVehicleCheck strandedVehicleCheck
+      StrandedVehicleCheck strandedVehicleCheck,
+      KernelHeartbeatLogger kernelHeartbeatLogger
   ) {
     this.blockCheck = requireNonNull(blockCheck, "blockCheck");
     this.strandedVehicleCheck = requireNonNull(strandedVehicleCheck, "strandedVehicleCheck");
+    this.kernelHeartbeatLogger = requireNonNull(kernelHeartbeatLogger, "kernelHeartbeatLogger");
   }
 
   @Override
@@ -50,6 +57,7 @@ public class Watchdog
 
     blockCheck.initialize();
     strandedVehicleCheck.initialize();
+    kernelHeartbeatLogger.initialize();
     initialized = true;
   }
 
@@ -66,6 +74,7 @@ public class Watchdog
 
     blockCheck.terminate();
     strandedVehicleCheck.terminate();
+    kernelHeartbeatLogger.terminate();
     initialized = false;
   }
 
