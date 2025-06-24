@@ -31,6 +31,8 @@ export CERTIFICATE_FILEPATH="${OUTPUTDIR}/certificate.cer"
 
 # Set the password used for generating the stores.
 export PASSWORD=password
+# Set the common name for the certificate to the hostname of the machine where the openTCS Kernel is running.
+export CERT_COMMON_NAME=localhost
 
 echo Deleting previously generated keystore and truststore...
 rm ${KEYSTORE_FILEPATH} 2>/dev/null
@@ -40,7 +42,7 @@ rm ${CERTIFICATE_FILEPATH} 2>/dev/null
 # Generates a keypair wrapped in a self-signed (X.509) certificate.
 # Some defaults of the -genkeypair command: -alias "mykey" -keyalg "DSA" -keysize 1024 -validity 90
 echo Generating a new keystore in ${KEYSTORE_FILEPATH}...
-${KEYTOOL_PATH} -genkeypair -alias openTCS -keyalg RSA -dname "c=DE" -storepass ${PASSWORD} -keypass ${PASSWORD} -validity 365 -storetype PKCS12 -keystore ${KEYSTORE_FILEPATH}
+${KEYTOOL_PATH} -genkeypair -alias openTCS -keyalg RSA -dname "c=DE, cn=${CERT_COMMON_NAME}" -storepass ${PASSWORD} -keypass ${PASSWORD} -validity 365 -storetype PKCS12 -keystore ${KEYSTORE_FILEPATH}
 
 # Exports the (wrapping) self-signed certificate from the generated keypair.
 # '-rfc' - Output the certificate in a printable encoding format (by default the -export command outputs a certificate in binary encoding)
@@ -54,4 +56,4 @@ ${KEYTOOL_PATH} -importcert -alias openTCS -file ${CERTIFICATE_FILEPATH} -storep
 # Delete the exported certificate since it's not really needed.
 rm ${CERTIFICATE_FILEPATH}
 
-echo Copy the generated truststore to the openTCS PlantOverview\'s /config folder or a corresponding location of your application.
+echo Copy the generated truststore to the \config folder of the openTCS client applications \(i.e. Model Editor, Operations Desk and Kernel Control Center\) or a corresponding location of your application.
