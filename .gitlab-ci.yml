@@ -15,23 +15,35 @@ include: '.gitlab/docker/codequality/version.yml'
 
 workflow:
   rules:
-    - if: $CI_MERGE_REQUEST_IID
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_PIPELINE_SOURCE == "web"
-
+      
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   DO_BUILD_CODEQUALITY_IMAGE:
     value: "false"
+    options:
+      - "false"
+      - "true"
     description: "Whether ('true') or not ('false') to (re-)build the Docker image for code quality jobs."
   DO_DEPLOY_PRIVATE:
     value: "false"
+    options:
+      - "false"
+      - "true"
     description: "Whether ('true') or not ('false') to deploy artifacts to private (GitLab) repository."
   DO_DEPLOY_OSSRH:
     value: "false"
+    options:
+      - "false"
+      - "true"
     description: "Whether ('true') or not ('false') to deploy artifacts to the public OSSRH repository, e.g. for release builds."
   NO_BUILD_NUMBER:
     value: "false"
+    options:
+      - "false"
+      - "true"
     description: "Whether ('true') or not ('false') to exclude the build number in the artifacts' version number, e.g. for release builds."
   SIGNING_KEY:
     value: ""
@@ -50,7 +62,6 @@ stages:
   - build
   - test
   - deploy
-
 
 .touch-gradle-build-results: &touch-gradle-build-results
   - echo "Touching build results to prevent Gradle rebuilding them..."
