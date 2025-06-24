@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi;
 
+import io.javalin.apibuilder.EndpointGroup;
 import org.opentcs.components.Lifecycle;
-import spark.Service;
 
 /**
  * A request handler.
@@ -13,9 +13,7 @@ public interface RequestHandler
       Lifecycle {
 
   /**
-   * Registers the handler's routes with the given service.
-   *
-   * @param service The service to register the routes with.
+   * Creates the handler's routes for the web service.
    */
-  void addRoutes(Service service);
+  EndpointGroup createRoutes();
 }

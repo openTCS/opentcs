@@ -11,6 +11,8 @@ huxhorn-sulky-ulid = "8.3.0"
 jackson = "2.19.1"
 jakarta-annotation = "3.0.0"
 jakarta-inject = "2.0.1"
+javalin = "6.6.0"
+javalin-ssl-plugin = "6.6.0"
 jaxb = "4.0.5"
 jgrapht-core = "1.5.2"
 jhotdraw = "7.6.20190506"
@@ -18,7 +20,6 @@ jts-core = "1.20.0"
 openapi-generator-cli = "7.13.0"
 semver4j = "5.6.0"
 slf4j = "2.0.17"
-spark-core = "2.9.4"
 swagger-ui = "5.25.2"
 # Test dependency versions
 approvaltests = "24.22.0"
@@ -49,6 +50,8 @@ jackson-datatype-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "ja
 jackson-module-jsonSchema = { group = "com.fasterxml.jackson.module", name = "jackson-module-jsonSchema", version.ref = "jackson" }
 jakarta-annotation = { group = "jakarta.annotation", name = "jakarta.annotation-api", version.ref = "jakarta-annotation" }
 jakarta-inject = { group = "jakarta.inject", name = "jakarta.inject-api", version.ref = "jakarta-inject" }
+javalin = { group = "io.javalin", name = "javalin", version.ref = "javalin" }
+javalin-ssl-plugin = { group = "io.javalin.community.ssl", name = "ssl-plugin", version.ref = "javalin-ssl-plugin" }
 jaxb-runtime = { group = "org.glassfish.jaxb", name = "jaxb-runtime", version.ref = "jaxb" }
 jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jgrapht-core" }
 jhotdraw = { group = "org.opentcs.thirdparty.jhotdraw", name = "jhotdraw", version.ref = "jhotdraw" }
@@ -57,7 +60,6 @@ openapi-generator-cli = { group = "org.openapitools", name = "openapi-generator-
 semver4j = { group = "org.semver4j", name = "semver4j", version.ref = "semver4j" }
 slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j" }
 slf4j-jdk14 = { group = "org.slf4j", name = "slf4j-jdk14", version.ref = "slf4j" }
-spark-core = {group = "com.sparkjava", name = "spark-core", version.ref = "spark-core" }
 swagger-ui = { group = "org.webjars", name = "swagger-ui", version.ref = "swagger-ui" }
 # Test dependencies
 approvaltests = { group = "com.approvaltests", name = "approvaltests", version.ref = "approvaltests" }

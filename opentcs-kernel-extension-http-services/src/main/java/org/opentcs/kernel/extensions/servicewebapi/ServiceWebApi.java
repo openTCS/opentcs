@@ -5,8 +5,13 @@ package org.opentcs.kernel.extensions.servicewebapi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.util.concurrent.Uninterruptibles;
+import io.javalin.Javalin;
+import io.javalin.community.ssl.SslPlugin;
+import io.javalin.config.JavalinConfig;
+import io.javalin.http.HttpResponseException;
 import jakarta.inject.Inject;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SslParameterSet;
 import org.opentcs.components.kernel.KernelExtension;
@@ -15,7 +20,6 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.kernel.extensions.servicewebapi.v1.V1RequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.Service;
 
 /**
  * Provides an HTTP interface for basic administration needs.
@@ -51,7 +55,7 @@ public class ServiceWebApi
   /**
    * The actual HTTP service.
    */
-  private Service service;
+  private Javalin app;
   /**
    * Whether this kernel extension is initialized.
    */
@@ -89,79 +93,85 @@ public class ServiceWebApi
 
     v1RequestHandler.initialize();
 
-    service = Service.ignite()
-        .ipAddress(configuration.bindAddress())
-        .port(configuration.bindPort());
+    Consumer<JavalinConfig> config = cfg -> {
+      cfg.showJavalinBanner = false;
+      cfg.router.apiBuilder(v1RequestHandler.createRoutes());
 
-    if (configuration.useSsl()) {
-      service.secure(
-          sslParamSet.getKeystoreFile().getAbsolutePath(),
-          sslParamSet.getKeystorePassword(),
-          null,
-          null
-      );
-    }
-    else {
-      LOG.warn("Encryption disabled, connections will not be secured!");
-    }
+      if (configuration.useSsl()) {
+        cfg.registerPlugin(
+            new SslPlugin(ssl -> {
+              ssl.keystoreFromPath(
+                  sslParamSet.getKeystoreFile().getAbsolutePath(),
+                  sslParamSet.getKeystorePassword()
+              );
+              // Disable the default (insecure) HTTP connector.
+              ssl.insecure = false;
+              // Configure host and port for the (secure) SSL connector.
+              ssl.host = configuration.bindAddress();
+              ssl.securePort = configuration.bindPort();
+            })
+        );
+      }
+      else {
+        cfg.jetty.defaultHost = configuration.bindAddress();
+        cfg.jetty.defaultPort = configuration.bindPort();
 
-    service.before((request, response) -> {
-      if (!authenticator.isAuthenticated(request)) {
+        LOG.warn("Encryption disabled, connections will not be secured!");
+      }
+    };
+
+    app = Javalin.create(config).start();
+
+    app.beforeMatched(ctx -> {
+      if (!authenticator.isAuthenticated(ctx)) {
         // Delay the response a bit to slow down brute force attacks.
         Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
-        service.halt(403, "Not authenticated.");
+        throw new HttpResponseException(403, "Not authenticated.");
       }
-
       // Add a CORS header to allow cross-origin requests from all hosts.
       // This also makes using the "try it out" buttons in the Swagger UI documentation possible.
-      response.header("Access-Control-Allow-Origin", "*");
-    });
-
-    // Reflect that we allow cross-origin requests for any headers and methods.
-    service.options(
-        "/*",
-        (request, response) -> {
-          String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
-          if (accessControlRequestHeaders != null) {
-            response.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
-          }
-
-          String accessControlRequestMethod = request.headers("Access-Control-Request-Method");
-          if (accessControlRequestMethod != null) {
-            response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
-          }
-
-          return "OK";
-        }
+      ctx.header("Access-Control-Allow-Origin", "*");
+    }
     );
 
-    // Register routes for API versions here.
-    service.path("/v1", () -> v1RequestHandler.addRoutes(service));
+    // Reflect that we allow cross-origin requests for any headers and methods.
+    app.options("/*", ctx -> {
+      String requestHeaders = ctx.header("Access-Control-Request-Headers");
+      if (requestHeaders != null) {
+        ctx.header("Access-Control-Allow-Headers", requestHeaders);
+      }
 
-    service.exception(IllegalArgumentException.class, (exception, request, response) -> {
-      response.status(400);
-      response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-      response.body(jsonBinder.toJson(exception));
+      String requestMethod = ctx.header("Access-Control-Request-Method");
+      if (requestMethod != null) {
+        ctx.header("Access-Control-Allow-Methods", requestMethod);
+      }
+
+      ctx.result("OK");
     });
-    service.exception(ObjectUnknownException.class, (exception, request, response) -> {
-      response.status(404);
-      response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-      response.body(jsonBinder.toJson(exception));
+
+    app.exception(IllegalArgumentException.class, (e, ctx) -> {
+      ctx.status(400);
+      ctx.result(jsonBinder.toJson(e));
     });
-    service.exception(ObjectExistsException.class, (exception, request, response) -> {
-      response.status(409);
-      response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-      response.body(jsonBinder.toJson(exception));
+
+    app.exception(ObjectUnknownException.class, (e, ctx) -> {
+      ctx.status(404);
+      ctx.result(jsonBinder.toJson(e));
     });
-    service.exception(KernelRuntimeException.class, (exception, request, response) -> {
-      response.status(500);
-      response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-      response.body(jsonBinder.toJson(exception));
+
+    app.exception(ObjectExistsException.class, (e, ctx) -> {
+      ctx.status(409);
+      ctx.result(jsonBinder.toJson(e));
     });
-    service.exception(IllegalStateException.class, (exception, request, response) -> {
-      response.status(500);
-      response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-      response.body(jsonBinder.toJson(exception));
+
+    app.exception(KernelRuntimeException.class, (e, ctx) -> {
+      ctx.status(500);
+      ctx.result(jsonBinder.toJson(e));
+    });
+
+    app.exception(KernelRuntimeException.class, (e, ctx) -> {
+      ctx.status(400);
+      ctx.result(jsonBinder.toJson(e));
     });
 
     initialized = true;
@@ -174,7 +184,7 @@ public class ServiceWebApi
     }
 
     v1RequestHandler.terminate();
-    service.stop();
+    app.stop();
 
     initialized = false;
   }

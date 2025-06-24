@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import io.javalin.http.Context;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import spark.Request;
 
 /**
  */
@@ -50,12 +50,12 @@ class AuthenticatorTest {
     assertFalse(authenticator.isAuthenticated(aRequestWithAccessKey("some random value")));
   }
 
-  private Request aRequestWithAccessKey(String accessKey) {
-    Request request = mock(Request.class);
+  private Context aRequestWithAccessKey(String accessKey) {
+    Context context = mock(Context.class);
 
-    when(request.headers(HttpConstants.HEADER_NAME_ACCESS_KEY)).thenReturn(accessKey);
+    when(context.header(HttpConstants.HEADER_NAME_ACCESS_KEY)).thenReturn(accessKey);
 
-    return request;
+    return context;
   }
 
 }

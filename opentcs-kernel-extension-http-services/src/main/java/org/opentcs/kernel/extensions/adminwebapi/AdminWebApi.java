@@ -2,13 +2,16 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.adminwebapi;
 
+import static io.javalin.apibuilder.ApiBuilder.delete;
+import static io.javalin.apibuilder.ApiBuilder.get;
+import static io.javalin.apibuilder.ApiBuilder.path;
 import static java.util.Objects.requireNonNull;
 
+import io.javalin.Javalin;
 import jakarta.inject.Inject;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.kernel.extensions.adminwebapi.v1.V1RequestHandler;
 import org.opentcs.kernel.extensions.servicewebapi.HttpConstants;
-import spark.Service;
 
 /**
  * Provides an HTTP interface for basic administration needs.
@@ -28,7 +31,7 @@ public class AdminWebApi
   /**
    * The actual HTTP service.
    */
-  private Service service;
+  private Javalin app;
   /**
    * Whether this kernel extension is initialized.
    */
@@ -54,27 +57,36 @@ public class AdminWebApi
     if (isInitialized()) {
       return;
     }
+    app = Javalin.create(
+        config -> {
+          config.showJavalinBanner = false;
+          config.router.apiBuilder(
+              () -> path(
+                  "/v1", () -> {
+                    get("/version", v1RequestHandler::handleGetVersion);
+                    get("/status", v1RequestHandler::handleGetStatus);
+                    delete("/kernel", v1RequestHandler::handleDeleteKernel);
+                  }
+              )
+          );
+        }
+    ).start(configuration.bindAddress(), configuration.bindPort());
 
-    service = Service.ignite()
-        .ipAddress(configuration.bindAddress())
-        .port(configuration.bindPort());
-
-    service.path("/v1", () -> {
-      service.get("/version", v1RequestHandler::handleGetVersion);
-      service.get("/status", v1RequestHandler::handleGetStatus);
-      service.delete("/kernel", v1RequestHandler::handleDeleteKernel);
-    }
+    app.exception(
+        IllegalArgumentException.class, (exception, ctx) -> {
+          ctx.status(400);
+          ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+          ctx.result(exception.getMessage());
+        }
     );
-    service.exception(IllegalArgumentException.class, (exception, request, response) -> {
-      response.status(400);
-      response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-      response.body(exception.getMessage());
-    });
-    service.exception(IllegalStateException.class, (exception, request, response) -> {
-      response.status(500);
-      response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-      response.body(exception.getMessage());
-    });
+
+    app.exception(
+        IllegalStateException.class, (exception, ctx) -> {
+          ctx.status(500);
+          ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+          ctx.result(exception.getMessage());
+        }
+    );
 
     initialized = true;
   }
@@ -85,7 +97,7 @@ public class AdminWebApi
       return;
     }
 
-    service.stop();
+    app.stop();
 
     initialized = false;
   }

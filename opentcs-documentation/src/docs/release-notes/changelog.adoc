@@ -24,6 +24,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 *** Extend the endpoint `POST /vehicles/NAME/routeComputationQuery` by an optional parameter which specifies the maximum number of routes to compute for one destination point.
 *** Add an endpoint `POST /vehicles/{NAME}/commAdapter/message`, which allows sending messages to the communication adapter that is attached to a vehicle.
 *** The `GET /events` endpoint now returns status messages of transport orders and vehicles that contain the same information as the transport orders and vehicles returned via the `GET /transportOrders` and `GET /vehicles` endpoints.
+*** Use Javalin instead of Spark as the framework for the web API implementation.
 * Bugs fixed:
 ** Properly allow updates of a vehicle's acceptable order types via the `PUT /vehicles/{NAME}/acceptableOrderTypes` web API endpoint.
 ** Avoid `NullPointerException` when trying to save transport order definitions in the continuous load panel.

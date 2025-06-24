@@ -2,8 +2,14 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v1;
 
+import static io.javalin.apibuilder.ApiBuilder.get;
+import static io.javalin.apibuilder.ApiBuilder.path;
+import static io.javalin.apibuilder.ApiBuilder.post;
+import static io.javalin.apibuilder.ApiBuilder.put;
 import static java.util.Objects.requireNonNull;
 
+import io.javalin.apibuilder.EndpointGroup;
+import io.javalin.http.Context;
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -29,10 +35,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralAttach
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralJobConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.TransportOrderConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.VehicleAttachmentInformationConverter;
-import spark.QueryParamsMap;
-import spark.Request;
-import spark.Response;
-import spark.Service;
 
 /**
  * Handles requests and produces responses for version 1 of the web API.
@@ -131,620 +133,514 @@ public class V1RequestHandler
   }
 
   @Override
-  public void addRoutes(Service service) {
-    requireNonNull(service, "service");
-
-    service.get(
-        "/events",
-        this::handleGetEvents
-    );
-    service.post(
-        "/vehicles/dispatcher/trigger",
-        this::handlePostDispatcherTrigger
-    );
-    service.post(
-        "/vehicles/:NAME/routeComputationQuery",
-        this::handleGetVehicleRoutes
-    );
-    service.put(
-        "/vehicles/:NAME/commAdapter/attachment",
-        this::handlePutVehicleCommAdapterAttachment
-    );
-    service.get(
-        "/vehicles/:NAME/commAdapter/attachmentInformation",
-        this::handleGetVehicleCommAdapterAttachmentInfo
-    );
-    service.put(
-        "/vehicles/:NAME/commAdapter/enabled",
-        this::handlePutVehicleCommAdapterEnabled
-    );
-    service.post(
-        "/vehicles/:NAME/commAdapter/message",
-        this::handlePostVehicleCommAdapterMessage
-    );
-    service.put(
-        "/vehicles/:NAME/paused",
-        this::handlePutVehiclePaused
-    );
-    service.put(
-        "/vehicles/:NAME/integrationLevel",
-        this::handlePutVehicleIntegrationLevel
-    );
-    service.post(
-        "/vehicles/:NAME/withdrawal",
-        this::handlePostWithdrawalByVehicle
-    );
-    service.post(
-        "/vehicles/:NAME/rerouteRequest",
-        this::handlePostVehicleRerouteRequest
-    );
-    service.put(
-        "/vehicles/:NAME/allowedOrderTypes",
-        this::handlePutVehicleAllowedOrderTypes
-    );
-    service.put(
-        "/vehicles/:NAME/acceptableOrderTypes",
-        this::handlePutVehicleAcceptableOrderTypes
-    );
-    service.put(
-        "/vehicles/:NAME/energyLevelThresholdSet",
-        this::handlePutVehicleEnergyLevelThresholdSet
-    );
-    service.put(
-        "/vehicles/:NAME/envelopeKey",
-        this::handlePutVehicleEnvelopeKey
-    );
-    service.get(
-        "/vehicles/:NAME",
-        this::handleGetVehicleByName
-    );
-    service.get(
-        "/vehicles",
-        this::handleGetVehicles
-    );
-    service.post(
-        "/transportOrders/dispatcher/trigger",
-        this::handlePostDispatcherTrigger
-    );
-    service.post(
-        "/transportOrders/:NAME/immediateAssignment",
-        this::handlePostImmediateAssignment
-    );
-    service.post(
-        "/transportOrders/:NAME/withdrawal",
-        this::handlePostWithdrawalByOrder
-    );
-    service.post(
-        "/transportOrders/:NAME",
-        this::handlePostTransportOrder
-    );
-    service.put(
-        "/transportOrders/:NAME/intendedVehicle",
-        this::handlePutTransportOrderIntendedVehicle
-    );
-    service.get(
-        "/transportOrders/:NAME",
-        this::handleGetTransportOrderByName
-    );
-    service.get(
-        "/transportOrders",
-        this::handleGetTransportOrders
-    );
-    service.post(
-        "/orderSequences/:NAME",
-        this::handlePostOrderSequence
-    );
-    service.get(
-        "/orderSequences",
-        this::handleGetOrderSequences
-    );
-    service.get(
-        "/orderSequences/:NAME",
-        this::handleGetOrderSequenceByName
-    );
-    service.put(
-        "/orderSequences/:NAME/complete",
-        this::handlePutOrderSequenceComplete
-    );
-    service.put(
-        "/plantModel",
-        this::handlePutPlantModel
-    );
-    service.get(
-        "/plantModel",
-        this::handleGetPlantModel
-    );
-    service.post(
-        "/plantModel/topologyUpdateRequest",
-        this::handlePostUpdateTopology
-    );
-    service.put(
-        "/paths/:NAME/locked",
-        this::handlePutPathLocked
-    );
-    service.put(
-        "/locations/:NAME/locked",
-        this::handlePutLocationLocked
-    );
-    service.post(
-        "/dispatcher/trigger",
-        this::handlePostDispatcherTrigger
-    );
-    service.post(
-        "/peripherals/dispatcher/trigger",
-        this::handlePostPeripheralJobsDispatchTrigger
-    );
-    service.post(
-        "/peripherals/:NAME/withdrawal",
-        this::handlePostPeripheralWithdrawal
-    );
-    service.put(
-        "/peripherals/:NAME/commAdapter/enabled",
-        this::handlePutPeripheralCommAdapterEnabled
-    );
-    service.get(
-        "/peripherals/:NAME/commAdapter/attachmentInformation",
-        this::handleGetPeripheralCommAdapterAttachmentInfo
-    );
-    service.put(
-        "/peripherals/:NAME/commAdapter/attachment",
-        this::handlePutPeripheralCommAdapterAttachment
-    );
-    service.get(
-        "/peripheralJobs",
-        this::handleGetPeripheralJobs
-    );
-    service.get(
-        "/peripheralJobs/:NAME",
-        this::handleGetPeripheralJobsByName
-    );
-    service.post(
-        "/peripheralJobs/:NAME",
-        this::handlePostPeripheralJobsByName
-    );
-    service.post(
-        "/peripheralJobs/:NAME/withdrawal",
-        this::handlePostPeripheralJobWithdrawal
-    );
-    service.post(
-        "/peripheralJobs/dispatcher/trigger",
-        this::handlePostPeripheralJobsDispatchTrigger
+  public EndpointGroup createRoutes() {
+    return () -> path(
+        "/v1", () -> {
+          get("/events", this::handleGetEvents);
+          post("/vehicles/dispatcher/trigger", this::handlePostDispatcherTrigger);
+          post("/vehicles/{NAME}/routeComputationQuery", this::handleGetVehicleRoutes);
+          put(
+              "/vehicles/{NAME}/commAdapter/attachment",
+              this::handlePutVehicleCommAdapterAttachment
+          );
+          get(
+              "/vehicles/{NAME}/commAdapter/attachmentInformation",
+              this::handleGetVehicleCommAdapterAttachmentInfo
+          );
+          put("/vehicles/{NAME}/commAdapter/enabled", this::handlePutVehicleCommAdapterEnabled);
+          post("/vehicles/{NAME}/commAdapter/message", this::handlePostVehicleCommAdapterMessage);
+          put("/vehicles/{NAME}/paused", this::handlePutVehiclePaused);
+          put("/vehicles/{NAME}/integrationLevel", this::handlePutVehicleIntegrationLevel);
+          post("/vehicles/{NAME}/withdrawal", this::handlePostWithdrawalByVehicle);
+          post("/vehicles/{NAME}/rerouteRequest", this::handlePostVehicleRerouteRequest);
+          put("/vehicles/{NAME}/allowedOrderTypes", this::handlePutVehicleAllowedOrderTypes);
+          put(
+              "/vehicles/{NAME}/acceptableOrderTypes",
+              this::handlePutVehicleAcceptableOrderTypes
+          );
+          put(
+              "/vehicles/{NAME}/energyLevelThresholdSet",
+              this::handlePutVehicleEnergyLevelThresholdSet
+          );
+          put("/vehicles/{NAME}/envelopeKey", this::handlePutVehicleEnvelopeKey);
+          get("/vehicles/{NAME}", this::handleGetVehicleByName);
+          get("/vehicles", this::handleGetVehicles);
+          post("/transportOrders/dispatcher/trigger", this::handlePostDispatcherTrigger);
+          post(
+              "/transportOrders/{NAME}/immediateAssignment",
+              this::handlePostImmediateAssignment
+          );
+          post("/transportOrders/{NAME}/withdrawal", this::handlePostWithdrawalByOrder);
+          post("/transportOrders/{NAME}", this::handlePostTransportOrder);
+          put(
+              "/transportOrders/{NAME}/intendedVehicle",
+              this::handlePutTransportOrderIntendedVehicle
+          );
+          get("/transportOrders/{NAME}", this::handleGetTransportOrderByName);
+          get("/transportOrders", this::handleGetTransportOrders);
+          post("/orderSequences/{NAME}", this::handlePostOrderSequence);
+          get("/orderSequences", this::handleGetOrderSequences);
+          get("/orderSequences/{NAME}", this::handleGetOrderSequenceByName);
+          put("/orderSequences/{NAME}/complete", this::handlePutOrderSequenceComplete);
+          put("/plantModel", this::handlePutPlantModel);
+          get("/plantModel", this::handleGetPlantModel);
+          post("/plantModel/topologyUpdateRequest", this::handlePostUpdateTopology);
+          put("/paths/{NAME}/locked", this::handlePutPathLocked);
+          put("/locations/{NAME}/locked", this::handlePutLocationLocked);
+          post("/dispatcher/trigger", this::handlePostDispatcherTrigger);
+          post("/peripherals/dispatcher/trigger", this::handlePostPeripheralJobsDispatchTrigger);
+          post("/peripherals/{NAME}/withdrawal", this::handlePostPeripheralWithdrawal);
+          put(
+              "/peripherals/{NAME}/commAdapter/enabled",
+              this::handlePutPeripheralCommAdapterEnabled
+          );
+          get(
+              "/peripherals/{NAME}/commAdapter/attachmentInformation",
+              this::handleGetPeripheralCommAdapterAttachmentInfo
+          );
+          put(
+              "/peripherals/{NAME}/commAdapter/attachment",
+              this::handlePutPeripheralCommAdapterAttachment
+          );
+          get("/peripheralJobs", this::handleGetPeripheralJobs);
+          get("/peripheralJobs/{NAME}", this::handleGetPeripheralJobsByName);
+          post("/peripheralJobs/{NAME}", this::handlePostPeripheralJobsByName);
+          post("/peripheralJobs/{NAME}/withdrawal", this::handlePostPeripheralJobWithdrawal);
+          post(
+              "/peripheralJobs/dispatcher/trigger",
+              this::handlePostPeripheralJobsDispatchTrigger
+          );
+        }
     );
   }
 
-  private Object handlePostDispatcherTrigger(Request request, Response response)
+  private void handlePostDispatcherTrigger(Context ctx)
       throws KernelRuntimeException {
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     orderDispatcherHandler.triggerDispatcher();
-    return "";
+    ctx.result("");
   }
 
-  private Object handleGetEvents(Request request, Response response)
+  public void handleGetEvents(Context ctx)
       throws IllegalArgumentException,
         IllegalStateException {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        statusEventDispatcher.fetchEvents(
-            minSequenceNo(request),
-            maxSequenceNo(request),
-            timeout(request)
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            statusEventDispatcher.fetchEvents(minSequenceNo(ctx), maxSequenceNo(ctx), timeout(ctx))
         )
     );
   }
 
-  private Object handlePutVehicleCommAdapterEnabled(Request request, Response response)
+  private void handlePutVehicleCommAdapterEnabled(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
-    vehicleHandler.putVehicleCommAdapterEnabled(
-        request.params(":NAME"),
-        valueIfKeyPresent(request.queryMap(), "newValue")
-    );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    vehicleHandler.putVehicleCommAdapterEnabled(ctx.pathParam("NAME"), ctx.queryParam("newValue"));
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePostVehicleCommAdapterMessage(Request request, Response response)
+  private void handlePostVehicleCommAdapterMessage(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
     vehicleHandler.postVehicleCommAdapterMessage(
-        request.params(":NAME"),
-        jsonBinder.fromJson(request.body(), PostVehicleCommAdapterMessageRequestTO.class)
+        ctx.pathParam("NAME"),
+        jsonBinder.fromJson(ctx.body(), PostVehicleCommAdapterMessageRequestTO.class)
     );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handleGetVehicleCommAdapterAttachmentInfo(Request request, Response response)
+  private void handleGetVehicleCommAdapterAttachmentInfo(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        vehicleAttachmentInformationConverter.toGetVehicleAttachmentInfoResponseTO(
-            vehicleHandler.getVehicleCommAdapterAttachmentInformation(
-                request.params(":NAME")
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            vehicleAttachmentInformationConverter.toGetVehicleAttachmentInfoResponseTO(
+                vehicleHandler.getVehicleCommAdapterAttachmentInformation(ctx.pathParam("NAME"))
             )
         )
     );
   }
 
-  private Object handleGetVehicleRoutes(Request request, Response response)
+  private void handleGetVehicleRoutes(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        PostVehicleRoutesResponseTO.fromMap(
-            vehicleHandler.getVehicleRoutes(
-                request.params(":NAME"),
-                maxRoutePerDestinationPoint(request),
-                jsonBinder.fromJson(request.body(), PostVehicleRoutesRequestTO.class)
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            PostVehicleRoutesResponseTO.fromMap(
+                vehicleHandler.getVehicleRoutes(
+                    ctx.pathParam("NAME"),
+                    maxRoutePerDestinationPoint(ctx),
+                    jsonBinder.fromJson(ctx.body(), PostVehicleRoutesRequestTO.class)
+                )
             )
         )
     );
   }
 
-  private Object handlePutVehicleCommAdapterAttachment(Request request, Response response)
+  private void handlePutVehicleCommAdapterAttachment(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
-    vehicleHandler.putVehicleCommAdapter(
-        request.params(":NAME"),
-        valueIfKeyPresent(request.queryMap(), "newValue")
-    );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    vehicleHandler.putVehicleCommAdapter(ctx.pathParam("NAME"), ctx.queryParam("newValue"));
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePostTransportOrder(Request request, Response response)
+  private void handlePostTransportOrder(Context ctx)
       throws ObjectUnknownException,
         ObjectExistsException,
         IllegalArgumentException,
         IllegalStateException {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        transportOrderConverter.toGetTransportOrderResponse(
-            transportOrderHandler.createOrder(
-                request.params(":NAME"),
-                jsonBinder.fromJson(request.body(), PostTransportOrderRequestTO.class)
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            transportOrderConverter.toGetTransportOrderResponse(
+                transportOrderHandler.createOrder(
+                    ctx.pathParam("NAME"),
+                    jsonBinder.fromJson(ctx.body(), PostTransportOrderRequestTO.class)
+                )
             )
         )
     );
   }
 
-  private Object handlePutTransportOrderIntendedVehicle(Request request, Response response)
+  private void handlePutTransportOrderIntendedVehicle(Context ctx)
       throws ObjectUnknownException {
     transportOrderHandler.updateTransportOrderIntendedVehicle(
-        request.params(":NAME"),
-        request.queryParamOrDefault("vehicle", null)
+        ctx.pathParam("NAME"),
+        ctx.queryParam("vehicle")
     );
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePostOrderSequence(Request request, Response response)
+  private void handlePostOrderSequence(Context ctx)
       throws ObjectUnknownException,
         ObjectExistsException,
         IllegalArgumentException,
         IllegalStateException {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        orderSequenceConverter.toGetOrderSequenceResponseTO(
-            transportOrderHandler.createOrderSequence(
-                request.params(":NAME"),
-                jsonBinder.fromJson(request.body(), PostOrderSequenceRequestTO.class)
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            orderSequenceConverter.toGetOrderSequenceResponseTO(
+                transportOrderHandler.createOrderSequence(
+                    ctx.pathParam("NAME"),
+                    jsonBinder.fromJson(ctx.body(), PostOrderSequenceRequestTO.class)
+                )
             )
         )
     );
   }
 
-  private Object handleGetOrderSequences(Request request, Response response) {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        transportOrderHandler.getOrderSequences(
-            valueIfKeyPresent(request.queryMap(), "intendedVehicle")
+  private void handleGetOrderSequences(Context ctx) {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            transportOrderHandler.getOrderSequences(
+                ctx.queryParam("intendedVehicle")
+            )
         )
     );
   }
 
-  private Object handleGetOrderSequenceByName(Request request, Response response) {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        transportOrderHandler.getOrderSequenceByName(request.params(":NAME"))
+  private void handleGetOrderSequenceByName(Context ctx) {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(transportOrderHandler.getOrderSequenceByName(ctx.pathParam("NAME")))
     );
   }
 
-  private Object handlePutOrderSequenceComplete(Request request, Response response)
+  private void handlePutOrderSequenceComplete(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException,
         InterruptedException,
         ExecutionException {
-    transportOrderHandler.putOrderSequenceComplete(request.params(":NAME"));
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    transportOrderHandler.putOrderSequenceComplete(ctx.pathParam("NAME"));
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePostImmediateAssignment(Request request, Response response)
+  private void handlePostImmediateAssignment(Context ctx)
       throws ObjectUnknownException {
-    orderDispatcherHandler.tryImmediateAssignment(request.params(":NAME"));
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    orderDispatcherHandler.tryImmediateAssignment(ctx.pathParam("NAME"));
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePostWithdrawalByOrder(Request request, Response response)
+  private void handlePostWithdrawalByOrder(Context ctx)
       throws ObjectUnknownException {
     orderDispatcherHandler.withdrawByTransportOrder(
-        request.params(":NAME"),
-        immediate(request),
-        disableVehicle(request)
+        ctx.pathParam("NAME"),
+        immediate(ctx),
+        disableVehicle(ctx)
     );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePostWithdrawalByVehicle(Request request, Response response)
+  private void handlePostWithdrawalByVehicle(Context ctx)
       throws ObjectUnknownException {
     orderDispatcherHandler.withdrawByVehicle(
-        request.params(":NAME"),
-        immediate(request),
-        disableVehicle(request)
+        ctx.pathParam("NAME"), immediate(ctx),
+        disableVehicle(ctx)
     );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePostPeripheralJobWithdrawal(Request request, Response response)
+  private void handlePostPeripheralJobWithdrawal(Context ctx)
       throws KernelRuntimeException {
-    jobDispatcherHandler.withdrawPeripheralJob(request.params(":NAME"));
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    jobDispatcherHandler.withdrawPeripheralJob(ctx.pathParam("NAME"));
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePostVehicleRerouteRequest(Request request, Response response)
+  private void handlePostVehicleRerouteRequest(Context ctx)
       throws ObjectUnknownException {
-    orderDispatcherHandler.reroute(request.params(":NAME"), forced(request));
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    orderDispatcherHandler.reroute(ctx.pathParam("NAME"), forced(ctx));
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handleGetTransportOrders(Request request, Response response) {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        transportOrderHandler.getTransportOrders(
-            valueIfKeyPresent(request.queryMap(), "intendedVehicle")
+  private void handleGetTransportOrders(Context ctx) {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            transportOrderHandler.getTransportOrders(
+                ctx.queryParam("intendedVehicle")
+            )
         )
     );
   }
 
-  private Object handlePutPlantModel(Request request, Response response)
+  private void handlePutPlantModel(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
-    plantModelHandler.putPlantModel(jsonBinder.fromJson(request.body(), PlantModelTO.class));
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    plantModelHandler.putPlantModel(jsonBinder.fromJson(ctx.body(), PlantModelTO.class));
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handleGetPlantModel(Request request, Response response) {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(plantModelHandler.getPlantModel());
+  private void handleGetPlantModel(Context ctx) {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(jsonBinder.toJson(plantModelHandler.getPlantModel()));
   }
 
-  private Object handlePostUpdateTopology(Request request, Response response)
+  private void handlePostUpdateTopology(Context ctx)
       throws ObjectUnknownException,
         KernelRuntimeException {
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    if (request.body().isBlank()) {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    if (ctx.body().isBlank()) {
       plantModelHandler.requestTopologyUpdate(new PostTopologyUpdateRequestTO(List.of()));
     }
     else {
-      plantModelHandler
-          .requestTopologyUpdate(
-              jsonBinder.fromJson(request.body(), PostTopologyUpdateRequestTO.class)
-          );
+      plantModelHandler.requestTopologyUpdate(
+          jsonBinder.fromJson(ctx.body(), PostTopologyUpdateRequestTO.class)
+      );
     }
-    return "";
+    ctx.result("");
   }
 
-  private Object handlePutPathLocked(Request request, Response response) {
+  private void handlePutPathLocked(Context ctx) {
     pathHandler.updatePathLock(
-        request.params(":NAME"),
-        valueIfKeyPresent(request.queryMap(), "newValue")
+        ctx.pathParam("NAME"),
+        ctx.queryParam("newValue")
     );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePutLocationLocked(Request request, Response response) {
+  private void handlePutLocationLocked(Context ctx) {
     locationHandler.updateLocationLock(
-        request.params(":NAME"),
-        valueIfKeyPresent(request.queryMap(), "newValue")
+        ctx.pathParam("NAME"),
+        ctx.queryParam("newValue")
     );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handleGetTransportOrderByName(Request request, Response response) {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        transportOrderHandler.getTransportOrderByName(request.params(":NAME"))
+  private void handleGetTransportOrderByName(Context ctx) {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(transportOrderHandler.getTransportOrderByName(ctx.pathParam("NAME")))
     );
   }
 
-  private Object handleGetVehicles(Request request, Response response)
+  private void handleGetVehicles(Context ctx)
       throws IllegalArgumentException {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        vehicleHandler.getVehiclesState(
-            valueIfKeyPresent(
-                request.queryMap(),
-                "procState"
-            )
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            vehicleHandler.getVehiclesState(ctx.queryParam("procState"))
         )
     );
   }
 
-  private Object handleGetVehicleByName(Request request, Response response)
+  private void handleGetVehicleByName(Context ctx)
       throws ObjectUnknownException {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        vehicleHandler.getVehicleStateByName(request.params(":NAME"))
-    );
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(jsonBinder.toJson(vehicleHandler.getVehicleStateByName(ctx.pathParam("NAME"))));
   }
 
-  private Object handlePutVehicleIntegrationLevel(Request request, Response response)
+  private void handlePutVehicleIntegrationLevel(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
     vehicleHandler.putVehicleIntegrationLevel(
-        request.params(":NAME"),
-        valueIfKeyPresent(request.queryMap(), "newValue")
+        ctx.pathParam("NAME"),
+        ctx.queryParam("newValue")
     );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePutVehiclePaused(Request request, Response response)
+  private void handlePutVehiclePaused(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
     vehicleHandler.putVehiclePaused(
-        request.params(":NAME"),
-        valueIfKeyPresent(request.queryMap(), "newValue")
+        ctx.pathParam("NAME"),
+        ctx.queryParam("newValue")
     );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
   @Deprecated
-  private Object handlePutVehicleAllowedOrderTypes(Request request, Response response)
+  private void handlePutVehicleAllowedOrderTypes(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
     vehicleHandler.putVehicleAllowedOrderTypes(
-        request.params(":NAME"),
-        jsonBinder.fromJson(request.body(), PutVehicleAllowedOrderTypesTO.class)
+        ctx.pathParam("NAME"),
+        jsonBinder.fromJson(ctx.body(), PutVehicleAllowedOrderTypesTO.class)
     );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePutVehicleAcceptableOrderTypes(Request request, Response response)
+  private void handlePutVehicleAcceptableOrderTypes(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
     vehicleHandler.putVehicleAcceptableOrderTypes(
-        request.params(":NAME"),
-        jsonBinder.fromJson(request.body(), PutVehicleAcceptableOrderTypesTO.class)
+        ctx.pathParam("NAME"),
+        jsonBinder.fromJson(ctx.body(), PutVehicleAcceptableOrderTypesTO.class)
     );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePutVehicleEnergyLevelThresholdSet(Request request, Response response)
+  private void handlePutVehicleEnergyLevelThresholdSet(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
     vehicleHandler.putVehicleEnergyLevelThresholdSet(
-        request.params(":NAME"),
-        jsonBinder.fromJson(request.body(), PutVehicleEnergyLevelThresholdSetTO.class)
+        ctx.pathParam("NAME"),
+        jsonBinder.fromJson(ctx.body(), PutVehicleEnergyLevelThresholdSetTO.class)
     );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePutVehicleEnvelopeKey(Request request, Response response)
+  private void handlePutVehicleEnvelopeKey(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
     vehicleHandler.putVehicleEnvelopeKey(
-        request.params(":NAME"),
-        valueIfKeyPresent(request.queryMap(), "newValue")
+        ctx.pathParam("NAME"),
+        ctx.queryParam("newValue")
     );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePostPeripheralWithdrawal(Request request, Response response)
+  private void handlePostPeripheralWithdrawal(Context ctx)
       throws KernelRuntimeException {
-    jobDispatcherHandler.withdrawPeripheralJobByLocation(request.params(":NAME"));
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    jobDispatcherHandler.withdrawPeripheralJobByLocation(ctx.pathParam("NAME"));
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handlePutPeripheralCommAdapterEnabled(Request request, Response response)
+  private void handlePutPeripheralCommAdapterEnabled(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
     peripheralHandler.putPeripheralCommAdapterEnabled(
-        request.params(":NAME"),
-        valueIfKeyPresent(request.queryMap(), "newValue")
+        ctx.pathParam("NAME"),
+        ctx.queryParam("newValue")
     );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handleGetPeripheralCommAdapterAttachmentInfo(Request request, Response response)
+  private void handleGetPeripheralCommAdapterAttachmentInfo(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        peripheralAttachmentInformationConverter.toGetPeripheralAttachmentInfoResponseTO(
-            peripheralHandler.getPeripheralCommAdapterAttachmentInformation(
-                request.params(":NAME")
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            peripheralAttachmentInformationConverter.toGetPeripheralAttachmentInfoResponseTO(
+                peripheralHandler.getPeripheralCommAdapterAttachmentInformation(
+                    ctx.pathParam("NAME")
+                )
             )
         )
     );
   }
 
-  private Object handleGetPeripheralJobs(Request request, Response response) {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        peripheralJobHandler.getPeripheralJobs(
-            valueIfKeyPresent(request.queryMap(), "relatedVehicle"),
-            valueIfKeyPresent(request.queryMap(), "relatedTransportOrder")
+  private void handleGetPeripheralJobs(Context ctx) {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            peripheralJobHandler.getPeripheralJobs(
+                ctx.queryParam("relatedVehicle"),
+                ctx.queryParam("relatedTransportOrder")
+            )
         )
     );
   }
 
-  private Object handlePutPeripheralCommAdapterAttachment(Request request, Response response)
+  private void handlePutPeripheralCommAdapterAttachment(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
     peripheralHandler.putPeripheralCommAdapter(
-        request.params(":NAME"),
-        valueIfKeyPresent(request.queryMap(), "newValue")
+        ctx.pathParam("NAME"),
+        ctx.queryParam("newValue")
     );
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
-    return "";
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
-  private Object handleGetPeripheralJobsByName(Request request, Response response) {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        peripheralJobHandler.getPeripheralJobByName(request.params(":NAME"))
+  private void handleGetPeripheralJobsByName(Context ctx) {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            peripheralJobHandler.getPeripheralJobByName(ctx.pathParam("NAME"))
+        )
     );
   }
 
-  private Object handlePostPeripheralJobsByName(Request request, Response response) {
-    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
-    return jsonBinder.toJson(
-        peripheralJobConverter.toGetPeripheralJobResponseTO(
-            peripheralJobHandler.createPeripheralJob(
-                request.params(":NAME"),
-                jsonBinder.fromJson(request.body(), PostPeripheralJobRequestTO.class)
+  private void handlePostPeripheralJobsByName(Context ctx) {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            peripheralJobConverter.toGetPeripheralJobResponseTO(
+                peripheralJobHandler.createPeripheralJob(
+                    ctx.pathParam("NAME"),
+                    jsonBinder.fromJson(ctx.body(), PostPeripheralJobRequestTO.class)
+                )
             )
         )
     );
   }
 
-  private Object handlePostPeripheralJobsDispatchTrigger(Request request, Response response) {
-    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+  private void handlePostPeripheralJobsDispatchTrigger(Context ctx) {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     jobDispatcherHandler.triggerJobDispatcher();
-    return "";
+    ctx.result("");
   }
 
-  private String valueIfKeyPresent(QueryParamsMap queryParams, String key) {
-    if (queryParams.hasKey(key)) {
-      return queryParams.value(key);
-    }
-    else {
-      return null;
-    }
-  }
-
-  private int maxRoutePerDestinationPoint(Request request)
+  private int maxRoutePerDestinationPoint(Context ctx)
       throws IllegalArgumentException {
-    String param
-        = request.queryParamOrDefault("maxRoutesPerDestinationPoint", "1");
+    String param = ctx.queryParamAsClass("maxRoutesPerDestinationPoint", String.class)
+        .getOrDefault("1");
     try {
       return Integer.parseInt(param);
     }
@@ -753,9 +649,9 @@ public class V1RequestHandler
     }
   }
 
-  private long minSequenceNo(Request request)
+  private long minSequenceNo(Context ctx)
       throws IllegalArgumentException {
-    String param = request.queryParamOrDefault("minSequenceNo", "0");
+    String param = ctx.queryParamAsClass("minSequenceNo", String.class).getOrDefault("0");
     try {
       return Long.parseLong(param);
     }
@@ -764,9 +660,10 @@ public class V1RequestHandler
     }
   }
 
-  private long maxSequenceNo(Request request)
+  private long maxSequenceNo(Context ctx)
       throws IllegalArgumentException {
-    String param = request.queryParamOrDefault("maxSequenceNo", String.valueOf(Long.MAX_VALUE));
+    String param = ctx.queryParamAsClass("maxSequenceNo", String.class)
+        .getOrDefault(String.valueOf(Long.MAX_VALUE));
     try {
       return Long.parseLong(param);
     }
@@ -775,9 +672,9 @@ public class V1RequestHandler
     }
   }
 
-  private long timeout(Request request)
+  private long timeout(Context ctx)
       throws IllegalArgumentException {
-    String param = request.queryParamOrDefault("timeout", "1000");
+    String param = ctx.queryParamAsClass("timeout", String.class).getOrDefault("1000");
     try {
       // Allow a maximum timeout of 10 seconds so server threads are only bound for a limited time.
       return Math.min(10000, Long.parseLong(param));
@@ -787,16 +684,15 @@ public class V1RequestHandler
     }
   }
 
-  private boolean immediate(Request request) {
-    return Boolean.parseBoolean(request.queryParamOrDefault("immediate", "false"));
+  private boolean immediate(Context ctx) {
+    return Boolean.parseBoolean(ctx.queryParam("immediate"));
   }
 
-  private boolean disableVehicle(Request request) {
-    return Boolean.parseBoolean(request.queryParamOrDefault("disableVehicle", "false"));
+  private boolean disableVehicle(Context ctx) {
+    return Boolean.parseBoolean(ctx.queryParam("disableVehicle"));
   }
 
-  private boolean forced(Request request) {
-    return Boolean.parseBoolean(request.queryParamOrDefault("forced", "false"));
+  private boolean forced(Context ctx) {
+    return Boolean.parseBoolean(ctx.queryParam("forced"));
   }
-
 }

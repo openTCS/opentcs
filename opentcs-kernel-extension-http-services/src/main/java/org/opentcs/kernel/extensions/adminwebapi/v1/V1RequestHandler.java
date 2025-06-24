@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.javalin.http.Context;
 import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -16,10 +17,9 @@ import org.opentcs.access.Kernel;
 import org.opentcs.access.LocalKernel;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.kernel.KernelExecutor;
+import org.opentcs.kernel.extensions.servicewebapi.HttpConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.Request;
-import spark.Response;
 
 /**
  * Handles requests and produces responses for version 1 of the admin web API.
@@ -91,18 +91,20 @@ public class V1RequestHandler
     initialized = false;
   }
 
-  public Object handleGetVersion(Request request, Response response) {
-    return toJson(new Version());
+  public void handleGetVersion(Context ctx) {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(toJson(new Version()));
   }
 
-  public Object handleGetStatus(Request request, Response response) {
-    return toJson(new Status());
+  public void handleGetStatus(Context ctx) {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(toJson(new Status()));
   }
 
-  public Object handleDeleteKernel(Request request, Response response) {
-    LOG.info("Initiating kernel shutdown as requested from {}...", request.ip());
+  public void handleDeleteKernel(Context ctx) {
+    LOG.info("Initiating kernel shutdown as requested from {}...", ctx.ip());
     kernelExecutor.schedule(() -> kernel.setState(Kernel.State.SHUTDOWN), 1, TimeUnit.SECONDS);
-    return "";
+    ctx.result("");
   }
 
   private <T> T fromJson(String jsonString, Class<T> clazz)

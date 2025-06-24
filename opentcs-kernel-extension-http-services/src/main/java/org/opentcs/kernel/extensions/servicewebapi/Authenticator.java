@@ -5,11 +5,11 @@ package org.opentcs.kernel.extensions.servicewebapi;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Strings;
+import io.javalin.http.Context;
 import jakarta.inject.Inject;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spark.Request;
 
 /**
  * Authenticates incoming requests.
@@ -38,14 +38,14 @@ public class Authenticator {
   /**
    * Checks whether authentication is required and the given request is authenticated.
    *
-   * @param request The request to be checked.
+   * @param context The context to be checked.
    * @return <code>true</code> if, and only if, authentication is required and the given request is
    * authenticated.
    */
-  public boolean isAuthenticated(Request request) {
-    requireNonNull(request, "request");
+  public boolean isAuthenticated(Context context) {
+    requireNonNull(context, "context");
 
-    String requestAccessKey = request.headers(HttpConstants.HEADER_NAME_ACCESS_KEY);
+    String requestAccessKey = context.header(HttpConstants.HEADER_NAME_ACCESS_KEY);
     LOG.debug(
         "Provided access key in header is '{}', required value is '{}'",
         requestAccessKey,

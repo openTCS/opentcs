@@ -10,7 +10,8 @@ dependencies {
   api project(':opentcs-api-injection')
   api project(':opentcs-common')
 
-  api libs.spark.core
+  api libs.javalin
+  api libs.javalin.ssl.plugin
 
   api libs.jackson.databind
   api libs.jackson.module.jsonSchema
