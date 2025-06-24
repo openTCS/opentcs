@@ -41,7 +41,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update SLF4J to 2.0.17.
 ** Update Spotless to 7.0.4.
 ** Update Checkstyle to 10.25.0.
-** Update Gradle wrapper to 8.13.
+** Update Gradle wrapper to 8.14.2.
 ** Update Semver4J to 5.6.0.
 ** Update JTS Topology Suite to 1.20.0.
 ** Update Asciidoctor Gradle plugins to 4.0.4.
