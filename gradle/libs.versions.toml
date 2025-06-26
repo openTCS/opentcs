@@ -18,7 +18,7 @@ jgrapht-core = "1.5.2"
 jhotdraw = "7.6.20190506"
 jts-core = "1.20.0"
 openapi-generator-cli = "7.13.0"
-semver4j = "5.6.0"
+semver4j = "5.8.0"
 slf4j = "2.0.17"
 swagger-ui = "5.25.2"
 # Test dependency versions
