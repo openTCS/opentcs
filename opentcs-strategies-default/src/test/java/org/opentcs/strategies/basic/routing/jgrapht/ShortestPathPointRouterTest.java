@@ -44,22 +44,27 @@ class ShortestPathPointRouterTest {
     pointB = new Point("B");
     pointC = new Point("C");
 
+    Vertex vertexA = new Vertex(pointA.getReference());
+    Vertex vertexB = new Vertex(pointB.getReference());
+    Vertex vertexC = new Vertex(pointC.getReference());
+
     pathAC = new Path("A-->C", pointA.getReference(), pointC.getReference());
 
     edgeAC = new Edge(pathAC, false);
 
-    Graph<String, Edge> graph = new DirectedWeightedMultigraph<>(Edge.class);
+    Graph<Vertex, Edge> graph = new DirectedWeightedMultigraph<>(Edge.class);
 
-    graph.addVertex(pointA.getName());
-    graph.addVertex(pointB.getName());
-    graph.addVertex(pointC.getName());
+    graph.addVertex(vertexA);
+    graph.addVertex(vertexB);
+    graph.addVertex(vertexC);
 
-    graph.addEdge(pointA.getName(), pointC.getName(), edgeAC);
+    graph.addEdge(vertexA, vertexC, edgeAC);
     graph.setEdgeWeight(edgeAC, 1234);
 
     pointRouter = new ShortestPathPointRouter(
         new DijkstraShortestPath<>(graph),
-        new HashSet<>(Arrays.asList(pointA, pointB, pointC))
+        new HashSet<>(Arrays.asList(pointA, pointB, pointC)),
+        graph.vertexSet()
     );
   }
 

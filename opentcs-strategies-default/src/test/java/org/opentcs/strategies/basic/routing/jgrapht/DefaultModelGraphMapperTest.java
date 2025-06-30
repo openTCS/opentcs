@@ -66,15 +66,22 @@ class DefaultModelGraphMapperTest {
 
   @Test
   void translateModelToGraph() {
-    when(pointVertexMapper.translatePoints(any())).thenReturn(Set.of("A", "B", "C"));
+    when(pointVertexMapper.translatePoints(any())).thenReturn(
+        Set.of(
+            new Vertex(new Point("A").getReference()),
+            new Vertex(new Point("B").getReference()),
+            new Vertex(new Point("C").getReference())
+        )
+    );
     Edge edgeAB = new Edge(pathAB, false);
     Edge edgeBC = new Edge(pathBC, false);
     when(pathEdgeMapper.translatePaths(any(), any()))
         .thenReturn(Map.of(edgeAB, 42.0, edgeBC, 29.0));
 
-    Graph<String, Edge> result = mapper.translateModel(points, paths, vehicle);
+    Graph<Vertex, Edge> result = mapper.translateModel(points, paths, vehicle);
 
     assertThat(result.vertexSet())
+        .map(vertex -> vertex.getPoint().getName())
         .hasSize(3)
         .contains("A", "B", "C");
     assertThat(result.edgeSet())
@@ -89,27 +96,30 @@ class DefaultModelGraphMapperTest {
   @Test
   void updateGraphWithChangedPaths() {
     // Build the input graph with one path/edge that is expected to be updated.
-    Graph<String, Edge> originalGraph = new DirectedWeightedMultigraph<>(Edge.class);
-    originalGraph.addVertex("A");
-    originalGraph.addVertex("B");
-    originalGraph.addVertex("C");
+    Graph<Vertex, Edge> originalGraph = new DirectedWeightedMultigraph<>(Edge.class);
+    Vertex a = new Vertex(new Point("A").getReference());
+    Vertex b = new Vertex(new Point("B").getReference());
+    Vertex c = new Vertex(new Point("C").getReference());
+    originalGraph.addVertex(a);
+    originalGraph.addVertex(b);
+    originalGraph.addVertex(c);
     Edge edgeAB = new Edge(pathAB, false);
-    originalGraph.addEdge("A", "B", edgeAB);
+    originalGraph.addEdge(a, b, edgeAB);
     originalGraph.setEdgeWeight(edgeAB, 42.0);
     Edge edgeBC = new Edge(pathBC, false);
-    originalGraph.addEdge("B", "C", edgeBC);
+    originalGraph.addEdge(b, c, edgeBC);
     originalGraph.setEdgeWeight(edgeBC, 29.0);
 
     when(pathEdgeMapper.translatePaths(any(), any())).thenReturn(Map.of(edgeAB, 79.0));
     Set<Path> changedPaths = Set.of(pathAB);
 
-    Graph<String, Edge> result = mapper.updateGraph(changedPaths, vehicle, originalGraph);
+    Graph<Vertex, Edge> result = mapper.updateGraph(changedPaths, vehicle, originalGraph);
 
     // Assert that the output graph contains the same vertices and edges but the weight of one of
     // the edges was updated.
     assertThat(result.vertexSet())
         .hasSize(3)
-        .contains("A", "B", "C");
+        .contains(a, b, c);
     assertThat(result.edgeSet())
         .hasSize(2)
         .contains(edgeAB, edgeBC);

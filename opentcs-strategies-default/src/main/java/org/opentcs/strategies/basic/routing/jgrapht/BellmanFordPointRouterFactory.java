@@ -31,8 +31,8 @@ public class BellmanFordPointRouterFactory
   }
 
   @Override
-  protected ShortestPathAlgorithm<String, Edge> createShortestPathAlgorithm(
-      Graph<String, Edge> graph
+  protected ShortestPathAlgorithm<Vertex, Edge> createShortestPathAlgorithm(
+      Graph<Vertex, Edge> graph
   ) {
     return new BellmanFordShortestPath<>(graph);
   }

@@ -35,17 +35,19 @@ class PointVertexMapperTest {
 
   @Test
   void translateEmptyPointCollectionToEmptySet() {
-    Set<String> result = mapper.translatePoints(new HashSet<>());
+    Set<Vertex> result = mapper.translatePoints(new HashSet<>());
 
     assertThat(result).isEmpty();
   }
 
   @Test
-  void translatePointsToPointNames() {
-    Set<String> result
+  void translatePointsToVertex() {
+    Set<Vertex> result
         = mapper.translatePoints(new HashSet<>(Arrays.asList(pointA, pointB, pointC, pointD)));
 
     assertThat(result).hasSize(4);
-    assertThat(result).contains("A", "B", "C", "D");
+    assertThat(result)
+        .map(vertex -> vertex.getPoint().getName())
+        .contains("A", "B", "C", "D");
   }
 }

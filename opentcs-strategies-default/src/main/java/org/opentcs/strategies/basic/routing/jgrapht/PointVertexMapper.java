@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import org.opentcs.data.model.Point;
 
 /**
- * Mapper to translate a collection of {@link Point}s to names of vertices.
+ * Mapper to translate a collection of {@link Point}s to vertices.
  */
 public class PointVertexMapper {
 
@@ -23,16 +23,16 @@ public class PointVertexMapper {
   }
 
   /**
-   * Translates the given {@link Point}s to names of vertices.
+   * Translates the given {@link Point}s to vertices.
    *
-   * @param points The points to translate to names of vertices.
-   * @return The translated names of vertices.
+   * @param points The points to translate to vertices.
+   * @return The vertices.
    */
-  public Set<String> translatePoints(Collection<Point> points) {
+  public Set<Vertex> translatePoints(Collection<Point> points) {
     requireNonNull(points, "points");
 
     return points.stream()
-        .map(Point::getName)
+        .map(point -> new Vertex(point.getReference()))
         .collect(Collectors.toSet());
   }
 }

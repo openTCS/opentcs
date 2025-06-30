@@ -36,21 +36,28 @@ public class ShortestPathPointRouter
    */
   private static final Logger LOG = LoggerFactory.getLogger(ShortestPathPointRouter.class);
 
-  private final ShortestPathAlgorithm<String, Edge> algo;
+  private final ShortestPathAlgorithm<Vertex, Edge> algo;
 
   private final Map<String, Point> points = new HashMap<>();
 
+  private final Map<String, Vertex> pointVertexMap = new HashMap<>();
+
   public ShortestPathPointRouter(
-      ShortestPathAlgorithm<String, Edge> algo,
-      Collection<Point> points
+      ShortestPathAlgorithm<Vertex, Edge> algo,
+      Collection<Point> points,
+      Collection<Vertex> vertices
   ) {
     this.algo = requireNonNull(algo, "algo");
     requireNonNull(points, "points");
+    requireNonNull(vertices, "vertexSet");
 
     for (Point point : points) {
       this.points.put(point.getName(), point);
     }
 
+    for (Vertex vertex : vertices) {
+      pointVertexMap.put(vertex.getPoint().getName(), vertex);
+    }
   }
 
   @Override
@@ -63,7 +70,10 @@ public class ShortestPathPointRouter
       return new ArrayList<>();
     }
 
-    GraphPath<String, Edge> graphPath = algo.getPath(srcPoint.getName(), destPoint.getName());
+    GraphPath<Vertex, Edge> graphPath = algo.getPath(
+        pointVertexMap.get(srcPoint.getName()),
+        pointVertexMap.get(destPoint.getName())
+    );
     if (graphPath == null) {
       return null;
     }
@@ -92,9 +102,9 @@ public class ShortestPathPointRouter
       return 0;
     }
 
-    GraphPath<String, Edge> graphPath = algo.getPath(
-        srcPointRef.getName(),
-        destPointRef.getName()
+    GraphPath<Vertex, Edge> graphPath = algo.getPath(
+        pointVertexMap.get(srcPointRef.getName()),
+        pointVertexMap.get(destPointRef.getName())
     );
     if (graphPath == null) {
       return INFINITE_COSTS;
@@ -103,14 +113,14 @@ public class ShortestPathPointRouter
     return (long) graphPath.getWeight();
   }
 
-  private List<Route.Step> translateToSteps(GraphPath<String, Edge> graphPath) {
+  private List<Route.Step> translateToSteps(GraphPath<Vertex, Edge> graphPath) {
     List<Edge> edges = graphPath.getEdgeList();
     List<Route.Step> result = new ArrayList<>(edges.size());
 
     int routeIndex = 0;
     for (Edge edge : edges) {
-      Point sourcePoint = points.get(graphPath.getGraph().getEdgeSource(edge));
-      Point destPoint = points.get(graphPath.getGraph().getEdgeTarget(edge));
+      Point sourcePoint = points.get(graphPath.getGraph().getEdgeSource(edge).getPoint().getName());
+      Point destPoint = points.get(graphPath.getGraph().getEdgeTarget(edge).getPoint().getName());
 
       result.add(
           new Route.Step(

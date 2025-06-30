@@ -297,7 +297,7 @@ public class GraphProvider {
     private final Set<Path> pathBase;
     private final Set<Point> excludedPoints;
     private final Set<Path> excludedPaths;
-    private final Graph<String, Edge> graph;
+    private final Graph<Vertex, Edge> graph;
 
     /**
      * Creates a new instance.
@@ -315,7 +315,7 @@ public class GraphProvider {
         Set<Path> pathBase,
         Set<Point> excludedPoints,
         Set<Path> excludedPaths,
-        Graph<String, Edge> graph
+        Graph<Vertex, Edge> graph
     ) {
       this.pointBase = Collections.unmodifiableSet(requireNonNull(pointBase, "pointBase"));
       this.pathBase = Collections.unmodifiableSet(requireNonNull(pathBase, "pathBase"));
@@ -367,7 +367,7 @@ public class GraphProvider {
      *
      * @return The computed graph.
      */
-    public Graph<String, Edge> getGraph() {
+    public Graph<Vertex, Edge> getGraph() {
       return graph;
     }
   }

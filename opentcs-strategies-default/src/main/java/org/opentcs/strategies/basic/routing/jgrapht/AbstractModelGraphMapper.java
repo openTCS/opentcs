@@ -6,6 +6,7 @@ import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,7 +47,7 @@ public abstract class AbstractModelGraphMapper
   }
 
   @Override
-  public Graph<String, Edge> translateModel(
+  public Graph<Vertex, Edge> translateModel(
       Collection<Point> points,
       Collection<Path> paths,
       Vehicle vehicle
@@ -58,17 +59,20 @@ public abstract class AbstractModelGraphMapper
     LOG.debug("Translating model for {}...", vehicle.getName());
     long timeStampBefore = System.currentTimeMillis();
 
-    Graph<String, Edge> graph = new DirectedWeightedMultigraph<>(Edge.class);
+    Graph<Vertex, Edge> graph = new DirectedWeightedMultigraph<>(Edge.class);
 
-    for (String vertex : pointVertexMapper.translatePoints(points)) {
+    Map<String, Vertex> pointVertexMap = new HashMap<>();
+
+    for (Vertex vertex : pointVertexMapper.translatePoints(points)) {
       graph.addVertex(vertex);
+      pointVertexMap.put(vertex.getPoint().getName(), vertex);
     }
 
     for (Map.Entry<Edge, Double> edgeEntry : pathEdgeMapper.translatePaths(paths, vehicle)
         .entrySet()) {
       graph.addEdge(
-          edgeEntry.getKey().getSourceVertex(),
-          edgeEntry.getKey().getTargetVertex(),
+          pointVertexMap.get(edgeEntry.getKey().getSourceVertex()),
+          pointVertexMap.get(edgeEntry.getKey().getTargetVertex()),
           edgeEntry.getKey()
       );
       graph.setEdgeWeight(edgeEntry.getKey(), edgeEntry.getValue());
@@ -84,10 +88,10 @@ public abstract class AbstractModelGraphMapper
   }
 
   @Override
-  public Graph<String, Edge> updateGraph(
+  public Graph<Vertex, Edge> updateGraph(
       Collection<Path> paths,
       Vehicle vehicle,
-      Graph<String, Edge> graph
+      Graph<Vertex, Edge> graph
   ) {
     requireNonNull(paths, "paths");
     requireNonNull(vehicle, "vehicle");
@@ -96,11 +100,12 @@ public abstract class AbstractModelGraphMapper
     LOG.debug("Updating graph for {}...", vehicle.getName());
     long timeStampBefore = System.currentTimeMillis();
 
-    Graph<String, Edge> updatedGraph = new DirectedWeightedMultigraph<>(Edge.class);
-
+    Graph<Vertex, Edge> updatedGraph = new DirectedWeightedMultigraph<>(Edge.class);
+    Map<String, Vertex> pointVertexMap = new HashMap<>();
     // First, copy all points from the original graph.
-    for (String vertex : graph.vertexSet()) {
+    for (Vertex vertex : graph.vertexSet()) {
       updatedGraph.addVertex(vertex);
+      pointVertexMap.put(vertex.getPoint().getName(), vertex);
     }
 
     // Then, determine the edges that have not changed and copy these from the original graph as
@@ -117,7 +122,11 @@ public abstract class AbstractModelGraphMapper
         graph.edgeSet().size()
     );
     for (Edge edge : unchangedEdges) {
-      updatedGraph.addEdge(edge.getSourceVertex(), edge.getTargetVertex(), edge);
+      updatedGraph.addEdge(
+          pointVertexMap.get(edge.getSourceVertex()),
+          pointVertexMap.get(edge.getTargetVertex()),
+          edge
+      );
       updatedGraph.setEdgeWeight(edge, graph.getEdgeWeight(edge));
     }
 
@@ -126,8 +135,8 @@ public abstract class AbstractModelGraphMapper
     LOG.debug("Adding {} (changed) edges to the graph...", changedEdges.size());
     for (Map.Entry<Edge, Double> edgeEntry : changedEdges.entrySet()) {
       updatedGraph.addEdge(
-          edgeEntry.getKey().getSourceVertex(),
-          edgeEntry.getKey().getTargetVertex(),
+          pointVertexMap.get(edgeEntry.getKey().getSourceVertex()),
+          pointVertexMap.get(edgeEntry.getKey().getTargetVertex()),
           edgeEntry.getKey()
       );
       updatedGraph.setEdgeWeight(edgeEntry.getKey(), edgeEntry.getValue());

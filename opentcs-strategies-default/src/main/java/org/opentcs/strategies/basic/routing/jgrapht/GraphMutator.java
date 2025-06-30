@@ -5,7 +5,9 @@ package org.opentcs.strategies.basic.routing.jgrapht;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.jgrapht.Graph;
@@ -53,15 +55,21 @@ public class GraphMutator {
     Set<Path> derivedPathBase = new HashSet<>(baseGraph.getPathBase());
     derivedPathBase.removeAll(pathsToExclude);
 
-    Graph<String, Edge> derivedGraph = new DirectedWeightedMultigraph<>(Edge.class);
+    Graph<Vertex, Edge> derivedGraph = new DirectedWeightedMultigraph<>(Edge.class);
+
+    Map<String, Vertex> pointVertexMap = new HashMap<>();
 
     // Determine the vertices that should be included and add them to the derived graph.
     Set<String> pointsToIncludeByName = derivedPointBase.stream()
         .map(Point::getName)
         .collect(Collectors.toSet());
     baseGraph.getGraph().vertexSet().stream()
-        .filter(vertex -> pointsToIncludeByName.contains(vertex))
-        .forEach(vertex -> derivedGraph.addVertex(vertex));
+        .filter(vertex -> pointsToIncludeByName.contains(vertex.getPoint().getName()))
+        .forEach(vertex -> {
+          derivedGraph.addVertex(vertex);
+          pointVertexMap.put(vertex.getPoint().getName(), vertex);
+        }
+        );
 
     // Determine the edges that should be included and add them to the derived graph.
     Set<String> pathsToIncludeByName = derivedPathBase.stream()
@@ -78,7 +86,11 @@ public class GraphMutator {
                 && pointsToIncludeByName.contains(edge.getTargetVertex())
         )
         .forEach(edge -> {
-          derivedGraph.addEdge(edge.getSourceVertex(), edge.getTargetVertex(), edge);
+          derivedGraph.addEdge(
+              pointVertexMap.get(edge.getSourceVertex()),
+              pointVertexMap.get(edge.getTargetVertex()),
+              edge
+          );
           derivedGraph.setEdgeWeight(edge, baseGraph.getGraph().getEdgeWeight(edge));
         });
 

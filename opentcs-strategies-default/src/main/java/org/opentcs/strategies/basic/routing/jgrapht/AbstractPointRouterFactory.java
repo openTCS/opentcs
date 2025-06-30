@@ -112,8 +112,8 @@ public abstract class AbstractPointRouterFactory
    * @param graph The graph.
    * @return A shortest path algorithm implementation working on the given graph.
    */
-  protected abstract ShortestPathAlgorithm<String, Edge> createShortestPathAlgorithm(
-      Graph<String, Edge> graph
+  protected abstract ShortestPathAlgorithm<Vertex, Edge> createShortestPathAlgorithm(
+      Graph<Vertex, Edge> graph
   );
 
   private PointRouter createPointRouter(GraphResult graphResult) {
@@ -122,7 +122,8 @@ public abstract class AbstractPointRouterFactory
 
     PointRouter router = new ShortestPathPointRouter(
         createShortestPathAlgorithm(graphResult.getGraph()),
-        points
+        points,
+        graphResult.getGraph().vertexSet()
     );
     // Make a single request for a route from one point to a different one to make sure the
     // point router is primed. (Some implementations are initialized lazily.)
