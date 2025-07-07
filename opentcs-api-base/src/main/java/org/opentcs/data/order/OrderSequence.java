@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -640,12 +641,14 @@ public class OrderSequence
   }
 
   private ObjectHistory historyForNewProcessingVehicle(TCSObjectReference<Vehicle> ref) {
-    return getHistory().withEntryAppended(
-        new ObjectHistory.Entry(
-            SEQUENCE_PROCESSING_VEHICLE_CHANGED,
-            ref == null ? "" : ref.getName()
-        )
-    );
+    return Objects.equals(ref, processingVehicle)
+        ? getHistory()
+        : getHistory().withEntryAppended(
+            new ObjectHistory.Entry(
+                SEQUENCE_PROCESSING_VEHICLE_CHANGED,
+                ref == null ? "" : ref.getName()
+            )
+        );
   }
 
   private ObjectHistory historyForAppendedOrder(TCSObjectReference<TransportOrder> ref) {

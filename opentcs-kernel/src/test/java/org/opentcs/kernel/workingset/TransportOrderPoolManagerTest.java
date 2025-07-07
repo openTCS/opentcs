@@ -7,7 +7,9 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.sameInstance;
 
 import java.util.HashSet;
 import java.util.List;
@@ -202,6 +204,54 @@ class TransportOrderPoolManagerTest {
     orderPoolManager.removeTransportOrder(order.getReference());
 
     assertThat(objectRepo.getObjects(TransportOrder.class), is(empty()));
+  }
+
+  @Test
+  void createOrderSequence() {
+    OrderSequence sequence = orderPoolManager.createOrderSequence(
+        new OrderSequenceCreationTO("some-sequence")
+    );
+
+    assertThat(objectRepo.getObjects(OrderSequence.class), is(not(empty())));
+  }
+
+  @Test
+  void assignProcessingVehicleToOrderSequenceIfDifferentToPreviousOne() {
+    plantModelManager.createPlantModelObjects(
+        new PlantModelCreationTO("some-model")
+            .withVehicle(new VehicleCreationTO("vehicle-1"))
+            .withVehicle(new VehicleCreationTO("vehicle-2"))
+    );
+    Vehicle vehicle1 = objectRepo.getObject(Vehicle.class, "vehicle-1");
+    Vehicle vehicle2 = objectRepo.getObject(Vehicle.class, "vehicle-2");
+
+    OrderSequence initialSequence = orderPoolManager.createOrderSequence(
+        new OrderSequenceCreationTO("some-sequence")
+    );
+
+    OrderSequence seqAfterFirstAssignment = orderPoolManager.setOrderSequenceProcessingVehicle(
+        initialSequence.getReference(),
+        vehicle1.getReference()
+    );
+    assertThat(seqAfterFirstAssignment, is(not(sameInstance(initialSequence))));
+    assertThat(
+        seqAfterFirstAssignment.getProcessingVehicle(), is(equalTo(vehicle1.getReference()))
+    );
+
+    OrderSequence seqAfterSecondAssignment = orderPoolManager.setOrderSequenceProcessingVehicle(
+        initialSequence.getReference(),
+        vehicle2.getReference()
+    );
+    assertThat(seqAfterSecondAssignment, is(not(sameInstance(seqAfterFirstAssignment))));
+    assertThat(
+        seqAfterSecondAssignment.getProcessingVehicle(), is(equalTo(vehicle2.getReference()))
+    );
+
+    OrderSequence seqAfterThirdAssignment = orderPoolManager.setOrderSequenceProcessingVehicle(
+        initialSequence.getReference(),
+        vehicle2.getReference()
+    );
+    assertThat(seqAfterThirdAssignment, is(sameInstance(seqAfterSecondAssignment)));
   }
 
   @Test

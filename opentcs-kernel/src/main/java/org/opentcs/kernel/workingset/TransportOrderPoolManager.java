@@ -597,6 +597,10 @@ public class TransportOrderPoolManager
       throws ObjectUnknownException {
     OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
 
+    if (Objects.equals(vehicleRef, previousState.getProcessingVehicle())) {
+      return previousState;
+    }
+
     LOG.info(
         "Order sequence's processing vehicle changes: {} -- {} -> {}",
         previousState.getName(),
