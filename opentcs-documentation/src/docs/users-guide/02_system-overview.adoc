@@ -310,6 +310,9 @@ When creating a transport order, the following attributes can be set:
   A vehicle may only be assigned to a transport order if the order's type is in the vehicle's set of acceptable order types.
   (Examples for potentially useful types are `"Transport"` and `"Maintenance"`.)
 * An optional _intended vehicle_, telling the dispatcher to assign the transport order to the specified vehicle instead of selecting one automatically.
+* A _dispensable_ flag, indicating whether the transport order may be withdrawn automatically, primarily to make the processing vehicle available for another transport order.
+  Orders that are usually marked as dispensable are parking orders, for instance:
+  when a vehicle is on its way to a parking position and a new transport order becomes available for it, it makes sense to assign the new transport order to the vehicle rather sooner than later, skipping the rest of the way to the parking position.
 * An optional set of _dependencies_, i.e. references to other transport orders that need to be processed before the transport order.
   Dependencies are transitive, meaning that if order A depends on order B and order B depends on order C, C must be processed first, then B, then A.
   As a result, dependencies are a means to impose an order on sets of transport orders.
