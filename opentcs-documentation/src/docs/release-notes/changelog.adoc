@@ -49,7 +49,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update Asciidoctor Gradle plugins to 4.0.4.
 ** Update JAXB XML binding runtime to 4.0.5.
 ** Update OpenAPI generator to 7.13.0 and Swagger UI to 5.25.2.
-** Update Gestalt to 0.35.4.
+** Update Gestalt to 0.36.0.
 
 == Version 6.4 (2025-03-10)
 

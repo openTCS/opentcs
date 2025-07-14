@@ -5,7 +5,7 @@
 # Other dependency versions
 checkstyle = "10.25.0"
 dockingframes = "1.1.2p11"
-gestalt = "0.35.4"
+gestalt = "0.36.0"
 guice = "7.0.0"
 huxhorn-sulky-ulid = "8.3.0"
 jackson = "2.19.1"
