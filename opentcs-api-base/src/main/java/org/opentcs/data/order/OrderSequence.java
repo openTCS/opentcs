@@ -646,7 +646,7 @@ public class OrderSequence
         : getHistory().withEntryAppended(
             new ObjectHistory.Entry(
                 SEQUENCE_PROCESSING_VEHICLE_CHANGED,
-                ref == null ? "" : ref.getName()
+                ref == null ? List.of("") : List.of(ref.getName())
             )
         );
   }
@@ -655,7 +655,7 @@ public class OrderSequence
     return getHistory().withEntryAppended(
         new ObjectHistory.Entry(
             SEQUENCE_ORDER_APPENDED,
-            ref == null ? "" : ref.getName()
+            ref == null ? List.of("") : List.of(ref.getName())
         )
     );
   }

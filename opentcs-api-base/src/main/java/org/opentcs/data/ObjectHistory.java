@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A history of events related to an object.
@@ -87,65 +88,93 @@ public class ObjectHistory
         Serializable {
 
     /**
-     * The point of time at which the event occured.
+     * The point of time at which the event occurred.
      */
     private final Instant timestamp;
     /**
-     * A code identifying the event that occured.
+     * A code identifying the event that occurred.
      */
     private final String eventCode;
     /**
      * Supplementary information about the event.
-     * How this information is to be interpreted (if at all) depends on the respective event code.
      */
-    private final Object supplement;
+    private final List<String> supplements;
 
     /**
      * Creates a new instance.
      *
-     * @param timestamp The point of time at which the event occured.
-     * @param eventCode A code identifying the event that occured.
+     * @param timestamp The point of time at which the event occurred.
+     * @param eventCode A code identifying the event that occurred.
      * @param supplement Supplementary information about the event.
      * Must be {@link Serializable} and should provide a human-readable default representation from
      * its {@code toString()} method.
+     * @deprecated Use {@link #Entry(Instant, String, List)} instead.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed")
     public Entry(Instant timestamp, String eventCode, Object supplement) {
       this.timestamp = requireNonNull(timestamp, "timestamp");
       this.eventCode = requireNonNull(eventCode, "eventCode");
-      this.supplement = requireNonNull(supplement, "supplement");
       checkArgument(supplement instanceof Serializable, "supplement is not serializable");
+      this.supplements = List.of(supplement.toString());
+    }
+
+    /**
+     * Creates a new instance.
+     *
+     * @param timestamp The point of time at which the event occurred.
+     * @param eventCode A code identifying the event that occurred.
+     * @param supplements Supplementary information about the event.
+     */
+    public Entry(Instant timestamp, String eventCode, List<String> supplements) {
+      this.timestamp = requireNonNull(timestamp, "timestamp");
+      this.eventCode = requireNonNull(eventCode, "eventCode");
+      this.supplements = List.copyOf(requireNonNull(supplements, "supplements"));
     }
 
     /**
      * Creates a new instance with an empty supplement.
      *
-     * @param timestamp The point of time at which the event occured.
-     * @param eventCode A code identifying the event that occured.
+     * @param timestamp The point of time at which the event occurred.
+     * @param eventCode A code identifying the event that occurred.
      */
     public Entry(Instant timestamp, String eventCode) {
-      this(timestamp, eventCode, "");
+      this(timestamp, eventCode, List.of());
     }
 
     /**
      * Creates a new instance with the timestamp set to the current point of time.
      *
-     * @param eventCode A code identifying the event that occured.
+     * @param eventCode A code identifying the event that occurred.
      * @param supplement Supplementary information about the event.
      * Must be {@link Serializable} and should provide a human-readable default representation from
      * its {@code toString()} method.
+     * @deprecated Use {@link #Entry(String, List)} instead.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed")
     public Entry(String eventCode, Object supplement) {
       this(Instant.now(), eventCode, supplement);
+    }
+
+    /**
+     * Creates a new instance with the timestamp set to the current point of time.
+     *
+     * @param eventCode A code identifying the event that occurred.
+     * @param supplements Supplementary information about the event.
+     */
+    public Entry(String eventCode, List<String> supplements) {
+      this(Instant.now(), eventCode, supplements);
     }
 
     /**
      * Creates a new instance with the timestamp set to the current point of time and an empty
      * supplement.
      *
-     * @param eventCode A code identifying the event that occured.
+     * @param eventCode A code identifying the event that occurred.
      */
     public Entry(String eventCode) {
-      this(eventCode, "");
+      this(eventCode, List.of());
     }
 
     /**
@@ -172,10 +201,25 @@ public class ObjectHistory
      * Returns a supplemental object providing details about the event.
      *
      * @return A supplemental object providing details about the event.
+     * @deprecated Use {@link #getSupplements()} instead.
      */
     @Nonnull
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed")
     public Object getSupplement() {
-      return supplement;
+      return supplements.isEmpty()
+          ? ""
+          : supplements.getFirst();
+    }
+
+    /**
+     * Returns supplementary information about the event.
+     *
+     * @return Supplementary information about the event.
+     */
+    @Nonnull
+    public List<String> getSupplements() {
+      return supplements;
     }
 
     @Override
@@ -183,7 +227,7 @@ public class ObjectHistory
       return "Entry{"
           + "timestamp=" + timestamp
           + ", eventCode=" + eventCode
-          + ", supplement=" + supplement
+          + ", supplements=" + supplements
           + '}';
     }
   }

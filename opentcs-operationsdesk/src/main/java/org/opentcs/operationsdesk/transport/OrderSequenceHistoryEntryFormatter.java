@@ -46,7 +46,7 @@ public class OrderSequenceHistoryEntryFormatter
             bundle.getString(
                 "orderSequenceHistoryEntryFormatter.code_sequenceOrderAppended.text"
             )
-                + " '" + entry.getSupplement().toString() + "'"
+                + " '" + entry.getSupplements().getFirst() + "'"
         );
 
       case OrderSequenceHistoryCodes.SEQUENCE_PROCESSING_VEHICLE_CHANGED:
@@ -54,7 +54,7 @@ public class OrderSequenceHistoryEntryFormatter
             bundle.getString(
                 "orderSequenceHistoryEntryFormatter.code_sequenceProcVehicleChanged.text"
             )
-                + " '" + entry.getSupplement().toString() + "'"
+                + " '" + entry.getSupplements().getFirst() + "'"
         );
 
       case OrderSequenceHistoryCodes.SEQUENCE_COMPLETED:

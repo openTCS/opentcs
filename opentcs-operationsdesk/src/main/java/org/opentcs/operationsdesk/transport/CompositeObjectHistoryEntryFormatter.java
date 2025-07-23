@@ -60,7 +60,7 @@ public class CompositeObjectHistoryEntryFormatter
   private Optional<String> fallbackFormat(ObjectHistory.Entry entry) {
     return Optional.of(
         "eventCode: '" + entry.getEventCode()
-            + "', supplement: '" + entry.getSupplement().toString() + '\''
+            + "', supplements: '" + entry.getSupplements() + '\''
     );
   }
 

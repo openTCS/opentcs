@@ -32,6 +32,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Avoid `NullPointerException` when trying to save transport order definitions in the continuous load panel.
 * Changes affecting developers:
 ** Deprecate `VehicleCommAdapter.processMessage(Object)`, `VehicleCommAdapter.execute(AdapterCommads)` and related code in favor of `VehicleCommAdapter.processMessage(VehicleCommAdapterMessage)`, which provides a generic one-way communication channel to the comm adapter.
+** Deprecate `ObjectHistory.Entry.supplement` and introduce `ObjectHistory.Entry.supplements`, which allows storing multiple supplements in a list of strings.
 ** Provide `DriveOrder` with a name, which helps with identifying and comparing `DriveOrder` instances.
    For this, introduce a new constructor `DriveOrder(String, Destination)` and deprecate `DriveOrder(Destination)`.
 ** Remove dependencies to the base API data structures in the web API data structures to ensure that they are not directly impacted by changes in the base API.

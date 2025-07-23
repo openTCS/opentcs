@@ -9,10 +9,9 @@ import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DISPATCHIN
 import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_RESERVED_FOR_VEHICLE;
 
 import jakarta.inject.Inject;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectHistory;
@@ -57,7 +56,7 @@ public class DispatchingStatusMarker {
         filterResult.getOrder().getReference(),
         new ObjectHistory.Entry(
             ORDER_DISPATCHING_DEFERRED,
-            Collections.unmodifiableList(new ArrayList<>(filterResult.getFilterReasons()))
+            List.copyOf(filterResult.getFilterReasons())
         )
     );
   }
@@ -72,7 +71,7 @@ public class DispatchingStatusMarker {
         transportOrder.getReference(),
         new ObjectHistory.Entry(
             ORDER_DISPATCHING_RESUMED,
-            Collections.unmodifiableList(new ArrayList<>())
+            List.of()
         )
     );
   }
@@ -97,7 +96,7 @@ public class DispatchingStatusMarker {
   public void markOrderAsAssigned(TransportOrder transportOrder, Vehicle vehicle) {
     objectService.appendObjectHistoryEntry(
         transportOrder.getReference(),
-        new ObjectHistory.Entry(ORDER_ASSIGNED_TO_VEHICLE, vehicle.getName())
+        new ObjectHistory.Entry(ORDER_ASSIGNED_TO_VEHICLE, List.of(vehicle.getName()))
     );
   }
 
@@ -110,7 +109,7 @@ public class DispatchingStatusMarker {
   public void markOrderAsReserved(TransportOrder transportOrder, Vehicle vehicle) {
     objectService.appendObjectHistoryEntry(
         transportOrder.getReference(),
-        new ObjectHistory.Entry(ORDER_RESERVED_FOR_VEHICLE, vehicle.getName())
+        new ObjectHistory.Entry(ORDER_RESERVED_FOR_VEHICLE, List.of(vehicle.getName()))
     );
   }
 
@@ -122,12 +121,11 @@ public class DispatchingStatusMarker {
    * @param filterResult The filter result.
    * @return {@code true}, if the reasons for deferral have changed, otherwise {@code false}.
    */
-  @SuppressWarnings("unchecked")
   public boolean haveDeferralReasonsForOrderChanged(OrderFilterResult filterResult) {
     Collection<String> newReasons = filterResult.getFilterReasons();
     Collection<String> oldReasons = lastRelevantDeferredHistoryEntry(filterResult.getOrder())
-        .map(entry -> (Collection<String>) entry.getSupplement())
-        .orElse(new ArrayList<>());
+        .map(ObjectHistory.Entry::getSupplements)
+        .orElse(List.of());
 
     return newReasons.size() != oldReasons.size()
         || !newReasons.containsAll(oldReasons);

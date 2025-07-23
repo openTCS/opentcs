@@ -981,7 +981,7 @@ public class TransportOrder
     return getHistory().withEntryAppended(
         new ObjectHistory.Entry(
             ORDER_PROCESSING_VEHICLE_CHANGED,
-            ref == null ? "" : ref.getName()
+            ref == null ? List.of("") : List.of(ref.getName())
         )
     );
   }
