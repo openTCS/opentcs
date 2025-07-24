@@ -1,8 +1,3 @@
-<!--
-SPDX-FileCopyrightText: The openTCS Authors
-SPDX-License-Identifier: CC-BY-4.0
--->
-
 ---
 name: Bug report
 about: Create a report to help us improve
@@ -43,5 +38,5 @@ _What behaviour can actually be observed instead of the correct behaviour?_
 _Other data that can help with fixing the defect, e.g. logs, screenshots etc._
 
 * Operating system and version: _e.g. Ubuntu Linux 20.04, Windows 10, ..._
-* Java distribution version: _e.g. Oracle Java Runtime Environment 13_
+* Java distribution version: _e.g. Oracle Java Runtime Environment 21_
 * ...
