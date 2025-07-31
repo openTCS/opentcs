@@ -31,8 +31,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Properly allow updates of a vehicle's acceptable order types via the `PUT /vehicles/{NAME}/acceptableOrderTypes` web API endpoint.
 ** Avoid `NullPointerException` when trying to save transport order definitions in the continuous load panel.
 * Changes affecting developers:
-** Deprecate `VehicleCommAdapter.processMessage(Object)`, `VehicleCommAdapter.execute(AdapterCommads)` and related code in favor of `VehicleCommAdapter.processMessage(VehicleCommAdapterMessage)`, which provides a generic one-way communication channel to the comm adapter.
+** Deprecate `VehicleCommAdapter.processMessage(Object)`, `VehicleCommAdapter.execute(AdapterCommand)` and related code in favor of `VehicleCommAdapter.processMessage(VehicleCommAdapterMessage)`, which provides a generic one-way communication channel to the comm adapter.
 ** Deprecate `ObjectHistory.Entry.supplement` and introduce `ObjectHistory.Entry.supplements`, which allows storing multiple supplements in a list of strings.
+** Deprecate `ModelTransitionEvent.modelContentChanged`, which hasn't properly reflected model content changes for a very long time.
 ** Provide `DriveOrder` with a name, which helps with identifying and comparing `DriveOrder` instances.
    For this, introduce a new constructor `DriveOrder(String, Destination)` and deprecate `DriveOrder(Destination)`.
 ** Remove dependencies to the base API data structures in the web API data structures to ensure that they are not directly impacted by changes in the base API.

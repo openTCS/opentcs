@@ -3,6 +3,7 @@
 package org.opentcs.access;
 
 import java.io.Serializable;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Emitted when the kernel loads a model.
@@ -29,6 +30,22 @@ public class ModelTransitionEvent
   private final boolean transitionFinished;
 
   /**
+   * Creates a new instance.
+   *
+   * @param oldModelName The name of the previously loaded model.
+   * @param newModelName The name of the new model.
+   * @param transitionFinished Whether the transition to the new model is
+   * finished, yet.
+   */
+  public ModelTransitionEvent(
+      String oldModelName,
+      String newModelName,
+      boolean transitionFinished
+  ) {
+    this(oldModelName, newModelName, true, transitionFinished);
+  }
+
+  /**
    * Creates a new TCSModelTransitionEvent.
    *
    * @param oldModelName The name of the previously loaded model.
@@ -37,7 +54,10 @@ public class ModelTransitionEvent
    * changed with the transition.
    * @param transitionFinished Whether the transition to the new model is
    * finished, yet.
+   * @deprecated Use {@link #ModelTransitionEvent(String, String, boolean)}, instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public ModelTransitionEvent(
       String oldModelName,
       String newModelName,
@@ -74,7 +94,11 @@ public class ModelTransitionEvent
    *
    * @return <code>true</code> if, and only if, the content of the model
    * actually changed with the transition.
+   * @deprecated Will be removed, as this flag has not been set to anything but <code>true</code>
+   * for quite a while.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
   public boolean hasModelContentChanged() {
     return modelContentChanged;
   }

@@ -129,10 +129,10 @@ public class StandardPlantModelService
           ? ""
           : modelCreationTO.getName();
       // Let listeners know we're in transition.
-      emitModelEvent(oldModelName, newModelName, true, false);
+      emitModelEvent(oldModelName, newModelName, false);
       plantModelManager.createPlantModelObjects(modelCreationTO);
       // Let listeners know we're done with the transition.
-      emitModelEvent(oldModelName, newModelName, true, true);
+      emitModelEvent(oldModelName, newModelName, true);
       notificationService.publishUserNotification(
           new UserNotification(
               "Kernel loaded model " + newModelName,
@@ -179,7 +179,7 @@ public class StandardPlantModelService
     }
 
     String oldModelName = getModelName();
-    emitModelEvent(oldModelName, to.getName(), true, false);
+    emitModelEvent(oldModelName, to.getName(), false);
 
     // Create the plant model
     synchronized (globalSyncObject) {
@@ -193,7 +193,7 @@ public class StandardPlantModelService
       kernel.setState(Kernel.State.OPERATING);
     }
 
-    emitModelEvent(oldModelName, to.getName(), true, true);
+    emitModelEvent(oldModelName, to.getName(), true);
     notificationService.publishUserNotification(
         new UserNotification(
             "Kernel created model " + to.getName(),
@@ -241,13 +241,11 @@ public class StandardPlantModelService
    *
    * @param oldModelName The old model name.
    * @param newModelName The new model name.
-   * @param modelContentChanged Whether the model's content actually changed.
    * @param transitionFinished Whether the transition is finished or not.
    */
   private void emitModelEvent(
       String oldModelName,
       String newModelName,
-      boolean modelContentChanged,
       boolean transitionFinished
   ) {
     requireNonNull(newModelName, "newModelName");
@@ -256,7 +254,6 @@ public class StandardPlantModelService
         new ModelTransitionEvent(
             oldModelName,
             newModelName,
-            modelContentChanged,
             transitionFinished
         )
     );
