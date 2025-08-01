@@ -214,12 +214,7 @@ public class Vehicle
     this.currentPosition = currentPosition;
     this.pose = requireNonNull(pose, "pose");
     this.energyLevel = checkInRange(energyLevel, 0, 100, "energyLevel");
-    this.loadHandlingDevices = listWithoutNullValues(
-        requireNonNull(
-            loadHandlingDevices,
-            "loadHandlingDevices"
-        )
-    );
+    this.loadHandlingDevices = requireNonNull(loadHandlingDevices, "loadHandlingDevices");
     this.envelopeKey = envelopeKey;
     this.layout = requireNonNull(layout, "layout");
   }
@@ -257,7 +252,7 @@ public class Vehicle
   public Vehicle withProperties(Map<String, String> properties) {
     return new Vehicle(
         getName(),
-        properties,
+        mapWithoutNullValues(properties),
         getHistory(),
         boundingBox,
         energyLevelThresholdSet,
@@ -283,7 +278,7 @@ public class Vehicle
   }
 
   @Override
-  public TCSObject<Vehicle> withHistoryEntry(ObjectHistory.Entry entry) {
+  public Vehicle withHistoryEntry(ObjectHistory.Entry entry) {
     return new Vehicle(
         getName(),
         getProperties(),
@@ -312,7 +307,7 @@ public class Vehicle
   }
 
   @Override
-  public TCSObject<Vehicle> withHistory(ObjectHistory history) {
+  public Vehicle withHistory(ObjectHistory history) {
     return new Vehicle(
         getName(),
         getProperties(),
@@ -673,7 +668,7 @@ public class Vehicle
         currentPosition,
         pose,
         energyLevel,
-        loadHandlingDevices,
+        listWithoutNullValues(loadHandlingDevices),
         envelopeKey,
         layout
     );
@@ -1207,7 +1202,7 @@ public class Vehicle
         procState,
         transportOrder,
         orderSequence,
-        acceptableOrderTypes,
+        setWithoutNullValues(acceptableOrderTypes),
         claimedResources,
         allocatedResources,
         state,
@@ -1238,6 +1233,8 @@ public class Vehicle
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withClaimedResources(List<Set<TCSResourceReference<?>>> claimedResources) {
+    requireNonNull(claimedResources, "claimedResources");
+
     return new Vehicle(
         getName(),
         getProperties(),
@@ -1251,7 +1248,7 @@ public class Vehicle
         transportOrder,
         orderSequence,
         acceptableOrderTypes,
-        claimedResources,
+        claimedResources.stream().map(Set::copyOf).toList(),
         allocatedResources,
         state,
         integrationLevel,
@@ -1281,6 +1278,8 @@ public class Vehicle
    * @return A copy of this object, differing in the given value.
    */
   public Vehicle withAllocatedResources(List<Set<TCSResourceReference<?>>> allocatedResources) {
+    requireNonNull(allocatedResources, "allocatedResources");
+
     return new Vehicle(
         getName(),
         getProperties(),
@@ -1295,7 +1294,7 @@ public class Vehicle
         orderSequence,
         acceptableOrderTypes,
         claimedResources,
-        allocatedResources,
+        allocatedResources.stream().map(Set::copyOf).toList(),
         state,
         integrationLevel,
         paused,

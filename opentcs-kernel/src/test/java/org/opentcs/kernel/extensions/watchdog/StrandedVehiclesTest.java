@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ public class StrandedVehiclesTest {
 
     vehicle = new Vehicle("vehicle");
 
-    transportOrder = new TransportOrder("TransportOrder", mock());
+    transportOrder = new TransportOrder("TransportOrder", List.of());
 
     parkingPoint = new Point("point").withType(Point.Type.PARK_POSITION);
     noParkingPoint = new Point("point 2").withType(Point.Type.HALT_POSITION);
@@ -207,7 +208,7 @@ public class StrandedVehiclesTest {
 
     vehicle = vehicle
         .withTransportOrder(
-            new TransportOrder("TransportOrder2", mock()).getReference()
+            new TransportOrder("TransportOrder2", List.of()).getReference()
         );
     when(objectService.fetchObjects(Vehicle.class)).thenReturn(Set.of(vehicle));
     // After the second invocation (when the vehicle is no longer in a "stranded" state), the

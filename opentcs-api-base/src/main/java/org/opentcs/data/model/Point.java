@@ -5,12 +5,9 @@ package org.opentcs.data.model;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.opentcs.data.ObjectHistory;
-import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
@@ -71,9 +68,9 @@ public class Point
     super(name);
     this.pose = new Pose(new Triple(0, 0, 0), Double.NaN);
     this.type = Type.HALT_POSITION;
-    this.incomingPaths = new HashSet<>();
-    this.outgoingPaths = new HashSet<>();
-    this.attachedLinks = new HashSet<>();
+    this.incomingPaths = Set.of();
+    this.outgoingPaths = Set.of();
+    this.attachedLinks = Set.of();
     this.occupyingVehicle = null;
     this.vehicleEnvelopes = Map.of();
     this.maxVehicleBoundingBox = new BoundingBox(1000, 1000, 1000);
@@ -98,9 +95,9 @@ public class Point
     this.pose = requireNonNull(pose, "pose");
     requireNonNull(pose.getPosition(), "A point requires a pose with a position.");
     this.type = requireNonNull(type, "type");
-    this.incomingPaths = setWithoutNullValues(requireNonNull(incomingPaths, "incomingPaths"));
-    this.outgoingPaths = setWithoutNullValues(requireNonNull(outgoingPaths, "outgoingPaths"));
-    this.attachedLinks = setWithoutNullValues(requireNonNull(attachedLinks, "attachedLinks"));
+    this.incomingPaths = requireNonNull(incomingPaths, "incomingPaths");
+    this.outgoingPaths = requireNonNull(outgoingPaths, "outgoingPaths");
+    this.attachedLinks = requireNonNull(attachedLinks, "attachedLinks");
     this.occupyingVehicle = occupyingVehicle;
     this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     this.maxVehicleBoundingBox = requireNonNull(maxVehicleBoundingBox, "maxVehicleBoundingBox");
@@ -129,7 +126,7 @@ public class Point
   public Point withProperties(Map<String, String> properties) {
     return new Point(
         getName(),
-        properties,
+        mapWithoutNullValues(properties),
         getHistory(),
         pose,
         type,
@@ -144,7 +141,7 @@ public class Point
   }
 
   @Override
-  public TCSObject<Point> withHistoryEntry(ObjectHistory.Entry entry) {
+  public Point withHistoryEntry(ObjectHistory.Entry entry) {
     return new Point(
         getName(),
         getProperties(),
@@ -162,7 +159,7 @@ public class Point
   }
 
   @Override
-  public TCSObject<Point> withHistory(ObjectHistory history) {
+  public Point withHistory(ObjectHistory history) {
     return new Point(
         getName(),
         getProperties(),
@@ -316,7 +313,7 @@ public class Point
    * @return A set of references to paths ending in this point.
    */
   public Set<TCSObjectReference<Path>> getIncomingPaths() {
-    return Collections.unmodifiableSet(incomingPaths);
+    return incomingPaths;
   }
 
   /**
@@ -332,7 +329,7 @@ public class Point
         getHistory(),
         pose,
         type,
-        incomingPaths,
+        setWithoutNullValues(incomingPaths),
         outgoingPaths,
         attachedLinks,
         occupyingVehicle,
@@ -348,7 +345,7 @@ public class Point
    * @return A set of references to paths originating in this point.
    */
   public Set<TCSObjectReference<Path>> getOutgoingPaths() {
-    return Collections.unmodifiableSet(outgoingPaths);
+    return outgoingPaths;
   }
 
   /**
@@ -365,7 +362,7 @@ public class Point
         pose,
         type,
         incomingPaths,
-        outgoingPaths,
+        setWithoutNullValues(outgoingPaths),
         attachedLinks,
         occupyingVehicle,
         vehicleEnvelopes,
@@ -380,7 +377,7 @@ public class Point
    * @return A set of links attached to this point.
    */
   public Set<Location.Link> getAttachedLinks() {
-    return Collections.unmodifiableSet(attachedLinks);
+    return attachedLinks;
   }
 
   /**
@@ -398,7 +395,7 @@ public class Point
         type,
         incomingPaths,
         outgoingPaths,
-        attachedLinks,
+        setWithoutNullValues(attachedLinks),
         occupyingVehicle,
         vehicleEnvelopes,
         maxVehicleBoundingBox,

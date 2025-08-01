@@ -7,12 +7,10 @@ import static java.util.Objects.requireNonNull;
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import org.opentcs.data.ObjectHistory;
-import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 
@@ -58,14 +56,12 @@ public class Location
    */
   private final PeripheralInformation peripheralInformation;
   /**
-   * The information regarding the grahical representation of this location.
+   * The information regarding the graphical representation of this location.
    */
   private final Layout layout;
 
   /**
    * Creates a new Location.
-   *
-   * this.locked = false;
    *
    * @param name The new location's name.
    * @param type The new location's type.
@@ -74,7 +70,7 @@ public class Location
     super(name);
     this.type = requireNonNull(type, "type");
     this.position = new Triple(0, 0, 0);
-    this.attachedLinks = new HashSet<>();
+    this.attachedLinks = Set.of();
     this.locked = false;
     this.peripheralInformation = new PeripheralInformation();
     this.layout = new Layout();
@@ -94,7 +90,7 @@ public class Location
     super(name, properties, history);
     this.type = requireNonNull(locationType, "locationType");
     this.position = requireNonNull(position, "position");
-    this.attachedLinks = new HashSet<>(requireNonNull(attachedLinks, "attachedLinks"));
+    this.attachedLinks = requireNonNull(attachedLinks, "attachedLinks");
     this.locked = locked;
     this.peripheralInformation = requireNonNull(peripheralInformation, "peripheralInformation");
     this.layout = requireNonNull(layout, "layout");
@@ -119,7 +115,7 @@ public class Location
   public Location withProperties(Map<String, String> properties) {
     return new Location(
         getName(),
-        properties,
+        mapWithoutNullValues(properties),
         getHistory(),
         type,
         position,
@@ -131,7 +127,7 @@ public class Location
   }
 
   @Override
-  public TCSObject<Location> withHistoryEntry(ObjectHistory.Entry entry) {
+  public Location withHistoryEntry(ObjectHistory.Entry entry) {
     return new Location(
         getName(),
         getProperties(),
@@ -146,7 +142,7 @@ public class Location
   }
 
   @Override
-  public TCSObject<Location> withHistory(ObjectHistory history) {
+  public Location withHistory(ObjectHistory history) {
     return new Location(
         getName(),
         getProperties(),
@@ -204,7 +200,7 @@ public class Location
    * @return A set of links attached to this location.
    */
   public Set<Link> getAttachedLinks() {
-    return Collections.unmodifiableSet(attachedLinks);
+    return attachedLinks;
   }
 
   /**
@@ -223,7 +219,7 @@ public class Location
         getHistory(),
         type,
         position,
-        attachedLinks,
+        setWithoutNullValues(attachedLinks),
         locked,
         peripheralInformation,
         layout
@@ -294,9 +290,9 @@ public class Location
   }
 
   /**
-   * Returns the information regarding the grahical representation of this location.
+   * Returns the information regarding the graphical representation of this location.
    *
-   * @return The information regarding the grahical representation of this location.
+   * @return The information regarding the graphical representation of this location.
    */
   public Layout getLayout() {
     return layout;
@@ -474,7 +470,7 @@ public class Location
   }
 
   /**
-   * Contains information regarding the grahical representation of a location.
+   * Contains information regarding the graphical representation of a location.
    */
   public static class Layout
       implements

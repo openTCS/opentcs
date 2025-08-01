@@ -56,8 +56,8 @@ class DriveOrderRouteAssignerTest {
     assertThat(result).isPresent();
     assertThat(result).contains(
         List.of(
-            driveOrderToA.withRoute(routeTo(pointA)),
-            driveOrderToB.withRoute(routeTo(pointB))
+            driveOrderToA.withTransportOrder(order.getReference()).withRoute(routeTo(pointA)),
+            driveOrderToB.withTransportOrder(order.getReference()).withRoute(routeTo(pointB))
         )
     );
   }

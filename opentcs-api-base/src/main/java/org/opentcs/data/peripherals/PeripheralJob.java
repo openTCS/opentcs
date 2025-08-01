@@ -10,7 +10,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
@@ -87,7 +86,7 @@ public class PeripheralJob
   ) {
     this(
         name,
-        new HashMap<>(),
+        Map.of(),
         new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(JOB_CREATED)),
         reservationToken,
         null,
@@ -142,7 +141,7 @@ public class PeripheralJob
   public PeripheralJob withProperties(Map<String, String> properties) {
     return new PeripheralJob(
         getName(),
-        properties,
+        mapWithoutNullValues(properties),
         getHistory(),
         reservationToken,
         relatedVehicle,

@@ -33,14 +33,6 @@ public abstract class TCSObject<E extends TCSObject<E>>
    */
   private final Map<String, String> properties;
   /**
-   * An unmodifiable view on this object's properties.
-   * This mainly exists for {@link #getProperties()}, as the alternative of
-   * creating ad-hoc copies or unmodifiable views can lead to performance issues
-   * related to garbage collection in situations where {@link #getProperties()}
-   * is called often.
-   */
-  private final Map<String, String> propertiesReadOnly;
-  /**
    * The name of the business object.
    */
   private final String name;
@@ -58,7 +50,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
       @Nonnull
       String objectName
   ) {
-    this(objectName, new HashMap<>(), new ObjectHistory());
+    this(objectName, Map.of(), new ObjectHistory());
   }
 
   /**
@@ -78,8 +70,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
       ObjectHistory history
   ) {
     this.name = requireNonNull(objectName, "objectName");
-    this.properties = mapWithoutNullValues(properties);
-    this.propertiesReadOnly = Collections.unmodifiableMap(this.properties);
+    this.properties = requireNonNull(properties, "properties");
     this.reference = new TCSObjectReference<>(this);
     this.history = requireNonNull(history, "history");
   }
@@ -110,7 +101,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
    */
   @Nonnull
   public Map<String, String> getProperties() {
-    return propertiesReadOnly;
+    return properties;
   }
 
   /**
@@ -220,7 +211,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
     else {
       result.put(key, value);
     }
-    return result;
+    return Collections.unmodifiableMap(result);
   }
 
   /**
@@ -236,13 +227,9 @@ public abstract class TCSObject<E extends TCSObject<E>>
   protected static final <K, V> Map<K, V> mapWithoutNullValues(Map<K, V> original) {
     requireNonNull(original, "original");
 
-    Map<K, V> result = new HashMap<>();
-    for (Map.Entry<K, V> entry : original.entrySet()) {
-      if (entry.getValue() != null) {
-        result.put(entry.getKey(), entry.getValue());
-      }
-    }
-    return result;
+    return original.entrySet().stream()
+        .filter(entry -> entry.getValue() != null)
+        .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   /**
@@ -259,7 +246,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
 
     return original.stream()
         .filter(value -> value != null)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   /**
@@ -274,6 +261,6 @@ public abstract class TCSObject<E extends TCSObject<E>>
 
     return original.stream()
         .filter(value -> value != null)
-        .collect(Collectors.toSet());
+        .collect(Collectors.toUnmodifiableSet());
   }
 }

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.opentcs.data.ObjectHistory;
-import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.peripherals.PeripheralOperation;
 
@@ -61,7 +60,7 @@ public class Path
    */
   private final Map<String, Envelope> vehicleEnvelopes;
   /**
-   * The information regarding the grahical representation of this path.
+   * The information regarding the graphical representation of this path.
    */
   private final Layout layout;
 
@@ -114,12 +113,7 @@ public class Path
         Integer.MAX_VALUE,
         "maxReverseVelocity"
     );
-    this.peripheralOperations = new ArrayList<>(
-        requireNonNull(
-            peripheralOperations,
-            "peripheralOperations"
-        )
-    );
+    this.peripheralOperations = requireNonNull(peripheralOperations, "peripheralOperations");
     this.locked = locked;
     this.vehicleEnvelopes = requireNonNull(vehicleEnvelopes, "vehicleEnvelopes");
     this.layout = requireNonNull(layout, "layout");
@@ -147,7 +141,7 @@ public class Path
   public Path withProperties(Map<String, String> properties) {
     return new Path(
         getName(),
-        properties,
+        mapWithoutNullValues(properties),
         getHistory(),
         sourcePoint,
         destinationPoint,
@@ -162,7 +156,7 @@ public class Path
   }
 
   @Override
-  public TCSObject<Path> withHistoryEntry(ObjectHistory.Entry entry) {
+  public Path withHistoryEntry(ObjectHistory.Entry entry) {
     return new Path(
         getName(),
         getProperties(),
@@ -180,7 +174,7 @@ public class Path
   }
 
   @Override
-  public TCSObject<Path> withHistory(ObjectHistory history) {
+  public Path withHistory(ObjectHistory history) {
     return new Path(
         getName(),
         getProperties(),
@@ -319,7 +313,7 @@ public class Path
    * @return The peripheral operations to be performed when a vehicle travels along this path.
    */
   public List<PeripheralOperation> getPeripheralOperations() {
-    return Collections.unmodifiableList(peripheralOperations);
+    return peripheralOperations;
   }
 
   /**
@@ -341,7 +335,7 @@ public class Path
         length,
         maxVelocity,
         maxReverseVelocity,
-        peripheralOperations,
+        listWithoutNullValues(peripheralOperations),
         locked,
         vehicleEnvelopes,
         layout
@@ -410,15 +404,15 @@ public class Path
         maxReverseVelocity,
         peripheralOperations,
         locked,
-        vehicleEnvelopes,
+        mapWithoutNullValues(vehicleEnvelopes),
         layout
     );
   }
 
   /**
-   * Returns the information regarding the grahical representation of this path.
+   * Returns the information regarding the graphical representation of this path.
    *
-   * @return The information regarding the grahical representation of this path.
+   * @return The information regarding the graphical representation of this path.
    */
   public Layout getLayout() {
     return layout;
@@ -509,7 +503,7 @@ public class Path
   }
 
   /**
-   * Contains information regarding the grahical representation of a path.
+   * Contains information regarding the graphical representation of a path.
    */
   public static class Layout
       implements

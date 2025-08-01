@@ -6,12 +6,9 @@ import static java.util.Objects.requireNonNull;
 
 import java.awt.Color;
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.opentcs.data.ObjectHistory;
-import org.opentcs.data.TCSObject;
 
 /**
  * An aggregation of resources with distinct usage rules depending on the block's type.
@@ -33,7 +30,7 @@ public class Block
    */
   private final Set<TCSResourceReference<?>> members;
   /**
-   * The information regarding the grahical representation of this block.
+   * The information regarding the graphical representation of this block.
    */
   private final Layout layout;
 
@@ -45,7 +42,7 @@ public class Block
   public Block(String name) {
     super(name);
     this.type = Type.SINGLE_VEHICLE_ONLY;
-    this.members = new HashSet<>();
+    this.members = Set.of();
     this.layout = new Layout();
   }
 
@@ -59,7 +56,7 @@ public class Block
   ) {
     super(name, properties, history);
     this.type = type;
-    this.members = new HashSet<>(requireNonNull(members, "members"));
+    this.members = requireNonNull(members, "members");
     this.layout = requireNonNull(layout, "layout");
   }
 
@@ -79,7 +76,7 @@ public class Block
   public Block withProperties(Map<String, String> properties) {
     return new Block(
         getName(),
-        properties,
+        mapWithoutNullValues(properties),
         getHistory(),
         type,
         members,
@@ -88,7 +85,7 @@ public class Block
   }
 
   @Override
-  public TCSObject<Block> withHistoryEntry(ObjectHistory.Entry entry) {
+  public Block withHistoryEntry(ObjectHistory.Entry entry) {
     return new Block(
         getName(),
         getProperties(),
@@ -100,7 +97,7 @@ public class Block
   }
 
   @Override
-  public TCSObject<Block> withHistory(ObjectHistory history) {
+  public Block withHistory(ObjectHistory history) {
     return new Block(
         getName(),
         getProperties(),
@@ -112,7 +109,7 @@ public class Block
   }
 
   /**
-   * Retruns the type of this block.
+   * Returns the type of this block.
    *
    * @return The type of this block.
    */
@@ -143,7 +140,7 @@ public class Block
    * @return An unmodifiable set of all members of this block.
    */
   public Set<TCSResourceReference<?>> getMembers() {
-    return Collections.unmodifiableSet(members);
+    return members;
   }
 
   /**
@@ -158,7 +155,7 @@ public class Block
         getProperties(),
         getHistory(),
         type,
-        members,
+        setWithoutNullValues(members),
         layout
     );
   }
@@ -218,7 +215,7 @@ public class Block
   }
 
   /**
-   * Contains information regarding the grahical representation of a block.
+   * Contains information regarding the graphical representation of a block.
    */
   public static class Layout
       implements

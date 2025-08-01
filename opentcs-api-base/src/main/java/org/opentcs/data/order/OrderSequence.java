@@ -16,7 +16,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -110,7 +109,7 @@ public class OrderSequence
   public OrderSequence(String name) {
     super(
         name,
-        new HashMap<>(),
+        Map.of(),
         new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(SEQUENCE_CREATED))
     );
     this.type = OrderConstants.TYPE_NONE;
@@ -143,7 +142,7 @@ public class OrderSequence
     super(name, properties, history);
     this.type = requireNonNull(type, "type");
     this.intendedVehicle = intendedVehicle;
-    this.orders = new ArrayList<>(requireNonNull(orders, "orders"));
+    this.orders = requireNonNull(orders, "orders");
     this.creationTime = requireNonNull(creationTime, "creationTime");
     this.finishedIndex = finishedIndex;
     this.complete = complete;
@@ -176,7 +175,7 @@ public class OrderSequence
   public OrderSequence withProperties(Map<String, String> properties) {
     return new OrderSequence(
         getName(),
-        properties,
+        mapWithoutNullValues(properties),
         getHistory(),
         type,
         intendedVehicle,
@@ -192,7 +191,7 @@ public class OrderSequence
   }
 
   @Override
-  public TCSObject<OrderSequence> withHistoryEntry(ObjectHistory.Entry entry) {
+  public OrderSequence withHistoryEntry(ObjectHistory.Entry entry) {
     return new OrderSequence(
         getName(),
         getProperties(),
@@ -211,7 +210,7 @@ public class OrderSequence
   }
 
   @Override
-  public TCSObject<OrderSequence> withHistory(ObjectHistory history) {
+  public OrderSequence withHistory(ObjectHistory history) {
     return new OrderSequence(
         getName(),
         getProperties(),
@@ -269,7 +268,7 @@ public class OrderSequence
    * @return The list of orders making up this sequence.
    */
   public List<TCSObjectReference<TransportOrder>> getOrders() {
-    return Collections.unmodifiableList(orders);
+    return orders;
   }
 
   /**
@@ -288,7 +287,7 @@ public class OrderSequence
         historyForAppendedOrder(order),
         type,
         intendedVehicle,
-        ordersWithAppended(order),
+        Collections.unmodifiableList(ordersWithAppended(order)),
         creationTime,
         finishedIndex,
         complete,

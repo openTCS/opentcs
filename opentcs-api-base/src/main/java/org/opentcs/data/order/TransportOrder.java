@@ -7,14 +7,12 @@ import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_CREATED;
 import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_DRIVE_ORDER_FINISHED;
 import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_PROCESSING_VEHICLE_CHANGED;
 import static org.opentcs.data.order.TransportOrderHistoryCodes.ORDER_REACHED_FINAL_STATE;
+import static org.opentcs.util.Assertions.checkArgument;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -121,14 +119,17 @@ public class TransportOrder
    * @param driveOrders A list of drive orders to be processed when processing this transport
    * order.
    */
+  @SuppressWarnings("this-escape")
   public TransportOrder(String name, List<DriveOrder> driveOrders) {
     super(
         name,
-        new HashMap<>(),
+        Map.of(),
         new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(ORDER_CREATED))
     );
     this.type = OrderConstants.TYPE_NONE;
-    this.driveOrders = requireNonNull(driveOrders, "driveOrders");
+    this.driveOrders = requireNonNull(driveOrders, "driveOrders").stream()
+        .map(driveOrder -> driveOrder.withTransportOrder(this.getReference()))
+        .toList();
     this.peripheralReservationToken = null;
     this.currentDriveOrderIndex = -1;
     this.currentRouteStepIndex = ROUTE_STEP_INDEX_DEFAULT;
@@ -140,18 +141,9 @@ public class TransportOrder
     this.finishedTime = Instant.MAX;
     this.dispensable = false;
     this.wrappingSequence = null;
-    this.dependencies = new LinkedHashSet<>();
+    this.dependencies = Set.of();
   }
 
-  /**
-   * Creates a new TransportOrder.
-   *
-   * @param objectID This transport order's ID.
-   * @param name This transport order's name.
-   * @param destinations A list of destinations that are to be travelled to
-   * when processing this transport order.
-   * @param creationTime The creation time stamp to be set.
-   */
   private TransportOrder(
       String name,
       Map<String, String> properties,
@@ -174,13 +166,7 @@ public class TransportOrder
     super(name, properties, history);
 
     this.type = requireNonNull(type, "type");
-
-    requireNonNull(driveOrders, "driveOrders");
-    this.driveOrders = new ArrayList<>(driveOrders.size());
-    for (DriveOrder driveOrder : driveOrders) {
-      this.driveOrders.add(driveOrder.withTransportOrder(this.getReference()));
-    }
-
+    this.driveOrders = requireNonNull(driveOrders, "driveOrders");
     this.peripheralReservationToken = peripheralReservationToken;
     this.currentDriveOrderIndex = currentDriveOrderIndex;
     this.currentRouteStepIndex = currentRouteStepIndex;
@@ -222,7 +208,7 @@ public class TransportOrder
   public TransportOrder withProperties(Map<String, String> properties) {
     return new TransportOrder(
         getName(),
-        properties,
+        mapWithoutNullValues(properties),
         getHistory(),
         type,
         driveOrders,
@@ -613,7 +599,7 @@ public class TransportOrder
         deadline,
         dispensable,
         wrappingSequence,
-        dependencies,
+        setWithoutNullValues(dependencies),
         processingVehicle,
         state,
         finishedTime
@@ -627,11 +613,9 @@ public class TransportOrder
    */
   @Nonnull
   public List<DriveOrder> getPastDriveOrders() {
-    List<DriveOrder> result = new ArrayList<>();
-    for (int i = 0; i < currentDriveOrderIndex; i++) {
-      result.add(driveOrders.get(i));
-    }
-    return result;
+    return (currentDriveOrderIndex < 0)
+        ? List.of()
+        : driveOrders.subList(0, currentDriveOrderIndex);
   }
 
   /**
@@ -641,11 +625,9 @@ public class TransportOrder
    */
   @Nonnull
   public List<DriveOrder> getFutureDriveOrders() {
-    List<DriveOrder> result = new ArrayList<>();
-    for (int i = currentDriveOrderIndex + 1; i < driveOrders.size(); i++) {
-      result.add(driveOrders.get(i));
-    }
-    return result;
+    return (currentDriveOrderIndex + 1 >= driveOrders.size())
+        ? List.of()
+        : driveOrders.subList(currentDriveOrderIndex + 1, driveOrders.size());
   }
 
   /**
@@ -659,12 +641,15 @@ public class TransportOrder
       List<DriveOrder> driveOrders
   ) {
     requireNonNull(driveOrders, "driveOrders");
+
     return new TransportOrder(
         getName(),
         getProperties(),
         getHistory(),
         type,
-        driveOrders,
+        driveOrders.stream()
+            .map(driveOrder -> driveOrder.withTransportOrder(this.getReference()))
+            .toList(),
         peripheralReservationToken,
         currentDriveOrderIndex,
         currentRouteStepIndex,
@@ -703,7 +688,7 @@ public class TransportOrder
    */
   @Nonnull
   public List<DriveOrder> getAllDriveOrders() {
-    return new ArrayList<>(driveOrders);
+    return driveOrders;
   }
 
   /**
@@ -835,18 +820,21 @@ public class TransportOrder
   ) {
     requireNonNull(driveOrderState, "driveOrderState");
 
-    List<DriveOrder> newDriveOrders = new ArrayList<>(this.driveOrders);
-    newDriveOrders.set(
-        currentDriveOrderIndex,
-        newDriveOrders.get(currentDriveOrderIndex).withState(driveOrderState)
-    );
+    DriveOrder currentDriveOrder = getCurrentDriveOrder();
+    checkArgument(currentDriveOrder != null, "There is no current drive order");
 
     return new TransportOrder(
         getName(),
         getProperties(),
         historyForNewDriveOrderState(driveOrderState),
         type,
-        newDriveOrders,
+        driveOrders.stream()
+            .map(
+                driveOrder -> driveOrder == currentDriveOrder
+                    ? driveOrder.withState(driveOrderState)
+                    : driveOrder
+            )
+            .toList(),
         peripheralReservationToken,
         currentDriveOrderIndex,
         currentRouteStepIndex,

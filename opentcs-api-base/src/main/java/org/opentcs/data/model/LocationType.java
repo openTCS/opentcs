@@ -5,7 +5,6 @@ package org.opentcs.data.model;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.opentcs.data.ObjectHistory;
@@ -30,7 +29,7 @@ public class LocationType
    */
   private final List<String> allowedPeripheralOperations;
   /**
-   * The information regarding the grahical representation of this location type.
+   * The information regarding the graphical representation of this location type.
    */
   private final Layout layout;
 
@@ -55,19 +54,9 @@ public class LocationType
       Layout layout
   ) {
     super(name, properties, history);
-    this.allowedOperations = listWithoutNullValues(
-        requireNonNull(
-            allowedOperations,
-            "allowedOperations"
-        )
-    );
+    this.allowedOperations = requireNonNull(allowedOperations, "allowedOperations");
     this.allowedPeripheralOperations
-        = listWithoutNullValues(
-            requireNonNull(
-                allowedPeripheralOperations,
-                "allowedPeripheralOperations"
-            )
-        );
+        = requireNonNull(allowedPeripheralOperations, "allowedPeripheralOperations");
     this.layout = requireNonNull(layout, "layout");
   }
 
@@ -87,7 +76,7 @@ public class LocationType
   public LocationType withProperties(Map<String, String> properties) {
     return new LocationType(
         getName(),
-        properties,
+        mapWithoutNullValues(properties),
         getHistory(),
         allowedOperations,
         allowedPeripheralOperations,
@@ -96,7 +85,7 @@ public class LocationType
   }
 
   @Override
-  public TCSObject<LocationType> withHistoryEntry(ObjectHistory.Entry entry) {
+  public LocationType withHistoryEntry(ObjectHistory.Entry entry) {
     return new LocationType(
         getName(),
         getProperties(),
@@ -108,7 +97,7 @@ public class LocationType
   }
 
   @Override
-  public TCSObject<LocationType> withHistory(ObjectHistory history) {
+  public LocationType withHistory(ObjectHistory history) {
     return new LocationType(
         getName(),
         getProperties(),
@@ -125,7 +114,7 @@ public class LocationType
    * @return A set of operations allowed with locations of this type.
    */
   public List<String> getAllowedOperations() {
-    return Collections.unmodifiableList(allowedOperations);
+    return allowedOperations;
   }
 
   /**
@@ -151,7 +140,7 @@ public class LocationType
         getName(),
         getProperties(),
         getHistory(),
-        allowedOperations,
+        listWithoutNullValues(allowedOperations),
         allowedPeripheralOperations,
         layout
     );
@@ -163,7 +152,7 @@ public class LocationType
    * @return A set of peripheral operations allowed with locations of this type.
    */
   public List<String> getAllowedPeripheralOperations() {
-    return Collections.unmodifiableList(allowedPeripheralOperations);
+    return allowedPeripheralOperations;
   }
 
   /**
@@ -178,15 +167,15 @@ public class LocationType
         getProperties(),
         getHistory(),
         allowedOperations,
-        allowedPeripheralOperations,
+        listWithoutNullValues(allowedPeripheralOperations),
         layout
     );
   }
 
   /**
-   * Returns the information regarding the grahical representation of this location type.
+   * Returns the information regarding the graphical representation of this location type.
    *
-   * @return The information regarding the grahical representation of this location type.
+   * @return The information regarding the graphical representation of this location type.
    */
   public Layout getLayout() {
     return layout;
@@ -222,7 +211,7 @@ public class LocationType
   }
 
   /**
-   * Contains information regarding the grahical representation of a location type.
+   * Contains information regarding the graphical representation of a location type.
    */
   public static class Layout
       implements
