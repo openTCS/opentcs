@@ -1,0 +1,152 @@
+{
+  "currentObjectState" : {
+    "name" : "vehicle-1",
+    "properties" : {
+      "key-1" : "value-1",
+      "key-2" : "value-2"
+    },
+    "history" : {
+      "entries" : [ {
+        "timestamp" : "2025-07-22T12:03:00Z",
+        "eventCode" : "event-code-1",
+        "supplements" : [ "supplement-1", "supplement-2" ]
+      } ]
+    },
+    "boundingBox" : {
+      "length" : 1,
+      "width" : 2,
+      "height" : 3,
+      "referenceOffset" : {
+        "x" : 4,
+        "y" : 5
+      }
+    },
+    "energyLevelThresholdSet" : {
+      "energyLevelCritical" : 1,
+      "energyLevelGood" : 2,
+      "energyLevelFullyRecharged" : 4,
+      "energyLevelSufficientlyRecharged" : 3
+    },
+    "energyLevel" : 42,
+    "maxVelocity" : 200,
+    "maxReverseVelocity" : 100,
+    "rechargeOperation" : "recharge-operation",
+    "loadHandlingDevices" : [ {
+      "label" : "lhd-1",
+      "full" : true
+    } ],
+    "state" : {
+      "state" : "IDLE",
+      "timestamp" : "2025-07-22T12:03:00Z"
+    },
+    "procState" : {
+      "procState" : "IDLE",
+      "timestamp" : "2025-07-22T12:03:00Z"
+    },
+    "integrationLevel" : "TO_BE_UTILIZED",
+    "paused" : true,
+    "transportOrder" : "transport-order-1",
+    "orderSequence" : "order-sequence-1",
+    "acceptableOrderTypes" : [ {
+      "name" : "acceptable-order-type-1",
+      "priority" : 2
+    }, {
+      "name" : "acceptable-order-type-2",
+      "priority" : 5
+    } ],
+    "claimedResources" : [ [ "resource-1", "resource-2" ] ],
+    "allocatedResources" : [ [ "resource-3", "resource-4" ], [ "resource-5", "resource-6" ] ],
+    "currentPosition" : "position-1",
+    "pose" : {
+      "position" : {
+        "x" : 1,
+        "y" : 2,
+        "z" : 3
+      },
+      "orientationAngle" : 4.5
+    },
+    "envelopeKey" : "envelope-key-1",
+    "layout" : {
+      "routeColor" : {
+        "red" : 60,
+        "green" : 20,
+        "blue" : 40
+      }
+    }
+  },
+  "previousObjectState" : {
+    "name" : "vehicle-1",
+    "properties" : {
+      "key-1" : "value-1",
+      "key-2" : "value-2"
+    },
+    "history" : {
+      "entries" : [ {
+        "timestamp" : "2025-07-22T12:03:00Z",
+        "eventCode" : "event-code-1",
+        "supplements" : [ "supplement-1", "supplement-2" ]
+      } ]
+    },
+    "boundingBox" : {
+      "length" : 1,
+      "width" : 2,
+      "height" : 3,
+      "referenceOffset" : {
+        "x" : 4,
+        "y" : 5
+      }
+    },
+    "energyLevelThresholdSet" : {
+      "energyLevelCritical" : 1,
+      "energyLevelGood" : 2,
+      "energyLevelFullyRecharged" : 4,
+      "energyLevelSufficientlyRecharged" : 3
+    },
+    "energyLevel" : 42,
+    "maxVelocity" : 200,
+    "maxReverseVelocity" : 100,
+    "rechargeOperation" : "recharge-operation",
+    "loadHandlingDevices" : [ {
+      "label" : "lhd-1",
+      "full" : true
+    } ],
+    "state" : {
+      "state" : "IDLE",
+      "timestamp" : "2025-07-22T12:03:00Z"
+    },
+    "procState" : {
+      "procState" : "IDLE",
+      "timestamp" : "2025-07-22T12:03:00Z"
+    },
+    "integrationLevel" : "TO_BE_RESPECTED",
+    "paused" : true,
+    "transportOrder" : "transport-order-1",
+    "orderSequence" : "order-sequence-1",
+    "acceptableOrderTypes" : [ {
+      "name" : "acceptable-order-type-1",
+      "priority" : 2
+    }, {
+      "name" : "acceptable-order-type-2",
+      "priority" : 5
+    } ],
+    "claimedResources" : [ [ "resource-1", "resource-2" ] ],
+    "allocatedResources" : [ [ "resource-3", "resource-4" ], [ "resource-5", "resource-6" ] ],
+    "currentPosition" : "position-1",
+    "pose" : {
+      "position" : {
+        "x" : 1,
+        "y" : 2,
+        "z" : 3
+      },
+      "orientationAngle" : 4.5
+    },
+    "envelopeKey" : "envelope-key-1",
+    "layout" : {
+      "routeColor" : {
+        "red" : 60,
+        "green" : 20,
+        "blue" : 40
+      }
+    }
+  }
+}

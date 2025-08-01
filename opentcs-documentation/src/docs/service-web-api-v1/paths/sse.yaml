@@ -1,0 +1,731 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /sse:
+    get:
+      tags:
+        - Server-Sent Events - Connection
+      summary: Establishes a Server-Sent Events connection.
+      description: >-
+        Sends a stream of events. The types of events sent can be selected via query parameters.
+
+        The respective event data is described in separate endpoints below.
+      parameters:
+        - name: /events/vehicles
+          in: query
+          description: >-
+            Whether or not events of this type are to be sent.
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: /events/transportOrders
+          in: query
+          description: >-
+            Whether or not events of this type are to be sent.
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: /events/orderSequences
+          in: query
+          description: >-
+            Whether or not events of this type are to be sent.
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: /events/peripheralJobs
+          in: query
+          description: >-
+            Whether or not events of this type are to be sent.
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Connection closed properly by client or server.
+  /sse::/events/vehicles:
+    get:
+      tags:
+        - Server-Sent Events - Named Events
+      summary: Describes a change of a vehicle.
+      responses:
+        default:
+          description: The event content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VehicleEvent"
+  /sse::/events/transportOrders:
+    get:
+      tags:
+        - Server-Sent Events - Named Events
+      summary: Describes a change of a transport order.
+      responses:
+        default:
+          description: The event content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransportOrderEvent"
+  /sse::/events/orderSequences:
+    get:
+      tags:
+        - Server-Sent Events - Named Events
+      summary: Describes a change of an order sequence.
+      responses:
+        default:
+          description: The event content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderSequenceEvent"
+  /sse::/events/peripheralJobs:
+    get:
+      tags:
+        - Server-Sent Events - Named Events
+      summary: Describes a change of a peripheral job.
+      responses:
+        default:
+          description: The event content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeripheralJobEvent"
+components:
+  schemas:
+    # Schemas for vehicles
+    VehicleEvent:
+      allOf:
+        - $ref: '#/components/schemas/TCSObjectEvent'
+      properties:
+        currentObjectState:
+          $ref: '#/components/schemas/Vehicle'
+        previousObjectState:
+          $ref: '#/components/schemas/Vehicle'
+    Vehicle:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        history:
+          $ref: '#/components/schemas/ObjectHistory'
+        boundingBox:
+          $ref: '#/components/schemas/BoundingBox'
+        energyLevelThresholdSet:
+          $ref: '#/components/schemas/EnergyLevelThresholdSet'
+        energyLevel:
+          type: integer
+          minimum: 0
+          maximum: 100
+        maxVelocity:
+          type: integer
+          minimum: 0
+          maximum: 2147483647
+        maxReverseVelocity:
+          type: integer
+          minimum: 0
+          maximum: 2147483647
+        rechargeOperation:
+          type: string
+        loadHandlingDevices:
+          type: array
+          items:
+            $ref: '#/components/schemas/LoadHandlingDevice'
+        state:
+          $ref: '#/components/schemas/TimestampedVehicleState'
+        procState:
+          $ref: '#/components/schemas/TimestampedVehicleProcState'
+        integrationLevel:
+          $ref: '#/components/schemas/VehicleIntegrationLevel'
+        paused:
+          type: boolean
+        transportOrder:
+          type: string
+          nullable: true
+        orderSequence:
+          type: string
+          nullable: true
+        acceptableOrderTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AcceptableOrderType'
+        claimedResources:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        allocatedResources:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        currentPosition:
+          type: string
+          nullable: true
+        pose:
+          $ref: '#/components/schemas/Pose'
+        envelopeKey:
+          type: string
+          nullable: true
+        layout:
+          $ref: '#/components/schemas/VehicleLayout'
+      required:
+        - name
+        - properties
+        - history
+        - boundingBox
+        - energyLevelThresholdSet
+        - energyLevel
+        - maxVelocity
+        - maxReverseVelocity
+        - rechargeOperation
+        - loadHandlingDevices
+        - state
+        - procState
+        - integrationLevel
+        - paused
+        - transportOrder
+        - orderSequence
+        - acceptableOrderTypes
+        - claimedResources
+        - allocatedResources
+        - currentPosition
+        - pose
+        - envelopeKey
+        - layout
+    BoundingBox:
+      type: object
+      properties:
+        length:
+          type: integer
+          minimum: 1
+          maximum: 9223372036854775807
+        width:
+          type: integer
+          minimum: 1
+          maximum: 9223372036854775807
+        height:
+          type: integer
+          minimum: 1
+          maximum: 9223372036854775807
+        referenceOffset:
+          $ref: '#/components/schemas/Couple'
+      required:
+        - length
+        - width
+        - height
+        - referenceOffset
+    Couple:
+      type: object
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+      required:
+        - x
+        - y
+    EnergyLevelThresholdSet:
+      type: object
+      properties:
+        energyLevelCritical:
+          type: integer
+          minimum: 0
+          maximum: 100
+        energyLevelGood:
+          type: integer
+          minimum: 0
+          maximum: 100
+        energyLevelFullyRecharged:
+          type: integer
+          minimum: 0
+          maximum: 100
+        energyLevelSufficientlyRecharged:
+          type: integer
+          minimum: 0
+          maximum: 100
+      required:
+        - energyLevelCritical
+        - energyLevelGood
+        - energyLevelFullyRecharged
+        - energyLevelSufficientlyRecharged
+    LoadHandlingDevice:
+      type: object
+      properties:
+        label:
+          type: string
+        full:
+          type: boolean
+      required:
+        - label
+        - full
+    AcceptableOrderType:
+      type: object
+      properties:
+        name:
+          type: string
+        priority:
+          type: integer
+      required:
+        - name
+        - priority
+    Pose:
+      type: object
+      properties:
+        position:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/Triple'
+        orientationAngle:
+          type: number
+          minimum: -360
+          maximum: 360
+      required:
+        - position
+        - orientationAngle
+    Triple:
+      type: object
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+        z:
+          type: integer
+      required:
+        - x
+        - y
+        - z
+    TimestampedVehicleState:
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+            - UNKNOWN
+            - UNAVAILABLE
+            - ERROR
+            - IDLE
+            - EXECUTING
+            - CHARGING
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - state
+        - timestamp
+    VehicleIntegrationLevel:
+      type: string
+      enum:
+        - TO_BE_IGNORED
+        - TO_BE_NOTICED
+        - TO_BE_RESPECTED
+        - TO_BE_UTILIZED
+    TimestampedVehicleProcState:
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+            - IDLE
+            - AWAITING_ORDER
+            - PROCESSING_ORDER
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - state
+        - timestamp
+    VehicleLayout:
+      type: object
+      properties:
+        routeColor:
+          $ref: "#/components/schemas/Color"
+      required:
+        - routeColor
+    Color:
+        type: object
+        properties:
+            red:
+              type: integer
+              minimum: 0
+              maximum: 255
+            green:
+              type: integer
+              minimum: 0
+              maximum: 255
+            blue:
+              type: integer
+              minimum: 0
+              maximum: 255
+        required:
+            - red
+            - green
+            - blue
+    # Schemas for transport orders
+    TransportOrderEvent:
+      allOf:
+        - $ref: '#/components/schemas/TCSObjectEvent'
+      properties:
+        currentObjectState:
+          $ref: '#/components/schemas/TransportOrder'
+        previousObjectState:
+          $ref: '#/components/schemas/TransportOrder'
+    TransportOrder:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        history:
+          $ref: '#/components/schemas/ObjectHistory'
+        type:
+          type: string
+        dependencies:
+          type: array
+          items:
+            type: string
+        driveOrders:
+          type: array
+          items:
+            $ref: '#/components/schemas/DriveOrder'
+        peripheralReservationToken:
+          type: string
+          nullable: true
+        currentDriveOrderIndex:
+          type: integer
+        currentRouteStepIndex:
+          type: integer
+        state:
+          $ref: '#/components/schemas/TransportOrderState'
+        creationTime:
+          type: string
+          format: date-time
+        deadline:
+          type: string
+          format: date-time
+        finishedTime:
+          type: string
+          format: date-time
+        intendedVehicle:
+          type: string
+          nullable: true
+        processingVehicle:
+          type: string
+          nullable: true
+        wrappingSequence:
+          type: string
+          nullable: true
+        dispensable:
+          type: boolean
+      required:
+        - name
+        - properties
+        - history
+        - type
+        - driveOrders
+        - peripheralReservationToken
+        - currentDriveOrderIndex
+        - currentRouteStepIndex
+        - creationTime
+        - intendedVehicle
+        - deadline
+        - dispensable
+        - wrappingSequence
+        - dependencies
+        - processingVehicle
+        - state
+        - finishedTime
+    DriveOrder:
+      type: object
+      properties:
+        name:
+          type: string
+        destination:
+          $ref: '#/components/schemas/DriveOrderDestination'
+        transportOrder:
+          type: string
+        route:
+          $ref: '#/components/schemas/Route'
+        state:
+          $ref: '#/components/schemas/DriveOrderState'
+      required:
+        - name
+        - destination
+        - transportOrder
+        - route
+        - state
+    DriveOrderDestination:
+      type: object
+      properties:
+        destination:
+          type: string
+        operation:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+        - destination
+        - operation
+        - properties
+    Route:
+      type: object
+      properties:
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteStep'
+        costs:
+          type: integer
+          format: int64
+      required:
+        - steps
+        - costs
+    RouteStep:
+      type: object
+      properties:
+        path:
+          type: string
+        sourcePoint:
+          type: string
+        destinationPoint:
+          type: string
+        vehicleOrientation:
+          type: string
+          enum: [ FORWARD, BACKWARD, UNDEFINED ]
+        routeIndex:
+          type: integer
+        costs:
+          type: integer
+          format: int64
+        executionAllowed:
+          type: boolean
+        reroutingType:
+          type: string
+          nullable: true
+          enum: [ REGULAR, FORCED]
+      required:
+        - path
+        - sourcePoint
+        - destinationPoint
+        - vehicleOrientation
+        - routeIndex
+        - costs
+        - executionAllowed
+        - reroutingType
+    TransportOrderState:
+      type: string
+      enum:
+        - RAW
+        - ACTIVE
+        - DISPATCHABLE
+        - BEING_PROCESSED
+        - WITHDRAWN
+        - FINISHED
+        - FAILED
+        - UNROUTABLE
+    DriveOrderState:
+      type: string
+      enum:
+        - PRISTINE
+        - TRAVELLING
+        - OPERATING
+        - FINISHED
+        - FAILED
+    # Schemas for order sequences
+    OrderSequenceEvent:
+      allOf:
+        - $ref: '#/components/schemas/TCSObjectEvent'
+      properties:
+        currentObjectState:
+          $ref: '#/components/schemas/OrderSequence'
+        previousObjectState:
+          $ref: '#/components/schemas/OrderSequence'
+    OrderSequence:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        history:
+          $ref: '#/components/schemas/ObjectHistory'
+        type:
+          type: string
+        orders:
+          type: array
+          items:
+            type: string
+        finishedIndex:
+          type: integer
+        complete:
+          type: boolean
+        finished:
+          type: boolean
+        failureFatal:
+          type: boolean
+        intendedVehicle:
+          type: string
+          nullable: true
+        processingVehicle:
+          type: string
+          nullable: true
+        creationTime:
+          type: string
+          format: date-time
+        finishedTime:
+          type: string
+          format: date-time
+      required:
+        - name
+        - properties
+        - history
+        - type
+        - orders
+        - finishedIndex
+        - complete
+        - finished
+        - failureFatal
+        - intendedVehicle
+        - processingVehicle
+        - creationTime
+        - finishedTime
+    # Schemas for peripheral jobs
+    PeripheralJobEvent:
+      allOf:
+        - $ref: '#/components/schemas/TCSObjectEvent'
+      properties:
+        currentObjectState:
+          $ref: '#/components/schemas/PeripheralJob'
+        previousObjectState:
+          $ref: '#/components/schemas/PeripheralJob'
+    PeripheralJob:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        history:
+          $ref: '#/components/schemas/ObjectHistory'
+        reservationToken:
+          type: string
+          minLength: 1
+        relatedVehicle:
+          type: string
+          nullable: true
+        relatedTransportOrder:
+          type: string
+          nullable: true
+        peripheralOperation:
+          $ref: '#/components/schemas/PeripheralOperation'
+        state:
+          $ref: '#/components/schemas/PeripheralJobState'
+        creationTime:
+          type: string
+          format: date-time
+        finishedTime:
+          type: string
+          format: date-time
+      required:
+        - name
+        - properties
+        - history
+        - reservationToken
+        - relatedVehicle
+        - relatedTransportOrder
+        - peripheralOperation
+        - state
+        - creationTime
+        - finishedTime
+    PeripheralOperation:
+      type: object
+      properties:
+        location:
+          type: string
+        operation:
+          type: string
+        executionTrigger:
+          $ref: '#/components/schemas/PeripheralOperationExecutionTrigger'
+        completionRequired:
+          type: boolean
+      required:
+        - location
+        - operation
+        - executionTrigger
+        - completionRequired
+    PeripheralOperationExecutionTrigger:
+      type: string
+      enum:
+        - IMMEDIATE
+        - AFTER_ALLOCATION
+        - AFTER_MOVEMENT
+    PeripheralJobState:
+      type: string
+      enum:
+        - TO_BE_PROCESSED
+        - BEING_PROCESSED
+        - FINISHED
+        - FAILED
+    # Common schemas
+    TCSObjectEvent:
+      type: object
+      description: >-
+        For events of this type, either `currentObjectState` or `previousObjectState` may be `null`, but both cannot be `null` at the same time.
+        `previousObjectState` is `null` if the corresponding object was created.
+        `currentObjectState` is `null` if the corresponding object was deleted.
+        If an objects was merely modified, both `currentObjectState` and `previousObjectState` are not `null`.
+      properties:
+        currentObjectState:
+          type: object
+          nullable: true
+        previousObjectState:
+          type: object
+          nullable: true
+      required:
+        - currentObjectState
+        - previousObjectState
+    ObjectHistory:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectHistoryEntry'
+      required:
+        - entries
+    ObjectHistoryEntry:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        eventCode:
+          type: string
+        supplements:
+          type: array
+          items:
+            type: string
+      required:
+        - timestamp
+        - eventCode
+        - supplements

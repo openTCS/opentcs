@@ -1,0 +1,75 @@
+{
+  "name" : "vehicle-1",
+  "properties" : {
+    "key-1" : "value-1",
+    "key-2" : "value-2"
+  },
+  "history" : {
+    "entries" : [ {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "event-code-1",
+      "supplements" : [ "supplement-1" ]
+    } ]
+  },
+  "boundingBox" : {
+    "length" : 1,
+    "width" : 2,
+    "height" : 3,
+    "referenceOffset" : {
+      "x" : 4,
+      "y" : 5
+    }
+  },
+  "energyLevelThresholdSet" : {
+    "energyLevelCritical" : 1,
+    "energyLevelGood" : 2,
+    "energyLevelFullyRecharged" : 4,
+    "energyLevelSufficientlyRecharged" : 3
+  },
+  "energyLevel" : 42,
+  "maxVelocity" : 200,
+  "maxReverseVelocity" : 100,
+  "rechargeOperation" : "recharge-operation",
+  "loadHandlingDevices" : [ {
+    "label" : "lhd-1",
+    "full" : true
+  } ],
+  "state" : {
+    "state" : "IDLE",
+    "timestamp" : "[Timestamp]"
+  },
+  "procState" : {
+    "procState" : "IDLE",
+    "timestamp" : "[Timestamp]"
+  },
+  "integrationLevel" : "TO_BE_UTILIZED",
+  "paused" : true,
+  "transportOrder" : "transport-order-1",
+  "orderSequence" : "order-sequence-1",
+  "acceptableOrderTypes" : [ {
+    "name" : "acceptable-order-type-1",
+    "priority" : 2
+  }, {
+    "name" : "acceptable-order-type-2",
+    "priority" : 5
+  } ],
+  "claimedResources" : [ [ "point-1", "point-2" ], [ "point-3", "point-4" ] ],
+  "allocatedResources" : [ [ "point-5", "point-6" ], [ "point-7", "point-8" ] ],
+  "currentPosition" : "point-5",
+  "pose" : {
+    "position" : {
+      "x" : 1,
+      "y" : 2,
+      "z" : 3
+    },
+    "orientationAngle" : 4.5
+  },
+  "envelopeKey" : "envelope-key-1",
+  "layout" : {
+    "routeColor" : {
+      "red" : 20,
+      "green" : 40,
+      "blue" : 60
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "name" : "order-1",
+  "properties" : {
+    "key-1" : "value-1",
+    "key-2" : "value-2"
+  },
+  "history" : {
+    "entries" : [ {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "tcs:history:orderCreated",
+      "supplements" : [ ]
+    }, {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "event-code-1",
+      "supplements" : [ "supplement-1" ]
+    }, {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "tcs:history:orderReachedFinalState",
+      "supplements" : [ ]
+    }, {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "tcs:history:orderProcVehicleChanged",
+      "supplements" : [ "vehicle-2" ]
+    } ]
+  },
+  "type" : "type-1",
+  "dependencies" : [ "dependency-1", "dependency-2" ],
+  "driveOrders" : [ {
+    "name" : "drive-order-1",
+    "destination" : {
+      "destination" : "location-1",
+      "operation" : "operation-1",
+      "properties" : {
+        "key-3" : "value-3"
+      }
+    },
+    "transportOrder" : "order-1",
+    "route" : {
+      "steps" : [ {
+        "path" : "path-1-2",
+        "sourcePoint" : "point-1",
+        "destinationPoint" : "point-2",
+        "vehicleOrientation" : "FORWARD",
+        "routeIndex" : 1,
+        "costs" : 200,
+        "executionAllowed" : true,
+        "reroutingType" : null
+      }, {
+        "path" : null,
+        "sourcePoint" : null,
+        "destinationPoint" : "point-2",
+        "vehicleOrientation" : "FORWARD",
+        "routeIndex" : 2,
+        "costs" : 100,
+        "executionAllowed" : false,
+        "reroutingType" : "REGULAR"
+      } ],
+      "costs" : 300
+    },
+    "state" : "FINISHED"
+  } ],
+  "peripheralReservationToken" : "reservation-token-1",
+  "currentDriveOrderIndex" : 3,
+  "currentRouteStepIndex" : 2,
+  "state" : "FINISHED",
+  "creationTime" : "[Timestamp]",
+  "deadline" : "[Timestamp]",
+  "finishedTime" : "[Timestamp]",
+  "intendedVehicle" : "vehicle-1",
+  "processingVehicle" : "vehicle-2",
+  "wrappingSequence" : "sequence-1",
+  "dispensable" : true
+}

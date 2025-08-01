@@ -1,0 +1,54 @@
+{
+  "currentObjectState" : {
+    "name" : "job-1",
+    "properties" : {
+      "key-1" : "value-1",
+      "key-2" : "value-2"
+    },
+    "history" : {
+      "entries" : [ {
+        "timestamp" : "2025-07-22T12:03:00Z",
+        "eventCode" : "event-code-1",
+        "supplements" : [ "supplement-1", "supplement-2" ]
+      } ]
+    },
+    "reservationToken" : "reservation-token-1",
+    "relatedVehicle" : "vehicle-1",
+    "relatedTransportOrder" : "transport-order-1",
+    "peripheralOperation" : {
+      "location" : "location-1",
+      "operation" : "operation-1",
+      "executionTrigger" : "AFTER_MOVEMENT",
+      "completionRequired" : true
+    },
+    "state" : "FINISHED",
+    "creationTime" : "2025-07-22T12:03:00Z",
+    "finishedTime" : "2025-07-22T13:03:00Z"
+  },
+  "previousObjectState" : {
+    "name" : "job-1",
+    "properties" : {
+      "key-1" : "value-1",
+      "key-2" : "value-2"
+    },
+    "history" : {
+      "entries" : [ {
+        "timestamp" : "2025-07-22T12:03:00Z",
+        "eventCode" : "event-code-1",
+        "supplements" : [ "supplement-1", "supplement-2" ]
+      } ]
+    },
+    "reservationToken" : "reservation-token-1",
+    "relatedVehicle" : "vehicle-1",
+    "relatedTransportOrder" : "transport-order-1",
+    "peripheralOperation" : {
+      "location" : "location-1",
+      "operation" : "operation-1",
+      "executionTrigger" : "AFTER_MOVEMENT",
+      "completionRequired" : true
+    },
+    "state" : "BEING_PROCESSED",
+    "creationTime" : "2025-07-22T12:03:00Z",
+    "finishedTime" : "2025-07-22T13:03:00Z"
+  }
+}

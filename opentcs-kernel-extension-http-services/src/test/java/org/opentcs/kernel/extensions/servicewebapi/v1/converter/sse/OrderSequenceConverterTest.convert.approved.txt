@@ -1,0 +1,48 @@
+{
+  "name" : "sequence-1",
+  "properties" : {
+    "key-1" : "value-1",
+    "key-2" : "value-2"
+  },
+  "history" : {
+    "entries" : [ {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "tcs:history:sequenceCreated",
+      "supplements" : [ ]
+    }, {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "event-code-1",
+      "supplements" : [ "supplement-1" ]
+    }, {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "tcs:history:sequenceOrderAppended",
+      "supplements" : [ "order-1" ]
+    }, {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "tcs:history:sequenceOrderAppended",
+      "supplements" : [ "order-2" ]
+    }, {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "tcs:history:sequenceCompleted",
+      "supplements" : [ ]
+    }, {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "tcs:history:sequenceFinished",
+      "supplements" : [ ]
+    }, {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "tcs:history:sequenceProcVehicleChanged",
+      "supplements" : [ "vehicle-2" ]
+    } ]
+  },
+  "type" : "type-1",
+  "orders" : [ "order-1", "order-2" ],
+  "finishedIndex" : 1,
+  "complete" : true,
+  "finished" : true,
+  "failureFatal" : true,
+  "intendedVehicle" : "vehicle-1",
+  "processingVehicle" : "vehicle-2",
+  "creationTime" : "[Timestamp]",
+  "finishedTime" : "[Timestamp]"
+}

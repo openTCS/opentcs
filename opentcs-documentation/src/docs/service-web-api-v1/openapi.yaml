@@ -41,6 +41,19 @@ tags:
     description: Working with plant models
   - name: Status
     description: Retrieving status updates
+  - name: Server-Sent Events - Connection
+    description: Receiving status updates
+  - name: Server-Sent Events - Named Events
+    description: >-
+      The following endpoints do not specify actual web API endpoints, but rather messages published by the openTCS kernel using the Server-Sent Events (SSE) technology.
+      The openTCS kernel exclusively uses named events to send messages to connected clients.
+      Each endpoint represents a named event and starts with a `/sse::` prefix, followed by the name of the corresponding event.
+      As an example, the `/sse::/events/vehicles` endpoint represents the named event `/events/vehicles`.
+      The response body of an endpoint specifies the data contained in the respective named event.
+
+
+      To avoid redundant documentation, descriptions for the properties in the response body schemas are omitted.
+      Instead, refer to the API documentation of the corresponding Java classes for detailed information on the semantics of the properties.
 security:
   - ApiKeyAuth: [ ]
 paths:
@@ -124,6 +137,16 @@ paths:
     $ref: './paths/events.yaml#/paths/~1events'
   /dispatcher/trigger:
     $ref: './paths/dispatcher.yaml#/paths/~1dispatcher~1trigger'
+  /sse:
+    $ref: './paths/sse.yaml#/paths/~1sse'
+  /sse::/events/vehicles:
+    $ref: './paths/sse.yaml#/paths/~1sse::~1events~1vehicles'
+  /sse::/events/transportOrders:
+    $ref: './paths/sse.yaml#/paths/~1sse::~1events~1transportOrders'
+  /sse::/events/orderSequences:
+    $ref: './paths/sse.yaml#/paths/~1sse::~1events~1orderSequences'
+  /sse::/events/peripheralJobs:
+    $ref: './paths/sse.yaml#/paths/~1sse::~1events~1peripheralJobs'
 components:
   securitySchemes:
     ApiKeyAuth:

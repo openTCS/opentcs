@@ -1,5 +1,8 @@
 // SPDX-FileCopyrightText: The openTCS Authors
 // SPDX-License-Identifier: MIT
+plugins {
+  alias(libs.plugins.freefair.lombok)
+}
 
 apply from: "${rootDir}/gradle/java-project.gradle"
 apply from: "${rootDir}/gradle/java-codequality.gradle"
@@ -16,6 +19,8 @@ dependencies {
   api libs.jackson.databind
   api libs.jackson.module.jsonSchema
   api libs.jackson.datatype.jsr310
+
+  api libs.modelmapper
 }
 
 task release {

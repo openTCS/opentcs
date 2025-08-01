@@ -18,6 +18,7 @@ import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.kernel.extensions.servicewebapi.v1.V1RequestHandler;
+import org.opentcs.kernel.extensions.servicewebapi.v1.V1SseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,10 @@ public class ServiceWebApi
    */
   private final V1RequestHandler v1RequestHandler;
   /**
+   * Handles connections to the Server-Sent Events API version 1.
+   */
+  private final V1SseHandler v1SseHandler;
+  /**
    * Binds JSON data to objects and vice versa.
    */
   private final JsonBinder jsonBinder;
@@ -69,6 +74,7 @@ public class ServiceWebApi
    * @param authenticator Authenticates incoming requests.
    * @param jsonBinder Binds JSON data to objects and vice versa.
    * @param v1RequestHandler Handles requests for API version 1.
+   * @param v1SseHandler Handles connections to the Server-Sent Events API version 1.
    */
   @Inject
   public ServiceWebApi(
@@ -76,13 +82,15 @@ public class ServiceWebApi
       SslParameterSet sslParamSet,
       Authenticator authenticator,
       JsonBinder jsonBinder,
-      V1RequestHandler v1RequestHandler
+      V1RequestHandler v1RequestHandler,
+      V1SseHandler v1SseHandler
   ) {
     this.configuration = requireNonNull(configuration, "configuration");
     this.sslParamSet = requireNonNull(sslParamSet, "sslParamSet");
     this.authenticator = requireNonNull(authenticator, "authenticator");
     this.jsonBinder = requireNonNull(jsonBinder, "jsonBinder");
     this.v1RequestHandler = requireNonNull(v1RequestHandler, "v1RequestHandler");
+    this.v1SseHandler = requireNonNull(v1SseHandler, "sseHandler");
   }
 
   @Override
@@ -92,6 +100,7 @@ public class ServiceWebApi
     }
 
     v1RequestHandler.initialize();
+    v1SseHandler.initialize();
 
     Consumer<JavalinConfig> config = cfg -> {
       cfg.showJavalinBanner = false;
@@ -121,6 +130,8 @@ public class ServiceWebApi
     };
 
     app = Javalin.create(config).start();
+
+    app.sse("/v1/sse", v1SseHandler::handleSseConnection);
 
     app.beforeMatched(ctx -> {
       if (!authenticator.isAuthenticated(ctx)) {
@@ -183,6 +194,7 @@ public class ServiceWebApi
       return;
     }
 
+    v1SseHandler.terminate();
     v1RequestHandler.terminate();
     app.stop();
 
@@ -193,5 +205,4 @@ public class ServiceWebApi
   public boolean isInitialized() {
     return initialized;
   }
-
 }

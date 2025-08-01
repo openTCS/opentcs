@@ -17,6 +17,7 @@ jaxb = "4.0.5"
 jgrapht-core = "1.5.2"
 jhotdraw = "7.6.20190506"
 jts-core = "1.20.0"
+modelmapper = "3.2.4"
 openapi-generator-cli = "7.13.0"
 semver4j = "5.8.0"
 slf4j = "2.0.17"
@@ -31,6 +32,7 @@ mockito = "5.18.0"
 # Plugin versions
 asciidoctor = "4.0.4"
 dependency-license-report = "2.9"
+freefair-lombok = "8.14"
 jacocolog = "3.1.0"
 openapi-generator = "7.13.0"
 gradle-nexus-publish-plugin = "2.0.0"
@@ -56,6 +58,7 @@ jaxb-runtime = { group = "org.glassfish.jaxb", name = "jaxb-runtime", version.re
 jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jgrapht-core" }
 jhotdraw = { group = "org.opentcs.thirdparty.jhotdraw", name = "jhotdraw", version.ref = "jhotdraw" }
 jts-core = { group = "org.locationtech.jts", name = "jts-core", version.ref = "jts-core" }
+modelmapper = { group = "org.modelmapper", name = "modelmapper", version.ref = "modelmapper" }
 openapi-generator-cli = { group = "org.openapitools", name = "openapi-generator-cli", version.ref = "openapi-generator-cli" }
 semver4j = { group = "org.semver4j", name = "semver4j", version.ref = "semver4j" }
 slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j" }
@@ -75,6 +78,7 @@ mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito
 asciidocor-jvm-convert = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor" }
 asciidocor-jvm-pdf = { id = "org.asciidoctor.jvm.pdf", version.ref = "asciidoctor" }
 dependency-license-report = { id = "com.github.jk1.dependency-license-report", version.ref = "dependency-license-report" }
+freefair-lombok = { id = "io.freefair.lombok", version.ref = "freefair-lombok" }
 gradle-nexus-publish-plugin = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "gradle-nexus-publish-plugin" }
 hidetake-swagger-generator = { id = "org.hidetake.swagger.generator", version.ref = "swagger-generator" }
 jacocolog = { id = "org.barfuin.gradle.jacocolog", version.ref = "jacocolog" }

@@ -1,0 +1,30 @@
+{
+  "name" : "job-1",
+  "properties" : {
+    "key-1" : "value-1",
+    "key-2" : "value-2"
+  },
+  "history" : {
+    "entries" : [ {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "tcs:history:jobCreated",
+      "supplements" : [ ]
+    }, {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "event-code-1",
+      "supplements" : [ "supplement-1" ]
+    } ]
+  },
+  "reservationToken" : "reservation-token-1",
+  "relatedVehicle" : "vehicle-1",
+  "relatedTransportOrder" : "order-1",
+  "peripheralOperation" : {
+    "location" : "location-1",
+    "operation" : "operation-1",
+    "executionTrigger" : "AFTER_MOVEMENT",
+    "completionRequired" : true
+  },
+  "state" : "FINISHED",
+  "creationTime" : "[Timestamp]",
+  "finishedTime" : "[Timestamp]"
+}
