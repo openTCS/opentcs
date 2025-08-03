@@ -134,6 +134,24 @@ public class V1RequestHandler
   public void addRoutes(Service service) {
     requireNonNull(service, "service");
 
+    service.exception(
+        IllegalArgumentException.class,
+        (exception, request, response) -> {
+          response.status(400);
+          response.type("application/json");
+          response.body("Bad request: " + exception.getMessage());
+        }
+    );
+
+    service.exception(
+        Exception.class,
+        (exception, request, response) -> {
+          response.status(500);
+          response.type("application/json");
+          response.body("Internal server error: " + exception.getMessage());
+        }
+    );
+
     service.get(
         "/events",
         this::handleGetEvents
