@@ -11,6 +11,7 @@ import java.util.Set;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.components.kernel.services.RouterService;
+import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Path;
@@ -95,6 +96,7 @@ public class PlantModelHandler {
 
   public void putPlantModel(PlantModelTO putPlantModel)
       throws ObjectUnknownException,
+        ObjectExistsException,
         IllegalArgumentException {
     requireNonNull(putPlantModel, "putPlantModel");
 

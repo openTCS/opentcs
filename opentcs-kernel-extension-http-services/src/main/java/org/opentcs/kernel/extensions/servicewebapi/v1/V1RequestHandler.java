@@ -515,6 +515,7 @@ public class V1RequestHandler
 
   private Object handlePutPlantModel(Request request, Response response)
       throws ObjectUnknownException,
+        ObjectExistsException,
         IllegalArgumentException {
     plantModelHandler.putPlantModel(jsonBinder.fromJson(request.body(), PlantModelTO.class));
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
