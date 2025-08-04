@@ -8,8 +8,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.opentcs.data.TCSObjectReference;
@@ -190,11 +188,10 @@ public class DriveOrder
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof DriveOrder)) {
+    if (!(obj instanceof DriveOrder other)) {
       return false;
     }
 
-    final DriveOrder other = (DriveOrder) obj;
     return Objects.equals(name, other.name)
         && Objects.equals(destination, other.destination)
         && Objects.equals(transportOrder, other.transportOrder);
@@ -202,7 +199,7 @@ public class DriveOrder
 
   @Override
   public int hashCode() {
-    return name.hashCode() ^ destination.hashCode() ^ transportOrder.hashCode();
+    return Objects.hash(name, destination, transportOrder);
   }
 
   @Override
@@ -268,7 +265,7 @@ public class DriveOrder
 
       this.destination = requireNonNull(destination, "destination");
       this.operation = OP_NOP;
-      this.properties = Collections.unmodifiableMap(new HashMap<>());
+      this.properties = Map.of();
     }
 
     private Destination(
@@ -281,7 +278,7 @@ public class DriveOrder
     ) {
       this.destination = requireNonNull(destination, "destination");
       this.operation = requireNonNull(operation, "operation");
-      this.properties = Collections.unmodifiableMap(new HashMap<>(properties));
+      this.properties = requireNonNull(properties, "properties");
     }
 
     /**
@@ -334,13 +331,12 @@ public class DriveOrder
      * @return A copy of this object, differing in the given value.
      */
     public Destination withProperties(Map<String, String> properties) {
-      return new Destination(destination, properties, operation);
+      return new Destination(destination, Map.copyOf(properties), operation);
     }
 
     @Override
     public boolean equals(Object o) {
-      if (o instanceof Destination) {
-        Destination other = (Destination) o;
+      if (o instanceof Destination other) {
         return destination.equals(other.destination)
             && operation.equals(other.operation)
             && properties.equals(other.properties);
@@ -352,7 +348,7 @@ public class DriveOrder
 
     @Override
     public int hashCode() {
-      return destination.hashCode() ^ operation.hashCode();
+      return Objects.hash(destination, operation);
     }
 
     @Override

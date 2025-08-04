@@ -100,11 +100,7 @@ public class UserNotification
 
   @Override
   public int hashCode() {
-    int hash = 5;
-    hash = 89 * hash + Objects.hashCode(this.text);
-    hash = 89 * hash + Objects.hashCode(this.level);
-    hash = 89 * hash + Objects.hashCode(this.timestamp);
-    return hash;
+    return Objects.hash(text, level, timestamp);
   }
 
   @Override
@@ -112,8 +108,7 @@ public class UserNotification
     if (this == o) {
       return true;
     }
-    if (o instanceof UserNotification) {
-      UserNotification other = (UserNotification) o;
+    if (o instanceof UserNotification other) {
       return Objects.equals(this.source, other.source)
           && Objects.equals(this.text, other.text)
           && Objects.equals(this.level, other.level)

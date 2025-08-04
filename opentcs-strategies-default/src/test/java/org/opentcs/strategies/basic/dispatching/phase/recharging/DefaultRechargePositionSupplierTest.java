@@ -173,7 +173,7 @@ class DefaultRechargePositionSupplierTest {
             oneOf(
                 rechargeLoc1.getReference(),
                 rechargeLoc2.getReference(),
-                rechargeLoc2.getReference()
+                rechargeLoc3.getReference()
             )
         )
     );
@@ -190,7 +190,7 @@ class DefaultRechargePositionSupplierTest {
             oneOf(
                 rechargeLoc1.getReference(),
                 rechargeLoc2.getReference(),
-                rechargeLoc2.getReference()
+                rechargeLoc3.getReference()
             )
         )
     );

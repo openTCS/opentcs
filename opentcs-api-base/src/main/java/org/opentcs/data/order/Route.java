@@ -8,8 +8,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.opentcs.data.model.Path;
@@ -50,7 +48,7 @@ public class Route
   ) {
     requireNonNull(routeSteps, "routeSteps");
     checkArgument(!routeSteps.isEmpty(), "routeSteps may not be empty");
-    steps = Collections.unmodifiableList(new ArrayList<>(routeSteps));
+    steps = List.copyOf(routeSteps);
     costs = routeCosts;
   }
 
@@ -65,8 +63,8 @@ public class Route
   ) {
     requireNonNull(routeSteps, "routeSteps");
     checkArgument(!routeSteps.isEmpty(), "routeSteps may not be empty");
-    steps = Collections.unmodifiableList(new ArrayList<>(routeSteps));
-    costs = routeSteps.stream().mapToLong(step -> step.getCosts()).sum();
+    steps = List.copyOf(routeSteps);
+    costs = routeSteps.stream().mapToLong(Step::getCosts).sum();
   }
 
   /**
@@ -98,15 +96,14 @@ public class Route
    */
   @Nonnull
   public Point getFinalDestinationPoint() {
-    return steps.get(steps.size() - 1).getDestinationPoint();
+    return steps.getLast().getDestinationPoint();
   }
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof Route)) {
+    if (!(o instanceof Route other)) {
       return false;
     }
-    final Route other = (Route) o;
     return costs == other.costs
         && Objects.equals(steps, other.steps);
   }
@@ -576,10 +573,9 @@ public class Route
 
     @Override
     public boolean equals(Object o) {
-      if (!(o instanceof Step)) {
+      if (!(o instanceof Step other)) {
         return false;
       }
-      Step other = (Step) o;
       return Objects.equals(path, other.path)
           && Objects.equals(sourcePoint, other.sourcePoint)
           && Objects.equals(destinationPoint, other.destinationPoint)

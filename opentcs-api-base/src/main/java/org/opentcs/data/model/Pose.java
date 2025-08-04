@@ -90,23 +90,17 @@ public class Pose
 
   @Override
   public int hashCode() {
-    int hash = 5;
-    hash = 47 * hash + Objects.hashCode(this.position);
-    hash = 47 * hash
-        + (int) (Double.doubleToLongBits(this.orientationAngle)
-            ^ (Double.doubleToLongBits(this.orientationAngle) >>> 32));
-    return hash;
+    return Objects.hash(position, orientationAngle);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Pose)) {
+    if (!(obj instanceof Pose other)) {
       return false;
     }
     if (this == obj) {
       return true;
     }
-    final Pose other = (Pose) obj;
     if (Double.doubleToLongBits(this.orientationAngle) != Double.doubleToLongBits(
         other.orientationAngle
     )) {

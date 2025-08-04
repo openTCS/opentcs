@@ -189,8 +189,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
    */
   @Override
   public int hashCode() {
-    return getName().hashCode()
-        ^ this.getClass().getName().hashCode();
+    return Objects.hash(getName(), getClass().getName());
   }
 
   /**

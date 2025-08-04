@@ -56,18 +56,15 @@ public class Envelope
 
   @Override
   public int hashCode() {
-    int hash = 3;
-    hash = 89 * hash + Objects.hashCode(this.vertices);
-    return hash;
+    return Objects.hash(vertices);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Envelope)) {
+    if (!(obj instanceof Envelope other)) {
       return false;
     }
 
-    Envelope other = (Envelope) obj;
     return Objects.equals(this.vertices, other.vertices);
   }
 
