@@ -318,6 +318,7 @@ public class PeripheralsPanel
     setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
 
     listPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Peripheral devices in model"));
+    listPanel.setToolTipText("");
     listPanel.setMaximumSize(new java.awt.Dimension(464, 2147483647));
     listPanel.setMinimumSize(new java.awt.Dimension(464, 425));
     listPanel.setPreferredSize(new java.awt.Dimension(464, 424));

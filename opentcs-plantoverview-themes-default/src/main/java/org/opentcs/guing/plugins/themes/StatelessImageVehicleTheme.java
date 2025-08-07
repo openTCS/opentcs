@@ -104,6 +104,6 @@ public class StatelessImageVehicleTheme
 
   @Override
   public Font labelFont() {
-    return new Font("Arial", Font.BOLD, 12);
+    return new Font("Dialog", Font.BOLD, 12);
   }
 }

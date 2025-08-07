@@ -136,7 +136,7 @@ public class SplashFrame
         panel.add(labelImage, gridBagConstraints);
 
         labelMessage.setBackground(new java.awt.Color(255, 255, 255));
-        labelMessage.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
+        labelMessage.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         labelMessage.setText(bundle.getString("splashFrame.label_message.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

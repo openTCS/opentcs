@@ -71,7 +71,7 @@ public final class TextListInputPanel
 
     setLayout(new java.awt.GridBagLayout());
 
-    messageLabel.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    messageLabel.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     messageLabel.setText("Message");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -80,7 +80,7 @@ public final class TextListInputPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(messageLabel, gridBagConstraints);
 
-    inputField.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    inputField.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     inputField.setPreferredSize(new java.awt.Dimension(70, 20));
     inputField.addFocusListener(new java.awt.event.FocusAdapter() {
       public void focusGained(java.awt.event.FocusEvent evt) {
@@ -94,7 +94,7 @@ public final class TextListInputPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(inputField, gridBagConstraints);
 
-    list.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    list.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     list.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
     jScrollPane1.setViewportView(list);
 
