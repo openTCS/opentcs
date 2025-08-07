@@ -105,6 +105,15 @@ public class ServiceWebApi
     Consumer<JavalinConfig> config = cfg -> {
       cfg.showJavalinBanner = false;
       cfg.router.apiBuilder(v1RequestHandler.createRoutes());
+      if (configuration.maxRequestBodySize() <= 0) {
+        LOG.warn(
+            "Maximum request body size must be at least 1 MB. Using default size of {} bytes.",
+            cfg.http.maxRequestSize
+        );
+      }
+      else {
+        cfg.http.maxRequestSize = configuration.maxRequestBodySize() * 1024L * 1024L;
+      }
 
       if (configuration.useSsl()) {
         cfg.registerPlugin(

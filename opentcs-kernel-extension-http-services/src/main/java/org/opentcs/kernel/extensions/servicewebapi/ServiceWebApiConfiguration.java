@@ -63,4 +63,12 @@ public interface ServiceWebApiConfiguration {
       orderKey = "5"
   )
   boolean useSsl();
+
+  @ConfigurationEntry(
+      type = "Integer",
+      description = "The maximum size (in MB) that a request body may have for it to be processed.",
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "6"
+  )
+  int maxRequestBodySize();
 }

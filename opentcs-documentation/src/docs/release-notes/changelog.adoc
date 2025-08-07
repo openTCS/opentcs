@@ -30,6 +30,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 *** Add support for Server-Sent Events (SSE) to the web API.
     As an alternative to the `GET /events` endpoint, clients can use the `GET /sse` endpoint to subscribe to events that are sent by the kernel.
 *** Use Javalin instead of Spark as the framework for the web API implementation.
+    The maximum size of request bodies can now be configured via the `servicewebapi.maxRequestBodySize` configuration entry.
 * Bugs fixed:
 ** Properly allow updates of a vehicle's acceptable order types via the `PUT /vehicles/{NAME}/acceptableOrderTypes` web API endpoint.
 ** Avoid `NullPointerException` when trying to save transport order definitions in the continuous load panel.
