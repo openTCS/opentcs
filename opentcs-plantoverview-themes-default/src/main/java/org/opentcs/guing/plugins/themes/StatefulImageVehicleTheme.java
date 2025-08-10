@@ -30,7 +30,7 @@ public class StatefulImageVehicleTheme
   /**
    * The font to be used for labels.
    */
-  private static final Font LABEL_FONT = new Font("Arial", Font.BOLD, 12);
+  private static final Font LABEL_FONT = new Font("Dialog", Font.BOLD, 12);
   /**
    * Map containing images for a specific vehicle state when it's in a default state.
    */
