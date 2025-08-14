@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.jhotdraw.geom.Geom;
+import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.guing.base.AllocationState;
 import org.opentcs.guing.base.model.elements.BlockModel;
@@ -30,6 +31,7 @@ import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.components.drawing.DrawingOptions;
 import org.opentcs.guing.common.components.drawing.Strokes;
 import org.opentcs.guing.common.components.drawing.ZoomPoint;
+import org.opentcs.guing.common.exchange.AllocatedResourcesContainer;
 
 /**
  * A figure that represents a decision point.
@@ -54,20 +56,30 @@ public class PointFigure
    * The drawing options.
    */
   private final DrawingOptions drawingOptions;
+  /**
+   * Maintains a set of all currently allocated resources.
+   */
+  private final AllocatedResourcesContainer allocatedResourcesContainer;
 
   /**
    * Creates a new instance.
    *
    * @param model The model corresponding to this graphical object.
+   * @param allocatedResourcesContainer A container that maintains currently allocated resources.
    * @param drawingOptions The drawing options.
    */
   @Inject
   public PointFigure(
       @Assisted
       PointModel model,
+      AllocatedResourcesContainer allocatedResourcesContainer,
       DrawingOptions drawingOptions
   ) {
     super(model);
+    this.allocatedResourcesContainer = requireNonNull(
+        allocatedResourcesContainer,
+        "allocatedResourcesContainer"
+    );
     this.drawingOptions = requireNonNull(drawingOptions, "drawingOptions");
 
     fDiameter = 10;
@@ -142,6 +154,9 @@ public class PointFigure
       drawBlockDecoration(g);
     }
     drawRouteDecoration(g);
+    if (drawingOptions.isEnvelopesVisible()) {
+      drawEnvelopesOfAllocatedBlocks(g);
+    }
 
     super.drawFigure(g);
   }
@@ -150,6 +165,7 @@ public class PointFigure
     for (Map.Entry<VehicleModel, AllocationState> entry : getModel().getAllocationStates()
         .entrySet()) {
       VehicleModel vehicleModel = entry.getKey();
+      vehicleModel.getName();
       switch (entry.getValue()) {
         case CLAIMED:
           drawDecoration(
@@ -157,12 +173,36 @@ public class PointFigure
               Strokes.PATH_ON_ROUTE,
               transparentColor(vehicleModel.getDriveOrderColor(), 70)
           );
+          if (drawingOptions.isEnvelopesVisible() && isNextClaimedResource(vehicleModel)) {
+            drawEnvelope(
+                g,
+                Strokes.ENVELOPES,
+                transparentColor(vehicleModel.getDriveOrderColor(), 70),
+                vehicleModel.getPropertyEnvelopeKey().getText()
+            );
+          }
           break;
         case ALLOCATED:
           drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
+          if (drawingOptions.isEnvelopesVisible()) {
+            drawEnvelope(
+                g,
+                Strokes.ENVELOPES,
+                vehicleModel.getDriveOrderColor(),
+                vehicleModel.getPropertyEnvelopeKey().getText()
+            );
+          }
           break;
         case ALLOCATED_WITHDRAWN:
           drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
+          if (drawingOptions.isEnvelopesVisible()) {
+            drawEnvelope(
+                g,
+                Strokes.ENVELOPES,
+                vehicleModel.getDriveOrderColor(),
+                vehicleModel.getPropertyEnvelopeKey().getText()
+            );
+          }
           break;
         default:
           // Don't draw any decoration.
@@ -170,10 +210,44 @@ public class PointFigure
     }
   }
 
+  private boolean isNextClaimedResource(VehicleModel vehicleModel) {
+    return vehicleModel.getClaimedResources().getItems().getFirst()
+        .stream()
+        .map(TCSResourceReference::getName)
+        .anyMatch(name -> name.equals(getModel().getName()));
+  }
+
   private void drawBlockDecoration(Graphics2D g) {
     for (BlockModel blockModel : getModel().getBlockModels()) {
       drawDecoration(g, Strokes.BLOCK_ELEMENT, transparentColor(blockModel.getColor(), 192));
     }
+  }
+
+  private void drawEnvelopesOfAllocatedBlocks(Graphics2D g) {
+    getModel().getBlockModels().stream()
+        .flatMap(blockModel -> getAllocatingVehicles(blockModel).stream())
+        .forEach(
+            vehicleModel -> drawEnvelope(
+                g,
+                Strokes.ENVELOPES,
+                vehicleModel.getDriveOrderColor(),
+                vehicleModel.getPropertyEnvelopeKey().getText()
+            )
+        );
+  }
+
+  private List<VehicleModel> getAllocatingVehicles(BlockModel blockModel) {
+    return blockModel.getPropertyElements().getItems()
+        .stream()
+        .map(blockElement -> allocatedResourcesContainer.getAllocatedResources().get(blockElement))
+        .filter(Objects::nonNull)
+        .flatMap(component -> component.getAllocationStates().entrySet().stream())
+        .filter(
+            entry -> entry.getValue() == AllocationState.ALLOCATED
+                || entry.getValue() == AllocationState.ALLOCATED_WITHDRAWN
+        )
+        .map(Map.Entry::getKey)
+        .toList();
   }
 
   private Color transparentColor(Color color, int alpha) {
@@ -184,6 +258,32 @@ public class PointFigure
     g.setStroke(stroke);
     g.setColor(color);
     g.draw(this.getShape());
+  }
+
+  private void drawEnvelope(Graphics2D g, Stroke stroke, Color color, String envelopeKey) {
+    g.setStroke(stroke);
+    g.setColor(color);
+    getModel().getPropertyVehicleEnvelopes().getValue()
+        .stream()
+        .filter(env -> env.getKey().equals(envelopeKey))
+        .findFirst()
+        .ifPresent(envelopeModel -> {
+          List<Couple> vertices = envelopeModel.getVertices();
+          g.drawPolyline(
+              vertices.stream()
+                  .mapToInt(
+                      couple -> (int) (couple.getX() / get(FigureConstants.ORIGIN).getScaleX())
+                  )
+                  .toArray(),
+              vertices.stream()
+                  .mapToInt(
+                      couple -> (int) (couple.getY() / get(FigureConstants.ORIGIN).getScaleY()
+                          * (-1))
+                  )
+                  .toArray(),
+              vertices.size()
+          );
+        });
   }
 
   @Override

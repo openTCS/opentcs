@@ -31,6 +31,7 @@ import org.jhotdraw.draw.liner.ElbowLiner;
 import org.jhotdraw.draw.liner.Liner;
 import org.jhotdraw.draw.liner.SlantedLiner;
 import org.jhotdraw.geom.BezierPath;
+import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.guing.base.AllocationState;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
@@ -50,6 +51,7 @@ import org.opentcs.guing.common.components.drawing.figures.liner.BezierLinerCont
 import org.opentcs.guing.common.components.drawing.figures.liner.PolyPathLiner;
 import org.opentcs.guing.common.components.drawing.figures.liner.TripleBezierLiner;
 import org.opentcs.guing.common.components.drawing.figures.liner.TupelBezierLiner;
+import org.opentcs.guing.common.exchange.AllocatedResourcesContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,6 +83,10 @@ public class PathConnection
    */
   private final DrawingOptions drawingOptions;
   /**
+   * Maintains a set of all currently allocated resources.
+   */
+  private final AllocatedResourcesContainer allocatedResourcesContainer;
+  /**
    * Control point 1.
    */
   private Point2D.Double cp1;
@@ -107,6 +113,7 @@ public class PathConnection
    * Creates a new instance.
    *
    * @param model The model corresponding to this graphical object.
+   * @param allocatedResourcesContainer A container that maintains currently allocated resources.
    * @param textGenerator The tool tip text generator.
    * @param drawingOptions The drawing options.
    */
@@ -115,10 +122,15 @@ public class PathConnection
   public PathConnection(
       @Assisted
       PathModel model,
+      AllocatedResourcesContainer allocatedResourcesContainer,
       ToolTipTextGenerator textGenerator,
       DrawingOptions drawingOptions
   ) {
     super(model);
+    this.allocatedResourcesContainer = requireNonNull(
+        allocatedResourcesContainer,
+        "allocatedResourcesContainer"
+    );
     this.textGenerator = requireNonNull(textGenerator, "textGenerator");
     this.drawingOptions = requireNonNull(drawingOptions, "drawingOptions");
     resetPath();
@@ -681,6 +693,9 @@ public class PathConnection
       drawBlockDecoration(g);
     }
     drawRouteDecoration(g);
+    if (drawingOptions.isEnvelopesVisible()) {
+      drawEnvelopesOfAllocatedBlocks(g);
+    }
 
     super.draw(g);
   }
@@ -696,12 +711,36 @@ public class PathConnection
               Strokes.PATH_ON_ROUTE,
               transparentColor(vehicleModel.getDriveOrderColor(), 70)
           );
+          if (drawingOptions.isEnvelopesVisible() && isNextClaimedResource(vehicleModel)) {
+            drawEnvelope(
+                g,
+                Strokes.ENVELOPES,
+                transparentColor(vehicleModel.getDriveOrderColor(), 70),
+                vehicleModel.getPropertyEnvelopeKey().getText()
+            );
+          }
           break;
         case ALLOCATED:
           drawDecoration(g, Strokes.PATH_ON_ROUTE, vehicleModel.getDriveOrderColor());
+          if (drawingOptions.isEnvelopesVisible()) {
+            drawEnvelope(
+                g,
+                Strokes.ENVELOPES,
+                vehicleModel.getDriveOrderColor(),
+                vehicleModel.getPropertyEnvelopeKey().getText()
+            );
+          }
           break;
         case ALLOCATED_WITHDRAWN:
           drawDecoration(g, Strokes.PATH_ON_WITHDRAWN_ROUTE, Color.GRAY);
+          if (drawingOptions.isEnvelopesVisible()) {
+            drawEnvelope(
+                g,
+                Strokes.ENVELOPES,
+                vehicleModel.getDriveOrderColor(),
+                vehicleModel.getPropertyEnvelopeKey().getText()
+            );
+          }
           break;
         default:
           // Don't draw any decoration.
@@ -709,10 +748,44 @@ public class PathConnection
     }
   }
 
+  private boolean isNextClaimedResource(VehicleModel vehicleModel) {
+    return vehicleModel.getClaimedResources().getItems().getFirst()
+        .stream()
+        .map(TCSResourceReference::getName)
+        .anyMatch(name -> name.equals(getModel().getName()));
+  }
+
   private void drawBlockDecoration(Graphics2D g) {
     for (BlockModel blockModel : getModel().getBlockModels()) {
       drawDecoration(g, Strokes.BLOCK_ELEMENT, transparentColor(blockModel.getColor(), 192));
     }
+  }
+
+  private void drawEnvelopesOfAllocatedBlocks(Graphics2D g) {
+    getModel().getBlockModels().stream()
+        .flatMap(blockModel -> getAllocatingVehicles(blockModel).stream())
+        .forEach(
+            vehicleModel -> drawEnvelope(
+                g,
+                Strokes.ENVELOPES,
+                vehicleModel.getDriveOrderColor(),
+                vehicleModel.getPropertyEnvelopeKey().getText()
+            )
+        );
+  }
+
+  private List<VehicleModel> getAllocatingVehicles(BlockModel blockModel) {
+    return blockModel.getPropertyElements().getItems()
+        .stream()
+        .map(blockElement -> allocatedResourcesContainer.getAllocatedResources().get(blockElement))
+        .filter(Objects::nonNull)
+        .flatMap(component -> component.getAllocationStates().entrySet().stream())
+        .filter(
+            entry -> entry.getValue() == AllocationState.ALLOCATED
+                || entry.getValue() == AllocationState.ALLOCATED_WITHDRAWN
+        )
+        .map(Map.Entry::getKey)
+        .toList();
   }
 
   private Color transparentColor(Color color, int alpha) {
@@ -723,6 +796,29 @@ public class PathConnection
     g.setStroke(stroke);
     g.setColor(color);
     g.draw(this.getShape());
+  }
+
+  private void drawEnvelope(Graphics2D g, Stroke stroke, Color color, String envelopeKey) {
+    g.setStroke(stroke);
+    g.setColor(color);
+    getModel().getPropertyVehicleEnvelopes().getValue()
+        .stream()
+        .filter(env -> env.getKey().equals(envelopeKey))
+        .findFirst()
+        .ifPresent(envelopeModel -> {
+          List<Couple> vertices = envelopeModel.getVertices();
+          g.drawPolyline(
+              vertices
+                  .stream()
+                  .mapToInt(couple -> (int) (couple.getX() / previousOrigin.getScaleX()))
+                  .toArray(),
+              vertices
+                  .stream()
+                  .mapToInt(couple -> (int) (couple.getY() / previousOrigin.getScaleY() * (-1)))
+                  .toArray(),
+              vertices.size()
+          );
+        });
   }
 
   @Override

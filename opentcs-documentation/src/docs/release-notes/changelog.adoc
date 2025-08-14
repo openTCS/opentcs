@@ -27,6 +27,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Avoid re-setting the same processing vehicle of an order sequence, which triggers an entry in the log and one in the sequence's object history.
    And if in some way the same processing vehicle is indeed set again, at least don't add an object history entry.
 ** Add example vehicle envelopes to the demo model.
+** Optionally show vehicle envelopes for currently allocated and upcoming resources in the Operations Desk.
 ** Update web API specification and implementation to version 1.12.0:
 *** Extend the endpoint `POST /vehicles/{NAME}/routeComputationQuery` by an optional parameter which specifies the maximum number of routes to compute for one destination point.
 *** Add an endpoint `POST /vehicles/{NAME}/commAdapter/message`, which allows sending messages to the communication adapter that is attached to a vehicle.

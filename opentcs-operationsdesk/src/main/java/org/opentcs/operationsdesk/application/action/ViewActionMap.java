@@ -10,6 +10,8 @@ import org.opentcs.common.KernelClientApplication;
 import org.opentcs.guing.common.application.action.file.ModelPropertiesAction;
 import org.opentcs.guing.common.application.action.file.SaveModelAction;
 import org.opentcs.guing.common.application.action.file.SaveModelAsAction;
+import org.opentcs.guing.common.components.drawing.DrawingOptions;
+import org.opentcs.guing.common.components.drawing.OpenTCSDrawingEditor;
 import org.opentcs.operationsdesk.application.OpenTCSView;
 import org.opentcs.operationsdesk.application.action.actions.ConnectToKernelAction;
 import org.opentcs.operationsdesk.application.action.actions.CreatePeripheralJobAction;
@@ -24,6 +26,7 @@ import org.opentcs.operationsdesk.application.action.view.AddPeripheralJobViewAc
 import org.opentcs.operationsdesk.application.action.view.AddTransportOrderSequenceViewAction;
 import org.opentcs.operationsdesk.application.action.view.AddTransportOrderViewAction;
 import org.opentcs.operationsdesk.application.action.view.RestoreDockingLayoutAction;
+import org.opentcs.operationsdesk.application.action.view.ShowEnvelopesAction;
 import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.DeleteAction;
 import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.SelectAllAction;
 import org.opentcs.thirdparty.guing.common.jhotdraw.application.action.edit.UndoRedoManager;
@@ -42,6 +45,8 @@ public class ViewActionMap
    * @param view The openTCS view
    * @param undoRedoManager The undo redo manager
    * @param kernelClientApplication The kernel-client application
+   * @param drawingEditor The drawing editor
+   * @param drawingOptions The drawing options
    * @param actionFactory The action factory
    * @param createTransportOrderAction The action to create transport orders
    * @param findVehicleAction The action to find vehicles
@@ -57,6 +62,8 @@ public class ViewActionMap
       OpenTCSView view,
       UndoRedoManager undoRedoManager,
       KernelClientApplication kernelClientApplication,
+      OpenTCSDrawingEditor drawingEditor,
+      DrawingOptions drawingOptions,
       ActionFactory actionFactory,
       CreateTransportOrderAction createTransportOrderAction,
       FindVehicleAction findVehicleAction,
@@ -69,6 +76,8 @@ public class ViewActionMap
     requireNonNull(view, "view");
     requireNonNull(undoRedoManager, "undoRedoManager");
     requireNonNull(kernelClientApplication, "kernelClientApplication");
+    requireNonNull(drawingEditor, "drawingEditor");
+    requireNonNull(drawingOptions, "drawingOptions");
     requireNonNull(actionFactory, "actionFactory");
     requireNonNull(createTransportOrderAction, "createTransportOrderAction");
     requireNonNull(findVehicleAction, "findVehicleAction");
@@ -110,6 +119,8 @@ public class ViewActionMap
     put(AddTransportOrderSequenceViewAction.ID, new AddTransportOrderSequenceViewAction(view));
 
     put(AddPeripheralJobViewAction.ID, new AddPeripheralJobViewAction(view));
+
+    put(ShowEnvelopesAction.ID, new ShowEnvelopesAction(drawingEditor, drawingOptions));
 
     put(RestoreDockingLayoutAction.ID, new RestoreDockingLayoutAction(view));
 
