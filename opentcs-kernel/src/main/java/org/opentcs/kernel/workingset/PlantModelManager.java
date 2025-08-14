@@ -1124,7 +1124,6 @@ public class PlantModelManager
               .withProperties(curPoint.getProperties())
               .withLayout(
                   new PointCreationTO.Layout(
-                      curPoint.getLayout().getPosition(),
                       curPoint.getLayout().getLabelOffset(),
                       curPoint.getLayout().getLayerId()
                   )
@@ -1280,7 +1279,6 @@ public class PlantModelManager
               .withProperties(curLoc.getProperties())
               .withLayout(
                   new LocationCreationTO.Layout(
-                      curLoc.getLayout().getPosition(),
                       curLoc.getLayout().getLabelOffset(),
                       curLoc.getLayout().getLocationRepresentation(),
                       curLoc.getLayout().getLayerId()
@@ -1399,7 +1397,6 @@ public class PlantModelManager
         .withProperties(to.getProperties())
         .withLayout(
             new Point.Layout(
-                to.getLayout().getPosition(),
                 to.getLayout().getLabelOffset(),
                 to.getLayout().getLayerId()
             )
@@ -1502,7 +1499,6 @@ public class PlantModelManager
         .withProperties(to.getProperties())
         .withLayout(
             new Location.Layout(
-                to.getLayout().getPosition(),
                 to.getLayout().getLabelOffset(),
                 to.getLayout().getLocationRepresentation(),
                 to.getLayout().getLayerId()

@@ -20,6 +20,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * New features and enhancements:
 ** Optionally show vehicle envelopes for currently allocated and upcoming resources in the Operations Desk.
+* Changes affecting developers:
+** Mark layout coordinates of points and locations for removal with the next major version as they are apparently not really used in practice.
+   The model coordinates of points and locations should be used instead.
 
 == Version 6.5 (2025-08-08)
 

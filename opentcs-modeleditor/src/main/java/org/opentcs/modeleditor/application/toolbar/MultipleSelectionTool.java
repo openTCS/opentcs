@@ -56,10 +56,6 @@ public class MultipleSelectionTool
 
   @Override
   public List<JMenuItem> customPopupMenuItems() {
-    // Points and Locations get two additional entries
-    List<JMenuItem> actions = new ArrayList<>();
-    actions.add(menuFactory.createModelToLayoutMenuItem(false));
-    actions.add(menuFactory.createLayoutToModelMenuItem(false));
-    return actions;
+    return new ArrayList<>();
   }
 }

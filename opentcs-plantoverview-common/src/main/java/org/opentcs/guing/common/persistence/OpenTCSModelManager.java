@@ -500,17 +500,16 @@ public class OpenTCSModelManager
 
     Point2D.Double labelPosition;
     Point2D.Double figurePosition;
-    double figurePositionX = 0;
-    double figurePositionY = 0;
-    String locPosX = locationModel.getPropertyLayoutPositionX().getText();
-    String locPosY = locationModel.getPropertyLayoutPositionY().getText();
-    if (locPosX != null && locPosY != null) {
-      try {
-        figurePositionX = Integer.parseInt(locPosX);
-        figurePositionY = Integer.parseInt(locPosY);
-      }
-      catch (NumberFormatException ex) {
-      }
+
+    double figurePositionX = locationModel.getPropertyModelPositionX().getValueByUnit(
+        LengthProperty.Unit.MM
+    );
+    double figurePositionY = locationModel.getPropertyModelPositionY().getValueByUnit(
+        LengthProperty.Unit.MM
+    );
+    if (figurePositionX == Double.NaN || figurePositionY == Double.NaN) {
+      figurePositionX = 0;
+      figurePositionY = 0;
     }
 
     // Label
@@ -796,17 +795,15 @@ public class OpenTCSModelManager
 
     Point2D.Double labelPosition;
     Point2D.Double figurePosition;
-    double figurePositionX = 0;
-    double figurePositionY = 0;
-    String pointPosX = pointModel.getPropertyLayoutPosX().getText();
-    String pointPosY = pointModel.getPropertyLayoutPosY().getText();
-    if (pointPosX != null && pointPosY != null) {
-      try {
-        figurePositionX = Integer.parseInt(pointPosX);
-        figurePositionY = Integer.parseInt(pointPosY);
-      }
-      catch (NumberFormatException ex) {
-      }
+    double figurePositionX = pointModel.getPropertyModelPositionX().getValueByUnit(
+        LengthProperty.Unit.MM
+    );
+    double figurePositionY = pointModel.getPropertyModelPositionY().getValueByUnit(
+        LengthProperty.Unit.MM
+    );
+    if (figurePositionX == Double.NaN || figurePositionY == Double.NaN) {
+      figurePositionX = 0;
+      figurePositionY = 0;
     }
 
     // Label

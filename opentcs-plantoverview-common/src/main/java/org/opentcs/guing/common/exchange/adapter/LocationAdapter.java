@@ -121,10 +121,6 @@ public class LocationAdapter
       Location location,
       LayoutModel layoutModel
   ) {
-    model.getPropertyLayoutPositionX()
-        .setText(String.valueOf(location.getLayout().getPosition().getX()));
-    model.getPropertyLayoutPositionY()
-        .setText(String.valueOf(location.getLayout().getPosition().getY()));
     model.getPropertyLabelOffsetX()
         .setText(String.valueOf(location.getLayout().getLabelOffset().getX()));
     model.getPropertyLabelOffsetY()
@@ -158,10 +154,6 @@ public class LocationAdapter
 
   private LocationCreationTO.Layout getLayout(LocationModel model) {
     return new LocationCreationTO.Layout(
-        new Couple(
-            Long.parseLong(model.getPropertyLayoutPositionX().getText()),
-            Long.parseLong(model.getPropertyLayoutPositionY().getText())
-        ),
         new Couple(
             Long.parseLong(model.getPropertyLabelOffsetX().getText()),
             Long.parseLong(model.getPropertyLabelOffsetY().getText())

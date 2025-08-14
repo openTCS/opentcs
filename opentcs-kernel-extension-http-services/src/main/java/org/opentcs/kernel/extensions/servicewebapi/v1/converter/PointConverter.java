@@ -72,8 +72,8 @@ public class PointConverter {
                         )
                         .setPosition(
                             new CoupleTO(
-                                point.getLayout().getPosition().getX(),
-                                point.getLayout().getPosition().getY()
+                                point.getPose().getPosition().getX(),
+                                point.getPose().getPosition().getY()
                             )
                         )
                         .setLayerId(point.getLayout().getLayerId())
@@ -101,10 +101,6 @@ public class PointConverter {
                 .withType(Point.Type.valueOf(point.getType()))
                 .withLayout(
                     new PointCreationTO.Layout(
-                        new Couple(
-                            point.getLayout().getPosition().getX(),
-                            point.getLayout().getPosition().getY()
-                        ),
                         new Couple(
                             point.getLayout().getLabelOffset().getX(),
                             point.getLayout().getLabelOffset().getY()

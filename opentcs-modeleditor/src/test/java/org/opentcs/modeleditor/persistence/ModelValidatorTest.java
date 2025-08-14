@@ -258,8 +258,6 @@ class ModelValidatorTest {
     addProperty(point, SelectionProperty.class, PointModel.TYPE, PointModel.Type.HALT);
     addProperty(point, CoordinateProperty.class, PointModel.MODEL_X_POSITION, "0");
     addProperty(point, CoordinateProperty.class, PointModel.MODEL_Y_POSITION, "0");
-    addProperty(point, StringProperty.class, ElementPropKeys.POINT_POS_X, "0");
-    addProperty(point, StringProperty.class, ElementPropKeys.POINT_POS_Y, "0");
     addProperty(
         point,
         BoundingBoxProperty.class,
@@ -316,8 +314,6 @@ class ModelValidatorTest {
     LocationModel location = createComponentWithName(LocationModel.class, name);
     addProperty(location, CoordinateProperty.class, LocationModel.MODEL_X_POSITION, "0");
     addProperty(location, CoordinateProperty.class, LocationModel.MODEL_Y_POSITION, "0");
-    addProperty(location, StringProperty.class, ElementPropKeys.LOC_POS_X, "0");
-    addProperty(location, StringProperty.class, ElementPropKeys.LOC_POS_Y, "0");
     addProperty(location, LocationTypeProperty.class, LocationModel.TYPE, LOCATION_TYPE_NAME);
     addProperty(location, StringProperty.class, ElementPropKeys.LOC_LABEL_OFFSET_X, "0");
     addProperty(location, StringProperty.class, ElementPropKeys.LOC_LABEL_OFFSET_Y, "0");

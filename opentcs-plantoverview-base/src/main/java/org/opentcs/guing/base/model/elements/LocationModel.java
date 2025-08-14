@@ -205,14 +205,6 @@ public class LocationModel
     return (SymbolProperty) getProperty(SYMBOL);
   }
 
-  public StringProperty getPropertyLayoutPositionX() {
-    return (StringProperty) getProperty(ElementPropKeys.LOC_POS_X);
-  }
-
-  public StringProperty getPropertyLayoutPositionY() {
-    return (StringProperty) getProperty(ElementPropKeys.LOC_POS_Y);
-  }
-
   public StringProperty getPropertyLabelOffsetX() {
     return (StringProperty) getProperty(ElementPropKeys.LOC_LABEL_OFFSET_X);
   }
@@ -328,18 +320,6 @@ public class LocationModel
     pSymbol.setHelptext(bundle.getString("locationModel.property_symbol.helptext"));
     pSymbol.setCollectiveEditable(true);
     setProperty(SYMBOL, pSymbol);
-
-    StringProperty pLocPosX = new StringProperty(this);
-    pLocPosX.setDescription(bundle.getString("locationModel.property_positionX.description"));
-    pLocPosX.setHelptext(bundle.getString("locationModel.property_positionX.helptext"));
-    pLocPosX.setModellingEditable(false);
-    setProperty(ElementPropKeys.LOC_POS_X, pLocPosX);
-
-    StringProperty pLocPosY = new StringProperty(this);
-    pLocPosY.setDescription(bundle.getString("locationModel.property_positionY.description"));
-    pLocPosY.setHelptext(bundle.getString("locationModel.property_positionY.helptext"));
-    pLocPosY.setModellingEditable(false);
-    setProperty(ElementPropKeys.LOC_POS_Y, pLocPosY);
 
     StringProperty pLocLabelOffsetX = new StringProperty(this);
     pLocLabelOffsetX.setDescription(

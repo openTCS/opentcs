@@ -13,6 +13,7 @@ import org.opentcs.access.to.CreationTO;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.visualization.LocationRepresentation;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a location in a plant model.
@@ -380,7 +381,7 @@ public class LocationCreationTO
      * Creates a new instance.
      */
     public Layout() {
-      this(new Couple(0, 0), new Couple(0, 0), LocationRepresentation.DEFAULT, 0);
+      this(new Couple(0, 0), LocationRepresentation.DEFAULT, 0);
     }
 
     /**
@@ -390,7 +391,10 @@ public class LocationCreationTO
      * @param labelOffset The offset of the label's location to the point's position (in lu).
      * @param locationRepresentation The location representation to use.
      * @param layerId The ID of the layer on which the location is to be drawn.
+     * @deprecated Use {@link Layout#Layout(Couple, LocationRepresentation, int)} instead.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed")
     public Layout(
         Couple position,
         Couple labelOffset,
@@ -407,10 +411,35 @@ public class LocationCreationTO
     }
 
     /**
+     * Creates a new instance.
+     *
+     * @param labelOffset The offset of the label's location to the point's position (in lu).
+     * @param locationRepresentation The location representation to use.
+     * @param layerId The ID of the layer on which the location is to be drawn.
+     */
+    public Layout(
+        Couple labelOffset,
+        LocationRepresentation locationRepresentation,
+        int layerId
+    ) {
+      this.position = new Couple(0, 0);
+      this.labelOffset = requireNonNull(labelOffset, "labelOffset");
+      this.locationRepresentation = requireNonNull(
+          locationRepresentation,
+          "locationRepresentation"
+      );
+      this.layerId = layerId;
+    }
+
+    /**
      * Returns the coordinates at which the location is to be drawn (in mm).
      *
      * @return The coordinates at which the location is to be drawn (in mm).
+     * @deprecated Will be removed without replacement. {@link LocationCreationTO#getPosition()}
+     * should be used instead.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed")
     public Couple getPosition() {
       return position;
     }
@@ -420,7 +449,11 @@ public class LocationCreationTO
      *
      * @param position The value to be set in the copy.
      * @return A copy of this object, differing in the given value.
+     * @deprecated Will be removed without replacement.
+     * {@link LocationCreationTO#withPosition(Triple)} should be used instead.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed")
     public Layout withPosition(Couple position) {
       return new Layout(
           position,
@@ -505,7 +538,6 @@ public class LocationCreationTO
     @Override
     public String toString() {
       return "Layout{"
-          + "position=" + position
           + ", labelOffset=" + labelOffset
           + ", locationRepresentation=" + locationRepresentation
           + ", layerId=" + layerId

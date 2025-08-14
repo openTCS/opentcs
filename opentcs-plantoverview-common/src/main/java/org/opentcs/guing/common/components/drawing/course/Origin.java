@@ -8,7 +8,6 @@ import java.util.EventObject;
 import java.util.HashSet;
 import java.util.Set;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
-import org.opentcs.guing.base.components.properties.type.StringProperty;
 import org.opentcs.guing.common.components.drawing.figures.OriginFigure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,29 +144,6 @@ public final class Origin {
     Point2D pixelPosition = fCoordinateSystem.toPixel(fPosition, realPosition, fScaleX, fScaleY);
 
     return pixelPosition;
-  }
-
-  /**
-   * Translates the real coordinate into pixel coordinates with double precision from
-   * string properties.
-   *
-   * @param xReal The real x position.
-   * @param yReal The real y position.
-   * @return A point with the pixel position with double precision.
-   */
-  public Point2D calculatePixelPositionExactly(StringProperty xReal, StringProperty yReal) {
-    try {
-      double xPos = Double.parseDouble(xReal.getText());
-      double yPos = Double.parseDouble(yReal.getText());
-      Point2D realPosition = new Point2D.Double(xPos, yPos);
-      Point2D pixelPosition = fCoordinateSystem.toPixel(fPosition, realPosition, fScaleX, fScaleY);
-
-      return pixelPosition;
-    }
-    catch (NumberFormatException e) {
-      LOG.info("Couldn't parse layout coordinates", e);
-      return new Point2D.Double();
-    }
   }
 
   /**

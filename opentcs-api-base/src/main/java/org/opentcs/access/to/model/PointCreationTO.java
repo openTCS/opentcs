@@ -13,6 +13,7 @@ import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a point in the plant model.
@@ -343,7 +344,7 @@ public class PointCreationTO
      * Creates a new instance.
      */
     public Layout() {
-      this(new Couple(0, 0), new Couple(0, 0), 0);
+      this(new Couple(0, 0), 0);
     }
 
     /**
@@ -352,7 +353,10 @@ public class PointCreationTO
      * @param position The coordinates at which the point is to be drawn (in mm).
      * @param labelOffset The offset of the label's position to the point's position (in lu).
      * @param layerId The ID of the layer on which the point is to be drawn.
+     * @deprecated Use {@link Layout#Layout(Couple, int)} instead.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed")
     public Layout(
         Couple position,
         Couple labelOffset,
@@ -364,10 +368,29 @@ public class PointCreationTO
     }
 
     /**
+     * Creates a new instance.
+     *
+     * @param labelOffset The offset of the label's position to the point's position (in lu).
+     * @param layerId The ID of the layer on which the point is to be drawn.
+     */
+    public Layout(
+        Couple labelOffset,
+        int layerId
+    ) {
+      this.position = new Couple(0, 0);
+      this.labelOffset = requireNonNull(labelOffset, "labelOffset");
+      this.layerId = layerId;
+    }
+
+    /**
      * Returns the coordinates at which the point is to be drawn (in mm).
      *
      * @return The coordinates at which the point is to be drawn (in mm).
+     * @deprecated Will be removed without replacement. {@link PointCreationTO#getPose()}
+     * should be used instead.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed")
     public Couple getPosition() {
       return position;
     }
@@ -377,7 +400,11 @@ public class PointCreationTO
      *
      * @param position The value to be set in the copy.
      * @return A copy of this object, differing in the given value.
+     * @deprecated Will be removed without replacement.
+     * {@link PointCreationTO#withPose(Pose)} should be used instead.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed")
     public Layout withPosition(Couple position) {
       return new Layout(
           position,
@@ -435,7 +462,6 @@ public class PointCreationTO
     @Override
     public String toString() {
       return "Layout{"
-          + "position=" + position
           + ", labelOffset=" + labelOffset
           + ", layerId=" + layerId
           + '}';

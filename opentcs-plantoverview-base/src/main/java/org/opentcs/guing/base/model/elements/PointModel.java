@@ -122,14 +122,6 @@ public class PointModel
     return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
 
-  public StringProperty getPropertyLayoutPosX() {
-    return (StringProperty) getProperty(ElementPropKeys.POINT_POS_X);
-  }
-
-  public StringProperty getPropertyLayoutPosY() {
-    return (StringProperty) getProperty(ElementPropKeys.POINT_POS_Y);
-  }
-
   public StringProperty getPropertyPointLabelOffsetX() {
     return (StringProperty) getProperty(ElementPropKeys.POINT_LABEL_OFFSET_X);
   }
@@ -259,20 +251,6 @@ public class PointModel
     pMiscellaneous.setHelptext(bundle.getString("pointModel.property_miscellaneous.helptext"));
     pMiscellaneous.setOperatingEditable(true);
     setProperty(MISCELLANEOUS, pMiscellaneous);
-
-    StringProperty pPointPosX = new StringProperty(this, String.valueOf(DEFAULT_XY_POSITION));
-    pPointPosX.setDescription(bundle.getString("pointModel.property_positionX.description"));
-    pPointPosX.setHelptext(bundle.getString("pointModel.property_positionX.helptext"));
-    // The position can only be changed in the drawing.
-    pPointPosX.setModellingEditable(false);
-    setProperty(ElementPropKeys.POINT_POS_X, pPointPosX);
-
-    StringProperty pPointPosY = new StringProperty(this, String.valueOf(DEFAULT_XY_POSITION));
-    pPointPosY.setDescription(bundle.getString("pointModel.property_positionY.description"));
-    pPointPosY.setHelptext(bundle.getString("pointModel.property_positionY.helptext"));
-    // The position can only be changed in the drawing.
-    pPointPosY.setModellingEditable(false);
-    setProperty(ElementPropKeys.POINT_POS_Y, pPointPosY);
 
     StringProperty pPointLabelOffsetX = new StringProperty(this);
     pPointLabelOffsetX.setDescription(

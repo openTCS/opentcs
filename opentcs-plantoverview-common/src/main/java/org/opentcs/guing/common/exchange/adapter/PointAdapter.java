@@ -121,8 +121,6 @@ public class PointAdapter
   }
 
   private void updateModelLayoutProperties(PointModel model, Point point, LayoutModel layoutModel) {
-    model.getPropertyLayoutPosX().setText(String.valueOf(point.getLayout().getPosition().getX()));
-    model.getPropertyLayoutPosY().setText(String.valueOf(point.getLayout().getPosition().getY()));
     model.getPropertyPointLabelOffsetX()
         .setText(String.valueOf(point.getLayout().getLabelOffset().getX()));
     model.getPropertyPointLabelOffsetY()
@@ -188,10 +186,6 @@ public class PointAdapter
 
   private PointCreationTO.Layout getLayout(PointModel model) {
     return new PointCreationTO.Layout(
-        new Couple(
-            Long.parseLong(model.getPropertyLayoutPosX().getText()),
-            Long.parseLong(model.getPropertyLayoutPosY().getText())
-        ),
         new Couple(
             Long.parseLong(model.getPropertyPointLabelOffsetX().getText()),
             Long.parseLong(model.getPropertyPointLabelOffsetY().getText())

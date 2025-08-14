@@ -76,6 +76,8 @@ NOTE: In openTCS, an angle of 0 degrees is at the 3 o'clock position, and a posi
 
 ===== Layout coordinates vs model coordinates
 
+NOTE: This feature is deprecated and will be removed with OpenTCS 7.0.
+
 A point has two sets of coordinates: layout coordinates and model coordinates.
 The layout coordinates are merely intended for the graphical presentation in the model editor and operations desk clients, while the model coordinates are data that a vehicle driver could potentially use or send to the vehicle it communicates with (e.g. if the vehicle needs the exact coordinates of a destination point for navigation).
 Both coordinate sets are not tied to each other per se, i.e. they may differ.

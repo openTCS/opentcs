@@ -89,7 +89,6 @@ class LocationConverterTest {
         hasEntry("point1", Set.of(LocationRepresentation.LOAD_TRANSFER_GENERIC.name()))
     );
     assertTrue(result.get(0).isLocked());
-    assertThat(result.get(0).getLayout().getPosition(), is(new Couple(2, 2)));
     assertThat(result.get(0).getLayout().getLabelOffset(), is(new Couple(3, 3)));
     assertThat(
         result.get(0).getLayout().getLocationRepresentation(),
@@ -116,7 +115,6 @@ class LocationConverterTest {
         .withLocked(false)
         .withLayout(
             new Location.Layout(
-                new Couple(1, 1),
                 new Couple(2, 2),
                 LocationRepresentation.LOAD_TRANSFER_GENERIC,
                 3
