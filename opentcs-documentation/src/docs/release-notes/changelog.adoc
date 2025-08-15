@@ -23,6 +23,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Changes affecting developers:
 ** Mark layout coordinates of points and locations for removal with the next major version as they are apparently not really used in practice.
    The model coordinates of points and locations should be used instead.
+** Update Jackson to 2.19.2.
 
 == Version 6.5 (2025-08-08)
 
