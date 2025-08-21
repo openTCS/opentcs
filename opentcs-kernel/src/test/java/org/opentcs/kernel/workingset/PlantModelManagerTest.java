@@ -3,12 +3,14 @@
 package org.opentcs.kernel.workingset;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import java.util.List;
 import java.util.Set;
@@ -23,6 +25,7 @@ import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
+import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
@@ -73,6 +76,27 @@ class PlantModelManagerTest {
         .withVehicle(new VehicleCreationTO("some-vehicle"))
         .withVisualLayout(new VisualLayoutCreationTO("some-visual-layout"))
         .withProperty("some-prop-key", "some-prop-value");
+  }
+
+  @Test
+  void acceptValidPlantModel() {
+    plantModelManager.validate(plantModelCreationTo);
+  }
+
+  @Test
+  void rejectInvalidPlantModelWithDuplicateNames() {
+    plantModelCreationTo = plantModelCreationTo
+        .withPoint(new PointCreationTO("i-am-a-duplicate"))
+        .withPath(new PathCreationTO("i-like-redundancy", "point1", "point2"))
+        .withBlock(new BlockCreationTO("i-am-a-duplicate"))
+        .withVehicle(new VehicleCreationTO("i-like-redundancy"));
+
+    ObjectExistsException exception = assertThrowsExactly(
+        ObjectExistsException.class,
+        () -> plantModelManager.validate(plantModelCreationTo)
+    );
+    assertThat(exception.getMessage(), containsString("i-am-a-duplicate"));
+    assertThat(exception.getMessage(), containsString("i-like-redundancy"));
   }
 
   @Test

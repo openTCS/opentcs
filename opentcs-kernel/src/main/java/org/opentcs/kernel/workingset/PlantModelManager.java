@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.opentcs.access.to.CreationTO;
 import org.opentcs.access.to.model.BlockCreationTO;
 import org.opentcs.access.to.model.BoundingBoxCreationTO;
 import org.opentcs.access.to.model.CoupleCreationTO;
@@ -154,6 +156,38 @@ public class PlantModelManager
           curObject,
           TCSObjectEvent.Type.OBJECT_REMOVED
       );
+    }
+  }
+
+  /**
+   * Checks the validity of the given plant model.
+   *
+   * @param plantModel The plant model.
+   * @throws ObjectExistsException If there are elements with duplicate names in the given model.
+   */
+  public void validate(PlantModelCreationTO plantModel)
+      throws ObjectExistsException {
+    requireNonNull(plantModel, "to");
+
+    Set<String> duplicateNames = Stream.of(
+        plantModel.getPoints().stream(),
+        plantModel.getPaths().stream(),
+        plantModel.getLocationTypes().stream(),
+        plantModel.getLocations().stream(),
+        plantModel.getBlocks().stream(),
+        plantModel.getVehicles().stream()
+    )
+        .reduce(Stream::concat)
+        .orElseGet(Stream::empty)
+        .collect(Collectors.groupingBy(CreationTO::getName, Collectors.counting()))
+        .entrySet()
+        .stream()
+        .filter(entry -> entry.getValue() > 1)
+        .map(Map.Entry::getKey)
+        .collect(Collectors.toSet());
+
+    if (!duplicateNames.isEmpty()) {
+      throw new ObjectExistsException("Duplicate names in plant model: " + duplicateNames);
     }
   }
 
