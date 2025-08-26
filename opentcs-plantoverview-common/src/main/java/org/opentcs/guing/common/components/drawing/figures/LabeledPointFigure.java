@@ -23,6 +23,7 @@ import org.jhotdraw.draw.handle.MoveHandle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
+import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.base.components.properties.type.StringProperty;
 import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.common.components.drawing.ZoomPoint;
@@ -120,12 +121,12 @@ public class LabeledPointFigure
     if (origin != null) {
       PointFigure pf = getPresentationFigure();
 
-      StringProperty xLayout = pf.getModel().getPropertyLayoutPosX();
-      StringProperty yLayout = pf.getModel().getPropertyLayoutPosY();
+      CoordinateProperty xCoord = pf.getModel().getPropertyModelPositionX();
+      CoordinateProperty yCoord = pf.getModel().getPropertyModelPositionY();
 
-      if (xLayout.hasChanged() || yLayout.hasChanged()) {
+      if (xCoord.hasChanged() || xCoord.hasChanged()) {
         getLabel().willChange();
-        Point2D exact = origin.calculatePixelPositionExactly(xLayout, yLayout);
+        Point2D exact = origin.calculatePixelPositionExactly(xCoord, yCoord);
         double scale = pf.getZoomPoint().scale();
         double xNew = exact.getX() / scale;
         double yNew = exact.getY() / scale;
@@ -147,8 +148,8 @@ public class LabeledPointFigure
       PointFigure pf = getPresentationFigure();
 
       Point2D exact = origin.calculatePixelPositionExactly(
-          pf.getModel().getPropertyLayoutPosX(),
-          pf.getModel().getPropertyLayoutPosY()
+          pf.getModel().getPropertyModelPositionX(),
+          pf.getModel().getPropertyModelPositionY()
       );
       Point2D.Double anchor = new Point2D.Double(exact.getX(), exact.getY());
       setBounds(anchor, anchor);
@@ -173,30 +174,30 @@ public class LabeledPointFigure
     }
     ZoomPoint zoomPoint = pf.getZoomPoint();
     if (zoomPoint != null && origin != null) {
-      StringProperty lpx = model.getPropertyLayoutPosX();
+      CoordinateProperty px = model.getPropertyModelPositionX();
 
       int oldX = 0;
-      if (!Strings.isNullOrEmpty(lpx.getText())) {
-        oldX = (int) Double.parseDouble(lpx.getText());
+      if (px.getValue() != null) {
+        oldX = (int) px.getValueByUnit(LengthProperty.Unit.MM);
       }
 
       int newX = (int) (zoomPoint.getX() * origin.getScaleX());
       if (newX != oldX) {
-        lpx.setText(String.format("%d", newX));
-        lpx.markChanged();
+        px.setValue(newX);
+        px.markChanged();
       }
 
-      StringProperty lpy = model.getPropertyLayoutPosY();
+      CoordinateProperty py = model.getPropertyModelPositionY();
 
       int oldY = 0;
-      if (!Strings.isNullOrEmpty(lpy.getText())) {
-        oldY = (int) Double.parseDouble(lpy.getText());
+      if (py.getValue() != null) {
+        oldY = (int) py.getValueByUnit(LengthProperty.Unit.MM);
       }
 
       int newY = (int) (-zoomPoint.getY() * origin.getScaleY());  // Vorzeichen!
       if (newY != oldY) {
-        lpy.setText(String.format("%d", newY));
-        lpy.markChanged();
+        py.setValue(newY);
+        py.markChanged();
       }
 
       // Offset of the labels of the location will be updated here.

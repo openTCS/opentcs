@@ -33,7 +33,6 @@ import org.opentcs.guing.common.components.properties.panel.PeripheralOperations
 import org.opentcs.guing.common.components.properties.panel.PropertiesPanelFactory;
 import org.opentcs.guing.common.components.properties.panel.SymbolPropertyEditorPanel;
 import org.opentcs.guing.common.components.properties.table.CellEditorFactory;
-import org.opentcs.modeleditor.application.menus.MenuItemComponentsFactory;
 
 /**
  * A Guice module for this package.
@@ -53,7 +52,6 @@ public class PropertiesInjectionModule
     install(new FactoryModuleBuilder().build(PropertiesPanelFactory.class));
     install(new FactoryModuleBuilder().build(CellEditorFactory.class));
     install(new FactoryModuleBuilder().build(PropertiesComponentsFactory.class));
-    install(new FactoryModuleBuilder().build(MenuItemComponentsFactory.class));
 
     MapBinder<Class<? extends AbstractComplexProperty>, DetailsDialogContent> dialogContentMapBinder
         = MapBinder.newMapBinder(

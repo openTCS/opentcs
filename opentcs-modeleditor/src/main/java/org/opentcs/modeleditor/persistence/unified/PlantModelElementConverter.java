@@ -102,8 +102,6 @@ public class PlantModelElementConverter {
     }
 
     // Gather information contained in the layout
-    model.getPropertyLayoutPosX().setText(String.valueOf(pointTO.getLayout().getPosition().getX()));
-    model.getPropertyLayoutPosY().setText(String.valueOf(pointTO.getLayout().getPosition().getY()));
     model.getPropertyPointLabelOffsetX().setText(
         String.valueOf(pointTO.getLayout().getLabelOffset().getX())
     );
@@ -295,12 +293,6 @@ public class PlantModelElementConverter {
     }
 
     // Gather information contained in the layout
-    model.getPropertyLayoutPositionX().setText(
-        String.valueOf(locationTO.getLayout().getPosition().getX())
-    );
-    model.getPropertyLayoutPositionY().setText(
-        String.valueOf(locationTO.getLayout().getPosition().getY())
-    );
     model.getPropertyLabelOffsetX().setText(
         String.valueOf(locationTO.getLayout().getLabelOffset().getX())
     );

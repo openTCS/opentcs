@@ -108,10 +108,6 @@ public class V6TOMapper {
               .withLayout(
                   new PointCreationTO.Layout(
                       new Couple(
-                          point.getPointLayout().getPositionX(),
-                          point.getPointLayout().getPositionY()
-                      ),
-                      new Couple(
                           point.getPointLayout().getLabelOffsetX(),
                           point.getPointLayout().getLabelOffsetY()
                       ),
@@ -242,10 +238,6 @@ public class V6TOMapper {
               .withProperties(convertProperties(location.getProperties()))
               .withLayout(
                   new LocationCreationTO.Layout(
-                      new Couple(
-                          location.getLocationLayout().getPositionX(),
-                          location.getLocationLayout().getPositionY()
-                      ),
                       new Couple(
                           location.getLocationLayout().getLabelOffsetX(),
                           location.getLocationLayout().getLabelOffsetY()
@@ -392,8 +384,8 @@ public class V6TOMapper {
           .setMaxVehicleBoundingBox(toBoundingBoxTO(point.getMaxVehicleBoundingBox()))
           .setPointLayout(
               new PointTO.PointLayout()
-                  .setPositionX(point.getLayout().getPosition().getX())
-                  .setPositionY(point.getLayout().getPosition().getY())
+                  .setPositionX(point.getPose().getPosition().getX())
+                  .setPositionY(point.getPose().getPosition().getY())
                   .setLabelOffsetX(point.getLayout().getLabelOffset().getX())
                   .setLabelOffsetY(point.getLayout().getLabelOffset().getY())
                   .setLayerId(point.getLayout().getLayerId())
@@ -541,8 +533,8 @@ public class V6TOMapper {
           .setLocked(location.isLocked())
           .setLocationLayout(
               new LocationTO.LocationLayout()
-                  .setPositionX(location.getLayout().getPosition().getX())
-                  .setPositionY(location.getLayout().getPosition().getY())
+                  .setPositionX(location.getPosition().getX())
+                  .setPositionY(location.getPosition().getY())
                   .setLabelOffsetX(location.getLayout().getLabelOffset().getX())
                   .setLabelOffsetY(location.getLayout().getLabelOffset().getY())
                   .setLocationRepresentation(

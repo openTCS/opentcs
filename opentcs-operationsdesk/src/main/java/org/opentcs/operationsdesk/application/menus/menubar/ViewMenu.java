@@ -6,17 +6,20 @@ import static java.util.Objects.requireNonNull;
 import static org.opentcs.operationsdesk.event.KernelStateChangeEvent.State.LOGGED_IN;
 
 import jakarta.inject.Inject;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.guing.common.application.OperationMode;
 import org.opentcs.guing.common.application.menus.menubar.ViewPluginPanelsMenu;
+import org.opentcs.guing.common.components.drawing.DrawingOptions;
 import org.opentcs.operationsdesk.application.action.ViewActionMap;
 import org.opentcs.operationsdesk.application.action.view.AddDrawingViewAction;
 import org.opentcs.operationsdesk.application.action.view.AddPeripheralJobViewAction;
 import org.opentcs.operationsdesk.application.action.view.AddTransportOrderSequenceViewAction;
 import org.opentcs.operationsdesk.application.action.view.AddTransportOrderViewAction;
 import org.opentcs.operationsdesk.application.action.view.RestoreDockingLayoutAction;
+import org.opentcs.operationsdesk.application.action.view.ShowEnvelopesAction;
 import org.opentcs.operationsdesk.event.KernelStateChangeEvent;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
@@ -49,6 +52,10 @@ public class ViewMenu
    */
   private final JMenuItem menuPeripheralJobView;
   /**
+   * A checkbox menu item for showing vehicle envelopes at allocated and claimed resources.
+   */
+  private final JCheckBoxMenuItem menuShowEnvelopes;
+  /**
    * A menu for showing/hiding plugin panels.
    */
   private final ViewPluginPanelsMenu menuPluginPanels;
@@ -68,11 +75,13 @@ public class ViewMenu
   public ViewMenu(
       ViewActionMap actionMap,
       ViewPluginPanelsMenu menuPluginPanels,
+      DrawingOptions drawingOptions,
       @ApplicationEventBus
       EventSource eventSource
   ) {
     requireNonNull(actionMap, "actionMap");
     requireNonNull(menuPluginPanels, "menuPluginPanels");
+    requireNonNull(drawingOptions, "drawingOptions");
 
     final ResourceBundleUtil labels
         = ResourceBundleUtil.getBundle(I18nPlantOverviewOperating.MENU_PATH);
@@ -95,6 +104,12 @@ public class ViewMenu
 
     menuPeripheralJobView = new JMenuItem(actionMap.get(AddPeripheralJobViewAction.ID));
     add(menuPeripheralJobView);
+
+    addSeparator();
+
+    menuShowEnvelopes = new JCheckBoxMenuItem(actionMap.get(ShowEnvelopesAction.ID));
+    menuShowEnvelopes.setSelected(drawingOptions.isEnvelopesVisible());
+    add(menuShowEnvelopes);
 
     addSeparator();
 

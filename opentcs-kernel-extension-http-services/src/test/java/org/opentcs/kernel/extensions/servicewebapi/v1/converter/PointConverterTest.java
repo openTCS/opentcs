@@ -71,7 +71,7 @@ class PointConverterTest {
             new BoundingBox(1000, 2000, 3000)
                 .withReferenceOffset(new Couple(4, 5))
         )
-        .withLayout(new Point.Layout(new Couple(3, 3), new Couple(4, 4), 7))
+        .withLayout(new Point.Layout(new Couple(4, 4), 7))
         .withProperties(propertyMap);
 
     List<PointTO> result = pointConverter.toPointTOs(Set.of(point1));
@@ -90,7 +90,7 @@ class PointConverterTest {
         result.get(0).getMaxVehicleBoundingBox().getReferenceOffset(),
         samePropertyValuesAs(new CoupleTO(4, 5))
     );
-    assertThat(result.get(0).getLayout().getPosition(), samePropertyValuesAs(new CoupleTO(3, 3)));
+    assertThat(result.get(0).getLayout().getPosition(), samePropertyValuesAs(new CoupleTO(1, 1)));
     assertThat(
         result.get(0).getLayout().getLabelOffset(),
         samePropertyValuesAs(new CoupleTO(4, 4))
@@ -133,7 +133,6 @@ class PointConverterTest {
         result.get(0).getMaxVehicleBoundingBox().getReferenceOffset(),
         samePropertyValuesAs(new CoupleCreationTO(4, 5))
     );
-    assertThat(result.get(0).getLayout().getPosition(), samePropertyValuesAs(new Couple(3, 3)));
     assertThat(result.get(0).getLayout().getLabelOffset(), samePropertyValuesAs(new Couple(4, 4)));
     assertThat(result.get(0).getLayout().getLayerId(), is(9));
     assertThat(result.get(0).getProperties(), is(aMapWithSize(1)));

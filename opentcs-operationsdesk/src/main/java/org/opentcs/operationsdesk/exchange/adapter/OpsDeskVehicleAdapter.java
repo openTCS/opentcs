@@ -25,9 +25,11 @@ import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.base.AllocationState;
 import org.opentcs.guing.base.model.FigureDecorationDetails;
+import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.PathModel;
 import org.opentcs.guing.base.model.elements.PointModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
+import org.opentcs.guing.common.exchange.AllocatedResourcesContainer;
 import org.opentcs.guing.common.exchange.AllocationHistory;
 import org.opentcs.guing.common.exchange.adapter.VehicleAdapter;
 import org.opentcs.guing.common.model.SystemModel;
@@ -51,6 +53,10 @@ public class OpsDeskVehicleAdapter
    */
   private final AllocationHistory allocationHistory;
   /**
+   * Maintains a set of all currently allocated resources.
+   */
+  private final AllocatedResourcesContainer allocatedResourcesContainer;
+  /**
    * Maintains a set of all transport orders.
    */
   private final TransportOrdersContainer transportOrdersContainer;
@@ -58,10 +64,15 @@ public class OpsDeskVehicleAdapter
   @Inject
   public OpsDeskVehicleAdapter(
       AllocationHistory allocationHistory,
+      AllocatedResourcesContainer allocatedResourcesContainer,
       @Nonnull
       TransportOrdersContainer transportOrdersContainer
   ) {
     this.allocationHistory = requireNonNull(allocationHistory, "allocationHistory");
+    this.allocatedResourcesContainer = requireNonNull(
+        allocatedResourcesContainer,
+        "allocatedResourcesContainer"
+    );
     this.transportOrdersContainer = requireNonNull(
         transportOrdersContainer,
         "transportOrdersContainer"
@@ -180,12 +191,22 @@ public class OpsDeskVehicleAdapter
       else {
         component.updateAllocationState(vehicleModel, AllocationState.ALLOCATED);
       }
+      if (component instanceof PointModel || component instanceof PathModel) {
+        allocatedResourcesContainer.addAllocatedResources(
+            ((ModelComponent) component).getName(), component
+        );
+      }
     }
 
     for (FigureDecorationDetails component : toFigureDecorationDetails(
         entry.getCurrentAllocatedResourcesBehind(), systemModel
     )) {
       component.updateAllocationState(vehicleModel, AllocationState.ALLOCATED);
+      if (component instanceof PointModel || component instanceof PathModel) {
+        allocatedResourcesContainer.addAllocatedResources(
+            ((ModelComponent) component).getName(), component
+        );
+      }
     }
 
     for (FigureDecorationDetails component : toFigureDecorationDetails(
@@ -193,6 +214,9 @@ public class OpsDeskVehicleAdapter
         systemModel
     )) {
       component.clearAllocationState(vehicleModel);
+      if (component instanceof PointModel || component instanceof PathModel) {
+        allocatedResourcesContainer.removeAllocatedResource(((ModelComponent) component).getName());
+      }
     }
   }
 

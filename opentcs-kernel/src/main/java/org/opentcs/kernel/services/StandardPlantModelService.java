@@ -172,6 +172,8 @@ public class StandardPlantModelService
         IllegalStateException {
     requireNonNull(to, "to");
 
+    plantModelManager.validate(to);
+
     boolean kernelInOperating = kernel.getState() == Kernel.State.OPERATING;
     // If we are in state operating, change the kernel state before creating the plant model
     if (kernelInOperating) {

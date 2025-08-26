@@ -51,10 +51,6 @@ public class LocationConverter {
                 .withLayout(
                     new LocationCreationTO.Layout(
                         new Couple(
-                            location.getLayout().getPosition().getX(),
-                            location.getLayout().getPosition().getY()
-                        ),
-                        new Couple(
                             location.getLayout().getLabelOffset().getX(),
                             location.getLayout().getLabelOffset().getY()
                         ),
@@ -97,8 +93,8 @@ public class LocationConverter {
                         )
                         .setPosition(
                             new CoupleTO(
-                                location.getLayout().getPosition().getX(),
-                                location.getLayout().getPosition().getY()
+                                location.getPosition().getX(),
+                                location.getPosition().getY()
                             )
                         )
                 )

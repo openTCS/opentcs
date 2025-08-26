@@ -15,6 +15,18 @@ public class Strokes {
    */
   public static final Stroke BLOCK_ELEMENT = new BasicStroke(4.0f);
   /**
+   * Decoration of envelopes .
+   */
+  public static final Stroke ENVELOPES
+      = new BasicStroke(
+          2.0f,
+          BasicStroke.CAP_BUTT,
+          BasicStroke.JOIN_MITER,
+          10.0f,
+          new float[]{2.0f, 2.0f},
+          0.0f
+      );
+  /**
    * Decoration of paths that are part of a transport order.
    */
   public static final Stroke PATH_ON_ROUTE

@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.data.model.visualization;
 
+import org.opentcs.util.annotations.ScheduledApiChange;
+
 /**
  * Defines some reserved/commonly used property keys of elements in a {@link VisualLayout}.
  */
@@ -12,12 +14,16 @@ public interface ElementPropKeys {
    * Type: int.
    * Default value: Physical coordinate of the point.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed")
   String POINT_POS_X = "POSITION_X";
   /**
    * Y coordinate at which the point is to be drawn (in mm).
    * Type: int.
    * Default value: Physical coordinate of the point.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed")
   String POINT_POS_Y = "POSITION_Y";
   /**
    * X offset of the label's position to the object's position (in lu).
@@ -42,12 +48,16 @@ public interface ElementPropKeys {
    * Type: int.
    * Default value: ??.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed")
   String LOC_POS_X = "POSITION_X";
   /**
    * Y coordinate at which the location is to be drawn (in mm).
    * Type: int.
    * Default value: ??.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "7.0", details = "Will be removed")
   String LOC_POS_Y = "POSITION_Y";
   /**
    * X offset of the label's position to the object's position (in lu).

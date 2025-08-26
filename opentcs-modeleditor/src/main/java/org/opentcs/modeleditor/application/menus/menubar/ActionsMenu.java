@@ -19,15 +19,6 @@ import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
 public class ActionsMenu
     extends
       JMenu {
-
-  /**
-   * A menu item for assuming the model coordinates from the layout coordinates.
-   */
-  private final JMenuItem cbiAlignLayoutWithModel;
-  /**
-   * A menu item for assuming the layout coordinates from the model coordinates.
-   */
-  private final JMenuItem cbiAlignModelWithLayout;
   /**
    * A menu item for calculating the euclidean distance for paths.
    */
@@ -57,14 +48,6 @@ public class ActionsMenu
     this.setText(labels.getString("actionsMenu.text"));
     this.setToolTipText(labels.getString("actionsMenu.tooltipText"));
     this.setMnemonic('A');
-
-    // Menu item Actions -> Copy model to layout
-    cbiAlignModelWithLayout = menuFactory.createModelToLayoutMenuItem(true);
-    add(cbiAlignModelWithLayout);
-
-    // Menu item Actions -> Copy layout to model
-    cbiAlignLayoutWithModel = menuFactory.createLayoutToModelMenuItem(true);
-    add(cbiAlignLayoutWithModel);
 
     calculatePathLength = menuFactory.createCalculatePathLengthMenuItem();
     add(calculatePathLength);
