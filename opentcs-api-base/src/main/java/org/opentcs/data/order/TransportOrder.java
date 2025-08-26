@@ -59,6 +59,7 @@ public class TransportOrder
   private final List<DriveOrder> driveOrders;
   /**
    * An optional token for reserving peripheral devices while processing this transport order.
+   * The reservation token may be {@code null} but not empty.
    */
   @Nullable
   private final String peripheralReservationToken;
@@ -274,7 +275,7 @@ public class TransportOrder
   }
 
   /**
-   * Retruns this transport order's type.
+   * Returns this transport order's type.
    *
    * @return This transport order's type.
    */
@@ -283,9 +284,9 @@ public class TransportOrder
   }
 
   /**
-   * Creates a copy of this obejct, with the given type.
+   * Creates a copy of this object, with the given type.
    *
-   * @param type The tpye to be set in the copy.
+   * @param type The type to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
   public TransportOrder withType(String type) {
@@ -705,6 +706,9 @@ public class TransportOrder
 
   /**
    * Creates a copy of this object, with the given reservation token.
+   * <p>
+   * The reservation token may be {@code null} but not empty.
+   * </p>
    *
    * @param peripheralReservationToken The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
@@ -713,6 +717,12 @@ public class TransportOrder
       @Nullable
       String peripheralReservationToken
   ) {
+    if (peripheralReservationToken != null) {
+      checkArgument(
+          !peripheralReservationToken.isEmpty(),
+          "peripheralReservationToken may be 'null' but not empty."
+      );
+    }
     return new TransportOrder(
         getName(),
         getProperties(),
