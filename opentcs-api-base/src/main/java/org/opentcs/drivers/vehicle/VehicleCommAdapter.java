@@ -120,7 +120,7 @@ public interface VehicleCommAdapter
    * {@link #getUnsentCommands() unsent commands}.
    * <p>
    * The return value of this method indicates whether the command was really added to the queue.
-   * The primary reason for a commmand not being added to the queue is that it would exceed the
+   * The primary reason for a command not being added to the queue is that it would exceed the
    * adapter's {@link #getCommandsCapacity() commands capacity}.
    * </p>
    *
@@ -190,10 +190,11 @@ public interface VehicleCommAdapter
    */
   @Deprecated
   @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  void processMessage(
+  default void processMessage(
       @Nullable
       Object message
-  );
+  ) {
+  }
 
   /**
    * Executes the given {@link AdapterCommand}.
@@ -203,10 +204,12 @@ public interface VehicleCommAdapter
    */
   @Deprecated
   @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  void execute(
+  default void execute(
       @Nonnull
       AdapterCommand command
-  );
+  ) {
+    command.execute(this);
+  }
 
   /**
    * Processes the given {@link VehicleCommAdapterMessage}

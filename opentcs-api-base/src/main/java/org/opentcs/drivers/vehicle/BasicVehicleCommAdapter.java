@@ -249,12 +249,6 @@ public abstract class BasicVehicleCommAdapter
   }
 
   @Override
-  @Deprecated
-  public void execute(AdapterCommand command) {
-    command.execute(this);
-  }
-
-  @Override
   public void processMessage(
       @Nonnull
       VehicleCommAdapterMessage message

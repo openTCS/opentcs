@@ -278,11 +278,6 @@ public class LoopbackCommunicationAdapter
   }
 
   @Override
-  @Deprecated
-  public void processMessage(Object message) {
-  }
-
-  @Override
   public void processMessage(
       @Nonnull
       VehicleCommAdapterMessage message
