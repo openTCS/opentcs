@@ -20,6 +20,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * New features and enhancements:
 ** Optionally show vehicle envelopes for currently allocated and upcoming resources in the Operations Desk.
+** Consider `orderpool.sweepAge` when cleaning up order sequences, too.
 * Bugs fixed:
 ** Properly check a new plant model for duplicate element names before accepting it.
 * Changes affecting developers:

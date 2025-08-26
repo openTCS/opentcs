@@ -50,7 +50,11 @@ class WorkingSetCleanupTaskTest {
             creationTimeThreshold
         );
     DefaultOrderSequenceCleanupApproval orderSequenceCleanupApproval
-        = new DefaultOrderSequenceCleanupApproval(orderPoolManager, orderCleanupApproval);
+        = new DefaultOrderSequenceCleanupApproval(
+            orderPoolManager,
+            orderCleanupApproval,
+            creationTimeThreshold
+        );
     cleanupTask = new WorkingSetCleanupTask(
         new Object(),
         orderPoolManager,
@@ -96,7 +100,8 @@ class WorkingSetCleanupTaskTest {
   void cleanExpiredOrderSequences() {
     when(configuration.sweepAge()).thenReturn(60000);
 
-    OrderSequence orderSequence = new OrderSequence("seq-1");
+    OrderSequence orderSequence = new OrderSequence("seq-1")
+        .withCreationTime(Instant.now().minusMillis(70000));
     objectRepository.addObject(orderSequence);
 
     TransportOrder order = new TransportOrder("Order-1", List.of())

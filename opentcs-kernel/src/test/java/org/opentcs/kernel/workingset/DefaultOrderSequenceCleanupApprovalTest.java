@@ -25,6 +25,7 @@ class DefaultOrderSequenceCleanupApprovalTest {
   private TransportOrderPoolManager orderPoolManager;
   private TCSObjectRepository objectRepo;
   private DefaultTransportOrderCleanupApproval defaultTransportOrderCleanupApproval;
+  private CreationTimeThreshold creationTimeThreshold;
   private DefaultOrderSequenceCleanupApproval approval;
 
   @BeforeEach
@@ -32,18 +33,23 @@ class DefaultOrderSequenceCleanupApprovalTest {
     orderPoolManager = mock();
     objectRepo = mock();
     defaultTransportOrderCleanupApproval = mock();
+    creationTimeThreshold = mock();
+    given(creationTimeThreshold.getCurrentThreshold())
+        .willReturn(Instant.parse("2024-01-01T12:00:00.00Z"));
     given(orderPoolManager.getObjectRepo()).willReturn(objectRepo);
 
     approval = new DefaultOrderSequenceCleanupApproval(
         orderPoolManager,
-        defaultTransportOrderCleanupApproval
+        defaultTransportOrderCleanupApproval,
+        creationTimeThreshold
     );
   }
 
   @Test
   void approveOrderSequence() {
     OrderSequence sequence = createOrderSequence()
-        .withFinished(true);
+        .withFinished(true)
+        .withCreationTime(Instant.parse("2024-01-01T09:00:00.00Z"));
 
     assertTrue(approval.test(sequence));
   }
@@ -51,7 +57,8 @@ class DefaultOrderSequenceCleanupApprovalTest {
   @Test
   void disapproveOrderSequenceNotFinished() {
     OrderSequence sequence = createOrderSequence()
-        .withFinished(false);
+        .withFinished(false)
+        .withCreationTime(Instant.parse("2024-01-01T09:00:00.00Z"));
 
     assertFalse(approval.test(sequence));
   }
@@ -65,6 +72,15 @@ class DefaultOrderSequenceCleanupApprovalTest {
         .withOrder(order.getReference())
         .withFinished(true);
     given(objectRepo.getObject(TransportOrder.class, order.getReference())).willReturn(order);
+
+    assertFalse(approval.test(sequence));
+  }
+
+  @Test
+  void disapproveOrderSequenceCreatedAfterCurrentThreshold() {
+    OrderSequence sequence = createOrderSequence()
+        .withFinished(true)
+        .withCreationTime(Instant.parse("2024-01-01T15:00:00.00Z"));
 
     assertFalse(approval.test(sequence));
   }

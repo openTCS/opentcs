@@ -18,17 +18,21 @@ public class DefaultOrderSequenceCleanupApproval
 
   private final TransportOrderPoolManager orderPoolManager;
   private final DefaultTransportOrderCleanupApproval defaultTransportOrderCleanupApproval;
+  private final CreationTimeThreshold creationTimeThreshold;
 
   /**
    * Creates a new instance.
    *
    * @param orderPoolManager The order pool manager to be used.
    * @param defaultTransportOrderCleanupApproval Checks whether a transport order may be removed.
+   * @param creationTimeThreshold Keeps track of the time used to determine whether an order
+   * sequence should be removed (according to its creation time).
    */
   @Inject
   public DefaultOrderSequenceCleanupApproval(
       TransportOrderPoolManager orderPoolManager,
-      DefaultTransportOrderCleanupApproval defaultTransportOrderCleanupApproval
+      DefaultTransportOrderCleanupApproval defaultTransportOrderCleanupApproval,
+      CreationTimeThreshold creationTimeThreshold
   ) {
     this.orderPoolManager = requireNonNull(orderPoolManager, "orderPoolManager");
     this.defaultTransportOrderCleanupApproval
@@ -36,6 +40,7 @@ public class DefaultOrderSequenceCleanupApproval
             defaultTransportOrderCleanupApproval,
             "defaultTransportOrderCleanupApproval"
         );
+    this.creationTimeThreshold = requireNonNull(creationTimeThreshold, "creationTimeThreshold");
   }
 
   @Override
@@ -44,6 +49,9 @@ public class DefaultOrderSequenceCleanupApproval
       return false;
     }
     if (hasUnapprovedOrder(seq)) {
+      return false;
+    }
+    if (seq.getCreationTime().isAfter(creationTimeThreshold.getCurrentThreshold())) {
       return false;
     }
     return true;
