@@ -11,6 +11,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsMapWithSize.anEmptyMap;
 
+import jakarta.annotation.Nonnull;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -140,12 +141,17 @@ class ReservationPoolTest {
     }
 
     @Override
+    @Deprecated
     public boolean allocationSuccessful(Set<TCSResource<?>> resources) {
-      return false;
+      return onAllocation(resources);
     }
 
     @Override
-    public void allocationFailed(Set<TCSResource<?>> resources) {
+    public boolean onAllocation(
+        @Nonnull
+        Set<TCSResource<?>> resources
+    ) {
+      return false;
     }
   }
 }

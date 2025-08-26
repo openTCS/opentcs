@@ -725,7 +725,16 @@ public class DefaultVehicleController
   }
 
   @Override
+  @Deprecated
   public boolean allocationSuccessful(
+      @Nonnull
+      Set<TCSResource<?>> resources
+  ) {
+    return onAllocation(resources);
+  }
+
+  @Override
+  public boolean onAllocation(
       @Nonnull
       Set<TCSResource<?>> resources
   ) {
@@ -771,15 +780,6 @@ public class DefaultVehicleController
     }
     // Let the scheduler know we've accepted the resources given.
     return true;
-  }
-
-  @Override
-  public void allocationFailed(
-      @Nonnull
-      Set<TCSResource<?>> resources
-  ) {
-    requireNonNull(resources, "resources");
-    throw new IllegalStateException("Failed to allocate: " + resources);
   }
 
   @Override

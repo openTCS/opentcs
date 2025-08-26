@@ -129,7 +129,7 @@ public class DummyScheduler
 
     @Override
     public void run() {
-      client.allocationSuccessful(resources);
+      client.onAllocation(resources);
     }
   }
 }

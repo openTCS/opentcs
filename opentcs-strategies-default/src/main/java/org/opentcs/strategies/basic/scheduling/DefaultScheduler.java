@@ -417,12 +417,17 @@ public class DefaultScheduler
     }
 
     @Override
+    @Deprecated
     public boolean allocationSuccessful(Set<TCSResource<?>> resources) {
-      return false;
+      return onAllocation(resources);
     }
 
     @Override
-    public void allocationFailed(Set<TCSResource<?>> resources) {
+    public boolean onAllocation(
+        @Nonnull
+        Set<TCSResource<?>> resources
+    ) {
+      return false;
     }
   }
 }

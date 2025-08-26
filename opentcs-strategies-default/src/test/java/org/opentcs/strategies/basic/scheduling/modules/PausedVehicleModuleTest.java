@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import jakarta.annotation.Nonnull;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,16 +78,19 @@ class PausedVehicleModuleTest {
     }
 
     @Override
+    @Deprecated
     public boolean allocationSuccessful(
         Set<TCSResource<?>> resources
     ) {
-      return true;
+      return onAllocation(resources);
     }
 
     @Override
-    public void allocationFailed(
+    public boolean onAllocation(
+        @Nonnull
         Set<TCSResource<?>> resources
     ) {
+      return true;
     }
   }
 }

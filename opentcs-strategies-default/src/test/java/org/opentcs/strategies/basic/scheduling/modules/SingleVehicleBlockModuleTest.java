@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import jakarta.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -140,16 +141,19 @@ class SingleVehicleBlockModuleTest {
     }
 
     @Override
+    @Deprecated
     public boolean allocationSuccessful(
         Set<TCSResource<?>> resources
     ) {
-      return true;
+      return onAllocation(resources);
     }
 
     @Override
-    public void allocationFailed(
+    public boolean onAllocation(
+        @Nonnull
         Set<TCSResource<?>> resources
     ) {
+      return true;
     }
   }
 }

@@ -127,7 +127,7 @@ class AllocatorTask
         resources,
         client.getId()
     );
-    if (!client.allocationSuccessful(resources)) {
+    if (!client.onAllocation(resources)) {
       LOG.warn(
           "{}: Client didn't want allocated resources ({}), unallocating them...",
           client.getId(),

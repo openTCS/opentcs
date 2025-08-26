@@ -11,6 +11,7 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Manages resources used by clients (vehicles) to help prevent both collisions and deadlocks.
@@ -303,21 +304,44 @@ public interface Scheduler
      * @return <code>true</code> if, and only if, this client accepts the resources allocated. A
      * return value of <code>false</code> indicates this client does not need the given resources
      * (any more), freeing them implicitly, but not restoring any previous claim.
+     * @deprecated Use {@link #onAllocation(Set)} instead.
      */
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
     boolean allocationSuccessful(
         @Nonnull
         Set<TCSResource<?>> resources
     );
 
     /**
+     * Called when resources have been reserved for this client.
+     *
+     * @param resources The resources reserved.
+     * @return {@code true} if, and only if, this client accepts the resources allocated. A
+     * return value of {@code false} indicates this client does not need the given resources
+     * (any more), freeing them implicitly, but not restoring any previous claim.
+     */
+    @ScheduledApiChange(when = "7.0", details = "Default implementation will be removed.")
+    default boolean onAllocation(
+        @Nonnull
+        Set<TCSResource<?>> resources
+    ) {
+      return allocationSuccessful(resources);
+    }
+
+    /**
      * Called if it was impossible to allocate a requested set of resources for this client.
      *
      * @param resources The resources which could not be reserved.
+     * @deprecated Will be removed without replacement.
      */
-    void allocationFailed(
+    @Deprecated
+    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
+    default void allocationFailed(
         @Nonnull
         Set<TCSResource<?>> resources
-    );
+    ) {
+    }
   }
 
   /**
