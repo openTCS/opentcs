@@ -17,6 +17,7 @@ import org.opentcs.data.model.Vehicle;
 /**
  * Tests for {@link CoordinateSystemTransformation}.
  */
+@Deprecated
 class CoordinateSystemTransformationTest {
 
   @Test

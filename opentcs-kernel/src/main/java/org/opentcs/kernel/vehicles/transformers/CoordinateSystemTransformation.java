@@ -19,7 +19,10 @@ import org.slf4j.LoggerFactory;
  * <li>added to coordinate and orientation angle values sent to the vehicle driver.</li>
  * <li>subtracted from coordinate and orientation angle values reported by the vehicle driver.</li>
  * </ul>
+ *
+ * @deprecated Use {@link CoordinateSystemMapping} instead.
  */
+@Deprecated
 public class CoordinateSystemTransformation {
 
   /**

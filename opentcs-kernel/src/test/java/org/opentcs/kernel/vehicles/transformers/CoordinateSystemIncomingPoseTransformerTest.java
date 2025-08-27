@@ -15,6 +15,7 @@ import org.opentcs.data.model.Triple;
 /**
  * Tests for {@link CoordinateSystemIncomingPoseTransformer}.
  */
+@Deprecated
 public class CoordinateSystemIncomingPoseTransformerTest {
 
   @Test

@@ -13,7 +13,10 @@ import org.opentcs.drivers.vehicle.IncomingPoseTransformer;
 /**
  * Transforms {@link Pose}s by subtracting offsets in a given
  * {@link CoordinateSystemTransformation}.
+ *
+ * @deprecated Use {@link CsmIncomingPoseTransformer} instead.
  */
+@Deprecated
 public class CoordinateSystemIncomingPoseTransformer
     implements
       IncomingPoseTransformer {

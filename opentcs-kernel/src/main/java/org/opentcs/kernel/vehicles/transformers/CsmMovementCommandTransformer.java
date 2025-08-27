@@ -5,6 +5,8 @@ package org.opentcs.kernel.vehicles.transformers;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,29 +16,30 @@ import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
-import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.MovementCommandTransformer;
 
 /**
- * Transforms coordinates in {@link MovementCommand}s by adding offsets in a given
- * {@link CoordinateSystemTransformation}.
- *
- * @deprecated Use {@link CsmMovementCommandTransformer} instead.
+ * Transforms coordinates in {@link MovementCommand}s (i.e. coordinates in the plant model's
+ * coordinate system) to coordinates in the vehicle's coordinate system as described by the provided
+ * {@link CoordinateSystemMapping}.
  */
-@Deprecated
-public class CoordinateSystemMovementCommandTransformer
+public class CsmMovementCommandTransformer
     implements
       MovementCommandTransformer {
 
-  private final CoordinateSystemTransformation transformation;
+  private final CoordinateSystemMapping mapping;
+  private final AffineTransform affineTransform;
 
-  public CoordinateSystemMovementCommandTransformer(
+  public CsmMovementCommandTransformer(
       @Nonnull
-      CoordinateSystemTransformation transformation
+      CoordinateSystemMapping mapping
   ) {
-    this.transformation = requireNonNull(transformation, "transformation");
+    this.mapping = requireNonNull(mapping, "mapping");
+    affineTransform = new AffineTransform();
+    affineTransform.rotate(Math.toRadians(-mapping.getRotationZ()));
+    affineTransform.translate(-mapping.getTranslationX(), -mapping.getTranslationY());
   }
 
   @Override
@@ -78,7 +81,7 @@ public class CoordinateSystemMovementCommandTransformer
         .orElse(null);
   }
 
-  private Step transformStep(Step oldStep) {
+  private Route.Step transformStep(Route.Step oldStep) {
     return oldStep
         .withSourcePoint(transformPoint(oldStep.getSourcePoint()))
         .withDestinationPoint(transformPoint(oldStep.getDestinationPoint()));
@@ -88,11 +91,7 @@ public class CoordinateSystemMovementCommandTransformer
     return Optional.ofNullable(point)
         .map(
             originalPoint -> originalPoint.withPose(
-                new Pose(
-                    transformTriple(originalPoint.getPose().getPosition()),
-                    (originalPoint.getPose().getOrientationAngle() + transformation
-                        .getOffsetOrientation()) % 360.0
-                )
+                transformPose(originalPoint.getPose())
             )
         )
         .orElse(null);
@@ -108,14 +107,26 @@ public class CoordinateSystemMovementCommandTransformer
         .orElse(null);
   }
 
+  private Pose transformPose(Pose pose) {
+    return new Pose(
+        transformTriple(pose.getPosition()),
+        (pose.getOrientationAngle() - mapping.getRotationZ()) % 360
+    );
+  }
+
   private Triple transformTriple(Triple triple) {
     return Optional.ofNullable(triple)
         .map(
-            originalTriple -> new Triple(
-                originalTriple.getX() + transformation.getOffsetX(),
-                originalTriple.getY() + transformation.getOffsetY(),
-                originalTriple.getZ() + transformation.getOffsetZ()
-            )
+            trpl -> {
+              Point2D srcPoint = new Point2D.Double(trpl.getX(), trpl.getY());
+              Point2D destPoint = new Point2D.Double();
+              affineTransform.transform(srcPoint, destPoint);
+              return new Triple(
+                  Math.round(destPoint.getX()),
+                  Math.round(destPoint.getY()),
+                  trpl.getZ() - mapping.getTranslationZ()
+              );
+            }
         )
         .orElse(null);
   }

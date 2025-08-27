@@ -66,6 +66,7 @@ import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
 import org.opentcs.kernel.vehicles.VehicleControllerComponentsFactory;
 import org.opentcs.kernel.vehicles.VehicleControllerFactory;
+import org.opentcs.kernel.vehicles.transformers.CoordinateSystemMapperFactory;
 import org.opentcs.kernel.vehicles.transformers.CoordinateSystemTransformerFactory;
 import org.opentcs.kernel.vehicles.transformers.DefaultVehicleDataTransformerFactory;
 import org.opentcs.kernel.workingset.CreationTimeThreshold;
@@ -95,6 +96,7 @@ public class DefaultKernelInjectionModule
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   protected void configure() {
     configureEventHub();
     configureKernelExecutor();
@@ -150,8 +152,9 @@ public class DefaultKernelInjectionModule
         .to(StandardKernel.class);
 
     vehicleDataTransformersBinder().addBinding().to(DefaultVehicleDataTransformerFactory.class);
-    // tag::documentation_registerTransformerFactory[]
     vehicleDataTransformersBinder().addBinding().to(CoordinateSystemTransformerFactory.class);
+    // tag::documentation_registerTransformerFactory[]
+    vehicleDataTransformersBinder().addBinding().to(CoordinateSystemMapperFactory.class);
     // end::documentation_registerTransformerFactory[]
 
     configureKernelStatesDependencies();

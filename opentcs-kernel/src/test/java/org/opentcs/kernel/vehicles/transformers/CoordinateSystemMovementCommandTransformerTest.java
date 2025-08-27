@@ -27,6 +27,7 @@ import org.opentcs.drivers.vehicle.MovementCommand;
 /**
  * Tests for {@link CoordinateSystemMovementCommandTransformer}.
  */
+@Deprecated
 public class CoordinateSystemMovementCommandTransformerTest {
 
   private MovementCommand command;

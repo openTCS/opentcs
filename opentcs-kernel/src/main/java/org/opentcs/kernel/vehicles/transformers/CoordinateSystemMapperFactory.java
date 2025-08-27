@@ -11,35 +11,32 @@ import org.opentcs.drivers.vehicle.MovementCommandTransformer;
 import org.opentcs.drivers.vehicle.VehicleDataTransformerFactory;
 
 /**
- * Provides instances of {@link CoordinateSystemMovementCommandTransformer} and
- * {@link CoordinateSystemIncomingPoseTransformer}.
- *
- * @deprecated Use {@link CoordinateSystemMapperFactory} instead.
+ * Provides instances of {@link CsmMovementCommandTransformer} and
+ * {@link CsmIncomingPoseTransformer}.
  */
-@Deprecated
-public class CoordinateSystemTransformerFactory
+public class CoordinateSystemMapperFactory
     implements
       VehicleDataTransformerFactory {
 
-  public CoordinateSystemTransformerFactory() {
+  public CoordinateSystemMapperFactory() {
   }
 
-  @Override
   @Nonnull
+  @Override
   public String getName() {
-    return "OFFSET_TRANSFORMER";
+    return "COORDINATE_SYSTEM_MAPPER";
   }
 
-  @Override
   @Nonnull
+  @Override
   public MovementCommandTransformer createMovementCommandTransformer(
       @Nonnull
       Vehicle vehicle
   ) {
     requireNonNull(vehicle);
 
-    return new CoordinateSystemMovementCommandTransformer(
-        CoordinateSystemTransformation.fromVehicle(vehicle)
+    return new CsmMovementCommandTransformer(
+        CoordinateSystemMapping.fromVehicle(vehicle)
             .orElseThrow(
                 () -> new IllegalArgumentException(
                     "Cannot create transformer without transformation data."
@@ -48,16 +45,16 @@ public class CoordinateSystemTransformerFactory
     );
   }
 
-  @Override
   @Nonnull
+  @Override
   public IncomingPoseTransformer createIncomingPoseTransformer(
       @Nonnull
       Vehicle vehicle
   ) {
     requireNonNull(vehicle);
 
-    return new CoordinateSystemIncomingPoseTransformer(
-        CoordinateSystemTransformation.fromVehicle(vehicle)
+    return new CsmIncomingPoseTransformer(
+        CoordinateSystemMapping.fromVehicle(vehicle)
             .orElseThrow(
                 () -> new IllegalArgumentException(
                     "Cannot create transformer without transformation data."
@@ -73,6 +70,6 @@ public class CoordinateSystemTransformerFactory
   ) {
     requireNonNull(vehicle, "vehicle");
 
-    return CoordinateSystemTransformation.fromVehicle(vehicle).isPresent();
+    return CoordinateSystemMapping.fromVehicle(vehicle).isPresent();
   }
 }
