@@ -26,6 +26,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Bugs fixed:
 ** Properly check a new plant model for duplicate element names before accepting it.
 ** Don't allow transport orders to be created with a peripheral reservation token set to the empty string.
+** Record allocation futures for retried tasks in `PendingAllocationManager` to ensure proper tracking and cancellation.
 * Changes affecting developers:
 ** Mark layout coordinates of points and locations for removal with the next major version as they are apparently not really used in practice.
    The model coordinates of points and locations should be used instead.
