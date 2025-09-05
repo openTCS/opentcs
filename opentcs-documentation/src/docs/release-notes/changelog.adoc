@@ -16,7 +16,7 @@ The openTCS developers
 This change log lists the most relevant changes for past releases in reverse chronological order.
 (Note that the openTCS project adheres to https://semver.org/[Semantic Versioning].)
 
-== Unreleased
+== Version 6.6 (2025-09-05)
 
 * New features and enhancements:
 ** Optionally show vehicle envelopes for currently allocated and upcoming resources in the Operations Desk.
@@ -37,7 +37,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update Asciidoctor Gradle plugins to 4.0.5.
 ** Update OpenAPI generator to 7.15.0.
 ** Update Swagger UI to 5.28.0.
-** Update Approvaltests to 25.0.23.
+** Update ApprovalTests to 25.0.23.
 ** Update AssertJ to 3.27.4.
 ** Update JUnit to 5.13.4.
 ** Update Mockito to 5.19.0.
