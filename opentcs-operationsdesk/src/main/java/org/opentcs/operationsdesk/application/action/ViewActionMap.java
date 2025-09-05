@@ -20,6 +20,7 @@ import org.opentcs.operationsdesk.application.action.actions.DisconnectFromKerne
 import org.opentcs.operationsdesk.application.action.actions.FindVehicleAction;
 import org.opentcs.operationsdesk.application.action.actions.PauseAllVehiclesAction;
 import org.opentcs.operationsdesk.application.action.actions.ResumeAllVehiclesAction;
+import org.opentcs.operationsdesk.application.action.actions.SendVehicleCommAdapterMessageAction;
 import org.opentcs.operationsdesk.application.action.app.AboutAction;
 import org.opentcs.operationsdesk.application.action.view.AddDrawingViewAction;
 import org.opentcs.operationsdesk.application.action.view.AddPeripheralJobViewAction;
@@ -50,6 +51,7 @@ public class ViewActionMap
    * @param actionFactory The action factory
    * @param createTransportOrderAction The action to create transport orders
    * @param findVehicleAction The action to find vehicles
+   * @param sendVehicleCommAdapterMessageAction The action to send vehicle comm adapter messages.
    * @param pauseAllVehiclesAction The action to pause all vehicles
    * @param resumeAllVehiclesAction The action to resume all vehicles
    * @param aboutAction The action to show the about window
@@ -67,6 +69,7 @@ public class ViewActionMap
       ActionFactory actionFactory,
       CreateTransportOrderAction createTransportOrderAction,
       FindVehicleAction findVehicleAction,
+      SendVehicleCommAdapterMessageAction sendVehicleCommAdapterMessageAction,
       PauseAllVehiclesAction pauseAllVehiclesAction,
       ResumeAllVehiclesAction resumeAllVehiclesAction,
       AboutAction aboutAction,
@@ -107,6 +110,7 @@ public class ViewActionMap
     // Menu item Actions -> Create ...
     put(CreateTransportOrderAction.ID, createTransportOrderAction);
     put(CreatePeripheralJobAction.ID, createPeripheralJobAction);
+    put(SendVehicleCommAdapterMessageAction.ID, sendVehicleCommAdapterMessageAction);
 
     // --- Menu View ---
     // Menu View -> Add drawing view

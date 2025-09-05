@@ -17,6 +17,7 @@ import org.opentcs.operationsdesk.application.action.ViewActionMap;
 import org.opentcs.operationsdesk.application.action.actions.CreatePeripheralJobAction;
 import org.opentcs.operationsdesk.application.action.actions.CreateTransportOrderAction;
 import org.opentcs.operationsdesk.application.action.actions.FindVehicleAction;
+import org.opentcs.operationsdesk.application.action.actions.SendVehicleCommAdapterMessageAction;
 import org.opentcs.operationsdesk.application.menus.MenuFactory;
 import org.opentcs.operationsdesk.components.drawing.figures.VehicleFigure;
 import org.opentcs.operationsdesk.event.KernelStateChangeEvent;
@@ -55,6 +56,10 @@ public class ActionsMenu
    * A check box for ignoring the vehicles' orientation angles.
    */
   private final JCheckBoxMenuItem cbiIgnoreOrientationAngle;
+  /**
+   * A menu item for sending vehicle comm adapter messages.
+   */
+  private final JMenuItem menuItemSendVehicleCommAdapterMessage;
 
   /**
    * Creates a new instance.
@@ -95,6 +100,14 @@ public class ActionsMenu
     menuItemCreatePeripheralJob = new JMenuItem(actionMap.get(CreatePeripheralJobAction.ID));
     menuItemCreatePeripheralJob.setEnabled(false);
     add(menuItemCreatePeripheralJob);
+    addSeparator();
+
+    // Menu item Actions -> Send vehicle comm adapter message
+    menuItemSendVehicleCommAdapterMessage = new JMenuItem(
+        actionMap.get(SendVehicleCommAdapterMessageAction.ID)
+    );
+    menuItemSendVehicleCommAdapterMessage.setEnabled(false);
+    add(menuItemSendVehicleCommAdapterMessage);
     addSeparator();
 
     // Menu item Actions -> Find Vehicle
@@ -150,11 +163,13 @@ public class ActionsMenu
         menuItemCreateTransportOrder.setEnabled(true);
         menuItemCreatePeripheralJob.setEnabled(true);
         menuItemFindVehicle.setEnabled(true);
+        menuItemSendVehicleCommAdapterMessage.setEnabled(true);
         break;
       case DISCONNECTED:
         menuItemCreateTransportOrder.setEnabled(false);
         menuItemCreatePeripheralJob.setEnabled(false);
         menuItemFindVehicle.setEnabled(false);
+        menuItemSendVehicleCommAdapterMessage.setEnabled(false);
         break;
       default:
         // Do nothing.

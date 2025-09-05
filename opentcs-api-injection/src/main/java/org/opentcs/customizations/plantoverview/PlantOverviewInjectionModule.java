@@ -9,6 +9,7 @@ import org.opentcs.components.plantoverview.PlantModelExporter;
 import org.opentcs.components.plantoverview.PlantModelImporter;
 import org.opentcs.components.plantoverview.PluggablePanelFactory;
 import org.opentcs.components.plantoverview.PropertySuggestions;
+import org.opentcs.components.plantoverview.VehicleCommAdapterMessageSuggestions;
 import org.opentcs.customizations.ConfigurableInjectionModule;
 
 /**
@@ -61,6 +62,17 @@ public abstract class PlantOverviewInjectionModule
    */
   protected Multibinder<OrderTypeSuggestions> orderTypeSuggestionsBinder() {
     return Multibinder.newSetBinder(binder(), OrderTypeSuggestions.class);
+  }
+
+  /**
+   * Returns a multibinder that can be used to register classes that provide suggestions for
+   * vehicle comm adapter messages.
+   *
+   * @return The multibinder.
+   */
+  protected Multibinder<VehicleCommAdapterMessageSuggestions>
+      vehicleCommAdapterMessageSuggestionsBinder() {
+    return Multibinder.newSetBinder(binder(), VehicleCommAdapterMessageSuggestions.class);
   }
 
   /**

@@ -4,3 +4,4 @@
 org.opentcs.operationsdesk.DefaultImportersExportersModule
 org.opentcs.operationsdesk.PropertySuggestionsModule
 org.opentcs.operationsdesk.transport.OrderTypeSuggestionsModule
+org.opentcs.operationsdesk.VehicleCommAdapterMessageSuggestionsModule

@@ -85,4 +85,9 @@ public interface I18nPlantOverviewOperating {
    */
   String CREATE_PERIPHERAL_JOB_PATH
       = "i18n.org.opentcs.plantoverview.operating.dialogs.createPeripheralJob";
+  /**
+   * Path to the resources related to the send vehicle comm adapter message panel.
+   */
+  String SEND_VEHICLE_COMM_ADAPTER_MESSAGE_PATH
+      = "i18n.org.opentcs.plantoverview.operating.dialogs.sendVehicleCommAdapterMessage";
 }

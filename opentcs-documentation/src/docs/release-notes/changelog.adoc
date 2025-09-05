@@ -23,6 +23,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Consider `orderpool.sweepAge` when cleaning up order sequences, too.
 ** Add support for mapping coordinates from the plant model's coordinate system to the coordinate system of a vehicle and vice versa (when sending/receiving them to/from a vehicle).
    For more information, please refer to the user's guide.
+** Add support for sending `VehicleCommAdapterMessage`s via the Operations Desk.
 * Bugs fixed:
 ** Properly check a new plant model for duplicate element names before accepting it.
 ** Don't allow transport orders to be created with a peripheral reservation token set to the empty string.
