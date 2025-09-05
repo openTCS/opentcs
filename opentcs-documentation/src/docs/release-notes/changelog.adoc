@@ -33,6 +33,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Deprecate `Scheduler.Client.allocationSuccessful(Set)` in favor of the newly introduced `Scheduler.Client.onAllocation(Set)`.
 ** Update Jackson to 2.19.2.
 ** Update Semver4J to 6.0.0.
+** Update Asciidoctor Gradle plugins to 4.0.5.
 ** Update Approvaltests to 25.0.23.
 ** Update AssertJ to 3.27.4.
 ** Update JUnit to 5.13.4.
