@@ -73,7 +73,7 @@ class LocationConverterTest {
                 .setPosition(new CoupleTO(2, 2))
                 .setLabelOffset(new CoupleTO(3, 3))
                 .setLayerId(4)
-                .setLocationRepresentation(LocationRepresentationTO.LOAD_TRANSFER_GENERIC.name())
+                .setLocationRepresentation(LocationRepresentationTO.LOAD_TRANSFER_GENERIC)
         )
         .setProperties(propertyList);
 
@@ -140,7 +140,7 @@ class LocationConverterTest {
     );
     assertThat(
         result.get(0).getLayout().getLocationRepresentation(),
-        is(LocationRepresentationTO.LOAD_TRANSFER_GENERIC.name())
+        is(LocationRepresentationTO.LOAD_TRANSFER_GENERIC)
     );
     assertThat(result.get(0).getLayout().getLayerId(), is(3));
     assertThat(result.get(0).getProperties(), hasSize(1));

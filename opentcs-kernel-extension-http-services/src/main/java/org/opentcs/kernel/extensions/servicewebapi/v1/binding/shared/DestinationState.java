@@ -98,20 +98,13 @@ public class DestinationState {
   }
 
   private static DestinationState.State mapDriveOrderState(DriveOrder.State driveOrderState) {
-    switch (driveOrderState) {
-      case PRISTINE:
-        return DestinationState.State.PRISTINE;
-      case TRAVELLING:
-        return DestinationState.State.TRAVELLING;
-      case OPERATING:
-        return DestinationState.State.OPERATING;
-      case FINISHED:
-        return DestinationState.State.FINISHED;
-      case FAILED:
-        return DestinationState.State.FAILED;
-      default:
-        throw new IllegalArgumentException("Unhandled drive order state: " + driveOrderState);
-    }
+    return switch (driveOrderState) {
+      case PRISTINE -> State.PRISTINE;
+      case TRAVELLING -> State.TRAVELLING;
+      case OPERATING -> State.OPERATING;
+      case FINISHED -> State.FINISHED;
+      case FAILED -> State.FAILED;
+    };
   }
 
   /**

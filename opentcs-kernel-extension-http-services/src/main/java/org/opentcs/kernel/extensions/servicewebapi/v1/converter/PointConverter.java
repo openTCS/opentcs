@@ -47,7 +47,7 @@ public class PointConverter {
                         point.getPose().getPosition().getZ()
                     )
                 )
-                .setType(point.getType().name())
+                .setType(toPointTOType(point.getType()))
                 .setVehicleOrientationAngle(point.getPose().getOrientationAngle())
                 .setVehicleEnvelopes(envelopeConverter.toEnvelopeTOs(point.getVehicleEnvelopes()))
                 .setMaxVehicleBoundingBox(
@@ -98,7 +98,7 @@ public class PointConverter {
                         point.getVehicleOrientationAngle()
                     )
                 )
-                .withType(Point.Type.valueOf(point.getType()))
+                .withType(toPointType(point.getType()))
                 .withLayout(
                     new PointCreationTO.Layout(
                         new Couple(
@@ -127,5 +127,19 @@ public class PointConverter {
                 )
         )
         .collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  private PointTO.Type toPointTOType(Point.Type type) {
+    return switch (type) {
+      case HALT_POSITION -> PointTO.Type.HALT_POSITION;
+      case PARK_POSITION -> PointTO.Type.PARK_POSITION;
+    };
+  }
+
+  private Point.Type toPointType(PointTO.Type type) {
+    return switch (type) {
+      case HALT_POSITION -> Point.Type.HALT_POSITION;
+      case PARK_POSITION -> Point.Type.PARK_POSITION;
+    };
   }
 }

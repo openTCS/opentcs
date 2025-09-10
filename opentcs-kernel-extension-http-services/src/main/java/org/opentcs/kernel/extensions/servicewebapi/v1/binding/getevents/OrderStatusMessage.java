@@ -191,26 +191,16 @@ public class OrderStatusMessage
      * @return The corresponding OrderState.
      */
     public static OrderState fromTransportOrderState(TransportOrder.State state) {
-      switch (state) {
-        case RAW:
-          return RAW;
-        case ACTIVE:
-          return ACTIVE;
-        case DISPATCHABLE:
-          return DISPATCHABLE;
-        case BEING_PROCESSED:
-          return BEING_PROCESSED;
-        case WITHDRAWN:
-          return WITHDRAWN;
-        case FINISHED:
-          return FINISHED;
-        case FAILED:
-          return FAILED;
-        case UNROUTABLE:
-          return UNROUTABLE;
-        default:
-          throw new IllegalArgumentException("Unknown transport order state.");
-      }
+      return switch (state) {
+        case RAW -> RAW;
+        case ACTIVE -> ACTIVE;
+        case DISPATCHABLE -> DISPATCHABLE;
+        case BEING_PROCESSED -> BEING_PROCESSED;
+        case WITHDRAWN -> WITHDRAWN;
+        case FINISHED -> FINISHED;
+        case FAILED -> FAILED;
+        case UNROUTABLE -> UNROUTABLE;
+      };
     }
   }
 }

@@ -80,7 +80,7 @@ class PathConverterTest {
         )
     );
     peripheralOperationTO = new PeripheralOperationTO("some-operation", "some-location")
-        .setExecutionTrigger(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION.name())
+        .setExecutionTrigger(PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION)
         .setCompletionRequired(true);
     peripheralOperationTOList = List.of(peripheralOperationTO);
     peripheralOperationCreationTO
@@ -128,7 +128,7 @@ class PathConverterTest {
     assertThat(result.get(0).getLayout().getLayerId(), is(4));
     assertThat(
         result.get(0).getLayout().getConnectionType(),
-        is(PathTO.Layout.ConnectionType.POLYPATH.name())
+        is(PathTO.Layout.ConnectionType.POLYPATH)
     );
     assertThat(result.get(0).getLayout().getControlPoints(), hasSize(1));
     assertThat(
@@ -150,7 +150,7 @@ class PathConverterTest {
         .setVehicleEnvelopes(envelopeList)
         .setLayout(
             new PathTO.Layout()
-                .setConnectionType(Path.Layout.ConnectionType.POLYPATH.name())
+                .setConnectionType(PathTO.Layout.ConnectionType.POLYPATH)
                 .setControlPoints(List.of(new CoupleTO(1, 1)))
                 .setLayerId(4)
         )

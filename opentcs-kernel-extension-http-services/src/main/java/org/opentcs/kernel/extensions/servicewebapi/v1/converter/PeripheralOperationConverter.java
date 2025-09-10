@@ -27,9 +27,7 @@ public class PeripheralOperationConverter {
                 perOp.getLocation().getName()
             )
                 .setCompletionRequired(perOp.isCompletionRequired())
-                .setExecutionTrigger(
-                    perOp.getExecutionTrigger().name()
-                )
+                .setExecutionTrigger(toExecutionTriggerTO(perOp.getExecutionTrigger()))
         )
         .collect(Collectors.toList());
   }
@@ -44,11 +42,7 @@ public class PeripheralOperationConverter {
                 perOp.getLocationName()
             )
                 .withCompletionRequired(perOp.isCompletionRequired())
-                .withExecutionTrigger(
-                    PeripheralOperation.ExecutionTrigger.valueOf(
-                        perOp.getExecutionTrigger()
-                    )
-                )
+                .withExecutionTrigger(toExecutionTrigger(perOp.getExecutionTrigger()))
         )
         .collect(Collectors.toList());
   }
@@ -59,17 +53,27 @@ public class PeripheralOperationConverter {
     return new PeripheralOperationDescription()
         .setOperation(operation.getOperation())
         .setLocationName(operation.getLocation().getName())
-        .setExecutionTrigger(toExecutionTrigger(operation.getExecutionTrigger()))
+        .setExecutionTrigger(toExecutionTriggerTO(operation.getExecutionTrigger()))
         .setCompletionRequired(operation.isCompletionRequired());
   }
 
-  private PeripheralOperationTO.ExecutionTrigger toExecutionTrigger(
+  private PeripheralOperationTO.ExecutionTrigger toExecutionTriggerTO(
       PeripheralOperation.ExecutionTrigger trigger
   ) {
     return switch (trigger) {
       case IMMEDIATE -> PeripheralOperationTO.ExecutionTrigger.IMMEDIATE;
       case AFTER_ALLOCATION -> PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION;
       case AFTER_MOVEMENT -> PeripheralOperationTO.ExecutionTrigger.AFTER_MOVEMENT;
+    };
+  }
+
+  private PeripheralOperation.ExecutionTrigger toExecutionTrigger(
+      PeripheralOperationTO.ExecutionTrigger trigger
+  ) {
+    return switch (trigger) {
+      case IMMEDIATE -> PeripheralOperation.ExecutionTrigger.IMMEDIATE;
+      case AFTER_ALLOCATION -> PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION;
+      case AFTER_MOVEMENT -> PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT;
     };
   }
 }

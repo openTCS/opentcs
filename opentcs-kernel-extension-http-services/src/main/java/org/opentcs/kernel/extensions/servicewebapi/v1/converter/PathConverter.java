@@ -55,7 +55,9 @@ public class PathConverter {
                 .setLayout(
                     new PathTO.Layout()
                         .setLayerId(path.getLayout().getLayerId())
-                        .setConnectionType(path.getLayout().getConnectionType().name())
+                        .setConnectionType(
+                            toPathTOConnectionType(path.getLayout().getConnectionType())
+                        )
                         .setControlPoints(toCoupleTOs(path.getLayout().getControlPoints()))
                 )
         )
@@ -91,7 +93,7 @@ public class PathConverter {
 
   private PathCreationTO.Layout toPathCreationTOLayout(PathTO.Layout layout) {
     return new PathCreationTO.Layout(
-        Path.Layout.ConnectionType.valueOf(layout.getConnectionType()),
+        toPathConnectionType(layout.getConnectionType()),
         layout.getControlPoints()
             .stream()
             .map(cp -> new Couple(cp.getX(), cp.getY()))
@@ -104,5 +106,31 @@ public class PathConverter {
     return controlPoints.stream()
         .map(cp -> new CoupleTO(cp.getX(), cp.getY()))
         .collect(Collectors.toList());
+  }
+
+  private Path.Layout.ConnectionType toPathConnectionType(
+      PathTO.Layout.ConnectionType connectionType
+  ) {
+    return switch (connectionType) {
+      case BEZIER -> Path.Layout.ConnectionType.BEZIER;
+      case BEZIER_3 -> Path.Layout.ConnectionType.BEZIER_3;
+      case DIRECT -> Path.Layout.ConnectionType.DIRECT;
+      case ELBOW -> Path.Layout.ConnectionType.ELBOW;
+      case POLYPATH -> Path.Layout.ConnectionType.POLYPATH;
+      case SLANTED -> Path.Layout.ConnectionType.SLANTED;
+    };
+  }
+
+  private PathTO.Layout.ConnectionType toPathTOConnectionType(
+      Path.Layout.ConnectionType connectionType
+  ) {
+    return switch (connectionType) {
+      case BEZIER -> PathTO.Layout.ConnectionType.BEZIER;
+      case BEZIER_3 -> PathTO.Layout.ConnectionType.BEZIER_3;
+      case DIRECT -> PathTO.Layout.ConnectionType.DIRECT;
+      case ELBOW -> PathTO.Layout.ConnectionType.ELBOW;
+      case POLYPATH -> PathTO.Layout.ConnectionType.POLYPATH;
+      case SLANTED -> PathTO.Layout.ConnectionType.SLANTED;
+    };
   }
 }

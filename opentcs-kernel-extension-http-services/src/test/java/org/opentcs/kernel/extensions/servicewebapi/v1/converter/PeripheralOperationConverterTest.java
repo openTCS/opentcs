@@ -32,7 +32,7 @@ class PeripheralOperationConverterTest {
   @Test
   void checkToPeripheralOperationCreationTOs() {
     PeripheralOperationTO peripheralOp = new PeripheralOperationTO("all", "l1")
-        .setExecutionTrigger(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION.name())
+        .setExecutionTrigger(PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION)
         .setCompletionRequired(true);
 
     List<PeripheralOperationCreationTO> result
@@ -65,7 +65,7 @@ class PeripheralOperationConverterTest {
     assertThat(result.get(0).getLocationName(), is("L1"));
     assertThat(
         result.get(0).getExecutionTrigger(),
-        is(PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION.name())
+        is(PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION)
     );
     assertTrue(result.get(0).isCompletionRequired());
   }

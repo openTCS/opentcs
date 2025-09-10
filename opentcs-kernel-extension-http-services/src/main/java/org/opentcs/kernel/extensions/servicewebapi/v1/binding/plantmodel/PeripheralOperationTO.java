@@ -14,7 +14,7 @@ public class PeripheralOperationTO {
 
   private String operation;
   private String locationName;
-  private String executionTrigger = ExecutionTrigger.AFTER_ALLOCATION.name();
+  private ExecutionTrigger executionTrigger = ExecutionTrigger.AFTER_ALLOCATION;
   private boolean completionRequired;
 
   @JsonCreator
@@ -57,13 +57,13 @@ public class PeripheralOperationTO {
   }
 
   @Nonnull
-  public String getExecutionTrigger() {
+  public ExecutionTrigger getExecutionTrigger() {
     return executionTrigger;
   }
 
   public PeripheralOperationTO setExecutionTrigger(
       @Nonnull
-      String executionTrigger
+      ExecutionTrigger executionTrigger
   ) {
     this.executionTrigger = requireNonNull(executionTrigger, "executionTrigger");
     return this;

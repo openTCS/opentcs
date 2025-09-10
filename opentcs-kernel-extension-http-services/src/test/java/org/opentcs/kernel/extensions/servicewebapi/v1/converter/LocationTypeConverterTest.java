@@ -51,7 +51,7 @@ class LocationTypeConverterTest {
         .setAllowedPeripheralOperations(List.of("PO1"))
         .setLayout(
             new LocationTypeTO.Layout()
-                .setLocationRepresentation(LocationRepresentationTO.RECHARGE_ALT_1.name())
+                .setLocationRepresentation(LocationRepresentationTO.RECHARGE_ALT_1)
         )
         .setProperties(propertyList);
 
@@ -93,7 +93,7 @@ class LocationTypeConverterTest {
     assertThat(result.get(0).getAllowedPeripheralOperations(), contains("PO1"));
     assertThat(
         result.get(0).getLayout().getLocationRepresentation(),
-        is(LocationRepresentationTO.LOAD_TRANSFER_GENERIC.name())
+        is(LocationRepresentationTO.LOAD_TRANSFER_GENERIC)
     );
     assertThat(result.get(0).getProperties(), hasSize(1));
     assertThat(result.get(0).getProperties(), is(propertyList));

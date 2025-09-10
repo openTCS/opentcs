@@ -21,7 +21,7 @@ public class PointTO {
   private String name;
   private TripleTO position = new TripleTO(0, 0, 0);
   private double vehicleOrientationAngle = Double.NaN;
-  private String type = Type.HALT_POSITION.name();
+  private Type type = Type.HALT_POSITION;
   private Layout layout = new Layout();
   private List<EnvelopeTO> vehicleEnvelopes = List.of();
   private BoundingBoxTO maxVehicleBoundingBox
@@ -86,13 +86,13 @@ public class PointTO {
   }
 
   @Nonnull
-  public String getType() {
+  public Type getType() {
     return type;
   }
 
   public PointTO setType(
       @Nonnull
-      String type
+      Type type
   ) {
     this.type = requireNonNull(type, "type");
     return this;
@@ -137,6 +137,7 @@ public class PointTO {
   public enum Type {
 
     HALT_POSITION,
+    PARK_POSITION;
   }
   // CHECKSTYLE:ON
 

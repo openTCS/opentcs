@@ -34,7 +34,7 @@ public class BlockConverter {
             block -> new BlockCreationTO(block.getName())
                 .withProperties(pConverter.toPropertyMap(block.getProperties()))
                 .withMemberNames(block.getMemberNames())
-                .withType(Block.Type.valueOf(block.getType()))
+                .withType(convertToBlockType(block.getType()))
                 .withLayout(
                     new BlockCreationTO.Layout(
                         Colors.decodeFromHexRGB(block.getLayout().getColor())
@@ -48,7 +48,7 @@ public class BlockConverter {
     return blocks.stream()
         .map(
             block -> new BlockTO(block.getName())
-                .setType(block.getType().name())
+                .setType(convertToBlockTOType(block.getType()))
                 .setMemberNames(convertMemberNames(block.getMembers()))
                 .setLayout(
                     new BlockTO.Layout()
@@ -64,5 +64,19 @@ public class BlockConverter {
     return members.stream()
         .map(TCSResourceReference::getName)
         .collect(Collectors.toSet());
+  }
+
+  private BlockTO.Type convertToBlockTOType(Block.Type type) {
+    return switch (type) {
+      case SAME_DIRECTION_ONLY -> BlockTO.Type.SAME_DIRECTION_ONLY;
+      case SINGLE_VEHICLE_ONLY -> BlockTO.Type.SINGLE_VEHICLE_ONLY;
+    };
+  }
+
+  private Block.Type convertToBlockType(BlockTO.Type type) {
+    return switch (type) {
+      case SAME_DIRECTION_ONLY -> Block.Type.SAME_DIRECTION_ONLY;
+      case SINGLE_VEHICLE_ONLY -> Block.Type.SINGLE_VEHICLE_ONLY;
+    };
   }
 }

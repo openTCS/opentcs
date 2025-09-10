@@ -134,7 +134,7 @@ public class LocationTO {
 
     private CoupleTO position = new CoupleTO(0, 0);
     private CoupleTO labelOffset = new CoupleTO(0, 0);
-    private String locationRepresentation = LocationRepresentationTO.DEFAULT.name();
+    private LocationRepresentationTO locationRepresentation = LocationRepresentationTO.DEFAULT;
     private int layerId;
 
     public Layout() {
@@ -168,13 +168,13 @@ public class LocationTO {
     }
 
     @Nonnull
-    public String getLocationRepresentation() {
+    public LocationRepresentationTO getLocationRepresentation() {
       return locationRepresentation;
     }
 
     public Layout setLocationRepresentation(
         @Nonnull
-        String locationRepresentation
+        LocationRepresentationTO locationRepresentation
     ) {
       this.locationRepresentation = requireNonNull(
           locationRepresentation, "locationRepresentation"

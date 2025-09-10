@@ -99,20 +99,20 @@ public class LocationTypeTO {
 
   public static class Layout {
 
-    private String locationRepresentation = LocationRepresentationTO.NONE.name();
+    private LocationRepresentationTO locationRepresentation = LocationRepresentationTO.NONE;
 
     public Layout() {
 
     }
 
     @Nonnull
-    public String getLocationRepresentation() {
+    public LocationRepresentationTO getLocationRepresentation() {
       return locationRepresentation;
     }
 
     public Layout setLocationRepresentation(
         @Nonnull
-        String locationRepresentation
+        LocationRepresentationTO locationRepresentation
     ) {
       this.locationRepresentation = requireNonNull(
           locationRepresentation,

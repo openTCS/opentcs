@@ -11,6 +11,7 @@ import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.BlockTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LayerGroupTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LayerTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationTypeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PathTO;
@@ -44,7 +45,7 @@ class PlantModelTOTest {
                     .setProperties(List.of(new PropertyTO("point-prop", "point-value")))
                     .setPosition(new TripleTO(25000, -15000, 0))
                     .setVehicleOrientationAngle(73.3)
-                    .setType("PARK_POSITION")
+                    .setType(PointTO.Type.PARK_POSITION)
                     .setVehicleEnvelopes(
                         List.of(
                             new EnvelopeTO(
@@ -120,13 +121,15 @@ class PlantModelTOTest {
                                 "some-op",
                                 "some-location"
                             )
-                                .setExecutionTrigger("AFTER_ALLOCATION")
+                                .setExecutionTrigger(
+                                    PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION
+                                )
                                 .setCompletionRequired(true)
                         )
                     )
                     .setLayout(
                         new PathTO.Layout()
-                            .setConnectionType("SLANTED")
+                            .setConnectionType(PathTO.Layout.ConnectionType.SLANTED)
                             .setLayerId(0)
                             .setControlPoints(
                                 List.of(
@@ -151,7 +154,7 @@ class PlantModelTOTest {
                     )
                     .setLayout(
                         new LocationTypeTO.Layout()
-                            .setLocationRepresentation("WORKING_GENERIC")
+                            .setLocationRepresentation(LocationRepresentationTO.WORKING_GENERIC)
                     )
             )
         )
@@ -167,7 +170,9 @@ class PlantModelTOTest {
                         new LocationTO.Layout()
                             .setPosition(new CoupleTO(30000, -15000))
                             .setLabelOffset(new CoupleTO(-10, -20))
-                            .setLocationRepresentation("LOAD_TRANSFER_GENERIC")
+                            .setLocationRepresentation(
+                                LocationRepresentationTO.LOAD_TRANSFER_GENERIC
+                            )
                     )
             )
         )
@@ -175,7 +180,7 @@ class PlantModelTOTest {
             List.of(
                 new BlockTO("some-block")
                     .setProperties(List.of(new PropertyTO("block-prop", "block-value")))
-                    .setType("SAME_DIRECTION_ONLY")
+                    .setType(BlockTO.Type.SAME_DIRECTION_ONLY)
                     .setMemberNames(Set.of("some-point2"))
                     .setLayout(new BlockTO.Layout())
             )

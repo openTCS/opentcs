@@ -174,7 +174,7 @@ public class PathTO {
 
   public static class Layout {
 
-    private String connectionType = ConnectionType.DIRECT.name();
+    private ConnectionType connectionType = ConnectionType.DIRECT;
     private List<CoupleTO> controlPoints = List.of();
     private int layerId;
 
@@ -183,13 +183,13 @@ public class PathTO {
     }
 
     @Nonnull
-    public String getConnectionType() {
+    public ConnectionType getConnectionType() {
       return connectionType;
     }
 
     public Layout setConnectionType(
         @Nonnull
-        String connectionType
+        ConnectionType connectionType
     ) {
       this.connectionType = requireNonNull(connectionType, "connectionType");
       return this;
@@ -221,7 +221,11 @@ public class PathTO {
     public enum ConnectionType {
 
       DIRECT,
+      ELBOW,
+      SLANTED,
       POLYPATH,
+      BEZIER,
+      BEZIER_3
     }
     // CHECKSTYLE:ON
   }

@@ -16,7 +16,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
 public class BlockTO {
 
   private String name;
-  private String type = Type.SINGLE_VEHICLE_ONLY.name();
+  private Type type = Type.SINGLE_VEHICLE_ONLY;
   private Layout layout = new Layout();
   private Set<String> memberNames = Set.of();
   private List<PropertyTO> properties = List.of();
@@ -57,13 +57,13 @@ public class BlockTO {
   }
 
   @Nonnull
-  public String getType() {
+  public Type getType() {
     return type;
   }
 
   public BlockTO setType(
       @Nonnull
-      String type
+      Type type
   ) {
     this.type = requireNonNull(type, "type");
     return this;
@@ -99,6 +99,7 @@ public class BlockTO {
   public enum Type {
 
     SINGLE_VEHICLE_ONLY,
+    SAME_DIRECTION_ONLY
   }
   // CHECKSTYLE:ON
 

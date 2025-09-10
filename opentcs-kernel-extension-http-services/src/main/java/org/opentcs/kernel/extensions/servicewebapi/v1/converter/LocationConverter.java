@@ -16,6 +16,7 @@ import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.visualization.LocationRepresentation;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.LinkTO;
@@ -54,7 +55,7 @@ public class LocationConverter {
                             location.getLayout().getLabelOffset().getX(),
                             location.getLayout().getLabelOffset().getY()
                         ),
-                        LocationRepresentation.valueOf(
+                        convertToLocationRepresentation(
                             location.getLayout().getLocationRepresentation()
                         ),
                         location.getLayout().getLayerId()
@@ -83,7 +84,9 @@ public class LocationConverter {
                     new LocationTO.Layout()
                         .setLayerId(location.getLayout().getLayerId())
                         .setLocationRepresentation(
-                            location.getLayout().getLocationRepresentation().name()
+                            convertToLocationRepresentationTO(
+                                location.getLayout().getLocationRepresentation()
+                            )
                         )
                         .setLabelOffset(
                             new CoupleTO(
@@ -116,5 +119,47 @@ public class LocationConverter {
                 .setAllowedOperations(link.getAllowedOperations())
         )
         .collect(Collectors.toList());
+  }
+
+  private LocationRepresentation convertToLocationRepresentation(
+      LocationRepresentationTO locationRepresentation
+  ) {
+    return switch (locationRepresentation) {
+      case DEFAULT -> LocationRepresentation.DEFAULT;
+      case LOAD_TRANSFER_ALT_1 -> LocationRepresentation.LOAD_TRANSFER_ALT_1;
+      case LOAD_TRANSFER_ALT_2 -> LocationRepresentation.LOAD_TRANSFER_ALT_2;
+      case LOAD_TRANSFER_ALT_3 -> LocationRepresentation.LOAD_TRANSFER_ALT_3;
+      case LOAD_TRANSFER_ALT_4 -> LocationRepresentation.LOAD_TRANSFER_ALT_4;
+      case LOAD_TRANSFER_ALT_5 -> LocationRepresentation.LOAD_TRANSFER_ALT_5;
+      case LOAD_TRANSFER_GENERIC -> LocationRepresentation.LOAD_TRANSFER_GENERIC;
+      case NONE -> LocationRepresentation.NONE;
+      case RECHARGE_ALT_1 -> LocationRepresentation.RECHARGE_ALT_1;
+      case RECHARGE_ALT_2 -> LocationRepresentation.RECHARGE_ALT_2;
+      case RECHARGE_GENERIC -> LocationRepresentation.RECHARGE_GENERIC;
+      case WORKING_ALT_1 -> LocationRepresentation.WORKING_ALT_1;
+      case WORKING_ALT_2 -> LocationRepresentation.WORKING_ALT_2;
+      case WORKING_GENERIC -> LocationRepresentation.WORKING_GENERIC;
+    };
+  }
+
+  private LocationRepresentationTO convertToLocationRepresentationTO(
+      LocationRepresentation locationRepresentation
+  ) {
+    return switch (locationRepresentation) {
+      case DEFAULT -> LocationRepresentationTO.DEFAULT;
+      case LOAD_TRANSFER_ALT_1 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_1;
+      case LOAD_TRANSFER_ALT_2 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_2;
+      case LOAD_TRANSFER_ALT_3 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_3;
+      case LOAD_TRANSFER_ALT_4 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_4;
+      case LOAD_TRANSFER_ALT_5 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_5;
+      case LOAD_TRANSFER_GENERIC -> LocationRepresentationTO.LOAD_TRANSFER_GENERIC;
+      case NONE -> LocationRepresentationTO.NONE;
+      case RECHARGE_ALT_1 -> LocationRepresentationTO.RECHARGE_ALT_1;
+      case RECHARGE_ALT_2 -> LocationRepresentationTO.RECHARGE_ALT_2;
+      case RECHARGE_GENERIC -> LocationRepresentationTO.RECHARGE_GENERIC;
+      case WORKING_ALT_1 -> LocationRepresentationTO.WORKING_ALT_1;
+      case WORKING_ALT_2 -> LocationRepresentationTO.WORKING_ALT_2;
+      case WORKING_GENERIC -> LocationRepresentationTO.WORKING_GENERIC;
+    };
   }
 }

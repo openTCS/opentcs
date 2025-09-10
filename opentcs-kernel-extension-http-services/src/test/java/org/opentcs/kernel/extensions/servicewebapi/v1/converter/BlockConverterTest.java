@@ -48,7 +48,7 @@ class BlockConverterTest {
   @Test
   void checkToBlockCreationTOs() {
     BlockTO blockTO = new BlockTO("block1")
-        .setType(BlockTO.Type.SINGLE_VEHICLE_ONLY.name())
+        .setType(BlockTO.Type.SINGLE_VEHICLE_ONLY)
         .setMemberNames(Set.of("member1"))
         .setLayout(new BlockTO.Layout())
         .setProperties(propertyList);
@@ -80,7 +80,7 @@ class BlockConverterTest {
 
     assertThat(result, hasSize(1));
     assertThat(result.get(0).getName(), is("B1"));
-    assertThat(result.get(0).getType(), is("SAME_DIRECTION_ONLY"));
+    assertThat(result.get(0).getType(), is(BlockTO.Type.SAME_DIRECTION_ONLY));
     assertThat(result.get(0).getMemberNames(), hasSize(1));
     assertThat(result.get(0).getMemberNames(), contains("point1"));
     assertThat(result.get(0).getLayout().getColor(), is(Colors.encodeToHexRGB(Color.RED)));
