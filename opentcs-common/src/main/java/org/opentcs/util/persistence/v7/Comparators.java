@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: The openTCS Authors
 // SPDX-License-Identifier: MIT
-package org.opentcs.util.persistence.v6;
+package org.opentcs.util.persistence.v7;
 
 import java.util.Comparator;
 

@@ -18,6 +18,25 @@ public class ModelParserTest {
   private final ModelParser modelParser = new ModelParser();
 
   @Test
+  public void readModelV7AndWriteLatestVersion()
+      throws URISyntaxException,
+        IOException {
+    PlantModelCreationTO parsedModel = modelParser.readModel(
+        new File(
+            Thread.currentThread().getContextClassLoader()
+                .getResource("org/opentcs/util/persistence/PlantModelV7.sample.xml").toURI()
+        )
+    );
+
+    File writtenModel = new File(
+        WRITE_PATH + "ModelParserTest.readModelV7AndWriteLatestVersion.received.xml"
+    );
+    modelParser.writeModel(parsedModel, writtenModel);
+
+    Approvals.verify(writtenModel);
+  }
+
+  @Test
   public void readModelV6AndWriteLatestVersion()
       throws URISyntaxException,
         IOException {

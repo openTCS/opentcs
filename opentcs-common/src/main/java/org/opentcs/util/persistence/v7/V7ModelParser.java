@@ -1,45 +1,57 @@
 // SPDX-FileCopyrightText: The openTCS Authors
 // SPDX-License-Identifier: MIT
-package org.opentcs.util.persistence.v6;
+package org.opentcs.util.persistence.v7;
 
 import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import org.opentcs.util.persistence.v005.V005ModelParser;
-import org.opentcs.util.persistence.v005.V005PlantModelTO;
+import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.util.persistence.v6.V6ModelParser;
+import org.opentcs.util.persistence.v6.V6PlantModelTO;
 import org.semver4j.Semver;
 import org.semver4j.SemverException;
 
 /**
- * The parser for V6 models.
+ * The parser for V7 models.
  */
-public class V6ModelParser {
+public class V7ModelParser {
 
   /**
    * The maximum supported schema version for model files.
    */
-  private static final Semver V6_SUPPORTED_VERSION = new Semver(V6PlantModelTO.VERSION_STRING);
+  private static final Semver V7_SUPPORTED_VERSION = new Semver(V7PlantModelTO.VERSION_STRING);
 
   /**
    * Creates a new instance.
    */
-  public V6ModelParser() {
+  public V7ModelParser() {
   }
 
   /**
-   * Reads a model with the given reader and parses it to a {@link V6PlantModelTO} instance.
+   * Reads a model with the given reader and parses it to a {@link PlantModelCreationTO} instance.
    *
    * @param reader The reader to use.
    * @param modelVersion The model version.
-   * @return The parsed {@link V6PlantModelTO}.
+   * @return The parsed {@link PlantModelCreationTO}.
    * @throws IOException If there was an error reading the model.
    */
-  public V6PlantModelTO readRaw(
+  public PlantModelCreationTO read(Reader reader, String modelVersion)
+      throws IOException {
+    return new V7TOMapper().map(readRaw(reader, modelVersion));
+  }
+
+  /**
+   * Reads a model with the given reader and parses it to a {@link V7PlantModelTO} instance.
+   *
+   * @param reader The reader to use.
+   * @param modelVersion The model version.
+   * @return The parsed {@link V7PlantModelTO}.
+   * @throws IOException If there was an error reading the model.
+   */
+  public V7PlantModelTO readRaw(
       @Nonnull
       Reader reader,
       @Nonnull
@@ -57,17 +69,17 @@ public class V6ModelParser {
       throw new IOException(e);
     }
 
-    if (fileVersionNumber.getMajor() == V6_SUPPORTED_VERSION.getMajor()
-        && fileVersionNumber.isLowerThanOrEqualTo(V6_SUPPORTED_VERSION)) {
-      return V6PlantModelTO.fromXml(reader);
+    if (fileVersionNumber.getMajor() == V7_SUPPORTED_VERSION.getMajor()
+        && fileVersionNumber.isLowerThanOrEqualTo(V7_SUPPORTED_VERSION)) {
+      return V7PlantModelTO.fromXml(reader);
     }
     else {
-      return convert(new V005ModelParser().readRaw(reader, modelVersion));
+      return convert(new V6ModelParser().readRaw(reader, modelVersion));
     }
   }
 
-  private V6PlantModelTO convert(V005PlantModelTO to) {
-    return new V6PlantModelTO()
+  private V7PlantModelTO convert(V6PlantModelTO to) {
+    return new V7PlantModelTO()
         .setName(to.getName())
         .setPoints(convertPoints(to))
         .setPaths(convertPaths(to))
@@ -80,40 +92,31 @@ public class V6ModelParser {
   }
 
   private List<PropertyTO> convertProperties(
-      List<org.opentcs.util.persistence.v005.PropertyTO> tos
+      List<org.opentcs.util.persistence.v6.PropertyTO> tos
   ) {
     return tos.stream()
         .map(property -> new PropertyTO().setName(property.getName()).setValue(property.getValue()))
         .toList();
   }
 
-  private List<PointTO> convertPoints(V005PlantModelTO to) {
+  private List<PointTO> convertPoints(V6PlantModelTO to) {
     return to.getPoints().stream()
         .map(point -> {
           PointTO result = new PointTO();
           result.setName(point.getName())
               .setProperties(convertProperties(point.getProperties()));
-          result.setPositionX(point.getxPosition())
-              .setPositionY(point.getyPosition())
-              .setPositionZ(point.getzPosition())
+          result.setPositionX(point.getPositionX())
+              .setPositionY(point.getPositionY())
+              .setPositionZ(point.getPositionZ())
               .setVehicleOrientationAngle(point.getVehicleOrientationAngle())
               .setType(convertPointTOType(point.getType()))
               .setVehicleEnvelopes(convertVehicleEnvelopes(point.getVehicleEnvelopes()))
               .setOutgoingPaths(convertOutgoingPaths(point))
-              .setMaxVehicleBoundingBox(
-                  new BoundingBoxTO()
-                      .setLength(1000)
-                      .setWidth(1000)
-                      .setHeight(1000)
-                      .setReferenceOffsetX(0)
-                      .setReferenceOffsetY(0)
-              )
+              .setMaxVehicleBoundingBox(convertBoundingBox(point.getMaxVehicleBoundingBox()))
               .setPointLayout(
                   new PointTO.PointLayout()
-                      .setPositionX(point.getPointLayout().getxPosition())
-                      .setPositionY(point.getPointLayout().getyPosition())
-                      .setLabelOffsetX(point.getPointLayout().getxLabelOffset())
-                      .setLabelOffsetY(point.getPointLayout().getyLabelOffset())
+                      .setLabelOffsetX(point.getPointLayout().getLabelOffsetX())
+                      .setLabelOffsetY(point.getPointLayout().getLabelOffsetY())
                       .setLayerId(point.getPointLayout().getLayerId())
               );
           return result;
@@ -122,7 +125,7 @@ public class V6ModelParser {
   }
 
   private List<VehicleEnvelopeTO> convertVehicleEnvelopes(
-      List<org.opentcs.util.persistence.v005.VehicleEnvelopeTO> tos
+      List<org.opentcs.util.persistence.v6.VehicleEnvelopeTO> tos
   ) {
     return tos.stream()
         .map(
@@ -141,25 +144,15 @@ public class V6ModelParser {
         .toList();
   }
 
-  private Map<String, String> toPropertiesMap(
-      List<org.opentcs.util.persistence.v005.PropertyTO> properties
-  ) {
-    Map<String, String> result = new HashMap<>();
-    for (org.opentcs.util.persistence.v005.PropertyTO property : properties) {
-      result.put(property.getName(), property.getValue());
-    }
-    return result;
-  }
-
   private List<PointTO.OutgoingPath> convertOutgoingPaths(
-      org.opentcs.util.persistence.v005.PointTO to
+      org.opentcs.util.persistence.v6.PointTO to
   ) {
     return to.getOutgoingPaths().stream()
         .map(path -> new PointTO.OutgoingPath().setName(path.getName()))
         .toList();
   }
 
-  private List<PathTO> convertPaths(V005PlantModelTO to) {
+  private List<PathTO> convertPaths(V6PlantModelTO to) {
     return to.getPaths().stream()
         .map(path -> {
           PathTO result = new PathTO();
@@ -194,8 +187,17 @@ public class V6ModelParser {
         .toList();
   }
 
+  private BoundingBoxTO convertBoundingBox(org.opentcs.util.persistence.v6.BoundingBoxTO to) {
+    return new BoundingBoxTO()
+        .setLength(to.getLength())
+        .setWidth(to.getWidth())
+        .setHeight(to.getHeight())
+        .setReferenceOffsetX(to.getReferenceOffsetX())
+        .setReferenceOffsetY(to.getReferenceOffsetY());
+  }
+
   private List<PeripheralOperationTO> convertPeripheralOperations(
-      List<org.opentcs.util.persistence.v005.PeripheralOperationTO> tos
+      List<org.opentcs.util.persistence.v6.PeripheralOperationTO> tos
   ) {
     return tos.stream()
         .map(
@@ -214,7 +216,7 @@ public class V6ModelParser {
         .toList();
   }
 
-  private List<VehicleTO> convertVehicles(V005PlantModelTO to) {
+  private List<VehicleTO> convertVehicles(V6PlantModelTO to) {
     return to.getVehicles().stream()
         .map(vehicle -> {
           VehicleTO result = new VehicleTO();
@@ -227,12 +229,7 @@ public class V6ModelParser {
               .setMaxVelocity(vehicle.getMaxVelocity())
               .setMaxReverseVelocity(vehicle.getMaxReverseVelocity())
               .setEnvelopeKey(vehicle.getEnvelopeKey())
-              .setBoundingBox(
-                  new BoundingBoxTO()
-                      .setLength(vehicle.getLength())
-                      .setWidth(1000)
-                      .setHeight(1000)
-              )
+              .setBoundingBox(convertBoundingBox(vehicle.getBoundingBox()))
               .setVehicleLayout(
                   new VehicleTO.VehicleLayout()
                       .setColor(vehicle.getVehicleLayout().getColor())
@@ -242,7 +239,7 @@ public class V6ModelParser {
         .toList();
   }
 
-  private List<LocationTypeTO> convertLocationTypes(V005PlantModelTO to) {
+  private List<LocationTypeTO> convertLocationTypes(V6PlantModelTO to) {
     return to.getLocationTypes().stream()
         .map(locationType -> {
           LocationTypeTO result = new LocationTypeTO();
@@ -266,7 +263,7 @@ public class V6ModelParser {
   }
 
   private List<AllowedOperationTO> convertAllowedOperations(
-      List<org.opentcs.util.persistence.v005.AllowedOperationTO> tos
+      List<org.opentcs.util.persistence.v6.AllowedOperationTO> tos
   ) {
     return tos.stream()
         .map(allowedOperation -> {
@@ -279,7 +276,7 @@ public class V6ModelParser {
   }
 
   private List<AllowedPeripheralOperationTO> convertAllowedPeripheralOperations(
-      List<org.opentcs.util.persistence.v005.AllowedPeripheralOperationTO> tos
+      List<org.opentcs.util.persistence.v6.AllowedPeripheralOperationTO> tos
   ) {
     return tos.stream()
         .map(
@@ -293,24 +290,22 @@ public class V6ModelParser {
         .toList();
   }
 
-  private List<LocationTO> convertLocations(V005PlantModelTO to) {
+  private List<LocationTO> convertLocations(V6PlantModelTO to) {
     return to.getLocations().stream()
         .map(location -> {
           LocationTO result = new LocationTO();
           result.setName(location.getName())
               .setProperties(convertProperties(location.getProperties()));
-          result.setPositionX(location.getxPosition())
-              .setPositionY(location.getyPosition())
-              .setPositionZ(location.getzPosition())
+          result.setPositionX(location.getPositionX())
+              .setPositionY(location.getPositionY())
+              .setPositionZ(location.getPositionZ())
               .setType(location.getType())
               .setLinks(convertLinks(location))
               .setLocked(location.isLocked())
               .setLocationLayout(
                   new LocationTO.LocationLayout()
-                      .setPositionX(location.getLocationLayout().getxPosition())
-                      .setPositionY(location.getLocationLayout().getyPosition())
-                      .setLabelOffsetX(location.getLocationLayout().getxLabelOffset())
-                      .setLabelOffsetY(location.getLocationLayout().getyLabelOffset())
+                      .setLabelOffsetX(location.getLocationLayout().getLabelOffsetX())
+                      .setLabelOffsetY(location.getLocationLayout().getLabelOffsetY())
                       .setLocationRepresentation(
                           convertLocationRepresentation(
                               location.getLocationLayout().getLocationRepresentation()
@@ -323,7 +318,7 @@ public class V6ModelParser {
         .toList();
   }
 
-  private List<LocationTO.Link> convertLinks(org.opentcs.util.persistence.v005.LocationTO to) {
+  private List<LocationTO.Link> convertLinks(org.opentcs.util.persistence.v6.LocationTO to) {
     return to.getLinks().stream()
         .map(link -> {
           return new LocationTO.Link()
@@ -333,7 +328,7 @@ public class V6ModelParser {
         .toList();
   }
 
-  private List<BlockTO> convertBlocks(V005PlantModelTO to) {
+  private List<BlockTO> convertBlocks(V6PlantModelTO to) {
     return to.getBlocks().stream()
         .map(block -> {
           BlockTO result = new BlockTO();
@@ -350,7 +345,7 @@ public class V6ModelParser {
         .toList();
   }
 
-  private List<MemberTO> convertMembers(List<org.opentcs.util.persistence.v005.MemberTO> tos) {
+  private List<MemberTO> convertMembers(List<org.opentcs.util.persistence.v6.MemberTO> tos) {
     return tos.stream()
         .map(member -> {
           MemberTO result = new MemberTO();
@@ -361,7 +356,7 @@ public class V6ModelParser {
         .toList();
   }
 
-  private VisualLayoutTO convertVisualLayout(V005PlantModelTO to) {
+  private VisualLayoutTO convertVisualLayout(V6PlantModelTO to) {
     VisualLayoutTO result = new VisualLayoutTO()
         .setScaleX(to.getVisualLayout().getScaleX())
         .setScaleY(to.getVisualLayout().getScaleY())
@@ -394,97 +389,60 @@ public class V6ModelParser {
     return result;
   }
 
-  private PointTO.Type convertPointTOType(org.opentcs.util.persistence.v005.PointTO.Type type) {
-    switch (type) {
-      case org.opentcs.util.persistence.v005.PointTO.Type.HALT_POSITION:
-        return PointTO.Type.HALT_POSITION;
-      case org.opentcs.util.persistence.v005.PointTO.Type.PARK_POSITION:
-        return PointTO.Type.PARK_POSITION;
-      default:
-        throw new IllegalArgumentException(type.name() + " does not exist");
-    }
+  private PointTO.Type convertPointTOType(org.opentcs.util.persistence.v6.PointTO.Type type) {
+    return switch (type) {
+      case HALT_POSITION -> PointTO.Type.HALT_POSITION;
+      case PARK_POSITION -> PointTO.Type.PARK_POSITION;
+    };
   }
 
   private PathTO.PathLayout.ConnectionType convertConnectionType(
-      org.opentcs.util.persistence.v005.PathTO.PathLayout.ConnectionType connectionType
+      org.opentcs.util.persistence.v6.PathTO.PathLayout.ConnectionType connectionType
   ) {
-    switch (connectionType) {
-      case org.opentcs.util.persistence.v005.PathTO.PathLayout.ConnectionType.BEZIER:
-        return PathTO.PathLayout.ConnectionType.BEZIER;
-      case org.opentcs.util.persistence.v005.PathTO.PathLayout.ConnectionType.BEZIER_3:
-        return PathTO.PathLayout.ConnectionType.BEZIER_3;
-      case org.opentcs.util.persistence.v005.PathTO.PathLayout.ConnectionType.DIRECT:
-        return PathTO.PathLayout.ConnectionType.DIRECT;
-      case org.opentcs.util.persistence.v005.PathTO.PathLayout.ConnectionType.ELBOW:
-        return PathTO.PathLayout.ConnectionType.ELBOW;
-      case org.opentcs.util.persistence.v005.PathTO.PathLayout.ConnectionType.POLYPATH:
-        return PathTO.PathLayout.ConnectionType.POLYPATH;
-      case org.opentcs.util.persistence.v005.PathTO.PathLayout.ConnectionType.SLANTED:
-        return PathTO.PathLayout.ConnectionType.SLANTED;
-      default:
-        throw new IllegalArgumentException(connectionType.name() + " does not exist");
-    }
+    return switch (connectionType) {
+      case BEZIER -> PathTO.PathLayout.ConnectionType.BEZIER;
+      case BEZIER_3 -> PathTO.PathLayout.ConnectionType.BEZIER_3;
+      case DIRECT -> PathTO.PathLayout.ConnectionType.DIRECT;
+      case ELBOW -> PathTO.PathLayout.ConnectionType.ELBOW;
+      case POLYPATH -> PathTO.PathLayout.ConnectionType.POLYPATH;
+      case SLANTED -> PathTO.PathLayout.ConnectionType.SLANTED;
+    };
   }
 
-  @SuppressWarnings("checkstyle:LineLength")
   private PeripheralOperationTO.ExecutionTrigger convertExecutionTrigger(
-      org.opentcs.util.persistence.v005.PeripheralOperationTO.ExecutionTrigger executionTrigger
+      org.opentcs.util.persistence.v6.PeripheralOperationTO.ExecutionTrigger executionTrigger
   ) {
-    switch (executionTrigger) {
-      case org.opentcs.util.persistence.v005.PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION:
-        return PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION;
-      case org.opentcs.util.persistence.v005.PeripheralOperationTO.ExecutionTrigger.AFTER_MOVEMENT:
-        return PeripheralOperationTO.ExecutionTrigger.AFTER_MOVEMENT;
-      default:
-        throw new IllegalArgumentException(executionTrigger.name() + " does not exist");
-    }
+    return switch (executionTrigger) {
+      case AFTER_ALLOCATION -> PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION;
+      case AFTER_MOVEMENT -> PeripheralOperationTO.ExecutionTrigger.AFTER_MOVEMENT;
+    };
   }
 
   private LocationRepresentation convertLocationRepresentation(
-      org.opentcs.util.persistence.v005.LocationRepresentation locRepresentation
+      org.opentcs.util.persistence.v6.LocationRepresentation locRepresentation
   ) {
-    switch (locRepresentation) {
-      case org.opentcs.util.persistence.v005.LocationRepresentation.DEFAULT:
-        return LocationRepresentation.DEFAULT;
-      case org.opentcs.util.persistence.v005.LocationRepresentation.LOAD_TRANSFER_ALT_1:
-        return LocationRepresentation.LOAD_TRANSFER_ALT_1;
-      case org.opentcs.util.persistence.v005.LocationRepresentation.LOAD_TRANSFER_ALT_2:
-        return LocationRepresentation.LOAD_TRANSFER_ALT_2;
-      case org.opentcs.util.persistence.v005.LocationRepresentation.LOAD_TRANSFER_ALT_3:
-        return LocationRepresentation.LOAD_TRANSFER_ALT_3;
-      case org.opentcs.util.persistence.v005.LocationRepresentation.LOAD_TRANSFER_ALT_4:
-        return LocationRepresentation.LOAD_TRANSFER_ALT_4;
-      case org.opentcs.util.persistence.v005.LocationRepresentation.LOAD_TRANSFER_ALT_5:
-        return LocationRepresentation.LOAD_TRANSFER_ALT_5;
-      case org.opentcs.util.persistence.v005.LocationRepresentation.LOAD_TRANSFER_GENERIC:
-        return LocationRepresentation.LOAD_TRANSFER_GENERIC;
-      case org.opentcs.util.persistence.v005.LocationRepresentation.NONE:
-        return LocationRepresentation.NONE;
-      case org.opentcs.util.persistence.v005.LocationRepresentation.RECHARGE_ALT_1:
-        return LocationRepresentation.RECHARGE_ALT_1;
-      case org.opentcs.util.persistence.v005.LocationRepresentation.RECHARGE_ALT_2:
-        return LocationRepresentation.RECHARGE_ALT_2;
-      case org.opentcs.util.persistence.v005.LocationRepresentation.RECHARGE_GENERIC:
-        return LocationRepresentation.RECHARGE_GENERIC;
-      case org.opentcs.util.persistence.v005.LocationRepresentation.WORKING_ALT_1:
-        return LocationRepresentation.WORKING_ALT_1;
-      case org.opentcs.util.persistence.v005.LocationRepresentation.WORKING_ALT_2:
-        return LocationRepresentation.WORKING_ALT_2;
-      case org.opentcs.util.persistence.v005.LocationRepresentation.WORKING_GENERIC:
-        return LocationRepresentation.WORKING_GENERIC;
-      default:
-        throw new IllegalArgumentException(locRepresentation.name() + " does not exist");
-    }
+    return switch (locRepresentation) {
+      case DEFAULT -> LocationRepresentation.DEFAULT;
+      case LOAD_TRANSFER_ALT_1 -> LocationRepresentation.LOAD_TRANSFER_ALT_1;
+      case LOAD_TRANSFER_ALT_2 -> LocationRepresentation.LOAD_TRANSFER_ALT_2;
+      case LOAD_TRANSFER_ALT_3 -> LocationRepresentation.LOAD_TRANSFER_ALT_3;
+      case LOAD_TRANSFER_ALT_4 -> LocationRepresentation.LOAD_TRANSFER_ALT_4;
+      case LOAD_TRANSFER_ALT_5 -> LocationRepresentation.LOAD_TRANSFER_ALT_5;
+      case LOAD_TRANSFER_GENERIC -> LocationRepresentation.LOAD_TRANSFER_GENERIC;
+      case NONE -> LocationRepresentation.NONE;
+      case RECHARGE_ALT_1 -> LocationRepresentation.RECHARGE_ALT_1;
+      case RECHARGE_ALT_2 -> LocationRepresentation.RECHARGE_ALT_2;
+      case RECHARGE_GENERIC -> LocationRepresentation.RECHARGE_GENERIC;
+      case WORKING_ALT_1 -> LocationRepresentation.WORKING_ALT_1;
+      case WORKING_ALT_2 -> LocationRepresentation.WORKING_ALT_2;
+      case WORKING_GENERIC -> LocationRepresentation.WORKING_GENERIC;
+    };
   }
 
-  private BlockTO.Type convertBlockTOType(org.opentcs.util.persistence.v005.BlockTO.Type type) {
-    switch (type) {
-      case org.opentcs.util.persistence.v005.BlockTO.Type.SAME_DIRECTION_ONLY:
-        return BlockTO.Type.SAME_DIRECTION_ONLY;
-      case org.opentcs.util.persistence.v005.BlockTO.Type.SINGLE_VEHICLE_ONLY:
-        return BlockTO.Type.SINGLE_VEHICLE_ONLY;
-      default:
-        throw new IllegalArgumentException(type.name() + " does not exist");
-    }
+  private BlockTO.Type convertBlockTOType(org.opentcs.util.persistence.v6.BlockTO.Type type) {
+    return switch (type) {
+      case SAME_DIRECTION_ONLY -> BlockTO.Type.SAME_DIRECTION_ONLY;
+      case SINGLE_VEHICLE_ONLY -> BlockTO.Type.SINGLE_VEHICLE_ONLY;
+    };
   }
 }

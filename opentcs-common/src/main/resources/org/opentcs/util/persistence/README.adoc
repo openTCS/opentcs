@@ -21,4 +21,4 @@ This means:
   If the version is not compatible (e.g. because it is a more recent MINOR/PATCH version than the one supported by the implementation), reading the respective plant model file must fail.
 * When writing a plant model file, an implementation must always apply the most recent MINOR/PATCH version for the MAJOR version it supports.
 * When a new MAJOR version is introduced, the previous MAJOR version's code for mapping to/from base API data structures can and should be removed, as it will no longer be used then.
-  (With the design applied at the time of this writing, this would be the `V6ModelParser` class's `read()` method and the class `V6TOMapper`.)
+  (With the design applied at the time of this writing, this would be the `V7ModelParser` class's `read()` method and the class `V7TOMapper`.)

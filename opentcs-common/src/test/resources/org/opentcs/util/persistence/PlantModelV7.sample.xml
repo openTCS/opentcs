@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model version="7.0.0" name="PlantModelV005">
+<model version="7.0.0" name="PlantModelV7">
     <point name="Point-0001" positionX="5000" positionY="5000" positionZ="0" vehicleOrientationAngle="NaN" type="HALT_POSITION">
         <maxVehicleBoundingBox length="1000" width="1000" height="1000" referenceOffsetX="0" referenceOffsetY="0"/>
         <outgoingPath name="Point-0001 --- Point-0002"/>
@@ -55,7 +55,7 @@
         <pointLayout labelOffsetX="-10" labelOffsetY="-20" layerId="0"/>
     </point>
     <point name="Point-0013" positionX="5000" positionY="15000" positionZ="0" vehicleOrientationAngle="90.0" type="HALT_POSITION">
-        <maxVehicleBoundingBox length="1000" width="1000" height="1000" referenceOffsetX="0" referenceOffsetY="0"/>
+        <maxVehicleBoundingBox length="700" width="600" height="500" referenceOffsetX="10" referenceOffsetY="20"/>
         <vehicleEnvelope key="env-key">
             <vertex x="0" y="0"/>
             <vertex x="100" y="0"/>
@@ -116,10 +116,10 @@
             <vertex x="0" y="0"/>
         </vehicleEnvelope>
         <property name="p-key" value="p-value"/>
-        <pathLayout connectionType="DIRECT" layerId="1"/>
+        <pathLayout connectionType="DIRECT" layerId="0"/>
     </path>
     <vehicle name="Vehicle-0001" energyLevelCritical="25" energyLevelGood="80" energyLevelFullyRecharged="90" energyLevelSufficientlyRecharged="30" maxVelocity="1500" maxReverseVelocity="1500" envelopeKey="env-key">
-        <boundingBox length="1500" width="1000" height="1000" referenceOffsetX="0" referenceOffsetY="0"/>
+        <boundingBox length="1500" width="600" height="500" referenceOffsetX="10" referenceOffsetY="20"/>
         <property name="v-key" value="v-value"/>
         <vehicleLayout color="#FF9900"/>
     </vehicle>
@@ -160,5 +160,5 @@
         <layerGroup id="1" name="Group 1" visible="false"/>
         <property name="vl-key" value="vl-value"/>
     </visualLayout>
-    <property name="tcs:modelFileLastModified" value="2024-11-21T13:01:21Z"/>
+    <property name="tcs:modelFileLastModified" value="2024-11-21T14:01:30Z"/>
 </model>

@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: The openTCS Authors
 // SPDX-License-Identifier: MIT
-package org.opentcs.util.persistence.v6;
+package org.opentcs.util.persistence.v7;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,15 +36,15 @@ import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.util.Colors;
 
 /**
- * Provides methods for mapping {@link PlantModelCreationTO} to {@link V6PlantModelTO} and
+ * Provides methods for mapping {@link PlantModelCreationTO} to {@link V7PlantModelTO} and
  * vice versa.
  */
-public class V6TOMapper {
+public class V7TOMapper {
 
   /**
    * Creates a new instance.
    */
-  public V6TOMapper() {
+  public V7TOMapper() {
   }
 
   /**
@@ -53,7 +53,7 @@ public class V6TOMapper {
    * @param model The model to map.
    * @return The mapped {@link PlantModelCreationTO} instance.
    */
-  public PlantModelCreationTO map(V6PlantModelTO model) {
+  public PlantModelCreationTO map(V7PlantModelTO model) {
     return new PlantModelCreationTO(model.getName())
         .withPoints(toPointCreationTO(model.getPoints()))
         .withVehicles(toVehicleCreationTO(model.getVehicles()))
@@ -66,16 +66,16 @@ public class V6TOMapper {
   }
 
   /**
-   * Maps the given model to a {@link V6PlantModelTO} instance.
+   * Maps the given model to a {@link V7PlantModelTO} instance.
    *
    * @param model The model to map.
-   * @return The mapped {@link V6PlantModelTO} instance.
+   * @return The mapped {@link V7PlantModelTO} instance.
    */
-  public V6PlantModelTO map(PlantModelCreationTO model) {
-    V6PlantModelTO result = new V6PlantModelTO();
+  public V7PlantModelTO map(PlantModelCreationTO model) {
+    V7PlantModelTO result = new V7PlantModelTO();
 
     result.setName(model.getName());
-    result.setVersion(V6PlantModelTO.VERSION_STRING);
+    result.setVersion(V7PlantModelTO.VERSION_STRING);
     result.getPoints().addAll(toPointTO(model.getPoints(), model.getPaths()));
     result.getVehicles().addAll(toVehicleTO(model.getVehicles()));
     result.getPaths().addAll(toPathTO(model.getPaths()));
@@ -384,8 +384,6 @@ public class V6TOMapper {
           .setMaxVehicleBoundingBox(toBoundingBoxTO(point.getMaxVehicleBoundingBox()))
           .setPointLayout(
               new PointTO.PointLayout()
-                  .setPositionX(point.getPose().getPosition().getX())
-                  .setPositionY(point.getPose().getPosition().getY())
                   .setLabelOffsetX(point.getLayout().getLabelOffset().getX())
                   .setLabelOffsetY(point.getLayout().getLabelOffset().getY())
                   .setLayerId(point.getLayout().getLayerId())
@@ -533,8 +531,6 @@ public class V6TOMapper {
           .setLocked(location.isLocked())
           .setLocationLayout(
               new LocationTO.LocationLayout()
-                  .setPositionX(location.getPosition().getX())
-                  .setPositionY(location.getPosition().getY())
                   .setLabelOffsetX(location.getLayout().getLabelOffset().getX())
                   .setLabelOffsetY(location.getLayout().getLabelOffset().getY())
                   .setLocationRepresentation(
@@ -771,188 +767,120 @@ public class V6TOMapper {
   }
 
   private Point.Type toPointType(PointTO.Type type) {
-    switch (type) {
-      case PointTO.Type.HALT_POSITION:
-        return Point.Type.HALT_POSITION;
-      case PointTO.Type.PARK_POSITION:
-        return Point.Type.PARK_POSITION;
-      default:
-        throw new IllegalArgumentException(type.name() + " does not exist");
-    }
+    return switch (type) {
+      case HALT_POSITION -> Point.Type.HALT_POSITION;
+      case PARK_POSITION -> Point.Type.PARK_POSITION;
+    };
   }
 
   private Path.Layout.ConnectionType toConnectionType(
       PathTO.PathLayout.ConnectionType connectionType
   ) {
-    switch (connectionType) {
-      case PathTO.PathLayout.ConnectionType.BEZIER:
-        return Path.Layout.ConnectionType.BEZIER;
-      case PathTO.PathLayout.ConnectionType.BEZIER_3:
-        return Path.Layout.ConnectionType.BEZIER_3;
-      case PathTO.PathLayout.ConnectionType.DIRECT:
-        return Path.Layout.ConnectionType.DIRECT;
-      case PathTO.PathLayout.ConnectionType.ELBOW:
-        return Path.Layout.ConnectionType.ELBOW;
-      case PathTO.PathLayout.ConnectionType.POLYPATH:
-        return Path.Layout.ConnectionType.POLYPATH;
-      case PathTO.PathLayout.ConnectionType.SLANTED:
-        return Path.Layout.ConnectionType.SLANTED;
-      default:
-        throw new IllegalArgumentException(connectionType.name() + " does not exist");
-    }
+    return switch (connectionType) {
+      case BEZIER -> Path.Layout.ConnectionType.BEZIER;
+      case BEZIER_3 -> Path.Layout.ConnectionType.BEZIER_3;
+      case DIRECT -> Path.Layout.ConnectionType.DIRECT;
+      case ELBOW -> Path.Layout.ConnectionType.ELBOW;
+      case POLYPATH -> Path.Layout.ConnectionType.POLYPATH;
+      case SLANTED -> Path.Layout.ConnectionType.SLANTED;
+    };
   }
 
   private PeripheralOperation.ExecutionTrigger toExecutionTrigger(
       PeripheralOperationTO.ExecutionTrigger executionTrigger
   ) {
-    switch (executionTrigger) {
-      case PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION:
-        return PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION;
-      case PeripheralOperationTO.ExecutionTrigger.AFTER_MOVEMENT:
-        return PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT;
-      default:
-        throw new IllegalArgumentException(executionTrigger.name() + " does not exist");
-    }
+    return switch (executionTrigger) {
+      case AFTER_ALLOCATION -> PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION;
+      case AFTER_MOVEMENT -> PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT;
+    };
   }
 
   private LocationRepresentation toLocationRepresentation(
-      org.opentcs.util.persistence.v6.LocationRepresentation locRepresentation
+      org.opentcs.util.persistence.v7.LocationRepresentation locRepresentation
   ) {
-    switch (locRepresentation) {
-      case org.opentcs.util.persistence.v6.LocationRepresentation.DEFAULT:
-        return LocationRepresentation.DEFAULT;
-      case org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_1:
-        return LocationRepresentation.LOAD_TRANSFER_ALT_1;
-      case org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_2:
-        return LocationRepresentation.LOAD_TRANSFER_ALT_2;
-      case org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_3:
-        return LocationRepresentation.LOAD_TRANSFER_ALT_3;
-      case org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_4:
-        return LocationRepresentation.LOAD_TRANSFER_ALT_4;
-      case org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_5:
-        return LocationRepresentation.LOAD_TRANSFER_ALT_5;
-      case org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_GENERIC:
-        return LocationRepresentation.LOAD_TRANSFER_GENERIC;
-      case org.opentcs.util.persistence.v6.LocationRepresentation.NONE:
-        return LocationRepresentation.NONE;
-      case org.opentcs.util.persistence.v6.LocationRepresentation.RECHARGE_ALT_1:
-        return LocationRepresentation.RECHARGE_ALT_1;
-      case org.opentcs.util.persistence.v6.LocationRepresentation.RECHARGE_ALT_2:
-        return LocationRepresentation.RECHARGE_ALT_2;
-      case org.opentcs.util.persistence.v6.LocationRepresentation.RECHARGE_GENERIC:
-        return LocationRepresentation.RECHARGE_GENERIC;
-      case org.opentcs.util.persistence.v6.LocationRepresentation.WORKING_ALT_1:
-        return LocationRepresentation.WORKING_ALT_1;
-      case org.opentcs.util.persistence.v6.LocationRepresentation.WORKING_ALT_2:
-        return LocationRepresentation.WORKING_ALT_2;
-      case org.opentcs.util.persistence.v6.LocationRepresentation.WORKING_GENERIC:
-        return LocationRepresentation.WORKING_GENERIC;
-      default:
-        throw new IllegalArgumentException(locRepresentation.name() + " does not exist");
-    }
+    return switch (locRepresentation) {
+      case DEFAULT -> LocationRepresentation.DEFAULT;
+      case LOAD_TRANSFER_ALT_1 -> LocationRepresentation.LOAD_TRANSFER_ALT_1;
+      case LOAD_TRANSFER_ALT_2 -> LocationRepresentation.LOAD_TRANSFER_ALT_2;
+      case LOAD_TRANSFER_ALT_3 -> LocationRepresentation.LOAD_TRANSFER_ALT_3;
+      case LOAD_TRANSFER_ALT_4 -> LocationRepresentation.LOAD_TRANSFER_ALT_4;
+      case LOAD_TRANSFER_ALT_5 -> LocationRepresentation.LOAD_TRANSFER_ALT_5;
+      case LOAD_TRANSFER_GENERIC -> LocationRepresentation.LOAD_TRANSFER_GENERIC;
+      case NONE -> LocationRepresentation.NONE;
+      case RECHARGE_ALT_1 -> LocationRepresentation.RECHARGE_ALT_1;
+      case RECHARGE_ALT_2 -> LocationRepresentation.RECHARGE_ALT_2;
+      case RECHARGE_GENERIC -> LocationRepresentation.RECHARGE_GENERIC;
+      case WORKING_ALT_1 -> LocationRepresentation.WORKING_ALT_1;
+      case WORKING_ALT_2 -> LocationRepresentation.WORKING_ALT_2;
+      case WORKING_GENERIC -> LocationRepresentation.WORKING_GENERIC;
+    };
   }
 
   private Block.Type toBlockType(BlockTO.Type type) {
-    switch (type) {
-      case BlockTO.Type.SAME_DIRECTION_ONLY:
-        return Block.Type.SAME_DIRECTION_ONLY;
-      case BlockTO.Type.SINGLE_VEHICLE_ONLY:
-        return Block.Type.SINGLE_VEHICLE_ONLY;
-      default:
-        throw new IllegalArgumentException(type.name() + " does not exist");
-    }
+    return switch (type) {
+      case SAME_DIRECTION_ONLY -> Block.Type.SAME_DIRECTION_ONLY;
+      case SINGLE_VEHICLE_ONLY -> Block.Type.SINGLE_VEHICLE_ONLY;
+    };
   }
 
   private PointTO.Type toPointTOType(Point.Type type) {
-    switch (type) {
-      case Point.Type.HALT_POSITION:
-        return PointTO.Type.HALT_POSITION;
-      case Point.Type.PARK_POSITION:
-        return PointTO.Type.PARK_POSITION;
-      default:
-        throw new IllegalArgumentException(type.name() + " does not exist");
-    }
+    return switch (type) {
+      case HALT_POSITION -> PointTO.Type.HALT_POSITION;
+      case PARK_POSITION -> PointTO.Type.PARK_POSITION;
+    };
   }
 
   private PathTO.PathLayout.ConnectionType toPathTOConnectionType(
       Path.Layout.ConnectionType connectionType
   ) {
-    switch (connectionType) {
-      case Path.Layout.ConnectionType.BEZIER:
-        return PathTO.PathLayout.ConnectionType.BEZIER;
-      case Path.Layout.ConnectionType.BEZIER_3:
-        return PathTO.PathLayout.ConnectionType.BEZIER_3;
-      case Path.Layout.ConnectionType.DIRECT:
-        return PathTO.PathLayout.ConnectionType.DIRECT;
-      case Path.Layout.ConnectionType.ELBOW:
-        return PathTO.PathLayout.ConnectionType.ELBOW;
-      case Path.Layout.ConnectionType.POLYPATH:
-        return PathTO.PathLayout.ConnectionType.POLYPATH;
-      case Path.Layout.ConnectionType.SLANTED:
-        return PathTO.PathLayout.ConnectionType.SLANTED;
-      default:
-        throw new IllegalArgumentException(connectionType.name() + " does not exist");
-    }
+    return switch (connectionType) {
+      case BEZIER -> PathTO.PathLayout.ConnectionType.BEZIER;
+      case BEZIER_3 -> PathTO.PathLayout.ConnectionType.BEZIER_3;
+      case DIRECT -> PathTO.PathLayout.ConnectionType.DIRECT;
+      case ELBOW -> PathTO.PathLayout.ConnectionType.ELBOW;
+      case POLYPATH -> PathTO.PathLayout.ConnectionType.POLYPATH;
+      case SLANTED -> PathTO.PathLayout.ConnectionType.SLANTED;
+    };
   }
 
   private PeripheralOperationTO.ExecutionTrigger toPeripheralOperationTOExecutionTrigger(
       PeripheralOperation.ExecutionTrigger executionTrigger
   ) {
-    switch (executionTrigger) {
-      case PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION:
-        return PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION;
-      case PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT:
-        return PeripheralOperationTO.ExecutionTrigger.AFTER_MOVEMENT;
-      default:
-        throw new IllegalArgumentException(executionTrigger.name() + " does not exist");
-    }
+    return switch (executionTrigger) {
+      case AFTER_ALLOCATION -> PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION;
+      case AFTER_MOVEMENT -> PeripheralOperationTO.ExecutionTrigger.AFTER_MOVEMENT;
+      // The case IMMEDIATE will probably never occur in a persisted model, but if it does it will
+      // be mapped to AFTER_ALLOCATION.
+      case IMMEDIATE -> PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION;
+    };
   }
 
-  private org.opentcs.util.persistence.v6.LocationRepresentation toLocationTOLocationRepresentation(
+  @SuppressWarnings("checkstyle:LineLength")
+  private org.opentcs.util.persistence.v7.LocationRepresentation toLocationTOLocationRepresentation(
       LocationRepresentation locRepresentation
   ) {
-    switch (locRepresentation) {
-      case LocationRepresentation.DEFAULT:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.DEFAULT;
-      case LocationRepresentation.LOAD_TRANSFER_ALT_1:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_1;
-      case LocationRepresentation.LOAD_TRANSFER_ALT_2:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_2;
-      case LocationRepresentation.LOAD_TRANSFER_ALT_3:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_3;
-      case LocationRepresentation.LOAD_TRANSFER_ALT_4:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_4;
-      case LocationRepresentation.LOAD_TRANSFER_ALT_5:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_ALT_5;
-      case LocationRepresentation.LOAD_TRANSFER_GENERIC:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.LOAD_TRANSFER_GENERIC;
-      case LocationRepresentation.NONE:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.NONE;
-      case LocationRepresentation.RECHARGE_ALT_1:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.RECHARGE_ALT_1;
-      case LocationRepresentation.RECHARGE_ALT_2:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.RECHARGE_ALT_2;
-      case LocationRepresentation.RECHARGE_GENERIC:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.RECHARGE_GENERIC;
-      case LocationRepresentation.WORKING_ALT_1:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.WORKING_ALT_1;
-      case LocationRepresentation.WORKING_ALT_2:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.WORKING_ALT_2;
-      case LocationRepresentation.WORKING_GENERIC:
-        return org.opentcs.util.persistence.v6.LocationRepresentation.WORKING_GENERIC;
-      default:
-        throw new IllegalArgumentException(locRepresentation.name() + " does not exist");
-    }
+    return switch (locRepresentation) {
+      case DEFAULT -> org.opentcs.util.persistence.v7.LocationRepresentation.DEFAULT;
+      case LOAD_TRANSFER_ALT_1 -> org.opentcs.util.persistence.v7.LocationRepresentation.LOAD_TRANSFER_ALT_1;
+      case LOAD_TRANSFER_ALT_2 -> org.opentcs.util.persistence.v7.LocationRepresentation.LOAD_TRANSFER_ALT_2;
+      case LOAD_TRANSFER_ALT_3 -> org.opentcs.util.persistence.v7.LocationRepresentation.LOAD_TRANSFER_ALT_3;
+      case LOAD_TRANSFER_ALT_4 -> org.opentcs.util.persistence.v7.LocationRepresentation.LOAD_TRANSFER_ALT_4;
+      case LOAD_TRANSFER_ALT_5 -> org.opentcs.util.persistence.v7.LocationRepresentation.LOAD_TRANSFER_ALT_5;
+      case LOAD_TRANSFER_GENERIC -> org.opentcs.util.persistence.v7.LocationRepresentation.LOAD_TRANSFER_GENERIC;
+      case NONE -> org.opentcs.util.persistence.v7.LocationRepresentation.NONE;
+      case RECHARGE_ALT_1 -> org.opentcs.util.persistence.v7.LocationRepresentation.RECHARGE_ALT_1;
+      case RECHARGE_ALT_2 -> org.opentcs.util.persistence.v7.LocationRepresentation.RECHARGE_ALT_2;
+      case RECHARGE_GENERIC -> org.opentcs.util.persistence.v7.LocationRepresentation.RECHARGE_GENERIC;
+      case WORKING_ALT_1 -> org.opentcs.util.persistence.v7.LocationRepresentation.WORKING_ALT_1;
+      case WORKING_ALT_2 -> org.opentcs.util.persistence.v7.LocationRepresentation.WORKING_ALT_2;
+      case WORKING_GENERIC -> org.opentcs.util.persistence.v7.LocationRepresentation.WORKING_GENERIC;
+    };
   }
 
   private BlockTO.Type toBlockTOType(Block.Type type) {
-    switch (type) {
-      case Block.Type.SAME_DIRECTION_ONLY:
-        return BlockTO.Type.SAME_DIRECTION_ONLY;
-      case Block.Type.SINGLE_VEHICLE_ONLY:
-        return BlockTO.Type.SINGLE_VEHICLE_ONLY;
-      default:
-        throw new IllegalArgumentException(type.name() + " does not exist");
-    }
+    return switch (type) {
+      case SAME_DIRECTION_ONLY -> BlockTO.Type.SAME_DIRECTION_ONLY;
+      case SINGLE_VEHICLE_ONLY -> BlockTO.Type.SINGLE_VEHICLE_ONLY;
+    };
   }
 }
