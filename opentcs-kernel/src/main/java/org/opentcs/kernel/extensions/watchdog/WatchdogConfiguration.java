@@ -48,4 +48,22 @@ public interface WatchdogConfiguration {
       orderKey = "3_kernel_heartbeat"
   )
   int heartbeatLogInterval();
+
+  @ConfigurationEntry(
+      type = "Integer",
+      description = "The interval (in milliseconds) in which to check for idle and expired"
+          + " transport orders.",
+      changesApplied = ConfigurationEntry.ChangesApplied.ON_APPLICATION_START,
+      orderKey = "4_transportOrderCheck_0"
+  )
+  int transportOrderCheckInterval();
+
+  @ConfigurationEntry(
+      type = "Integer",
+      description = "The duration (in milliseconds) that a transport order must be in an _idle_ "
+          + "state to actually be considered idle/unused.",
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
+      orderKey = "4_transportOrderCheck_1"
+  )
+  int idleTransportOrderDurationThreshold();
 }

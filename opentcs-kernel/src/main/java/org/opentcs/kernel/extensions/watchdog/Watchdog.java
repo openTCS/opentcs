@@ -27,6 +27,10 @@ public class Watchdog
    */
   private final StrandedVehicleCheck strandedVehicleCheck;
   /**
+   * The task to check for idle and expired transport orders.
+   */
+  private final TransportOrderCheck transportOrderCheck;
+  /**
    * The task to log the heartbeat for the kernel.
    */
   private final KernelHeartbeatLogger kernelHeartbeatLogger;
@@ -36,16 +40,19 @@ public class Watchdog
    *
    * @param blockCheck The block check task.
    * @param strandedVehicleCheck The stranded vehicle check task.
+   * @param transportOrderCheck The transport order check task.
    * @param kernelHeartbeatLogger The kernel heartbeat logger.
    */
   @Inject
   public Watchdog(
       BlockConsistencyCheck blockCheck,
       StrandedVehicleCheck strandedVehicleCheck,
+      TransportOrderCheck transportOrderCheck,
       KernelHeartbeatLogger kernelHeartbeatLogger
   ) {
     this.blockCheck = requireNonNull(blockCheck, "blockCheck");
     this.strandedVehicleCheck = requireNonNull(strandedVehicleCheck, "strandedVehicleCheck");
+    this.transportOrderCheck = requireNonNull(transportOrderCheck, "transportOrderCheck");
     this.kernelHeartbeatLogger = requireNonNull(kernelHeartbeatLogger, "kernelHeartbeatLogger");
   }
 
@@ -57,6 +64,7 @@ public class Watchdog
 
     blockCheck.initialize();
     strandedVehicleCheck.initialize();
+    transportOrderCheck.initialize();
     kernelHeartbeatLogger.initialize();
     initialized = true;
   }
@@ -74,6 +82,7 @@ public class Watchdog
 
     blockCheck.terminate();
     strandedVehicleCheck.terminate();
+    transportOrderCheck.terminate();
     kernelHeartbeatLogger.terminate();
     initialized = false;
   }
