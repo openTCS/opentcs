@@ -655,7 +655,7 @@ components:
           type: string
           format: date-time
           description: The time at which the vehicle has entered its current state (expressed according to ISO 8601).
-          example: 2018-05-14T07:42:00.343Z
+          example: "2018-05-14T07:42:00.343Z"
         transportOrder:
           type: string
           description: The name of the transport order the vehicle is currently processing.
@@ -689,7 +689,7 @@ components:
           type: string
           format: date-time
           description: The time at which the vehicle has entered its current processing state (expressed according to ISO 8601).
-          example: 2018-05-14T07:42:00.343Z
+          example: "2018-05-14T07:42:00.343Z"
         allocatedResources:
           type: array
           items:

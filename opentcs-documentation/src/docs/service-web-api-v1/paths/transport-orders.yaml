@@ -338,8 +338,8 @@ components:
         deadline:
           type: string
           format: date-time
-          description: The (optional) deadline of the transport order
-          example: 2018-05-17T06:42:40.396Z
+          description: The (optional) deadline of the transport order (expressed according to ISO 8601; with the time zone explicitly specified at the end, e.g. Z for UTC).
+          example: "2018-05-17T06:42:40.396Z"
         intendedVehicle:
           type: string
           description: The (optional) intended vehicle of the transport order
