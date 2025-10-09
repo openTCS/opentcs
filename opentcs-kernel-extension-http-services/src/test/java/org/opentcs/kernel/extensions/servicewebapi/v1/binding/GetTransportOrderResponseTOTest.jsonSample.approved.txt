@@ -1,6 +1,45 @@
 {
   "dispensable" : true,
   "name" : "some-order",
+  "history" : {
+    "entries" : [ {
+      "timestamp" : "1970-01-01T00:00:00Z",
+      "eventCode" : "code-1",
+      "supplements" : [ "supp-1" ]
+    } ]
+  },
+  "dependencies" : [ "order-1" ],
+  "driveOrders" : [ {
+    "name" : "DriveOrder-1",
+    "destination" : {
+      "destination" : "location-1",
+      "operation" : "operation-1",
+      "properties" : [ {
+        "key" : "key",
+        "value" : "value"
+      } ]
+    },
+    "transportOrder" : "T-Order1",
+    "route" : {
+      "costs" : 1000,
+      "steps" : [ {
+        "path" : "path1",
+        "sourcePoint" : "point1",
+        "destinationPoint" : "point2",
+        "vehicleOrientation" : "FORWARD",
+        "routeIndex" : 1,
+        "costs" : 50,
+        "executionAllowed" : true,
+        "reroutingType" : "REGULAR"
+      } ]
+    },
+    "state" : "OPERATING"
+  } ],
+  "currentDriveOrderIndex" : 1,
+  "currentRouteStepIndex" : 1,
+  "creationTime" : "1970-01-01T00:00:00Z",
+  "deadline" : "1970-01-01T00:00:00Z",
+  "finishedTime" : "1970-01-01T00:00:00Z",
   "peripheralReservationToken" : "some-token",
   "wrappingSequence" : "some-sequence",
   "type" : "some-type",

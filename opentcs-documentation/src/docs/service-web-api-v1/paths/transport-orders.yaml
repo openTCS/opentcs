@@ -255,18 +255,44 @@ components:
       type: object
       additionalProperties: false
       properties:
-        dispensable:
-          type: boolean
-          description: Whether this order is dispensable (may be withdrawn automatically).
-          example: false
         name:
           type: string
           description: The name of the transport order.
           example: TOrder-01
+        properties:
+          type: array
+          items:
+            $ref: "../schemas/common.yaml#/components/schemas/Property"
+          description: The transport order's properties
+        history:
+          $ref: '#/components/schemas/ObjectHistory'
         type:
           type: string
           description: The type of the transport order.
           example: Park
+        dependencies:
+          type: array
+          items:
+            type: string
+          description: The transport order dependencies.
+        driveOrders:
+          type: array
+          items:
+            $ref: '#/components/schemas/DriveOrder'
+          description: The drive orders of the transport order.
+        peripheralReservationToken:
+          type: string
+          nullable: true
+          description: An (optional) token for reserving peripheral devices while processing this transport order.
+          example: Token-001
+        currentDriveOrderIndex:
+          type: integer
+          description: The current driver order index of the transport order.
+          example: 1
+        currentRouteStepIndex:
+          type: integer
+          description: The current route step index of the transport order.
+          example: 2
         state:
           type: string
           enum:
@@ -279,6 +305,21 @@ components:
             - FAILED
             - UNROUTABLE
           description: The transport order's current state.
+        creationTime:
+          type: string
+          format: date-time
+          description: The creation time of the transport order (expressed according to ISO 8601).
+          example: "2018-05-17T06:42:40.396Z"
+        deadline:
+          type: string
+          format: date-time
+          description: The deadline of the transport order (expressed according to ISO 8601).
+          example: "2018-05-17T06:42:40.396Z"
+        finishedTime:
+          type: string
+          format: date-time
+          description: The finished time of the transport order (expressed according to ISO 8601).
+          example: "2018-05-17T06:42:40.396Z"
         intendedVehicle:
           type: string
           description: The name of the vehicle that is intended to process the transport
@@ -288,31 +329,37 @@ components:
           type: string
           description: The name of the vehicle currently processing the transport order.
           example: Vehicle-0002
-        peripheralReservationToken:
-          type: string
-          description: An (optional) token for reserving peripheral devices while processing this transport order.
-          example: Token-001
         wrappingSequence:
           type: string
           description: >-
             The order sequence this transport order belongs to.
             May be `null` in case this order isn't part of any sequence.
           example: OrderSequence-01
+        dispensable:
+          type: boolean
+          description: Whether this order is dispensable (may be withdrawn automatically).
+          example: false
         destinations:
+          deprecated: true
           type: array
           items:
             $ref: "../schemas/common.yaml#/components/schemas/DestinationState"
-          description: The sequence of destinations of the transport order.
-        properties:
-          type: array
-          items:
-            $ref: "../schemas/common.yaml#/components/schemas/Property"
-          description: The transport order's properties
+          description: >-
+            Use the `driveOrders` property instead.
+            The sequence of destinations of the transport order.
       required:
         - dispensable
         - name
+        - history
+        - dependencies
+        - driveOrders
         - type
         - state
+        - currentDriveOrderIndex
+        - currentRouteStepIndex
+        - finishedTime
+        - creationTime
+        - deadline
         - intendedVehicle
         - processingVehicle
         - peripheralReservationToken
@@ -404,3 +451,123 @@ components:
       required:
         - locationName
         - operation
+    DriveOrder:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "The drive order's name."
+          example: "DriveOrder-1"
+        destination:
+          $ref: '#/components/schemas/DriveOrderDestination'
+        transportOrder:
+          type: string
+          example: "T-Order-1"
+          description: The transport order this drive order belongs to.
+        route:
+          $ref: '#/components/schemas/Route'
+        state:
+          $ref: '#/components/schemas/DriveOrderState'
+      required:
+        - name
+        - destination
+        - transportOrder
+        - route
+        - state
+    DriveOrderDestination:
+      type: object
+      properties:
+        destination:
+          type: string
+        operation:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+        - destination
+        - operation
+        - properties
+    DriveOrderState:
+      type: string
+      enum:
+        - PRISTINE
+        - TRAVELLING
+        - OPERATING
+        - FINISHED
+        - FAILED
+    Route:
+      nullable: true
+      type: object
+      properties:
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteStep'
+        costs:
+          type: integer
+          format: int64
+      required:
+        - steps
+        - costs
+    RouteStep:
+      type: object
+      properties:
+        path:
+          type: string
+        sourcePoint:
+          type: string
+        destinationPoint:
+          type: string
+        vehicleOrientation:
+          type: string
+          enum: [ FORWARD, BACKWARD, UNDEFINED ]
+        routeIndex:
+          type: integer
+        costs:
+          type: integer
+          format: int64
+        executionAllowed:
+          type: boolean
+        reroutingType:
+          type: string
+          nullable: true
+          enum: [ REGULAR, FORCED ]
+      required:
+        - path
+        - sourcePoint
+        - destinationPoint
+        - vehicleOrientation
+        - routeIndex
+        - costs
+        - executionAllowed
+        - reroutingType
+    ObjectHistory:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectHistoryEntry'
+          description: "The object history entries."
+      required:
+        - entries
+    ObjectHistoryEntry:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: "2018-05-17T06:42:40.396Z"
+        eventCode:
+          type: string
+          example: "code-1"
+        supplements:
+          type: array
+          items:
+            type: string
+      required:
+        - timestamp
+        - eventCode
+        - supplements

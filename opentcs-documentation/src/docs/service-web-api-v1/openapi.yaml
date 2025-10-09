@@ -21,7 +21,7 @@ info:
     Optionally, an access key can be set in the kernel configuration.
     The configured value is then expected to be sent by the client in an HTTP header named `X-Api-Access-Key`.
   # IMPORTANT: When updating this version number, remember to mention that in the changelog, too!
-  version: 1.12.0
+  version: 1.13.0
   title: openTCS web API specification
 servers:
   - url: http://localhost:55200/v1

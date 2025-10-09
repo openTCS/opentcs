@@ -5,9 +5,12 @@ package org.opentcs.kernel.extensions.servicewebapi.v1.binding;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DestinationState;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DriveOrderTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.ObjectHistoryTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
@@ -17,6 +20,22 @@ public class GetTransportOrderResponseTO {
   private boolean dispensable;
 
   private String name = "";
+
+  private ObjectHistoryTO history;
+
+  private List<String> dependencies;
+
+  private List<DriveOrderTO> driveOrders;
+
+  private int currentDriveOrderIndex;
+
+  private int currentRouteStepIndex;
+
+  private Instant creationTime;
+
+  private Instant deadline;
+
+  private Instant finishedTime;
 
   private String peripheralReservationToken;
 
@@ -53,6 +72,78 @@ public class GetTransportOrderResponseTO {
 
   public GetTransportOrderResponseTO setName(String name) {
     this.name = requireNonNull(name, "name");
+    return this;
+  }
+
+  public ObjectHistoryTO getHistory() {
+    return history;
+  }
+
+  public GetTransportOrderResponseTO setHistory(ObjectHistoryTO history) {
+    this.history = requireNonNull(history, "history");
+    return this;
+  }
+
+  public List<String> getDependencies() {
+    return dependencies;
+  }
+
+  public GetTransportOrderResponseTO setDependencies(List<String> dependencies) {
+    this.dependencies = requireNonNull(dependencies, "dependencies");
+    return this;
+  }
+
+  public List<DriveOrderTO> getDriveOrders() {
+    return driveOrders;
+  }
+
+  public GetTransportOrderResponseTO setDriveOrders(List<DriveOrderTO> driveOrders) {
+    this.driveOrders = requireNonNull(driveOrders, "driveOrders");
+    return this;
+  }
+
+  public int getCurrentDriveOrderIndex() {
+    return currentDriveOrderIndex;
+  }
+
+  public GetTransportOrderResponseTO setCurrentDriveOrderIndex(int currentDriveOrderIndex) {
+    this.currentDriveOrderIndex = currentDriveOrderIndex;
+    return this;
+  }
+
+  public int getCurrentRouteStepIndex() {
+    return currentRouteStepIndex;
+  }
+
+  public GetTransportOrderResponseTO setCurrentRouteStepIndex(int currentRouteStepIndex) {
+    this.currentRouteStepIndex = currentRouteStepIndex;
+    return this;
+  }
+
+  public Instant getCreationTime() {
+    return creationTime;
+  }
+
+  public GetTransportOrderResponseTO setCreationTime(Instant creationTime) {
+    this.creationTime = requireNonNull(creationTime, "creationTime");
+    return this;
+  }
+
+  public Instant getDeadline() {
+    return deadline;
+  }
+
+  public GetTransportOrderResponseTO setDeadline(Instant deadline) {
+    this.deadline = requireNonNull(deadline, "deadline");
+    return this;
+  }
+
+  public Instant getFinishedTime() {
+    return finishedTime;
+  }
+
+  public GetTransportOrderResponseTO setFinishedTime(Instant finishedTime) {
+    this.finishedTime = requireNonNull(finishedTime, "finishedTime");
     return this;
   }
 
@@ -112,10 +203,12 @@ public class GetTransportOrderResponseTO {
     return this;
   }
 
+  @Deprecated
   public List<DestinationState> getDestinations() {
     return destinations;
   }
 
+  @Deprecated
   public GetTransportOrderResponseTO setDestinations(List<DestinationState> destinations) {
     this.destinations = requireNonNull(destinations, "destinations");
     return this;
