@@ -24,6 +24,7 @@ This change log lists the most relevant changes for past releases in reverse chr
    This watchdog task publishes a user notification in case a transport order is considered _idle_ (i.e., a transport order that has been waiting for a configurable amount of time to be processed by a vehicle) or in case the order's deadline has expired and the order is not yet in a final state.
 ** Update web API specification and implementation to version 1.13.0:
 *** Extend the `GET /transportOrders` and `GET /transportOrders/{NAME}` endpoints to include the complete transport order information in the response.
+*** Fix the `/sse::/events/transportOrders` SSE event, documenting the route in a drive order to actually be nullable.
 * Changes affecting developers:
 ** Consistently use enums for members in web API data structures instead of a mix of strings and enums.
 

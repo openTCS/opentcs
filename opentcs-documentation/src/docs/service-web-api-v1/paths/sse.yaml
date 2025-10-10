@@ -485,6 +485,7 @@ components:
         - properties
     Route:
       type: object
+      nullable: true
       properties:
         steps:
           type: array
