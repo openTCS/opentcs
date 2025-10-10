@@ -154,6 +154,12 @@ public class ServiceWebApi
     }
     );
 
+    app.before("/v1/kernel", ctx -> {
+      if (!isLocalHost(ctx.ip())) {
+        throw new HttpResponseException(403, "Access forbidden.");
+      }
+    });
+
     // Reflect that we allow cross-origin requests for any headers and methods.
     app.options("/*", ctx -> {
       String requestHeaders = ctx.header("Access-Control-Request-Headers");
@@ -174,6 +180,13 @@ public class ServiceWebApi
       ctx.result(jsonBinder.toJson(e));
     });
 
+    app.exception(
+        IllegalStateException.class, (e, ctx) -> {
+          ctx.status(500);
+          ctx.result(jsonBinder.toJson(e));
+        }
+    );
+
     app.exception(ObjectUnknownException.class, (e, ctx) -> {
       ctx.status(404);
       ctx.result(jsonBinder.toJson(e));
@@ -186,11 +199,6 @@ public class ServiceWebApi
 
     app.exception(KernelRuntimeException.class, (e, ctx) -> {
       ctx.status(500);
-      ctx.result(jsonBinder.toJson(e));
-    });
-
-    app.exception(KernelRuntimeException.class, (e, ctx) -> {
-      ctx.status(400);
       ctx.result(jsonBinder.toJson(e));
     });
 
@@ -213,5 +221,9 @@ public class ServiceWebApi
   @Override
   public boolean isInitialized() {
     return initialized;
+  }
+
+  private boolean isLocalHost(String ip) {
+    return ip.equals("127.0.0.1") || ip.equals("[0:0:0:0:0:0:0:1]");
   }
 }

@@ -54,6 +54,8 @@ tags:
 
       To avoid redundant documentation, descriptions for the properties in the response body schemas are omitted.
       Instead, refer to the API documentation of the corresponding Java classes for detailed information on the semantics of the properties.
+  - name: Kernel administration
+    description: Kernel administration
 security:
   - ApiKeyAuth: [ ]
 paths:
@@ -147,6 +149,10 @@ paths:
     $ref: './paths/sse.yaml#/paths/~1sse::~1events~1orderSequences'
   /sse::/events/peripheralJobs:
     $ref: './paths/sse.yaml#/paths/~1sse::~1events~1peripheralJobs'
+  /kernel:
+    $ref: './paths/kernel.yaml#/paths/~1kernel'
+  /kernel/version:
+    $ref: './paths/kernel.yaml#/paths/~1kernel~1version'
 components:
   securitySchemes:
     ApiKeyAuth:

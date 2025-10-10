@@ -267,9 +267,6 @@ task configdocgen {
         "org.opentcs.strategies.basic.peripherals.dispatching.DefaultPeripheralJobDispatcherConfiguration",
         "${configDocDir}/DefaultPeripheralJobDispatcherConfigurationEntries.adoc",
 
-        "org.opentcs.kernel.extensions.adminwebapi.AdminWebApiConfiguration",
-        "${configDocDir}/AdminWebApiConfigurationEntries.adoc",
-
         "org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration",
         "${configDocDir}/ServiceWebApiConfigurationEntries.adoc",
 

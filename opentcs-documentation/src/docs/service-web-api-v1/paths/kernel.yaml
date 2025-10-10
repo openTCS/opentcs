@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /kernel:
+    delete:
+      tags:
+        - Kernel administration
+      summary: Shuts down the kernel
+      description: >-
+        Shuts down the kernel. Only accepted from localhost.
+      responses:
+        "200":
+          description: Kernel shut down successful.
+        "403":
+          description: Access forbidden.
+  /kernel/version:
+    get:
+      tags:
+        - Kernel administration
+      summary: Returns the current kernel version
+      description: >-
+        Returns the current kernel version
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Version"
+components:
+  schemas:
+    Version:
+      title: Version
+      type: object
+      additionalProperties: false
+      properties:
+        baselineVersion:
+          type: string
+          example: "6.6.0"
+        customizationName:
+          type: string
+          example: "MyOpenTCS"
+        customizationVersion:
+          type: string
+          example: "1.2.3"
+      required:
+        - baselineVersion
+        - customizationName
+        - customizationVersion

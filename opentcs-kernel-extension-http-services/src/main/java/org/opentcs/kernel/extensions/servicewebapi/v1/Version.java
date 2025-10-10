@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: The openTCS Authors
 // SPDX-License-Identifier: MIT
-package org.opentcs.kernel.extensions.adminwebapi.v1;
+package org.opentcs.kernel.extensions.servicewebapi.v1;
 
 import org.opentcs.util.Environment;
 

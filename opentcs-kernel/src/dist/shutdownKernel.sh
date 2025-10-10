@@ -21,4 +21,4 @@ else
 fi
 
 ${JAVA} -classpath "${OPENTCS_CP}" \
-    org.opentcs.kernel.ShutdownKernel localhost 55100
+    org.opentcs.kernel.ShutdownKernel localhost 55200
