@@ -34,6 +34,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update Mockito to 5.20.0.
 ** Update Spotless to 8.0.0.
 ** Update Gradle wrapper to 8.14.3.
+** Update OpenAPI generator to 7.16.0.
+** Update Swagger UI to 5.29.3.
 
 == Version 6.6 (2025-09-05)
 
