@@ -23,7 +23,7 @@ semver4j = "6.0.0"
 slf4j = "2.0.17"
 swagger-ui = "5.29.3"
 # Test dependency versions
-approvaltests = "25.6.0"
+approvaltests = "25.7.0"
 assertj = "3.27.6"
 hamcrest = "3.0"
 junit = "6.0.0"

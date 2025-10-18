@@ -28,7 +28,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 *** Fix the `/sse::/events/transportOrders` SSE event, documenting the route in a drive order to actually be nullable.
 * Changes affecting developers:
 ** Consistently use enums for members in web API data structures instead of a mix of strings and enums.
-** Update ApprovalTests to 25.6.0.
+** Update ApprovalTests to 25.7.0.
 ** Update AssertJ to 3.27.6.
 ** Update JUnit to 6.0.0.
 ** Update Mockito to 5.20.0.
