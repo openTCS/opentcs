@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -56,8 +57,8 @@ class IsAvailableForAnyOrderTest {
         .withState(Vehicle.State.IDLE)
         .withProcState(Vehicle.ProcState.IDLE);
 
-    given(objectService.fetchObject(TransportOrder.class, transportOrder.getReference()))
-        .willReturn(transportOrder);
+    given(objectService.fetch(TransportOrder.class, transportOrder.getReference()))
+        .willReturn(Optional.of(transportOrder));
 
     reservationsList = new ArrayList<>();
     given(orderReservationPool.findReservations(any()))
@@ -82,11 +83,11 @@ class IsAvailableForAnyOrderTest {
         .withTransportOrder(transportOrder.getReference())
         .withProcState(Vehicle.ProcState.PROCESSING_ORDER);
 
-    given(objectService.fetchObject(TransportOrder.class, transportOrder.getReference()))
-        .willReturn(transportOrder);
+    given(objectService.fetch(TransportOrder.class, transportOrder.getReference()))
+        .willReturn(Optional.of(transportOrder));
 
-    given(objectService.fetchObject(OrderSequence.class, seq.getReference()))
-        .willReturn(seq);
+    given(objectService.fetch(OrderSequence.class, seq.getReference()))
+        .willReturn(Optional.of(seq));
 
     assertTrue(isAvailableForAnyOrder.test(vehicle));
   }

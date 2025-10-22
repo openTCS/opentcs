@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.components.kernel.services.InternalVehicleService;
-import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectUnknownException;
@@ -92,7 +92,7 @@ public class StandardVehicleService
    */
   @Inject
   public StandardVehicleService(
-      TCSObjectService objectService,
+      InternalTCSObjectService objectService,
       @GlobalSyncObject
       Object globalSyncObject,
       LocalVehicleControllerPool vehicleControllerPool,
@@ -430,7 +430,7 @@ public class StandardVehicleService
     requireNonNull(integrationLevel, "integrationLevel");
 
     synchronized (globalSyncObject) {
-      Vehicle vehicle = fetchObject(Vehicle.class, ref);
+      Vehicle vehicle = fetch(Vehicle.class, ref).orElseThrow();
 
       if (vehicle.isProcessingOrder()
           && (integrationLevel == Vehicle.IntegrationLevel.TO_BE_IGNORED
@@ -518,7 +518,7 @@ public class StandardVehicleService
     requireNonNull(ref, "ref");
 
     synchronized (globalSyncObject) {
-      Vehicle vehicle = fetchObject(Vehicle.class, ref);
+      Vehicle vehicle = fetch(Vehicle.class, ref).orElseThrow();
       if (vehicle.isProcessingOrder()
           || !vehicle.getClaimedResources().isEmpty()
           || !vehicle.getAllocatedResources().isEmpty()) {

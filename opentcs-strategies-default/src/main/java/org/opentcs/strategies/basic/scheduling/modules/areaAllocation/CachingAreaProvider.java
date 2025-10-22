@@ -90,7 +90,7 @@ public class CachingAreaProvider
   }
 
   private void populateCache() {
-    Set<Point> points = objectService.fetchObjects(
+    Set<Point> points = objectService.fetch(
         Point.class,
         point -> !point.getVehicleEnvelopes().isEmpty()
     );
@@ -102,7 +102,7 @@ public class CachingAreaProvider
       }
     }
 
-    Set<Path> paths = objectService.fetchObjects(
+    Set<Path> paths = objectService.fetch(
         Path.class,
         path -> !path.getVehicleEnvelopes().isEmpty()
     );

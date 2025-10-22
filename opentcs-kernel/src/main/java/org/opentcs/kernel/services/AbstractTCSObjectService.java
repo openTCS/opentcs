@@ -6,10 +6,13 @@ import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 import org.opentcs.access.CredentialsException;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.ObjectUnknownException;
@@ -21,22 +24,31 @@ import org.opentcs.data.TCSObjectReference;
  */
 public abstract class AbstractTCSObjectService
     implements
-      TCSObjectService {
+      InternalTCSObjectService {
 
   /**
    * The tcs object service to delegate method calls to.
    */
-  private final TCSObjectService objectService;
+  private final InternalTCSObjectService objectService;
 
   /**
    * Creates a new instance.
    *
    * @param objectService The service to delegate method calls to.
    */
-  public AbstractTCSObjectService(TCSObjectService objectService) {
+  public AbstractTCSObjectService(InternalTCSObjectService objectService) {
     this.objectService = requireNonNull(objectService, "objectService");
   }
 
+  @Override
+  public <T extends TCSObject<T>> Stream<T> stream(Class<T> clazz)
+      throws KernelRuntimeException {
+    requireNonNull(clazz, "clazz");
+
+    return getObjectService().stream(clazz);
+  }
+
+  @Deprecated
   @Override
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, TCSObjectReference<T> ref)
       throws CredentialsException {
@@ -47,6 +59,16 @@ public abstract class AbstractTCSObjectService
   }
 
   @Override
+  public <T extends TCSObject<T>> Optional<T> fetch(Class<T> clazz, TCSObjectReference<T> ref)
+      throws CredentialsException {
+    requireNonNull(clazz, "clazz");
+    requireNonNull(ref, "ref");
+
+    return getObjectService().fetch(clazz, ref);
+  }
+
+  @Deprecated
+  @Override
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, String name)
       throws CredentialsException {
     requireNonNull(clazz, "clazz");
@@ -55,6 +77,15 @@ public abstract class AbstractTCSObjectService
   }
 
   @Override
+  public <T extends TCSObject<T>> Optional<T> fetch(Class<T> clazz, String name)
+      throws CredentialsException {
+    requireNonNull(clazz, "clazz");
+
+    return getObjectService().fetch(clazz, name);
+  }
+
+  @Deprecated
+  @Override
   public <T extends TCSObject<T>> Set<T> fetchObjects(Class<T> clazz)
       throws CredentialsException {
     requireNonNull(clazz, "clazz");
@@ -62,6 +93,15 @@ public abstract class AbstractTCSObjectService
     return getObjectService().fetchObjects(clazz);
   }
 
+  @Override
+  public <T extends TCSObject<T>> Set<T> fetch(Class<T> clazz)
+      throws CredentialsException {
+    requireNonNull(clazz, "clazz");
+
+    return getObjectService().fetch(clazz);
+  }
+
+  @Deprecated
   @Override
   public <T extends TCSObject<T>> Set<T> fetchObjects(
       @Nonnull
@@ -74,6 +114,20 @@ public abstract class AbstractTCSObjectService
     requireNonNull(predicate, "predicate");
 
     return getObjectService().fetchObjects(clazz, predicate);
+  }
+
+  @Override
+  public <T extends TCSObject<T>> Set<T> fetch(
+      @Nonnull
+      Class<T> clazz,
+      @Nonnull
+      Predicate<? super T> predicate
+  )
+      throws CredentialsException {
+    requireNonNull(clazz, "clazz");
+    requireNonNull(predicate, "predicate");
+
+    return getObjectService().fetch(clazz, predicate);
   }
 
   @Override
@@ -102,11 +156,11 @@ public abstract class AbstractTCSObjectService
   }
 
   /**
-   * Retruns the {@link TCSObjectService} implementation being used.
+   * Returns the {@link TCSObjectService} implementation being used.
    *
    * @return The {@link TCSObjectService} implementation being used.
    */
-  public TCSObjectService getObjectService() {
+  public InternalTCSObjectService getObjectService() {
     return objectService;
   }
 }

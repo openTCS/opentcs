@@ -14,14 +14,15 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
+import org.opentcs.components.kernel.services.InternalPeripheralJobService;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
-import org.opentcs.components.kernel.services.PeripheralJobService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
@@ -43,7 +44,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralOperat
  */
 class PeripheralJobHandlerTest {
 
-  private PeripheralJobService jobService;
+  private InternalPeripheralJobService jobService;
   private PeripheralDispatcherService jobDispatcherService;
   private KernelExecutorWrapper executorWrapper;
   private PeripheralJobConverter peripheralJobConverter;
@@ -85,12 +86,12 @@ class PeripheralJobHandlerTest {
         .withRelatedVehicle(vehicle.getReference())
         .withRelatedTransportOrder(order.getReference())
         .withProperty("some-prop-key", "some-prop-value");
-    given(jobService.fetchObject(Location.class, "some-location"))
-        .willReturn(location);
-    given(jobService.fetchObject(Vehicle.class, "some-vehicle"))
-        .willReturn(vehicle);
-    given(jobService.fetchObject(TransportOrder.class, "some-order"))
-        .willReturn(order);
+    given(jobService.fetch(Location.class, "some-location"))
+        .willReturn(Optional.of(location));
+    given(jobService.fetch(Vehicle.class, "some-vehicle"))
+        .willReturn(Optional.of(vehicle));
+    given(jobService.fetch(TransportOrder.class, "some-order"))
+        .willReturn(Optional.of(order));
     given(jobService.createPeripheralJob(any(PeripheralJobCreationTO.class)))
         .willReturn(job);
 
@@ -142,17 +143,15 @@ class PeripheralJobHandlerTest {
             true
         )
     );
-    given(
-        jobService.fetchObjects(ArgumentMatchers.<Class<PeripheralJob>>any(), any())
-    )
-        .willReturn(Set.of(job1, job2));
+    given(jobService.stream(PeripheralJob.class))
+        .willReturn(Stream.of(job1, job2));
 
     // Act
     List<GetPeripheralJobResponseTO> result = handler.getPeripheralJobs(null, null);
 
     // Assert
     assertThat(result, hasSize(2));
-    then(jobService).should().fetchObjects(ArgumentMatchers.<Class<PeripheralJob>>any(), any());
+    then(jobService).should().stream(ArgumentMatchers.<Class<PeripheralJob>>any());
   }
 
   @Test
@@ -160,6 +159,7 @@ class PeripheralJobHandlerTest {
     // Arrange
     Location location
         = new Location("some-location", new LocationType("some-location-type").getReference());
+    Vehicle vehicle = new Vehicle("some-vehicle");
     PeripheralJob job1 = new PeripheralJob(
         "some-job",
         "some-token",
@@ -169,7 +169,9 @@ class PeripheralJobHandlerTest {
             PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION,
             true
         )
-    );
+    )
+        .withRelatedVehicle(vehicle.getReference());
+
     PeripheralJob job2 = new PeripheralJob(
         "some-job-2",
         "some-token",
@@ -179,20 +181,19 @@ class PeripheralJobHandlerTest {
             PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION,
             true
         )
-    );
-    Vehicle vehicle = new Vehicle("some-vehicle");
-    given(jobService.fetchObject(Vehicle.class, "some-vehicle"))
-        .willReturn(vehicle);
-    given(
-        jobService.fetchObjects(ArgumentMatchers.<Class<PeripheralJob>>any(), any())
     )
-        .willReturn(Set.of(job1, job2));
+        .withRelatedVehicle(vehicle.getReference());
+
+    given(jobService.fetch(Vehicle.class, "some-vehicle"))
+        .willReturn(Optional.of(vehicle));
+    given(jobService.stream(PeripheralJob.class))
+        .willReturn(Stream.of(job1, job2));
 
     // Act & Assert: happy path
     List<GetPeripheralJobResponseTO> result = handler.getPeripheralJobs("some-vehicle", null);
 
     assertThat(result, hasSize(2));
-    then(jobService).should().fetchObjects(ArgumentMatchers.<Class<PeripheralJob>>any(), any());
+    then(jobService).should().stream(PeripheralJob.class);
 
     // Act & Assert: nonexistent vehicle
     assertThatExceptionOfType(ObjectUnknownException.class)
@@ -204,6 +205,7 @@ class PeripheralJobHandlerTest {
     // Arrange
     Location location
         = new Location("some-location", new LocationType("some-location-type").getReference());
+    TransportOrder transportOrder = new TransportOrder("some-order", List.of());
     PeripheralJob job1 = new PeripheralJob(
         "some-job",
         "some-token",
@@ -213,7 +215,9 @@ class PeripheralJobHandlerTest {
             PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION,
             true
         )
-    );
+    )
+        .withRelatedTransportOrder(transportOrder.getReference());
+
     PeripheralJob job2 = new PeripheralJob(
         "some-job-2",
         "some-token",
@@ -223,20 +227,19 @@ class PeripheralJobHandlerTest {
             PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION,
             true
         )
-    );
-    TransportOrder transportOrder = new TransportOrder("some-order", List.of());
-    given(jobService.fetchObject(TransportOrder.class, "some-order"))
-        .willReturn(transportOrder);
-    given(
-        jobService.fetchObjects(ArgumentMatchers.<Class<PeripheralJob>>any(), any())
     )
-        .willReturn(Set.of(job1, job2));
+        .withRelatedTransportOrder(transportOrder.getReference());
+
+    given(jobService.fetch(TransportOrder.class, "some-order"))
+        .willReturn(Optional.of(transportOrder));
+    given(jobService.stream(PeripheralJob.class))
+        .willReturn(Stream.of(job1, job2));
 
     // Act & Assert: happy path
     List<GetPeripheralJobResponseTO> result = handler.getPeripheralJobs(null, "some-order");
 
     assertThat(result, hasSize(2));
-    then(jobService).should().fetchObjects(ArgumentMatchers.<Class<PeripheralJob>>any(), any());
+    then(jobService).should().stream(PeripheralJob.class);
 
     // Act & Assert: nonexistent vehicle
     assertThatExceptionOfType(ObjectUnknownException.class)
@@ -258,13 +261,13 @@ class PeripheralJobHandlerTest {
             true
         )
     );
-    given(jobService.fetchObject(PeripheralJob.class, "some-job"))
-        .willReturn(job);
+    given(jobService.fetch(PeripheralJob.class, "some-job"))
+        .willReturn(Optional.of(job));
 
     // Act & Assert: happy path
     GetPeripheralJobResponseTO result = handler.getPeripheralJobByName("some-job");
     assertThat(result, is(notNullValue()));
-    then(jobService).should().fetchObject(PeripheralJob.class, "some-job");
+    then(jobService).should().fetch(PeripheralJob.class, "some-job");
 
     // Act & Assert: nonexistent order
     assertThatExceptionOfType(ObjectUnknownException.class)

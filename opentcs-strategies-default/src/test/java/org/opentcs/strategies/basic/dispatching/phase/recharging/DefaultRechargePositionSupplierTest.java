@@ -11,6 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,13 +90,13 @@ class DefaultRechargePositionSupplierTest {
         mock(RouteSelector.class)
     );
 
-    when(plantModelService.fetchObject(Point.class, currentPosition.getReference()))
-        .thenReturn(currentPosition);
-    when(plantModelService.fetchObject(Point.class, locationAccessPoint.getReference()))
-        .thenReturn(locationAccessPoint);
-    when(plantModelService.fetchObject(LocationType.class, rechargeLocType.getReference()))
-        .thenReturn(rechargeLocType);
-    when(plantModelService.fetchObjects(Location.class))
+    when(plantModelService.fetch(Point.class, currentPosition.getReference()))
+        .thenReturn(Optional.of(currentPosition));
+    when(plantModelService.fetch(Point.class, locationAccessPoint.getReference()))
+        .thenReturn(Optional.of(locationAccessPoint));
+    when(plantModelService.fetch(LocationType.class, rechargeLocType.getReference()))
+        .thenReturn(Optional.of(rechargeLocType));
+    when(plantModelService.fetch(Location.class))
         .thenReturn(Set.of(rechargeLoc1, rechargeLoc2, rechargeLoc3));
     when(plantModelService.expandResources(Set.of(locationAccessPoint.getReference())))
         .thenReturn(Set.of(locationAccessPoint));

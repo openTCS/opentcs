@@ -282,7 +282,7 @@ public class DriverGUI
 
     Set<Point> points;
     try {
-      points = callWrapper.call(() -> servicePortal.getVehicleService().fetchObjects(Point.class));
+      points = callWrapper.call(() -> servicePortal.getVehicleService().fetch(Point.class));
     }
     catch (Exception ex) {
       LOG.warn("Error fetching points", ex);

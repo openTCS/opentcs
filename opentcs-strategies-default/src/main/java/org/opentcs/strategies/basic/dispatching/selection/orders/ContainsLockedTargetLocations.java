@@ -43,7 +43,10 @@ public class ContainsLockedTargetLocations
         .map(driveOrder -> driveOrder.getDestination().getDestination())
         .filter(destination -> Objects.equal(destination.getReferentClass(), Location.class))
         .map(destination -> (TCSObjectReference<Location>) destination)
-        .map(locationReference -> objectService.fetchObject(Location.class, locationReference))
+        .map(
+            locationReference -> objectService.fetch(Location.class, locationReference)
+                .orElseThrow()
+        )
         .anyMatch(location -> location.isLocked());
   }
 }

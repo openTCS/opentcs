@@ -192,7 +192,7 @@ public class PeripheralAttachmentManager
         factory.getClass().getName()
     );
 
-    Location location = peripheralService.fetchObject(Location.class, entry.getLocation());
+    Location location = peripheralService.fetch(Location.class, entry.getLocation()).orElseThrow();
     PeripheralCommAdapter commAdapter = factory.getAdapterFor(location);
     if (commAdapter == null) {
       LOG.warn(
@@ -239,10 +239,10 @@ public class PeripheralAttachmentManager
       return;
     }
 
-    Location location = peripheralService.fetchObject(
+    Location location = peripheralService.fetch(
         Location.class,
         peripheralEntry.getLocation()
-    );
+    ).orElseThrow();
     List<PeripheralCommAdapterFactory> factories = commAdapterRegistry.findFactoriesFor(location);
     if (!factories.isEmpty()) {
       LOG.debug(

@@ -156,7 +156,7 @@ public class SingleVehicleBlockModule
       Block.Type type
   ) {
     Set<Block> result = new HashSet<>();
-    Set<Block> blocks = plantModelService.fetchObjects(
+    Set<Block> blocks = plantModelService.fetch(
         Block.class,
         block -> block.getType() == type
     );

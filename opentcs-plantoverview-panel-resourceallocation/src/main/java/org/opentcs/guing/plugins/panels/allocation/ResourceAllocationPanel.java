@@ -145,7 +145,7 @@ public class ResourceAllocationPanel
 
   private void updateAllVehicleAllocations() {
     SwingUtilities.invokeLater(
-        () -> sharedPortal.getPortal().getVehicleService().fetchObjects(Vehicle.class).stream()
+        () -> sharedPortal.getPortal().getVehicleService().fetch(Vehicle.class)
             .forEach(this::handleVehicleStateChange)
     );
   }

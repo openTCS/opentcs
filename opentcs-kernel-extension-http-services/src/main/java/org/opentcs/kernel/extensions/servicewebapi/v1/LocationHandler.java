@@ -48,10 +48,8 @@ public class LocationHandler {
   )
       throws ObjectUnknownException {
     executorWrapper.callAndWait(() -> {
-      Location location = plantModelService.fetchObject(Location.class, locationName);
-      if (location == null) {
-        throw new ObjectUnknownException("Unknown location: " + locationName);
-      }
+      Location location = plantModelService.fetch(Location.class, locationName)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown location: " + locationName));
 
       plantModelService.updateLocationLock(
           location.getReference(),

@@ -5,7 +5,7 @@ package org.opentcs.strategies.basic.dispatching.phase;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.Phase;
@@ -21,7 +21,7 @@ public class FinishWithdrawalsPhase
   /**
    * The object service
    */
-  private final TCSObjectService objectService;
+  private final InternalTCSObjectService objectService;
   private final TransportOrderUtil transportOrderUtil;
   /**
    * Indicates whether this component is initialized.
@@ -30,7 +30,7 @@ public class FinishWithdrawalsPhase
 
   @Inject
   public FinishWithdrawalsPhase(
-      TCSObjectService objectService,
+      InternalTCSObjectService objectService,
       TransportOrderUtil transportOrderUtil
   ) {
     this.objectService = requireNonNull(objectService, "objectService");
@@ -60,14 +60,15 @@ public class FinishWithdrawalsPhase
 
   @Override
   public void run() {
-    objectService.fetchObjects(Vehicle.class).stream()
+    objectService.fetch(Vehicle.class).stream()
         .filter(vehicle -> vehicle.hasProcState(Vehicle.ProcState.AWAITING_ORDER))
         .filter(vehicle -> hasWithdrawnTransportOrder(vehicle))
         .forEach(vehicle -> transportOrderUtil.finishAbortion(vehicle));
   }
 
   private boolean hasWithdrawnTransportOrder(Vehicle vehicle) {
-    return objectService.fetchObject(TransportOrder.class, vehicle.getTransportOrder())
+    return objectService.fetch(TransportOrder.class, vehicle.getTransportOrder())
+        .orElseThrow()
         .hasState(TransportOrder.State.WITHDRAWN);
   }
 

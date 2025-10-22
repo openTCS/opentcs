@@ -77,7 +77,7 @@ public class ThresholdOrderGenTrigger
     synchronized (knownOrders) {
       if (enabled) {
         // Remember all orders that are not finished, failed etc.
-        for (TransportOrder curOrder : objectService.fetchObjects(TransportOrder.class)) {
+        for (TransportOrder curOrder : objectService.fetch(TransportOrder.class)) {
           if (!curOrder.getState().isFinalState()) {
             knownOrders.add(curOrder);
           }

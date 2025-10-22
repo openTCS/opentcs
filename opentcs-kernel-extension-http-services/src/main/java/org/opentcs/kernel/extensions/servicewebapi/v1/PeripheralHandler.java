@@ -41,10 +41,8 @@ public class PeripheralHandler {
     requireNonNull(value, "value");
 
     executorWrapper.callAndWait(() -> {
-      Location location = peripheralService.fetchObject(Location.class, name);
-      if (location == null) {
-        throw new ObjectUnknownException("Unknown location: " + name);
-      }
+      Location location = peripheralService.fetch(Location.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown location: " + name));
 
       PeripheralCommAdapterDescription newAdapter
           = peripheralService.fetchAttachmentInformation(location.getReference())
@@ -69,10 +67,8 @@ public class PeripheralHandler {
     requireNonNull(value, "value");
 
     executorWrapper.callAndWait(() -> {
-      Location location = peripheralService.fetchObject(Location.class, name);
-      if (location == null) {
-        throw new ObjectUnknownException("Unknown location: " + name);
-      }
+      Location location = peripheralService.fetch(Location.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown location: " + name));
 
       if (Boolean.parseBoolean(value)) {
         peripheralService.enableCommAdapter(location.getReference());
@@ -89,10 +85,8 @@ public class PeripheralHandler {
     requireNonNull(name, "name");
 
     return executorWrapper.callAndWait(() -> {
-      Location location = peripheralService.fetchObject(Location.class, name);
-      if (location == null) {
-        throw new ObjectUnknownException("Unknown location: " + name);
-      }
+      Location location = peripheralService.fetch(Location.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown location: " + name));
 
       return peripheralService.fetchAttachmentInformation(location.getReference());
     });

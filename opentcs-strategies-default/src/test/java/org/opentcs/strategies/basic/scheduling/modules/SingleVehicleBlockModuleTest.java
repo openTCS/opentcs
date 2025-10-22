@@ -10,11 +10,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import jakarta.annotation.Nonnull;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.TCSObjectReference;
@@ -52,7 +53,8 @@ class SingleVehicleBlockModuleTest {
     Scheduler.Client client = new SampleClient();
     ModelData model = new ModelData();
 
-    when(plantModelService.fetchObjects(eq(Block.class), any())).thenReturn(new HashSet<>());
+    when(plantModelService.fetch(eq(Block.class), ArgumentMatchers.<Predicate<? super Block>>any()))
+        .thenReturn(Set.of());
     assertTrue(module.mayAllocate(client, model.resourcesToAllocate));
   }
 
@@ -61,8 +63,10 @@ class SingleVehicleBlockModuleTest {
     Scheduler.Client client = new SampleClient();
     ModelData model = new ModelData();
 
-    when(plantModelService.fetchObjects(eq(Block.class), any()))
-        .thenReturn(new HashSet<>(Arrays.asList(model.getBlock())));
+    when(
+        plantModelService.fetch(eq(Block.class), ArgumentMatchers.<Predicate<? super Block>>any())
+    )
+        .thenReturn(Set.of(model.getBlock()));
     when(plantModelService.expandResources(any())).thenReturn(model.getBlockResources());
     when(reservationPool.resourcesAvailableForUser(model.getBlockResources(), client))
         .thenReturn(true);
@@ -74,8 +78,8 @@ class SingleVehicleBlockModuleTest {
     Scheduler.Client client = new SampleClient();
     ModelData model = new ModelData();
 
-    when(plantModelService.fetchObjects(eq(Block.class), any()))
-        .thenReturn(new HashSet<>(Arrays.asList(model.getBlock())));
+    when(plantModelService.fetch(eq(Block.class), ArgumentMatchers.<Predicate<? super Block>>any()))
+        .thenReturn(Set.of(model.getBlock()));
     when(plantModelService.expandResources(any())).thenReturn(model.getBlockResources());
     when(reservationPool.resourcesAvailableForUser(model.getBlockResources(), client))
         .thenReturn(false);

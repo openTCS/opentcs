@@ -18,16 +18,17 @@ import static org.mockito.Mockito.mock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
-import org.opentcs.components.kernel.services.TransportOrderService;
+import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
@@ -47,7 +48,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.converter.TransportOrderCo
  */
 class TransportOrderHandlerTest {
 
-  private TransportOrderService orderService;
+  private InternalTransportOrderService orderService;
   private KernelExecutorWrapper executorWrapper;
   private TransportOrderHandler handler;
   private OrderSequenceConverter orderSequenceConverter;
@@ -130,10 +131,10 @@ class TransportOrderHandlerTest {
     TransportOrder transportOrder = new TransportOrder("some-order", List.of());
     Vehicle vehicle = new Vehicle("some-vehicle");
 
-    given(orderService.fetchObject(TransportOrder.class, "some-order"))
-        .willReturn(transportOrder);
-    given(orderService.fetchObject(Vehicle.class, "some-vehicle"))
-        .willReturn(vehicle);
+    given(orderService.fetch(TransportOrder.class, "some-order"))
+        .willReturn(Optional.of(transportOrder));
+    given(orderService.fetch(Vehicle.class, "some-vehicle"))
+        .willReturn(Optional.of(vehicle));
 
     // Act & Assert: set to vehicle
     handler.updateTransportOrderIntendedVehicle("some-order", "some-vehicle");
@@ -166,39 +167,35 @@ class TransportOrderHandlerTest {
     TransportOrder transportOrder1 = new TransportOrder("some-order", List.of());
     TransportOrder transportOrder2 = new TransportOrder("some-order-2", List.of());
 
-    given(
-        orderService.fetchObjects(ArgumentMatchers.<Class<TransportOrder>>any(), any())
-    )
-        .willReturn(Set.of(transportOrder1, transportOrder2));
+    given(orderService.stream(TransportOrder.class))
+        .willReturn(Set.of(transportOrder1, transportOrder2).stream());
 
     // Act
     List<GetTransportOrderResponseTO> result = handler.getTransportOrders(null);
 
     // Assert
     assertThat(result, hasSize(2));
-    then(orderService).should().fetchObjects(ArgumentMatchers.<Class<TransportOrder>>any(), any());
+    then(orderService).should().stream(TransportOrder.class);
   }
 
   @Test
   void retrieveTransportOrdersFilteredByIntendedVehicle() {
     // Arrange
-    TransportOrder transportOrder1 = new TransportOrder("some-order", List.of());
-    TransportOrder transportOrder2 = new TransportOrder("some-order-2", List.of());
     Vehicle vehicle = new Vehicle("some-vehicle");
+    TransportOrder transportOrder1 = new TransportOrder("some-order", List.of())
+        .withIntendedVehicle(vehicle.getReference());
+    TransportOrder transportOrder2 = new TransportOrder("some-order-2", List.of())
+        .withIntendedVehicle(vehicle.getReference());
 
-    given(
-        orderService.fetchObject(Vehicle.class, "some-vehicle")
-    )
-        .willReturn(vehicle);
-    given(
-        orderService.fetchObjects(ArgumentMatchers.<Class<TransportOrder>>any(), any())
-    )
-        .willReturn(Set.of(transportOrder1, transportOrder2));
+    given(orderService.fetch(Vehicle.class, "some-vehicle"))
+        .willReturn(Optional.of(vehicle));
+    given(orderService.stream(TransportOrder.class))
+        .willReturn(Stream.of(transportOrder1, transportOrder2));
 
     // Act & Assert: happy path
     List<GetTransportOrderResponseTO> result = handler.getTransportOrders("some-vehicle");
     assertThat(result, hasSize(2));
-    then(orderService).should().fetchObjects(ArgumentMatchers.<Class<TransportOrder>>any(), any());
+    then(orderService).should().stream(TransportOrder.class);
 
     // Act & Assert: nonexistent vehicle
     assertThatExceptionOfType(ObjectUnknownException.class)
@@ -210,15 +207,13 @@ class TransportOrderHandlerTest {
     // Arrange
     TransportOrder transportOrder = new TransportOrder("some-order", List.of());
 
-    given(
-        orderService.fetchObject(TransportOrder.class, "some-order")
-    )
-        .willReturn(transportOrder);
+    given(orderService.fetch(TransportOrder.class, "some-order"))
+        .willReturn(Optional.of(transportOrder));
 
     // Act & Assert: happy path
     GetTransportOrderResponseTO result = handler.getTransportOrderByName("some-order");
     assertThat(result, is(notNullValue()));
-    then(orderService).should().fetchObject(TransportOrder.class, "some-order");
+    then(orderService).should().fetch(TransportOrder.class, "some-order");
 
     // Act & Assert: nonexistent order
     assertThatExceptionOfType(ObjectUnknownException.class)
@@ -269,8 +264,8 @@ class TransportOrderHandlerTest {
     // Arrange
     OrderSequence orderSequence = new OrderSequence("some-sequence");
 
-    given(orderService.fetchObject(OrderSequence.class, "some-sequence"))
-        .willReturn(orderSequence);
+    given(orderService.fetch(OrderSequence.class, "some-sequence"))
+        .willReturn(Optional.of(orderSequence));
 
     // Act & Assert: happy path
     handler.putOrderSequenceComplete("some-sequence");
@@ -287,39 +282,35 @@ class TransportOrderHandlerTest {
     OrderSequence sequence1 = new OrderSequence("some-sequence");
     OrderSequence sequence2 = new OrderSequence("some-sequence-2");
 
-    given(
-        orderService.fetchObjects(ArgumentMatchers.<Class<OrderSequence>>any(), any())
-    )
-        .willReturn(Set.of(sequence1, sequence2));
+    given(orderService.stream(OrderSequence.class))
+        .willReturn(Stream.of(sequence1, sequence2));
 
     // Act
     List<GetOrderSequenceResponseTO> result = handler.getOrderSequences(null);
 
     // Assert
     assertThat(result, hasSize(2));
-    then(orderService).should().fetchObjects(ArgumentMatchers.<Class<OrderSequence>>any(), any());
+    then(orderService).should().stream(OrderSequence.class);
   }
 
   @Test
   void retrieveOrderSequencesFilteredByIntendedVehicle() {
     // Arrange
-    OrderSequence sequence1 = new OrderSequence("some-sequence");
-    OrderSequence sequence2 = new OrderSequence("some-sequence-2");
     Vehicle vehicle = new Vehicle("some-vehicle");
+    OrderSequence sequence1 = new OrderSequence("some-sequence")
+        .withIntendedVehicle(vehicle.getReference());
+    OrderSequence sequence2 = new OrderSequence("some-sequence-2")
+        .withIntendedVehicle(vehicle.getReference());
 
-    given(
-        orderService.fetchObject(Vehicle.class, "some-vehicle")
-    )
-        .willReturn(vehicle);
-    given(
-        orderService.fetchObjects(ArgumentMatchers.<Class<OrderSequence>>any(), any())
-    )
-        .willReturn(Set.of(sequence1, sequence2));
+    given(orderService.fetch(Vehicle.class, "some-vehicle"))
+        .willReturn(Optional.of(vehicle));
+    given(orderService.stream(OrderSequence.class))
+        .willReturn(Stream.of(sequence1, sequence2));
 
     // Act & Assert: happy path
     List<GetOrderSequenceResponseTO> result = handler.getOrderSequences("some-vehicle");
     assertThat(result, hasSize(2));
-    then(orderService).should().fetchObjects(ArgumentMatchers.<Class<OrderSequence>>any(), any());
+    then(orderService).should().stream(OrderSequence.class);
 
     // Act & Assert: nonexistent vehicle
     assertThatExceptionOfType(ObjectUnknownException.class)
@@ -331,15 +322,13 @@ class TransportOrderHandlerTest {
     // Arrange
     OrderSequence orderSequence = new OrderSequence("some-sequence");
 
-    given(
-        orderService.fetchObject(OrderSequence.class, "some-sequence")
-    )
-        .willReturn(orderSequence);
+    given(orderService.fetch(OrderSequence.class, "some-sequence"))
+        .willReturn(Optional.of(orderSequence));
 
     // Act & Assert: happy path
     GetOrderSequenceResponseTO result = handler.getOrderSequenceByName("some-sequence");
     assertThat(result, is(notNullValue()));
-    then(orderService).should().fetchObject(OrderSequence.class, "some-sequence");
+    then(orderService).should().fetch(OrderSequence.class, "some-sequence");
 
     // Act & Assert: nonexistent order
     assertThatExceptionOfType(ObjectUnknownException.class)

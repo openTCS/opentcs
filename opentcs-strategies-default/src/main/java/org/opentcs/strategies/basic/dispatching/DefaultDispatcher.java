@@ -215,7 +215,7 @@ public class DefaultDispatcher
     requireNonNull(reroutingType, "reroutingType");
 
     LOG.info("Rerouting all vehicles using rerouting type '{}'...", reroutingType);
-    rerouteUtil.reroute(vehicleService.fetchObjects(Vehicle.class), reroutingType);
+    rerouteUtil.reroute(vehicleService.fetch(Vehicle.class), reroutingType);
   }
 
   @Override
@@ -235,7 +235,9 @@ public class DefaultDispatcher
     }
 
     orderAssigner.tryAssignments(
-        List.of(vehicleService.fetchObject(Vehicle.class, transportOrder.getIntendedVehicle())),
+        List.of(
+            vehicleService.fetch(Vehicle.class, transportOrder.getIntendedVehicle()).orElseThrow()
+        ),
         List.of(transportOrder)
     );
   }

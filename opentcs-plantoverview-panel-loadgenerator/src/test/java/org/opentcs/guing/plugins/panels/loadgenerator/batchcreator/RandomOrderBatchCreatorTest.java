@@ -55,9 +55,9 @@ class RandomOrderBatchCreatorTest {
 
   @Test
   void givenUnsuitableTypeWithoutLinkThenCreateNoOrders() {
-    when(transportOrderService.fetchObjects(LocationType.class))
+    when(transportOrderService.fetch(LocationType.class))
         .thenReturn(Set.of(unsuitableLocType));
-    when(transportOrderService.fetchObjects(Location.class))
+    when(transportOrderService.fetch(Location.class))
         .thenReturn(Set.of(unsuitableLoc));
     RandomOrderBatchCreator batchCreator = new RandomOrderBatchCreator(transportOrderService,
                                                                        dispatcherService,
@@ -73,9 +73,9 @@ class RandomOrderBatchCreatorTest {
 
   @Test
   void givenSuitableTypeWithoutLinkThenCreateNoOrders() {
-    when(transportOrderService.fetchObjects(LocationType.class))
+    when(transportOrderService.fetch(LocationType.class))
         .thenReturn(Set.of(suitableLocType));
-    when(transportOrderService.fetchObjects(Location.class))
+    when(transportOrderService.fetch(Location.class))
         .thenReturn(Set.of(suitableLoc));
     RandomOrderBatchCreator batchCreator = new RandomOrderBatchCreator(transportOrderService,
                                                                        dispatcherService,
@@ -95,9 +95,9 @@ class RandomOrderBatchCreatorTest {
         unsuitableLoc.getReference(),
         point.getReference()
     );
-    when(transportOrderService.fetchObjects(LocationType.class))
+    when(transportOrderService.fetch(LocationType.class))
         .thenReturn(Set.of(unsuitableLocType));
-    when(transportOrderService.fetchObjects(Location.class))
+    when(transportOrderService.fetch(Location.class))
         .thenReturn(Set.of(unsuitableLoc.withAttachedLinks(Set.of(unsuitableLink))));
     RandomOrderBatchCreator batchCreator = new RandomOrderBatchCreator(
         transportOrderService,
@@ -119,9 +119,9 @@ class RandomOrderBatchCreatorTest {
         suitableLoc.getReference(),
         point.getReference()
     );
-    when(transportOrderService.fetchObjects(LocationType.class))
+    when(transportOrderService.fetch(LocationType.class))
         .thenReturn(Set.of(suitableLocType));
-    when(transportOrderService.fetchObjects(Location.class))
+    when(transportOrderService.fetch(Location.class))
         .thenReturn(Set.of(suitableLoc.withAttachedLinks(Set.of(suitableLink))));
     when(transportOrderService.createTransportOrder(any(TransportOrderCreationTO.class)))
         .thenAnswer(

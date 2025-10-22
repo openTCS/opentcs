@@ -186,7 +186,7 @@ public class PeripheralJobsContainer
   private Set<PeripheralJob> fetchJobsIfOnline() {
     if (kernelClientApplication.isOnline()) {
       try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
-        return sharedPortal.getPortal().getPeripheralJobService().fetchObjects(PeripheralJob.class);
+        return sharedPortal.getPortal().getPeripheralJobService().fetch(PeripheralJob.class);
       }
       catch (KernelRuntimeException exc) {
         LOG.warn("Exception fetching peripheral jobs", exc);

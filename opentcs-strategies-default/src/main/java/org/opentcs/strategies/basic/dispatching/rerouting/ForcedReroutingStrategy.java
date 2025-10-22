@@ -45,10 +45,10 @@ public class ForcedReroutingStrategy
 
   @Override
   protected Optional<Point> determineRerouteSource(Vehicle vehicle) {
-    Point currentVehiclePosition = transportOrderService.fetchObject(
+    Point currentVehiclePosition = transportOrderService.fetch(
         Point.class,
         vehicle.getCurrentPosition()
-    );
+    ).orElse(null);
 
     if (currentVehiclePosition == null) {
       return Optional.empty();

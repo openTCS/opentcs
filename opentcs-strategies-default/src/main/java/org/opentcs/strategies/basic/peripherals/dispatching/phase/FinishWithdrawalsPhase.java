@@ -85,7 +85,7 @@ public class FinishWithdrawalsPhase
     // Get all non-final peripheral jobs that are related to a transport order, and if their
     // transport order is marked as FAILED, abort them.
     Set<PeripheralJob> jobs
-        = objectService.fetchObjects(
+        = objectService.fetch(
             PeripheralJob.class,
             this::isRelatedToTransportOrderAndNotInFinalState
         );
@@ -94,7 +94,7 @@ public class FinishWithdrawalsPhase
         = jobs.stream()
             .map(PeripheralJob::getRelatedTransportOrder)
             .distinct()
-            .map(orderRef -> objectService.fetchObject(TransportOrder.class, orderRef))
+            .map(orderRef -> objectService.fetch(TransportOrder.class, orderRef).orElseThrow())
             .filter(order -> order.hasState(TransportOrder.State.FAILED))
             .map(TransportOrder::getReference)
             .collect(Collectors.toSet());

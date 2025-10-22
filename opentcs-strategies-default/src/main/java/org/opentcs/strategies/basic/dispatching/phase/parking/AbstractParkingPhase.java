@@ -10,7 +10,6 @@ import java.util.Optional;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
-import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
@@ -114,7 +113,7 @@ public abstract class AbstractParkingPhase
     initialized = false;
   }
 
-  public TransportOrderService getOrderService() {
+  public InternalTransportOrderService getOrderService() {
     return orderService;
   }
 
@@ -145,7 +144,7 @@ public abstract class AbstractParkingPhase
     );
     Optional<AssignmentCandidate> candidate = computeCandidate(
         vehicle,
-        orderService.fetchObject(Point.class, vehicle.getCurrentPosition()),
+        orderService.fetch(Point.class, vehicle.getCurrentPosition()).orElseThrow(),
         parkOrder
     )
         .filter(c -> assignmentCandidateSelectionFilter.apply(c).isEmpty());

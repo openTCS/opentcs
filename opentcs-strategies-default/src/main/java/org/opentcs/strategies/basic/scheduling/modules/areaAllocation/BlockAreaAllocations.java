@@ -115,7 +115,7 @@ public class BlockAreaAllocations
 
     Set<Block> requestedBlocks = blockStore.getBlocksContainingResources(resources);
 
-    Set<Vehicle> otherVehicles = plantModelService.fetchObjects(
+    Set<Vehicle> otherVehicles = plantModelService.fetch(
         Vehicle.class,
         vehicle -> !Objects.equals(vehicle.getName(), vehicleRef.getName())
             && !vehicle.getAllocatedResources().isEmpty()
@@ -223,7 +223,7 @@ public class BlockAreaAllocations
     }
 
     public void init() {
-      for (Block block : plantModelService.fetchObjects(Block.class)) {
+      for (Block block : plantModelService.fetch(Block.class)) {
         resourcesByBlocks.put(
             block,
             block.getMembers().stream()
@@ -255,16 +255,18 @@ public class BlockAreaAllocations
     @SuppressWarnings("unchecked")
     private TCSObject<?> toTcsObject(TCSResourceReference<?> resourceRef) {
       if (resourceRef.getReferentClass() == Point.class) {
-        return plantModelService.fetchObject(Point.class, (TCSObjectReference<Point>) resourceRef);
+        return plantModelService.fetch(Point.class, (TCSObjectReference<Point>) resourceRef)
+            .orElseThrow();
       }
       else if (resourceRef.getReferentClass() == Path.class) {
-        return plantModelService.fetchObject(Path.class, (TCSObjectReference<Path>) resourceRef);
+        return plantModelService.fetch(Path.class, (TCSObjectReference<Path>) resourceRef)
+            .orElseThrow();
       }
       else if (resourceRef.getReferentClass() == Location.class) {
-        return plantModelService.fetchObject(
+        return plantModelService.fetch(
             Location.class,
             (TCSObjectReference<Location>) resourceRef
-        );
+        ).orElseThrow();
       }
       else {
         throw new IllegalArgumentException("Unsupported resource type: " + resourceRef);

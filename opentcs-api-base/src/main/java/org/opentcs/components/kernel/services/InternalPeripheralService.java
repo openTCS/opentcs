@@ -15,7 +15,8 @@ import org.opentcs.data.peripherals.PeripheralJob;
  */
 public interface InternalPeripheralService
     extends
-      PeripheralService {
+      PeripheralService,
+      InternalTCSObjectService {
 
   /**
    * Updates a peripheral's processing state.

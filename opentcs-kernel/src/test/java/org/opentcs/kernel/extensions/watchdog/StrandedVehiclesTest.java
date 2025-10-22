@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,10 +48,10 @@ public class StrandedVehiclesTest {
     parkingPoint = new Point("point").withType(Point.Type.PARK_POSITION);
     noParkingPoint = new Point("point 2").withType(Point.Type.HALT_POSITION);
 
-    when(objectService.fetchObject(Point.class, parkingPoint.getReference()))
-        .thenReturn(parkingPoint);
-    when(objectService.fetchObject(Point.class, noParkingPoint.getReference()))
-        .thenReturn(noParkingPoint);
+    when(objectService.fetch(Point.class, parkingPoint.getReference()))
+        .thenReturn(Optional.of(parkingPoint));
+    when(objectService.fetch(Point.class, noParkingPoint.getReference()))
+        .thenReturn(Optional.of(noParkingPoint));
     when(timeProvider.getCurrentTimeEpochMillis()).thenReturn(0L);
 
     stranded = new StrandedVehicles(objectService, timeProvider);
@@ -62,7 +63,7 @@ public class StrandedVehiclesTest {
         .withState(Vehicle.State.IDLE)
         .withCurrentPosition(noParkingPoint.getReference())
         .withTransportOrder(transportOrder.getReference());
-    when(objectService.fetchObjects(Vehicle.class)).thenReturn(Set.of(vehicle));
+    when(objectService.fetch(Vehicle.class)).thenReturn(Set.of(vehicle));
     stranded.initialize();
 
     long strandedDurationThreshold = 300000;
@@ -92,7 +93,7 @@ public class StrandedVehiclesTest {
         .withState(Vehicle.State.IDLE)
         .withCurrentPosition(noParkingPoint.getReference())
         .withTransportOrder(transportOrder.getReference());
-    when(objectService.fetchObjects(Vehicle.class)).thenReturn(Set.of(vehicle));
+    when(objectService.fetch(Vehicle.class)).thenReturn(Set.of(vehicle));
     stranded.initialize();
 
     long strandedDurationThreshold = 300000;
@@ -122,7 +123,7 @@ public class StrandedVehiclesTest {
         .withState(Vehicle.State.IDLE)
         .withCurrentPosition(noParkingPoint.getReference())
         .withTransportOrder(transportOrder.getReference());
-    when(objectService.fetchObjects(Vehicle.class)).thenReturn(Set.of(vehicle));
+    when(objectService.fetch(Vehicle.class)).thenReturn(Set.of(vehicle));
     stranded.initialize();
 
     long strandedDurationThreshold = 300000;
@@ -137,7 +138,7 @@ public class StrandedVehiclesTest {
     assertThat(result.iterator().next().isStranded(), is(true));
 
     vehicle = vehicle.withState(Vehicle.State.EXECUTING);
-    when(objectService.fetchObjects(Vehicle.class)).thenReturn(Set.of(vehicle));
+    when(objectService.fetch(Vehicle.class)).thenReturn(Set.of(vehicle));
 
     // After the second invocation (when the vehicle is no longer in a "stranded" state), the
     // vehicle should be considered no longer stranded.
@@ -157,7 +158,7 @@ public class StrandedVehiclesTest {
         .withState(Vehicle.State.IDLE)
         .withCurrentPosition(noParkingPoint.getReference())
         .withTransportOrder(transportOrder.getReference());
-    when(objectService.fetchObjects(Vehicle.class)).thenReturn(Set.of(vehicle));
+    when(objectService.fetch(Vehicle.class)).thenReturn(Set.of(vehicle));
     stranded.initialize();
 
     long strandedDurationThreshold = 300000;
@@ -172,7 +173,7 @@ public class StrandedVehiclesTest {
     assertThat(result.iterator().next().isStranded(), is(true));
 
     vehicle = vehicle.withCurrentPosition(parkingPoint.getReference());
-    when(objectService.fetchObjects(Vehicle.class)).thenReturn(Set.of(vehicle));
+    when(objectService.fetch(Vehicle.class)).thenReturn(Set.of(vehicle));
 
     // After the second invocation (when the vehicle is no longer in a "stranded" state), the
     // vehicle should be considered no longer stranded.
@@ -192,7 +193,7 @@ public class StrandedVehiclesTest {
         .withState(Vehicle.State.IDLE)
         .withCurrentPosition(noParkingPoint.getReference())
         .withTransportOrder(transportOrder.getReference());
-    when(objectService.fetchObjects(Vehicle.class)).thenReturn(Set.of(vehicle));
+    when(objectService.fetch(Vehicle.class)).thenReturn(Set.of(vehicle));
     stranded.initialize();
 
     long strandedDurationThreshold = 300000;
@@ -210,7 +211,7 @@ public class StrandedVehiclesTest {
         .withTransportOrder(
             new TransportOrder("TransportOrder2", List.of()).getReference()
         );
-    when(objectService.fetchObjects(Vehicle.class)).thenReturn(Set.of(vehicle));
+    when(objectService.fetch(Vehicle.class)).thenReturn(Set.of(vehicle));
     // After the second invocation (when the vehicle is no longer in a "stranded" state), the
     // vehicle should be considered no longer stranded.
     stranded.identifyStrandedVehicles(secondInvocationTime, strandedDurationThreshold);

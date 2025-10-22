@@ -96,7 +96,7 @@ public class PausedVehicleModule
     requireNonNull(resources, "resources");
 
     synchronized (globalSyncObject) {
-      Vehicle vehicle = objectService.fetchObject(Vehicle.class, client.getId());
+      Vehicle vehicle = objectService.fetch(Vehicle.class, client.getId()).orElse(null);
 
       if (vehicle == null) {
         LOG.debug("Client '{}' is not a vehicle; not interfering with allocation.", client.getId());

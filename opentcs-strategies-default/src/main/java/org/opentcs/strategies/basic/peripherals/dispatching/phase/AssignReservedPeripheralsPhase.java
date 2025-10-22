@@ -7,7 +7,7 @@ import static java.util.Objects.requireNonNull;
 import jakarta.inject.Inject;
 import java.util.Objects;
 import java.util.Set;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.data.peripherals.PeripheralJob;
@@ -35,7 +35,7 @@ public class AssignReservedPeripheralsPhase
   /**
    * The object service.
    */
-  private final TCSObjectService objectService;
+  private final InternalTCSObjectService objectService;
   /**
    * The peripheral controller pool.
    */
@@ -51,7 +51,7 @@ public class AssignReservedPeripheralsPhase
 
   @Inject
   public AssignReservedPeripheralsPhase(
-      TCSObjectService objectService,
+      InternalTCSObjectService objectService,
       PeripheralControllerPool peripheralControllerPool,
       PeripheralJobUtil peripheralJobUtil
   ) {
@@ -86,7 +86,7 @@ public class AssignReservedPeripheralsPhase
 
   @Override
   public void run() {
-    Set<Location> availablePeripherals = objectService.fetchObjects(
+    Set<Location> availablePeripherals = objectService.fetch(
         Location.class,
         this::reservedAndAvailable
     );
@@ -112,7 +112,8 @@ public class AssignReservedPeripheralsPhase
 
   private void checkForReservedJobs(Location location) {
     LOG.debug("Trying to find job for peripheral '{}'...", location.getName());
-    objectService.fetchObjects(PeripheralJob.class, this::toBeProcessed).stream()
+    objectService.stream(PeripheralJob.class)
+        .filter(this::toBeProcessed)
         .filter(job -> matchesReservationToken(job, location))
         .filter(job -> matchesLocation(job, location))
         .filter(job -> canProcess(location, job))

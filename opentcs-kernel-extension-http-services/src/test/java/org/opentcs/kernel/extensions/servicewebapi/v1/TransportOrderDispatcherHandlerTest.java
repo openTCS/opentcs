@@ -8,6 +8,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,10 +49,10 @@ class TransportOrderDispatcherHandlerTest {
     order = new TransportOrder("some-order", List.of())
         .withProcessingVehicle(vehicle.getReference());
 
-    given(vehicleService.fetchObject(Vehicle.class, "some-vehicle"))
-        .willReturn(vehicle);
-    given(vehicleService.fetchObject(TransportOrder.class, "some-order"))
-        .willReturn(order);
+    given(vehicleService.fetch(Vehicle.class, "some-vehicle"))
+        .willReturn(Optional.of(vehicle));
+    given(vehicleService.fetch(TransportOrder.class, "some-order"))
+        .willReturn(Optional.of(order));
   }
 
   @Test

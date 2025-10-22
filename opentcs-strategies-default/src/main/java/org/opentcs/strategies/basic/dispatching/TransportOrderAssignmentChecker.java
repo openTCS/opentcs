@@ -55,10 +55,11 @@ public class TransportOrderAssignmentChecker {
       return TransportOrderAssignmentVeto.TRANSPORT_ORDER_INTENDED_VEHICLE_NOT_SET;
     }
 
-    Vehicle intendedVehicle = objectService.fetchObject(
+    Vehicle intendedVehicle = objectService.fetch(
         Vehicle.class,
         transportOrder.getIntendedVehicle()
-    );
+    )
+        .orElseThrow();
     if (!intendedVehicle.hasProcState(Vehicle.ProcState.IDLE)) {
       return TransportOrderAssignmentVeto.VEHICLE_PROCESSING_STATE_INVALID;
     }

@@ -73,7 +73,7 @@ public class StrandedVehicles
     }
 
     long currentTime = timeProvider.getCurrentTimeEpochMillis();
-    objectService.fetchObjects(Vehicle.class).forEach(vehicle -> {
+    objectService.fetch(Vehicle.class).forEach(vehicle -> {
       VehicleSnapshot vehicleSnapshot = new VehicleSnapshot(vehicle);
       vehicleSnapshot.setLastRelevantStateChange(currentTime);
       currentSnapshots.put(vehicle.getName(), vehicleSnapshot);
@@ -115,8 +115,7 @@ public class StrandedVehicles
     previousSnapshots.putAll(currentSnapshots);
     currentSnapshots.clear();
 
-    objectService.fetchObjects(Vehicle.class)
-        .stream()
+    objectService.fetch(Vehicle.class)
         .forEach(vehicle -> {
           VehicleSnapshot previousSnapshot = previousSnapshots.get(vehicle.getName());
           VehicleSnapshot currentSnapshot = new VehicleSnapshot(vehicle);
@@ -187,7 +186,8 @@ public class StrandedVehicles
   private boolean isIdleAtNoParkingPosition(Vehicle vehicle) {
     return vehicle.hasState(Vehicle.State.IDLE)
         && vehicle.getCurrentPosition() != null
-        && objectService.fetchObject(Point.class, vehicle.getCurrentPosition())
+        && objectService.fetch(Point.class, vehicle.getCurrentPosition())
+            .orElseThrow()
             .getType() != Point.Type.PARK_POSITION;
   }
 

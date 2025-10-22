@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,18 +51,20 @@ class ResourceAvoidanceExtractorTest {
     );
 
     objectService = mock();
-    when(objectService.fetchObject(Point.class, "Point-A")).thenReturn(pointA);
-    when(objectService.fetchObject(Point.class, "Point-B")).thenReturn(pointB);
-    when(objectService.fetchObject(Point.class, pointC.getReference())).thenReturn(pointC);
-    when(objectService.fetchObject(Path.class, "Path-AB")).thenReturn(pathAB);
-    when(objectService.fetchObject(Path.class, "Path-BC")).thenReturn(pathBC);
-    when(objectService.fetchObject(Location.class, "Location-C")).thenReturn(locationC);
+    when(objectService.fetch(Point.class, "Point-A")).thenReturn(Optional.of(pointA));
+    when(objectService.fetch(Point.class, "Point-B")).thenReturn(Optional.of(pointB));
+    when(objectService.fetch(Point.class, pointC.getReference())).thenReturn(Optional.of(pointC));
+    when(objectService.fetch(Path.class, "Path-AB")).thenReturn(Optional.of(pathAB));
+    when(objectService.fetch(Path.class, "Path-BC")).thenReturn(Optional.of(pathBC));
+    when(objectService.fetch(Location.class, "Location-C"))
+        .thenReturn(Optional.of(locationC));
 
-    when(objectService.fetchObject(Point.class, pointA.getReference())).thenReturn(pointA);
-    when(objectService.fetchObject(Point.class, pointB.getReference())).thenReturn(pointB);
-    when(objectService.fetchObject(Path.class, pathAB.getReference())).thenReturn(pathAB);
-    when(objectService.fetchObject(Path.class, pathBC.getReference())).thenReturn(pathBC);
-    when(objectService.fetchObject(Location.class, locationC.getReference())).thenReturn(locationC);
+    when(objectService.fetch(Point.class, pointA.getReference())).thenReturn(Optional.of(pointA));
+    when(objectService.fetch(Point.class, pointB.getReference())).thenReturn(Optional.of(pointB));
+    when(objectService.fetch(Path.class, pathAB.getReference())).thenReturn(Optional.of(pathAB));
+    when(objectService.fetch(Path.class, pathBC.getReference())).thenReturn(Optional.of(pathBC));
+    when(objectService.fetch(Location.class, locationC.getReference()))
+        .thenReturn(Optional.of(locationC));
 
     extractor = new ResourceAvoidanceExtractor(objectService);
   }

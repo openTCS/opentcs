@@ -259,7 +259,7 @@ public class GraphProvider {
 
   private HashedResourceSet<Point> getCurrentPointBase() {
     if (currentPointBase.isEmpty()) {
-      currentPointBase.overrideResources(objectService.fetchObjects(Point.class));
+      currentPointBase.overrideResources(objectService.fetch(Point.class));
     }
 
     return currentPointBase;
@@ -267,7 +267,7 @@ public class GraphProvider {
 
   private HashedResourceSet<Path> getCurrentPathBase() {
     if (currentPathBase.isEmpty()) {
-      currentPathBase.overrideResources(objectService.fetchObjects(Path.class));
+      currentPathBase.overrideResources(objectService.fetch(Path.class));
     }
 
     return currentPathBase;

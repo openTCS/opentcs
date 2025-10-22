@@ -80,10 +80,10 @@ public class LocationLockAdapter
       // Check if the kernel is in operating mode, too.
       if (portal.getState() == Kernel.State.OPERATING) {
         // Update the path in the kernel if it exists and its locked state is different.
-        Location location = portal.getPlantModelService().fetchObject(
+        Location location = portal.getPlantModelService().fetch(
             Location.class,
             model.getName()
-        );
+        ).orElse(null);
         if (location != null && location.isLocked() != locked) {
           portal.getPlantModelService().updateLocationLock(location.getReference(), locked);
         }

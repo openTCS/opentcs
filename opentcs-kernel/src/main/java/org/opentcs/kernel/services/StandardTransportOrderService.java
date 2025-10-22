@@ -8,8 +8,8 @@ import jakarta.inject.Inject;
 import java.util.List;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
-import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectExistsException;
@@ -60,7 +60,7 @@ public class StandardTransportOrderService
    */
   @Inject
   public StandardTransportOrderService(
-      TCSObjectService objectService,
+      InternalTCSObjectService objectService,
       @GlobalSyncObject
       Object globalSyncObject,
       TCSObjectRepository globalObjectPool,

@@ -16,9 +16,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.routing.GroupMapper;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -51,7 +52,7 @@ public class DefaultRouter
   /**
    * The object service providing the model data.
    */
-  private final TCSObjectService objectService;
+  private final InternalTCSObjectService objectService;
   /**
    * Provides point routers for vehicles.
    */
@@ -79,7 +80,7 @@ public class DefaultRouter
    */
   @Inject
   public DefaultRouter(
-      TCSObjectService objectService,
+      InternalTCSObjectService objectService,
       PointRouterProvider pointRouterProvider,
       GroupMapper routingGroupMapper,
       DefaultRouterConfiguration configuration
@@ -480,8 +481,8 @@ public class DefaultRouter
         && (Destination.OP_MOVE.equals(dest.getOperation())
             || Destination.OP_PARK.equals(dest.getOperation()))) {
       // Route the vehicle to an user selected point if halting is allowed there.
-      Point destPoint = objectService.fetchObject(Point.class, dest.getDestination().getName());
-      requireNonNull(destPoint, "destPoint");
+      Point destPoint
+          = objectService.fetch(Point.class, dest.getDestination().getName()).orElseThrow();
       final Set<Point> result = new HashSet<>();
       result.add(destPoint);
       return result;
@@ -490,14 +491,14 @@ public class DefaultRouter
     // to the destination location.
     else if (dest.getDestination().getReferentClass() == Location.class) {
       final Set<Point> result = new HashSet<>();
-      final Location destLoc = objectService.fetchObject(
+      final Location destLoc = objectService.fetch(
           Location.class,
           dest.getDestination().getName()
-      );
-      final LocationType destLocType = objectService.fetchObject(
+      ).orElseThrow();
+      final LocationType destLocType = objectService.fetch(
           LocationType.class,
           destLoc.getType()
-      );
+      ).orElseThrow();
       for (Location.Link curLink : destLoc.getAttachedLinks()) {
         // A link is acceptable if any of the following conditions are true:
         // - The destination operation is OP_NOP, which is allowed everywhere.
@@ -509,7 +510,7 @@ public class DefaultRouter
             || curLink.hasAllowedOperation(dest.getOperation())
             || (curLink.getAllowedOperations().isEmpty()
                 && destLocType.isAllowedOperation(dest.getOperation()))) {
-          Point destPoint = objectService.fetchObject(Point.class, curLink.getPoint());
+          Point destPoint = objectService.fetch(Point.class, curLink.getPoint()).orElseThrow();
           result.add(destPoint);
         }
       }
@@ -527,13 +528,10 @@ public class DefaultRouter
    * @return The vehicles which have the given routing group
    */
   private Set<Vehicle> getVehiclesByRoutingGroup(String routingGroup) {
-    Set<Vehicle> result = new HashSet<>();
-    for (Vehicle curVehicle : objectService.fetchObjects(Vehicle.class)) {
-      if (Objects.equals(routingGroupMapper.apply(curVehicle), routingGroup)) {
-        result.add(curVehicle);
-      }
-    }
-    return result;
+    return objectService.fetch(Vehicle.class)
+        .stream()
+        .filter(vehicle -> Objects.equals(routingGroupMapper.apply(vehicle), routingGroup))
+        .collect(Collectors.toSet());
   }
 
   /**

@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,8 +51,8 @@ class IsParkableTest {
             Set.of(new AcceptableOrderType(OrderConstants.TYPE_ANY, 0))
         );
 
-    given(objectService.fetchObject(Point.class, p1.getReference()))
-        .willReturn(p1);
+    given(objectService.fetch(Point.class, p1.getReference()))
+        .willReturn(Optional.of(p1));
     long parkIdleVehiclesDelay = 60000;
     given(configuration.parkIdleVehiclesDelay()).willReturn(parkIdleVehiclesDelay);
     given(timeProvider.getCurrentTimeInstant())
@@ -87,8 +88,8 @@ class IsParkableTest {
     p1 = p1.withType(Point.Type.PARK_POSITION);
     Vehicle vehicle = parkableVehicle.withCurrentPosition(p1.getReference());
 
-    given(objectService.fetchObject(Point.class, p1.getReference()))
-        .willReturn(p1);
+    given(objectService.fetch(Point.class, p1.getReference()))
+        .willReturn(Optional.of(p1));
 
     assertThat(isParkable.apply(vehicle), hasSize(1));
   }

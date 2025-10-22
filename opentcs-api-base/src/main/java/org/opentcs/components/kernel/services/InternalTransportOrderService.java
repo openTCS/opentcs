@@ -16,7 +16,8 @@ import org.opentcs.data.order.TransportOrder;
  */
 public interface InternalTransportOrderService
     extends
-      TransportOrderService {
+      TransportOrderService,
+      InternalTCSObjectService {
 
   /**
    * Sets an order sequence's finished flag.

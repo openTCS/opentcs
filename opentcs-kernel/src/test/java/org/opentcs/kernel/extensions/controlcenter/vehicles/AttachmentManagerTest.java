@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.BasicVehicleCommAdapter;
@@ -49,7 +49,7 @@ class AttachmentManagerTest {
   private static final String VEHICLE_3_NAME = "Vehicle3";
 
   private final AttachmentManager attachmentManager;
-  private final TCSObjectService objectService;
+  private final InternalTCSObjectService objectService;
   private final LocalVehicleControllerPool vehicleControllerPool;
   private final VehicleCommAdapterRegistry commAdapterRegistry;
   private final VehicleEntryPool vehicleEntryPool;
@@ -61,7 +61,7 @@ class AttachmentManagerTest {
   private final Vehicle vehicle3;
 
   AttachmentManagerTest() {
-    objectService = mock(TCSObjectService.class);
+    objectService = mock(InternalTCSObjectService.class);
     vehicleControllerPool = mock(LocalVehicleControllerPool.class);
     commAdapterRegistry = mock(VehicleCommAdapterRegistry.class);
     commAdapterFactory = mock(VehicleCommAdapterFactory.class);
@@ -97,7 +97,7 @@ class AttachmentManagerTest {
     vehicles.add(vehicle1);
     vehicles.add(vehicle2);
     vehicles.add(vehicle3);
-    when(objectService.fetchObjects(Vehicle.class)).thenReturn(vehicles);
+    when(objectService.fetch(Vehicle.class)).thenReturn(vehicles);
     attachmentManager.initialize();
     for (VehicleEntry entry : vehicleEntryPool.getEntries().values()) {
       LoggerFactory.getLogger(getClass()).info("{}", entry.getVehicle());

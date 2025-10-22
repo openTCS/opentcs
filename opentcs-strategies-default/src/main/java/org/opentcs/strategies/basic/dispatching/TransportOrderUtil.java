@@ -120,7 +120,7 @@ public class TransportOrderUtil
     // Check if any transport order referenced as a an explicit dependency
     // (really still exists and) is not finished.
     if (order.getDependencies().stream()
-        .map(depRef -> transportOrderService.fetchObject(TransportOrder.class, depRef))
+        .map(depRef -> transportOrderService.fetch(TransportOrder.class, depRef).orElse(null))
         .anyMatch(dep -> dep != null && !dep.hasState(TransportOrder.State.FINISHED))) {
       return true;
     }
@@ -128,10 +128,11 @@ public class TransportOrderUtil
     // Check if the transport order is part of an order sequence and if yes,
     // if it's the next unfinished order in the sequence.
     if (order.getWrappingSequence() != null) {
-      OrderSequence seq = transportOrderService.fetchObject(
+      OrderSequence seq = transportOrderService.fetch(
           OrderSequence.class,
           order.getWrappingSequence()
-      );
+      )
+          .orElseThrow();
       if (!order.getReference().equals(seq.getNextUnfinishedOrder())) {
         return true;
       }
@@ -146,7 +147,7 @@ public class TransportOrderUtil
    * marking them as DISPATCHABLE.
    */
   public void markNewDispatchableOrders() {
-    transportOrderService.fetchObjects(TransportOrder.class).stream()
+    transportOrderService.stream(TransportOrder.class)
         .filter(order -> order.hasState(TransportOrder.State.ACTIVE))
         .filter(order -> !hasUnfinishedDependencies(order))
         .forEach(
@@ -214,7 +215,8 @@ public class TransportOrderUtil
     }
     transportOrderService.updateTransportOrderProcessingVehicle(orderRef, vehicleRef, driveOrders);
     // Update the transport order's copy.
-    TransportOrder updatedOrder = transportOrderService.fetchObject(TransportOrder.class, orderRef);
+    TransportOrder updatedOrder
+        = transportOrderService.fetch(TransportOrder.class, orderRef).orElseThrow();
     // If the drive order must be assigned, do so.
     if (mustAssign(updatedOrder.getCurrentDriveOrder(), vehicle)) {
       // Let the vehicle controller know about the first drive order.
@@ -276,7 +278,10 @@ public class TransportOrderUtil
     }
 
     abortAssignedOrder(
-        transportOrderService.fetchObject(TransportOrder.class, vehicle.getTransportOrder()),
+        transportOrderService.fetch(
+            TransportOrder.class,
+            vehicle.getTransportOrder()
+        ).orElseThrow(),
         vehicle,
         immediateAbort
     );
@@ -300,7 +305,7 @@ public class TransportOrderUtil
     else {
       abortAssignedOrder(
           order,
-          vehicleService.fetchObject(Vehicle.class, order.getProcessingVehicle()),
+          vehicleService.fetch(Vehicle.class, order.getProcessingVehicle()).orElseThrow(),
           immediateAbort
       );
     }
@@ -318,14 +323,18 @@ public class TransportOrderUtil
   public Optional<TransportOrder> nextDispatchableOrderInSequence(
       TCSObjectReference<OrderSequence> sequenceRef
   ) {
-    OrderSequence seq = transportOrderService.fetchObject(OrderSequence.class, sequenceRef);
+    OrderSequence seq = transportOrderService.fetch(OrderSequence.class, sequenceRef).orElseThrow();
     // If the order sequence's next order is not available, yet, the vehicle should wait for it.
     if (seq.getNextUnfinishedOrder() == null) {
       return Optional.empty();
     }
 
     TransportOrder nextUnfinishedOrder
-        = transportOrderService.fetchObject(TransportOrder.class, seq.getNextUnfinishedOrder());
+        = transportOrderService.fetch(
+            TransportOrder.class,
+            seq.getNextUnfinishedOrder()
+        )
+            .orElseThrow();
 
     // If the order sequence's next order is not available because it was not properly finished.
     if (nextUnfinishedOrder.hasState(TransportOrder.State.WITHDRAWN)) {
@@ -340,13 +349,17 @@ public class TransportOrderUtil
 
       //Look for next orders, using an up-to-date copy of the sequence.
       seq = transportOrderService
-          .fetchObject(OrderSequence.class, nextUnfinishedOrder.getWrappingSequence());
+          .fetch(OrderSequence.class, nextUnfinishedOrder.getWrappingSequence()).orElseThrow();
       if (seq.getNextUnfinishedOrder() == null) {
         return Optional.empty();
       }
 
       nextUnfinishedOrder
-          = transportOrderService.fetchObject(TransportOrder.class, seq.getNextUnfinishedOrder());
+          = transportOrderService.fetch(
+              TransportOrder.class,
+              seq.getNextUnfinishedOrder()
+          )
+              .orElseThrow();
       if (nextUnfinishedOrder.hasState(TransportOrder.State.WITHDRAWN)) {
         return Optional.empty();
       }
@@ -446,7 +459,7 @@ public class TransportOrderUtil
     else {
       abortAssignedOrder(
           order,
-          vehicleService.fetchObject(Vehicle.class, order.getProcessingVehicle()),
+          vehicleService.fetch(Vehicle.class, order.getProcessingVehicle()).orElseThrow(),
           false
       );
     }
@@ -460,7 +473,7 @@ public class TransportOrderUtil
   private void markOrderAndSequenceAsFinished(TCSObjectReference<TransportOrder> ref) {
     requireNonNull(ref, "ref");
 
-    TransportOrder order = transportOrderService.fetchObject(TransportOrder.class, ref);
+    TransportOrder order = transportOrderService.fetch(TransportOrder.class, ref).orElseThrow();
     Optional<OrderSequence> osOpt = extractWrappingSequence(order);
 
     // Sanity check: The finished order must be the next one in the sequence.
@@ -484,10 +497,7 @@ public class TransportOrderUtil
 
       // Finish the order sequence, using an up-to-date copy.
       finishOrderSequence(
-          transportOrderService.fetchObject(
-              OrderSequence.class,
-              seq.getReference()
-          )
+          transportOrderService.fetch(OrderSequence.class, seq.getReference()).orElseThrow()
       );
     });
   }
@@ -500,7 +510,8 @@ public class TransportOrderUtil
   private void updateSequenceOfFailedTransportOrder(TCSObjectReference<TransportOrder> ref) {
     requireNonNull(ref, "ref");
 
-    TransportOrder failedOrder = transportOrderService.fetchObject(TransportOrder.class, ref);
+    TransportOrder failedOrder
+        = transportOrderService.fetch(TransportOrder.class, ref).orElseThrow();
 
     Optional<OrderSequence> osOpt = extractWrappingSequence(failedOrder);
     osOpt.ifPresent(seq -> {
@@ -510,7 +521,7 @@ public class TransportOrderUtil
         transportOrderService.markOrderSequenceComplete(seq.getReference());
         // Mark all orders of the sequence that are not in a final state as FAILED.
         seq.getOrders().stream()
-            .map(curRef -> transportOrderService.fetchObject(TransportOrder.class, curRef))
+            .map(curRef -> transportOrderService.fetch(TransportOrder.class, curRef).orElseThrow())
             .filter(o -> !o.getState().isFinalState())
             .forEach(
                 o -> transportOrderService.updateTransportOrderState(
@@ -537,10 +548,11 @@ public class TransportOrderUtil
 
       // Finish the order sequence, using an up-to-date copy.
       finishOrderSequence(
-          transportOrderService.fetchObject(
+          transportOrderService.fetch(
               OrderSequence.class,
               failedOrder.getWrappingSequence()
           )
+              .orElseThrow()
       );
     });
   }
@@ -560,11 +572,6 @@ public class TransportOrderUtil
   private Optional<OrderSequence> extractWrappingSequence(TransportOrder order) {
     return order.getWrappingSequence() == null
         ? Optional.empty()
-        : Optional.of(
-            transportOrderService.fetchObject(
-                OrderSequence.class,
-                order.getWrappingSequence()
-            )
-        );
+        : transportOrderService.fetch(OrderSequence.class, order.getWrappingSequence());
   }
 }

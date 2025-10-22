@@ -451,12 +451,12 @@ public class PeripheralInteractor
   }
 
   private String determineReservationToken() {
-    Vehicle vehicle = peripheralJobService.fetchObject(Vehicle.class, vehicleRef);
+    Vehicle vehicle = peripheralJobService.fetch(Vehicle.class, vehicleRef).orElseThrow();
     if (vehicle.getTransportOrder() != null) {
-      TransportOrder transportOrder = peripheralJobService.fetchObject(
+      TransportOrder transportOrder = peripheralJobService.fetch(
           TransportOrder.class,
           vehicle.getTransportOrder()
-      );
+      ).orElseThrow();
       if (transportOrder.getPeripheralReservationToken() != null) {
         return transportOrder.getPeripheralReservationToken();
       }

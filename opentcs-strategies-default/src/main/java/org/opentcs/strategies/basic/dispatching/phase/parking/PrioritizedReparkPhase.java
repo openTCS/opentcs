@@ -65,12 +65,14 @@ public class PrioritizedReparkPhase
 
     LOG.debug("Looking for parking vehicles to send to higher prioritized parking positions...");
 
-    getOrderService().fetchObjects(Vehicle.class).stream()
+    getOrderService().fetch(Vehicle.class).stream()
         .filter(vehicle -> vehicleSelectionFilter.apply(vehicle).isEmpty())
         .sorted((vehicle1, vehicle2) -> {
           // Sort the vehicles based on the priority of the parking position they occupy
-          Point point1 = getOrderService().fetchObject(Point.class, vehicle1.getCurrentPosition());
-          Point point2 = getOrderService().fetchObject(Point.class, vehicle2.getCurrentPosition());
+          Point point1
+              = getOrderService().fetch(Point.class, vehicle1.getCurrentPosition()).orElseThrow();
+          Point point2
+              = getOrderService().fetch(Point.class, vehicle2.getCurrentPosition()).orElseThrow();
           return priorityComparator.compare(point1, point2);
         })
         .forEach(vehicle -> createParkingOrder(vehicle));

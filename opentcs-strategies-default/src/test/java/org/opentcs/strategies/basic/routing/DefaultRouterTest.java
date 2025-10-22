@@ -14,11 +14,12 @@ import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.routing.GroupMapper;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Location.Link;
 import org.opentcs.data.model.LocationType;
@@ -36,7 +37,7 @@ import org.opentcs.strategies.basic.routing.jgrapht.PointRouterProvider;
 class DefaultRouterTest {
 
   private DefaultRouter defaultRouter;
-  private TCSObjectService objectService;
+  private InternalTCSObjectService objectService;
   private PointRouterProvider pointRouterProvider;
   private GroupMapper routingGroupMapper;
   private DefaultRouterConfiguration configuration;
@@ -75,8 +76,8 @@ class DefaultRouterTest {
         )
     );
 
-    when(objectService.fetchObject(Point.class, "P1")).thenReturn(point1);
-    when(objectService.fetchObject(Point.class, "P2")).thenReturn(point2);
+    when(objectService.fetch(Point.class, "P1")).thenReturn(Optional.of(point1));
+    when(objectService.fetch(Point.class, "P2")).thenReturn(Optional.of(point2));
   }
 
   @Test
@@ -94,7 +95,7 @@ class DefaultRouterTest {
     when(pointRouterProvider.getPointRoutersByVehicleGroup())
         .thenReturn(Map.of("some-group", pointRouter));
     when(pointRouter.getCosts(any(Point.class), any(Point.class))).thenReturn(50L);
-    when(objectService.fetchObjects(Vehicle.class)).thenReturn(Set.of(vehicle));
+    when(objectService.fetch(Vehicle.class)).thenReturn(Set.of(vehicle));
     when(routingGroupMapper.apply(vehicle)).thenReturn("some-group");
 
     assertThat(defaultRouter.checkRoutability(order), contains(vehicle));
@@ -161,11 +162,12 @@ class DefaultRouterTest {
               );
             }
         );
-    when(objectService.fetchObject(Point.class, "D")).thenReturn(pointD);
-    when(objectService.fetchObject(Point.class, pointB.getReference())).thenReturn(pointB);
-    when(objectService.fetchObject(Point.class, pointC.getReference())).thenReturn(pointC);
-    when(objectService.fetchObject(Location.class, "L1")).thenReturn(locationBC);
-    when(objectService.fetchObject(LocationType.class, type1.getReference())).thenReturn(type1);
+    when(objectService.fetch(Point.class, "D")).thenReturn(Optional.of(pointD));
+    when(objectService.fetch(Point.class, pointB.getReference())).thenReturn(Optional.of(pointB));
+    when(objectService.fetch(Point.class, pointC.getReference())).thenReturn(Optional.of(pointC));
+    when(objectService.fetch(Location.class, "L1")).thenReturn(Optional.of(locationBC));
+    when(objectService.fetch(LocationType.class, type1.getReference()))
+        .thenReturn(Optional.of(type1));
 
     Set<List<Route>> orderRoutes = defaultRouter
         .getRoutes(vehicle, pointA, transportOrder, 1);

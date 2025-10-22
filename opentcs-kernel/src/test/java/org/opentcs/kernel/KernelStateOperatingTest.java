@@ -79,7 +79,7 @@ class KernelStateOperatingTest {
     controllerPool = mock(LocalVehicleControllerPool.class);
     attachmentManager = mock(AttachmentManager.class);
     vehicleService = mock(InternalVehicleService.class);
-    when(vehicleService.fetchObjects(Vehicle.class)).thenReturn(vehicles);
+    when(vehicleService.fetch(Vehicle.class)).thenReturn(vehicles);
   }
 
   @Test

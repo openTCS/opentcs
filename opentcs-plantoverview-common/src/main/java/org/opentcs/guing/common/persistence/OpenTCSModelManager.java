@@ -347,18 +347,18 @@ public class OpenTCSModelManager
 
     TCSObjectService objectService = (TCSObjectService) portal.getPlantModelService();
 
-    Set<VisualLayout> allVisualLayouts = objectService.fetchObjects(VisualLayout.class);
+    Set<VisualLayout> allVisualLayouts = objectService.fetch(VisualLayout.class);
     checkState(
         allVisualLayouts.size() == 1,
         "There has to be one, and only one, visual layout. Number of visual layouts: %d",
         allVisualLayouts.size()
     );
-    Set<Vehicle> allVehicles = objectService.fetchObjects(Vehicle.class);
-    Set<Point> allPoints = objectService.fetchObjects(Point.class);
-    Set<LocationType> allLocationTypes = objectService.fetchObjects(LocationType.class);
-    Set<Location> allLocations = objectService.fetchObjects(Location.class);
-    Set<Path> allPaths = objectService.fetchObjects(Path.class);
-    Set<Block> allBlocks = objectService.fetchObjects(Block.class);
+    Set<Vehicle> allVehicles = objectService.fetch(Vehicle.class);
+    Set<Point> allPoints = objectService.fetch(Point.class);
+    Set<LocationType> allLocationTypes = objectService.fetch(LocationType.class);
+    Set<Location> allLocations = objectService.fetch(Location.class);
+    Set<Path> allPaths = objectService.fetch(Path.class);
+    Set<Block> allBlocks = objectService.fetch(Block.class);
 
     List<Figure> restoredFigures = new ArrayList<>();
 

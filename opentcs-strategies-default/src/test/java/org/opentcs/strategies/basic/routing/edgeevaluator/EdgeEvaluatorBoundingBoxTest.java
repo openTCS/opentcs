@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.routing.Edge;
@@ -38,7 +39,7 @@ class EdgeEvaluatorBoundingBoxTest {
     Path path = new Path("1 -- 2", srcPoint.getReference(), destPoint.getReference());
     Edge edge = new Edge(path, false);
     Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(new BoundingBox(3, 3, 3));
-    when(objectService.fetchObject(Point.class, "2")).thenReturn(destPoint);
+    when(objectService.fetch(Point.class, "2")).thenReturn(Optional.of(destPoint));
 
     double result = edgeEvaluator.computeWeight(edge, vehicle);
 
@@ -52,7 +53,7 @@ class EdgeEvaluatorBoundingBoxTest {
     Path path = new Path("1 -- 2", srcPoint.getReference(), destPoint.getReference());
     Edge edge = new Edge(path, false);
     Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(new BoundingBox(3, 3, 3));
-    when(objectService.fetchObject(Point.class, "2")).thenReturn(destPoint);
+    when(objectService.fetch(Point.class, "2")).thenReturn(Optional.of(destPoint));
 
     double result = edgeEvaluator.computeWeight(edge, vehicle);
 
@@ -66,7 +67,7 @@ class EdgeEvaluatorBoundingBoxTest {
     Path path = new Path("1 -- 2", srcPoint.getReference(), destPoint.getReference());
     Edge edge = new Edge(path, false);
     Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(new BoundingBox(3, 3, 3));
-    when(objectService.fetchObject(Point.class, "2")).thenReturn(destPoint);
+    when(objectService.fetch(Point.class, "2")).thenReturn(Optional.of(destPoint));
 
     double result = edgeEvaluator.computeWeight(edge, vehicle);
 
@@ -80,7 +81,7 @@ class EdgeEvaluatorBoundingBoxTest {
     Path path = new Path("1 -- 2", srcPoint.getReference(), destPoint.getReference());
     Edge edge = new Edge(path, true);
     Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(new BoundingBox(3, 3, 3));
-    when(objectService.fetchObject(Point.class, "1")).thenReturn(srcPoint);
+    when(objectService.fetch(Point.class, "1")).thenReturn(Optional.of(srcPoint));
 
     double result = edgeEvaluator.computeWeight(edge, vehicle);
 
@@ -94,7 +95,7 @@ class EdgeEvaluatorBoundingBoxTest {
     Path path = new Path("1 -- 2", srcPoint.getReference(), destPoint.getReference());
     Edge edge = new Edge(path, true);
     Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(new BoundingBox(3, 3, 3));
-    when(objectService.fetchObject(Point.class, "1")).thenReturn(srcPoint);
+    when(objectService.fetch(Point.class, "1")).thenReturn(Optional.of(srcPoint));
 
     double result = edgeEvaluator.computeWeight(edge, vehicle);
 
@@ -108,7 +109,7 @@ class EdgeEvaluatorBoundingBoxTest {
     Path path = new Path("1 -- 2", srcPoint.getReference(), destPoint.getReference());
     Edge edge = new Edge(path, true);
     Vehicle vehicle = new Vehicle("vehicle").withBoundingBox(new BoundingBox(3, 3, 3));
-    when(objectService.fetchObject(Point.class, "1")).thenReturn(srcPoint);
+    when(objectService.fetch(Point.class, "1")).thenReturn(Optional.of(srcPoint));
 
     double result = edgeEvaluator.computeWeight(edge, vehicle);
 

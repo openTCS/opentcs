@@ -8,8 +8,12 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
+import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectHistory;
@@ -24,7 +28,7 @@ import org.opentcs.kernel.workingset.TCSObjectRepository;
  */
 public class StandardTCSObjectService
     implements
-      TCSObjectService {
+      InternalTCSObjectService {
 
   /**
    * A global object to be used for synchronization within the kernel.
@@ -52,6 +56,15 @@ public class StandardTCSObjectService
   }
 
   @Override
+  public <T extends TCSObject<T>> Stream<T> stream(Class<T> clazz)
+      throws KernelRuntimeException {
+    synchronized (getGlobalSyncObject()) {
+      return getObjectRepo().streamObjects(clazz);
+    }
+  }
+
+  @Deprecated
+  @Override
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, TCSObjectReference<T> ref) {
     requireNonNull(clazz, "clazz");
     requireNonNull(ref, "ref");
@@ -62,6 +75,17 @@ public class StandardTCSObjectService
   }
 
   @Override
+  public <T extends TCSObject<T>> Optional<T> fetch(Class<T> clazz, TCSObjectReference<T> ref) {
+    requireNonNull(clazz, "clazz");
+    requireNonNull(ref, "ref");
+
+    synchronized (getGlobalSyncObject()) {
+      return Optional.ofNullable(getObjectRepo().getObjectOrNull(clazz, ref));
+    }
+  }
+
+  @Deprecated
+  @Override
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, String name) {
     requireNonNull(clazz, "clazz");
 
@@ -70,6 +94,16 @@ public class StandardTCSObjectService
     }
   }
 
+  @Override
+  public <T extends TCSObject<T>> Optional<T> fetch(Class<T> clazz, String name) {
+    requireNonNull(clazz, "clazz");
+
+    synchronized (getGlobalSyncObject()) {
+      return Optional.ofNullable(getObjectRepo().getObjectOrNull(clazz, name));
+    }
+  }
+
+  @Deprecated
   @Override
   public <T extends TCSObject<T>> Set<T> fetchObjects(Class<T> clazz) {
     requireNonNull(clazz, "clazz");
@@ -85,7 +119,32 @@ public class StandardTCSObjectService
   }
 
   @Override
+  public <T extends TCSObject<T>> Set<T> fetch(Class<T> clazz) {
+    requireNonNull(clazz, "clazz");
+
+    synchronized (getGlobalSyncObject()) {
+      return getObjectRepo().getObjects(clazz);
+    }
+  }
+
+  @Deprecated
+  @Override
   public <T extends TCSObject<T>> Set<T> fetchObjects(
+      @Nonnull
+      Class<T> clazz,
+      @Nonnull
+      Predicate<? super T> predicate
+  ) {
+    requireNonNull(clazz, "clazz");
+    requireNonNull(predicate, "predicate");
+
+    synchronized (getGlobalSyncObject()) {
+      return getObjectRepo().getObjects(clazz, predicate);
+    }
+  }
+
+  @Override
+  public <T extends TCSObject<T>> Set<T> fetch(
       @Nonnull
       Class<T> clazz,
       @Nonnull

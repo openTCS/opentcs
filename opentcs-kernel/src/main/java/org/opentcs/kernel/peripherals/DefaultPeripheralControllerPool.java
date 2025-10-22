@@ -117,7 +117,7 @@ public class DefaultPeripheralControllerPool
       return;
     }
 
-    Location location = objectService.fetchObject(Location.class, locationRef);
+    Location location = objectService.fetch(Location.class, locationRef).orElse(null);
     checkArgument(location != null, "No such location: %s", locationRef.getName());
 
     LOG.debug("{}: Attaching controller...", locationRef.getName());

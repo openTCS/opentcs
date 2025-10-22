@@ -93,7 +93,7 @@ public class AssignReservedOrdersPhase
 
   @Override
   public void run() {
-    for (Vehicle vehicle : objectService.fetchObjects(Vehicle.class)) {
+    for (Vehicle vehicle : objectService.fetch(Vehicle.class)) {
       if (availableForReservedOrders(vehicle)) {
         checkForReservedOrder(vehicle);
       }
@@ -109,7 +109,7 @@ public class AssignReservedOrdersPhase
     // Note that we expect no more than a single reserved order, and remove ALL reservations if we
     // find at least one, even if it cannot be processed by the vehicle in the end.
     orderReservationPool.findReservations(vehicle.getReference()).stream()
-        .map(orderRef -> objectService.fetchObject(TransportOrder.class, orderRef))
+        .map(orderRef -> objectService.fetch(TransportOrder.class, orderRef).orElseThrow())
         .filter(order -> order.hasState(TransportOrder.State.DISPATCHABLE))
         // A transport order's intended vehicle can change after its creation and also after
         // reservation. Only handle orders where the intended vehicle (still) fits the reservation.
@@ -118,7 +118,7 @@ public class AssignReservedOrdersPhase
         .map(
             order -> computeCandidate(
                 vehicle,
-                objectService.fetchObject(Point.class, vehicle.getCurrentPosition()),
+                objectService.fetch(Point.class, vehicle.getCurrentPosition()).orElseThrow(),
                 order
             )
         )

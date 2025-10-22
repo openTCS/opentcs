@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,8 +46,8 @@ class PathHandlerTest {
         new Point("some-point-1").getReference(),
         new Point("some-point-2").getReference()
     );
-    given(objectService.fetchObject(Path.class, "some-path"))
-        .willReturn(path);
+    given(objectService.fetch(Path.class, "some-path"))
+        .willReturn(Optional.of(path));
   }
 
   @Test

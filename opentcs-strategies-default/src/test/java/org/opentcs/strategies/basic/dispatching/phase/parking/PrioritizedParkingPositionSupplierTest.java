@@ -5,7 +5,6 @@ package org.opentcs.strategies.basic.dispatching.phase.parking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -15,8 +14,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
@@ -89,8 +90,14 @@ class PrioritizedParkingPositionSupplierTest {
                 )
             )
         );
-    when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
-    when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
+    when(plantModelService.fetch(Point.class, point1.getReference()))
+        .thenReturn(Optional.of(point1));
+    when(
+        plantModelService.fetch(
+            eq(Point.class),
+            ArgumentMatchers.<Predicate<? super Point>>any()
+        )
+    ).thenReturn(setOf(point2, point3));
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
     assertTrue(result.isPresent());
@@ -129,8 +136,14 @@ class PrioritizedParkingPositionSupplierTest {
                 )
             )
         );
-    when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
-    when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
+    when(plantModelService.fetch(Point.class, point1.getReference()))
+        .thenReturn(Optional.of(point1));
+    when(
+        plantModelService.fetch(
+            eq(Point.class),
+            ArgumentMatchers.<Predicate<? super Point>>any()
+        )
+    ).thenReturn(setOf(point2, point3));
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
     assertTrue(result.isPresent());
@@ -171,8 +184,14 @@ class PrioritizedParkingPositionSupplierTest {
                 )
             )
         );
-    when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
-    when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
+    when(plantModelService.fetch(Point.class, point1.getReference()))
+        .thenReturn(Optional.of(point1));
+    when(
+        plantModelService.fetch(
+            eq(Point.class),
+            ArgumentMatchers.<Predicate<? super Point>>any()
+        )
+    ).thenReturn(setOf(point2, point3));
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
     assertTrue(result.isPresent());
@@ -193,8 +212,14 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
-    when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
+    when(plantModelService.fetch(Point.class, point1.getReference()))
+        .thenReturn(Optional.of(point1));
+    when(
+        plantModelService.fetch(
+            eq(Point.class),
+            ArgumentMatchers.<Predicate<? super Point>>any()
+        )
+    ).thenReturn(setOf(point2, point3));
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
     assertFalse(result.isPresent());
@@ -214,8 +239,14 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
-    when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
+    when(plantModelService.fetch(Point.class, point1.getReference()))
+        .thenReturn(Optional.of(point1));
+    when(
+        plantModelService.fetch(
+            eq(Point.class),
+            ArgumentMatchers.<Predicate<? super Point>>any()
+        )
+    ).thenReturn(setOf(point2, point3));
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
     assertFalse(result.isPresent());
@@ -231,8 +262,14 @@ class PrioritizedParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
-    when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
+    when(plantModelService.fetch(Point.class, point1.getReference()))
+        .thenReturn(Optional.of(point1));
+    when(
+        plantModelService.fetch(
+            eq(Point.class),
+            ArgumentMatchers.<Predicate<? super Point>>any()
+        )
+    ).thenReturn(setOf(point2, point3));
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
     assertFalse(result.isPresent());

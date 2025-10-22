@@ -5,16 +5,16 @@ package org.opentcs.strategies.basic.dispatching.phase;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
@@ -29,11 +29,11 @@ import org.opentcs.data.order.TransportOrder;
 public class TargetedPointsSupplierTest {
 
   private TargetedPointsSupplier targetedPointsSupplier;
-  private TCSObjectService objectService;
+  private InternalTCSObjectService objectService;
 
   @BeforeEach
   public void setUp() {
-    objectService = mock(TCSObjectService.class);
+    objectService = mock(InternalTCSObjectService.class);
     targetedPointsSupplier = new TargetedPointsSupplier(objectService);
   }
 
@@ -91,8 +91,8 @@ public class TargetedPointsSupplierTest {
         )
     ).withState(TransportOrder.State.BEING_PROCESSED);
 
-    when(objectService.fetchObjects(eq(TransportOrder.class), any()))
-        .thenReturn(Set.of(order1, order2));
+    when(objectService.stream(eq(TransportOrder.class)))
+        .thenReturn(Stream.of(order1, order2));
 
     Set<Point> targetedPoints = targetedPointsSupplier.getTargetedPoints();
     assertThat(targetedPoints, hasSize(2));

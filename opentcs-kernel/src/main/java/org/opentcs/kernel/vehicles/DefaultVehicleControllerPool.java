@@ -83,7 +83,7 @@ public final class DefaultVehicleControllerPool
     // Detach all vehicles and reset their positions.
     for (PoolEntry curEntry : poolEntries.values()) {
       curEntry.vehicleController.terminate();
-      Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, curEntry.vehicleName);
+      Vehicle vehicle = vehicleService.fetch(Vehicle.class, curEntry.vehicleName).orElseThrow();
       vehicleService.updateVehiclePosition(vehicle.getReference(), null);
     }
     poolEntries.clear();
@@ -103,7 +103,7 @@ public final class DefaultVehicleControllerPool
       return;
     }
 
-    Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, vehicleName);
+    Vehicle vehicle = vehicleService.fetch(Vehicle.class, vehicleName).orElse(null);
     checkArgument(vehicle != null, "No such vehicle: %s", vehicleName);
 
     VehicleController controller = vehicleManagerFactory.createVehicleController(

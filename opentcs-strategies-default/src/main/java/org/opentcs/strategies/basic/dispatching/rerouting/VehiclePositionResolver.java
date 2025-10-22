@@ -58,7 +58,7 @@ public class VehiclePositionResolver {
           vehicle.getName(),
           vehicle.getCurrentPosition()
       );
-      return objectService.fetchObject(Point.class, vehicle.getCurrentPosition());
+      return objectService.fetch(Point.class, vehicle.getCurrentPosition()).orElse(null);
     }
 
     if (controller.getInteractionsPendingCommand().isPresent()) {

@@ -209,7 +209,7 @@ public class TransportOrdersContainer
     if (kernelClientApplication.isOnline()) {
       try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
         return sharedPortal.getPortal().getTransportOrderService()
-            .fetchObjects(TransportOrder.class);
+            .fetch(TransportOrder.class);
       }
       catch (KernelRuntimeException exc) {
         LOG.warn("Exception fetching transport orders", exc);

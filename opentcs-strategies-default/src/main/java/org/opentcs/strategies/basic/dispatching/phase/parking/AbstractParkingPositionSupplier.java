@@ -147,7 +147,8 @@ public abstract class AbstractParkingPositionSupplier
       return null;
     }
 
-    Point vehiclePos = plantModelService.fetchObject(Point.class, vehicle.getCurrentPosition());
+    Point vehiclePos
+        = plantModelService.fetch(Point.class, vehicle.getCurrentPosition()).orElseThrow();
 
     return points.stream()
         .map(point -> parkingPositionCandidate(vehicle, vehiclePos, point))
@@ -171,7 +172,7 @@ public abstract class AbstractParkingPositionSupplier
   }
 
   protected Set<Point> fetchAllParkingPositions() {
-    return plantModelService.fetchObjects(Point.class, point -> point.isParkingPosition());
+    return plantModelService.fetch(Point.class, Point::isParkingPosition);
   }
 
   /**

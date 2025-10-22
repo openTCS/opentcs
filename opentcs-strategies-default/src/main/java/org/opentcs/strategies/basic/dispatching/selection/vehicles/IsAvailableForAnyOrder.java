@@ -85,19 +85,21 @@ public class IsAvailableForAnyOrder
     return vehicle.hasProcState(Vehicle.ProcState.IDLE)
         && (vehicle.hasState(Vehicle.State.IDLE) || vehicle.hasState(Vehicle.State.CHARGING))
         || vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)
-            && objectService.fetchObject(TransportOrder.class, vehicle.getTransportOrder())
+            && objectService.fetch(TransportOrder.class, vehicle.getTransportOrder())
+                .orElseThrow()
                 .isDispensable();
   }
 
   private boolean processesDispensableLastOrderInOrderSequence(Vehicle vehicle) {
     if (vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)
         && vehicle.getOrderSequence() != null) {
-      OrderSequence seq = objectService.fetchObject(
+      OrderSequence seq = objectService.fetch(
           OrderSequence.class, vehicle.getOrderSequence()
-      );
+      ).orElseThrow();
       return seq.isComplete()
           && seq.getOrders().getLast().equals(vehicle.getTransportOrder())
-          && objectService.fetchObject(TransportOrder.class, vehicle.getTransportOrder())
+          && objectService.fetch(TransportOrder.class, vehicle.getTransportOrder())
+              .orElseThrow()
               .isDispensable();
     }
     return false;

@@ -8,8 +8,8 @@ import jakarta.inject.Inject;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.components.kernel.services.InternalPeripheralJobService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.components.kernel.services.PeripheralJobService;
-import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
@@ -44,7 +44,7 @@ public class StandardPeripheralJobService
    */
   @Inject
   public StandardPeripheralJobService(
-      TCSObjectService objectService,
+      InternalTCSObjectService objectService,
       @GlobalSyncObject
       Object globalSyncObject,
       PeripheralJobPoolManager jobPoolManager

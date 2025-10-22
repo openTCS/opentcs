@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
@@ -280,7 +281,23 @@ public class TCSObjectRepository {
   }
 
   /**
-   * Returns a set of objects belonging to the given class.
+   * Returns a stream of objects belonging to the given class.
+   *
+   * @param <T> The objects' type.
+   * @param clazz The class of the objects to be returned.
+   * @return A stream of objects belonging to the given class.
+   */
+  @Nonnull
+  public <T extends TCSObject<T>> Stream<T> streamObjects(
+      @Nonnull
+      Class<T> clazz
+  ) {
+    return objects.getOrDefault(clazz, Map.of()).values().stream()
+        .map(clazz::cast);
+  }
+
+  /**
+   * Returns an unmodifiable set of objects belonging to the given class.
    *
    * @param <T> The objects' type.
    * @param clazz The class of the objects to be returned.
@@ -292,12 +309,13 @@ public class TCSObjectRepository {
       Class<T> clazz
   ) {
     return objects.getOrDefault(clazz, Map.of()).values().stream()
-        .map(object -> clazz.cast(object))
-        .collect(Collectors.toSet());
+        .map(clazz::cast)
+        .collect(Collectors.toUnmodifiableSet());
   }
 
   /**
-   * Returns a set of objects of the given class for which the given predicate is true.
+   * Returns an unmodifiable set of objects of the given class for which the given predicate is
+   * true.
    *
    * @param <T> The objects' type.
    * @param clazz The class of the objects to be returned.
@@ -316,9 +334,9 @@ public class TCSObjectRepository {
     requireNonNull(predicate, "predicate");
 
     return objects.getOrDefault(clazz, Map.of()).values().stream()
-        .map(object -> clazz.cast(object))
+        .map(clazz::cast)
         .filter(predicate)
-        .collect(Collectors.toSet());
+        .collect(Collectors.toUnmodifiableSet());
   }
 
   /**

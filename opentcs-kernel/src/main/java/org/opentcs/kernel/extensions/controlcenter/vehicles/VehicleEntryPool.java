@@ -60,7 +60,7 @@ public class VehicleEntryPool
       return;
     }
 
-    objectService.fetchObjects(Vehicle.class).stream()
+    objectService.fetch(Vehicle.class)
         .forEach(vehicle -> entries.put(vehicle.getName(), new VehicleEntry(vehicle)));
     LOG.debug("Initialized vehicle entry pool: {}", entries);
     initialized = true;

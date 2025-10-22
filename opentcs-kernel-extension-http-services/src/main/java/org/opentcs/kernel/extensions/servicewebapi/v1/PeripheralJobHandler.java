@@ -13,8 +13,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
+import org.opentcs.components.kernel.services.InternalPeripheralJobService;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
-import org.opentcs.components.kernel.services.PeripheralJobService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
@@ -31,7 +31,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralJobCon
  */
 public class PeripheralJobHandler {
 
-  private final PeripheralJobService jobService;
+  private final InternalPeripheralJobService jobService;
   private final PeripheralDispatcherService jobDispatcherService;
   private final KernelExecutorWrapper executorWrapper;
   private final PeripheralJobConverter peripheralJobConverter;
@@ -45,7 +45,7 @@ public class PeripheralJobHandler {
    */
   @Inject
   public PeripheralJobHandler(
-      PeripheralJobService jobService,
+      InternalPeripheralJobService jobService,
       PeripheralDispatcherService jobDispatcherService,
       KernelExecutorWrapper executorWrapper,
       PeripheralJobConverter peripheralJobConverter
@@ -63,23 +63,20 @@ public class PeripheralJobHandler {
     return executorWrapper.callAndWait(() -> {
       // Check if the vehicle, location and transport order exist.
       if (job.getRelatedVehicle() != null
-          && jobService.fetchObject(Vehicle.class, job.getRelatedVehicle()) == null) {
+          && jobService.fetch(Vehicle.class, job.getRelatedVehicle()).isEmpty()) {
         throw new ObjectUnknownException("Unknown vehicle: " + job.getRelatedVehicle());
       }
       if (job.getRelatedTransportOrder() != null
-          && jobService.fetchObject(
-              TransportOrder.class,
-              job.getRelatedTransportOrder()
-          ) == null) {
+          && jobService.fetch(TransportOrder.class, job.getRelatedTransportOrder()).isEmpty()) {
         throw new ObjectUnknownException(
             "Unknown transport order: " + job.getRelatedTransportOrder()
         );
       }
       if (job.getPeripheralOperation().getLocationName() != null
-          && jobService.fetchObject(
+          && jobService.fetch(
               Location.class,
               job.getPeripheralOperation().getLocationName()
-          ) == null) {
+          ).isEmpty()) {
         throw new ObjectUnknownException(
             "Unknown location: " + job.getPeripheralOperation().getLocationName()
         );
@@ -139,7 +136,7 @@ public class PeripheralJobHandler {
       // If a related vehicle is set, make sure it exists.
       TCSObjectReference<Vehicle> relatedVehicleRef
           = Optional.ofNullable(relatedVehicle)
-              .map(name -> jobService.fetchObject(Vehicle.class, name))
+              .map(name -> jobService.fetch(Vehicle.class, name).orElse(null))
               .map(Vehicle::getReference)
               .orElse(null);
 
@@ -150,7 +147,7 @@ public class PeripheralJobHandler {
       // If a related transport order is set, make sure it exists.
       TCSObjectReference<TransportOrder> relatedOrderRef
           = Optional.ofNullable(relatedTransportOrder)
-              .map(name -> jobService.fetchObject(TransportOrder.class, name))
+              .map(name -> jobService.fetch(TransportOrder.class, name).orElse(null))
               .map(TransportOrder::getReference)
               .orElse(null);
 
@@ -158,12 +155,11 @@ public class PeripheralJobHandler {
         throw new ObjectUnknownException("Unknown oransport order: " + relatedVehicle);
       }
 
-      return jobService.fetchObjects(
-          PeripheralJob.class,
-          Filters.peripheralJobWithRelatedVehicle(relatedVehicleRef)
-              .and(Filters.peripheralJobWithRelatedTransportOrder(relatedOrderRef))
-      )
-          .stream()
+      return jobService.stream(PeripheralJob.class)
+          .filter(
+              Filters.peripheralJobWithRelatedVehicle(relatedVehicleRef)
+                  .and(Filters.peripheralJobWithRelatedTransportOrder(relatedOrderRef))
+          )
           .map(peripheralJob -> peripheralJobConverter.toGetPeripheralJobResponseTO(peripheralJob))
           .sorted(Comparator.comparing(GetPeripheralJobResponseTO::getName))
           .collect(Collectors.toList());
@@ -183,10 +179,8 @@ public class PeripheralJobHandler {
     requireNonNull(name, "name");
 
     return executorWrapper.callAndWait(() -> {
-      PeripheralJob job = jobService.fetchObject(PeripheralJob.class, name);
-      if (job == null) {
-        throw new ObjectUnknownException("Unknown peripheral job: " + name);
-      }
+      PeripheralJob job = jobService.fetch(PeripheralJob.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown peripheral job: " + name));
 
       return peripheralJobConverter.toGetPeripheralJobResponseTO(job);
     });

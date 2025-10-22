@@ -48,10 +48,8 @@ public class PeripheralJobDispatcherHandler {
     requireNonNull(name, "name");
 
     executorWrapper.callAndWait(() -> {
-      Location location = jobService.fetchObject(Location.class, name);
-      if (location == null) {
-        throw new ObjectUnknownException("Unknown location: " + name);
-      }
+      Location location = jobService.fetch(Location.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown location: " + name));
 
       jobDispatcherService.withdrawByLocation(location.getReference());
     });
@@ -62,10 +60,8 @@ public class PeripheralJobDispatcherHandler {
     requireNonNull(name, "name");
 
     executorWrapper.callAndWait(() -> {
-      PeripheralJob job = jobService.fetchObject(PeripheralJob.class, name);
-      if (job == null) {
-        throw new ObjectUnknownException("Unknown peripheral job: " + name);
-      }
+      PeripheralJob job = jobService.fetch(PeripheralJob.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown peripheral job: " + name));
 
       jobDispatcherService.withdrawByPeripheralJob(job.getReference());
     });

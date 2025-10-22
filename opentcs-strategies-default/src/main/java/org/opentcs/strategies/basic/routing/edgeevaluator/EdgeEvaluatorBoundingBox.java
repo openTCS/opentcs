@@ -70,7 +70,7 @@ public class EdgeEvaluatorBoundingBox
       @Nonnull
       Vehicle vehicle
   ) {
-    Point targetPoint = objectService.fetchObject(Point.class, edge.getTargetVertex());
+    Point targetPoint = objectService.fetch(Point.class, edge.getTargetVertex()).orElseThrow();
     BoundingBoxProtrusion protrusion = protrusionCheck.checkProtrusion(
         vehicle.getBoundingBox(), targetPoint.getMaxVehicleBoundingBox()
     );

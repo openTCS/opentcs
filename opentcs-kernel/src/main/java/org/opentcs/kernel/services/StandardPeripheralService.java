@@ -6,8 +6,8 @@ import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.components.kernel.services.PeripheralService;
-import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
@@ -61,7 +61,7 @@ public class StandardPeripheralService
    */
   @Inject
   public StandardPeripheralService(
-      TCSObjectService objectService,
+      InternalTCSObjectService objectService,
       @GlobalSyncObject
       Object globalSyncObject,
       PeripheralAttachmentManager attachmentManager,

@@ -69,7 +69,7 @@ public class PeripheralEntryPool
       return;
     }
 
-    for (Location location : objectService.fetchObjects(Location.class)) {
+    for (Location location : objectService.fetch(Location.class)) {
       entries.put(
           location.getReference(),
           new PeripheralEntry(

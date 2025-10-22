@@ -19,6 +19,7 @@ import java.util.Set;
 import javax.swing.SwingUtilities;
 import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.customizations.ServiceCallWrapper;
+import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Triple;
@@ -235,7 +236,7 @@ public class LoopbackCommAdapterPanel
       }
 
       try {
-        for (Point curPoint : callWrapper.call(() -> vehicleService.fetchObjects(Point.class))) {
+        for (Point curPoint : callWrapper.call(() -> vehicleService.fetch(Point.class))) {
           if (curPoint.getName().equals(vehiclePosition)) {
             positionTxt.setText(curPoint.getName());
             break;
@@ -320,8 +321,9 @@ public class LoopbackCommAdapterPanel
 
   private TCSObjectReference<Vehicle> getVehicleReference()
       throws Exception {
-    return callWrapper.call(() -> vehicleService.fetchObject(Vehicle.class, processModel.getName()))
-        .getReference();
+    return callWrapper.call(() -> vehicleService.fetch(Vehicle.class, processModel.getName()))
+        .map(TCSObject::getReference)
+        .orElseThrow();
   }
 
   private void sendCommAdapterMessage(VehicleCommAdapterMessage message) {
@@ -1049,8 +1051,9 @@ public class LoopbackCommAdapterPanel
   private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkBoxEnableActionPerformed
     try {
       Vehicle vehicle = callWrapper.call(
-          () -> vehicleService.fetchObject(Vehicle.class, processModel.getName())
-      );
+          () -> vehicleService.fetch(Vehicle.class, processModel.getName())
+      )
+          .orElseThrow();
 
       if (chkBoxEnable.isSelected()) {
         callWrapper.call(() -> vehicleService.enableCommAdapter(vehicle.getReference()));
@@ -1172,7 +1175,7 @@ public class LoopbackCommAdapterPanel
     // Prepare list of model points
     Set<Point> pointSet;
     try {
-      pointSet = callWrapper.call(() -> vehicleService.fetchObjects(Point.class));
+      pointSet = callWrapper.call(() -> vehicleService.fetch(Point.class));
     }
     catch (Exception ex) {
       LOG.warn("Error fetching points", ex);

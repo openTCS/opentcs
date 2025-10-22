@@ -115,13 +115,13 @@ public class RandomOrderBatchCreator
 
   private List<Location> initializeLocations() {
     Set<TCSObjectReference<LocationType>> suitableLocationTypeRefs
-        = transportOrderService.fetchObjects(LocationType.class)
+        = transportOrderService.fetch(LocationType.class)
             .stream()
             .filter(locationType -> locationType.isAllowedOperation(Destination.OP_NOP))
             .map(TCSObject::getReference)
             .collect(Collectors.toSet());
 
-    return transportOrderService.fetchObjects(Location.class)
+    return transportOrderService.fetch(Location.class)
         .stream()
         .filter(location -> !location.getAttachedLinks().isEmpty())
         .filter(location -> suitableLocationTypeRefs.contains(location.getType()))

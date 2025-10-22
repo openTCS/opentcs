@@ -93,7 +93,7 @@ public class AssignFreePeripheralsPhase
 
   @Override
   public void run() {
-    Set<Location> availablePeripherals = objectService.fetchObjects(
+    Set<Location> availablePeripherals = objectService.fetch(
         Location.class,
         this::availableForAnyJob
     );
@@ -101,7 +101,7 @@ public class AssignFreePeripheralsPhase
       LOG.debug("No peripherals available, skipping potentially expensive fetching of jobs.");
       return;
     }
-    Set<PeripheralJob> jobsToBeProcessed = objectService.fetchObjects(
+    Set<PeripheralJob> jobsToBeProcessed = objectService.fetch(
         PeripheralJob.class,
         this::toBeProcessed
     );

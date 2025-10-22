@@ -124,7 +124,7 @@ public class RechargeIdleVehiclesPhase
       return;
     }
 
-    orderService.fetchObjects(Vehicle.class).stream()
+    orderService.fetch(Vehicle.class).stream()
         .filter(vehicle -> vehicleSelectionFilter.apply(vehicle).isEmpty())
         .forEach(vehicle -> createRechargeOrder(vehicle));
   }
@@ -157,7 +157,7 @@ public class RechargeIdleVehiclesPhase
 
     Optional<AssignmentCandidate> candidate = computeCandidate(
         vehicle,
-        orderService.fetchObject(Point.class, vehicle.getCurrentPosition()),
+        orderService.fetch(Point.class, vehicle.getCurrentPosition()).orElseThrow(),
         rechargeOrder
     )
         .filter(c -> assignmentCandidateSelectionFilter.apply(c).isEmpty());

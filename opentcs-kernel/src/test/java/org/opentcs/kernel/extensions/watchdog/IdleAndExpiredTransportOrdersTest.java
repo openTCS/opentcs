@@ -49,7 +49,7 @@ public class IdleAndExpiredTransportOrdersTest {
     TransportOrder orderIdleAndWithExpiredDeadline = new TransportOrder("T5", List.of())
         .withDeadline(Instant.ofEpochMilli(12000));
 
-    when(objectService.fetchObjects(TransportOrder.class))
+    when(objectService.fetch(TransportOrder.class))
         .thenReturn(
             Set.of(
                 orderInFinalState,
@@ -112,7 +112,7 @@ public class IdleAndExpiredTransportOrdersTest {
   void doNotConsiderTransportOrdersWithARelevantStateChangeAsIdle() {
     TransportOrder order1 = new TransportOrder("T1", List.of());
     TransportOrder order2 = new TransportOrder("T2", List.of());
-    when(objectService.fetchObjects(TransportOrder.class))
+    when(objectService.fetch(TransportOrder.class))
         .thenReturn(Set.of(order1, order2));
     idleAndExpiredTransportOrders.initialize();
 
@@ -130,7 +130,7 @@ public class IdleAndExpiredTransportOrdersTest {
 
     order1 = order1.withState(TransportOrder.State.ACTIVE);
     order2 = order2.withProcessingVehicle(new Vehicle("V1").getReference());
-    when(objectService.fetchObjects(TransportOrder.class))
+    when(objectService.fetch(TransportOrder.class))
         .thenReturn(Set.of(order1, order2));
     idleAndExpiredTransportOrders.identifyIdleOrExpiredTransportOrders(
         secondInvocationTime,
@@ -148,7 +148,7 @@ public class IdleAndExpiredTransportOrdersTest {
         .withState(TransportOrder.State.BEING_PROCESSED)
         .withDeadline(Instant.ofEpochMilli(5000));
 
-    when(objectService.fetchObjects(TransportOrder.class))
+    when(objectService.fetch(TransportOrder.class))
         .thenReturn(
             Set.of(
                 orderIdle,
@@ -190,7 +190,7 @@ public class IdleAndExpiredTransportOrdersTest {
     orderIdle2 = orderIdle2.withState(TransportOrder.State.BEING_PROCESSED);
     orderWithExpiredDeadline = orderWithExpiredDeadline.withState(TransportOrder.State.FINISHED);
 
-    when(objectService.fetchObjects(TransportOrder.class))
+    when(objectService.fetch(TransportOrder.class))
         .thenReturn(
             Set.of(
                 orderIdle,
@@ -212,7 +212,7 @@ public class IdleAndExpiredTransportOrdersTest {
     // After the third invocation there should be only one transport order that changed to a
     // final state since the last invocation.
     orderIdle2 = orderIdle2.withState(TransportOrder.State.FINISHED);
-    when(objectService.fetchObjects(TransportOrder.class))
+    when(objectService.fetch(TransportOrder.class))
         .thenReturn(
             Set.of(
                 orderIdle,

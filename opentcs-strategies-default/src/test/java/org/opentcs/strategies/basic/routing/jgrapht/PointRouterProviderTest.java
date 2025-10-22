@@ -49,12 +49,12 @@ public class PointRouterProviderTest {
   @BeforeEach
   public void setUp() {
     objectService = mock();
-    when(objectService.fetchObjects(Vehicle.class)).thenReturn(vehicles);
-    when(objectService.fetchObject(eq(Vehicle.class), anyString()))
+    when(objectService.fetch(Vehicle.class)).thenReturn(vehicles);
+    when(objectService.fetch(eq(Vehicle.class), anyString()))
         .then(
             o -> vehicles.stream()
                 .filter(t -> filterByName(o, t))
-                .findFirst().orElse(null)
+                .findFirst()
         );
     resourceAvoidanceExtractor = mock();
     when(resourceAvoidanceExtractor.extractResourcesToAvoid(nullable(TransportOrder.class)))

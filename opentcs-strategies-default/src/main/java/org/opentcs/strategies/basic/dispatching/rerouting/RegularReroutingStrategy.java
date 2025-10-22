@@ -69,7 +69,7 @@ public class RegularReroutingStrategy
 
   private boolean isVehicleAtExpectedPosition(Vehicle vehicle) {
     TransportOrder currentTransportOrder
-        = getObjectService().fetchObject(TransportOrder.class, vehicle.getTransportOrder());
+        = getObjectService().fetch(TransportOrder.class, vehicle.getTransportOrder()).orElseThrow();
     TCSObjectReference<Point> currentVehiclePosition = vehicle.getCurrentPosition();
     DriveOrder currentDriveOrder = currentTransportOrder.getCurrentDriveOrder();
     if (currentVehiclePosition == null || currentDriveOrder == null) {

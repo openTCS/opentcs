@@ -9,7 +9,6 @@ import static org.opentcs.components.kernel.Dispatcher.PROPKEY_PREFERRED_RECHARG
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -143,7 +142,7 @@ public class DefaultRechargePositionSupplier
 
   @Nullable
   private Location findCheapestLocation(Map<Location, Set<Point>> locations, Vehicle vehicle) {
-    Point curPos = plantModelService.fetchObject(Point.class, vehicle.getCurrentPosition());
+    Point curPos = plantModelService.fetch(Point.class, vehicle.getCurrentPosition()).orElseThrow();
 
     return locations.entrySet().stream()
         .map(entry -> bestAccessPointCandidate(vehicle, curPos, entry.getKey(), entry.getValue()))
@@ -182,24 +181,26 @@ public class DefaultRechargePositionSupplier
       Vehicle vehicle,
       Set<Point> targetedPoints
   ) {
-    Map<Location, Set<Point>> result = new HashMap<>();
-
-    for (Location curLoc : plantModelService.fetchObjects(Location.class)) {
-      LocationType lType = plantModelService.fetchObject(LocationType.class, curLoc.getType());
-      if (lType.isAllowedOperation(operation)) {
-        Set<Point> points = findUnoccupiedAccessPointsForOperation(
-            curLoc,
-            operation,
-            vehicle,
-            targetedPoints
-        );
-        if (!points.isEmpty()) {
-          result.put(curLoc, points);
-        }
-      }
-    }
-
-    return result;
+    return plantModelService.fetch(Location.class)
+        .stream()
+        .filter(
+            curLoc -> plantModelService.fetch(LocationType.class, curLoc.getType())
+                .orElseThrow()
+                .isAllowedOperation(operation)
+        )
+        .map(
+            curLoc -> Map.entry(
+                curLoc,
+                findUnoccupiedAccessPointsForOperation(
+                    curLoc,
+                    operation,
+                    vehicle,
+                    targetedPoints
+                )
+            )
+        )
+        .filter(mapEntry -> !mapEntry.getValue().isEmpty())
+        .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   private Set<Point> findUnoccupiedAccessPointsForOperation(
@@ -210,7 +211,7 @@ public class DefaultRechargePositionSupplier
   ) {
     return location.getAttachedLinks().stream()
         .filter(link -> allowsOperation(link, rechargeOp))
-        .map(link -> plantModelService.fetchObject(Point.class, link.getPoint()))
+        .map(link -> plantModelService.fetch(Point.class, link.getPoint()).orElseThrow())
         .filter(accessPoint -> isPointUnoccupiedFor(accessPoint, vehicle, targetedPoints))
         .collect(Collectors.toSet());
   }

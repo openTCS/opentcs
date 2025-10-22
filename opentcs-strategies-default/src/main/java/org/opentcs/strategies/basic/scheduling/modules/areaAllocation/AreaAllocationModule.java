@@ -100,7 +100,7 @@ public class AreaAllocationModule
       return true;
     }
 
-    Vehicle vehicle = objectService.fetchObject(Vehicle.class, client.getRelatedVehicle());
+    Vehicle vehicle = objectService.fetch(Vehicle.class, client.getRelatedVehicle()).orElseThrow();
     if (vehicle.getEnvelopeKey() == null) {
       return true;
     }
@@ -151,7 +151,7 @@ public class AreaAllocationModule
       return;
     }
 
-    Vehicle vehicle = objectService.fetchObject(Vehicle.class, client.getRelatedVehicle());
+    Vehicle vehicle = objectService.fetch(Vehicle.class, client.getRelatedVehicle()).orElseThrow();
     if (vehicle.getEnvelopeKey() == null) {
       return;
     }

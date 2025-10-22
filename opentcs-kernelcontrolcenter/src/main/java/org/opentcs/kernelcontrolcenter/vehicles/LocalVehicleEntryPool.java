@@ -91,7 +91,7 @@ public class LocalVehicleEntryPool
     try {
 
       Set<Vehicle> vehicles
-          = callWrapper.call(() -> servicePortal.getVehicleService().fetchObjects(Vehicle.class));
+          = callWrapper.call(() -> servicePortal.getVehicleService().fetch(Vehicle.class));
       for (Vehicle vehicle : vehicles) {
         VehicleAttachmentInformation ai = callWrapper.call(() -> {
           return servicePortal.getVehicleService()

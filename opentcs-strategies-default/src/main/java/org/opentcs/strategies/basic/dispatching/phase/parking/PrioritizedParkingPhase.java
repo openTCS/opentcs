@@ -62,7 +62,7 @@ public class PrioritizedParkingPhase
 
     LOG.debug("Looking for vehicles to send to prioritized parking positions...");
 
-    getOrderService().fetchObjects(Vehicle.class).stream()
+    getOrderService().fetch(Vehicle.class).stream()
         .filter(vehicle -> vehicleSelectionFilter.apply(vehicle).isEmpty())
         .forEach(vehicle -> createParkingOrder(vehicle));
   }

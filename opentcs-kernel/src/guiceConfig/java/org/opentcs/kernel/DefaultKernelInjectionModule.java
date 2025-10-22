@@ -19,6 +19,7 @@ import org.opentcs.components.kernel.services.InternalPeripheralJobService;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.components.kernel.services.InternalQueryService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.components.kernel.services.NotificationService;
@@ -187,6 +188,7 @@ public class DefaultKernelInjectionModule
 
     bind(StandardTCSObjectService.class).in(Singleton.class);
     bind(TCSObjectService.class).to(StandardTCSObjectService.class);
+    bind(InternalTCSObjectService.class).to(StandardTCSObjectService.class);
 
     bind(StandardNotificationService.class).in(Singleton.class);
     bind(NotificationService.class).to(StandardNotificationService.class);

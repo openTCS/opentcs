@@ -149,7 +149,7 @@ public class ContinuousLoadPanel
     objectService = (TCSObjectService) sharedPortal.getPortal().getPlantModelService();
 
     Set<Vehicle> vehicles = new TreeSet<>(Comparators.objectsByName());
-    vehicles.addAll(objectService.fetchObjects(Vehicle.class));
+    vehicles.addAll(objectService.fetch(Vehicle.class));
     JComboBox<TCSObjectReference<Vehicle>> vehiclesComboBox = new JComboBox<>();
     vehiclesComboBox.addItem(null);
     vehiclesComboBox.setRenderer(new StringListCellRenderer<>(x -> x == null ? "" : x.getName()));
@@ -395,7 +395,7 @@ public class ContinuousLoadPanel
     doTable.setModel(new DriveOrderTableModel(transportOrder.getDriveOrders()));
 
     Set<TCSObjectReference<LocationType>> suitableLocationTypeRefs
-        = objectService.fetchObjects(LocationType.class)
+        = objectService.fetch(LocationType.class)
             .stream()
             .filter(locationType -> !locationType.getAllowedOperations().isEmpty())
             .map(TCSObject::getReference)
@@ -403,7 +403,7 @@ public class ContinuousLoadPanel
 
     SortedSet<Location> sortedLocationSet = new TreeSet<>(Comparators.objectsByName());
     sortedLocationSet.addAll(
-        objectService.fetchObjects(Location.class)
+        objectService.fetch(Location.class)
             .stream()
             .filter(
                 loc -> !loc.getAttachedLinks().isEmpty()
@@ -986,9 +986,9 @@ toTable.getSelectionModel().addListSelectionListener(listener);
 
     TCSObjectReference<Location> loc
         = (TCSObjectReference<Location>) locationsComboBox.getSelectedItem();
-    Location location = objectService.fetchObject(Location.class, loc);
+    Location location = objectService.fetch(Location.class, loc).orElseThrow();
     TCSObjectReference<LocationType> locationRef = location.getType();
-    LocationType locationType = objectService.fetchObject(LocationType.class, locationRef);
+    LocationType locationType = objectService.fetch(LocationType.class, locationRef).orElseThrow();
     Set<String> operationTypes = new TreeSet<>(locationType.getAllowedOperations());
     for (String j : operationTypes) {
       operationTypesComboBox.addItem(j);
@@ -1113,11 +1113,14 @@ toTable.getSelectionModel().addListSelectionListener(listener);
             break;
         }
         data.setIntendedVehicle(
-            curStruc.getIntendedVehicle() == null ? null
-                : objectService.fetchObject(
+            curStruc.getIntendedVehicle() == null
+                ? null
+                : objectService.fetch(
                     Vehicle.class,
                     curStruc.getIntendedVehicle()
-                ).getReference()
+                )
+                    .orElseThrow()
+                    .getReference()
         );
         for (TransportOrderEntry.XMLMapEntry curEntry : curStruc.getProperties()) {
           data.addProperty(curEntry.getKey(), curEntry.getValue());
@@ -1125,9 +1128,9 @@ toTable.getSelectionModel().addListSelectionListener(listener);
         for (DriveOrderEntry curDOXMLS : curStruc.getDriveOrders()) {
           DriveOrderStructure newDOS
               = new DriveOrderStructure(
-                  objectService.fetchObject(
-                      Location.class, curDOXMLS.getLocationName()
-                  ).getReference(),
+                  objectService.fetch(Location.class, curDOXMLS.getLocationName())
+                      .orElseThrow()
+                      .getReference(),
                   curDOXMLS.getVehicleOperation()
               );
           data.addDriveOrder(newDOS);

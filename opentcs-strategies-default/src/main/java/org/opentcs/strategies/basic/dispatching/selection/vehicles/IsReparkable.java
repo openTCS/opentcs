@@ -56,8 +56,9 @@ public class IsReparkable
       return false;
     }
 
-    Point position = objectService.fetchObject(Point.class, positionRef);
-    return position.isParkingPosition();
+    return objectService.fetch(Point.class, positionRef)
+        .orElseThrow()
+        .isParkingPosition();
   }
 
   private boolean hasAcceptableOrderTypesForParking(Vehicle vehicle) {

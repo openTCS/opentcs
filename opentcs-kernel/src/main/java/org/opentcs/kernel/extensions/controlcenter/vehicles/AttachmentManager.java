@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentcs.components.Lifecycle;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -50,7 +50,7 @@ public class AttachmentManager
   /**
    * The object service.
    */
-  private final TCSObjectService objectService;
+  private final InternalTCSObjectService objectService;
   /**
    * The vehicle controller pool.
    */
@@ -89,7 +89,7 @@ public class AttachmentManager
   @Inject
   public AttachmentManager(
       @Nonnull
-      TCSObjectService objectService,
+      InternalTCSObjectService objectService,
       @Nonnull
       LocalVehicleControllerPool controllerPool,
       @Nonnull
@@ -359,7 +359,7 @@ public class AttachmentManager
   ) {
     requireNonNull(vehicle, "vehicle");
 
-    return objectService.fetchObjects(Vehicle.class).stream()
+    return objectService.stream(Vehicle.class)
         .filter(updatedVehicle -> Objects.equals(updatedVehicle.getName(), vehicle.getName()))
         .findFirst().orElse(vehicle);
   }

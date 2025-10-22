@@ -15,8 +15,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,9 +26,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
+import org.opentcs.components.kernel.services.InternalVehicleService;
 import org.opentcs.components.kernel.services.RouterService;
-import org.opentcs.components.kernel.services.VehicleService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Location;
@@ -49,7 +50,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.converter.VehicleConverter
  */
 class VehicleHandlerTest {
 
-  private VehicleService vehicleService;
+  private InternalVehicleService vehicleService;
   private RouterService routerService;
   private VehicleConverter vehicleConverter;
   private KernelExecutorWrapper executorWrapper;
@@ -78,8 +79,8 @@ class VehicleHandlerTest {
         adapterDescriptionMock
     );
 
-    given(vehicleService.fetchObject(Vehicle.class, "some-vehicle"))
-        .willReturn(vehicle);
+    given(vehicleService.fetch(Vehicle.class, "some-vehicle"))
+        .willReturn(Optional.of(vehicle));
     given(vehicleService.fetchAttachmentInformation(vehicle.getReference()))
         .willReturn(attachmentInfo);
   }
@@ -161,13 +162,13 @@ class VehicleHandlerTest {
   void retrieveVehiclesByProcState(Vehicle.ProcState procState) {
     // Arrange
     Vehicle vehicleWithProcState = vehicle.withProcState(procState);
-    given(vehicleService.fetchObjects(ArgumentMatchers.<Class<Vehicle>>any(), any()))
-        .willReturn(Set.of(vehicleWithProcState));
+    given(vehicleService.stream(Vehicle.class))
+        .willReturn(Stream.of(vehicleWithProcState));
 
     // Act & Assert
     List<GetVehicleResponseTO> result = handler.getVehiclesState(procState.name());
     MatcherAssert.assertThat(result, hasSize(1));
-    then(vehicleService).should().fetchObjects(ArgumentMatchers.<Class<Vehicle>>any(), any());
+    then(vehicleService).should().stream(Vehicle.class);
   }
 
   @Test
@@ -185,7 +186,7 @@ class VehicleHandlerTest {
     // Act & Assert: happy path
     GetVehicleResponseTO result = handler.getVehicleStateByName("some-vehicle");
     MatcherAssert.assertThat(result, is(notNullValue()));
-    then(vehicleService).should().fetchObject(Vehicle.class, "some-vehicle");
+    then(vehicleService).should().fetch(Vehicle.class, "some-vehicle");
 
     // Act & Assert: nonexistent vehicle
     assertThatExceptionOfType(ObjectUnknownException.class)
@@ -341,14 +342,14 @@ class VehicleHandlerTest {
     Point destinationPoint1 = new Point("some-destination-point");
     Point destinationPoint2 = new Point("some-destination-point-2");
     Vehicle vehicleWithPosition = vehicle.withCurrentPosition(vehiclePosition.getReference());
-    given(vehicleService.fetchObject(Point.class, "some-point"))
-        .willReturn(vehiclePosition);
-    given(vehicleService.fetchObject(Point.class, "some-destination-point"))
-        .willReturn(destinationPoint1);
-    given(vehicleService.fetchObject(Point.class, "some-destination-point-2"))
-        .willReturn(destinationPoint2);
-    given(vehicleService.fetchObject(Vehicle.class, "some-vehicle"))
-        .willReturn(vehicleWithPosition);
+    given(vehicleService.fetch(Point.class, "some-point"))
+        .willReturn(Optional.of(vehiclePosition));
+    given(vehicleService.fetch(Point.class, "some-destination-point"))
+        .willReturn(Optional.of(destinationPoint1));
+    given(vehicleService.fetch(Point.class, "some-destination-point-2"))
+        .willReturn(Optional.of(destinationPoint2));
+    given(vehicleService.fetch(Vehicle.class, "some-vehicle"))
+        .willReturn(Optional.of(vehicleWithPosition));
 
     // Act & Assert: happy path
     handler.getVehicleRoutes(
@@ -390,8 +391,8 @@ class VehicleHandlerTest {
         );
 
     // Act & Assert: unknown vehicle position
-    given(vehicleService.fetchObject(Vehicle.class, "some-vehicle"))
-        .willReturn(vehicle);
+    given(vehicleService.fetch(Vehicle.class, "some-vehicle"))
+        .willReturn(Optional.of(vehicle));
     assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(
             () -> handler.getVehicleRoutes(
@@ -408,12 +409,12 @@ class VehicleHandlerTest {
     Point sourcePoint = new Point("some-source-point");
     Point destinationPoint1 = new Point("some-destination-point");
     Point destinationPoint2 = new Point("some-destination-point-2");
-    given(vehicleService.fetchObject(Point.class, "some-source-point"))
-        .willReturn(sourcePoint);
-    given(vehicleService.fetchObject(Point.class, "some-destination-point"))
-        .willReturn(destinationPoint1);
-    given(vehicleService.fetchObject(Point.class, "some-destination-point-2"))
-        .willReturn(destinationPoint2);
+    given(vehicleService.fetch(Point.class, "some-source-point"))
+        .willReturn(Optional.of(sourcePoint));
+    given(vehicleService.fetch(Point.class, "some-destination-point"))
+        .willReturn(Optional.of(destinationPoint1));
+    given(vehicleService.fetch(Point.class, "some-destination-point-2"))
+        .willReturn(Optional.of(destinationPoint2));
 
     // Act & Assert: happy path
     handler.getVehicleRoutes(
@@ -462,18 +463,18 @@ class VehicleHandlerTest {
         "some-location",
         new LocationType("some-locType").getReference()
     );
-    given(vehicleService.fetchObject(Point.class, "some-source-point"))
-        .willReturn(sourcePoint);
-    given(vehicleService.fetchObject(Point.class, "some-destination-point"))
-        .willReturn(destinationPoint1);
-    given(vehicleService.fetchObject(Point.class, "some-destination-point-2"))
-        .willReturn(destinationPoint2);
-    given(vehicleService.fetchObject(Point.class, "some-point-to-avoid"))
-        .willReturn(pointToAvoid);
-    given(vehicleService.fetchObject(Path.class, "some-path"))
-        .willReturn(pathToAvoid);
-    given(vehicleService.fetchObject(Location.class, "some-location"))
-        .willReturn(locationToAvoid);
+    given(vehicleService.fetch(Point.class, "some-source-point"))
+        .willReturn(Optional.of(sourcePoint));
+    given(vehicleService.fetch(Point.class, "some-destination-point"))
+        .willReturn(Optional.of(destinationPoint1));
+    given(vehicleService.fetch(Point.class, "some-destination-point-2"))
+        .willReturn(Optional.of(destinationPoint2));
+    given(vehicleService.fetch(Point.class, "some-point-to-avoid"))
+        .willReturn(Optional.of(pointToAvoid));
+    given(vehicleService.fetch(Path.class, "some-path"))
+        .willReturn(Optional.of(pathToAvoid));
+    given(vehicleService.fetch(Location.class, "some-location"))
+        .willReturn(Optional.of(locationToAvoid));
 
     // Act & Assert: happy path
     handler.getVehicleRoutes(

@@ -81,7 +81,8 @@ public class VehicleEnvelopeKeyAdapter
       KernelServicePortal portal = sharedPortal.getPortal();
       // Check if the kernel is in operating mode, too.
       if (portal.getState() == Kernel.State.OPERATING) {
-        Vehicle vehicle = portal.getVehicleService().fetchObject(Vehicle.class, model.getName());
+        Vehicle vehicle
+            = portal.getVehicleService().fetch(Vehicle.class, model.getName()).orElseThrow();
         if (Objects.equals(vehicle.getEnvelopeKey(), envelopeKey)) {
           LOG.debug("Ignoring vehicle properties update. Already up do date.");
           return;

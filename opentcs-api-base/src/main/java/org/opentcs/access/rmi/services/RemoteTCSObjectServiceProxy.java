@@ -3,6 +3,7 @@
 package org.opentcs.access.rmi.services;
 
 import java.rmi.RemoteException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.opentcs.access.KernelRuntimeException;
@@ -24,6 +25,7 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
     implements
       TCSObjectService {
 
+  @Deprecated
   @Override
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, TCSObjectReference<T> ref)
       throws KernelRuntimeException {
@@ -38,6 +40,20 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
   }
 
   @Override
+  public <T extends TCSObject<T>> Optional<T> fetch(Class<T> clazz, TCSObjectReference<T> ref)
+      throws KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      return Optional.ofNullable(getRemoteService().fetch(getClientId(), clazz, ref));
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Deprecated
+  @Override
   public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, String name)
       throws KernelRuntimeException {
     checkServiceAvailability();
@@ -50,6 +66,20 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
     }
   }
 
+  @Override
+  public <T extends TCSObject<T>> Optional<T> fetch(Class<T> clazz, String name)
+      throws KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      return Optional.ofNullable(getRemoteService().fetch(getClientId(), clazz, name));
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Deprecated
   @Override
   public <T extends TCSObject<T>> Set<T> fetchObjects(Class<T> clazz)
       throws KernelRuntimeException {
@@ -64,6 +94,20 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
   }
 
   @Override
+  public <T extends TCSObject<T>> Set<T> fetch(Class<T> clazz)
+      throws KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      return getRemoteService().fetch(getClientId(), clazz);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Deprecated
+  @Override
   public <T extends TCSObject<T>> Set<T> fetchObjects(
       Class<T> clazz,
       Predicate<? super T> predicate
@@ -73,6 +117,22 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
 
     try {
       return getRemoteService().fetchObjects(getClientId(), clazz, predicate);
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  }
+
+  @Override
+  public <T extends TCSObject<T>> Set<T> fetch(
+      Class<T> clazz,
+      Predicate<? super T> predicate
+  )
+      throws KernelRuntimeException {
+    checkServiceAvailability();
+
+    try {
+      return getRemoteService().fetch(getClientId(), clazz, predicate);
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

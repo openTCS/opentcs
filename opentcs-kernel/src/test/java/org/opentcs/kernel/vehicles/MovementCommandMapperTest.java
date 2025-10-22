@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -53,8 +54,8 @@ class MovementCommandMapperTest {
     Path pathBC = new Path("path-bc", pointB.getReference(), pointC.getReference());
     LocationType locationType = new LocationType("location-type");
     Location destinationLocation = new Location("location", locationType.getReference());
-    when(objectService.fetchObject(eq(Location.class), eq("location")))
-        .thenReturn(destinationLocation);
+    when(objectService.fetch(eq(Location.class), eq("location")))
+        .thenReturn(Optional.of(destinationLocation));
 
     Route.Step stepAB = new Route.Step(pathAB, pointA, pointB, Vehicle.Orientation.FORWARD, 0, 1);
     Route.Step stepBC = new Route.Step(pathBC, pointB, pointC, Vehicle.Orientation.FORWARD, 1, 1);

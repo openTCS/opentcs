@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,8 +42,8 @@ class LocationHandlerTest {
         "some-location",
         new LocationType("some-location-type").getReference()
     );
-    given(plantModelService.fetchObject(Location.class, "some-location"))
-        .willReturn(location);
+    given(plantModelService.fetch(Location.class, "some-location"))
+        .willReturn(Optional.of(location));
   }
 
   @Test

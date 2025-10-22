@@ -6,7 +6,7 @@ import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
 import org.opentcs.components.kernel.Router;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration;
 import org.opentcs.strategies.basic.dispatching.Phase;
@@ -23,7 +23,7 @@ public class CheckNewOrdersPhase
   /**
    * The object service
    */
-  private final TCSObjectService objectService;
+  private final InternalTCSObjectService objectService;
   /**
    * The Router instance calculating route costs.
    */
@@ -40,7 +40,7 @@ public class CheckNewOrdersPhase
 
   @Inject
   public CheckNewOrdersPhase(
-      TCSObjectService objectService,
+      InternalTCSObjectService objectService,
       Router router,
       TransportOrderUtil transportOrderUtil,
       DefaultDispatcherConfiguration configuration
@@ -74,7 +74,7 @@ public class CheckNewOrdersPhase
 
   @Override
   public void run() {
-    objectService.fetchObjects(TransportOrder.class, this::inRawState).stream()
+    objectService.fetch(TransportOrder.class, this::inRawState)
         .forEach(order -> checkRawTransportOrder(order));
   }
 

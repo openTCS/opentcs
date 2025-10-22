@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
@@ -39,7 +39,7 @@ public class AssignFreeOrdersPhase
   /**
    * The object service.
    */
-  private final TCSObjectService objectService;
+  private final InternalTCSObjectService objectService;
   /**
    * A collection of predicates for filtering vehicles.
    */
@@ -71,7 +71,7 @@ public class AssignFreeOrdersPhase
 
   @Inject
   public AssignFreeOrdersPhase(
-      TCSObjectService objectService,
+      InternalTCSObjectService objectService,
       CompositeVehicleSelectionFilter vehicleSelectionFilter,
       IsAvailableForAnyOrder isAvailableForAnyOrder,
       IsFreelyDispatchableToAnyVehicle isFreelyDispatchableToAnyVehicle,
@@ -123,8 +123,8 @@ public class AssignFreeOrdersPhase
   @Override
   public void run() {
     Map<Boolean, List<VehicleFilterResult>> vehiclesSplitByFilter
-        = objectService.fetchObjects(Vehicle.class, isAvailableForAnyOrder)
-            .stream()
+        = objectService.stream(Vehicle.class)
+            .filter(isAvailableForAnyOrder)
             .map(vehicle -> new VehicleFilterResult(vehicle, vehicleSelectionFilter.apply(vehicle)))
             .collect(Collectors.partitioningBy(filterResult -> !filterResult.isFiltered()));
 
@@ -143,8 +143,8 @@ public class AssignFreeOrdersPhase
     // Select only dispatchable orders first, then apply the composite filter, handle
     // the orders that can be tried as usual and mark the others as filtered (if they aren't, yet).
     Map<Boolean, List<OrderFilterResult>> ordersSplitByFilter
-        = objectService.fetchObjects(TransportOrder.class, isFreelyDispatchableToAnyVehicle)
-            .stream()
+        = objectService.stream(TransportOrder.class)
+            .filter(isFreelyDispatchableToAnyVehicle)
             .map(order -> new OrderFilterResult(order, transportOrderSelectionFilter.apply(order)))
             .collect(Collectors.partitioningBy(filterResult -> !filterResult.isFiltered()));
 
@@ -159,7 +159,7 @@ public class AssignFreeOrdersPhase
   }
 
   private void markFirstDispatchableOrderInUnassignedSequences() {
-    objectService.fetchObjects(
+    objectService.fetch(
         TransportOrder.class,
         order -> order.hasState(TransportOrder.State.DISPATCHABLE)
             && order.getWrappingSequence() != null
@@ -185,7 +185,8 @@ public class AssignFreeOrdersPhase
   }
 
   private boolean partOfAnyVehiclesSequence(TransportOrder order) {
-    return objectService.fetchObject(OrderSequence.class, order.getWrappingSequence())
+    return objectService.fetch(OrderSequence.class, order.getWrappingSequence())
+        .orElseThrow()
         .getProcessingVehicle() != null;
   }
 }

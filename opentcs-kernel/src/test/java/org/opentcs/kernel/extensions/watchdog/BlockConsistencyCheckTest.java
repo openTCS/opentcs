@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,13 +63,13 @@ public class BlockConsistencyCheckTest {
   }
 
   void rebuildObjectService() {
-    when(objectService.fetchObjects(Vehicle.class))
+    when(objectService.fetch(Vehicle.class))
         .thenReturn(Set.of(vehicle1, vehicle2, vehicle3));
-    when(objectService.fetchObject(Point.class, point.getReference()))
-        .thenReturn(point);
-    when(objectService.fetchObject(Point.class, pointOutSideBlock.getReference()))
-        .thenReturn(pointOutSideBlock);
-    when(objectService.fetchObjects(Block.class)).thenReturn(Set.of(block));
+    when(objectService.fetch(Point.class, point.getReference()))
+        .thenReturn(Optional.of(point));
+    when(objectService.fetch(Point.class, pointOutSideBlock.getReference()))
+        .thenReturn(Optional.of(pointOutSideBlock));
+    when(objectService.fetch(Block.class)).thenReturn(Set.of(block));
   }
 
   @Test

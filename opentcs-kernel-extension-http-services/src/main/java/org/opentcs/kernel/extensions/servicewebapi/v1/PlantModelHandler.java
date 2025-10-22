@@ -139,10 +139,8 @@ public class PlantModelHandler {
     Set<TCSObjectReference<Path>> pathsToUpdate = new HashSet<>();
 
     for (String name : paths) {
-      Path path = plantModelService.fetchObject(Path.class, name);
-      if (path == null) {
-        throw new ObjectUnknownException("Unknown path: " + name);
-      }
+      Path path = plantModelService.fetch(Path.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown path: " + name));
       pathsToUpdate.add(path.getReference());
     }
 

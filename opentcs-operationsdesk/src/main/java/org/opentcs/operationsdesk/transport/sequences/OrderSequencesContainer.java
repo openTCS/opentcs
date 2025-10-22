@@ -126,7 +126,7 @@ public class OrderSequencesContainer
     if (kernelClientApplication.isOnline()) {
       try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
         return sharedPortal.getPortal().getTransportOrderService()
-            .fetchObjects(OrderSequence.class);
+            .fetch(OrderSequence.class);
       }
       catch (KernelRuntimeException exc) {
         LOG.warn("Exception fetching order sequences", exc);

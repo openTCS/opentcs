@@ -54,10 +54,10 @@ public class MovementCommandMapper {
     Route orderRoute = driveOrder.getRoute();
     Point finalDestination = orderRoute.getFinalDestinationPoint();
     Location finalDestinationLocation
-        = objectService.fetchObject(
+        = objectService.fetch(
             Location.class,
             driveOrder.getDestination().getDestination().getName()
-        );
+        ).orElse(null);
     Map<String, String> destProperties = driveOrder.getDestination().getProperties();
 
     List<MovementCommand> result = new ArrayList<>(orderRoute.getSteps().size());

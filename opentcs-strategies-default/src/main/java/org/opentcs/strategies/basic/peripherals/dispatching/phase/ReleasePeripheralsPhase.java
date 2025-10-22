@@ -69,11 +69,11 @@ public class ReleasePeripheralsPhase
 
   @Override
   public void run() {
-    Collection<Location> peripheralsToBeRelease
+    Collection<Location> peripheralsToRelease
         = releaseStrategy.selectPeripheralsToRelease(
-            peripheralService.fetchObjects(Location.class)
+            peripheralService.fetch(Location.class)
         );
-    for (Location location : peripheralsToBeRelease) {
+    for (Location location : peripheralsToRelease) {
       releasePeripheral(location);
     }
   }

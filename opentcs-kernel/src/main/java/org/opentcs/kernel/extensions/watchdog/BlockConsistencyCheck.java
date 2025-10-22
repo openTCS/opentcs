@@ -206,9 +206,9 @@ public class BlockConsistencyCheck
     Map<TCSResourceReference<Block>, Set<TCSObjectReference<Vehicle>>> currentOccupations
         = new HashMap<>();
 
-    Set<Block> blocks = objectService.fetchObjects(Block.class);
+    Set<Block> blocks = objectService.fetch(Block.class);
 
-    objectService.fetchObjects(Vehicle.class)
+    objectService.fetch(Vehicle.class)
         .stream()
         .filter(vehicle -> {
           return vehicle.getIntegrationLevel() == TO_BE_RESPECTED
@@ -216,7 +216,8 @@ public class BlockConsistencyCheck
         })
         .filter(vehicle -> vehicle.getCurrentPosition() != null)
         .forEach(vehicle -> {
-          Point currentPoint = objectService.fetchObject(Point.class, vehicle.getCurrentPosition());
+          Point currentPoint
+              = objectService.fetch(Point.class, vehicle.getCurrentPosition()).orElseThrow();
 
           blocks.stream()
               .filter(block -> block.getType() == Block.Type.SINGLE_VEHICLE_ONLY)

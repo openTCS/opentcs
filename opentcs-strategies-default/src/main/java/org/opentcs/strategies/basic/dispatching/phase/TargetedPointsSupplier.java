@@ -7,7 +7,7 @@ import static java.util.Objects.requireNonNull;
 import jakarta.inject.Inject;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.TransportOrder;
 
@@ -19,10 +19,10 @@ public class TargetedPointsSupplier {
   /**
    * The object service.
    */
-  private final TCSObjectService objectService;
+  private final InternalTCSObjectService objectService;
 
   @Inject
-  public TargetedPointsSupplier(TCSObjectService objectService) {
+  public TargetedPointsSupplier(InternalTCSObjectService objectService) {
     this.objectService = requireNonNull(objectService, "objectService");
   }
 
@@ -32,12 +32,8 @@ public class TargetedPointsSupplier {
    * @return A set of all points currently targeted by vehicles.
    */
   public Set<Point> getTargetedPoints() {
-    return objectService
-        .fetchObjects(
-            TransportOrder.class,
-            order -> order.hasState(TransportOrder.State.BEING_PROCESSED)
-        )
-        .stream()
+    return objectService.stream(TransportOrder.class)
+        .filter(order -> order.hasState(TransportOrder.State.BEING_PROCESSED))
         .map(
             transportOrder -> transportOrder.getAllDriveOrders().getLast().getRoute()
                 .getFinalDestinationPoint()

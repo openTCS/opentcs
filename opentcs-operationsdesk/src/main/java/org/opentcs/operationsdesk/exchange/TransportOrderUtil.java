@@ -113,10 +113,11 @@ public class TransportOrderUtil {
         if (!propertiesList.isEmpty()) {
           properties = propertiesList.get(i);
         }
-        Location location = transportOrderService.fetchObject(Location.class, locModel.getName());
+        Location location
+            = transportOrderService.fetch(Location.class, locModel.getName()).orElse(null);
         DestinationCreationTO destination;
         if (location == null) {
-          Point point = transportOrderService.fetchObject(Point.class, locModel.getName());
+          Point point = transportOrderService.fetch(Point.class, locModel.getName()).orElseThrow();
           destination = new DestinationCreationTO(point.getName(), action)
               .withDestLocationName(point.getName());
         }

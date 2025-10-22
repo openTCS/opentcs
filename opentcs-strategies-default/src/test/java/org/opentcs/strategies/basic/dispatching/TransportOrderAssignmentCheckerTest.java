@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -91,8 +92,8 @@ class TransportOrderAssignmentCheckerTest {
   void onlyAcceptIntendedVehicleWithValidProcState(Vehicle.ProcState procState) {
     vehicle = vehicle.withProcState(procState);
 
-    when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
-        .thenReturn(vehicle);
+    when(objectService.fetch(Vehicle.class, vehicle.getReference()))
+        .thenReturn(Optional.of(vehicle));
 
     assertThat(
         checker.checkTransportOrderAssignment(transportOrder),
@@ -108,8 +109,8 @@ class TransportOrderAssignmentCheckerTest {
   void onlyAcceptIntendedVehicleWithValidState(Vehicle.State state) {
     vehicle = vehicle.withState(state);
 
-    when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
-        .thenReturn(vehicle);
+    when(objectService.fetch(Vehicle.class, vehicle.getReference()))
+        .thenReturn(Optional.of(vehicle));
 
     assertThat(
         checker.checkTransportOrderAssignment(transportOrder),
@@ -125,8 +126,8 @@ class TransportOrderAssignmentCheckerTest {
   void onlyAcceptIntendedVehicleWithValidIntegrationLevel(Vehicle.IntegrationLevel level) {
     vehicle = vehicle.withIntegrationLevel(level);
 
-    when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
-        .thenReturn(vehicle);
+    when(objectService.fetch(Vehicle.class, vehicle.getReference()))
+        .thenReturn(Optional.of(vehicle));
 
     assertThat(
         checker.checkTransportOrderAssignment(transportOrder),
@@ -138,8 +139,8 @@ class TransportOrderAssignmentCheckerTest {
   void onlyAcceptIntendedVehicleWithKnownPosition() {
     vehicle = vehicle.withCurrentPosition(null);
 
-    when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
-        .thenReturn(vehicle);
+    when(objectService.fetch(Vehicle.class, vehicle.getReference()))
+        .thenReturn(Optional.of(vehicle));
 
     assertThat(
         checker.checkTransportOrderAssignment(transportOrder),
@@ -151,8 +152,8 @@ class TransportOrderAssignmentCheckerTest {
   void onlyAcceptIntendedVehicleWithoutOrderSequence() {
     vehicle = vehicle.withOrderSequence(new OrderSequence("some-seq").getReference());
 
-    when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
-        .thenReturn(vehicle);
+    when(objectService.fetch(Vehicle.class, vehicle.getReference()))
+        .thenReturn(Optional.of(vehicle));
 
     assertThat(
         checker.checkTransportOrderAssignment(transportOrder),
@@ -167,8 +168,8 @@ class TransportOrderAssignmentCheckerTest {
         vehicle.getReference()
     );
 
-    when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
-        .thenReturn(vehicle);
+    when(objectService.fetch(Vehicle.class, vehicle.getReference()))
+        .thenReturn(Optional.of(vehicle));
 
     assertThat(
         checker.checkTransportOrderAssignment(transportOrder),
@@ -179,8 +180,8 @@ class TransportOrderAssignmentCheckerTest {
   @Test
   void acceptValidOrderAndVehicle() {
     // No changes to vehicle, transport order or reservation pool here.
-    when(objectService.fetchObject(Vehicle.class, vehicle.getReference()))
-        .thenReturn(vehicle);
+    when(objectService.fetch(Vehicle.class, vehicle.getReference()))
+        .thenReturn(Optional.of(vehicle));
 
     assertThat(checker.checkTransportOrderAssignment(transportOrder),
                is(TransportOrderAssignmentVeto.NO_VETO));

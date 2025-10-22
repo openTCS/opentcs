@@ -35,7 +35,7 @@ public class IsFreelyDispatchableToAnyVehicle
   private final OrderReservationPool orderReservationPool;
 
   /**
-   * Creates a new isntance.
+   * Creates a new instance.
    *
    * @param objectService The order service.
    * @param orderReservationPool Stores reservations of orders for vehicles.
@@ -64,10 +64,8 @@ public class IsFreelyDispatchableToAnyVehicle
     if (order.getWrappingSequence() == null) {
       return false;
     }
-    OrderSequence seq = objectService.fetchObject(
-        OrderSequence.class,
-        order.getWrappingSequence()
-    );
-    return seq != null && seq.getProcessingVehicle() != null;
+    return objectService.fetch(OrderSequence.class, order.getWrappingSequence())
+        .map(OrderSequence::getProcessingVehicle)
+        .isPresent();
   }
 }

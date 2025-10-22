@@ -6,7 +6,7 @@ import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
 import org.opentcs.components.kernel.services.DispatcherService;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class PeriodicVehicleRedispatchingTask
 
   private final DispatcherService dispatcherService;
 
-  private final TCSObjectService objectService;
+  private final InternalTCSObjectService objectService;
 
   /**
    * Creates a new instance.
@@ -41,7 +41,7 @@ public class PeriodicVehicleRedispatchingTask
   @Inject
   public PeriodicVehicleRedispatchingTask(
       DispatcherService dispatcherService,
-      TCSObjectService objectService
+      InternalTCSObjectService objectService
   ) {
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.objectService = requireNonNull(objectService, "objectService");
@@ -51,7 +51,8 @@ public class PeriodicVehicleRedispatchingTask
   public void run() {
     // If there are any vehicles that could process a transport order,
     // trigger the dispatcher once.
-    objectService.fetchObjects(Vehicle.class, this::couldProcessTransportOrder).stream()
+    objectService.stream(Vehicle.class)
+        .filter(this::couldProcessTransportOrder)
         .findAny()
         .ifPresent(vehicle -> {
           LOG.debug("Vehicle {} could process transport order, triggering dispatcher ...", vehicle);
@@ -74,7 +75,8 @@ public class PeriodicVehicleRedispatchingTask
 
   private boolean processesDispensableOrder(Vehicle vehicle) {
     return vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)
-        && objectService.fetchObject(TransportOrder.class, vehicle.getTransportOrder())
+        && objectService.fetch(TransportOrder.class, vehicle.getTransportOrder())
+            .orElseThrow()
             .isDispensable();
   }
 }

@@ -211,7 +211,7 @@ public class KernelStateOperating
     LOG.debug("Initializing operating state...");
 
     // Reset vehicle states to ensure vehicles are not dispatchable initially.
-    for (Vehicle curVehicle : vehicleService.fetchObjects(Vehicle.class)) {
+    for (Vehicle curVehicle : vehicleService.fetch(Vehicle.class)) {
       vehicleService.updateVehicleProcState(curVehicle.getReference(), Vehicle.ProcState.IDLE);
       vehicleService.updateVehicleIntegrationLevel(
           curVehicle.getReference(),
@@ -312,7 +312,7 @@ public class KernelStateOperating
     Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
 
     // Ensure that vehicles do not reference orders any more.
-    for (Vehicle curVehicle : vehicleService.fetchObjects(Vehicle.class)) {
+    for (Vehicle curVehicle : vehicleService.fetch(Vehicle.class)) {
       vehicleService.updateVehicleProcState(curVehicle.getReference(), Vehicle.ProcState.IDLE);
       vehicleService.updateVehicleIntegrationLevel(
           curVehicle.getReference(),

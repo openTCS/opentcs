@@ -5,7 +5,6 @@ package org.opentcs.strategies.basic.dispatching.phase.parking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -15,8 +14,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.opentcs.components.kernel.RouteSelector;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
@@ -69,7 +70,12 @@ class AbstractParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
+    when(
+        plantModelService.fetch(
+            eq(Point.class),
+            ArgumentMatchers.<Predicate<? super Point>>any()
+        )
+    ).thenReturn(setOf(point2, point3));
     when(plantModelService.expandResources(Collections.singleton(point2.getReference())))
         .thenReturn(Collections.singleton(point2));
     when(plantModelService.expandResources(Collections.singleton(point3.getReference())))
@@ -89,7 +95,12 @@ class AbstractParkingPositionSupplierTest {
     Vehicle vehicle = new Vehicle("vehicle")
         .withCurrentPosition(point1.getReference());
 
-    when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
+    when(
+        plantModelService.fetch(
+            eq(Point.class),
+            ArgumentMatchers.<Predicate<? super Point>>any()
+        )
+    ).thenReturn(setOf(point2, point3));
     when(plantModelService.expandResources(Collections.singleton(point2.getReference())))
         .thenReturn(Collections.singleton(point2));
     when(plantModelService.expandResources(Collections.singleton(point3.getReference())))
@@ -118,7 +129,7 @@ class AbstractParkingPositionSupplierTest {
         paths[0], paths[4]
     );
 
-    when(plantModelService.fetchObjects(Point.class)).thenReturn(setOf(points));
+    when(plantModelService.fetch(Point.class)).thenReturn(setOf(points));
     when(plantModelService.expandResources(Collections.singleton(points[2].getReference())))
         .thenReturn(blockMembers);
 

@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,10 +58,10 @@ class PeripheralJobDispatcherHandlerTest {
         )
     );
 
-    given(jobService.fetchObject(Location.class, "some-location"))
-        .willReturn(location);
-    given(jobService.fetchObject(PeripheralJob.class, "some-job"))
-        .willReturn(job);
+    given(jobService.fetch(Location.class, "some-location"))
+        .willReturn(Optional.of(location));
+    given(jobService.fetch(PeripheralJob.class, "some-job"))
+        .willReturn(Optional.of(job));
   }
 
   @Test

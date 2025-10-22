@@ -3,16 +3,18 @@
 package org.opentcs.strategies.basic.scheduling.modules.areaAllocation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Couple;
@@ -175,15 +177,26 @@ class BlockAreaAllocationsTest {
   }
 
   private void defaultPlantModelServiceConfiguration() {
-    when(plantModelService.fetchObjects(eq(Vehicle.class), any())).thenReturn(Set.of(otherVehicle));
-    when(plantModelService.fetchObjects(eq(Point.class), any()))
+    when(
+        plantModelService.fetch(
+            eq(Vehicle.class),
+            ArgumentMatchers.<Predicate<? super Vehicle>>any()
+        )
+    ).thenReturn(Set.of(otherVehicle));
+    when(plantModelService.fetch(eq(Point.class), ArgumentMatchers.<Predicate<? super Point>>any()))
         .thenReturn(Set.of(pointA, pointB, pointY, pointZ));
-    when(plantModelService.fetchObject(Point.class, pointA.getReference())).thenReturn(pointA);
-    when(plantModelService.fetchObject(Point.class, pointB.getReference())).thenReturn(pointB);
-    when(plantModelService.fetchObject(Point.class, pointY.getReference())).thenReturn(pointY);
-    when(plantModelService.fetchObject(Point.class, pointZ.getReference())).thenReturn(pointZ);
-    when(plantModelService.fetchObject(Path.class, pathAB.getReference())).thenReturn(pathAB);
-    when(plantModelService.fetchObject(Path.class, pathZY.getReference())).thenReturn(pathZY);
-    when(plantModelService.fetchObjects(Block.class)).thenReturn(Set.of(block));
+    when(plantModelService.fetch(Point.class, pointA.getReference()))
+        .thenReturn(Optional.of(pointA));
+    when(plantModelService.fetch(Point.class, pointB.getReference()))
+        .thenReturn(Optional.of(pointB));
+    when(plantModelService.fetch(Point.class, pointY.getReference()))
+        .thenReturn(Optional.of(pointY));
+    when(plantModelService.fetch(Point.class, pointZ.getReference()))
+        .thenReturn(Optional.of(pointZ));
+    when(plantModelService.fetch(Path.class, pathAB.getReference()))
+        .thenReturn(Optional.of(pathAB));
+    when(plantModelService.fetch(Path.class, pathZY.getReference()))
+        .thenReturn(Optional.of(pathZY));
+    when(plantModelService.fetch(Block.class)).thenReturn(Set.of(block));
   }
 }

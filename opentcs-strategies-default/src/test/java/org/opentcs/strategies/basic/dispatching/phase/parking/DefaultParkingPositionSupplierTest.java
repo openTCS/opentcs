@@ -6,7 +6,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -16,9 +15,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
@@ -86,8 +87,8 @@ class DefaultParkingPositionSupplierTest {
 
   @Test
   void returnsEmptyForNoParkingPositionsFromKernel() {
-    when(plantModelService.fetchObjects(Point.class)).thenReturn(new HashSet<>());
-    when(plantModelService.fetchObjects(Block.class)).thenReturn(new HashSet<>());
+    when(plantModelService.fetch(Point.class)).thenReturn(new HashSet<>());
+    when(plantModelService.fetch(Block.class)).thenReturn(new HashSet<>());
     vehicle = vehicle.withCurrentPosition(new Point("dummyPoint").getReference());
     supplier.initialize();
     Optional<Point> result = supplier.findParkingPosition(vehicle);
@@ -118,8 +119,11 @@ class DefaultParkingPositionSupplierTest {
                 )
             )
         );
-    when(plantModelService.fetchObject(Point.class, point1.getReference())).thenReturn(point1);
-    when(plantModelService.fetchObjects(eq(Point.class), any())).thenReturn(setOf(point2, point3));
+    when(plantModelService.fetch(Point.class, point1.getReference()))
+        .thenReturn(Optional.of(point1));
+    when(
+        plantModelService.fetch(eq(Point.class), ArgumentMatchers.<Predicate<? super Point>>any())
+    ).thenReturn(setOf(point2, point3));
 
     Optional<Point> result = supplier.findParkingPosition(vehicle);
     assertTrue(result.isPresent());

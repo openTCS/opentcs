@@ -51,10 +51,10 @@ public abstract class AbstractReroutingStrategy
 
   @Override
   public Optional<List<DriveOrder>> reroute(Vehicle vehicle) {
-    TransportOrder currentTransportOrder = objectService.fetchObject(
+    TransportOrder currentTransportOrder = objectService.fetch(
         TransportOrder.class,
         vehicle.getTransportOrder()
-    );
+    ).orElseThrow();
 
     LOG.debug("{}: Determining the reroute source...", vehicle.getName());
     Optional<Point> optRerouteSource = determineRerouteSource(vehicle);
@@ -135,10 +135,10 @@ public abstract class AbstractReroutingStrategy
         sourcePoint,
         driveOrders
     );
-    TransportOrder vehicleOrder = objectService.fetchObject(
+    TransportOrder vehicleOrder = objectService.fetch(
         TransportOrder.class,
         vehicle.getTransportOrder()
-    );
+    ).orElseThrow();
 
     return driveOrderRouteAssigner.tryAssignRoutes(
         new TransportOrder("reroute-dummy", driveOrders)

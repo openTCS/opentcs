@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -149,8 +150,10 @@ class DefaultVehicleControllerTest {
     doReturn(vehicleModel).when(commAdapter).getProcessModel();
     doReturn(vehicleModelTO).when(commAdapter).createTransferableProcessModel();
 
-    doReturn(vehicle).when(vehicleService).fetchObject(Vehicle.class, vehicle.getReference());
-    doReturn(vehicle).when(vehicleService).fetchObject(Vehicle.class, vehicle.getName());
+    doReturn(Optional.of(vehicle)).when(vehicleService).fetch(
+        Vehicle.class, vehicle.getReference()
+    );
+    doReturn(Optional.of(vehicle)).when(vehicleService).fetch(Vehicle.class, vehicle.getName());
 
     doReturn(peripheralInteractor).when(componentsFactory)
         .createPeripheralInteractor(vehicle.getReference());
@@ -185,7 +188,7 @@ class DefaultVehicleControllerTest {
   @Test
   void shouldForwardPositionChangeToKernel() {
     Point point = dataObjectFactory.createPoint();
-    doReturn(point).when(vehicleService).fetchObject(Point.class, point.getName());
+    doReturn(Optional.of(point)).when(vehicleService).fetch(Point.class, point.getName());
 
     vehicleModel.setPosition(point.getName());
 

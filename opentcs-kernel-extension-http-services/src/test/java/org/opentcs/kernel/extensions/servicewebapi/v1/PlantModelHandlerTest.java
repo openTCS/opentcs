@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
@@ -245,7 +246,7 @@ class PlantModelHandlerTest {
         new Point("dest").getReference()
     );
 
-    given(orderService.fetchObject(Path.class, "path1")).willReturn(path1);
+    given(orderService.fetch(Path.class, "path1")).willReturn(Optional.of(path1));
 
     handler.requestTopologyUpdate(
         new PostTopologyUpdateRequestTO(List.of("path1"))

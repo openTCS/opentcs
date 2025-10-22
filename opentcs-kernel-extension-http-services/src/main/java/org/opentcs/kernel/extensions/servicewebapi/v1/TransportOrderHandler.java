@@ -20,7 +20,7 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
-import org.opentcs.components.kernel.services.TransportOrderService;
+import org.opentcs.components.kernel.services.InternalTransportOrderService;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
@@ -43,7 +43,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.converter.TransportOrderCo
  */
 public class TransportOrderHandler {
 
-  private final TransportOrderService orderService;
+  private final InternalTransportOrderService orderService;
   private final KernelExecutorWrapper executorWrapper;
   private final OrderSequenceConverter orderSequenceConverter;
   private final TransportOrderConverter transportOrderConverter;
@@ -56,7 +56,7 @@ public class TransportOrderHandler {
    */
   @Inject
   public TransportOrderHandler(
-      TransportOrderService orderService,
+      InternalTransportOrderService orderService,
       KernelExecutorWrapper executorWrapper,
       OrderSequenceConverter orderSequenceConverter,
       TransportOrderConverter transportOrderConverter
@@ -103,16 +103,12 @@ public class TransportOrderHandler {
     requireNonNull(orderName, "orderName");
 
     executorWrapper.callAndWait(() -> {
-      TransportOrder order = orderService.fetchObject(TransportOrder.class, orderName);
-      if (order == null) {
-        throw new ObjectUnknownException("Unknown transport order: " + orderName);
-      }
+      TransportOrder order = orderService.fetch(TransportOrder.class, orderName)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + orderName));
       Vehicle vehicle = null;
       if (vehicleName != null) {
-        vehicle = orderService.fetchObject(Vehicle.class, vehicleName);
-        if (vehicle == null) {
-          throw new ObjectUnknownException("Unknown vehicle: " + vehicleName);
-        }
+        vehicle = orderService.fetch(Vehicle.class, vehicleName)
+            .orElseThrow(() -> new ObjectUnknownException("Unknown vehicle: " + vehicleName));
       }
 
       orderService.updateTransportOrderIntendedVehicle(
@@ -137,7 +133,7 @@ public class TransportOrderHandler {
     return executorWrapper.callAndWait(() -> {
       TCSObjectReference<Vehicle> intendedVehicleRef
           = Optional.ofNullable(intendedVehicle)
-              .map(name -> orderService.fetchObject(Vehicle.class, name))
+              .map(name -> orderService.fetch(Vehicle.class, name).orElse(null))
               .map(Vehicle::getReference)
               .orElse(null);
 
@@ -145,11 +141,8 @@ public class TransportOrderHandler {
         throw new ObjectUnknownException("Unknown vehicle: " + intendedVehicle);
       }
 
-      return orderService.fetchObjects(
-          TransportOrder.class,
-          Filters.transportOrderWithIntendedVehicle(intendedVehicleRef)
-      )
-          .stream()
+      return orderService.stream(TransportOrder.class)
+          .filter(Filters.transportOrderWithIntendedVehicle(intendedVehicleRef))
           .map(order -> transportOrderConverter.toGetTransportOrderResponse(order))
           .sorted(Comparator.comparing(GetTransportOrderResponseTO::getName))
           .collect(Collectors.toList());
@@ -168,7 +161,7 @@ public class TransportOrderHandler {
     requireNonNull(name, "name");
 
     return executorWrapper.callAndWait(() -> {
-      return Optional.ofNullable(orderService.fetchObject(TransportOrder.class, name))
+      return orderService.fetch(TransportOrder.class, name)
           .map(order -> transportOrderConverter.toGetTransportOrderResponse(order))
           .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + name));
     });
@@ -200,10 +193,8 @@ public class TransportOrderHandler {
     requireNonNull(name, "name");
 
     executorWrapper.callAndWait(() -> {
-      OrderSequence orderSequence = orderService.fetchObject(OrderSequence.class, name);
-      if (orderSequence == null) {
-        throw new ObjectUnknownException("Unknown order sequence: " + name);
-      }
+      OrderSequence orderSequence = orderService.fetch(OrderSequence.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown order sequence: " + name));
       orderService.markOrderSequenceComplete(orderSequence.getReference());
     });
   }
@@ -215,7 +206,7 @@ public class TransportOrderHandler {
     return executorWrapper.callAndWait(() -> {
       TCSObjectReference<Vehicle> intendedVehicleRef
           = Optional.ofNullable(intendedVehicle)
-              .map(name -> orderService.fetchObject(Vehicle.class, name))
+              .map(name -> orderService.fetch(Vehicle.class, name).orElse(null))
               .map(Vehicle::getReference)
               .orElse(null);
 
@@ -223,11 +214,8 @@ public class TransportOrderHandler {
         throw new ObjectUnknownException("Unknown vehicle: " + intendedVehicle);
       }
 
-      return orderService.fetchObjects(
-          OrderSequence.class,
-          Filters.orderSequenceWithIntendedVehicle(intendedVehicleRef)
-      )
-          .stream()
+      return orderService.stream(OrderSequence.class)
+          .filter(Filters.orderSequenceWithIntendedVehicle(intendedVehicleRef))
           .map(sequence -> orderSequenceConverter.toGetOrderSequenceResponseTO(sequence))
           .sorted(Comparator.comparing(GetOrderSequenceResponseTO::getName))
           .collect(Collectors.toList());
@@ -239,7 +227,7 @@ public class TransportOrderHandler {
     requireNonNull(name, "name");
 
     return executorWrapper.callAndWait(() -> {
-      return Optional.ofNullable(orderService.fetchObject(OrderSequence.class, name))
+      return orderService.fetch(OrderSequence.class, name)
           .map(sequence -> orderSequenceConverter.toGetOrderSequenceResponseTO(sequence))
           .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + name));
     });

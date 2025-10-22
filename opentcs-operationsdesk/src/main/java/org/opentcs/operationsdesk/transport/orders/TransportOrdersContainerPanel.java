@@ -253,7 +253,7 @@ public class TransportOrdersContainerPanel
 
       Set<Vehicle> vehicles = null;
       try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
-        vehicles = sharedPortal.getPortal().getVehicleService().fetchObjects(Vehicle.class);
+        vehicles = sharedPortal.getPortal().getVehicleService().fetch(Vehicle.class);
       }
       catch (KernelRuntimeException exc) {
         LOG.warn("Exception retrieving vehicles", exc);

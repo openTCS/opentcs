@@ -8,6 +8,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -73,22 +74,22 @@ public class ResourceAvoidanceExtractor {
     Set<Path> pathsToAvoid = new HashSet<>();
     Set<String> resourcesToAvoidByName = Set.of(resourcesToAvoidString.split(","));
     for (String resourceToAvoid : resourcesToAvoidByName) {
-      Point point = objectService.fetchObject(Point.class, resourceToAvoid);
-      if (point != null) {
-        pointsToAvoid.add(point);
+      Optional<Point> point = objectService.fetch(Point.class, resourceToAvoid);
+      if (point.isPresent()) {
+        pointsToAvoid.add(point.get());
         continue;
       }
 
-      Path path = objectService.fetchObject(Path.class, resourceToAvoid);
-      if (path != null) {
-        pathsToAvoid.add(path);
+      Optional<Path> path = objectService.fetch(Path.class, resourceToAvoid);
+      if (path.isPresent()) {
+        pathsToAvoid.add(path.get());
         continue;
       }
 
-      Location location = objectService.fetchObject(Location.class, resourceToAvoid);
-      if (location != null) {
-        for (Location.Link link : location.getAttachedLinks()) {
-          pointsToAvoid.add(objectService.fetchObject(Point.class, link.getPoint()));
+      Optional<Location> location = objectService.fetch(Location.class, resourceToAvoid);
+      if (location.isPresent()) {
+        for (Location.Link link : location.get().getAttachedLinks()) {
+          pointsToAvoid.add(objectService.fetch(Point.class, link.getPoint()).orElseThrow());
         }
         continue;
       }
@@ -121,22 +122,22 @@ public class ResourceAvoidanceExtractor {
     Set<Path> pathsToAvoid = new HashSet<>();
 
     for (TCSResourceReference<?> resourceToAvoid : resourcesToAvoid) {
-      Point point = objectService.fetchObject(Point.class, resourceToAvoid.getName());
-      if (point != null) {
-        pointsToAvoid.add(point);
+      Optional<Point> point = objectService.fetch(Point.class, resourceToAvoid.getName());
+      if (point.isPresent()) {
+        pointsToAvoid.add(point.get());
         continue;
       }
 
-      Path path = objectService.fetchObject(Path.class, resourceToAvoid.getName());
-      if (path != null) {
-        pathsToAvoid.add(path);
+      Optional<Path> path = objectService.fetch(Path.class, resourceToAvoid.getName());
+      if (path.isPresent()) {
+        pathsToAvoid.add(path.get());
         continue;
       }
 
-      Location location = objectService.fetchObject(Location.class, resourceToAvoid.getName());
-      if (location != null) {
-        for (Location.Link link : location.getAttachedLinks()) {
-          pointsToAvoid.add(objectService.fetchObject(Point.class, link.getPoint()));
+      Optional<Location> location = objectService.fetch(Location.class, resourceToAvoid.getName());
+      if (location.isPresent()) {
+        for (Location.Link link : location.get().getAttachedLinks()) {
+          pointsToAvoid.add(objectService.fetch(Point.class, link.getPoint()).orElseThrow());
         }
         continue;
       }

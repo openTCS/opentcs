@@ -72,7 +72,7 @@ public class IdleAndExpiredTransportOrders
     }
 
     long currentTime = timeProvider.getCurrentTimeEpochMillis();
-    objectService.fetchObjects(TransportOrder.class).forEach(order -> {
+    objectService.fetch(TransportOrder.class).forEach(order -> {
       TransportOrderSnapshot transportOrderSnapshot = new TransportOrderSnapshot(order);
       transportOrderSnapshot.setLastRelevantStateChange(currentTime);
       currentSnapshots.put(order.getName(), transportOrderSnapshot);
@@ -114,8 +114,7 @@ public class IdleAndExpiredTransportOrders
     previousSnapshots.putAll(currentSnapshots);
     currentSnapshots.clear();
 
-    objectService.fetchObjects(TransportOrder.class)
-        .stream()
+    objectService.fetch(TransportOrder.class)
         .forEach(order -> {
           TransportOrderSnapshot previousSnapshot = previousSnapshots.get(order.getName());
           TransportOrderSnapshot currentSnapshot = new TransportOrderSnapshot(order);

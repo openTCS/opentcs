@@ -5,7 +5,6 @@ package org.opentcs.strategies.basic.scheduling.modules.areaAllocation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -13,9 +12,11 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.GeometryCollection;
+import org.mockito.ArgumentMatchers;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Envelope;
@@ -108,9 +109,9 @@ class CachingAreaProviderTest {
             )
         )
     );
-    when(objectService.fetchObjects(eq(Point.class), any()))
+    when(objectService.fetch(eq(Point.class), ArgumentMatchers.<Predicate<? super Point>>any()))
         .thenReturn(Set.of(point1, point2, point3));
-    when(objectService.fetchObjects(eq(Path.class), any()))
+    when(objectService.fetch(eq(Path.class), ArgumentMatchers.<Predicate<? super Path>>any()))
         .thenReturn(Set.of(path1, path2));
     areaProvider.initialize();
 
@@ -172,9 +173,9 @@ class CachingAreaProviderTest {
             )
         )
     );
-    when(objectService.fetchObjects(eq(Point.class), any()))
+    when(objectService.fetch(eq(Point.class), ArgumentMatchers.<Predicate<? super Point>>any()))
         .thenReturn(Set.of(point1, point2, point3));
-    when(objectService.fetchObjects(eq(Path.class), any()))
+    when(objectService.fetch(eq(Path.class), ArgumentMatchers.<Predicate<? super Path>>any()))
         .thenReturn(Set.of(path1, path2));
     areaProvider.initialize();
 

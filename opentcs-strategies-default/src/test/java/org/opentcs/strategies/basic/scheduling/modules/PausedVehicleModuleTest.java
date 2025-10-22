@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import jakarta.annotation.Nonnull;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,8 @@ class PausedVehicleModuleTest {
     Vehicle vehicle = new Vehicle("some-vehicle").withPaused(false);
     Scheduler.Client client = new SampleClient(vehicle.getName());
 
-    when(objectService.fetchObject(eq(Vehicle.class), any(String.class))).thenReturn(vehicle);
+    when(objectService.fetch(eq(Vehicle.class), any(String.class)))
+        .thenReturn(Optional.of(vehicle));
 
     assertTrue(module.mayAllocate(client, Set.of()));
   }
@@ -52,7 +54,8 @@ class PausedVehicleModuleTest {
     Vehicle vehicle = new Vehicle("some-vehicle").withPaused(true);
     Scheduler.Client client = new SampleClient(vehicle.getName());
 
-    when(objectService.fetchObject(eq(Vehicle.class), any(String.class))).thenReturn(vehicle);
+    when(objectService.fetch(eq(Vehicle.class), any(String.class)))
+        .thenReturn(Optional.of(vehicle));
 
     assertFalse(module.mayAllocate(client, Set.of()));
   }

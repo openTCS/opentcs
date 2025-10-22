@@ -178,7 +178,7 @@ public class PointRouterProvider {
 
   private void createMissingPointRouters() {
     Map<String, Vehicle> distinctRoutingGroups = new HashMap<>();
-    for (Vehicle vehicle : objectService.fetchObjects(Vehicle.class)) {
+    for (Vehicle vehicle : objectService.fetch(Vehicle.class)) {
       distinctRoutingGroups.putIfAbsent(routingGroupMapper.apply(vehicle), vehicle);
     }
 

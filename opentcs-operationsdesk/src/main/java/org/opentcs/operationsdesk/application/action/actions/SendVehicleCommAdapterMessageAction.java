@@ -79,9 +79,9 @@ public class SendVehicleCommAdapterMessageAction
 
     contentPanel.getSelectedVehicle().ifPresent(vehicleName -> {
       try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {
-        Vehicle vehicle = sharedPortal.getPortal().getVehicleService().fetchObject(
+        Vehicle vehicle = sharedPortal.getPortal().getVehicleService().fetch(
             Vehicle.class, vehicleName
-        );
+        ).orElseThrow();
         sharedPortal.getPortal().getVehicleService().sendCommAdapterMessage(
             vehicle.getReference(),
             contentPanel.getVehicleCommAdapterMessage()

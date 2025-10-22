@@ -125,16 +125,16 @@ public class StandardRouterService
 
     synchronized (globalSyncObject) {
       Map<TCSObjectReference<Point>, Set<Route>> result = new HashMap<>();
-      Vehicle vehicle = objectService.fetchObject(Vehicle.class, vehicleRef);
+      Vehicle vehicle = objectService.fetch(Vehicle.class, vehicleRef).orElse(null);
       if (vehicle == null) {
         throw new ObjectUnknownException("Unknown vehicle: " + vehicleRef.getName());
       }
-      Point sourcePoint = objectService.fetchObject(Point.class, sourcePointRef);
+      Point sourcePoint = objectService.fetch(Point.class, sourcePointRef).orElse(null);
       if (sourcePoint == null) {
         throw new ObjectUnknownException("Unknown source point: " + sourcePointRef.getName());
       }
       for (TCSObjectReference<Point> dest : destinationPointRefs) {
-        Point destinationPoint = objectService.fetchObject(Point.class, dest);
+        Point destinationPoint = objectService.fetch(Point.class, dest).orElse(null);
         if (destinationPoint == null) {
           throw new ObjectUnknownException("Unknown destination point: " + dest.getName());
         }

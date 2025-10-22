@@ -367,7 +367,8 @@ public class DefaultVehicleController
       );
 
       if (isForcedRerouting(transportOrder.getCurrentDriveOrder())) {
-        Vehicle currVehicle = vehicleService.fetchObject(Vehicle.class, vehicle.getReference());
+        Vehicle currVehicle
+            = vehicleService.fetch(Vehicle.class, vehicle.getReference()).orElseThrow();
         if (currVehicle.getCurrentPosition() == null) {
           throw new IllegalArgumentException("The vehicle's current position is unknown.");
         }
@@ -375,10 +376,10 @@ public class DefaultVehicleController
         sendingCommandsAllowed = true;
         transformedToOriginalCommands.clear();
 
-        Point currPosition = vehicleService.fetchObject(
+        Point currPosition = vehicleService.fetch(
             Point.class,
             currVehicle.getCurrentPosition()
-        );
+        ).orElseThrow();
         // Before interacting with the scheduler in any way, ensure that we will be able to
         // allocate the required resources.
         if (!mayAllocateNow(Set.of(currPosition))) {
@@ -862,7 +863,9 @@ public class DefaultVehicleController
         evt.getPropertyName(),
         VehicleProcessModel.Attribute.POSE.name()
     )) {
-      if (vehicleService.fetchObject(Vehicle.class, vehicle.getReference()).getIntegrationLevel()
+      if (vehicleService.fetch(Vehicle.class, vehicle.getReference())
+          .orElseThrow()
+          .getIntegrationLevel()
           != Vehicle.IntegrationLevel.TO_BE_IGNORED) {
         updateVehiclePose((Pose) evt.getNewValue());
       }
@@ -973,7 +976,7 @@ public class DefaultVehicleController
 
   private void updateVehiclePosition(String position) {
     // Get an up-to-date copy of the vehicle
-    Vehicle currVehicle = vehicleService.fetchObject(Vehicle.class, vehicle.getReference());
+    Vehicle currVehicle = vehicleService.fetch(Vehicle.class, vehicle.getReference()).orElseThrow();
 
     if (currVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_RESPECTED
         || currVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
@@ -992,7 +995,7 @@ public class DefaultVehicleController
       point = null;
     }
     else {
-      point = vehicleService.fetchObject(Point.class, position);
+      point = vehicleService.fetch(Point.class, position).orElse(null);
       // If the new position is not in the model, ignore it. (Some vehicles/drivers send
       // intermediate positions that cannot be order destinations and thus do not exist in
       // the model.
@@ -1372,7 +1375,7 @@ public class DefaultVehicleController
         // Update the vehicle's position in its model, but don't allocate any resources
         VehicleProcessModel processModel = commAdapter.getProcessModel();
         if (processModel.getPosition() != null) {
-          Point point = vehicleService.fetchObject(Point.class, processModel.getPosition());
+          Point point = vehicleService.fetch(Point.class, processModel.getPosition()).orElse(null);
           vehicleService.updateVehiclePosition(vehicle.getReference(), toReference(point));
         }
         updateVehiclePose(processModel.getPose());

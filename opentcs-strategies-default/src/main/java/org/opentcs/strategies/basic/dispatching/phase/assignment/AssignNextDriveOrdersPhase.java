@@ -82,7 +82,7 @@ public class AssignNextDriveOrdersPhase
 
   @Override
   public void run() {
-    transportOrderService.fetchObjects(Vehicle.class).stream()
+    transportOrderService.fetch(Vehicle.class).stream()
         .filter(vehicle -> vehicle.hasProcState(Vehicle.ProcState.AWAITING_ORDER))
         .forEach(vehicle -> checkForNextDriveOrder(vehicle));
   }
@@ -92,10 +92,10 @@ public class AssignNextDriveOrdersPhase
     // The vehicle is processing a transport order and has finished a drive order.
     // See if there's another drive order to be processed.
     transportOrderService.updateTransportOrderNextDriveOrder(vehicle.getTransportOrder());
-    TransportOrder vehicleOrder = transportOrderService.fetchObject(
+    TransportOrder vehicleOrder = transportOrderService.fetch(
         TransportOrder.class,
         vehicle.getTransportOrder()
-    );
+    ).orElseThrow();
     if (vehicleOrder.getCurrentDriveOrder() == null) {
       LOG.debug(
           "Vehicle '{}' finished transport order '{}'",
@@ -117,10 +117,10 @@ public class AssignNextDriveOrdersPhase
       LOG.debug("Assigning next drive order to vehicle '{}'...", vehicle.getName());
       if (transportOrderUtil.mustAssign(vehicleOrder.getCurrentDriveOrder(), vehicle)) {
         // Get an up-to-date copy of the transport order in case the route changed.
-        vehicleOrder = transportOrderService.fetchObject(
+        vehicleOrder = transportOrderService.fetch(
             TransportOrder.class,
             vehicle.getTransportOrder()
-        );
+        ).orElseThrow();
 
         // Let the vehicle controller know about the new drive order.
         vehicleControllerPool.getVehicleController(vehicle.getName())

@@ -205,10 +205,10 @@ public class DefaultPeripheralJobDispatcher
     }
 
     withdrawJob(
-        peripheralService.fetchObject(
+        peripheralService.fetch(
             PeripheralJob.class,
             location.getPeripheralInformation().getPeripheralJob()
-        )
+        ).orElseThrow()
     );
   }
 
@@ -243,7 +243,8 @@ public class DefaultPeripheralJobDispatcher
 
   private boolean isRelatedToNonFinalTransportOrder(PeripheralJob job) {
     return job.getRelatedTransportOrder() != null
-        && !peripheralService.fetchObject(TransportOrder.class, job.getRelatedTransportOrder())
+        && !peripheralService.fetch(TransportOrder.class, job.getRelatedTransportOrder())
+            .orElseThrow()
             .getState().isFinalState();
   }
 
@@ -254,7 +255,7 @@ public class DefaultPeripheralJobDispatcher
   ) {
     requireNonNull(ref, "ref");
 
-    PeripheralJob job = peripheralJobService.fetchObject(PeripheralJob.class, ref);
+    PeripheralJob job = peripheralJobService.fetch(PeripheralJob.class, ref).orElseThrow();
     if (job.getState() != PeripheralJob.State.BEING_PROCESSED) {
       LOG.info(
           "Peripheral job not in state BEING_PROCESSED, ignoring: {} ({})",
@@ -275,7 +276,7 @@ public class DefaultPeripheralJobDispatcher
   ) {
     requireNonNull(ref, "ref");
 
-    PeripheralJob job = peripheralJobService.fetchObject(PeripheralJob.class, ref);
+    PeripheralJob job = peripheralJobService.fetch(PeripheralJob.class, ref).orElseThrow();
     if (job.getState() != PeripheralJob.State.BEING_PROCESSED) {
       LOG.info(
           "Peripheral job not in state BEING_PROCESSED, ignoring: {} ({})",

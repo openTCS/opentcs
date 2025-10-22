@@ -53,10 +53,8 @@ public class PathHandler {
   )
       throws ObjectUnknownException {
     executorWrapper.callAndWait(() -> {
-      Path path = objectService.fetchObject(Path.class, pathName);
-      if (path == null) {
-        throw new ObjectUnknownException("Unknown path: " + pathName);
-      }
+      Path path = objectService.fetch(Path.class, pathName)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown path: " + pathName));
       plantModelService.updatePathLock(path.getReference(), Boolean.parseBoolean(lockedValue));
     });
   }

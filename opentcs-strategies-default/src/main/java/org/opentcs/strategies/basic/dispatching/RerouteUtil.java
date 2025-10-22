@@ -105,10 +105,11 @@ public class RerouteUtil {
       return;
     }
 
-    TransportOrder originalOrder = transportOrderService.fetchObject(
+    TransportOrder originalOrder = transportOrderService.fetch(
         TransportOrder.class,
         vehicle.getTransportOrder()
-    );
+    )
+        .orElseThrow();
 
     if (originalOrder.hasState(TransportOrder.State.WITHDRAWN)) {
       LOG.warn("{} can't be rerouted when its transport order was withdrawn.", vehicle.getName());
@@ -206,7 +207,8 @@ public class RerouteUtil {
     // drive order) we need to update the vehicle's current drive order with the new one.
     if (vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)) {
       controller.setTransportOrder(
-          transportOrderService.fetchObject(TransportOrder.class, originalOrder.getReference())
+          transportOrderService.fetch(TransportOrder.class, originalOrder.getReference())
+              .orElseThrow()
       );
     }
   }
@@ -221,7 +223,8 @@ public class RerouteUtil {
         if (step.getPath() != null) {
           updatedSteps.add(
               step.withPath(
-                  transportOrderService.fetchObject(Path.class, step.getPath().getReference())
+                  transportOrderService.fetch(Path.class, step.getPath().getReference())
+                      .orElseThrow()
               )
           );
         }
@@ -286,12 +289,12 @@ public class RerouteUtil {
   }
 
   private boolean isRelatedToUnfinishedPeripheralJobs(TransportOrder transportOrder) {
-    return !transportOrderService.fetchObjects(
-        PeripheralJob.class,
-        job -> Objects.equals(job.getRelatedTransportOrder(), transportOrder.getReference())
-            && job.getPeripheralOperation().isCompletionRequired()
-            && !job.getState().isFinalState()
-    ).isEmpty();
+    return transportOrderService.stream(PeripheralJob.class)
+        .anyMatch(
+            job -> Objects.equals(job.getRelatedTransportOrder(), transportOrder.getReference())
+                && job.getPeripheralOperation().isCompletionRequired()
+                && !job.getState().isFinalState()
+        );
   }
 
   private class ExecutionTest

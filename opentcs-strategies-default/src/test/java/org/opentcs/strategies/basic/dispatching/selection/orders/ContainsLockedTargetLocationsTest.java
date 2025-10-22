@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -47,9 +48,11 @@ class ContainsLockedTargetLocationsTest {
   void setUp() {
     localObjectPool = new HashMap<>();
     objectService = mock(TCSObjectService.class);
-    when(objectService.fetchObject(any(), ArgumentMatchers.<TCSObjectReference<?>>any()))
+    when(objectService.fetch(any(), ArgumentMatchers.<TCSObjectReference<?>>any()))
         .thenAnswer(
-            invocation -> localObjectPool.get((TCSObjectReference<?>) invocation.getArgument(1))
+            invocation -> Optional.ofNullable(
+                localObjectPool.get((TCSObjectReference<?>) invocation.getArgument(1))
+            )
         );
     filter = new ContainsLockedTargetLocations(objectService);
   }

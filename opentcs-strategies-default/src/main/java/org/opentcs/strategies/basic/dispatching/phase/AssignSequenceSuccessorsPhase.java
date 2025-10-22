@@ -5,7 +5,7 @@ package org.opentcs.strategies.basic.dispatching.phase;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
@@ -26,7 +26,7 @@ public class AssignSequenceSuccessorsPhase
   /**
    * The object service
    */
-  private final TCSObjectService objectService;
+  private final InternalTCSObjectService objectService;
   /**
    * A collection of predicates for filtering assignment candidates.
    */
@@ -44,7 +44,7 @@ public class AssignSequenceSuccessorsPhase
 
   @Inject
   public AssignSequenceSuccessorsPhase(
-      TCSObjectService objectService,
+      InternalTCSObjectService objectService,
       CompositeAssignmentCandidateSelectionFilter assignmentCandidateSelectionFilter,
       TransportOrderUtil transportOrderUtil,
       DriveOrderRouteAssigner driveOrderRouteAssigner
@@ -84,14 +84,13 @@ public class AssignSequenceSuccessorsPhase
 
   @Override
   public void run() {
-    for (Vehicle vehicle : objectService.fetchObjects(
-        Vehicle.class,
-        vehicle -> isFullyIntegratedWithOrderSequence(vehicle)
-            && (readyForNextInSequence(vehicle)
-                || processingSkippableOrderInSequence(vehicle))
-    )) {
-      tryAssignNextOrderInSequence(vehicle);
-    }
+    objectService.fetch(Vehicle.class).stream()
+        .filter(
+            vehicle -> isFullyIntegratedWithOrderSequence(vehicle)
+                && (readyForNextInSequence(vehicle)
+                    || processingSkippableOrderInSequence(vehicle))
+        )
+        .forEach(this::tryAssignNextOrderInSequence);
   }
 
   private void tryAssignNextOrderInSequence(Vehicle vehicle) {
@@ -99,7 +98,7 @@ public class AssignSequenceSuccessorsPhase
         .map(
             order -> computeCandidate(
                 vehicle,
-                objectService.fetchObject(Point.class, vehicle.getCurrentPosition()),
+                objectService.fetch(Point.class, vehicle.getCurrentPosition()).orElseThrow(),
                 order
             )
         )
@@ -134,12 +133,12 @@ public class AssignSequenceSuccessorsPhase
             || vehicle.hasState(Vehicle.State.EXECUTING)
             || vehicle.hasState(Vehicle.State.CHARGING))) {
       TransportOrder currentOrder
-          = objectService.fetchObject(TransportOrder.class, vehicle.getTransportOrder());
+          = objectService.fetch(TransportOrder.class, vehicle.getTransportOrder()).orElseThrow();
       if (!currentOrder.isDispensable()) {
         return false;
       }
       OrderSequence seq
-          = objectService.fetchObject(OrderSequence.class, vehicle.getOrderSequence());
+          = objectService.fetch(OrderSequence.class, vehicle.getOrderSequence()).orElseThrow();
       return !currentOrder.getReference().equals(seq.getOrders().getLast());
     }
     else {

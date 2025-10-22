@@ -97,10 +97,10 @@ public class PrioritizedParkingPositionSupplier
   }
 
   private int priorityOfCurrentPosition(Vehicle vehicle) {
-    Point currentPos = getPlantModelService().fetchObject(
+    Point currentPos = getPlantModelService().fetch(
         Point.class,
         vehicle.getCurrentPosition()
-    );
+    ).orElseThrow();
     return priorityFunction
         .andThen(priority -> priority != null ? priority : Integer.MAX_VALUE)
         .apply(currentPos);

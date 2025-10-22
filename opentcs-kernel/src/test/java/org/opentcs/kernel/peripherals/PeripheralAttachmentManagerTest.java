@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,8 +72,9 @@ class PeripheralAttachmentManagerTest {
   void setUp() {
     Set<Location> locations = new HashSet<>();
     locations.add(location);
-    when(peripheralService.fetchObjects(Location.class)).thenReturn(locations);
-    when(peripheralService.fetchObject(any(), eq(location.getReference()))).thenReturn(location);
+    when(peripheralService.fetch(Location.class)).thenReturn(locations);
+    when(peripheralService.fetch(any(), eq(location.getReference())))
+        .thenReturn(Optional.of(location));
   }
 
   @Test

@@ -50,10 +50,8 @@ public class TransportOrderDispatcherHandler {
     requireNonNull(name, "name");
 
     executorWrapper.callAndWait(() -> {
-      TransportOrder order = vehicleService.fetchObject(TransportOrder.class, name);
-      if (order == null) {
-        throw new ObjectUnknownException("Unknown transport order: " + name);
-      }
+      TransportOrder order = vehicleService.fetch(TransportOrder.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + name));
 
       dispatcherService.assignNow(order.getReference());
     });
@@ -64,11 +62,8 @@ public class TransportOrderDispatcherHandler {
     requireNonNull(name, "name");
 
     executorWrapper.callAndWait(() -> {
-      if (vehicleService.fetchObject(TransportOrder.class, name) == null) {
-        throw new ObjectUnknownException("Unknown transport order: " + name);
-      }
-
-      TransportOrder order = vehicleService.fetchObject(TransportOrder.class, name);
+      TransportOrder order = vehicleService.fetch(TransportOrder.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + name));
       if (disableVehicle && order.getProcessingVehicle() != null) {
         vehicleService.updateVehicleIntegrationLevel(
             order.getProcessingVehicle(),
@@ -85,10 +80,8 @@ public class TransportOrderDispatcherHandler {
     requireNonNull(name, "name");
 
     executorWrapper.callAndWait(() -> {
-      Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, name);
-      if (vehicle == null) {
-        throw new ObjectUnknownException("Unknown vehicle: " + name);
-      }
+      Vehicle vehicle = vehicleService.fetch(Vehicle.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown vehicle: " + name));
 
       if (disableVehicle) {
         vehicleService.updateVehicleIntegrationLevel(
@@ -106,10 +99,8 @@ public class TransportOrderDispatcherHandler {
     requireNonNull(vehicleName, "vehicleName");
 
     executorWrapper.callAndWait(() -> {
-      Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, vehicleName);
-      if (vehicle == null) {
-        throw new ObjectUnknownException("Unknown vehicle: " + vehicleName);
-      }
+      Vehicle vehicle = vehicleService.fetch(Vehicle.class, vehicleName)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown vehicle: " + vehicleName));
 
       dispatcherService.reroute(
           vehicle.getReference(),

@@ -80,8 +80,7 @@ public class SameDirectionBlockModule
       return;
     }
 
-    Set<Block> blocks = plantModelService.fetchObjects(Block.class);
-    for (Block block : blocks) {
+    for (Block block : plantModelService.fetch(Block.class)) {
       if (block.getType() == Block.Type.SAME_DIRECTION_ONLY) {
         permissions.put(block, new BlockPermission(block));
       }
@@ -200,7 +199,7 @@ public class SameDirectionBlockModule
       Block.Type type
   ) {
     Set<Block> result = new HashSet<>();
-    Set<Block> blocks = plantModelService.fetchObjects(
+    Set<Block> blocks = plantModelService.fetch(
         Block.class,
         block -> block.getType() == type
     );

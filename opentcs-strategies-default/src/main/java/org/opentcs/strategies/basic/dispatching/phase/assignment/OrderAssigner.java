@@ -168,7 +168,8 @@ public class OrderAssigner {
   ) {
     LOG.debug("Trying to find transport order for vehicle '{}'...", vehicle.getName());
 
-    Point vehiclePosition = objectService.fetchObject(Point.class, vehicle.getCurrentPosition());
+    Point vehiclePosition
+        = objectService.fetch(Point.class, vehicle.getCurrentPosition()).orElseThrow();
 
     Map<Boolean, List<CandidateFilterResult>> ordersSplitByFilter
         = availableOrders.stream()
@@ -216,7 +217,7 @@ public class OrderAssigner {
             .map(
                 vehicle -> computeCandidate(
                     vehicle,
-                    objectService.fetchObject(Point.class, vehicle.getCurrentPosition()),
+                    objectService.fetch(Point.class, vehicle.getCurrentPosition()).orElseThrow(),
                     order
                 )
             )

@@ -133,7 +133,7 @@ public class LocalPeripheralEntryPool
   private void initializeEntryMap()
       throws Exception {
     Set<Location> locations
-        = callWrapper.call(() -> servicePortal.getPlantModelService().fetchObjects(Location.class));
+        = callWrapper.call(() -> servicePortal.getPlantModelService().fetch(Location.class));
     for (Location location : locations) {
       PeripheralAttachmentInformation ai = callWrapper.call(() -> {
         return servicePortal.getPeripheralService()

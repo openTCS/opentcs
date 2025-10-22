@@ -82,7 +82,7 @@ public class PathLockAdapter
       // Check if the kernel is in operating mode, too.
       if (portal.getState() == Kernel.State.OPERATING) {
         // Update the path in the kernel if it exists and its locked state is different.
-        Path path = portal.getPlantModelService().fetchObject(Path.class, model.getName());
+        Path path = portal.getPlantModelService().fetch(Path.class, model.getName()).orElse(null);
         if (path != null && path.isLocked() != locked) {
           portal.getPlantModelService().updatePathLock(path.getReference(), locked);
           portal.getRouterService().updateRoutingTopology(Set.of(path.getReference()));

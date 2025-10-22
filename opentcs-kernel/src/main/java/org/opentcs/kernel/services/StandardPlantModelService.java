@@ -14,9 +14,9 @@ import org.opentcs.access.LocalKernel;
 import org.opentcs.access.ModelTransitionEvent;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.components.kernel.services.PlantModelService;
-import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.ObjectExistsException;
@@ -85,7 +85,7 @@ public class StandardPlantModelService
   @Inject
   public StandardPlantModelService(
       LocalKernel kernel,
-      TCSObjectService objectService,
+      InternalTCSObjectService objectService,
       @GlobalSyncObject
       Object globalSyncObject,
       PlantModelManager plantModelManager,
@@ -155,13 +155,13 @@ public class StandardPlantModelService
     synchronized (globalSyncObject) {
       return new PlantModel(plantModelManager.getName())
           .withProperties(getModelProperties())
-          .withPoints(fetchObjects(Point.class))
-          .withPaths(fetchObjects(Path.class))
-          .withLocationTypes(fetchObjects(LocationType.class))
-          .withLocations(fetchObjects(Location.class))
-          .withBlocks(fetchObjects(Block.class))
-          .withVehicles(fetchObjects(Vehicle.class))
-          .withVisualLayout(fetchObjects(VisualLayout.class).stream().findFirst().get());
+          .withPoints(fetch(Point.class))
+          .withPaths(fetch(Path.class))
+          .withLocationTypes(fetch(LocationType.class))
+          .withLocations(fetch(Location.class))
+          .withBlocks(fetch(Block.class))
+          .withVehicles(fetch(Vehicle.class))
+          .withVisualLayout(fetch(VisualLayout.class).stream().findFirst().get());
     }
   }
 

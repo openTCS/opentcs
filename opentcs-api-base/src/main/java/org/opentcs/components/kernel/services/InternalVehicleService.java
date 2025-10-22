@@ -25,7 +25,8 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  */
 public interface InternalVehicleService
     extends
-      VehicleService {
+      VehicleService,
+      InternalTCSObjectService {
 
   /**
    * Updates a vehicle's energy level.
