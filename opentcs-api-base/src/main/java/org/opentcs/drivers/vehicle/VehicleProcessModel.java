@@ -669,6 +669,20 @@ public class VehicleProcessModel {
   }
 
   /**
+   * Notifies observers that the vehicle would like to have its (logical) position
+   * determined based on a precise position.
+   *
+   * @param precisePosition The precise position.
+   */
+  public void positionResolutionRequested(Pose precisePosition) {
+    getPropertyChangeSupport().firePropertyChange(
+        Attribute.POSITION_RESOLUTION_REQUESTED.name(),
+        position,
+        precisePosition
+    );
+  }
+
+  /**
    * Notifies observers that the vehicle would like to have its current transport order withdrawn.
    *
    * @param forced Whether a forced withdrawal is requested.
@@ -858,6 +872,11 @@ public class VehicleProcessModel {
     /**
      * Indicates a request to withdraw the vehicles current transport order.
      */
-    TRANSPORT_ORDER_WITHDRAWAL_REQUESTED;
+    TRANSPORT_ORDER_WITHDRAWAL_REQUESTED,
+    /**
+     * Indicates a request to determine the vehicle's (logical) position based on a precise
+     * position.
+     */
+    POSITION_RESOLUTION_REQUESTED;
   }
 }

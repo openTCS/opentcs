@@ -173,7 +173,8 @@ class DefaultVehicleControllerTest {
         mock(MovementCommandMapper.class),
         mock(KernelApplicationConfiguration.class),
         new CommandProcessingTracker(),
-        dataTransformerRegistry
+        dataTransformerRegistry,
+        mock(VehiclePositionResolver.class)
     );
     stdVehicleController.initialize();
   }

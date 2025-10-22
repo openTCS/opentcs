@@ -276,6 +276,9 @@ task configdocgen {
         "org.opentcs.kernel.SslConfiguration",
         "${configDocDir}/KernelSslConfigurationEntries.adoc",
 
+        "org.opentcs.kernel.vehicles.VehiclePositionResolverConfiguration",
+        "${configDocDir}/VehiclePositionResolverConfigurationEntries.adoc", 
+
         "org.opentcs.virtualvehicle.VirtualVehicleConfiguration",
         "${configDocDir}/VirtualVehicleConfigurationEntries.adoc",
 

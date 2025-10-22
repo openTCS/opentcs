@@ -92,6 +92,12 @@ The kernel's SSL encryption can be configured using the following configuration 
 
 include::{configdoc}/KernelSslConfigurationEntries.adoc[]
 
+==== Vehicle position resolver configuration entries
+
+The vehicle position resolver can be configured using the following configuration entries:
+
+include::{configdoc}/VehiclePositionResolverConfigurationEntries.adoc[]
+
 ==== Virtual vehicle configuration entries
 
 The virtual vehicle (loopback communication adapter) can be configured using the following configuration entries:

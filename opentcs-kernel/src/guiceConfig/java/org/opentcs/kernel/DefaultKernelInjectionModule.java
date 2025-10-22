@@ -67,6 +67,7 @@ import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
 import org.opentcs.kernel.vehicles.VehicleControllerComponentsFactory;
 import org.opentcs.kernel.vehicles.VehicleControllerFactory;
+import org.opentcs.kernel.vehicles.VehiclePositionResolverConfiguration;
 import org.opentcs.kernel.vehicles.transformers.CoordinateSystemMapperFactory;
 import org.opentcs.kernel.vehicles.transformers.CoordinateSystemTransformerFactory;
 import org.opentcs.kernel.vehicles.transformers.DefaultVehicleDataTransformerFactory;
@@ -225,6 +226,13 @@ public class DefaultKernelInjectionModule
         .to(DefaultVehicleControllerPool.class);
     bind(LocalVehicleControllerPool.class)
         .to(DefaultVehicleControllerPool.class);
+    bind(VehiclePositionResolverConfiguration.class)
+        .toInstance(
+            getConfigBindingProvider().get(
+                VehiclePositionResolverConfiguration.PREFIX,
+                VehiclePositionResolverConfiguration.class
+            )
+        );
   }
 
   private void configurePeripheralControllers() {

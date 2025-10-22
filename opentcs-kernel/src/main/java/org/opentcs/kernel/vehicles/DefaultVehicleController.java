@@ -153,6 +153,10 @@ public class DefaultVehicleController
    */
   private final IncomingPoseTransformer incomingPoseTransformer;
   /**
+   * Resolves the vehicle precise position to an openTCS point.
+   */
+  private final VehiclePositionResolver vehiclePositionResolver;
+  /**
    * A map of transformed movement commands to their corresponding original ones.
    */
   private final Map<MovementCommand, MovementCommand> transformedToOriginalCommands
@@ -174,6 +178,7 @@ public class DefaultVehicleController
    * @param configuration The configuration to use.
    * @param commandProcessingTracker Track processing of movement commands.
    * @param dataTransformerRegistry A registry for data transformer factories.
+   * @param vehiclePositionResolver Resolves the vehicle precise position to an openTCS point.
    */
   @Inject
   public DefaultVehicleController(
@@ -205,7 +210,9 @@ public class DefaultVehicleController
       @Nonnull
       CommandProcessingTracker commandProcessingTracker,
       @Nonnull
-      VehicleDataTransformerRegistry dataTransformerRegistry
+      VehicleDataTransformerRegistry dataTransformerRegistry,
+      @Nonnull
+      VehiclePositionResolver vehiclePositionResolver
   ) {
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.commAdapter = requireNonNull(adapter, "adapter");
@@ -231,6 +238,8 @@ public class DefaultVehicleController
         = dataTransformerRegistry
             .findFactoryFor(vehicle)
             .createIncomingPoseTransformer(vehicle);
+    this.vehiclePositionResolver
+        = requireNonNull(vehiclePositionResolver, "vehiclePositionResolver");
   }
 
   @Override
@@ -959,10 +968,31 @@ public class DefaultVehicleController
     )) {
       dispatcherService.withdrawByVehicle(vehicle.getReference(), (Boolean) evt.getNewValue());
     }
+    else if (Objects.equals(
+        evt.getPropertyName(),
+        VehicleProcessModel.Attribute.POSITION_RESOLUTION_REQUESTED.name()
+    )) {
+      mapPrecisePositionToLocalPosition((Pose) evt.getNewValue());
+    }
   }
 
   private void withdrawPendingResourceAllocations() {
     scheduler.clearPendingAllocations(this);
+  }
+
+  private void mapPrecisePositionToLocalPosition(
+      @Nonnull
+      Pose pose
+  )
+      throws ObjectUnknownException {
+    requireNonNull(pose, "pose");
+
+    setVehiclePosition(
+        vehiclePositionResolver.resolveVehiclePosition(
+            incomingPoseTransformer.apply(pose),
+            (vehicle.getCurrentPosition() != null) ? vehicle.getCurrentPosition().getName() : null
+        )
+    );
   }
 
   private void updateVehiclePose(
