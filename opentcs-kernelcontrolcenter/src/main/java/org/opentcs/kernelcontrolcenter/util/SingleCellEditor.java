@@ -2,12 +2,15 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernelcontrolcenter.util;
 
+import static org.opentcs.kernelcontrolcenter.I18nKernelControlCenter.BUNDLE_PATH;
+
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -37,6 +40,10 @@ public final class SingleCellEditor
    * The table associated with the editors.
    */
   private final JTable table;
+  /**
+   * This class's resource bundle.
+   */
+  private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
 
   /**
    * Constructs a SingleCellEditor.
@@ -133,6 +140,6 @@ public final class SingleCellEditor
     if (editor == null) {
       editor = defaultEditor;
     }
-    table.changeSelection(row, table.getColumn("Adapter").getModelIndex(), false, false);
+    table.changeSelection(row, table.getColumn(BUNDLE.getString("vehicleTableModel.column_adapter.headerText")).getModelIndex(), false, false);
   }
 }
