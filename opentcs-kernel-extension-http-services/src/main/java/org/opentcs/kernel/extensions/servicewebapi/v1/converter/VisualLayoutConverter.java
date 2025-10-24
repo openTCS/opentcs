@@ -7,6 +7,8 @@ import static java.util.Objects.requireNonNull;
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opentcs.access.to.model.LayerCreationTO;
+import org.opentcs.access.to.model.LayerGroupCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.model.visualization.Layer;
 import org.opentcs.data.model.visualization.LayerGroup;
@@ -45,10 +47,10 @@ public class VisualLayoutConverter {
         .setLayerGroups(toLayerGroupTOs(visualLayout.getLayerGroups()));
   }
 
-  private List<LayerGroup> convertLayerGroups(List<LayerGroupTO> layerGroups) {
+  private List<LayerGroupCreationTO> convertLayerGroups(List<LayerGroupTO> layerGroups) {
     return layerGroups.stream()
         .map(
-            layerGroup -> new LayerGroup(
+            layerGroup -> new LayerGroupCreationTO(
                 layerGroup.getId(),
                 layerGroup.getName(),
                 layerGroup.isVisible()
@@ -69,10 +71,10 @@ public class VisualLayoutConverter {
         .collect(Collectors.toList());
   }
 
-  private List<Layer> convertLayers(List<LayerTO> layers) {
+  private List<LayerCreationTO> convertLayers(List<LayerTO> layers) {
     return layers.stream()
         .map(
-            layer -> new Layer(
+            layer -> new LayerCreationTO(
                 layer.getId(),
                 layer.getOrdinal(),
                 layer.isVisible(),

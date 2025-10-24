@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.data.order.OrderConstants;
 
 /**
  * A transfer object describing a transport order.
@@ -89,7 +88,7 @@ public class TransportOrderCreationTO
     this.wrappingSequence = null;
     this.dependencyNames = Set.of();
     this.intendedVehicleName = null;
-    this.type = OrderConstants.TYPE_NONE;
+    this.type = OrderConstantsTO.TYPE_NONE;
     this.deadline = Instant.MAX;
     this.dispensable = false;
   }

@@ -73,10 +73,10 @@ public class BlockConverter {
     };
   }
 
-  private Block.Type convertToBlockType(BlockTO.Type type) {
+  private BlockCreationTO.Type convertToBlockType(BlockTO.Type type) {
     return switch (type) {
-      case SAME_DIRECTION_ONLY -> Block.Type.SAME_DIRECTION_ONLY;
-      case SINGLE_VEHICLE_ONLY -> Block.Type.SINGLE_VEHICLE_ONLY;
+      case SAME_DIRECTION_ONLY -> BlockCreationTO.Type.SAME_DIRECTION_ONLY;
+      case SINGLE_VEHICLE_ONLY -> BlockCreationTO.Type.SINGLE_VEHICLE_ONLY;
     };
   }
 }

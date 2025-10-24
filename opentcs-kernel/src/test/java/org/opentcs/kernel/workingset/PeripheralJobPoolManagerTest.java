@@ -14,11 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.model.TripleCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralJobCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
-import org.opentcs.data.model.Triple;
 import org.opentcs.data.peripherals.PeripheralJob;
-import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.util.event.SimpleEventBus;
 
 /**
@@ -57,7 +56,7 @@ class PeripheralJobPoolManagerTest {
                 new LocationCreationTO(
                     "some-location",
                     "some-location-type",
-                    new Triple(1, 2, 3)
+                    new TripleCreationTO(1, 2, 3)
                 )
             )
     );
@@ -101,7 +100,9 @@ class PeripheralJobPoolManagerTest {
                   "some-job",
                   "some-token",
                   new PeripheralOperationCreationTO("some-operation", "some-location")
-                      .withExecutionTrigger(PeripheralOperation.ExecutionTrigger.IMMEDIATE)
+                      .withExecutionTrigger(
+                          PeripheralOperationCreationTO.ExecutionTrigger.IMMEDIATE
+                      )
                       .withCompletionRequired(true)
               )
           );

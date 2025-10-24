@@ -4,13 +4,15 @@ package org.opentcs.guing.common.exchange.adapter;
 
 import static java.util.Objects.requireNonNull;
 
+import org.opentcs.access.to.model.CoupleCreationTO;
 import org.opentcs.access.to.model.LocationCreationTO;
+import org.opentcs.access.to.model.LocationRepresentationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
+import org.opentcs.access.to.model.TripleCreationTO;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
-import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Location;
-import org.opentcs.data.model.Triple;
+import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.base.components.layer.LayerWrapper;
 import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
@@ -138,8 +140,8 @@ public class LocationAdapter
         : location.getPeripheralInformation().getPeripheralJob().getName();
   }
 
-  private Triple getPosition(LocationModel model) {
-    return convertToTriple(
+  private TripleCreationTO getPosition(LocationModel model) {
+    return convertToTripleCreationTO(
         model.getPropertyModelPositionX(),
         model.getPropertyModelPositionY()
     );
@@ -154,22 +156,47 @@ public class LocationAdapter
 
   private LocationCreationTO.Layout getLayout(LocationModel model) {
     return new LocationCreationTO.Layout(
-        new Couple(
+        new CoupleCreationTO(
             Long.parseLong(model.getPropertyLabelOffsetX().getText()),
             Long.parseLong(model.getPropertyLabelOffsetY().getText())
         ),
-        model.getPropertyDefaultRepresentation().getLocationRepresentation(),
+        convertToLocationRepresentationTO(
+            model.getPropertyDefaultRepresentation().getLocationRepresentation()
+        ),
         model.getPropertyLayerWrapper().getValue().getLayer().getId()
     );
   }
 
-  private Triple convertToTriple(CoordinateProperty cpx, CoordinateProperty cpy) {
-    Triple result = new Triple(
+  private TripleCreationTO convertToTripleCreationTO(
+      CoordinateProperty cpx, CoordinateProperty cpy
+  ) {
+    TripleCreationTO result = new TripleCreationTO(
         (int) cpx.getValueByUnit(LengthProperty.Unit.MM),
         (int) cpy.getValueByUnit(LengthProperty.Unit.MM),
         0
     );
 
     return result;
+  }
+
+  private LocationRepresentationTO convertToLocationRepresentationTO(
+      LocationRepresentation locRepresentation
+  ) {
+    return switch (locRepresentation) {
+      case DEFAULT -> LocationRepresentationTO.DEFAULT;
+      case LOAD_TRANSFER_ALT_1 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_1;
+      case LOAD_TRANSFER_ALT_2 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_2;
+      case LOAD_TRANSFER_ALT_3 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_3;
+      case LOAD_TRANSFER_ALT_4 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_4;
+      case LOAD_TRANSFER_ALT_5 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_5;
+      case LOAD_TRANSFER_GENERIC -> LocationRepresentationTO.LOAD_TRANSFER_GENERIC;
+      case NONE -> LocationRepresentationTO.NONE;
+      case RECHARGE_ALT_1 -> LocationRepresentationTO.RECHARGE_ALT_1;
+      case RECHARGE_ALT_2 -> LocationRepresentationTO.RECHARGE_ALT_2;
+      case RECHARGE_GENERIC -> LocationRepresentationTO.RECHARGE_GENERIC;
+      case WORKING_ALT_1 -> LocationRepresentationTO.WORKING_ALT_1;
+      case WORKING_ALT_2 -> LocationRepresentationTO.WORKING_ALT_2;
+      case WORKING_GENERIC -> LocationRepresentationTO.WORKING_GENERIC;
+    };
   }
 }

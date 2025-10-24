@@ -67,13 +67,13 @@ public class PeripheralOperationConverter {
     };
   }
 
-  private PeripheralOperation.ExecutionTrigger toExecutionTrigger(
+  private PeripheralOperationCreationTO.ExecutionTrigger toExecutionTrigger(
       PeripheralOperationTO.ExecutionTrigger trigger
   ) {
     return switch (trigger) {
-      case IMMEDIATE -> PeripheralOperation.ExecutionTrigger.IMMEDIATE;
-      case AFTER_ALLOCATION -> PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION;
-      case AFTER_MOVEMENT -> PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT;
+      case IMMEDIATE -> PeripheralOperationCreationTO.ExecutionTrigger.IMMEDIATE;
+      case AFTER_ALLOCATION -> PeripheralOperationCreationTO.ExecutionTrigger.AFTER_ALLOCATION;
+      case AFTER_MOVEMENT -> PeripheralOperationCreationTO.ExecutionTrigger.AFTER_MOVEMENT;
     };
   }
 }

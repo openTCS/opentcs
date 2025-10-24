@@ -8,11 +8,6 @@ import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Map;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.data.model.Couple;
-import org.opentcs.data.model.Envelope;
-import org.opentcs.data.model.Point;
-import org.opentcs.data.model.Pose;
-import org.opentcs.data.model.Triple;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
@@ -27,16 +22,16 @@ public class PointCreationTO
   /**
    * The pose of the vehicle at this point.
    */
-  private final Pose pose;
+  private final PoseCreationTO pose;
   /**
    * This point's type.
    */
   @Nonnull
-  private final Point.Type type;
+  private final Type type;
   /**
    * A map of envelope keys to envelopes that vehicles located at this point may occupy.
    */
-  private final Map<String, Envelope> vehicleEnvelopes;
+  private final Map<String, EnvelopeCreationTO> vehicleEnvelopes;
   /**
    * The maximum bounding box (in mm) that a vehicle at this point is allowed to have.
    */
@@ -56,8 +51,8 @@ public class PointCreationTO
       String name
   ) {
     super(name);
-    this.pose = new Pose(new Triple(0, 0, 0), Double.NaN);
-    this.type = Point.Type.HALT_POSITION;
+    this.pose = new PoseCreationTO(new TripleCreationTO(0, 0, 0), Double.NaN);
+    this.type = Type.HALT_POSITION;
     this.vehicleEnvelopes = Map.of();
     this.maxVehicleBoundingBox
         = new BoundingBoxCreationTO(1000, 1000, 1000);
@@ -70,11 +65,11 @@ public class PointCreationTO
       @Nonnull
       Map<String, String> properties,
       @Nonnull
-      Pose pose,
+      PoseCreationTO pose,
       @Nonnull
-      Point.Type type,
+      Type type,
       @Nonnull
-      Map<String, Envelope> vehicleEnvelopes,
+      Map<String, EnvelopeCreationTO> vehicleEnvelopes,
       @Nonnull
       BoundingBoxCreationTO maxVehicleBoundingBox,
       @Nonnull
@@ -117,7 +112,7 @@ public class PointCreationTO
    * @return The pose of the vehicle at this point.
    */
   @Nonnull
-  public Pose getPose() {
+  public PoseCreationTO getPose() {
     return pose;
   }
 
@@ -129,7 +124,7 @@ public class PointCreationTO
    */
   public PointCreationTO withPose(
       @Nonnull
-      Pose pose
+      PoseCreationTO pose
   ) {
     return new PointCreationTO(
         getName(),
@@ -148,7 +143,7 @@ public class PointCreationTO
    * @return The type of this point.
    */
   @Nonnull
-  public Point.Type getType() {
+  public Type getType() {
     return type;
   }
 
@@ -160,7 +155,7 @@ public class PointCreationTO
    */
   public PointCreationTO withType(
       @Nonnull
-      Point.Type type
+      Type type
   ) {
     return new PointCreationTO(
         getName(),
@@ -228,7 +223,7 @@ public class PointCreationTO
    *
    * @return A map of envelope keys to envelopes that vehicles located at this point may occupy.
    */
-  public Map<String, Envelope> getVehicleEnvelopes() {
+  public Map<String, EnvelopeCreationTO> getVehicleEnvelopes() {
     return vehicleEnvelopes;
   }
 
@@ -240,7 +235,7 @@ public class PointCreationTO
    */
   public PointCreationTO withVehicleEnvelopes(
       @Nonnull
-      Map<String, Envelope> vehicleEnvelopes
+      Map<String, EnvelopeCreationTO> vehicleEnvelopes
   ) {
     return new PointCreationTO(
         getName(),
@@ -321,6 +316,26 @@ public class PointCreationTO
   }
 
   /**
+   * Describes the types of positions in a driving course.
+   */
+  public enum Type {
+
+    /**
+     * Indicates a position at which a vehicle may halt temporarily, e.g. for executing an
+     * operation.
+     * The vehicle is also expected to report in when it arrives at such a position.
+     * It may not park here for longer than necessary, though.
+     */
+    HALT_POSITION,
+    /**
+     * Indicates a position at which a vehicle may halt for longer periods of time when it is not
+     * processing orders.
+     * The vehicle is also expected to report in when it arrives at such a position.
+     */
+    PARK_POSITION;
+  }
+
+  /**
    * Contains information regarding the graphical representation of a point.
    */
   public static class Layout
@@ -330,11 +345,11 @@ public class PointCreationTO
     /**
      * The coordinates at which the point is to be drawn (in mm).
      */
-    private final Couple position;
+    private final CoupleCreationTO position;
     /**
      * The offset of the label's position to the point's position (in lu).
      */
-    private final Couple labelOffset;
+    private final CoupleCreationTO labelOffset;
     /**
      * The ID of the layer on which the point is to be drawn.
      */
@@ -344,7 +359,7 @@ public class PointCreationTO
      * Creates a new instance.
      */
     public Layout() {
-      this(new Couple(0, 0), 0);
+      this(new CoupleCreationTO(0, 0), 0);
     }
 
     /**
@@ -353,13 +368,13 @@ public class PointCreationTO
      * @param position The coordinates at which the point is to be drawn (in mm).
      * @param labelOffset The offset of the label's position to the point's position (in lu).
      * @param layerId The ID of the layer on which the point is to be drawn.
-     * @deprecated Use {@link Layout#Layout(Couple, int)} instead.
+     * @deprecated Use {@link Layout#Layout(CoupleCreationTO, int)} instead.
      */
     @Deprecated
     @ScheduledApiChange(when = "7.0", details = "Will be removed")
     public Layout(
-        Couple position,
-        Couple labelOffset,
+        CoupleCreationTO position,
+        CoupleCreationTO labelOffset,
         int layerId
     ) {
       this.position = requireNonNull(position, "position");
@@ -374,10 +389,10 @@ public class PointCreationTO
      * @param layerId The ID of the layer on which the point is to be drawn.
      */
     public Layout(
-        Couple labelOffset,
+        CoupleCreationTO labelOffset,
         int layerId
     ) {
-      this.position = new Couple(0, 0);
+      this.position = new CoupleCreationTO(0, 0);
       this.labelOffset = requireNonNull(labelOffset, "labelOffset");
       this.layerId = layerId;
     }
@@ -391,7 +406,7 @@ public class PointCreationTO
      */
     @Deprecated
     @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Couple getPosition() {
+    public CoupleCreationTO getPosition() {
       return position;
     }
 
@@ -401,11 +416,11 @@ public class PointCreationTO
      * @param position The value to be set in the copy.
      * @return A copy of this object, differing in the given value.
      * @deprecated Will be removed without replacement.
-     * {@link PointCreationTO#withPose(Pose)} should be used instead.
+     * {@link PointCreationTO#withPose(PoseCreationTO)} should be used instead.
      */
     @Deprecated
     @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Layout withPosition(Couple position) {
+    public Layout withPosition(CoupleCreationTO position) {
       return new Layout(
           position,
           labelOffset,
@@ -418,7 +433,7 @@ public class PointCreationTO
      *
      * @return The offset of the label's position to the point's position (in lu).
      */
-    public Couple getLabelOffset() {
+    public CoupleCreationTO getLabelOffset() {
       return labelOffset;
     }
 
@@ -428,7 +443,7 @@ public class PointCreationTO
      * @param labelOffset The value to be set in the copy.
      * @return A copy of this object, differing in the given value.
      */
-    public Layout withLabelOffset(Couple labelOffset) {
+    public Layout withLabelOffset(CoupleCreationTO labelOffset) {
       return new Layout(
           position,
           labelOffset,

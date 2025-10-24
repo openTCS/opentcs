@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.data.model.visualization.LocationRepresentation;
 
 /**
  * A transfer object describing a location type in the plant model.
@@ -240,13 +239,13 @@ public class LocationTypeCreationTO
     /**
      * The location representation to use for locations with this location type.
      */
-    private final LocationRepresentation locationRepresentation;
+    private final LocationRepresentationTO locationRepresentation;
 
     /**
      * Creates a new instance.
      */
     public Layout() {
-      this(LocationRepresentation.NONE);
+      this(LocationRepresentationTO.NONE);
     }
 
     /**
@@ -255,7 +254,7 @@ public class LocationTypeCreationTO
      * @param locationRepresentation The location representation to use for locations with this
      * location type.
      */
-    public Layout(LocationRepresentation locationRepresentation) {
+    public Layout(LocationRepresentationTO locationRepresentation) {
       this.locationRepresentation = requireNonNull(
           locationRepresentation,
           "locationRepresentation"
@@ -267,7 +266,7 @@ public class LocationTypeCreationTO
      *
      * @return The location representation to use for locations with this location type.
      */
-    public LocationRepresentation getLocationRepresentation() {
+    public LocationRepresentationTO getLocationRepresentation() {
       return locationRepresentation;
     }
 
@@ -277,7 +276,9 @@ public class LocationTypeCreationTO
      * @param locationRepresentation The value to be set in the copy.
      * @return A copy of this object, differing in the given value.
      */
-    public Layout withLocationRepresentation(LocationRepresentation locationRepresentation) {
+    public Layout withLocationRepresentation(
+        LocationRepresentationTO locationRepresentation
+    ) {
       return new Layout(locationRepresentation);
     }
 

@@ -10,9 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.data.model.ModelConstants;
-import org.opentcs.data.model.visualization.Layer;
-import org.opentcs.data.model.visualization.LayerGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +61,10 @@ public class PlantModelCreationTO
    *
    * @param name The name of this plant model.
    */
-  public PlantModelCreationTO(String name) {
+  public PlantModelCreationTO(
+      @Nonnull
+      String name
+  ) {
     super(name);
     this.points = List.of();
     this.paths = List.of();
@@ -544,20 +544,20 @@ public class PlantModelCreationTO
   }
 
   private VisualLayoutCreationTO defaultVisualLayout() {
-    return new VisualLayoutCreationTO(ModelConstants.DEFAULT_VISUAL_LAYOUT_NAME)
+    return new VisualLayoutCreationTO(ModelConstantsTO.DEFAULT_VISUAL_LAYOUT_NAME)
         .withLayer(
-            new Layer(
-                ModelConstants.DEFAULT_LAYER_ID,
-                ModelConstants.DEFAULT_LAYER_ORDINAL,
+            new LayerCreationTO(
+                ModelConstantsTO.DEFAULT_LAYER_ID,
+                ModelConstantsTO.DEFAULT_LAYER_ORDINAL,
                 true,
-                ModelConstants.DEFAULT_LAYER_NAME,
-                ModelConstants.DEFAULT_LAYER_GROUP_ID
+                ModelConstantsTO.DEFAULT_LAYER_NAME,
+                ModelConstantsTO.DEFAULT_LAYER_GROUP_ID
             )
         )
         .withLayerGroup(
-            new LayerGroup(
-                ModelConstants.DEFAULT_LAYER_GROUP_ID,
-                ModelConstants.DEFAULT_LAYER_GROUP_NAME,
+            new LayerGroupCreationTO(
+                ModelConstantsTO.DEFAULT_LAYER_GROUP_ID,
+                ModelConstantsTO.DEFAULT_LAYER_GROUP_NAME,
                 true
             )
         );
@@ -572,12 +572,12 @@ public class PlantModelCreationTO
     if (visualLayout.getLayers().isEmpty()) {
       LOG.warn("Adding default layer to visual layout with no layers...");
       vLayout = visualLayout.withLayer(
-          new Layer(
-              ModelConstants.DEFAULT_LAYER_ID,
-              ModelConstants.DEFAULT_LAYER_ORDINAL,
+          new LayerCreationTO(
+              ModelConstantsTO.DEFAULT_LAYER_ID,
+              ModelConstantsTO.DEFAULT_LAYER_ORDINAL,
               true,
-              ModelConstants.DEFAULT_LAYER_NAME,
-              ModelConstants.DEFAULT_LAYER_GROUP_ID
+              ModelConstantsTO.DEFAULT_LAYER_NAME,
+              ModelConstantsTO.DEFAULT_LAYER_GROUP_ID
           )
       );
     }
@@ -585,9 +585,9 @@ public class PlantModelCreationTO
     if (visualLayout.getLayerGroups().isEmpty()) {
       LOG.warn("Adding default layer group to visual layout with no layer groups...");
       vLayout = vLayout.withLayerGroup(
-          new LayerGroup(
-              ModelConstants.DEFAULT_LAYER_GROUP_ID,
-              ModelConstants.DEFAULT_LAYER_GROUP_NAME,
+          new LayerGroupCreationTO(
+              ModelConstantsTO.DEFAULT_LAYER_GROUP_ID,
+              ModelConstantsTO.DEFAULT_LAYER_GROUP_NAME,
               true
           )
       );

@@ -57,7 +57,7 @@ class BlockConverterTest {
 
     assertThat(result, hasSize(1));
     assertThat(result.get(0).getName(), is("block1"));
-    assertThat(result.get(0).getType(), is(Block.Type.SINGLE_VEHICLE_ONLY));
+    assertThat(result.get(0).getType(), is(BlockCreationTO.Type.SINGLE_VEHICLE_ONLY));
     assertThat(result.get(0).getMemberNames(), hasSize(1));
     assertThat(result.get(0).getMemberNames(), contains("member1"));
     assertThat(

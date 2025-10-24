@@ -13,9 +13,6 @@ import java.util.List;
 import java.util.Map;
 import org.opentcs.access.to.CreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
-import org.opentcs.data.model.Couple;
-import org.opentcs.data.model.Envelope;
-import org.opentcs.data.model.Path.Layout.ConnectionType;
 
 /**
  * A transfer object describing a path in the plant model.
@@ -61,7 +58,7 @@ public class PathCreationTO
   /**
    * A map of envelope keys to envelopes that vehicles traversing this path may occupy.
    */
-  private final Map<String, Envelope> vehicleEnvelopes;
+  private final Map<String, EnvelopeCreationTO> vehicleEnvelopes;
   /**
    * The information regarding the grahical representation of this path.
    */
@@ -108,7 +105,7 @@ public class PathCreationTO
       List<PeripheralOperationCreationTO> peripheralOperations,
       boolean locked,
       @Nonnull
-      Map<String, Envelope> vehicleEnvelopes,
+      Map<String, EnvelopeCreationTO> vehicleEnvelopes,
       @Nonnull
       Layout layout
   ) {
@@ -461,7 +458,7 @@ public class PathCreationTO
    *
    * @return A map of envelope keys to envelopes that vehicles traversing this path may occupy.
    */
-  public Map<String, Envelope> getVehicleEnvelopes() {
+  public Map<String, EnvelopeCreationTO> getVehicleEnvelopes() {
     return vehicleEnvelopes;
   }
 
@@ -473,7 +470,7 @@ public class PathCreationTO
    */
   public PathCreationTO withVehicleEnvelopes(
       @Nonnull
-      Map<String, Envelope> vehicleEnvelopes
+      Map<String, EnvelopeCreationTO> vehicleEnvelopes
   ) {
     return new PathCreationTO(
         getName(),
@@ -554,7 +551,7 @@ public class PathCreationTO
      * is {@link ConnectionType#BEZIER}, {@link ConnectionType#BEZIER_3}
      * or {@link ConnectionType#POLYPATH}).
      */
-    private final List<Couple> controlPoints;
+    private final List<CoupleCreationTO> controlPoints;
     /**
      * The ID of the layer on which the path is to be drawn.
      */
@@ -574,7 +571,9 @@ public class PathCreationTO
      * @param controlPoints Control points describing the way the path is drawn.
      * @param layerId The ID of the layer on which the path is to be drawn.
      */
-    public Layout(ConnectionType connectionType, List<Couple> controlPoints, int layerId) {
+    public Layout(
+        ConnectionType connectionType, List<CoupleCreationTO> controlPoints, int layerId
+    ) {
       this.connectionType = connectionType;
       this.controlPoints = requireNonNull(controlPoints, "controlPoints");
       this.layerId = layerId;
@@ -606,7 +605,7 @@ public class PathCreationTO
      *
      * @return The control points describing the way the path is drawn.
      */
-    public List<Couple> getControlPoints() {
+    public List<CoupleCreationTO> getControlPoints() {
       return Collections.unmodifiableList(controlPoints);
     }
 
@@ -616,7 +615,7 @@ public class PathCreationTO
      * @param controlPoints The value to be set in the copy.
      * @return A copy of this object, differing in the given value.
      */
-    public Layout withControlPoints(List<Couple> controlPoints) {
+    public Layout withControlPoints(List<CoupleCreationTO> controlPoints) {
       return new Layout(connectionType, controlPoints, layerId);
     }
 
@@ -637,6 +636,37 @@ public class PathCreationTO
      */
     public Layout withLayer(int layerId) {
       return new Layout(connectionType, controlPoints, layerId);
+    }
+
+    /**
+     * The connection type a path is represented as.
+     */
+    public enum ConnectionType {
+
+      /**
+       * A direct connection.
+       */
+      DIRECT,
+      /**
+       * An elbow connection.
+       */
+      ELBOW,
+      /**
+       * A slanted connection.
+       */
+      SLANTED,
+      /**
+       * A polygon path with any number of vertecies.
+       */
+      POLYPATH,
+      /**
+       * A bezier curve with 2 control points.
+       */
+      BEZIER,
+      /**
+       * A bezier curve with 3 control points.
+       */
+      BEZIER_3;
     }
 
     @Override

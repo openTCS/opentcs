@@ -62,4 +62,29 @@ public class CoupleCreationTO
   public CoupleCreationTO withY(long y) {
     return new CoupleCreationTO(x, y);
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof CoupleCreationTO)) {
+      return false;
+    }
+    CoupleCreationTO other = (CoupleCreationTO) obj;
+    if (this.x != other.x) {
+      return false;
+    }
+    if (this.y != other.y) {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    return (int) (x ^ y);
+  }
+
+  @Override
+  public String toString() {
+    return "CoupleCreationTO{" + "x=" + x + ", y=" + y + '}';
+  }
 }

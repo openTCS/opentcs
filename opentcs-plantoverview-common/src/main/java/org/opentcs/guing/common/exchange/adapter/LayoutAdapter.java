@@ -9,6 +9,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentcs.access.to.model.LayerCreationTO;
+import org.opentcs.access.to.model.LayerGroupCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -117,16 +119,28 @@ public class LayoutAdapter
     return model.getPropertyScaleY().getValueByUnit(LengthProperty.Unit.MM);
   }
 
-  private List<Layer> getLayers(LayoutModel model) {
+  private List<LayerCreationTO> getLayers(LayoutModel model) {
     return model.getPropertyLayerWrappers().getValue().values().stream()
         .map(wrapper -> wrapper.getLayer())
         .sorted(Comparator.comparing(layer -> layer.getId()))
+        .map(
+            layer -> new LayerCreationTO(
+                layer.getId(),
+                layer.getOrdinal(),
+                layer.isVisible(),
+                layer.getName(),
+                layer.getGroupId()
+            )
+        )
         .collect(Collectors.toList());
   }
 
-  private List<LayerGroup> getLayerGroups(LayoutModel model) {
+  private List<LayerGroupCreationTO> getLayerGroups(LayoutModel model) {
     return model.getPropertyLayerGroups().getValue().values().stream()
         .sorted(Comparator.comparing(group -> group.getId()))
+        .map(
+            group -> new LayerGroupCreationTO(group.getId(), group.getName(), group.isVisible())
+        )
         .collect(Collectors.toList());
   }
 }

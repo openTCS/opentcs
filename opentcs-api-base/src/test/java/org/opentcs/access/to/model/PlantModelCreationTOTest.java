@@ -10,31 +10,28 @@ import static org.hamcrest.Matchers.samePropertyValuesAs;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentcs.data.model.ModelConstants;
-import org.opentcs.data.model.visualization.Layer;
-import org.opentcs.data.model.visualization.LayerGroup;
 
 /**
  * Tests for {@link PlantModelCreationTO}.
  */
 class PlantModelCreationTOTest {
 
-  private Layer defaultLayer;
-  private LayerGroup defaultLayerGroup;
+  private LayerCreationTO defaultLayer;
+  private LayerGroupCreationTO defaultLayerGroup;
 
   @BeforeEach
   void setUp() {
-    defaultLayer = new Layer(
-        ModelConstants.DEFAULT_LAYER_ID,
-        ModelConstants.DEFAULT_LAYER_ORDINAL,
+    defaultLayer = new LayerCreationTO(
+        ModelConstantsTO.DEFAULT_LAYER_ID,
+        ModelConstantsTO.DEFAULT_LAYER_ORDINAL,
         true,
-        ModelConstants.DEFAULT_LAYER_NAME,
-        ModelConstants.DEFAULT_LAYER_GROUP_ID
+        ModelConstantsTO.DEFAULT_LAYER_NAME,
+        ModelConstantsTO.DEFAULT_LAYER_GROUP_ID
     );
 
-    defaultLayerGroup = new LayerGroup(
-        ModelConstants.DEFAULT_LAYER_GROUP_ID,
-        ModelConstants.DEFAULT_LAYER_GROUP_NAME,
+    defaultLayerGroup = new LayerGroupCreationTO(
+        ModelConstantsTO.DEFAULT_LAYER_GROUP_ID,
+        ModelConstantsTO.DEFAULT_LAYER_GROUP_NAME,
         true
     );
   }

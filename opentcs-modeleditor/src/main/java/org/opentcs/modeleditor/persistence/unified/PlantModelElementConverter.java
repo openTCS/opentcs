@@ -11,6 +11,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.BlockCreationTO;
+import org.opentcs.access.to.model.CoupleCreationTO;
+import org.opentcs.access.to.model.EnvelopeCreationTO;
+import org.opentcs.access.to.model.LayerCreationTO;
+import org.opentcs.access.to.model.LayerGroupCreationTO;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
@@ -18,13 +22,11 @@ import org.opentcs.access.to.model.PointCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
-import org.opentcs.data.model.Block;
 import org.opentcs.data.model.Couple;
-import org.opentcs.data.model.Envelope;
-import org.opentcs.data.model.Point;
 import org.opentcs.data.model.visualization.Layer;
 import org.opentcs.data.model.visualization.LayerGroup;
 import org.opentcs.data.model.visualization.LocationRepresentation;
+import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.guing.base.components.layer.LayerWrapper;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.KeyValueProperty;
@@ -73,9 +75,9 @@ public class PlantModelElementConverter {
     );
     model.getPropertyType().setValue(mapPointType(pointTO.getType()));
 
-    for (Map.Entry<String, Envelope> entry : pointTO.getVehicleEnvelopes().entrySet()) {
+    for (Map.Entry<String, EnvelopeCreationTO> entry : pointTO.getVehicleEnvelopes().entrySet()) {
       model.getPropertyVehicleEnvelopes().getValue().add(
-          new EnvelopeModel(entry.getKey(), entry.getValue().getVertices())
+          new EnvelopeModel(entry.getKey(), mapCouples(entry.getValue().getVertices()))
       );
     }
 
@@ -133,9 +135,9 @@ public class PlantModelElementConverter {
     model.getPropertyEndComponent().setText(pathTO.getDestPointName());
     model.getPropertyLocked().setValue(pathTO.isLocked());
 
-    for (Map.Entry<String, Envelope> entry : pathTO.getVehicleEnvelopes().entrySet()) {
+    for (Map.Entry<String, EnvelopeCreationTO> entry : pathTO.getVehicleEnvelopes().entrySet()) {
       model.getPropertyVehicleEnvelopes().getValue().add(
-          new EnvelopeModel(entry.getKey(), entry.getValue().getVertices())
+          new EnvelopeModel(entry.getKey(), mapCouples(entry.getValue().getVertices()))
       );
     }
 
@@ -154,7 +156,7 @@ public class PlantModelElementConverter {
           new PeripheralOperationModel(
               operationTO.getLocationName(),
               operationTO.getOperation(),
-              operationTO.getExecutionTrigger(),
+              mapExecutionTrigger(operationTO.getExecutionTrigger()),
               operationTO.isCompletionRequired()
           )
       );
@@ -382,45 +384,74 @@ public class PlantModelElementConverter {
     return model;
   }
 
-  private PointModel.Type mapPointType(Point.Type type) {
-    switch (type) {
-      case HALT_POSITION:
-        return PointModel.Type.HALT;
-      case PARK_POSITION:
-        return PointModel.Type.PARK;
-      default:
-        throw new IllegalArgumentException("Unhandled point type: " + type);
-    }
+  private PointModel.Type mapPointType(PointCreationTO.Type type) {
+    return switch (type) {
+      case HALT_POSITION -> PointModel.Type.HALT;
+      case PARK_POSITION -> PointModel.Type.PARK;
+    };
   }
 
-  private BlockModel.Type mapBlockType(Block.Type type) {
-    switch (type) {
-      case SINGLE_VEHICLE_ONLY:
-        return BlockModel.Type.SINGLE_VEHICLE_ONLY;
-      case SAME_DIRECTION_ONLY:
-        return BlockModel.Type.SAME_DIRECTION_ONLY;
-      default:
-        throw new IllegalArgumentException("Unhandled block type: " + type);
-    }
+  private BlockModel.Type mapBlockType(BlockCreationTO.Type type) {
+    return switch (type) {
+      case SINGLE_VEHICLE_ONLY -> BlockModel.Type.SINGLE_VEHICLE_ONLY;
+      case SAME_DIRECTION_ONLY -> BlockModel.Type.SAME_DIRECTION_ONLY;
+    };
   }
 
-  private void initLayerGroups(LayoutModel model, Collection<LayerGroup> groups) {
+  private List<Couple> mapCouples(List<CoupleCreationTO> couples) {
+    return couples.stream()
+        .map(
+            couple -> new Couple(
+                couple.getX(),
+                couple.getY()
+            )
+        )
+        .toList();
+  }
+
+  private PeripheralOperation.ExecutionTrigger mapExecutionTrigger(
+      PeripheralOperationCreationTO.ExecutionTrigger executionTrigger
+  ) {
+    return switch (executionTrigger) {
+      case IMMEDIATE -> PeripheralOperation.ExecutionTrigger.IMMEDIATE;
+      case AFTER_ALLOCATION -> PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION;
+      case AFTER_MOVEMENT -> PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT;
+    };
+  }
+
+  private void initLayerGroups(LayoutModel model, Collection<LayerGroupCreationTO> groups) {
     Map<Integer, LayerGroup> layerGroups = model.getPropertyLayerGroups().getValue();
     layerGroups.clear();
-    for (LayerGroup group : groups) {
-      layerGroups.put(group.getId(), group);
+    for (LayerGroupCreationTO groupCreationTO : groups) {
+      layerGroups.put(
+          groupCreationTO.getId(),
+          new LayerGroup(
+              groupCreationTO.getId(),
+              groupCreationTO.getName(),
+              groupCreationTO.isVisible()
+          )
+      );
     }
   }
 
-  private void initLayers(LayoutModel model, Collection<Layer> layers) {
+  private void initLayers(LayoutModel model, Collection<LayerCreationTO> layers) {
     Map<Integer, LayerWrapper> layerWrappers = model.getPropertyLayerWrappers().getValue();
     layerWrappers.clear();
 
     Map<Integer, LayerGroup> layerGroups = model.getPropertyLayerGroups().getValue();
-    for (Layer layer : layers) {
+    for (LayerCreationTO layerCreationTO : layers) {
       layerWrappers.put(
-          layer.getId(),
-          new LayerWrapper(layer, layerGroups.get(layer.getGroupId()))
+          layerCreationTO.getId(),
+          new LayerWrapper(
+              new Layer(
+                  layerCreationTO.getId(),
+                  layerCreationTO.getOrdinal(),
+                  layerCreationTO.isVisible(),
+                  layerCreationTO.getName(),
+                  layerCreationTO.getGroupId()
+              ),
+              layerGroups.get(layerCreationTO.getGroupId())
+          )
       );
     }
   }

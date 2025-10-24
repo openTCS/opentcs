@@ -9,7 +9,6 @@ import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Map;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.data.order.OrderConstants;
 
 /**
  * A transfer object describing a transport order.
@@ -51,7 +50,7 @@ public class OrderSequenceCreationTO
   ) {
     super(name);
     this.incompleteName = false;
-    this.type = OrderConstants.TYPE_NONE;
+    this.type = OrderConstantsTO.TYPE_NONE;
     this.intendedVehicleName = null;
     this.failureFatal = false;
   }

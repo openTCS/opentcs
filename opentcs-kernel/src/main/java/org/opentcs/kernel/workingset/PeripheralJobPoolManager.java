@@ -189,7 +189,7 @@ public class PeripheralJobPoolManager
     return new PeripheralOperation(
         toLocationReference(to.getLocationName()),
         to.getOperation(),
-        to.getExecutionTrigger(),
+        toExecutionTrigger(to.getExecutionTrigger()),
         to.isCompletionRequired()
     );
   }
@@ -234,6 +234,16 @@ public class PeripheralJobPoolManager
   private boolean hasCompletionRequiredAndExecutionTriggerImmediate(PeripheralJobCreationTO to) {
     PeripheralOperationCreationTO opTo = to.getPeripheralOperation();
     return opTo.isCompletionRequired()
-        && opTo.getExecutionTrigger() == PeripheralOperation.ExecutionTrigger.IMMEDIATE;
+        && opTo.getExecutionTrigger() == PeripheralOperationCreationTO.ExecutionTrigger.IMMEDIATE;
+  }
+
+  private PeripheralOperation.ExecutionTrigger toExecutionTrigger(
+      PeripheralOperationCreationTO.ExecutionTrigger executionTrigger
+  ) {
+    return switch (executionTrigger) {
+      case AFTER_ALLOCATION -> PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION;
+      case AFTER_MOVEMENT -> PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT;
+      case IMMEDIATE -> PeripheralOperation.ExecutionTrigger.IMMEDIATE;
+    };
   }
 }

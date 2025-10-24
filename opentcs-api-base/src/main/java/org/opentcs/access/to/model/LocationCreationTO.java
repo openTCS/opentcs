@@ -10,9 +10,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.data.model.Couple;
-import org.opentcs.data.model.Triple;
-import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
@@ -33,7 +30,7 @@ public class LocationCreationTO
    * This location's position (in mm).
    */
   @Nonnull
-  private final Triple position;
+  private final TripleCreationTO position;
   /**
    * The links attaching points to this location.
    * This is a map of point names to allowed operations.
@@ -45,7 +42,7 @@ public class LocationCreationTO
    */
   private final boolean locked;
   /**
-   * The information regarding the grahical representation of this location.
+   * The information regarding the graphical representation of this location.
    */
   private final Layout layout;
 
@@ -62,7 +59,7 @@ public class LocationCreationTO
       @Nonnull
       String typeName,
       @Nonnull
-      Triple position
+      TripleCreationTO position
   ) {
     super(name);
     this.typeName = requireNonNull(typeName, "typeName");
@@ -80,7 +77,7 @@ public class LocationCreationTO
       @Nonnull
       String typeName,
       @Nonnull
-      Triple position,
+      TripleCreationTO position,
       @Nonnull
       Map<String, Set<String>> links,
       boolean locked,
@@ -154,7 +151,7 @@ public class LocationCreationTO
    * @return The position of this location (in mm).
    */
   @Nonnull
-  public Triple getPosition() {
+  public TripleCreationTO getPosition() {
     return position;
   }
 
@@ -166,7 +163,7 @@ public class LocationCreationTO
    */
   public LocationCreationTO withPosition(
       @Nonnull
-      Triple position
+      TripleCreationTO position
   ) {
     return new LocationCreationTO(
         getName(),
@@ -354,7 +351,7 @@ public class LocationCreationTO
   }
 
   /**
-   * Contains information regarding the grahical representation of a location.
+   * Contains information regarding the graphical representation of a location.
    */
   public static class Layout
       implements
@@ -363,15 +360,15 @@ public class LocationCreationTO
     /**
      * The coordinates at which the location is to be drawn (in mm).
      */
-    private final Couple position;
+    private final CoupleCreationTO position;
     /**
      * The offset of the label's position to the location's position (in lu).
      */
-    private final Couple labelOffset;
+    private final CoupleCreationTO labelOffset;
     /**
      * The location representation to use.
      */
-    private final LocationRepresentation locationRepresentation;
+    private final LocationRepresentationTO locationRepresentation;
     /**
      * The ID of the layer on which the location is to be drawn.
      */
@@ -381,7 +378,11 @@ public class LocationCreationTO
      * Creates a new instance.
      */
     public Layout() {
-      this(new Couple(0, 0), LocationRepresentation.DEFAULT, 0);
+      this(
+          new CoupleCreationTO(0, 0),
+          LocationRepresentationTO.DEFAULT,
+          0
+      );
     }
 
     /**
@@ -391,14 +392,15 @@ public class LocationCreationTO
      * @param labelOffset The offset of the label's location to the point's position (in lu).
      * @param locationRepresentation The location representation to use.
      * @param layerId The ID of the layer on which the location is to be drawn.
-     * @deprecated Use {@link Layout#Layout(Couple, LocationRepresentation, int)} instead.
+     * @deprecated Use
+     * {@link Layout#Layout(CoupleCreationTO, LocationRepresentationTO, int)} instead.
      */
     @Deprecated
     @ScheduledApiChange(when = "7.0", details = "Will be removed")
     public Layout(
-        Couple position,
-        Couple labelOffset,
-        LocationRepresentation locationRepresentation,
+        CoupleCreationTO position,
+        CoupleCreationTO labelOffset,
+        LocationRepresentationTO locationRepresentation,
         int layerId
     ) {
       this.position = requireNonNull(position, "position");
@@ -418,11 +420,11 @@ public class LocationCreationTO
      * @param layerId The ID of the layer on which the location is to be drawn.
      */
     public Layout(
-        Couple labelOffset,
-        LocationRepresentation locationRepresentation,
+        CoupleCreationTO labelOffset,
+        LocationRepresentationTO locationRepresentation,
         int layerId
     ) {
-      this.position = new Couple(0, 0);
+      this.position = new CoupleCreationTO(0, 0);
       this.labelOffset = requireNonNull(labelOffset, "labelOffset");
       this.locationRepresentation = requireNonNull(
           locationRepresentation,
@@ -440,7 +442,7 @@ public class LocationCreationTO
      */
     @Deprecated
     @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Couple getPosition() {
+    public CoupleCreationTO getPosition() {
       return position;
     }
 
@@ -450,11 +452,11 @@ public class LocationCreationTO
      * @param position The value to be set in the copy.
      * @return A copy of this object, differing in the given value.
      * @deprecated Will be removed without replacement.
-     * {@link LocationCreationTO#withPosition(Triple)} should be used instead.
+     * {@link LocationCreationTO#withPosition(TripleCreationTO)} should be used instead.
      */
     @Deprecated
     @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Layout withPosition(Couple position) {
+    public Layout withPosition(CoupleCreationTO position) {
       return new Layout(
           position,
           labelOffset,
@@ -468,7 +470,7 @@ public class LocationCreationTO
      *
      * @return The offset of the label's position to the location's position (in lu).
      */
-    public Couple getLabelOffset() {
+    public CoupleCreationTO getLabelOffset() {
       return labelOffset;
     }
 
@@ -478,7 +480,7 @@ public class LocationCreationTO
      * @param labelOffset The value to be set in the copy.
      * @return A copy of this object, differing in the given value.
      */
-    public Layout withLabelOffset(Couple labelOffset) {
+    public Layout withLabelOffset(CoupleCreationTO labelOffset) {
       return new Layout(
           position,
           labelOffset,
@@ -492,7 +494,7 @@ public class LocationCreationTO
      *
      * @return The location representation to use.
      */
-    public LocationRepresentation getLocationRepresentation() {
+    public LocationRepresentationTO getLocationRepresentation() {
       return locationRepresentation;
     }
 
@@ -502,7 +504,9 @@ public class LocationCreationTO
      * @param locationRepresentation The value to be set in the copy.
      * @return A copy of this object, differing in the given value.
      */
-    public Layout withLocationRepresentation(LocationRepresentation locationRepresentation) {
+    public Layout withLocationRepresentation(
+        LocationRepresentationTO locationRepresentation
+    ) {
       return new Layout(
           position,
           labelOffset,

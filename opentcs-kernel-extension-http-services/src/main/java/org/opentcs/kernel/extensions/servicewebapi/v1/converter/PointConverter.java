@@ -13,10 +13,9 @@ import java.util.stream.Collectors;
 import org.opentcs.access.to.model.BoundingBoxCreationTO;
 import org.opentcs.access.to.model.CoupleCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
-import org.opentcs.data.model.Couple;
+import org.opentcs.access.to.model.PoseCreationTO;
+import org.opentcs.access.to.model.TripleCreationTO;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.Pose;
-import org.opentcs.data.model.Triple;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.PointTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
@@ -89,8 +88,8 @@ public class PointConverter {
             point -> new PointCreationTO(point.getName())
                 .withProperties(pConverter.toPropertyMap(point.getProperties()))
                 .withPose(
-                    new Pose(
-                        new Triple(
+                    new PoseCreationTO(
+                        new TripleCreationTO(
                             point.getPosition().getX(),
                             point.getPosition().getY(),
                             point.getPosition().getZ()
@@ -101,7 +100,7 @@ public class PointConverter {
                 .withType(toPointType(point.getType()))
                 .withLayout(
                     new PointCreationTO.Layout(
-                        new Couple(
+                        new CoupleCreationTO(
                             point.getLayout().getLabelOffset().getX(),
                             point.getLayout().getLabelOffset().getY()
                         ),
@@ -136,10 +135,10 @@ public class PointConverter {
     };
   }
 
-  private Point.Type toPointType(PointTO.Type type) {
+  private PointCreationTO.Type toPointType(PointTO.Type type) {
     return switch (type) {
-      case HALT_POSITION -> Point.Type.HALT_POSITION;
-      case PARK_POSITION -> Point.Type.PARK_POSITION;
+      case HALT_POSITION -> PointCreationTO.Type.HALT_POSITION;
+      case PARK_POSITION -> PointCreationTO.Type.PARK_POSITION;
     };
   }
 }

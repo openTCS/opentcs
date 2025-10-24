@@ -6,11 +6,13 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.opentcs.access.to.model.LocationRepresentationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.LocationType;
+import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.LocationTypeModel;
 import org.opentcs.guing.common.model.SystemModel;
@@ -87,7 +89,30 @@ public class LocationTypeAdapter
 
   private LocationTypeCreationTO.Layout getLayout(LocationTypeModel model) {
     return new LocationTypeCreationTO.Layout(
-        model.getPropertyDefaultRepresentation().getLocationRepresentation()
+        convertToLocationRepresentationTO(
+            model.getPropertyDefaultRepresentation().getLocationRepresentation()
+        )
     );
+  }
+
+  private LocationRepresentationTO convertToLocationRepresentationTO(
+      LocationRepresentation locRepresentation
+  ) {
+    return switch (locRepresentation) {
+      case DEFAULT -> LocationRepresentationTO.DEFAULT;
+      case LOAD_TRANSFER_ALT_1 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_1;
+      case LOAD_TRANSFER_ALT_2 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_2;
+      case LOAD_TRANSFER_ALT_3 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_3;
+      case LOAD_TRANSFER_ALT_4 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_4;
+      case LOAD_TRANSFER_ALT_5 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_5;
+      case LOAD_TRANSFER_GENERIC -> LocationRepresentationTO.LOAD_TRANSFER_GENERIC;
+      case NONE -> LocationRepresentationTO.NONE;
+      case RECHARGE_ALT_1 -> LocationRepresentationTO.RECHARGE_ALT_1;
+      case RECHARGE_ALT_2 -> LocationRepresentationTO.RECHARGE_ALT_2;
+      case RECHARGE_GENERIC -> LocationRepresentationTO.RECHARGE_GENERIC;
+      case WORKING_ALT_1 -> LocationRepresentationTO.WORKING_ALT_1;
+      case WORKING_ALT_2 -> LocationRepresentationTO.WORKING_ALT_2;
+      case WORKING_GENERIC -> LocationRepresentationTO.WORKING_GENERIC;
+    };
   }
 }

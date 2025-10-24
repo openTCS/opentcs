@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentcs.access.to.model.CoupleCreationTO;
+import org.opentcs.access.to.model.EnvelopeCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
@@ -142,32 +144,14 @@ public class PathAdapter
   }
 
   private PathModel.Type toPathModelConnectionType(Path.Layout.ConnectionType connectionType) {
-    PathModel.Type result = PathModel.Type.DIRECT;
-
-    switch (connectionType) {
-      case DIRECT:
-        result = PathModel.Type.DIRECT;
-        break;
-      case ELBOW:
-        result = PathModel.Type.ELBOW;
-        break;
-      case SLANTED:
-        result = PathModel.Type.SLANTED;
-        break;
-      case POLYPATH:
-        result = PathModel.Type.POLYPATH;
-        break;
-      case BEZIER:
-        result = PathModel.Type.BEZIER;
-        break;
-      case BEZIER_3:
-        result = PathModel.Type.BEZIER_3;
-        break;
-      default:
-        throw new IllegalArgumentException("Unhandled connection type: " + connectionType);
-    }
-
-    return result;
+    return switch (connectionType) {
+      case DIRECT -> PathModel.Type.DIRECT;
+      case ELBOW -> PathModel.Type.ELBOW;
+      case SLANTED -> PathModel.Type.SLANTED;
+      case POLYPATH -> PathModel.Type.POLYPATH;
+      case BEZIER -> PathModel.Type.BEZIER;
+      case BEZIER_3 -> PathModel.Type.BEZIER_3;
+    };
   }
 
   private boolean getLocked(PathModel model) {
@@ -215,12 +199,12 @@ public class PathAdapter
     return (long) pLength.getValueByUnit(LengthProperty.Unit.MM);
   }
 
-  private Map<String, Envelope> getKernelVehicleEnvelopes(PathModel model) {
+  private Map<String, EnvelopeCreationTO> getKernelVehicleEnvelopes(PathModel model) {
     return model.getPropertyVehicleEnvelopes().getValue().stream()
         .collect(
             Collectors.toMap(
                 EnvelopeModel::getKey,
-                envelopeModel -> new Envelope(envelopeModel.getVertices())
+                envelopeModel -> new EnvelopeCreationTO(toCoupleTOs(envelopeModel.getVertices()))
             )
         );
   }
@@ -240,38 +224,31 @@ public class PathAdapter
 
     return new PathCreationTO.Layout(
         toPathConnectionType((PathModel.Type) model.getPropertyPathConnType().getValue()),
-        controlPoints,
+        toCoupleTOs(controlPoints),
         model.getPropertyLayerWrapper().getValue().getLayer().getId()
     );
   }
 
-  private Path.Layout.ConnectionType toPathConnectionType(PathModel.Type type) {
-    Path.Layout.ConnectionType result = Path.Layout.ConnectionType.DIRECT;
+  private PathCreationTO.Layout.ConnectionType toPathConnectionType(PathModel.Type type) {
+    return switch (type) {
+      case DIRECT -> PathCreationTO.Layout.ConnectionType.DIRECT;
+      case ELBOW -> PathCreationTO.Layout.ConnectionType.ELBOW;
+      case SLANTED -> PathCreationTO.Layout.ConnectionType.SLANTED;
+      case POLYPATH -> PathCreationTO.Layout.ConnectionType.POLYPATH;
+      case BEZIER -> PathCreationTO.Layout.ConnectionType.BEZIER;
+      case BEZIER_3 -> PathCreationTO.Layout.ConnectionType.BEZIER_3;
+    };
+  }
 
-    switch (type) {
-      case DIRECT:
-        result = Path.Layout.ConnectionType.DIRECT;
-        break;
-      case ELBOW:
-        result = Path.Layout.ConnectionType.ELBOW;
-        break;
-      case SLANTED:
-        result = Path.Layout.ConnectionType.SLANTED;
-        break;
-      case POLYPATH:
-        result = Path.Layout.ConnectionType.POLYPATH;
-        break;
-      case BEZIER:
-        result = Path.Layout.ConnectionType.BEZIER;
-        break;
-      case BEZIER_3:
-        result = Path.Layout.ConnectionType.BEZIER_3;
-        break;
-      default:
-        throw new IllegalArgumentException("Unhandled connection type: " + type);
-    }
-
-    return result;
+  private List<CoupleCreationTO> toCoupleTOs(List<Couple> couples) {
+    return couples.stream()
+        .map(
+            couple -> new CoupleCreationTO(
+                couple.getX(),
+                couple.getY()
+            )
+        )
+        .toList();
   }
 
   private List<PeripheralOperationCreationTO> getPeripheralOperations(PathModel path) {
@@ -280,9 +257,19 @@ public class PathAdapter
             model -> new PeripheralOperationCreationTO(
                 model.getOperation(), model.getLocationName()
             )
-                .withExecutionTrigger(model.getExecutionTrigger())
+                .withExecutionTrigger(toExecutionTriggerCreationTO(model.getExecutionTrigger()))
                 .withCompletionRequired(model.isCompletionRequired())
         )
         .collect(Collectors.toList());
+  }
+
+  private PeripheralOperationCreationTO.ExecutionTrigger toExecutionTriggerCreationTO(
+      PeripheralOperation.ExecutionTrigger executionTrigger
+  ) {
+    return switch (executionTrigger) {
+      case IMMEDIATE -> PeripheralOperationCreationTO.ExecutionTrigger.IMMEDIATE;
+      case AFTER_ALLOCATION -> PeripheralOperationCreationTO.ExecutionTrigger.AFTER_ALLOCATION;
+      case AFTER_MOVEMENT -> PeripheralOperationCreationTO.ExecutionTrigger.AFTER_MOVEMENT;
+    };
   }
 }

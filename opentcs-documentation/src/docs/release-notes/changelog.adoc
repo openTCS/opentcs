@@ -18,7 +18,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
-...
+* Breaking changes:
+** Make data structures in `org.opentcs.access.to` independent of the primary object data structures in `org.opentcs.data`.
 
 == Version 6.7 (2025-10-22)
 

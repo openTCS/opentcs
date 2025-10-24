@@ -301,13 +301,23 @@ public class PeripheralInteraction {
                 operation.getOperation(),
                 operation.getLocation().getName()
             )
-                .withExecutionTrigger(operation.getExecutionTrigger())
+                .withExecutionTrigger(toExecutionTriggerCreationTO(operation.getExecutionTrigger()))
                 .withCompletionRequired(operation.isCompletionRequired())
         )
             .withIncompleteName(true)
             .withRelatedVehicleName(vehicleRef.getName())
             .withRelatedTransportOrderName(orderRef.getName())
     );
+  }
+
+  private PeripheralOperationCreationTO.ExecutionTrigger toExecutionTriggerCreationTO(
+      PeripheralOperation.ExecutionTrigger executionTrigger
+  ) {
+    return switch (executionTrigger) {
+      case AFTER_ALLOCATION -> PeripheralOperationCreationTO.ExecutionTrigger.AFTER_ALLOCATION;
+      case AFTER_MOVEMENT -> PeripheralOperationCreationTO.ExecutionTrigger.AFTER_MOVEMENT;
+      case IMMEDIATE -> PeripheralOperationCreationTO.ExecutionTrigger.IMMEDIATE;
+    };
   }
 
   private void onInteractionFailed() {

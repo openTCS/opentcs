@@ -4,19 +4,21 @@ package org.opentcs.guing.common.exchange.adapter;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.BoundingBoxCreationTO;
 import org.opentcs.access.to.model.CoupleCreationTO;
+import org.opentcs.access.to.model.EnvelopeCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
+import org.opentcs.access.to.model.PoseCreationTO;
+import org.opentcs.access.to.model.TripleCreationTO;
 import org.opentcs.components.kernel.services.TCSObjectService;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.Pose;
-import org.opentcs.data.model.Triple;
 import org.opentcs.guing.base.components.layer.LayerWrapper;
 import org.opentcs.guing.base.components.properties.type.AngleProperty;
 import org.opentcs.guing.base.components.properties.type.CoordinateProperty;
@@ -101,7 +103,7 @@ public class PointAdapter
         .withPoint(
             new PointCreationTO(modelComponent.getName())
                 .withPose(
-                    new Pose(
+                    new PoseCreationTO(
                         getKernelCoordinates((PointModel) modelComponent),
                         getKernelVehicleAngle((PointModel) modelComponent)
                     )
@@ -145,12 +147,12 @@ public class PointAdapter
     model.getPropertyType().setValue(value);
   }
 
-  private Point.Type getKernelPointType(PointModel model) {
+  private PointCreationTO.Type getKernelPointType(PointModel model) {
     return convertPointType((PointModel.Type) model.getPropertyType().getValue());
   }
 
-  private Triple getKernelCoordinates(PointModel model) {
-    return convertToTriple(
+  private TripleCreationTO getKernelCoordinates(PointModel model) {
+    return convertToTripleCreationTO(
         model.getPropertyModelPositionX(),
         model.getPropertyModelPositionY()
     );
@@ -160,14 +162,27 @@ public class PointAdapter
     return model.getPropertyVehicleOrientationAngle().getValueByUnit(AngleProperty.Unit.DEG);
   }
 
-  private Map<String, Envelope> getKernelVehicleEnvelopes(PointModel model) {
+  private Map<String, EnvelopeCreationTO> getKernelVehicleEnvelopes(PointModel model) {
     return model.getPropertyVehicleEnvelopes().getValue().stream()
         .collect(
             Collectors.toMap(
                 EnvelopeModel::getKey,
-                envelopeModel -> new Envelope(envelopeModel.getVertices())
+                envelopeModel -> new EnvelopeCreationTO(
+                    toCoupleCreationTOs(envelopeModel.getVertices())
+                )
             )
         );
+  }
+
+  private List<CoupleCreationTO> toCoupleCreationTOs(List<Couple> couples) {
+    return couples.stream()
+        .map(
+            couple -> new CoupleCreationTO(
+                couple.getX(),
+                couple.getY()
+            )
+        )
+        .toList();
   }
 
   private BoundingBoxCreationTO getKernelMaxVehicleBoundingBox(PointModel model) {
@@ -186,7 +201,7 @@ public class PointAdapter
 
   private PointCreationTO.Layout getLayout(PointModel model) {
     return new PointCreationTO.Layout(
-        new Couple(
+        new CoupleCreationTO(
             Long.parseLong(model.getPropertyPointLabelOffsetX().getText()),
             Long.parseLong(model.getPropertyPointLabelOffsetY().getText())
         ),
@@ -194,20 +209,18 @@ public class PointAdapter
     );
   }
 
-  private Point.Type convertPointType(PointModel.Type type) {
+  private PointCreationTO.Type convertPointType(PointModel.Type type) {
     requireNonNull(type, "type");
-    switch (type) {
-      case PARK:
-        return Point.Type.PARK_POSITION;
-      case HALT:
-        return Point.Type.HALT_POSITION;
-      default:
-        throw new IllegalArgumentException("Unhandled type: " + type);
-    }
+    return switch (type) {
+      case PARK -> PointCreationTO.Type.PARK_POSITION;
+      case HALT -> PointCreationTO.Type.HALT_POSITION;
+    };
   }
 
-  private Triple convertToTriple(CoordinateProperty cpx, CoordinateProperty cpy) {
-    Triple result = new Triple(
+  private TripleCreationTO convertToTripleCreationTO(
+      CoordinateProperty cpx, CoordinateProperty cpy
+  ) {
+    TripleCreationTO result = new TripleCreationTO(
         (int) cpx.getValueByUnit(LengthProperty.Unit.MM),
         (int) cpy.getValueByUnit(LengthProperty.Unit.MM),
         0

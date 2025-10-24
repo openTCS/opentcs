@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.data.model.Block;
 
 /**
  * A transfer object describing a block in the plant model.
@@ -26,7 +25,7 @@ public class BlockCreationTO
    * This block's type.
    */
   @Nonnull
-  private final Block.Type type;
+  private final Type type;
   /**
    * This block's member names.
    */
@@ -42,9 +41,12 @@ public class BlockCreationTO
    *
    * @param name The name of this block.
    */
-  public BlockCreationTO(String name) {
+  public BlockCreationTO(
+      @Nonnull
+      String name
+  ) {
     super(name);
-    this.type = Block.Type.SINGLE_VEHICLE_ONLY;
+    this.type = Type.SINGLE_VEHICLE_ONLY;
     this.memberNames = Set.of();
     this.layout = new Layout();
   }
@@ -62,7 +64,7 @@ public class BlockCreationTO
       @Nonnull
       Map<String, String> properties,
       @Nonnull
-      Block.Type type,
+      Type type,
       @Nonnull
       Set<String> memberNames,
       @Nonnull
@@ -146,7 +148,7 @@ public class BlockCreationTO
    * @return The type of this block.
    */
   @Nonnull
-  public Block.Type getType() {
+  public Type getType() {
     return type;
   }
 
@@ -158,7 +160,7 @@ public class BlockCreationTO
    */
   public BlockCreationTO withType(
       @Nonnull
-      Block.Type type
+      Type type
   ) {
     return new BlockCreationTO(
         getName(),
@@ -232,6 +234,22 @@ public class BlockCreationTO
         + ", layout=" + layout
         + ", properties=" + getProperties()
         + '}';
+  }
+
+  /**
+   * Describes the types of blocks in a driving course.
+   */
+  public enum Type {
+
+    /**
+     * The resources aggregated in this block can only be used by one vehicle at the same time.
+     */
+    SINGLE_VEHICLE_ONLY,
+    /**
+     * The resources aggregated in this block can be used by multiple vehicles, but only if they
+     * enter the block in the same direction.
+     */
+    SAME_DIRECTION_ONLY;
   }
 
   /**

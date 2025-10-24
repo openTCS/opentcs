@@ -14,25 +14,20 @@ import java.util.stream.Collectors;
 import org.opentcs.access.to.model.BlockCreationTO;
 import org.opentcs.access.to.model.BoundingBoxCreationTO;
 import org.opentcs.access.to.model.CoupleCreationTO;
+import org.opentcs.access.to.model.EnvelopeCreationTO;
+import org.opentcs.access.to.model.LayerCreationTO;
+import org.opentcs.access.to.model.LayerGroupCreationTO;
 import org.opentcs.access.to.model.LocationCreationTO;
+import org.opentcs.access.to.model.LocationRepresentationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
+import org.opentcs.access.to.model.PoseCreationTO;
+import org.opentcs.access.to.model.TripleCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
-import org.opentcs.data.model.Block;
-import org.opentcs.data.model.Couple;
-import org.opentcs.data.model.Envelope;
-import org.opentcs.data.model.Path;
-import org.opentcs.data.model.Point;
-import org.opentcs.data.model.Pose;
-import org.opentcs.data.model.Triple;
-import org.opentcs.data.model.visualization.Layer;
-import org.opentcs.data.model.visualization.LayerGroup;
-import org.opentcs.data.model.visualization.LocationRepresentation;
-import org.opentcs.data.peripherals.PeripheralOperation;
 import org.opentcs.util.Colors;
 
 /**
@@ -96,8 +91,12 @@ public class V7TOMapper {
       result.add(
           new PointCreationTO(point.getName())
               .withPose(
-                  new Pose(
-                      new Triple(point.getPositionX(), point.getPositionY(), point.getPositionZ()),
+                  new PoseCreationTO(
+                      new TripleCreationTO(
+                          point.getPositionX(),
+                          point.getPositionY(),
+                          point.getPositionZ()
+                      ),
                       point.getVehicleOrientationAngle().doubleValue()
                   )
               )
@@ -107,7 +106,7 @@ public class V7TOMapper {
               .withProperties(convertProperties(point.getProperties()))
               .withLayout(
                   new PointCreationTO.Layout(
-                      new Couple(
+                      new CoupleCreationTO(
                           point.getPointLayout().getLabelOffsetX(),
                           point.getPointLayout().getLabelOffsetY()
                       ),
@@ -166,7 +165,11 @@ public class V7TOMapper {
                   new PathCreationTO.Layout(
                       toConnectionType(path.getPathLayout().getConnectionType()),
                       path.getPathLayout().getControlPoints().stream()
-                          .map(controlPoint -> new Couple(controlPoint.getX(), controlPoint.getY()))
+                          .map(
+                              controlPoint -> new CoupleCreationTO(
+                                  controlPoint.getX(), controlPoint.getY()
+                              )
+                          )
                           .toList(),
                       path.getPathLayout().getLayerId()
                   )
@@ -227,7 +230,7 @@ public class V7TOMapper {
           new LocationCreationTO(
               location.getName(),
               location.getType(),
-              new Triple(
+              new TripleCreationTO(
                   location.getPositionX(),
                   location.getPositionY(),
                   location.getPositionZ()
@@ -238,7 +241,7 @@ public class V7TOMapper {
               .withProperties(convertProperties(location.getProperties()))
               .withLayout(
                   new LocationCreationTO.Layout(
-                      new Couple(
+                      new CoupleCreationTO(
                           location.getLocationLayout().getLabelOffsetX(),
                           location.getLocationLayout().getLabelOffsetY()
                       ),
@@ -287,12 +290,12 @@ public class V7TOMapper {
         .withProperties(convertProperties(visualLayout.getProperties()));
   }
 
-  private List<Layer> convertLayers(List<VisualLayoutTO.Layer> layers) {
-    List<Layer> result = new ArrayList<>();
+  private List<LayerCreationTO> convertLayers(List<VisualLayoutTO.Layer> layers) {
+    List<LayerCreationTO> result = new ArrayList<>();
 
     for (VisualLayoutTO.Layer layer : layers) {
       result.add(
-          new Layer(
+          new LayerCreationTO(
               layer.getId(),
               layer.getOrdinal(),
               layer.isVisible(),
@@ -305,12 +308,14 @@ public class V7TOMapper {
     return result;
   }
 
-  private List<LayerGroup> convertLayerGroups(List<VisualLayoutTO.LayerGroup> layerGroups) {
-    List<LayerGroup> result = new ArrayList<>();
+  private List<LayerGroupCreationTO> convertLayerGroups(
+      List<VisualLayoutTO.LayerGroup> layerGroups
+  ) {
+    List<LayerGroupCreationTO> result = new ArrayList<>();
 
     for (VisualLayoutTO.LayerGroup layerGroup : layerGroups) {
       result.add(
-          new LayerGroup(
+          new LayerGroupCreationTO(
               layerGroup.getId(),
               layerGroup.getName(),
               layerGroup.isVisible()
@@ -585,10 +590,10 @@ public class V7TOMapper {
     return result;
   }
 
-  private List<VisualLayoutTO.Layer> toLayerTOs(List<Layer> layers) {
+  private List<VisualLayoutTO.Layer> toLayerTOs(List<LayerCreationTO> layers) {
     List<VisualLayoutTO.Layer> result = new ArrayList<>();
 
-    for (Layer layer : layers) {
+    for (LayerCreationTO layer : layers) {
       result.add(
           new VisualLayoutTO.Layer()
               .setId(layer.getId())
@@ -602,10 +607,10 @@ public class V7TOMapper {
     return result;
   }
 
-  private List<VisualLayoutTO.LayerGroup> toLayerGroupTOs(List<LayerGroup> layerGroups) {
+  private List<VisualLayoutTO.LayerGroup> toLayerGroupTOs(List<LayerGroupCreationTO> layerGroups) {
     List<VisualLayoutTO.LayerGroup> result = new ArrayList<>();
 
-    for (LayerGroup layerGroup : layerGroups) {
+    for (LayerGroupCreationTO layerGroup : layerGroups) {
       result.add(
           new VisualLayoutTO.LayerGroup()
               .setId(layerGroup.getId())
@@ -692,7 +697,7 @@ public class V7TOMapper {
     return s == null || s.isEmpty();
   }
 
-  private Map<String, Envelope> toEnvelopeMap(List<VehicleEnvelopeTO> envelopeTOs) {
+  private Map<String, EnvelopeCreationTO> toEnvelopeMap(List<VehicleEnvelopeTO> envelopeTOs) {
     return envelopeTOs.stream()
         .collect(
             Collectors.toMap(
@@ -702,15 +707,17 @@ public class V7TOMapper {
         );
   }
 
-  private Envelope toEnvelope(VehicleEnvelopeTO vehicleEnvelopeTO) {
-    return new Envelope(
+  private EnvelopeCreationTO toEnvelope(VehicleEnvelopeTO vehicleEnvelopeTO) {
+    return new EnvelopeCreationTO(
         vehicleEnvelopeTO.getVertices().stream()
-            .map(coupleTO -> new Couple(coupleTO.getX(), coupleTO.getY()))
+            .map(coupleTO -> new CoupleCreationTO(coupleTO.getX(), coupleTO.getY()))
             .toList()
     );
   }
 
-  private List<VehicleEnvelopeTO> toVehicleEnvelopeTOs(Map<String, Envelope> envelopeMap) {
+  private List<VehicleEnvelopeTO> toVehicleEnvelopeTOs(
+      Map<String, EnvelopeCreationTO> envelopeMap
+  ) {
     return envelopeMap.entrySet()
         .stream()
         .sorted(Map.Entry.comparingByKey())
@@ -722,7 +729,7 @@ public class V7TOMapper {
         .toList();
   }
 
-  private List<CoupleTO> toCoupleTOs(List<Couple> couples) {
+  private List<CoupleTO> toCoupleTOs(List<CoupleCreationTO> couples) {
     return couples.stream()
         .map(
             couple -> new CoupleTO()
@@ -766,64 +773,64 @@ public class V7TOMapper {
         .setReferenceOffsetY(boundingBox.getReferenceOffset().getY());
   }
 
-  private Point.Type toPointType(PointTO.Type type) {
+  private PointCreationTO.Type toPointType(PointTO.Type type) {
     return switch (type) {
-      case HALT_POSITION -> Point.Type.HALT_POSITION;
-      case PARK_POSITION -> Point.Type.PARK_POSITION;
+      case HALT_POSITION -> PointCreationTO.Type.HALT_POSITION;
+      case PARK_POSITION -> PointCreationTO.Type.PARK_POSITION;
     };
   }
 
-  private Path.Layout.ConnectionType toConnectionType(
+  private PathCreationTO.Layout.ConnectionType toConnectionType(
       PathTO.PathLayout.ConnectionType connectionType
   ) {
     return switch (connectionType) {
-      case BEZIER -> Path.Layout.ConnectionType.BEZIER;
-      case BEZIER_3 -> Path.Layout.ConnectionType.BEZIER_3;
-      case DIRECT -> Path.Layout.ConnectionType.DIRECT;
-      case ELBOW -> Path.Layout.ConnectionType.ELBOW;
-      case POLYPATH -> Path.Layout.ConnectionType.POLYPATH;
-      case SLANTED -> Path.Layout.ConnectionType.SLANTED;
+      case BEZIER -> PathCreationTO.Layout.ConnectionType.BEZIER;
+      case BEZIER_3 -> PathCreationTO.Layout.ConnectionType.BEZIER_3;
+      case DIRECT -> PathCreationTO.Layout.ConnectionType.DIRECT;
+      case ELBOW -> PathCreationTO.Layout.ConnectionType.ELBOW;
+      case POLYPATH -> PathCreationTO.Layout.ConnectionType.POLYPATH;
+      case SLANTED -> PathCreationTO.Layout.ConnectionType.SLANTED;
     };
   }
 
-  private PeripheralOperation.ExecutionTrigger toExecutionTrigger(
+  private PeripheralOperationCreationTO.ExecutionTrigger toExecutionTrigger(
       PeripheralOperationTO.ExecutionTrigger executionTrigger
   ) {
     return switch (executionTrigger) {
-      case AFTER_ALLOCATION -> PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION;
-      case AFTER_MOVEMENT -> PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT;
+      case AFTER_ALLOCATION -> PeripheralOperationCreationTO.ExecutionTrigger.AFTER_ALLOCATION;
+      case AFTER_MOVEMENT -> PeripheralOperationCreationTO.ExecutionTrigger.AFTER_MOVEMENT;
     };
   }
 
-  private LocationRepresentation toLocationRepresentation(
+  private LocationRepresentationTO toLocationRepresentation(
       org.opentcs.util.persistence.v7.LocationRepresentation locRepresentation
   ) {
     return switch (locRepresentation) {
-      case DEFAULT -> LocationRepresentation.DEFAULT;
-      case LOAD_TRANSFER_ALT_1 -> LocationRepresentation.LOAD_TRANSFER_ALT_1;
-      case LOAD_TRANSFER_ALT_2 -> LocationRepresentation.LOAD_TRANSFER_ALT_2;
-      case LOAD_TRANSFER_ALT_3 -> LocationRepresentation.LOAD_TRANSFER_ALT_3;
-      case LOAD_TRANSFER_ALT_4 -> LocationRepresentation.LOAD_TRANSFER_ALT_4;
-      case LOAD_TRANSFER_ALT_5 -> LocationRepresentation.LOAD_TRANSFER_ALT_5;
-      case LOAD_TRANSFER_GENERIC -> LocationRepresentation.LOAD_TRANSFER_GENERIC;
-      case NONE -> LocationRepresentation.NONE;
-      case RECHARGE_ALT_1 -> LocationRepresentation.RECHARGE_ALT_1;
-      case RECHARGE_ALT_2 -> LocationRepresentation.RECHARGE_ALT_2;
-      case RECHARGE_GENERIC -> LocationRepresentation.RECHARGE_GENERIC;
-      case WORKING_ALT_1 -> LocationRepresentation.WORKING_ALT_1;
-      case WORKING_ALT_2 -> LocationRepresentation.WORKING_ALT_2;
-      case WORKING_GENERIC -> LocationRepresentation.WORKING_GENERIC;
+      case DEFAULT -> LocationRepresentationTO.DEFAULT;
+      case LOAD_TRANSFER_ALT_1 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_1;
+      case LOAD_TRANSFER_ALT_2 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_2;
+      case LOAD_TRANSFER_ALT_3 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_3;
+      case LOAD_TRANSFER_ALT_4 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_4;
+      case LOAD_TRANSFER_ALT_5 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_5;
+      case LOAD_TRANSFER_GENERIC -> LocationRepresentationTO.LOAD_TRANSFER_GENERIC;
+      case NONE -> LocationRepresentationTO.NONE;
+      case RECHARGE_ALT_1 -> LocationRepresentationTO.RECHARGE_ALT_1;
+      case RECHARGE_ALT_2 -> LocationRepresentationTO.RECHARGE_ALT_2;
+      case RECHARGE_GENERIC -> LocationRepresentationTO.RECHARGE_GENERIC;
+      case WORKING_ALT_1 -> LocationRepresentationTO.WORKING_ALT_1;
+      case WORKING_ALT_2 -> LocationRepresentationTO.WORKING_ALT_2;
+      case WORKING_GENERIC -> LocationRepresentationTO.WORKING_GENERIC;
     };
   }
 
-  private Block.Type toBlockType(BlockTO.Type type) {
+  private BlockCreationTO.Type toBlockType(BlockTO.Type type) {
     return switch (type) {
-      case SAME_DIRECTION_ONLY -> Block.Type.SAME_DIRECTION_ONLY;
-      case SINGLE_VEHICLE_ONLY -> Block.Type.SINGLE_VEHICLE_ONLY;
+      case SAME_DIRECTION_ONLY -> BlockCreationTO.Type.SAME_DIRECTION_ONLY;
+      case SINGLE_VEHICLE_ONLY -> BlockCreationTO.Type.SINGLE_VEHICLE_ONLY;
     };
   }
 
-  private PointTO.Type toPointTOType(Point.Type type) {
+  private PointTO.Type toPointTOType(PointCreationTO.Type type) {
     return switch (type) {
       case HALT_POSITION -> PointTO.Type.HALT_POSITION;
       case PARK_POSITION -> PointTO.Type.PARK_POSITION;
@@ -831,7 +838,7 @@ public class V7TOMapper {
   }
 
   private PathTO.PathLayout.ConnectionType toPathTOConnectionType(
-      Path.Layout.ConnectionType connectionType
+      PathCreationTO.Layout.ConnectionType connectionType
   ) {
     return switch (connectionType) {
       case BEZIER -> PathTO.PathLayout.ConnectionType.BEZIER;
@@ -844,7 +851,7 @@ public class V7TOMapper {
   }
 
   private PeripheralOperationTO.ExecutionTrigger toPeripheralOperationTOExecutionTrigger(
-      PeripheralOperation.ExecutionTrigger executionTrigger
+      PeripheralOperationCreationTO.ExecutionTrigger executionTrigger
   ) {
     return switch (executionTrigger) {
       case AFTER_ALLOCATION -> PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION;
@@ -857,7 +864,7 @@ public class V7TOMapper {
 
   @SuppressWarnings("checkstyle:LineLength")
   private org.opentcs.util.persistence.v7.LocationRepresentation toLocationTOLocationRepresentation(
-      LocationRepresentation locRepresentation
+      LocationRepresentationTO locRepresentation
   ) {
     return switch (locRepresentation) {
       case DEFAULT -> org.opentcs.util.persistence.v7.LocationRepresentation.DEFAULT;
@@ -877,7 +884,7 @@ public class V7TOMapper {
     };
   }
 
-  private BlockTO.Type toBlockTOType(Block.Type type) {
+  private BlockTO.Type toBlockTOType(BlockCreationTO.Type type) {
     return switch (type) {
       case SAME_DIRECTION_ONLY -> BlockTO.Type.SAME_DIRECTION_ONLY;
       case SINGLE_VEHICLE_ONLY -> BlockTO.Type.SINGLE_VEHICLE_ONLY;

@@ -43,7 +43,7 @@ class PeripheralOperationConverterTest {
     assertThat(result.get(0).getLocationName(), is("l1"));
     assertThat(
         result.get(0).getExecutionTrigger(),
-        is(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION)
+        is(PeripheralOperationCreationTO.ExecutionTrigger.AFTER_ALLOCATION)
     );
     assertTrue(result.get(0).isCompletionRequired());
   }

@@ -3,6 +3,20 @@
 package org.opentcs.kernel.extensions.servicewebapi.v1.converter;
 
 import static java.util.Objects.requireNonNull;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.DEFAULT;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.LOAD_TRANSFER_ALT_1;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.LOAD_TRANSFER_ALT_2;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.LOAD_TRANSFER_ALT_3;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.LOAD_TRANSFER_ALT_4;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.LOAD_TRANSFER_ALT_5;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.LOAD_TRANSFER_GENERIC;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.NONE;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.RECHARGE_ALT_1;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.RECHARGE_ALT_2;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.RECHARGE_GENERIC;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.WORKING_ALT_1;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.WORKING_ALT_2;
+import static org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO.WORKING_GENERIC;
 
 import jakarta.inject.Inject;
 import java.util.ArrayList;
@@ -10,10 +24,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentcs.access.to.model.LocationRepresentationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.visualization.LocationRepresentation;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationTypeTO;
 
 /**
@@ -68,29 +82,9 @@ public class LocationTypeConverter {
         .collect(Collectors.toList());
   }
 
-  private LocationRepresentation convertToLocationRepresentation(
-      LocationRepresentationTO locationRepresentation
-  ) {
-    return switch (locationRepresentation) {
-      case DEFAULT -> LocationRepresentation.DEFAULT;
-      case LOAD_TRANSFER_ALT_1 -> LocationRepresentation.LOAD_TRANSFER_ALT_1;
-      case LOAD_TRANSFER_ALT_2 -> LocationRepresentation.LOAD_TRANSFER_ALT_2;
-      case LOAD_TRANSFER_ALT_3 -> LocationRepresentation.LOAD_TRANSFER_ALT_3;
-      case LOAD_TRANSFER_ALT_4 -> LocationRepresentation.LOAD_TRANSFER_ALT_4;
-      case LOAD_TRANSFER_ALT_5 -> LocationRepresentation.LOAD_TRANSFER_ALT_5;
-      case LOAD_TRANSFER_GENERIC -> LocationRepresentation.LOAD_TRANSFER_GENERIC;
-      case NONE -> LocationRepresentation.NONE;
-      case RECHARGE_ALT_1 -> LocationRepresentation.RECHARGE_ALT_1;
-      case RECHARGE_ALT_2 -> LocationRepresentation.RECHARGE_ALT_2;
-      case RECHARGE_GENERIC -> LocationRepresentation.RECHARGE_GENERIC;
-      case WORKING_ALT_1 -> LocationRepresentation.WORKING_ALT_1;
-      case WORKING_ALT_2 -> LocationRepresentation.WORKING_ALT_2;
-      case WORKING_GENERIC -> LocationRepresentation.WORKING_GENERIC;
-    };
-  }
-
-  private LocationRepresentationTO convertToLocationRepresentationTO(
-      LocationRepresentation locationRepresentation
+  @SuppressWarnings("checkstyle:LineLength")
+  private LocationRepresentationTO convertToLocationRepresentation(
+      org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO locationRepresentation
   ) {
     return switch (locationRepresentation) {
       case DEFAULT -> LocationRepresentationTO.DEFAULT;
@@ -107,6 +101,28 @@ public class LocationTypeConverter {
       case WORKING_ALT_1 -> LocationRepresentationTO.WORKING_ALT_1;
       case WORKING_ALT_2 -> LocationRepresentationTO.WORKING_ALT_2;
       case WORKING_GENERIC -> LocationRepresentationTO.WORKING_GENERIC;
+    };
+  }
+
+  private org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LocationRepresentationTO
+      convertToLocationRepresentationTO(
+          LocationRepresentation locationRepresentation
+      ) {
+    return switch (locationRepresentation) {
+      case DEFAULT -> DEFAULT;
+      case LOAD_TRANSFER_ALT_1 -> LOAD_TRANSFER_ALT_1;
+      case LOAD_TRANSFER_ALT_2 -> LOAD_TRANSFER_ALT_2;
+      case LOAD_TRANSFER_ALT_3 -> LOAD_TRANSFER_ALT_3;
+      case LOAD_TRANSFER_ALT_4 -> LOAD_TRANSFER_ALT_4;
+      case LOAD_TRANSFER_ALT_5 -> LOAD_TRANSFER_ALT_5;
+      case LOAD_TRANSFER_GENERIC -> LOAD_TRANSFER_GENERIC;
+      case NONE -> NONE;
+      case RECHARGE_ALT_1 -> RECHARGE_ALT_1;
+      case RECHARGE_ALT_2 -> RECHARGE_ALT_2;
+      case RECHARGE_GENERIC -> RECHARGE_GENERIC;
+      case WORKING_ALT_1 -> WORKING_ALT_1;
+      case WORKING_ALT_2 -> WORKING_ALT_2;
+      case WORKING_GENERIC -> WORKING_GENERIC;
     };
   }
 }

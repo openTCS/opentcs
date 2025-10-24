@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentcs.access.to.model.CoupleCreationTO;
+import org.opentcs.access.to.model.EnvelopeCreationTO;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Envelope;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
@@ -34,13 +36,15 @@ class EnvelopeConverterTest {
   void checkVehicleEnvelopeMap() {
     EnvelopeTO envelopeTo = new EnvelopeTO("E1", List.of(new CoupleTO(1, 1)));
 
-    Map<String, Envelope> result = envelopeConverter.toVehicleEnvelopeMap(List.of(envelopeTo));
+    Map<String, EnvelopeCreationTO> result = envelopeConverter.toVehicleEnvelopeMap(
+        List.of(envelopeTo)
+    );
 
     assertThat(result, is(aMapWithSize(1)));
     assertThat(result, hasKey("E1"));
     assertThat(
         result.get("E1").getVertices().get(0),
-        samePropertyValuesAs(new Couple(1, 1))
+        samePropertyValuesAs(new CoupleCreationTO(1, 1))
     );
   }
 

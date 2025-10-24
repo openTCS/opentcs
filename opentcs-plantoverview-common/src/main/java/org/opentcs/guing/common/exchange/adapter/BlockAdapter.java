@@ -73,7 +73,7 @@ public class BlockAdapter
     model.getPropertyColor().setColor(block.getLayout().getColor());
   }
 
-  private Block.Type getKernelBlockType(BlockModel model) {
+  private BlockCreationTO.Type getKernelBlockType(BlockModel model) {
     return convertBlockType((BlockModel.Type) model.getPropertyType().getValue());
   }
 
@@ -91,29 +91,19 @@ public class BlockAdapter
   }
 
   private void updateModelType(BlockModel model, Block block) {
-    BlockModel.Type value;
-
-    switch (block.getType()) {
-      case SAME_DIRECTION_ONLY:
-        value = BlockModel.Type.SAME_DIRECTION_ONLY;
-        break;
-      case SINGLE_VEHICLE_ONLY:
-      default:
-        value = BlockModel.Type.SINGLE_VEHICLE_ONLY;
-    }
+    BlockModel.Type value = switch (block.getType()) {
+      case SINGLE_VEHICLE_ONLY -> BlockModel.Type.SINGLE_VEHICLE_ONLY;
+      case SAME_DIRECTION_ONLY -> BlockModel.Type.SAME_DIRECTION_ONLY;
+    };
 
     model.getPropertyType().setValue(value);
   }
 
-  private Block.Type convertBlockType(BlockModel.Type type) {
+  private BlockCreationTO.Type convertBlockType(BlockModel.Type type) {
     requireNonNull(type, "type");
-    switch (type) {
-      case SINGLE_VEHICLE_ONLY:
-        return Block.Type.SINGLE_VEHICLE_ONLY;
-      case SAME_DIRECTION_ONLY:
-        return Block.Type.SAME_DIRECTION_ONLY;
-      default:
-        throw new IllegalArgumentException("Unhandled block type: " + type);
-    }
+    return switch (type) {
+      case SINGLE_VEHICLE_ONLY -> BlockCreationTO.Type.SINGLE_VEHICLE_ONLY;
+      case SAME_DIRECTION_ONLY -> BlockCreationTO.Type.SAME_DIRECTION_ONLY;
+    };
   }
 }

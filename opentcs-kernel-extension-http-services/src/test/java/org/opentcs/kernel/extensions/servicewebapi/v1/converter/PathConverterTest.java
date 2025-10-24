@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentcs.access.to.model.CoupleCreationTO;
+import org.opentcs.access.to.model.EnvelopeCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.model.Couple;
@@ -45,6 +47,7 @@ class PathConverterTest {
   private Map<String, String> propertyMap;
   private List<PropertyTO> propertyList;
   private Map<String, Envelope> envelopeMap;
+  private Map<String, EnvelopeCreationTO> envelopeCreationTOMap;
   private List<EnvelopeTO> envelopeList;
   private PeripheralOperationTO peripheralOperationTO;
   private List<PeripheralOperation> peripheralOperationList;
@@ -63,10 +66,15 @@ class PathConverterTest {
     when(propertyConverter.toPropertyTOs(propertyMap)).thenReturn(propertyList);
     when(propertyConverter.toPropertyMap(propertyList)).thenReturn(propertyMap);
 
-    envelopeMap = Map.of("some-envelope-key", new Envelope(List.of(new Couple(2, 2))));
+    envelopeMap = Map.of(
+        "some-envelope-key", new Envelope(List.of(new Couple(2, 2)))
+    );
+    envelopeCreationTOMap = Map.of(
+        "some-envelope-key", new EnvelopeCreationTO(List.of(new CoupleCreationTO(2, 2)))
+    );
     envelopeList = List.of(new EnvelopeTO("some-envelope-key", List.of(new CoupleTO(2, 2))));
     when(envelopeConverter.toEnvelopeTOs(envelopeMap)).thenReturn(envelopeList);
-    when(envelopeConverter.toVehicleEnvelopeMap(envelopeList)).thenReturn(envelopeMap);
+    when(envelopeConverter.toVehicleEnvelopeMap(envelopeList)).thenReturn(envelopeCreationTOMap);
 
     peripheralOperationList = List.of(
         new PeripheralOperation(
@@ -85,7 +93,7 @@ class PathConverterTest {
     peripheralOperationTOList = List.of(peripheralOperationTO);
     peripheralOperationCreationTO
         = new PeripheralOperationCreationTO("some-operation", "some-location")
-            .withExecutionTrigger(PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION)
+            .withExecutionTrigger(PeripheralOperationCreationTO.ExecutionTrigger.AFTER_ALLOCATION)
             .withCompletionRequired(true);
     when(peripheralOpConverter.toPeripheralOperationsTOs(peripheralOperationList))
         .thenReturn(List.of(peripheralOperationTO));
@@ -169,16 +177,16 @@ class PathConverterTest {
     assertThat(result.get(0).getPeripheralOperations(), contains(peripheralOperationCreationTO));
     assertTrue(result.get(0).isLocked());
     assertThat(result.get(0).getVehicleEnvelopes(), is(aMapWithSize(1)));
-    assertThat(result.get(0).getVehicleEnvelopes(), is(envelopeMap));
+    assertThat(result.get(0).getVehicleEnvelopes(), is(envelopeCreationTOMap));
     assertThat(result.get(0).getLayout().getLayerId(), is(4));
     assertThat(
         result.get(0).getLayout().getConnectionType(),
-        is(Path.Layout.ConnectionType.POLYPATH)
+        is(PathCreationTO.Layout.ConnectionType.POLYPATH)
     );
     assertThat(result.get(0).getLayout().getControlPoints(), hasSize(1));
     assertThat(
         result.get(0).getLayout().getControlPoints().get(0),
-        samePropertyValuesAs(new Couple(1, 1))
+        samePropertyValuesAs(new CoupleCreationTO(1, 1))
     );
     assertThat(result.get(0).getProperties(), is(aMapWithSize(1)));
     assertThat(result.get(0).getProperties(), is(propertyMap));

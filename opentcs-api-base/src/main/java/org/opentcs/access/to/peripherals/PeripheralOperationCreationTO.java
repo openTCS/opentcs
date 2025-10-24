@@ -8,7 +8,6 @@ import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Map;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.data.peripherals.PeripheralOperation;
 
 /**
  * A transfer object describing an operation to be performed by a peripheral device.
@@ -32,7 +31,7 @@ public class PeripheralOperationCreationTO
    * The moment at which this operation is to be performed.
    */
   @Nonnull
-  private final PeripheralOperation.ExecutionTrigger executionTrigger;
+  private final ExecutionTrigger executionTrigger;
   /**
    * Whether the completion of this operation is required to allow a vehicle to continue driving.
    */
@@ -40,7 +39,7 @@ public class PeripheralOperationCreationTO
 
   /**
    * Creates a new instance with {@code executionTrigger} set to
-   * {@link PeripheralOperation.ExecutionTrigger#IMMEDIATE} and {@code completionRequired}
+   * {@link ExecutionTrigger#IMMEDIATE} and {@code completionRequired}
    * set to {@code false}.
    *
    * @param operation The operation to be performed by the peripheral device.
@@ -55,7 +54,7 @@ public class PeripheralOperationCreationTO
     super("");
     this.operation = requireNonNull(operation, "operation");
     this.locationName = requireNonNull(locationName, "locationName");
-    this.executionTrigger = PeripheralOperation.ExecutionTrigger.IMMEDIATE;
+    this.executionTrigger = ExecutionTrigger.IMMEDIATE;
     this.completionRequired = false;
   }
 
@@ -69,7 +68,7 @@ public class PeripheralOperationCreationTO
       @Nonnull
       String locationName,
       @Nonnull
-      PeripheralOperation.ExecutionTrigger executionTrigger,
+      ExecutionTrigger executionTrigger,
       boolean completionRequired
   ) {
     super(name, properties);
@@ -192,7 +191,7 @@ public class PeripheralOperationCreationTO
    * @return The moment at which this operation is to be performed.
    */
   @Nonnull
-  public PeripheralOperation.ExecutionTrigger getExecutionTrigger() {
+  public ExecutionTrigger getExecutionTrigger() {
     return executionTrigger;
   }
 
@@ -207,7 +206,7 @@ public class PeripheralOperationCreationTO
    */
   public PeripheralOperationCreationTO withExecutionTrigger(
       @Nonnull
-      PeripheralOperation.ExecutionTrigger executionTrigger
+      ExecutionTrigger executionTrigger
   ) {
     return new PeripheralOperationCreationTO(
         getName(),
@@ -248,5 +247,23 @@ public class PeripheralOperationCreationTO
         executionTrigger,
         completionRequired
     );
+  }
+
+  /**
+   * Defines the various moments at which an operation may be executed.
+   */
+  public enum ExecutionTrigger {
+    /**
+     * The operation is to be triggered immediately.
+     */
+    IMMEDIATE,
+    /**
+     * The operation is to be triggered after the allocation of the path / before the movement.
+     */
+    AFTER_ALLOCATION,
+    /**
+     * The operation is to be triggered after the movement.
+     */
+    AFTER_MOVEMENT;
   }
 }

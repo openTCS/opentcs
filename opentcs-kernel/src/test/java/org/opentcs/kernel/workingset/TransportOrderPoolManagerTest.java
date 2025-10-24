@@ -23,11 +23,11 @@ import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
+import org.opentcs.access.to.model.TripleCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
-import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
@@ -69,7 +69,7 @@ class TransportOrderPoolManagerTest {
                 new LocationCreationTO(
                     "some-location",
                     "some-location-type",
-                    new Triple(1, 2, 3)
+                    new TripleCreationTO(1, 2, 3)
                 )
                     .withLink("some-point", new HashSet<>())
             )
@@ -124,7 +124,9 @@ class TransportOrderPoolManagerTest {
                     .withAllowedOperations(List.of("NOP"))
             )
             .withLocation(
-                new LocationCreationTO("some-location", "some-location-type", new Triple(1, 2, 3))
+                new LocationCreationTO(
+                    "some-location", "some-location-type", new TripleCreationTO(1, 2, 3)
+                )
                     .withLink("some-point", Set.of("NOP"))
             )
             .withVehicle(new VehicleCreationTO("some-vehicle"))
@@ -162,7 +164,9 @@ class TransportOrderPoolManagerTest {
                     .withAllowedOperations(List.of("NOP"))
             )
             .withLocation(
-                new LocationCreationTO("some-location", "some-location-type", new Triple(1, 2, 3))
+                new LocationCreationTO(
+                    "some-location", "some-location-type", new TripleCreationTO(1, 2, 3)
+                )
                     .withLink("some-point", Set.of("NOP"))
             )
             .withVehicle(new VehicleCreationTO("some-vehicle"))

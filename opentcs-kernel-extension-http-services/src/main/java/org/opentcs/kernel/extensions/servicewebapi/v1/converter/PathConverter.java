@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentcs.access.to.model.CoupleCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Path;
@@ -96,7 +97,7 @@ public class PathConverter {
         toPathConnectionType(layout.getConnectionType()),
         layout.getControlPoints()
             .stream()
-            .map(cp -> new Couple(cp.getX(), cp.getY()))
+            .map(cp -> new CoupleCreationTO(cp.getX(), cp.getY()))
             .collect(Collectors.toList()),
         layout.getLayerId()
     );
@@ -108,16 +109,16 @@ public class PathConverter {
         .collect(Collectors.toList());
   }
 
-  private Path.Layout.ConnectionType toPathConnectionType(
+  private PathCreationTO.Layout.ConnectionType toPathConnectionType(
       PathTO.Layout.ConnectionType connectionType
   ) {
     return switch (connectionType) {
-      case BEZIER -> Path.Layout.ConnectionType.BEZIER;
-      case BEZIER_3 -> Path.Layout.ConnectionType.BEZIER_3;
-      case DIRECT -> Path.Layout.ConnectionType.DIRECT;
-      case ELBOW -> Path.Layout.ConnectionType.ELBOW;
-      case POLYPATH -> Path.Layout.ConnectionType.POLYPATH;
-      case SLANTED -> Path.Layout.ConnectionType.SLANTED;
+      case BEZIER -> PathCreationTO.Layout.ConnectionType.BEZIER;
+      case BEZIER_3 -> PathCreationTO.Layout.ConnectionType.BEZIER_3;
+      case DIRECT -> PathCreationTO.Layout.ConnectionType.DIRECT;
+      case ELBOW -> PathCreationTO.Layout.ConnectionType.ELBOW;
+      case POLYPATH -> PathCreationTO.Layout.ConnectionType.POLYPATH;
+      case SLANTED -> PathCreationTO.Layout.ConnectionType.SLANTED;
     };
   }
 

@@ -22,6 +22,7 @@ import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
+import org.opentcs.access.to.model.TripleCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
@@ -31,7 +32,6 @@ import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.util.event.SimpleEventBus;
@@ -68,7 +68,7 @@ class PlantModelManagerTest {
             new LocationCreationTO(
                 "some-location",
                 "some-location-type",
-                new Triple(1, 2, 3)
+                new TripleCreationTO(1, 2, 3)
             )
                 .withLink("point1", Set.of("some-op"))
         )
@@ -165,7 +165,7 @@ class PlantModelManagerTest {
                 new LocationCreationTO(
                     "location-in-block",
                     "some-location-type",
-                    new Triple(1, 2, 3)
+                    new TripleCreationTO(1, 2, 3)
                 )
             )
             .withBlock(

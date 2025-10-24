@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentcs.access.to.model.LayerCreationTO;
+import org.opentcs.access.to.model.LayerGroupCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.data.model.visualization.Layer;
 import org.opentcs.data.model.visualization.LayerGroup;
@@ -60,11 +62,14 @@ class VisualLayoutConverterTest {
     assertThat(result.getScaleX(), is(50.0));
     assertThat(result.getScaleY(), is(50.0));
     assertThat(result.getLayers(), hasSize(1));
-    assertThat(result.getLayers().get(0), samePropertyValuesAs(new Layer(1, 2, true, "L1", 3)));
+    assertThat(
+        result.getLayers().get(0),
+        samePropertyValuesAs(new LayerCreationTO(1, 2, true, "L1", 3))
+    );
     assertThat(result.getLayerGroups(), hasSize(1));
     assertThat(
         result.getLayerGroups().get(0),
-        samePropertyValuesAs(new LayerGroup(1, "Lg1", true))
+        samePropertyValuesAs(new LayerGroupCreationTO(1, "Lg1", true))
     );
     assertThat(result.getProperties(), is(aMapWithSize(1)));
     assertThat(result.getProperties(), is(propertyMap));

@@ -10,8 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.data.model.visualization.Layer;
-import org.opentcs.data.model.visualization.LayerGroup;
 
 /**
  * A transfer object describing a visual layout in the plant model.
@@ -33,11 +31,11 @@ public class VisualLayoutCreationTO
   /**
    * This layout's layers.
    */
-  private final List<Layer> layers;
+  private final List<LayerCreationTO> layers;
   /**
    * The layout's layer groups.
    */
-  private final List<LayerGroup> layerGroups;
+  private final List<LayerGroupCreationTO> layerGroups;
 
   /**
    * Creates a new instance.
@@ -64,9 +62,9 @@ public class VisualLayoutCreationTO
       double scaleX,
       double scaleY,
       @Nonnull
-      List<Layer> layers,
+      List<LayerCreationTO> layers,
       @Nonnull
-      List<LayerGroup> layerGroups
+      List<LayerGroupCreationTO> layerGroups
   ) {
     super(name, properties);
     this.scaleX = scaleX;
@@ -202,7 +200,7 @@ public class VisualLayoutCreationTO
    * @return The layers of this visual layout.
    */
   @Nonnull
-  public List<Layer> getLayers() {
+  public List<LayerCreationTO> getLayers() {
     return Collections.unmodifiableList(layers);
   }
 
@@ -214,7 +212,7 @@ public class VisualLayoutCreationTO
    */
   public VisualLayoutCreationTO withLayers(
       @Nonnull
-      List<Layer> layers
+      List<LayerCreationTO> layers
   ) {
     return new VisualLayoutCreationTO(
         getName(),
@@ -234,7 +232,7 @@ public class VisualLayoutCreationTO
    */
   public VisualLayoutCreationTO withLayer(
       @Nonnull
-      Layer layer
+      LayerCreationTO layer
   ) {
     return new VisualLayoutCreationTO(
         getName(),
@@ -252,7 +250,7 @@ public class VisualLayoutCreationTO
    * @return The layer groups of this visual layout.
    */
   @Nonnull
-  public List<LayerGroup> getLayerGroups() {
+  public List<LayerGroupCreationTO> getLayerGroups() {
     return Collections.unmodifiableList(layerGroups);
   }
 
@@ -264,7 +262,7 @@ public class VisualLayoutCreationTO
    */
   public VisualLayoutCreationTO withLayerGroups(
       @Nonnull
-      List<LayerGroup> layerGroups
+      List<LayerGroupCreationTO> layerGroups
   ) {
     return new VisualLayoutCreationTO(
         getName(),
@@ -284,7 +282,7 @@ public class VisualLayoutCreationTO
    */
   public VisualLayoutCreationTO withLayerGroup(
       @Nonnull
-      LayerGroup layerGroup
+      LayerGroupCreationTO layerGroup
   ) {
     return new VisualLayoutCreationTO(
         getName(),

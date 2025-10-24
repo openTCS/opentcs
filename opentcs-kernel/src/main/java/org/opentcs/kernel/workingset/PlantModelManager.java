@@ -20,11 +20,17 @@ import org.opentcs.access.to.CreationTO;
 import org.opentcs.access.to.model.BlockCreationTO;
 import org.opentcs.access.to.model.BoundingBoxCreationTO;
 import org.opentcs.access.to.model.CoupleCreationTO;
+import org.opentcs.access.to.model.EnvelopeCreationTO;
+import org.opentcs.access.to.model.LayerCreationTO;
+import org.opentcs.access.to.model.LayerGroupCreationTO;
 import org.opentcs.access.to.model.LocationCreationTO;
+import org.opentcs.access.to.model.LocationRepresentationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
+import org.opentcs.access.to.model.PoseCreationTO;
+import org.opentcs.access.to.model.TripleCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
@@ -38,6 +44,7 @@ import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Block;
 import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Couple;
+import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -46,8 +53,12 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
+import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
+import org.opentcs.data.model.visualization.Layer;
+import org.opentcs.data.model.visualization.LayerGroup;
+import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
@@ -1115,7 +1126,7 @@ public class PlantModelManager
                     operationTO.getLocationName()
                 ).getReference(),
                 operationTO.getOperation(),
-                operationTO.getExecutionTrigger(),
+                toExecutionTrigger(operationTO.getExecutionTrigger()),
                 operationTO.isCompletionRequired()
             )
         )
@@ -1135,13 +1146,17 @@ public class PlantModelManager
       result.add(
           new PointCreationTO(curPoint.getName())
               .withPose(
-                  new Pose(
-                      curPoint.getPose().getPosition(),
+                  new PoseCreationTO(
+                      new TripleCreationTO(
+                          curPoint.getPose().getPosition().getX(),
+                          curPoint.getPose().getPosition().getY(),
+                          curPoint.getPose().getPosition().getZ()
+                      ),
                       curPoint.getPose().getOrientationAngle()
                   )
               )
-              .withType(curPoint.getType())
-              .withVehicleEnvelopes(curPoint.getVehicleEnvelopes())
+              .withType(toPointCreationTOType(curPoint.getType()))
+              .withVehicleEnvelopes(toEnvelopeCreationTOMap(curPoint.getVehicleEnvelopes()))
               .withMaxVehicleBoundingBox(
                   new BoundingBoxCreationTO(
                       curPoint.getMaxVehicleBoundingBox().getLength(),
@@ -1158,7 +1173,10 @@ public class PlantModelManager
               .withProperties(curPoint.getProperties())
               .withLayout(
                   new PointCreationTO.Layout(
-                      curPoint.getLayout().getLabelOffset(),
+                      new CoupleCreationTO(
+                          curPoint.getLayout().getLabelOffset().getX(),
+                          curPoint.getLayout().getLabelOffset().getY()
+                      ),
                       curPoint.getLayout().getLayerId()
                   )
               )
@@ -1189,12 +1207,15 @@ public class PlantModelManager
               .withMaxReverseVelocity(curPath.getMaxReverseVelocity())
               .withLocked(curPath.isLocked())
               .withPeripheralOperations(getPeripheralOperations(curPath))
-              .withVehicleEnvelopes(curPath.getVehicleEnvelopes())
+              .withVehicleEnvelopes(toEnvelopeCreationTOMap(curPath.getVehicleEnvelopes()))
               .withProperties(curPath.getProperties())
               .withLayout(
                   new PathCreationTO.Layout(
-                      curPath.getLayout().getConnectionType(),
-                      curPath.getLayout().getControlPoints(),
+                      toPathCreationTOConnectionType(curPath.getLayout().getConnectionType()),
+                      curPath.getLayout().getControlPoints()
+                          .stream()
+                          .map(cp -> new CoupleCreationTO(cp.getX(), cp.getY()))
+                          .collect(Collectors.toList()),
                       curPath.getLayout().getLayerId()
                   )
               )
@@ -1208,7 +1229,7 @@ public class PlantModelManager
     return path.getPeripheralOperations().stream()
         .map(
             op -> new PeripheralOperationCreationTO(op.getOperation(), op.getLocation().getName())
-                .withExecutionTrigger(op.getExecutionTrigger())
+                .withExecutionTrigger(toExecutionTriggerCreationTO(op.getExecutionTrigger()))
                 .withCompletionRequired(op.isCompletionRequired())
         )
         .collect(Collectors.toList());
@@ -1276,7 +1297,11 @@ public class PlantModelManager
               .withAllowedPeripheralOperations(curType.getAllowedPeripheralOperations())
               .withProperties(curType.getProperties())
               .withLayout(
-                  new LocationTypeCreationTO.Layout(curType.getLayout().getLocationRepresentation())
+                  new LocationTypeCreationTO.Layout(
+                      toLocationRepresentationCreationTO(
+                          curType.getLayout().getLocationRepresentation()
+                      )
+                  )
               )
       );
     }
@@ -1298,7 +1323,11 @@ public class PlantModelManager
           new LocationCreationTO(
               curLoc.getName(),
               curLoc.getType().getName(),
-              curLoc.getPosition()
+              new TripleCreationTO(
+                  curLoc.getPosition().getX(),
+                  curLoc.getPosition().getY(),
+                  curLoc.getPosition().getZ()
+              )
           )
               .withLinks(
                   curLoc.getAttachedLinks().stream()
@@ -1313,8 +1342,13 @@ public class PlantModelManager
               .withProperties(curLoc.getProperties())
               .withLayout(
                   new LocationCreationTO.Layout(
-                      curLoc.getLayout().getLabelOffset(),
-                      curLoc.getLayout().getLocationRepresentation(),
+                      new CoupleCreationTO(
+                          curLoc.getLayout().getLabelOffset().getX(),
+                          curLoc.getLayout().getLabelOffset().getY()
+                      ),
+                      toLocationRepresentationCreationTO(
+                          curLoc.getLayout().getLocationRepresentation()
+                      ),
                       curLoc.getLayout().getLayerId()
                   )
               )
@@ -1341,7 +1375,7 @@ public class PlantModelManager
                       .map(member -> member.getName())
                       .collect(Collectors.toSet())
               )
-              .withType(curBlock.getType())
+              .withType(toBlockCreationTOType(curBlock.getType()))
               .withProperties(curBlock.getProperties())
               .withLayout(new BlockCreationTO.Layout(curBlock.getLayout().getColor()))
       );
@@ -1368,8 +1402,8 @@ public class PlantModelManager
         .withScaleX(layout.getScaleX())
         .withScaleY(layout.getScaleY())
         .withProperties(layout.getProperties())
-        .withLayers(layout.getLayers())
-        .withLayerGroups(layout.getLayerGroups());
+        .withLayers(toLayerCreationTOs(layout.getLayers()))
+        .withLayerGroups(toLayerGroupCreationTOs(layout.getLayerGroups()));
   }
 
   /**
@@ -1387,8 +1421,8 @@ public class PlantModelManager
     VisualLayout newLayout = new VisualLayout(to.getName())
         .withScaleX(to.getScaleX())
         .withScaleY(to.getScaleY())
-        .withLayers(to.getLayers())
-        .withLayerGroups(to.getLayerGroups());
+        .withLayers(toLayers(to.getLayers()))
+        .withLayerGroups(toLayerGroups(to.getLayerGroups()));
 
     getObjectRepo().addObject(newLayout);
     emitObjectEvent(
@@ -1412,9 +1446,18 @@ public class PlantModelManager
       throws ObjectExistsException {
     // Get a unique ID for the new point and create an instance.
     Point newPoint = new Point(to.getName())
-        .withPose(new Pose(to.getPose().getPosition(), to.getPose().getOrientationAngle()))
-        .withType(to.getType())
-        .withVehicleEnvelopes(to.getVehicleEnvelopes())
+        .withPose(
+            new Pose(
+                new Triple(
+                    to.getPose().getPosition().getX(),
+                    to.getPose().getPosition().getY(),
+                    to.getPose().getPosition().getZ()
+                ),
+                to.getPose().getOrientationAngle()
+            )
+        )
+        .withType(toPointType(to.getType()))
+        .withVehicleEnvelopes(toEnvelopeMap(to.getVehicleEnvelopes()))
         .withMaxVehicleBoundingBox(
             new BoundingBox(
                 to.getMaxVehicleBoundingBox().getLength(),
@@ -1431,7 +1474,10 @@ public class PlantModelManager
         .withProperties(to.getProperties())
         .withLayout(
             new Point.Layout(
-                to.getLayout().getLabelOffset(),
+                new Couple(
+                    to.getLayout().getLabelOffset().getX(),
+                    to.getLayout().getLabelOffset().getY()
+                ),
                 to.getLayout().getLayerId()
             )
         );
@@ -1465,13 +1511,16 @@ public class PlantModelManager
         .withMaxVelocity(to.getMaxVelocity())
         .withMaxReverseVelocity(to.getMaxReverseVelocity())
         .withPeripheralOperations(mapPeripheralOperationTOs(to.getPeripheralOperations()))
-        .withVehicleEnvelopes(to.getVehicleEnvelopes())
+        .withVehicleEnvelopes(toEnvelopeMap(to.getVehicleEnvelopes()))
         .withProperties(to.getProperties())
         .withLocked(to.isLocked())
         .withLayout(
             new Path.Layout(
-                to.getLayout().getConnectionType(),
-                to.getLayout().getControlPoints(),
+                toConnectionType(to.getLayout().getConnectionType()),
+                to.getLayout().getControlPoints()
+                    .stream()
+                    .map(cp -> new Couple(cp.getX(), cp.getY()))
+                    .collect(Collectors.toList()),
                 to.getLayout().getLayerId()
             )
         );
@@ -1504,7 +1553,11 @@ public class PlantModelManager
         .withAllowedOperations(to.getAllowedOperations())
         .withAllowedPeripheralOperations(to.getAllowedPeripheralOperations())
         .withProperties(to.getProperties())
-        .withLayout(new LocationType.Layout(to.getLayout().getLocationRepresentation()));
+        .withLayout(
+            new LocationType.Layout(
+                toLocationRepresentation(to.getLayout().getLocationRepresentation())
+            )
+        );
     getObjectRepo().addObject(newType);
     emitObjectEvent(
         newType,
@@ -1528,13 +1581,17 @@ public class PlantModelManager
         ObjectExistsException {
     LocationType type = getObjectRepo().getObject(LocationType.class, to.getTypeName());
     Location newLocation = new Location(to.getName(), type.getReference())
-        .withPosition(to.getPosition())
+        .withPosition(
+            new Triple(to.getPosition().getX(), to.getPosition().getY(), to.getPosition().getZ())
+        )
         .withLocked(to.isLocked())
         .withProperties(to.getProperties())
         .withLayout(
             new Location.Layout(
-                to.getLayout().getLabelOffset(),
-                to.getLayout().getLocationRepresentation(),
+                new Couple(
+                    to.getLayout().getLabelOffset().getX(), to.getLayout().getLabelOffset().getY()
+                ),
+                toLocationRepresentation(to.getLayout().getLocationRepresentation()),
                 to.getLayout().getLayerId()
             )
         );
@@ -1643,7 +1700,7 @@ public class PlantModelManager
       members.add(((TCSResource) object).getReference());
     }
     Block newBlock = new Block(to.getName())
-        .withType(to.getType())
+        .withType(toBlockType(to.getType()))
         .withMembers(members)
         .withProperties(to.getProperties())
         .withLayout(new Block.Layout(to.getLayout().getColor()));
@@ -1721,6 +1778,232 @@ public class PlantModelManager
         TCSObjectEvent.Type.OBJECT_MODIFIED
     );
     return point;
+  }
+
+  private List<LayerCreationTO> toLayerCreationTOs(List<Layer> layers) {
+    List<LayerCreationTO> result = new ArrayList<>();
+
+    for (Layer layer : layers) {
+      result.add(
+          new LayerCreationTO(
+              layer.getId(),
+              layer.getOrdinal(),
+              layer.isVisible(),
+              layer.getName(),
+              layer.getGroupId()
+          )
+      );
+    }
+
+    return result;
+  }
+
+  private List<Layer> toLayers(List<LayerCreationTO> layerCreationTOs) {
+    List<Layer> result = new ArrayList<>();
+
+    for (LayerCreationTO layerCreationTO : layerCreationTOs) {
+      result.add(
+          new Layer(
+              layerCreationTO.getId(),
+              layerCreationTO.getOrdinal(),
+              layerCreationTO.isVisible(),
+              layerCreationTO.getName(),
+              layerCreationTO.getGroupId()
+          )
+      );
+    }
+
+    return result;
+  }
+
+  private List<LayerGroupCreationTO> toLayerGroupCreationTOs(
+      List<LayerGroup> layerGroups
+  ) {
+    List<LayerGroupCreationTO> result = new ArrayList<>();
+
+    for (LayerGroup layerGroup : layerGroups) {
+      result.add(
+          new LayerGroupCreationTO(
+              layerGroup.getId(),
+              layerGroup.getName(),
+              layerGroup.isVisible()
+          )
+      );
+    }
+
+    return result;
+  }
+
+  private List<LayerGroup> toLayerGroups(
+      List<LayerGroupCreationTO> layerGroupCreationTOs
+  ) {
+    List<LayerGroup> result = new ArrayList<>();
+
+    for (LayerGroupCreationTO layerGroupCreationTO : layerGroupCreationTOs) {
+      result.add(
+          new LayerGroup(
+              layerGroupCreationTO.getId(),
+              layerGroupCreationTO.getName(),
+              layerGroupCreationTO.isVisible()
+          )
+      );
+    }
+
+    return result;
+  }
+
+  private Map<String, EnvelopeCreationTO> toEnvelopeCreationTOMap(
+      Map<String, Envelope> envelopeMap
+  ) {
+    return envelopeMap.entrySet().stream()
+        .collect(
+            Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> toEnvelopeCreationTO(entry.getValue())
+            )
+        );
+  }
+
+  private EnvelopeCreationTO toEnvelopeCreationTO(Envelope envelope) {
+    return new EnvelopeCreationTO(
+        envelope.getVertices().stream()
+            .map(couple -> new CoupleCreationTO(couple.getX(), couple.getY()))
+            .toList()
+    );
+  }
+
+  private Map<String, Envelope> toEnvelopeMap(Map<String, EnvelopeCreationTO> envelopeMap) {
+    return envelopeMap.entrySet().stream()
+        .collect(
+            Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> toEnvelope(entry.getValue())
+            )
+        );
+  }
+
+  private Envelope toEnvelope(EnvelopeCreationTO envelopeCreationTO) {
+    return new Envelope(
+        envelopeCreationTO.getVertices().stream()
+            .map(coupleCreationTO -> new Couple(coupleCreationTO.getX(), coupleCreationTO.getY()))
+            .toList()
+    );
+  }
+
+  private PointCreationTO.Type toPointCreationTOType(Point.Type type) {
+    return switch (type) {
+      case HALT_POSITION -> PointCreationTO.Type.HALT_POSITION;
+      case PARK_POSITION -> PointCreationTO.Type.PARK_POSITION;
+    };
+  }
+
+  private Point.Type toPointType(PointCreationTO.Type type) {
+    return switch (type) {
+      case HALT_POSITION -> Point.Type.HALT_POSITION;
+      case PARK_POSITION -> Point.Type.PARK_POSITION;
+    };
+  }
+
+  private PeripheralOperationCreationTO.ExecutionTrigger toExecutionTriggerCreationTO(
+      PeripheralOperation.ExecutionTrigger executionTrigger
+  ) {
+    return switch (executionTrigger) {
+      case AFTER_ALLOCATION -> PeripheralOperationCreationTO.ExecutionTrigger.AFTER_ALLOCATION;
+      case AFTER_MOVEMENT -> PeripheralOperationCreationTO.ExecutionTrigger.AFTER_MOVEMENT;
+      case IMMEDIATE -> PeripheralOperationCreationTO.ExecutionTrigger.IMMEDIATE;
+    };
+  }
+
+  private PeripheralOperation.ExecutionTrigger toExecutionTrigger(
+      PeripheralOperationCreationTO.ExecutionTrigger executionTrigger
+  ) {
+    return switch (executionTrigger) {
+      case AFTER_ALLOCATION -> PeripheralOperation.ExecutionTrigger.AFTER_ALLOCATION;
+      case AFTER_MOVEMENT -> PeripheralOperation.ExecutionTrigger.AFTER_MOVEMENT;
+      case IMMEDIATE -> PeripheralOperation.ExecutionTrigger.IMMEDIATE;
+    };
+  }
+
+  private LocationRepresentationTO toLocationRepresentationCreationTO(
+      LocationRepresentation locRepresentation
+  ) {
+    return switch (locRepresentation) {
+      case DEFAULT -> LocationRepresentationTO.DEFAULT;
+      case LOAD_TRANSFER_ALT_1 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_1;
+      case LOAD_TRANSFER_ALT_2 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_2;
+      case LOAD_TRANSFER_ALT_3 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_3;
+      case LOAD_TRANSFER_ALT_4 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_4;
+      case LOAD_TRANSFER_ALT_5 -> LocationRepresentationTO.LOAD_TRANSFER_ALT_5;
+      case LOAD_TRANSFER_GENERIC -> LocationRepresentationTO.LOAD_TRANSFER_GENERIC;
+      case NONE -> LocationRepresentationTO.NONE;
+      case RECHARGE_ALT_1 -> LocationRepresentationTO.RECHARGE_ALT_1;
+      case RECHARGE_ALT_2 -> LocationRepresentationTO.RECHARGE_ALT_2;
+      case RECHARGE_GENERIC -> LocationRepresentationTO.RECHARGE_GENERIC;
+      case WORKING_ALT_1 -> LocationRepresentationTO.WORKING_ALT_1;
+      case WORKING_ALT_2 -> LocationRepresentationTO.WORKING_ALT_2;
+      case WORKING_GENERIC -> LocationRepresentationTO.WORKING_GENERIC;
+    };
+  }
+
+  private LocationRepresentation toLocationRepresentation(
+      LocationRepresentationTO locRepresentation
+  ) {
+    return switch (locRepresentation) {
+      case DEFAULT -> LocationRepresentation.DEFAULT;
+      case LOAD_TRANSFER_ALT_1 -> LocationRepresentation.LOAD_TRANSFER_ALT_1;
+      case LOAD_TRANSFER_ALT_2 -> LocationRepresentation.LOAD_TRANSFER_ALT_2;
+      case LOAD_TRANSFER_ALT_3 -> LocationRepresentation.LOAD_TRANSFER_ALT_3;
+      case LOAD_TRANSFER_ALT_4 -> LocationRepresentation.LOAD_TRANSFER_ALT_4;
+      case LOAD_TRANSFER_ALT_5 -> LocationRepresentation.LOAD_TRANSFER_ALT_5;
+      case LOAD_TRANSFER_GENERIC -> LocationRepresentation.LOAD_TRANSFER_GENERIC;
+      case NONE -> LocationRepresentation.NONE;
+      case RECHARGE_ALT_1 -> LocationRepresentation.RECHARGE_ALT_1;
+      case RECHARGE_ALT_2 -> LocationRepresentation.RECHARGE_ALT_2;
+      case RECHARGE_GENERIC -> LocationRepresentation.RECHARGE_GENERIC;
+      case WORKING_ALT_1 -> LocationRepresentation.WORKING_ALT_1;
+      case WORKING_ALT_2 -> LocationRepresentation.WORKING_ALT_2;
+      case WORKING_GENERIC -> LocationRepresentation.WORKING_GENERIC;
+    };
+  }
+
+  private BlockCreationTO.Type toBlockCreationTOType(Block.Type type) {
+    return switch (type) {
+      case Block.Type.SAME_DIRECTION_ONLY -> BlockCreationTO.Type.SAME_DIRECTION_ONLY;
+      case Block.Type.SINGLE_VEHICLE_ONLY -> BlockCreationTO.Type.SINGLE_VEHICLE_ONLY;
+    };
+  }
+
+  private Block.Type toBlockType(BlockCreationTO.Type type) {
+    return switch (type) {
+      case BlockCreationTO.Type.SAME_DIRECTION_ONLY -> Block.Type.SAME_DIRECTION_ONLY;
+      case BlockCreationTO.Type.SINGLE_VEHICLE_ONLY -> Block.Type.SINGLE_VEHICLE_ONLY;
+    };
+  }
+
+  private Path.Layout.ConnectionType toConnectionType(
+      PathCreationTO.Layout.ConnectionType connectionType
+  ) {
+    return switch (connectionType) {
+      case PathCreationTO.Layout.ConnectionType.BEZIER -> Path.Layout.ConnectionType.BEZIER;
+      case PathCreationTO.Layout.ConnectionType.BEZIER_3 -> Path.Layout.ConnectionType.BEZIER_3;
+      case PathCreationTO.Layout.ConnectionType.DIRECT -> Path.Layout.ConnectionType.DIRECT;
+      case PathCreationTO.Layout.ConnectionType.ELBOW -> Path.Layout.ConnectionType.ELBOW;
+      case PathCreationTO.Layout.ConnectionType.POLYPATH -> Path.Layout.ConnectionType.POLYPATH;
+      case PathCreationTO.Layout.ConnectionType.SLANTED -> Path.Layout.ConnectionType.SLANTED;
+    };
+  }
+
+  private PathCreationTO.Layout.ConnectionType toPathCreationTOConnectionType(
+      Path.Layout.ConnectionType connectionType
+  ) {
+    return switch (connectionType) {
+      case Path.Layout.ConnectionType.BEZIER -> PathCreationTO.Layout.ConnectionType.BEZIER;
+      case Path.Layout.ConnectionType.BEZIER_3 -> PathCreationTO.Layout.ConnectionType.BEZIER_3;
+      case Path.Layout.ConnectionType.DIRECT -> PathCreationTO.Layout.ConnectionType.DIRECT;
+      case Path.Layout.ConnectionType.ELBOW -> PathCreationTO.Layout.ConnectionType.ELBOW;
+      case Path.Layout.ConnectionType.POLYPATH -> PathCreationTO.Layout.ConnectionType.POLYPATH;
+      case Path.Layout.ConnectionType.SLANTED -> PathCreationTO.Layout.ConnectionType.SLANTED;
+    };
   }
 
   private static List<Set<TCSResourceReference<?>>> unmodifiableCopy(
