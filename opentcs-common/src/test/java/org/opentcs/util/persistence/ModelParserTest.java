@@ -54,42 +54,4 @@ public class ModelParserTest {
 
     Approvals.verify(writtenModel);
   }
-
-  @Test
-  public void readModelV005AndWriteLatestVersion()
-      throws IOException,
-        URISyntaxException {
-    PlantModelCreationTO parsedModel = modelParser.readModel(
-        new File(
-            Thread.currentThread().getContextClassLoader()
-                .getResource("org/opentcs/util/persistence/PlantModelV005.sample.xml").toURI()
-        )
-    );
-
-    File writtenModel = new File(
-        WRITE_PATH + "ModelParserTest.readModelV005AndWriteLatestVersion.received.xml"
-    );
-    modelParser.writeModel(parsedModel, writtenModel);
-
-    Approvals.verify(writtenModel);
-  }
-
-  @Test
-  public void readModelV004AndWriteLatestVersion()
-      throws IOException,
-        URISyntaxException {
-    PlantModelCreationTO parsedModel = modelParser.readModel(
-        new File(
-            Thread.currentThread().getContextClassLoader()
-                .getResource("org/opentcs/util/persistence/PlantModelV004.sample.xml").toURI()
-        )
-    );
-
-    File writtenModel = new File(
-        WRITE_PATH + "ModelParserTest.readModelV004AndWriteLatestVersion.received.xml"
-    );
-    modelParser.writeModel(parsedModel, writtenModel);
-
-    Approvals.verify(writtenModel);
-  }
 }

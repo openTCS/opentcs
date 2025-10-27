@@ -20,6 +20,10 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * Breaking changes:
 ** Make data structures in `org.opentcs.access.to` independent of the primary object data structures in `org.opentcs.data`.
+** Remove support for reading openTCS plant model file versions 0.0.4 and 0.0.5.
+   Trying to load plant models in version 0.0.4 or 0.0.5 files with openTCS 7 will fail.
+   (Note that plant model files are always written using the respective openTCS distribution's latest version of the file format.
+   To ensure a plant model stored in a version 0.0.4 or 0.0.5 file can still be used with openTCS 7.0, it is recommended to first load and save the plant model with the Model Editor of the latest openTCS 6 release, which is openTCS 6.7.0 at the time of this writing.)
 
 == Version 6.7 (2025-10-22)
 
