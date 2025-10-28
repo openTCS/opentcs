@@ -6,12 +6,10 @@ import static java.util.Objects.requireNonNull;
 import static org.opentcs.util.Assertions.checkInRange;
 
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.Map;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a block in the plant model.
@@ -61,7 +59,7 @@ public class VehicleCreationTO
     this.energyLevelThresholdSet = new EnergyLevelThresholdSet(30, 90, 30, 90);
     this.maxVelocity = 1000;
     this.maxReverseVelocity = 1000;
-    this.envelopeKey = null;
+    this.envelopeKey = "";
     this.layout = new Layout();
   }
 
@@ -76,7 +74,7 @@ public class VehicleCreationTO
       EnergyLevelThresholdSet energyLevelThresholdSet,
       int maxVelocity,
       int maxReverseVelocity,
-      @Nullable
+      @Nonnull
       String envelopeKey,
       @Nonnull
       Layout layout
@@ -87,7 +85,7 @@ public class VehicleCreationTO
         = requireNonNull(energyLevelThresholdSet, "energyLevelThresholdSet");
     this.maxVelocity = maxVelocity;
     this.maxReverseVelocity = maxReverseVelocity;
-    this.envelopeKey = envelopeKey;
+    this.envelopeKey = requireNonNull(envelopeKey, "envelopeKey");
     this.layout = requireNonNull(layout, "layout");
   }
 
@@ -195,154 +193,6 @@ public class VehicleCreationTO
   }
 
   /**
-   * Returns the vehicle's length (in mm).
-   *
-   * @return The vehicle's length (in mm).
-   * @deprecated Use {@link #getBoundingBox()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public int getLength() {
-    return (int) boundingBox.getLength();
-  }
-
-  /**
-   * Creates a copy of this object with the vehicle's given length (in mm).
-   *
-   * @param length The new length. Must be at least 1.
-   * @return A copy of this object, differing in the given vehicle length.
-   * @deprecated Use {@link #withBoundingBox(BoundingBoxCreationTO)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public VehicleCreationTO withLength(int length) {
-    return withBoundingBox(boundingBox.withLength(length));
-  }
-
-  /**
-   * Returns this vehicle's critical energy level (in percent of the maximum).
-   * The critical energy level is the one at/below which the vehicle should be recharged.
-   *
-   * @return This vehicle's critical energy level.
-   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public int getEnergyLevelCritical() {
-    return energyLevelThresholdSet.getEnergyLevelCritical();
-  }
-
-  /**
-   * Creates a copy of this object with the given critical energy level.
-   * The critical energy level is the one at/below which the vehicle should be recharged.
-   *
-   * @param energyLevelCritical The new critical energy level. Must not be smaller than 0 or
-   * greater than 100.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public VehicleCreationTO withEnergyLevelCritical(int energyLevelCritical) {
-    return withEnergyLevelThresholdSet(
-        getEnergyLevelThresholdSet().withEnergyLevelCritical(energyLevelCritical)
-    );
-  }
-
-  /**
-   * Returns this vehicle's good energy level (in percent of the maximum).
-   * The good energy level is the one at/above which the vehicle can be dispatched again when
-   * charging.
-   *
-   * @return This vehicle's good energy level.
-   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public int getEnergyLevelGood() {
-    return energyLevelThresholdSet.getEnergyLevelGood();
-  }
-
-  /**
-   * Creates a copy of this object with the vehicle's good energy level (in percent of the maximum).
-   * The good energy level is the one at/above which the vehicle can be dispatched again when
-   * charging.
-   *
-   * @param energyLevelGood The new good energy level. Must not be smaller than 0 or greater than
-   * 100.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public VehicleCreationTO withEnergyLevelGood(int energyLevelGood) {
-    return withEnergyLevelThresholdSet(
-        getEnergyLevelThresholdSet().withEnergyLevelGood(energyLevelGood)
-    );
-  }
-
-  /**
-   * Returns this vehicle's fully recharged energy level (in percent of the maximum).
-   *
-   * @return This vehicle's fully recharged energy level.
-   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public int getEnergyLevelFullyRecharged() {
-    return energyLevelThresholdSet.getEnergyLevelFullyRecharged();
-  }
-
-  /**
-   * Creates a copy of this object with the vehicle's fully recharged energy level (in percent of
-   * the maximum).
-   *
-   * @param energyLevelFullyRecharged The new fully recharged energy level.
-   * Must not be smaller than 0 or greater than 100.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public VehicleCreationTO withEnergyLevelFullyRecharged(int energyLevelFullyRecharged) {
-    return withEnergyLevelThresholdSet(
-        getEnergyLevelThresholdSet().withEnergyLevelFullyRecharged(energyLevelFullyRecharged)
-    );
-  }
-
-  /**
-   * Returns this vehicle's sufficiently recharged energy level (in percent of the maximum).
-   *
-   * @return This vehicle's sufficiently recharged energy level.
-   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public int getEnergyLevelSufficientlyRecharged() {
-    return energyLevelThresholdSet.getEnergyLevelSufficientlyRecharged();
-  }
-
-  /**
-   * Creates a copy of this object with the vehicle's sufficiently recharged energy level (in
-   * percent of the maximum).
-   *
-   * @param energyLevelSufficientlyRecharged The new sufficiently recharged energy level.
-   * Must not be smaller than 0 or greater than 100.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public VehicleCreationTO withEnergyLevelSufficientlyRecharged(
-      int energyLevelSufficientlyRecharged
-  ) {
-    return withEnergyLevelThresholdSet(
-        getEnergyLevelThresholdSet()
-            .withEnergyLevelSufficientlyRecharged(energyLevelSufficientlyRecharged)
-    );
-  }
-
-  /**
    * Returns this vehicle's energy level threshold set.
    *
    * @return This vehicle's energy level threshold set.
@@ -427,8 +277,7 @@ public class VehicleCreationTO
    *
    * @return The key for selecting the envelope to be used for resources the vehicle occupies.
    */
-  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
-  @Nullable
+  @Nonnull
   public String getEnvelopeKey() {
     return envelopeKey;
   }
@@ -440,9 +289,8 @@ public class VehicleCreationTO
    * @param envelopeKey The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
   public VehicleCreationTO withEnvelopeKey(
-      @Nullable
+      @Nonnull
       String envelopeKey
   ) {
     return new VehicleCreationTO(

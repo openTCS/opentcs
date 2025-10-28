@@ -8,7 +8,6 @@ import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.Map;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a point in the plant model.
@@ -343,10 +342,6 @@ public class PointCreationTO
         Serializable {
 
     /**
-     * The coordinates at which the point is to be drawn (in mm).
-     */
-    private final CoupleCreationTO position;
-    /**
      * The offset of the label's position to the point's position (in lu).
      */
     private final CoupleCreationTO labelOffset;
@@ -365,26 +360,6 @@ public class PointCreationTO
     /**
      * Creates a new instance.
      *
-     * @param position The coordinates at which the point is to be drawn (in mm).
-     * @param labelOffset The offset of the label's position to the point's position (in lu).
-     * @param layerId The ID of the layer on which the point is to be drawn.
-     * @deprecated Use {@link Layout#Layout(CoupleCreationTO, int)} instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Layout(
-        CoupleCreationTO position,
-        CoupleCreationTO labelOffset,
-        int layerId
-    ) {
-      this.position = requireNonNull(position, "position");
-      this.labelOffset = requireNonNull(labelOffset, "labelOffset");
-      this.layerId = layerId;
-    }
-
-    /**
-     * Creates a new instance.
-     *
      * @param labelOffset The offset of the label's position to the point's position (in lu).
      * @param layerId The ID of the layer on which the point is to be drawn.
      */
@@ -392,40 +367,8 @@ public class PointCreationTO
         CoupleCreationTO labelOffset,
         int layerId
     ) {
-      this.position = new CoupleCreationTO(0, 0);
       this.labelOffset = requireNonNull(labelOffset, "labelOffset");
       this.layerId = layerId;
-    }
-
-    /**
-     * Returns the coordinates at which the point is to be drawn (in mm).
-     *
-     * @return The coordinates at which the point is to be drawn (in mm).
-     * @deprecated Will be removed without replacement. {@link PointCreationTO#getPose()}
-     * should be used instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public CoupleCreationTO getPosition() {
-      return position;
-    }
-
-    /**
-     * Creates a copy of this object, with the given position.
-     *
-     * @param position The value to be set in the copy.
-     * @return A copy of this object, differing in the given value.
-     * @deprecated Will be removed without replacement.
-     * {@link PointCreationTO#withPose(PoseCreationTO)} should be used instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Layout withPosition(CoupleCreationTO position) {
-      return new Layout(
-          position,
-          labelOffset,
-          layerId
-      );
     }
 
     /**
@@ -445,7 +388,6 @@ public class PointCreationTO
      */
     public Layout withLabelOffset(CoupleCreationTO labelOffset) {
       return new Layout(
-          position,
           labelOffset,
           layerId
       );
@@ -468,7 +410,6 @@ public class PointCreationTO
      */
     public Layout withLayerId(int layerId) {
       return new Layout(
-          position,
           labelOffset,
           layerId
       );

@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import org.opentcs.access.to.CreationTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A transfer object describing a location in a plant model.
@@ -358,10 +357,6 @@ public class LocationCreationTO
         Serializable {
 
     /**
-     * The coordinates at which the location is to be drawn (in mm).
-     */
-    private final CoupleCreationTO position;
-    /**
      * The offset of the label's position to the location's position (in lu).
      */
     private final CoupleCreationTO labelOffset;
@@ -388,33 +383,6 @@ public class LocationCreationTO
     /**
      * Creates a new instance.
      *
-     * @param position The coordinates at which the location is to be drawn (in mm).
-     * @param labelOffset The offset of the label's location to the point's position (in lu).
-     * @param locationRepresentation The location representation to use.
-     * @param layerId The ID of the layer on which the location is to be drawn.
-     * @deprecated Use
-     * {@link Layout#Layout(CoupleCreationTO, LocationRepresentationTO, int)} instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Layout(
-        CoupleCreationTO position,
-        CoupleCreationTO labelOffset,
-        LocationRepresentationTO locationRepresentation,
-        int layerId
-    ) {
-      this.position = requireNonNull(position, "position");
-      this.labelOffset = requireNonNull(labelOffset, "labelOffset");
-      this.locationRepresentation = requireNonNull(
-          locationRepresentation,
-          "locationRepresentation"
-      );
-      this.layerId = layerId;
-    }
-
-    /**
-     * Creates a new instance.
-     *
      * @param labelOffset The offset of the label's location to the point's position (in lu).
      * @param locationRepresentation The location representation to use.
      * @param layerId The ID of the layer on which the location is to be drawn.
@@ -424,45 +392,12 @@ public class LocationCreationTO
         LocationRepresentationTO locationRepresentation,
         int layerId
     ) {
-      this.position = new CoupleCreationTO(0, 0);
       this.labelOffset = requireNonNull(labelOffset, "labelOffset");
       this.locationRepresentation = requireNonNull(
           locationRepresentation,
           "locationRepresentation"
       );
       this.layerId = layerId;
-    }
-
-    /**
-     * Returns the coordinates at which the location is to be drawn (in mm).
-     *
-     * @return The coordinates at which the location is to be drawn (in mm).
-     * @deprecated Will be removed without replacement. {@link LocationCreationTO#getPosition()}
-     * should be used instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public CoupleCreationTO getPosition() {
-      return position;
-    }
-
-    /**
-     * Creates a copy of this object, with the given position.
-     *
-     * @param position The value to be set in the copy.
-     * @return A copy of this object, differing in the given value.
-     * @deprecated Will be removed without replacement.
-     * {@link LocationCreationTO#withPosition(TripleCreationTO)} should be used instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Layout withPosition(CoupleCreationTO position) {
-      return new Layout(
-          position,
-          labelOffset,
-          locationRepresentation,
-          layerId
-      );
     }
 
     /**
@@ -482,7 +417,6 @@ public class LocationCreationTO
      */
     public Layout withLabelOffset(CoupleCreationTO labelOffset) {
       return new Layout(
-          position,
           labelOffset,
           locationRepresentation,
           layerId
@@ -508,7 +442,6 @@ public class LocationCreationTO
         LocationRepresentationTO locationRepresentation
     ) {
       return new Layout(
-          position,
           labelOffset,
           locationRepresentation,
           layerId
@@ -532,7 +465,6 @@ public class LocationCreationTO
      */
     public Layout withLayerId(int layerId) {
       return new Layout(
-          position,
           labelOffset,
           locationRepresentation,
           layerId

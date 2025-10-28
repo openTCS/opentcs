@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A point in the driving course at which a {@link Vehicle} may be located.
@@ -252,26 +251,6 @@ public class Point
    */
   public boolean isParkingPosition() {
     return type.equals(Type.PARK_POSITION);
-  }
-
-  /**
-   * Checks whether halting on this point is allowed.
-   * <p>
-   * This method is a convenience method; its return value is equal to
-   * <code>getType().equals(Point.Type.PARK_POSITION) ||
-   * getType().equals(Point.Type.HALT_POSITION)</code>.
-   * </p>
-   *
-   * @return <code>true</code> if, and only if, halting is allowed on this
-   * point.
-   * @deprecated Will be removed without replacement. With openTCS 6.0, the point type
-   * {@code REPORT_POSITION} was removed, which makes this method redundant, as all remaining point
-   * types allow halting.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public boolean isHaltingPosition() {
-    return type.equals(Type.PARK_POSITION) || type.equals(Type.HALT_POSITION);
   }
 
   /**
@@ -559,10 +538,6 @@ public class Point
         Serializable {
 
     /**
-     * The coordinates at which the point is to be drawn (in mm).
-     */
-    private final Couple position;
-    /**
      * The offset of the label's position to the point's position (in lu).
      */
     private final Couple labelOffset;
@@ -581,26 +556,6 @@ public class Point
     /**
      * Creates a new instance.
      *
-     * @param position The coordinates at which the point is to be drawn (in mm).
-     * @param labelOffset The offset of the label's position to the point's position (in lu).
-     * @param layerId The ID of the layer on which the point is to be drawn.
-     * @deprecated Use {@link Layout#Layout(Couple, int)} instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Layout(
-        Couple position,
-        Couple labelOffset,
-        int layerId
-    ) {
-      this.position = requireNonNull(position, "position");
-      this.labelOffset = requireNonNull(labelOffset, "labelOffset");
-      this.layerId = layerId;
-    }
-
-    /**
-     * Creates a new instance.
-     *
      * @param labelOffset The offset of the label's position to the point's position (in lu).
      * @param layerId The ID of the layer on which the point is to be drawn.
      */
@@ -608,40 +563,8 @@ public class Point
         Couple labelOffset,
         int layerId
     ) {
-      this.position = new Couple(0, 0);
       this.labelOffset = requireNonNull(labelOffset, "labelOffset");
       this.layerId = layerId;
-    }
-
-    /**
-     * Returns the coordinates at which the point is to be drawn (in mm).
-     *
-     * @return The coordinates at which the point is to be drawn (in mm).
-     * @deprecated Will be removed without replacement. {@link Point#getPose()} should be used
-     * instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Couple getPosition() {
-      return position;
-    }
-
-    /**
-     * Creates a copy of this object, with the given position.
-     *
-     * @param position The value to be set in the copy.
-     * @return A copy of this object, differing in the given value.
-     * @deprecated Will be removed without replacement. {@link Point#withPose(Pose)} should be used
-     * instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Layout withPosition(Couple position) {
-      return new Layout(
-          position,
-          labelOffset,
-          layerId
-      );
     }
 
     /**
@@ -661,7 +584,6 @@ public class Point
      */
     public Layout withLabelOffset(Couple labelOffset) {
       return new Layout(
-          position,
           labelOffset,
           layerId
       );
@@ -684,7 +606,6 @@ public class Point
      */
     public Layout withLayerId(int layerId) {
       return new Layout(
-          position,
           labelOffset,
           layerId
       );

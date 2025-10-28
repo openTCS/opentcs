@@ -48,16 +48,6 @@ public abstract class AbstractTCSObjectService
     return getObjectService().stream(clazz);
   }
 
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, TCSObjectReference<T> ref)
-      throws CredentialsException {
-    requireNonNull(clazz, "clazz");
-    requireNonNull(ref, "ref");
-
-    return getObjectService().fetchObject(clazz, ref);
-  }
-
   @Override
   public <T extends TCSObject<T>> Optional<T> fetch(Class<T> clazz, TCSObjectReference<T> ref)
       throws CredentialsException {
@@ -65,15 +55,6 @@ public abstract class AbstractTCSObjectService
     requireNonNull(ref, "ref");
 
     return getObjectService().fetch(clazz, ref);
-  }
-
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, String name)
-      throws CredentialsException {
-    requireNonNull(clazz, "clazz");
-
-    return getObjectService().fetchObject(clazz, name);
   }
 
   @Override
@@ -84,36 +65,12 @@ public abstract class AbstractTCSObjectService
     return getObjectService().fetch(clazz, name);
   }
 
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> Set<T> fetchObjects(Class<T> clazz)
-      throws CredentialsException {
-    requireNonNull(clazz, "clazz");
-
-    return getObjectService().fetchObjects(clazz);
-  }
-
   @Override
   public <T extends TCSObject<T>> Set<T> fetch(Class<T> clazz)
       throws CredentialsException {
     requireNonNull(clazz, "clazz");
 
     return getObjectService().fetch(clazz);
-  }
-
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> Set<T> fetchObjects(
-      @Nonnull
-      Class<T> clazz,
-      @Nonnull
-      Predicate<? super T> predicate
-  )
-      throws CredentialsException {
-    requireNonNull(clazz, "clazz");
-    requireNonNull(predicate, "predicate");
-
-    return getObjectService().fetchObjects(clazz, predicate);
   }
 
   @Override

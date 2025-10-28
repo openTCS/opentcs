@@ -14,7 +14,6 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes a sequence of movements and an optional operation at the end that a {@link Vehicle} is
@@ -46,21 +45,6 @@ public class DriveOrder
    * This drive order's current state.
    */
   private final State state;
-
-  /**
-   * Creates a new DriveOrder.
-   *
-   * @param destination This drive order's destination.
-   * @deprecated Use {@link #DriveOrder(String, Destination)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed")
-  public DriveOrder(
-      @Nonnull
-      Destination destination
-  ) {
-    this("", destination);
-  }
 
   /**
    * Creates a new DriveOrder.

@@ -223,11 +223,6 @@ class AttachmentManagerTest {
     }
 
     @Override
-    @Deprecated
-    public void processMessage(Object o) {
-    }
-
-    @Override
     public void processMessage(
         @Nonnull
         VehicleCommAdapterMessage message

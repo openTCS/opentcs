@@ -7,7 +7,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkInRange;
 
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import java.awt.Color;
 import java.io.Serializable;
 import java.time.Instant;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -23,7 +21,6 @@ import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes a vehicle's current state.
@@ -146,7 +143,7 @@ public class Vehicle
     this.pose = new Pose(null, Double.NaN);
     this.energyLevel = 100;
     this.loadHandlingDevices = List.of();
-    this.envelopeKey = null;
+    this.envelopeKey = "";
     this.layout = new Layout();
   }
 
@@ -215,7 +212,7 @@ public class Vehicle
     this.pose = requireNonNull(pose, "pose");
     this.energyLevel = checkInRange(energyLevel, 0, 100, "energyLevel");
     this.loadHandlingDevices = requireNonNull(loadHandlingDevices, "loadHandlingDevices");
-    this.envelopeKey = envelopeKey;
+    this.envelopeKey = requireNonNull(envelopeKey, "envelopeKey");
     this.layout = requireNonNull(layout, "layout");
   }
 
@@ -427,120 +424,6 @@ public class Vehicle
    */
   public boolean isEnergyLevelSufficientlyRecharged() {
     return energyLevel >= energyLevelThresholdSet.getEnergyLevelSufficientlyRecharged();
-  }
-
-  /**
-   * Returns this vehicle's critical energy level (in percent of the maximum).
-   * The critical energy level is the one at/below which the vehicle should be
-   * recharged.
-   *
-   * @return This vehicle's critical energy level.
-   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public int getEnergyLevelCritical() {
-    return energyLevelThresholdSet.getEnergyLevelCritical();
-  }
-
-  /**
-   * Creates a copy of this object, with the given critical energy level.
-   *
-   * @param energyLevelCritical The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public Vehicle withEnergyLevelCritical(int energyLevelCritical) {
-    return withEnergyLevelThresholdSet(
-        getEnergyLevelThresholdSet().withEnergyLevelCritical(energyLevelCritical)
-    );
-  }
-
-  /**
-   * Returns this vehicle's good energy level (in percent of the maximum).
-   * The good energy level is the one at/above which the vehicle can be
-   * dispatched again when charging.
-   *
-   * @return This vehicle's good energy level.
-   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public int getEnergyLevelGood() {
-    return energyLevelThresholdSet.getEnergyLevelGood();
-  }
-
-  /**
-   * Creates a copy of this object, with the given good energy level.
-   *
-   * @param energyLevelGood The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public Vehicle withEnergyLevelGood(int energyLevelGood) {
-    return withEnergyLevelThresholdSet(
-        getEnergyLevelThresholdSet().withEnergyLevelGood(energyLevelGood)
-    );
-  }
-
-  /**
-   * Returns this vehicle's energy level for being fully recharged (in percent of the maximum).
-   *
-   * @return This vehicle's fully recharged threshold.
-   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public int getEnergyLevelFullyRecharged() {
-    return energyLevelThresholdSet.getEnergyLevelFullyRecharged();
-  }
-
-  /**
-   * Creates a copy of this object, with the given fully recharged energy level.
-   *
-   * @param energyLevelFullyRecharged The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public Vehicle withEnergyLevelFullyRecharged(int energyLevelFullyRecharged) {
-    return withEnergyLevelThresholdSet(
-        getEnergyLevelThresholdSet().withEnergyLevelFullyRecharged(energyLevelFullyRecharged)
-    );
-  }
-
-  /**
-   * Returns this vehicle's energy level for being sufficiently recharged (in percent of the
-   * maximum).
-   *
-   * @return This vehicle's sufficiently recharged energy level.
-   * @deprecated Use {@link #getEnergyLevelThresholdSet()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public int getEnergyLevelSufficientlyRecharged() {
-    return energyLevelThresholdSet.getEnergyLevelSufficientlyRecharged();
-  }
-
-  /**
-   * Creates a copy of this object, with the given sufficiently recharged energy level.
-   *
-   * @param energyLevelSufficientlyRecharged The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withEnergyLevelThresholdSet(EnergyLevelThresholdSet)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public Vehicle withEnergyLevelSufficientlyRecharged(int energyLevelSufficientlyRecharged) {
-    return withEnergyLevelThresholdSet(
-        getEnergyLevelThresholdSet()
-            .withEnergyLevelSufficientlyRecharged(energyLevelSufficientlyRecharged)
-    );
   }
 
   /**
@@ -1027,31 +910,6 @@ public class Vehicle
   }
 
   /**
-   * Returns this vehicle's current length.
-   *
-   * @return this vehicle's current length.
-   * @deprecated Use {@link #getBoundingBox()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public int getLength() {
-    return (int) boundingBox.getLength();
-  }
-
-  /**
-   * Creates a copy of this object, with the given length.
-   *
-   * @param length The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withBoundingBox(BoundingBox)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public Vehicle withLength(int length) {
-    return withBoundingBox(boundingBox.withLength(length));
-  }
-
-  /**
    * Returns a reference to the transport order this vehicle is currently
    * processing.
    *
@@ -1140,37 +998,6 @@ public class Vehicle
         loadHandlingDevices,
         envelopeKey,
         layout
-    );
-  }
-
-  /**
-   * Returns the set of order types this vehicle is allowed to process.
-   *
-   * @return The set of order types this vehicle is allowed to process.
-   * @deprecated Use {@link #getAcceptableOrderTypes()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed")
-  public Set<String> getAllowedOrderTypes() {
-    return acceptableOrderTypes.stream()
-        .map(AcceptableOrderType::getName)
-        .collect(Collectors.toSet());
-  }
-
-  /**
-   * Creates a copy of this object, with the given set of allowed order types.
-   *
-   * @param allowedOrderTypes The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withAcceptableOrderTypes(Set)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public Vehicle withAllowedOrderTypes(Set<String> allowedOrderTypes) {
-    return withAcceptableOrderTypes(
-        allowedOrderTypes.stream()
-            .map(type -> new AcceptableOrderType(type, 0))
-            .collect(Collectors.toSet())
     );
   }
 
@@ -1353,96 +1180,6 @@ public class Vehicle
   }
 
   /**
-   * Returns a reference to the point this vehicle is expected to be seen at
-   * next.
-   *
-   * @return A reference to the point this vehicle is expected to be seen at
-   * next, or <code>null</code>, if this vehicle's next position is unknown.
-   * @deprecated Extract a vehicle's next position from {@link #getAllocatedResources()} instead.
-   * In this list, the next position is the one after {@link #getCurrentPosition()}.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  @SuppressWarnings("unchecked")
-  public TCSObjectReference<Point> getNextPosition() {
-    return getAllocatedResources().stream()
-        .flatMap(Set::stream)
-        .filter(point -> point.getReferentClass().equals(Point.class))
-        .dropWhile(point -> !point.equals(currentPosition))
-        .skip(1)
-        .map(point -> (TCSObjectReference<Point>) point)
-        .findFirst()
-        .orElse(null);
-  }
-
-  /**
-   * Creates a copy of this object, with the given next position.
-   *
-   * @param nextPosition The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Will be removed without replacement.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed")
-  public Vehicle withNextPosition(TCSObjectReference<Point> nextPosition) {
-    return this;
-  }
-
-  /**
-   * Returns the vehicle's position in world coordinates [mm], independent
-   * of logical positions/point names. May be <code>null</code> if the vehicle
-   * hasn't provided a precise position.
-   *
-   * @return The vehicle's precise position in mm.
-   * @deprecated Use {@link #getPose()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public Triple getPrecisePosition() {
-    return pose.getPosition();
-  }
-
-  /**
-   * Creates a copy of this object, with the given precise position.
-   *
-   * @param precisePosition The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withPose(Pose)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public Vehicle withPrecisePosition(Triple precisePosition) {
-    return withPose(pose.withPosition(precisePosition));
-  }
-
-  /**
-   * Returns the vehicle's current orientation angle (-360..360).
-   * May be <code>Double.NaN</code> if the vehicle hasn't provided an
-   * orientation angle.
-   *
-   * @return The vehicle's current orientation angle.
-   * @deprecated Use {@link #getPose()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public double getOrientationAngle() {
-    return pose.getOrientationAngle();
-  }
-
-  /**
-   * Creates a copy of this object, with the given orientation angle.
-   *
-   * @param orientationAngle The value to be set in the copy.
-   * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withPose(Pose)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public Vehicle withOrientationAngle(double orientationAngle) {
-    return withPose(pose.withOrientationAngle(orientationAngle));
-  }
-
-  /**
    * Returns the vehicle's pose containing the precise position and orientation angle.
    *
    * @return The vehicle's pose.
@@ -1494,8 +1231,7 @@ public class Vehicle
    *
    * @return The key for selecting the envelope to be used for resources the vehicle occupies.
    */
-  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
-  @Nullable
+  @Nonnull
   public String getEnvelopeKey() {
     return envelopeKey;
   }
@@ -1506,9 +1242,8 @@ public class Vehicle
    * @param envelopeKey The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
    */
-  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
   public Vehicle withEnvelopeKey(
-      @Nullable
+      @Nonnull
       String envelopeKey
   ) {
     return new Vehicle(

@@ -41,7 +41,6 @@ import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAcceptableOrderTypesTO;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.AcceptableOrderTypeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.VehicleConverter;
 
@@ -263,38 +262,6 @@ class VehicleHandlerTest {
   void throwOnSetEnvelopeUnknownVehicle() {
     assertThatExceptionOfType(ObjectUnknownException.class)
         .isThrownBy(() -> handler.putVehicleEnvelopeKey("some-unknown-vehicle", "some-key"));
-  }
-
-  @Test
-  @Deprecated
-  void updateVehicleAllowedOrderTypes() {
-    // Act
-    handler.putVehicleAllowedOrderTypes(
-        "some-vehicle",
-        new PutVehicleAllowedOrderTypesTO(List.of("some-order-type", "some-other-order-type"))
-    );
-
-    // Assert
-    @SuppressWarnings("unchecked")
-    ArgumentCaptor<Set<String>> captor = ArgumentCaptor.forClass(Set.class);
-    then(vehicleService)
-        .should()
-        .updateVehicleAllowedOrderTypes(eq(vehicle.getReference()), captor.capture());
-    assertThat(captor.getValue())
-        .hasSize(2)
-        .contains("some-order-type", "some-other-order-type");
-  }
-
-  @Test
-  @Deprecated
-  void throwOnUpdateAllowedOrderTypesForUnknownVehicle() {
-    assertThatExceptionOfType(ObjectUnknownException.class)
-        .isThrownBy(
-            () -> handler.putVehicleAllowedOrderTypes(
-                "some-unknown-vehicle",
-                new PutVehicleAllowedOrderTypesTO(List.of())
-            )
-        );
   }
 
   @Test

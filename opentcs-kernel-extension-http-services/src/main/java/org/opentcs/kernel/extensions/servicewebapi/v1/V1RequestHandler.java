@@ -36,11 +36,13 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesR
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAcceptableOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleEnergyLevelThresholdSetTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.AcceptableOrderTypeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.OrderSequenceConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralAttachmentInformationConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.PeripheralJobConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.TransportOrderConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.VehicleAttachmentInformationConverter;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -539,13 +541,21 @@ public class V1RequestHandler
     ctx.result("");
   }
 
-  @Deprecated
+  @ScheduledApiChange(
+      when = "Web API v2",
+      details = "Superseded by handlePutVehicleAcceptableOrderTypes()."
+  )
   private void handlePutVehicleAllowedOrderTypes(Context ctx)
       throws ObjectUnknownException,
         IllegalArgumentException {
-    vehicleHandler.putVehicleAllowedOrderTypes(
+    vehicleHandler.putVehicleAcceptableOrderTypes(
         ctx.pathParam("NAME"),
-        jsonBinder.fromJson(ctx.body(), PutVehicleAllowedOrderTypesTO.class)
+        new PutVehicleAcceptableOrderTypesTO(
+            jsonBinder.fromJson(ctx.body(), PutVehicleAllowedOrderTypesTO.class).getOrderTypes()
+                .stream()
+                .map(type -> new AcceptableOrderTypeTO(type, 0))
+                .toList()
+        )
     );
     ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     ctx.result("");

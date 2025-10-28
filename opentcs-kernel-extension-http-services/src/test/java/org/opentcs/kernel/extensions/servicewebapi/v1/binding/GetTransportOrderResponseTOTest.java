@@ -26,7 +26,6 @@ class GetTransportOrderResponseTOTest {
     jsonBinder = new JsonBinder();
   }
 
-  @SuppressWarnings("deprecation")
   @Test
   void jsonSample() {
     GetTransportOrderResponseTO to

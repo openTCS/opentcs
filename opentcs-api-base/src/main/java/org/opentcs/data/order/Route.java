@@ -13,7 +13,6 @@ import java.util.Objects;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A route for a {@link Vehicle}, consisting of a sequence of steps (pairs of {@link Path}s and
@@ -31,26 +30,6 @@ public class Route
    * The costs for travelling this route.
    */
   private final long costs;
-
-  /**
-   * Creates a new Route.
-   *
-   * @param routeSteps The sequence of steps this route consists of.
-   * @param routeCosts The costs for travelling this route.
-   * @deprecated Use {@link #Route(java.util.List)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public Route(
-      @Nonnull
-      List<Step> routeSteps,
-      long routeCosts
-  ) {
-    requireNonNull(routeSteps, "routeSteps");
-    checkArgument(!routeSteps.isEmpty(), "routeSteps may not be empty");
-    steps = List.copyOf(routeSteps);
-    costs = routeCosts;
-  }
 
   /**
    * Creates a new Route.
@@ -160,99 +139,6 @@ public class Route
      * Might be {@code null}, if this {@link Step} is not the origin of a recalculated route.
      */
     private final ReroutingType reroutingType;
-
-    /**
-     * Creates a new instance.
-     *
-     * @param path The path to travel.
-     * @param srcPoint The point that the vehicle is starting from.
-     * @param destPoint The point that is reached by travelling the path.
-     * @param orientation The vehicle's orientation on this step.
-     * @param routeIndex This step's index in the vehicle's route.
-     * @param executionAllowed Whether execution of this step is allowed.
-     * @param reroutingType Marks this step as the origin of a recalculated route.
-     * @deprecated Use {@link #Step(Path, Point, Point, Vehicle.Orientation, int, long)} in
-     * combination with {@link #withExecutionAllowed(boolean)} and
-     * {@link #withReroutingType(ReroutingType)} instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-    public Step(
-        @Nullable
-        Path path,
-        @Nullable
-        Point srcPoint,
-        @Nonnull
-        Point destPoint,
-        @Nonnull
-        Vehicle.Orientation orientation,
-        int routeIndex,
-        boolean executionAllowed,
-        @Nullable
-        ReroutingType reroutingType
-    ) {
-      this(
-          path, srcPoint, destPoint, orientation, routeIndex, 0, executionAllowed,
-          reroutingType
-      );
-    }
-
-    /**
-     * Creates a new instance.
-     *
-     * @param path The path to travel.
-     * @param srcPoint The point that the vehicle is starting from.
-     * @param destPoint The point that is reached by travelling the path.
-     * @param orientation The vehicle's orientation on this step.
-     * @param routeIndex This step's index in the vehicle's route.
-     * @param executionAllowed Whether execution of this step is allowed.
-     * @deprecated Use {@link #Step(Path, Point, Point, Vehicle.Orientation, int, long)} in
-     * combination with {@link #withExecutionAllowed(boolean)} instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-    public Step(
-        @Nullable
-        Path path,
-        @Nullable
-        Point srcPoint,
-        @Nonnull
-        Point destPoint,
-        @Nonnull
-        Vehicle.Orientation orientation,
-        int routeIndex,
-        boolean executionAllowed
-    ) {
-      this(
-          path, srcPoint, destPoint, orientation, routeIndex, 0, executionAllowed, null
-      );
-    }
-
-    /**
-     * Creates a new instance.
-     *
-     * @param path The path to travel.
-     * @param srcPoint The point that the vehicle is starting from.
-     * @param destPoint The point that is reached by travelling the path.
-     * @param orientation The vehicle's orientation on this step.
-     * @param routeIndex This step's index in the vehicle's route.
-     * @deprecated Use {@link #Step(Path, Point, Point, Vehicle.Orientation, int, long)} instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-    public Step(
-        @Nullable
-        Path path,
-        @Nullable
-        Point srcPoint,
-        @Nonnull
-        Point destPoint,
-        @Nonnull
-        Vehicle.Orientation orientation,
-        int routeIndex
-    ) {
-      this(path, srcPoint, destPoint, orientation, routeIndex, 0, true, null);
-    }
 
     /**
      * Creates a new instance.

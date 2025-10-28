@@ -31,14 +31,6 @@ public interface RemoteTCSObjectService
       Remote {
 
   // CHECKSTYLE:OFF
-  @Deprecated
-  <T extends TCSObject<T>> T fetchObject(
-      ClientID clientId,
-      Class<T> clazz,
-      TCSObjectReference<T> ref
-  )
-      throws RemoteException;
-
   <T extends TCSObject<T>> T fetch(
       ClientID clientId,
       Class<T> clazz,
@@ -46,26 +38,10 @@ public interface RemoteTCSObjectService
   )
       throws RemoteException;
 
-  @Deprecated
-  <T extends TCSObject<T>> T fetchObject(ClientID clientId, Class<T> clazz, String name)
-      throws RemoteException;
-
   <T extends TCSObject<T>> T fetch(ClientID clientId, Class<T> clazz, String name)
       throws RemoteException;
 
-  @Deprecated
-  <T extends TCSObject<T>> Set<T> fetchObjects(ClientID clientId, Class<T> clazz)
-      throws RemoteException;
-
   <T extends TCSObject<T>> Set<T> fetch(ClientID clientId, Class<T> clazz)
-      throws RemoteException;
-
-  @Deprecated
-  <T extends TCSObject<T>> Set<T> fetchObjects(
-      ClientID clientId,
-      Class<T> clazz,
-      Predicate<? super T> predicate
-  )
       throws RemoteException;
 
   <T extends TCSObject<T>> Set<T> fetch(

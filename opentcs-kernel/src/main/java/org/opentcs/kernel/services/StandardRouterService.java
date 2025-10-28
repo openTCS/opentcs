@@ -82,34 +82,6 @@ public class StandardRouterService
   }
 
   @Override
-  @Deprecated
-  public Map<TCSObjectReference<Point>, Route> computeRoutes(
-      TCSObjectReference<Vehicle> vehicleRef,
-      TCSObjectReference<Point> sourcePointRef,
-      Set<TCSObjectReference<Point>> destinationPointRefs,
-      Set<TCSResourceReference<?>> resourcesToAvoid
-  ) {
-    requireNonNull(vehicleRef, "vehicleRef");
-    requireNonNull(sourcePointRef, "sourcePointRef");
-    requireNonNull(destinationPointRefs, "destinationPointRefs");
-    requireNonNull(resourcesToAvoid, "resourcesToAvoid");
-
-    synchronized (globalSyncObject) {
-      return computeRoutes(vehicleRef, sourcePointRef, destinationPointRefs, resourcesToAvoid, 1)
-          .entrySet()
-          .stream()
-          .collect(
-              HashMap::new,
-              (map, entry) -> map.put(
-                  entry.getKey(),
-                  entry.getValue().stream().findAny().orElse(null)
-              ),
-              HashMap::putAll
-          );
-    }
-  }
-
-  @Override
   public Map<TCSObjectReference<Point>, Set<Route>> computeRoutes(
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<Point> sourcePointRef,

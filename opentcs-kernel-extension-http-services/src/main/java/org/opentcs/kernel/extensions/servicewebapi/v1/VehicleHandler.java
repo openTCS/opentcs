@@ -34,7 +34,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetVehicleResponse
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleCommAdapterMessageRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAcceptableOrderTypesTO;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleEnergyLevelThresholdSetTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.VehicleConverter;
@@ -229,24 +228,6 @@ public class VehicleHandler {
               request.getType(),
               toParameterMap(request.getParameters())
           )
-      );
-    });
-  }
-
-  @Deprecated
-  public void putVehicleAllowedOrderTypes(
-      String name,
-      PutVehicleAllowedOrderTypesTO allowedOrderTypes
-  )
-      throws ObjectUnknownException {
-    requireNonNull(name, "name");
-    requireNonNull(allowedOrderTypes, "allowedOrderTypes");
-
-    executorWrapper.callAndWait(() -> {
-      Vehicle vehicle = vehicleService.fetch(Vehicle.class, name)
-          .orElseThrow(() -> new ObjectUnknownException("Unknown vehicle: " + name));
-      vehicleService.updateVehicleAllowedOrderTypes(
-          vehicle.getReference(), new HashSet<>(allowedOrderTypes.getOrderTypes())
       );
     });
   }

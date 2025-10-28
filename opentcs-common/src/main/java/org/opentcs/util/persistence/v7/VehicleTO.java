@@ -12,7 +12,6 @@ import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlSchemaType;
 import jakarta.xml.bind.annotation.XmlType;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  */
@@ -132,19 +131,18 @@ public class VehicleTO
     return this;
   }
 
-  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
   @XmlAttribute
-  @Nullable
+  @Nonnull
   public String getEnvelopeKey() {
     return envelopeKey;
   }
 
-  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
   public VehicleTO setEnvelopeKey(
       @Nullable
       String envelopeKey
   ) {
-    this.envelopeKey = envelopeKey;
+    // Envelope key may not be null anymore starting with openTCS 7.0, so we ensure it isn't.
+    this.envelopeKey = envelopeKey == null ? "" : envelopeKey;
     return this;
   }
 

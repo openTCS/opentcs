@@ -70,20 +70,6 @@ class ObjectHistoryTest {
   }
 
   @Test
-  @Deprecated
-  void checkIfEntryHasTimestampEventCodeAndSupplement() {
-    Instant timestamp = Instant.now();
-    Entry entry = new Entry(timestamp, "eventCode1", "supplement");
-
-    assertEquals(entry.getTimestamp(), timestamp);
-    assertThat(entry.getEventCode(), is(equalTo("eventCode1")));
-    assertThat(entry.getSupplements(), hasSize(1));
-    assertThat(entry.getSupplements(), contains("supplement"));
-    assertThat(entry.getSupplement(), is(equalTo("supplement")));
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
   void checkIfEntryHasTimestampEventCodeAndSupplements() {
     Instant timestamp = Instant.now();
     Entry entry = new Entry(timestamp, "eventCode1", List.of("supplement"));
@@ -92,20 +78,9 @@ class ObjectHistoryTest {
     assertThat(entry.getEventCode(), is(equalTo("eventCode1")));
     assertThat(entry.getSupplements(), hasSize(1));
     assertThat(entry.getSupplements(), contains("supplement"));
-    assertThat(entry.getSupplement(), is(equalTo("supplement")));
   }
 
   @Test
-  @Deprecated
-  void throwIfSupplementIsNotSerializable() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> new Entry(Instant.now(), "eventCode", new Object())
-    );
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
   void checkIfEntryHasNoSupplements() {
     Instant timestamp = Instant.now();
     Entry entry = new Entry(timestamp, "eventCode1");
@@ -113,29 +88,24 @@ class ObjectHistoryTest {
     assertEquals(entry.getTimestamp(), timestamp);
     assertThat(entry.getEventCode(), is(equalTo("eventCode1")));
     assertThat(entry.getSupplements(), is(empty()));
-    assertThat(entry.getSupplement(), is(equalTo("")));
   }
 
   @Test
-  @SuppressWarnings("deprecation")
   void checkIfEntryHasTimestamp() {
     Entry entry = new Entry("eventCode1", List.of("supplement"));
 
     assertThat(entry.getTimestamp(), is(notNullValue()));
     assertThat(entry.getEventCode(), is(equalTo("eventCode1")));
     assertThat(entry.getSupplements(), contains("supplement"));
-    assertThat(entry.getSupplement(), is(equalTo("supplement")));
   }
 
   @Test
-  @SuppressWarnings("deprecation")
   void checkIfEntryHasTimestampAndNoSupplements() {
     Entry entry = new Entry("eventCode1");
 
     assertThat(entry.getTimestamp(), is(notNullValue()));
     assertThat(entry.getEventCode(), is(equalTo("eventCode1")));
     assertThat(entry.getSupplements(), is(empty()));
-    assertThat(entry.getSupplement(), is(equalTo("")));
   }
 
 }

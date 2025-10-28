@@ -11,7 +11,6 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Manages resources used by clients (vehicles) to help prevent both collisions and deadlocks.
@@ -37,9 +36,8 @@ import org.opentcs.util.annotations.ScheduledApiChange;
  * As the vehicle processes the transport order, the client subsequently calls
  * {@link #allocate(org.opentcs.components.kernel.Scheduler.Client, java.util.Set) allocate()} for
  * resources needed next (for reaching the next point on the route).
- * The <code>Scheduler</code> asynchronously calls back either
- * {@link Client#allocationSuccessful(java.util.Set)} or
- * {@link Client#allocationFailed(java.util.Set)}, informing the client about the result.
+ * The <code>Scheduler</code> asynchronously calls back {@link Client#onAllocation(java.util.Set)},
+ * informing the client about successful allocations.
  * Upon allocating the resources for the client, it also implicitly removes them from the head of
  * the client's claim sequence.
  * </li>
@@ -98,9 +96,8 @@ public interface Scheduler
 
   /**
    * Requests allocation of the given resources.
-   * The client will be informed via a callback to
-   * {@link Client#allocationSuccessful(java.util.Set)} or
-   * {@link Client#allocationFailed(java.util.Set)} whether the allocation was successful or not.
+   * The client will be informed via a callback to {@link Client#onAllocation(java.util.Set)} once
+   * the requested resources have been allocated successfully.
    * <ul>
    * <li>
    * Clients may only allocate resources in the order they have previously
@@ -301,47 +298,14 @@ public interface Scheduler
      * Called when resources have been reserved for this client.
      *
      * @param resources The resources reserved.
-     * @return <code>true</code> if, and only if, this client accepts the resources allocated. A
-     * return value of <code>false</code> indicates this client does not need the given resources
-     * (any more), freeing them implicitly, but not restoring any previous claim.
-     * @deprecated Use {@link #onAllocation(Set)} instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-    boolean allocationSuccessful(
-        @Nonnull
-        Set<TCSResource<?>> resources
-    );
-
-    /**
-     * Called when resources have been reserved for this client.
-     *
-     * @param resources The resources reserved.
      * @return {@code true} if, and only if, this client accepts the resources allocated. A
      * return value of {@code false} indicates this client does not need the given resources
      * (any more), freeing them implicitly, but not restoring any previous claim.
      */
-    @ScheduledApiChange(when = "7.0", details = "Default implementation will be removed.")
-    default boolean onAllocation(
+    boolean onAllocation(
         @Nonnull
         Set<TCSResource<?>> resources
-    ) {
-      return allocationSuccessful(resources);
-    }
-
-    /**
-     * Called if it was impossible to allocate a requested set of resources for this client.
-     *
-     * @param resources The resources which could not be reserved.
-     * @deprecated Will be removed without replacement.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-    default void allocationFailed(
-        @Nonnull
-        Set<TCSResource<?>> resources
-    ) {
-    }
+    );
   }
 
   /**

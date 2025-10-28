@@ -11,12 +11,10 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
-import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods provided by the {@link VehicleService} via RMI.
@@ -59,29 +57,12 @@ public interface RemoteVehicleService
   VehicleProcessModelTO fetchProcessModel(ClientID clientId, TCSObjectReference<Vehicle> ref)
       throws RemoteException;
 
-  @Deprecated
-  void sendCommAdapterCommand(
-      ClientID clientId,
-      TCSObjectReference<Vehicle> ref,
-      AdapterCommand command
-  )
-      throws RemoteException;
-
-  @Deprecated
   void sendCommAdapterMessage(
-      ClientID clientId,
-      TCSObjectReference<Vehicle> vehicleRef,
-      Object message
-  )
-      throws RemoteException;
-
-  default void sendCommAdapterMessage(
       ClientID clientId,
       TCSObjectReference<Vehicle> ref,
       VehicleCommAdapterMessage message
   )
-      throws RemoteException {
-  }
+      throws RemoteException;
 
   void updateVehicleIntegrationLevel(
       ClientID clientId,
@@ -97,33 +78,19 @@ public interface RemoteVehicleService
   )
       throws RemoteException;
 
-  @ScheduledApiChange(when = "7.0", details = "Default implementation will be removed.")
-  default void updateVehicleEnergyLevelThresholdSet(
+  void updateVehicleEnergyLevelThresholdSet(
       ClientID clientId,
       TCSObjectReference<Vehicle> ref,
       EnergyLevelThresholdSet energyLevelThresholdSet
   )
-      throws RemoteException {
-    throw new UnsupportedOperationException("Not yet implemented.");
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  void updateVehicleAllowedOrderTypes(
-      ClientID clientId,
-      TCSObjectReference<Vehicle> ref,
-      Set<String> allowedOrderTypes
-  )
       throws RemoteException;
 
-  default void updateVehicleAcceptableOrderTypes(
+  void updateVehicleAcceptableOrderTypes(
       ClientID clientId,
       TCSObjectReference<Vehicle> ref,
       Set<AcceptableOrderType> acceptableOrderTypes
   )
-      throws RemoteException {
-    throw new UnsupportedOperationException("Not yet implemented.");
-  }
+      throws RemoteException;
 
   void updateVehicleEnvelopeKey(
       ClientID clientId,

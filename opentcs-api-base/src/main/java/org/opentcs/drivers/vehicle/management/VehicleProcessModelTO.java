@@ -13,12 +13,10 @@ import java.util.List;
 import java.util.Queue;
 import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Pose;
-import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A serializable representation of a {@link VehicleProcessModel}.
@@ -104,36 +102,6 @@ public class VehicleProcessModelTO
     return this;
   }
 
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  @Nullable
-  public Triple getPrecisePosition() {
-    return pose.getPosition();
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public VehicleProcessModelTO setPrecisePosition(
-      @Nullable
-      Triple precisePosition
-  ) {
-    this.pose = pose.withPosition(precisePosition);
-    return this;
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public double getOrientationAngle() {
-    return pose.getOrientationAngle();
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public VehicleProcessModelTO setOrientationAngle(double orientationAngle) {
-    this.pose = pose.withOrientationAngle(orientationAngle);
-    return this;
-  }
-
   @Nonnull
   public Pose getPose() {
     return pose;
@@ -179,19 +147,6 @@ public class VehicleProcessModelTO
       Vehicle.State state
   ) {
     this.state = requireNonNull(state, "state");
-    return this;
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public int getLength() {
-    return (int) boundingBox.getLength();
-  }
-
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public VehicleProcessModelTO setLength(int length) {
-    setBoundingBox(getBoundingBox().withLength(length));
     return this;
   }
 

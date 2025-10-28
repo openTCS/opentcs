@@ -846,40 +846,6 @@ public class PlantModelManager
   }
 
   /**
-   * Sets a vehicle's next position.
-   *
-   * @param ref A reference to the vehicle to be modified.
-   * @param newPosition A reference to the point the vehicle is expected to
-   * occupy next.
-   * @return The modified vehicle.
-   * @throws ObjectUnknownException If the referenced vehicle does not exist.
-   * @deprecated Will be removed without replacement.
-   */
-  @Deprecated
-  public Vehicle setVehicleNextPosition(
-      TCSObjectReference<Vehicle> ref,
-      TCSObjectReference<Point> newPosition
-  )
-      throws ObjectUnknownException {
-    Vehicle previousState = getObjectRepo().getObject(Vehicle.class, ref);
-
-    LOG.debug(
-        "Vehicle's next position changes: {} -- {} -> {}",
-        previousState.getName(),
-        previousState.getNextPosition(),
-        newPosition
-    );
-    Vehicle vehicle = previousState.withNextPosition(newPosition);
-    getObjectRepo().replaceObject(vehicle);
-    emitObjectEvent(
-        vehicle,
-        previousState,
-        TCSObjectEvent.Type.OBJECT_MODIFIED
-    );
-    return vehicle;
-  }
-
-  /**
    * Sets a vehicle's pose.
    *
    * @param ref A reference to the vehicle to be modified.

@@ -25,20 +25,6 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
     implements
       TCSObjectService {
 
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, TCSObjectReference<T> ref)
-      throws KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      return getRemoteService().fetchObject(getClientId(), clazz, ref);
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
   @Override
   public <T extends TCSObject<T>> Optional<T> fetch(Class<T> clazz, TCSObjectReference<T> ref)
       throws KernelRuntimeException {
@@ -46,20 +32,6 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
 
     try {
       return Optional.ofNullable(getRemoteService().fetch(getClientId(), clazz, ref));
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, String name)
-      throws KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      return getRemoteService().fetchObject(getClientId(), clazz, name);
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);
@@ -79,20 +51,6 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
     }
   }
 
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> Set<T> fetchObjects(Class<T> clazz)
-      throws KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      return getRemoteService().fetchObjects(getClientId(), clazz);
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
   @Override
   public <T extends TCSObject<T>> Set<T> fetch(Class<T> clazz)
       throws KernelRuntimeException {
@@ -100,23 +58,6 @@ abstract class RemoteTCSObjectServiceProxy<R extends RemoteTCSObjectService>
 
     try {
       return getRemoteService().fetch(getClientId(), clazz);
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> Set<T> fetchObjects(
-      Class<T> clazz,
-      Predicate<? super T> predicate
-  )
-      throws KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      return getRemoteService().fetchObjects(getClientId(), clazz, predicate);
     }
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);

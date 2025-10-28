@@ -6,7 +6,6 @@ import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,12 +98,18 @@ public class GetVehicleResponseTO {
     return this;
   }
 
-  @Deprecated
+  @ScheduledApiChange(
+      when = "Web API v2",
+      details = "Redundant, as the whole bounding box is now reflected."
+  )
   public int getLength() {
     return (int) boundingBox.getLength();
   }
 
-  @Deprecated
+  @ScheduledApiChange(
+      when = "Web API v2",
+      details = "Redundant, as the whole bounding box is now reflected."
+  )
   public GetVehicleResponseTO setLength(int length) {
     this.boundingBox = boundingBox.setLength(length);
     return this;
@@ -287,7 +292,10 @@ public class GetVehicleResponseTO {
     return this;
   }
 
-  @Deprecated
+  @ScheduledApiChange(
+      when = "Web API v2",
+      details = "Redundant, as the whole acceptable order types are now reflected."
+  )
   public List<String> getAllowedOrderTypes() {
     return getAcceptableOrderTypes().stream()
         .map(AcceptableOrderTypeTO::getName)
@@ -305,18 +313,16 @@ public class GetVehicleResponseTO {
     return this;
   }
 
-  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
-  @Nullable
+  @Nonnull
   public String getEnvelopeKey() {
     return envelopeKey;
   }
 
-  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
   public GetVehicleResponseTO setEnvelopeKey(
-      @Nullable
+      @Nonnull
       String envelopeKey
   ) {
-    this.envelopeKey = envelopeKey;
+    this.envelopeKey = requireNonNull(envelopeKey, "envelopeKey");
     return this;
   }
 

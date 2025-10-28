@@ -11,12 +11,10 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
-import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * The default implementation of the vehicle service.
@@ -108,36 +106,6 @@ class RemoteVehicleServiceProxy
   }
 
   @Override
-  @Deprecated
-  public void sendCommAdapterCommand(TCSObjectReference<Vehicle> ref, AdapterCommand command)
-      throws ObjectUnknownException,
-        KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      getRemoteService().sendCommAdapterCommand(getClientId(), ref, command);
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void sendCommAdapterMessage(TCSObjectReference<Vehicle> ref, Object message)
-      throws ObjectUnknownException,
-        KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      getRemoteService().sendCommAdapterMessage(getClientId(), ref, message);
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
-  @Override
   public void sendCommAdapterMessage(
       TCSObjectReference<Vehicle> ref,
       VehicleCommAdapterMessage message
@@ -199,29 +167,6 @@ class RemoteVehicleServiceProxy
           getClientId(),
           ref,
           energyLevelThresholdSet
-      );
-    }
-    catch (RemoteException ex) {
-      throw findSuitableExceptionFor(ex);
-    }
-  }
-
-  @Override
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public void updateVehicleAllowedOrderTypes(
-      TCSObjectReference<Vehicle> ref,
-      Set<String> allowedOrderTypes
-  )
-      throws ObjectUnknownException,
-        KernelRuntimeException {
-    checkServiceAvailability();
-
-    try {
-      getRemoteService().updateVehicleAllowedOrderTypes(
-          getClientId(),
-          ref,
-          allowedOrderTypes
       );
     }
     catch (RemoteException ex) {

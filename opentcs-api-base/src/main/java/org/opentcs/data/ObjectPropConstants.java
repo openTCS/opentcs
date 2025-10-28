@@ -2,12 +2,8 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.data;
 
-import org.opentcs.data.model.Location;
-import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Defines some reserved/commonly used property keys and values.
@@ -21,26 +17,6 @@ public interface ObjectPropConstants {
    * </p>
    */
   String MODEL_FILE_LAST_MODIFIED = "tcs:modelFileLastModified";
-  /**
-   * A property key for {@link LocationType} instances used to provide a hint for the visualization
-   * how locations of the type should be visualized.
-   * <p>
-   * Type: String (any element of {@link LocationRepresentation})
-   * </p>
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed without replacement.")
-  String LOCTYPE_DEFAULT_REPRESENTATION = "tcs:defaultLocationTypeSymbol";
-  /**
-   * A property key for {@link Location} instances used to provide a hint for the visualization how
-   * the locations should be visualized.
-   * <p>
-   * Type: String (any element of {@link LocationRepresentation})
-   * </p>
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed without replacement.")
-  String LOC_DEFAULT_REPRESENTATION = "tcs:defaultLocationSymbol";
   /**
    * A property key for {@link TransportOrder} instances used to define resources (i.e., points,
    * paths or locations) that should be avoided by vehicles processing transport orders with such a

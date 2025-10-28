@@ -18,10 +18,8 @@ import java.util.Queue;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Pose;
-import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.notification.UserNotification;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * An observable model of a vehicle's and its comm adapter's attributes.
@@ -276,59 +274,6 @@ public class VehicleProcessModel {
   }
 
   /**
-   * Returns the vehicle's precise position.
-   *
-   * @return The vehicle's precise position.
-   * @deprecated Use {@link #getPose()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  @Nullable
-  public Triple getPrecisePosition() {
-    return pose.getPosition();
-  }
-
-  /**
-   * Sets the vehicle's precise position.
-   *
-   * @param position The new position.
-   * @deprecated Use {@link #setPose(Pose)}} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public void setPrecisePosition(
-      @Nullable
-      Triple position
-  ) {
-    setPose(pose.withPosition(position));
-  }
-
-  /**
-   * Returns the vehicle's current orientation angle.
-   *
-   * @return The vehicle's current orientation angle.
-   * @see Vehicle#getOrientationAngle()
-   * @deprecated Use {@link #getPose()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public double getOrientationAngle() {
-    return pose.getOrientationAngle();
-  }
-
-  /**
-   * Sets the vehicle's current orientation angle.
-   *
-   * @param angle The new angle
-   * @deprecated Use {@link #setPose(Pose)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public void setOrientationAngle(double angle) {
-    setPose(pose.withOrientationAngle(angle));
-  }
-
-  /**
    * Returns the vehicle's pose.
    *
    * @return The vehicle's pose.
@@ -355,16 +300,6 @@ public class VehicleProcessModel {
         Attribute.POSE.name(),
         oldPose,
         pose
-    );
-    getPropertyChangeSupport().firePropertyChange(
-        Attribute.PRECISE_POSITION.name(),
-        oldPose.getPosition(),
-        pose.getPosition()
-    );
-    getPropertyChangeSupport().firePropertyChange(
-        Attribute.ORIENTATION_ANGLE.name(),
-        oldPose.getOrientationAngle(),
-        pose.getOrientationAngle()
     );
   }
 
@@ -499,30 +434,6 @@ public class VehicleProcessModel {
   }
 
   /**
-   * Returns the vehicle's current length.
-   *
-   * @return The vehicle's current length.
-   * @deprecated Use {@link #getBoundingBox()} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public int getLength() {
-    return (int) boundingBox.getLength();
-  }
-
-  /**
-   * Sets the vehicle's current length.
-   *
-   * @param length The new length.
-   * @deprecated Use {@link #setBoundingBox(BoundingBox)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public void setLength(int length) {
-    setBoundingBox(getBoundingBox().withLength(length));
-  }
-
-  /**
    * Returns the vehicle's current bounding box.
    *
    * @return The vehicle's current bounding box.
@@ -550,11 +461,6 @@ public class VehicleProcessModel {
         Attribute.BOUNDING_BOX.name(),
         oldValue,
         boundingBox
-    );
-    getPropertyChangeSupport().firePropertyChange(
-        Attribute.LENGTH.name(),
-        oldValue.getLength(),
-        boundingBox.getLength()
     );
   }
 
@@ -796,18 +702,6 @@ public class VehicleProcessModel {
      */
     POSITION,
     /**
-     * Indicates a change of the vehicle's precise position.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-    PRECISE_POSITION,
-    /**
-     * Indicates a change of the vehicle's orientation angle.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-    ORIENTATION_ANGLE,
-    /**
      * Indicates a change of the vehicle's pose.
      */
     POSE,
@@ -823,12 +717,6 @@ public class VehicleProcessModel {
      * Indicates a change of the vehicle's state.
      */
     STATE,
-    /**
-     * Indicates a change of the vehicle's length.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-    LENGTH,
     /**
      * Indicates a change of the vehicle's bounding box.
      */

@@ -60,7 +60,6 @@ public class TransportOrderConverter {
     return orderMessage;
   }
 
-  @SuppressWarnings("deprecation")
   /**
    * Creates a new instance from a <code>TransportOrder</code>.
    *

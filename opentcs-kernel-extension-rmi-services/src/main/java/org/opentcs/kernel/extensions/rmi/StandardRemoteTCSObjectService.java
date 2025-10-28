@@ -57,17 +57,6 @@ public abstract class StandardRemoteTCSObjectService
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
   }
 
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> T fetchObject(
-      ClientID clientId, Class<T> clazz,
-      TCSObjectReference<T> ref
-  ) {
-    userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
-
-    return objectService.fetchObject(clazz, ref);
-  }
-
   @Override
   public <T extends TCSObject<T>> T fetch(
       ClientID clientId, Class<T> clazz,
@@ -78,14 +67,6 @@ public abstract class StandardRemoteTCSObjectService
     return objectService.fetch(clazz, ref).orElse(null);
   }
 
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> T fetchObject(ClientID clientId, Class<T> clazz, String name) {
-    userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
-
-    return objectService.fetchObject(clazz, name);
-  }
-
   @Override
   public <T extends TCSObject<T>> T fetch(ClientID clientId, Class<T> clazz, String name) {
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
@@ -93,31 +74,11 @@ public abstract class StandardRemoteTCSObjectService
     return objectService.fetch(clazz, name).orElse(null);
   }
 
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> Set<T> fetchObjects(ClientID clientId, Class<T> clazz) {
-    userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
-
-    return objectService.fetchObjects(clazz);
-  }
-
   @Override
   public <T extends TCSObject<T>> Set<T> fetch(ClientID clientId, Class<T> clazz) {
     userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
 
     return objectService.fetch(clazz);
-  }
-
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> Set<T> fetchObjects(
-      ClientID clientId,
-      Class<T> clazz,
-      Predicate<? super T> predicate
-  ) {
-    userManager.verifyCredentials(clientId, UserPermission.READ_DATA);
-
-    return objectService.fetchObjects(clazz, predicate);
   }
 
   @Override

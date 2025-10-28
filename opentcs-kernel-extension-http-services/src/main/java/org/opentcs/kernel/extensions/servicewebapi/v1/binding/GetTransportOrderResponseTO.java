@@ -12,6 +12,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Destination
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DriveOrderTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.ObjectHistoryTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  */
@@ -203,12 +204,18 @@ public class GetTransportOrderResponseTO {
     return this;
   }
 
-  @Deprecated
+  @ScheduledApiChange(
+      when = "Web API v2",
+      details = "Redundant, as the whole drive orders is now reflected."
+  )
   public List<DestinationState> getDestinations() {
     return destinations;
   }
 
-  @Deprecated
+  @ScheduledApiChange(
+      when = "Web API v2",
+      details = "Redundant, as the whole drive orders is now reflected."
+  )
   public GetTransportOrderResponseTO setDestinations(List<DestinationState> destinations) {
     this.destinations = requireNonNull(destinations, "destinations");
     return this;

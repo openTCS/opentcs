@@ -12,6 +12,7 @@ import java.util.List;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  */
@@ -70,12 +71,18 @@ public class VehicleTO {
     return this;
   }
 
-  @Deprecated
+  @ScheduledApiChange(
+      when = "Web API v2",
+      details = "Redundant, as the whole bounding box is now reflected."
+  )
   public int getLength() {
     return (int) boundingBox.getLength();
   }
 
-  @Deprecated
+  @ScheduledApiChange(
+      when = "Web API v2",
+      details = "Redundant, as the whole bounding box is now reflected."
+  )
   public VehicleTO setLength(int length) {
     this.boundingBox = boundingBox.setLength(length);
     return this;

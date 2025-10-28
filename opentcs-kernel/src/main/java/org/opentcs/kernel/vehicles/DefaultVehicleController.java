@@ -46,7 +46,6 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.IncomingPoseTransformer;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
@@ -679,25 +678,6 @@ public class DefaultVehicleController
   }
 
   @Override
-  @Deprecated
-  public void sendCommAdapterMessage(
-      @Nullable
-      Object message
-  ) {
-    synchronized (commAdapter) {
-      commAdapter.processMessage(message);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void sendCommAdapterCommand(AdapterCommand command) {
-    synchronized (commAdapter) {
-      commAdapter.execute(command);
-    }
-  }
-
-  @Override
   public void sendCommAdapterMessage(
       @Nonnull
       VehicleCommAdapterMessage message
@@ -732,15 +712,6 @@ public class DefaultVehicleController
   @Override
   public TCSObjectReference<Vehicle> getRelatedVehicle() {
     return vehicle.getReference();
-  }
-
-  @Override
-  @Deprecated
-  public boolean allocationSuccessful(
-      @Nonnull
-      Set<TCSResource<?>> resources
-  ) {
-    return onAllocation(resources);
   }
 
   @Override

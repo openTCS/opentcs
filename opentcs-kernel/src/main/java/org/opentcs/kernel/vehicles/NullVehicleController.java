@@ -11,7 +11,6 @@ import java.util.Queue;
 import java.util.Set;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.VehicleController;
@@ -73,18 +72,6 @@ public class NullVehicleController
   @Override
   public ExplainedBoolean canProcess(TransportOrder order) {
     return new ExplainedBoolean(false, "NullVehicleController");
-  }
-
-  @Override
-  @Deprecated
-  public void sendCommAdapterMessage(Object message) {
-    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
-  }
-
-  @Override
-  @Deprecated
-  public void sendCommAdapterCommand(AdapterCommand command) {
-    LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
   }
 
   @Override

@@ -8,7 +8,6 @@ import static org.opentcs.util.Assertions.checkArgument;
 
 import jakarta.inject.Inject;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -177,52 +176,6 @@ public class DefaultRouter
     }
   }
 
-  @Deprecated
-  @Override
-  public Optional<List<DriveOrder>> getRoute(
-      Vehicle vehicle,
-      Point sourcePoint,
-      TransportOrder transportOrder
-  ) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(sourcePoint, "sourcePoint");
-    requireNonNull(transportOrder, "transportOrder");
-
-    synchronized (this) {
-      return getRoutes(vehicle, sourcePoint, transportOrder, 1).stream().findFirst()
-          .map(routeList -> {
-            List<DriveOrder> driveOrdersWithoutRoutes = transportOrder.getFutureDriveOrders();
-            List<DriveOrder> driveOrdersWithRoutes
-                = new ArrayList<>(driveOrdersWithoutRoutes.size());
-            for (int i = 0; i < driveOrdersWithoutRoutes.size(); i++) {
-              driveOrdersWithRoutes.add(
-                  driveOrdersWithoutRoutes.get(i).withRoute(routeList.get(i))
-              );
-            }
-            return driveOrdersWithRoutes;
-          });
-    }
-  }
-
-  @Deprecated
-  @Override
-  public Optional<Route> getRoute(
-      Vehicle vehicle,
-      Point sourcePoint,
-      Point destinationPoint,
-      Set<TCSResourceReference<?>> resourcesToAvoid
-  ) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(sourcePoint, "sourcePoint");
-    requireNonNull(destinationPoint, "destinationPoint");
-    requireNonNull(resourcesToAvoid, "resourcesToAvoid");
-
-    synchronized (this) {
-      return getRoutes(vehicle, sourcePoint, destinationPoint, resourcesToAvoid, 1)
-          .stream().findFirst();
-    }
-  }
-
   @Override
   public Set<List<Route>> getRoutes(
       Vehicle vehicle,
@@ -289,63 +242,6 @@ public class DefaultRouter
           .map(Route::new)
           .map(Set::of)
           .orElse(Set.of());
-    }
-  }
-
-  @Deprecated
-  @Override
-  public long getCosts(
-      Vehicle vehicle,
-      Point sourcePoint,
-      Point destinationPoint,
-      Set<TCSResourceReference<?>> resourcesToAvoid
-  ) {
-    requireNonNull(vehicle, "vehicle");
-    requireNonNull(sourcePoint, "sourcePoint");
-    requireNonNull(destinationPoint, "destinationPoint");
-    requireNonNull(resourcesToAvoid, "resourcesToAvoid");
-
-    synchronized (this) {
-      return pointRouterProvider
-          .getPointRouterForVehicle(vehicle, resourcesToAvoid)
-          .getCosts(sourcePoint, destinationPoint);
-    }
-  }
-
-  @Deprecated
-  @Override
-  public void selectRoute(Vehicle vehicle, List<DriveOrder> driveOrders) {
-    requireNonNull(vehicle, "vehicle");
-
-    synchronized (this) {
-      if (driveOrders == null) {
-        // XXX Should we remember the vehicle's current position, maybe?
-        routesByVehicle.remove(vehicle);
-      }
-      else {
-        routesByVehicle.put(vehicle, driveOrders);
-      }
-    }
-  }
-
-  @Deprecated
-  @Override
-  public Map<Vehicle, List<DriveOrder>> getSelectedRoutes() {
-    synchronized (this) {
-      return new HashMap<>(routesByVehicle);
-    }
-  }
-
-  @Deprecated
-  @Override
-  public Set<Point> getTargetedPoints() {
-    synchronized (this) {
-      Set<Point> result = new HashSet<>();
-      for (List<DriveOrder> curOrderList : routesByVehicle.values()) {
-        DriveOrder finalOrder = curOrderList.get(curOrderList.size() - 1);
-        result.add(finalOrder.getRoute().getFinalDestinationPoint());
-      }
-      return result;
     }
   }
 

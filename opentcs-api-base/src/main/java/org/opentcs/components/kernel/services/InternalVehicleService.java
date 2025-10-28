@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.components.kernel.services;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.List;
 import java.util.Set;
 import org.opentcs.access.KernelRuntimeException;
@@ -13,12 +11,10 @@ import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.TCSResourceReference;
-import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Declares the methods the vehicle service must provide which are not accessible to remote peers.
@@ -52,22 +48,6 @@ public interface InternalVehicleService
       throws ObjectUnknownException;
 
   /**
-   * Updates the point which a vehicle is expected to occupy next.
-   *
-   * @param vehicleRef A reference to the vehicle to be modified.
-   * @param pointRef A reference to the point which the vehicle is expected to occupy next.
-   * @throws ObjectUnknownException If the referenced vehicle does not exist.
-   * @deprecated Will be removed without replacement.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  void updateVehicleNextPosition(
-      TCSObjectReference<Vehicle> vehicleRef,
-      TCSObjectReference<Point> pointRef
-  )
-      throws ObjectUnknownException;
-
-  /**
    * Updates a vehicle's order sequence.
    *
    * @param vehicleRef A reference to the vehicle to be modified.
@@ -78,20 +58,6 @@ public interface InternalVehicleService
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<OrderSequence> sequenceRef
   )
-      throws ObjectUnknownException;
-
-  /**
-   * Updates the vehicle's current orientation angle (-360..360 degrees, or {@link Double#NaN}, if
-   * the vehicle doesn't provide an angle).
-   *
-   * @param ref A reference to the vehicle to be modified.
-   * @param angle The vehicle's orientation angle.
-   * @throws ObjectUnknownException If the referenced vehicle does not exist.
-   * @deprecated Use {@link #updateVehiclePose(TCSObjectReference,Pose)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  void updateVehicleOrientationAngle(TCSObjectReference<Vehicle> ref, double angle)
       throws ObjectUnknownException;
 
   /**
@@ -108,34 +74,14 @@ public interface InternalVehicleService
       throws ObjectUnknownException;
 
   /**
-   * Updates the vehicle's current precise position in mm.
-   *
-   * @param ref A reference to the vehicle to be modified.
-   * @param position The vehicle's precise position in mm.
-   * @throws ObjectUnknownException If the referenced vehicle does not exist.
-   * @deprecated Use {@link #updateVehiclePose(TCSObjectReference,Pose)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  void updateVehiclePrecisePosition(TCSObjectReference<Vehicle> ref, Triple position)
-      throws ObjectUnknownException;
-
-  /**
    * Updates the vehicle's pose.
    *
    * @param ref A reference to the vehicle to be modified.
    * @param pose The vehicle's new pose.
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    */
-  @ScheduledApiChange(when = "7.0", details = "Default implementation will be removed.")
-  default void updateVehiclePose(TCSObjectReference<Vehicle> ref, Pose pose)
-      throws ObjectUnknownException {
-    requireNonNull(ref, "ref");
-    requireNonNull(pose, "pose");
-
-    updateVehiclePrecisePosition(ref, pose.getPosition());
-    updateVehicleOrientationAngle(ref, pose.getOrientationAngle());
-  }
+  void updateVehiclePose(TCSObjectReference<Vehicle> ref, Pose pose)
+      throws ObjectUnknownException;
 
   /**
    * Updates a vehicle's processing state.
@@ -194,19 +140,6 @@ public interface InternalVehicleService
       throws ObjectUnknownException;
 
   /**
-   * Updates a vehicle's length.
-   *
-   * @param ref A reference to the vehicle to be modified.
-   * @param length The vehicle's new length.
-   * @throws ObjectUnknownException If the referenced vehicle does not exist.
-   * @deprecated Use {@link #updateVehicleBoundingBox(TCSObjectReference, BoundingBox)} instead.
-   */
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  void updateVehicleLength(TCSObjectReference<Vehicle> ref, int length)
-      throws ObjectUnknownException;
-
-  /**
    * Updates the vehicle's bounding box.
    *
    * @param ref A reference to the vehicle.
@@ -214,12 +147,9 @@ public interface InternalVehicleService
    * @throws ObjectUnknownException If the referenced vehicle does not exist.
    * @throws KernelRuntimeException In case there is an exception executing this method.
    */
-  @ScheduledApiChange(when = "7.0", details = "Default implementation will be removed.")
-  default void updateVehicleBoundingBox(TCSObjectReference<Vehicle> ref, BoundingBox boundingBox)
+  void updateVehicleBoundingBox(TCSObjectReference<Vehicle> ref, BoundingBox boundingBox)
       throws ObjectUnknownException,
-        KernelRuntimeException {
-    throw new UnsupportedOperationException("Not yet implemented.");
-  }
+        KernelRuntimeException;
 
   /**
    * Updates a vehicle's transport order.

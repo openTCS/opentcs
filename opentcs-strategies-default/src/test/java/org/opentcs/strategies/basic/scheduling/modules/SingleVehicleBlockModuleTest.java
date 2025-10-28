@@ -145,14 +145,6 @@ class SingleVehicleBlockModuleTest {
     }
 
     @Override
-    @Deprecated
-    public boolean allocationSuccessful(
-        Set<TCSResource<?>> resources
-    ) {
-      return onAllocation(resources);
-    }
-
-    @Override
     public boolean onAllocation(
         @Nonnull
         Set<TCSResource<?>> resources

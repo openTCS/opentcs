@@ -19,6 +19,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 == Unreleased
 
 * Breaking changes:
+** Remove deprecated code from interfaces and data structures in the Java API.
 ** Make data structures in `org.opentcs.access.to` independent of the primary object data structures in `org.opentcs.data`.
 ** Remove support for reading openTCS plant model file versions 0.0.4 and 0.0.5.
    Trying to load plant models in version 0.0.4 or 0.0.5 files with openTCS 7 will fail.

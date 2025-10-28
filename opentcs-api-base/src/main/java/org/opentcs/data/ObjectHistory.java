@@ -3,7 +3,6 @@
 package org.opentcs.data;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentcs.util.Assertions.checkArgument;
 
 import jakarta.annotation.Nonnull;
 import java.io.Serializable;
@@ -11,7 +10,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * A history of events related to an object.
@@ -105,25 +103,6 @@ public class ObjectHistory
      *
      * @param timestamp The point of time at which the event occurred.
      * @param eventCode A code identifying the event that occurred.
-     * @param supplement Supplementary information about the event.
-     * Must be {@link Serializable} and should provide a human-readable default representation from
-     * its {@code toString()} method.
-     * @deprecated Use {@link #Entry(Instant, String, List)} instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Entry(Instant timestamp, String eventCode, Object supplement) {
-      this.timestamp = requireNonNull(timestamp, "timestamp");
-      this.eventCode = requireNonNull(eventCode, "eventCode");
-      checkArgument(supplement instanceof Serializable, "supplement is not serializable");
-      this.supplements = List.of(supplement.toString());
-    }
-
-    /**
-     * Creates a new instance.
-     *
-     * @param timestamp The point of time at which the event occurred.
-     * @param eventCode A code identifying the event that occurred.
      * @param supplements Supplementary information about the event.
      */
     public Entry(Instant timestamp, String eventCode, List<String> supplements) {
@@ -140,21 +119,6 @@ public class ObjectHistory
      */
     public Entry(Instant timestamp, String eventCode) {
       this(timestamp, eventCode, List.of());
-    }
-
-    /**
-     * Creates a new instance with the timestamp set to the current point of time.
-     *
-     * @param eventCode A code identifying the event that occurred.
-     * @param supplement Supplementary information about the event.
-     * Must be {@link Serializable} and should provide a human-readable default representation from
-     * its {@code toString()} method.
-     * @deprecated Use {@link #Entry(String, List)} instead.
-     */
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Entry(String eventCode, Object supplement) {
-      this(Instant.now(), eventCode, supplement);
     }
 
     /**
@@ -195,21 +159,6 @@ public class ObjectHistory
     @Nonnull
     public String getEventCode() {
       return eventCode;
-    }
-
-    /**
-     * Returns a supplemental object providing details about the event.
-     *
-     * @return A supplemental object providing details about the event.
-     * @deprecated Use {@link #getSupplements()} instead.
-     */
-    @Nonnull
-    @Deprecated
-    @ScheduledApiChange(when = "7.0", details = "Will be removed")
-    public Object getSupplement() {
-      return supplements.isEmpty()
-          ? ""
-          : supplements.getFirst();
     }
 
     /**

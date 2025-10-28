@@ -7,7 +7,6 @@ import static java.util.Objects.requireNonNull;
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.components.kernel.services.InternalVehicleService;
@@ -20,12 +19,10 @@ import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.TCSResourceReference;
-import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
@@ -37,7 +34,6 @@ import org.opentcs.kernel.extensions.controlcenter.vehicles.VehicleEntryPool;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
 import org.opentcs.kernel.workingset.PlantModelManager;
-import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,20 +131,6 @@ public class StandardVehicleService
   }
 
   @Override
-  @Deprecated
-  public void updateVehicleNextPosition(
-      TCSObjectReference<Vehicle> vehicleRef,
-      TCSObjectReference<Point> pointRef
-  )
-      throws ObjectUnknownException {
-    requireNonNull(vehicleRef, "vehicleRef");
-
-    synchronized (globalSyncObject) {
-      plantModelManager.setVehicleNextPosition(vehicleRef, pointRef);
-    }
-  }
-
-  @Override
   public void updateVehicleOrderSequence(
       TCSObjectReference<Vehicle> vehicleRef,
       TCSObjectReference<OrderSequence> sequenceRef
@@ -158,18 +140,6 @@ public class StandardVehicleService
 
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleOrderSequence(vehicleRef, sequenceRef);
-    }
-  }
-
-  @Deprecated
-  @Override
-  public void updateVehicleOrientationAngle(TCSObjectReference<Vehicle> ref, double angle)
-      throws ObjectUnknownException {
-    requireNonNull(ref, "ref");
-
-    synchronized (globalSyncObject) {
-      Vehicle previousState = plantModelManager.getObjectRepo().getObject(Vehicle.class, ref);
-      plantModelManager.setVehiclePose(ref, previousState.getPose().withOrientationAngle(angle));
     }
   }
 
@@ -184,18 +154,6 @@ public class StandardVehicleService
     synchronized (globalSyncObject) {
       LOG.debug("Vehicle {} has reached point {}.", vehicleRef, pointRef);
       plantModelManager.setVehiclePosition(vehicleRef, pointRef);
-    }
-  }
-
-  @Deprecated
-  @Override
-  public void updateVehiclePrecisePosition(TCSObjectReference<Vehicle> ref, Triple position)
-      throws ObjectUnknownException {
-    requireNonNull(ref, "ref");
-
-    synchronized (globalSyncObject) {
-      Vehicle previousState = plantModelManager.getObjectRepo().getObject(Vehicle.class, ref);
-      plantModelManager.setVehiclePose(ref, previousState.getPose().withPosition(position));
     }
   }
 
@@ -272,22 +230,6 @@ public class StandardVehicleService
 
     synchronized (globalSyncObject) {
       plantModelManager.setVehicleState(ref, state);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void updateVehicleLength(TCSObjectReference<Vehicle> ref, int length)
-      throws ObjectUnknownException {
-    requireNonNull(ref, "ref");
-
-    synchronized (globalSyncObject) {
-      plantModelManager.setVehicleBoundingBox(
-          ref,
-          plantModelManager.getObjectRepo().getObject(Vehicle.class, ref)
-              .getBoundingBox()
-              .withLength(length)
-      );
     }
   }
 
@@ -377,33 +319,6 @@ public class StandardVehicleService
   }
 
   @Override
-  @Deprecated
-  public void sendCommAdapterCommand(TCSObjectReference<Vehicle> ref, AdapterCommand command)
-      throws ObjectUnknownException {
-    requireNonNull(ref, "ref");
-    requireNonNull(command, "command");
-
-    synchronized (globalSyncObject) {
-      vehicleControllerPool
-          .getVehicleController(ref.getName())
-          .sendCommAdapterCommand(command);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void sendCommAdapterMessage(TCSObjectReference<Vehicle> ref, Object message)
-      throws ObjectUnknownException {
-    requireNonNull(ref, "ref");
-
-    synchronized (globalSyncObject) {
-      vehicleControllerPool
-          .getVehicleController(ref.getName())
-          .sendCommAdapterMessage(message);
-    }
-  }
-
-  @Override
   public void sendCommAdapterMessage(
       TCSObjectReference<Vehicle> ref,
       VehicleCommAdapterMessage message
@@ -476,26 +391,6 @@ public class StandardVehicleService
   }
 
   @Override
-  @Deprecated
-  public void updateVehicleAllowedOrderTypes(
-      TCSObjectReference<Vehicle> ref,
-      Set<String> allowedOrderTypes
-  )
-      throws ObjectUnknownException {
-    requireNonNull(ref, "ref");
-    requireNonNull(allowedOrderTypes, "allowedOrderTypes");
-
-    synchronized (globalSyncObject) {
-      plantModelManager.setVehicleAcceptableOrderTypes(
-          ref,
-          allowedOrderTypes.stream()
-              .map(orderType -> new AcceptableOrderType(orderType, 0))
-              .collect(Collectors.toSet())
-      );
-    }
-  }
-
-  @Override
   public void updateVehicleAcceptableOrderTypes(
       TCSObjectReference<Vehicle> ref,
       Set<AcceptableOrderType> acceptableOrderTypes
@@ -510,12 +405,12 @@ public class StandardVehicleService
   }
 
   @Override
-  @ScheduledApiChange(when = "7.0", details = "Envelope key will become non-null.")
   public void updateVehicleEnvelopeKey(TCSObjectReference<Vehicle> ref, String envelopeKey)
       throws ObjectUnknownException,
         IllegalArgumentException,
         KernelRuntimeException {
     requireNonNull(ref, "ref");
+    requireNonNull(envelopeKey, "envelopeKey");
 
     synchronized (globalSyncObject) {
       Vehicle vehicle = fetch(Vehicle.class, ref).orElseThrow();

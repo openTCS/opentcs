@@ -22,12 +22,10 @@ import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.Vehicle.EnergyLevelThresholdSet;
-import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.VehicleCommAdapterMessage;
 import org.opentcs.drivers.vehicle.management.VehicleAttachmentInformation;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
-import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -223,40 +221,6 @@ public class StandardRemoteVehicleService
   }
 
   @Override
-  @Deprecated
-  public void sendCommAdapterCommand(
-      ClientID clientId,
-      TCSObjectReference<Vehicle> ref,
-      AdapterCommand command
-  ) {
-    userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
-
-    try {
-      kernelExecutor.submit(() -> vehicleService.sendCommAdapterCommand(ref, command)).get();
-    }
-    catch (InterruptedException | ExecutionException exc) {
-      throw findSuitableExceptionFor(exc);
-    }
-  }
-
-  @Override
-  @Deprecated
-  public void sendCommAdapterMessage(
-      ClientID clientId,
-      TCSObjectReference<Vehicle> vehicleRef,
-      Object message
-  ) {
-    userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
-
-    try {
-      kernelExecutor.submit(() -> vehicleService.sendCommAdapterMessage(vehicleRef, message)).get();
-    }
-    catch (InterruptedException | ExecutionException exc) {
-      throw findSuitableExceptionFor(exc);
-    }
-  }
-
-  @Override
   public void sendCommAdapterMessage(
       ClientID clientId,
       TCSObjectReference<Vehicle> vehicleRef,
@@ -321,26 +285,6 @@ public class StandardRemoteVehicleService
     try {
       kernelExecutor.submit(
           () -> vehicleService.updateVehicleEnergyLevelThresholdSet(ref, energyLevelThresholdSet)
-      )
-          .get();
-    }
-    catch (InterruptedException | ExecutionException exc) {
-      throw findSuitableExceptionFor(exc);
-    }
-  }
-
-  @Override
-  @Deprecated
-  @ScheduledApiChange(when = "7.0", details = "Will be removed.")
-  public void updateVehicleAllowedOrderTypes(
-      ClientID clientId, TCSObjectReference<Vehicle> ref,
-      Set<String> allowedOrderTypes
-  ) {
-    userManager.verifyCredentials(clientId, UserPermission.MODIFY_VEHICLES);
-
-    try {
-      kernelExecutor.submit(
-          () -> vehicleService.updateVehicleAllowedOrderTypes(ref, allowedOrderTypes)
       )
           .get();
     }

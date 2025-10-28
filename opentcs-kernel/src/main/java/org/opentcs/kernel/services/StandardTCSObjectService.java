@@ -7,7 +7,6 @@ import static java.util.Objects.requireNonNull;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -63,17 +62,6 @@ public class StandardTCSObjectService
     }
   }
 
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, TCSObjectReference<T> ref) {
-    requireNonNull(clazz, "clazz");
-    requireNonNull(ref, "ref");
-
-    synchronized (getGlobalSyncObject()) {
-      return getObjectRepo().getObjectOrNull(clazz, ref);
-    }
-  }
-
   @Override
   public <T extends TCSObject<T>> Optional<T> fetch(Class<T> clazz, TCSObjectReference<T> ref) {
     requireNonNull(clazz, "clazz");
@@ -81,16 +69,6 @@ public class StandardTCSObjectService
 
     synchronized (getGlobalSyncObject()) {
       return Optional.ofNullable(getObjectRepo().getObjectOrNull(clazz, ref));
-    }
-  }
-
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> T fetchObject(Class<T> clazz, String name) {
-    requireNonNull(clazz, "clazz");
-
-    synchronized (getGlobalSyncObject()) {
-      return getObjectRepo().getObjectOrNull(clazz, name);
     }
   }
 
@@ -103,43 +81,12 @@ public class StandardTCSObjectService
     }
   }
 
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> Set<T> fetchObjects(Class<T> clazz) {
-    requireNonNull(clazz, "clazz");
-
-    synchronized (getGlobalSyncObject()) {
-      Set<T> objects = getObjectRepo().getObjects(clazz);
-      Set<T> copies = new HashSet<>();
-      for (T object : objects) {
-        copies.add(object);
-      }
-      return copies;
-    }
-  }
-
   @Override
   public <T extends TCSObject<T>> Set<T> fetch(Class<T> clazz) {
     requireNonNull(clazz, "clazz");
 
     synchronized (getGlobalSyncObject()) {
       return getObjectRepo().getObjects(clazz);
-    }
-  }
-
-  @Deprecated
-  @Override
-  public <T extends TCSObject<T>> Set<T> fetchObjects(
-      @Nonnull
-      Class<T> clazz,
-      @Nonnull
-      Predicate<? super T> predicate
-  ) {
-    requireNonNull(clazz, "clazz");
-    requireNonNull(predicate, "predicate");
-
-    synchronized (getGlobalSyncObject()) {
-      return getObjectRepo().getObjects(clazz, predicate);
     }
   }
 
