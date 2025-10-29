@@ -33,7 +33,7 @@ public class VehicleTO
   private Long energyLevelGood = 0L;
   private Long energyLevelFullyRecharged = 0L;
   private Long energyLevelSufficientlyRecharged = 0L;
-  private String envelopeKey;
+  private String envelopeKey = "";
   private BoundingBoxTO boundingBox = new BoundingBoxTO();
   private VehicleLayout vehicleLayout = new VehicleLayout();
 
