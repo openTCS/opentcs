@@ -20,6 +20,11 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 ...
 
+== Version 7.0.1 (2025-10-29)
+
+* Bugs fixed:
+** Allow loading of plant models with file version 7.0.0 in the Model Editor with vehicles that have no envelope key defined.
+
 == Version 7.0 (2025-10-28)
 
 * Breaking changes:
