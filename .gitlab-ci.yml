@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: MIT
 
 default:
-  image: eclipse-temurin:21.0.8_9-jdk-noble
+  image: eclipse-temurin:21.0.9_10-jdk-noble
   tags:
     - opentcs-runner
   before_script:
