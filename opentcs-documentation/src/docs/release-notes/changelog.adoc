@@ -21,6 +21,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Changes affecting developers:
 ** Update JUnit to 6.0.1.
 ** Update ApprovalTests to 25.9.0.
+** Update OpenAPI generator to 7.17.0.
+** Update Swagger UI to 5.30.3.
 
 == Version 7.0.1 (2025-10-29)
 
