@@ -18,15 +18,14 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
-...
+* Changes affecting developers:
+** Update JUnit to 6.0.1.
+** Update ApprovalTests to 25.9.0.
 
 == Version 7.0.1 (2025-10-29)
 
 * Bugs fixed:
 ** Allow loading of plant models with file version 7.0.0 in the Model Editor with vehicles that have no envelope key defined.
-* Changes affecting developers:
-** Update JUnit to 6.0.1.
-** Update ApprovalTests to 25.9.0.
 
 == Version 7.0 (2025-10-28)
 
