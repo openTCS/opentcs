@@ -4,7 +4,7 @@
 apply plugin: 'checkstyle'
 
 checkstyle {
-  toolVersion = libs.versions.checkstyle.get()
+  toolVersion = "10.25.0"
   configFile = rootProject.file("config/checkstyle/checkstyle.xml")
   showViolations = false
 }

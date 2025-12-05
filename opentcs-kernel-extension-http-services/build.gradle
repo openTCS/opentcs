@@ -5,7 +5,7 @@ plugins {
 }
 
 lombok {
-  version = libs.versions.lombok.get()
+  version = "1.18.38"
 }
 
 apply from: "${rootDir}/gradle/java-project.gradle"
