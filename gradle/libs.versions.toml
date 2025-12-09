@@ -35,7 +35,7 @@ freefair-lombok = "8.14"
 jacocolog = "3.1.0"
 openapi-generator = "7.17.0"
 gradle-nexus-publish-plugin = "2.0.0"
-spotless = "8.0.0"
+spotless = "8.1.0"
 swagger-generator = "2.19.2"
 
 [libraries]
