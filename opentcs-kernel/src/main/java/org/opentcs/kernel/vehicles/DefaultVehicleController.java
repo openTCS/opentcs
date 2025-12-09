@@ -1337,11 +1337,11 @@ public class DefaultVehicleController
       }
       else {
         // Check if the reported position belongs to any of the commands we sent.
-        List<Point> expectedPoints = commandProcessingTracker.getSentCommands().stream()
-            .map(cmd -> cmd.getStep().getDestinationPoint())
+        List<String> expectedPoints = commandProcessingTracker.getSentCommands().stream()
+            .map(cmd -> cmd.getStep().getDestinationPoint().getName())
             .collect(Collectors.toList());
 
-        if (!expectedPoints.contains(point)) {
+        if (!expectedPoints.contains(point.getName())) {
           LOG.warn(
               "{}: Reported position: {}, expected one of: {}",
               vehicle.getName(),
@@ -1517,6 +1517,10 @@ public class DefaultVehicleController
       @Nullable
       Point point
   ) {
+    if (!configuration.requireManualReroutingAfterUnexpectedPosition()) {
+      return;
+    }
+
     sendingCommandsAllowed = false;
 
     notificationService.publishUserNotification(

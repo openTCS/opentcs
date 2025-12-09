@@ -18,6 +18,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
+* New features and enhancements:
+** Allow to be less strict with unexpected positions:
+   Require manual rerouting after a vehicle driver has reported an unexpected position only if the configuration demands it.
 * Changes affecting developers:
 ** Update JUnit to 6.0.1.
 ** Update ApprovalTests to 25.10.0.

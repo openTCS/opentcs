@@ -73,6 +73,18 @@ public interface KernelApplicationConfiguration {
   boolean rerouteOnDriveOrderFinished();
 
   @ConfigurationEntry(
+      type = "Boolean",
+      description = {
+          "Whether a vehicle requires manual rerouting after reporting an unexpected position.",
+          "Disabling this is not recommended, as it may lead to vehicles continuing to operate "
+              + " despite deviating from their routes."
+      },
+      changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
+      orderKey = "4_reroute_3"
+  )
+  boolean requireManualReroutingAfterUnexpectedPosition();
+
+  @ConfigurationEntry(
       type = "String",
       description = {
           "The type of how vehicle resources (i.e., paths, points and locations allocated by "
