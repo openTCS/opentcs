@@ -30,7 +30,7 @@ junit-platform-launcher = "6.0.1"
 mockito = "5.20.0"
 # Plugin versions
 asciidoctor = "4.0.5"
-dependency-license-report = "2.9"
+dependency-license-report = "3.0.1"
 freefair-lombok = "8.14"
 jacocolog = "3.1.0"
 openapi-generator = "7.17.0"

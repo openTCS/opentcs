@@ -24,6 +24,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update OpenAPI generator to 7.17.0.
 ** Update Swagger UI to 5.30.3.
 ** Update Spotless to 8.1.0.
+** Update Gradle Dependency License Report plugin to 3.0.1.
 
 == Version 7.0.1 (2025-10-29)
 
