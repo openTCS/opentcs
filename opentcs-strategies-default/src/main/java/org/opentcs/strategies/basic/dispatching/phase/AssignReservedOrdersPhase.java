@@ -109,7 +109,9 @@ public class AssignReservedOrdersPhase
     // Note that we expect no more than a single reserved order, and remove ALL reservations if we
     // find at least one, even if it cannot be processed by the vehicle in the end.
     orderReservationPool.findReservations(vehicle.getReference()).stream()
-        .map(orderRef -> objectService.fetch(TransportOrder.class, orderRef).orElseThrow())
+        .map(orderRef -> objectService.fetch(TransportOrder.class, orderRef).orElse(null))
+        // An order we have reserved for a vehicle may have been removed in the meantime.
+        .filter(Objects::nonNull)
         .filter(order -> order.hasState(TransportOrder.State.DISPATCHABLE))
         // A transport order's intended vehicle can change after its creation and also after
         // reservation. Only handle orders where the intended vehicle (still) fits the reservation.

@@ -18,7 +18,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
-...
+* Bugs fixed:
+** Avoid `NullPointerException` when trying to assign a vehicle to a reserved transport orders that has been removed in the meantime.
 
 == Version 7.1 (2025-12-09)
 
