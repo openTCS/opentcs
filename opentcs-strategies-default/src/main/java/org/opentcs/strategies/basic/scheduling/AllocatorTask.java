@@ -5,8 +5,8 @@ package org.opentcs.strategies.basic.scheduling;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
-import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.Scheduler.Client;
@@ -35,9 +35,9 @@ class AllocatorTask
    */
   private final Scheduler.Module allocationAdvisor;
   /**
-   * Allocations deferred because they couldn't be granted, yet.
+   * The pending allocation manager.
    */
-  private final Queue<AllocatorCommand.Allocate> deferredAllocations;
+  private final PendingAllocationManager pendingAllocationManager;
   /**
    * Executes tasks.
    */
@@ -58,7 +58,7 @@ class AllocatorTask
       @Nonnull
       ReservationPool reservationPool,
       @Nonnull
-      Queue<AllocatorCommand.Allocate> deferredAllocations,
+      PendingAllocationManager allocationTracker,
       @Nonnull
       Scheduler.Module allocationAdvisor,
       @Nonnull
@@ -70,7 +70,8 @@ class AllocatorTask
       AllocatorCommand command
   ) {
     this.reservationPool = requireNonNull(reservationPool, "reservationPool");
-    this.deferredAllocations = requireNonNull(deferredAllocations, "deferredAllocations");
+    this.pendingAllocationManager
+        = requireNonNull(allocationTracker, "pendingAllocationManager");
     this.allocationAdvisor = requireNonNull(allocationAdvisor, "allocationAdvisor");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.globalSyncObject = requireNonNull(globalSyncObject, "globalSyncObject");
@@ -101,7 +102,7 @@ class AllocatorTask
   private void processAllocate(AllocatorCommand.Allocate command) {
     if (!tryAllocate(command)) {
       LOG.debug("{}: Resources unavailable, deferring allocation...", command.getClient().getId());
-      deferredAllocations.add(command);
+      pendingAllocationManager.addDeferredAllocation(command);
       return;
     }
 
@@ -215,18 +216,18 @@ class AllocatorTask
    * Moves all waiting allocations back into the incoming queue so they can be rechecked.
    */
   private void scheduleRetryWaitingAllocations() {
-    for (AllocatorCommand.Allocate allocate : deferredAllocations) {
-      kernelExecutor.submit(
+    for (AllocatorCommand.Allocate allocate : pendingAllocationManager.drainDeferredAllocations()) {
+      Future<?> future = kernelExecutor.submit(
           new AllocatorTask(
               reservationPool,
-              deferredAllocations,
+              pendingAllocationManager,
               allocationAdvisor,
               kernelExecutor,
               globalSyncObject,
               allocate
           )
       );
+      pendingAllocationManager.addAllocationFuture(allocate.getClient(), future);
     }
-    deferredAllocations.clear();
   }
 }
