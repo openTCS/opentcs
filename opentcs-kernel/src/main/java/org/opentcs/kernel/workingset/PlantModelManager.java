@@ -1388,7 +1388,8 @@ public class PlantModelManager
         .withScaleX(to.getScaleX())
         .withScaleY(to.getScaleY())
         .withLayers(toLayers(to.getLayers()))
-        .withLayerGroups(toLayerGroups(to.getLayerGroups()));
+        .withLayerGroups(toLayerGroups(to.getLayerGroups()))
+        .withProperties(to.getProperties());
 
     getObjectRepo().addObject(newLayout);
     emitObjectEvent(

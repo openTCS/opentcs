@@ -20,6 +20,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * Bugs fixed:
 ** Avoid `NullPointerException` when trying to assign a vehicle to a reserved transport orders that has been removed in the meantime.
+** Actually add given properties to newly-created plant models' visual layouts.
 
 == Version 7.1 (2025-12-09)
 
