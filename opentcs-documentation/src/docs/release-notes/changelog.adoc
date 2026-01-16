@@ -21,6 +21,10 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Bugs fixed:
 ** Avoid `NullPointerException` when trying to assign a vehicle to a reserved transport orders that has been removed in the meantime.
 ** Actually add given properties to newly-created plant models' visual layouts.
+* Changes affecting developers:
+** Update JUnit to 6.0.2.
+** Update Mockito to 5.21.0.
+** Update ApprovalTests to 26.4.0.
 
 == Version 7.1 (2025-12-09)
 
