@@ -178,15 +178,15 @@
                 </Constraint>
               </Constraints>
             </Component>
-            <Component class="javax.swing.JLabel" name="labelType">
+            <Component class="javax.swing.JLabel" name="labelOrderTypes">
               <Properties>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
                   <FontInfo relative="true">
-                    <Font component="labelType" property="font" relativeSize="true" size="0"/>
+                    <Font component="labelOrderTypes" property="font" relativeSize="true" size="0"/>
                   </FontInfo>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="i18n/org/opentcs/plantoverview/operating/dialogs/orderSequenceDetail.properties" key="orderSequenceView.panel_general.label_type.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="i18n/org/opentcs/plantoverview/operating/dialogs/orderSequenceDetail.properties" key="orderSequenceView.panel_general.label_orderTypes.text" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Constraints>
@@ -195,13 +195,13 @@
                 </Constraint>
               </Constraints>
             </Component>
-            <Component class="javax.swing.JTextField" name="textType">
+            <Component class="javax.swing.JTextField" name="textOrderTypes">
               <Properties>
                 <Property name="editable" type="boolean" value="false"/>
                 <Property name="columns" type="int" value="10"/>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
                   <FontInfo relative="true">
-                    <Font component="textType" property="font" relativeSize="true" size="0"/>
+                    <Font component="textOrderTypes" property="font" relativeSize="true" size="0"/>
                   </FontInfo>
                 </Property>
               </Properties>

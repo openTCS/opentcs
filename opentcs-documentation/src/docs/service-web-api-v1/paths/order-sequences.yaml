@@ -162,9 +162,18 @@ components:
           description: The name of the order sequence.
           example: Sequence-001
         type:
+          deprecated: true
           type: string
-          description: The type of the order sequence.
+          description: >-
+            The type of the order sequence.
+            Deprecated: Use `orderTypes` instead.
           example: Park
+        orderTypes:
+          type: array
+          example: [ "Park", "Charge", "Load" ]
+          items:
+            type: string
+            description: The types of transport orders allowed in this order sequence.
         orders:
           type: array
           example: [ "some-order", "another-order", "order-3" ]
@@ -218,6 +227,7 @@ components:
       required:
         - name
         - type
+        - orderTypes
         - orders
         - creationTime
         - finishedTime
@@ -242,7 +252,15 @@ components:
         type:
           type: string
           description: The type of the order sequence.
+            Note that `type` and `orderTypes` are mutually exclusive. If one is provided, the other must be omitted.
           example: Park
+        orderTypes:
+          type: array
+          example: [ "Park", "Charge", "Load" ]
+          items:
+            type: string
+          description: The types of transport orders allowed in this order sequence.
+             Note that `type` and `orderTypes` are mutually exclusive. If one is provided, the other must be omitted.
         intendedVehicle:
           type: string
           description: >-
@@ -259,7 +277,6 @@ components:
             $ref: "../schemas/common.yaml#/components/schemas/Property"
           description: The order sequence's properties
       required:
-        - type
         - properties
     Property:
       type: object

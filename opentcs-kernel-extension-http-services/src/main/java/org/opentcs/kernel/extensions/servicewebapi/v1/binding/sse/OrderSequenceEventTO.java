@@ -50,6 +50,7 @@ public class OrderSequenceEventTO {
     private Map<String, String> properties;
     private ObjectHistoryTO history;
     private String type;
+    private List<String> orderTypes;
     private List<String> orders;
     private int finishedIndex;
     private boolean complete;

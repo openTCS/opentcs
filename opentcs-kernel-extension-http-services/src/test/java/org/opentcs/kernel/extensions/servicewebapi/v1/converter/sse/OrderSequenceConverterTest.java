@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import org.approvaltests.Approvals;
 import org.approvaltests.core.Options;
@@ -44,7 +45,7 @@ class OrderSequenceConverterTest {
         .withHistoryEntry(
             new ObjectHistory.Entry(Instant.EPOCH, "event-code-1", List.of("supplement-1"))
         )
-        .withType("type-1")
+        .withOrderTypes(Set.of("some-type"))
         .withOrder(new TransportOrder("order-1", List.of()).getReference())
         .withOrder(new TransportOrder("order-2", List.of()).getReference())
         .withFinishedIndex(1)

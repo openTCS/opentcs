@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.is;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
@@ -30,7 +31,7 @@ public class OrderSequenceConverterTest {
         .withFinishedIndex(0)
         .withCreationTime(Instant.EPOCH)
         .withFinishedTime(Instant.EPOCH)
-        .withType("some-type")
+        .withOrderTypes(Set.of("some-type"))
         .withIntendedVehicle(new Vehicle("V1").getReference())
         .withProcessingVehicle(new Vehicle("V2").getReference())
         .withProperties(Map.of("some-key", "some-value"));
@@ -44,7 +45,8 @@ public class OrderSequenceConverterTest {
     assertThat(response.getFinishedIndex(), is(0));
     assertThat(response.getCreationTime(), is(Instant.EPOCH));
     assertThat(response.getFinishedTime(), is(Instant.EPOCH));
-    assertThat(response.getType(), is("some-type"));
+    assertThat(response.getType(), is("-"));
+    assertThat(response.getOrderTypes(), is(List.of("some-type")));
     assertThat(response.getIntendedVehicle(), is("V1"));
     assertThat(response.getOrders().size(), is(1));
     assertThat(response.getOrders().getFirst(), is("T1"));

@@ -18,6 +18,7 @@ public class OrderSequenceConverter {
   public OrderSequenceConverter() {
   }
 
+  @SuppressWarnings("deprecation")
   public GetOrderSequenceResponseTO toGetOrderSequenceResponseTO(OrderSequence orderSequence) {
     return new GetOrderSequenceResponseTO(orderSequence.getName())
         .setComplete(orderSequence.isComplete())
@@ -27,6 +28,7 @@ public class OrderSequenceConverter {
         .setCreationTime(orderSequence.getCreationTime())
         .setFinishedTime(orderSequence.getFinishedTime())
         .setType(orderSequence.getType())
+        .setOrderTypes(orderSequence.getOrderTypes().stream().toList())
         .setOrders(
             orderSequence.getOrders()
                 .stream()

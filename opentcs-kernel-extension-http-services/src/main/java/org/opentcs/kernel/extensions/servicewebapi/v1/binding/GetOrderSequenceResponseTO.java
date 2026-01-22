@@ -23,6 +23,9 @@ public class GetOrderSequenceResponseTO {
   private String type = OrderConstantsTO.TYPE_NONE;
 
   @Nonnull
+  private List<String> orderTypes = List.of();
+
+  @Nonnull
   private List<String> orders = List.of();
 
   private int finishedIndex;
@@ -76,6 +79,19 @@ public class GetOrderSequenceResponseTO {
       String type
   ) {
     this.type = requireNonNull(type, "type");
+    return this;
+  }
+
+  @Nonnull
+  public List<String> getOrderTypes() {
+    return orderTypes;
+  }
+
+  public GetOrderSequenceResponseTO setOrderTypes(
+      @Nonnull
+      List<String> orderTypes
+  ) {
+    this.orderTypes = requireNonNull(orderTypes, "orderTypes");
     return this;
   }
 

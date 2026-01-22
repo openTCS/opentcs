@@ -1,6 +1,7 @@
 {
   "name" : "some-order-sequence",
   "type" : "Charge",
+  "orderTypes" : [ "some-type", "some-other-type" ],
   "orders" : [ "some-order", "another-order", "order-3" ],
   "finishedIndex" : 3,
   "complete" : false,

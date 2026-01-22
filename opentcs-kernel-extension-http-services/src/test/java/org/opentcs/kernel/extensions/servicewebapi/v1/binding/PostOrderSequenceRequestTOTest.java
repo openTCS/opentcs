@@ -25,6 +25,7 @@ class PostOrderSequenceRequestTOTest {
     PostOrderSequenceRequestTO to = new PostOrderSequenceRequestTO()
         .setIncompleteName(true)
         .setType("Transport")
+        .setOrderTypes(List.of("some-type"))
         .setIntendedVehicle("some-vehicle")
         .setFailureFatal(true)
         .setProperties(

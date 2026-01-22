@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.theInstance;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -234,6 +235,46 @@ class TransportOrderHandlerTest {
             .setIncompleteName(false)
             .setFailureFatal(false)
             .setIntendedVehicle(null)
+            .setOrderTypes(List.of("some-type"))
+            .setProperties(
+                List.of(
+                    new Property("some-key", "some-value")
+                )
+            )
+    );
+
+    // Assert
+    assertThat(result, is(theInstance(orderSequence)));
+
+    ArgumentCaptor<OrderSequenceCreationTO> captor
+        = ArgumentCaptor.forClass(OrderSequenceCreationTO.class);
+    then(orderService).should().createOrderSequence(captor.capture());
+    assertThat(captor.getValue())
+        .returns(false, from(OrderSequenceCreationTO::hasIncompleteName))
+        .returns(null, from(OrderSequenceCreationTO::getIntendedVehicleName))
+        .returns(false, from(OrderSequenceCreationTO::isFailureFatal))
+        .returns(Set.of("some-type"), from(OrderSequenceCreationTO::getOrderTypes))
+        .returns(
+            Map.of("some-key", "some-value"),
+            from(OrderSequenceCreationTO::getProperties)
+        );
+  }
+
+  @SuppressWarnings("deprecation")
+  @Test
+  void createOrderSequenceWithType() {
+    // Arrange
+    OrderSequence orderSequence = new OrderSequence("some-sequence");
+    given(orderService.createOrderSequence(any(OrderSequenceCreationTO.class)))
+        .willReturn(orderSequence);
+
+    // Act
+    OrderSequence result = handler.createOrderSequence(
+        "some-sequence",
+        new PostOrderSequenceRequestTO()
+            .setIncompleteName(false)
+            .setFailureFatal(false)
+            .setIntendedVehicle(null)
             .setType("some-type")
             .setProperties(
                 List.of(
@@ -253,10 +294,37 @@ class TransportOrderHandlerTest {
         .returns(null, from(OrderSequenceCreationTO::getIntendedVehicleName))
         .returns(false, from(OrderSequenceCreationTO::isFailureFatal))
         .returns("some-type", from(OrderSequenceCreationTO::getType))
+        .returns(Set.of(), from(OrderSequenceCreationTO::getOrderTypes))
         .returns(
             Map.of("some-key", "some-value"),
             from(OrderSequenceCreationTO::getProperties)
         );
+  }
+
+  @Test
+  void createOrderSequenceWithTypeAndOrderTypesFails() {
+    // Arrange
+    OrderSequence orderSequence = new OrderSequence("some-sequence");
+    given(orderService.createOrderSequence(any(OrderSequenceCreationTO.class)))
+        .willReturn(orderSequence);
+
+    // Assert
+    assertThrows(
+        IllegalArgumentException.class, () -> handler.createOrderSequence(
+            "some-sequence",
+            new PostOrderSequenceRequestTO()
+                .setIncompleteName(false)
+                .setFailureFatal(false)
+                .setIntendedVehicle(null)
+                .setType("some-type")
+                .setOrderTypes(List.of("some-type"))
+                .setProperties(
+                    List.of(
+                        new Property("some-key", "some-value")
+                    )
+                )
+        )
+    );
   }
 
   @Test

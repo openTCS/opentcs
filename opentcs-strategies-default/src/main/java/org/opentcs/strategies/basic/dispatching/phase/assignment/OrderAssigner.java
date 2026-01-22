@@ -11,11 +11,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.AcceptableOrderType;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderConstants;
+import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
 import org.opentcs.strategies.basic.dispatching.DriveOrderRouteAssigner;
@@ -307,6 +311,24 @@ public class OrderAssigner {
             .anyMatch(
                 orderType -> orderType.getName().equals(order.getType())
                     || orderType.getName().equals(OrderConstants.TYPE_ANY)
+            ))
+        && (order.getWrappingSequence() == null
+            || vehicleAcceptableOrderTypesContainAllOrderTypesOfSequence(
+                vehicle,
+                order.getWrappingSequence()
             ));
+  }
+
+  private boolean vehicleAcceptableOrderTypesContainAllOrderTypesOfSequence(
+      Vehicle vehicle,
+      TCSObjectReference<OrderSequence> seqRef
+  ) {
+    OrderSequence sequence = objectService.fetch(OrderSequence.class, seqRef).orElseThrow();
+    Set<String> acceptableOrderTypes = vehicle.getAcceptableOrderTypes()
+        .stream()
+        .map(AcceptableOrderType::getName)
+        .collect(Collectors.toSet());
+    return acceptableOrderTypes.contains(OrderConstants.TYPE_ANY)
+        || acceptableOrderTypes.containsAll(sequence.getOrderTypes());
   }
 }

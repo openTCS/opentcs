@@ -7,7 +7,6 @@ import static java.util.Objects.requireNonNull;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.List;
-import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.OrderConstantsTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 
 /**
@@ -17,8 +16,11 @@ public class PostOrderSequenceRequestTO {
 
   private boolean incompleteName;
 
-  @Nonnull
-  private String type = OrderConstantsTO.TYPE_NONE;
+  @Nullable
+  private String type;
+
+  @Nullable
+  private List<String> orderTypes;
 
   @Nullable
   private String intendedVehicle;
@@ -41,16 +43,29 @@ public class PostOrderSequenceRequestTO {
     return this;
   }
 
-  @Nonnull
+  @Nullable
   public String getType() {
     return type;
   }
 
   public PostOrderSequenceRequestTO setType(
-      @Nonnull
+      @Nullable
       String type
   ) {
-    this.type = requireNonNull(type, "type");
+    this.type = type;
+    return this;
+  }
+
+  @Nullable
+  public List<String> getOrderTypes() {
+    return orderTypes;
+  }
+
+  public PostOrderSequenceRequestTO setOrderTypes(
+      @Nullable
+      List<String> orderTypes
+  ) {
+    this.orderTypes = orderTypes;
     return this;
   }
 

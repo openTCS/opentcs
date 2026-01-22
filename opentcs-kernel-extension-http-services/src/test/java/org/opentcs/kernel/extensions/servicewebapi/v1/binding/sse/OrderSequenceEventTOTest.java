@@ -50,6 +50,7 @@ class OrderSequenceEventTOTest {
             )
         )
         .setType("type-1")
+        .setOrderTypes(List.of("type-1"))
         .setOrders(List.of("order-1", "order-2"))
         .setFinishedIndex(4)
         .setComplete(true)

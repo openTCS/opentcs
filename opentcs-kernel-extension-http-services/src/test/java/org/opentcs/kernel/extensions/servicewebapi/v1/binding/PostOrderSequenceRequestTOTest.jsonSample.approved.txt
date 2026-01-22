@@ -1,6 +1,7 @@
 {
   "incompleteName" : true,
   "type" : "Transport",
+  "orderTypes" : [ "some-type" ],
   "intendedVehicle" : "some-vehicle",
   "failureFatal" : true,
   "properties" : [ {

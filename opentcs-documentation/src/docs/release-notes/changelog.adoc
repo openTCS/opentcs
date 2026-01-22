@@ -18,6 +18,13 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
+* New features and enhancements:
+** Allow order sequences to contain multiple types of transport orders.
+   Instead of a single type, order sequences now define a set of order types.
+   Additionally, transport orders whose type is included in this set of order types can be added to the order sequence.
+** Update web API specification and implementation to version 1.14.0:
+*** Extend the request body of the `POST /orderSequences/{NAME}` endpoint so that it also excepts a list of order types.
+*** Extend the response bodies where order sequences are returned to also include the list of order types.
 * Bugs fixed:
 ** Avoid `NullPointerException` when trying to assign a vehicle to a reserved transport orders that has been removed in the meantime.
 ** Actually add given properties to newly-created plant models' visual layouts.

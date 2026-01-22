@@ -35,7 +35,8 @@
       "supplements" : [ "vehicle-2" ]
     } ]
   },
-  "type" : "type-1",
+  "type" : "-",
+  "orderTypes" : [ "some-type" ],
   "orders" : [ "order-1", "order-2" ],
   "finishedIndex" : 1,
   "complete" : true,

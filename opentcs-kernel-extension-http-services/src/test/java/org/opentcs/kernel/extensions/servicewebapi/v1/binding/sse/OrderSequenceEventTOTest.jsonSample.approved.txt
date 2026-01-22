@@ -13,6 +13,7 @@
       } ]
     },
     "type" : "type-1",
+    "orderTypes" : [ "type-1" ],
     "orders" : [ "order-1", "order-2" ],
     "finishedIndex" : 4,
     "complete" : true,
@@ -37,6 +38,7 @@
       } ]
     },
     "type" : "type-1",
+    "orderTypes" : [ "type-1" ],
     "orders" : [ "order-1", "order-2" ],
     "finishedIndex" : 4,
     "complete" : true,

@@ -34,6 +34,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetTransportOrderR
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostOrderSequenceRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrderRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.posttransportorder.Destination;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.OrderConstantsTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.Property;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.OrderSequenceConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.TransportOrderConverter;
@@ -167,6 +168,7 @@ public class TransportOrderHandler {
     });
   }
 
+  @SuppressWarnings("deprecation")
   public OrderSequence createOrderSequence(String name, PostOrderSequenceRequestTO sequence)
       throws ObjectUnknownException,
         ObjectExistsException,
@@ -175,12 +177,21 @@ public class TransportOrderHandler {
     requireNonNull(name, "name");
     requireNonNull(sequence, "sequence");
 
+    if (!hasValidTypes(sequence)) {
+      throw new IllegalArgumentException(
+          "Order sequence must only have either 'type' or 'orderTypes' set."
+      );
+    }
+
     OrderSequenceCreationTO to = new OrderSequenceCreationTO(name)
         .withFailureFatal(sequence.isFailureFatal())
         .withIncompleteName(sequence.isIncompleteName())
         .withIntendedVehicleName(sequence.getIntendedVehicle())
         .withProperties(properties(sequence.getProperties()))
-        .withType(sequence.getType());
+        .withType(sequence.getType() != null ? sequence.getType() : OrderConstantsTO.TYPE_UNSET)
+        .withOrderTypes(
+            sequence.getOrderTypes() != null ? new HashSet<>(sequence.getOrderTypes()) : Set.of()
+        );
 
     return executorWrapper.callAndWait(() -> {
       return orderService.createOrderSequence(to);
@@ -252,6 +263,11 @@ public class TransportOrderHandler {
     }
 
     return result;
+  }
+
+  private boolean hasValidTypes(PostOrderSequenceRequestTO orderSequenceRequestTO) {
+    return (orderSequenceRequestTO.getType() != null)
+        ^ (orderSequenceRequestTO.getOrderTypes() != null);
   }
 
   private Set<String> dependencyNames(List<String> dependencies) {

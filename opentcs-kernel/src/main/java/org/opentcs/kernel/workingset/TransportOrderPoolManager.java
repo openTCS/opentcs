@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.opentcs.access.to.order.DestinationCreationTO;
+import org.opentcs.access.to.order.OrderConstantsTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.components.kernel.ObjectNameProvider;
@@ -474,15 +475,24 @@ public class TransportOrderPoolManager
    * @throws ObjectExistsException If an object with the new object's name already exists.
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    */
+  @SuppressWarnings("deprecation")
   public OrderSequence createOrderSequence(OrderSequenceCreationTO to)
       throws ObjectExistsException,
         ObjectUnknownException {
     OrderSequence newSequence = new OrderSequence(nameFor(to))
-        .withType(to.getType())
         .withCreationTime(Instant.now())
         .withIntendedVehicle(toVehicleReference(to.getIntendedVehicleName()))
         .withFailureFatal(to.isFailureFatal())
         .withProperties(to.getProperties());
+
+    if (!to.getType().equals(OrderConstantsTO.TYPE_UNSET)) {
+      newSequence = newSequence
+          .withType(to.getType());
+    }
+    else {
+      newSequence = newSequence
+          .withOrderTypes(to.getOrderTypes());
+    }
 
     LOG.info(
         "Order sequence is being created: {} -- details: {}",
@@ -693,12 +703,12 @@ public class TransportOrderPoolManager
     );
     checkArgument(!sequence.isComplete(), "Order sequence %s is already complete", sequence);
     checkArgument(
-        Objects.equals(to.getType(), sequence.getType()),
-        "Order sequence %s has different type than order %s: %s != %s",
-        sequence,
+        sequence.getOrderTypes().contains(to.getType()),
+        "Order sequence %s does not allow type of order %s: %s not in %s",
+        sequence.getName(),
         to.getName(),
-        sequence.getType(),
-        to.getType()
+        to.getType(),
+        sequence.getOrderTypes()
     );
     checkArgument(
         Objects.equals(to.getIntendedVehicleName(), getIntendedVehicleName(sequence)),

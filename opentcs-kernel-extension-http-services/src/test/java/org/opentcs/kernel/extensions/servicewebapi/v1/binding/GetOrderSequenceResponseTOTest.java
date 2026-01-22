@@ -25,6 +25,7 @@ class GetOrderSequenceResponseTOTest {
   void jsonSample() {
     GetOrderSequenceResponseTO to = new GetOrderSequenceResponseTO("some-order-sequence")
         .setType("Charge")
+        .setOrderTypes(List.of("some-type", "some-other-type"))
         .setOrders(List.of("some-order", "another-order", "order-3"))
         .setCreationTime(Instant.EPOCH)
         .setFinishedTime(Instant.MAX)

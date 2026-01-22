@@ -19,10 +19,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.util.annotations.ScheduledApiChange;
 
 /**
  * Describes a process spanning multiple {@link TransportOrder}s which are to be executed
@@ -60,7 +62,14 @@ public class OrderSequence
    * An order sequence and all transport orders it contains share the same type.
    */
   @Nonnull
+  @Deprecated
   private final String type;
+  /**
+   * The set of order types allowed in this order sequence.
+   * Each order in the sequence must match one of these types.
+   */
+  @Nonnull
+  private final Set<String> orderTypes;
   /**
    * Transport orders belonging to this sequence that still need to be processed.
    */
@@ -113,6 +122,7 @@ public class OrderSequence
         new ObjectHistory().withEntryAppended(new ObjectHistory.Entry(SEQUENCE_CREATED))
     );
     this.type = OrderConstants.TYPE_NONE;
+    this.orderTypes = Set.of(OrderConstants.TYPE_ANY);
     this.orders = List.of();
     this.creationTime = Instant.EPOCH;
     this.finishedIndex = -1;
@@ -129,6 +139,7 @@ public class OrderSequence
       Map<String, String> properties,
       ObjectHistory history,
       String type,
+      Set<String> orderTypes,
       TCSObjectReference<Vehicle> intendedVehicle,
       List<TCSObjectReference<TransportOrder>> orders,
       Instant creationTime,
@@ -140,7 +151,8 @@ public class OrderSequence
       TCSObjectReference<Vehicle> processingVehicle
   ) {
     super(name, properties, history);
-    this.type = requireNonNull(type, "type");
+    this.type = type;
+    this.orderTypes = orderTypes;
     this.intendedVehicle = intendedVehicle;
     this.orders = requireNonNull(orders, "orders");
     this.creationTime = requireNonNull(creationTime, "creationTime");
@@ -159,6 +171,7 @@ public class OrderSequence
         propertiesWith(key, value),
         getHistory(),
         type,
+        orderTypes,
         intendedVehicle,
         orders,
         creationTime,
@@ -178,6 +191,7 @@ public class OrderSequence
         mapWithoutNullValues(properties),
         getHistory(),
         type,
+        orderTypes,
         intendedVehicle,
         orders,
         creationTime,
@@ -197,6 +211,7 @@ public class OrderSequence
         getProperties(),
         getHistory().withEntryAppended(entry),
         type,
+        orderTypes,
         intendedVehicle,
         orders,
         creationTime,
@@ -216,6 +231,7 @@ public class OrderSequence
         getProperties(),
         history,
         type,
+        orderTypes,
         intendedVehicle,
         orders,
         creationTime,
@@ -232,7 +248,10 @@ public class OrderSequence
    * Returns this order sequence's type.
    *
    * @return This order sequence's type.
+   * @deprecated Use {@link OrderSequence#getOrderTypes()} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "8.0", details = "Will be removed.")
   @Nonnull
   public String getType() {
     return type;
@@ -243,13 +262,57 @@ public class OrderSequence
    *
    * @param type The type to be set in the copy.
    * @return A copy of this object, differing in the given value.
+   * @deprecated Use {@link OrderSequence#withOrderTypes(Set)} instead.
    */
+  @Deprecated
+  @ScheduledApiChange(when = "8.0", details = "Will be removed.")
   public OrderSequence withType(String type) {
     return new OrderSequence(
         getName(),
         getProperties(),
         getHistory(),
         type,
+        Set.of(type),
+        intendedVehicle,
+        orders,
+        creationTime,
+        finishedIndex,
+        complete,
+        failureFatal,
+        finished,
+        finishedTime,
+        processingVehicle
+    );
+  }
+
+  /**
+   * Returns this order sequence's order types.
+   *
+   * @return This order sequence's order types.
+   */
+  @Nonnull
+  public Set<String> getOrderTypes() {
+    return orderTypes;
+  }
+
+  /**
+   * Creates a copy of this object, with the given order types.
+   *
+   * @param orderTypes The order types to be set in the copy.
+   * @return A copy of this object, differing in the given value.
+   */
+  public OrderSequence withOrderTypes(
+      @Nonnull
+      Set<String> orderTypes
+  ) {
+    checkArgument(!orderTypes.isEmpty(), "Order types must not be empty");
+
+    return new OrderSequence(
+        getName(),
+        getProperties(),
+        getHistory(),
+        OrderConstants.TYPE_NONE,
+        orderTypes,
         intendedVehicle,
         orders,
         creationTime,
@@ -286,6 +349,7 @@ public class OrderSequence
         getProperties(),
         historyForAppendedOrder(order),
         type,
+        orderTypes,
         intendedVehicle,
         Collections.unmodifiableList(ordersWithAppended(order)),
         creationTime,
@@ -323,6 +387,7 @@ public class OrderSequence
         getProperties(),
         getHistory(),
         type,
+        orderTypes,
         intendedVehicle,
         orders,
         creationTime,
@@ -382,6 +447,7 @@ public class OrderSequence
         getProperties(),
         getHistory(),
         type,
+        orderTypes,
         intendedVehicle,
         orders,
         creationTime,
@@ -417,6 +483,7 @@ public class OrderSequence
         getProperties(),
         historyForComplete(complete),
         type,
+        orderTypes,
         intendedVehicle,
         orders,
         creationTime,
@@ -454,6 +521,7 @@ public class OrderSequence
         getProperties(),
         historyForFinished(finished),
         type,
+        orderTypes,
         intendedVehicle,
         orders,
         creationTime,
@@ -490,6 +558,7 @@ public class OrderSequence
         getProperties(),
         getHistory(),
         type,
+        orderTypes,
         intendedVehicle,
         orders,
         creationTime,
@@ -529,6 +598,7 @@ public class OrderSequence
         getProperties(),
         getHistory(),
         type,
+        orderTypes,
         intendedVehicle,
         orders,
         creationTime,
@@ -565,6 +635,7 @@ public class OrderSequence
         getProperties(),
         getHistory(),
         type,
+        orderTypes,
         intendedVehicle,
         orders,
         creationTime,
@@ -600,6 +671,7 @@ public class OrderSequence
         getProperties(),
         historyForNewProcessingVehicle(processingVehicle),
         type,
+        orderTypes,
         intendedVehicle,
         orders,
         creationTime,
@@ -616,7 +688,7 @@ public class OrderSequence
   public String toString() {
     return "OrderSequence{"
         + "name=" + getName()
-        + ", type=" + type
+        + ", orderTypes=" + orderTypes
         + ", failureFatal=" + failureFatal
         + ", complete=" + complete
         + ", finished=" + finished
