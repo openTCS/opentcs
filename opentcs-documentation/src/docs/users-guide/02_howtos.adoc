@@ -1,11 +1,25 @@
 // SPDX-FileCopyrightText: The openTCS Authors
 // SPDX-License-Identifier: CC-BY-4.0
 
-== Advanced usage examples
+== How-to Guides
 
-=== Configuring automatic startup
+=== Automatically enabling drivers on startup
 
-. To automatically enable vehicle drivers on startup, set the kernel application's configuration parameter `kernelapp.autoEnableDriversOnStartup` to `true`.
+To automatically enable vehicle drivers when the kernel is started, add the following line to the kernel configuration file (`config/opentcs-kernel.properties` in the kernel application directory):
+
+[source, properties]
+----
+kernelapp.autoEnableDriversOnStartup = true
+----
+
+To enable peripheral drivers on startup, add the following line:
+
+[source, properties]
+----
+kernelapp.autoEnablePeripheralDriversOnStartup = true
+----
+
+NOTE: See <<Kernel configuration>> for a description of all kernel configuration entries.
 
 === Automatically selecting a specific vehicle driver on startup
 
@@ -60,14 +74,12 @@ The loopback driver interprets properties with the following keys:
 
 It is possible that not all vehicles managed by an openTCS kernel instance are using the same coordinate system as the one in the plant model.
 To ease integration with such situations, the kernel can transform coordinates when they are sent to / received from vehicles.
-The following sections describe the included transformations.
+This section describes the included transformation.
 
 NOTE: This mechanism is extensible:
 Developers can integrate their own transformation components with the openTCS kernel to apply custom, complex transformations to data sent to / received from vehicles.
 
-==== Coordinate system mapping
-
-This transformation method maps coordinates from the plant model's coordinate system to the coordinate system of a vehicle (when sending coordinates to the vehicle) and vice versa (when receiving coordinates from the vehicle).
+The included transformation method maps coordinates from the plant model's coordinate system to the coordinate system of a vehicle (when sending coordinates to the vehicle) and vice versa (when receiving coordinates from the vehicle).
 For this, the position and orientation of the vehicle's coordinate system in relation to the plant model's coordinate system can be defined by providing...
 
 * translations in x, y and z direction in relation to the origin of the plant model's coordinate system.
@@ -84,22 +96,6 @@ To make use of this transformation method for a specific vehicle, do the followi
 3. Set a property with the key `tcs:coordinateSystemMapper.rotation.z` to the value for the rotation along the coordinate system's z-axis.
    The value is expected to be a floating-point value in degrees.
    If the property is not set, a rotation of 0 degrees is used.
-
-==== Offset-based transformation
-
-IMPORTANT: This type of transformation is deprecated and scheduled for removal with openTCS 7.0.
-
-The kernel can apply offsets to coordinate and orientation angle values.
-To make use of this, do the following:
-
-1. On a vehicle element in the plant model, set a property with key `tcs:vehicleDataTransformer` to value `OFFSET_TRANSFORMER`.
-2. Set a property with key `tcs:offsetTransformer.x` to an offset value, e.g. 10.
-   The value is expected to be an integer in millimeters and may also be negative.
-3. Also set properties with keys `tcs:offsetTransformer.y` and `tcs:offsetTransformer.z` for offsets on the other two axes.
-4. Also set a property with key `tcs:offsetTransformer.orientation` for an orientation angle offset.
-   The value is expected to be a floating-point value in degrees and may also be negative.
-
-With this configuration, the given offset values will be added to coordinate and orientation angle values that are sent to the vehicle, and will be subtracted from coordinate and orientation angle values that are received by the vehicle.
 
 === Running kernel and its clients on separate systems
 

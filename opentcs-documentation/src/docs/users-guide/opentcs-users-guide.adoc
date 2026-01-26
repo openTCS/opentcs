@@ -19,12 +19,11 @@ The openTCS developers
 
 include::01_introduction.adoc[]
 
-include::02_system-overview.adoc[]
+include::01_tutorials.adoc[]
 
-include::03_operating-opentcs.adoc[]
+include::02_howtos.adoc[]
 
-include::04_default-strategies.adoc[]
+include::03_reference.adoc[]
 
-include::05_configuring-opentcs.adoc[]
-
-include::06_advanced-usage-examples.adoc[]
+// Excluded as long as it is without content.
+//include::04_explanation.adoc[]
