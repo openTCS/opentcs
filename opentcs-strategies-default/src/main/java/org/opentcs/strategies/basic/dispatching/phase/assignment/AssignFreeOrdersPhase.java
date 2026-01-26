@@ -159,6 +159,9 @@ public class AssignFreeOrdersPhase
   }
 
   private void markFirstDispatchableOrderInUnassignedSequences() {
+    // In case any orders at the beginning of sequences were withdrawn, update the sequences.
+    transportOrderUtil.markNewDispatchableOrders();
+
     objectService.fetch(
         TransportOrder.class,
         order -> order.hasState(TransportOrder.State.DISPATCHABLE)

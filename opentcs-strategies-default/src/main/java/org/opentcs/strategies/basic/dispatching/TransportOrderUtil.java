@@ -314,8 +314,11 @@ public class TransportOrderUtil
   /**
    * Skips all transport orders in the given order sequence until the first transport order that
    * should be dispatched/executed is found.
-   * A transport order should be dispatched if it is not dispensable or
-   * if it is the last order in the sequence.
+   * I.e., this skips transport orders...
+   * <ul>
+   * <li>that are in a final state,</li>
+   * <li>that are dispensable and not the last order in the sequence.</li>
+   * </ul>
    *
    * @param sequenceRef The reference to the order sequence
    * @return The next transport order that should be dispatched/executed or Optional.empty()
@@ -341,10 +344,11 @@ public class TransportOrderUtil
       return Optional.empty();
     }
 
-    while (nextUnfinishedOrder.isDispensable()
-        && !nextUnfinishedOrder.getReference().equals(seq.getOrders().getLast())) {
-      //If the transport order is dispensable and not the last order in the sequence,
-      //it should be skipped.
+    while (nextUnfinishedOrder.getState().isFinalState()
+        || isDispensableAndNotLastInSequence(nextUnfinishedOrder, seq)) {
+      // A transport order should be skipped if...
+      // - it is already in a final state OR
+      // - it is dispensable AND not the last order in the sequence.
       skipOrderInSequence(nextUnfinishedOrder);
 
       //Look for next orders, using an up-to-date copy of the sequence.
@@ -449,10 +453,12 @@ public class TransportOrderUtil
     );
 
     if (order.getProcessingVehicle() == null) {
-      transportOrderService.updateTransportOrderState(
-          order.getReference(),
-          TransportOrder.State.FAILED
-      );
+      if (!order.getState().isFinalState()) {
+        transportOrderService.updateTransportOrderState(
+            order.getReference(),
+            TransportOrder.State.FAILED
+        );
+      }
       updateSequenceOfFailedTransportOrder(order.getReference());
       markNewDispatchableOrders();
     }
@@ -573,5 +579,10 @@ public class TransportOrderUtil
     return order.getWrappingSequence() == null
         ? Optional.empty()
         : transportOrderService.fetch(OrderSequence.class, order.getWrappingSequence());
+  }
+
+  private boolean isDispensableAndNotLastInSequence(TransportOrder order, OrderSequence sequence) {
+    return order.isDispensable()
+        && !order.getReference().equals(sequence.getOrders().getLast());
   }
 }
