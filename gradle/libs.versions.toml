@@ -4,7 +4,7 @@
 [versions]
 # Other dependency versions
 dockingframes = "1.1.2p11"
-gestalt = "0.36.0"
+gestalt = "0.37.0"
 guice = "7.0.0"
 huxhorn-sulky-ulid = "8.3.0"
 jackson = "2.20.0"

@@ -33,6 +33,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update JUnit to 6.0.2.
 ** Update Mockito to 5.21.0.
 ** Update ApprovalTests to 26.4.0.
+** Update Gestalt to 0.37.0.
 
 == Version 7.1 (2025-12-09)
 
