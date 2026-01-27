@@ -109,7 +109,7 @@ public abstract class Ruler
       }
 
       Graphics2D g2d = (Graphics2D) g;
-      g2d.setFont(new Font("Arial", Font.PLAIN, 10));
+      g2d.setFont(new Font("Dialog", Font.PLAIN, 10));
       // i translated
       int translated;
       // i normalized to decimal
@@ -271,7 +271,7 @@ public abstract class Ruler
       }
 
       Graphics2D g2d = (Graphics2D) g;
-      g2d.setFont(new Font("Arial", Font.PLAIN, 10));
+      g2d.setFont(new Font("Dialog", Font.PLAIN, 10));
       // i translated
       int translated;
       // i normalized to decimal

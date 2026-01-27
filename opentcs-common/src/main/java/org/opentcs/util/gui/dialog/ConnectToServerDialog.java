@@ -258,7 +258,7 @@ public class ConnectToServerDialog
     gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
     getContentPane().add(panelButtons, gridBagConstraints);
 
-    cbComboBox.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    cbComboBox.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     cbComboBox.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         cbComboBoxActionPerformed(evt);
