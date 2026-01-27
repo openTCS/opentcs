@@ -71,7 +71,9 @@ public class VehicleDataTransformerRegistryTest {
   @Test
   void fallBackToDefaultFactoryForUnacceptableSelectedFactory() {
     when(dummyFactory.providesTransformersFor(vehicle)).thenReturn(false);
-    assertThat(vehicleDataTransformerRegistry.findFactoryFor(vehicle).getClass(),
-               is(DefaultVehicleDataTransformerFactory.class));
+    assertThat(
+        vehicleDataTransformerRegistry.findFactoryFor(vehicle).getClass(),
+        is(DefaultVehicleDataTransformerFactory.class)
+    );
   }
 }

@@ -82,6 +82,6 @@ spotless {
     importOrder()
 
     // Use the Eclipse JDT formatter
-    eclipse('4.26').configFile("${rootDir}/config/eclipse-formatter-preferences.xml")
+    eclipse('4.38').configFile("${rootDir}/config/eclipse-formatter-preferences.xml")
   }
 }

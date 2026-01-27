@@ -60,8 +60,10 @@ class EdgeEvaluatorExplicitPropertiesTest {
     when(configuration.defaultValue()).thenReturn("123.456");
 
     Edge edge = new Edge(
-        new Path("pathName", new Point("srcPoint").getReference(),
-                 new Point("dstPoint").getReference()),
+        new Path(
+            "pathName", new Point("srcPoint").getReference(),
+            new Point("dstPoint").getReference()
+        ),
         false
     );
     Vehicle vehicle = new Vehicle("someVehicle");
@@ -79,8 +81,10 @@ class EdgeEvaluatorExplicitPropertiesTest {
     when(configuration.defaultValue()).thenReturn("some invalid value");
 
     Edge edge = new Edge(
-        new Path("pathName", new Point("srcPoint").getReference(),
-                 new Point("dstPoint").getReference()),
+        new Path(
+            "pathName", new Point("srcPoint").getReference(),
+            new Point("dstPoint").getReference()
+        ),
         false
     );
     Vehicle vehicle = new Vehicle("someVehicle");

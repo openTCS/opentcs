@@ -59,10 +59,12 @@ class RandomOrderBatchCreatorTest {
         .thenReturn(Set.of(unsuitableLocType));
     when(transportOrderService.fetch(Location.class))
         .thenReturn(Set.of(unsuitableLoc));
-    RandomOrderBatchCreator batchCreator = new RandomOrderBatchCreator(transportOrderService,
-                                                                       dispatcherService,
-                                                                       10,
-                                                                       3);
+    RandomOrderBatchCreator batchCreator = new RandomOrderBatchCreator(
+        transportOrderService,
+        dispatcherService,
+        10,
+        3
+    );
 
     Set<TransportOrder> result = batchCreator.createOrderBatch();
 
@@ -77,10 +79,12 @@ class RandomOrderBatchCreatorTest {
         .thenReturn(Set.of(suitableLocType));
     when(transportOrderService.fetch(Location.class))
         .thenReturn(Set.of(suitableLoc));
-    RandomOrderBatchCreator batchCreator = new RandomOrderBatchCreator(transportOrderService,
-                                                                       dispatcherService,
-                                                                       10,
-                                                                       3);
+    RandomOrderBatchCreator batchCreator = new RandomOrderBatchCreator(
+        transportOrderService,
+        dispatcherService,
+        10,
+        3
+    );
 
     Set<TransportOrder> result = batchCreator.createOrderBatch();
 

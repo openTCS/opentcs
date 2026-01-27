@@ -183,7 +183,9 @@ class TransportOrderAssignmentCheckerTest {
     when(objectService.fetch(Vehicle.class, vehicle.getReference()))
         .thenReturn(Optional.of(vehicle));
 
-    assertThat(checker.checkTransportOrderAssignment(transportOrder),
-               is(TransportOrderAssignmentVeto.NO_VETO));
+    assertThat(
+        checker.checkTransportOrderAssignment(transportOrder),
+        is(TransportOrderAssignmentVeto.NO_VETO)
+    );
   }
 }
