@@ -22,6 +22,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Allow order sequences to contain multiple types of transport orders.
    Instead of a single type, order sequences now define a set of order types.
    Additionally, transport orders whose type is included in this set of order types can be added to the order sequence.
+** Add support for customizable window icons.
+   For more information, please refer to the developer's guide.
 ** Update web API specification and implementation to version 1.14.0:
 *** Extend the request body of the `POST /orderSequences/{NAME}` endpoint so that it also excepts a list of order types.
 *** Extend the response bodies where order sequences are returned to also include the list of order types.

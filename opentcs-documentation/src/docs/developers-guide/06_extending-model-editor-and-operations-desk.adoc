@@ -100,3 +100,19 @@ To customize the appearance of locations and vehicles, new theme implementations
 . Set the `locationThemeClass` or `vehicleThemeClass` in the Operations Desk application's configuration file.
 
 Vehicles or locations in plant models are then rendered using your custom theme.
+
+=== How to change the window icon
+
+To change the image that is used as the icon for the application window:
+
+. Prepare custom icon files with the following names (the number at the end of the file name indicates the respective image's expected width and height in pixels):
+** `custom_icon_016.png`
+** `custom_icon_032.png`
+** `custom_icon_064.png`
+** `custom_icon_128.png`
+** `custom_icon_256.png`
+. Create a JAR file (with any name, e.g. `my-custom-icons.jar`) that contains the custom icon files in a folder named `/org/opentcs/util/gui/res/icons/`.
+* Place the JAR file in the subdirectory `lib/` of the Model Editor application's and/or Operations Desk application's installation directory _before_ the application is started.
+  (The openTCS start scripts include all JAR files in that directory in the respective application's classpath.)
+
+Note that the default set of icons will be used if _any_ of the custom icons (as described above) could not be found.
