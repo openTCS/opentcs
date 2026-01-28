@@ -837,7 +837,7 @@ public class DefaultVehicleController
     );
 
     if (Objects.equals(evt.getPropertyName(), VehicleProcessModel.Attribute.POSITION.name())) {
-      updateVehiclePosition((String) evt.getNewValue());
+      setVehiclePosition((String) evt.getNewValue());
     }
     else if (Objects.equals(
         evt.getPropertyName(),
@@ -975,18 +975,19 @@ public class DefaultVehicleController
     vehicleService.updateVehiclePose(vehicle.getReference(), incomingPoseTransformer.apply(pose));
   }
 
-  private void updateVehiclePosition(String position) {
-    // Get an up-to-date copy of the vehicle
+  private void setVehiclePosition(String position) {
     Vehicle currVehicle = vehicleService.fetch(Vehicle.class, vehicle.getReference()).orElseThrow();
 
-    if (currVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_RESPECTED
-        || currVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_UTILIZED
-        || currVehicle.getIntegrationLevel() == Vehicle.IntegrationLevel.TO_BE_NOTICED) {
-      setVehiclePosition(position);
-    }
-  }
+    boolean acceptPosition = switch (currVehicle.getIntegrationLevel()) {
+      case TO_BE_RESPECTED, TO_BE_UTILIZED, TO_BE_NOTICED -> true;
+      // Null position values reflect resetting the position and are always accepted.
+      case TO_BE_IGNORED -> position == null;
+    };
 
-  private void setVehiclePosition(String position) {
+    if (!acceptPosition) {
+      return;
+    }
+
     // Place the vehicle on the given position, regardless of what the kernel
     // might expect. The vehicle is physically there, even if it shouldn't be.
     // The same is true for null values - if the vehicle says it's not on any
