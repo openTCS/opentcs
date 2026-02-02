@@ -72,6 +72,33 @@ include::{kernel-guiceSrc}/org/opentcs/kernel/DefaultKernelInjectionModule.java[
 
 Finally, to select your transformer (factory) to be used for a specific vehicle, set a property on the vehicle element in the plant model with key `tcs:vehicleDataTransformer` to the value that your factory's `getName()` method provides.
 
+=== Customizing allowed deviation for vehicle positions
+
+When a vehicle reports its position not with a logical point name but as coordinates only, the openTCS kernel checks whether the reported position is within an allowed deviation from any known point in the plant model.
+The allowed deviation can be set globally for all vehicles at all points via the kernel configuration -- see the reference documentation for configuration parameters in the User's Guide.
+For more flexible and fine-grained control over the allowed deviation, you can integrate a custom implementation of the `PositionDeviationPolicy` and `PositionDeviationPolicyFactory` interfaces.
+To do so, follow these steps:
+
+. Create a custom implementation of `PositionDeviationPolicy` that implements the logic for determining the allowed deviation for a given vehicle and point.
+  It could e.g. read specific properties from the vehicle or point objects to determine the allowed deviation.
+. Create an implementation of `PositionDeviationPolicyFactory` that provides instances of your `PositionDeviationPolicy` implementation.
+  It should return instances only for vehicles your factory is supposed to handle.
+. Register your factory implementation as a binding for `PositionDeviationPolicyFactory` in your `KernelInjectionModule` implementation.
+  This would look like this:
++
+[source, java]
+----
+@Override
+protected void configure() {
+  positionDeviationPolicyFactoryBinder()
+      .addBinding()
+      .to(MyPositionDeviationPolicyFactory.class);
+}
+----
+
+IMPORTANT: Avoid registering multiple factories that provide policies for the same vehicle.
+Which factory is used is undefined in that case.
+
 === Developing vehicle drivers
 
 openTCS supports integration of custom vehicle drivers that implement vehicle-specific communication protocols and thus mediate between the kernel and the vehicle.

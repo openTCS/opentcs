@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.vehicles;
 
+import org.opentcs.components.kernel.PositionDeviationPolicy;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
 
@@ -17,4 +18,12 @@ public interface VehicleControllerComponentsFactory {
    * @return A new peripheral interactor.
    */
   PeripheralInteractor createPeripheralInteractor(TCSObjectReference<Vehicle> vehicleRef);
+
+  /**
+   * Creates a new {@link VehiclePositionResolver} instance.
+   *
+   * @param policy The position deviation policy to be used.
+   * @return A new vehicle position resolver.
+   */
+  VehiclePositionResolver createVehiclePositionResolver(PositionDeviationPolicy policy);
 }

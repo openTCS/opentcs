@@ -11,6 +11,7 @@ import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.components.kernel.OrderSequenceCleanupApproval;
 import org.opentcs.components.kernel.PeripheralJobCleanupApproval;
 import org.opentcs.components.kernel.PeripheralJobDispatcher;
+import org.opentcs.components.kernel.PositionDeviationPolicyFactory;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.TransportOrderCleanupApproval;
@@ -99,6 +100,15 @@ public abstract class KernelInjectionModule
    */
   protected Multibinder<VehicleCommAdapterFactory> vehicleCommAdaptersBinder() {
     return Multibinder.newSetBinder(binder(), VehicleCommAdapterFactory.class);
+  }
+
+  /**
+   * Returns a multibinder that can be used to register position deviation policy factories.
+   *
+   * @return The multibinder.
+   */
+  protected Multibinder<PositionDeviationPolicyFactory> positionDeviationPolicyFactoryBinder() {
+    return Multibinder.newSetBinder(binder(), PositionDeviationPolicyFactory.class);
   }
 
   /**

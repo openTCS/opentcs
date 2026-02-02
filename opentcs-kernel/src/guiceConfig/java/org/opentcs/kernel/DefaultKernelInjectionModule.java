@@ -64,6 +64,7 @@ import org.opentcs.kernel.services.StandardTransportOrderService;
 import org.opentcs.kernel.services.StandardVehicleService;
 import org.opentcs.kernel.vehicles.DefaultVehicleControllerPool;
 import org.opentcs.kernel.vehicles.LocalVehicleControllerPool;
+import org.opentcs.kernel.vehicles.PositionDeviationPolicyRegistry;
 import org.opentcs.kernel.vehicles.VehicleCommAdapterRegistry;
 import org.opentcs.kernel.vehicles.VehicleControllerComponentsFactory;
 import org.opentcs.kernel.vehicles.VehicleControllerFactory;
@@ -157,6 +158,9 @@ public class DefaultKernelInjectionModule
     vehicleDataTransformersBinder().addBinding().to(CoordinateSystemMapperFactory.class);
     // end::documentation_registerTransformerFactory[]
 
+    bind(PositionDeviationPolicyRegistry.class)
+        .in(Singleton.class);
+
     configureKernelStatesDependencies();
     configureKernelStarterDependencies();
     configureSslParameters();
@@ -168,6 +172,7 @@ public class DefaultKernelInjectionModule
     extensionsBinderOperating();
     vehicleCommAdaptersBinder();
     peripheralCommAdaptersBinder();
+    positionDeviationPolicyFactoryBinder();
 
     configureWatchdogExtension();
   }

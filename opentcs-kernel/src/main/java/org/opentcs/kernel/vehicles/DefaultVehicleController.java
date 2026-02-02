@@ -177,7 +177,7 @@ public class DefaultVehicleController
    * @param configuration The configuration to use.
    * @param commandProcessingTracker Track processing of movement commands.
    * @param dataTransformerRegistry A registry for data transformer factories.
-   * @param vehiclePositionResolver Resolves the vehicle precise position to an openTCS point.
+   * @param positionDeviationPolicyRegistry A registry for position deviation policies.
    */
   @Inject
   public DefaultVehicleController(
@@ -211,7 +211,7 @@ public class DefaultVehicleController
       @Nonnull
       VehicleDataTransformerRegistry dataTransformerRegistry,
       @Nonnull
-      VehiclePositionResolver vehiclePositionResolver
+      PositionDeviationPolicyRegistry positionDeviationPolicyRegistry
   ) {
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.commAdapter = requireNonNull(adapter, "adapter");
@@ -237,8 +237,10 @@ public class DefaultVehicleController
         = dataTransformerRegistry
             .findFactoryFor(vehicle)
             .createIncomingPoseTransformer(vehicle);
-    this.vehiclePositionResolver
-        = requireNonNull(vehiclePositionResolver, "vehiclePositionResolver");
+    requireNonNull(positionDeviationPolicyRegistry, "positionDeviationPolicyRegistry");
+    this.vehiclePositionResolver = componentsFactory.createVehiclePositionResolver(
+        positionDeviationPolicyRegistry.getPolicyForVehicle(vehicle)
+    );
   }
 
   @Override
@@ -962,7 +964,7 @@ public class DefaultVehicleController
         vehiclePositionResolver.resolveVehiclePosition(
             incomingPoseTransformer.apply(pose),
             (vehicle.getCurrentPosition() != null) ? vehicle.getCurrentPosition().getName() : null
-        )
+        ).orElse(null)
     );
   }
 
@@ -975,7 +977,10 @@ public class DefaultVehicleController
     vehicleService.updateVehiclePose(vehicle.getReference(), incomingPoseTransformer.apply(pose));
   }
 
-  private void setVehiclePosition(String position) {
+  private void setVehiclePosition(
+      @Nullable
+      String position
+  ) {
     Vehicle currVehicle = vehicleService.fetch(Vehicle.class, vehicle.getReference()).orElseThrow();
 
     boolean acceptPosition = switch (currVehicle.getIntegrationLevel()) {

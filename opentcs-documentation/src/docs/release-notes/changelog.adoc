@@ -22,6 +22,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Allow order sequences to contain multiple types of transport orders.
    Instead of a single type, order sequences now define a set of order types.
    Additionally, transport orders whose type is included in this set of order types can be added to the order sequence.
+** Use new injectable component `PositionDeviationPolicy` to provide the allowed deviation for a vehicle at a point.
+   This way, we can e.g. respect VDA5050 deviation properties for position resolution, too.
+** When resolving coordinates to a logical position, ensure that the closest of the matching points in the plant model is picked.
 ** Add support for customizable window icons.
    For more information, please refer to the developer's guide.
 ** Update web API specification and implementation to version 1.14.0:
@@ -32,6 +35,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Actually add given properties to newly-created plant models' visual layouts.
 ** Ensure failed transport orders in order sequences are skipped correctly.
 ** Respect integration level for all updates of a vehicle's logical position.
+** When resolving coordinates to logical positions, properly treat orientation angles to be in degrees, not in radians.
 * Changes affecting developers:
 ** Update JUnit to 6.0.2.
 ** Update Mockito to 5.21.0.

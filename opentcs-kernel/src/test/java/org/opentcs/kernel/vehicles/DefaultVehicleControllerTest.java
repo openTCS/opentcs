@@ -24,6 +24,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentcs.DataObjectFactory;
+import org.opentcs.components.kernel.PositionDeviationPolicy;
 import org.opentcs.components.kernel.Scheduler;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
@@ -104,6 +105,10 @@ class DefaultVehicleControllerTest {
    */
   private VehicleDataTransformerFactory dataTransformerFactory;
   /**
+   * A deviation policy registry.
+   */
+  private PositionDeviationPolicyRegistry positionDeviationPolicyRegistry;
+  /**
    * A (mocked) incoming pose transformer.
    */
   private IncomingPoseTransformer poseTransformer;
@@ -135,6 +140,7 @@ class DefaultVehicleControllerTest {
     poseTransformer = mock(IncomingPoseTransformer.class);
     movementCommandTransformer = mock(MovementCommandTransformer.class);
     dataTransformerRegistry = new VehicleDataTransformerRegistry(Set.of(dataTransformerFactory));
+    positionDeviationPolicyRegistry = mock(PositionDeviationPolicyRegistry.class);
 
     doReturn("dummyFactory").when(dataTransformerFactory).getName();
     doReturn(poseTransformer).when(dataTransformerFactory).createIncomingPoseTransformer(vehicle);
@@ -158,6 +164,13 @@ class DefaultVehicleControllerTest {
     doReturn(peripheralInteractor).when(componentsFactory)
         .createPeripheralInteractor(vehicle.getReference());
 
+    doReturn(new VehiclePositionResolver(vehicleService, new FixedPositionDeviationPolicy(0, 0)))
+        .when(componentsFactory)
+        .createVehiclePositionResolver(any(PositionDeviationPolicy.class));
+
+    when(positionDeviationPolicyRegistry.getPolicyForVehicle(vehicle))
+        .thenReturn(new FixedPositionDeviationPolicy(0, 0));
+
     scheduler = spy(new DummyScheduler());
     scheduler.initialize();
     stdVehicleController = new DefaultVehicleController(
@@ -174,7 +187,7 @@ class DefaultVehicleControllerTest {
         mock(KernelApplicationConfiguration.class),
         new CommandProcessingTracker(),
         dataTransformerRegistry,
-        mock(VehiclePositionResolver.class)
+        positionDeviationPolicyRegistry
     );
     stdVehicleController.initialize();
   }
