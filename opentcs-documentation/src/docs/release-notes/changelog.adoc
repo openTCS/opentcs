@@ -16,7 +16,7 @@ The openTCS developers
 This change log lists the most relevant changes for past releases in reverse chronological order.
 (Note that the openTCS project adheres to https://semver.org/[Semantic Versioning].)
 
-== Unreleased
+== Version 7.2 (2026-02-02)
 
 * New features and enhancements:
 ** Allow order sequences to contain multiple types of transport orders.
