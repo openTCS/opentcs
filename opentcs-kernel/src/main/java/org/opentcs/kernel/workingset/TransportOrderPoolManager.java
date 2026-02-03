@@ -32,6 +32,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
+import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.util.event.EventHandler;
@@ -703,7 +704,7 @@ public class TransportOrderPoolManager
     );
     checkArgument(!sequence.isComplete(), "Order sequence %s is already complete", sequence);
     checkArgument(
-        sequence.getOrderTypes().contains(to.getType()),
+        typeAllowedBySequence(sequence, to.getType()),
         "Order sequence %s does not allow type of order %s: %s not in %s",
         sequence.getName(),
         to.getName(),
@@ -801,6 +802,11 @@ public class TransportOrderPoolManager
   @Nullable
   private String getIntendedVehicleName(OrderSequence sequence) {
     return sequence.getIntendedVehicle() == null ? null : sequence.getIntendedVehicle().getName();
+  }
+
+  private boolean typeAllowedBySequence(OrderSequence sequence, String type) {
+    return sequence.getOrderTypes().contains(OrderConstants.TYPE_ANY)
+        || sequence.getOrderTypes().contains(type);
   }
 
   @Nonnull

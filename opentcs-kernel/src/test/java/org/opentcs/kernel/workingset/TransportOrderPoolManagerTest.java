@@ -29,6 +29,7 @@ import org.opentcs.access.to.order.DestinationCreationTO;
 import org.opentcs.access.to.order.OrderSequenceCreationTO;
 import org.opentcs.access.to.order.TransportOrderCreationTO;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.OrderConstants;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.util.event.SimpleEventBus;
@@ -256,6 +257,76 @@ class TransportOrderPoolManagerTest {
         vehicle2.getReference()
     );
     assertThat(seqAfterThirdAssignment, is(sameInstance(seqAfterSecondAssignment)));
+  }
+
+  @Test
+  void allowAssigningTransportOrderToOrderSequenceWithAnyType() {
+    OrderSequence sequence = orderPoolManager.createOrderSequence(
+        new OrderSequenceCreationTO("some-sequence")
+            .withOrderTypes(Set.of(OrderConstants.TYPE_ANY))
+    );
+
+    orderPoolManager.createTransportOrder(
+        new TransportOrderCreationTO(
+            "some-order",
+            List.of(new DestinationCreationTO("some-location", "NOP"))
+        )
+            .withType("some-type")
+            .withWrappingSequence(sequence.getName())
+    );
+
+    assertThat(objectRepo.getObjects(OrderSequence.class), is(not(empty())));
+    assertThat(objectRepo.getObjects(TransportOrder.class), is(not(empty())));
+  }
+
+  @Test
+  void allowAssigningTransportOrdersToOrderSequenceWithMatchingType() {
+    OrderSequence sequence = orderPoolManager.createOrderSequence(
+        new OrderSequenceCreationTO("some-sequence")
+            .withOrderTypes(Set.of("some-type", "some-other-type"))
+    );
+
+    orderPoolManager.createTransportOrder(
+        new TransportOrderCreationTO(
+            "some-order",
+            List.of(new DestinationCreationTO("some-location", "NOP"))
+        )
+            .withType("some-type")
+            .withWrappingSequence(sequence.getName())
+    );
+    orderPoolManager.createTransportOrder(
+        new TransportOrderCreationTO(
+            "some-other-order",
+            List.of(new DestinationCreationTO("some-location", "NOP"))
+        )
+            .withType("some-other-type")
+            .withWrappingSequence(sequence.getName())
+    );
+
+    assertThat(objectRepo.getObjects(OrderSequence.class), is(not(empty())));
+    assertThat(objectRepo.getObjects(TransportOrder.class), hasSize(2));
+  }
+
+
+  @Test
+  void disallowAssigningTransportOrderToOrderSequenceWithNonMatchingType() {
+    OrderSequence sequence = orderPoolManager.createOrderSequence(
+        new OrderSequenceCreationTO("some-sequence")
+            .withOrderTypes(Set.of("some-type"))
+    );
+
+    TransportOrderCreationTO creationTO = new TransportOrderCreationTO(
+        "some-order",
+        List.of(new DestinationCreationTO("some-location", "NOP"))
+    )
+        .withType("some-other-type")
+        .withWrappingSequence(sequence.getName());
+
+    assertThat(objectRepo.getObjects(OrderSequence.class), is(not(empty())));
+    Assertions.assertThrows(
+        IllegalArgumentException.class,
+        () -> orderPoolManager.createTransportOrder(creationTO)
+    );
   }
 
   @Test
