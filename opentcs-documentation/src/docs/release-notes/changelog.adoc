@@ -20,6 +20,11 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 ...
 
+== Version 7.2.1 (2026-02-03)
+
+* Bugs fixed:
+** Allow any type of transport order to be added to order sequences that contain the _any type_ (i.e. "*") in their set of allowed order types.
+
 == Version 7.2 (2026-02-02)
 
 * New features and enhancements:
