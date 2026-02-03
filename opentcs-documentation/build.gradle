@@ -6,7 +6,6 @@ plugins {
   alias(libs.plugins.openapi.generator)
   // To use AsciiDoctor for documentation
   alias(libs.plugins.asciidocor.jvm.convert)
-  alias(libs.plugins.asciidocor.jvm.pdf)
 }
 
 evaluationDependsOn(':opentcs-api-base')
@@ -173,7 +172,7 @@ task asciidoctorUsersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
     // Whether to put backends' outputs into separate subdirectories
     separateOutputDirs = false
     // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
-    backends = ['html5', 'pdf']
+    backends = ['html5']
   }
   attributes 'configdoc': configDocDir,
              // Attributes specific to the HTML output
@@ -206,7 +205,7 @@ task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask
     // Whether to put backends' outputs into separate subdirectories
     separateOutputDirs = false
     // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
-    backends = ['html5', 'pdf']
+    backends = ['html5']
   }
   attributes 'documentation-testSrc': project.testSrcDir,
              'loopback-guiceSrc': project(':opentcs-commadapter-loopback').guiceSrcDir,
@@ -277,7 +276,7 @@ task configdocgen {
         "${configDocDir}/KernelSslConfigurationEntries.adoc",
 
         "org.opentcs.kernel.vehicles.VehiclePositionResolverConfiguration",
-        "${configDocDir}/VehiclePositionResolverConfigurationEntries.adoc", 
+        "${configDocDir}/VehiclePositionResolverConfigurationEntries.adoc",
 
         "org.opentcs.virtualvehicle.VirtualVehicleConfiguration",
         "${configDocDir}/VirtualVehicleConfigurationEntries.adoc",

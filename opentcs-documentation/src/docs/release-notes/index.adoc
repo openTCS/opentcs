@@ -19,13 +19,11 @@ The openTCS developers
 ** Contributors List: link:./contributors.html[HTML]
 * User Resources:
 ** User's Guide:
-   link:./user/opentcs-users-guide.html[HTML],
-   link:./user/opentcs-users-guide.pdf[PDF]
+   link:./user/opentcs-users-guide.html[HTML]
 ** Frequently Asked Questions: link:./faq.html[HTML]
 * Developer Resources:
 ** Developer's Guide:
-   link:./developer/developers-guide/opentcs-developers-guide.html[HTML],
-   link:./developer/developers-guide/opentcs-developers-guide.pdf[PDF]
+   link:./developer/developers-guide/opentcs-developers-guide.html[HTML]
 ** Base API:
    link:./developer/api-base/index.html[JavaDoc documentation]
 ** Injection API:
