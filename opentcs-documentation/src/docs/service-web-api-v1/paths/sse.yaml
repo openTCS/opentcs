@@ -11,6 +11,8 @@ paths:
         Sends a stream of events. The types of events sent can be selected via query parameters.
 
         The respective event data is described in separate endpoints below.
+
+        Note that, in order for the SSE connection to be established properly, the request's `Accept` header must be set to `text/event-stream`.
       parameters:
         - name: /events/vehicles
           in: query
@@ -46,7 +48,13 @@ paths:
             default: false
       responses:
         "200":
-          description: Connection closed properly by client or server.
+          description: >-
+            A stream of event objects.
+            For details on the actual event objects, see the named events described below.
+          content:
+            text/event-stream:
+              schema:
+                type: object
   /sse::/events/vehicles:
     get:
       tags:
