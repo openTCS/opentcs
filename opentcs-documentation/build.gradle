@@ -152,8 +152,8 @@ task asciidoctorReleaseNotes(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
   // Attributes specific to the HTML output
   attributes 'webfonts': false, // Disable webfonts
              'iconfont-remote': false, // Disable remote icon fonts
+             'stylesdir': "_assets/css/", // Override the default styles directory to properly configure the use of local Font Awsome assets
              'docinfo': "${file('src/docs/release-notes/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
-
 }
 
 task asciidoctorUsersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
@@ -178,6 +178,7 @@ task asciidoctorUsersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
              // Attributes specific to the HTML output
              'webfonts': false, // Disable webfonts
              'iconfont-remote': false, // Disable remote icon fonts
+             'stylesdir': "../_assets/css/", // Override the default styles directory to properly configure the use of local Font Awsome assets
              'docinfo': "${file('src/docs/users-guide/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
 
   resources {
@@ -217,10 +218,9 @@ task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask
              // Attributes specific to the HTML output
              'webfonts': false, // Disable webfonts
              'iconfont-remote': false, // Disable remote icon fonts
+             'stylesdir': "../../_assets/css/", // Override the default styles directory to properly configure the use of local Font Awsome assets
              'docinfo': "${file('src/docs/developers-guide/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
 
-             // 'docinfo': "${file('src/docs/docinfo.html')}, shared", // doesn't seem to work
-             //'docinfodir': file('src/docs'),
   resources {
     from(sourceDir) {
       include '**/*.png'

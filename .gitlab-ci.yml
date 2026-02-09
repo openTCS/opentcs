@@ -18,7 +18,7 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_PIPELINE_SOURCE == "web"
-      
+
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   DO_BUILD_CODEQUALITY_IMAGE:
@@ -100,6 +100,7 @@ build:
       - opentcs-*/build/libs/
       - opentcs-*/build/resources/
       - opentcs-*/build/tmp/
+      - opentcs-documentation/build/install/
     exclude:
       - .gradle/.tmp/**/*
       - .gradle/caches/**/*
@@ -183,6 +184,18 @@ lint-checkstyle:
     key: lint_checkstyle-$(date +%Y-%m)
     paths:
       - .gradle
+
+lint-hyperlinks:
+  stage: test
+  interruptible: true
+  image:
+    name: ghcr.io/untitaker/hyperlink:0.2.0
+    entrypoint: [""]
+  dependencies:
+    - build
+  script:
+    - echo "Checking hyperlinks in generated documentation..."
+    - hyperlink --check-anchors opentcs-documentation/build/install/
 
 lint-reuse:
   stage: test
