@@ -80,7 +80,7 @@ public final class SingleTextInputPanel
 
     setLayout(new java.awt.GridBagLayout());
 
-    unitLabel.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    unitLabel.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     unitLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
     unitLabel.setText("Unit-Label");
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -90,7 +90,7 @@ public final class SingleTextInputPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(unitLabel, gridBagConstraints);
 
-    label.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    label.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     label.setText("Label");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -98,7 +98,7 @@ public final class SingleTextInputPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(label, gridBagConstraints);
 
-    inputField.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    inputField.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     inputField.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
     inputField.setText("initial Value");
     inputField.setPreferredSize(new java.awt.Dimension(70, 20));
@@ -113,7 +113,7 @@ public final class SingleTextInputPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(inputField, gridBagConstraints);
 
-    messageLabel.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    messageLabel.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     messageLabel.setText("Message");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
