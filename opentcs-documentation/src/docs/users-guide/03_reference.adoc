@@ -3,6 +3,32 @@
 
 == Reference
 
+=== Supported navigation principles / vehicle types
+
+openTCS works independently of specific navigation implementations, so any kind of navigation principle may be used.
+Locating and navigating are tasks usually performed on the vehicle side:
+The vehicle simply reports its current state -- including its position -- to the control system, and the control system orders the vehicle to move to a different position.
+
+Note that openTCS focuses on the dispatching of vehicles for transport orders.
+This task should not be confused with lower-level vehicle-side tasks like accelerating, decelerating and steering the vehicle, which are out of openTCS's scope.
+As such, the use of openTCS is not limited to a specific type of vehicle.
+
+=== Maximum vehicle fleet size
+
+The design of the software does not impose a specific limit on the number of vehicles that can be managed by a single openTCS instance.
+The hardware equipment / runtime environment used (CPU, RAM, communication bandwidth etc.) can, however, limit the system's effective performance.
+
+=== Requirements for vehicles
+
+For a vehicle to be managed by openTCS, it needs to meet certain minimal set of requirements:
+
+1. Communication with the vehicle must be possible.
+   (This implies that the vehicle's communication interface must be specified and accessible.)
+   How this communication is implemented exactly is not really relevant as long as the communication hardware exists and there is a way for openTCS to make use of the communication channel.
+   In many cases, standard Wi-Fi hardware is used.
+2. The vehicle must be able to report its current position/state.
+3. The vehicle must be able to perform movement orders from its current position to a nearby position in the driving course / environment given by openTCS.
+
 === System requirements
 
 openTCS does not come with any specific hardware requirements.
@@ -321,6 +347,15 @@ When creating a transport order, the following attributes can be set:
 
 .Transport order dependencies
 image::transportorder_dependencies_example.png[]
+
+===== Transport order priorities
+
+With openTCS, transport orders do not have a priority attribute.
+This is because a transport order's priority may change over time or when other transport orders are added.
+
+In the end, a single transport order's effective priority depends on the dispatcher implementation used.
+With openTCS's default dispatcher, transport orders' __deadline__ attributes are intended to be used for prioritizing - the sooner the deadline, the higher an order's effective priority.
+To give a transport order a higher priority from the beginning, you can set its deadline to something earlier than all other orders' deadlines, e.g. to "right now" or a point of time in the past.
 
 ==== Order sequence
 

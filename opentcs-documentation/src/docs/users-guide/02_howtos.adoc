@@ -3,6 +3,13 @@
 
 == How-to Guides
 
+=== Creating curved paths between points
+
+1. In the Model Editor application, select btn:[Bezier] from the path tools and connect two points by clicking on the first point, dragging the mouse to the second point and releasing the mouse button there.
+2. Activate the selection tool and click on the previously created bezier path.
+   Two blue control points will appear.
+3. Drag the control points to change the shape of the path.
+
 === Automatically enabling drivers on startup
 
 To automatically enable vehicle drivers when the kernel is started, add the following line to the kernel configuration file (`config/opentcs-kernel.properties` in the kernel application directory):
@@ -130,6 +137,14 @@ To achieve this, do the following:
   (See <<RMI kernel interface configuration entries>> and/or <<Service web API configuration entries>> for a description of the configuration entries.)
 . If you enabled SSL for the RMI interface, you need to enable it in the Model Editor's, Operations Desk's and the Kernel Control Center's configuration files, too.
   (See <<SSL model editor-side application configuration entries>>, <<SSL operation desk-side application configuration entries>> and <<SSL KCC-side application configuration entries>> for a description of the configuration entries.)
+
+=== Enabling RMI on multihomed kernel host
+
+If your kernel is running on a host with multiple IP addresses, you may observe connection problems with remote clients via RMI connections.
+Clients may be unable to connect to the kernel, or communication between client and kernel may be slow, especially when SSL is enabled for the RMI interface.
+
+In that case, set the kernel JVM's property `java.rmi.server.hostname` to the correct IP address of the machine running it.
+(Also see https://docs.oracle.com/javase/8/docs/technotes/guides/rmi/faq.html#netmultihomed.)
 
 === Configuring automatic parking and recharging
 

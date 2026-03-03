@@ -3,4 +3,146 @@
 
 == Tutorials
 
-TBD
+=== Getting started
+
+This tutorial shows you how to get started with your own custom openTCS integration project, add a couple of initial, exemplary custom components to it, and build a binary distribution from it.
+
+As a prerequisite, you need to have a Java Development Kit (JDK) 21+ installed.
+(Also see <<System requirements>>.)
+
+NOTE: This tutorial assumes that you are familiar with openTCS from a user perspective.
+If not, check the link:../../user/opentcs-users-guide.html[User's Guide], first.
+
+IMPORTANT: It is highly recommended to create a proper integration project as described in this tutorial instead of inserting your own source code into a copy of the original openTCS source code.
+This is because, when integrating openTCS by copying its source code, you lose the ability to easily upgrade your code to more recent openTCS versions (for bugfixes or new features).
+
+==== Prepare integration project
+
+Check out the Git repository at https://github.com/openTCS/opentcs-integration-example:
+
+[source,shell]
+----
+$ git clone https://github.com/openTCS/opentcs-integration-example.git
+----
+
+Within the resulting local directory, run the following command to create a copy of the integration project with your own custom name:
+
+[source,shell]
+----
+$ ./gradlew -PintegrationName=MyGreatProject -PclassPrefix=Great cloneProject
+----
+
+Your integration project will be created in `build/opentcs-integration-MyGreatProject/`.
+Copy that directory to an appropriate location.
+
+TIP: Also see <<Integration project template>> for more details on the integration project template and how to use it.
+
+==== Add custom kernel extension
+
+Within your integration project directory, create the following files in the subdirectory `opentcs-MyGreatProject-kernel/src/`:
+
+* `main/java/com/example/MyKernelExtension.java`
+* `guiceConfig/java/com/example/MyKernelExtensionModule.java`
+* `guiceConfig/resources/META-INF/services/org.opentcs.customizations.kernel.KernelInjectionModule`
+
+Add the code of your first, exemplary openTCS kernel extension to `MyKernelExtension.java`.
+The following implementation simply logs a message whenever a vehicle is assigned a transport order:
+
+.`MyKernelExtension.java`
+[%collapsible]
+====
+[source,java]
+----
+include::{documentation-testSrc}/com/example/MyKernelExtension.java[tags=tutorial_gettingstarted_MyKernelExtension, indent=0]
+----
+====
+
+Next, add the Guice module implementation to `MyKernelExtensionModule.java` that registers your kernel extension with the openTCS kernel:
+
+.`MyKernelExtensionModule.java`
+[%collapsible]
+====
+[source,java]
+----
+include::{documentation-testSrc}/com/example/MyKernelExtensionModule.java[tags=tutorial_gettingstarted_MyKernelExtensionModule, indent=0]
+----
+====
+
+Finally, put the following line in `org.opentcs.customizations.kernel.KernelInjectionModule` to make sure that your Guice module is found by the openTCS kernel:
+
+[source]
+----
+com.example.MyKernelExtensionModule
+----
+
+TIP: Also see <<Customizing and extending the kernel application>> for more details on how to add custom functionality to the kernel.
+
+==== Add custom plugin panel to Operations Desk
+
+Within your integration project directory, create the following files in the subdirectory `opentcs-MyGreatProject-operationsdesk/src/`:
+
+* `main/java/com/example/MyPluginPanel.java`
+* `main/java/com/example/MyPluginPanelFactory.java`
+* `guiceConfig/java/com/example/MyPluginPanelModule.java`
+* `guiceConfig/resources/META-INF/services/org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule`
+
+Add the code of your first, exemplary plugin panel to `MyPluginPanel.java`.
+The following implementation shows two buttons that enable/disable all vehicles in the plant model:
+
+.`MyPluginPanel.java`
+[%collapsible]
+====
+[source,java]
+----
+include::{documentation-testSrc}/com/example/MyPluginPanel.java[tags=tutorial_gettingstarted_MyPluginPanel, indent=0]
+----
+====
+
+Next, add the factory implementation to `MyPluginPanelFactory.java` that creates instances of your plugin panel:
+
+.`MyPluginPanelFactory.java`
+[%collapsible]
+====
+[source,java]
+----
+include::{documentation-testSrc}/com/example/MyPluginPanelFactory.java[tags=tutorial_gettingstarted_MyPluginPanelFactory, indent=0]
+----
+====
+
+Then, add the Guice module implementation to `MyPluginPanelModule.java` that registers your plugin panel with the Operations Desk:
+
+.`MyPluginPanelModule.java`
+[%collapsible]
+====
+[source,java]
+----
+include::{documentation-testSrc}/com/example/MyPluginPanelModule.java[tags=tutorial_gettingstarted_MyPluginPanelModule, indent=0]
+----
+====
+
+Finally, put the following line in `org.opentcs.customizations.plantoverview.PlantOverviewInjectionModule` to make sure that your Guice module is found by the openTCS kernel:
+
+[source]
+----
+com.example.MyPluginPanelModule
+----
+
+TIP: Also see <<Customizing and extending the Model Editor and Operations Desk applications>> for more details on how to add custom functionality the Operations Desk.
+
+==== Build custom binary distribution
+
+Within your integration project directory, run the following command to build a custom openTCS distribution that includes the components you added:
+
+[source,shell]
+----
+$ ./gradlew clean build
+----
+
+The resulting binary distribution will be put into `build/distributions/`.
+
+==== Try the custom components at runtime
+
+* To see your kernel extension in action, run the kernel in the custom distribution with an appropriate plant model and get the kernel to assign a transport order to any vehicle.
+  In the kernel's log file (see the subdirectory `log/` in the kernel's working directory), you should see the message logged by the kernel extension.
+* To try out your plugin panel, start the Operations Desk application and open the plugin panel via the main menu (in btn:[menu:View[Plugins]]).
+  You should see the buttons that you implemented in the plugin panel, and they should enable/disable all vehicles in the plant model when you click them.

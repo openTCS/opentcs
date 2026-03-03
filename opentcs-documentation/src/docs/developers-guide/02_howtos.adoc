@@ -3,42 +3,6 @@
 
 == How-to Guides
 
-=== Generating an integration project
-
-openTCS integration projects for customer- or plant-specific distributions often have a very similar structure.
-The openTCS distribution provides a way to easily generate such integration projects.
-This way, a developer can get started with customizing and extending openTCS components quickly.
-
-To generate a template/skeleton for a new integration project, do the following:
-
-1. Download and unzip the integration project example from the openTCS homepage.
-2. Execute the following command from the example project's root directory:
-`gradlew cloneProject`
-
-The integration project will be generated in the `build/` directory.
-(Make sure you copy it somewhere else before running the example project's `clean` task the next time.)
-
-The project and the included classes will have generic names.
-You can adjust their names by setting a couple of properties when running the above command.
-The following properties are looked at:
-
-* _integrationName_:
-Used for the names of the project itself and the subprojects within it.
-* _classPrefix_:
-Used for some classes within the subprojects.
-
-For instance, your command line could look like this:
-
-[source, shell]
-----
-gradlew -PintegrationName=MyGreatProject -PclassPrefix=Great cloneProject
-----
-
-This would include _MyGreatProject_ in the integration project name, and _Great_ in some class names.
-
-IMPORTANT: Inserting your own source code into a copy of the baseline openTCS project instead of creating a proper integration project as described above is not recommended.
-This is because, when integrating openTCS by copying its source code, you lose the ability to easily upgrade your code to more recent openTCS versions (for bugfixes or new features).
-
 === Acquiring service objects
 
 To use the services in code running inside the kernel JVM, e.g. a vehicle driver, simply request an instance of e.g. `PlantModelService` to be provided via dependency injection.
@@ -680,7 +644,7 @@ To change the image that is used as the icon for the application window:
 
 Note that the default set of icons will be used if _any_ of the custom icons (as described above) could not be found.
 
-=== Customizing and extending the Model Editor and the Operations Desk applications
+=== Customizing and extending the Model Editor and Operations Desk applications
 
 NOTE: The process of customizing and extending the Model Editor and the Operations Desk is basically identical for both applications.
 For the sake of simplicity, this section describes the process using the Operations Desk application as an example.
@@ -919,3 +883,27 @@ For example, on a Linux system you could run `diff -urN translation_old/ transla
 
 Based on the information from the diff, you can apply appropriate changes to your own language files.
 Then you merely need to create new JAR files for your translations and add them to the applications' class paths.
+
+=== Updating to a new version of openTCS
+
+To update your integration project to a new version of openTCS, you usually only need to update the version numbers of the respective openTCS dependencies in the Gradle build configuration in the file `gradle/libs.versions.toml`.
+For example, if your integration project is currently using openTCS version 7.2.1, the relevant section in that file would contain an entry like this:
+
+[source, toml]
+----
+[versions]
+opentcs-baseline = "7.2.1"
+----
+
+To update to a more recent version, e.g. 7.3.0, simply change the version number in the entry to the new version:
+
+[source, toml]
+----
+[versions]
+opentcs-baseline = "7.3.0"
+----
+
+Then, simply rebuild your project, and it should use the new version of openTCS.
+
+IMPORTANT: Before updating, make sure to read the release notes for the openTCS versions between the previous one you used and the one you are updating to.
+Check whether there are any breaking changes that may require you to adjust your code -- especially when you are updating to a new major version, e.g. from 7.x to 8.x.

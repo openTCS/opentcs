@@ -141,7 +141,6 @@ task asciidoctorReleaseNotes(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
     include 'index.adoc'
     include 'changelog.adoc'
     include 'contributors.adoc'
-    include 'faq.adoc'
   }
   outputOptions {
     // Whether to put backends' outputs into separate subdirectories

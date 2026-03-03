@@ -20,7 +20,6 @@ The openTCS developers
 * User Resources:
 ** User's Guide:
    link:./user/opentcs-users-guide.html[HTML]
-** Frequently Asked Questions: link:./faq.html[HTML]
 * Developer Resources:
 ** Developer's Guide:
    link:./developer/developers-guide/opentcs-developers-guide.html[HTML]

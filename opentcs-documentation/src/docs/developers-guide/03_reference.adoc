@@ -162,7 +162,7 @@ The artifacts for these dependencies are downloaded automatically when building 
 
 The openTCS project heavily relies on link:https://github.com/google/guice[Guice] for dependency injection and wiring of components as well as for providing plugin-like extension mechanisms.
 In the injection API, relevant classes can be found in the package `org.opentcs.customizations`.
-For examples, see <<Customizing and extending the kernel application>>, <<Customizing and extending the Model Editor and the Operations Desk applications>> and <<Customizing and extending the control center application>>.
+For examples, see <<Customizing and extending the kernel application>>, <<Customizing and extending the Model Editor and Operations Desk applications>> and <<Customizing and extending the control center application>>.
 
 === Logging
 
@@ -171,14 +171,42 @@ Thus, the actual logging implementation is easily interchangeable by replacing t
 The kernel and client applications come with SLF4J's bindings for `java.util.logging` by default.
 For more information on how to change the actual logging implementation, e.g. to use log4j, please see the SLF4J documentation.
 
-=== openTCS kernel APIs
+=== Integration project template
 
-openTCS provides the following APIs to interact with the kernel:
+At https://github.com/openTCS/opentcs-integration-example, a template/skeleton/example for an openTCS integration project is available.
+Using this, a developer can get started with customizing and extending openTCS components quickly.
 
-* The kernel's Java API for both extending the kernel application as well as interfacing with it via RMI.
-See <<section-kernel-api>> for details.
+The Gradle build script of the example project contains a task named `cloneProject` that generates a copy of the template with a custom name in the `build/` directory.
+The following parameters are available, to be set as command-line properties:
+
+* _integrationName_:
+Used for the names of the project itself and the subprojects within it.
+* _classPrefix_:
+Used for some classes within the subprojects.
+
+Example usage:
+
+[source, shell]
+----
+$ ./gradlew -PintegrationName=MyGreatProject -PclassPrefix=Great cloneProject
+----
+
+This would include _MyGreatProject_ in the integration project name, and _Great_ in some class names.
+
+[TIP]
+====
+* See <<Getting started>> for a tutorial that makes use of this.
+* See <<Updating to a new version of openTCS>> for a how-to guide explaining how to update an integration project to a new version of openTCS.
+====
+
+=== openTCS APIs
+
+openTCS provides the following APIs:
+
+* The openTCS Java API for both extending the kernel application as well as interfacing with it via RMI.
+  See <<section-kernel-api>> as well as the link:../api-base/index.html[openTCS Java API documentation] and link:../api-injection/index.html[openTCS injection API documentation] for details.
 * A web API for interfacing with the kernel via HTTP calls.
-See the separate interface documentation that is part of the openTCS distribution for details.
+  See the link:../service-web-api-v1/index.html[OpenAPI specification] for details.
 
 [#section-kernel-api]
 === The kernel's Java API
