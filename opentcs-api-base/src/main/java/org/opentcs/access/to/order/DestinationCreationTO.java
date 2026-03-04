@@ -132,12 +132,12 @@ public class DestinationCreationTO
   /**
    * Creates a copy of this object with the given destination location (or point) name.
    *
-   * @param desLocationName The destination location (or point) name.
+   * @param destLocationName The destination location (or point) name.
    * @return A copy of this object, differing in the given destination.
    */
   public DestinationCreationTO withDestLocationName(
       @Nonnull
-      String desLocationName
+      String destLocationName
   ) {
     return new DestinationCreationTO(
         destLocationName,

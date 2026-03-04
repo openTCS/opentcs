@@ -18,6 +18,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
+* Bugs fixed:
+** Allow to properly change the name of an already named transport order destination's location via the Java API.
 * Changes affecting developers:
 ** Update Gradle wrapper to 8.14.4.
 

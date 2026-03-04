@@ -118,12 +118,10 @@ public class TransportOrderUtil {
         DestinationCreationTO destination;
         if (location == null) {
           Point point = transportOrderService.fetch(Point.class, locModel.getName()).orElseThrow();
-          destination = new DestinationCreationTO(point.getName(), action)
-              .withDestLocationName(point.getName());
+          destination = new DestinationCreationTO(point.getName(), action);
         }
         else {
           destination = new DestinationCreationTO(location.getName(), action)
-              .withDestLocationName(location.getName())
               .withProperties(properties);
         }
         destinations.add(destination);
