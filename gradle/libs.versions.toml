@@ -10,8 +10,8 @@ huxhorn-sulky-ulid = "8.3.0"
 jackson = "2.21.1"
 jakarta-annotation = "3.0.0"
 jakarta-inject = "2.0.1"
-javalin = "6.7.0"
-javalin-ssl-plugin = "6.7.0"
+javalin = "7.0.1"
+javalin-ssl-plugin = "7.0.1"
 jaxb = "4.0.6"
 jgrapht-core = "1.5.2"
 jhotdraw = "7.6.20190506"
@@ -52,7 +52,7 @@ jackson-module-jsonSchema = { group = "com.fasterxml.jackson.module", name = "ja
 jakarta-annotation = { group = "jakarta.annotation", name = "jakarta.annotation-api", version.ref = "jakarta-annotation" }
 jakarta-inject = { group = "jakarta.inject", name = "jakarta.inject-api", version.ref = "jakarta-inject" }
 javalin = { group = "io.javalin", name = "javalin", version.ref = "javalin" }
-javalin-ssl-plugin = { group = "io.javalin.community.ssl", name = "ssl-plugin", version.ref = "javalin-ssl-plugin" }
+javalin-ssl-plugin = { group = "io.javalin.community.ssl", name = "javalin-ssl", version.ref = "javalin-ssl-plugin" }
 jaxb-runtime = { group = "org.glassfish.jaxb", name = "jaxb-runtime", version.ref = "jaxb" }
 jgrapht-core = { group = "org.jgrapht", name = "jgrapht-core", version.ref = "jgrapht-core" }
 jhotdraw = { group = "org.opentcs.thirdparty.jhotdraw", name = "jhotdraw", version.ref = "jhotdraw" }

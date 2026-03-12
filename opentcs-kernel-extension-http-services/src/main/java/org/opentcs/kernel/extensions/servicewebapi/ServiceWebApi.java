@@ -103,8 +103,8 @@ public class ServiceWebApi
     v1SseHandler.initialize();
 
     Consumer<JavalinConfig> config = cfg -> {
-      cfg.showJavalinBanner = false;
-      cfg.router.apiBuilder(v1RequestHandler.createRoutes());
+      cfg.startup.showJavalinBanner = false;
+      cfg.routes.apiBuilder(v1RequestHandler.createRoutes());
       if (configuration.maxRequestBodySize() <= 0) {
         LOG.warn(
             "Maximum request body size must be at least 1 MB. Using default size of {} bytes.",
@@ -131,76 +131,75 @@ public class ServiceWebApi
         );
       }
       else {
-        cfg.jetty.defaultHost = configuration.bindAddress();
-        cfg.jetty.defaultPort = configuration.bindPort();
+        cfg.jetty.host = configuration.bindAddress();
+        cfg.jetty.port = configuration.bindPort();
 
         LOG.warn("Encryption disabled, connections will not be secured!");
       }
+
+      cfg.routes.sse("/v1/sse", v1SseHandler::handleSseConnection);
+
+      cfg.routes.beforeMatched(ctx -> {
+        if (!authenticator.isAuthenticated(ctx)) {
+          // Delay the response a bit to slow down brute force attacks.
+          Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
+          throw new HttpResponseException(403, "Not authenticated.");
+        }
+        // Add a CORS header to allow cross-origin requests from all hosts.
+        // This also makes using the "try it out" buttons in the Swagger UI documentation possible.
+        ctx.header("Access-Control-Allow-Origin", "*");
+      });
+
+      cfg.routes.before("/v1/kernel", ctx -> {
+        if (!isLocalHost(ctx.ip())) {
+          throw new HttpResponseException(403, "Access forbidden.");
+        }
+      });
+
+      // Reflect that we allow cross-origin requests for any headers and methods.
+      cfg.routes.options("/*", ctx -> {
+        String requestHeaders = ctx.header("Access-Control-Request-Headers");
+        if (requestHeaders != null) {
+          ctx.header("Access-Control-Allow-Headers", requestHeaders);
+        }
+
+        String requestMethod = ctx.header("Access-Control-Request-Method");
+        if (requestMethod != null) {
+          ctx.header("Access-Control-Allow-Methods", requestMethod);
+        }
+
+        ctx.result("OK");
+      });
+
+      cfg.routes.exception(IllegalArgumentException.class, (e, ctx) -> {
+        ctx.status(400);
+        ctx.result(jsonBinder.toJson(e));
+      });
+
+      cfg.routes.exception(
+          IllegalStateException.class, (e, ctx) -> {
+            ctx.status(500);
+            ctx.result(jsonBinder.toJson(e));
+          }
+      );
+
+      cfg.routes.exception(ObjectUnknownException.class, (e, ctx) -> {
+        ctx.status(404);
+        ctx.result(jsonBinder.toJson(e));
+      });
+
+      cfg.routes.exception(ObjectExistsException.class, (e, ctx) -> {
+        ctx.status(409);
+        ctx.result(jsonBinder.toJson(e));
+      });
+
+      cfg.routes.exception(KernelRuntimeException.class, (e, ctx) -> {
+        ctx.status(500);
+        ctx.result(jsonBinder.toJson(e));
+      });
     };
 
     app = Javalin.create(config).start();
-
-    app.sse("/v1/sse", v1SseHandler::handleSseConnection);
-
-    app.beforeMatched(ctx -> {
-      if (!authenticator.isAuthenticated(ctx)) {
-        // Delay the response a bit to slow down brute force attacks.
-        Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
-        throw new HttpResponseException(403, "Not authenticated.");
-      }
-      // Add a CORS header to allow cross-origin requests from all hosts.
-      // This also makes using the "try it out" buttons in the Swagger UI documentation possible.
-      ctx.header("Access-Control-Allow-Origin", "*");
-    }
-    );
-
-    app.before("/v1/kernel", ctx -> {
-      if (!isLocalHost(ctx.ip())) {
-        throw new HttpResponseException(403, "Access forbidden.");
-      }
-    });
-
-    // Reflect that we allow cross-origin requests for any headers and methods.
-    app.options("/*", ctx -> {
-      String requestHeaders = ctx.header("Access-Control-Request-Headers");
-      if (requestHeaders != null) {
-        ctx.header("Access-Control-Allow-Headers", requestHeaders);
-      }
-
-      String requestMethod = ctx.header("Access-Control-Request-Method");
-      if (requestMethod != null) {
-        ctx.header("Access-Control-Allow-Methods", requestMethod);
-      }
-
-      ctx.result("OK");
-    });
-
-    app.exception(IllegalArgumentException.class, (e, ctx) -> {
-      ctx.status(400);
-      ctx.result(jsonBinder.toJson(e));
-    });
-
-    app.exception(
-        IllegalStateException.class, (e, ctx) -> {
-          ctx.status(500);
-          ctx.result(jsonBinder.toJson(e));
-        }
-    );
-
-    app.exception(ObjectUnknownException.class, (e, ctx) -> {
-      ctx.status(404);
-      ctx.result(jsonBinder.toJson(e));
-    });
-
-    app.exception(ObjectExistsException.class, (e, ctx) -> {
-      ctx.status(409);
-      ctx.result(jsonBinder.toJson(e));
-    });
-
-    app.exception(KernelRuntimeException.class, (e, ctx) -> {
-      ctx.status(500);
-      ctx.result(jsonBinder.toJson(e));
-    });
 
     initialized = true;
   }
