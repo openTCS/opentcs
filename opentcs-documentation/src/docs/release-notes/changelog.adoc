@@ -30,6 +30,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Update Javalin to 7.0.1.
 ** Update OpenAPI generator to 7.20.0.
 ** Update Swagger UI to 5.32.0.
+** Update Spotless to 8.3.0.
 
 == Version 7.2.1 (2026-02-03)
 
