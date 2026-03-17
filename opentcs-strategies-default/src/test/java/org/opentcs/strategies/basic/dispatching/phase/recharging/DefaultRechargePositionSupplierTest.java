@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,35 +35,31 @@ import org.opentcs.strategies.basic.dispatching.phase.TargetedPointsSupplier;
  */
 class DefaultRechargePositionSupplierTest {
 
-  private Point currentPosition;
   private Vehicle vehicle;
-  private LocationType rechargeLocType;
   private Location rechargeLoc1;
   private Location rechargeLoc2;
   private Location rechargeLoc3;
-  private Point locationAccessPoint;
+  private Location rechargeLoc4Locked;
 
-  private InternalPlantModelService plantModelService;
-  private Router router;
-  private TargetedPointsSupplier targetedPointsSupplier;
-  private DefaultDispatcherConfiguration configuration;
   private DefaultRechargePositionSupplier rechargePosSupplier;
 
   @BeforeEach
   void setUp() {
-    currentPosition = new Point("current-position");
+    Point currentPosition = new Point("current-position");
     vehicle = new Vehicle("some-vehicle")
         .withCurrentPosition(currentPosition.getReference())
         .withRechargeOperation("Do some recharging");
 
-    rechargeLocType = new LocationType("some-recharge-loc-type")
+    LocationType rechargeLocType = new LocationType("some-recharge-loc-type")
         .withAllowedOperations(List.of(vehicle.getRechargeOperation()));
 
     rechargeLoc1 = new Location("recharge-loc-1", rechargeLocType.getReference());
     rechargeLoc2 = new Location("recharge-loc-2", rechargeLocType.getReference());
     rechargeLoc3 = new Location("recharge-loc-3", rechargeLocType.getReference());
+    rechargeLoc4Locked = new Location("recharge-loc-4-locked", rechargeLocType.getReference())
+        .withLocked(true);
 
-    locationAccessPoint = new Point("location-access-point");
+    Point locationAccessPoint = new Point("location-access-point");
 
     Location.Link link1
         = new Location.Link(rechargeLoc1.getReference(), locationAccessPoint.getReference());
@@ -70,17 +67,20 @@ class DefaultRechargePositionSupplierTest {
         = new Location.Link(rechargeLoc2.getReference(), locationAccessPoint.getReference());
     Location.Link link3
         = new Location.Link(rechargeLoc3.getReference(), locationAccessPoint.getReference());
+    Location.Link link4
+        = new Location.Link(rechargeLoc4Locked.getReference(), locationAccessPoint.getReference());
 
     rechargeLoc1 = rechargeLoc1.withAttachedLinks(Set.of(link1));
     rechargeLoc2 = rechargeLoc2.withAttachedLinks(Set.of(link2));
     rechargeLoc3 = rechargeLoc3.withAttachedLinks(Set.of(link3));
+    rechargeLoc4Locked = rechargeLoc4Locked.withAttachedLinks(Set.of(link4));
 
-    locationAccessPoint = locationAccessPoint.withAttachedLinks(Set.of(link1, link2, link3));
+    locationAccessPoint = locationAccessPoint.withAttachedLinks(Set.of(link1, link2, link3, link4));
 
-    plantModelService = mock(InternalPlantModelService.class);
-    router = mock(Router.class);
-    targetedPointsSupplier = mock(TargetedPointsSupplier.class);
-    configuration = mock(DefaultDispatcherConfiguration.class);
+    InternalPlantModelService plantModelService = mock(InternalPlantModelService.class);
+    Router router = mock(Router.class);
+    TargetedPointsSupplier targetedPointsSupplier = mock(TargetedPointsSupplier.class);
+    DefaultDispatcherConfiguration configuration = mock(DefaultDispatcherConfiguration.class);
 
     rechargePosSupplier = new DefaultRechargePositionSupplier(
         plantModelService,
@@ -96,8 +96,12 @@ class DefaultRechargePositionSupplierTest {
         .thenReturn(Optional.of(locationAccessPoint));
     when(plantModelService.fetch(LocationType.class, rechargeLocType.getReference()))
         .thenReturn(Optional.of(rechargeLocType));
-    when(plantModelService.fetch(Location.class))
-        .thenReturn(Set.of(rechargeLoc1, rechargeLoc2, rechargeLoc3));
+    when(plantModelService.stream(Location.class))
+        .thenAnswer(
+            (invocation) -> {
+              return Stream.of(rechargeLoc1, rechargeLoc2, rechargeLoc3, rechargeLoc4Locked);
+            }
+        );
     when(plantModelService.expandResources(Set.of(locationAccessPoint.getReference())))
         .thenReturn(Set.of(locationAccessPoint));
     when(configuration.maxRoutesToConsider()).thenReturn(1);
@@ -159,6 +163,19 @@ class DefaultRechargePositionSupplierTest {
   }
 
   @Test
+  void returnEmptyListForLockedAssignedRechargeLocation() {
+    assertThat(
+        rechargePosSupplier.findRechargeSequence(
+            vehicle.withProperty(
+                Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION,
+                rechargeLoc4Locked.getName()
+            )
+        ),
+        is(empty())
+    );
+  }
+
+  @Test
   void returnAnyForNonexistentPreferredRechargeLocation() {
     List<Destination> result = rechargePosSupplier.findRechargeSequence(
         vehicle.withProperty(
@@ -169,7 +186,29 @@ class DefaultRechargePositionSupplierTest {
 
     assertThat(result, hasSize(1));
     assertThat(
-        result.get(0).getDestination(),
+        result.getFirst().getDestination(),
+        is(
+            oneOf(
+                rechargeLoc1.getReference(),
+                rechargeLoc2.getReference(),
+                rechargeLoc3.getReference()
+            )
+        )
+    );
+  }
+
+  @Test
+  void returnAnyOtherForLockedPreferredRechargeLocation() {
+    List<Destination> result = rechargePosSupplier.findRechargeSequence(
+        vehicle.withProperty(
+            Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION,
+            rechargeLoc4Locked.getName()
+        )
+    );
+
+    assertThat(result, hasSize(1));
+    assertThat(
+        result.getFirst().getDestination(),
         is(
             oneOf(
                 rechargeLoc1.getReference(),
@@ -186,7 +225,7 @@ class DefaultRechargePositionSupplierTest {
 
     assertThat(result, hasSize(1));
     assertThat(
-        result.get(0).getDestination(),
+        result.getFirst().getDestination(),
         is(
             oneOf(
                 rechargeLoc1.getReference(),
@@ -206,21 +245,21 @@ class DefaultRechargePositionSupplierTest {
     );
 
     assertThat(result, hasSize(1));
-    assertThat(result.get(0).getDestination(), is(rechargeLoc1.getReference()));
+    assertThat(result.getFirst().getDestination(), is(rechargeLoc1.getReference()));
 
     result = rechargePosSupplier.findRechargeSequence(
         vehicle.withProperty(Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION, rechargeLoc2.getName())
     );
 
     assertThat(result, hasSize(1));
-    assertThat(result.get(0).getDestination(), is(rechargeLoc2.getReference()));
+    assertThat(result.getFirst().getDestination(), is(rechargeLoc2.getReference()));
 
     result = rechargePosSupplier.findRechargeSequence(
         vehicle.withProperty(Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION, rechargeLoc3.getName())
     );
 
     assertThat(result, hasSize(1));
-    assertThat(result.get(0).getDestination(), is(rechargeLoc3.getReference()));
+    assertThat(result.getFirst().getDestination(), is(rechargeLoc3.getReference()));
   }
 
   @Test
@@ -232,21 +271,21 @@ class DefaultRechargePositionSupplierTest {
     );
 
     assertThat(result, hasSize(1));
-    assertThat(result.get(0).getDestination(), is(rechargeLoc1.getReference()));
+    assertThat(result.getFirst().getDestination(), is(rechargeLoc1.getReference()));
 
     result = rechargePosSupplier.findRechargeSequence(
         vehicle.withProperty(Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION, rechargeLoc2.getName())
     );
 
     assertThat(result, hasSize(1));
-    assertThat(result.get(0).getDestination(), is(rechargeLoc2.getReference()));
+    assertThat(result.getFirst().getDestination(), is(rechargeLoc2.getReference()));
 
     result = rechargePosSupplier.findRechargeSequence(
         vehicle.withProperty(Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION, rechargeLoc3.getName())
     );
 
     assertThat(result, hasSize(1));
-    assertThat(result.get(0).getDestination(), is(rechargeLoc3.getReference()));
+    assertThat(result.getFirst().getDestination(), is(rechargeLoc3.getReference()));
   }
 
   @Test
@@ -264,7 +303,7 @@ class DefaultRechargePositionSupplierTest {
 
     assertThat(result, hasSize(1));
     assertThat(
-        result.get(0).getDestination(),
+        result.getFirst().getDestination(),
         is(rechargeLoc1.getReference())
     );
 
@@ -274,7 +313,7 @@ class DefaultRechargePositionSupplierTest {
 
     assertThat(result, hasSize(1));
     assertThat(
-        result.get(0).getDestination(),
+        result.getFirst().getDestination(),
         is(rechargeLoc3.getReference())
     );
   }

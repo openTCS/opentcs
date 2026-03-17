@@ -181,8 +181,8 @@ public class DefaultRechargePositionSupplier
       Vehicle vehicle,
       Set<Point> targetedPoints
   ) {
-    return plantModelService.fetch(Location.class)
-        .stream()
+    return plantModelService.stream(Location.class)
+        .filter(curLoc -> !curLoc.isLocked())
         .filter(
             curLoc -> plantModelService.fetch(LocationType.class, curLoc.getType())
                 .orElseThrow()
