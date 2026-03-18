@@ -6,6 +6,8 @@ The openTCS developers
 :doctype: article
 :toc!:
 :sectnums!:
+:docinfo: shared
+:stylesdir: _assets/css/
 :icons: font
 :source-highlighter: coderay
 :coderay-linenums-mode: table

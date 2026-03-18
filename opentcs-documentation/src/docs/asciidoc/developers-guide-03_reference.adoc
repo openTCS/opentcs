@@ -204,9 +204,9 @@ This would include _MyGreatProject_ in the integration project name, and _Great_
 openTCS provides the following APIs:
 
 * The openTCS Java API for both extending the kernel application as well as interfacing with it via RMI.
-  See <<section-kernel-api>> as well as the link:../api-base/index.html[openTCS Java API documentation] and link:../api-injection/index.html[openTCS injection API documentation] for details.
+  See <<section-kernel-api>> as well as the link:./api-base/index.html[openTCS Java API documentation] and link:./api-injection/index.html[openTCS injection API documentation] for details.
 * A web API for interfacing with the kernel via HTTP calls.
-  See the link:../service-web-api-v1/index.html[OpenAPI specification] for details.
+  See the link:./service-web-api-v1/index.html[OpenAPI specification] for details.
 
 [#section-kernel-api]
 === The kernel's Java API

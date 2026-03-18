@@ -6,6 +6,8 @@ The openTCS developers
 :doctype: article
 :toc!:
 :sectnums!:
+:docinfo: shared
+:stylesdir: _assets/css/
 :icons: font
 :source-highlighter: coderay
 :coderay-linenums-mode: table
@@ -19,13 +21,13 @@ The openTCS developers
 ** Contributors List: link:./contributors.html[HTML]
 * User Resources:
 ** User's Guide:
-   link:./user/opentcs-users-guide.html[HTML]
+   link:./users-guide.html[HTML]
 * Developer Resources:
 ** Developer's Guide:
-   link:./developer/developers-guide/opentcs-developers-guide.html[HTML]
+   link:./developers-guide.html[HTML]
 ** Base API:
-   link:./developer/api-base/index.html[JavaDoc documentation]
+   link:./api-base/index.html[JavaDoc documentation]
 ** Injection API:
-   link:./developer/api-injection/index.html[JavaDoc documentation]
+   link:./api-injection/index.html[JavaDoc documentation]
 ** Web API:
-   link:./developer/service-web-api-v1/index.html?docExpansion=list[OpenAPI documentation]
+   link:./service-web-api-v1/index.html?docExpansion=list[OpenAPI documentation]

@@ -24,16 +24,10 @@ apply from: "${rootDir}/gradle/publishing-java.gradle"
 
 apply plugin: 'distribution'
 
-def baseApiDir = file("$buildDir/api-base")
-def injectionApiDir = file("$buildDir/api-injection")
 def generatedOpenApiDir = file("$buildDir/generated-openapi")
 def webApiDir = file("$buildDir/swagger-ui-servicewebapiv1")
 def configDocDir = file("$buildDir/configdoc")
-def userManualDir = file("$buildDir/users-guide")
-def devManualDir = file("$buildDir/developers-guide")
-def devManualImagesDir = file("$devManualDir/images")
-def releaseNotesDir = file("$buildDir/release-notes")
-def assetsDir = file("src/docs/_assets")
+def asciidocOutputDir = file("$buildDir/docs/asciidoc")
 
 ext.collectableDistDir = file("$buildDir/install")
 
@@ -70,24 +64,15 @@ dependencies {
 distributions {
   main {
     contents.from(project(':opentcs-api-base').javadoc.destinationDir) {
-      into('developer/api-base')
+      into('api-base')
     }
     contents.from(project(':opentcs-api-injection').javadoc.destinationDir) {
-      into('developer/api-injection')
+      into('api-injection')
     }
     contents.from(webApiDir) {
-      into('developer/service-web-api-v1')
+      into('service-web-api-v1')
     }
-    contents.from(devManualDir) {
-      into('developer/developers-guide')
-    }
-    contents.from(userManualDir) {
-      into('user')
-    }
-    contents.from(releaseNotesDir)
-    contents.from(assetsDir) {
-      into('_assets')
-    }
+    contents.from(asciidocOutputDir)
   }
 }
 
@@ -123,49 +108,17 @@ task release {
 }
 
 asciidoctor {
-  dependsOn 'asciidoctorUsersGuide'
-  dependsOn 'asciidoctorDevelopersGuide'
-  dependsOn 'asciidoctorReleaseNotes'
-  enabled = false
-}
+  dependsOn 'configdocgen'
 
-task asciidoctorReleaseNotes(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
-  // Document type: article (default), book, inline, manpage)
-  options doctype: 'article'
-  // Where to look for AsciiDoc files. Default: src/docs/asciidoc
-  sourceDir = file("src/docs/release-notes")
   baseDirFollowsSourceDir()
-  // Where to put the rendered documents. Default: $buildDir/asciidoc.
-  outputDir = releaseNotesDir
+  // Where to put the rendered documents. Default: $buildDir/docs/asciidoc.
+  outputDir = asciidocOutputDir
   sources {
-    include 'index.adoc'
     include 'changelog.adoc'
     include 'contributors.adoc'
-  }
-  outputOptions {
-    // Whether to put backends' outputs into separate subdirectories
-    separateOutputDirs = false
-    // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
-    backends = ['html5']
-  }
-  // Attributes specific to the HTML output
-  attributes 'webfonts': false, // Disable webfonts
-             'iconfont-remote': false, // Disable remote icon fonts
-             'stylesdir': "_assets/css/", // Override the default styles directory to properly configure the use of local Font Awsome assets
-             'docinfo': "${file('src/docs/release-notes/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
-}
-
-task asciidoctorUsersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
-  dependsOn 'configdocgen'
-  // Document type: article (default), book, inline, manpage)
-  options doctype: 'book'
-  // Where to look for AsciiDoc files. Default: src/docs/asciidoc
-  sourceDir = file("src/docs/users-guide")
-  baseDirFollowsSourceDir()
-  // Where to put the rendered documents. Default: $buildDir/asciidoc.
-  outputDir = userManualDir
-  sources {
-    include 'opentcs-users-guide.adoc'
+    include 'developers-guide.adoc'
+    include 'index.adoc'
+    include 'users-guide.adoc'
   }
   outputOptions{
     // Whether to put backends' outputs into separate subdirectories
@@ -174,59 +127,23 @@ task asciidoctorUsersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
     backends = ['html5']
   }
   attributes 'configdoc': configDocDir,
-             // Attributes specific to the HTML output
-             'webfonts': false, // Disable webfonts
-             'iconfont-remote': false, // Disable remote icon fonts
-             'stylesdir': "../_assets/css/", // Override the default styles directory to properly configure the use of local Font Awsome assets
-             'docinfo': "${file('src/docs/users-guide/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
+      'webfonts': false, // Disable webfonts
+      'iconfont-remote': false, // Disable remote icon fonts
+      'documentation-testSrc': project.testSrcDir,
+      'loopback-guiceSrc': project(':opentcs-commadapter-loopback').guiceSrcDir,
+      'peripheral-loopback-guiceSrc': project(':opentcs-peripheralcommadapter-loopback').guiceSrcDir,
+      'controlCenter-guiceSrc': project(':opentcs-kernelcontrolcenter').guiceSrcDir,
+      'kernel-guiceSrc': project(':opentcs-kernel').guiceSrcDir,
+      'loadGeneratorPanel-guiceSrc': project(':opentcs-plantoverview-panel-loadgenerator').guiceSrcDir
 
   resources {
     from(sourceDir) {
+      include '_assets/**'
       include '**/*.jpg'
       include '**/*.png'
       include '**/*.svg'
       exclude 'themes'
     }
-  }
-}
-
-task asciidoctorDevelopersGuide(type: org.asciidoctor.gradle.jvm.AsciidoctorTask) {
-  // Document type: article (default), book, inline, manpage)
-  options doctype: 'book'
-  // Where to look for AsciiDoc files. Default: src/docs/asciidoc
-  sourceDir = file("src/docs/developers-guide")
-  baseDirFollowsSourceDir()
-  // Where to put the rendered documents. Default: $buildDir/asciidoc.
-  outputDir = devManualDir
-  sources {
-    include 'opentcs-developers-guide.adoc'
-  }
-  outputOptions{
-    // Whether to put backends' outputs into separate subdirectories
-    separateOutputDirs = false
-    // Set the backends the processor should use: html5 (default), docbook, manpage, pdf, deckjs
-    backends = ['html5']
-  }
-  attributes 'documentation-testSrc': project.testSrcDir,
-             'loopback-guiceSrc': project(':opentcs-commadapter-loopback').guiceSrcDir,
-             'peripheral-loopback-guiceSrc': project(':opentcs-peripheralcommadapter-loopback').guiceSrcDir,
-             'controlCenter-guiceSrc': project(':opentcs-kernelcontrolcenter').guiceSrcDir,
-             'kernel-guiceSrc': project(':opentcs-kernel').guiceSrcDir,
-             'loadGeneratorPanel-guiceSrc': project(':opentcs-plantoverview-panel-loadgenerator').guiceSrcDir,
-             'imagesoutdir': devManualImagesDir, // Set the images directory for the output of asciidoctor-diagram
-             // Attributes specific to the HTML output
-             'webfonts': false, // Disable webfonts
-             'iconfont-remote': false, // Disable remote icon fonts
-             'stylesdir': "../../_assets/css/", // Override the default styles directory to properly configure the use of local Font Awsome assets
-             'docinfo': "${file('src/docs/developers-guide/docinfo.html')}, shared" // The docinfo file references the stylesheets for fonts to use
-
-  resources {
-    from(sourceDir) {
-      include '**/*.png'
-    }
-  }
-  doLast{
-    delete "$devManualDir/.asciidoctor"
   }
 }
 

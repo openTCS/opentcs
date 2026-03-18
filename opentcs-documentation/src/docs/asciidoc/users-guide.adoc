@@ -8,7 +8,9 @@ The openTCS developers
 :toclevels: 3
 :sectnums: all
 :sectnumlevels: 6
-:imagesdir: images
+:docinfo: shared
+:imagesdir: _images
+:stylesdir: _assets/css
 :icons: font
 :source-highlighter: coderay
 :coderay-linenums-mode: table
@@ -17,13 +19,13 @@ The openTCS developers
 
 // TIP: Always have the comprehensive http://asciidoctor.org/docs/asciidoc-syntax-quick-reference[QuickReference] handy.
 
-include::01_introduction.adoc[]
+include::users-guide-01_introduction.adoc[]
 
-include::01_tutorials.adoc[]
+include::users-guide-01_tutorials.adoc[]
 
-include::02_howtos.adoc[]
+include::users-guide-02_howtos.adoc[]
 
-include::03_reference.adoc[]
+include::users-guide-03_reference.adoc[]
 
 // Excluded as long as it is without content.
-//include::04_explanation.adoc[]
+//include::users-guide-04_explanation.adoc[]

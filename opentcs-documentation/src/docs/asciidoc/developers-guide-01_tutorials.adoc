@@ -11,7 +11,7 @@ As a prerequisite, you need to have a Java Development Kit (JDK) 21+ installed.
 (Also see <<System requirements>>.)
 
 NOTE: This tutorial assumes that you are familiar with openTCS from a user perspective.
-If not, check the link:../../user/opentcs-users-guide.html[User's Guide], first.
+If not, check the link:./users-guide.html[User's Guide], first.
 
 IMPORTANT: It is highly recommended to create a proper integration project as described in this tutorial instead of inserting your own source code into a copy of the original openTCS source code.
 This is because, when integrating openTCS by copying its source code, you lose the ability to easily upgrade your code to more recent openTCS versions (for bugfixes or new features).
