@@ -124,7 +124,7 @@ public class LabeledPointFigure
       CoordinateProperty xCoord = pf.getModel().getPropertyModelPositionX();
       CoordinateProperty yCoord = pf.getModel().getPropertyModelPositionY();
 
-      if (xCoord.hasChanged() || xCoord.hasChanged()) {
+      if (xCoord.hasChanged() || yCoord.hasChanged()) {
         getLabel().willChange();
         Point2D exact = origin.calculatePixelPositionExactly(xCoord, yCoord);
         double scale = pf.getZoomPoint().scale();
