@@ -167,7 +167,7 @@ public class PathConnection
   }
 
   /**
-   * Initialise the control points when converting into BEZIER curve.
+   * Initialize the control points when converting into BEZIER curve.
    *
    * @param type the type of the curve
    */
@@ -875,7 +875,7 @@ public class PathConnection
       return;
     }
 
-    if (isTupelBezier()) { // BEZIER
+    if (isTupleBezier()) { // BEZIER
       Point2D.Double scaledControlPoint = scaleControlPoint(cp1, origin);
       path.set(0, BezierPath.C2_MASK, scaledControlPoint);
       scaledControlPoint = scaleControlPoint(cp2, origin);
@@ -915,7 +915,7 @@ public class PathConnection
     );
   }
 
-  private boolean isTupelBezier() {
+  private boolean isTupleBezier() {
     return cp1 != null && cp2 != null && cp3 == null && cp4 == null && cp5 == null;
   }
 
@@ -951,18 +951,35 @@ public class PathConnection
     if (sp.x == ep.x && sp.y == ep.y) {
       path.clear();
       path.add(sp);
-      String[] coords = getModel().getPropertyPathControlPoints().getText().split("[;]");
+      String[] coords = getModel().getPropertyPathControlPoints().getText().split(";");
       for (String coordinates : coords) {
-        String[] c = coordinates.split("[,]");
-        int x = (int) java.lang.Double.parseDouble(c[0]);
-        int y = (int) java.lang.Double.parseDouble(c[1]);
-        path.add(x, y);
+        String[] c = coordinates.split(",");
+        if (c.length == 2) {
+          try {
+            int x = (int) java.lang.Double.parseDouble(c[0]);
+            int y = (int) java.lang.Double.parseDouble(c[1]);
+            path.add(x, y);
+          }
+          catch (NumberFormatException e) {
+            LOG.warn(
+                "Cannot parse control point coordinates pair (in path '{}'), ignoring: '{}'",
+                getModel().getName(),
+                coordinates
+            );
+          }
+        }
+        else {
+          LOG.warn(
+              "Not a control point coordinates pair (in path '{}'), ignoring: '{}'",
+              getModel().getName(),
+              coordinates
+          );
+        }
       }
 
       path.add(ep);
     }
     else {
-
       path.clear();
       path.add(new BezierPath.Node(sp));
       path.add(new BezierPath.Node((sp.x + ep.x) / 2.0, (sp.y + ep.y) / 2.0));

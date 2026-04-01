@@ -25,6 +25,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Ensure that orders for automatic recharging do not try to send vehicles to locked locations.
 ** Update a point figure in the Model Editor when its y-coordinate is changed via the properties panel.
    (Previously, only changes to the x-coordinate triggered an update.)
+** Avoid an exception when loading a plant model with polygonal paths that do not have any control points.
 * Changes affecting developers:
 ** Update Gradle wrapper to 8.14.4.
 ** Update JUnit to 6.0.3.
