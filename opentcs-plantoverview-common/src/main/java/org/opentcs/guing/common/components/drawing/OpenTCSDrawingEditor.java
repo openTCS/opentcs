@@ -250,9 +250,7 @@ public class OpenTCSDrawingEditor
   public void figureAdded(Figure figure) {
     // Create the data model to a new point or location figure and show
     // the name in the label
-    if (figure instanceof LabeledFigure) {
-      LabeledFigure labeledFigure = (LabeledFigure) figure;
-
+    if (figure instanceof LabeledFigure labeledFigure) {
       if (labeledFigure.getLabel() == null) {
         // Create the label and add the figure to the data model
         TCSLabelFigure label = new TCSLabelFigure();

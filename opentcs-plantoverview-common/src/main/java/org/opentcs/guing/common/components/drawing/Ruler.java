@@ -219,8 +219,7 @@ public abstract class Ruler
 
     @Override
     public void originScaleChanged(EventObject evt) {
-      if (evt.getSource() instanceof Origin) {
-        Origin origin = (Origin) evt.getSource();
+      if (evt.getSource() instanceof Origin origin) {
         SwingUtilities.invokeLater(() -> {
           horizontalRulerScale = origin.getScaleX();
           repaint();
@@ -385,8 +384,7 @@ public abstract class Ruler
 
     @Override
     public void originScaleChanged(EventObject evt) {
-      if (evt.getSource() instanceof Origin) {
-        Origin origin = (Origin) evt.getSource();
+      if (evt.getSource() instanceof Origin origin) {
         SwingUtilities.invokeLater(() -> {
           verticalRulerScale = origin.getScaleY();
           repaint();

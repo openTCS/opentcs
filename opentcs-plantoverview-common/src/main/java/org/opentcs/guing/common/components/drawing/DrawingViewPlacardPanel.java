@@ -124,9 +124,8 @@ public class DrawingViewPlacardPanel
     comboBox.addActionListener((ActionEvent e) -> {
       final double scaleFactor;
 
-      if (comboBox.getSelectedItem() instanceof ZoomItem) {
+      if (comboBox.getSelectedItem() instanceof ZoomItem item) {
         // A zoom step of the array scaleFactors[]
-        ZoomItem item = (ZoomItem) comboBox.getSelectedItem();
         scaleFactor = item.getScaleFactor();
       }
       else {
@@ -211,7 +210,7 @@ public class DrawingViewPlacardPanel
   /**
    * Creates a button to toggle the grid in the drawing.
    *
-   * @param view The DrawingView the button will belong to.
+   * @param drawingView The DrawingView the button will belong to.
    * @return The created button.
    */
   private JToggleButton toggleConstrainerButton(final OpenTCSDrawingView drawingView) {
@@ -254,9 +253,9 @@ public class DrawingViewPlacardPanel
   }
 
   /**
-   * Creates a button to toglle the labels.
+   * Creates a button to toggle the labels.
    *
-   * @param view The DrawingView the button will belong to.
+   * @param drawingView The DrawingView the button will belong to.
    * @return The created button.
    */
   private JToggleButton toggleLabelsButton(final OpenTCSDrawingView drawingView) {
@@ -281,7 +280,7 @@ public class DrawingViewPlacardPanel
   /**
    * Creates a button to toggle the blocks in the drawing.
    *
-   * @param view The DrawingView the button will belong to.
+   * @param drawingView The DrawingView the button will belong to.
    * @return The created button.
    */
   private JToggleButton toggleBlocksButton(final OpenTCSDrawingView drawingView) {

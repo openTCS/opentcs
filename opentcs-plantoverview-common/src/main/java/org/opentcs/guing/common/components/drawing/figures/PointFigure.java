@@ -16,11 +16,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import org.jhotdraw.geom.Geom;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.TCSResourceReference;
@@ -98,16 +96,13 @@ public class PointFigure
 
   public Ellipse2D.Double getShape() {
     Rectangle2D r2 = fDisplayBox.getBounds2D();
-    Ellipse2D.Double shape
-        = new Ellipse2D.Double(r2.getX(), r2.getY(), fDiameter - 1, fDiameter - 1);
-    return shape;
+    return new Ellipse2D.Double(r2.getX(), r2.getY(), fDiameter - 1, fDiameter - 1);
   }
 
   @Override  // Figure
   public Rectangle2D.Double getBounds() {
-    Rectangle2D r2 = fDisplayBox.getBounds2D();
     Rectangle2D.Double r2d = new Rectangle2D.Double();
-    r2d.setRect(r2);
+    r2d.setRect(fDisplayBox.getBounds2D());
 
     return r2d;
   }
@@ -338,45 +333,5 @@ public class PointFigure
     return super.isVisible()
         && getModel().getPropertyLayerWrapper().getValue().getLayer().isVisible()
         && getModel().getPropertyLayerWrapper().getValue().getLayerGroup().isVisible();
-  }
-
-  private List<Set<TCSResourceReference<?>>> getCurrentDriveOrderClaim(VehicleModel vehicle) {
-    List<Set<TCSResourceReference<?>>> result = new ArrayList<>();
-
-    boolean driveOrderEndFound = false;
-    for (Set<TCSResourceReference<?>> res : vehicle.getClaimedResources().getItems()) {
-      result.add(res);
-
-      if (containsDriveOrderDestination(res, vehicle)) {
-        driveOrderEndFound = true;
-        break;
-      }
-    }
-
-    if (driveOrderEndFound) {
-      return result;
-    }
-    else {
-      // With the end of the drive order not found, there is nothing from the current drive order in
-      // the claimed resources.
-      return List.of();
-    }
-  }
-
-  private boolean containsDriveOrderDestination(
-      Set<TCSResourceReference<?>> resources,
-      VehicleModel vehicle
-  ) {
-    if (vehicle.getDriveOrderDestination() == null) {
-      return false;
-    }
-
-    return resources.stream()
-        .anyMatch(
-            resource -> Objects.equals(
-                resource.getName(),
-                vehicle.getDriveOrderDestination().getName()
-            )
-        );
   }
 }

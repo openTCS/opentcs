@@ -3,8 +3,6 @@
 package org.opentcs.guing.common.components.drawing.figures;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentcs.guing.base.AllocationState.ALLOCATED;
-import static org.opentcs.guing.base.AllocationState.CLAIMED;
 
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
@@ -18,18 +16,13 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.ConnectionFigure;
 import org.jhotdraw.draw.connector.ChopEllipseConnector;
 import org.jhotdraw.draw.connector.Connector;
 import org.jhotdraw.geom.Geom;
 import org.opentcs.components.plantoverview.LocationTheme;
-import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.base.AllocationState;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
@@ -99,9 +92,8 @@ public class LocationFigure
 
   @Override // Figure
   public Rectangle2D.Double getBounds() {
-    Rectangle2D r2 = fDisplayBox.getBounds2D();
     Rectangle2D.Double r2d = new Rectangle2D.Double();
-    r2d.setRect(r2);
+    r2d.setRect(fDisplayBox.getBounds2D());
 
     return r2d;
   }
@@ -210,14 +202,12 @@ public class LocationFigure
 
   @Override  // AbstractAttributedFigure
   protected void drawFill(Graphics2D g) {
-    int dx;
-    int dy;
     Rectangle r = displayBox();
     g.fillRect(r.x, r.y, r.width, r.height);
 
     if (fImage != null) {
-      dx = (r.width - fImage.getWidth(this)) / 2;
-      dy = (r.height - fImage.getHeight(this)) / 2;
+      int dx = (r.width - fImage.getWidth(this)) / 2;
+      int dy = (r.height - fImage.getHeight(this)) / 2;
       g.drawImage(fImage, r.x + dx, r.y + dy, this);
     }
   }
@@ -282,45 +272,5 @@ public class LocationFigure
         AttributeKeys.FILL_COLOR,
         (Boolean) getModel().getPropertyLocked().getValue() ? LOCKED_COLOR : Color.WHITE
     );
-  }
-
-  private List<Set<TCSResourceReference<?>>> getCurrentDriveOrderClaim(VehicleModel vehicle) {
-    List<Set<TCSResourceReference<?>>> result = new ArrayList<>();
-
-    boolean driveOrderEndFound = false;
-    for (Set<TCSResourceReference<?>> res : vehicle.getClaimedResources().getItems()) {
-      result.add(res);
-
-      if (containsDriveOrderDestination(res, vehicle)) {
-        driveOrderEndFound = true;
-        break;
-      }
-    }
-
-    if (driveOrderEndFound) {
-      return result;
-    }
-    else {
-      // With the end of the drive order not found, there is nothing from the current drive order in
-      // the claimed resources.
-      return List.of();
-    }
-  }
-
-  private boolean containsDriveOrderDestination(
-      Set<TCSResourceReference<?>> resources,
-      VehicleModel vehicle
-  ) {
-    if (vehicle.getDriveOrderDestination() == null) {
-      return false;
-    }
-
-    return resources.stream()
-        .anyMatch(
-            resource -> Objects.equals(
-                resource.getName(),
-                vehicle.getDriveOrderDestination().getName()
-            )
-        );
   }
 }

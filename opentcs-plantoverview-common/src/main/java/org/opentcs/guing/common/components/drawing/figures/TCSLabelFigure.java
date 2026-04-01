@@ -128,12 +128,8 @@ public class TCSLabelFigure
 
   @Override  // LabelFigure
   public void figureChanged(FigureEvent event) {
-    if (event.getFigure() instanceof LabeledFigure) {
-      LabeledFigure lf = (LabeledFigure) event.getFigure();
-      TCSFigure figure = lf.getPresentationFigure();
-      ModelComponent model = figure.getModel();
-      String name = model.getName();
-      setText(name);
+    if (event.getFigure() instanceof LabeledFigure lf) {
+      setText(lf.getPresentationFigure().getModel().getName());
 
       if (isLabelVisible) {
         invalidate();

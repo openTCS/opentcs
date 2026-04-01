@@ -70,9 +70,7 @@ public abstract class LabeledFigure
 
   @Override
   public boolean handleMouseClick(Point2D.Double p, MouseEvent evt, DrawingView view) {
-    boolean ret = getPresentationFigure().handleMouseClick(p, evt, view);
-
-    return ret;
+    return getPresentationFigure().handleMouseClick(p, evt, view);
   }
 
   @Override
@@ -144,7 +142,7 @@ public abstract class LabeledFigure
   public abstract void updateModel();
 
   /**
-   * Scales the model coodinates accodring to changes to the layout scale.
+   * Scales the model coordinates according to changes to the layout scale.
    *
    * @param event The event containing the layout scale change.
    */

@@ -53,7 +53,7 @@ public abstract class SimpleLineConnection
   }
 
   /**
-   * Initialise this figure.
+   * Initialize this figure.
    */
   protected final void initConnectionFigure() {
     updateDecorations();
@@ -91,28 +91,26 @@ public abstract class SimpleLineConnection
   public abstract void updateModel();
 
   /**
-   * Scales the model coodinates accodring to changes to the layout scale.
+   * Scales the model coordinates according to changes to the layout scale.
    *
    * @param event The event containing the layout scale change.
    */
   public abstract void scaleModel(EventObject event);
 
   /**
-   * Calculates the euclid distance between the start position and the end position.
+   * Calculates the Euclidean distance between the start position and the end position.
    *
-   * @param startPosX The x coordiante of the start position.
-   * @param startPosY The y coordiante of the start position.
+   * @param startPosX The x coordinate of the start position.
+   * @param startPosY The y coordinate of the start position.
    * @param endPosX The x coordinate of the end position.
    * @param endPosY The y coordinate of the end position.
-   * @return the euclid distance between start and end point rounded to the next integer.
+   * @return the Euclidean distance between start and end point rounded to the next integer.
    */
   protected double distance(double startPosX, double startPosY, double endPosX, double endPosY) {
     double dX = startPosX - endPosX;
     double dY = startPosY - endPosY;
-    double dist = Math.sqrt(dX * dX + dY * dY);
-    dist = Math.floor(dist + 0.5);  // round to an integer value.
 
-    return dist;
+    return Math.floor(Math.sqrt(dX * dX + dY * dY) + 0.5);  // round to an integer value.
   }
 
   public void updateDecorations() {

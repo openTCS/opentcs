@@ -103,19 +103,13 @@ public class LinkConnection
     }
 
     // Even though new links can now only be created starting from a location, we need this to
-    // ensure backward campatibility for older models that may still have links with a point
-    // as the start component. Otherwise those links would not be connected/drawn properly.
-    if ((modelStart instanceof PointModel) && modelEnd instanceof LocationModel) {
-      LocationModel location = (LocationModel) modelEnd;
-      PointModel point = (PointModel) modelStart;
-
+    // ensure backward compatibility for older models that may still have links with a point
+    // as the start component. Otherwise, those links would not be connected/drawn properly.
+    if (modelStart instanceof PointModel point && modelEnd instanceof LocationModel location) {
       return !location.hasConnectionTo(point);
     }
 
-    if (modelStart instanceof LocationModel && (modelEnd instanceof PointModel)) {
-      LocationModel location = (LocationModel) modelStart;
-      PointModel point = (PointModel) modelEnd;
-
+    if (modelStart instanceof LocationModel location && modelEnd instanceof PointModel point) {
       return !point.hasConnectionTo(location);
     }
 

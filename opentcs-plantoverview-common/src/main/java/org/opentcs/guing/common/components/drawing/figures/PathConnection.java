@@ -18,7 +18,6 @@ import java.util.EventObject;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.StringJoiner;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.AttributeKeys;
@@ -336,45 +335,16 @@ public class PathConnection
     getModel().propertiesChanged(this);
   }
 
-  public Point2D.Double getCp1() {
-    return cp1;
-  }
-
-  public Point2D.Double getCp2() {
-    return cp2;
-  }
-
-  public Point2D.Double getCp3() {
-    return cp3;
-  }
-
-  public Point2D.Double getCp4() {
-    return cp4;
-  }
-
-  public Point2D.Double getCp5() {
-    return cp5;
-  }
-
   @Override
   public Point2D.Double getCenter() {
     // Computes the center of the curve.
     // Approximation: Center of the control points.
-    Point2D.Double p1;
-    Point2D.Double p2;
-    Point2D.Double pc;
 
-    p1 = (cp1 == null ? path.get(0, BezierPath.C0_MASK) : cp1);
-    p2 = (cp2 == null ? path.get(1, BezierPath.C0_MASK) : cp2);
-    if (cp3 == null) {
-      pc = new Point2D.Double((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-    }
-    else {
-      //Use cp3 for 3-bezier as center because the curve goes through it at 50%
-      pc = (cp3 == null ? path.get(3, BezierPath.C0_MASK) : cp3);
-    }
+    Point2D.Double p1 = cp1 == null ? path.get(0, BezierPath.C0_MASK) : cp1;
+    Point2D.Double p2 = cp2 == null ? path.get(1, BezierPath.C0_MASK) : cp2;
 
-    return pc;
+    // Use cp3 for 3-bezier as center because the curve goes through it at 50%.
+    return cp3 == null ? new Point2D.Double((p1.x + p2.x) / 2, (p1.y + p2.y) / 2) : cp3;
   }
 
   @Override
@@ -1014,45 +984,5 @@ public class PathConnection
       }
     }
     return false;
-  }
-
-  private List<Set<TCSResourceReference<?>>> getCurrentDriveOrderClaim(VehicleModel vehicle) {
-    List<Set<TCSResourceReference<?>>> result = new ArrayList<>();
-
-    boolean driveOrderEndFound = false;
-    for (Set<TCSResourceReference<?>> res : vehicle.getClaimedResources().getItems()) {
-      result.add(res);
-
-      if (containsDriveOrderDestination(res, vehicle)) {
-        driveOrderEndFound = true;
-        break;
-      }
-    }
-
-    if (driveOrderEndFound) {
-      return result;
-    }
-    else {
-      // With the end of the drive order not found, there is nothing from the current drive order in
-      // the claimed resources.
-      return List.of();
-    }
-  }
-
-  private boolean containsDriveOrderDestination(
-      Set<TCSResourceReference<?>> resources,
-      VehicleModel vehicle
-  ) {
-    if (vehicle.getDriveOrderDestination() == null) {
-      return false;
-    }
-
-    return resources.stream()
-        .anyMatch(
-            resource -> Objects.equals(
-                resource.getName(),
-                vehicle.getDriveOrderDestination().getName()
-            )
-        );
   }
 }
