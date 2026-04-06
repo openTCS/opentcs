@@ -153,7 +153,7 @@ public final class TripleTextInputPanel
 
     setLayout(new java.awt.GridBagLayout());
 
-    unitLabel3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    unitLabel3.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     unitLabel3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
     unitLabel3.setText("Unit-Label");
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -163,7 +163,7 @@ public final class TripleTextInputPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(unitLabel3, gridBagConstraints);
 
-    label3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    label3.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     label3.setText("Label");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -171,7 +171,7 @@ public final class TripleTextInputPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(label3, gridBagConstraints);
 
-    inputField3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    inputField3.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     inputField3.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
     inputField3.setText("initial Value");
     inputField3.setName("inputField3"); // NOI18N
@@ -188,7 +188,7 @@ public final class TripleTextInputPanel
     add(inputField3, gridBagConstraints);
     inputField3.getAccessibleContext().setAccessibleName("");
 
-    messageLabel.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    messageLabel.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     messageLabel.setText("Message");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -198,7 +198,7 @@ public final class TripleTextInputPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(messageLabel, gridBagConstraints);
 
-    label1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    label1.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     label1.setText("Label");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -206,7 +206,7 @@ public final class TripleTextInputPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(label1, gridBagConstraints);
 
-    inputField1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    inputField1.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     inputField1.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
     inputField1.setText("initial Value");
     inputField1.setName("inputField1"); // NOI18N
@@ -223,7 +223,7 @@ public final class TripleTextInputPanel
     add(inputField1, gridBagConstraints);
     inputField1.getAccessibleContext().setAccessibleName("");
 
-    unitLabel1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    unitLabel1.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     unitLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
     unitLabel1.setText("Unit-Label");
     gridBagConstraints = new java.awt.GridBagConstraints();
@@ -233,7 +233,7 @@ public final class TripleTextInputPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(unitLabel1, gridBagConstraints);
 
-    label2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    label2.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     label2.setText("Label");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
@@ -241,7 +241,7 @@ public final class TripleTextInputPanel
     gridBagConstraints.insets = new java.awt.Insets(3, 3, 3, 3);
     add(label2, gridBagConstraints);
 
-    inputField2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    inputField2.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     inputField2.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
     inputField2.setText("initial Value");
     inputField2.setName("inputField2"); // NOI18N
@@ -258,7 +258,7 @@ public final class TripleTextInputPanel
     add(inputField2, gridBagConstraints);
     inputField2.getAccessibleContext().setAccessibleName("");
 
-    unitLabel2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+    unitLabel2.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
     unitLabel2.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
     unitLabel2.setText("Unit-Label");
     gridBagConstraints = new java.awt.GridBagConstraints();
