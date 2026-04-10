@@ -113,22 +113,23 @@ public abstract class AbstractModelGraphMapper
     Set<String> pathNames = paths.stream()
         .map(Path::getName)
         .collect(Collectors.toSet());
-    Set<Edge> unchangedEdges = graph.edgeSet().stream()
+    graph.edgeSet().stream()
         .filter(edge -> !pathNames.contains(edge.getPath().getName()))
-        .collect(Collectors.toSet());
+        .forEach(
+            edge -> {
+              updatedGraph.addEdge(
+                  pointVertexMap.get(edge.getSourceVertex()),
+                  pointVertexMap.get(edge.getTargetVertex()),
+                  edge
+              );
+              updatedGraph.setEdgeWeight(edge, graph.getEdgeWeight(edge));
+            }
+        );
     LOG.debug(
-        "Adding {} (unchanged) edges (out of originally {}) to the graph...",
-        unchangedEdges.size(),
+        "Added {} (unchanged) edges (out of originally {}) to the graph",
+        updatedGraph.edgeSet().size(),
         graph.edgeSet().size()
     );
-    for (Edge edge : unchangedEdges) {
-      updatedGraph.addEdge(
-          pointVertexMap.get(edge.getSourceVertex()),
-          pointVertexMap.get(edge.getTargetVertex()),
-          edge
-      );
-      updatedGraph.setEdgeWeight(edge, graph.getEdgeWeight(edge));
-    }
 
     // Finally, map all paths that have changed and add the corresponding edges.
     Map<Edge, Double> changedEdges = pathEdgeMapper.translatePaths(paths, vehicle);
