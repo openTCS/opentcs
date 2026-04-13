@@ -73,13 +73,20 @@ public class DriverGUI
    */
   private final LocalVehicleEntryPool vehicleEntryPool;
   /**
-   * The detail panel to dispay when selecting a vehicle.
+   * The detail panel to display when selecting a vehicle.
    */
   private final DetailPanel detailPanel;
   /**
    * Whether this panel is initialized or not.
    */
   private boolean initialized;
+  /**
+   * An array of all points in the plant model for initializing the points combo boxes.
+   * <p>
+   * Points are cached as an optimization for large plant models.
+   * </p>
+   */
+  private Point[] cachedPoints = new Point[0];
 
   /**
    * Creates a new instance.
@@ -186,6 +193,8 @@ public class DriverGUI
     SingleCellEditor adapterCellEditor = new SingleCellEditor(vehicleTable);
     SingleCellEditor pointsCellEditor = new SingleCellEditor(vehicleTable);
 
+    cachedPoints = fetchAndSortPoints();
+
     int index = 0;
     for (LocalVehicleEntry entry : vehicleEntryPool.getEntries().values()) {
       initCommAdaptersComboBox(entry, index, adapterCellEditor);
@@ -197,6 +206,21 @@ public class DriverGUI
         .setCellEditor(adapterCellEditor);
     vehicleTable.getColumn(VehicleTableModel.positionColumnIdentifier())
         .setCellEditor(pointsCellEditor);
+  }
+
+  private Point[] fetchAndSortPoints() {
+    try {
+      Set<Point> points = callWrapper.call(
+          () -> servicePortal.getVehicleService().fetch(Point.class)
+      );
+      return points.stream()
+          .sorted(Comparators.objectsByName())
+          .toArray(Point[]::new);
+    }
+    catch (Exception ex) {
+      LOG.warn("Error fetching points", ex);
+      return new Point[0];
+    }
   }
 
   private void initCommAdaptersComboBox(
@@ -278,19 +302,8 @@ public class DriverGUI
    * @param pointsCellEditor The <code>SingleCellEditor</code> containing the combo boxes.
    */
   private void initPointsComboBox(int rowIndex, SingleCellEditor pointsCellEditor) {
-    final JComboBox<Point> pointComboBox = new JComboBox<>();
+    final JComboBox<Point> pointComboBox = new JComboBox<>(cachedPoints);
 
-    Set<Point> points;
-    try {
-      points = callWrapper.call(() -> servicePortal.getVehicleService().fetch(Point.class));
-    }
-    catch (Exception ex) {
-      LOG.warn("Error fetching points", ex);
-      return;
-    }
-
-    points.stream().sorted(Comparators.objectsByName())
-        .forEach(point -> pointComboBox.addItem(point));
     pointComboBox.setSelectedIndex(-1);
     pointComboBox.setRenderer(new StringListCellRenderer<>(x -> x == null ? "" : x.getName()));
 

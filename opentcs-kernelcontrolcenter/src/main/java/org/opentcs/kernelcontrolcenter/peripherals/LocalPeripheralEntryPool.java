@@ -8,11 +8,13 @@ import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.ServiceCallWrapper;
 import org.opentcs.data.model.Location;
+import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.drivers.peripherals.PeripheralProcessModel;
 import org.opentcs.drivers.peripherals.management.PeripheralAttachmentEvent;
@@ -133,12 +135,19 @@ public class LocalPeripheralEntryPool
   private void initializeEntryMap()
       throws Exception {
     Set<Location> locations
-        = callWrapper.call(() -> servicePortal.getPlantModelService().fetch(Location.class));
+        = callWrapper.call(
+            () -> servicePortal.getPlantModelService().fetch(Location.class).stream()
+                .filter(
+                    location -> location.getPeripheralInformation().getState()
+                        != PeripheralInformation.State.NO_PERIPHERAL
+                )
+                .collect(Collectors.toSet())
+        );
     for (Location location : locations) {
-      PeripheralAttachmentInformation ai = callWrapper.call(() -> {
-        return servicePortal.getPeripheralService()
-            .fetchAttachmentInformation(location.getReference());
-      });
+      PeripheralAttachmentInformation ai = callWrapper.call(
+          () -> servicePortal.getPeripheralService()
+              .fetchAttachmentInformation(location.getReference())
+      );
       PeripheralProcessModel processModel = callWrapper.call(
           () -> servicePortal.getPeripheralService().fetchProcessModel(location.getReference())
       );
