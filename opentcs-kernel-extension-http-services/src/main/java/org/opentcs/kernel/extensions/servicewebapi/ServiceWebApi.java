@@ -137,6 +137,8 @@ public class ServiceWebApi
         LOG.warn("Encryption disabled, connections will not be secured!");
       }
 
+      configureRequestLogging(cfg);
+
       cfg.routes.sse("/v1/sse", v1SseHandler::handleSseConnection);
 
       cfg.routes.beforeMatched(ctx -> {
@@ -224,5 +226,28 @@ public class ServiceWebApi
 
   private boolean isLocalHost(String ip) {
     return ip.equals("127.0.0.1") || ip.equals("[0:0:0:0:0:0:0:1]");
+  }
+
+  private void configureRequestLogging(JavalinConfig cfg) {
+    cfg.routes.beforeMatched(
+        ctx -> LOG.debug(
+            "Incoming request to '{} {}' by '{}'. (Request ID: {})",
+            ctx.method(),
+            ctx.fullUrl(),
+            ctx.host(),
+            ctx.req().getRequestId()
+        )
+    );
+
+    cfg.requestLogger.http(
+        (ctx, ms) -> LOG.debug(
+            "Request to '{} {}' by '{}' took {} ms. (Request ID: {})",
+            ctx.method(),
+            ctx.fullUrl(),
+            ctx.host(),
+            ms.longValue(),
+            ctx.req().getRequestId()
+        )
+    );
   }
 }
