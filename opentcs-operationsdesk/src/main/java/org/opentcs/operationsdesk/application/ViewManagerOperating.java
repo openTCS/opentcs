@@ -18,6 +18,7 @@ import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.guing.common.application.AbstractViewManager;
 import org.opentcs.guing.common.components.dockable.CStackDockStation;
 import org.opentcs.guing.common.components.dockable.DockableTitleComparator;
+import org.opentcs.guing.common.components.drawing.DrawingViewScrollPane;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingView;
 import org.opentcs.operationsdesk.components.dockable.DockingManagerOperating;
 import org.opentcs.operationsdesk.notifications.UserNotificationsContainerPanel;
@@ -38,10 +39,6 @@ public class ViewManagerOperating
    * Manages the application's docking frames.
    */
   private final DockingManagerOperating dockingManager;
-  /**
-   * Where we register event listeners.
-   */
-  private final EventSource eventSource;
   /**
    * Map for user notification dockable -> user notification container panel.
    */
@@ -73,7 +70,6 @@ public class ViewManagerOperating
   ) {
     super(eventSource);
     this.dockingManager = requireNonNull(dockingManager, "dockingManager");
-    this.eventSource = requireNonNull(eventSource, "eventSource");
     userNotificationViews = new TreeMap<>(new DockableTitleComparator());
     transportOrderViews = new TreeMap<>(new DockableTitleComparator());
     orderSequenceViews = new TreeMap<>(new DockableTitleComparator());
@@ -112,14 +108,14 @@ public class ViewManagerOperating
   }
 
   /**
-   * Returns all drawing views (excluding the modelling view)
+   * Returns all drawing views (excluding the modeling view)
    *
    * @return List with all known <code>OpenTCSDrawingViews</code>, but not
-   * the modelling view.
+   * the modeling view.
    */
   public List<OpenTCSDrawingView> getOperatingDrawingViews() {
-    return getDrawingViewMap().entrySet().stream()
-        .map(entry -> entry.getValue().getDrawingView())
+    return getDrawingViewMap().values().stream()
+        .map(DrawingViewScrollPane::getDrawingView)
         .collect(Collectors.toList());
   }
 

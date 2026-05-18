@@ -143,8 +143,8 @@ public class CloseFileAction
           doIt(evt.getActionCommand(), view);
           break;
 
-        default:
         case JOptionPane.CANCEL_OPTION:
+        default:
           break;
       }
     }

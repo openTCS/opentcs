@@ -75,7 +75,6 @@ public class IntendedVehiclesPanel
       @Override
       public void removeUpdate(DocumentEvent e) {
         verify();
-
       }
 
       @Override

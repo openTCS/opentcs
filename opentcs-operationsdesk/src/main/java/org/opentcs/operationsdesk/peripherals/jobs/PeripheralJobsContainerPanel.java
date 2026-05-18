@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.swing.JButton;
@@ -128,7 +127,7 @@ public class PeripheralJobsContainerPanel
     TableRowSorter<PeripheralJobTableModel> sorter = new TableRowSorter<>(tableModel);
     // Sort the table by the creation instant.
     sorter.setSortKeys(
-        Arrays.asList(
+        List.of(
             new RowSorter.SortKey(
                 PeripheralJobTableModel.COLUMN_CREATION_TIME, SortOrder.DESCENDING
             )

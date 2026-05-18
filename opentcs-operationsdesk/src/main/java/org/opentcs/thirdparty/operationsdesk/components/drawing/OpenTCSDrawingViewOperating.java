@@ -66,7 +66,7 @@ public class OpenTCSDrawingViewOperating
     super.propertyChange(evt);
 
     if (evt.getPropertyName().equals(VehicleFigure.POSITION_CHANGED)) {
-      scrollTo((VehicleFigure) getModelManager().getModel().getFigure(fFocusVehicle));
+      scrollTo(getModelManager().getModel().getFigure(fFocusVehicle));
     }
   }
 
@@ -172,7 +172,7 @@ public class OpenTCSDrawingViewOperating
   /**
    * Sets a radial gradient for the vehicle, its current and next position.
    *
-   * @param g2d
+   * @param g2d Where to draw.
    */
   private void highlightVehicle(Graphics2D g2d) {
     if (fFocusVehicle == null) {

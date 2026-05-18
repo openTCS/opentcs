@@ -44,10 +44,6 @@ public class VehicleLabelFigure
   }
 
   @Override
-  protected void drawStroke(Graphics2D g) {
-  }
-
-  @Override
   protected void drawText(Graphics2D g) {
     if (getText() != null || isEditable()) {
       TextLayout layout = getTextLayout();

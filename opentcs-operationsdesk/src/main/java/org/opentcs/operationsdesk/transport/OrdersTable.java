@@ -34,19 +34,11 @@ public class OrdersTable
 
   @Override
   public TableCellEditor getCellEditor(int row, int column) {
-    TableModel tableModel = getModel();
-    Object value = tableModel.getValueAt(row, column);
-    TableCellEditor editor = getDefaultEditor(value.getClass());
-
-    return editor;
+    return getDefaultEditor(getModel().getValueAt(row, column).getClass());
   }
 
   @Override
   public TableCellRenderer getCellRenderer(int row, int column) {
-    TableModel tableModel = getModel();
-    Object value = tableModel.getValueAt(row, column);
-    TableCellRenderer renderer = getDefaultRenderer(value.getClass());
-
-    return renderer;
+    return getDefaultRenderer(getModel().getValueAt(row, column).getClass());
   }
 }

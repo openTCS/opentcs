@@ -3,16 +3,12 @@
 package org.opentcs.operationsdesk.components.drawing.figures;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentcs.data.model.Vehicle.State.ERROR;
-import static org.opentcs.data.model.Vehicle.State.UNAVAILABLE;
-import static org.opentcs.data.model.Vehicle.State.UNKNOWN;
 
 import jakarta.inject.Inject;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.guing.base.AllocationState;
@@ -32,13 +28,13 @@ public class ToolTipTextGeneratorOperationsDesk
       ToolTipTextGenerator {
 
   /**
-   * A unicode play symbol.
+   * A Unicode play symbol.
    */
-  private static final String PLAY_SYMBOL = "\u23f5";
+  private static final String PLAY_SYMBOL = "⏵";
   /**
-   * A unicode hourglass symbol.
+   * A Unicode hourglass symbol.
    */
-  private static final String HOURGLASS_SYMBOL = "\u29d6";
+  private static final String HOURGLASS_SYMBOL = "⧖";
 
   /**
    * Collection of peripheral jobs.
@@ -86,7 +82,7 @@ public class ToolTipTextGeneratorOperationsDesk
         .entrySet()
         .stream()
         .filter(entry -> entry.getValue() == AllocationState.ALLOCATED)
-        .collect(Collectors.toList());
+        .toList();
 
     if (allocationStates.isEmpty()) {
       return;

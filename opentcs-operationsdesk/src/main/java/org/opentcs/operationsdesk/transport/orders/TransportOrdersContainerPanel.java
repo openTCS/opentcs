@@ -17,7 +17,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -39,6 +38,7 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.SharedKernelServicePortal;
 import org.opentcs.access.SharedKernelServicePortalProvider;
 import org.opentcs.components.kernel.dipatching.TransportOrderAssignmentException;
+import org.opentcs.data.TCSObject;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.common.components.dialogs.DialogContent;
@@ -151,7 +151,7 @@ public class TransportOrdersContainerPanel
     sorter = new FilteredRowSorter<>(tableModel);
     // Sort the table by the creation instant.
     sorter.setSortKeys(
-        Arrays.asList(
+        List.of(
             new RowSorter.SortKey(
                 TransportOrderTableModel.COLUMN_CREATION_TIME, SortOrder.DESCENDING
             )
@@ -242,7 +242,7 @@ public class TransportOrdersContainerPanel
 
   private void createCopyOfSelectedTransportOrder() {
     getSelectedTransportOrder().ifPresent(
-        transportOrder -> orderUtil.createTransportOrder(transportOrder)
+        orderUtil::createTransportOrder
     );
   }
 
@@ -289,7 +289,7 @@ public class TransportOrdersContainerPanel
         sharedPortal.getPortal().getTransportOrderService().updateTransportOrderIntendedVehicle(
             transportOrder.getReference(),
             panel.getSelectedVehicle()
-                .map(v -> v.getReference())
+                .map(TCSObject::getReference)
                 .orElse(null)
         );
       }
@@ -297,7 +297,7 @@ public class TransportOrdersContainerPanel
         LOG.warn(
             "Exception setting intended vehicle {} on transport order {}",
             panel.getSelectedVehicle()
-                .map(v -> v.getName())
+                .map(TCSObject::getName)
                 .orElse("null"),
             transportOrder.getName(),
             exc
@@ -409,7 +409,7 @@ public class TransportOrdersContainerPanel
       case NO_VETO:
       default:
         LOG.warn(
-            "TransportOrderAssignmentException with unmapped veto: {}, caused by: {}",
+            "TransportOrderAssignmentException with unmapped veto: {}",
             exc.getTransportOrderAssignmentVeto().name(),
             exc
         );
@@ -596,10 +596,8 @@ public class TransportOrdersContainerPanel
     int[] indices = fTable.getSelectedRows();
     List<TransportOrder> toWithdraw = new ArrayList<>();
 
-    for (int i = 0; i < indices.length; i++) {
-      int modelIndex = fTable.convertRowIndexToModel(indices[i]);
-      TransportOrder order = tableModel.getEntryAt(modelIndex);
-      toWithdraw.add(order);
+    for (int index : indices) {
+      toWithdraw.add(tableModel.getEntryAt(fTable.convertRowIndexToModel(index)));
     }
 
     try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {

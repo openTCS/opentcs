@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.operationsdesk.transport;
 
+import static java.util.Objects.requireNonNull;
+
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +40,9 @@ public class CompositeObjectHistoryEntryFormatter
    */
   @Inject
   public CompositeObjectHistoryEntryFormatter(Set<ObjectHistoryEntryFormatter> customFormatters) {
-    for (ObjectHistoryEntryFormatter formatter : customFormatters) {
-      formatters.add(formatter);
-    }
+    requireNonNull(customFormatters, "customFormatters");
+
+    formatters.addAll(customFormatters);
 
     formatters.add(new TransportOrderHistoryEntryFormatter());
     formatters.add(new PeripheralJobHistoryEntryFormatter());
@@ -52,8 +54,8 @@ public class CompositeObjectHistoryEntryFormatter
   public Optional<String> apply(ObjectHistory.Entry entry) {
     return formatters.stream()
         .map(formatter -> formatter.apply(entry))
-        .filter(result -> result.isPresent())
-        .map(result -> result.get())
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .findFirst();
   }
 

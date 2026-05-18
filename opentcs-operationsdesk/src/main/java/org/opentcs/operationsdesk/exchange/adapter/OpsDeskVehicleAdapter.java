@@ -165,7 +165,7 @@ public class OpsDeskVehicleAdapter
 
     List<Route.Step> routeSteps = driveOrder.getRoute().getSteps();
     return systemModel.getPointModel(
-        routeSteps.get(routeSteps.size() - 1).getDestinationPoint().getName()
+        routeSteps.getLast().getDestinationPoint().getName()
     );
   }
 

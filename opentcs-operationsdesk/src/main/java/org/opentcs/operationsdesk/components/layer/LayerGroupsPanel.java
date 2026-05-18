@@ -6,7 +6,7 @@ import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
 import java.awt.BorderLayout;
-import java.util.Arrays;
+import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -77,7 +77,7 @@ public class LayerGroupsPanel
     TableRowSorter<LayerGroupsTableModel> sorter = new TableRowSorter<>(tableModel);
     // Sort the table by the layer ordinals...
     sorter.setSortKeys(
-        Arrays.asList(
+        List.of(
             new RowSorter.SortKey(LayerGroupsTableModel.COLUMN_ID, SortOrder.DESCENDING)
         )
     );

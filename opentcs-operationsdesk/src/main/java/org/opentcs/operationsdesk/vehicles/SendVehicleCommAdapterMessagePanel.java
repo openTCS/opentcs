@@ -7,7 +7,6 @@ import static java.util.Objects.requireNonNull;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -147,7 +146,7 @@ public class SendVehicleCommAdapterMessagePanel
     TableRowSorter<ParametersTableModel> sorter = new TableRowSorter<>(tableModel);
     // Sort the table by the parameter key
     sorter.setSortKeys(
-        Arrays.asList(
+        List.of(
             new RowSorter.SortKey(ParametersTableModel.COLUMN_KEY, SortOrder.ASCENDING)
         )
     );

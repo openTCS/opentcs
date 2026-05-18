@@ -8,13 +8,11 @@ import static org.opentcs.operationsdesk.util.I18nPlantOverviewOperating.VEHICLE
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import org.opentcs.customizations.plantoverview.ApplicationFrame;
 import org.opentcs.data.order.OrderConstants;
-import org.opentcs.guing.base.model.AbstractConnectableModelComponent;
 import org.opentcs.guing.base.model.elements.LocationModel;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.components.dialogs.StandardContentDialog;
@@ -89,14 +87,9 @@ public class SendVehicleToLocationAction
       fDialog.setVisible(true);
 
       if (fDialog.getReturnStatus() == StandardContentDialog.RET_OK) {
-        LocationModel location = contentPanel.getSelectedLocation();
-        List<AbstractConnectableModelComponent> destinationModels = new ArrayList<>();
-        destinationModels.add(location);
-        List<String> actions = new ArrayList<>();
-        actions.add(contentPanel.getSelectedAction());
         orderUtil.createTransportOrder(
-            destinationModels,
-            actions,
+            List.of(contentPanel.getSelectedLocation()),
+            List.of(contentPanel.getSelectedAction()),
             System.currentTimeMillis(),
             fVehicle,
             OrderConstants.TYPE_NONE

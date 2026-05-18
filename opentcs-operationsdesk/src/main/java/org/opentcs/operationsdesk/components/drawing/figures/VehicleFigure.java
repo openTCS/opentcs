@@ -2,9 +2,6 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.operationsdesk.components.drawing.figures;
 
-import static java.awt.image.ImageObserver.ABORT;
-import static java.awt.image.ImageObserver.ALLBITS;
-import static java.awt.image.ImageObserver.FRAMEBITS;
 import static java.util.Objects.requireNonNull;
 
 import com.google.inject.assistedinject.Assisted;
@@ -18,8 +15,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import javax.swing.SwingUtilities;
 import org.jhotdraw.draw.DrawingView;
@@ -448,8 +445,7 @@ public class VehicleFigure
       DrawingView drawingView
   ) {
     // This gets executed on a double click AND a right click on the figure
-    VehicleModel model = getModel();
-    VehiclePopupMenu menu = menuFactory.createVehiclePopupMenu(Arrays.asList(model));
+    VehiclePopupMenu menu = menuFactory.createVehiclePopupMenu(List.of(getModel()));
     menu.show(drawingView.getComponent(), evt.getX(), evt.getY());
 
     return false;

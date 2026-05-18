@@ -5,7 +5,6 @@ package org.opentcs.operationsdesk.transport;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
@@ -41,17 +40,15 @@ public class PointPanel
    */
   @SuppressWarnings("this-escape")
   public PointPanel(List<PointModel> items) {
+    fItems = requireNonNull(items, "items").stream()
+        .sorted(Comparator.comparing(PointModel::getName, String.CASE_INSENSITIVE_ORDER))
+        .toList();
+
     initComponents();
-    fItems = items;
 
-    Collections.sort(fItems, getComparator());
-    List<String> names = new ArrayList<>();
-
-    for (PointModel pointModel : fItems) {
-      names.add(pointModel.getName());
-    }
-
-    itemsComboBox.setModel(new DefaultComboBoxModel<>(new Vector<>(names)));
+    itemsComboBox.setModel(
+        new DefaultComboBoxModel<>(new Vector<>(fItems.stream().map(PointModel::getName).toList()))
+    );
     JTextField textField = (JTextField) (itemsComboBox.getEditor().getEditorComponent());
     textField.getDocument().addDocumentListener(new DocumentListener() {
       @Override
@@ -62,15 +59,12 @@ public class PointPanel
       @Override
       public void removeUpdate(DocumentEvent e) {
         verify();
-
       }
 
       @Override
       public void changedUpdate(DocumentEvent e) {
         verify();
-
       }
-
     });
   }
 
@@ -103,31 +97,12 @@ public class PointPanel
   public void initFields() {
   }
 
-  protected final Comparator<ModelComponent> getComparator() {
-    return new Comparator<ModelComponent>() {
-
-      @Override
-      public int compare(ModelComponent item1, ModelComponent item2) {
-        String s1 = item1.getName();
-        String s2 = item2.getName();
-        s1 = s1.toLowerCase();
-        s2 = s2.toLowerCase();
-
-        return s1.compareTo(s2);
-      }
-    };
-  }
-
   private void verify() {
-    JTextField textField = (JTextField) (itemsComboBox.getEditor().getEditorComponent());
-    String inputText = textField.getText();
-    for (PointModel pointModel : fItems) {
-      if (pointModel.getName().equals(inputText)) {
-        inputValidationSuccessful(true);
-        return;
-      }
-    }
-    inputValidationSuccessful(false);
+    String inputText = ((JTextField) (itemsComboBox.getEditor().getEditorComponent())).getText();
+
+    inputValidationSuccessful(
+        fItems.stream().anyMatch(pointModel -> pointModel.getName().equals(inputText))
+    );
   }
 
   private void inputValidationSuccessful(boolean success) {

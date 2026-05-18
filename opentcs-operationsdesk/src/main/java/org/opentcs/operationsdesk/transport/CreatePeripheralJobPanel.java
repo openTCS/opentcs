@@ -63,7 +63,7 @@ public class CreatePeripheralJobPanel
 
   @Override
   public void initFields() {
-    locations.stream().forEach(locationCombobox::addItem);
+    locations.forEach(locationCombobox::addItem);
     loadOperations();
   }
 

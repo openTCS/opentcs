@@ -4,16 +4,13 @@ package org.opentcs.operationsdesk.transport;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.DefaultComboBoxModel;
 import org.opentcs.data.order.DriveOrder;
-import org.opentcs.guing.base.model.ModelComponent;
 import org.opentcs.guing.base.model.elements.LocationModel;
 import org.opentcs.guing.base.model.elements.LocationTypeModel;
 import org.opentcs.guing.common.components.dialogs.DialogContent;
@@ -43,7 +40,9 @@ public class LocationActionPanel
    */
   @SuppressWarnings("this-escape")
   public LocationActionPanel(List<LocationModel> locations) {
-    this.fLocations = requireNonNull(locations, "locations");
+    this.fLocations = requireNonNull(locations, "locations").stream()
+        .sorted(Comparator.comparing(LocationModel::getName, String.CASE_INSENSITIVE_ORDER))
+        .toList();
 
     initComponents();
 
@@ -52,31 +51,17 @@ public class LocationActionPanel
             .getString("locationActionPanel.title")
     );
 
-    Collections.sort(fLocations, getComparator());
-
-    List<String> names = fLocations.stream()
-        .map(location -> location.getName())
-        .collect(Collectors.toList());
-
-    locationsComboBox.setModel(new DefaultComboBoxModel<>(new Vector<>(names)));
+    locationsComboBox.setModel(
+        new DefaultComboBoxModel<>(
+            new Vector<>(
+                fLocations.stream()
+                    .map(LocationModel::getName)
+                    .toList()
+            )
+        )
+    );
 
     updateActions();
-  }
-
-  /**
-   * Returns a Comparator to sort model components by their name.
-   *
-   * @return The Comparator
-   */
-  protected final Comparator<ModelComponent> getComparator() {
-    return (ModelComponent item1, ModelComponent item2) -> {
-      String s1 = item1.getName();
-      String s2 = item2.getName();
-      s1 = s1.toLowerCase();
-      s2 = s2.toLowerCase();
-
-      return s1.compareTo(s2);
-    };
   }
 
   /**

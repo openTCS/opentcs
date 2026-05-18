@@ -165,7 +165,7 @@ public class UserNotificationsContainer
   private void initNotifications() {
     setUserNotifications(fetchNotificationsIfOnLine());
     while (userNotifications.size() > capacity) {
-      userNotifications.remove(0);
+      userNotifications.removeFirst();
     }
     listeners.forEach(listener -> listener.containerInitialized(userNotifications));
   }
@@ -189,7 +189,7 @@ public class UserNotificationsContainer
     listeners.forEach(listener -> listener.userNotificationAdded(evt.getNotification()));
 
     while (userNotifications.size() > capacity) {
-      UserNotification removedNotification = userNotifications.remove(0);
+      UserNotification removedNotification = userNotifications.removeFirst();
       listeners.forEach(listener -> listener.userNotificationRemoved(removedNotification));
     }
   }

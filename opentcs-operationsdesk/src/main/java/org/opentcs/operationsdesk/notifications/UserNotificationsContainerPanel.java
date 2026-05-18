@@ -12,8 +12,8 @@ import java.awt.event.MouseEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -109,7 +109,7 @@ public class UserNotificationsContainerPanel
     sorter = new FilteredRowSorter<>(tableModel);
     // Sort the table by the creation instant.
     sorter.setSortKeys(
-        Arrays.asList(
+        List.of(
             new RowSorter.SortKey(UserNotificationTableModel.COLUMN_TIME, SortOrder.DESCENDING)
         )
     );

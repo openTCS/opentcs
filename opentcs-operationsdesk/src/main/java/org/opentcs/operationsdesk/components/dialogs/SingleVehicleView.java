@@ -15,7 +15,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -141,7 +141,7 @@ public class SingleVehicleView
   }
 
   private void showPopup(int x, int y) {
-    menuFactory.createVehiclePopupMenu(Arrays.asList(fVehicleModel)).show(this, x, y);
+    menuFactory.createVehiclePopupMenu(List.of(fVehicleModel)).show(this, x, y);
   }
 
   private void updateVehicle() {
@@ -484,8 +484,8 @@ public class SingleVehicleView
     private void drawVehicle(Graphics2D g2d) {
       figure.setIgnorePrecisePosition(true);
       Point2D.Double posDialog = new Point2D.Double(
-          fVehicleView.getWidth() / 2,
-          fVehicleView.getHeight() / 2
+          fVehicleView.getWidth() / 2.0,
+          fVehicleView.getHeight() / 2.0
       );
       figure.setBounds(posDialog, null);
       figure.setAngle(0.0);

@@ -266,11 +266,6 @@ public class ToolBarManager
     return toggleButton;
   }
 
-  /**
-   *
-   * @param toolBar
-   * @param editor
-   */
   private JToggleButton addDragToolButton(JToolBar toolBar, DrawingEditor editor) {
     final JToggleButton button = new JToggleButton();
     dragTool = new DragTool();

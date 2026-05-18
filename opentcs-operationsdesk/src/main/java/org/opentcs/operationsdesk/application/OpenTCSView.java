@@ -1845,8 +1845,7 @@ public class OpenTCSView
       vehicleModel = null;
 
       if (vehicleModel != null
-          && (Vehicle.ProcState) vehicleModel.getPropertyProcState()
-              .getValue() == Vehicle.ProcState.IDLE) {
+          && vehicleModel.getPropertyProcState().getValue() == Vehicle.ProcState.IDLE) {
         createOrderToPointOnScreen(event.getLocationOnScreen());
       }
     }

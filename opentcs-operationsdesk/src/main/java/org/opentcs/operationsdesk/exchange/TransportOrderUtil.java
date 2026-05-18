@@ -97,9 +97,9 @@ public class TransportOrderUtil {
     requireNonNull(actions, "actions");
     requireNonNull(propertiesList, "propertiesList");
     checkArgument(
-        !destModels.stream()
-            .anyMatch(o -> !(o instanceof PointModel || o instanceof LocationModel)),
-        "destModels have to be a PointModel or a Locationmodel"
+        destModels.stream()
+            .allMatch(o -> o instanceof PointModel || o instanceof LocationModel),
+        "destModels have to be a PointModel or a LocationModel"
     );
 
     try (SharedKernelServicePortal sharedPortal = portalProvider.register()) {

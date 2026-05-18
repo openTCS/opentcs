@@ -178,7 +178,7 @@ public class TransportOrderTableModel
     requireNonNull(orders, "orders");
 
     SwingUtilities.invokeLater(() -> {
-      // Notifiations of any change listeners must happen at the same time/in the same thread the
+      // Notifications of any change listeners must happen at the same time/in the same thread the
       // data behind the model is updated. Otherwise, there is a risk that listeners work with/
       // refer to outdated data, which can lead to runtime exceptions.
       entries.clear();

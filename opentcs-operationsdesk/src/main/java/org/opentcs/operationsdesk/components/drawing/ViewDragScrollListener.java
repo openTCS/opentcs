@@ -382,8 +382,7 @@ public class ViewDragScrollListener
       LOG.warn("Selected VehicleFigure does not have a model, skipping.");
       return;
     }
-    if ((Vehicle.ProcState) vehicleModel.getPropertyProcState()
-        .getValue() != Vehicle.ProcState.IDLE) {
+    if (vehicleModel.getPropertyProcState().getValue() != Vehicle.ProcState.IDLE) {
       LOG.debug("Selected vehicle already has an order, skipping.");
       return;
     }
