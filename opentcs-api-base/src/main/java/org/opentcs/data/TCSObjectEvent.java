@@ -130,6 +130,6 @@ public class TCSObjectEvent
     /**
      * Indicates that the referenced object is no longer a valid kernel object.
      */
-    OBJECT_REMOVED;
+    OBJECT_REMOVED
   }
 }

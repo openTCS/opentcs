@@ -94,7 +94,7 @@ public class LayerGroupCreationTO
 
   @Override
   public String toString() {
-    return "LayerGroupCreationTO{" + ""
+    return "LayerGroupCreationTO{"
         + "id=" + id + ", "
         + "name=" + name + ", "
         + "visible=" + visible + '}';

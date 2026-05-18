@@ -27,11 +27,10 @@ public abstract class VehicleCommAdapterDescription
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof VehicleCommAdapterDescription)) {
+    if (!(obj instanceof VehicleCommAdapterDescription other)) {
       return false;
     }
 
-    VehicleCommAdapterDescription other = (VehicleCommAdapterDescription) obj;
     return getDescription().equals(other.getDescription())
         && isSimVehicleCommAdapter() == other.isSimVehicleCommAdapter();
   }

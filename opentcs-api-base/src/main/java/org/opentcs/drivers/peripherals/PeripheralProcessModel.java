@@ -156,6 +156,6 @@ public class PeripheralProcessModel
     /**
      * Indicates a change of the state property.
      */
-    STATE;
+    STATE
   }
 }

@@ -666,7 +666,7 @@ public class PathCreationTO
       /**
        * A bezier curve with 3 control points.
        */
-      BEZIER_3;
+      BEZIER_3
     }
 
     @Override

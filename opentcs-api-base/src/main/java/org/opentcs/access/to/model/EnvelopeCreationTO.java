@@ -40,7 +40,7 @@ public class EnvelopeCreationTO
     this.vertices = requireNonNull(vertices, "vertices");
     checkArgument(!vertices.isEmpty(), "An envelope must contain some vertices.");
     checkArgument(
-        Objects.equals(vertices.get(0), vertices.get(vertices.size() - 1)),
+        Objects.equals(vertices.getFirst(), vertices.getLast()),
         "An envelope's last vertex must match the first one."
     );
   }
@@ -63,11 +63,10 @@ public class EnvelopeCreationTO
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof EnvelopeCreationTO)) {
+    if (!(obj instanceof EnvelopeCreationTO other)) {
       return false;
     }
 
-    EnvelopeCreationTO other = (EnvelopeCreationTO) obj;
     return Objects.equals(this.vertices, other.vertices);
   }
 

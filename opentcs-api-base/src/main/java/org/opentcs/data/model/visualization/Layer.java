@@ -140,7 +140,7 @@ public class Layer
 
   @Override
   public String toString() {
-    return "Layer{" + ""
+    return "Layer{"
         + "id=" + id + ", "
         + "ordinal=" + ordinal + ", "
         + "visible=" + visible + ", "

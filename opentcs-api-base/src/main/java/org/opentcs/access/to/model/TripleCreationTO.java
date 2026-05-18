@@ -66,13 +66,12 @@ public class TripleCreationTO
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof TripleCreationTO)) {
+    if (!(obj instanceof TripleCreationTO other)) {
       return false;
     }
     if (this == obj) {
       return true;
     }
-    TripleCreationTO other = (TripleCreationTO) obj;
     if (this.x != other.x) {
       return false;
     }

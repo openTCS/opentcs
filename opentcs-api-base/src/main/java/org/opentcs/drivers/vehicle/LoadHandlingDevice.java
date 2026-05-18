@@ -66,10 +66,9 @@ public class LoadHandlingDevice
     if (obj == null) {
       return false;
     }
-    if (!(obj instanceof LoadHandlingDevice)) {
+    if (!(obj instanceof LoadHandlingDevice other)) {
       return false;
     }
-    final LoadHandlingDevice other = (LoadHandlingDevice) obj;
     if (!Objects.equals(this.label, other.label)) {
       return false;
     }

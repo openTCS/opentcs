@@ -45,11 +45,11 @@ class PlantModelCreationTOTest {
     assertThat(plantModel.getVisualLayout().getLayers(), hasSize(1));
     assertThat(plantModel.getVisualLayout().getLayerGroups(), hasSize(1));
     assertThat(
-        plantModel.getVisualLayout().getLayers().get(0),
+        plantModel.getVisualLayout().getLayers().getFirst(),
         samePropertyValuesAs(defaultLayer)
     );
     assertThat(
-        plantModel.getVisualLayout().getLayerGroups().get(0),
+        plantModel.getVisualLayout().getLayerGroups().getFirst(),
         samePropertyValuesAs(defaultLayerGroup)
     );
   }
@@ -64,11 +64,11 @@ class PlantModelCreationTOTest {
     assertThat(plantModel.getVisualLayout().getLayers(), hasSize(1));
     assertThat(plantModel.getVisualLayout().getLayerGroups(), hasSize(1));
     assertThat(
-        plantModel.getVisualLayout().getLayers().get(0),
+        plantModel.getVisualLayout().getLayers().getFirst(),
         samePropertyValuesAs(defaultLayer)
     );
     assertThat(
-        plantModel.getVisualLayout().getLayerGroups().get(0),
+        plantModel.getVisualLayout().getLayerGroups().getFirst(),
         is(sameInstance(defaultLayerGroup))
     );
   }
@@ -83,11 +83,11 @@ class PlantModelCreationTOTest {
     assertThat(plantModel.getVisualLayout().getLayers(), hasSize(1));
     assertThat(plantModel.getVisualLayout().getLayerGroups(), hasSize(1));
     assertThat(
-        plantModel.getVisualLayout().getLayers().get(0),
+        plantModel.getVisualLayout().getLayers().getFirst(),
         is(sameInstance(defaultLayer))
     );
     assertThat(
-        plantModel.getVisualLayout().getLayerGroups().get(0),
+        plantModel.getVisualLayout().getLayerGroups().getFirst(),
         samePropertyValuesAs(defaultLayerGroup)
     );
   }

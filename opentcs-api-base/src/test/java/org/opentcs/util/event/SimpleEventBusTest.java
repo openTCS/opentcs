@@ -27,7 +27,7 @@ class SimpleEventBusTest {
   @Test
   void forwardEventToSubscribers() {
     List<Object> receivedObjects = new ArrayList<>();
-    EventHandler eventHandler = (object) -> receivedObjects.add(object);
+    EventHandler eventHandler = receivedObjects::add;
 
     eventBus.subscribe(eventHandler);
 

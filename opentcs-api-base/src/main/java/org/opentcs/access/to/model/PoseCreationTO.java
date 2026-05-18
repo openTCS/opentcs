@@ -93,23 +93,20 @@ public class PoseCreationTO
     int hash = 5;
     hash = 47 * hash + Objects.hashCode(this.position);
     hash = 47 * hash
-        + (int) (Double.doubleToLongBits(this.orientationAngle)
-            ^ (Double.doubleToLongBits(this.orientationAngle) >>> 32));
+        + Long.hashCode(Double.doubleToLongBits(this.orientationAngle));
     return hash;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof PoseCreationTO)) {
+    if (!(obj instanceof PoseCreationTO other)) {
       return false;
     }
     if (this == obj) {
       return true;
     }
-    final PoseCreationTO other = (PoseCreationTO) obj;
-    if (Double.doubleToLongBits(this.orientationAngle) != Double.doubleToLongBits(
-        other.orientationAngle
-    )) {
+    if (Double.doubleToLongBits(this.orientationAngle)
+        != Double.doubleToLongBits(other.orientationAngle)) {
       return false;
     }
     return Objects.equals(this.position, other.position);

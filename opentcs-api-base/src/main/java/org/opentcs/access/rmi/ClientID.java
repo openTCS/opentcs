@@ -56,8 +56,7 @@ public class ClientID
    */
   @Override
   public boolean equals(Object otherObject) {
-    if (otherObject instanceof ClientID) {
-      ClientID otherID = (ClientID) otherObject;
+    if (otherObject instanceof ClientID otherID) {
       return clientName.equals(otherID.clientName) && uuid.equals(otherID.uuid);
     }
     else {

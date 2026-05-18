@@ -55,5 +55,5 @@ public enum TransportOrderAssignmentVeto {
    * A generic (dispatcher implementation-specific) reason that prevents the transport order
    * assignment.
    */
-  GENERIC_VETO;
+  GENERIC_VETO
 }

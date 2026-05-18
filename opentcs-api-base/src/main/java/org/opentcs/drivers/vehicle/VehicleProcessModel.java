@@ -765,6 +765,6 @@ public class VehicleProcessModel {
      * Indicates a request to determine the vehicle's (logical) position based on a precise
      * position.
      */
-    POSITION_RESOLUTION_REQUESTED;
+    POSITION_RESOLUTION_REQUESTED
   }
 }

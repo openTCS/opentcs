@@ -631,7 +631,7 @@ public class Path
       /**
        * A bezier curve with 3 control points.
        */
-      BEZIER_3;
+      BEZIER_3
     }
   }
 }

@@ -148,7 +148,7 @@ public class LayerCreationTO
 
   @Override
   public String toString() {
-    return "LayerCreationTO{" + ""
+    return "LayerCreationTO{"
         + "id=" + id + ", "
         + "ordinal=" + ordinal + ", "
         + "visible=" + visible + ", "

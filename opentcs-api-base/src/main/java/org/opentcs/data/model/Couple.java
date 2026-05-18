@@ -51,10 +51,9 @@ public class Couple
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Couple)) {
+    if (!(obj instanceof Couple other)) {
       return false;
     }
-    Couple other = (Couple) obj;
     if (this.x != other.x) {
       return false;
     }

@@ -74,7 +74,7 @@ public abstract class KernelInjectionModule
   }
 
   /**
-   * Returns a multibinder that can be used to register kernel extensions for the kernel's modelling
+   * Returns a multibinder that can be used to register kernel extensions for the kernel's modeling
    * state.
    *
    * @return The multibinder.

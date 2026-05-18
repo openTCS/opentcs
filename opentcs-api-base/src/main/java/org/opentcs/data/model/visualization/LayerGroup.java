@@ -88,7 +88,7 @@ public class LayerGroup
 
   @Override
   public String toString() {
-    return "LayerGroup{" + ""
+    return "LayerGroup{"
         + "id=" + id + ", "
         + "name=" + name + ", "
         + "visible=" + visible + '}';

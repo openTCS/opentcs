@@ -527,7 +527,7 @@ public class Point
      * processing orders.
      * The vehicle is also expected to report in when it arrives at such a position.
      */
-    PARK_POSITION;
+    PARK_POSITION
   }
 
   /**

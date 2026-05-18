@@ -34,7 +34,7 @@ public interface RemoteRouterService
       Remote {
 
   // CHECKSTYLE:OFF
-  public void updateRoutingTopology(ClientID clientId, Set<TCSObjectReference<Path>> refs)
+  void updateRoutingTopology(ClientID clientId, Set<TCSObjectReference<Path>> refs)
       throws RemoteException;
 
   Map<TCSObjectReference<Point>, Set<Route>> computeRoutes(

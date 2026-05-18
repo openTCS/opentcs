@@ -64,11 +64,10 @@ public class TCSObjectReference<E extends TCSObject<E>>
     if (otherObj == this) {
       return true;
     }
-    if (!(otherObj instanceof TCSObjectReference)) {
+    if (!(otherObj instanceof TCSObjectReference<?> otherRef)) {
       return false;
     }
 
-    TCSObjectReference<?> otherRef = (TCSObjectReference<?>) otherObj;
     return Objects.equals(referentClass, otherRef.referentClass)
         && Objects.equals(name, otherRef.name);
   }

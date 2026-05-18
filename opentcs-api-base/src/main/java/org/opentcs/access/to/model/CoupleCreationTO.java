@@ -65,10 +65,9 @@ public class CoupleCreationTO
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof CoupleCreationTO)) {
+    if (!(obj instanceof CoupleCreationTO other)) {
       return false;
     }
-    CoupleCreationTO other = (CoupleCreationTO) obj;
     if (this.x != other.x) {
       return false;
     }

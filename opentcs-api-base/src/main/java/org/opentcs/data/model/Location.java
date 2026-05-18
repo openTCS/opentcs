@@ -445,8 +445,7 @@ public class Location
      */
     @Override
     public boolean equals(Object obj) {
-      if (obj instanceof Link) {
-        Link other = (Link) obj;
+      if (obj instanceof Link other) {
         return point.equals(other.getPoint())
             && location.equals(other.getLocation());
       }

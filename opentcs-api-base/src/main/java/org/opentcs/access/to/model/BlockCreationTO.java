@@ -249,7 +249,7 @@ public class BlockCreationTO
      * The resources aggregated in this block can be used by multiple vehicles, but only if they
      * enter the block in the same direction.
      */
-    SAME_DIRECTION_ONLY;
+    SAME_DIRECTION_ONLY
   }
 
   /**

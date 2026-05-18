@@ -33,7 +33,7 @@ public class ObjectHistory
   /**
    * Creates a new instance with the given list of entries.
    *
-   * @param entries
+   * @param entries The entries.
    */
   private ObjectHistory(List<Entry> entries) {
     this.entries = Collections.unmodifiableList(requireNonNull(entries, "entries"));

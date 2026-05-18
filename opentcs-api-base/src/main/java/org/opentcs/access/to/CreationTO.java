@@ -147,7 +147,7 @@ public class CreationTO
    * @param value The value. May be <code>null</code> to remove the mapping from the given map.
    * @return a new map, with the mappings of the given map and the given mapping added to it.
    */
-  protected static final <K, V> Map<K, V> mapWithMapping(Map<K, V> map, K key, V value) {
+  protected static <K, V> Map<K, V> mapWithMapping(Map<K, V> map, K key, V value) {
     requireNonNull(map, "map");
     requireNonNull(key, "key");
 
@@ -171,7 +171,7 @@ public class CreationTO
    * @param newElement The element to be added to the list.
    * @return A new list, consisting of the given list and the given element added to it.
    */
-  protected static final <T> List<T> listWithAppendix(List<T> list, T newElement) {
+  protected static <T> List<T> listWithAppendix(List<T> list, T newElement) {
     List<T> result = new ArrayList<>(list.size() + 1);
     result.addAll(list);
     result.add(newElement);

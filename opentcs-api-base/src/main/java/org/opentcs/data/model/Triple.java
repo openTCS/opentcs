@@ -66,13 +66,12 @@ public class Triple
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Triple)) {
+    if (!(obj instanceof Triple other)) {
       return false;
     }
     if (this == obj) {
       return true;
     }
-    Triple other = (Triple) obj;
     if (this.x != other.x) {
       return false;
     }

@@ -3,7 +3,6 @@
 package org.opentcs.data.order;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayInputStream;
@@ -35,9 +34,9 @@ class OrderSerializationTest {
 
     assertEquals(originalObject, deserializedObject);
     assertEquals(originalObject.getProperties(), deserializedObject.getProperties());
-    assertTrue(
-        originalObject.getAllDriveOrders().get(0).getDestination()
-            .equals(deserializedObject.getAllDriveOrders().get(0).getDestination())
+    assertEquals(
+        originalObject.getAllDriveOrders().getFirst().getDestination(),
+        deserializedObject.getAllDriveOrders().getFirst().getDestination()
     );
   }
 
@@ -49,10 +48,7 @@ class OrderSerializationTest {
         = (OrderSequence) deserializeTCSObject(serializeTCSObject(originalObject));
 
     assertEquals(originalObject, deserializedObject);
-    assertTrue(
-        originalObject.getOrders().get(0)
-            .equals(deserializedObject.getOrders().get(0))
-    );
+    assertEquals(originalObject.getOrders().getFirst(), deserializedObject.getOrders().getFirst());
   }
 
   private TransportOrder createTransportOrder() {
@@ -75,9 +71,8 @@ class OrderSerializationTest {
                 .withOperation("someOperation2")
         )
     );
-    TransportOrder transportOrder = new TransportOrder("TransportOrder", driveOrders)
+    return new TransportOrder("TransportOrder", driveOrders)
         .withProperty("someKey", "someValue");
-    return transportOrder;
   }
 
   private OrderSequence createOrderSequence() {

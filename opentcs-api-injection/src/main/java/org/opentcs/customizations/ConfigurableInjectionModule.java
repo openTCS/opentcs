@@ -18,7 +18,7 @@ public abstract class ConfigurableInjectionModule
   private org.opentcs.configuration.ConfigurationBindingProvider configBindingProvider;
 
   /**
-   * Returns the configuration bindung provider.
+   * Returns the configuration binding provider.
    *
    * @return The configuration binding provider.
    */

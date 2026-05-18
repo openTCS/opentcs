@@ -264,6 +264,6 @@ public class PeripheralOperationCreationTO
     /**
      * The operation is to be triggered after the movement.
      */
-    AFTER_MOVEMENT;
+    AFTER_MOVEMENT
   }
 }

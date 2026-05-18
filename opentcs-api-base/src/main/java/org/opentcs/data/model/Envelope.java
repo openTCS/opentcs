@@ -40,7 +40,7 @@ public class Envelope
     this.vertices = requireNonNull(vertices, "vertices");
     checkArgument(!vertices.isEmpty(), "An envelope must contain some vertices.");
     checkArgument(
-        Objects.equals(vertices.get(0), vertices.get(vertices.size() - 1)),
+        Objects.equals(vertices.getFirst(), vertices.getLast()),
         "An envelope's last vertex must match the first one."
     );
   }

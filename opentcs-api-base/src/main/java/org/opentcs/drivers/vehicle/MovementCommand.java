@@ -484,11 +484,10 @@ public class MovementCommand {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof MovementCommand)) {
+    if (!(o instanceof MovementCommand other)) {
       return false;
     }
 
-    MovementCommand other = (MovementCommand) o;
     return step.equals(other.getStep()) && operation.equals(other.getOperation());
   }
 

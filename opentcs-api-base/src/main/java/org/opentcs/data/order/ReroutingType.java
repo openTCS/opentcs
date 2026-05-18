@@ -17,5 +17,5 @@ public enum ReroutingType {
    * Vehicles get (forcefully) rerouted from their current position (disregarding any resources that
    * might have already been allocated).
    */
-  FORCED;
+  FORCED
 }

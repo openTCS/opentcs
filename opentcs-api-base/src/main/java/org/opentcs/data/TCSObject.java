@@ -223,7 +223,7 @@ public abstract class TCSObject<E extends TCSObject<E>>
    * @return A new map with the entries from the given map but all entries with <code>null</code>
    * values removed.
    */
-  protected static final <K, V> Map<K, V> mapWithoutNullValues(Map<K, V> original) {
+  protected static <K, V> Map<K, V> mapWithoutNullValues(Map<K, V> original) {
     requireNonNull(original, "original");
 
     return original.entrySet().stream()
@@ -240,11 +240,11 @@ public abstract class TCSObject<E extends TCSObject<E>>
    * @return A new list with the values from the given list but all <code>null</code> values
    * removed.
    */
-  protected static final <V> List<V> listWithoutNullValues(List<V> original) {
+  protected static <V> List<V> listWithoutNullValues(List<V> original) {
     requireNonNull(original, "original");
 
     return original.stream()
-        .filter(value -> value != null)
+        .filter(Objects::nonNull)
         .toList();
   }
 
@@ -255,11 +255,11 @@ public abstract class TCSObject<E extends TCSObject<E>>
    * @param original The original set.
    * @return A new set with the values from the given set but all <code>null</code> values removed.
    */
-  protected static final <V> Set<V> setWithoutNullValues(Set<V> original) {
+  protected static <V> Set<V> setWithoutNullValues(Set<V> original) {
     requireNonNull(original, "original");
 
     return original.stream()
-        .filter(value -> value != null)
+        .filter(Objects::nonNull)
         .collect(Collectors.toUnmodifiableSet());
   }
 }
