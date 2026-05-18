@@ -4,12 +4,13 @@ package org.opentcs.operationsdesk.transport;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Vector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.swing.DefaultComboBoxModel;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.guing.base.model.ModelComponent;
@@ -106,11 +107,16 @@ public class LocationActionPanel
   private void updateActions() {
     LocationModel selectedLocation = getSelectedLocation();
     LocationTypeModel locationType = selectedLocation.getLocationType();
-    List<String> actions = locationType.getPropertyAllowedOperations().getItems();
-    Collections.sort(actions);
-    fActions = new ArrayList<>();
-    fActions.add(DriveOrder.Destination.OP_NOP);
-    fActions.addAll(actions);
+    // We explicitly add NOP here, even if it's not in the list of user-specified operations for
+    // this location type; we explicitly add it as the FIRST operation here, to always have it at
+    // the top of the combo box list. All other elements are added sorted for adequate orientation.
+    fActions = Stream.concat(
+        Stream.of(DriveOrder.Destination.OP_NOP),
+        locationType.getPropertyAllowedOperations().getItems().stream()
+            .filter(action -> !Objects.equals(action, DriveOrder.Destination.OP_NOP))
+            .sorted()
+    ).toList();
+
     actionsComboBox.setModel(new DefaultComboBoxModel<>(new Vector<>(fActions)));
   }
 
