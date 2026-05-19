@@ -11,15 +11,18 @@ import jakarta.annotation.Nullable;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
+import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -555,6 +558,37 @@ public class CommandProcessingTracker {
    */
   public boolean isWaitingForAllocation() {
     return pendingCommandState == PendingCommandState.ALLOCATION_PENDING;
+  }
+
+  /**
+   * Returns a list of positions that the vehicle is expected to appear at, based on the movement
+   * commands sent to it.
+   * <p>
+   * The list contains the source point of the first/oldest incomplete movement command sent to the
+   * vehicle (if any) and the destination points of all incomplete movement commands sent to the
+   * vehicle, in the order the commands were sent to the vehicle. If there are no incomplete
+   * movement commands, the returned list is empty.
+   * </p>
+   *
+   * @return A list of positions that the vehicle is expected to appear at.
+   */
+  public List<TCSResourceReference<Point>> getExpectedPositions() {
+    if (sentCommands.isEmpty()) {
+      return List.of();
+    }
+
+    Deque<MovementCommand> movementCommands = getSentCommands();
+
+    return Stream.concat(
+        Optional.ofNullable(
+            movementCommands.getFirst().getStep().getSourcePoint()
+        )
+            .map(Point::getReference)
+            .stream(),
+        movementCommands.stream()
+            .map(cmd -> cmd.getStep().getDestinationPoint().getReference())
+    )
+        .toList();
   }
 
   private SequencedCollection<CommandResourcePair> toCommandResourcePairs(

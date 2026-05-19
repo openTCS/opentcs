@@ -1343,18 +1343,26 @@ public class DefaultVehicleController
       }
       else {
         // Check if the reported position belongs to any of the commands we sent.
-        List<String> expectedPoints = commandProcessingTracker.getSentCommands().stream()
-            .map(cmd -> cmd.getStep().getDestinationPoint().getName())
-            .collect(Collectors.toList());
+        List<String> expectedPoints = commandProcessingTracker.getExpectedPositions().stream()
+            .map(TCSResourceReference::getName)
+            .toList();
 
         if (!expectedPoints.contains(point.getName())) {
           LOG.warn(
-              "{}: Reported position: {}, expected one of: {}",
+              "{}: Reported position: {}, but we expected one of {}",
               vehicle.getName(),
               point.getName(),
               expectedPoints
           );
           onUnexpectedPositionReported(point);
+        }
+        else {
+          LOG.debug(
+              "{}: Reported position {}, which we expected as one of {}",
+              vehicle.getName(),
+              point.getName(),
+              expectedPoints
+          );
         }
       }
 

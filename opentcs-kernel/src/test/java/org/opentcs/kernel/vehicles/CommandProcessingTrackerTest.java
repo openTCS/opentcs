@@ -58,6 +58,8 @@ class CommandProcessingTrackerTest {
     assertThat(commandProcessingTracker.getAllocatedResources()).isEmpty();
     assertThat(commandProcessingTracker.getAllocatedResourcesAhead()).isEmpty();
     assertThat(commandProcessingTracker.getAllocationPendingResources()).isEmpty();
+    assertThat(commandProcessingTracker.getSentCommands()).isEmpty();
+    assertThat(commandProcessingTracker.getExpectedPositions()).isEmpty();
   }
 
   @Test
@@ -80,6 +82,7 @@ class CommandProcessingTrackerTest {
     assertThat(commandProcessingTracker.getAllocationPendingCommand()).isEmpty();
     assertThat(commandProcessingTracker.getSendingPendingCommand()).isEmpty();
     assertThat(commandProcessingTracker.getSentCommands()).isEmpty();
+    assertThat(commandProcessingTracker.getExpectedPositions()).isEmpty();
     assertThat(commandProcessingTracker.getLastCommandExecuted()).isEmpty();
     assertThat(commandProcessingTracker.getNextAllocationCommand()).isEmpty();
     assertThat(commandProcessingTracker.isWaitingForAllocation()).isFalse();
@@ -126,6 +129,7 @@ class CommandProcessingTrackerTest {
     assertThat(commandProcessingTracker.getSendingPendingCommand())
         .contains(movementCommands.get(0));
     assertThat(commandProcessingTracker.getSentCommands()).isEmpty();
+    assertThat(commandProcessingTracker.getExpectedPositions()).isEmpty();
     assertThat(commandProcessingTracker.isWaitingForAllocation()).isFalse();
 
     // Then, the movement command for which resources have been allocated is sent to the vehicle
@@ -143,6 +147,11 @@ class CommandProcessingTrackerTest {
         .containsExactly(Set.of(pathAB, pointB));
     assertThat(commandProcessingTracker.getSendingPendingCommand()).isEmpty();
     assertThat(commandProcessingTracker.getSentCommands()).containsExactly(movementCommands.get(0));
+    assertThat(commandProcessingTracker.getExpectedPositions())
+        .containsExactly(
+            pointA.getReference(),
+            pointB.getReference()
+        );
     assertThat(commandProcessingTracker.getLastCommandExecuted()).isEmpty();
 
     // Then, the movement command is reported as executed and resources for that command are still
@@ -160,6 +169,7 @@ class CommandProcessingTrackerTest {
     );
     assertThat(commandProcessingTracker.getAllocatedResourcesAhead()).isEmpty();
     assertThat(commandProcessingTracker.getSentCommands()).isEmpty();
+    assertThat(commandProcessingTracker.getExpectedPositions()).isEmpty();
     assertThat(commandProcessingTracker.getLastCommandExecuted()).contains(movementCommands.get(0));
 
     // Then, allocation for the resources that are no longer needed is released
@@ -178,6 +188,12 @@ class CommandProcessingTrackerTest {
     commandProcessingTracker.allocationRequested(Set.of(pathBC, pointC));
     commandProcessingTracker.allocationConfirmed(Set.of(pathBC, pointC));
     commandProcessingTracker.commandSent(movementCommands.get(1));
+    assertThat(commandProcessingTracker.getSentCommands()).containsExactly(movementCommands.get(1));
+    assertThat(commandProcessingTracker.getExpectedPositions())
+        .containsExactly(
+            pointB.getReference(),
+            pointC.getReference()
+        );
     commandProcessingTracker.commandExecuted(movementCommands.get(1));
     commandProcessingTracker.allocationReleased(Set.of(pathAB));
     commandProcessingTracker.allocationReleased(Set.of(pointB));
@@ -193,6 +209,12 @@ class CommandProcessingTrackerTest {
     commandProcessingTracker.allocationRequested(Set.of(pathCD, pointD));
     commandProcessingTracker.allocationConfirmed(Set.of(pathCD, pointD));
     commandProcessingTracker.commandSent(movementCommands.get(2));
+    assertThat(commandProcessingTracker.getSentCommands()).containsExactly(movementCommands.get(2));
+    assertThat(commandProcessingTracker.getExpectedPositions())
+        .containsExactly(
+            pointC.getReference(),
+            pointD.getReference()
+        );
     commandProcessingTracker.commandExecuted(movementCommands.get(2));
     commandProcessingTracker.allocationReleased(Set.of(pathBC));
     commandProcessingTracker.allocationReleased(Set.of(pointC));
@@ -236,6 +258,11 @@ class CommandProcessingTrackerTest {
         .containsExactly(Set.of(pathAB, pointB));
     assertThat(commandProcessingTracker.getAllocationPendingCommand()).isEmpty();
     assertThat(commandProcessingTracker.getSentCommands()).containsExactly(movementCommands.get(0));
+    assertThat(commandProcessingTracker.getExpectedPositions())
+        .containsExactly(
+            pointA.getReference(),
+            pointB.getReference()
+        );
     assertThat(commandProcessingTracker.getNextAllocationCommand())
         .contains(movementCommands.get(1));
 
@@ -260,6 +287,11 @@ class CommandProcessingTrackerTest {
         .containsExactly(Set.of(pathAB, pointB));
     assertThat(commandProcessingTracker.getAllocationPendingCommand()).isEmpty();
     assertThat(commandProcessingTracker.getSentCommands()).containsExactly(movementCommands.get(0));
+    assertThat(commandProcessingTracker.getExpectedPositions())
+        .containsExactly(
+            pointA.getReference(),
+            pointB.getReference()
+        );
     assertThat(commandProcessingTracker.getNextAllocationCommand())
         .contains(movementCommands.get(1));
 

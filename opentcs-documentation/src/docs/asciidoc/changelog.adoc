@@ -30,6 +30,7 @@ This change log lists the most relevant changes for past releases in reverse chr
    (Previously, only changes to the x-coordinate triggered an update.)
 ** Avoid an exception when loading a plant model with polygonal paths that do not have any control points.
 ** In the Operations Desk application's "send to location" dialog, ensure that the list of destination operations for the currently selected location does not contain `NOP` multiple times.
+** When processing position updates from vehicles, allow any point on the vehicle's route, explicitly including the initial position.
 * Changes affecting developers:
 ** Update Gradle wrapper to 8.14.4.
 ** Update JUnit to 6.0.3.
