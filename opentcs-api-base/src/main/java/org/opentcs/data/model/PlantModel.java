@@ -8,7 +8,10 @@ import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.opentcs.data.model.visualization.Layer;
 import org.opentcs.data.model.visualization.LayerGroup;
 import org.opentcs.data.model.visualization.VisualLayout;
@@ -22,12 +25,12 @@ public class PlantModel
 
   private final String name;
   private final Map<String, String> properties;
-  private final Set<Point> points;
-  private final Set<Path> paths;
-  private final Set<LocationType> locationTypes;
-  private final Set<Location> locations;
-  private final Set<Block> blocks;
-  private final Set<Vehicle> vehicles;
+  private final Map<String, Point> points;
+  private final Map<String, Path> paths;
+  private final Map<String, LocationType> locationTypes;
+  private final Map<String, Location> locations;
+  private final Map<String, Block> blocks;
+  private final Map<String, Vehicle> vehicles;
   private final VisualLayout visualLayout;
 
   /**
@@ -40,7 +43,7 @@ public class PlantModel
       String name
   ) {
     this(
-        name, Map.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of(),
+        name, Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of(),
         defaultVisualLayout()
     );
   }
@@ -51,28 +54,28 @@ public class PlantModel
       @Nonnull
       Map<String, String> properties,
       @Nonnull
-      Set<Point> points,
+      Map<String, Point> points,
       @Nonnull
-      Set<Path> paths,
+      Map<String, Path> paths,
       @Nonnull
-      Set<LocationType> locationTypes,
+      Map<String, LocationType> locationTypes,
       @Nonnull
-      Set<Location> locations,
+      Map<String, Location> locations,
       @Nonnull
-      Set<Block> blocks,
+      Map<String, Block> blocks,
       @Nonnull
-      Set<Vehicle> vehicles,
+      Map<String, Vehicle> vehicles,
       @Nonnull
       VisualLayout visualLayout
   ) {
     this.name = requireNonNull(name, "name");
     this.properties = Map.copyOf(properties);
-    this.points = Set.copyOf(points);
-    this.paths = Set.copyOf(paths);
-    this.locationTypes = Set.copyOf(locationTypes);
-    this.locations = Set.copyOf(locations);
-    this.blocks = Set.copyOf(blocks);
-    this.vehicles = Set.copyOf(vehicles);
+    this.points = Map.copyOf(points);
+    this.paths = Map.copyOf(paths);
+    this.locationTypes = Map.copyOf(locationTypes);
+    this.locations = Map.copyOf(locations);
+    this.blocks = Map.copyOf(blocks);
+    this.vehicles = Map.copyOf(vehicles);
     this.visualLayout = requireNonNull(visualLayout, "visualLayout");
   }
 
@@ -123,7 +126,28 @@ public class PlantModel
    */
   @Nonnull
   public Set<Point> getPoints() {
+    return Set.copyOf(points.values());
+  }
+
+  /**
+   * Returns the points in this plant model.
+   *
+   * @return The points in this plant model.
+   */
+  @Nonnull
+  public Map<String, Point> getPointsByName() {
     return points;
+  }
+
+  /**
+   * Returns the point with the given name.
+   *
+   * @param name The name of the point.
+   * @return An {@link Optional} containing the named point, or an empty {@link Optional} if no
+   * such point exists.
+   */
+  public Optional<Point> getPoint(String name) {
+    return Optional.ofNullable(points.get(name));
   }
 
   /**
@@ -135,6 +159,29 @@ public class PlantModel
   public PlantModel withPoints(
       @Nonnull
       Set<Point> points
+  ) {
+    return new PlantModel(
+        name,
+        properties,
+        points.stream().collect(Collectors.toMap(Point::getName, Function.identity())),
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
+  }
+
+  /**
+   * Returns a copy of this plant model, with its points replaced by the given ones.
+   *
+   * @param points The points.
+   * @return A copy of this plant model, with its points replaced by the given ones.
+   */
+  public PlantModel withPoints(
+      @Nonnull
+      Map<String, Point> points
   ) {
     return new PlantModel(
         name,
@@ -156,7 +203,28 @@ public class PlantModel
    */
   @Nonnull
   public Set<Path> getPaths() {
+    return Set.copyOf(paths.values());
+  }
+
+  /**
+   * Returns the paths in this plant model.
+   *
+   * @return The paths in this plant model.
+   */
+  @Nonnull
+  public Map<String, Path> getPathsByName() {
     return paths;
+  }
+
+  /**
+   * Returns the path with the given name.
+   *
+   * @param name The name of the path.
+   * @return An {@link Optional} containing the named path, or an empty {@link Optional} if no
+   * such path exists.
+   */
+  public Optional<Path> getPath(String name) {
+    return Optional.ofNullable(paths.get(name));
   }
 
   /**
@@ -168,6 +236,29 @@ public class PlantModel
   public PlantModel withPaths(
       @Nonnull
       Set<Path> paths
+  ) {
+    return new PlantModel(
+        name,
+        properties,
+        points,
+        paths.stream().collect(Collectors.toMap(Path::getName, Function.identity())),
+        locationTypes,
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
+  }
+
+  /**
+   * Returns a copy of this plant model, with its paths replaced by the given ones.
+   *
+   * @param paths The paths.
+   * @return A copy of this plant model, with its paths replaced by the given ones.
+   */
+  public PlantModel withPaths(
+      @Nonnull
+      Map<String, Path> paths
   ) {
     return new PlantModel(
         name,
@@ -189,7 +280,28 @@ public class PlantModel
    */
   @Nonnull
   public Set<LocationType> getLocationTypes() {
+    return Set.copyOf(locationTypes.values());
+  }
+
+  /**
+   * Returns the location types in this plant model.
+   *
+   * @return The location types in this plant model.
+   */
+  @Nonnull
+  public Map<String, LocationType> getLocationTypesByName() {
     return locationTypes;
+  }
+
+  /**
+   * Returns the location type with the given name.
+   *
+   * @param name The name of the location type.
+   * @return An {@link Optional} containing the named location type, or an empty {@link Optional}
+   * if no such location type exists.
+   */
+  public Optional<LocationType> getLocationType(String name) {
+    return Optional.ofNullable(locationTypes.get(name));
   }
 
   /**
@@ -201,6 +313,30 @@ public class PlantModel
   public PlantModel withLocationTypes(
       @Nonnull
       Set<LocationType> locationTypes
+  ) {
+    return new PlantModel(
+        name,
+        properties,
+        points,
+        paths,
+        locationTypes.stream()
+            .collect(Collectors.toMap(LocationType::getName, Function.identity())),
+        locations,
+        blocks,
+        vehicles,
+        visualLayout
+    );
+  }
+
+  /**
+   * Returns a copy of this plant model, with its location types replaced by the given ones.
+   *
+   * @param locationTypes The location types.
+   * @return A copy of this plant model, with its location types replaced by the given ones.
+   */
+  public PlantModel withLocationTypes(
+      @Nonnull
+      Map<String, LocationType> locationTypes
   ) {
     return new PlantModel(
         name,
@@ -222,7 +358,28 @@ public class PlantModel
    */
   @Nonnull
   public Set<Location> getLocations() {
+    return Set.copyOf(locations.values());
+  }
+
+  /**
+   * Returns the locations in this plant model.
+   *
+   * @return The locations in this plant model.
+   */
+  @Nonnull
+  public Map<String, Location> getLocationsByName() {
     return locations;
+  }
+
+  /**
+   * Returns the location with the given name.
+   *
+   * @param name The name of the location.
+   * @return An {@link Optional} containing the named location, or an empty {@link Optional} if no
+   * such location exists.
+   */
+  public Optional<Location> getLocation(String name) {
+    return Optional.ofNullable(locations.get(name));
   }
 
   /**
@@ -234,6 +391,29 @@ public class PlantModel
   public PlantModel withLocations(
       @Nonnull
       Set<Location> locations
+  ) {
+    return new PlantModel(
+        name,
+        properties,
+        points,
+        paths,
+        locationTypes,
+        locations.stream().collect(Collectors.toMap(Location::getName, Function.identity())),
+        blocks,
+        vehicles,
+        visualLayout
+    );
+  }
+
+  /**
+   * Returns a copy of this plant model, with its locations replaced by the given ones.
+   *
+   * @param locations The locations.
+   * @return A copy of this plant model, with its locations replaced by the given ones.
+   */
+  public PlantModel withLocations(
+      @Nonnull
+      Map<String, Location> locations
   ) {
     return new PlantModel(
         name,
@@ -255,7 +435,28 @@ public class PlantModel
    */
   @Nonnull
   public Set<Block> getBlocks() {
+    return Set.copyOf(blocks.values());
+  }
+
+  /**
+   * Returns the blocks in this plant model.
+   *
+   * @return The blocks in this plant model.
+   */
+  @Nonnull
+  public Map<String, Block> getBlocksByName() {
     return blocks;
+  }
+
+  /**
+   * Returns the block with the given name.
+   *
+   * @param name The name of the block.
+   * @return An {@link Optional} containing the named block, or an empty {@link Optional} if no
+   * such block exists.
+   */
+  public Optional<Block> getBlock(String name) {
+    return Optional.ofNullable(blocks.get(name));
   }
 
   /**
@@ -267,6 +468,29 @@ public class PlantModel
   public PlantModel withBlocks(
       @Nonnull
       Set<Block> blocks
+  ) {
+    return new PlantModel(
+        name,
+        properties,
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks.stream().collect(Collectors.toMap(Block::getName, Function.identity())),
+        vehicles,
+        visualLayout
+    );
+  }
+
+  /**
+   * Returns a copy of this plant model, with its blocks replaced by the given ones.
+   *
+   * @param blocks The blocks.
+   * @return A copy of this plant model, with its blocks replaced by the given ones.
+   */
+  public PlantModel withBlocks(
+      @Nonnull
+      Map<String, Block> blocks
   ) {
     return new PlantModel(
         name,
@@ -288,7 +512,28 @@ public class PlantModel
    */
   @Nonnull
   public Set<Vehicle> getVehicles() {
+    return Set.copyOf(vehicles.values());
+  }
+
+  /**
+   * Returns the vehicles in this plant model.
+   *
+   * @return The vehicles in this plant model.
+   */
+  @Nonnull
+  public Map<String, Vehicle> getVehiclesByName() {
     return vehicles;
+  }
+
+  /**
+   * Returns the vehicle with the given name.
+   *
+   * @param name The name of the vehicle.
+   * @return An {@link Optional} containing the named vehicle, or an empty {@link Optional} if no
+   * such vehicle exists.
+   */
+  public Optional<Vehicle> getVehicle(String name) {
+    return Optional.ofNullable(vehicles.get(name));
   }
 
   /**
@@ -300,6 +545,29 @@ public class PlantModel
   public PlantModel withVehicles(
       @Nonnull
       Set<Vehicle> vehicles
+  ) {
+    return new PlantModel(
+        name,
+        properties,
+        points,
+        paths,
+        locationTypes,
+        locations,
+        blocks,
+        vehicles.stream().collect(Collectors.toMap(Vehicle::getName, Function.identity())),
+        visualLayout
+    );
+  }
+
+  /**
+   * Returns a copy of this plant model, with its vehicles replaced by the given ones.
+   *
+   * @param vehicles The vehicles.
+   * @return A copy of this plant model, with its vehicles replaced by the given ones.
+   */
+  public PlantModel withVehicles(
+      @Nonnull
+      Map<String, Vehicle> vehicles
   ) {
     return new PlantModel(
         name,
