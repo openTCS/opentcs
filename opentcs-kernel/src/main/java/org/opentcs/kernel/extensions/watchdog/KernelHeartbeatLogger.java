@@ -66,7 +66,7 @@ public class KernelHeartbeatLogger
       return;
     }
 
-    scheduledFuture = kernelExecutor.scheduleAtFixedRate(
+    scheduledFuture = kernelExecutor.scheduleWithFixedDelay(
         this,
         configuration.heartbeatLogInterval(),
         configuration.heartbeatLogInterval(),

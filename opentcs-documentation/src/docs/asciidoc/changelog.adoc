@@ -23,6 +23,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * New features and enhancements:
 ** Optimize the procedure of updating already computed routing graphs.
 ** Improve Kernel Control Center start-up times with large plant models.
+** Execute the kernel heartbeat logger with a fixed delay instead of a fixed rate to avoid accumulating task executions in case other tasks hog the kernel executor.
 * Bugs fixed:
 ** Allow to properly change the name of an already named transport order destination's location via the Java API.
 ** Ensure that orders for automatic recharging do not try to send vehicles to locked locations.
