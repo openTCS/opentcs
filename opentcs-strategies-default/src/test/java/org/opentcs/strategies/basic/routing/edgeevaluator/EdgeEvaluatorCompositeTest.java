@@ -4,6 +4,9 @@ package org.opentcs.strategies.basic.routing.edgeevaluator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -13,11 +16,14 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
+import org.opentcs.components.kernel.routing.RoutingContext;
 import org.opentcs.data.model.Path;
+import org.opentcs.data.model.PlantModel;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration;
@@ -53,9 +59,44 @@ class EdgeEvaluatorCompositeTest {
     evaluatorMock = mock(EdgeEvaluator.class);
 
     evaluators.put(EVALUATOR_MOCK, evaluatorMock);
-    evaluators.put(EVALUATOR_1, new FixedValueEdgeEvaluator(1.0));
-    evaluators.put(EVALUATOR_2, new FixedValueEdgeEvaluator(0.9));
-    evaluators.put(EVALUATOR_3, new FixedValueEdgeEvaluator(Double.POSITIVE_INFINITY));
+    evaluators.put(EVALUATOR_1, new FixedValueEdgeEvaluator(1.0, false));
+    evaluators.put(EVALUATOR_2, new FixedValueEdgeEvaluator(0.9, false));
+    evaluators.put(EVALUATOR_3, new FixedValueEdgeEvaluator(Double.POSITIVE_INFINITY, false));
+  }
+
+  @Test
+  void supportsParallelComputationWithAllParallelEvaluators() {
+    when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_1, EVALUATOR_2, EVALUATOR_3));
+    evaluators.clear();
+    evaluators.put(EVALUATOR_1, new FixedValueEdgeEvaluator(1.0, true));
+    evaluators.put(EVALUATOR_2, new FixedValueEdgeEvaluator(0.9, true));
+    evaluators.put(EVALUATOR_3, new FixedValueEdgeEvaluator(Double.POSITIVE_INFINITY, true));
+    EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
+
+    assertTrue(edgeEvaluator.isParallelGraphComputationSupported());
+  }
+
+  @Test
+  void supportsSequentialComputationWithPartialParallelEvaluators() {
+    when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_1, EVALUATOR_2, EVALUATOR_3));
+    evaluators.clear();
+    evaluators.put(EVALUATOR_1, new FixedValueEdgeEvaluator(1.0, true));
+    evaluators.put(EVALUATOR_2, new FixedValueEdgeEvaluator(0.9, false));
+    evaluators.put(EVALUATOR_3, new FixedValueEdgeEvaluator(Double.POSITIVE_INFINITY, true));
+    EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
+
+    assertFalse(edgeEvaluator.isParallelGraphComputationSupported());
+  }
+
+  @Test
+  void notifyOnRoutingContextUpdated() {
+    when(configuration.edgeEvaluators()).thenReturn(List.of(EVALUATOR_MOCK));
+    EdgeEvaluatorComposite edgeEvaluator = new EdgeEvaluatorComposite(configuration, evaluators);
+    RoutingContext context = new RoutingContext(new PlantModel(""));
+
+    verify(evaluatorMock, never()).onRoutingContextUpdated(any());
+    edgeEvaluator.onRoutingContextUpdated(context);
+    verify(evaluatorMock).onRoutingContextUpdated(context);
   }
 
   @Test
@@ -115,9 +156,21 @@ class EdgeEvaluatorCompositeTest {
         EdgeEvaluator {
 
     private final double value;
+    private final boolean parallel;
 
-    FixedValueEdgeEvaluator(double value) {
+    FixedValueEdgeEvaluator(double value, boolean parallel) {
       this.value = value;
+      this.parallel = parallel;
+    }
+
+    @Override
+    public boolean isParallelGraphComputationSupported() {
+      return parallel;
+    }
+
+    @Override
+    public void onRoutingContextUpdated(@NonNull
+    RoutingContext context) {
     }
 
     @Override

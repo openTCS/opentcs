@@ -22,6 +22,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 * New features and enhancements:
 ** Optimize the procedure of updating already computed routing graphs.
+** Add support for parallelization in the context of computing routing graphs.
 ** Improve Kernel Control Center start-up times with large plant models.
 ** Execute the kernel heartbeat logger with a fixed delay instead of a fixed rate to avoid accumulating task executions in case other tasks hog the kernel executor.
 * Bugs fixed:

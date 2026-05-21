@@ -2,14 +2,18 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.strategies.basic.routing.edgeevaluator;
 
+import static java.util.Objects.requireNonNull;
 import static org.opentcs.util.Assertions.checkArgument;
 
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
+import org.opentcs.components.kernel.routing.RoutingContext;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration;
 import org.slf4j.Logger;
@@ -31,6 +35,10 @@ public class EdgeEvaluatorComposite
    * The evaluators.
    */
   private final Set<EdgeEvaluator> evaluators = new HashSet<>();
+  /**
+   * Indicates whether parallel graph computation is supported.
+   */
+  private final boolean parallelGraphComputationSupported;
 
   /**
    * Creates a new instance.
@@ -56,6 +64,32 @@ public class EdgeEvaluatorComposite
         );
         evaluators.add(availableEvaluators.get(evaluatorKey));
       }
+    }
+    List<String> nonParallelEvaluatorNames = evaluators.stream()
+        .filter(evaluator -> !evaluator.isParallelGraphComputationSupported())
+        .map(evaluator -> evaluator.getClass().getName())
+        .toList();
+    this.parallelGraphComputationSupported = nonParallelEvaluatorNames.isEmpty();
+    LOG.info("Parallel graph computation supported: {}", parallelGraphComputationSupported);
+    if (!parallelGraphComputationSupported) {
+      LOG.info("Parallel graph computation not supported by: {}", nonParallelEvaluatorNames);
+    }
+  }
+
+  @Override
+  public boolean isParallelGraphComputationSupported() {
+    return parallelGraphComputationSupported;
+  }
+
+  @Override
+  public void onRoutingContextUpdated(
+      @Nonnull
+      RoutingContext context
+  ) {
+    requireNonNull(context, "context");
+
+    for (EdgeEvaluator component : evaluators) {
+      component.onRoutingContextUpdated(context);
     }
   }
 

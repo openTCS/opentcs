@@ -18,7 +18,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.GroupMapper;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.PlantModelService;
+import org.opentcs.data.model.PlantModel;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.routing.jgrapht.GraphProvider.GraphResult;
 
@@ -31,19 +32,23 @@ class GraphProviderTest {
   private GroupMapper groupMapper;
   private GraphMutator graphMutator;
   private GraphProvider graphProvider;
+  private PlantModelService plantModelService;
 
   @BeforeEach
   void setUp() {
     defaultModelGraphMapper = mock();
     groupMapper = mock();
     graphMutator = mock();
+    plantModelService = mock();
     graphProvider = new GraphProvider(
-        mock(TCSObjectService.class),
+        plantModelService,
         mock(GeneralModelGraphMapper.class),
         defaultModelGraphMapper,
         groupMapper,
         graphMutator
     );
+
+    when(plantModelService.getPlantModel()).thenReturn(new PlantModel(""));
   }
 
   @Test

@@ -8,7 +8,8 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.routing.RoutingContext;
+import org.opentcs.data.model.PlantModel;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.routing.edgeevaluator.BoundingBoxProtrusionCheck.BoundingBoxProtrusion;
@@ -31,22 +32,34 @@ public class EdgeEvaluatorBoundingBox
    */
   public static final String CONFIGURATION_KEY = "BOUNDING_BOX";
   private static final Logger LOG = LoggerFactory.getLogger(EdgeEvaluatorBoundingBox.class);
-  private final TCSObjectService objectService;
   private final BoundingBoxProtrusionCheck protrusionCheck;
+  /**
+   * The plant model for the current routing context.
+   */
+  private volatile PlantModel plantModel = new PlantModel("");
 
   /**
    * Creates a new instance.
    *
-   * @param objectService The object service.
    * @param protrusionCheck Checks whether one bounding box protrudes beyond another one.
    */
   @Inject
-  public EdgeEvaluatorBoundingBox(
-      TCSObjectService objectService,
-      BoundingBoxProtrusionCheck protrusionCheck
-  ) {
-    this.objectService = requireNonNull(objectService, "objectService");
+  public EdgeEvaluatorBoundingBox(BoundingBoxProtrusionCheck protrusionCheck) {
     this.protrusionCheck = requireNonNull(protrusionCheck, "protrusionCheck");
+  }
+
+  @Override
+  public boolean isParallelGraphComputationSupported() {
+    return true;
+  }
+
+  @Override
+  public void onRoutingContextUpdated(
+      @Nonnull
+      RoutingContext context
+  ) {
+    requireNonNull(context, "context");
+    plantModel = context.getPlantModel();
   }
 
   @Override
@@ -70,7 +83,7 @@ public class EdgeEvaluatorBoundingBox
       @Nonnull
       Vehicle vehicle
   ) {
-    Point targetPoint = objectService.fetch(Point.class, edge.getTargetVertex()).orElseThrow();
+    Point targetPoint = plantModel.getPoint(edge.getTargetVertex()).orElseThrow();
     BoundingBoxProtrusion protrusion = protrusionCheck.checkProtrusion(
         vehicle.getBoundingBox(), targetPoint.getMaxVehicleBoundingBox()
     );

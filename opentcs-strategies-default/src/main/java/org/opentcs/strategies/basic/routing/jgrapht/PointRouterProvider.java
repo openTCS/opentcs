@@ -79,8 +79,8 @@ public class PointRouterProvider {
   /**
    * Updates the routing topology with respect to the given paths.
    *
-   * @param paths The paths to update in the routing topology. An empty set of paths results in any
-   * constructed point routers to be invalidated.
+   * @param paths The paths to update in the routing topology. An empty set of paths results in all
+   * paths in the routing topology to be updated.
    */
   public void updateRoutingTopology(
       @Nonnull
@@ -91,7 +91,7 @@ public class PointRouterProvider {
     pointRoutersByVehicleGroup.clear();
 
     if (paths.isEmpty()) {
-      graphProvider.invalidate();
+      graphProvider.updateGraphResults(objectService.fetch(Path.class));
     }
     else {
       graphProvider.updateGraphResults(paths);

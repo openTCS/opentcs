@@ -6,10 +6,12 @@ import static java.util.Objects.requireNonNull;
 import static org.opentcs.components.kernel.Router.PROPKEY_ROUTING_COST_FORWARD;
 import static org.opentcs.components.kernel.Router.PROPKEY_ROUTING_COST_REVERSE;
 
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
 import org.opentcs.components.kernel.routing.GroupMapper;
+import org.opentcs.components.kernel.routing.RoutingContext;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Vehicle;
 import org.slf4j.Logger;
@@ -47,6 +49,18 @@ public class EdgeEvaluatorExplicitProperties
   ) {
     this.configuration = requireNonNull(configuration, "configuration");
     this.routingGroupMapper = requireNonNull(routingGroupMapper, "routingGroupMapper");
+  }
+
+  @Override
+  public boolean isParallelGraphComputationSupported() {
+    return true;
+  }
+
+  @Override
+  public void onRoutingContextUpdated(
+      @Nonnull
+      RoutingContext context
+  ) {
   }
 
   @Override

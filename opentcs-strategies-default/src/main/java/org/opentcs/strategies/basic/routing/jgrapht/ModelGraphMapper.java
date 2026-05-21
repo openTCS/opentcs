@@ -5,6 +5,7 @@ package org.opentcs.strategies.basic.routing.jgrapht;
 import java.util.Collection;
 import org.jgrapht.Graph;
 import org.opentcs.components.kernel.routing.Edge;
+import org.opentcs.components.kernel.routing.RoutingContext;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -31,7 +32,7 @@ public interface ModelGraphMapper {
   /**
    * Re-translates the given paths and replaces corresponding edges in a copy of the provided graph.
    * <p>
-   * If a path cannnot be translated to an edge but the provided graph contained an edge for that
+   * If a path cannot be translated to an edge but the provided graph contained an edge for that
    * path, the edge will <em>not</em> be contained in the returned graph copy.
    * </p>
    *
@@ -45,4 +46,19 @@ public interface ModelGraphMapper {
       Vehicle vehicle,
       Graph<Vertex, Edge> graph
   );
+
+  /**
+   * Indicates whether parallel model graph mapping is supported.
+   *
+   * @return {@code true}, if parallel mapping is supported, or {@code false}, if only sequential
+   * mapping is supported.
+   */
+  boolean isParallelMappingSupported();
+
+  /**
+   * Called when the routing context has been updated.
+   *
+   * @param context The routing context.
+   */
+  void onRoutingContextUpdated(RoutingContext context);
 }

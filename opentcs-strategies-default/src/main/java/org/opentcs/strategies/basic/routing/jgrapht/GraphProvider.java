@@ -8,15 +8,17 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 import org.jgrapht.Graph;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.GroupMapper;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.routing.RoutingContext;
+import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -29,7 +31,7 @@ import org.opentcs.data.model.Vehicle;
  */
 public class GraphProvider {
 
-  private final TCSObjectService objectService;
+  private final PlantModelService plantModelService;
   private final ModelGraphMapper defaultModelGraphMapper;
   private final ModelGraphMapper generalModelGraphMapper;
   private final GroupMapper routingGroupMapper;
@@ -37,7 +39,7 @@ public class GraphProvider {
   /**
    * Contains {@link GraphResult}s mapped to (vehicle) routing groups.
    */
-  private final Map<String, GraphResult> graphResultsByRoutingGroup = new HashMap<>();
+  private final Map<String, GraphResult> graphResultsByRoutingGroup = new ConcurrentHashMap<>();
   /**
    * A cache for derived {@link GraphResult}s.
    */
@@ -60,7 +62,7 @@ public class GraphProvider {
   /**
    * Creates a new instance.
    *
-   * @param objectService The object service providing the model data.
+   * @param plantModelService The plant model service providing the model data.
    * @param defaultModelGraphMapper Maps the points and paths to a graph.
    * @param generalModelGraphMapper Maps the points and paths to a graph.
    * @param routingGroupMapper Used to map vehicles to their routing groups.
@@ -69,7 +71,7 @@ public class GraphProvider {
   @Inject
   public GraphProvider(
       @Nonnull
-      TCSObjectService objectService,
+      PlantModelService plantModelService,
       @Nonnull
       GeneralModelGraphMapper generalModelGraphMapper,
       @Nonnull
@@ -79,7 +81,7 @@ public class GraphProvider {
       @Nonnull
       GraphMutator graphMutator
   ) {
-    this.objectService = requireNonNull(objectService, "objectService");
+    this.plantModelService = requireNonNull(plantModelService, "plantModelService");
     this.defaultModelGraphMapper = requireNonNull(
         defaultModelGraphMapper,
         "defaultModelGraphMapper"
@@ -110,6 +112,9 @@ public class GraphProvider {
    * @return A {@link GraphResult} containing the routing graph for the given vehicle.
    */
   public GraphResult getGraphResult(Vehicle vehicle) {
+    defaultModelGraphMapper.onRoutingContextUpdated(
+        new RoutingContext(plantModelService.getPlantModel())
+    );
     return graphResultsByRoutingGroup.computeIfAbsent(
         routingGroupMapper.apply(vehicle),
         routingGroup -> new GraphResult(
@@ -135,6 +140,9 @@ public class GraphProvider {
    */
   public GraphResult getGeneralGraphResult() {
     if (generalGraphResult == null) {
+      generalModelGraphMapper.onRoutingContextUpdated(
+          new RoutingContext(plantModelService.getPlantModel())
+      );
       generalGraphResult = new GraphResult(
           new Vehicle("Dummy"),
           getCurrentPointBase().getResources(),
@@ -220,24 +228,35 @@ public class GraphProvider {
 
     // Ensure the path base is up-to-date.
     getCurrentPathBase().updateResources(paths);
+    defaultModelGraphMapper.onRoutingContextUpdated(
+        new RoutingContext(plantModelService.getPlantModel())
+    );
 
-    for (Map.Entry<String, GraphResult> entry : Set.copyOf(graphResultsByRoutingGroup.entrySet())) {
-      graphResultsByRoutingGroup.put(
-          entry.getKey(),
-          new GraphResult(
-              entry.getValue().getVehicle(),
-              entry.getValue().getPointBase(),
-              getCurrentPathBase().getResources(),
-              Set.of(),
-              Set.of(),
-              defaultModelGraphMapper.updateGraph(
-                  paths,
-                  entry.getValue().getVehicle(),
-                  entry.getValue().getGraph()
-              )
-          )
-      );
+    Stream<Map.Entry<String, GraphResult>> graphResultStream;
+    if (defaultModelGraphMapper.isParallelMappingSupported()) {
+      graphResultStream = Set.copyOf(graphResultsByRoutingGroup.entrySet()).parallelStream();
     }
+    else {
+      graphResultStream = Set.copyOf(graphResultsByRoutingGroup.entrySet()).stream();
+    }
+
+    graphResultStream.forEach(
+        entry -> graphResultsByRoutingGroup.put(
+            entry.getKey(),
+            new GraphResult(
+                entry.getValue().getVehicle(),
+                entry.getValue().getPointBase(),
+                getCurrentPathBase().getResources(),
+                Set.of(),
+                Set.of(),
+                defaultModelGraphMapper.updateGraph(
+                    paths,
+                    entry.getValue().getVehicle(),
+                    entry.getValue().getGraph()
+                )
+            )
+        )
+    );
   }
 
   private String derivedGraphResultCacheKey(
@@ -259,7 +278,7 @@ public class GraphProvider {
 
   private HashedResourceSet<Point> getCurrentPointBase() {
     if (currentPointBase.isEmpty()) {
-      currentPointBase.overrideResources(objectService.fetch(Point.class));
+      currentPointBase.overrideResources(plantModelService.fetch(Point.class));
     }
 
     return currentPointBase;
@@ -267,7 +286,7 @@ public class GraphProvider {
 
   private HashedResourceSet<Path> getCurrentPathBase() {
     if (currentPathBase.isEmpty()) {
-      currentPathBase.overrideResources(objectService.fetch(Path.class));
+      currentPathBase.overrideResources(plantModelService.fetch(Path.class));
     }
 
     return currentPathBase;

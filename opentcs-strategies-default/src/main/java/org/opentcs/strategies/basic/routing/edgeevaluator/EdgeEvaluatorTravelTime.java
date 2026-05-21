@@ -4,8 +4,10 @@ package org.opentcs.strategies.basic.routing.edgeevaluator;
 
 import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
 
+import jakarta.annotation.Nonnull;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
+import org.opentcs.components.kernel.routing.RoutingContext;
 import org.opentcs.data.model.Vehicle;
 
 /**
@@ -22,6 +24,18 @@ public class EdgeEvaluatorTravelTime
   public static final String CONFIGURATION_KEY = "TRAVELTIME";
 
   public EdgeEvaluatorTravelTime() {
+  }
+
+  @Override
+  public boolean isParallelGraphComputationSupported() {
+    return true;
+  }
+
+  @Override
+  public void onRoutingContextUpdated(
+      @Nonnull
+      RoutingContext context
+  ) {
   }
 
   @Override

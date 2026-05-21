@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.opentcs.components.kernel.routing.Edge;
+import org.opentcs.components.kernel.routing.RoutingContext;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -44,6 +45,16 @@ public abstract class AbstractModelGraphMapper
   ) {
     this.pointVertexMapper = requireNonNull(pointVertexMapper, "pointVertextMapper");
     this.pathEdgeMapper = requireNonNull(pathEdgeMapper, "pathEdgeMapper");
+  }
+
+  @Override
+  public boolean isParallelMappingSupported() {
+    return pathEdgeMapper.isParallelMappingSupported();
+  }
+
+  @Override
+  public void onRoutingContextUpdated(RoutingContext context) {
+    pathEdgeMapper.onRoutingContextUpdated(context);
   }
 
   @Override

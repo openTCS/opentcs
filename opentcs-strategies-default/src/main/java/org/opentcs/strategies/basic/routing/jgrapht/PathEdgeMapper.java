@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
+import org.opentcs.components.kernel.routing.RoutingContext;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Vehicle;
 import org.slf4j.Logger;
@@ -47,6 +48,25 @@ public class PathEdgeMapper {
     this.edgeEvaluator = requireNonNull(edgeEvaluator, "edgeEvaluator");
     this.excludeLockedPaths = excludeLockedPaths;
     this.configuration = requireNonNull(configuration, "configuration");
+  }
+
+  /**
+   * Indicates whether parallel model graph mapping is supported.
+   *
+   * @return {@code true}, if parallel mapping is supported, or {@code false}, if only sequential
+   * mapping is supported.
+   */
+  public boolean isParallelMappingSupported() {
+    return edgeEvaluator.isParallelGraphComputationSupported();
+  }
+
+  /**
+   * Called when the routing context has been updated.
+   *
+   * @param context The routing context.
+   */
+  public void onRoutingContextUpdated(RoutingContext context) {
+    edgeEvaluator.onRoutingContextUpdated(context);
   }
 
   /**
