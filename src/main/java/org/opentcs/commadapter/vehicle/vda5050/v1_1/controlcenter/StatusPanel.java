@@ -154,7 +154,7 @@ public class StatusPanel
   /**
    * Updates the status panel with the given state response.
    *
-   * @param stateTelegram The state response
+   * @param stateMessage The state response
    */
   private void updateCurrentState(State stateMessage) {
     SwingUtilities.invokeLater(() -> updateStatusPanel(stateMessage));
@@ -209,6 +209,7 @@ public class StatusPanel
 
     if (stateMessage.getAgvPosition() == null) {
       agvPosInitializedTextField.setText("-");
+      agvPosMapIdTextField.setText("-");
       agvPosXTextField.setText("-");
       agvPosYTextField.setText("-");
       agvPosThetaTextField.setText("-");
@@ -217,6 +218,7 @@ public class StatusPanel
       agvPosInitializedTextField.setText(
           String.valueOf(stateMessage.getAgvPosition().isPositionInitialized())
       );
+      agvPosMapIdTextField.setText(stateMessage.getAgvPosition().getMapId());
       agvPosXTextField.setText(String.format("%.2f", stateMessage.getAgvPosition().getX()));
       agvPosYTextField.setText(String.format("%.2f", stateMessage.getAgvPosition().getY()));
       agvPosThetaTextField.setText(String.format("%.2f", stateMessage.getAgvPosition().getTheta()));
@@ -317,6 +319,7 @@ public class StatusPanel
 
     if (visMessage.getAgvPosition() == null) {
       visualizationAgvPosInitializedTextField.setText("-");
+      visualizationAgvPosMapIdTextField.setText("-");
       visualizationAgvPosXTextField.setText("-");
       visualizationAgvPosYTextField.setText("-");
       visualizationAgvPosThetaTextField.setText("-");
@@ -325,6 +328,7 @@ public class StatusPanel
       visualizationAgvPosInitializedTextField.setText(
           String.valueOf(visMessage.getAgvPosition().isPositionInitialized())
       );
+      visualizationAgvPosMapIdTextField.setText(visMessage.getAgvPosition().getMapId());
       visualizationAgvPosXTextField.setText(
           String.format("%.2f", visMessage.getAgvPosition().getX())
       );
@@ -393,6 +397,8 @@ public class StatusPanel
     agvPositionPanel = new javax.swing.JPanel();
     agvPosInitializedLabel = new javax.swing.JLabel();
     agvPosInitializedTextField = new javax.swing.JTextField();
+    agvPosMapIdLabel = new javax.swing.JLabel();
+    agvPosMapIdTextField = new javax.swing.JTextField();
     agvPosXLabel = new javax.swing.JLabel();
     agvPosXTextField = new javax.swing.JTextField();
     agvPosYLabel = new javax.swing.JLabel();
@@ -441,6 +447,8 @@ public class StatusPanel
     visualizationAgvPositionPanel = new javax.swing.JPanel();
     visualizationAgvPosInitializedLabel = new javax.swing.JLabel();
     visualizationAgvPosInitializedTextField = new javax.swing.JTextField();
+    visualizationAgvPosMapIdLabel = new javax.swing.JLabel();
+    visualizationAgvPosMapIdTextField = new javax.swing.JTextField();
     visualizationAgvPosXLabel = new javax.swing.JLabel();
     visualizationAgvPosXTextField = new javax.swing.JTextField();
     visualizationAgvPosYLabel = new javax.swing.JLabel();
@@ -853,10 +861,30 @@ public class StatusPanel
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     agvPositionPanel.add(agvPosInitializedTextField, gridBagConstraints);
 
-    agvPosXLabel.setText("x:");
+    agvPosMapIdLabel.setText("Map ID:");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
+    agvPositionPanel.add(agvPosMapIdLabel, gridBagConstraints);
+
+    agvPosMapIdTextField.setBackground(new java.awt.Color(255, 255, 204));
+    agvPosMapIdTextField.setColumns(10);
+    agvPosMapIdTextField.setFont(new java.awt.Font("Monospaced", 0, 11)); // NOI18N
+    agvPosMapIdTextField.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+    agvPosMapIdTextField.setText("String");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
+    agvPositionPanel.add(agvPosMapIdTextField, gridBagConstraints);
+
+    agvPosXLabel.setText("x:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
     agvPositionPanel.add(agvPosXLabel, gridBagConstraints);
@@ -869,7 +897,7 @@ public class StatusPanel
     agvPosXTextField.setText("double");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
     agvPositionPanel.add(agvPosXTextField, gridBagConstraints);
@@ -877,7 +905,7 @@ public class StatusPanel
     agvPosYLabel.setText("y:");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 2;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
     agvPositionPanel.add(agvPosYLabel, gridBagConstraints);
@@ -890,7 +918,7 @@ public class StatusPanel
     agvPosYTextField.setText("double");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 2;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
     agvPositionPanel.add(agvPosYTextField, gridBagConstraints);
@@ -898,7 +926,7 @@ public class StatusPanel
     agvPosThetaLabel.setText("theta:");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
     agvPositionPanel.add(agvPosThetaLabel, gridBagConstraints);
@@ -911,7 +939,7 @@ public class StatusPanel
     agvPosThetaTextField.setText("double");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
     agvPositionPanel.add(agvPosThetaTextField, gridBagConstraints);
@@ -1289,10 +1317,30 @@ public class StatusPanel
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     visualizationAgvPositionPanel.add(visualizationAgvPosInitializedTextField, gridBagConstraints);
 
-    visualizationAgvPosXLabel.setText("x:");
+    visualizationAgvPosMapIdLabel.setText("Map ID:");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
     gridBagConstraints.gridy = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+    gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
+    visualizationAgvPositionPanel.add(visualizationAgvPosMapIdLabel, gridBagConstraints);
+
+    visualizationAgvPosMapIdTextField.setBackground(new java.awt.Color(255, 255, 204));
+    visualizationAgvPosMapIdTextField.setColumns(10);
+    visualizationAgvPosMapIdTextField.setFont(new java.awt.Font("Monospaced", 0, 11)); // NOI18N
+    visualizationAgvPosMapIdTextField.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
+    visualizationAgvPosMapIdTextField.setText("String");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = 1;
+    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
+    visualizationAgvPositionPanel.add(visualizationAgvPosMapIdTextField, gridBagConstraints);
+
+    visualizationAgvPosXLabel.setText("x:");
+    gridBagConstraints = new java.awt.GridBagConstraints();
+    gridBagConstraints.gridx = 0;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
     visualizationAgvPositionPanel.add(visualizationAgvPosXLabel, gridBagConstraints);
@@ -1305,7 +1353,7 @@ public class StatusPanel
     visualizationAgvPosXTextField.setText("double");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 1;
+    gridBagConstraints.gridy = 2;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
     visualizationAgvPositionPanel.add(visualizationAgvPosXTextField, gridBagConstraints);
@@ -1313,7 +1361,7 @@ public class StatusPanel
     visualizationAgvPosYLabel.setText("y:");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 2;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
     visualizationAgvPositionPanel.add(visualizationAgvPosYLabel, gridBagConstraints);
@@ -1326,7 +1374,7 @@ public class StatusPanel
     visualizationAgvPosYTextField.setText("double");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 2;
+    gridBagConstraints.gridy = 3;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
     visualizationAgvPositionPanel.add(visualizationAgvPosYTextField, gridBagConstraints);
@@ -1334,7 +1382,7 @@ public class StatusPanel
     visualizationAgvPosThetaLabel.setText("theta:");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 3);
     visualizationAgvPositionPanel.add(visualizationAgvPosThetaLabel, gridBagConstraints);
@@ -1347,7 +1395,7 @@ public class StatusPanel
     visualizationAgvPosThetaTextField.setText("double");
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = 3;
+    gridBagConstraints.gridy = 4;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
     gridBagConstraints.insets = new java.awt.Insets(3, 0, 0, 0);
     visualizationAgvPositionPanel.add(visualizationAgvPosThetaTextField, gridBagConstraints);
@@ -1461,7 +1509,7 @@ public class StatusPanel
         .addComponent(statePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(visualizationPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        .addGap(0, 0, Short.MAX_VALUE))
+        .addGap(0, 66, Short.MAX_VALUE))
     );
 
     statusPanelScrollPane.setViewportView(scrollPaneContainerPanel);
@@ -1531,6 +1579,8 @@ public class StatusPanel
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JLabel agvPosInitializedLabel;
   private javax.swing.JTextField agvPosInitializedTextField;
+  private javax.swing.JLabel agvPosMapIdLabel;
+  private javax.swing.JTextField agvPosMapIdTextField;
   private javax.swing.JLabel agvPosThetaLabel;
   private javax.swing.JTextField agvPosThetaTextField;
   private javax.swing.JLabel agvPosXLabel;
@@ -1608,6 +1658,8 @@ public class StatusPanel
   private javax.swing.JTextField versionTextField;
   private javax.swing.JLabel visualizationAgvPosInitializedLabel;
   private javax.swing.JTextField visualizationAgvPosInitializedTextField;
+  private javax.swing.JLabel visualizationAgvPosMapIdLabel;
+  private javax.swing.JTextField visualizationAgvPosMapIdTextField;
   private javax.swing.JLabel visualizationAgvPosThetaLabel;
   private javax.swing.JTextField visualizationAgvPosThetaTextField;
   private javax.swing.JLabel visualizationAgvPosXLabel;
