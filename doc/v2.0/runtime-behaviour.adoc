@@ -55,6 +55,7 @@ Any other vehicle states in openTCS are derived from `state` messages.
 NOTE: The openTCS driver expects vehicles to set a _last will_ with the MQTT broker (with the _retained_ flag set) to ensure a connection state of `CONNECTIONBROKEN` is published as soon as possible when the broker's connection to the vehicle is lost.
 
 NOTE: Although the VDA5050 1.1 specification states to use a Quality-of-Service (QoS) level of 0 (_at most once_) for this topic, the openTCS driver subscribes with a QoS level of 1 (_at least once_) and expects vehicles to publish to this topic with a QoS level of 1, too.
+
 == Topic `state`
 
 Upon receiving a message on the `state` topic, the vehicle driver will...
