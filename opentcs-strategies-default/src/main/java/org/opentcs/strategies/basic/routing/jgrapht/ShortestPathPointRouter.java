@@ -38,22 +38,18 @@ public class ShortestPathPointRouter
 
   private final ShortestPathAlgorithm<Vertex, Edge> algo;
 
-  private final Map<String, Point> points = new HashMap<>();
+  private final Map<String, Point> points;
 
   private final Map<String, Vertex> pointVertexMap = new HashMap<>();
 
   public ShortestPathPointRouter(
       ShortestPathAlgorithm<Vertex, Edge> algo,
-      Collection<Point> points,
+      Map<String, Point> points,
       Collection<Vertex> vertices
   ) {
     this.algo = requireNonNull(algo, "algo");
-    requireNonNull(points, "points");
+    this.points = requireNonNull(points, "points");
     requireNonNull(vertices, "vertexSet");
-
-    for (Point point : points) {
-      this.points.put(point.getName(), point);
-    }
 
     for (Vertex vertex : vertices) {
       pointVertexMap.put(vertex.getPoint().getName(), vertex);

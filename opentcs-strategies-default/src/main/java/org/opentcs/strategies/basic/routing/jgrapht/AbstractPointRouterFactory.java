@@ -5,9 +5,11 @@ package org.opentcs.strategies.basic.routing.jgrapht;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
 import org.opentcs.components.kernel.routing.Edge;
@@ -65,6 +67,14 @@ public abstract class AbstractPointRouterFactory
       graphResult = graphProvider.getDerivedGraphResult(vehicle, pointsToExclude, pathsToExclude);
     }
 
+    LOG.debug(
+        "Retrieved graph result for {} in {} milliseconds.",
+        vehicle.getName(),
+        System.currentTimeMillis() - timeStampBefore
+    );
+
+    timeStampBefore = System.currentTimeMillis();
+
     PointRouter router = createPointRouter(graphResult);
 
     LOG.debug(
@@ -117,18 +127,20 @@ public abstract class AbstractPointRouterFactory
   );
 
   private PointRouter createPointRouter(GraphResult graphResult) {
-    Set<Point> points = new HashSet<>(graphResult.getPointBase());
-    points.removeAll(graphResult.getExcludedPoints());
+    Map<String, Point> points = graphResult.getPointBase().stream()
+        .filter(point -> !graphResult.getExcludedPoints().contains(point))
+        .collect(Collectors.toMap(Point::getName, Function.identity()));
 
     PointRouter router = new ShortestPathPointRouter(
         createShortestPathAlgorithm(graphResult.getGraph()),
         points,
         graphResult.getGraph().vertexSet()
     );
+
     // Make a single request for a route from one point to a different one to make sure the
     // point router is primed. (Some implementations are initialized lazily.)
     if (points.size() >= 2) {
-      Iterator<Point> pointIter = points.iterator();
+      Iterator<Point> pointIter = points.values().iterator();
       router.getRouteSteps(pointIter.next(), pointIter.next());
     }
 

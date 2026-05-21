@@ -89,7 +89,13 @@ public class EdgeEvaluatorComposite
     requireNonNull(context, "context");
 
     for (EdgeEvaluator component : evaluators) {
+      long timeStampBefore = System.currentTimeMillis();
       component.onRoutingContextUpdated(context);
+      LOG.debug(
+          "Updated routing context in {} milliseconds for edge evaluator {}.",
+          System.currentTimeMillis() - timeStampBefore,
+          component
+      );
     }
   }
 

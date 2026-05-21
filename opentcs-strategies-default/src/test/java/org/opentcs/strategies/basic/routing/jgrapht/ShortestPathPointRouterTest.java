@@ -10,9 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
@@ -63,7 +62,7 @@ class ShortestPathPointRouterTest {
 
     pointRouter = new ShortestPathPointRouter(
         new DijkstraShortestPath<>(graph),
-        new HashSet<>(Arrays.asList(pointA, pointB, pointC)),
+        Map.of(pointA.getName(), pointA, pointB.getName(), pointB, pointC.getName(), pointC),
         graph.vertexSet()
     );
   }

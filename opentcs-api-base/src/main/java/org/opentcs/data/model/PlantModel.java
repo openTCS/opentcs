@@ -163,7 +163,7 @@ public class PlantModel
     return new PlantModel(
         name,
         properties,
-        points.stream().collect(Collectors.toMap(Point::getName, Function.identity())),
+        points.stream().collect(Collectors.toUnmodifiableMap(Point::getName, Function.identity())),
         paths,
         locationTypes,
         locations,
@@ -241,7 +241,7 @@ public class PlantModel
         name,
         properties,
         points,
-        paths.stream().collect(Collectors.toMap(Path::getName, Function.identity())),
+        paths.stream().collect(Collectors.toUnmodifiableMap(Path::getName, Function.identity())),
         locationTypes,
         locations,
         blocks,
@@ -320,7 +320,7 @@ public class PlantModel
         points,
         paths,
         locationTypes.stream()
-            .collect(Collectors.toMap(LocationType::getName, Function.identity())),
+            .collect(Collectors.toUnmodifiableMap(LocationType::getName, Function.identity())),
         locations,
         blocks,
         vehicles,
@@ -398,7 +398,8 @@ public class PlantModel
         points,
         paths,
         locationTypes,
-        locations.stream().collect(Collectors.toMap(Location::getName, Function.identity())),
+        locations.stream()
+            .collect(Collectors.toUnmodifiableMap(Location::getName, Function.identity())),
         blocks,
         vehicles,
         visualLayout
@@ -476,7 +477,7 @@ public class PlantModel
         paths,
         locationTypes,
         locations,
-        blocks.stream().collect(Collectors.toMap(Block::getName, Function.identity())),
+        blocks.stream().collect(Collectors.toUnmodifiableMap(Block::getName, Function.identity())),
         vehicles,
         visualLayout
     );
@@ -554,7 +555,8 @@ public class PlantModel
         locationTypes,
         locations,
         blocks,
-        vehicles.stream().collect(Collectors.toMap(Vehicle::getName, Function.identity())),
+        vehicles.stream()
+            .collect(Collectors.toUnmodifiableMap(Vehicle::getName, Function.identity())),
         visualLayout
     );
   }

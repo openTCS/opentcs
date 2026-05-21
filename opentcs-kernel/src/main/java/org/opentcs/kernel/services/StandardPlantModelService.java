@@ -8,6 +8,8 @@ import static java.util.Objects.requireNonNull;
 import jakarta.inject.Inject;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.LocalKernel;
@@ -155,12 +157,36 @@ public class StandardPlantModelService
     synchronized (globalSyncObject) {
       return new PlantModel(plantModelManager.getName())
           .withProperties(getModelProperties())
-          .withPoints(fetch(Point.class))
-          .withPaths(fetch(Path.class))
-          .withLocationTypes(fetch(LocationType.class))
-          .withLocations(fetch(Location.class))
-          .withBlocks(fetch(Block.class))
-          .withVehicles(fetch(Vehicle.class))
+          .withPoints(
+              stream(Point.class).collect(
+                  Collectors.toUnmodifiableMap(Point::getName, Function.identity())
+              )
+          )
+          .withPaths(
+              stream(Path.class).collect(
+                  Collectors.toUnmodifiableMap(Path::getName, Function.identity())
+              )
+          )
+          .withLocationTypes(
+              stream(LocationType.class).collect(
+                  Collectors.toUnmodifiableMap(LocationType::getName, Function.identity())
+              )
+          )
+          .withLocations(
+              stream(Location.class).collect(
+                  Collectors.toUnmodifiableMap(Location::getName, Function.identity())
+              )
+          )
+          .withBlocks(
+              stream(Block.class).collect(
+                  Collectors.toUnmodifiableMap(Block::getName, Function.identity())
+              )
+          )
+          .withVehicles(
+              stream(Vehicle.class).collect(
+                  Collectors.toUnmodifiableMap(Vehicle::getName, Function.identity())
+              )
+          )
           .withVisualLayout(fetch(VisualLayout.class).stream().findFirst().get());
     }
   }

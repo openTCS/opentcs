@@ -20,8 +20,11 @@ import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.components.kernel.routing.RoutingContext;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.data.model.Path;
+import org.opentcs.data.model.PlantModel;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides routing graphs for vehicles.
@@ -31,6 +34,7 @@ import org.opentcs.data.model.Vehicle;
  */
 public class GraphProvider {
 
+  private static final Logger LOG = LoggerFactory.getLogger(GraphProvider.class);
   private final PlantModelService plantModelService;
   private final ModelGraphMapper defaultModelGraphMapper;
   private final ModelGraphMapper generalModelGraphMapper;
@@ -112,24 +116,54 @@ public class GraphProvider {
    * @return A {@link GraphResult} containing the routing graph for the given vehicle.
    */
   public GraphResult getGraphResult(Vehicle vehicle) {
+    long timeStampBefore = System.currentTimeMillis();
+    PlantModel plantModel = plantModelService.getPlantModel();
+
+    LOG.debug(
+        "Retrieved plant model for {} in {} milliseconds.",
+        vehicle.getName(),
+        System.currentTimeMillis() - timeStampBefore
+    );
+
+    timeStampBefore = System.currentTimeMillis();
     defaultModelGraphMapper.onRoutingContextUpdated(
-        new RoutingContext(plantModelService.getPlantModel())
+        new RoutingContext(plantModel)
     );
-    return graphResultsByRoutingGroup.computeIfAbsent(
-        routingGroupMapper.apply(vehicle),
-        routingGroup -> new GraphResult(
-            vehicle,
-            getCurrentPointBase().getResources(),
-            getCurrentPathBase().getResources(),
-            Set.of(),
-            Set.of(),
-            defaultModelGraphMapper.translateModel(
-                getCurrentPointBase().getResources(),
-                getCurrentPathBase().getResources(),
-                vehicle
-            )
-        )
+
+    LOG.debug(
+        "Updated routing context for {} in {} milliseconds.",
+        vehicle.getName(),
+        System.currentTimeMillis() - timeStampBefore
     );
+
+    timeStampBefore = System.currentTimeMillis();
+    String routingGroup = routingGroupMapper.apply(vehicle);
+    GraphResult graphResult = graphResultsByRoutingGroup.get(routingGroup);
+    if (graphResult == null) {
+      LOG.debug("Creating new graph result for {}...", vehicle.getName());
+      graphResult = new GraphResult(
+          vehicle,
+          getCurrentPointBase().getResources(),
+          getCurrentPathBase().getResources(),
+          Set.of(),
+          Set.of(),
+          defaultModelGraphMapper.translateModel(
+              getCurrentPointBase().getResources(),
+              getCurrentPathBase().getResources(),
+              vehicle
+          )
+      );
+      graphResultsByRoutingGroup.put(routingGroup, graphResult);
+
+    }
+
+    LOG.debug(
+        "Got graph result for {} in {} milliseconds.",
+        vehicle.getName(),
+        System.currentTimeMillis() - timeStampBefore
+    );
+
+    return graphResult;
   }
 
   /**
