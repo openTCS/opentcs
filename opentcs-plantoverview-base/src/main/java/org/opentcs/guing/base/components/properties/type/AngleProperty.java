@@ -55,7 +55,9 @@ public class AngleProperty
 
   @Override
   protected void initValidRange() {
-    validRange.setMin(0);
+    validRange.setMin(0.0)
+        .setMax(360.0)
+        .setAllowingNan(true);
   }
 
   private static List<Relation<Unit>> relations() {

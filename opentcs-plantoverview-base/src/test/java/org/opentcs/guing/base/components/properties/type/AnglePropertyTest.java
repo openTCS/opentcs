@@ -48,8 +48,8 @@ class AnglePropertyTest {
   @Test
   void testPropertyRange() {
     property = new AngleProperty(new DummyComponent());
-    assertEquals(0, property.getValidRange().getMin(), 0);
-    assertEquals(Double.MAX_VALUE, property.getValidRange().getMax(), 0);
+    assertEquals(0.0, property.getValidRange().getMin(), 0);
+    assertEquals(360.0, property.getValidRange().getMax(), 0);
   }
 
   @Test
@@ -64,6 +64,13 @@ class AnglePropertyTest {
     property = new AngleProperty(new DummyComponent(), 10, Unit.RAD);
     assertEquals(3.716, (double) property.getValue(), 0.001);
     assertEquals(AngleProperty.Unit.RAD, property.getUnit());
+  }
+
+  @Test
+  void shouldAcceptNan() {
+    property = new AngleProperty(new DummyComponent(), 180.0, Unit.DEG);
+    property.setValue(Double.NaN);
+    assertEquals(Double.NaN, property.getValue());
   }
 
   private class DummyComponent

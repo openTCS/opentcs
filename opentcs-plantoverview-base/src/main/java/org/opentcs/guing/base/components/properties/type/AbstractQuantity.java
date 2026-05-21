@@ -391,17 +391,13 @@ public abstract class AbstractQuantity<U extends Enum<U>>
     return null;
   }
 
-  public class ValidRangePair {
+  public static class ValidRangePair {
 
     private double min = Double.NEGATIVE_INFINITY;
     private double max = Double.MAX_VALUE;
+    private boolean allowingNan;
 
     public ValidRangePair() {
-    }
-
-    public ValidRangePair(double min, double max) {
-      this.min = min;
-      this.max = max;
     }
 
     /**
@@ -412,7 +408,7 @@ public abstract class AbstractQuantity<U extends Enum<U>>
      * otherwise.
      */
     public boolean isValueValid(double value) {
-      return value >= min && value <= max;
+      return (value >= min && value <= max) || (allowingNan && Double.isNaN(value));
     }
 
     public double getMin() {
@@ -430,6 +426,15 @@ public abstract class AbstractQuantity<U extends Enum<U>>
 
     public ValidRangePair setMax(double max) {
       this.max = max;
+      return this;
+    }
+
+    public boolean isAllowingNan() {
+      return allowingNan;
+    }
+
+    public ValidRangePair setAllowingNan(boolean allowingNan) {
+      this.allowingNan = allowingNan;
       return this;
     }
   }
