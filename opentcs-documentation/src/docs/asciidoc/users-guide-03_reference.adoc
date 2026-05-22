@@ -477,6 +477,8 @@ Even if there currently aren't any transport orders, it might nevertheless be a 
 To assign a priority to a parking position, set a property with the key `tcs:parkingPositionPriority` on the point.
 The property's value should be a decimal integer, with lower values resulting in a higher priority for the parking position.
 
+NOTE: If a parking position with a higher priority is unoccupied but unreachable for a vehicle, a reachable parking position with a lower priority may be selected instead.
+
 ===== Default recharging location selection
 
 When sending a vehicle to a recharge location, the closest (according to the router) unoccupied position is selected by default.

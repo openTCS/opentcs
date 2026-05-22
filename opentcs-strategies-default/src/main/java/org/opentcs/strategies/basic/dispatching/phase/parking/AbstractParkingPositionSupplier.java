@@ -5,6 +5,7 @@ package org.opentcs.strategies.basic.dispatching.phase.parking;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nullable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Set;
@@ -139,7 +140,7 @@ public abstract class AbstractParkingPositionSupplier
    * @return The point nearest to the given vehicle.
    */
   @Nullable
-  protected Point nearestPoint(Vehicle vehicle, Set<Point> points) {
+  protected Point nearestPoint(Vehicle vehicle, Collection<Point> points) {
     requireNonNull(vehicle, "vehicle");
     requireNonNull(points, "points");
 

@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -99,9 +97,58 @@ class PrioritizedParkingPositionSupplierTest {
         )
     ).thenReturn(setOf(point2, point3));
 
-    Optional<Point> result = supplier.findParkingPosition(vehicle);
-    assertTrue(result.isPresent());
-    assertEquals(point3, result.get());
+    assertThat(supplier.findParkingPosition(vehicle))
+        .isPresent().contains(point3);
+  }
+
+  @Test
+  void fallBackToLowerPriorityIfUnreachable() {
+    Point point1 = new Point("vehicle's current position");
+    Point point2 = new Point("parking position without priority")
+        .withType(Point.Type.PARK_POSITION);
+    Point point3 = new Point("parking position with priority")
+        .withType(Point.Type.PARK_POSITION)
+        .withProperty(Dispatcher.PROPKEY_PARKING_POSITION_PRIORITY, "2");
+    Point point4 = new Point("unreachable parking position with higher priority")
+        .withType(Point.Type.PARK_POSITION)
+        .withProperty(Dispatcher.PROPKEY_PARKING_POSITION_PRIORITY, "1");
+    Vehicle vehicle = new Vehicle("vehicle")
+        .withCurrentPosition(point1.getReference());
+
+    when(router.getRoutes(vehicle, point1, point4, Set.of(), 1))
+        .thenReturn(Set.of());
+    when(router.getRoutes(vehicle, point1, point3, Set.of(), 1))
+        .thenReturn(
+            Set.of(
+                new Route(
+                    List.of(
+                        new Route.Step(null, point1, point3, Vehicle.Orientation.FORWARD, 0, 10)
+                    )
+                )
+            )
+        );
+    when(router.getRoutes(vehicle, point1, point2, Set.of(), 1))
+        .thenReturn(
+            Set.of(
+                new Route(
+                    List.of(
+                        new Route.Step(null, point1, point2, Vehicle.Orientation.FORWARD, 0, 10)
+                    )
+                )
+            )
+        );
+    when(plantModelService.fetch(Point.class, point1.getReference()))
+        .thenReturn(Optional.of(point1));
+    when(
+        plantModelService.fetch(
+            eq(Point.class),
+            ArgumentMatchers.<Predicate<? super Point>>any()
+        )
+    ).thenReturn(setOf(point2, point3, point4));
+
+    assertThat(supplier.findParkingPosition(vehicle))
+        .isPresent()
+        .contains(point3);
   }
 
   @Test
@@ -145,9 +192,9 @@ class PrioritizedParkingPositionSupplierTest {
         )
     ).thenReturn(setOf(point2, point3));
 
-    Optional<Point> result = supplier.findParkingPosition(vehicle);
-    assertTrue(result.isPresent());
-    assertEquals(point3, result.get());
+    assertThat(supplier.findParkingPosition(vehicle))
+        .isPresent()
+        .contains(point3);
   }
 
   @Test
@@ -193,9 +240,9 @@ class PrioritizedParkingPositionSupplierTest {
         )
     ).thenReturn(setOf(point2, point3));
 
-    Optional<Point> result = supplier.findParkingPosition(vehicle);
-    assertTrue(result.isPresent());
-    assertEquals(point3, result.get());
+    assertThat(supplier.findParkingPosition(vehicle))
+        .isPresent()
+        .contains(point3);
   }
 
   @Test
@@ -221,8 +268,8 @@ class PrioritizedParkingPositionSupplierTest {
         )
     ).thenReturn(setOf(point2, point3));
 
-    Optional<Point> result = supplier.findParkingPosition(vehicle);
-    assertFalse(result.isPresent());
+    assertThat(supplier.findParkingPosition(vehicle))
+        .isEmpty();
   }
 
   @Test
@@ -248,8 +295,8 @@ class PrioritizedParkingPositionSupplierTest {
         )
     ).thenReturn(setOf(point2, point3));
 
-    Optional<Point> result = supplier.findParkingPosition(vehicle);
-    assertFalse(result.isPresent());
+    assertThat(supplier.findParkingPosition(vehicle))
+        .isEmpty();
   }
 
   @Test
@@ -271,8 +318,8 @@ class PrioritizedParkingPositionSupplierTest {
         )
     ).thenReturn(setOf(point2, point3));
 
-    Optional<Point> result = supplier.findParkingPosition(vehicle);
-    assertFalse(result.isPresent());
+    assertThat(supplier.findParkingPosition(vehicle))
+        .isEmpty();
   }
 
   @SuppressWarnings("unchecked")

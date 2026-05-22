@@ -28,6 +28,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 * Bugs fixed:
 ** Allow to properly change the name of an already named transport order destination's location via the Java API.
 ** Ensure that orders for automatic recharging do not try to send vehicles to locked locations.
+** Skip to lower-priority parking positions if those with a higher priority are available but not reachable for the respective vehicle.
 ** Update a point figure in the Model Editor when its y-coordinate is changed via the properties panel.
    (Previously, only changes to the x-coordinate triggered an update.)
 ** Avoid an exception when loading a plant model with polygonal paths that do not have any control points.

@@ -3,14 +3,12 @@
 package org.opentcs.strategies.basic.dispatching.phase.parking;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentcs.util.Assertions.checkArgument;
 
 import jakarta.inject.Inject;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.components.kernel.RouteSelector;
 import org.opentcs.components.kernel.Router;
@@ -73,11 +71,12 @@ public class PrioritizedParkingPositionSupplier
     }
 
     int currentPriority = priorityOfCurrentPosition(vehicle);
-    Set<Point> parkingPosCandidates = findUsableParkingPositions(vehicle).stream()
-        .filter(point -> hasHigherPriorityThan(point, currentPriority))
-        .collect(Collectors.toSet());
+    Map<Integer, List<Point>> parkingPosCandidatesByPriority
+        = findUsableParkingPositions(vehicle).stream()
+            .filter(point -> hasHigherPriorityThan(point, currentPriority))
+            .collect(Collectors.groupingBy(priorityFunction));
 
-    if (parkingPosCandidates.isEmpty()) {
+    if (parkingPosCandidatesByPriority.isEmpty()) {
       LOG.debug("{}: No parking position candidates found.", vehicle.getName());
       return Optional.empty();
     }
@@ -85,11 +84,15 @@ public class PrioritizedParkingPositionSupplier
     LOG.debug(
         "{}: Selecting parking position from candidates {}.",
         vehicle.getName(),
-        parkingPosCandidates
+        parkingPosCandidatesByPriority
     );
 
-    parkingPosCandidates = filterPositionsWithHighestPriority(parkingPosCandidates);
-    Point parkingPos = nearestPoint(vehicle, parkingPosCandidates);
+    Point parkingPos = parkingPosCandidatesByPriority.entrySet().stream()
+        .sorted(Map.Entry.comparingByKey())
+        .map(entry -> nearestPoint(vehicle, entry.getValue()))
+        .filter(Objects::nonNull)
+        .findFirst()
+        .orElse(null);
 
     LOG.debug("{}: Selected parking position {}.", vehicle.getName(), parkingPos);
 
@@ -113,18 +116,5 @@ public class PrioritizedParkingPositionSupplier
     }
 
     return pointPriority < priority;
-  }
-
-  private Set<Point> filterPositionsWithHighestPriority(Set<Point> positions) {
-    checkArgument(!positions.isEmpty(), "'positions' must not be empty");
-
-    Map<Integer, List<Point>> prioritiesToPositions = positions.stream()
-        .collect(Collectors.groupingBy(point -> priorityFunction.apply(point)));
-
-    Integer highestPriority = prioritiesToPositions.keySet().stream()
-        .reduce(Integer::min)
-        .get();
-
-    return new HashSet<>(prioritiesToPositions.get(highestPriority));
   }
 }
