@@ -262,9 +262,8 @@ public class GraphProvider {
 
     // Ensure the path base is up-to-date.
     getCurrentPathBase().updateResources(paths);
-    defaultModelGraphMapper.onRoutingContextUpdated(
-        new RoutingContext(plantModelService.getPlantModel())
-    );
+    PlantModel plantModel = plantModelService.getPlantModel();
+    defaultModelGraphMapper.onRoutingContextUpdated(new RoutingContext(plantModel));
 
     Stream<Map.Entry<String, GraphResult>> graphResultStream;
     if (defaultModelGraphMapper.isParallelMappingSupported()) {
@@ -275,21 +274,27 @@ public class GraphProvider {
     }
 
     graphResultStream.forEach(
-        entry -> graphResultsByRoutingGroup.put(
-            entry.getKey(),
-            new GraphResult(
-                entry.getValue().getVehicle(),
-                entry.getValue().getPointBase(),
-                getCurrentPathBase().getResources(),
-                Set.of(),
-                Set.of(),
-                defaultModelGraphMapper.updateGraph(
-                    paths,
-                    entry.getValue().getVehicle(),
-                    entry.getValue().getGraph()
-                )
-            )
-        )
+        entry -> {
+          // Get an up-to-date copy of the vehicle (so that edge evaluators work with the vehicle's
+          // current state).
+          Vehicle vehicle = plantModel.getVehicle(entry.getValue().getVehicle().getName())
+              .orElseThrow();
+          graphResultsByRoutingGroup.put(
+              entry.getKey(),
+              new GraphResult(
+                  vehicle,
+                  entry.getValue().getPointBase(),
+                  getCurrentPathBase().getResources(),
+                  Set.of(),
+                  Set.of(),
+                  defaultModelGraphMapper.updateGraph(
+                      paths,
+                      vehicle,
+                      entry.getValue().getGraph()
+                  )
+              )
+          );
+        }
     );
   }
 
