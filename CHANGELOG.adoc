@@ -18,7 +18,7 @@ toc::[]
 
 = Changelog
 
-== Unreleased
+== Version 0.33 (2026-05-26)
 
 * New features and enhancements:
 ** For VDA5050 1.1, a vehicle property `vda5050:version` with a value of "1.1" is now required, analogous to VDA5050 2.0 / for consistency.
