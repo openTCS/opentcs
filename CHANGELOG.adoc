@@ -20,7 +20,8 @@ toc::[]
 
 == Unreleased
 
-...
+* Changes affecting developers:
+** Update Gradle wrapper to 9.5.1.
 
 == Version 0.33 (2026-05-26)
 
