@@ -50,13 +50,15 @@ javadoc {
     addBooleanOption('Xdoclint:none', true)
   }
 }
+
 test {
   useJUnitPlatform()
   // ignoreFailures = true
   systemProperties.put("java.awt.headless", "true")
 }
 
-task sourcesJar(type: Jar, dependsOn: classes, description: 'Creates a jar from the source files.') {
+tasks.register('sourcesJar', Jar) {
+  dependsOn classes
   archiveClassifier = 'sources'
   from sourceSets.main.allSource
 }

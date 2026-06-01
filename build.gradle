@@ -49,7 +49,7 @@ dependencies {
 
 // Attributes for the AsciiDoc documentation to include code from source files
 ext.javaSrcDir = sourceSets.main.java.srcDirs[0]
-ext.collectableDistDir = new File(buildDir, 'install')
+ext.collectableDistDir = new File(layout.buildDirectory.asFile.get(), 'install')
 
 distributions {
   main {
@@ -76,7 +76,7 @@ build {
   dependsOn installDist
 }
 
-task distSrcZip(type: Zip) {
+tasks.register('distSrcZip', Zip) {
   archiveClassifier = 'src'
   from "${rootDir}"
 
