@@ -11,6 +11,6 @@ dependencies {
   api project(':opentcs-common')
 }
 
-task release {
+tasks.register('release') {
   dependsOn build
 }

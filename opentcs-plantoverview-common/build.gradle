@@ -18,7 +18,7 @@ dependencies {
   api libs.dockingframes.core
 }
 
-task release {
+tasks.register('release') {
   dependsOn build
 }
 

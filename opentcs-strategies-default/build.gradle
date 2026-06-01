@@ -14,6 +14,6 @@ dependencies {
   implementation libs.jts.core
 }
 
-task release {
+tasks.register('release') {
   dependsOn build
 }

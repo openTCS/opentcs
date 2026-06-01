@@ -57,7 +57,7 @@ distributions {
   }
 }
 
-task subDists {
+tasks.register('subDists') {
   dependsOn(':opentcs-kernel:installDist')
   dependsOn(':opentcs-kernelcontrolcenter:installDist')
   dependsOn(':opentcs-modeleditor:installDist')
@@ -78,7 +78,7 @@ distTar {
   dependsOn subDists
 }
 
-task distSrcZip(type: Zip) {
+tasks.register('distSrcZip', Zip) {
   archiveClassifier = 'src'
   from "${rootDir}"
 
@@ -101,7 +101,7 @@ build {
   dependsOn installDist
 }
 
-task release {
+tasks.register('release') {
   dependsOn build
   subprojects.each { dependsOn("${it.name}:release") }
   dependsOn distZip
@@ -109,7 +109,7 @@ task release {
 }
 
 licenseReport {
-  outputDir = "${buildDir}/license-report"
+  outputDir = "${layout.buildDirectory.asFile.get()}/license-report"
   configurations = ['runtimeClasspath', 'guiceConfigRuntimeClasspath']
   excludeBoms = true
   filters = [new LicenseBundleNormalizer(bundlePath: "$projectDir/config/license-normalizer-bundle.json")]

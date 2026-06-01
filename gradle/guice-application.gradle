@@ -6,12 +6,12 @@ apply plugin: 'application'
 
 run {
   dependsOn installDist
-  workingDir new File(new File(buildDir, 'install'), project.name)
+  workingDir new File(new File(layout.buildDirectory.asFile.get(), 'install'), project.name)
   enableAssertions true
   classpath sourceSets.guiceConfig.output
 }
 
-task(debug, type:JavaExec) {
+tasks.register('debug', JavaExec) {
   dependsOn installDist
 
   doFirst {

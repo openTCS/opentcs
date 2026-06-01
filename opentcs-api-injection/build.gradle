@@ -11,6 +11,6 @@ dependencies {
   api libs.guice.assistedinject
 }
 
-task release {
+tasks.register('release') {
   dependsOn build
 }

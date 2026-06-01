@@ -24,6 +24,6 @@ processResources.doLast {
   }
 }
 
-task release {
+tasks.register('release') {
   dependsOn build
 }

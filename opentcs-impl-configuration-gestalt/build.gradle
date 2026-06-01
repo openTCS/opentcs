@@ -11,6 +11,6 @@ dependencies {
   implementation libs.gestalt.core
 }
 
-task release {
+tasks.register('release') {
   dependsOn build
 }

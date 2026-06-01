@@ -11,7 +11,7 @@ if (!hasProperty('mainClass')) {
 }
 application.mainClass = ext.mainClass
 
-ext.collectableDistDir = new File(buildDir, 'install')
+ext.collectableDistDir = new File(layout.buildDirectory.asFile.get(), 'install')
 
 dependencies {
   api project(':opentcs-api-injection')
@@ -42,7 +42,7 @@ startScripts.enabled = false
 
 distTar.enabled = false
 
-task release {
+tasks.register('release') {
   dependsOn build
   dependsOn installDist
 }

@@ -27,6 +27,6 @@ dependencies {
   api libs.modelmapper
 }
 
-task release {
+tasks.register('release') {
   dependsOn build
 }

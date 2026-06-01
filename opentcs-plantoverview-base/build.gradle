@@ -10,6 +10,6 @@ dependencies {
   api project(':opentcs-api-base')
 }
 
-task release {
+tasks.register('release') {
   dependsOn build
 }

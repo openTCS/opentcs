@@ -24,12 +24,12 @@ apply from: "${rootDir}/gradle/publishing-java.gradle"
 
 apply plugin: 'distribution'
 
-def generatedOpenApiDir = file("$buildDir/generated-openapi")
-def webApiDir = file("$buildDir/swagger-ui-servicewebapiv1")
-def configDocDir = file("$buildDir/configdoc")
-def asciidocOutputDir = file("$buildDir/docs/asciidoc")
+def generatedOpenApiDir = file("${layout.buildDirectory.asFile.get()}/generated-openapi")
+def webApiDir = file("${layout.buildDirectory.asFile.get()}/swagger-ui-servicewebapiv1")
+def configDocDir = file("${layout.buildDirectory.asFile.get()}/configdoc")
+def asciidocOutputDir = file("${layout.buildDirectory.asFile.get()}/docs/asciidoc")
 
-ext.collectableDistDir = file("$buildDir/install")
+ext.collectableDistDir = file("${layout.buildDirectory.asFile.get()}/install")
 
 configurations {
   schemagen
@@ -76,7 +76,7 @@ distributions {
   }
 }
 
-task renderDocs {
+tasks.register('renderDocs') {
   dependsOn project(':opentcs-api-base').javadoc
   dependsOn project(':opentcs-api-injection').javadoc
   dependsOn 'asciidoctor'
@@ -84,7 +84,7 @@ task renderDocs {
 }
 installDist.dependsOn renderDocs
 
-task bundleOpenApiSpecFiles(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+tasks.register('bundleOpenApiSpecFiles', org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
   generatorName = "openapi"
   inputSpec = file("src/docs/service-web-api-v1/openapi.yaml").toString()
   outputDir = generatedOpenApiDir.toString()
@@ -102,7 +102,7 @@ distZip {
   archiveBaseName = archiveBaseName.get().toLowerCase()
 }
 
-task release {
+tasks.register('release') {
   dependsOn build
   dependsOn installDist
 }
@@ -147,82 +147,98 @@ asciidoctor {
   }
 }
 
-task configdocgen {
+abstract class GenerateConfigDocTask extends DefaultTask {
+  @Classpath
+  abstract ConfigurableFileCollection getToolClasspath()
+
+  @OutputDirectory
+  abstract DirectoryProperty getOutputDir()
+
+  @Inject
+  abstract ExecOperations getExecOperations()
+
+  @TaskAction
+  void generate() {
+    def out = outputDir.get().asFile
+    out.mkdirs()
+
+    execOperations.javaexec {
+      classpath = toolClasspath
+      mainClass = "org.opentcs.documentation.ConfigDocGenerator"
+      args = [
+        "org.opentcs.kernel.KernelApplicationConfiguration",
+        "${out}/KernelApplicationConfigurationEntries.adoc",
+
+        "org.opentcs.kernel.OrderPoolConfiguration",
+        "${out}/OrderPoolConfigurationEntries.adoc",
+
+        "org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration",
+        "${out}/DefaultDispatcherConfigurationEntries.adoc",
+
+        "org.opentcs.strategies.basic.routing.DefaultRouterConfiguration",
+        "${out}/DefaultRouterConfigurationEntries.adoc",
+
+        "org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration",
+        "${out}/ShortestPathConfigurationEntries.adoc",
+
+        "org.opentcs.strategies.basic.routing.edgeevaluator.ExplicitPropertiesConfiguration",
+        "${out}/ExplicitPropertiesConfigurationEntries.adoc",
+
+        "org.opentcs.strategies.basic.peripherals.dispatching.DefaultPeripheralJobDispatcherConfiguration",
+        "${out}/DefaultPeripheralJobDispatcherConfigurationEntries.adoc",
+
+        "org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration",
+        "${out}/ServiceWebApiConfigurationEntries.adoc",
+
+        "org.opentcs.kernel.extensions.rmi.RmiKernelInterfaceConfiguration",
+        "${out}/RmiKernelInterfaceConfigurationEntries.adoc",
+
+        "org.opentcs.kernel.SslConfiguration",
+        "${out}/KernelSslConfigurationEntries.adoc",
+
+        "org.opentcs.kernel.vehicles.VehiclePositionResolverConfiguration",
+        "${out}/VehiclePositionResolverConfigurationEntries.adoc",
+
+        "org.opentcs.virtualvehicle.VirtualVehicleConfiguration",
+        "${out}/VirtualVehicleConfigurationEntries.adoc",
+
+        "org.opentcs.commadapter.peripheral.loopback.VirtualPeripheralConfiguration",
+        "${out}/VirtualPeripheralConfigurationEntries.adoc",
+
+        "org.opentcs.kernel.extensions.watchdog.WatchdogConfiguration",
+        "${out}/WatchdogConfigurationEntries.adoc",
+
+        "org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration",
+        "${out}/KernelControlCenterApplicationConfigurationEntries.adoc",
+
+        "org.opentcs.kernelcontrolcenter.exchange.SslConfiguration",
+        "${out}/KccSslConfigurationEntries.adoc",
+
+        "org.opentcs.guing.common.exchange.SslConfiguration",
+        "${out}/PoSslConfigurationEntries.adoc",
+
+        "org.opentcs.modeleditor.util.ModelEditorConfiguration",
+        "${out}/ModelEditorConfigurationEntries.adoc",
+
+        "org.opentcs.modeleditor.util.ElementNamingSchemeConfiguration",
+        "${out}/PO_ElementNamingSchemeConfigurationEntries.adoc",
+
+        "org.opentcs.operationsdesk.util.OperationsDeskConfiguration",
+        "${out}/OperationsDeskConfigurationEntries.adoc"
+      ]
+    }
+  }
+}
+
+tasks.register('configdocgen', GenerateConfigDocTask) {
   dependsOn 'jar'
   dependsOn ':opentcs-kernel:jar'
   dependsOn ':opentcs-kernelcontrolcenter:jar'
   dependsOn ':opentcs-modeleditor:jar'
   dependsOn ':opentcs-operationsdesk:jar'
 
-  doLast {
-    mkdir(configDocDir)
-
-    javaexec {
-      classpath configurations.configdocgen
-      mainClass = "org.opentcs.documentation.ConfigDocGenerator"
-      args = [
-        "org.opentcs.kernel.KernelApplicationConfiguration",
-        "${configDocDir}/KernelApplicationConfigurationEntries.adoc",
-
-        "org.opentcs.kernel.OrderPoolConfiguration",
-        "${configDocDir}/OrderPoolConfigurationEntries.adoc",
-
-        "org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration",
-        "${configDocDir}/DefaultDispatcherConfigurationEntries.adoc",
-
-        "org.opentcs.strategies.basic.routing.DefaultRouterConfiguration",
-        "${configDocDir}/DefaultRouterConfigurationEntries.adoc",
-
-        "org.opentcs.strategies.basic.routing.jgrapht.ShortestPathConfiguration",
-        "${configDocDir}/ShortestPathConfigurationEntries.adoc",
-
-        "org.opentcs.strategies.basic.routing.edgeevaluator.ExplicitPropertiesConfiguration",
-        "${configDocDir}/ExplicitPropertiesConfigurationEntries.adoc",
-
-        "org.opentcs.strategies.basic.peripherals.dispatching.DefaultPeripheralJobDispatcherConfiguration",
-        "${configDocDir}/DefaultPeripheralJobDispatcherConfigurationEntries.adoc",
-
-        "org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration",
-        "${configDocDir}/ServiceWebApiConfigurationEntries.adoc",
-
-        "org.opentcs.kernel.extensions.rmi.RmiKernelInterfaceConfiguration",
-        "${configDocDir}/RmiKernelInterfaceConfigurationEntries.adoc",
-
-        "org.opentcs.kernel.SslConfiguration",
-        "${configDocDir}/KernelSslConfigurationEntries.adoc",
-
-        "org.opentcs.kernel.vehicles.VehiclePositionResolverConfiguration",
-        "${configDocDir}/VehiclePositionResolverConfigurationEntries.adoc",
-
-        "org.opentcs.virtualvehicle.VirtualVehicleConfiguration",
-        "${configDocDir}/VirtualVehicleConfigurationEntries.adoc",
-
-        "org.opentcs.commadapter.peripheral.loopback.VirtualPeripheralConfiguration",
-        "${configDocDir}/VirtualPeripheralConfigurationEntries.adoc",
-
-        "org.opentcs.kernel.extensions.watchdog.WatchdogConfiguration",
-        "${configDocDir}/WatchdogConfigurationEntries.adoc",
-
-        "org.opentcs.kernelcontrolcenter.util.KernelControlCenterConfiguration",
-        "${configDocDir}/KernelControlCenterApplicationConfigurationEntries.adoc",
-
-        "org.opentcs.kernelcontrolcenter.exchange.SslConfiguration",
-        "${configDocDir}/KccSslConfigurationEntries.adoc",
-
-        "org.opentcs.guing.common.exchange.SslConfiguration",
-        "${configDocDir}/PoSslConfigurationEntries.adoc",
-
-        "org.opentcs.modeleditor.util.ModelEditorConfiguration",
-        "${configDocDir}/ModelEditorConfigurationEntries.adoc",
-
-        "org.opentcs.modeleditor.util.ElementNamingSchemeConfiguration",
-        "${configDocDir}/PO_ElementNamingSchemeConfigurationEntries.adoc",
-
-        "org.opentcs.operationsdesk.util.OperationsDeskConfiguration",
-        "${configDocDir}/OperationsDeskConfigurationEntries.adoc"
-      ]
-    }
-  }
+  toolClasspath.from(configurations.configdocgen)
+  outputDir.set(configDocDir)
 }
 
 publishing {
