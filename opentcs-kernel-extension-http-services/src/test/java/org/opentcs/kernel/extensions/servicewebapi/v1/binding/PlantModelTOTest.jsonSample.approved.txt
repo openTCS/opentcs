@@ -249,6 +249,7 @@
     "energyLevelSufficientlyRecharged" : 60,
     "maxVelocity" : 2000,
     "maxReverseVelocity" : 733,
+    "envelopeKey" : "envelopeType-01",
     "layout" : {
       "routeColor" : "#123456"
     },

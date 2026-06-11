@@ -195,6 +195,7 @@ class PlantModelTOTest {
                     .setEnergyLevelSufficientlyRecharged(60)
                     .setMaxVelocity(2000)
                     .setMaxReverseVelocity(733)
+                    .setEnvelopeKey("envelopeType-01")
                     .setLayout(new VehicleTO.Layout().setRouteColor("#123456"))
             )
         )

@@ -20,7 +20,7 @@ import org.opentcs.util.annotations.ScheduledApiChange;
   {
       "name", "length", "boundingBox", "energyLevelCritical", "energyLevelGood",
       "energyLevelFullyRecharged", "energyLevelFullyRecharged", "energyLevelSufficientlyRecharged",
-      "maxVelocity", "maxReverseVelocity", "layout", "properties"
+      "maxVelocity", "maxReverseVelocity", "envelopeKey", "layout", "properties"
   }
 )
 public class VehicleTO {
@@ -33,6 +33,7 @@ public class VehicleTO {
   private int energyLevelSufficientlyRecharged = 30;
   private int maxVelocity = 1000;
   private int maxReverseVelocity = 1000;
+  private String envelopeKey = "";
   private Layout layout = new Layout();
   private List<PropertyTO> properties = List.of();
 
@@ -152,6 +153,19 @@ public class VehicleTO {
 
   public VehicleTO setMaxReverseVelocity(int maxReverseVelocity) {
     this.maxReverseVelocity = maxReverseVelocity;
+    return this;
+  }
+
+  @Nonnull
+  public String getEnvelopeKey() {
+    return envelopeKey;
+  }
+
+  public VehicleTO setEnvelopeKey(
+      @Nonnull
+      String envelopeKey
+  ) {
+    this.envelopeKey = requireNonNull(envelopeKey, "envelopeKey");
     return this;
   }
 

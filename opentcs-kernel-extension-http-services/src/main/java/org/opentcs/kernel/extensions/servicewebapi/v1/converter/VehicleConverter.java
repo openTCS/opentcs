@@ -70,6 +70,7 @@ public class VehicleConverter {
                 )
                 .withMaxVelocity(vehicle.getMaxVelocity())
                 .withMaxReverseVelocity(vehicle.getMaxReverseVelocity())
+                .withEnvelopeKey(vehicle.getEnvelopeKey())
                 .withLayout(
                     new VehicleCreationTO.Layout(
                         Colors.decodeFromHexRGB(vehicle.getLayout().getRouteColor())
@@ -106,6 +107,7 @@ public class VehicleConverter {
                 )
                 .setMaxVelocity(vehicle.getMaxVelocity())
                 .setMaxReverseVelocity(vehicle.getMaxReverseVelocity())
+                .setEnvelopeKey(vehicle.getEnvelopeKey())
                 .setLayout(
                     new VehicleTO.Layout()
                         .setRouteColor(Colors.encodeToHexRGB(vehicle.getLayout().getRouteColor()))
