@@ -111,7 +111,9 @@ public interface EdgeEvaluator {
    * @return The computed weight of the given edge.
    * A value of {@code Double.POSITIVE_INFINITY} indicates that the edge is to be excluded from
    * routing.
-   * Note that negative weights might not be handled well by the respective routing algorithm used.
+   * Note that negative weights as well as values less than 1.0 might not be handled well by the
+   * respective routing implementation. It is strongly recommended to keep values between 1 and
+   * 2<sup>48</sup>.
    */
   double computeWeight(
       @Nonnull

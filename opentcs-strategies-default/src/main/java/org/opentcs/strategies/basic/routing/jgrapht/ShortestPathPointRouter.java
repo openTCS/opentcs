@@ -23,14 +23,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Computes routes between points using a JGraphT-based shortest path algorithm.
- * <p>
- * <em>Note that this implementation does not integrate static routes.</em>
- * </p>
  */
 public class ShortestPathPointRouter
     implements
       PointRouter {
 
+  /**
+   * Applied to route costs when casting them to integers in order to avoid zero-cost results.
+   */
+  public static final double COST_INTEGER_CAST_FACTOR = 10_000.0;
   /**
    * This class's logger.
    */
@@ -106,7 +107,7 @@ public class ShortestPathPointRouter
       return INFINITE_COSTS;
     }
 
-    return (long) graphPath.getWeight();
+    return (long) (COST_INTEGER_CAST_FACTOR * graphPath.getWeight());
   }
 
   private List<Route.Step> translateToSteps(GraphPath<Vertex, Edge> graphPath) {
@@ -125,7 +126,7 @@ public class ShortestPathPointRouter
               destPoint,
               orientation(edge, sourcePoint),
               routeIndex,
-              (long) graphPath.getGraph().getEdgeWeight(edge)
+              (long) (COST_INTEGER_CAST_FACTOR * graphPath.getGraph().getEdgeWeight(edge))
           )
       );
       routeIndex++;

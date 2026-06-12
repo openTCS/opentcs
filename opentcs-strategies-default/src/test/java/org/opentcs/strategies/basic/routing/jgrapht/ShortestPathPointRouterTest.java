@@ -95,7 +95,7 @@ class ShortestPathPointRouterTest {
   @Test
   void returnGraphPathCostsForExistingRoute() {
     assertEquals(
-        1234,
+        (long) (1234 * ShortestPathPointRouter.COST_INTEGER_CAST_FACTOR),
         pointRouter.getCosts(pointA.getReference(), pointC.getReference())
     );
   }

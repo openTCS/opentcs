@@ -58,6 +58,6 @@ public class EdgeEvaluatorTravelTime
     else {
       maxVelocity = Math.min(vehicle.getMaxVelocity(), edge.getPath().getMaxVelocity());
     }
-    return (maxVelocity == 0) ? INFINITE_COSTS : edge.getPath().getLength() / maxVelocity;
+    return (maxVelocity == 0) ? INFINITE_COSTS : (double) edge.getPath().getLength() / maxVelocity;
   }
 }
