@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.locationtech.jts.geom.GeometryCollection;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.TCSObject;
@@ -159,9 +158,9 @@ public class BlockAreaAllocations
           = expandResourcesIgnoringBlocks(otherVehicle.getAllocatedResources(), sharedBlocks);
 
       // Determine the areas effectively requested and occupied by both vehicles.
-      GeometryCollection requestedArea
+      MultiPlaneGeometryCollection requestedArea
           = areaProvider.getAreas(envelopeKey, expandedRequestedResources);
-      GeometryCollection occupiedArea
+      MultiPlaneGeometryCollection occupiedArea
           = areaProvider.getAreas(otherVehicle.getEnvelopeKey(), expandedOccupiedResources);
 
       if (requestedArea.intersects(occupiedArea)) {

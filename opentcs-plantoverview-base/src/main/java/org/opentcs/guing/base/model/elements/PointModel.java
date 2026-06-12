@@ -61,9 +61,9 @@ public class PointModel
    */
   public static final String MAX_VEHICLE_BOUNDING_BOX = "maxVehicleBoundingBox";
   /**
-   * The point's default position for both axes.
+   * The point's default position for all axes.
    */
-  private static final int DEFAULT_XY_POSITION = 0;
+  private static final int DEFAULT_XYZ_POSITION = 0;
   /**
    * This class's resource bundle.
    */
@@ -99,6 +99,10 @@ public class PointModel
 
   public CoordinateProperty getPropertyModelPositionY() {
     return (CoordinateProperty) getProperty(MODEL_Y_POSITION);
+  }
+
+  public CoordinateProperty getPropertyModelPositionZ() {
+    return (CoordinateProperty) getProperty(MODEL_Z_POSITION);
   }
 
   public AngleProperty getPropertyVehicleOrientationAngle() {
@@ -195,7 +199,7 @@ public class PointModel
 
     CoordinateProperty pPosX = new CoordinateProperty(
         this,
-        DEFAULT_XY_POSITION,
+        DEFAULT_XYZ_POSITION,
         LengthProperty.Unit.MM
     );
     pPosX.setDescription(bundle.getString("pointModel.property_modelPositionX.description"));
@@ -204,12 +208,21 @@ public class PointModel
 
     CoordinateProperty pPosY = new CoordinateProperty(
         this,
-        DEFAULT_XY_POSITION,
+        DEFAULT_XYZ_POSITION,
         LengthProperty.Unit.MM
     );
     pPosY.setDescription(bundle.getString("pointModel.property_modelPositionY.description"));
     pPosY.setHelptext(bundle.getString("pointModel.property_modelPositionY.helptext"));
     setProperty(MODEL_Y_POSITION, pPosY);
+
+    CoordinateProperty pPosZ = new CoordinateProperty(
+        this,
+        DEFAULT_XYZ_POSITION,
+        LengthProperty.Unit.MM
+    );
+    pPosZ.setDescription(bundle.getString("pointModel.property_modelPositionZ.description"));
+    pPosZ.setHelptext(bundle.getString("pointModel.property_modelPositionZ.helptext"));
+    setProperty(MODEL_Z_POSITION, pPosZ);
 
     AngleProperty pPhi = new AngleProperty(this);
     pPhi.setDescription(bundle.getString("pointModel.property_angle.description"));

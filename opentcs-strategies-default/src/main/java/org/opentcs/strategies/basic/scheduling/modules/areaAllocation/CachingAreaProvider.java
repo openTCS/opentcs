@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryCollection;
-import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
@@ -29,9 +29,10 @@ public class CachingAreaProvider
     implements
       AreaProvider {
 
-  private final TCSObjectService objectService;
+  private final InternalTCSObjectService objectService;
   private final CustomGeometryFactory geometryFactory = new CustomGeometryFactory();
   private final Map<CacheKey, Geometry> cache = new HashMap<>();
+  private final Map<String, Point> points = new HashMap<>();
   private boolean initialized;
 
   /**
@@ -40,7 +41,7 @@ public class CachingAreaProvider
    * @param objectService The object service to use.
    */
   @Inject
-  public CachingAreaProvider(TCSObjectService objectService) {
+  public CachingAreaProvider(InternalTCSObjectService objectService) {
     this.objectService = requireNonNull(objectService, "objectService");
   }
 
@@ -50,6 +51,7 @@ public class CachingAreaProvider
       return;
     }
 
+    objectService.stream(Point.class).forEach(point -> points.put(point.getName(), point));
     populateCache();
 
     initialized = true;
@@ -67,12 +69,13 @@ public class CachingAreaProvider
     }
 
     cache.clear();
+    points.clear();
 
     initialized = false;
   }
 
   @Override
-  public GeometryCollection getAreas(
+  public MultiPlaneGeometryCollection getAreas(
       @Nonnull
       String envelopeKey,
       @Nonnull
@@ -81,12 +84,24 @@ public class CachingAreaProvider
     requireNonNull(envelopeKey, "envelopeKey");
     requireNonNull(resources, "resources");
 
-    Geometry[] computedAreas = resources.stream()
-        .map(resource -> lookupArea(envelopeKey, resource))
-        .filter(geometry -> geometry != EMPTY_GEOMETRY)
-        .toArray(Geometry[]::new);
-
-    return geometryFactory.createGeometryCollection(computedAreas);
+    return new MultiPlaneGeometryCollection(
+        resources.stream()
+            .flatMap(resource -> toPlaneGeometries(envelopeKey, resource).stream())
+            .collect(
+                Collectors.groupingBy(
+                    PlaneGeometry::plane,
+                    Collectors.mapping(
+                        PlaneGeometry::geometry,
+                        Collectors.collectingAndThen(
+                            Collectors.toList(),
+                            list -> geometryFactory.createGeometryCollection(
+                                list.toArray(Geometry[]::new)
+                            )
+                        )
+                    )
+                )
+            )
+    );
   }
 
   private void populateCache() {
@@ -142,6 +157,37 @@ public class CachingAreaProvider
     }
   }
 
+  private Set<PlaneGeometry> toPlaneGeometries(String envelopeKey, TCSResource<?> resource) {
+    if (resource instanceof Point point) {
+      Geometry area = lookupArea(envelopeKey, point);
+      if (area == EMPTY_GEOMETRY) {
+        return Set.of();
+      }
+
+      return Set.of(new PlaneGeometry(point.getPose().getPosition().getZ(), area));
+    }
+    else if (resource instanceof Path path) {
+      Geometry area = lookupArea(envelopeKey, path);
+      if (area == EMPTY_GEOMETRY) {
+        return Set.of();
+      }
+
+      Point srcPoint = points.get(path.getSourcePoint().getName());
+      Point destPoint = points.get(path.getDestinationPoint().getName());
+      return srcPoint.getPose().getPosition().getZ() == destPoint.getPose().getPosition().getZ()
+          ? Set.of(new PlaneGeometry(srcPoint.getPose().getPosition().getZ(), area))
+          // If the path's source and destination point are on different planes, add a geometry for
+          // each of them to allow for intersection detection on both planes.
+          : Set.of(
+              new PlaneGeometry(srcPoint.getPose().getPosition().getZ(), area),
+              new PlaneGeometry(destPoint.getPose().getPosition().getZ(), area)
+          );
+    }
+    else {
+      return Set.of();
+    }
+  }
+
   private Geometry lookupArea(String envelopeKey, TCSResource<?> resource) {
     return cache.getOrDefault(new CacheKey(envelopeKey, resource), EMPTY_GEOMETRY);
   }
@@ -188,4 +234,6 @@ public class CachingAreaProvider
           && Objects.equals(this.resource, other.resource);
     }
   }
+
+  private record PlaneGeometry(long plane, Geometry geometry) {}
 }

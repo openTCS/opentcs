@@ -23,7 +23,7 @@ public interface AreaProvider
    * @param resources The set of resources.
    * @return The areas related to the given envelope key and the given set of resources.
    */
-  GeometryCollection getAreas(
+  MultiPlaneGeometryCollection getAreas(
       @Nonnull
       String envelopeKey,
       @Nonnull

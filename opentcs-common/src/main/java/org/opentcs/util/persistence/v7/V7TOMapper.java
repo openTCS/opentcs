@@ -382,6 +382,7 @@ public class V7TOMapper {
       pointTO.setName(point.getName());
       pointTO.setPositionX(point.getPose().getPosition().getX())
           .setPositionY(point.getPose().getPosition().getY())
+          .setPositionZ(point.getPose().getPosition().getZ())
           .setVehicleOrientationAngle((float) point.getPose().getOrientationAngle())
           .setType(toPointTOType(point.getType()))
           .setOutgoingPaths(getOutgoingPaths(point, pathsBySourcePoint))

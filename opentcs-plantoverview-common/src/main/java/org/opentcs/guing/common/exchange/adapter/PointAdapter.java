@@ -65,6 +65,10 @@ public class PointAdapter
         point.getPose().getPosition().getY(),
         LengthProperty.Unit.MM
     );
+    model.getPropertyModelPositionZ().setValueAndUnit(
+        point.getPose().getPosition().getZ(),
+        LengthProperty.Unit.MM
+    );
     model.getPropertyVehicleOrientationAngle()
         .setValueAndUnit(point.getPose().getOrientationAngle(), AngleProperty.Unit.DEG);
 
@@ -154,7 +158,8 @@ public class PointAdapter
   private TripleCreationTO getKernelCoordinates(PointModel model) {
     return convertToTripleCreationTO(
         model.getPropertyModelPositionX(),
-        model.getPropertyModelPositionY()
+        model.getPropertyModelPositionY(),
+        model.getPropertyModelPositionZ()
     );
   }
 
@@ -218,12 +223,14 @@ public class PointAdapter
   }
 
   private TripleCreationTO convertToTripleCreationTO(
-      CoordinateProperty cpx, CoordinateProperty cpy
+      CoordinateProperty cpx,
+      CoordinateProperty cpy,
+      CoordinateProperty cpz
   ) {
     TripleCreationTO result = new TripleCreationTO(
         (int) cpx.getValueByUnit(LengthProperty.Unit.MM),
         (int) cpy.getValueByUnit(LengthProperty.Unit.MM),
-        0
+        (int) cpz.getValueByUnit(LengthProperty.Unit.MM)
     );
 
     return result;

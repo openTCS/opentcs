@@ -6,7 +6,6 @@ import jakarta.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import org.locationtech.jts.geom.GeometryCollection;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
@@ -18,7 +17,8 @@ public class AreaAllocations
     implements
       Lifecycle {
 
-  private final Map<TCSObjectReference<Vehicle>, GeometryCollection> allocatedAreasByVehicles
+  @SuppressWarnings("checkstyle:LineLength")
+  private final Map<TCSObjectReference<Vehicle>, MultiPlaneGeometryCollection> allocatedAreasByVehicles
       = new HashMap<>();
   private boolean initialized = false;
 
@@ -67,7 +67,7 @@ public class AreaAllocations
    */
   public void setAreaAllocation(
       TCSObjectReference<Vehicle> vehicleRef,
-      GeometryCollection allocatedAreas
+      MultiPlaneGeometryCollection allocatedAreas
   ) {
     allocatedAreasByVehicles.put(vehicleRef, allocatedAreas);
   }
@@ -92,7 +92,7 @@ public class AreaAllocations
    */
   public boolean isAreaAllocationAllowed(
       TCSObjectReference<Vehicle> vehicleRef,
-      GeometryCollection requestedAreas
+      MultiPlaneGeometryCollection requestedAreas
   ) {
     return allocatedAreasByVehicles.entrySet().stream()
         // Only check areas allocated by vehicles other than the given vehicle.

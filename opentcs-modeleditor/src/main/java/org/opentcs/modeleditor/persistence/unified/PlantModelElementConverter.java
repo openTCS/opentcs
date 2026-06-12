@@ -69,6 +69,10 @@ public class PlantModelElementConverter {
         pointTO.getPose().getPosition().getY(),
         LengthProperty.Unit.MM
     );
+    model.getPropertyModelPositionZ().setValueAndUnit(
+        pointTO.getPose().getPosition().getZ(),
+        LengthProperty.Unit.MM
+    );
     model.getPropertyVehicleOrientationAngle().setValueAndUnit(
         pointTO.getPose().getOrientationAngle(),
         AngleProperty.Unit.DEG

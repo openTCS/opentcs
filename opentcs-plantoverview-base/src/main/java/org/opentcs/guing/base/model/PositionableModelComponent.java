@@ -10,11 +10,15 @@ public interface PositionableModelComponent
       ModelComponent {
 
   /**
-   * Key for the X (model) cordinate.
+   * Key for the X (model) coordinate.
    */
   String MODEL_X_POSITION = "modelXPosition";
   /**
-   * Key for the Y (model) cordinate.
+   * Key for the Y (model) coordinate.
    */
   String MODEL_Y_POSITION = "modelYPosition";
+  /**
+   * Key for the Z (model) coordinate.
+   */
+  String MODEL_Z_POSITION = "modelZPosition";
 }
