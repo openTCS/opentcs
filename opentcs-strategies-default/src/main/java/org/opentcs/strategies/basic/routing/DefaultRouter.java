@@ -3,7 +3,6 @@
 package org.opentcs.strategies.basic.routing;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
 import static org.opentcs.util.Assertions.checkArgument;
 
 import jakarta.inject.Inject;
@@ -272,7 +271,7 @@ public class DefaultRouter
       for (Point curPoint : getDestinationPoints(driveOrders[nextHopIndex])) {
         // Check if there is a route from the starting point to the current
         // point and if the rest of the orders are routable from there, too.
-        if (pointRouter.getCosts(startPoint, curPoint) != INFINITE_COSTS
+        if (!Double.isNaN(pointRouter.getCosts(startPoint, curPoint))
             && isRoutable(curPoint, driveOrders, nextHopIndex + 1, pointRouter)) {
           // If it was possible to reach the end of the order list from here,
           // propagate the result back to the caller.
@@ -320,8 +319,8 @@ public class DefaultRouter
       }
       boolean routable = false;
       for (Point curDestPoint : destPoints) {
-        final long hopCosts = params.pointRouter.getCosts(startPoint, curDestPoint);
-        if (hopCosts == INFINITE_COSTS) {
+        final double hopCosts = params.pointRouter.getCosts(startPoint, curDestPoint);
+        if (Double.isNaN(hopCosts)) {
           continue;
         }
         // Get the list of steps for the route of the current drive order.

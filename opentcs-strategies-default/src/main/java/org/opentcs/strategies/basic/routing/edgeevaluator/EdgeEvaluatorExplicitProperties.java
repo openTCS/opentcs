@@ -117,7 +117,7 @@ public class EdgeEvaluatorExplicitProperties
     }
     catch (NumberFormatException exc) {
       LOG.warn("Exception parsing routing cost value '{}'.", costs, exc);
-      return Double.POSITIVE_INFINITY;
+      return Double.NaN;
     }
   }
 }

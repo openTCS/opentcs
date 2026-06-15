@@ -10,7 +10,6 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
 
 import java.util.List;
 import java.util.Map;
@@ -84,7 +83,7 @@ class DefaultRouterTest {
   void checkRoutabilityNotRoutable() {
     when(pointRouterProvider.getPointRoutersByVehicleGroup())
         .thenReturn(Map.of("some-group", pointRouter));
-    when(pointRouter.getCosts(any(Point.class), any(Point.class))).thenReturn(INFINITE_COSTS);
+    when(pointRouter.getCosts(any(Point.class), any(Point.class))).thenReturn(Double.NaN);
 
     assertThat(defaultRouter.checkRoutability(order), is(empty()));
   }
@@ -94,7 +93,7 @@ class DefaultRouterTest {
     Vehicle vehicle = new Vehicle("some-vehicle");
     when(pointRouterProvider.getPointRoutersByVehicleGroup())
         .thenReturn(Map.of("some-group", pointRouter));
-    when(pointRouter.getCosts(any(Point.class), any(Point.class))).thenReturn(50L);
+    when(pointRouter.getCosts(any(Point.class), any(Point.class))).thenReturn(50.0);
     when(objectService.fetch(Vehicle.class)).thenReturn(Set.of(vehicle));
     when(routingGroupMapper.apply(vehicle)).thenReturn("some-group");
 
@@ -104,7 +103,7 @@ class DefaultRouterTest {
   @Test
   void checkGeneralRoutabilityNotRoutable() {
     when(pointRouterProvider.getGeneralPointRouter(order)).thenReturn(pointRouter);
-    when(pointRouter.getCosts(any(Point.class), any(Point.class))).thenReturn(INFINITE_COSTS);
+    when(pointRouter.getCosts(any(Point.class), any(Point.class))).thenReturn(Double.NaN);
 
     assertThat(defaultRouter.checkGeneralRoutability(order), is(false));
   }
@@ -112,7 +111,7 @@ class DefaultRouterTest {
   @Test
   void checkGeneralRoutabilityIsRoutable() {
     when(pointRouterProvider.getGeneralPointRouter(order)).thenReturn(pointRouter);
-    when(pointRouter.getCosts(any(Point.class), any(Point.class))).thenReturn(50L);
+    when(pointRouter.getCosts(any(Point.class), any(Point.class))).thenReturn(50.0);
 
     assertThat(defaultRouter.checkGeneralRoutability(order), is(true));
   }

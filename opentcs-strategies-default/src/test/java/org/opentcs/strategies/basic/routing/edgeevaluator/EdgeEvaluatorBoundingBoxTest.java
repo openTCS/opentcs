@@ -46,7 +46,7 @@ class EdgeEvaluatorBoundingBoxTest {
 
     double result = edgeEvaluator.computeWeight(edge, vehicle);
 
-    assertThat(result).isEqualTo(Double.POSITIVE_INFINITY);
+    assertThat(result).isNaN();
   }
 
   @Test
@@ -106,7 +106,7 @@ class EdgeEvaluatorBoundingBoxTest {
 
     double result = edgeEvaluator.computeWeight(edge, vehicle);
 
-    assertThat(result).isEqualTo(Double.POSITIVE_INFINITY);
+    assertThat(result).isNaN();
   }
 
   @Test

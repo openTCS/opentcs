@@ -21,7 +21,6 @@ import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.order.Route.Step;
-import org.opentcs.strategies.basic.routing.PointRouter;
 
 /**
  */
@@ -82,7 +81,7 @@ class ShortestPathPointRouterTest {
   @Test
   void returnInfiniteCostsIfNoRouteExists() {
     assertEquals(
-        PointRouter.INFINITE_COSTS,
+        Double.NaN,
         pointRouter.getCosts(pointA.getReference(), pointB.getReference())
     );
   }

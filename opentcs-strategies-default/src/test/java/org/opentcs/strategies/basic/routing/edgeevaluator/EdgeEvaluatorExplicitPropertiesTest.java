@@ -4,6 +4,7 @@ package org.opentcs.strategies.basic.routing.edgeevaluator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notANumber;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -90,10 +91,10 @@ class EdgeEvaluatorExplicitPropertiesTest {
     Vehicle vehicle = new Vehicle("someVehicle");
     when(routingGroupMapper.apply(vehicle)).thenReturn("XYZ");
 
-    assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(Double.POSITIVE_INFINITY));
+    assertThat(edgeEvaluator.computeWeight(edge, vehicle), is(notANumber()));
 
     Edge reverseEdge = new Edge(edge.getPath(), true);
 
-    assertThat(edgeEvaluator.computeWeight(reverseEdge, vehicle), is(Double.POSITIVE_INFINITY));
+    assertThat(edgeEvaluator.computeWeight(reverseEdge, vehicle), is(notANumber()));
   }
 }

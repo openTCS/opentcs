@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.strategies.basic.routing.edgeevaluator;
 
-import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
-
 import jakarta.annotation.Nonnull;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.routing.EdgeEvaluator;
@@ -58,6 +56,6 @@ public class EdgeEvaluatorTravelTime
     else {
       maxVelocity = Math.min(vehicle.getMaxVelocity(), edge.getPath().getMaxVelocity());
     }
-    return (maxVelocity == 0) ? INFINITE_COSTS : (double) edge.getPath().getLength() / maxVelocity;
+    return (maxVelocity == 0) ? Double.NaN : (double) edge.getPath().getLength() / maxVelocity;
   }
 }

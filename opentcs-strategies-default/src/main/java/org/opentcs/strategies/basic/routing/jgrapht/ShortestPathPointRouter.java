@@ -18,6 +18,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route;
 import org.opentcs.strategies.basic.routing.PointRouter;
+import org.opentcs.util.annotations.ScheduledApiChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +32,10 @@ public class ShortestPathPointRouter
   /**
    * Applied to route costs when casting them to integers in order to avoid zero-cost results.
    */
+  @ScheduledApiChange(
+      when = "8.0",
+      details = "Will be eliminated when Route.Step.costs becomes a double"
+  )
   public static final double COST_INTEGER_CAST_FACTOR = 10_000.0;
   /**
    * This class's logger.
@@ -88,7 +93,7 @@ public class ShortestPathPointRouter
   }
 
   @Override
-  public long getCosts(
+  public double getCosts(
       TCSObjectReference<Point> srcPointRef,
       TCSObjectReference<Point> destPointRef
   ) {
@@ -104,10 +109,10 @@ public class ShortestPathPointRouter
         pointVertexMap.get(destPointRef.getName())
     );
     if (graphPath == null) {
-      return INFINITE_COSTS;
+      return Double.NaN;
     }
 
-    return (long) (COST_INTEGER_CAST_FACTOR * graphPath.getWeight());
+    return toRouteCosts(graphPath.getWeight());
   }
 
   private List<Route.Step> translateToSteps(GraphPath<Vertex, Edge> graphPath) {
@@ -126,7 +131,7 @@ public class ShortestPathPointRouter
               destPoint,
               orientation(edge, sourcePoint),
               routeIndex,
-              (long) (COST_INTEGER_CAST_FACTOR * graphPath.getGraph().getEdgeWeight(edge))
+              toRouteCosts(graphPath.getGraph().getEdgeWeight(edge))
           )
       );
       routeIndex++;
@@ -139,5 +144,19 @@ public class ShortestPathPointRouter
     return Objects.equals(edge.getPath().getSourcePoint(), graphSourcePoint.getReference())
         ? Vehicle.Orientation.FORWARD
         : Vehicle.Orientation.BACKWARD;
+  }
+
+  /**
+   * Converts the given routing graph weight to a route cost value.
+   *
+   * @param weight The weight.
+   * @return The route cost value.
+   */
+  @ScheduledApiChange(
+      when = "8.0",
+      details = "Will be eliminated when Route.Step.costs becomes a directly-usable double"
+  )
+  private long toRouteCosts(double weight) {
+    return (long) (COST_INTEGER_CAST_FACTOR * weight);
   }
 }

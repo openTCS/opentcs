@@ -15,11 +15,6 @@ import org.opentcs.data.order.Route;
 public interface PointRouter {
 
   /**
-   * A constant for marking the costs for a route as infinite.
-   */
-  long INFINITE_COSTS = Long.MAX_VALUE;
-
-  /**
    * Returns a list of route steps to travel from a given source point to a given destination point.
    *
    * @param srcPoint The source point.
@@ -39,9 +34,9 @@ public interface PointRouter {
    * @param destPointRef The destination point reference.
    * @return The costs for travelling the shortest route from the starting point to the destination
    * point.
-   * If no route exists, {@link #INFINITE_COSTS INFINITE_COSTS} will be returned.
+   * If no route exists, {@link Double#NaN} will be returned.
    */
-  long getCosts(
+  double getCosts(
       TCSObjectReference<Point> srcPointRef,
       TCSObjectReference<Point> destPointRef
   );
@@ -53,9 +48,9 @@ public interface PointRouter {
    * @param destPoint The destination point.
    * @return The costs for travelling the shortest route from the starting point to the destination
    * point.
-   * If no route exists, {@link #INFINITE_COSTS INFINITE_COSTS} will be returned.
+   * If no route exists, {@link Double#NaN} will be returned.
    */
-  default long getCosts(Point srcPoint, Point destPoint) {
+  default double getCosts(Point srcPoint, Point destPoint) {
     requireNonNull(srcPoint, "srcPoint");
     requireNonNull(destPoint, "destPoint");
 

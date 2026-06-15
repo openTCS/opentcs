@@ -109,12 +109,17 @@ public interface EdgeEvaluator {
    * @param edge The edge.
    * @param vehicle The vehicle for which to compute the edge's weight.
    * @return The computed weight of the given edge.
-   * A value of {@code Double.POSITIVE_INFINITY} indicates that the edge is to be excluded from
-   * routing.
+   * A value of {@code Double.NaN} indicates that the edge is to be excluded from routing.
+   * (For backwards compatibility, {@code Double.POSITIVE_INFINITY} and
+   * {@code Double.NEGATIVE_INFINITY} are interpreted the same way until openTCS 8.0.)
    * Note that negative weights as well as values less than 1.0 might not be handled well by the
-   * respective routing implementation. It is strongly recommended to keep values between 1 and
-   * 2<sup>48</sup>.
+   * respective routing implementation. It is strongly recommended that implementations keep return
+   * values between 1 and 2<sup>48</sup>.
    */
+  @ScheduledApiChange(
+      when = "8.0",
+      details = "Infinite values are not interpreted as untraversable edges any more."
+  )
   double computeWeight(
       @Nonnull
       Edge edge,

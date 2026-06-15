@@ -91,16 +91,19 @@ public class PathEdgeMapper {
         Edge edge = new Edge(path, false);
         double weight = edgeEvaluator.computeWeight(edge, vehicle);
 
-        if (weight < 0 && !allowNegativeEdgeWeights) {
+        if (Double.isInfinite(weight)) {
+          LOG.debug("Edge {} with infinite weight ignored.", edge);
+        }
+        else if (Double.isNaN(weight)) {
+          LOG.debug("Edge {} with NaN weight ignored.", edge);
+        }
+        else if (weight < 0 && !allowNegativeEdgeWeights) {
           LOG.warn(
               "Edge {} with weight {} ignored. Algorithm {} cannot handle negative weights.",
               edge,
               weight,
               configuration.algorithm().name()
           );
-        }
-        else if (weight == Double.POSITIVE_INFINITY) {
-          LOG.debug("Edge {} with infinite weight ignored.", edge);
         }
         else {
           weightedEdges.put(edge, weight);
@@ -111,16 +114,19 @@ public class PathEdgeMapper {
         Edge edge = new Edge(path, true);
         double weight = edgeEvaluator.computeWeight(edge, vehicle);
 
-        if (weight < 0 && !allowNegativeEdgeWeights) {
+        if (Double.isInfinite(weight)) {
+          LOG.debug("Edge {} with infinite weight ignored.", edge);
+        }
+        else if (Double.isNaN(weight)) {
+          LOG.debug("Edge {} with NaN weight ignored.", edge);
+        }
+        else if (weight < 0 && !allowNegativeEdgeWeights) {
           LOG.warn(
               "Edge {} with weight {} ignored. Algorithm {} cannot handle negative weights.",
               edge,
               weight,
               configuration.algorithm().name()
           );
-        }
-        else if (weight == Double.POSITIVE_INFINITY) {
-          LOG.debug("Edge {} with infinite weight ignored.", edge);
         }
         else {
           weightedEdges.put(edge, weight);

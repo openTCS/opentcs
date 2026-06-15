@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Compares the bounding box of a vehicle with the maximum allowed bounding box at the destination
- * point of an edge and uses {@link Double#POSITIVE_INFINITY} as the edge's weight (effectively
+ * point of an edge and uses {@link Double#NaN} as the edge's weight (effectively
  * excluding the edge from routing) if the vehicle's bounding box protrudes the one of the point;
  * otherwise, it uses 0.
  */
@@ -97,7 +97,7 @@ public class EdgeEvaluatorBoundingBox
           vehicle.getBoundingBox(),
           targetPoint.getMaxVehicleBoundingBox()
       );
-      return Double.POSITIVE_INFINITY;
+      return Double.NaN;
     }
 
     return 0;

@@ -4,7 +4,6 @@ package org.opentcs.strategies.basic.routing.edgeevaluator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.withPrecision;
-import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -91,15 +90,13 @@ class EdgeEvaluatorTravelTimeTest {
         false
     );
 
-    // Expect the weight/costs to be infinite.
     assertThat(edgeEvaluator.computeWeight(edge, vehicle))
-        .isEqualTo(INFINITE_COSTS, withPrecision(0.0));
+        .isNaN();
 
     Edge reverseEdge = new Edge(edge.getPath(), true);
 
-    // Expect the weight/costs to be infinite.
     assertThat(edgeEvaluator.computeWeight(reverseEdge, vehicle))
-        .isEqualTo(INFINITE_COSTS, withPrecision(0.0));
+        .isNaN();
   }
 
 }
