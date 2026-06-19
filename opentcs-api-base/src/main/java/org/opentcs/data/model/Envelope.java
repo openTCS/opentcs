@@ -37,7 +37,7 @@ public class Envelope
       @Nonnull
       List<Couple> vertices
   ) {
-    this.vertices = requireNonNull(vertices, "vertices");
+    this.vertices = List.copyOf(requireNonNull(vertices, "vertices"));
     checkArgument(!vertices.isEmpty(), "An envelope must contain some vertices.");
     checkArgument(
         Objects.equals(vertices.getFirst(), vertices.getLast()),
