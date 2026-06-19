@@ -52,7 +52,7 @@ public class StandardTransportOrderService
   /**
    * Creates a new instance.
    *
-   * @param objectService The tcs obejct service.
+   * @param objectService The object service.
    * @param globalSyncObject The kernel threads' global synchronization object.
    * @param globalObjectPool The object pool to be used.
    * @param orderPoolManager The order pool manager to be used.
