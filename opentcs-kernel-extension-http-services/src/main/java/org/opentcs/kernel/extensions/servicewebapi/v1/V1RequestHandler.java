@@ -237,12 +237,12 @@ public class V1RequestHandler
     );
   }
 
-  public void handleGetVersion(Context ctx) {
+  private void handleGetVersion(Context ctx) {
     ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     ctx.result(jsonBinder.toJson(new Version()));
   }
 
-  public void handleDeleteKernel(Context ctx) {
+  private void handleDeleteKernel(Context ctx) {
     LOG.info("Initiating kernel shutdown as requested from {}...", ctx.ip());
     kernelExecutor.schedule(() -> kernel.setState(Kernel.State.SHUTDOWN), 1, TimeUnit.SECONDS);
     ctx.result("");
@@ -255,7 +255,7 @@ public class V1RequestHandler
     ctx.result("");
   }
 
-  public void handleGetEvents(Context ctx)
+  private void handleGetEvents(Context ctx)
       throws IllegalArgumentException,
         IllegalStateException {
     ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
