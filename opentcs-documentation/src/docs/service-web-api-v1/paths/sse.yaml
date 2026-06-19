@@ -295,6 +295,7 @@ components:
           allOf:
             - $ref: '#/components/schemas/Triple'
         orientationAngle:
+          nullable: true
           type: number
           minimum: -360
           maximum: 360
