@@ -15,13 +15,17 @@ Note that, with a reference to an issue and/or an expressive commit message (see
 
 ## Checklist
 
-- [ ] You have the right to contribute the code/documentation/assets to this project, and you agree to contribute it under the terms of the project's license(s).
-- [ ] All changes have been made on a separate branch (not master) in a fork.
+The author of this pull request confirms the following:
+
+- [ ] I have the right to contribute the code/documentation/assets to this project, and I agree to contribute it under the terms of the project's license(s).
+- [ ] I have read the [latest version of the contributing guidelines of the openTCS project](https://github.com/openTCS/opentcs/blob/master/CONTRIBUTING.adoc) and followed them in this pull request.
+- [ ] The changes introduced by this pull request are made only by myself and the human co-authors listed in the commit message. No large language models (LLMs) were used to generate (e.g. while editing in an IDE) or suggest (e.g. during a review) any code/documentation/assets.
+- [ ] All changes have been made on a separate branch (not the default branch) in a fork.
 - [ ] The whole project compiles correctly and all tests pass, i.e. `gradlew clean build` succeeds with the changes made, and without unavoidable compiler/toolchain warnings.
 - [ ] New tests covering the change have been added, if it is possible / makes sense.
 - [ ] The documentation has been extended, if necessary.
-- [ ] The PR contains a proposal for a _well-formed_ commit message that mentions all authors who contributed to the PR.
-      (The commits in the PR will be squashed into one commit on the base branch, and your proposed message is intended to be used for this commit. See below for a template you can use for the message. See [this blog post](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) and [this one](https://chris.beams.io/posts/git-commit/#seven-rules) for more on well-formed commit messages.)
+- [ ] The pull request contains a proposal for a _well-formed_ commit message that mentions all authors who contributed to the pull request.
+      (In case the pull request is accepted, the commits in the pull request will be squashed into one commit on the base branch, and your proposed message is intended to be used for this commit. See below for a template you can use for the message. See [this blog post](https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html) and [this one](https://chris.beams.io/posts/git-commit/#seven-rules) for more on well-formed commit messages.)
 
 ## Proposed squash commit message
 
