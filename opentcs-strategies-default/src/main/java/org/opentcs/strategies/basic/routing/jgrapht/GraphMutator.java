@@ -5,13 +5,10 @@ package org.opentcs.strategies.basic.routing.jgrapht;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DirectedWeightedMultigraph;
+import org.jgrapht.graph.AbstractBaseGraph;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
@@ -49,50 +46,23 @@ public class GraphMutator {
     requireNonNull(pathsToExclude, "pathsToExclude");
     requireNonNull(baseGraph, "baseGraph");
 
-    // Determine the derived point base and path base.
-    Set<Point> derivedPointBase = new HashSet<>(baseGraph.getPointBase());
-    derivedPointBase.removeAll(pointsToExclude);
-    Set<Path> derivedPathBase = new HashSet<>(baseGraph.getPathBase());
-    derivedPathBase.removeAll(pathsToExclude);
+    @SuppressWarnings("unchecked")
+    Graph<Vertex, Edge> derivedGraph
+        = (Graph<Vertex, Edge>) ((AbstractBaseGraph<Vertex, Edge>) baseGraph.getGraph()).clone();
 
-    Graph<Vertex, Edge> derivedGraph = new DirectedWeightedMultigraph<>(Edge.class);
-
-    Map<String, Vertex> pointVertexMap = new HashMap<>();
-
-    // Determine the vertices that should be included and add them to the derived graph.
-    Set<String> pointsToIncludeByName = derivedPointBase.stream()
+    Set<String> pointsToExcludeByName = pointsToExclude.stream()
         .map(Point::getName)
         .collect(Collectors.toSet());
     baseGraph.getGraph().vertexSet().stream()
-        .filter(vertex -> pointsToIncludeByName.contains(vertex.getPoint().getName()))
-        .forEach(vertex -> {
-          derivedGraph.addVertex(vertex);
-          pointVertexMap.put(vertex.getPoint().getName(), vertex);
-        }
-        );
+        .filter(vertex -> pointsToExcludeByName.contains(vertex.getPoint().getName()))
+        .forEach(derivedGraph::removeVertex);
 
-    // Determine the edges that should be included and add them to the derived graph.
-    Set<String> pathsToIncludeByName = derivedPathBase.stream()
+    Set<String> pathsToExcludeByName = pathsToExclude.stream()
         .map(Path::getName)
         .collect(Collectors.toSet());
     baseGraph.getGraph().edgeSet().stream()
-        .filter(edge -> pathsToIncludeByName.contains(edge.getPath().getName()))
-        // Ensure that edges are only added if their source and target vertices are contained in the
-        // derived graph. This is relevant when there are points to be excluded from the derived
-        // graph, as adding an edge whose source or target vertex is not present in the graph will
-        // result in an IllegalArgumentException.
-        .filter(
-            edge -> pointsToIncludeByName.contains(edge.getSourceVertex())
-                && pointsToIncludeByName.contains(edge.getTargetVertex())
-        )
-        .forEach(edge -> {
-          derivedGraph.addEdge(
-              pointVertexMap.get(edge.getSourceVertex()),
-              pointVertexMap.get(edge.getTargetVertex()),
-              edge
-          );
-          derivedGraph.setEdgeWeight(edge, baseGraph.getGraph().getEdgeWeight(edge));
-        });
+        .filter(edge -> pathsToExcludeByName.contains(edge.getPath().getName()))
+        .forEach(derivedGraph::removeEdge);
 
     return new GraphResult(
         baseGraph.getVehicle(),

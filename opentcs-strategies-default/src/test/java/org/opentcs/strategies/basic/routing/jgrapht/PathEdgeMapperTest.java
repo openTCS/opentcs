@@ -128,7 +128,14 @@ class PathEdgeMapperTest {
   void excludeLockedPaths() {
     Map<Edge, Double> result = mapper.translatePaths(Set.of(pathAB.withLocked(true)), vehicle);
 
-    assertThat(result).isEmpty();
+    assertThat(result).hasSize(1);
+    assertThat(result)
+        .extractingFromEntries(
+            entry -> entry.getKey().getPath(),
+            entry -> entry.getKey().isTravellingReverse(),
+            entry -> entry.getValue()
+        )
+        .contains(tuple(pathAB, false, Double.NaN));
     verify(edgeEvaluator).onGraphComputationStart(vehicle);
     verify(edgeEvaluator).onGraphComputationEnd(vehicle);
   }

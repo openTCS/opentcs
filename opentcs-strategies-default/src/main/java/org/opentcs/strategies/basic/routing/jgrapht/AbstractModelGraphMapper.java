@@ -8,8 +8,6 @@ import jakarta.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DirectedWeightedMultigraph;
 import org.opentcs.components.kernel.routing.Edge;
@@ -81,12 +79,14 @@ public abstract class AbstractModelGraphMapper
 
     for (Map.Entry<Edge, Double> edgeEntry : pathEdgeMapper.translatePaths(paths, vehicle)
         .entrySet()) {
-      graph.addEdge(
-          pointVertexMap.get(edgeEntry.getKey().getSourceVertex()),
-          pointVertexMap.get(edgeEntry.getKey().getTargetVertex()),
-          edgeEntry.getKey()
-      );
-      graph.setEdgeWeight(edgeEntry.getKey(), edgeEntry.getValue());
+      if (!Double.isInfinite(edgeEntry.getValue()) && !Double.isNaN(edgeEntry.getValue())) {
+        graph.addEdge(
+            pointVertexMap.get(edgeEntry.getKey().getSourceVertex()),
+            pointVertexMap.get(edgeEntry.getKey().getTargetVertex()),
+            edgeEntry.getKey()
+        );
+        graph.setEdgeWeight(edgeEntry.getKey(), edgeEntry.getValue());
+      }
     }
 
     LOG.debug(
@@ -111,47 +111,31 @@ public abstract class AbstractModelGraphMapper
     LOG.debug("Updating graph for {}...", vehicle.getName());
     long timeStampBefore = System.currentTimeMillis();
 
-    Graph<Vertex, Edge> updatedGraph = new DirectedWeightedMultigraph<>(Edge.class);
     Map<String, Vertex> pointVertexMap = new HashMap<>();
-    // First, copy all points from the original graph.
     for (Vertex vertex : graph.vertexSet()) {
-      updatedGraph.addVertex(vertex);
       pointVertexMap.put(vertex.getPoint().getName(), vertex);
     }
 
-    // Then, determine the edges that have not changed and copy these from the original graph as
-    // well.
-    Set<String> pathNames = paths.stream()
-        .map(Path::getName)
-        .collect(Collectors.toSet());
-    graph.edgeSet().stream()
-        .filter(edge -> !pathNames.contains(edge.getPath().getName()))
-        .forEach(
-            edge -> {
-              updatedGraph.addEdge(
-                  pointVertexMap.get(edge.getSourceVertex()),
-                  pointVertexMap.get(edge.getTargetVertex()),
-                  edge
-              );
-              updatedGraph.setEdgeWeight(edge, graph.getEdgeWeight(edge));
-            }
-        );
-    LOG.debug(
-        "Added {} (unchanged) edges (out of originally {}) to the graph",
-        updatedGraph.edgeSet().size(),
-        graph.edgeSet().size()
-    );
-
-    // Finally, map all paths that have changed and add the corresponding edges.
     Map<Edge, Double> changedEdges = pathEdgeMapper.translatePaths(paths, vehicle);
-    LOG.debug("Adding {} (changed) edges to the graph...", changedEdges.size());
     for (Map.Entry<Edge, Double> edgeEntry : changedEdges.entrySet()) {
-      updatedGraph.addEdge(
-          pointVertexMap.get(edgeEntry.getKey().getSourceVertex()),
-          pointVertexMap.get(edgeEntry.getKey().getTargetVertex()),
-          edgeEntry.getKey()
-      );
-      updatedGraph.setEdgeWeight(edgeEntry.getKey(), edgeEntry.getValue());
+      if (Double.isInfinite(edgeEntry.getValue()) || Double.isNaN(edgeEntry.getValue())) {
+        graph.removeEdge(
+            pointVertexMap.get(edgeEntry.getKey().getSourceVertex()),
+            pointVertexMap.get(edgeEntry.getKey().getTargetVertex())
+        );
+      }
+      else {
+        graph.removeEdge(
+            pointVertexMap.get(edgeEntry.getKey().getSourceVertex()),
+            pointVertexMap.get(edgeEntry.getKey().getTargetVertex())
+        );
+        graph.addEdge(
+            pointVertexMap.get(edgeEntry.getKey().getSourceVertex()),
+            pointVertexMap.get(edgeEntry.getKey().getTargetVertex()),
+            edgeEntry.getKey()
+        );
+        graph.setEdgeWeight(edgeEntry.getKey(), edgeEntry.getValue());
+      }
     }
 
     LOG.debug(
@@ -160,6 +144,6 @@ public abstract class AbstractModelGraphMapper
         System.currentTimeMillis() - timeStampBefore
     );
 
-    return updatedGraph;
+    return graph;
   }
 }

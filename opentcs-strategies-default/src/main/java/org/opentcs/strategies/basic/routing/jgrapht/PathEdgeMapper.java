@@ -91,11 +91,17 @@ public class PathEdgeMapper {
         Edge edge = new Edge(path, false);
         double weight = edgeEvaluator.computeWeight(edge, vehicle);
 
-        if (Double.isInfinite(weight)) {
+        if (path.isLocked() && excludeLockedPaths) {
+          LOG.debug("Edge {} for locked path ignored.", edge);
+          weightedEdges.put(edge, Double.NaN);
+        }
+        else if (Double.isInfinite(weight)) {
           LOG.debug("Edge {} with infinite weight ignored.", edge);
+          weightedEdges.put(edge, weight);
         }
         else if (Double.isNaN(weight)) {
           LOG.debug("Edge {} with NaN weight ignored.", edge);
+          weightedEdges.put(edge, weight);
         }
         else if (weight < 0 && !allowNegativeEdgeWeights) {
           LOG.warn(
@@ -114,11 +120,17 @@ public class PathEdgeMapper {
         Edge edge = new Edge(path, true);
         double weight = edgeEvaluator.computeWeight(edge, vehicle);
 
-        if (Double.isInfinite(weight)) {
+        if (path.isLocked() && excludeLockedPaths) {
+          LOG.debug("Edge {} for locked path ignored.", edge);
+          weightedEdges.put(edge, Double.NaN);
+        }
+        else if (Double.isInfinite(weight)) {
           LOG.debug("Edge {} with infinite weight ignored.", edge);
+          weightedEdges.put(edge, weight);
         }
         else if (Double.isNaN(weight)) {
           LOG.debug("Edge {} with NaN weight ignored.", edge);
+          weightedEdges.put(edge, weight);
         }
         else if (weight < 0 && !allowNegativeEdgeWeights) {
           LOG.warn(
@@ -147,7 +159,7 @@ public class PathEdgeMapper {
    * @return <code>true</code> if and only if the edge should be added to the graph.
    */
   private boolean shouldAddForwardEdge(Path path) {
-    return excludeLockedPaths ? path.isNavigableForward() : path.getMaxVelocity() != 0;
+    return path.getMaxVelocity() != 0;
   }
 
   /**
@@ -158,6 +170,6 @@ public class PathEdgeMapper {
    * @return <code>true</code> if and only if the edge should be added to the graph.
    */
   private boolean shouldAddReverseEdge(Path path) {
-    return excludeLockedPaths ? path.isNavigableReverse() : path.getMaxReverseVelocity() != 0;
+    return path.getMaxReverseVelocity() != 0;
   }
 }

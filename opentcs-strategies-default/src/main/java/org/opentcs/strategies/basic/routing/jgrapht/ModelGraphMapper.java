@@ -30,16 +30,16 @@ public interface ModelGraphMapper {
   );
 
   /**
-   * Re-translates the given paths and replaces corresponding edges in a copy of the provided graph.
+   * Re-translates the given paths and replaces corresponding edges in the provided graph.
    * <p>
-   * If a path cannot be translated to an edge but the provided graph contained an edge for that
-   * path, the edge will <em>not</em> be contained in the returned graph copy.
+   * Translated edges that should be excluded from the graph (indicated by edge weights that match
+   * {@link Double#isInfinite()} or {@link Double#isNaN()}) will be removed from the graph.
    * </p>
    *
    * @param paths The paths to re-translate.
    * @param vehicle The vehicle for which to update the graph.
-   * @param graph The graph to whose copy the re-translated paths are to be added.
-   * @return A copy of the provided graph including the re-translated paths.
+   * @param graph The graph to modify.
+   * @return The modified graph.
    */
   Graph<Vertex, Edge> updateGraph(
       Collection<Path> paths,
