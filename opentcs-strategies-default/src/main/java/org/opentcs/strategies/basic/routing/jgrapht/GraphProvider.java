@@ -117,6 +117,20 @@ public class GraphProvider {
    */
   public GraphResult getGraphResult(Vehicle vehicle) {
     long timeStampBefore = System.currentTimeMillis();
+
+    String routingGroup = routingGroupMapper.apply(vehicle);
+    GraphResult graphResult = graphResultsByRoutingGroup.get(routingGroup);
+    if (graphResult != null) {
+      LOG.debug(
+          "Retrieved graph result for {} in {} milliseconds.",
+          vehicle.getName(),
+          System.currentTimeMillis() - timeStampBefore
+      );
+      return graphResult;
+    }
+
+    LOG.debug("Creating new graph result for {}...", vehicle.getName());
+    timeStampBefore = System.currentTimeMillis();
     PlantModel plantModel = plantModelService.getPlantModel();
 
     LOG.debug(
@@ -137,28 +151,23 @@ public class GraphProvider {
     );
 
     timeStampBefore = System.currentTimeMillis();
-    String routingGroup = routingGroupMapper.apply(vehicle);
-    GraphResult graphResult = graphResultsByRoutingGroup.get(routingGroup);
-    if (graphResult == null) {
-      LOG.debug("Creating new graph result for {}...", vehicle.getName());
-      graphResult = new GraphResult(
-          vehicle,
-          getCurrentPointBase().getResources(),
-          getCurrentPathBase().getResources(),
-          Set.of(),
-          Set.of(),
-          defaultModelGraphMapper.translateModel(
-              getCurrentPointBase().getResources(),
-              getCurrentPathBase().getResources(),
-              vehicle
-          )
-      );
-      graphResultsByRoutingGroup.put(routingGroup, graphResult);
 
-    }
+    graphResult = new GraphResult(
+        vehicle,
+        getCurrentPointBase().getResources(),
+        getCurrentPathBase().getResources(),
+        Set.of(),
+        Set.of(),
+        defaultModelGraphMapper.translateModel(
+            getCurrentPointBase().getResources(),
+            getCurrentPathBase().getResources(),
+            vehicle
+        )
+    );
+    graphResultsByRoutingGroup.put(routingGroup, graphResult);
 
     LOG.debug(
-        "Got graph result for {} in {} milliseconds.",
+        "Created graph result for {} in {} milliseconds.",
         vehicle.getName(),
         System.currentTimeMillis() - timeStampBefore
     );
