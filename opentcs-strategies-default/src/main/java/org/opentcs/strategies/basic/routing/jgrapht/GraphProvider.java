@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jgrapht.Graph;
 import org.opentcs.components.kernel.routing.Edge;
@@ -282,27 +283,66 @@ public class GraphProvider {
       graphResultStream = Set.copyOf(graphResultsByRoutingGroup.entrySet()).stream();
     }
 
+    // Note: Routing groups depend on the vehicles' respective states, and routing graphs depend on
+    // both the vehicles' states and the state of the topology.
+    // We may have routing graphs (graph results) belonging to a routing group that is currently not
+    // in use (i.e. no vehicle is in that routing group right now). However, it makes sense to keep
+    // these routing graphs up-to-date, too, as not doing so would lead to missing topology updates
+    // in them. Our approach is:
+    // Update routing graph results for the current routing groups of all vehicles taking into
+    // account the vehicles' current states. In addition to that, also update the rest of the graph
+    // results using their respective *old* vehicle states.
+
+    // Get routing groups that are currently actually in use.
+    Set<String> routingGroups = plantModel.getVehicles().stream()
+        .map(routingGroupMapper)
+        .collect(Collectors.toSet());
+
     graphResultStream.forEach(
         entry -> {
-          // Get an up-to-date copy of the vehicle (so that edge evaluators work with the vehicle's
-          // current state).
-          Vehicle vehicle = plantModel.getVehicle(entry.getValue().getVehicle().getName())
-              .orElseThrow();
-          graphResultsByRoutingGroup.put(
-              entry.getKey(),
-              new GraphResult(
-                  vehicle,
-                  entry.getValue().getPointBase(),
-                  getCurrentPathBase().getResources(),
-                  Set.of(),
-                  Set.of(),
-                  defaultModelGraphMapper.updateGraph(
-                      paths,
-                      vehicle,
-                      entry.getValue().getGraph()
-                  )
-              )
-          );
+          if (routingGroups.contains(entry.getKey())) {
+            // Get an up-to-date copy of the vehicle used to compute the graph (so that edge
+            // evaluators work with the vehicle's current state).
+            Vehicle vehicle = plantModel.getVehicle(entry.getValue().getVehicle().getName())
+                .orElseThrow();
+            graphResultsByRoutingGroup.put(
+                entry.getKey(),
+                new GraphResult(
+                    vehicle,
+                    entry.getValue().getPointBase(),
+                    getCurrentPathBase().getResources(),
+                    Set.of(),
+                    Set.of(),
+                    defaultModelGraphMapper.updateGraph(
+                        paths,
+                        vehicle,
+                        entry.getValue().getGraph()
+                    )
+                )
+            );
+          }
+          else {
+            // The routing group is not currently in use. Nevertheless, it might be used again
+            // later, so we want to keep the routing graph up-to-date.
+            // Update the entry with the Vehicle instance that we used previously. This way, we
+            // take into account changes in the topology but ignore changes in the vehicle state
+            // (as these changes could lead to different/wrong edge weights.)
+            graphResultsByRoutingGroup.put(
+                entry.getKey(),
+                new GraphResult(
+                    entry.getValue().getVehicle(),
+                    entry.getValue().getPointBase(),
+                    getCurrentPathBase().getResources(),
+                    Set.of(),
+                    Set.of(),
+                    defaultModelGraphMapper.updateGraph(
+                        paths,
+                        entry.getValue().getVehicle(),
+                        entry.getValue().getGraph()
+                    )
+                )
+            );
+          }
         }
     );
   }
