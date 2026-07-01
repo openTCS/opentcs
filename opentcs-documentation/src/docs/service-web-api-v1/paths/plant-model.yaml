@@ -810,7 +810,7 @@ components:
           description: This point's name.
           example: some point
         position:
-          $ref: "#/components/schemas/PlantModelTriple"
+          $ref: "../schemas/common.yaml#/components/schemas/Triple"
         vehicleOrientationAngle:
           oneOf:
             - type: string
@@ -838,9 +838,9 @@ components:
           description: Describes the graphical representation of this point.
           properties:
             position:
-              $ref: "../schemas/common.yaml#/components/schemas/PlantModelCouple"
+              $ref: "../schemas/common.yaml#/components/schemas/Couple"
             labelOffset:
-              $ref: "../schemas/common.yaml#/components/schemas/PlantModelCouple"
+              $ref: "../schemas/common.yaml#/components/schemas/Couple"
             layerId:
               type: integer
               example: 3
@@ -860,7 +860,7 @@ components:
           description: This point's name.
           example: some point
         position:
-          $ref: "#/components/schemas/PlantModelTriple"
+          $ref: "../schemas/common.yaml#/components/schemas/Triple"
         vehicleOrientationAngle:
           oneOf:
             - type: string
@@ -888,9 +888,9 @@ components:
           description: Describes the graphical representation of this point.
           properties:
             position:
-              $ref: "../schemas/common.yaml#/components/schemas/PlantModelCouple"
+              $ref: "../schemas/common.yaml#/components/schemas/Couple"
             labelOffset:
-              $ref: "../schemas/common.yaml#/components/schemas/PlantModelCouple"
+              $ref: "../schemas/common.yaml#/components/schemas/Couple"
             layerId:
               type: integer
               example: 3
@@ -987,7 +987,7 @@ components:
             controlPoints:
               type: array
               items:
-                $ref: "../schemas/common.yaml#/components/schemas/PlantModelCouple"
+                $ref: "../schemas/common.yaml#/components/schemas/Couple"
             layerId:
               type: integer
               example: 3
@@ -1077,7 +1077,7 @@ components:
             controlPoints:
               type: array
               items:
-                $ref: "../schemas/common.yaml#/components/schemas/PlantModelCouple"
+                $ref: "../schemas/common.yaml#/components/schemas/Couple"
             layerId:
               type: integer
               example: 3
@@ -1209,7 +1209,7 @@ components:
           description: The name of this location's type.
           example: some location type
         position:
-          $ref: "#/components/schemas/PlantModelTriple"
+          $ref: "../schemas/common.yaml#/components/schemas/Triple"
         links:
           type: array
           description: >-
@@ -1234,9 +1234,9 @@ components:
           description: The information regarding the graphical representation of this location.
           properties:
             position:
-              $ref: "../schemas/common.yaml#/components/schemas/PlantModelCouple"
+              $ref: "../schemas/common.yaml#/components/schemas/Couple"
             labelOffset:
-              $ref: "../schemas/common.yaml#/components/schemas/PlantModelCouple"
+              $ref: "../schemas/common.yaml#/components/schemas/Couple"
             locationRepresentation:
               type: string
               enum:
@@ -1279,7 +1279,7 @@ components:
           description: The name of this location's type.
           example: some location type
         position:
-          $ref: "#/components/schemas/PlantModelTriple"
+          $ref: "../schemas/common.yaml#/components/schemas/Triple"
         links:
           type: array
           description: >-
@@ -1304,9 +1304,9 @@ components:
           description: The information regarding the graphical representation of this location.
           properties:
             position:
-              $ref: "../schemas/common.yaml#/components/schemas/PlantModelCouple"
+              $ref: "../schemas/common.yaml#/components/schemas/Couple"
             labelOffset:
-              $ref: "../schemas/common.yaml#/components/schemas/PlantModelCouple"
+              $ref: "../schemas/common.yaml#/components/schemas/Couple"
             locationRepresentation:
               type: string
               enum:
@@ -1615,31 +1615,8 @@ components:
         - layers
         - layerGroups
         - properties
-    PlantModelTriple:
-      title: Triple
-      type: object
-      properties:
-        x:
-          type: integer
-          format: int64
-          description: The Triple's x value.
-          example: 1500
-        y:
-          type: integer
-          format: int64
-          description: The Triple's y value.
-          example: 2000
-        z:
-          type: integer
-          format: int64
-          description: The Triple's z value.
-          example: 500
-      required:
-        - x
-        - y
-        - z
     PlantModelEnvelope:
-      title:  Envelope
+      title: Envelope
       type: object
       properties:
         envelopeKey:
@@ -1650,7 +1627,7 @@ components:
           type: array
           description: The sequence of vertices this envelope consists of.
           items:
-            $ref: "../schemas/common.yaml#/components/schemas/PlantModelCouple"
+            $ref: "../schemas/common.yaml#/components/schemas/Couple"
           example:
             - x: 1500
               y: 1750

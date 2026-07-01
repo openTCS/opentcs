@@ -3,7 +3,7 @@
 package org.opentcs.strategies.basic.scheduling.modules.areaAllocation;
 
 import static java.util.Objects.requireNonNull;
-import static org.opentcs.strategies.basic.scheduling.modules.areaAllocation.CustomGeometryFactory.EMPTY_GEOMETRY;
+import static org.opentcs.strategies.basic.util.CustomGeometryFactory.EMPTY_GEOMETRY;
 
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -13,13 +13,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentcs.components.kernel.services.InternalTCSObjectService;
 import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
+import org.opentcs.strategies.basic.util.CustomGeometryFactory;
+import org.opentcs.strategies.basic.util.MultiPlaneGeometryCollection;
 
 /**
  * An {@link AreaProvider} implementation that, upon initialization, computes and caches the areas
@@ -137,12 +138,9 @@ public class CachingAreaProvider
       return Optional.empty();
     }
 
-    Envelope envelope = vehicleEnvelopes.get(envelopeKey);
-    Coordinate[] coordinates = envelope.getVertices().stream()
-        .map(vertex -> new Coordinate(vertex.getX(), vertex.getY()))
-        .toArray(Coordinate[]::new);
-
-    return Optional.of(geometryFactory.createPolygonOrEmptyGeometry(coordinates));
+    return Optional.of(
+        geometryFactory.createPolygonOrEmptyGeometry(vehicleEnvelopes.get(envelopeKey))
+    );
   }
 
   private Map<String, Envelope> extractVehicleEnvelopes(TCSResource<?> resource) {

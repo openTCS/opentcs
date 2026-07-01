@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.opentcs.access.rmi.ClientID;
 import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.EnvironmentalEntityService;
 import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
 import org.opentcs.components.kernel.services.PeripheralJobService;
@@ -41,6 +42,7 @@ class RemoteServicesTest {
     checkMapping(PeripheralJobService.class, RemotePeripheralJobService.class);
     checkMapping(PeripheralService.class, RemotePeripheralService.class);
     checkMapping(PlantModelService.class, RemotePlantModelService.class);
+    checkMapping(EnvironmentalEntityService.class, RemoteEnvironmentalEntityService.class);
     checkMapping(QueryService.class, RemoteQueryService.class);
     checkMapping(RouterService.class, RemoteRouterService.class);
     checkMapping(TCSObjectService.class, RemoteTCSObjectService.class);

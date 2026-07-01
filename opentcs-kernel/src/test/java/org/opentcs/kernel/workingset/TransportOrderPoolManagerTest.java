@@ -55,7 +55,11 @@ class TransportOrderPoolManagerTest {
   @BeforeEach
   void setUp() {
     objectRepo = new TCSObjectRepository();
-    plantModelManager = new PlantModelManager(objectRepo, new SimpleEventBus());
+    plantModelManager = new PlantModelManager(
+        objectRepo,
+        new SimpleEventBus(),
+        new PrefixedUlidObjectNameProvider()
+    );
     orderPoolManager = new TransportOrderPoolManager(
         objectRepo,
         new SimpleEventBus(),

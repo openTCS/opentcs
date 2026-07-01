@@ -265,7 +265,7 @@ components:
             $ref: "../schemas/common.yaml#/components/schemas/Property"
           description: The transport order's properties
         history:
-          $ref: '#/components/schemas/ObjectHistory'
+          $ref: "../schemas/common.yaml#/components/schemas/ObjectHistory"
         type:
           type: string
           description: The type of the transport order.
@@ -543,31 +543,3 @@ components:
         - costs
         - executionAllowed
         - reroutingType
-    ObjectHistory:
-      type: object
-      properties:
-        entries:
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectHistoryEntry'
-          description: "The object history entries."
-      required:
-        - entries
-    ObjectHistoryEntry:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-          example: "2018-05-17T06:42:40.396Z"
-        eventCode:
-          type: string
-          example: "code-1"
-        supplements:
-          type: array
-          items:
-            type: string
-      required:
-        - timestamp
-        - eventCode
-        - supplements

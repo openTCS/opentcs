@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: The openTCS Authors
 // SPDX-License-Identifier: MIT
-package org.opentcs.strategies.basic.scheduling.modules.areaAllocation;
+package org.opentcs.strategies.basic.util;
 
 import static java.util.Objects.requireNonNull;
 

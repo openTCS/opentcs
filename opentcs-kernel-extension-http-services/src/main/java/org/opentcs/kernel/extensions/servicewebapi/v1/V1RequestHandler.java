@@ -26,6 +26,7 @@ import org.opentcs.kernel.extensions.servicewebapi.HttpConstants;
 import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.RequestHandler;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PlantModelTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostEnvironmentalEntityRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostOrderSequenceRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostPeripheralJobRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTopologyUpdateRequestTO;
@@ -33,6 +34,8 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostTransportOrder
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleCommAdapterMessageRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostVehicleRoutesResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutEnvironmentalEntityEnvelopeTO;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutEnvironmentalEntityPoseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAcceptableOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleAllowedOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutVehicleEnergyLevelThresholdSetTO;
@@ -64,6 +67,7 @@ public class V1RequestHandler
   private final PeripheralJobHandler peripheralJobHandler;
   private final PeripheralJobDispatcherHandler jobDispatcherHandler;
   private final PlantModelHandler plantModelHandler;
+  private final EnvironmentalEntityHandler environmentalEntityHandler;
   private final VehicleHandler vehicleHandler;
   private final PathHandler pathHandler;
   private final LocationHandler locationHandler;
@@ -87,6 +91,7 @@ public class V1RequestHandler
       PeripheralJobHandler peripheralJobHandler,
       PeripheralJobDispatcherHandler jobDispatcherHandler,
       PlantModelHandler plantModelHandler,
+      EnvironmentalEntityHandler environmentalEntityHandler,
       VehicleHandler vehicleHandler,
       PathHandler pathHandler,
       LocationHandler locationHandler,
@@ -107,6 +112,8 @@ public class V1RequestHandler
     this.peripheralJobHandler = requireNonNull(peripheralJobHandler, "peripheralJobHandler");
     this.jobDispatcherHandler = requireNonNull(jobDispatcherHandler, "jobDispatcherHandler");
     this.plantModelHandler = requireNonNull(plantModelHandler, "plantModelHandler");
+    this.environmentalEntityHandler
+        = requireNonNull(environmentalEntityHandler, "environmentalEntityHandler");
     this.vehicleHandler = requireNonNull(vehicleHandler, "vehicleHandler");
     this.pathHandler = requireNonNull(pathHandler, "pathHandler");
     this.locationHandler = requireNonNull(locationHandler, "locationHandler");
@@ -210,6 +217,19 @@ public class V1RequestHandler
           post("/plantModel/topologyUpdateRequest", this::handlePostUpdateTopology);
           put("/paths/{NAME}/locked", this::handlePutPathLocked);
           put("/locations/{NAME}/locked", this::handlePutLocationLocked);
+          get("/environmentalEntities", this::handleGetEnvironmentalEntities);
+          get("/environmentalEntities/{NAME}", this::handleGetEnvironmentalEntity);
+          post("/environmentalEntities/{NAME}", this::handlePostEnvironmentalEntity);
+          put(
+              "/environmentalEntities/{NAME}/envelope",
+              this::handlePutEnvironmentalEntityEnvelope
+          );
+          put("/environmentalEntities/{NAME}/pose", this::handlePutEnvironmentalEntityPose);
+          put(
+              "/environmentalEntities/{NAME}/integrationLevel",
+              this::handlePutEnvironmentalEntityIntegrationLevel
+          );
+          put("/environmentalEntities/{NAME}/retired", this::handlePutEnvironmentalEntityRetired);
           post("/dispatcher/trigger", this::handlePostDispatcherTrigger);
           post("/peripherals/dispatcher/trigger", this::handlePostPeripheralJobsDispatchTrigger);
           post("/peripherals/{NAME}/withdrawal", this::handlePostPeripheralWithdrawal);
@@ -494,6 +514,85 @@ public class V1RequestHandler
     );
     ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     ctx.result("");
+  }
+
+  private void handleGetEnvironmentalEntities(Context ctx)
+      throws ObjectUnknownException {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            environmentalEntityHandler.getAllEnvironmentalEntities()
+        )
+    );
+  }
+
+  private void handlePostEnvironmentalEntity(Context ctx)
+      throws ObjectUnknownException,
+        ObjectExistsException,
+        IllegalArgumentException,
+        IllegalStateException {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            environmentalEntityHandler.createEnvironmentalEntity(
+                ctx.pathParam("NAME"),
+                jsonBinder.fromJson(ctx.body(), PostEnvironmentalEntityRequestTO.class)
+            )
+        )
+    );
+  }
+
+  private void handlePutEnvironmentalEntityEnvelope(Context ctx)
+      throws ObjectUnknownException,
+        IllegalArgumentException {
+
+    environmentalEntityHandler.putEnvironmentalEntityEnvelope(
+        ctx.pathParam("NAME"),
+        jsonBinder.fromJson(ctx.body(), PutEnvironmentalEntityEnvelopeTO.class)
+    );
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
+  }
+
+  private void handlePutEnvironmentalEntityPose(Context ctx)
+      throws ObjectUnknownException,
+        IllegalArgumentException {
+
+    environmentalEntityHandler.putEnvironmentalEntityPose(
+        ctx.pathParam("NAME"),
+        jsonBinder.fromJson(ctx.body(), PutEnvironmentalEntityPoseTO.class)
+    );
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
+  }
+
+  private void handlePutEnvironmentalEntityIntegrationLevel(Context ctx)
+      throws ObjectUnknownException,
+        IllegalArgumentException {
+    environmentalEntityHandler.putEnvironmentalEntityIntegrationLevel(
+        ctx.pathParam("NAME"),
+        ctx.queryParam("newValue")
+    );
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
+  }
+
+  private void handlePutEnvironmentalEntityRetired(Context ctx)
+      throws ObjectUnknownException,
+        IllegalArgumentException {
+    environmentalEntityHandler.putEnvironmentalEntityRetired(ctx.pathParam("NAME"));
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
+  }
+
+  private void handleGetEnvironmentalEntity(Context ctx)
+      throws ObjectUnknownException {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            environmentalEntityHandler.getEnvironmentalEntityByName(ctx.pathParam("NAME"))
+        )
+    );
   }
 
   private void handleGetTransportOrderByName(Context ctx) {

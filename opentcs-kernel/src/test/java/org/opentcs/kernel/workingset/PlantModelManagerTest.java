@@ -9,29 +9,45 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.BlockCreationTO;
+import org.opentcs.access.to.model.CoupleCreationTO;
+import org.opentcs.access.to.model.EnvelopeCreationTO;
+import org.opentcs.access.to.model.EnvironmentalEntityCreationTO;
 import org.opentcs.access.to.model.LocationCreationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
 import org.opentcs.access.to.model.PlantModelCreationTO;
 import org.opentcs.access.to.model.PointCreationTO;
+import org.opentcs.access.to.model.PoseCreationTO;
 import org.opentcs.access.to.model.TripleCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.data.ObjectExistsException;
+import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Block;
+import org.opentcs.data.model.Couple;
+import org.opentcs.data.model.Envelope;
+import org.opentcs.data.model.EnvironmentalEntity;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
+import org.opentcs.data.model.Pose;
+import org.opentcs.data.model.Triple;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.util.event.SimpleEventBus;
@@ -44,11 +60,16 @@ class PlantModelManagerTest {
   private TCSObjectRepository objectRepo;
   private PlantModelManager plantModelManager;
   private PlantModelCreationTO plantModelCreationTo;
+  private EnvironmentalEntityCreationTO envEntityCreationTo;
 
   @BeforeEach
   void setUp() {
     objectRepo = new TCSObjectRepository();
-    plantModelManager = new PlantModelManager(objectRepo, new SimpleEventBus());
+    plantModelManager = new PlantModelManager(
+        objectRepo,
+        new SimpleEventBus(),
+        new PrefixedUlidObjectNameProvider()
+    );
     plantModelCreationTo = new PlantModelCreationTO("some-plant-model")
         .withPoint(new PointCreationTO("point1"))
         .withPoint(new PointCreationTO("point2"))
@@ -76,6 +97,24 @@ class PlantModelManagerTest {
         .withVehicle(new VehicleCreationTO("some-vehicle"))
         .withVisualLayout(new VisualLayoutCreationTO("some-visual-layout"))
         .withProperty("some-prop-key", "some-prop-value");
+
+    envEntityCreationTo = new EnvironmentalEntityCreationTO(
+        "some-env-entity",
+        new EnvelopeCreationTO(
+            List.of(
+                new CoupleCreationTO(1, 2),
+                new CoupleCreationTO(3, 4),
+                new CoupleCreationTO(5, 6),
+                new CoupleCreationTO(1, 2)
+            )
+        ),
+        new PoseCreationTO(new TripleCreationTO(1, 2, 3), 123.45)
+    )
+        .withIncompleteName(true)
+        .withType(EnvironmentalEntityCreationTO.Type.OBJECT)
+        .withIntegrationLevel(EnvironmentalEntityCreationTO.IntegrationLevel.TO_BE_RESPECTED)
+        .withLayout(new EnvironmentalEntityCreationTO.Layout().withLayerId(23))
+        .withProperty("some-env-prop-key", "some-env-prop-value");
   }
 
   @Test
@@ -135,6 +174,88 @@ class PlantModelManagerTest {
     assertThat(exportedModel.getLocations(), hasSize(1));
     assertThat(exportedModel.getBlocks(), hasSize(1));
     assertThat(exportedModel.getVehicles(), hasSize(1));
+  }
+
+  @Test
+  void createAndManipulateEnvironmentalEntity() {
+    EnvironmentalEntity createdEntity
+        = plantModelManager.createEnvironmentalEntity(envEntityCreationTo);
+
+    assertThat(createdEntity.getName(), is(not(equalTo(envEntityCreationTo.getName()))));
+    assertThat(createdEntity.getName(), Matchers.startsWith(envEntityCreationTo.getName()));
+
+    assertThat(objectRepo.getObjects(EnvironmentalEntity.class), hasSize(1));
+    assertDoesNotThrow(
+        () -> objectRepo.getObject(EnvironmentalEntity.class, createdEntity.getName())
+    );
+
+    plantModelManager.setEnvironmentalEntityEnvelope(
+        createdEntity.getReference(),
+        new Envelope(
+            List.of(
+                new Couple(7, 8),
+                new Couple(9, 10),
+                new Couple(11, 12),
+                new Couple(7, 8)
+            )
+        )
+    );
+
+    assertThat(
+        objectRepo.getObject(EnvironmentalEntity.class, createdEntity.getName()).getEnvelope(),
+        is(
+            equalTo(
+                new Envelope(
+                    List.of(
+                        new Couple(7, 8),
+                        new Couple(9, 10),
+                        new Couple(11, 12),
+                        new Couple(7, 8)
+                    )
+                )
+            )
+        )
+    );
+
+    plantModelManager.setEnvironmentalEntityPose(
+        createdEntity.getReference(),
+        new Pose(new Triple(4, 5, 6), 234.56)
+    );
+
+    assertThat(
+        objectRepo.getObject(EnvironmentalEntity.class, createdEntity.getName()).getPose(),
+        is(equalTo(new Pose(new Triple(4, 5, 6), 234.56)))
+    );
+
+    plantModelManager.setEnvironmentalEntityIntegrationLevel(
+        createdEntity.getReference(),
+        EnvironmentalEntity.IntegrationLevel.TO_BE_NOTICED
+    );
+
+    assertThat(
+        objectRepo.getObject(EnvironmentalEntity.class, createdEntity.getName())
+            .getIntegrationLevel(),
+        is(EnvironmentalEntity.IntegrationLevel.TO_BE_NOTICED)
+    );
+
+    plantModelManager.setEnvironmentalEntityRetired(createdEntity.getReference());
+
+    assertThat(
+        objectRepo.getObject(EnvironmentalEntity.class, createdEntity.getName()).isRetired(),
+        is(true)
+    );
+    assertFalse(
+        objectRepo.getObject(EnvironmentalEntity.class, createdEntity.getName()).getRetiredTime()
+            .isAfter(Instant.now())
+    );
+
+    plantModelManager.clear();
+
+    assertThat(objectRepo.getObjects(EnvironmentalEntity.class), is(empty()));
+    assertThrows(
+        ObjectUnknownException.class,
+        () -> objectRepo.getObject(EnvironmentalEntity.class, createdEntity.getName())
+    );
   }
 
   @Test

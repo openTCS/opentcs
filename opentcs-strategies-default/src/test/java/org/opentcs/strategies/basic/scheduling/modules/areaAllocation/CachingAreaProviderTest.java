@@ -24,6 +24,7 @@ import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
+import org.opentcs.strategies.basic.util.MultiPlaneGeometryCollection;
 
 /**
  * Tests for {@link CachingAreaProvider}.

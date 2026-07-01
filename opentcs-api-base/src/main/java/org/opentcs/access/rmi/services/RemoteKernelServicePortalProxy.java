@@ -28,6 +28,7 @@ import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.access.rmi.factories.SocketFactoryProvider;
 import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.EnvironmentalEntityService;
 import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
 import org.opentcs.components.kernel.services.PeripheralJobService;
@@ -76,6 +77,11 @@ public class RemoteKernelServicePortalProxy
    */
   private final RemotePlantModelServiceProxy plantModelService
       = new RemotePlantModelServiceProxy();
+  /**
+   * The environmental entity service.
+   */
+  private final RemoteEnvironmentalEntityServiceProxy environmentalEntityService
+      = new RemoteEnvironmentalEntityServiceProxy();
   /**
    * The transport order service.
    */
@@ -254,6 +260,12 @@ public class RemoteKernelServicePortalProxy
   @Nonnull
   public PlantModelService getPlantModelService() {
     return plantModelService;
+  }
+
+  @Override
+  @Nonnull
+  public EnvironmentalEntityService getEnvironmentalEntityService() {
+    return environmentalEntityService;
   }
 
   @Override

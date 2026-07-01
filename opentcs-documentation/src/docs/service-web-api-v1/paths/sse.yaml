@@ -103,6 +103,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PeripheralJobEvent"
+  /sse::/events/environmentalEntities:
+    get:
+      tags:
+        - Server-Sent Events - Named Events
+      summary: Describes a change of an environmental entity.
+      responses:
+        default:
+          description: The event content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnvironmentalEntityEvent"
 components:
   schemas:
     # Schemas for vehicles
@@ -124,7 +136,7 @@ components:
           additionalProperties:
             type: string
         history:
-          $ref: '#/components/schemas/ObjectHistory'
+          $ref: "../schemas/common.yaml#/components/schemas/ObjectHistory"
         boundingBox:
           $ref: '#/components/schemas/BoundingBox'
         energyLevelThresholdSet:
@@ -181,7 +193,7 @@ components:
           type: string
           nullable: true
         pose:
-          $ref: '#/components/schemas/Pose'
+          $ref: '#/components/schemas/VehiclePose'
         envelopeKey:
           type: string
           nullable: true
@@ -227,22 +239,12 @@ components:
           minimum: 1
           maximum: 9223372036854775807
         referenceOffset:
-          $ref: '#/components/schemas/Couple'
+          $ref: "../schemas/common.yaml#/components/schemas/Couple"
       required:
         - length
         - width
         - height
         - referenceOffset
-    Couple:
-      type: object
-      properties:
-        x:
-          type: integer
-        y:
-          type: integer
-      required:
-        - x
-        - y
     EnergyLevelThresholdSet:
       type: object
       properties:
@@ -287,13 +289,13 @@ components:
       required:
         - name
         - priority
-    Pose:
+    VehiclePose:
       type: object
       properties:
         position:
           nullable: true
           allOf:
-            - $ref: '#/components/schemas/Triple'
+            - $ref: "../schemas/common.yaml#/components/schemas/Triple"
         orientationAngle:
           nullable: true
           type: number
@@ -302,19 +304,6 @@ components:
       required:
         - position
         - orientationAngle
-    Triple:
-      type: object
-      properties:
-        x:
-          type: integer
-        y:
-          type: integer
-        z:
-          type: integer
-      required:
-        - x
-        - y
-        - z
     TimestampedVehicleState:
       type: object
       properties:
@@ -400,7 +389,7 @@ components:
           additionalProperties:
             type: string
         history:
-          $ref: '#/components/schemas/ObjectHistory'
+          $ref: "../schemas/common.yaml#/components/schemas/ObjectHistory"
         type:
           type: string
         dependencies:
@@ -576,7 +565,7 @@ components:
           additionalProperties:
             type: string
         history:
-          $ref: '#/components/schemas/ObjectHistory'
+          $ref: "../schemas/common.yaml#/components/schemas/ObjectHistory"
         type:
           type: string
         orders:
@@ -636,7 +625,7 @@ components:
           additionalProperties:
             type: string
         history:
-          $ref: '#/components/schemas/ObjectHistory'
+          $ref: "../schemas/common.yaml#/components/schemas/ObjectHistory"
         reservationToken:
           type: string
           minLength: 1
@@ -696,6 +685,100 @@ components:
         - BEING_PROCESSED
         - FINISHED
         - FAILED
+    # Schemas for environmental entities
+    EnvironmentalEntityEvent:
+      allOf:
+        - $ref: '#/components/schemas/TCSObjectEvent'
+      properties:
+        currentObjectState:
+          $ref: '#/components/schemas/EnvironmentalEntity'
+        previousObjectState:
+          $ref: '#/components/schemas/EnvironmentalEntity'
+    EnvironmentalEntity:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        history:
+          $ref: "../schemas/common.yaml#/components/schemas/ObjectHistory"
+        envelope:
+          $ref: "#/components/schemas/EnvironmentalEntityEnvelope"
+        pose:
+          $ref: "#/components/schemas/EnvironmentalEntityPose"
+        type:
+          type: string
+          description: This entity's type.
+          enum:
+            - OBJECT
+            - ZONE
+        integrationLevel:
+          type: string
+          enum:
+            - TO_BE_IGNORED
+            - TO_BE_NOTICED
+            - TO_BE_RESPECTED
+          description: The entity's integration level.
+        layout:
+          type: object
+          description: The information regarding the graphical representation of this entity.
+          properties:
+            layerId:
+              type: integer
+              example: 3
+        createdTime:
+          type: string
+          format: date-time
+        retiredTime:
+          type: string
+          format: date-time
+      required:
+        - name
+        - properties
+        - history
+        - envelope
+        - pose
+        - type
+        - integrationLevel
+        - layout
+        - createdTime
+        - retiredTime
+    EnvironmentalEntityEnvelope:
+      title: Envelope
+      type: object
+      properties:
+        vertices:
+          type: array
+          description: The sequence of vertices this envelope consists of.
+          items:
+            $ref: "../schemas/common.yaml#/components/schemas/Couple"
+          example:
+            - x: 1500
+              y: 1750
+            - x: 1600
+              y: 1820
+            - x: 1700
+              y: 1890
+      required:
+        - vertices
+    EnvironmentalEntityPose:
+      type: object
+      properties:
+        position:
+          nullable: false
+          allOf:
+            - $ref: "../schemas/common.yaml#/components/schemas/Triple"
+        orientationAngle:
+          nullable: false
+          type: number
+          minimum: -360
+          maximum: 360
+      required:
+        - position
+        - orientationAngle
     # Common schemas
     TCSObjectEvent:
       type: object
@@ -714,28 +797,3 @@ components:
       required:
         - currentObjectState
         - previousObjectState
-    ObjectHistory:
-      type: object
-      properties:
-        entries:
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectHistoryEntry'
-      required:
-        - entries
-    ObjectHistoryEntry:
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        eventCode:
-          type: string
-        supplements:
-          type: array
-          items:
-            type: string
-      required:
-        - timestamp
-        - eventCode
-        - supplements

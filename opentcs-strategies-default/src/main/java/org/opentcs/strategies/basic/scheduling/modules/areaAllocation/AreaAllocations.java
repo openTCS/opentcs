@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.util.MultiPlaneGeometryCollection;
 
 /**
  * A container for keeping track of areas allocated by vehicles.

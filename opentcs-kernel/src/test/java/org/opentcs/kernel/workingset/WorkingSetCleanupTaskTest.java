@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentcs.data.model.Couple;
+import org.opentcs.data.model.Envelope;
+import org.opentcs.data.model.EnvironmentalEntity;
+import org.opentcs.data.model.Pose;
+import org.opentcs.data.model.Triple;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
@@ -41,6 +46,12 @@ class WorkingSetCleanupTaskTest {
             mock(),
             new PrefixedUlidObjectNameProvider()
         );
+    PlantModelManager plantModelManager
+        = new PlantModelManager(
+            objectRepository,
+            mock(),
+            new PrefixedUlidObjectNameProvider()
+        );
     DefaultPeripheralJobCleanupApproval peripheralJobCleanupApproval
         = new DefaultPeripheralJobCleanupApproval(creationTimeThreshold);
     DefaultTransportOrderCleanupApproval orderCleanupApproval
@@ -59,6 +70,7 @@ class WorkingSetCleanupTaskTest {
         new Object(),
         orderPoolManager,
         peripheralJobPoolManager,
+        plantModelManager,
         configuration,
         new CompositeOrderSequenceCleanupApproval(
             Set.of(),
@@ -144,6 +156,48 @@ class WorkingSetCleanupTaskTest {
     cleanupTask.run();
     assertEquals(0, objectRepository.getObjects(PeripheralJob.class).size());
     assertEquals(0, objectRepository.getObjects(TransportOrder.class).size());
+  }
+
+  @Test
+  void cleanExpiredEnvironmentalEntities() {
+    when(configuration.sweepAge()).thenReturn(60000);
+
+    objectRepository.addObject(
+        new EnvironmentalEntity(
+            "Entity-1",
+            new Envelope(
+                List.of(
+                    new Couple(1, 2),
+                    new Couple(3, 4),
+                    new Couple(5, 6),
+                    new Couple(1, 2)
+                )
+            ),
+            new Pose(new Triple(9, 10, 0), 123.45)
+        )
+            .withRetiredTime(Instant.now().minusMillis(70000))
+            .withRetired(true)
+    );
+    objectRepository.addObject(
+        new EnvironmentalEntity(
+            "Entity-2",
+            new Envelope(
+                List.of(
+                    new Couple(1, 2),
+                    new Couple(3, 4),
+                    new Couple(5, 6),
+                    new Couple(1, 2)
+                )
+            ),
+            new Pose(new Triple(9, 10, 0), 123.45)
+        )
+            .withRetiredTime(Instant.now().minusMillis(50000))
+            .withRetired(true)
+    );
+
+    assertEquals(2, objectRepository.getObjects(EnvironmentalEntity.class).size());
+    cleanupTask.run();
+    assertEquals(1, objectRepository.getObjects(EnvironmentalEntity.class).size());
   }
 
 }

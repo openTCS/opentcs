@@ -5,10 +5,12 @@ package org.opentcs.kernel.workingset;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.inject.Inject;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.function.Predicate;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.EnvironmentalEntity;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
@@ -40,6 +42,10 @@ public class WorkingSetCleanupTask
    */
   private final PeripheralJobPoolManager peripheralJobPoolManager;
   /**
+   * Keeps all environmental entities.
+   */
+  private final PlantModelManager plantModelManager;
+  /**
    * This class's configuration.
    */
   private final OrderPoolConfiguration configuration;
@@ -67,6 +73,7 @@ public class WorkingSetCleanupTask
    * @param globalSyncObject The kernel threads' global synchronization object.
    * @param orderPoolManager The order pool manager to be used.
    * @param peripheralJobPoolManager The peripheral job pool manager to be used.
+   * @param plantModelManager The plant model manager to be used.
    * @param compositeOrderSequenceCleanupApproval Checks whether an order sequence may be removed.
    * @param compositeTransportOrderCleanupApproval Checks whether a transport order may be removed.
    * @param compositePeripheralJobCleanupApproval Checks whether a peripheral job may be removed.
@@ -80,6 +87,7 @@ public class WorkingSetCleanupTask
       Object globalSyncObject,
       TransportOrderPoolManager orderPoolManager,
       PeripheralJobPoolManager peripheralJobPoolManager,
+      PlantModelManager plantModelManager,
       OrderPoolConfiguration configuration,
       CompositeOrderSequenceCleanupApproval compositeOrderSequenceCleanupApproval,
       CompositeTransportOrderCleanupApproval compositeTransportOrderCleanupApproval,
@@ -92,6 +100,7 @@ public class WorkingSetCleanupTask
         peripheralJobPoolManager,
         "peripheralJobPoolManager"
     );
+    this.plantModelManager = requireNonNull(plantModelManager, "plantModelManager");
     this.compositeOrderSequenceCleanupApproval
         = requireNonNull(compositeOrderSequenceCleanupApproval);
     this.compositeTransportOrderCleanupApproval
@@ -147,6 +156,14 @@ public class WorkingSetCleanupTask
         }
         orderPoolManager.removeFinishedOrderSequenceAndOrders(orderSequence.getReference());
       }
+
+      // Remove all environmental entities that have been retired more than the configured time ago.
+      Instant removalTimeThreshold = Instant.now().minusMillis(configuration.sweepAge());
+      plantModelManager.getObjectRepo().streamObjects(EnvironmentalEntity.class)
+          .filter(EnvironmentalEntity::isRetired)
+          .filter(entity -> entity.getRetiredTime().isBefore(removalTimeThreshold))
+          .toList()
+          .forEach(entity -> plantModelManager.removeEnvironmentalEntity(entity.getReference()));
     }
   }
 

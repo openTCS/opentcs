@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
@@ -81,6 +82,27 @@ class ModelSerializationTest {
     assertEquals(originalObject, deserializedObject);
   }
 
+  @Test
+  void shouldSerializeAndDeserializeEnvironmentalEntity()
+      throws Exception {
+    EnvironmentalEntity originalObject = new EnvironmentalEntity(
+        "some-entity",
+        new Envelope(
+            List.of(
+                new Couple(1, 2),
+                new Couple(3, 4),
+                new Couple(5, 6),
+                new Couple(1, 2)
+            )
+        ),
+        new Pose(new Triple(9, 10, 0), 123.45)
+    );
+    EnvironmentalEntity deserializedObject
+        = (EnvironmentalEntity) deserializeTCSObject(serializeTCSObject(originalObject));
+
+    assertEquals(originalObject, deserializedObject);
+  }
+
   private byte[] serializeTCSObject(TCSObject<?> tcsObject)
       throws IOException {
     byte[] serializedObject;
@@ -98,7 +120,7 @@ class ModelSerializationTest {
     TCSObject<?> deserializedObject;
     try (ByteArrayInputStream is = new ByteArrayInputStream(serializedObject);
          ObjectInputStream ois = new ObjectInputStream(is)) {
-      deserializedObject = (TCSObject) ois.readObject();
+      deserializedObject = (TCSObject<?>) ois.readObject();
     }
     return deserializedObject;
   }

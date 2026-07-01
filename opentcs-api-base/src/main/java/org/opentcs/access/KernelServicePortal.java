@@ -5,6 +5,7 @@ package org.opentcs.access;
 import jakarta.annotation.Nonnull;
 import java.util.List;
 import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.EnvironmentalEntityService;
 import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.components.kernel.services.PeripheralDispatcherService;
 import org.opentcs.components.kernel.services.PeripheralJobService;
@@ -78,6 +79,14 @@ public interface KernelServicePortal {
    */
   @Nonnull
   PlantModelService getPlantModelService();
+
+  /**
+   * Returns the service a client can use to access methods regarding environmental entities.
+   *
+   * @return The service a client can use to access methods regarding environmental entities.
+   */
+  @Nonnull
+  EnvironmentalEntityService getEnvironmentalEntityService();
 
   /**
    * Returns the service a client can use to access methods regarding transport orders and order

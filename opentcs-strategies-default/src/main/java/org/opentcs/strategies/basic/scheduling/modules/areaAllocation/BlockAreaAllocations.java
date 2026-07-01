@@ -25,6 +25,7 @@ import org.opentcs.data.model.Point;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.util.MultiPlaneGeometryCollection;
 
 /**
  * Ensures that block areas are allocated by a single vehicle at a time. (With a block are being

@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.strategies.basic.util.MultiPlaneGeometryCollection;
 
 /**
  * Tests for {@link AreaAllocations}.

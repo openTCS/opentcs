@@ -192,6 +192,43 @@ include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/With
 
 The second argument indicates whether the vehicle should finish the movements it is already assigned to (`false`) or abort immediately (`true`).
 
+=== Working with environmental entities
+
+To create, modify or retire environmental entities, get an `EnvironmentalEntityService` (see <<Acquiring service objects>>) and use its methods for the respective operations.
+
+==== How to create an environmental entity
+
+To create an environmental entity, you must provide at least a name/prefix, an envelope describing the area the entity covers, and a pose expressing where the reference point of this area is in the plant model coordinate system.
+In most cases, it makes sense to also set the _incompleteName_ flag to have the kernel append a suffix to the name to ensure the name is unique.
+Optionally, set the entity's type to `ZONE` if it doesn't represent a tangible object but rather an area.
+
+With all that information, ask the service to create the entity:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/HandleEnvironmentalEntitiesTest.java[tags=documentation_createEnvironmentalEntity, indent=0]
+----
+
+==== Update an environmental entity's integration level
+
+If an entity still exists but does not currently need to be considered with e.g. traffic management, set its integration level to `TO_BE_IGNORED`:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/HandleEnvironmentalEntitiesTest.java[tags=documentation_updateEnvironmentalEntityIntegrationLevel, indent=0]
+----
+
+==== Retire an environmental entity
+
+When an entity is no longer there/relevant, retire it:
+
+[source, java]
+----
+include::{documentation-testSrc}/org/opentcs/documentation/developers_guide/HandleEnvironmentalEntitiesTest.java[tags=documentation_retireEnvironmentalEntity, indent=0]
+----
+
+The entity object will automatically be removed from the kernel at a later point of time.
+
 === Using the event bus
 
 Each of the main openTCS applications -- Kernel, Kernel Control Center, Model Editor and Operations Desk -- provides an event bus that can be used to receive or emit event objects application-wide.

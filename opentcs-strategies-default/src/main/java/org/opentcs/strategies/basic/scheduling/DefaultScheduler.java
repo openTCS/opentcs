@@ -25,6 +25,7 @@ import org.opentcs.customizations.kernel.GlobalSyncObject;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.EnvironmentalEntity;
 import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.strategies.basic.scheduling.AllocatorCommand.Allocate;
@@ -345,22 +346,48 @@ public class DefaultScheduler
 
   @Override
   public void onEvent(Object event) {
-    if (!(event instanceof TCSObjectEvent)) {
+    if (!(event instanceof TCSObjectEvent tcsObjectEvent)) {
+      return;
+    }
+    if (tcsObjectEvent.getType() != TCSObjectEvent.Type.OBJECT_MODIFIED) {
       return;
     }
 
-    TCSObjectEvent tcsObjectEvent = (TCSObjectEvent) event;
-    if (tcsObjectEvent.getType() != TCSObjectEvent.Type.OBJECT_MODIFIED
-        || !(tcsObjectEvent.getCurrentObjectState() instanceof Vehicle)) {
-      return;
+    if (tcsObjectEvent.getCurrentObjectState() instanceof Vehicle) {
+      onVehicleEvent(
+          (Vehicle) tcsObjectEvent.getPreviousObjectState(),
+          (Vehicle) tcsObjectEvent.getCurrentObjectState()
+      );
     }
+    else if (tcsObjectEvent.getCurrentObjectState() instanceof EnvironmentalEntity) {
+      onEnvironmentalEntityEvent(
+          (EnvironmentalEntity) tcsObjectEvent.getPreviousObjectState(),
+          (EnvironmentalEntity) tcsObjectEvent.getCurrentObjectState()
+      );
+    }
+  }
 
+  private void onVehicleEvent(Vehicle previousState, Vehicle currentState) {
     // If the vehicle was unpaused, trigger a scheduling run in case the vehicle is waiting for
     // resources.
-    if (((Vehicle) tcsObjectEvent.getPreviousObjectState()).isPaused()
-        && !((Vehicle) tcsObjectEvent.getCurrentObjectState()).isPaused()) {
+    if (previousState.isPaused() && !currentState.isPaused()) {
       reschedule();
     }
+  }
+
+  private void onEnvironmentalEntityEvent(
+      EnvironmentalEntity previousState,
+      EnvironmentalEntity currentState
+  ) {
+    // If the entity already has been ignored previously, any change made now cannot lead to an
+    // allocation, so we can skip a scheduling run in that case.
+    if (previousState.getIntegrationLevel() == EnvironmentalEntity.IntegrationLevel.TO_BE_IGNORED
+        || previousState.getIntegrationLevel()
+            == EnvironmentalEntity.IntegrationLevel.TO_BE_NOTICED) {
+      return;
+    }
+
+    reschedule();
   }
 
   private void addAllocateFuture(Client client, Future<?> allocateFuture) {

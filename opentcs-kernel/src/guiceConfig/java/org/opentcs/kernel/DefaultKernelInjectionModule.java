@@ -15,6 +15,7 @@ import org.opentcs.access.SslParameterSet;
 import org.opentcs.common.LoggingScheduledThreadPoolExecutor;
 import org.opentcs.components.kernel.ObjectNameProvider;
 import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.EnvironmentalEntityService;
 import org.opentcs.components.kernel.services.InternalPeripheralJobService;
 import org.opentcs.components.kernel.services.InternalPeripheralService;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
@@ -52,6 +53,7 @@ import org.opentcs.kernel.peripherals.PeripheralEntryPool;
 import org.opentcs.kernel.persistence.ModelPersister;
 import org.opentcs.kernel.persistence.XMLFileModelPersister;
 import org.opentcs.kernel.services.StandardDispatcherService;
+import org.opentcs.kernel.services.StandardEnvironmentalEntityService;
 import org.opentcs.kernel.services.StandardNotificationService;
 import org.opentcs.kernel.services.StandardPeripheralDispatcherService;
 import org.opentcs.kernel.services.StandardPeripheralJobService;
@@ -181,6 +183,9 @@ public class DefaultKernelInjectionModule
     bind(StandardPlantModelService.class).in(Singleton.class);
     bind(PlantModelService.class).to(StandardPlantModelService.class);
     bind(InternalPlantModelService.class).to(StandardPlantModelService.class);
+
+    bind(StandardEnvironmentalEntityService.class).in(Singleton.class);
+    bind(EnvironmentalEntityService.class).to(StandardEnvironmentalEntityService.class);
 
     bind(StandardTransportOrderService.class).in(Singleton.class);
     bind(TransportOrderService.class).to(StandardTransportOrderService.class);

@@ -1,0 +1,375 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /environmentalEntities:
+    get:
+      tags:
+        - Environmental entities
+      summary: Retrieves a set of environmental entities.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: ArrayOfEnvironmentalEntityStates
+                type: array
+                items:
+                  $ref: "#/components/schemas/EnvironmentalEntityState"
+  /environmentalEntities/{NAME}:
+    get:
+      tags:
+        - Environmental entities
+      summary: Retrieves the named environmental entity.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the environmental entity.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnvironmentalEntityState"
+    post:
+      tags:
+        - Environmental entities
+      summary: Creates a new environmental entity with the given name.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the environmental entity.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnvironmentalEntity"
+        description: The details of the environmental entity to be uploaded.
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnvironmentalEntityState"
+        "400":
+          description: The submitted environmental entity is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
+  /environmentalEntities/{NAME}/envelope:
+    put:
+      tags:
+        - Environmental entities
+      summary: Updates the envelope of the named environmental entity.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the environmental entity.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnvironmentalEntityEnvelope"
+        description: The new envelope for the environmental entity.
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: The submitted envelope is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find environmental entity 'Some Entity 01'.
+  /environmentalEntities/{NAME}/pose:
+    put:
+      tags:
+        - Environmental entities
+      summary: Updates the pose of the named environmental entity.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the environmental entity.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnvironmentalEntityPose"
+        description: The new pose for the environmental entity.
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: The submitted pose is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find environmental entity 'Some Entity 01'.
+  /environmentalEntities/{NAME}/integrationLevel:
+    put:
+      tags:
+        - Environmental entities
+      summary: Updates the integration level of the named environmental entity.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the environmental entity.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The entity's new integration level.
+          required: true
+          example: TO_BE_RESPECTED
+          schema:
+            type: string
+            enum:
+              - TO_BE_RESPECTED
+              - TO_BE_NOTICED
+              - TO_BE_IGNORED
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: The submitted integration level is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find environmental entity 'Some Entity 01'.
+  /environmentalEntities/{NAME}/retired:
+    put:
+      tags:
+        - Environmental entities
+      summary: Marks the named environmental entity as retired.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the environmental entity.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find environmental entity 'Some Entity 01'.
+components:
+  schemas:
+    EnvironmentalEntity:
+      title: Environmental entity
+      type: object
+      properties:
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        incompleteName:
+          type: boolean
+          description: Whether the name of the entity is considered to be incomplete. If
+            set, the kernel will complete the name according to its configuration, e.g. by appending
+            a suffix to it. It is recommended to set this, as names generated by the kernel can be
+            guaranteed to be unique, while clients typically cannot guarantee this.
+          default: false
+        envelope:
+          $ref: "#/components/schemas/EnvironmentalEntityEnvelope"
+        pose:
+          $ref: "#/components/schemas/EnvironmentalEntityPose"
+        type:
+          type: string
+          description: This entity's type.
+          enum:
+            - OBJECT
+            - ZONE
+          default:
+            - OBJECT
+        integrationLevel:
+          type: string
+          enum:
+            - TO_BE_IGNORED
+            - TO_BE_NOTICED
+            - TO_BE_RESPECTED
+          default:
+            - TO_BE_RESPECTED
+          description: The entity's integration level.
+        layout:
+          type: object
+          description: The information regarding the graphical representation of this entity.
+          properties:
+            layerId:
+              type: integer
+              example: 3
+      required:
+        - name
+        - envelope
+        - pose
+    EnvironmentalEntityState:
+      title: Environmental entity state
+      type: object
+      properties:
+        name:
+          type: string
+          description: The entity's name.
+          example: Some Entity 01
+        properties:
+          type: array
+          items:
+            $ref: "../schemas/common.yaml#/components/schemas/Property"
+          description: The entity's properties.
+        history:
+          $ref: "../schemas/common.yaml#/components/schemas/ObjectHistory"
+        envelope:
+          $ref: "#/components/schemas/EnvironmentalEntityEnvelope"
+        pose:
+          $ref: "#/components/schemas/EnvironmentalEntityPose"
+        type:
+          type: string
+          description: This entity's type.
+          enum:
+            - OBJECT
+            - ZONE
+        integrationLevel:
+          type: string
+          enum:
+            - TO_BE_IGNORED
+            - TO_BE_NOTICED
+            - TO_BE_RESPECTED
+          description: The entity's integration level.
+        layout:
+          type: object
+          description: The information regarding the graphical representation of this entity.
+          properties:
+            layerId:
+              type: integer
+              example: 3
+        retired:
+          type: boolean
+          description: Whether this entity is retired.
+          example: false
+        createdTime:
+          type: string
+          format: date-time
+          description: The point of time at which this entity was created (expressed according to ISO 8601).
+          example: "2022-01-01T12:00:00Z"
+        retiredTime:
+          type: string
+          format: date-time
+          description: The point of time at which this entity was retired (expressed according to ISO 8601).
+          example: "2022-01-01T12:00:00Z"
+      required:
+        - name
+        - properties
+        - history
+        - envelope
+        - pose
+        - type
+        - integrationLevel
+        - layout
+        - retired
+        - createdTime
+        - retiredTime
+    EnvironmentalEntityEnvelope:
+      title: Envelope
+      type: object
+      properties:
+        vertices:
+          type: array
+          description: The sequence of vertices this envelope consists of.
+          items:
+            $ref: "../schemas/common.yaml#/components/schemas/Couple"
+          example:
+            - x: 1500
+              y: 1750
+            - x: 1600
+              y: 1820
+            - x: 1700
+              y: 1890
+      required:
+        - vertices
+    EnvironmentalEntityPose:
+      type: object
+      properties:
+        position:
+          nullable: false
+          allOf:
+            - $ref: "../schemas/common.yaml#/components/schemas/Triple"
+        orientationAngle:
+          nullable: false
+          type: number
+          minimum: -360
+          maximum: 360
+      required:
+        - position
+        - orientationAngle

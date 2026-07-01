@@ -320,8 +320,8 @@ A layer group has the following properties:
 
 === Plant operation elements
 
-Transport orders and order sequences are elements that are available only at plant operation time.
-Their attributes are primarily set when the respective elements are created.
+Transport orders, order sequences, peripheral jobs and environmental entities are elements that are available only at plant operation time.
+Their attributes are primarily set when the respective elements are created, and they are volatile in the sense that they are implicitly removed when a new plant model is loaded into the kernel.
 
 ==== Transport order
 
@@ -394,6 +394,36 @@ A peripheral job carries the following attributes:
   A peripheral device that is reserved for a specific token can only process jobs which match that reservation token -- see <<Reservation token>>.
 * An optional _related vehicle_ referencing the vehicle by which the peripheral job was created.
 * An optional _related transport order_ referencing the transport order in which context the peripheral job was created.
+
+==== Environmental entities
+
+Environmental entities represent objects or areas in the plant environment that are known to the system, but not controlled by it.
+Typical examples are people, manually moved vehicles, temporary obstacles or dynamically restricted zones.
+
+An environmental entity carries the following attributes:
+
+* An _envelope_, describing the area that is occupied by the entity as a closed polygon.
+  The envelope is defined with vertex coordinates relative to the plant coordinate system's origin.
+* A _pose_, i.e. the entity's position in the plant coordinate system and its orientation angle.
+  (The pose rotates and translates the envelope to the actual position of the entity.)
+* A _type_, which is one of these:
+** _Object_:
+   The entity represents a tangible object in the environment.
+** _Zone_:
+   The entity represents an area in the environment.
+* An _integration level_, indicating how far the entity is taken into account by the system.
+  An entity can be
+** ..._respected_:
+   The entity is taken into account, e.g. for traffic management.
+** ..._noticed_:
+   The entity may be shown to users, but is not considered for traffic management.
+** ..._ignored_:
+   The entity exists, but is ignored completely.
+* A _retired_ flag, indicating whether the entity is still active or has been retired.
+  Retired entities are not considered for traffic management and are not shown to users.
+  They are kept in the system temporarily before being removed automatically.
+
+Environmental entities can be used for traffic management, e.g. to prevent vehicles from colliding with objects they represent or from entering zones that are currently not safe to enter.
 
 === Common element attributes
 

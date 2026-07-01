@@ -7,6 +7,7 @@ import static org.opentcs.util.Assertions.checkState;
 
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import org.opentcs.access.to.model.BlockCreationTO;
 import org.opentcs.access.to.model.BoundingBoxCreationTO;
 import org.opentcs.access.to.model.CoupleCreationTO;
 import org.opentcs.access.to.model.EnvelopeCreationTO;
+import org.opentcs.access.to.model.EnvironmentalEntityCreationTO;
 import org.opentcs.access.to.model.LayerCreationTO;
 import org.opentcs.access.to.model.LayerGroupCreationTO;
 import org.opentcs.access.to.model.LocationCreationTO;
@@ -34,6 +36,7 @@ import org.opentcs.access.to.model.TripleCreationTO;
 import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
+import org.opentcs.components.kernel.ObjectNameProvider;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
@@ -45,6 +48,7 @@ import org.opentcs.data.model.Block;
 import org.opentcs.data.model.BoundingBox;
 import org.opentcs.data.model.Couple;
 import org.opentcs.data.model.Envelope;
+import org.opentcs.data.model.EnvironmentalEntity;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
@@ -86,6 +90,10 @@ public class PlantModelManager
    */
   private static final Logger LOG = LoggerFactory.getLogger(PlantModelManager.class);
   /**
+   * Provides names for environmental entities.
+   */
+  private final ObjectNameProvider objectNameProvider;
+  /**
    * This model's name.
    */
   private String name = "";
@@ -99,6 +107,7 @@ public class PlantModelManager
    *
    * @param objectRepo The object repo.
    * @param eventHandler The event handler to publish events to.
+   * @param objectNameProvider Provides names for environmental entities.
    */
   @Inject
   public PlantModelManager(
@@ -106,9 +115,12 @@ public class PlantModelManager
       TCSObjectRepository objectRepo,
       @Nonnull
       @ApplicationEventBus
-      EventHandler eventHandler
+      EventHandler eventHandler,
+      @Nonnull
+      ObjectNameProvider objectNameProvider
   ) {
     super(objectRepo, eventHandler);
+    this.objectNameProvider = requireNonNull(objectNameProvider, "objectNameProvider");
   }
 
   /**
@@ -152,6 +164,7 @@ public class PlantModelManager
    */
   public void clear() {
     List<TCSObject<?>> objects = new ArrayList<>();
+    objects.addAll(getObjectRepo().getObjects(EnvironmentalEntity.class));
     objects.addAll(getObjectRepo().getObjects(VisualLayout.class));
     objects.addAll(getObjectRepo().getObjects(Vehicle.class));
     objects.addAll(getObjectRepo().getObjects(Block.class));
@@ -1039,6 +1052,205 @@ public class PlantModelManager
         .withLocations(getLocations())
         .withBlocks(getBlocks())
         .withVisualLayout(getVisualLayout());
+  }
+
+  /**
+   * Creates a new environmental entity with a unique name and all other attributes taken from the
+   * given transfer object.
+   *
+   * @param to The transfer object from which to create the new object.
+   * @return The newly created entity.
+   * @throws ObjectExistsException If an object with a new object's name already exists.
+   */
+  public EnvironmentalEntity createEnvironmentalEntity(EnvironmentalEntityCreationTO to)
+      throws ObjectExistsException {
+    LOG.info("Environmental entity is being created: {}", to.getName());
+
+    EnvironmentalEntity newEntity = new EnvironmentalEntity(
+        nameFor(to),
+        toEnvelope(to.getEnvelope()),
+        new Pose(
+            new Triple(
+                to.getPose().getPosition().getX(),
+                to.getPose().getPosition().getY(),
+                to.getPose().getPosition().getZ()
+            ),
+            to.getPose().getOrientationAngle()
+        )
+    )
+        .withCreatedTime(Instant.now())
+        .withType(toEnvEntityType(to.getType()))
+        .withIntegrationLevel(toEnvEntityIntegrationLevel(to.getIntegrationLevel()))
+        .withLayout(
+            new EnvironmentalEntity.Layout()
+                .withLayerId(to.getLayout().getLayerId())
+        )
+        .withProperties(to.getProperties());
+
+    getObjectRepo().addObject(newEntity);
+    emitObjectEvent(newEntity, null, TCSObjectEvent.Type.OBJECT_CREATED);
+    // Return the newly created entity.
+    return newEntity;
+  }
+
+  /**
+   * Sets an environmental entity's envelope.
+   *
+   * @param ref A reference to the entity to be modified.
+   * @param envelope The new envelope of the entity.
+   * @return The modified entity.
+   * @throws ObjectUnknownException If the referenced entity does not exist.
+   */
+  public EnvironmentalEntity setEnvironmentalEntityEnvelope(
+      TCSObjectReference<EnvironmentalEntity> ref,
+      Envelope envelope
+  )
+      throws ObjectUnknownException {
+    EnvironmentalEntity previousState = getObjectRepo().getObject(EnvironmentalEntity.class, ref);
+
+    LOG.debug(
+        "Environmental entity's envelope changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getEnvelope(),
+        envelope
+    );
+
+    EnvironmentalEntity envEntity = previousState.withEnvelope(envelope);
+    getObjectRepo().replaceObject(envEntity);
+    emitObjectEvent(
+        envEntity,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
+    return envEntity;
+  }
+
+  /**
+   * Sets an environmental entity's pose.
+   *
+   * @param ref A reference to the entity to be modified.
+   * @param pose The new pose of the entity.
+   * @return The modified entity.
+   * @throws ObjectUnknownException If the referenced entity does not exist.
+   */
+  public EnvironmentalEntity setEnvironmentalEntityPose(
+      TCSObjectReference<EnvironmentalEntity> ref,
+      Pose pose
+  )
+      throws ObjectUnknownException {
+    EnvironmentalEntity previousState = getObjectRepo().getObject(EnvironmentalEntity.class, ref);
+
+    LOG.debug(
+        "Environmental entity's pose changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getPose(),
+        pose
+    );
+
+    EnvironmentalEntity envEntity = previousState.withPose(pose);
+    getObjectRepo().replaceObject(envEntity);
+    emitObjectEvent(
+        envEntity,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
+    return envEntity;
+  }
+
+  /**
+   * Sets an environmental entity's integration level.
+   *
+   * @param ref A reference to the entity to be modified.
+   * @param integrationLevel The new integration level of the entity.
+   * @return The modified entity.
+   * @throws ObjectUnknownException If the referenced entity does not exist.
+   */
+  public EnvironmentalEntity setEnvironmentalEntityIntegrationLevel(
+      TCSObjectReference<EnvironmentalEntity> ref,
+      EnvironmentalEntity.IntegrationLevel integrationLevel
+  )
+      throws ObjectUnknownException {
+    EnvironmentalEntity previousState = getObjectRepo().getObject(EnvironmentalEntity.class, ref);
+
+    LOG.info(
+        "Environmental entity's integration level changes: {} -- {} -> {}",
+        previousState.getName(),
+        previousState.getIntegrationLevel(),
+        integrationLevel
+    );
+
+    EnvironmentalEntity envEntity = previousState.withIntegrationLevel(integrationLevel);
+    getObjectRepo().replaceObject(envEntity);
+    emitObjectEvent(
+        envEntity,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
+    return envEntity;
+  }
+
+  /**
+   * Sets an environmental entity's retired flag.
+   *
+   * @param ref A reference to the entity to be modified.
+   * @return The modified entity.
+   * @throws ObjectUnknownException If the referenced entity does not exist.
+   */
+  public EnvironmentalEntity setEnvironmentalEntityRetired(
+      TCSObjectReference<EnvironmentalEntity> ref
+  )
+      throws ObjectUnknownException {
+    EnvironmentalEntity previousState = getObjectRepo().getObject(EnvironmentalEntity.class, ref);
+
+    LOG.info("Environmental entity being marked as retired: {}", previousState.getName());
+
+    EnvironmentalEntity envEntity = previousState
+        .withRetired(true)
+        .withRetiredTime(Instant.now());
+    getObjectRepo().replaceObject(envEntity);
+    emitObjectEvent(
+        envEntity,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_MODIFIED
+    );
+    return envEntity;
+  }
+
+  /**
+   * Removes the referenced environmental entity from the model.
+   *
+   * @param ref A reference to the entity to be removed.
+   * @return The removed entity.
+   * @throws ObjectUnknownException If the referenced entity does not exist.
+   */
+  public EnvironmentalEntity removeEnvironmentalEntity(
+      TCSObjectReference<EnvironmentalEntity> ref
+  ) {
+    EnvironmentalEntity previousState = getObjectRepo().getObject(EnvironmentalEntity.class, ref);
+    getObjectRepo().removeObject(ref);
+    emitObjectEvent(
+        null,
+        previousState,
+        TCSObjectEvent.Type.OBJECT_REMOVED
+    );
+    return previousState;
+  }
+
+  private EnvironmentalEntity.Type toEnvEntityType(EnvironmentalEntityCreationTO.Type type) {
+    return switch (type) {
+      case OBJECT -> EnvironmentalEntity.Type.OBJECT;
+      case ZONE -> EnvironmentalEntity.Type.ZONE;
+    };
+  }
+
+  private EnvironmentalEntity.IntegrationLevel toEnvEntityIntegrationLevel(
+      EnvironmentalEntityCreationTO.IntegrationLevel level
+  ) {
+    return switch (level) {
+      case TO_BE_RESPECTED -> EnvironmentalEntity.IntegrationLevel.TO_BE_RESPECTED;
+      case TO_BE_NOTICED -> EnvironmentalEntity.IntegrationLevel.TO_BE_NOTICED;
+      case TO_BE_IGNORED -> EnvironmentalEntity.IntegrationLevel.TO_BE_IGNORED;
+    };
   }
 
   /**
@@ -1971,6 +2183,19 @@ public class PlantModelManager
       case Path.Layout.ConnectionType.POLYPATH -> PathCreationTO.Layout.ConnectionType.POLYPATH;
       case Path.Layout.ConnectionType.SLANTED -> PathCreationTO.Layout.ConnectionType.SLANTED;
     };
+  }
+
+  @Nonnull
+  private String nameFor(
+      @Nonnull
+      EnvironmentalEntityCreationTO to
+  ) {
+    if (to.hasIncompleteName()) {
+      return objectNameProvider.apply(to);
+    }
+    else {
+      return to.getName();
+    }
   }
 
   private static List<Set<TCSResourceReference<?>>> unmodifiableCopy(

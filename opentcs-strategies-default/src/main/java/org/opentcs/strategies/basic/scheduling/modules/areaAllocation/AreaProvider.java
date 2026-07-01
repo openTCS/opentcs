@@ -7,6 +7,7 @@ import java.util.Set;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.opentcs.components.Lifecycle;
 import org.opentcs.data.model.TCSResource;
+import org.opentcs.strategies.basic.util.MultiPlaneGeometryCollection;
 
 /**
  * Provides areas related to resources.

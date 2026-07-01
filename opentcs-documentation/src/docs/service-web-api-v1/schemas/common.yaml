@@ -38,7 +38,7 @@ components:
           description: The bounding box height
           example: 50
         referenceOffset:
-          $ref: "#/components/schemas/PlantModelCouple"
+          $ref: "#/components/schemas/Couple"
       required:
         - length
         - width
@@ -224,7 +224,7 @@ components:
         - locationName
         - executionTrigger
         - completionRequired
-    PlantModelCouple:
+    Couple:
       title: Couple
       type: object
       properties:
@@ -241,3 +241,53 @@ components:
       required:
         - x
         - y
+    Triple:
+      type: object
+      properties:
+        x:
+          type: integer
+          format: int64
+          description: The Triple's x value.
+          example: 1500
+        y:
+          type: integer
+          format: int64
+          description: The Triple's y value.
+          example: 2000
+        z:
+          type: integer
+          format: int64
+          description: The Triple's z value.
+          example: 2500
+      required:
+        - x
+        - y
+        - z
+    ObjectHistory:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectHistoryEntry'
+          description: "The object history entries."
+      required:
+        - entries
+    ObjectHistoryEntry:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: "2018-05-17T06:42:40.396Z"
+        eventCode:
+          type: string
+          example: "code-1"
+        supplements:
+          type: array
+          items:
+            type: string
+      required:
+        - timestamp
+        - eventCode
+        - supplements
