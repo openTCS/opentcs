@@ -72,10 +72,7 @@ public class ShortestPathPointRouter
       return new ArrayList<>();
     }
 
-    GraphPath<Vertex, Edge> graphPath = algo.getPath(
-        pointVertexMap.get(srcPoint.getName()),
-        pointVertexMap.get(destPoint.getName())
-    );
+    GraphPath<Vertex, Edge> graphPath = getPath(srcPoint.getName(), destPoint.getName());
     if (graphPath == null) {
       return null;
     }
@@ -104,15 +101,27 @@ public class ShortestPathPointRouter
       return 0;
     }
 
-    GraphPath<Vertex, Edge> graphPath = algo.getPath(
-        pointVertexMap.get(srcPointRef.getName()),
-        pointVertexMap.get(destPointRef.getName())
-    );
+    GraphPath<Vertex, Edge> graphPath = getPath(srcPointRef.getName(), destPointRef.getName());
     if (graphPath == null) {
       return Double.NaN;
     }
 
     return toRouteCosts(graphPath.getWeight());
+  }
+
+  private GraphPath<Vertex, Edge> getPath(String srcName, String destName) {
+    try {
+      return algo.getPath(
+          pointVertexMap.get(srcName),
+          pointVertexMap.get(destName)
+      );
+    }
+    catch (RuntimeException exc) {
+      throw new IllegalStateException(
+          "Could not get path from '%s' to '%s'".formatted(srcName, destName),
+          exc
+      );
+    }
   }
 
   private List<Route.Step> translateToSteps(GraphPath<Vertex, Edge> graphPath) {
