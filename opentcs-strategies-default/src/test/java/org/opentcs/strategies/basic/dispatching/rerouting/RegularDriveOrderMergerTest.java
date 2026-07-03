@@ -34,11 +34,11 @@ class RegularDriveOrderMergerTest {
   }
 
   @Test
-  void shouldMergeDriveOrders() {
+  void shouldMergeDriveOrdersWithNoRouteProgress() {
     // Arrange
     DriveOrder orderA = createDriveOrder(1, "A", "B", "C", "D", "E", "F", "G");
-    DriveOrder orderB = createDriveOrder(1, "D", "H", "I", "J", "K");
-    Route expected = createDriveOrder(1, "A", "B", "C", "D", "H", "I", "J", "K").getRoute();
+    DriveOrder orderB = createDriveOrder(1, "A", "H", "I", "J", "K", "G");
+    Route expected = createDriveOrder(1, "A", "H", "I", "J", "K", "G").getRoute();
 
     // Act
     Route actual = driveOrderMerger.mergeDriveOrders(
@@ -46,6 +46,54 @@ class RegularDriveOrderMergerTest {
         orderB,
         new TransportOrder("t1", List.of()),
         TransportOrder.ROUTE_STEP_INDEX_DEFAULT,
+        new Vehicle("Vehicle")
+    ).getRoute();
+
+    // Assert
+    assertStepsEqualsIgnoringReroutingType(expected, actual);
+  }
+
+  @Test
+  void shouldMergeDriveOrdersWithRouteProgress() {
+    // Arrange
+    DriveOrder orderA = createDriveOrder(1, "A", "B", "C", "D", "E", "F", "G");
+    DriveOrder orderB = createDriveOrder(1, "C", "L", "M", "N", "O", "G");
+    Route expected = createDriveOrder(
+        1,
+        "A",
+        "B", "C", "L", "M", "N", "O", "G"
+    ).getRoute();
+
+    // Act
+    Route actual = driveOrderMerger.mergeDriveOrders(
+        orderA,
+        orderB,
+        new TransportOrder("t1", List.of()),
+        3,
+        new Vehicle("Vehicle")
+    ).getRoute();
+
+    // Assert
+    assertStepsEqualsIgnoringReroutingType(expected, actual);
+  }
+
+  @Test
+  void shouldMergeDriveOrdersWithRouteLoopCausedByRerouting() {
+    // Arrange
+    DriveOrder orderA = createDriveOrder(1, "A", "B", "C", "D", "E", "D", "F", "G");
+    DriveOrder orderB = createDriveOrder(1, "D", "L", "M", "N", "O", "G");
+    Route expected = createDriveOrder(
+        1,
+        "A",
+        "B", "C", "D", "E", "D", "L", "M", "N", "O", "G"
+    ).getRoute();
+
+    // Act
+    Route actual = driveOrderMerger.mergeDriveOrders(
+        orderA,
+        orderB,
+        new TransportOrder("t1", List.of()),
+        5,
         new Vehicle("Vehicle")
     ).getRoute();
 

@@ -63,9 +63,15 @@ public class RegularDriveOrderMerger
         sourcePoint,
         stepsToPaths(steps)
     );
-    return steps.stream()
+    // Start searching from the back of the route/steps to account for loops in the route. Although
+    // we can't have loops in a route returned directly by the router, loops are possible when
+    // rerouting is involved (e.g. when the vehicle has to perform some backtracking in order to
+    // "get on the new route"). This means that the given source point can appear multiple times in
+    // the route, but only in the "old" part of the route before the merge; thus, we only look for
+    // its latest occurrence here.
+    return steps.reversed().stream()
         .filter(step -> Objects.equals(step.getSourcePoint(), sourcePoint))
         .findFirst()
-        .get();
+        .orElseThrow();
   }
 }
