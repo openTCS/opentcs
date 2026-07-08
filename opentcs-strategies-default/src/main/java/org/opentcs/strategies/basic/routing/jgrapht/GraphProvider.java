@@ -225,9 +225,10 @@ public class GraphProvider {
     requireNonNull(pointsToExclude, "pointsToExclude");
     requireNonNull(pathsToExclude, "pathsToExclude");
 
+    GraphResult baseGraph = getGraphResult(vehicle);
     return derivedGraphResults.computeIfAbsent(
-        derivedGraphResultCacheKey(vehicle, pointsToExclude, pathsToExclude),
-        key -> graphMutator.deriveGraph(pointsToExclude, pathsToExclude, getGraphResult(vehicle))
+        derivedGraphResultCacheKey(vehicle, baseGraph, pointsToExclude, pathsToExclude),
+        key -> graphMutator.deriveGraph(pointsToExclude, pathsToExclude, baseGraph)
     );
   }
 
@@ -349,16 +350,16 @@ public class GraphProvider {
 
   private String derivedGraphResultCacheKey(
       Vehicle vehicle,
+      GraphResult baseGraph,
       Set<Point> pointsToExclude,
       Set<Path> pathsToExclude
   ) {
     // Concat the different hash code values (e.g. instead of simply calculating the sum) to
     // minimize risk of hash collisions.
     return String.format(
-        "routingGroup(%s)_pointBase(%s)_pathBase(%s)_excludedPoints(%s)_excludedPaths(%s)",
+        "routingGroup(%s)_baseGraph(%s)_excludedPoints(%s)_excludedPaths(%s)",
         routingGroupMapper.apply(vehicle).hashCode(),
-        getCurrentPointBase().getHash(),
-        getCurrentPathBase().getHash(),
+        baseGraph.getGraph().hashCode(),
         pointsHashCode(pointsToExclude),
         pathsHashCode(pathsToExclude)
     );
