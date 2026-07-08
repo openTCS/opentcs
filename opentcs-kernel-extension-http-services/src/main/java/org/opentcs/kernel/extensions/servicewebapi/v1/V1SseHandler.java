@@ -18,6 +18,7 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
+import org.opentcs.data.model.EnvironmentalEntity;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
@@ -172,6 +173,12 @@ public class V1SseHandler
       sendEventToClients(
           SseConstants.EVENT_TYPE_PERIPHERAL_JOBS,
           jsonBinder.toJson(eventConverter.convertPeripheralJobEvent(event))
+      );
+    }
+    else if (object instanceof EnvironmentalEntity) {
+      sendEventToClients(
+          SseConstants.EVENT_TYPE_ENVIRONMENTAL_ENTITIES,
+          jsonBinder.toJson(eventConverter.convertEnvironmentalEntityEvent(event))
       );
     }
   }

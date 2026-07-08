@@ -8,10 +8,12 @@ import static org.opentcs.util.Assertions.checkArgument;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.opentcs.data.TCSObjectEvent;
+import org.opentcs.data.model.EnvironmentalEntity;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
+import org.opentcs.kernel.extensions.servicewebapi.v1.binding.sse.EnvironmentalEntityEventTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.sse.OrderSequenceEventTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.sse.PeripheralJobEventTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.sse.TransportOrderEventTO;
@@ -26,6 +28,7 @@ public class EventConverter {
   private final TransportOrderConverter transportOrderConverter;
   private final OrderSequenceConverter orderSequenceConverter;
   private final PeripheralJobConverter peripheralJobConverter;
+  private final EnvironmentalEntityConverter envEntityConverter;
 
   /**
    * Creates a new instance.
@@ -36,13 +39,17 @@ public class EventConverter {
    * @param orderSequenceConverter Provides methods to convert order sequences to their SSE
    * representation.
    * @param peripheralJobConverter Provides methods to convert peripheral jobs to their SSE
+   * representation.
+   * @param envEntityConverter Provides methods to convert environmental entities to their SSE
+   * representation.
    */
   @Inject
   public EventConverter(
       VehicleConverter vehicleConverter,
       TransportOrderConverter transportOrderConverter,
       OrderSequenceConverter orderSequenceConverter,
-      PeripheralJobConverter peripheralJobConverter
+      PeripheralJobConverter peripheralJobConverter,
+      EnvironmentalEntityConverter envEntityConverter
   ) {
     this.vehicleConverter = requireNonNull(vehicleConverter, "vehicleConverter");
     this.transportOrderConverter = requireNonNull(
@@ -50,6 +57,7 @@ public class EventConverter {
     );
     this.orderSequenceConverter = requireNonNull(orderSequenceConverter, "orderSequenceConverter");
     this.peripheralJobConverter = requireNonNull(peripheralJobConverter, "peripheralJobConverter");
+    this.envEntityConverter = requireNonNull(envEntityConverter, "envEntityConverter");
   }
 
   /**
@@ -157,6 +165,34 @@ public class EventConverter {
         event.getPreviousObjectState() == null
             ? null
             : peripheralJobConverter.convert((PeripheralJob) event.getPreviousObjectState())
+    );
+  }
+
+  /**
+   * Converts the given event to its SSE representation.
+   *
+   * @param event The event to convert.
+   * @return The converted event.
+   * @throws IllegalArgumentException If the event's object is not of type
+   * {@link EnvironmentalEntity}.
+   */
+  public EnvironmentalEntityEventTO convertEnvironmentalEntityEvent(
+      @Nonnull
+      TCSObjectEvent event
+  ) {
+    requireNonNull(event, "event");
+    checkArgument(
+        event.getCurrentOrPreviousObjectState() instanceof EnvironmentalEntity,
+        "Event object must be of type EnvironmentalEntity"
+    );
+
+    return new EnvironmentalEntityEventTO(
+        event.getCurrentObjectState() == null
+            ? null
+            : envEntityConverter.convert((EnvironmentalEntity) event.getCurrentObjectState()),
+        event.getPreviousObjectState() == null
+            ? null
+            : envEntityConverter.convert((EnvironmentalEntity) event.getPreviousObjectState())
     );
   }
 }

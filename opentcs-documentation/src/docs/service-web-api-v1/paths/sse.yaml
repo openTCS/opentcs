@@ -46,6 +46,14 @@ paths:
           schema:
             type: boolean
             default: false
+        - name: /events/environmentalEntities
+          in: query
+          description: >-
+            Whether or not events of this type are to be sent.
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         "200":
           description: >-

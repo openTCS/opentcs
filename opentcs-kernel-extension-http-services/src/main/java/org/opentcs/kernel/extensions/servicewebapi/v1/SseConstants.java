@@ -26,13 +26,18 @@ public abstract class SseConstants {
    */
   public static final String EVENT_TYPE_PERIPHERAL_JOBS = "/events/peripheralJobs";
   /**
+   * The event type for events regarding environmental entities.
+   */
+  public static final String EVENT_TYPE_ENVIRONMENTAL_ENTITIES = "/events/environmentalEntities";
+  /**
    * A set of all event types supported by the SSE API.
    */
   public static final Set<String> SUPPORTED_EVENTS = Set.of(
       EVENT_TYPE_VEHICLES,
       EVENT_TYPE_TRANSPORT_ORDERS,
       EVENT_TYPE_ORDER_SEQUENCES,
-      EVENT_TYPE_PERIPHERAL_JOBS
+      EVENT_TYPE_PERIPHERAL_JOBS,
+      EVENT_TYPE_ENVIRONMENTAL_ENTITIES
   );
 
   /**
