@@ -1,0 +1,755 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /vehicles:
+    get:
+      tags:
+        - Vehicles
+      summary: Retrieves a set of vehicles.
+      description: ""
+      parameters:
+        - name: procState
+          in: query
+          description: The processing state of the vehicles to be retrieved.
+          example: IDLE
+          required: false
+          schema:
+            type: string
+            default: null
+            enum:
+              - IDLE
+              - AWAITING_ORDER
+              - PROCESSING_ORDER
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: ArrayOfVehicles
+                type: array
+                items:
+                  $ref: '../schemas/objects-states/vehicle.yaml#/components/schemas/Vehicle'
+              examples:
+                vehicles:
+                  $ref: '../examples/response-examples.yaml#/components/examples/vehiclesExample'
+        "400":
+          description: The submitted data is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse input.
+  "/vehicles/{NAME}":
+    get:
+      tags:
+        - Vehicles
+      summary: Retrieves the vehicle with the given name.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle to be retrieved.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/objects-states/vehicle.yaml#/components/schemas/Vehicle'
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/withdrawal":
+    post:
+      tags:
+        - Vehicles
+      summary: Withdraws a transport order processed by the vehicle with the given name.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: Name of the vehicle processing the transport order to be withdrawn
+          required: true
+          schema:
+            type: string
+        - name: immediate
+          in: query
+          description: Whether the transport order should be aborted as quickly as possible.
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/rerouteRequest":
+    post:
+      tags:
+        - Vehicles
+      summary: Reroutes a vehicle with the given name.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: Name of the vehicle to be rerouted
+          required: true
+          schema:
+            type: string
+        - name: forced
+          in: query
+          description: |
+            Whether the vehicle should be rerouted even if it's not where it is expected to be.
+
+            Forced rerouting of a vehicle from its current position can disrupt traffic management if used inappropriately.
+            Only do this if you are sure it is necessary and safe, and only if the vehicle is not moving!
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/integrationLevel":
+    put:
+      tags:
+        - Vehicles
+      summary: Sets a new integration level for the named vehicle.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The vehicle's new integration level.
+          required: true
+          example: TO_BE_RESPECTED
+          schema:
+            type: string
+            enum:
+              - TO_BE_UTILIZED
+              - TO_BE_RESPECTED
+              - TO_BE_NOTICED
+              - TO_BE_IGNORED
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/paused":
+    put:
+      tags:
+        - Vehicles
+      summary: Sets the paused state for the named vehicle.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The vehicle's new paused state.
+          required: true
+          example: true
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/acceptableOrderTypes":
+    put:
+      tags:
+        - Vehicles
+      summary: Sets the acceptable order types for the named vehicle.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptableOrderTypes"
+        description: The list of all acceptable order types with priorities.
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: The submitted data is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/energyLevelThresholdSet":
+    put:
+      tags:
+        - Vehicles
+      summary: Sets energy level threshold values for the named vehicle (in percent).
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnergyLevelThresholdSet"
+        description: The new set of energy level thresholds.
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: The submitted data is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/commAdapter/attachmentInformation":
+    get:
+      tags:
+        - Vehicles
+      summary: Retrieves the driver attachment information of this vehicle.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttachmentInformation"
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/commAdapter/attachment":
+    put:
+      tags:
+        - Vehicles
+      summary: Attaches the given vehicle driver to this vehicle.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The description class name of the vehicle driver that is to be attached.
+          required: true
+          example: org.opentcs.virtualvehicle.LoopbackCommunicationAdapterDescription
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+        "400":
+          description: The submitted value is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: "Unknown vehicle driver class name: org.opentcs.someVehicle.driver11"
+  "/vehicles/{NAME}/commAdapter/enabled":
+    put:
+      tags:
+        - Vehicles
+      summary: Sets the enabled state for the named vehicle's driver.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The vehicle driver's new enabled state.
+          required: true
+          example: true
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/commAdapter/message":
+    post:
+        tags:
+            - Vehicles
+        summary: Sends a message to the named vehicle's driver.
+        description: ""
+        parameters:
+          - name: NAME
+            in: path
+            description: The name of the vehicle.
+            required: true
+            schema:
+                type: string
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VehicleCommAdapterMessage"
+        responses:
+          "200":
+            description: Successful operation
+          "404":
+            description: Referencing object that could not be found.
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: string
+                    description: Details on the actual error.
+                    example: Could not find vehicle 'Vehicle-0001'.
+  "/vehicles/{NAME}/routeComputationQuery":
+    post:
+      tags:
+        - Vehicles
+      summary: Computes routes for the named vehicle to the given destination points.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+        - name: maxRoutesPerDestinationPoint
+          in: query
+          description: The maximum number of routes to compute for one destination point.
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoutesRequest"
+        description: The destination points, optional source point and optional list of resources to avoid for the routes to be computed.
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoutesResponse"
+        "400":
+          description: The submitted request body is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: "Unknown source point: Point-X"
+  "/vehicles/{NAME}/envelopeKey":
+    put:
+      tags:
+        - Vehicles
+      summary: Sets the envelope key for this vehicle.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the vehicle.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The vehicle's new envelope key.
+          required: false
+          example: envelopeType-01
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find vehicle 'Vehicle-0001'.
+  /vehicles/dispatcher/trigger:
+    post:
+      tags:
+        - Vehicles
+      summary: Explicitly triggers dispatching of vehicles / transport orders.
+      description: >-
+        Triggers the kernel's dispatcher to assign vehicles to transport orders.
+        This usually happens automatically, but depending on the kernel configuration, explicitly triggering it may be necessary.
+      responses:
+        "200":
+          description: Successful response
+components:
+  schemas:
+    AcceptableOrderTypes:
+      title: Acceptable Order Types
+      type: object
+      properties:
+        acceptableOrderTypes:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The name of the order type.
+              priority:
+                type: integer
+                description: The priority of the order type, with a lower value indicating a higher priority.
+            required:
+              - name
+              - priority
+          example: [ { "name": "Park", "priority": 0 }, { "name": "Load cargo", "priority": 0 }, { "name": "Unload cargo", "priority": 0 } ]
+      required:
+        - acceptableOrderTypes
+    EnergyLevelThresholdSet:
+      title: Energy Level Threshold Set
+      type: object
+      properties:
+        energyLevelCritical:
+          description: The energy level value (in %) at/below which the vehicle _must_ be recharged.
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 15
+        energyLevelGood:
+          description: The energy level value (in %) at/above which the vehicle _should not_ be recharged.
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 60
+        energyLevelSufficientlyRecharged:
+          description: The energy level value (in %) at/above which the vehicle is considered sufficiently recharged, i.e. _may_ stop recharging.
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 50
+        energyLevelFullyRecharged:
+          description: The energy level value (in %) at/above which the vehicle is considered fully recharged, i.e. _should_ stop recharging.
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 90
+      required:
+        - energyLevelCritical
+        - energyLevelGood
+        - energyLevelSufficientlyRecharged
+        - energyLevelFullyRecharged
+    AttachmentInformation:
+      title: Attachment Information
+      type: object
+      additionalProperties: false
+      properties:
+        vehicleName:
+          type: string
+          description: The name of the vehicle.
+          example: Vehicle-0001
+        availableCommAdapters:
+          type: array
+          items:
+            type: string
+          description: The list of drivers (as names of description classes) available for this vehicle.
+          example: [ "org.opentcs.someVehicle.driver001", "org.opentcs.someVehicle.driver002" ]
+        attachedCommAdapter:
+          type: string
+          description: The description class name of the vehicle driver currently attached to this vehicle.
+          example: org.opentcs.someVehicle.driver001
+      required:
+        - vehicleName
+        - availableCommAdapters
+        - attachedCommAdapter
+    RoutesRequest:
+      title: Requested routes
+      type: object
+      properties:
+        sourcePoint:
+          type: string
+          description: >-
+            The (optional) starting point for route computation.
+            If `null` or not set, the vehicle's current position will be used.
+          example: Point-A
+        destinationPoints:
+          type: array
+          description: The destination point for each route to be computed.
+          items:
+            type: string
+          example:
+            - Point-C
+            - Point-D
+            - Point-E
+        resourcesToAvoid:
+          type: array
+          description: The resources to be avoided for each route.
+          items:
+            type: string
+          example:
+            - Path-CA
+            - Point-B
+      required:
+        - destinationPoints
+    RoutesResponse:
+      title: Computed routes for different destination points.
+      type: object
+      properties:
+        routes:
+          type: array
+          description: The list of computed routes.
+          items:
+            $ref: "#/components/schemas/Route"
+      required:
+        - Routes
+      example:
+        routes:
+          - destinationPoint: Point-C
+            costs: 77644
+            steps:
+              - path: Point-A --- Point-B
+                sourcePoint: Point-A
+                destinationPoint: Point-B
+                vehicleOrientation: FORWARD
+              - path: Point-B --- Point-C
+                sourcePoint: Point-B
+                destinationPoint: Point-C
+                vehicleOrientation: FORWARD
+          - destinationPoint: Point-D
+            costs: -1
+            steps: null
+          - destinationPoint: Point-E
+            costs: 67934
+            steps:
+              - path: Point-A --- Point-D
+                sourcePoint: Point-A
+                destinationPoint: Point-D
+                vehicleOrientation: FORWARD
+              - path: Point-D --- Point-E
+                sourcePoint: Point-D
+                destinationPoint: Point-E
+                vehicleOrientation: BACKWARD
+    Route:
+      title: Route
+      type: object
+      properties:
+        destinationPoint:
+          type: string
+          description: The computed route's destination point.
+          example: Point-A
+        costs:
+          type: integer
+          format: int64
+          description: The costs for the computed route, or `-1`, if no route could be computed.
+          example: 33475
+        steps:
+          type: array
+          nullable: true
+          description: An array containing the computed route's steps, or `null`, if no route could be computed.
+          items:
+            $ref: "#/components/schemas/Step"
+      required:
+        - destinationPoint
+        - costs
+        - steps
+    Step:
+      title: Single step of a route
+      type: object
+      properties:
+        path:
+          type: string
+          description: The path to travel for this step.
+          nullable: true
+          example: Point-A --- Point-B
+        sourcePoint:
+          type: string
+          description: The source point for this step.
+          nullable: true
+          example: Point-A
+        destinationPoint:
+          type: string
+          description: The destination point for this step.
+          example: Point-B
+        vehicleOrientation:
+          type: string
+          default: UNDEFINED
+          enum:
+            - FORWARD
+            - BACKWARD
+            - UNDEFINED
+      required:
+        - path
+        - sourcePoint
+        - destinationPoint
+        - vehicleOrientation
+    VehicleCommAdapterMessage:
+      title: Vehicle Comm Adapter Message
+      type: object
+      properties:
+        type:
+          type: string
+          description: The message's type
+          example: "tcs:virtualVehicle:setPosition"
+        parameters:
+          type: array
+          description: The message's parameters.
+          items:
+            $ref: "../schemas/common.yaml#/components/schemas/Property"
+          example:
+            - key: "position"
+              value: "Point-0001"
+      required:
+        - type
+        - parameters

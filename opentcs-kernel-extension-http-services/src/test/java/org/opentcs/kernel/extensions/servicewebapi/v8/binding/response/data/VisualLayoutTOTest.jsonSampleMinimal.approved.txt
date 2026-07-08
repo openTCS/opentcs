@@ -1,0 +1,8 @@
+{
+  "layerGroups" : [ ],
+  "layers" : [ ],
+  "name" : "some-visual-layout",
+  "properties" : { },
+  "scaleX" : 1.2,
+  "scaleY" : 3.4
+}

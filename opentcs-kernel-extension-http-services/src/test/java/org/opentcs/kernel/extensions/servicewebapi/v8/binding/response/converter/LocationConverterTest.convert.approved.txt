@@ -1,0 +1,32 @@
+{
+  "attachedLinks" : [ {
+    "allowedOperations" : [ "operation-1" ],
+    "location" : "location-1",
+    "point" : "point-1"
+  } ],
+  "layout" : {
+    "labelOffset" : {
+      "x" : 4,
+      "y" : 5
+    },
+    "layerId" : 6,
+    "locationRepresentation" : "LOAD_TRANSFER_GENERIC"
+  },
+  "locked" : true,
+  "name" : "location-1",
+  "peripheralInformation" : {
+    "peripheralJob" : null,
+    "procState" : "IDLE",
+    "reservationToken" : null,
+    "state" : "NO_PERIPHERAL"
+  },
+  "position" : {
+    "x" : 1,
+    "y" : 2,
+    "z" : 3
+  },
+  "properties" : {
+    "key-1" : "value-1"
+  },
+  "type" : "location-type-1"
+}

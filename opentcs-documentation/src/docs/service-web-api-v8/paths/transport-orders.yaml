@@ -1,0 +1,325 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /transportOrders:
+    get:
+      tags:
+        - Transport orders
+      summary: Retrieves a set of transport orders.
+      description: ""
+      parameters:
+        - name: intendedVehicle
+          in: query
+          description: >-
+            The name of the vehicle that is intended to process the transport orders to be retrieved.
+          required: false
+          schema:
+            type: string
+            default: null
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: ArrayOfTransportOrders
+                type: array
+                items:
+                  $ref: '../schemas/objects-states/transport-order.yaml#/components/schemas/TransportOrder'
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find the intended vehicle 'Vehicle-0001'.
+  "/transportOrders/{NAME}":
+    get:
+      tags:
+        - Transport orders
+      summary: Retrieves a single named transport order.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the transport order to be retrieved.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/objects-states/transport-order.yaml#/components/schemas/TransportOrder'
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find transport order 'TOrder-01'.
+    post:
+      tags:
+        - Transport orders
+      summary: Creates a new transport order with the given name.
+      description: ""
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/objects-states/transport-order.yaml#/components/schemas/TransportOrder'
+        "400":
+          description: The submitted data is invalid.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not parse JSON input.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find location 'Storage 01'.
+        "409":
+          description: An object with the same name already exists in the model.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Transport order 'TOrder-01' already exists.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the transport order to be created.
+          required: true
+          schema:
+            type: string
+            example: TOrder-002
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransportOrderInput"
+        description: The details of the transport order to be created.
+  "/transportOrders/{NAME}/immediateAssignment":
+    post:
+      tags:
+        - Transport orders
+      summary: Immediately assigns the transport order to its intended vehicle.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the transport order to be assigned.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Referencing transport order with invalid state.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not assign transport order 'TOrder-01' to vehicle 'Vehicle-0001'.
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find transport order 'TOrder-01'.
+  "/transportOrders/{NAME}/withdrawal":
+    post:
+      tags:
+        - Transport orders
+      summary: Withdraws the transport order with the given name.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the transport order to be withdrawn.
+          required: true
+          schema:
+            type: string
+        - name: immediate
+          in: query
+          description: |
+            Whether the transport order should be aborted as quickly as possible.
+
+            Withdrawing a vehicle's transport order immediately should be used carefully:
+            * It can lead to collisions or deadlocks if the vehicle is not currently halted on a point.
+            * It aborts all peripheral jobs related to this transport order that may still be pending.
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find transport order 'TOrder-01'.
+  "/transportOrders/{NAME}/intendedVehicle":
+    put:
+      tags:
+        - Transport orders
+      summary: Updates the transport order's intended vehicle.
+      description: ""
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the transport order to be updated.
+          required: true
+          schema:
+            type: string
+        - name: vehicle
+          in: query
+          description: The name of the vehicle to assign the transport order to.
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find transport order 'TOrder-01'.
+  /transportOrders/dispatcher/trigger:
+    post:
+      tags:
+        - Transport orders
+      summary: Explicitly triggers dispatching of vehicles / transport orders.
+      description: >-
+        Triggers the kernel's dispatcher to assign vehicles to transport orders.
+        This usually happens automatically, but depending on the kernel configuration, explicitly triggering it may be necessary.
+      responses:
+        "200":
+          description: Successful response
+components:
+  schemas:
+    TransportOrderInput:
+      title: Transport Order
+      type: object
+      additionalProperties: false
+      properties:
+        incompleteName:
+          type: boolean
+          description: Whether the name of the transport order is considered to be incomplete. If
+            set, the kernel will complete the name according to its configuration, e.g. by appending
+            a suffix to it. It is recommended to set this, as names generated by the kernel can be
+            guaranteed to be unique, while clients typically cannot guarantee this.
+          default: false
+        dispensable:
+          type: boolean
+          description: Whether this order is dispensable (may be withdrawn automatically).
+          default: false
+        deadline:
+          type: string
+          format: date-time
+          description: The (optional) deadline of the transport order (expressed according to ISO 8601; with the time zone explicitly specified at the end, e.g. Z for UTC).
+          example: "2018-05-17T06:42:40.396Z"
+        intendedVehicle:
+          type: string
+          description: The (optional) intended vehicle of the transport order
+          example: Vehicle-01
+        peripheralReservationToken:
+          type: string
+          description: An (optional) token for reserving peripheral devices while processing this transport order.
+          example: Token-001
+        wrappingSequence:
+          type: string
+          description: >-
+            The order sequence this transport order belongs to.
+            May be `null` in case this order isn't part of any sequence.
+          example: OrderSequence-01
+        type:
+          type: string
+          description: The (optional) type of the transport order
+          example: Park
+        destinations:
+          type: array
+          minItems: 1
+          maxItems: 2147483647
+          items:
+            $ref: "#/components/schemas/DestinationOrder"
+          description: The destinations
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+          description: The transport order's properties
+        dependencies:
+          type: array
+          minItems: 0
+          maxItems: 2147483647
+          items:
+            type: string
+            example: TOrder-001
+          description: The transport order's dependencies
+      required:
+        - destinations
+    DestinationOrder:
+      type: object
+      additionalProperties: false
+      properties:
+        locationName:
+          type: string
+          description: The name of the destination location
+          example: Storage 01
+        operation:
+          type: string
+          description: The destination operation
+          example: Load cargo
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+          description: The drive order's properties
+      required:
+        - locationName
+        - operation

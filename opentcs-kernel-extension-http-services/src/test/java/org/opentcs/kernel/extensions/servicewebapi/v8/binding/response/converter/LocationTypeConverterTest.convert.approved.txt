@@ -1,0 +1,11 @@
+{
+  "allowedOperations" : [ "operation-1" ],
+  "allowedPeripheralOperations" : [ "peripheral-operation-1" ],
+  "layout" : {
+    "locationRepresentation" : "LOAD_TRANSFER_GENERIC"
+  },
+  "name" : "location-type-1",
+  "properties" : {
+    "key-1" : "value-1"
+  }
+}

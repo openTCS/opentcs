@@ -1,0 +1,10 @@
+{
+  "failureFatal" : true,
+  "incompleteName" : true,
+  "intendedVehicle" : "some-vehicle",
+  "orderTypes" : [ "some-type" ],
+  "properties" : {
+    "another-key" : "another-value",
+    "some-key" : "some-value"
+  }
+}

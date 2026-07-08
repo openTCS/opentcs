@@ -1,0 +1,34 @@
+{
+  "attachedLinks" : [ ],
+  "incomingPaths" : [ ],
+  "layout" : {
+    "labelOffset" : {
+      "x" : 6,
+      "y" : 7
+    },
+    "layerId" : 8
+  },
+  "maxVehicleBoundingBox" : {
+    "height" : 3,
+    "length" : 1,
+    "referenceOffset" : {
+      "x" : 4,
+      "y" : 5
+    },
+    "width" : 2
+  },
+  "name" : "some-point",
+  "occupyingVehicle" : null,
+  "outgoingPaths" : [ ],
+  "pose" : {
+    "orientationAngle" : null,
+    "position" : {
+      "x" : 1,
+      "y" : 2,
+      "z" : 3
+    }
+  },
+  "properties" : { },
+  "type" : "HALT_POSITION",
+  "vehicleEnvelopes" : { }
+}

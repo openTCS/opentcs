@@ -1,0 +1,55 @@
+{
+  "acceptableOrderTypes" : [ ],
+  "allocatedResources" : [ ],
+  "boundingBox" : {
+    "height" : 30,
+    "length" : 50,
+    "referenceOffset" : {
+      "x" : 20,
+      "y" : 10
+    },
+    "width" : 40
+  },
+  "claimedResources" : [ ],
+  "currentPosition" : null,
+  "energyLevel" : 48,
+  "energyLevelThresholdSet" : {
+    "energyLevelCritical" : 30,
+    "energyLevelFullyRecharged" : 90,
+    "energyLevelGood" : 90,
+    "energyLevelSufficientlyRecharged" : 30
+  },
+  "envelopeKey" : "envelopeType-01",
+  "history" : {
+    "entries" : [ ]
+  },
+  "integrationLevel" : "TO_BE_UTILIZED",
+  "layout" : {
+    "routeColor" : {
+      "blue" : 3,
+      "green" : 2,
+      "red" : 1
+    }
+  },
+  "loadHandlingDevices" : [ ],
+  "maxReverseVelocity" : 20,
+  "maxVelocity" : 10,
+  "name" : "some-vehicle",
+  "orderSequence" : null,
+  "paused" : true,
+  "pose" : {
+    "orientationAngle" : null,
+    "position" : null
+  },
+  "procState" : {
+    "procState" : "PROCESSING_ORDER",
+    "timestamp" : "2025-01-29T11:41:17Z"
+  },
+  "properties" : { },
+  "rechargeOperation" : "some-recharge-operation",
+  "state" : {
+    "state" : "EXECUTING",
+    "timestamp" : "2025-01-29T11:48:37Z"
+  },
+  "transportOrder" : null
+}

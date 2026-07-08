@@ -29,5 +29,8 @@ The openTCS developers
    link:./api-base/index.html[JavaDoc documentation]
 ** Injection API:
    link:./api-injection/index.html[JavaDoc documentation]
-** Web API:
-   link:./service-web-api-v1/index.html?docExpansion=list[OpenAPI documentation]
+** Web API
+*** Stable:
+    link:./service-web-api-stable/index.html?docExpansion=list[OpenAPI specification]
+*** Preview:
+    link:./service-web-api-preview/index.html?docExpansion=list[OpenAPI specification]

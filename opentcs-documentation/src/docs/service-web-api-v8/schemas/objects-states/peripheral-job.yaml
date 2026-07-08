@@ -1,0 +1,76 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    PeripheralJob:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        history:
+          $ref: 'common.yaml#/components/schemas/ObjectHistory'
+        reservationToken:
+          type: string
+          minLength: 1
+        relatedVehicle:
+          type: string
+          nullable: true
+        relatedTransportOrder:
+          type: string
+          nullable: true
+        peripheralOperation:
+          $ref: '#/components/schemas/PeripheralOperation'
+        state:
+          $ref: '#/components/schemas/PeripheralJobState'
+        creationTime:
+          type: string
+          format: date-time
+        finishedTime:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - name
+        - properties
+        - history
+        - reservationToken
+        - relatedVehicle
+        - relatedTransportOrder
+        - peripheralOperation
+        - state
+        - creationTime
+        - finishedTime
+    PeripheralOperation:
+      type: object
+      properties:
+        location:
+          type: string
+        operation:
+          type: string
+        executionTrigger:
+          $ref: '#/components/schemas/PeripheralOperationExecutionTrigger'
+        completionRequired:
+          type: boolean
+      required:
+        - location
+        - operation
+        - executionTrigger
+        - completionRequired
+    PeripheralOperationExecutionTrigger:
+      type: string
+      enum:
+        - IMMEDIATE
+        - AFTER_ALLOCATION
+        - AFTER_MOVEMENT
+    PeripheralJobState:
+      type: string
+      enum:
+        - TO_BE_PROCESSED
+        - BEING_PROCESSED
+        - FINISHED
+        - FAILED

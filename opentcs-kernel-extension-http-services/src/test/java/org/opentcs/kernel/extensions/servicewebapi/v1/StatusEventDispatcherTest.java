@@ -20,7 +20,6 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.data.peripherals.PeripheralOperation;
-import org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetEventsResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.OrderStatusMessage;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.getevents.PeripheralJobStatusMessage;

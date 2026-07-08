@@ -1,0 +1,105 @@
+{
+  "acceptableOrderTypes" : [ {
+    "name" : "acceptable-order-type-1",
+    "priority" : 2
+  }, {
+    "name" : "acceptable-order-type-2",
+    "priority" : 5
+  } ],
+  "allocatedResources" : [ [ {
+    "name" : "path-3",
+    "type" : "PATH"
+  }, {
+    "name" : "point-3",
+    "type" : "POINT"
+  } ], [ {
+    "name" : "location-4",
+    "type" : "LOCATION"
+  }, {
+    "name" : "path-4",
+    "type" : "PATH"
+  }, {
+    "name" : "point-4",
+    "type" : "POINT"
+  } ] ],
+  "boundingBox" : {
+    "height" : 3,
+    "length" : 1,
+    "referenceOffset" : {
+      "x" : 4,
+      "y" : 5
+    },
+    "width" : 2
+  },
+  "claimedResources" : [ [ {
+    "name" : "path-1",
+    "type" : "PATH"
+  }, {
+    "name" : "point-1",
+    "type" : "POINT"
+  } ], [ {
+    "name" : "location-2",
+    "type" : "LOCATION"
+  }, {
+    "name" : "path-2",
+    "type" : "PATH"
+  }, {
+    "name" : "point-2",
+    "type" : "POINT"
+  } ] ],
+  "currentPosition" : "point-5",
+  "energyLevel" : 42,
+  "energyLevelThresholdSet" : {
+    "energyLevelCritical" : 1,
+    "energyLevelFullyRecharged" : 4,
+    "energyLevelGood" : 2,
+    "energyLevelSufficientlyRecharged" : 3
+  },
+  "envelopeKey" : "envelope-key-1",
+  "history" : {
+    "entries" : [ {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "event-code-1",
+      "supplements" : [ "supplement-1" ]
+    } ]
+  },
+  "integrationLevel" : "TO_BE_UTILIZED",
+  "layout" : {
+    "routeColor" : {
+      "blue" : 60,
+      "green" : 40,
+      "red" : 20
+    }
+  },
+  "loadHandlingDevices" : [ {
+    "full" : true,
+    "label" : "lhd-1"
+  } ],
+  "maxReverseVelocity" : 100,
+  "maxVelocity" : 200,
+  "name" : "vehicle-1",
+  "orderSequence" : "order-sequence-1",
+  "paused" : true,
+  "pose" : {
+    "orientationAngle" : 4.5,
+    "position" : {
+      "x" : 1,
+      "y" : 2,
+      "z" : 3
+    }
+  },
+  "procState" : {
+    "procState" : "IDLE",
+    "timestamp" : "[Timestamp]"
+  },
+  "properties" : {
+    "key-1" : "value-1",
+    "key-2" : "value-2"
+  },
+  "rechargeOperation" : "recharge-operation",
+  "state" : {
+    "state" : "IDLE",
+    "timestamp" : "[Timestamp]"
+  },
+  "transportOrder" : "transport-order-1"
+}

@@ -11,10 +11,22 @@ import java.io.File;
  */
 public final class FileSystems {
 
+  private static final File HOME_DIRECTORY
+      = new File(System.getProperty("opentcs.home", "."));
+
   /**
    * Prevents creation of instances.
    */
   private FileSystems() {
+  }
+
+  /**
+   * Returns the application's home directory.
+   *
+   * @return The application's home directory.
+   */
+  public static File getApplicationHome() {
+    return HOME_DIRECTORY;
   }
 
   /**

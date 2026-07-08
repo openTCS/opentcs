@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: The openTCS Authors
 # SPDX-License-Identifier: MIT
 
-org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiModule
+org.opentcs.kernel.extensions.servicewebapi.v1.ServiceWebApiModule
+org.opentcs.kernel.extensions.servicewebapi.v8.ServiceWebApiModule

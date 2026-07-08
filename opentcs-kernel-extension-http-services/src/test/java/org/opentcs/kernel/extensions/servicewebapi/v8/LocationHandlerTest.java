@@ -1,0 +1,81 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
+package org.opentcs.kernel.extensions.servicewebapi.v8;
+
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
+
+import java.util.Optional;
+import java.util.concurrent.Executors;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.opentcs.components.kernel.services.InternalTCSObjectService;
+import org.opentcs.components.kernel.services.PlantModelService;
+import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.model.Location;
+import org.opentcs.data.model.LocationType;
+import org.opentcs.kernel.extensions.servicewebapi.common.KernelExecutorWrapper;
+import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.converter.LocationConverter;
+
+/**
+ * Tests for {@link LocationHandler}.
+ */
+class LocationHandlerTest {
+
+  private InternalTCSObjectService objectService;
+  private LocationConverter locationConverter;
+  private PlantModelService plantModelService;
+  private KernelExecutorWrapper executorWrapper;
+
+  private LocationHandler handler;
+
+  private Location location;
+
+  @BeforeEach
+  void setUp() {
+    objectService = mock();
+    locationConverter = mock();
+    plantModelService = mock();
+    executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
+
+    handler = new LocationHandler(
+        objectService,
+        locationConverter,
+        plantModelService,
+        executorWrapper
+    );
+
+    location = new Location(
+        "some-location",
+        new LocationType("some-location-type").getReference()
+    );
+    given(plantModelService.fetch(Location.class, "some-location"))
+        .willReturn(Optional.of(location));
+  }
+
+  @Test
+  void lockLocation() {
+    handler.updateLocationLock("some-location", "true");
+
+    then(plantModelService).should().updateLocationLock(location.getReference(), true);
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"false", "flase", "some-value-that-is-not-true"})
+  void unlockLocationOnAnyNontrueValue(String value) {
+    handler.updateLocationLock("some-location", value);
+
+    then(plantModelService).should().updateLocationLock(location.getReference(), false);
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"true", "false"})
+  void throwOnLockUnknownLocation(String value) {
+    assertThatExceptionOfType(ObjectUnknownException.class)
+        .isThrownBy(() -> handler.updateLocationLock("some-unknown-location", value));
+  }
+}

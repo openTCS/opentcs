@@ -20,6 +20,11 @@ dependencies {
   api libs.javalin
   api libs.javalin.ssl.plugin
 
+  api libs.jakarta.servlet
+
+  api(variantOf(libs.shiro.core) { classifier("jakarta") })
+  api(variantOf(libs.shiro.web) { classifier("jakarta") })
+
   api libs.jackson.databind
   api libs.jackson.module.jsonSchema
   api libs.jackson.datatype.jsr310

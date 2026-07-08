@@ -1,0 +1,17 @@
+{
+  "complete" : true,
+  "creationTime" : "2025-07-22T12:03:00Z",
+  "failureFatal" : true,
+  "finished" : true,
+  "finishedIndex" : 4,
+  "finishedTime" : null,
+  "history" : {
+    "entries" : [ ]
+  },
+  "intendedVehicle" : null,
+  "name" : "order-sequence-1",
+  "orderTypes" : [ ],
+  "orders" : [ ],
+  "processingVehicle" : null,
+  "properties" : { }
+}

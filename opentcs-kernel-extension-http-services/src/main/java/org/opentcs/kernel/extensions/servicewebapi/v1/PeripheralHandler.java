@@ -10,7 +10,7 @@ import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Location;
 import org.opentcs.drivers.peripherals.PeripheralCommAdapterDescription;
 import org.opentcs.drivers.peripherals.management.PeripheralAttachmentInformation;
-import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
+import org.opentcs.kernel.extensions.servicewebapi.common.KernelExecutorWrapper;
 
 /**
  * Handles requests related to peripherals.

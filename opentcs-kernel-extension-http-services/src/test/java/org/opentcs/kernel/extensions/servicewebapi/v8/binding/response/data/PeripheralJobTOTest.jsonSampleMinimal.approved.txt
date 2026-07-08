@@ -1,0 +1,19 @@
+{
+  "creationTime" : "2025-07-22T12:03:00Z",
+  "finishedTime" : null,
+  "history" : {
+    "entries" : [ ]
+  },
+  "name" : "job-1",
+  "peripheralOperation" : {
+    "location" : "location-1",
+    "operation" : "operation-1",
+    "executionTrigger" : "AFTER_MOVEMENT",
+    "completionRequired" : true
+  },
+  "properties" : { },
+  "relatedTransportOrder" : null,
+  "relatedVehicle" : null,
+  "reservationToken" : "reservation-token-1",
+  "state" : "FINISHED"
+}

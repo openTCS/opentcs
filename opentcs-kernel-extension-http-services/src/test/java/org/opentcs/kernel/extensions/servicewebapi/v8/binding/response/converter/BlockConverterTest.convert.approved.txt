@@ -1,0 +1,24 @@
+{
+  "layout" : {
+    "color" : {
+      "blue" : 3,
+      "green" : 2,
+      "red" : 1
+    }
+  },
+  "members" : [ {
+    "name" : "location-1",
+    "type" : "LOCATION"
+  }, {
+    "name" : "path-1",
+    "type" : "PATH"
+  }, {
+    "name" : "point-1",
+    "type" : "POINT"
+  } ],
+  "name" : "block-1",
+  "properties" : {
+    "key-1" : "value-1"
+  },
+  "type" : "SAME_DIRECTION_ONLY"
+}

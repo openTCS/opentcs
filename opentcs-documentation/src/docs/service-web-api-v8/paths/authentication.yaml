@@ -1,0 +1,129 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /login:
+    post:
+      operationId: login
+      tags:
+        - Authentication
+      summary: Logs a user in and grants access to the web API.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        description: The details of the user to be logged in.
+      security: [] # no authentication
+      responses:
+        "200":
+          description: >-
+            Successfully authenticated.
+            The session ID is returned in a cookie named `JSESSIONID`.
+            You need to include this cookie in subsequent requests.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: JSESSIONID=e37...a6b; Path=/; HttpOnly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        "401":
+          description: Authentication failed.
+  /logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logs a user out.
+      responses:
+        "200":
+          description: Successful response
+  /session:
+    get:
+      tags:
+        - Authentication
+      summary: Retrieves information about the session of the currently logged-in user.
+      responses:
+        "200":
+          description: Details on the session/user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        "401":
+          description: Not authenticated.
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    LoginResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            username:
+              description: The name of the logged in user.
+              type: string
+            permissions:
+              description: The permissions granted to the user.
+              type: array
+              items:
+                $ref: '#/components/schemas/UserPermission'
+          required:
+            - username
+            - permissions
+        session:
+          type: object
+          properties:
+            sessionId:
+              description: The ID of the user's current session.
+              type: string
+            creationTime:
+              description: The time the session was created.
+              type: string
+              format: date-time
+            expirationTime:
+              description: The time the session will expire.
+              type: string
+              format: date-time
+          required:
+            - sessionId
+            - creationTime
+            - expirationTime
+    UserPermission:
+      type: string
+      enum:
+        - READ_DATA
+        - SHUTDOWN_KERNEL
+        - LOAD_MODEL
+        - LOCK_RESOURCE
+        - UPDATE_ROUTING_TOPOLOGY
+        - MODIFY_VEHICLE
+        - MODIFY_ORDER
+        - MODIFY_ORDER_SEQUENCE
+        - MODIFY_PERIPHERAL
+        - MODIFY_PERIPHERAL_JOB
+      description: |-
+        Possible user permission values:
+        * `READ_DATA` - Indicates the user may retrieve any data from the kernel.
+        * `SHUTDOWN_KERNEL` - Indicates the user may shut down the kernel.
+        * `LOAD_MODEL` - Indicates the user may load another model.
+        * `LOCK_RESOURCE` - Indicates the user may add or remove temporary locks at paths or locations.
+        * `UPDATE_ROUTING_TOPOLOGY` - Indicates the user may update the routing topology.
+        * `MODIFY_VEHICLE` - Indicates the user may move/place vehicles and modify their states.
+        * `MODIFY_ORDER` - Indicates the user may create/modify transport orders.
+        * `MODIFY_ORDER_SEQUENCE` - Indicates the user may create/modify order sequences.
+        * `MODIFY_PERIPHERAL` - Indicates the user may modify peripheral states.
+        * `MODIFY_PERIPHERAL_JOB` - Indicates the user may create/modify peripheral jobs.

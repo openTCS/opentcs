@@ -81,6 +81,7 @@ import org.opentcs.kernel.workingset.PrefixedUlidObjectNameProvider;
 import org.opentcs.kernel.workingset.TCSObjectManager;
 import org.opentcs.kernel.workingset.TCSObjectRepository;
 import org.opentcs.kernel.workingset.TransportOrderPoolManager;
+import org.opentcs.util.FileSystems;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.SimpleEventBus;
@@ -106,10 +107,9 @@ public class DefaultKernelInjectionModule
     configureKernelExecutor();
 
     // Ensure that the application's home directory can be used everywhere.
-    File applicationHome = new File(System.getProperty("opentcs.home", "."));
     bind(File.class)
         .annotatedWith(ApplicationHome.class)
-        .toInstance(applicationHome);
+        .toInstance(FileSystems.getApplicationHome());
 
     // A single global synchronization object for the kernel.
     bind(Object.class)

@@ -1,0 +1,105 @@
+{
+  "acceptableOrderTypes" : [ {
+    "name" : "OrderType001",
+    "priority" : 23
+  }, {
+    "name" : "OrderType002",
+    "priority" : 42
+  } ],
+  "allocatedResources" : [ [ {
+    "name" : "some-path",
+    "type" : "PATH"
+  }, {
+    "name" : "some-point",
+    "type" : "POINT"
+  }, {
+    "name" : "some-location",
+    "type" : "LOCATION"
+  } ], [ {
+    "name" : "some-other-path",
+    "type" : "PATH"
+  }, {
+    "name" : "some-other-point",
+    "type" : "POINT"
+  } ] ],
+  "boundingBox" : {
+    "height" : 30,
+    "length" : 50,
+    "referenceOffset" : {
+      "x" : 20,
+      "y" : 10
+    },
+    "width" : 40
+  },
+  "claimedResources" : [ [ {
+    "name" : "some-path",
+    "type" : "PATH"
+  }, {
+    "name" : "some-point",
+    "type" : "POINT"
+  }, {
+    "name" : "some-location",
+    "type" : "LOCATION"
+  } ], [ {
+    "name" : "some-other-path",
+    "type" : "PATH"
+  }, {
+    "name" : "some-other-point",
+    "type" : "POINT"
+  } ] ],
+  "currentPosition" : "some-point",
+  "energyLevel" : 48,
+  "energyLevelThresholdSet" : {
+    "energyLevelCritical" : 30,
+    "energyLevelFullyRecharged" : 90,
+    "energyLevelGood" : 90,
+    "energyLevelSufficientlyRecharged" : 30
+  },
+  "envelopeKey" : "envelopeType-01",
+  "history" : {
+    "entries" : [ {
+      "timestamp" : "2025-01-29T11:38:37Z",
+      "eventCode" : "some-event-code",
+      "supplements" : [ "some-supplement" ]
+    } ]
+  },
+  "integrationLevel" : "TO_BE_UTILIZED",
+  "layout" : {
+    "routeColor" : {
+      "blue" : 3,
+      "green" : 2,
+      "red" : 1
+    }
+  },
+  "loadHandlingDevices" : [ {
+    "full" : true,
+    "label" : "some-load-handling-device"
+  } ],
+  "maxReverseVelocity" : 20,
+  "maxVelocity" : 10,
+  "name" : "some-vehicle",
+  "orderSequence" : "some-order-sequence",
+  "paused" : true,
+  "pose" : {
+    "orientationAngle" : 90.0,
+    "position" : {
+      "x" : 1,
+      "y" : 2,
+      "z" : 3
+    }
+  },
+  "procState" : {
+    "procState" : "PROCESSING_ORDER",
+    "timestamp" : "2025-01-29T11:41:17Z"
+  },
+  "properties" : {
+    "some-key" : "some-value",
+    "some-other-key" : "some-other-value"
+  },
+  "rechargeOperation" : "some-recharge-operation",
+  "state" : {
+    "state" : "EXECUTING",
+    "timestamp" : "2025-01-29T11:48:37Z"
+  },
+  "transportOrder" : "some-order"
+}

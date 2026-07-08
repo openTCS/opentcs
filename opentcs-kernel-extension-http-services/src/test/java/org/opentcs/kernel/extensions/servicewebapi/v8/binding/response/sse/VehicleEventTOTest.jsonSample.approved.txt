@@ -1,0 +1,194 @@
+{
+  "currentObjectState" : {
+    "acceptableOrderTypes" : [ {
+      "name" : "acceptable-order-type-1",
+      "priority" : 2
+    }, {
+      "name" : "acceptable-order-type-2",
+      "priority" : 5
+    } ],
+    "allocatedResources" : [ [ {
+      "name" : "resource-3",
+      "type" : "PATH"
+    }, {
+      "name" : "resource-4",
+      "type" : "POINT"
+    } ], [ {
+      "name" : "resource-5",
+      "type" : "PATH"
+    }, {
+      "name" : "resource-6",
+      "type" : "POINT"
+    }, {
+      "name" : "resource-7",
+      "type" : "LOCATION"
+    } ] ],
+    "boundingBox" : {
+      "height" : 3,
+      "length" : 1,
+      "referenceOffset" : {
+        "x" : 4,
+        "y" : 5
+      },
+      "width" : 2
+    },
+    "claimedResources" : [ [ {
+      "name" : "resource-1",
+      "type" : "PATH"
+    }, {
+      "name" : "resource-2",
+      "type" : "POINT"
+    } ] ],
+    "currentPosition" : "position-1",
+    "energyLevel" : 42,
+    "energyLevelThresholdSet" : {
+      "energyLevelCritical" : 1,
+      "energyLevelFullyRecharged" : 4,
+      "energyLevelGood" : 2,
+      "energyLevelSufficientlyRecharged" : 3
+    },
+    "envelopeKey" : "envelope-key-1",
+    "history" : {
+      "entries" : [ {
+        "timestamp" : "2025-07-22T12:03:00Z",
+        "eventCode" : "event-code-1",
+        "supplements" : [ "supplement-1", "supplement-2" ]
+      } ]
+    },
+    "integrationLevel" : "TO_BE_UTILIZED",
+    "layout" : {
+      "routeColor" : {
+        "blue" : 40,
+        "green" : 20,
+        "red" : 60
+      }
+    },
+    "loadHandlingDevices" : [ {
+      "full" : true,
+      "label" : "lhd-1"
+    } ],
+    "maxReverseVelocity" : 100,
+    "maxVelocity" : 200,
+    "name" : "vehicle-1",
+    "orderSequence" : "order-sequence-1",
+    "paused" : true,
+    "pose" : {
+      "orientationAngle" : 4.5,
+      "position" : {
+        "x" : 1,
+        "y" : 2,
+        "z" : 3
+      }
+    },
+    "procState" : {
+      "procState" : "IDLE",
+      "timestamp" : "2025-07-22T12:03:00Z"
+    },
+    "properties" : {
+      "key-1" : "value-1",
+      "key-2" : "value-2"
+    },
+    "rechargeOperation" : "recharge-operation",
+    "state" : {
+      "state" : "IDLE",
+      "timestamp" : "2025-07-22T12:03:00Z"
+    },
+    "transportOrder" : "transport-order-1"
+  },
+  "previousObjectState" : {
+    "acceptableOrderTypes" : [ {
+      "name" : "acceptable-order-type-1",
+      "priority" : 2
+    }, {
+      "name" : "acceptable-order-type-2",
+      "priority" : 5
+    } ],
+    "allocatedResources" : [ [ {
+      "name" : "resource-3",
+      "type" : "PATH"
+    }, {
+      "name" : "resource-4",
+      "type" : "POINT"
+    } ], [ {
+      "name" : "resource-5",
+      "type" : "PATH"
+    }, {
+      "name" : "resource-6",
+      "type" : "POINT"
+    }, {
+      "name" : "resource-7",
+      "type" : "LOCATION"
+    } ] ],
+    "boundingBox" : {
+      "height" : 3,
+      "length" : 1,
+      "referenceOffset" : {
+        "x" : 4,
+        "y" : 5
+      },
+      "width" : 2
+    },
+    "claimedResources" : [ [ {
+      "name" : "resource-1",
+      "type" : "PATH"
+    }, {
+      "name" : "resource-2",
+      "type" : "POINT"
+    } ] ],
+    "currentPosition" : "position-1",
+    "energyLevel" : 42,
+    "energyLevelThresholdSet" : {
+      "energyLevelCritical" : 1,
+      "energyLevelFullyRecharged" : 4,
+      "energyLevelGood" : 2,
+      "energyLevelSufficientlyRecharged" : 3
+    },
+    "envelopeKey" : "envelope-key-1",
+    "history" : {
+      "entries" : [ {
+        "timestamp" : "2025-07-22T12:03:00Z",
+        "eventCode" : "event-code-1",
+        "supplements" : [ "supplement-1", "supplement-2" ]
+      } ]
+    },
+    "integrationLevel" : "TO_BE_RESPECTED",
+    "layout" : {
+      "routeColor" : {
+        "blue" : 40,
+        "green" : 20,
+        "red" : 60
+      }
+    },
+    "loadHandlingDevices" : [ {
+      "full" : true,
+      "label" : "lhd-1"
+    } ],
+    "maxReverseVelocity" : 100,
+    "maxVelocity" : 200,
+    "name" : "vehicle-1",
+    "orderSequence" : "order-sequence-1",
+    "paused" : true,
+    "pose" : {
+      "orientationAngle" : 4.5,
+      "position" : {
+        "x" : 1,
+        "y" : 2,
+        "z" : 3
+      }
+    },
+    "procState" : {
+      "procState" : "IDLE",
+      "timestamp" : "2025-07-22T12:03:00Z"
+    },
+    "properties" : {
+      "key-1" : "value-1",
+      "key-2" : "value-2"
+    },
+    "rechargeOperation" : "recharge-operation",
+    "state" : {
+      "state" : "IDLE",
+      "timestamp" : "2025-07-22T12:03:00Z"
+    },
+    "transportOrder" : "transport-order-1"
+  }
+}

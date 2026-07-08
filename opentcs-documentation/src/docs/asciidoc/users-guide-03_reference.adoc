@@ -761,11 +761,17 @@ The default peripheral job dispatcher can be configured using the following conf
 
 include::{configdoc}/DefaultPeripheralJobDispatcherConfigurationEntries.adoc[]
 
-===== Service web API configuration entries
+===== Service web API v1 configuration entries
 
 The kernel's service web API can be configured using the following configuration entries:
 
-include::{configdoc}/ServiceWebApiConfigurationEntries.adoc[]
+include::{configdoc}/ServiceWebApiV1ConfigurationEntries.adoc[]
+
+===== Service web API v8 configuration entries
+
+The kernel's service web API can be configured using the following configuration entries:
+
+include::{configdoc}/ServiceWebApiV8ConfigurationEntries.adoc[]
 
 ===== RMI kernel interface configuration entries
 

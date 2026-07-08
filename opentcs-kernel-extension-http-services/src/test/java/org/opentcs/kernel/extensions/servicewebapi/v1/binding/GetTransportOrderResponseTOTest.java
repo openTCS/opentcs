@@ -7,7 +7,7 @@ import java.util.List;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
+import org.opentcs.kernel.extensions.servicewebapi.common.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DestinationState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DriveOrderTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.ObjectHistoryTO;

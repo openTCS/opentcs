@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /points:
+    get:
+      tags:
+        - Plant models
+      summary: Retrieves a set of points.
+      parameters:
+        - name: names
+          in: query
+          description: >-
+            The names of the points to be retrieved.
+            If a named point could not be found, it will simply be omitted from the response (and not result in an error).
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          example: ['Point-0001', 'Point-0002']
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../schemas/objects-states/point.yaml#/components/schemas/Point'
+              examples:
+                points:
+                  $ref: '../examples/response-examples.yaml#/components/examples/pointsExample'
+  "/points/{NAME}":
+    get:
+      tags:
+        - Plant models
+      summary: Retrieves the point with the given name.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the point to be retrieved.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/objects-states/point.yaml#/components/schemas/Point'
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find point 'Point-0001'.

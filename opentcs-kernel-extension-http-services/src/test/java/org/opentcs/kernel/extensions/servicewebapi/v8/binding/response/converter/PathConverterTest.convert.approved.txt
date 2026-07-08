@@ -1,0 +1,34 @@
+{
+  "destinationPoint" : "point-2",
+  "layout" : {
+    "connectionType" : "POLYPATH",
+    "controlPoints" : [ {
+      "x" : 6,
+      "y" : 7
+    } ],
+    "layerId" : 8
+  },
+  "length" : 1,
+  "locked" : true,
+  "maxReverseVelocity" : 3,
+  "maxVelocity" : 2,
+  "name" : "path-1",
+  "peripheralOperations" : [ {
+    "completionRequired" : true,
+    "executionTrigger" : "AFTER_ALLOCATION",
+    "location" : "location-1",
+    "operation" : "operation-1"
+  } ],
+  "properties" : {
+    "key-1" : "value-1"
+  },
+  "sourcePoint" : "point-1",
+  "vehicleEnvelopes" : {
+    "envelope-key-1" : {
+      "vertices" : [ {
+        "x" : 4,
+        "y" : 5
+      } ]
+    }
+  }
+}

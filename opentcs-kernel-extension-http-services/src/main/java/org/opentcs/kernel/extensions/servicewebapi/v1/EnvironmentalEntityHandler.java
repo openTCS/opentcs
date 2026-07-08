@@ -19,7 +19,7 @@ import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.EnvironmentalEntity;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
-import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
+import org.opentcs.kernel.extensions.servicewebapi.common.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.GetEnvironmentalEntityResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostEnvironmentalEntityRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PutEnvironmentalEntityEnvelopeTO;

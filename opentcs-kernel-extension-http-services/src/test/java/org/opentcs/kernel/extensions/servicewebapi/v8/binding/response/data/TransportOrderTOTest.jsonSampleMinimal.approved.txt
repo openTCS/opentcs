@@ -1,0 +1,21 @@
+{
+  "creationTime" : "2025-11-28T15:45:41Z",
+  "currentDriveOrderIndex" : 1,
+  "currentRouteStepIndex" : 2,
+  "deadline" : null,
+  "dependencies" : [ ],
+  "dispensable" : true,
+  "driveOrders" : [ ],
+  "finishedTime" : null,
+  "history" : {
+    "entries" : [ ]
+  },
+  "intendedVehicle" : null,
+  "name" : "some-order",
+  "peripheralReservationToken" : null,
+  "processingVehicle" : null,
+  "properties" : { },
+  "state" : "ACTIVE",
+  "type" : "some-type",
+  "wrappingSequence" : null
+}

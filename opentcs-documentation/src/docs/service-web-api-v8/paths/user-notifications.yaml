@@ -1,0 +1,31 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /userNotifications:
+    get:
+      tags:
+        - User notifications
+      summary: Returns user notifications issued by the kernel.
+      parameters:
+        - name: since
+          in: query
+          description: >-
+            The timestamp after which user notifications should be returned.
+            If `null`, all available user notifications are returned.
+          required: false
+          schema:
+            type: string
+            format: date-time
+            nullable: true
+            example: "2018-05-17T06:42:40.396Z"
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../schemas/objects-states/user-notification.yaml#/components/schemas/UserNotification'
+

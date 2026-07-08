@@ -18,7 +18,7 @@ import org.opentcs.data.model.Envelope;
 import org.opentcs.data.model.EnvironmentalEntity;
 import org.opentcs.data.model.Pose;
 import org.opentcs.data.model.Triple;
-import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
+import org.opentcs.kernel.extensions.servicewebapi.common.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.sse.EnvironmentalEntityEventTO;
 
 /**

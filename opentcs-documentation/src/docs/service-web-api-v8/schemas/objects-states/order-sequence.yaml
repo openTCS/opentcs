@@ -1,0 +1,59 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    OrderSequence:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        history:
+          $ref: 'common.yaml#/components/schemas/ObjectHistory'
+        orderTypes:
+          type: array
+          items:
+            type: string
+        orders:
+          type: array
+          items:
+            type: string
+        finishedIndex:
+          type: integer
+        complete:
+          type: boolean
+        finished:
+          type: boolean
+        failureFatal:
+          type: boolean
+        intendedVehicle:
+          type: string
+          nullable: true
+        processingVehicle:
+          type: string
+          nullable: true
+        creationTime:
+          type: string
+          format: date-time
+        finishedTime:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - name
+        - properties
+        - history
+        - orderTypes
+        - orders
+        - finishedIndex
+        - complete
+        - finished
+        - failureFatal
+        - intendedVehicle
+        - processingVehicle
+        - creationTime
+        - finishedTime

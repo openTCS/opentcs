@@ -1,0 +1,12 @@
+{
+  "allowedOperations" : [ "some-vehicle-operation" ],
+  "allowedPeripheralOperations" : [ "some-peripheral-operation" ],
+  "layout" : {
+    "locationRepresentation" : "DEFAULT"
+  },
+  "name" : "some-location",
+  "properties" : {
+    "some-key" : "some-value",
+    "some-other-key" : "some-other-value"
+  }
+}

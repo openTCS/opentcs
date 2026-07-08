@@ -1,0 +1,239 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /sse:
+    get:
+      tags:
+        - Server-Sent Events - Connection
+      summary: Establishes a Server-Sent Events connection.
+      description: >-
+        Sends a stream of events. The types of events sent can be selected via query parameters.
+
+        The respective event data is described in separate endpoints below.
+
+        Note that, in order for the SSE connection to be established properly, the request's `Accept` header must be set to `text/event-stream`.
+      parameters:
+        - name: /events/vehicles
+          in: query
+          description: >-
+            Whether or not events of this type are to be sent.
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: /events/transportOrders
+          in: query
+          description: >-
+            Whether or not events of this type are to be sent.
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: /events/orderSequences
+          in: query
+          description: >-
+            Whether or not events of this type are to be sent.
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: /events/peripheralJobs
+          in: query
+          description: >-
+            Whether or not events of this type are to be sent.
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: /events/paths
+          in: query
+          description: >-
+            Whether or not events of this type are to be sent.
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: /events/locations
+          in: query
+          description: >-
+            Whether or not events of this type are to be sent.
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: /events/userNotifications
+          in: query
+          description: >-
+            Whether or not events of this type are to be sent.
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: >-
+            A stream of event objects.
+            For details on the actual event objects, see the named events described below.
+          content:
+            text/event-stream:
+              schema:
+                type: object
+  /sse::/events/vehicles:
+    get:
+      tags:
+        - Server-Sent Events - Named Events
+      summary: Describes a change of a vehicle.
+      responses:
+        default:
+          description: The event content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VehicleEvent"
+  /sse::/events/transportOrders:
+    get:
+      tags:
+        - Server-Sent Events - Named Events
+      summary: Describes a change of a transport order.
+      responses:
+        default:
+          description: The event content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransportOrderEvent"
+  /sse::/events/orderSequences:
+    get:
+      tags:
+        - Server-Sent Events - Named Events
+      summary: Describes a change of an order sequence.
+      responses:
+        default:
+          description: The event content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderSequenceEvent"
+  /sse::/events/peripheralJobs:
+    get:
+      tags:
+        - Server-Sent Events - Named Events
+      summary: Describes a change of a peripheral job.
+      responses:
+        default:
+          description: The event content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeripheralJobEvent"
+  /sse::/events/paths:
+    get:
+      tags:
+        - Server-Sent Events - Named Events
+      summary: Describes a change of a path.
+      responses:
+        default:
+          description: The event content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PathEvent"
+  /sse::/events/locations:
+    get:
+      tags:
+        - Server-Sent Events - Named Events
+      summary: Describes a change of a location.
+      responses:
+        default:
+          description: The event content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LocationEvent"
+  /sse::/events/userNotifications:
+    get:
+      tags:
+        - Server-Sent Events - Named Events
+      summary: Describes a user notification.
+      responses:
+        default:
+          description: The user notification.
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/objects-states/user-notification.yaml#/components/schemas/UserNotification'
+components:
+  schemas:
+    # Schemas for vehicles
+    VehicleEvent:
+      allOf:
+        - $ref: '#/components/schemas/TCSObjectEvent'
+      properties:
+        currentObjectState:
+          $ref: '../schemas/objects-states/vehicle.yaml#/components/schemas/Vehicle'
+        previousObjectState:
+          $ref: '../schemas/objects-states/vehicle.yaml#/components/schemas/Vehicle'
+    # Schemas for transport orders
+    TransportOrderEvent:
+      allOf:
+        - $ref: '#/components/schemas/TCSObjectEvent'
+      properties:
+        currentObjectState:
+          $ref: '../schemas/objects-states/transport-order.yaml#/components/schemas/TransportOrder'
+        previousObjectState:
+          $ref: '../schemas/objects-states/transport-order.yaml#/components/schemas/TransportOrder'
+    # Schemas for order sequences
+    OrderSequenceEvent:
+      allOf:
+        - $ref: '#/components/schemas/TCSObjectEvent'
+      properties:
+        currentObjectState:
+          $ref: '../schemas/objects-states/order-sequence.yaml#/components/schemas/OrderSequence'
+        previousObjectState:
+          $ref: '../schemas/objects-states/order-sequence.yaml#/components/schemas/OrderSequence'
+    # Schemas for peripheral jobs
+    PeripheralJobEvent:
+      allOf:
+        - $ref: '#/components/schemas/TCSObjectEvent'
+      properties:
+        currentObjectState:
+          $ref: '../schemas/objects-states/peripheral-job.yaml#/components/schemas/PeripheralJob'
+        previousObjectState:
+          $ref: '../schemas/objects-states/peripheral-job.yaml#/components/schemas/PeripheralJob'
+    # Schemas for paths
+    PathEvent:
+      allOf:
+        - $ref: '#/components/schemas/TCSObjectEvent'
+      properties:
+        currentObjectState:
+          $ref: '../schemas/objects-states/path.yaml#/components/schemas/Path'
+        previousObjectState:
+          $ref: '../schemas/objects-states/path.yaml#/components/schemas/Path'
+    # Schemas for locations
+    LocationEvent:
+      allOf:
+        - $ref: '#/components/schemas/TCSObjectEvent'
+      properties:
+        currentObjectState:
+          $ref: '../schemas/objects-states/location.yaml#/components/schemas/Location'
+        previousObjectState:
+          $ref: '../schemas/objects-states/location.yaml#/components/schemas/Location'
+    # Common schemas
+    TCSObjectEvent:
+      type: object
+      description: >-
+        For events of this type, either `currentObjectState` or `previousObjectState` may be `null`, but both cannot be `null` at the same time.
+        `previousObjectState` is `null` if the corresponding object was created.
+        `currentObjectState` is `null` if the corresponding object was deleted.
+        If an objects was merely modified, both `currentObjectState` and `previousObjectState` are not `null`.
+      properties:
+        currentObjectState:
+          type: object
+          nullable: true
+        previousObjectState:
+          type: object
+          nullable: true
+      required:
+        - currentObjectState
+        - previousObjectState

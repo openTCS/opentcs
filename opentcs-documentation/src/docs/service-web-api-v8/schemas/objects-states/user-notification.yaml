@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    UserNotification:
+      type: object
+      properties:
+        source:
+          type: string
+          nullable: true
+        text:
+          type: string
+        level:
+          $ref: '#/components/schemas/UserNotificationLevel'
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - source
+        - text
+        - level
+        - timestamp
+    UserNotificationLevel:
+      type: string
+      enum:
+        - INFORMATIONAL
+        - NOTEWORTHY
+        - IMPORTANT
+

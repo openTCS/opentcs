@@ -1,0 +1,73 @@
+{
+  "creationTime" : "[Timestamp]",
+  "currentDriveOrderIndex" : 3,
+  "currentRouteStepIndex" : 2,
+  "deadline" : "[Timestamp]",
+  "dependencies" : [ "dependency-1", "dependency-2" ],
+  "dispensable" : true,
+  "driveOrders" : [ {
+    "destination" : {
+      "destination" : "location-1",
+      "operation" : "operation-1",
+      "properties" : {
+        "key-3" : "value-3"
+      }
+    },
+    "name" : "drive-order-1",
+    "route" : {
+      "costs" : 300,
+      "steps" : [ {
+        "costs" : 200,
+        "destinationPoint" : "point-2",
+        "executionAllowed" : true,
+        "path" : "path-1-2",
+        "reroutingType" : null,
+        "routeIndex" : 1,
+        "sourcePoint" : "point-1",
+        "vehicleOrientation" : "FORWARD"
+      }, {
+        "costs" : 100,
+        "destinationPoint" : "point-2",
+        "executionAllowed" : false,
+        "path" : null,
+        "reroutingType" : "REGULAR",
+        "routeIndex" : 2,
+        "sourcePoint" : null,
+        "vehicleOrientation" : "FORWARD"
+      } ]
+    },
+    "state" : "FINISHED",
+    "transportOrder" : "order-1"
+  } ],
+  "finishedTime" : "[Timestamp]",
+  "history" : {
+    "entries" : [ {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "tcs:history:orderCreated",
+      "supplements" : [ ]
+    }, {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "event-code-1",
+      "supplements" : [ "supplement-1" ]
+    }, {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "tcs:history:orderReachedFinalState",
+      "supplements" : [ ]
+    }, {
+      "timestamp" : "[Timestamp]",
+      "eventCode" : "tcs:history:orderProcVehicleChanged",
+      "supplements" : [ "vehicle-2" ]
+    } ]
+  },
+  "intendedVehicle" : "vehicle-1",
+  "name" : "order-1",
+  "peripheralReservationToken" : "reservation-token-1",
+  "processingVehicle" : "vehicle-2",
+  "properties" : {
+    "key-1" : "value-1",
+    "key-2" : "value-2"
+  },
+  "state" : "FINISHED",
+  "type" : "type-1",
+  "wrappingSequence" : "sequence-1"
+}

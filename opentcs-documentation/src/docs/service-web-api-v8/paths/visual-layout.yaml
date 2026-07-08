@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /visualLayout:
+    get:
+      tags:
+        - Plant models
+      summary: Retrieves the visual layout.
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/objects-states/visual-layout.yaml#/components/schemas/VisualLayout'
+              examples:
+                visualLayout:
+                  $ref: '../examples/response-examples.yaml#/components/examples/visualLayoutExample'

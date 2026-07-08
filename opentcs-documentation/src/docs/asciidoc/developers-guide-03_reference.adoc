@@ -204,12 +204,12 @@ This would include _MyGreatProject_ in the integration project name, and _Great_
 openTCS provides the following APIs:
 
 * The openTCS Java API for both extending the kernel application as well as interfacing with it via RMI.
-  See <<section-kernel-api>> as well as the link:./api-base/index.html[openTCS Java API documentation] and link:./api-injection/index.html[openTCS injection API documentation] for details.
+  See <<section-kernel-java-api>> as well as the link:./api-base/index.html[openTCS Java API documentation] and link:./api-injection/index.html[openTCS injection API documentation] for details.
 * A web API for interfacing with the kernel via HTTP calls.
-  See the link:./service-web-api-v1/index.html[OpenAPI specification] for details.
+  See <<section-kernel-web-api>> for more on this.
 
-[#section-kernel-api]
-=== The kernel's Java API
+[#section-kernel-java-api]
+==== The kernel's Java API
 
 The interfaces and classes required to use the kernel API are part of the `opentcs-api-base` JAR file, so you should add that to your classpath/declare a dependency on it.
 (See <<Available artifacts and API compatibility>>.)
@@ -230,6 +230,37 @@ image::service_interfaces_others.png[]
 
 NOTE: _Peripheral*_ are classes/interfaces related to experimental integration of peripheral devices.
 These features are not documented in detail, yet, and developers using any of them are on their own, for now.
+
+[#section-kernel-web-api]
+==== The kernel's web API
+
+Clients can interact with the openTCS kernel via HTTP calls, using the kernel's web API.
+The kernel actually provides two versions of this web API:
+
+* A _stable_ version for which backwards compatibility is maintained between minor releases.
+  This is the version that most developers will want to use for production environments.
+  See the link:./service-web-api-stable/index.html[current _stable_ OpenAPI specification] for details.
+* A _preview_ version that is intended to become the next stable version, but is still under development and may contain breaking changes between minor releases.
+  See the link:./service-web-api-preview/index.html[current _preview_ OpenAPI specification] for details.
+
+Starting with openTCS 8.0, the following schema is applied to web API versions and their evolution:
+
+* The version number of the _stable_ web API will always be the same as the major version number of the openTCS distribution, e.g. for openTCS 8.x it will be v8, for openTCS 9.x it will be v9 and so on.
+* The _preview_ web API will always have a version number that is one higher than the stable web API, e.g. for openTCS 8.x it will be v9, for openTCS 9.x it will be v10 and so on.
+* With the next major release of openTCS, the _preview_ web API will become the new _stable_ web API, and the previous _stable_ web API will be removed.
+  For instance, with the release of openTCS 9.0, v9 will become the new _stable_ web API, and the previous _stable_ web API v8 will be removed.
+
+There is no strict rule for when exactly a new _preview_ web API version is created -- the goal is to include it as part of an x.1 release, but it can also be integrated slightly earlier or later.
+There is also no strict rule for what exactly the specification of a new _preview_ web API looks like.
+In most cases, though, it will probably start out as a clone of the current _stable_ web API, and will then be evolved from there to include new features and changes.
+
+The following diagram visualizes this schema:
+
+.Web API evolution
+image::web_api_evolution.png[]
+
+This schema is applied to provide a stable, backwards-compatible interface for production environments while at the same time allowing for continuous evolution of the web API, e.g. to better integrate new openTCS features into it.
+It also makes the evolution of the web API predictable for developers to a certain extent, so they can plan their integration projects accordingly.
 
 === Transport orders in openTCS
 

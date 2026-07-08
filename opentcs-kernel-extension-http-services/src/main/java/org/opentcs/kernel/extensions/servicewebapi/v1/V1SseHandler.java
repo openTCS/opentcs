@@ -23,7 +23,7 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
-import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
+import org.opentcs.kernel.extensions.servicewebapi.common.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.converter.sse.EventConverter;
 import org.opentcs.util.event.EventHandler;
 import org.opentcs.util.event.EventSource;

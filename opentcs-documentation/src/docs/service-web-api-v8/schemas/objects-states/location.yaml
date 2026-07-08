@@ -1,0 +1,93 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    Location:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        type:
+          type: string
+        position:
+          $ref: "common.yaml#/components/schemas/Triple"
+        attachedLinks:
+          type: array
+          items:
+            $ref: 'common.yaml#/components/schemas/Link'
+        locked:
+          type: boolean
+        peripheralInformation:
+          $ref: '#/components/schemas/PeripheralInformation'
+        layout:
+          $ref: '#/components/schemas/LocationLayout'
+      required:
+        - name
+        - properties
+        - type
+        - position
+        - attachedLinks
+        - locked
+        - peripheralInformation
+        - layout
+    PeripheralInformation:
+      type: object
+      properties:
+        reservationToken:
+          type: string
+          nullable: true
+        state:
+          type: string
+          enum:
+            - NO_PERIPHERAL
+            - UNKNOWN
+            - UNAVAILABLE
+            - ERROR
+            - IDLE
+            - EXECUTING
+        procState:
+          type: string
+          enum:
+            - IDLE
+            - PROCESSING_JOB
+        peripheralJob:
+          type: string
+          nullable: true
+      required:
+        - reservationToken
+        - state
+        - procState
+        - peripheralJob
+    LocationLayout:
+      type: object
+      properties:
+        labelOffset:
+          $ref: 'common.yaml#/components/schemas/Couple'
+        locationRepresentation:
+          type: string
+          enum:
+            - NONE
+            - DEFAULT
+            - LOAD_TRANSFER_GENERIC
+            - LOAD_TRANSFER_ALT_1
+            - LOAD_TRANSFER_ALT_2
+            - LOAD_TRANSFER_ALT_3
+            - LOAD_TRANSFER_ALT_4
+            - LOAD_TRANSFER_ALT_5
+            - WORKING_GENERIC
+            - WORKING_ALT_1
+            - WORKING_ALT_2
+            - RECHARGE_GENERIC
+            - RECHARGE_ALT_1
+            - RECHARGE_ALT_2
+        layerId:
+          type: integer
+      required:
+        - labelOffset
+        - locationRepresentation
+        - layerId

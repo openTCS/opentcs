@@ -1,0 +1,68 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    VisualLayout:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        scaleX:
+          type: number
+          format: double
+        scaleY:
+          type: number
+          format: double
+        layers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Layer'
+        layerGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/LayerGroup'
+      required:
+        - name
+        - properties
+        - history
+        - scaleX
+        - scaleY
+        - layers
+        - layerGroups
+    Layer:
+      type: object
+      properties:
+        id:
+          type: integer
+        ordinal:
+          type: integer
+        name:
+          type: string
+        visible:
+          type: boolean
+        groupId:
+          type: integer
+      required:
+        - id
+        - ordinal
+        - name
+        - visible
+        - groupId
+    LayerGroup:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        visible:
+          type: boolean
+      required:
+        - id
+        - name
+        - visible

@@ -24,8 +24,12 @@ apply from: "${rootDir}/gradle/publishing-java.gradle"
 
 apply plugin: 'distribution'
 
-def generatedOpenApiDir = file("${layout.buildDirectory.asFile.get()}/generated-openapi")
-def webApiDir = file("${layout.buildDirectory.asFile.get()}/swagger-ui-servicewebapiv1")
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+
+def generatedOpenApiStableDir = file("${layout.buildDirectory.asFile.get()}/generated-openapi-stable")
+def generatedOpenApiPreviewDir = file("${layout.buildDirectory.asFile.get()}/generated-openapi-preview")
+def webApiStableDir = file("${layout.buildDirectory.asFile.get()}/swagger-ui-servicewebapistable")
+def webApiPreviewDir = file("${layout.buildDirectory.asFile.get()}/swagger-ui-servicewebapipreview")
 def configDocDir = file("${layout.buildDirectory.asFile.get()}/configdoc")
 def asciidocOutputDir = file("${layout.buildDirectory.asFile.get()}/docs/asciidoc")
 
@@ -37,8 +41,11 @@ configurations {
 }
 
 swaggerSources {
-  servicewebapiv1 {
-    inputFile = file("$generatedOpenApiDir/openapi.json")
+  servicewebapistable {
+    inputFile = file("$generatedOpenApiStableDir/openapi.json")
+  }
+  servicewebapipreview {
+    inputFile = file("$generatedOpenApiPreviewDir/openapi.json")
   }
 }
 
@@ -69,8 +76,11 @@ distributions {
     contents.from(project(':opentcs-api-injection').javadoc.destinationDir) {
       into('api-injection')
     }
-    contents.from(webApiDir) {
-      into('service-web-api-v1')
+    contents.from(webApiStableDir) {
+      into('service-web-api-stable')
+    }
+    contents.from(webApiPreviewDir) {
+      into('service-web-api-preview')
     }
     contents.from(asciidocOutputDir)
   }
@@ -84,12 +94,19 @@ tasks.register('renderDocs') {
 }
 installDist.dependsOn renderDocs
 
-tasks.register('bundleOpenApiSpecFiles', org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+tasks.register('bundleOpenApiSpecFiles', GenerateTask) {
   generatorName = "openapi"
   inputSpec = file("src/docs/service-web-api-v1/openapi.yaml").toString()
-  outputDir = generatedOpenApiDir.toString()
+  outputDir = generatedOpenApiStableDir.toString()
 }
-generateSwaggerUIServicewebapiv1.dependsOn bundleOpenApiSpecFiles
+generateSwaggerUIServicewebapistable.dependsOn bundleOpenApiSpecFiles
+
+tasks.register('bundleOpenApiSpecPreviewFiles', GenerateTask) {
+  generatorName = "openapi"
+  inputSpec = file("src/docs/service-web-api-v8/openapi.yaml").toString()
+  outputDir = generatedOpenApiPreviewDir.toString()
+}
+generateSwaggerUIServicewebapipreview.dependsOn bundleOpenApiSpecPreviewFiles
 
 distTar {
   enabled = false
@@ -187,8 +204,11 @@ abstract class GenerateConfigDocTask extends DefaultTask {
         "org.opentcs.strategies.basic.peripherals.dispatching.DefaultPeripheralJobDispatcherConfiguration",
         "${out}/DefaultPeripheralJobDispatcherConfigurationEntries.adoc",
 
-        "org.opentcs.kernel.extensions.servicewebapi.ServiceWebApiConfiguration",
-        "${out}/ServiceWebApiConfigurationEntries.adoc",
+        "org.opentcs.kernel.extensions.servicewebapi.v1.ServiceWebApiConfiguration",
+        "${out}/ServiceWebApiV1ConfigurationEntries.adoc",
+
+        "org.opentcs.kernel.extensions.servicewebapi.v8.ServiceWebApiConfiguration",
+        "${out}/ServiceWebApiV8ConfigurationEntries.adoc",
 
         "org.opentcs.kernel.extensions.rmi.RmiKernelInterfaceConfiguration",
         "${out}/RmiKernelInterfaceConfigurationEntries.adoc",

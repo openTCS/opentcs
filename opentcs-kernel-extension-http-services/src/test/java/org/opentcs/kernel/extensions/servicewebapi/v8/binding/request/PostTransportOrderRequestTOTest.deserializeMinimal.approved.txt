@@ -1,0 +1,16 @@
+{
+  "destinations" : [ {
+    "locationName" : "some-location",
+    "operation" : "some-operation",
+    "properties" : null
+  } ],
+  "deadline" : null,
+  "dependencies" : null,
+  "dispensable" : false,
+  "incompleteName" : false,
+  "intendedVehicle" : null,
+  "peripheralReservationToken" : null,
+  "properties" : null,
+  "type" : null,
+  "wrappingSequence" : null
+}

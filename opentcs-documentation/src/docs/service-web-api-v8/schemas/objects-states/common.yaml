@@ -1,0 +1,152 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    BoundingBox:
+      type: object
+      properties:
+        length:
+          type: integer
+          minimum: 1
+          maximum: 9223372036854775807
+        width:
+          type: integer
+          minimum: 1
+          maximum: 9223372036854775807
+        height:
+          type: integer
+          minimum: 1
+          maximum: 9223372036854775807
+        referenceOffset:
+          $ref: '#/components/schemas/Couple'
+      required:
+        - length
+        - width
+        - height
+        - referenceOffset
+    Color:
+      type: object
+      properties:
+        red:
+          type: integer
+          minimum: 0
+          maximum: 255
+        green:
+          type: integer
+          minimum: 0
+          maximum: 255
+        blue:
+          type: integer
+          minimum: 0
+          maximum: 255
+      required:
+        - red
+        - green
+        - blue
+    Couple:
+      type: object
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+      required:
+        - x
+        - y
+    ObjectHistory:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectHistoryEntry'
+      required:
+        - entries
+    ObjectHistoryEntry:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        eventCode:
+          type: string
+        supplements:
+          type: array
+          items:
+            type: string
+      required:
+        - timestamp
+        - eventCode
+        - supplements
+    Pose:
+      type: object
+      properties:
+        position:
+          anyOf:
+            - type: 'null'
+            - $ref: '#/components/schemas/Triple'
+        orientationAngle:
+          type: number
+          format: double
+          nullable: true
+          minimum: -360
+          maximum: 360
+      required:
+        - position
+        - orientationAngle
+    Triple:
+      type: object
+      properties:
+        x:
+          type: integer
+        y:
+          type: integer
+        z:
+          type: integer
+      required:
+        - x
+        - y
+        - z
+    Link:
+      type: object
+      properties:
+        location:
+          type: string
+        point:
+          type: string
+        allowedOperations:
+          type: array
+          items:
+            type: string
+      required:
+        - location
+        - point
+        - allowedOperations
+    Envelope:
+      type: object
+      properties:
+        vertices:
+          type: array
+          items:
+            $ref: "#/components/schemas/Couple"
+      required:
+        - vertices
+    Resource:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+            - POINT
+            - PATH
+            - LOCATION
+      required:
+        - name
+        - type
+    ResourceSet:
+      type: array
+      items:
+        $ref: "#/components/schemas/Resource"

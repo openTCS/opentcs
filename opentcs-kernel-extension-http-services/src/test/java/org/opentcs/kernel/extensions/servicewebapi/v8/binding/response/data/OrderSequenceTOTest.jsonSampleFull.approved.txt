@@ -1,0 +1,24 @@
+{
+  "complete" : true,
+  "creationTime" : "2025-07-22T12:03:00Z",
+  "failureFatal" : true,
+  "finished" : true,
+  "finishedIndex" : 4,
+  "finishedTime" : "2025-07-22T13:03:00Z",
+  "history" : {
+    "entries" : [ {
+      "timestamp" : "2025-07-22T12:03:00Z",
+      "eventCode" : "event-code-1",
+      "supplements" : [ "supplement-1", "supplement-2" ]
+    } ]
+  },
+  "intendedVehicle" : "vehicle-1",
+  "name" : "order-sequence-1",
+  "orderTypes" : [ "type-1" ],
+  "orders" : [ "order-1", "order-2" ],
+  "processingVehicle" : "vehicle-2",
+  "properties" : {
+    "key-1" : "value-1",
+    "key-2" : "value-2"
+  }
+}

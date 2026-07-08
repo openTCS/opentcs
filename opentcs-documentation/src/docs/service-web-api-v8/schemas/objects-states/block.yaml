@@ -1,0 +1,36 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    Block:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        type:
+          type: string
+          enum:
+            - SINGLE_VEHICLE_ONLY
+            - SAME_DIRECTION_ONLY
+        members:
+          $ref: "common.yaml#/components/schemas/ResourceSet"
+        layout:
+          $ref: '#/components/schemas/BlockLayout'
+      required:
+        - name
+        - properties
+        - type
+        - members
+        - layout
+    BlockLayout:
+      type: object
+      properties:
+        color:
+          $ref: 'common.yaml#/components/schemas/Color'
+      required:
+        - color

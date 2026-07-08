@@ -1,0 +1,9 @@
+{
+  "allowedOperations" : [ ],
+  "allowedPeripheralOperations" : [ ],
+  "layout" : {
+    "locationRepresentation" : "DEFAULT"
+  },
+  "name" : "some-location",
+  "properties" : { }
+}

@@ -1,0 +1,188 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    Vehicle:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        history:
+          $ref: 'common.yaml#/components/schemas/ObjectHistory'
+        boundingBox:
+          $ref: 'common.yaml#/components/schemas/BoundingBox'
+        energyLevelThresholdSet:
+          $ref: '#/components/schemas/EnergyLevelThresholdSet'
+        energyLevel:
+          type: integer
+          minimum: 0
+          maximum: 100
+        maxVelocity:
+          type: integer
+          minimum: 0
+          maximum: 2147483647
+        maxReverseVelocity:
+          type: integer
+          minimum: 0
+          maximum: 2147483647
+        rechargeOperation:
+          type: string
+        loadHandlingDevices:
+          type: array
+          items:
+            $ref: '#/components/schemas/LoadHandlingDevice'
+        state:
+          $ref: '#/components/schemas/TimestampedVehicleState'
+        procState:
+          $ref: '#/components/schemas/TimestampedVehicleProcState'
+        integrationLevel:
+          $ref: '#/components/schemas/VehicleIntegrationLevel'
+        paused:
+          type: boolean
+        transportOrder:
+          type: string
+          nullable: true
+        orderSequence:
+          type: string
+          nullable: true
+        acceptableOrderTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AcceptableOrderType'
+        claimedResources:
+          type: array
+          items:
+            $ref: "common.yaml#/components/schemas/ResourceSet"
+        allocatedResources:
+          type: array
+          items:
+            $ref: "common.yaml#/components/schemas/ResourceSet"
+        currentPosition:
+          type: string
+          nullable: true
+        pose:
+          $ref: 'common.yaml#/components/schemas/Pose'
+        envelopeKey:
+          type: string
+        layout:
+          $ref: '#/components/schemas/VehicleLayout'
+      required:
+        - name
+        - properties
+        - history
+        - boundingBox
+        - energyLevelThresholdSet
+        - energyLevel
+        - maxVelocity
+        - maxReverseVelocity
+        - rechargeOperation
+        - loadHandlingDevices
+        - state
+        - procState
+        - integrationLevel
+        - paused
+        - transportOrder
+        - orderSequence
+        - acceptableOrderTypes
+        - claimedResources
+        - allocatedResources
+        - currentPosition
+        - pose
+        - envelopeKey
+        - layout
+    AcceptableOrderType:
+      type: object
+      properties:
+        name:
+          type: string
+        priority:
+          type: integer
+      required:
+        - name
+        - priority
+    EnergyLevelThresholdSet:
+      type: object
+      properties:
+        energyLevelCritical:
+          type: integer
+          minimum: 0
+          maximum: 100
+        energyLevelGood:
+          type: integer
+          minimum: 0
+          maximum: 100
+        energyLevelSufficientlyRecharged:
+          type: integer
+          minimum: 0
+          maximum: 100
+        energyLevelFullyRecharged:
+          type: integer
+          minimum: 0
+          maximum: 100
+      required:
+        - energyLevelCritical
+        - energyLevelGood
+        - energyLevelSufficientlyRecharged
+        - energyLevelFullyRecharged
+    LoadHandlingDevice:
+      type: object
+      properties:
+        label:
+          type: string
+        full:
+          type: boolean
+      required:
+        - label
+        - full
+    TimestampedVehicleState:
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+            - UNKNOWN
+            - UNAVAILABLE
+            - ERROR
+            - IDLE
+            - EXECUTING
+            - CHARGING
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - state
+        - timestamp
+    TimestampedVehicleProcState:
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+            - IDLE
+            - AWAITING_ORDER
+            - PROCESSING_ORDER
+        timestamp:
+          type: string
+          format: date-time
+      required:
+        - state
+        - timestamp
+    VehicleIntegrationLevel:
+      type: string
+      enum:
+        - TO_BE_IGNORED
+        - TO_BE_NOTICED
+        - TO_BE_RESPECTED
+        - TO_BE_UTILIZED
+    VehicleLayout:
+      type: object
+      properties:
+        routeColor:
+          $ref: "common.yaml#/components/schemas/Color"
+      required:
+        - routeColor

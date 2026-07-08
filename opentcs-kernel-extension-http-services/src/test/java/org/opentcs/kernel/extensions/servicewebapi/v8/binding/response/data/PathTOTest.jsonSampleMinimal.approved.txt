@@ -1,0 +1,17 @@
+{
+  "destinationPoint" : "some-destination-point",
+  "layout" : {
+    "connectionType" : "DIRECT",
+    "controlPoints" : [ ],
+    "layerId" : 4
+  },
+  "length" : 1,
+  "locked" : true,
+  "maxReverseVelocity" : 3,
+  "maxVelocity" : 2,
+  "name" : "some-path",
+  "peripheralOperations" : [ ],
+  "properties" : { },
+  "sourcePoint" : "some-source-point",
+  "vehicleEnvelopes" : { }
+}

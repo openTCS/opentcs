@@ -1,0 +1,99 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
+package org.opentcs.kernel.extensions.servicewebapi.v8;
+
+import static java.util.Objects.requireNonNull;
+
+import jakarta.inject.Inject;
+import org.opentcs.components.kernel.services.DispatcherService;
+import org.opentcs.components.kernel.services.VehicleService;
+import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.ReroutingType;
+import org.opentcs.data.order.TransportOrder;
+import org.opentcs.kernel.extensions.servicewebapi.common.KernelExecutorWrapper;
+
+/**
+ * Handles requests related to transport order dispatching.
+ */
+public class TransportOrderDispatcherHandler {
+
+  private final VehicleService vehicleService;
+  private final DispatcherService dispatcherService;
+  private final KernelExecutorWrapper executorWrapper;
+
+  /**
+   * Creates a new instance.
+   *
+   * @param vehicleService Used to update vehicle state.
+   * @param dispatcherService Used to withdraw transport orders.
+   * @param executorWrapper Executes calls via the kernel executor and waits for the outcome.
+   */
+  @Inject
+  public TransportOrderDispatcherHandler(
+      VehicleService vehicleService,
+      DispatcherService dispatcherService,
+      KernelExecutorWrapper executorWrapper
+  ) {
+    this.vehicleService = requireNonNull(vehicleService, "vehicleService");
+    this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
+    this.executorWrapper = requireNonNull(executorWrapper, "executorWrapper");
+  }
+
+  public void triggerDispatcher() {
+    executorWrapper.callAndWait(() -> dispatcherService.dispatch());
+  }
+
+  public void tryImmediateAssignment(String name)
+      throws ObjectUnknownException,
+        IllegalArgumentException {
+    requireNonNull(name, "name");
+
+    executorWrapper.callAndWait(() -> {
+      TransportOrder order = vehicleService.fetch(TransportOrder.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + name));
+
+      dispatcherService.assignNow(order.getReference());
+    });
+  }
+
+  public void withdrawByTransportOrder(String name, boolean immediate)
+      throws ObjectUnknownException {
+    requireNonNull(name, "name");
+
+    executorWrapper.callAndWait(() -> {
+      TransportOrder order = vehicleService.fetch(TransportOrder.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown transport order: " + name));
+
+      dispatcherService.withdrawByTransportOrder(order.getReference(), immediate);
+    });
+  }
+
+  public void withdrawByVehicle(String name, boolean immediate)
+      throws ObjectUnknownException {
+    requireNonNull(name, "name");
+
+    executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = vehicleService.fetch(Vehicle.class, name)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown vehicle: " + name));
+
+      dispatcherService.withdrawByVehicle(vehicle.getReference(), immediate);
+    });
+  }
+
+  public void reroute(String vehicleName, boolean forced)
+      throws ObjectUnknownException {
+    requireNonNull(vehicleName, "vehicleName");
+
+    executorWrapper.callAndWait(() -> {
+      Vehicle vehicle = vehicleService.fetch(Vehicle.class, vehicleName)
+          .orElseThrow(() -> new ObjectUnknownException("Unknown vehicle: " + vehicleName));
+
+      dispatcherService.reroute(
+          vehicle.getReference(),
+          forced ? ReroutingType.FORCED : ReroutingType.REGULAR
+      );
+    });
+  }
+
+}

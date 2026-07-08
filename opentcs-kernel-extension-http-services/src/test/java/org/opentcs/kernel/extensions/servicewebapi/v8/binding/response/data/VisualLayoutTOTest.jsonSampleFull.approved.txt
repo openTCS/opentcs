@@ -1,0 +1,21 @@
+{
+  "layerGroups" : [ {
+    "id" : 8,
+    "name" : "some-layer-group",
+    "visible" : true
+  } ],
+  "layers" : [ {
+    "groupId" : 7,
+    "id" : 5,
+    "name" : "some-layer",
+    "ordinal" : 6,
+    "visible" : true
+  } ],
+  "name" : "some-visual-layout",
+  "properties" : {
+    "some-key" : "some-value",
+    "some-other-key" : "some-other-value"
+  },
+  "scaleX" : 1.2,
+  "scaleY" : 3.4
+}

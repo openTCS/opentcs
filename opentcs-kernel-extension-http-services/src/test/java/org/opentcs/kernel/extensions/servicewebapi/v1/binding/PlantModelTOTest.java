@@ -7,7 +7,7 @@ import java.util.Set;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
+import org.opentcs.kernel.extensions.servicewebapi.common.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.BlockTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LayerGroupTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.LayerTO;

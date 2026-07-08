@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    PlantModelState:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        points:
+          type: array
+          items:
+            $ref: './objects-states/point.yaml#/components/schemas/Point'
+        paths:
+          type: array
+          items:
+            $ref: './objects-states/path.yaml#/components/schemas/Path'
+        locationTypes:
+          type: array
+          items:
+            $ref: './objects-states/location-type.yaml#/components/schemas/LocationType'
+        locations:
+          type: array
+          items:
+            $ref: './objects-states/location.yaml#/components/schemas/Location'
+        blocks:
+          type: array
+          items:
+            $ref: './objects-states/block.yaml#/components/schemas/Block'
+        vehicles:
+          type: array
+          items:
+            $ref: './objects-states/vehicle.yaml#/components/schemas/Vehicle'
+        visualLayout:
+          $ref: './objects-states/visual-layout.yaml#/components/schemas/VisualLayout'
+      required:
+        - name
+        - properties
+        - points
+        - paths
+        - locationTypes
+        - locations
+        - blocks
+        - vehicles
+        - visualLayout

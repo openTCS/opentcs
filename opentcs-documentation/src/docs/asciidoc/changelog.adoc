@@ -24,7 +24,8 @@ This change log lists the most relevant changes for past releases in reverse chr
 ** Introduce the concept of environmental entities, representing objects or areas in the plant model that are not under control of the kernel but which may be relevant for e.g. traffic management.
 ** Improve scheduler support for multi-level plants by handling vehicle envelopes per Z-plane.
 ** Improve performance when updating routing graphs.
-** Update web API specification and implementation to version 1.15.0:
+** Introduce web API v8 as a preview, which is supposed to become the stable web API / replace the current web API in openTCS 8.0.
+** Update web API v1 specification and implementation to version 1.15.0:
 *** Extend the response body of the `GET /plantModel` endpoint and the request body of the `PUT /plantModel` endpoint to respect vehicle envelope keys.
 * Bugs fixed:
 ** Fix integer truncation of small route cost values.

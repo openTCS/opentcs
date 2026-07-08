@@ -19,12 +19,12 @@ import java.util.concurrent.TimeUnit;
 import org.opentcs.access.Kernel;
 import org.opentcs.access.KernelRuntimeException;
 import org.opentcs.access.LocalKernel;
+import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
-import org.opentcs.kernel.extensions.servicewebapi.HttpConstants;
-import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
-import org.opentcs.kernel.extensions.servicewebapi.RequestHandler;
+import org.opentcs.kernel.extensions.servicewebapi.common.HttpConstants;
+import org.opentcs.kernel.extensions.servicewebapi.common.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PlantModelTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostEnvironmentalEntityRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.PostOrderSequenceRequestTO;
@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 public class V1RequestHandler
     implements
-      RequestHandler {
+      Lifecycle {
 
   /**
    * This class's logger.
@@ -160,7 +160,6 @@ public class V1RequestHandler
     initialized = false;
   }
 
-  @Override
   public EndpointGroup createRoutes() {
     return () -> path(
         "/v1", () -> {

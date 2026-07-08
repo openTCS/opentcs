@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /locationTypes:
+    get:
+      tags:
+        - Plant models
+      summary: Retrieves a set of location types.
+      parameters:
+        - name: names
+          in: query
+          description: >-
+            The names of the location types to be retrieved.
+            If a named location type could not be found, it will simply be omitted from the response (and not result in an error).
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          example: ['LocationType-0001', 'LocationType-0002']
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../schemas/objects-states/location-type.yaml#/components/schemas/LocationType'
+              examples:
+                locationTypes:
+                  $ref: '../examples/response-examples.yaml#/components/examples/locationTypesExample'
+  "/locationTypes/{NAME}":
+    get:
+      tags:
+        - Plant models
+      summary: Retrieves the location type with the given name.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the location type to be retrieved.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/objects-states/location-type.yaml#/components/schemas/LocationType'
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find location type 'LocationType-0001'.

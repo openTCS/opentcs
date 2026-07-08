@@ -1,0 +1,71 @@
+{
+  "creationTime" : "2025-11-28T15:45:41Z",
+  "currentDriveOrderIndex" : 1,
+  "currentRouteStepIndex" : 2,
+  "deadline" : "2025-11-28T19:45:41Z",
+  "dependencies" : [ "some-other-order", "yet-another-order" ],
+  "dispensable" : true,
+  "driveOrders" : [ {
+    "destination" : {
+      "destination" : "some-destination",
+      "operation" : "some-operation",
+      "properties" : { }
+    },
+    "name" : "drive-order-0",
+    "route" : null,
+    "state" : "PRISTINE",
+    "transportOrder" : "some-order"
+  }, {
+    "destination" : {
+      "destination" : "some-other-destination",
+      "operation" : "some-other-operation",
+      "properties" : {
+        "yet-another-key" : "yet-another-value"
+      }
+    },
+    "name" : "drive-order-1",
+    "route" : {
+      "costs" : 300,
+      "steps" : [ {
+        "costs" : 150,
+        "destinationPoint" : "some-destination-point",
+        "executionAllowed" : true,
+        "path" : null,
+        "reroutingType" : null,
+        "routeIndex" : 0,
+        "sourcePoint" : null,
+        "vehicleOrientation" : "FORWARD"
+      }, {
+        "costs" : 150,
+        "destinationPoint" : "some-other-destination-point",
+        "executionAllowed" : true,
+        "path" : "some-path",
+        "reroutingType" : "REGULAR",
+        "routeIndex" : 1,
+        "sourcePoint" : "some-source-point",
+        "vehicleOrientation" : "BACKWARD"
+      } ]
+    },
+    "state" : "PRISTINE",
+    "transportOrder" : "some-order"
+  } ],
+  "finishedTime" : "2025-11-28T16:45:41Z",
+  "history" : {
+    "entries" : [ {
+      "timestamp" : "2025-11-28T15:55:41Z",
+      "eventCode" : "some-event-code",
+      "supplements" : [ "some-supplement" ]
+    } ]
+  },
+  "intendedVehicle" : "some-intended-vehicle",
+  "name" : "some-order",
+  "peripheralReservationToken" : "some-reservation-token",
+  "processingVehicle" : "some-processing-vehicle",
+  "properties" : {
+    "some-key" : "some-value",
+    "some-other-key" : "some-other-value"
+  },
+  "state" : "FINISHED",
+  "type" : "some-type",
+  "wrappingSequence" : "some-wrapping-sequence"
+}

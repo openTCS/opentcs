@@ -1,0 +1,108 @@
+{
+  "currentObjectState" : {
+    "creationTime" : "2025-07-22T12:03:00Z",
+    "currentDriveOrderIndex" : 3,
+    "currentRouteStepIndex" : 5,
+    "deadline" : "2025-07-22T13:03:00Z",
+    "dependencies" : [ "dependency-1", "dependency-2" ],
+    "dispensable" : true,
+    "driveOrders" : [ {
+      "destination" : {
+        "destination" : "destination-1",
+        "operation" : "operation-1",
+        "properties" : {
+          "key-3" : "value-3",
+          "key-4" : "value-4"
+        }
+      },
+      "name" : "drive-order-1",
+      "route" : {
+        "costs" : 200,
+        "steps" : [ {
+          "costs" : 100,
+          "destinationPoint" : "point-2",
+          "executionAllowed" : true,
+          "path" : "path-1",
+          "reroutingType" : "REGULAR",
+          "routeIndex" : 1,
+          "sourcePoint" : "point-1",
+          "vehicleOrientation" : "FORWARD"
+        } ]
+      },
+      "state" : "TRAVELLING",
+      "transportOrder" : "order-1"
+    } ],
+    "finishedTime" : "2025-07-22T12:33:00Z",
+    "history" : {
+      "entries" : [ {
+        "timestamp" : "2025-07-22T12:03:00Z",
+        "eventCode" : "event-code-1",
+        "supplements" : [ "supplement-1", "supplement-2" ]
+      } ]
+    },
+    "intendedVehicle" : "vehicle-1",
+    "name" : "order-1",
+    "peripheralReservationToken" : "reservation-token-1",
+    "processingVehicle" : "vehicle-2",
+    "properties" : {
+      "key-1" : "value-1",
+      "key-2" : "value-2"
+    },
+    "state" : "RAW",
+    "type" : "type-1",
+    "wrappingSequence" : "sequence-1"
+  },
+  "previousObjectState" : {
+    "creationTime" : "2025-07-22T12:03:00Z",
+    "currentDriveOrderIndex" : 3,
+    "currentRouteStepIndex" : 5,
+    "deadline" : "2025-07-22T13:03:00Z",
+    "dependencies" : [ "dependency-1", "dependency-2" ],
+    "dispensable" : true,
+    "driveOrders" : [ {
+      "destination" : {
+        "destination" : "destination-1",
+        "operation" : "operation-1",
+        "properties" : {
+          "key-3" : "value-3",
+          "key-4" : "value-4"
+        }
+      },
+      "name" : "drive-order-1",
+      "route" : {
+        "costs" : 200,
+        "steps" : [ {
+          "costs" : 100,
+          "destinationPoint" : "point-2",
+          "executionAllowed" : true,
+          "path" : "path-1",
+          "reroutingType" : "REGULAR",
+          "routeIndex" : 1,
+          "sourcePoint" : "point-1",
+          "vehicleOrientation" : "FORWARD"
+        } ]
+      },
+      "state" : "TRAVELLING",
+      "transportOrder" : "order-1"
+    } ],
+    "finishedTime" : "2025-07-22T12:33:00Z",
+    "history" : {
+      "entries" : [ {
+        "timestamp" : "2025-07-22T12:03:00Z",
+        "eventCode" : "event-code-1",
+        "supplements" : [ "supplement-1", "supplement-2" ]
+      } ]
+    },
+    "intendedVehicle" : "vehicle-1",
+    "name" : "order-1",
+    "peripheralReservationToken" : "reservation-token-1",
+    "processingVehicle" : "vehicle-2",
+    "properties" : {
+      "key-1" : "value-1",
+      "key-2" : "value-2"
+    },
+    "state" : "BEING_PROCESSED",
+    "type" : "type-1",
+    "wrappingSequence" : "sequence-1"
+  }
+}

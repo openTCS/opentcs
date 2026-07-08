@@ -1,0 +1,52 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    LocationType:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        allowedOperations:
+          type: array
+          items:
+            type: string
+        allowedPeripheralOperations:
+          type: array
+          items:
+            type: string
+        layout:
+          $ref: '#/components/schemas/LocationTypeLayout'
+      required:
+        - name
+        - properties
+        - allowedOperations
+        - allowedPeripheralOperations
+        - layout
+    LocationTypeLayout:
+      type: object
+      properties:
+        locationRepresentation:
+          type: string
+          enum:
+            - NONE
+            - DEFAULT
+            - LOAD_TRANSFER_GENERIC
+            - LOAD_TRANSFER_ALT_1
+            - LOAD_TRANSFER_ALT_2
+            - LOAD_TRANSFER_ALT_3
+            - LOAD_TRANSFER_ALT_4
+            - LOAD_TRANSFER_ALT_5
+            - WORKING_GENERIC
+            - WORKING_ALT_1
+            - WORKING_ALT_2
+            - RECHARGE_GENERIC
+            - RECHARGE_ALT_1
+            - RECHARGE_ALT_2
+      required:
+        - locationRepresentation

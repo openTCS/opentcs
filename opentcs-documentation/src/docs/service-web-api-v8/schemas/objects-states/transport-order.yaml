@@ -1,0 +1,177 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    TransportOrder:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        history:
+          $ref: 'common.yaml#/components/schemas/ObjectHistory'
+        type:
+          type: string
+        dependencies:
+          type: array
+          items:
+            type: string
+        driveOrders:
+          type: array
+          items:
+            $ref: '#/components/schemas/DriveOrder'
+        peripheralReservationToken:
+          type: string
+          nullable: true
+        currentDriveOrderIndex:
+          type: integer
+        currentRouteStepIndex:
+          type: integer
+        state:
+          $ref: '#/components/schemas/TransportOrderState'
+        creationTime:
+          type: string
+          format: date-time
+        deadline:
+          type: string
+          format: date-time
+          nullable: true
+        finishedTime:
+          type: string
+          format: date-time
+          nullable: true
+        intendedVehicle:
+          type: string
+          nullable: true
+        processingVehicle:
+          type: string
+          nullable: true
+        wrappingSequence:
+          type: string
+          nullable: true
+        dispensable:
+          type: boolean
+      required:
+        - name
+        - properties
+        - history
+        - type
+        - dependencies
+        - driveOrders
+        - peripheralReservationToken
+        - currentDriveOrderIndex
+        - currentRouteStepIndex
+        - state
+        - creationTime
+        - deadline
+        - finishedTime
+        - intendedVehicle
+        - processingVehicle
+        - wrappingSequence
+        - dispensable
+    DriveOrder:
+      type: object
+      properties:
+        name:
+          type: string
+        destination:
+          $ref: '#/components/schemas/DriveOrderDestination'
+        transportOrder:
+          type: string
+        route:
+          anyOf:
+            - type: 'null'
+            - $ref: '#/components/schemas/Route'
+        state:
+          $ref: '#/components/schemas/DriveOrderState'
+      required:
+        - name
+        - destination
+        - transportOrder
+        - route
+        - state
+    DriveOrderDestination:
+      type: object
+      properties:
+        destination:
+          type: string
+        operation:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+        - destination
+        - operation
+        - properties
+    Route:
+      type: object
+      properties:
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteStep'
+        costs:
+          type: integer
+          format: int64
+      required:
+        - steps
+        - costs
+    RouteStep:
+      type: object
+      properties:
+        path:
+          type: string
+          nullable: true
+        sourcePoint:
+          type: string
+          nullable: true
+        destinationPoint:
+          type: string
+        vehicleOrientation:
+          type: string
+          enum: [ FORWARD, BACKWARD, UNDEFINED ]
+        routeIndex:
+          type: integer
+        costs:
+          type: integer
+          format: int64
+        executionAllowed:
+          type: boolean
+        reroutingType:
+          type: string
+          nullable: true
+          enum: [ REGULAR, FORCED]
+      required:
+        - path
+        - sourcePoint
+        - destinationPoint
+        - vehicleOrientation
+        - routeIndex
+        - costs
+        - executionAllowed
+        - reroutingType
+    TransportOrderState:
+      type: string
+      enum:
+        - RAW
+        - ACTIVE
+        - DISPATCHABLE
+        - BEING_PROCESSED
+        - WITHDRAWN
+        - FINISHED
+        - FAILED
+        - UNROUTABLE
+    DriveOrderState:
+      type: string
+      enum:
+        - PRISTINE
+        - TRAVELLING
+        - OPERATING
+        - FINISHED
+        - FAILED

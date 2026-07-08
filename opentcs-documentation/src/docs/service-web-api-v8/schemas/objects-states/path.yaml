@@ -1,0 +1,97 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    Path:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        sourcePoint:
+          type: string
+        destinationPoint:
+          type: string
+        length:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 9223372036854775807
+        maxVelocity:
+          type: integer
+          minimum: 0
+          maximum: 2147483647
+        maxReverseVelocity:
+          type: integer
+          minimum: 0
+          maximum: 2147483647
+        peripheralOperations:
+          type: array
+          items:
+            $ref: "#/components/schemas/PeripheralOperation"
+        locked:
+          type: boolean
+        vehicleEnvelopes:
+          type: object
+          additionalProperties:
+            $ref: "common.yaml#/components/schemas/Envelope"
+        layout:
+          $ref: "#/components/schemas/PathLayout"
+      required:
+        - name
+        - properties
+        - sourcePoint
+        - destinationPoint
+        - length
+        - maxVelocity
+        - maxReverseVelocity
+        - peripheralOperations
+        - locked
+        - vehicleEnvelopes
+        - layout
+    PeripheralOperation:
+      type: object
+      properties:
+        location:
+          type: string
+        operation:
+          type: string
+        executionTrigger:
+          type: string
+          enum:
+            - IMMEDIATE
+            - AFTER_ALLOCATION
+            - AFTER_MOVEMENT
+        completionRequired:
+          type: boolean
+      required:
+        - location
+        - operation
+        - executionTrigger
+        - completionRequired
+    PathLayout:
+      type: object
+      properties:
+        connectionType:
+          type: string
+          enum:
+            - DIRECT
+            - ELBOW
+            - SLANTED
+            - POLYPATH
+            - BEZIER
+            - BEZIER_3
+        controlPoints:
+          type: array
+          items:
+            $ref: "common.yaml#/components/schemas/Couple"
+        layerId:
+          type: integer
+      required:
+        - connectionType
+        - controlPoints
+        - layerId

@@ -1,0 +1,44 @@
+{
+  "routes" : [ {
+    "costs" : 1376,
+    "destinationPoint" : "C",
+    "steps" : [ {
+      "destinationPoint" : "B",
+      "path" : "A --- B",
+      "sourcePoint" : "A",
+      "vehicleOrientation" : "FORWARD"
+    }, {
+      "destinationPoint" : "C",
+      "path" : "B --- C",
+      "sourcePoint" : "B",
+      "vehicleOrientation" : "FORWARD"
+    } ]
+  }, {
+    "costs" : -1,
+    "destinationPoint" : "D",
+    "steps" : null
+  }, {
+    "costs" : 0,
+    "destinationPoint" : "E",
+    "steps" : [ {
+      "destinationPoint" : "E",
+      "path" : null,
+      "sourcePoint" : null,
+      "vehicleOrientation" : "FORWARD"
+    } ]
+  }, {
+    "costs" : 4682,
+    "destinationPoint" : "F",
+    "steps" : [ {
+      "destinationPoint" : "E",
+      "path" : "D --- E",
+      "sourcePoint" : "D",
+      "vehicleOrientation" : "BACKWARD"
+    }, {
+      "destinationPoint" : "F",
+      "path" : "E --- F",
+      "sourcePoint" : "E",
+      "vehicleOrientation" : "UNDEFINED"
+    } ]
+  } ]
+}

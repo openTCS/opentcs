@@ -9,7 +9,7 @@ import jakarta.inject.Inject;
 import org.opentcs.components.kernel.services.PlantModelService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.model.Location;
-import org.opentcs.kernel.extensions.servicewebapi.KernelExecutorWrapper;
+import org.opentcs.kernel.extensions.servicewebapi.common.KernelExecutorWrapper;
 
 /**
  * Handles requests related to locations.

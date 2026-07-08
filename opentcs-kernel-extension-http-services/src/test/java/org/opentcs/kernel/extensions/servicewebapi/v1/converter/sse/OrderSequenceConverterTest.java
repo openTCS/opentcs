@@ -19,8 +19,8 @@ import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
-import org.opentcs.kernel.extensions.servicewebapi.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.TimestampScrubber;
+import org.opentcs.kernel.extensions.servicewebapi.common.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.sse.ObjectHistoryTO;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.sse.OrderSequenceEventTO;
 

@@ -1,0 +1,25 @@
+{
+  "layout" : {
+    "color" : {
+      "blue" : 3,
+      "green" : 2,
+      "red" : 1
+    }
+  },
+  "members" : [ {
+    "name" : "some-point",
+    "type" : "POINT"
+  }, {
+    "name" : "some-path",
+    "type" : "PATH"
+  }, {
+    "name" : "some-location",
+    "type" : "LOCATION"
+  } ],
+  "name" : "some-block",
+  "properties" : {
+    "some-key" : "some-value",
+    "some-other-key" : "some-other-value"
+  },
+  "type" : "SINGLE_VEHICLE_ONLY"
+}

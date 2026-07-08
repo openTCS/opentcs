@@ -1,0 +1,22 @@
+{
+  "destinations" : [ {
+    "locationName" : "some-location",
+    "operation" : "some-operation",
+    "properties" : {
+      "some-key" : "some-value",
+      "some-other-key" : "some-other-value"
+    }
+  } ],
+  "deadline" : "1970-01-01T00:00:00Z",
+  "dependencies" : [ "some-other-order", "another-order" ],
+  "dispensable" : true,
+  "incompleteName" : true,
+  "intendedVehicle" : "some-vehicle",
+  "peripheralReservationToken" : "some-token",
+  "properties" : {
+    "some-key" : "some-value",
+    "some-other-key" : "some-other-value"
+  },
+  "type" : "some-type",
+  "wrappingSequence" : "some-sequence"
+}

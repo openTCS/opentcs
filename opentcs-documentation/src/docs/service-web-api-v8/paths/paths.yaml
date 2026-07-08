@@ -1,0 +1,94 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /paths:
+    get:
+      tags:
+        - Plant models
+      summary: Retrieves a set of paths.
+      parameters:
+        - name: names
+          in: query
+          description: >-
+            The names of the paths to be retrieved.
+            If a named path could not be found, it will simply be omitted from the response (and not result in an error).
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          example: ['Point-0001 --- Point-0002', 'Point-0001 --- Point-0003']
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../schemas/objects-states/path.yaml#/components/schemas/Path'
+              examples:
+                paths:
+                  $ref: '../examples/response-examples.yaml#/components/examples/pathsExample'
+  "/paths/{NAME}":
+    get:
+      tags:
+        - Plant models
+      summary: Retrieves the path with the given name.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the path to be retrieved.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/objects-states/path.yaml#/components/schemas/Path'
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find path 'Point-0001 --- Point-0002'.
+  /paths/{NAME}/locked:
+    put:
+      tags:
+        - Plant models
+      summary: Sets the locked state for the named path.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the path.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The path's new locked state.
+          required: true
+          example: true
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find path 'Point-0001 --- Point-0002'.

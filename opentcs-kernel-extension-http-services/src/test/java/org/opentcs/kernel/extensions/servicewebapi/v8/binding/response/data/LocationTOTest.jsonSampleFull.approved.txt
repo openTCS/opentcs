@@ -1,0 +1,33 @@
+{
+  "attachedLinks" : [ {
+    "allowedOperations" : [ "some-operation" ],
+    "location" : "some-location",
+    "point" : "some-point"
+  } ],
+  "layout" : {
+    "labelOffset" : {
+      "x" : 4,
+      "y" : 5
+    },
+    "layerId" : 6,
+    "locationRepresentation" : "DEFAULT"
+  },
+  "locked" : true,
+  "name" : "some-location",
+  "peripheralInformation" : {
+    "peripheralJob" : "some-peripheral-job",
+    "procState" : "PROCESSING_JOB",
+    "reservationToken" : "some-reservation-token",
+    "state" : "EXECUTING"
+  },
+  "position" : {
+    "x" : 1,
+    "y" : 2,
+    "z" : 3
+  },
+  "properties" : {
+    "some-key" : "some-value",
+    "some-other-key" : "some-other-value"
+  },
+  "type" : "some-type"
+}

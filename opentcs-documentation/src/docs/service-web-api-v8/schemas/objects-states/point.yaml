@@ -1,0 +1,63 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    Point:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        pose:
+          $ref: 'common.yaml#/components/schemas/Pose'
+        type:
+          type: string
+          enum:
+            - HALT_POSITION
+            - PARK_POSITION
+        incomingPaths:
+          type: array
+          items:
+            type: string
+        outgoingPaths:
+          type: array
+          items:
+            type: string
+        attachedLinks:
+          type: array
+          items:
+            $ref: 'common.yaml#/components/schemas/Link'
+        occupyingVehicle:
+          type: string
+          nullable: true
+        vehicleEnvelopes:
+          type: object
+          additionalProperties:
+            $ref: 'common.yaml#/components/schemas/Envelope'
+        maxVehicleBoundingBox:
+          $ref: 'common.yaml#/components/schemas/BoundingBox'
+        layout:
+          $ref: '#/components/schemas/PointLayout'
+      required:
+        - name
+        - properties
+        - pose
+        - type
+        - incomingPaths
+        - outgoingPaths
+        - attachedLinks
+        - occupyingVehicle
+        - vehicleEnvelopes
+        - maxVehicleBoundingBox
+        - layout
+    PointLayout:
+      type: object
+      properties:
+        labelOffset:
+          $ref: 'common.yaml#/components/schemas/Couple'
+        layerId:
+          type: integer

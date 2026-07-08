@@ -1,0 +1,19 @@
+[ {
+  "costs" : 1,
+  "destinationPoint" : "point-2",
+  "steps" : [ {
+    "destinationPoint" : "point-2",
+    "path" : "point-1 --- point-2",
+    "sourcePoint" : "point-1",
+    "vehicleOrientation" : "BACKWARD"
+  } ]
+}, {
+  "costs" : 0,
+  "destinationPoint" : "point-3",
+  "steps" : [ {
+    "destinationPoint" : "point-3",
+    "path" : null,
+    "sourcePoint" : null,
+    "vehicleOrientation" : "FORWARD"
+  } ]
+} ]

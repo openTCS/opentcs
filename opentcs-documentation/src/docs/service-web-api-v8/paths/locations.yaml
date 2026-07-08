@@ -1,0 +1,94 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+paths:
+  /locations:
+    get:
+      tags:
+        - Plant models
+      summary: Retrieves a set of locations.
+      parameters:
+        - name: names
+          in: query
+          description: >-
+            The names of the locations to be retrieved.
+            If a named location could not be found, it will simply be omitted from the response (and not result in an error).
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          example: ['Location-0001', 'Location-0002']
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../schemas/objects-states/location.yaml#/components/schemas/Location'
+              examples:
+                locations:
+                  $ref: '../examples/response-examples.yaml#/components/examples/locationsExample'
+  "/locations/{NAME}":
+    get:
+      tags:
+        - Plant models
+      summary: Retrieves the location with the given name.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the location to be retrieved.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/objects-states/location.yaml#/components/schemas/Location'
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find location 'Location-0001'.
+  /locations/{NAME}/locked:
+    put:
+      tags:
+        - Plant models
+      summary: Sets the locked state for the named location.
+      parameters:
+        - name: NAME
+          in: path
+          description: The name of the location.
+          required: true
+          schema:
+            type: string
+        - name: newValue
+          in: query
+          description: The location's new locked state.
+          required: true
+          example: true
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Successful operation
+        "404":
+          description: Referencing object that could not be found.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: Details on the actual error.
+                  example: Could not find location 'Location-0001'.

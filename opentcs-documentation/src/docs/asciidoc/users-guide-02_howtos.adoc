@@ -134,7 +134,7 @@ To achieve this, do the following:
 . Copy the `truststore.p12` file to the client application's (Model Editor, Operations Desk or Kernel Control Center) `config` directory.
   Leave the file in the kernel application's `config` directory as well.
 . In the kernel's configuration file, enable SSL for the RMI interface and/or for the web service interface.
-  (See <<RMI kernel interface configuration entries>> and/or <<Service web API configuration entries>> for a description of the configuration entries.)
+  (See <<RMI kernel interface configuration entries>> and/or <<Service web API v1 configuration entries>> and/or <<Service web API v8 configuration entries>> for a description of the configuration entries.)
 . If you enabled SSL for the RMI interface, you need to enable it in the Model Editor's, Operations Desk's and the Kernel Control Center's configuration files, too.
   (See <<SSL model editor-side application configuration entries>>, <<SSL operation desk-side application configuration entries>> and <<SSL KCC-side application configuration entries>> for a description of the configuration entries.)
 

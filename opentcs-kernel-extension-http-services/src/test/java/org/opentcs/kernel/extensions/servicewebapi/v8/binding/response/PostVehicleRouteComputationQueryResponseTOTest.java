@@ -1,0 +1,86 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
+package org.opentcs.kernel.extensions.servicewebapi.v8.binding.response;
+
+import java.util.List;
+import org.approvaltests.Approvals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.opentcs.kernel.extensions.servicewebapi.common.JsonBinder;
+import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.RouteTO;
+
+/**
+ * Unit tests for {@link PostVehicleRouteComputationQueryResponseTO}.
+ */
+class PostVehicleRouteComputationQueryResponseTOTest {
+
+  private JsonBinder jsonBinder;
+
+  @BeforeEach
+  void setUp() {
+    jsonBinder = new JsonBinder();
+  }
+
+  @Test
+  void jsonSample() {
+    Approvals.verify(jsonBinder.toJson(createResponse()));
+  }
+
+  private PostVehicleRouteComputationQueryResponseTO createResponse() {
+    return new PostVehicleRouteComputationQueryResponseTO()
+        .setRoutes(
+            List.of(
+                new RouteTO()
+                    .setDestinationPoint("C")
+                    .setCosts(1376)
+                    .setSteps(
+                        List.of(
+                            new RouteTO.Step()
+                                .setSourcePoint("A")
+                                .setDestinationPoint("B")
+                                .setPath("A --- B")
+                                .setVehicleOrientation("FORWARD"),
+                            new RouteTO.Step()
+                                .setSourcePoint("B")
+                                .setDestinationPoint("C")
+                                .setPath("B --- C")
+                                .setVehicleOrientation("FORWARD")
+                        )
+                    ),
+                new RouteTO()
+                    .setDestinationPoint("D")
+                    .setCosts(-1)
+                    .setSteps(null),
+                new RouteTO()
+                    .setDestinationPoint("E")
+                    .setCosts(0)
+                    .setSteps(
+                        List.of(
+                            new RouteTO.Step()
+                                .setSourcePoint(null)
+                                .setPath(null)
+                                .setDestinationPoint("E")
+                                .setVehicleOrientation("FORWARD")
+                        )
+                    ),
+                new RouteTO()
+                    .setDestinationPoint("F")
+                    .setCosts(4682)
+                    .setSteps(
+                        List.of(
+                            new RouteTO.Step()
+                                .setSourcePoint("D")
+                                .setDestinationPoint("E")
+                                .setPath("D --- E")
+                                .setVehicleOrientation("BACKWARD"),
+                            new RouteTO.Step()
+                                .setSourcePoint("E")
+                                .setDestinationPoint("F")
+                                .setPath("E --- F")
+                                .setVehicleOrientation("UNDEFINED")
+                        )
+                    )
+            )
+        );
+  }
+}

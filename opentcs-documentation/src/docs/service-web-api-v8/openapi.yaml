@@ -1,0 +1,191 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+# OpenAPI 3 specification:
+# - https://swagger.io/docs/specification/
+# - https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md
+# Online validator:
+# - https://apidevtools.org/swagger-parser/online/
+openapi: 3.0.0
+info:
+  description: >-
+    Bodies of HTTP requests and responses, where applicable, are JSON structures.
+    The encoding used may be UTF-8, UTF-16 or UTF-32.
+    Where time stamps are used, they are encoded using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601); the time zone used is UTC.
+
+
+    The TCP port to be used for the HTTP requests is configuration-dependent; by default, it is 55300.
+
+
+    By default, a client first needs to log in and acquire a session via [/login](#/Authentication/login) before accessing any other endpoints.
+  # IMPORTANT: When updating this version number, remember to mention that in the changelog, too!
+  version: 8.0.0
+  title: openTCS web API specification v8
+servers:
+  - url: http://localhost:55300/v8
+    description: openTCS kernel running on localhost
+tags:
+  - name: Authentication
+    description: Authenticating with the web API
+  - name: Transport orders
+    description: Working with transport orders
+  - name: Order Sequences
+    description: Working with order sequences
+  - name: Vehicles
+    description: Working with vehicles
+  - name: Peripheral jobs
+    description: Working with peripheral jobs
+  - name: Peripherals
+    description: Working with peripherals
+  - name: Plant models
+    description: Working with plant models
+  - name: User notifications
+    description: Retrieving user notifications
+  - name: Server-Sent Events - Connection
+    description: Receiving status updates
+  - name: Server-Sent Events - Named Events
+    description: >-
+      The following endpoints do not specify actual web API endpoints, but rather messages published by the openTCS kernel using the Server-Sent Events (SSE) technology.
+      The openTCS kernel exclusively uses named events to send messages to connected clients.
+      Each endpoint represents a named event and starts with a `/sse::` prefix, followed by the name of the corresponding event.
+      As an example, the `/sse::/events/vehicles` endpoint represents the named event `/events/vehicles`.
+      The response body of an endpoint specifies the data contained in the respective named event.
+
+
+      To avoid redundant documentation, descriptions for the properties in the response body schemas are omitted.
+      Instead, refer to the API documentation of the corresponding Java classes for detailed information on the semantics of the properties.
+  - name: Kernel administration
+    description: Kernel administration
+security:
+  - cookieAuth: []
+paths:
+  /login:
+    $ref: './paths/authentication.yaml#/paths/~1login'
+  /session:
+    $ref: './paths/authentication.yaml#/paths/~1session'
+  /logout:
+    $ref: './paths/authentication.yaml#/paths/~1logout'
+  /transportOrders:
+    $ref: './paths/transport-orders.yaml#/paths/~1transportOrders'
+  "/transportOrders/{NAME}":
+    $ref: './paths/transport-orders.yaml#/paths/~1transportOrders~1{NAME}'
+  "/transportOrders/{NAME}/immediateAssignment":
+    $ref: './paths/transport-orders.yaml#/paths/~1transportOrders~1{NAME}~1immediateAssignment'
+  "/transportOrders/{NAME}/withdrawal":
+    $ref: './paths/transport-orders.yaml#/paths/~1transportOrders~1{NAME}~1withdrawal'
+  "/transportOrders/{NAME}/intendedVehicle":
+    $ref: './paths/transport-orders.yaml#/paths/~1transportOrders~1{NAME}~1intendedVehicle'
+  /transportOrders/dispatcher/trigger:
+    $ref: './paths/transport-orders.yaml#/paths/~1transportOrders~1dispatcher~1trigger'
+  "/orderSequences":
+    $ref: './paths/order-sequences.yaml#/paths/~1orderSequences'
+  "/orderSequences/{NAME}":
+    $ref: './paths/order-sequences.yaml#/paths/~1orderSequences~1{NAME}'
+  "/orderSequences/{NAME}/complete":
+    $ref: './paths/order-sequences.yaml#/paths/~1orderSequences~1{NAME}~1complete'
+  /vehicles:
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles'
+  "/vehicles/{NAME}":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}'
+  "/vehicles/{NAME}/withdrawal":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1withdrawal'
+  "/vehicles/{NAME}/rerouteRequest":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1rerouteRequest'
+  "/vehicles/{NAME}/integrationLevel":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1integrationLevel'
+  "/vehicles/{NAME}/paused":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1paused'
+  "/vehicles/{NAME}/acceptableOrderTypes":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1acceptableOrderTypes'
+  "/vehicles/{NAME}/energyLevelThresholdSet":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1energyLevelThresholdSet'
+  "/vehicles/{NAME}/commAdapter/attachmentInformation":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1commAdapter~1attachmentInformation'
+  "/vehicles/{NAME}/commAdapter/attachment":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1commAdapter~1attachment'
+  "/vehicles/{NAME}/commAdapter/enabled":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1commAdapter~1enabled'
+  "/vehicles/{NAME}/commAdapter/message":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1commAdapter~1message'
+  "/vehicles/{NAME}/routeComputationQuery":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1routeComputationQuery'
+  "/vehicles/{NAME}/envelopeKey":
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1{NAME}~1envelopeKey'
+  /vehicles/dispatcher/trigger:
+    $ref: './paths/vehicles.yaml#/paths/~1vehicles~1dispatcher~1trigger'
+  /peripheralJobs:
+    $ref: './paths/peripheral-jobs.yaml#/paths/~1peripheralJobs'
+  "/peripheralJobs/{NAME}":
+    $ref: './paths/peripheral-jobs.yaml#/paths/~1peripheralJobs~1{NAME}'
+  "/peripheralJobs/{NAME}/withdrawal":
+    $ref: './paths/peripheral-jobs.yaml#/paths/~1peripheralJobs~1{NAME}~1withdrawal'
+  /peripheralJobs/dispatcher/trigger:
+    $ref: './paths/peripheral-jobs.yaml#/paths/~1peripheralJobs~1dispatcher~1trigger'
+  "/peripherals/{NAME}/commAdapter/attachmentInformation":
+    $ref: './paths/peripherals.yaml#/paths/~1peripherals~1{NAME}~1commAdapter~1attachmentInformation'
+  "/peripherals/{NAME}/commAdapter/attachment":
+    $ref: './paths/peripherals.yaml#/paths/~1peripherals~1{NAME}~1commAdapter~1attachment'
+  "/peripherals/{NAME}/commAdapter/enabled":
+    $ref: './paths/peripherals.yaml#/paths/~1peripherals~1{NAME}~1commAdapter~1enabled'
+  /plantModel:
+    $ref: './paths/plant-model.yaml#/paths/~1plantModel'
+  /plantModel/topologyUpdateRequest:
+    $ref: './paths/plant-model.yaml#/paths/~1plantModel~1topologyUpdateRequest'
+  /points:
+    $ref: './paths/points.yaml#/paths/~1points'
+  /points/{NAME}:
+    $ref: './paths/points.yaml#/paths/~1points~1{NAME}'
+  /paths:
+    $ref: './paths/paths.yaml#/paths/~1paths'
+  /paths/{NAME}:
+    $ref: './paths/paths.yaml#/paths/~1paths~1{NAME}'
+  /paths/{NAME}/locked:
+    $ref: './paths/paths.yaml#/paths/~1paths~1{NAME}~1locked'
+  /locations:
+    $ref: './paths/locations.yaml#/paths/~1locations'
+  /locations/{NAME}:
+    $ref: './paths/locations.yaml#/paths/~1locations~1{NAME}'
+  /locations/{NAME}/locked:
+    $ref: './paths/locations.yaml#/paths/~1locations~1{NAME}~1locked'
+  /locationTypes:
+    $ref: './paths/location-types.yaml#/paths/~1locationTypes'
+  /locationTypes/{NAME}:
+    $ref: './paths/location-types.yaml#/paths/~1locationTypes~1{NAME}'
+  /blocks:
+    $ref: './paths/blocks.yaml#/paths/~1blocks'
+  /blocks/{NAME}:
+    $ref: './paths/blocks.yaml#/paths/~1blocks~1{NAME}'
+  /visualLayout:
+    $ref: './paths/visual-layout.yaml#/paths/~1visualLayout'
+  "/peripherals/{NAME}/withdrawal":
+    $ref: './paths/peripherals.yaml#/paths/~1peripherals~1{NAME}~1withdrawal'
+  /peripherals/dispatcher/trigger:
+    $ref: './paths/peripherals.yaml#/paths/~1peripherals~1dispatcher~1trigger'
+  /userNotifications:
+    $ref: './paths/user-notifications.yaml#/paths/~1userNotifications'
+  /sse:
+    $ref: './paths/sse.yaml#/paths/~1sse'
+  /sse::/events/vehicles:
+    $ref: './paths/sse.yaml#/paths/~1sse::~1events~1vehicles'
+  /sse::/events/transportOrders:
+    $ref: './paths/sse.yaml#/paths/~1sse::~1events~1transportOrders'
+  /sse::/events/orderSequences:
+    $ref: './paths/sse.yaml#/paths/~1sse::~1events~1orderSequences'
+  /sse::/events/peripheralJobs:
+    $ref: './paths/sse.yaml#/paths/~1sse::~1events~1peripheralJobs'
+  /sse::/events/paths:
+    $ref: './paths/sse.yaml#/paths/~1sse::~1events~1paths'
+  /sse::/events/locations:
+    $ref: './paths/sse.yaml#/paths/~1sse::~1events~1locations'
+  /sse::/events/userNotifications:
+    $ref: './paths/sse.yaml#/paths/~1sse::~1events~1userNotifications'
+  /kernel:
+    $ref: './paths/kernel.yaml#/paths/~1kernel'
+  /kernel/version:
+    $ref: './paths/kernel.yaml#/paths/~1kernel~1version'
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID # cookie name

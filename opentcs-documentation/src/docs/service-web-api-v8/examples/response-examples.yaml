@@ -1,0 +1,377 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+exampleModelElements:
+  point1: &point1
+    attachedLinks:
+      - allowedOperations: []
+        location: Location-0001
+        point: Point-0001
+    incomingPaths:
+      - Point-0003 --- Point-0001
+    layout:
+      labelOffset:
+        x: -10
+        y: -20
+      layerId: 0
+    maxVehicleBoundingBox:
+      height: 1000
+      length: 1000
+      referenceOffset:
+        x: 0
+        y: 0
+      width: 1000
+    name: Point-0001
+    occupyingVehicle: Vehicle-0001
+    outgoingPaths:
+      - Point-0001 --- Point-0002
+    pose:
+      orientationAngle:
+      position:
+        x: 4750
+        y: 4750
+        z: 0
+    properties: {}
+    type: HALT_POSITION
+    vehicleEnvelopes: {}
+  point2: &point2
+    attachedLinks: []
+    incomingPaths:
+      - Point-0001 --- Point-0002
+    layout:
+      labelOffset:
+        x: -10
+        y: -20
+      layerId: 0
+    maxVehicleBoundingBox:
+      height: 1000
+      length: 1000
+      referenceOffset:
+        x: 0
+        y: 0
+      width: 1000
+    name: Point-0002
+    occupyingVehicle:
+    outgoingPaths:
+      - Point-0002 --- Point-0004
+    pose:
+      orientationAngle:
+      position:
+        x: 10250
+        y: 4750
+        z: 0
+    properties: {}
+    type: HALT_POSITION
+    vehicleEnvelopes: {}
+  point3: &point3
+    attachedLinks: []
+    incomingPaths:
+      - Point-0004 --- Point-0003
+    layout:
+      labelOffset:
+        x: -10
+        y: -20
+      layerId: 0
+    maxVehicleBoundingBox:
+      height: 1000
+      length: 1000
+      referenceOffset:
+        x: 0
+        y: 0
+      width: 1000
+    name: Point-0003
+    occupyingVehicle:
+    outgoingPaths:
+      - Point-0003 --- Point-0001
+    pose:
+      orientationAngle:
+      position:
+        x: 4750
+        y: 9750
+        z: 0
+    properties: {}
+    type: HALT_POSITION
+    vehicleEnvelopes: {}
+  point4: &point4
+    attachedLinks:
+      - allowedOperations: []
+        location: Location-0002
+        point: Point-0004
+    incomingPaths:
+      - Point-0002 --- Point-0004
+    layout:
+      labelOffset:
+        x: -10
+        y: -20
+      layerId: 0
+    maxVehicleBoundingBox:
+      height: 1000
+      length: 1000
+      referenceOffset:
+        x: 0
+        y: 0
+      width: 1000
+    name: Point-0004
+    occupyingVehicle:
+    outgoingPaths:
+      - Point-0004 --- Point-0003
+    pose:
+      orientationAngle:
+      position:
+        x: 10250
+        y: 9750
+        z: 0
+    properties: {}
+    type: HALT_POSITION
+    vehicleEnvelopes: {}
+  path12: &path12
+    destinationPoint: Point-0002
+    layout:
+      connectionType: DIRECT
+      controlPoints: []
+      layerId: 0
+    length: 5500
+    locked: false
+    maxReverseVelocity: 0
+    maxVelocity: 1000
+    name: Point-0001 --- Point-0002
+    peripheralOperations: []
+    properties: {}
+    sourcePoint: Point-0001
+    vehicleEnvelopes: {}
+  path24: &path24
+    destinationPoint: Point-0004
+    layout:
+      connectionType: DIRECT
+      controlPoints: []
+      layerId: 0
+    length: 5000
+    locked: false
+    maxReverseVelocity: 0
+    maxVelocity: 1000
+    name: Point-0002 --- Point-0004
+    peripheralOperations: []
+    properties: {}
+    sourcePoint: Point-0002
+    vehicleEnvelopes: {}
+  path31: &path31
+    destinationPoint: Point-0001
+    layout:
+      connectionType: DIRECT
+      controlPoints: []
+      layerId: 0
+    length: 5000
+    locked: false
+    maxReverseVelocity: 0
+    maxVelocity: 1000
+    name: Point-0003 --- Point-0001
+    peripheralOperations: []
+    properties: {}
+    sourcePoint: Point-0003
+    vehicleEnvelopes: {}
+  path43: &path43
+    destinationPoint: Point-0003
+    layout:
+      connectionType: DIRECT
+      controlPoints: []
+      layerId: 0
+    length: 5500
+    locked: false
+    maxReverseVelocity: 0
+    maxVelocity: 1000
+    name: Point-0004 --- Point-0003
+    peripheralOperations: []
+    properties: {}
+    sourcePoint: Point-0004
+    vehicleEnvelopes: {}
+  locationType1: &locationType1
+    allowedOperations:
+      - NOP
+    allowedPeripheralOperations: []
+    layout:
+      locationRepresentation: NONE
+    name: LType-0001
+    properties: {}
+  location1: &location1
+    attachedLinks:
+      - allowedOperations: []
+        location: Location-0001
+        point: Point-0001
+    layout:
+      labelOffset:
+        x: -10
+        y: -20
+      layerId: 0
+      locationRepresentation: DEFAULT
+    locked: false
+    name: Location-0001
+    peripheralInformation:
+      peripheralJob:
+      procState: IDLE
+      reservationToken:
+      state: NO_PERIPHERAL
+    position:
+      x: 2250
+      y: 2250
+      z: 0
+    properties: {}
+    type: LType-0001
+  location2: &location2
+    attachedLinks:
+      - allowedOperations: []
+        location: Location-0002
+        point: Point-0004
+    layout:
+      labelOffset:
+        x: -10
+        y: -20
+      layerId: 0
+      locationRepresentation: DEFAULT
+    locked: false
+    name: Location-0002
+    peripheralInformation:
+      peripheralJob:
+      procState: IDLE
+      reservationToken:
+      state: NO_PERIPHERAL
+    position:
+      x: 12750
+      y: 12750
+      z: 0
+    properties: {}
+    type: LType-0001
+  block1: &block1
+    layout:
+      color:
+        blue: 0
+        green: 0
+        red: 255
+    members:
+      - name: Point-0002
+        type: POINT
+      - name: Point-0002 --- Point-0004
+        type: PATH
+      - name: Point-0004
+        type: POINT
+    name: Block-0001
+    properties: {}
+    type: SINGLE_VEHICLE_ONLY
+  vehicle1: &vehicle1
+    acceptableOrderTypes:
+      - name: "*"
+        priority: 0
+    allocatedResources:
+      - - name: Point-0001
+          type: POINT
+    boundingBox:
+      height: 1000
+      length: 1000
+      referenceOffset:
+        x: 0
+        y: 0
+      width: 1000
+    claimedResources: []
+    currentPosition: Point-0001
+    energyLevel: 100
+    energyLevelThresholdSet:
+      energyLevelCritical: 30
+      energyLevelFullyRecharged: 95
+      energyLevelGood: 90
+      energyLevelSufficientlyRecharged: 40
+    envelopeKey: ''
+    history:
+      entries: []
+    integrationLevel: TO_BE_RESPECTED
+    layout:
+      routeColor:
+        blue: 0
+        green: 0
+        red: 255
+    loadHandlingDevices:
+      - full: false
+        label: default
+    maxReverseVelocity: 1000
+    maxVelocity: 1000
+    name: Vehicle-0001
+    orderSequence:
+    paused: false
+    pose:
+      orientationAngle:
+      position:
+    procState:
+      procState: IDLE
+      timestamp: '2026-02-20T14:34:11.862359200Z'
+    properties:
+      tcs:preferredAdapterClass: org.opentcs.virtualvehicle.LoopbackCommunicationAdapterFactory
+    rechargeOperation: CHARGE
+    state:
+      state: IDLE
+      timestamp: '2026-02-20T14:34:11.865365800Z'
+    transportOrder:
+  visualLayout: &visualLayout
+    layerGroups:
+      - id: 0
+        name: Default layer group
+        visible: true
+    layers:
+      - groupId: 0
+        id: 0
+        name: Default layer
+        ordinal: 0
+        visible: true
+    name: VLayout
+    properties: {}
+    scaleX: 50
+    scaleY: 50
+
+components:
+  examples:
+    pointsExample:
+      value:
+        - *point1
+        - *point2
+    pathsExample:
+      value:
+        - *path12
+        - *path24
+    locationTypesExample:
+      value:
+        - *locationType1
+    locationsExample:
+      value:
+        - *location1
+        - *location2
+    blocksExample:
+      value:
+        - *block1
+    vehiclesExample:
+      value:
+        - *vehicle1
+    visualLayoutExample:
+      value: *visualLayout
+    plantModelExample:
+      value:
+        name: Example plant model
+        properties:
+          tcs:modelFileLastModified: '2026-02-20T14:06:38Z'
+        points:
+          - *point1
+          - *point2
+          - *point3
+          - *point4
+        paths:
+          - *path12
+          - *path24
+          - *path31
+          - *path43
+        locationTypes:
+          - *locationType1
+        locations:
+          - *location1
+          - *location2
+        blocks:
+          - *block1
+        vehicles:
+          - *vehicle1
+        visualLayout: *visualLayout
+

@@ -1,0 +1,252 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
+package org.opentcs.kernel.extensions.servicewebapi.v1;
+
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.util.concurrent.Uninterruptibles;
+import io.javalin.Javalin;
+import io.javalin.community.ssl.SslPlugin;
+import io.javalin.config.JavalinConfig;
+import io.javalin.http.HttpResponseException;
+import jakarta.inject.Inject;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.SslParameterSet;
+import org.opentcs.components.kernel.KernelExtension;
+import org.opentcs.data.ObjectExistsException;
+import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.kernel.extensions.servicewebapi.common.JsonBinder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Provides an HTTP interface for basic administration needs.
+ */
+public class ServiceWebApi
+    implements
+      KernelExtension {
+
+  /**
+   * This class's logger.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(ServiceWebApi.class);
+  /**
+   * The interface configuration.
+   */
+  private final ServiceWebApiConfiguration configuration;
+  /**
+   * Authenticates incoming requests.
+   */
+  private final Authenticator authenticator;
+  /**
+   * Handles requests for API version 1.
+   */
+  private final V1RequestHandler v1RequestHandler;
+  /**
+   * Handles connections to the Server-Sent Events API version 1.
+   */
+  private final V1SseHandler v1SseHandler;
+  /**
+   * Binds JSON data to objects and vice versa.
+   */
+  private final JsonBinder jsonBinder;
+  /**
+   * The connection encryption configuration.
+   */
+  private final SslParameterSet sslParamSet;
+  /**
+   * The actual HTTP service.
+   */
+  private Javalin app;
+  /**
+   * Whether this kernel extension is initialized.
+   */
+  private boolean initialized;
+
+  /**
+   * Creates a new instance.
+   *
+   * @param configuration The interface configuration.
+   * @param sslParamSet The SSL parameter set.
+   * @param authenticator Authenticates incoming requests.
+   * @param jsonBinder Binds JSON data to objects and vice versa.
+   * @param v1RequestHandler Handles requests for API version 1.
+   * @param v1SseHandler Handles connections to the Server-Sent Events API version 1.
+   */
+  @Inject
+  public ServiceWebApi(
+      ServiceWebApiConfiguration configuration,
+      SslParameterSet sslParamSet,
+      Authenticator authenticator,
+      JsonBinder jsonBinder,
+      V1RequestHandler v1RequestHandler,
+      V1SseHandler v1SseHandler
+  ) {
+    this.configuration = requireNonNull(configuration, "configuration");
+    this.sslParamSet = requireNonNull(sslParamSet, "sslParamSet");
+    this.authenticator = requireNonNull(authenticator, "authenticator");
+    this.jsonBinder = requireNonNull(jsonBinder, "jsonBinder");
+    this.v1RequestHandler = requireNonNull(v1RequestHandler, "v1RequestHandler");
+    this.v1SseHandler = requireNonNull(v1SseHandler, "sseHandler");
+  }
+
+  @Override
+  public void initialize() {
+    if (isInitialized()) {
+      return;
+    }
+
+    v1RequestHandler.initialize();
+    v1SseHandler.initialize();
+
+    Consumer<JavalinConfig> config = cfg -> {
+      cfg.startup.showJavalinBanner = false;
+      cfg.routes.apiBuilder(v1RequestHandler.createRoutes());
+      if (configuration.maxRequestBodySize() <= 0) {
+        LOG.warn(
+            "Maximum request body size must be at least 1 MB. Using default size of {} bytes.",
+            cfg.http.maxRequestSize
+        );
+      }
+      else {
+        cfg.http.maxRequestSize = configuration.maxRequestBodySize() * 1024L * 1024L;
+      }
+
+      if (configuration.useSsl()) {
+        cfg.registerPlugin(
+            new SslPlugin(ssl -> {
+              ssl.keystoreFromPath(
+                  sslParamSet.getKeystoreFile().getAbsolutePath(),
+                  sslParamSet.getKeystorePassword()
+              );
+              // Disable the default (insecure) HTTP connector.
+              ssl.insecure = false;
+              // Configure host and port for the (secure) SSL connector.
+              ssl.host = configuration.bindAddress();
+              ssl.securePort = configuration.bindPort();
+            })
+        );
+      }
+      else {
+        cfg.jetty.host = configuration.bindAddress();
+        cfg.jetty.port = configuration.bindPort();
+
+        LOG.warn("Encryption disabled, connections will not be secured!");
+      }
+
+      configureRequestLogging(cfg);
+
+      cfg.routes.sse("/v1/sse", v1SseHandler::handleSseConnection);
+
+      cfg.routes.beforeMatched(ctx -> {
+        if (!authenticator.isAuthenticated(ctx)) {
+          // Delay the response a bit to slow down brute force attacks.
+          Uninterruptibles.sleepUninterruptibly(2, TimeUnit.SECONDS);
+          throw new HttpResponseException(403, "Not authenticated.");
+        }
+        // Add a CORS header to allow cross-origin requests from all hosts.
+        // This also makes using the "try it out" buttons in the Swagger UI documentation possible.
+        ctx.header("Access-Control-Allow-Origin", "*");
+      });
+
+      cfg.routes.before("/v1/kernel", ctx -> {
+        if (!isLocalHost(ctx.ip())) {
+          throw new HttpResponseException(403, "Access forbidden.");
+        }
+      });
+
+      // Reflect that we allow cross-origin requests for any headers and methods.
+      cfg.routes.options("/*", ctx -> {
+        String requestHeaders = ctx.header("Access-Control-Request-Headers");
+        if (requestHeaders != null) {
+          ctx.header("Access-Control-Allow-Headers", requestHeaders);
+        }
+
+        String requestMethod = ctx.header("Access-Control-Request-Method");
+        if (requestMethod != null) {
+          ctx.header("Access-Control-Allow-Methods", requestMethod);
+        }
+
+        ctx.result("OK");
+      });
+
+      cfg.routes.exception(IllegalArgumentException.class, (e, ctx) -> {
+        ctx.status(400);
+        ctx.result(jsonBinder.toJson(e));
+      });
+
+      cfg.routes.exception(
+          IllegalStateException.class, (e, ctx) -> {
+            ctx.status(500);
+            ctx.result(jsonBinder.toJson(e));
+          }
+      );
+
+      cfg.routes.exception(ObjectUnknownException.class, (e, ctx) -> {
+        ctx.status(404);
+        ctx.result(jsonBinder.toJson(e));
+      });
+
+      cfg.routes.exception(ObjectExistsException.class, (e, ctx) -> {
+        ctx.status(409);
+        ctx.result(jsonBinder.toJson(e));
+      });
+
+      cfg.routes.exception(KernelRuntimeException.class, (e, ctx) -> {
+        ctx.status(500);
+        ctx.result(jsonBinder.toJson(e));
+      });
+    };
+
+    app = Javalin.create(config).start();
+
+    initialized = true;
+  }
+
+  @Override
+  public void terminate() {
+    if (!isInitialized()) {
+      return;
+    }
+
+    v1SseHandler.terminate();
+    v1RequestHandler.terminate();
+    app.stop();
+
+    initialized = false;
+  }
+
+  @Override
+  public boolean isInitialized() {
+    return initialized;
+  }
+
+  private boolean isLocalHost(String ip) {
+    return ip.equals("127.0.0.1") || ip.equals("[0:0:0:0:0:0:0:1]");
+  }
+
+  private void configureRequestLogging(JavalinConfig cfg) {
+    cfg.routes.beforeMatched(
+        ctx -> LOG.debug(
+            "Incoming request to '{} {}' by '{}'. (Request ID: {})",
+            ctx.method(),
+            ctx.fullUrl(),
+            ctx.host(),
+            ctx.req().getRequestId()
+        )
+    );
+
+    cfg.requestLogger.http(
+        (ctx, ms) -> LOG.debug(
+            "Request to '{} {}' by '{}' took {} ms. (Request ID: {})",
+            ctx.method(),
+            ctx.fullUrl(),
+            ctx.host(),
+            ms.longValue(),
+            ctx.req().getRequestId()
+        )
+    );
+  }
+}

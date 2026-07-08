@@ -1,0 +1,48 @@
+{
+  "attachedLinks" : [ {
+    "allowedOperations" : [ "some-operation" ],
+    "location" : "some-location",
+    "point" : "some-point"
+  } ],
+  "incomingPaths" : [ "some-path" ],
+  "layout" : {
+    "labelOffset" : {
+      "x" : 12,
+      "y" : 13
+    },
+    "layerId" : 14
+  },
+  "maxVehicleBoundingBox" : {
+    "height" : 9,
+    "length" : 7,
+    "referenceOffset" : {
+      "x" : 10,
+      "y" : 11
+    },
+    "width" : 8
+  },
+  "name" : "some-point",
+  "occupyingVehicle" : "some-vehicle",
+  "outgoingPaths" : [ "some-other-path" ],
+  "pose" : {
+    "orientationAngle" : 4.0,
+    "position" : {
+      "x" : 1,
+      "y" : 2,
+      "z" : 3
+    }
+  },
+  "properties" : {
+    "some-key" : "some-value",
+    "some-other-key" : "some-other-value"
+  },
+  "type" : "HALT_POSITION",
+  "vehicleEnvelopes" : {
+    "some-envelope" : {
+      "vertices" : [ {
+        "x" : 5,
+        "y" : 6
+      } ]
+    }
+  }
+}

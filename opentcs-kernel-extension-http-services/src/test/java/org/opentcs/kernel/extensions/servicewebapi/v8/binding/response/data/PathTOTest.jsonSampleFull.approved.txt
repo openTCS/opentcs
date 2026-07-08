@@ -1,0 +1,35 @@
+{
+  "destinationPoint" : "some-destination-point",
+  "layout" : {
+    "connectionType" : "DIRECT",
+    "controlPoints" : [ {
+      "x" : 6,
+      "y" : 7
+    } ],
+    "layerId" : 8
+  },
+  "length" : 1,
+  "locked" : true,
+  "maxReverseVelocity" : 3,
+  "maxVelocity" : 2,
+  "name" : "some-path",
+  "peripheralOperations" : [ {
+    "completionRequired" : true,
+    "executionTrigger" : "AFTER_ALLOCATION",
+    "location" : "some-location",
+    "operation" : "some-operation"
+  } ],
+  "properties" : {
+    "some-key" : "some-value",
+    "some-other-key" : "some-other-value"
+  },
+  "sourcePoint" : "some-source-point",
+  "vehicleEnvelopes" : {
+    "some-envelope" : {
+      "vertices" : [ {
+        "x" : 4,
+        "y" : 5
+      } ]
+    }
+  }
+}

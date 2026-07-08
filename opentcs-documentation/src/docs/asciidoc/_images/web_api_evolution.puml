@@ -1,0 +1,57 @@
+@startuml
+' SPDX-FileCopyrightText: The openTCS Authors
+' SPDX-License-Identifier: CC-BY-4.0
+
+hide time-axis
+scale 1.5
+
+rectangle "openTCS Version" as OPENTCS
+concise "Web API v8" as WEBV8
+concise "Web API v9" as WEBV9
+concise "Web API v10" as WEBV10
+concise "Web API v11" as WEBV11
+
+@0
+OPENTCS is "8.0"
+WEBV8 is "stable" #lightgreen
+
+@1
+OPENTCS is "8.1"
+WEBV9 is "preview" #lightyellow
+
+@2
+OPENTCS is "8.2"
+
+@3
+OPENTCS is "8.3"
+
+@4
+OPENTCS is "8.4"
+
+@5
+OPENTCS is "9.0"
+WEBV8 is {hidden}
+WEBV9 is "stable" #lightgreen
+
+@6
+OPENTCS is "9.1"
+WEBV10 is "preview" #lightyellow
+
+@7
+OPENTCS is "9.2"
+
+@8
+OPENTCS is "9.3"
+
+@9
+OPENTCS is "10.0"
+WEBV9 is {hidden}
+WEBV10 is "stable" #lightgreen
+
+@10
+OPENTCS is "10.1"
+WEBV11 is "preview" #lightyellow
+
+@11
+OPENTCS is "10.2"
+@enduml
