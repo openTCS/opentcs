@@ -1064,10 +1064,12 @@ public class PlantModelManager
    */
   public EnvironmentalEntity createEnvironmentalEntity(EnvironmentalEntityCreationTO to)
       throws ObjectExistsException {
-    LOG.info("Environmental entity is being created: {}", to.getName());
+    String name = nameFor(to);
+
+    LOG.info("Environmental entity is being created: {}", name);
 
     EnvironmentalEntity newEntity = new EnvironmentalEntity(
-        nameFor(to),
+        name,
         toEnvelope(to.getEnvelope()),
         new Pose(
             new Triple(
