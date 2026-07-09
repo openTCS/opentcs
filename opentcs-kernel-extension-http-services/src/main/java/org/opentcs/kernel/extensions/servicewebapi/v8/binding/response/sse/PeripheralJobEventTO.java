@@ -2,36 +2,29 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.sse;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import javax.annotation.Nullable;
-import org.opentcs.data.TCSObjectEvent;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.PeripheralJobTO;
 
-/**
- * A transfer object (to be used with the SSE API) representing a {@link TCSObjectEvent} for a
- * peripheral job.
- */
+// CHECKSTYLE:OFF
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class PeripheralJobEventTO {
 
+  @Nullable
   private final PeripheralJobTO currentObjectState;
+  @Nullable
   private final PeripheralJobTO previousObjectState;
-
-  public PeripheralJobEventTO(
-      @Nullable
-      PeripheralJobTO currentObjectState,
-      @Nullable
-      PeripheralJobTO previousObjectState
-  ) {
-    this.currentObjectState = currentObjectState;
-    this.previousObjectState = previousObjectState;
-  }
-
-  @Nullable
-  public PeripheralJobTO getCurrentObjectState() {
-    return currentObjectState;
-  }
-
-  @Nullable
-  public PeripheralJobTO getPreviousObjectState() {
-    return previousObjectState;
-  }
 }
+// CHECKSTYLE:ON

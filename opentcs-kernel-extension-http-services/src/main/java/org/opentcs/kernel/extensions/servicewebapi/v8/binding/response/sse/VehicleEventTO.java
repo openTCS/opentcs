@@ -2,36 +2,29 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.sse;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import javax.annotation.Nullable;
-import org.opentcs.data.TCSObjectEvent;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.VehicleTO;
 
-/**
- * A transfer object (to be used with the SSE API) representing a {@link TCSObjectEvent} for a
- * vehicle.
- */
+// CHECKSTYLE:OFF
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class VehicleEventTO {
 
+  @Nullable
   private final VehicleTO currentObjectState;
+  @Nullable
   private final VehicleTO previousObjectState;
-
-  public VehicleEventTO(
-      @Nullable
-      VehicleTO currentObjectState,
-      @Nullable
-      VehicleTO previousObjectState
-  ) {
-    this.currentObjectState = currentObjectState;
-    this.previousObjectState = previousObjectState;
-  }
-
-  @Nullable
-  public VehicleTO getCurrentObjectState() {
-    return currentObjectState;
-  }
-
-  @Nullable
-  public VehicleTO getPreviousObjectState() {
-    return previousObjectState;
-  }
 }
+// CHECKSTYLE:ON

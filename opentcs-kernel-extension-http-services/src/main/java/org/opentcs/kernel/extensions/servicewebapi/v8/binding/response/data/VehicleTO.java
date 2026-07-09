@@ -8,24 +8,24 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.opentcs.data.model.Vehicle;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared.ColorTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared.ObjectHistoryTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared.PoseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared.ResourceTO;
 
-/**
- * A transfer object representing a {@link Vehicle} instance.
- */
 // CHECKSTYLE:OFF
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 @Accessors(chain = true)
 @JsonPropertyOrder(alphabetic = true)
 public class VehicleTO {
@@ -77,6 +77,8 @@ public class VehicleTO {
   @NoArgsConstructor
   @Getter
   @Setter
+  @EqualsAndHashCode
+  @ToString
   @Accessors(chain = true)
   @JsonPropertyOrder(alphabetic = true)
   public static class EnergyLevelThresholdSetTO {
@@ -90,6 +92,8 @@ public class VehicleTO {
   @NoArgsConstructor
   @Getter
   @Setter
+  @EqualsAndHashCode
+  @ToString
   @Accessors(chain = true)
   @JsonPropertyOrder(alphabetic = true)
   public static class LoadHandlingDeviceTO {
@@ -102,6 +106,8 @@ public class VehicleTO {
   @NoArgsConstructor
   @Getter
   @Setter
+  @EqualsAndHashCode
+  @ToString
   @Accessors(chain = true)
   @JsonPropertyOrder(alphabetic = true)
   public static class TimestampedVehicleStateTO {
@@ -115,6 +121,8 @@ public class VehicleTO {
   @NoArgsConstructor
   @Getter
   @Setter
+  @EqualsAndHashCode
+  @ToString
   @Accessors(chain = true)
   @JsonPropertyOrder(alphabetic = true)
   public static class TimestampedVehicleProcStateTO {
@@ -150,6 +158,8 @@ public class VehicleTO {
   @NoArgsConstructor
   @Getter
   @Setter
+  @EqualsAndHashCode
+  @ToString
   @Accessors(chain = true)
   @JsonPropertyOrder(alphabetic = true)
   public static class AcceptableOrderTypeTO {
@@ -162,6 +172,8 @@ public class VehicleTO {
   @NoArgsConstructor
   @Getter
   @Setter
+  @EqualsAndHashCode
+  @ToString
   @Accessors(chain = true)
   @JsonPropertyOrder(alphabetic = true)
   public static class LayoutTO {

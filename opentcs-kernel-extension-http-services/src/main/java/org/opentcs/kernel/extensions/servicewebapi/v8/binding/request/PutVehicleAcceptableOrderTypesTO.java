@@ -2,41 +2,30 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request;
 
-import static java.util.Objects.requireNonNull;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import java.util.List;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.AcceptableOrderTypeTO;
 
-/**
- * An update for a vehicle's list of acceptable order types.
- */
+// CHECKSTYLE:OFF
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class PutVehicleAcceptableOrderTypesTO {
 
   @Nonnull
-  private List<AcceptableOrderTypeTO> acceptableOrderTypes;
-
-  @JsonCreator
-  public PutVehicleAcceptableOrderTypesTO(
-      @Nonnull
-      @JsonProperty(value = "acceptableOrderTypes", required = true)
-      List<AcceptableOrderTypeTO> acceptableOrderTypes
-  ) {
-    this.acceptableOrderTypes = requireNonNull(acceptableOrderTypes, "acceptableOrderTypes");
-  }
-
-  @Nonnull
-  public List<AcceptableOrderTypeTO> getAcceptableOrderTypes() {
-    return acceptableOrderTypes;
-  }
-
-  public PutVehicleAcceptableOrderTypesTO setAcceptableOrderTypes(
-      @Nonnull
-      List<AcceptableOrderTypeTO> acceptableOrderTypes
-  ) {
-    this.acceptableOrderTypes = requireNonNull(acceptableOrderTypes, "acceptableOrderTypes");
-    return this;
-  }
+  @JsonProperty(value = "acceptableOrderTypes", required = true)
+  private final List<AcceptableOrderTypeTO> acceptableOrderTypes;
 }
+// CHECKSTYLE:ON

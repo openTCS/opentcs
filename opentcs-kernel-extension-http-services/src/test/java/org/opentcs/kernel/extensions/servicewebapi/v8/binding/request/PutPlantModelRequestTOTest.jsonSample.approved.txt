@@ -1,187 +1,16 @@
 {
   "name" : "some-name",
-  "points" : [ {
-    "name" : "some-point",
-    "position" : {
-      "x" : 25000,
-      "y" : -15000,
-      "z" : 0
-    },
-    "vehicleOrientationAngle" : 73.3,
-    "type" : "PARK_POSITION",
+  "blocks" : [ {
+    "name" : "some-block",
     "layout" : {
-      "position" : {
-        "x" : 25000,
-        "y" : -15000
-      },
-      "labelOffset" : {
-        "x" : -10,
-        "y" : -20
-      },
-      "layerId" : 0
+      "color" : "#FF0000"
     },
-    "vehicleEnvelopes" : [ {
-      "key" : "envelopeType-01",
-      "vertices" : [ {
-        "x" : 25500,
-        "y" : -15500
-      }, {
-        "x" : 25500,
-        "y" : -14500
-      }, {
-        "x" : 24500,
-        "y" : -14500
-      }, {
-        "x" : 24500,
-        "y" : -15500
-      } ]
+    "memberNames" : [ "some-point2" ],
+    "properties" : [ {
+      "name" : "block-prop",
+      "value" : "block-value"
     } ],
-    "maxVehicleBoundingBox" : {
-      "length" : 1500,
-      "width" : 2000,
-      "height" : 3000,
-      "referenceOffset" : {
-        "x" : 10,
-        "y" : 20
-      }
-    },
-    "properties" : [ {
-      "name" : "point-prop",
-      "value" : "point-value"
-    } ]
-  }, {
-    "name" : "some-point2",
-    "position" : {
-      "x" : 18000,
-      "y" : -15000,
-      "z" : 0
-    },
-    "vehicleOrientationAngle" : "NaN",
-    "type" : "HALT_POSITION",
-    "layout" : {
-      "position" : {
-        "x" : 18000,
-        "y" : -15000
-      },
-      "labelOffset" : {
-        "x" : -10,
-        "y" : -20
-      },
-      "layerId" : 0
-    },
-    "vehicleEnvelopes" : [ ],
-    "maxVehicleBoundingBox" : {
-      "length" : 1500,
-      "width" : 2000,
-      "height" : 3000,
-      "referenceOffset" : {
-        "x" : 10,
-        "y" : 20
-      }
-    },
-    "properties" : [ {
-      "name" : "point-prop",
-      "value" : "point-value"
-    } ]
-  }, {
-    "name" : "some-point3",
-    "position" : {
-      "x" : 25000,
-      "y" : -9000,
-      "z" : 0
-    },
-    "vehicleOrientationAngle" : "NaN",
-    "type" : "HALT_POSITION",
-    "layout" : {
-      "position" : {
-        "x" : 25000,
-        "y" : -9000
-      },
-      "labelOffset" : {
-        "x" : -10,
-        "y" : -20
-      },
-      "layerId" : 0
-    },
-    "vehicleEnvelopes" : [ ],
-    "maxVehicleBoundingBox" : {
-      "length" : 1500,
-      "width" : 2000,
-      "height" : 3000,
-      "referenceOffset" : {
-        "x" : 10,
-        "y" : 20
-      }
-    },
-    "properties" : [ {
-      "name" : "point-prop",
-      "value" : "point-value"
-    } ]
-  } ],
-  "paths" : [ {
-    "name" : "some-path",
-    "srcPointName" : "some-point",
-    "destPointName" : "some-point2",
-    "length" : 3,
-    "maxVelocity" : 13,
-    "maxReverseVelocity" : 3,
-    "peripheralOperations" : [ {
-      "operation" : "some-op",
-      "locationName" : "some-location",
-      "executionTrigger" : "AFTER_ALLOCATION",
-      "completionRequired" : true
-    } ],
-    "locked" : true,
-    "layout" : {
-      "connectionType" : "SLANTED",
-      "controlPoints" : [ {
-        "x" : 43000,
-        "y" : 30000
-      }, {
-        "x" : 44000,
-        "y" : 31000
-      }, {
-        "x" : 45000,
-        "y" : 32000
-      } ],
-      "layerId" : 0
-    },
-    "vehicleEnvelopes" : [ {
-      "key" : "envelopeType-01",
-      "vertices" : [ {
-        "x" : 25500,
-        "y" : -15500
-      }, {
-        "x" : 25500,
-        "y" : -14500
-      }, {
-        "x" : 17500,
-        "y" : -14500
-      }, {
-        "x" : 17500,
-        "y" : -15500
-      } ]
-    } ],
-    "properties" : [ {
-      "name" : "path-prop",
-      "value" : "path-value"
-    } ]
-  }, {
-    "name" : "another-path",
-    "srcPointName" : "some-point2",
-    "destPointName" : "some-point3",
-    "length" : 1,
-    "maxVelocity" : 0,
-    "maxReverseVelocity" : 0,
-    "peripheralOperations" : [ ],
-    "locked" : false,
-    "layout" : {
-      "connectionType" : "DIRECT",
-      "controlPoints" : [ ],
-      "layerId" : 0
-    },
-    "vehicleEnvelopes" : [ ],
-    "properties" : [ ]
+    "type" : "SAME_DIRECTION_ONLY"
   } ],
   "locationTypes" : [ {
     "name" : "some-locationType",
@@ -197,60 +26,235 @@
   } ],
   "locations" : [ {
     "name" : "some-location",
-    "typeName" : "some-locationType",
     "position" : {
       "x" : 30000,
       "y" : -15000,
       "z" : 0
     },
-    "links" : [ ],
-    "locked" : true,
+    "typeName" : "some-locationType",
     "layout" : {
-      "position" : {
-        "x" : 30000,
-        "y" : -15000
-      },
       "labelOffset" : {
         "x" : -10,
         "y" : -20
       },
+      "layerId" : 0,
       "locationRepresentation" : "LOAD_TRANSFER_GENERIC",
-      "layerId" : 0
+      "position" : {
+        "x" : 30000,
+        "y" : -15000
+      }
     },
+    "links" : [ ],
+    "locked" : true,
     "properties" : [ ]
   } ],
-  "blocks" : [ {
-    "name" : "some-block",
-    "type" : "SAME_DIRECTION_ONLY",
+  "paths" : [ {
+    "destPointName" : "some-point2",
+    "name" : "some-path",
+    "srcPointName" : "some-point",
     "layout" : {
-      "color" : "#FF0000"
+      "connectionType" : "SLANTED",
+      "controlPoints" : [ {
+        "x" : 43000,
+        "y" : 30000
+      }, {
+        "x" : 44000,
+        "y" : 31000
+      }, {
+        "x" : 45000,
+        "y" : 32000
+      } ],
+      "layerId" : 0
     },
-    "memberNames" : [ "some-point2" ],
+    "length" : 3,
+    "locked" : true,
+    "maxReverseVelocity" : 3,
+    "maxVelocity" : 13,
+    "peripheralOperations" : [ {
+      "locationName" : "some-location",
+      "operation" : "some-op",
+      "completionRequired" : true,
+      "executionTrigger" : "AFTER_ALLOCATION"
+    } ],
     "properties" : [ {
-      "name" : "block-prop",
-      "value" : "block-value"
+      "name" : "path-prop",
+      "value" : "path-value"
+    } ],
+    "vehicleEnvelopes" : [ {
+      "key" : "envelopeType-01",
+      "vertices" : [ {
+        "x" : 25500,
+        "y" : -15500
+      }, {
+        "x" : 25500,
+        "y" : -14500
+      }, {
+        "x" : 17500,
+        "y" : -14500
+      }, {
+        "x" : 17500,
+        "y" : -15500
+      } ]
     } ]
+  }, {
+    "destPointName" : "some-point3",
+    "name" : "another-path",
+    "srcPointName" : "some-point2",
+    "layout" : {
+      "connectionType" : "DIRECT",
+      "controlPoints" : [ ],
+      "layerId" : 0
+    },
+    "length" : 1,
+    "locked" : false,
+    "maxReverseVelocity" : 0,
+    "maxVelocity" : 0,
+    "peripheralOperations" : [ ],
+    "properties" : [ ],
+    "vehicleEnvelopes" : [ ]
+  } ],
+  "points" : [ {
+    "name" : "some-point",
+    "layout" : {
+      "labelOffset" : {
+        "x" : -10,
+        "y" : -20
+      },
+      "layerId" : 0,
+      "position" : {
+        "x" : 25000,
+        "y" : -15000
+      }
+    },
+    "maxVehicleBoundingBox" : {
+      "height" : 3000,
+      "length" : 1500,
+      "referenceOffset" : {
+        "x" : 10,
+        "y" : 20
+      },
+      "width" : 2000
+    },
+    "position" : {
+      "x" : 25000,
+      "y" : -15000,
+      "z" : 0
+    },
+    "properties" : [ {
+      "name" : "point-prop",
+      "value" : "point-value"
+    } ],
+    "type" : "PARK_POSITION",
+    "vehicleEnvelopes" : [ {
+      "key" : "envelopeType-01",
+      "vertices" : [ {
+        "x" : 25500,
+        "y" : -15500
+      }, {
+        "x" : 25500,
+        "y" : -14500
+      }, {
+        "x" : 24500,
+        "y" : -14500
+      }, {
+        "x" : 24500,
+        "y" : -15500
+      } ]
+    } ],
+    "vehicleOrientationAngle" : 73.3
+  }, {
+    "name" : "some-point2",
+    "layout" : {
+      "labelOffset" : {
+        "x" : -10,
+        "y" : -20
+      },
+      "layerId" : 0,
+      "position" : {
+        "x" : 18000,
+        "y" : -15000
+      }
+    },
+    "maxVehicleBoundingBox" : {
+      "height" : 3000,
+      "length" : 1500,
+      "referenceOffset" : {
+        "x" : 10,
+        "y" : 20
+      },
+      "width" : 2000
+    },
+    "position" : {
+      "x" : 18000,
+      "y" : -15000,
+      "z" : 0
+    },
+    "properties" : [ {
+      "name" : "point-prop",
+      "value" : "point-value"
+    } ],
+    "type" : "HALT_POSITION",
+    "vehicleEnvelopes" : [ ],
+    "vehicleOrientationAngle" : "NaN"
+  }, {
+    "name" : "some-point3",
+    "layout" : {
+      "labelOffset" : {
+        "x" : -10,
+        "y" : -20
+      },
+      "layerId" : 0,
+      "position" : {
+        "x" : 25000,
+        "y" : -9000
+      }
+    },
+    "maxVehicleBoundingBox" : {
+      "height" : 3000,
+      "length" : 1500,
+      "referenceOffset" : {
+        "x" : 10,
+        "y" : 20
+      },
+      "width" : 2000
+    },
+    "position" : {
+      "x" : 25000,
+      "y" : -9000,
+      "z" : 0
+    },
+    "properties" : [ {
+      "name" : "point-prop",
+      "value" : "point-value"
+    } ],
+    "type" : "HALT_POSITION",
+    "vehicleEnvelopes" : [ ],
+    "vehicleOrientationAngle" : "NaN"
+  } ],
+  "properties" : [ {
+    "name" : "plantModel-prop",
+    "value" : "value"
   } ],
   "vehicles" : [ {
     "name" : "some-vehicle",
     "boundingBox" : {
-      "length" : 150,
-      "width" : 200,
       "height" : 300,
+      "length" : 150,
       "referenceOffset" : {
         "x" : 10,
         "y" : 20
-      }
+      },
+      "width" : 200
     },
     "energyLevelCritical" : 10,
-    "energyLevelGood" : 30,
     "energyLevelFullyRecharged" : 90,
+    "energyLevelGood" : 30,
     "energyLevelSufficientlyRecharged" : 60,
-    "maxVelocity" : 2000,
-    "maxReverseVelocity" : 733,
     "layout" : {
       "routeColor" : "#123456"
     },
+    "maxReverseVelocity" : 733,
+    "maxVelocity" : 2000,
     "properties" : [ {
       "name" : "vehicle-prop",
       "value" : "vehicle-value"
@@ -258,27 +262,23 @@
   } ],
   "visualLayout" : {
     "name" : "some-visualLayout",
-    "scaleX" : 65.0,
-    "scaleY" : 65.0,
-    "layers" : [ {
-      "id" : 0,
-      "ordinal" : 0,
-      "visible" : true,
-      "name" : "layer0",
-      "groupId" : 0
-    } ],
     "layerGroups" : [ {
       "id" : 0,
       "name" : "layerGroup0",
       "visible" : true
     } ],
+    "layers" : [ {
+      "groupId" : 0,
+      "id" : 0,
+      "name" : "layer0",
+      "ordinal" : 0,
+      "visible" : true
+    } ],
     "properties" : [ {
       "name" : "vLayout-prop",
       "value" : "vLayout-value"
-    } ]
-  },
-  "properties" : [ {
-    "name" : "plantModel-prop",
-    "value" : "value"
-  } ]
+    } ],
+    "scaleX" : 65.0,
+    "scaleY" : 65.0
+  }
 }

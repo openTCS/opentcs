@@ -101,9 +101,7 @@ class PeripheralJobHandlerTest {
             .setIncompleteName(false)
             .setReservationToken("some-token")
             .setPeripheralOperation(
-                new PeripheralOperationDescription()
-                    .setLocationName("some-location")
-                    .setOperation("some-operation")
+                new PeripheralOperationDescription("some-operation", "some-location")
                     .setExecutionTrigger(PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION)
                     .setCompletionRequired(true)
             )

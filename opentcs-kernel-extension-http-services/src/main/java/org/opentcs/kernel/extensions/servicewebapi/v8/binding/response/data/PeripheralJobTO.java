@@ -7,20 +7,20 @@ import java.time.Instant;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared.ObjectHistoryTO;
 
-/**
- * A transfer object representing a {@link PeripheralJob} instance.
- */
 // CHECKSTYLE:OFF
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 @Accessors(chain = true)
 @JsonPropertyOrder(alphabetic = true)
 public class PeripheralJobTO {
@@ -49,7 +49,10 @@ public class PeripheralJobTO {
   @NoArgsConstructor
   @Getter
   @Setter
+  @EqualsAndHashCode
+  @ToString
   @Accessors(chain = true)
+  @JsonPropertyOrder(alphabetic = true)
   public static class PeripheralOperationTO {
 
     @Nonnull

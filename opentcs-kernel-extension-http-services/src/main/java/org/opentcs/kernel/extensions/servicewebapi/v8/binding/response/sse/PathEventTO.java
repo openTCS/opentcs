@@ -2,36 +2,29 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.sse;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import javax.annotation.Nullable;
-import org.opentcs.data.TCSObjectEvent;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.PathTO;
 
-/**
- * A transfer object (to be used with the SSE API) representing a {@link TCSObjectEvent} for a
- * path.
- */
+// CHECKSTYLE:OFF
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class PathEventTO {
 
+  @Nullable
   private final PathTO currentObjectState;
+  @Nullable
   private final PathTO previousObjectState;
-
-  public PathEventTO(
-      @Nullable
-      PathTO currentObjectState,
-      @Nullable
-      PathTO previousObjectState
-  ) {
-    this.currentObjectState = currentObjectState;
-    this.previousObjectState = previousObjectState;
-  }
-
-  @Nullable
-  public PathTO getCurrentObjectState() {
-    return currentObjectState;
-  }
-
-  @Nullable
-  public PathTO getPreviousObjectState() {
-    return previousObjectState;
-  }
 }
+// CHECKSTYLE:ON

@@ -2,56 +2,31 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared;
 
-import static java.util.Objects.requireNonNull;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
-/**
- */
+// CHECKSTYLE:OFF
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class PropertyTO {
 
-  private String name;
-  private String value;
-
-  @JsonCreator
-  public PropertyTO(
-      @Nonnull
-      @JsonProperty(value = "name", required = true)
-      String name,
-      @Nonnull
-      @JsonProperty(value = "value", required = true)
-      String value
-  ) {
-    this.name = requireNonNull(name, "name");
-    this.value = requireNonNull(value, "value");
-  }
-
   @Nonnull
-  public String getName() {
-    return name;
-  }
-
-  public PropertyTO setName(
-      @Nonnull
-      String name
-  ) {
-    this.name = requireNonNull(name, "name");
-    return this;
-  }
-
+  @JsonProperty(value = "name", required = true)
+  private final String name;
   @Nonnull
-  public String getValue() {
-    return value;
-  }
-
-  public PropertyTO setValue(
-      @Nonnull
-      String value
-  ) {
-    this.value = requireNonNull(value, "value");
-    return this;
-  }
-
+  @JsonProperty(value = "value", required = true)
+  private final String value;
 }
+// CHECKSTYLE:ON

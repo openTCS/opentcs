@@ -2,74 +2,32 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared;
 
-import static java.util.Objects.requireNonNull;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
-/**
- * A key-value property.
- */
+// CHECKSTYLE:OFF
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class Property {
 
-  private String key;
-
-  private String value;
-
-  public Property(
-      @Nonnull
-      @JsonProperty(required = true, value = "key")
-      String key,
-      @Nullable
-      @JsonProperty(required = false, value = "value")
-      String value
-  ) {
-    this.key = requireNonNull(key, "key");
-    this.value = value;
-  }
-
-  /**
-   * Returns the property key.
-   *
-   * @return The property key.
-   */
   @Nonnull
-  public String getKey() {
-    return key;
-  }
-
-  /**
-   * Sets the property key.
-   *
-   * @param key The new key.
-   */
-  public void setKey(
-      @Nonnull
-      String key
-  ) {
-    this.key = requireNonNull(key, "key");
-  }
-
-  /**
-   * Returns the property value.
-   *
-   * @return The property value.
-   */
+  @JsonProperty(required = true, value = "key")
+  private final String key;
   @Nullable
-  public String getValue() {
-    return value;
-  }
-
-  /**
-   * Sets the property value.
-   *
-   * @param value The new value.
-   */
-  public void setValue(
-      @Nullable
-      String value
-  ) {
-    this.value = value;
-  }
+  @JsonProperty(required = false, value = "value")
+  private final String value;
 }
+// CHECKSTYLE:ON

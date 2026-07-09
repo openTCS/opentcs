@@ -6,20 +6,20 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.opentcs.data.model.LocationType;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared.LocationRepresentationTO;
 
-/**
- * A transfer object representing a {@link LocationType} instance.
- */
 // CHECKSTYLE:OFF
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 @Accessors(chain = true)
 @JsonPropertyOrder(alphabetic = true)
 public class LocationTypeTO {
@@ -39,6 +39,8 @@ public class LocationTypeTO {
   @NoArgsConstructor
   @Getter
   @Setter
+  @EqualsAndHashCode
+  @ToString
   @Accessors(chain = true)
   @JsonPropertyOrder(alphabetic = true)
   public static class LayoutTO {

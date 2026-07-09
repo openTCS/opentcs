@@ -2,23 +2,26 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.response;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import java.time.Instant;
 import java.util.List;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.opentcs.kernel.extensions.servicewebapi.v8.auth.UserPermission;
 
-/**
- * A successful login response with information on the user and session.
- */
 // CHECKSTYLE:OFF
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 @Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class LoginResponseTO {
   @Nonnull
   private User user;
@@ -28,7 +31,10 @@ public class LoginResponseTO {
   @NoArgsConstructor
   @Getter
   @Setter
+  @EqualsAndHashCode
+  @ToString
   @Accessors(chain = true)
+  @JsonPropertyOrder(alphabetic = true)
   public static class User {
     @Nonnull
     private String username;
@@ -39,7 +45,10 @@ public class LoginResponseTO {
   @NoArgsConstructor
   @Getter
   @Setter
+  @EqualsAndHashCode
+  @ToString
   @Accessors(chain = true)
+  @JsonPropertyOrder(alphabetic = true)
   public static class Session {
     @Nonnull
     private String sessionId;

@@ -2,73 +2,31 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.response;
 
-import static java.util.Objects.requireNonNull;
-
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import java.util.List;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
-/**
- */
+// CHECKSTYLE:OFF
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class GetPeripheralAttachmentInfoResponseTO {
 
   @Nonnull
-  private String locationName;
-
+  private final String locationName;
   @Nonnull
-  private List<String> availableCommAdapters;
-
+  private final String attachedCommAdapter;
   @Nonnull
-  private String attachedCommAdapter;
-
-  public GetPeripheralAttachmentInfoResponseTO(
-      @Nonnull
-      String locationName,
-      @Nonnull
-      String attachedCommAdapter,
-      @Nonnull
-      List<String> availableCommAdapters
-  ) {
-    this.locationName = requireNonNull(locationName, "locationName");
-    this.attachedCommAdapter = requireNonNull(attachedCommAdapter, "attachedCommAdapter");
-    this.availableCommAdapters = requireNonNull(availableCommAdapters, "availableCommAdapters");
-  }
-
-  @Nonnull
-  public String getLocationName() {
-    return locationName;
-  }
-
-  public GetPeripheralAttachmentInfoResponseTO setLocationName(
-      @Nonnull
-      String locationName
-  ) {
-    this.locationName = requireNonNull(locationName, "locationName");
-    return this;
-  }
-
-  @Nonnull
-  public List<String> getAvailableCommAdapters() {
-    return availableCommAdapters;
-  }
-
-  public GetPeripheralAttachmentInfoResponseTO setAvailableCommAdapters(
-      @Nonnull
-      List<String> availableCommAdapters
-  ) {
-    this.availableCommAdapters = requireNonNull(availableCommAdapters, "availableCommAdapters");
-    return this;
-  }
-
-  @Nonnull
-  public String getAttachedCommAdapter() {
-    return attachedCommAdapter;
-  }
-
-  public GetPeripheralAttachmentInfoResponseTO setAttachedCommAdapter(
-      @Nonnull
-      String attachedCommAdapter
-  ) {
-    this.attachedCommAdapter = requireNonNull(attachedCommAdapter, "attachedCommAdapter");
-    return this;
-  }
+  private final List<String> availableCommAdapters;
 }
+// CHECKSTYLE:ON

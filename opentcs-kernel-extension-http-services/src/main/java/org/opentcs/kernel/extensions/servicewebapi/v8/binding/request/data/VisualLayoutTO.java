@@ -2,102 +2,35 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data;
 
-import static java.util.Objects.requireNonNull;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import java.util.List;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PropertyTO;
 
-/**
- */
+// CHECKSTYLE:OFF
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class VisualLayoutTO {
 
-  private String name;
+  @Nonnull
+  @JsonProperty(value = "name", required = true)
+  private final String name;
   private double scaleX = 50.0;
   private double scaleY = 50.0;
   private List<LayerTO> layers = List.of(new LayerTO(0, 0, true, "layer0", 0));
   private List<LayerGroupTO> layerGroups = List.of(new LayerGroupTO(0, "layerGroup0", true));
   private List<PropertyTO> properties = List.of();
-
-  @JsonCreator
-  public VisualLayoutTO(
-      @Nonnull
-      @JsonProperty(value = "name", required = true)
-      String name
-  ) {
-    this.name = requireNonNull(name, "name");
-  }
-
-  @Nonnull
-  public String getName() {
-    return name;
-  }
-
-  public VisualLayoutTO setName(
-      @Nonnull
-      String name
-  ) {
-    this.name = requireNonNull(name, "name");
-    return this;
-  }
-
-  @Nonnull
-  public List<PropertyTO> getProperties() {
-    return properties;
-  }
-
-  public VisualLayoutTO setProperties(
-      @Nonnull
-      List<PropertyTO> properties
-  ) {
-    this.properties = requireNonNull(properties, "properties");
-    return this;
-  }
-
-  public double getScaleX() {
-    return scaleX;
-  }
-
-  public VisualLayoutTO setScaleX(double scaleX) {
-    this.scaleX = scaleX;
-    return this;
-  }
-
-  public double getScaleY() {
-    return scaleY;
-  }
-
-  public VisualLayoutTO setScaleY(double scaleY) {
-    this.scaleY = scaleY;
-    return this;
-  }
-
-  @Nonnull
-  public List<LayerTO> getLayers() {
-    return layers;
-  }
-
-  public VisualLayoutTO setLayers(
-      @Nonnull
-      List<LayerTO> layers
-  ) {
-    this.layers = requireNonNull(layers, "layers");
-    return this;
-  }
-
-  @Nonnull
-  public List<LayerGroupTO> getLayerGroups() {
-    return layerGroups;
-  }
-
-  public VisualLayoutTO setLayerGroups(
-      @Nonnull
-      List<LayerGroupTO> layerGroups
-  ) {
-    this.layerGroups = requireNonNull(layerGroups, "layerGroups");
-    return this;
-  }
-
 }
+// CHECKSTYLE:ON

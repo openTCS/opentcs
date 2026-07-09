@@ -1,13 +1,10 @@
 {
   "incompleteName" : true,
-  "reservationToken" : "some-token",
-  "relatedVehicle" : "some-vehicle",
-  "relatedTransportOrder" : "some-order",
   "peripheralOperation" : {
-    "operation" : "some-operation",
     "locationName" : "some-location",
-    "executionTrigger" : "AFTER_ALLOCATION",
-    "completionRequired" : true
+    "operation" : "some-operation",
+    "completionRequired" : true,
+    "executionTrigger" : "AFTER_ALLOCATION"
   },
   "properties" : [ {
     "key" : "some-key",
@@ -15,5 +12,8 @@
   }, {
     "key" : "some-other-key",
     "value" : "some-other-value"
-  } ]
+  } ],
+  "relatedTransportOrder" : "some-order",
+  "relatedVehicle" : "some-vehicle",
+  "reservationToken" : "some-token"
 }

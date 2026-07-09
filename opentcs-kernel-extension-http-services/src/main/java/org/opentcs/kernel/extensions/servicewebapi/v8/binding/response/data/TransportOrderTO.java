@@ -8,20 +8,20 @@ import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared.ObjectHistoryTO;
 
-/**
- * A transfer object representing a {@link TransportOrder} instance.
- */
 // CHECKSTYLE:OFF
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 @Accessors(chain = true)
 @JsonPropertyOrder(alphabetic = true)
 public class TransportOrderTO {
@@ -73,6 +73,8 @@ public class TransportOrderTO {
   @NoArgsConstructor
   @Getter
   @Setter
+  @EqualsAndHashCode
+  @ToString
   @Accessors(chain = true)
   @JsonPropertyOrder(alphabetic = true)
   public static class DriveOrderTO {
@@ -99,6 +101,8 @@ public class TransportOrderTO {
     @NoArgsConstructor
     @Getter
     @Setter
+    @EqualsAndHashCode
+    @ToString
     @Accessors(chain = true)
     @JsonPropertyOrder(alphabetic = true)
     public static class DestinationTO {
@@ -115,6 +119,8 @@ public class TransportOrderTO {
     @NoArgsConstructor
     @Getter
     @Setter
+    @EqualsAndHashCode
+    @ToString
     @Accessors(chain = true)
     @JsonPropertyOrder(alphabetic = true)
     public static class RouteTO {
@@ -126,6 +132,8 @@ public class TransportOrderTO {
       @NoArgsConstructor
       @Getter
       @Setter
+      @EqualsAndHashCode
+      @ToString
       @Accessors(chain = true)
       @JsonPropertyOrder(alphabetic = true)
       public static class StepTO {

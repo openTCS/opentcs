@@ -3,59 +3,34 @@
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.annotation.Nonnull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.PeripheralOperationTO;
 
-/**
- * Describes a peripheral operation.
- */
+// CHECKSTYLE:OFF
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class PeripheralOperationDescription {
 
-  private String operation;
-
-  private String locationName;
-
+  @Nonnull
+  @JsonProperty(value = "operation", required = true)
+  private final String operation;
+  @Nonnull
+  @JsonProperty(value = "locationName", required = true)
+  private final String locationName;
   private PeripheralOperationTO.ExecutionTrigger executionTrigger;
-
   private boolean completionRequired;
-
-  public PeripheralOperationDescription() {
-  }
-
-  public String getOperation() {
-    return operation;
-  }
-
-  public PeripheralOperationDescription setOperation(String operation) {
-    this.operation = operation;
-    return this;
-  }
-
-  public String getLocationName() {
-    return locationName;
-  }
-
-  public PeripheralOperationDescription setLocationName(String locationName) {
-    this.locationName = locationName;
-    return this;
-  }
-
-  public PeripheralOperationTO.ExecutionTrigger getExecutionTrigger() {
-    return executionTrigger;
-  }
-
-  public PeripheralOperationDescription setExecutionTrigger(
-      PeripheralOperationTO.ExecutionTrigger executionTrigger
-  ) {
-    this.executionTrigger = executionTrigger;
-    return this;
-  }
-
-  public boolean isCompletionRequired() {
-    return completionRequired;
-  }
-
-  public PeripheralOperationDescription setCompletionRequired(boolean completionRequired) {
-    this.completionRequired = completionRequired;
-    return this;
-  }
 }
+// CHECKSTYLE:ON

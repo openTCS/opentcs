@@ -13,16 +13,15 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
-/**
- * A transport order to be processed by the kernel.
- */
 // CHECKSTYLE:OFF
 @RequiredArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode
+@ToString
 @Accessors(chain = true)
 @JsonPropertyOrder(alphabetic = true)
 public class PostTransportOrderRequestTO {
@@ -41,7 +40,7 @@ public class PostTransportOrderRequestTO {
   private String type;
   @Nonnull
   @JsonProperty(required = true, value = "destinations")
-  private List<Destination> destinations;
+  private final List<Destination> destinations;
   @Nullable
   @JsonPropertyOrder(alphabetic = true)
   private Map<String, String> properties;
@@ -58,10 +57,10 @@ public class PostTransportOrderRequestTO {
 
     @Nonnull
     @JsonProperty(required = true, value = "locationName")
-    private String locationName;
+    private final String locationName;
     @Nonnull
     @JsonProperty(required = true, value = "operation")
-    private String operation;
+    private final String operation;
     @Nullable
     @JsonPropertyOrder(alphabetic = true)
     private Map<String, String> properties;

@@ -1,6 +1,6 @@
 {
+  "level" : "INFORMATIONAL",
   "source" : "source",
   "text" : "notification-text",
-  "level" : "INFORMATIONAL",
   "timestamp" : "[Timestamp]"
 }

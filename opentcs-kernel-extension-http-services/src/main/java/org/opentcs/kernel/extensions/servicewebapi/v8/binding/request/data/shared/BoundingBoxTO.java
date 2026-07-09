@@ -2,76 +2,34 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared;
 
-import static java.util.Objects.requireNonNull;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
-/**
- */
+// CHECKSTYLE:OFF
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class BoundingBoxTO {
 
-  private long length;
-  private long width;
-  private long height;
-  private CoupleTO referenceOffset;
-
-  @JsonCreator
-  public BoundingBoxTO(
-      @JsonProperty(value = "length", required = true)
-      long length,
-      @JsonProperty(value = "width", required = true)
-      long width,
-      @JsonProperty(value = "height", required = true)
-      long height,
-      @JsonProperty(value = "referenceOffset", required = true)
-      @Nonnull
-      CoupleTO referenceOffset
-  ) {
-    this.length = length;
-    this.width = width;
-    this.height = height;
-    this.referenceOffset = requireNonNull(referenceOffset, "referenceOffset");
-  }
-
-  public long getLength() {
-    return length;
-  }
-
-  public BoundingBoxTO setLength(long length) {
-    this.length = length;
-    return this;
-  }
-
-  public long getWidth() {
-    return width;
-  }
-
-  public BoundingBoxTO setWidth(long width) {
-    this.width = width;
-    return this;
-  }
-
-  public long getHeight() {
-    return height;
-  }
-
-  public BoundingBoxTO setHeight(long height) {
-    this.height = height;
-    return this;
-  }
-
+  @JsonProperty(value = "length", required = true)
+  private final long length;
+  @JsonProperty(value = "width", required = true)
+  private final long width;
+  @JsonProperty(value = "height", required = true)
+  private final long height;
   @Nonnull
-  public CoupleTO getReferenceOffset() {
-    return referenceOffset;
-  }
-
-  public BoundingBoxTO setReferenceOffset(
-      @Nonnull
-      CoupleTO referenceOffset
-  ) {
-    this.referenceOffset = requireNonNull(referenceOffset, "referenceOffset");
-    return this;
-  }
+  @JsonProperty(value = "referenceOffset", required = true)
+  private final CoupleTO referenceOffset;
 }
+// CHECKSTYLE:ON

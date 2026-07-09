@@ -6,10 +6,10 @@
   },
   "name" : "job-1",
   "peripheralOperation" : {
-    "location" : "location-1",
-    "operation" : "operation-1",
+    "completionRequired" : true,
     "executionTrigger" : "AFTER_MOVEMENT",
-    "completionRequired" : true
+    "location" : "location-1",
+    "operation" : "operation-1"
   },
   "properties" : { },
   "relatedTransportOrder" : null,

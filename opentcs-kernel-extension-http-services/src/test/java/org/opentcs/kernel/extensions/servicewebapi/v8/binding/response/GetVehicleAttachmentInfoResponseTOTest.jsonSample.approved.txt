@@ -1,5 +1,5 @@
 {
-  "vehicleName" : "some-vehicle",
+  "attachedCommAdapter" : "com.example.somedriver.descriptionclass",
   "availableCommAdapters" : [ "com.example.somedriver.descriptionclass", "com.example.someotherdriver.descriptionclass" ],
-  "attachedCommAdapter" : "com.example.somedriver.descriptionclass"
+  "vehicleName" : "some-vehicle"
 }

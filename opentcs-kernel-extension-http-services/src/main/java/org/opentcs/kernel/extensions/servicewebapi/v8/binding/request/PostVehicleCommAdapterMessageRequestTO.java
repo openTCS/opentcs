@@ -2,42 +2,33 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request;
 
-import static java.util.Objects.requireNonNull;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import java.util.List;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.Property;
 
-/**
- * A message to be sent to a vehicle driver.
- */
+// CHECKSTYLE:OFF
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class PostVehicleCommAdapterMessageRequestTO {
 
+  @Nonnull
+  @JsonProperty(value = "type", required = true)
   private final String type;
+  @Nonnull
+  @JsonProperty(value = "parameters", required = true)
   private final List<Property> parameters;
-
-  @JsonCreator
-  public PostVehicleCommAdapterMessageRequestTO(
-      @Nonnull
-      @JsonProperty(value = "type", required = true)
-      String type,
-      @Nonnull
-      @JsonProperty(value = "parameters", required = true)
-      List<Property> parameters
-  ) {
-    this.type = requireNonNull(type, "type");
-    this.parameters = requireNonNull(parameters, "parameters");
-  }
-
-  @Nonnull
-  public String getType() {
-    return type;
-  }
-
-  @Nonnull
-  public List<Property> getParameters() {
-    return parameters;
-  }
 }
+// CHECKSTYLE:ON

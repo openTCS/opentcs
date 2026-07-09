@@ -32,9 +32,7 @@ class PostPeripheralJobRequestTOTest {
             .setRelatedVehicle("some-vehicle")
             .setRelatedTransportOrder("some-order")
             .setPeripheralOperation(
-                new PeripheralOperationDescription()
-                    .setOperation("some-operation")
-                    .setLocationName("some-location")
+                new PeripheralOperationDescription("some-operation", "some-location")
                     .setExecutionTrigger(PeripheralOperationTO.ExecutionTrigger.AFTER_ALLOCATION)
                     .setCompletionRequired(true)
             )

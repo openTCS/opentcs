@@ -2,42 +2,28 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
-/**
- */
+// CHECKSTYLE:OFF
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class CoupleTO {
 
-  private long x;
-  private long y;
-
-  @JsonCreator
-  public CoupleTO(
-      @JsonProperty(value = "x", required = true)
-      long x,
-      @JsonProperty(value = "y", required = true)
-      long y
-  ) {
-    this.x = x;
-    this.y = y;
-  }
-
-  public long getX() {
-    return x;
-  }
-
-  public CoupleTO setX(long x) {
-    this.x = x;
-    return this;
-  }
-
-  public long getY() {
-    return y;
-  }
-
-  public CoupleTO setY(long y) {
-    this.y = y;
-    return this;
-  }
+  @JsonProperty(value = "x", required = true)
+  private final long x;
+  @JsonProperty(value = "y", required = true)
+  private final long y;
 }
+// CHECKSTYLE:ON

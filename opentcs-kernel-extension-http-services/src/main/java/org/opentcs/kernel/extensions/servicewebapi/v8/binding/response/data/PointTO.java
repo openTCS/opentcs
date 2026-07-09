@@ -7,24 +7,24 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.opentcs.data.model.Point;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared.EnvelopeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared.LinkTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared.PoseTO;
 
-/**
- * A transfer object representing a {@link Point} instance.
- */
 // CHECKSTYLE:OFF
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
+@ToString
 @Accessors(chain = true)
 @JsonPropertyOrder(alphabetic = true)
 public class PointTO {
@@ -57,6 +57,8 @@ public class PointTO {
   @NoArgsConstructor
   @Getter
   @Setter
+  @EqualsAndHashCode
+  @ToString
   @Accessors(chain = true)
   @JsonPropertyOrder(alphabetic = true)
   public static class LayoutTO {

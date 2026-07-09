@@ -2,64 +2,32 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data;
 
-import static java.util.Objects.requireNonNull;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
-/**
- */
+// CHECKSTYLE:OFF
+@RequiredArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+@Accessors(chain = true)
+@JsonPropertyOrder(alphabetic = true)
 public class LayerGroupTO {
 
-  private int id;
-  private String name;
-  private boolean visible;
-
-  @JsonCreator
-  public LayerGroupTO(
-      @JsonProperty(value = "id", required = true)
-      int id,
-      @Nonnull
-      @JsonProperty(value = "name", required = true)
-      String name,
-      @JsonProperty(value = "visible", required = true)
-      boolean visible
-  ) {
-    this.id = id;
-    this.name = requireNonNull(name, "name");
-    this.visible = visible;
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public LayerGroupTO setId(int id) {
-    this.id = id;
-    return this;
-  }
-
+  @JsonProperty(value = "id", required = true)
+  private final int id;
   @Nonnull
-  public String getName() {
-    return name;
-  }
-
-  public LayerGroupTO setName(
-      @Nonnull
-      String name
-  ) {
-    this.name = requireNonNull(name, "name");
-    return this;
-  }
-
-  public boolean isVisible() {
-    return visible;
-  }
-
-  public LayerGroupTO setVisible(boolean visible) {
-    this.visible = visible;
-    return this;
-  }
-
+  @JsonProperty(value = "name", required = true)
+  private final String name;
+  @JsonProperty(value = "visible", required = true)
+  private final boolean visible;
 }
+// CHECKSTYLE:ON
