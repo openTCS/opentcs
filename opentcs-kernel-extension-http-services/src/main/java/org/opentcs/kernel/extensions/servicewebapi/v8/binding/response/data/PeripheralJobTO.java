@@ -3,10 +3,10 @@
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.Map;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

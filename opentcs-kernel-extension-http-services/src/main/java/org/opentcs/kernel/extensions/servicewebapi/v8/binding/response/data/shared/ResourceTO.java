@@ -3,7 +3,7 @@
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.shared;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

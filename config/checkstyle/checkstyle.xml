@@ -75,6 +75,7 @@ SPDX-License-Identifier: CC0-1.0
     <module name="SuppressWarningsHolder"/>
 
     <module name="IllegalImport">
+      <property name="illegalPkgs" value="javax.annotation"/>
       <property name="severity" value="error"/>
     </module>
 
