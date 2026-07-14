@@ -50,19 +50,30 @@ public class GraphMutator {
     Graph<Vertex, Edge> derivedGraph
         = (Graph<Vertex, Edge>) ((AbstractBaseGraph<Vertex, Edge>) baseGraph.getGraph()).clone();
 
+    // Since removing vertices also implicitly removes connected edges, remove edges first.
+    // Otherwise, setting edge weights might result in an exception if the corresponding edge was
+    // removed previously.
+    Set<String> pathsToExcludeByName = pathsToExclude.stream()
+        .map(Path::getName)
+        .collect(Collectors.toSet());
+    baseGraph.getGraph().edgeSet()
+        .forEach(edge -> {
+          if (pathsToExcludeByName.contains(edge.getPath().getName())) {
+            derivedGraph.removeEdge(edge);
+          }
+          else {
+            // Set the edge weights in the derived graph as this is _not_ done by
+            // AbstractBaseGraph.clone()
+            derivedGraph.setEdgeWeight(edge, baseGraph.getGraph().getEdgeWeight(edge));
+          }
+        });
+
     Set<String> pointsToExcludeByName = pointsToExclude.stream()
         .map(Point::getName)
         .collect(Collectors.toSet());
     baseGraph.getGraph().vertexSet().stream()
         .filter(vertex -> pointsToExcludeByName.contains(vertex.getPoint().getName()))
         .forEach(derivedGraph::removeVertex);
-
-    Set<String> pathsToExcludeByName = pathsToExclude.stream()
-        .map(Path::getName)
-        .collect(Collectors.toSet());
-    baseGraph.getGraph().edgeSet().stream()
-        .filter(edge -> pathsToExcludeByName.contains(edge.getPath().getName()))
-        .forEach(derivedGraph::removeEdge);
 
     return new GraphResult(
         baseGraph.getVehicle(),

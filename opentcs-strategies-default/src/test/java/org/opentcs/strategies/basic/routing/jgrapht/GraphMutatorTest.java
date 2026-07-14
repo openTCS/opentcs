@@ -59,8 +59,37 @@ class GraphMutatorTest {
     graph.addEdge(vertexA, vertexB, edgeAB);
     graph.addEdge(vertexB, vertexC, edgeBC);
     graph.addEdge(vertexC, vertexA, edgeCA);
+    graph.setEdgeWeight(edgeAB, 10.0);
+    graph.setEdgeWeight(edgeBC, 20.0);
+    graph.setEdgeWeight(edgeCA, 30.0);
 
     graphMutator = new GraphMutator();
+  }
+
+  @Test
+  void derivingDoesNotAlterOriginalGraph() {
+    GraphProvider.GraphResult originalGraphResult = new GraphProvider.GraphResult(
+        vehicle,
+        Set.of(pointA, pointB, pointC),
+        Set.of(pathAB, pathBC, pathCA),
+        Set.of(),
+        Set.of(),
+        graph
+    );
+
+    graphMutator.deriveGraph(
+        Set.of(pointB, pointC),
+        Set.of(pathAB, pathBC, pathCA),
+        originalGraphResult
+    );
+
+    assertThat(originalGraphResult.getGraph().vertexSet())
+        .containsExactlyInAnyOrder(vertexA, vertexB, vertexC);
+    assertThat(originalGraphResult.getGraph().edgeSet())
+        .containsExactlyInAnyOrder(edgeAB, edgeBC, edgeCA);
+    assertThat(originalGraphResult.getGraph().getEdgeWeight(edgeAB)).isEqualTo(10.0);
+    assertThat(originalGraphResult.getGraph().getEdgeWeight(edgeBC)).isEqualTo(20.0);
+    assertThat(originalGraphResult.getGraph().getEdgeWeight(edgeCA)).isEqualTo(30.0);
   }
 
   @Test
@@ -86,6 +115,9 @@ class GraphMutatorTest {
         .containsExactlyInAnyOrder(vertexA, vertexB, vertexC);
     assertThat(derivedGraphResult.getGraph().edgeSet())
         .containsExactlyInAnyOrder(edgeAB, edgeBC, edgeCA);
+    assertThat(derivedGraphResult.getGraph().getEdgeWeight(edgeAB)).isEqualTo(10.0);
+    assertThat(derivedGraphResult.getGraph().getEdgeWeight(edgeBC)).isEqualTo(20.0);
+    assertThat(derivedGraphResult.getGraph().getEdgeWeight(edgeCA)).isEqualTo(30.0);
   }
 
   @Test
@@ -111,6 +143,7 @@ class GraphMutatorTest {
         .containsExactlyInAnyOrder(vertexB, vertexC);
     assertThat(derivedGraphResult.getGraph().edgeSet())
         .containsExactlyInAnyOrder(edgeBC);
+    assertThat(derivedGraphResult.getGraph().getEdgeWeight(edgeBC)).isEqualTo(20.0);
   }
 
   @Test
@@ -136,5 +169,7 @@ class GraphMutatorTest {
         .containsExactlyInAnyOrder(vertexA, vertexB, vertexC);
     assertThat(derivedGraphResult.getGraph().edgeSet())
         .containsExactlyInAnyOrder(edgeAB, edgeCA);
+    assertThat(derivedGraphResult.getGraph().getEdgeWeight(edgeAB)).isEqualTo(10.0);
+    assertThat(derivedGraphResult.getGraph().getEdgeWeight(edgeCA)).isEqualTo(30.0);
   }
 }
