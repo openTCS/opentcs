@@ -39,6 +39,8 @@ tags:
     description: Working with peripherals
   - name: Plant models
     description: Working with plant models
+  - name: Environmental entities
+    description: Working with environmental entities
   - name: User notifications
     description: Retrieving user notifications
   - name: Server-Sent Events - Connection
@@ -157,6 +159,18 @@ paths:
     $ref: './paths/blocks.yaml#/paths/~1blocks~1{NAME}'
   /visualLayout:
     $ref: './paths/visual-layout.yaml#/paths/~1visualLayout'
+  "/environmentalEntities":
+    $ref: './paths/environmental-entities.yaml#/paths/~1environmentalEntities'
+  "/environmentalEntities/{NAME}":
+    $ref: './paths/environmental-entities.yaml#/paths/~1environmentalEntities~1{NAME}'
+  "/environmentalEntities/{NAME}/envelope":
+    $ref: './paths/environmental-entities.yaml#/paths/~1environmentalEntities~1{NAME}~1envelope'
+  "/environmentalEntities/{NAME}/pose":
+    $ref: './paths/environmental-entities.yaml#/paths/~1environmentalEntities~1{NAME}~1pose'
+  "/environmentalEntities/{NAME}/integrationLevel":
+    $ref: './paths/environmental-entities.yaml#/paths/~1environmentalEntities~1{NAME}~1integrationLevel'
+  "/environmentalEntities/{NAME}/retired":
+    $ref: './paths/environmental-entities.yaml#/paths/~1environmentalEntities~1{NAME}~1retired'
   "/peripherals/{NAME}/withdrawal":
     $ref: './paths/peripherals.yaml#/paths/~1peripherals~1{NAME}~1withdrawal'
   /peripherals/dispatcher/trigger:
@@ -177,6 +191,8 @@ paths:
     $ref: './paths/sse.yaml#/paths/~1sse::~1events~1paths'
   /sse::/events/locations:
     $ref: './paths/sse.yaml#/paths/~1sse::~1events~1locations'
+  /sse::/events/environmentalEntities:
+    $ref: './paths/sse.yaml#/paths/~1sse::~1events~1environmentalEntities'
   /sse::/events/userNotifications:
     $ref: './paths/sse.yaml#/paths/~1sse::~1events~1userNotifications'
   /kernel:

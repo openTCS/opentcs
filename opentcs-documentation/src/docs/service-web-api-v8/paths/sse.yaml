@@ -151,6 +151,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LocationEvent"
+  /sse::/events/environmentalEntities:
+    get:
+      tags:
+        - Server-Sent Events - Named Events
+      summary: Describes a change of an environmental entity.
+      responses:
+        default:
+          description: The event content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnvironmentalEntityEvent"
   /sse::/events/userNotifications:
     get:
       tags:
@@ -219,6 +231,100 @@ components:
           $ref: '../schemas/objects-states/location.yaml#/components/schemas/Location'
         previousObjectState:
           $ref: '../schemas/objects-states/location.yaml#/components/schemas/Location'
+    # Schemas for environmental entities
+    EnvironmentalEntityEvent:
+      allOf:
+        - $ref: '#/components/schemas/TCSObjectEvent'
+      properties:
+        currentObjectState:
+          $ref: '#/components/schemas/EnvironmentalEntity'
+        previousObjectState:
+          $ref: '#/components/schemas/EnvironmentalEntity'
+    EnvironmentalEntity:
+      type: object
+      properties:
+        name:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+        history:
+          $ref: "../schemas/objects-states/common.yaml#/components/schemas/ObjectHistory"
+        envelope:
+          $ref: "#/components/schemas/EnvironmentalEntityEnvelope"
+        pose:
+          $ref: "#/components/schemas/EnvironmentalEntityPose"
+        type:
+          type: string
+          description: This entity's type.
+          enum:
+            - OBJECT
+            - ZONE
+        integrationLevel:
+          type: string
+          enum:
+            - TO_BE_IGNORED
+            - TO_BE_NOTICED
+            - TO_BE_RESPECTED
+          description: The entity's integration level.
+        layout:
+          type: object
+          description: The information regarding the graphical representation of this entity.
+          properties:
+            layerId:
+              type: integer
+              example: 3
+        createdTime:
+          type: string
+          format: date-time
+        retiredTime:
+          type: string
+          format: date-time
+      required:
+        - name
+        - properties
+        - history
+        - envelope
+        - pose
+        - type
+        - integrationLevel
+        - layout
+        - createdTime
+        - retiredTime
+    EnvironmentalEntityEnvelope:
+      title: Envelope
+      type: object
+      properties:
+        vertices:
+          type: array
+          description: The sequence of vertices this envelope consists of.
+          items:
+            $ref: "../schemas/objects-states/common.yaml#/components/schemas/Couple"
+          example:
+            - x: 1500
+              y: 1750
+            - x: 1600
+              y: 1820
+            - x: 1700
+              y: 1890
+      required:
+        - vertices
+    EnvironmentalEntityPose:
+      type: object
+      properties:
+        position:
+          nullable: false
+          allOf:
+            - $ref: "../schemas/objects-states/common.yaml#/components/schemas/Triple"
+        orientationAngle:
+          nullable: false
+          type: number
+          minimum: -360
+          maximum: 360
+      required:
+        - position
+        - orientationAngle
     # Common schemas
     TCSObjectEvent:
       type: object

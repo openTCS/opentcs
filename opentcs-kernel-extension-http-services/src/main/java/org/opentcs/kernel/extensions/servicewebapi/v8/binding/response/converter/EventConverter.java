@@ -9,6 +9,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.opentcs.access.NotificationPublicationEvent;
 import org.opentcs.data.TCSObjectEvent;
+import org.opentcs.data.model.EnvironmentalEntity;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Vehicle;
@@ -16,6 +17,7 @@ import org.opentcs.data.order.OrderSequence;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.data.peripherals.PeripheralJob;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.UserNotificationTO;
+import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.sse.EnvironmentalEntityEventTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.sse.LocationEventTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.sse.OrderSequenceEventTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.sse.PathEventTO;
@@ -34,6 +36,7 @@ public class EventConverter {
   private final PeripheralJobConverter peripheralJobConverter;
   private final PathConverter pathConverter;
   private final LocationConverter locationConverter;
+  private final EnvironmentalEntityConverter environmentalEntityConverter;
   private final UserNotificationConverter userNotificationConverter;
 
   /**
@@ -48,6 +51,8 @@ public class EventConverter {
    * representation.
    * @param pathConverter Provides methods to convert paths to their SSE representation.
    * @param locationConverter Provides methods to convert locations to their SSE representation.
+   * @param environmentalEntityConverter Provides methods to convert environmental entities to their
+   * SSE representation.
    * @param userNotificationConverter Provides methods to convert user notifications to their SSE
    * representation.
    */
@@ -59,16 +64,22 @@ public class EventConverter {
       PeripheralJobConverter peripheralJobConverter,
       PathConverter pathConverter,
       LocationConverter locationConverter,
+      EnvironmentalEntityConverter environmentalEntityConverter,
       UserNotificationConverter userNotificationConverter
   ) {
     this.vehicleConverter = requireNonNull(vehicleConverter, "vehicleConverter");
     this.transportOrderConverter = requireNonNull(
-        transportOrderConverter, "transportOrderConverter"
+        transportOrderConverter,
+        "transportOrderConverter"
     );
     this.orderSequenceConverter = requireNonNull(orderSequenceConverter, "orderSequenceConverter");
     this.peripheralJobConverter = requireNonNull(peripheralJobConverter, "peripheralJobConverter");
     this.pathConverter = requireNonNull(pathConverter, "pathConverter");
     this.locationConverter = requireNonNull(locationConverter, "locationConverter");
+    this.environmentalEntityConverter = requireNonNull(
+        environmentalEntityConverter,
+        "environmentalEntityConverter"
+    );
     this.userNotificationConverter = requireNonNull(
         userNotificationConverter,
         "userNotificationConverter"
@@ -234,6 +245,29 @@ public class EventConverter {
         event.getPreviousObjectState() == null
             ? null
             : locationConverter.convert((Location) event.getPreviousObjectState())
+    );
+  }
+
+  public EnvironmentalEntityEventTO convertEnvironmentalEntityEvent(
+      @Nonnull
+      TCSObjectEvent event
+  ) {
+    requireNonNull(event, "event");
+    checkArgument(
+        event.getCurrentOrPreviousObjectState() instanceof EnvironmentalEntity,
+        "Event object must be of type EnvironmentalEntity"
+    );
+    return new EnvironmentalEntityEventTO(
+        event.getCurrentObjectState() == null
+            ? null
+            : environmentalEntityConverter.convert(
+                (EnvironmentalEntity) event.getCurrentObjectState()
+            ),
+        event.getPreviousObjectState() == null
+            ? null
+            : environmentalEntityConverter.convert(
+                (EnvironmentalEntity) event.getPreviousObjectState()
+            )
     );
   }
 

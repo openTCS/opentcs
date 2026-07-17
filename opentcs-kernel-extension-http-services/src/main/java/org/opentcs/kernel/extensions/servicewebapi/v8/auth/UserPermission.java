@@ -49,6 +49,10 @@ public enum UserPermission
    */
   MODIFY_PERIPHERAL_JOB,
   /**
+   * Indicates the client may create/modify environmental entities.
+   */
+  MODIFY_ENVIRONMENTAL_ENTITY,
+  /**
    * Indicates the client may shut down the kernel.
    */
   SHUTDOWN_KERNEL

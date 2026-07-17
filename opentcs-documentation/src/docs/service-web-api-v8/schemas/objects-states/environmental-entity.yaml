@@ -1,0 +1,70 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: CC-BY-4.0
+
+components:
+  schemas:
+    EnvironmentalEntityState:
+      title: Environmental entity state
+      type: object
+      properties:
+        name:
+          type: string
+          description: The entity's name.
+          example: Some Entity 01
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+          description: The entity's properties.
+        history:
+          $ref: "common.yaml#/components/schemas/ObjectHistory"
+        envelope:
+          $ref: "common.yaml#/components/schemas/Envelope"
+        pose:
+          $ref: "common.yaml#/components/schemas/Pose"
+        type:
+          type: string
+          description: This entity's type.
+          enum:
+            - OBJECT
+            - ZONE
+        integrationLevel:
+          type: string
+          enum:
+            - TO_BE_IGNORED
+            - TO_BE_NOTICED
+            - TO_BE_RESPECTED
+          description: The entity's integration level.
+        layout:
+          type: object
+          description: The information regarding the graphical representation of this entity.
+          properties:
+            layerId:
+              type: integer
+              example: 3
+        retired:
+          type: boolean
+          description: Whether this entity is retired.
+          example: false
+        createdTime:
+          type: string
+          format: date-time
+          description: The point of time at which this entity was created (expressed according to ISO 8601).
+          example: "2022-01-01T12:00:00Z"
+        retiredTime:
+          type: string
+          format: date-time
+          description: The point of time at which this entity was retired (expressed according to ISO 8601).
+          example: "2022-01-01T12:00:00Z"
+      required:
+        - name
+        - properties
+        - history
+        - envelope
+        - pose
+        - type
+        - integrationLevel
+        - layout
+        - retired
+        - createdTime
+        - retiredTime

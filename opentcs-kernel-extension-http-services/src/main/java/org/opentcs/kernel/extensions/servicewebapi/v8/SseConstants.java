@@ -34,6 +34,10 @@ public abstract class SseConstants {
    */
   public static final String EVENT_TYPE_LOCATIONS = "/events/locations";
   /**
+   * The event type for events regarding environmental entities.
+   */
+  public static final String EVENT_TYPE_ENVIRONMENTAL_ENTITIES = "/events/environmentalEntities";
+  /**
    * The event type for events regarding user notifications.
    */
   public static final String EVENT_TYPE_USER_NOTIFICATIONS = "/events/userNotifications";
@@ -47,6 +51,7 @@ public abstract class SseConstants {
       EVENT_TYPE_PERIPHERAL_JOBS,
       EVENT_TYPE_PATHS,
       EVENT_TYPE_LOCATIONS,
+      EVENT_TYPE_ENVIRONMENTAL_ENTITIES,
       EVENT_TYPE_USER_NOTIFICATIONS
   );
 

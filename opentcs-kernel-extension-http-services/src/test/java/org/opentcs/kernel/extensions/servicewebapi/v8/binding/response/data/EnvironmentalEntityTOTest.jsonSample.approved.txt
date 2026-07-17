@@ -1,0 +1,44 @@
+{
+  "createdTime" : "1970-01-01T00:00:00Z",
+  "envelope" : {
+    "vertices" : [ {
+      "x" : 1,
+      "y" : 2
+    }, {
+      "x" : 3,
+      "y" : 4
+    }, {
+      "x" : 5,
+      "y" : 6
+    }, {
+      "x" : 1,
+      "y" : 2
+    } ]
+  },
+  "history" : {
+    "entries" : [ {
+      "timestamp" : "1970-01-01T00:00:00Z",
+      "eventCode" : "some-code",
+      "supplements" : [ "supplement-1", "supplement-2" ]
+    } ]
+  },
+  "integrationLevel" : "TO_BE_NOTICED",
+  "layout" : {
+    "layerId" : 23
+  },
+  "name" : "entity-1",
+  "pose" : {
+    "orientationAngle" : 123.45,
+    "position" : {
+      "x" : 1,
+      "y" : 2,
+      "z" : 3
+    }
+  },
+  "properties" : {
+    "some-key" : "some-value"
+  },
+  "retired" : false,
+  "retiredTime" : "1970-01-01T00:00:00Z",
+  "type" : "OBJECT"
+}

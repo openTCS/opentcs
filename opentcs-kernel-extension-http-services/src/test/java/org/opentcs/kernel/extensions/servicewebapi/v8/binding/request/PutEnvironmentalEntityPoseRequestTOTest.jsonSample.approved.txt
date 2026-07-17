@@ -1,0 +1,8 @@
+{
+  "orientationAngle" : 135.123,
+  "position" : {
+    "x" : 1,
+    "y" : 2,
+    "z" : 3
+  }
+}

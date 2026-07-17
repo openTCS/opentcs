@@ -19,6 +19,7 @@ import org.opentcs.components.Lifecycle;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
+import org.opentcs.data.model.EnvironmentalEntity;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Vehicle;
@@ -190,6 +191,12 @@ public class SseHandler
       sendEventToClients(
           SseConstants.EVENT_TYPE_LOCATIONS,
           jsonBinder.toJson(eventConverter.convertLocationEvent(event))
+      );
+    }
+    else if (object instanceof EnvironmentalEntity) {
+      sendEventToClients(
+          SseConstants.EVENT_TYPE_ENVIRONMENTAL_ENTITIES,
+          jsonBinder.toJson(eventConverter.convertEnvironmentalEntityEvent(event))
       );
     }
   }

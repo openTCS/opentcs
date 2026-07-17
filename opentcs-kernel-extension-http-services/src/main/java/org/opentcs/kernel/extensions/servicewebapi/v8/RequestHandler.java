@@ -33,6 +33,7 @@ import org.opentcs.kernel.extensions.servicewebapi.common.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v8.auth.AccessControl;
 import org.opentcs.kernel.extensions.servicewebapi.v8.auth.AuthenticationException;
 import org.opentcs.kernel.extensions.servicewebapi.v8.auth.UserPermission;
+import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PostEnvironmentalEntityRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PostLoginRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PostOrderSequenceRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PostPeripheralJobRequestTO;
@@ -40,11 +41,14 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PostTopolo
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PostTransportOrderRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PostVehicleCommAdapterMessageRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PostVehicleRouteComputationQueryRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PutEnvironmentalEntityEnvelopeRequestTO;
+import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PutEnvironmentalEntityPoseRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PutPlantModelRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PutVehicleAcceptableOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PutVehicleEnergyLevelThresholdSetTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.GetVersionResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.LoginResponseTO;
+import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.converter.EnvironmentalEntityConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.converter.OrderSequenceConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.converter.PeripheralAttachmentInformationConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.converter.PeripheralJobConverter;
@@ -79,9 +83,11 @@ public class RequestHandler
   private final BlockHandler blockHandler;
   private final VisualLayoutHandler visualLayoutHandler;
   private final PeripheralHandler peripheralHandler;
+  private final EnvironmentalEntityHandler environmentalEntityHandler;
   private final OrderSequenceConverter orderSequenceConverter;
   private final PeripheralJobConverter peripheralJobConverter;
   private final TransportOrderConverter transportOrderConverter;
+  private final EnvironmentalEntityConverter environmentalEntityConverter;
   private final PeripheralAttachmentInformationConverter peripheralAttachmentInformationConverter;
   private final VehicleAttachmentInformationConverter vehicleAttachmentInformationConverter;
   private final UserNotificationConverter userNotificationConverter;
@@ -108,9 +114,11 @@ public class RequestHandler
       BlockHandler blockHandler,
       VisualLayoutHandler visualLayoutHandler,
       PeripheralHandler peripheralHandler,
+      EnvironmentalEntityHandler environmentalEntityHandler,
       OrderSequenceConverter orderSequenceConverter,
       PeripheralJobConverter peripheralJobConverter,
       TransportOrderConverter transportOrderConverter,
+      EnvironmentalEntityConverter environmentalEntityConverter,
       PeripheralAttachmentInformationConverter peripheralAttachmentInformationConverter,
       VehicleAttachmentInformationConverter vehicleAttachmentInformationConverter,
       UserNotificationConverter userNotificationConverter,
@@ -134,20 +142,23 @@ public class RequestHandler
     this.blockHandler = requireNonNull(blockHandler, "blockHandler");
     this.visualLayoutHandler = requireNonNull(visualLayoutHandler, "visualLayoutHandler");
     this.peripheralHandler = requireNonNull(peripheralHandler, "peripheralHandler");
+    this.environmentalEntityHandler
+        = requireNonNull(environmentalEntityHandler, "environmentalEntityHandler");
     this.orderSequenceConverter = requireNonNull(orderSequenceConverter, "orderSequenceConverter");
     this.peripheralJobConverter = requireNonNull(peripheralJobConverter, "peripheralJobConverter");
-    this.transportOrderConverter = requireNonNull(
-        transportOrderConverter, "transportOrderConverter"
-    );
+    this.transportOrderConverter
+        = requireNonNull(transportOrderConverter, "transportOrderConverter");
+    this.environmentalEntityConverter
+        = requireNonNull(environmentalEntityConverter, "environmentalEntityConverter");
     this.peripheralAttachmentInformationConverter = requireNonNull(
         peripheralAttachmentInformationConverter, "peripheralAttachmentInformationConverter"
     );
     this.vehicleAttachmentInformationConverter = requireNonNull(
-        vehicleAttachmentInformationConverter, "vehicleAttachmentInformationConverter"
+        vehicleAttachmentInformationConverter,
+        "vehicleAttachmentInformationConverter"
     );
-    this.userNotificationConverter = requireNonNull(
-        userNotificationConverter, "userNotificationConverter"
-    );
+    this.userNotificationConverter
+        = requireNonNull(userNotificationConverter, "userNotificationConverter");
     this.notificationService = requireNonNull(notificationService, "notificationService");
     this.kernel = requireNonNull(kernel, "kernel");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
@@ -373,12 +384,47 @@ public class RequestHandler
               this::handlePostPeripheralJobsDispatchTrigger,
               UserPermission.MODIFY_PERIPHERAL_JOB
           );
+          get(
+              "/environmentalEntities",
+              this::handleGetEnvironmentalEntities,
+              UserPermission.READ_DATA
+          );
+          get(
+              "/environmentalEntities/{NAME}",
+              this::handleGetEnvironmentalEntityByName,
+              UserPermission.READ_DATA
+          );
+          post(
+              "/environmentalEntities/{NAME}",
+              this::handlePostEnvironmentalEntity,
+              UserPermission.MODIFY_ENVIRONMENTAL_ENTITY
+          );
+          put(
+              "/environmentalEntities/{NAME}/envelope",
+              this::handlePutEnvironmentalEntityEnvelope,
+              UserPermission.MODIFY_ENVIRONMENTAL_ENTITY
+          );
+          put(
+              "/environmentalEntities/{NAME}/pose",
+              this::handlePutEnvironmentalEntityPose,
+              UserPermission.MODIFY_ENVIRONMENTAL_ENTITY
+          );
+          put(
+              "/environmentalEntities/{NAME}/integrationLevel",
+              this::handlePutEnvironmentalEntityIntegrationLevel,
+              UserPermission.MODIFY_ENVIRONMENTAL_ENTITY
+          );
+          put(
+              "/environmentalEntities/{NAME}/retired",
+              this::handlePutEnvironmentalEntityRetired,
+              UserPermission.MODIFY_ENVIRONMENTAL_ENTITY
+          );
           get("/userNotifications", this::handleGetUserNotifications, UserPermission.READ_DATA);
         }
     );
   }
 
-  public void handlePostLogin(Context ctx)
+  private void handlePostLogin(Context ctx)
       throws AuthenticationException {
     ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     PostLoginRequestTO request = jsonBinder.fromJson(ctx.body(), PostLoginRequestTO.class);
@@ -389,7 +435,7 @@ public class RequestHandler
     );
   }
 
-  public void handleGetSession(Context ctx) {
+  private void handleGetSession(Context ctx) {
     Optional<LoginResponseTO> loginResponse = accessControl.getLoginInformation();
     if (loginResponse.isEmpty()) {
       ctx.status(HttpStatus.UNAUTHORIZED);
@@ -400,7 +446,7 @@ public class RequestHandler
     ctx.result(jsonBinder.toJson(loginResponse.get()));
   }
 
-  public void handlePostLogout(Context ctx) {
+  private void handlePostLogout(Context ctx) {
     ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     if (accessControl.logout()) {
       ctx.result("Log out successful.");
@@ -410,12 +456,12 @@ public class RequestHandler
     }
   }
 
-  public void handleGetVersion(Context ctx) {
+  private void handleGetVersion(Context ctx) {
     ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     ctx.result(jsonBinder.toJson(new GetVersionResponseTO()));
   }
 
-  public void handleDeleteKernel(Context ctx) {
+  private void handleDeleteKernel(Context ctx) {
     LOG.info("Initiating kernel shutdown as requested from {}...", ctx.ip());
     kernelExecutor.schedule(() -> kernel.setState(Kernel.State.SHUTDOWN), 1, TimeUnit.SECONDS);
     ctx.result("");
@@ -880,6 +926,25 @@ public class RequestHandler
     ctx.result("");
   }
 
+  private void handleGetEnvironmentalEntities(Context ctx) {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            environmentalEntityHandler.getEnvironmentalEntitiesState()
+        )
+    );
+  }
+
+  private void handleGetEnvironmentalEntityByName(Context ctx)
+      throws ObjectUnknownException {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            environmentalEntityHandler.getEnvironmentalEntityStateByName(ctx.pathParam("NAME"))
+        )
+    );
+  }
+
   public void handleGetUserNotifications(Context ctx) {
     ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
     ctx.result(
@@ -893,6 +958,61 @@ public class RequestHandler
                 .toList()
         )
     );
+  }
+
+  private void handlePostEnvironmentalEntity(Context ctx)
+      throws ObjectExistsException,
+        IllegalArgumentException,
+        IllegalStateException {
+    ctx.contentType(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    ctx.result(
+        jsonBinder.toJson(
+            environmentalEntityConverter.convert(
+                environmentalEntityHandler.createEnvironmentalEntity(
+                    ctx.pathParam("NAME"),
+                    jsonBinder.fromJson(ctx.body(), PostEnvironmentalEntityRequestTO.class)
+                )
+            )
+        )
+    );
+  }
+
+  private void handlePutEnvironmentalEntityEnvelope(Context ctx)
+      throws ObjectUnknownException {
+    environmentalEntityHandler.putEnvironmentalEntityEnvelope(
+        ctx.pathParam("NAME"),
+        jsonBinder.fromJson(ctx.body(), PutEnvironmentalEntityEnvelopeRequestTO.class)
+    );
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
+  }
+
+  private void handlePutEnvironmentalEntityPose(Context ctx)
+      throws ObjectExistsException {
+    environmentalEntityHandler.putEnvironmentalEntityPose(
+        ctx.pathParam("NAME"),
+        jsonBinder.fromJson(ctx.body(), PutEnvironmentalEntityPoseRequestTO.class)
+    );
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
+  }
+
+  private void handlePutEnvironmentalEntityIntegrationLevel(Context ctx)
+      throws ObjectUnknownException,
+        IllegalArgumentException {
+    environmentalEntityHandler.putEnvironmentalEntityIntegrationLevel(
+        ctx.pathParam("NAME"),
+        ctx.queryParam("newValue")
+    );
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
+  }
+
+  private void handlePutEnvironmentalEntityRetired(Context ctx)
+      throws ObjectUnknownException {
+    environmentalEntityHandler.putEnvironmentalEntityRetired(ctx.pathParam("NAME"));
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
   }
 
   private Instant since(Context ctx) {

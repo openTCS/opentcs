@@ -1,0 +1,35 @@
+{
+  "envelope" : {
+    "vertices" : [ {
+      "x" : 1,
+      "y" : 2
+    }, {
+      "x" : 3,
+      "y" : 4
+    }, {
+      "x" : 5,
+      "y" : 6
+    }, {
+      "x" : 7,
+      "y" : 8
+    } ]
+  },
+  "pose" : {
+    "orientationAngle" : 123.456,
+    "position" : {
+      "x" : 1,
+      "y" : 2,
+      "z" : 3
+    }
+  },
+  "incompleteName" : true,
+  "integrationLevel" : "TO_BE_RESPECTED",
+  "layout" : {
+    "layerId" : 23
+  },
+  "properties" : {
+    "some-key" : "some-value",
+    "some-other-key" : "some-other-value"
+  },
+  "type" : "OBJECT"
+}

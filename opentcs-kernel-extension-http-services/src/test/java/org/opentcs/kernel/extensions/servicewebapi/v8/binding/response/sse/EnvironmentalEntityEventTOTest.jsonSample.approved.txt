@@ -1,0 +1,90 @@
+{
+  "currentObjectState" : {
+    "name" : "entity-1",
+    "properties" : {
+      "key-1" : "value-1",
+      "key-2" : "value-2"
+    },
+    "history" : {
+      "entries" : [ {
+        "timestamp" : "2025-07-22T12:03:00Z",
+        "eventCode" : "event-code-1",
+        "supplements" : [ "supplement-1", "supplement-2" ]
+      } ]
+    },
+    "envelope" : {
+      "vertices" : [ {
+        "x" : 1,
+        "y" : 2
+      }, {
+        "x" : 3,
+        "y" : 4
+      }, {
+        "x" : 5,
+        "y" : 6
+      }, {
+        "x" : 1,
+        "y" : 2
+      } ]
+    },
+    "pose" : {
+      "position" : {
+        "x" : 1,
+        "y" : 2,
+        "z" : 0
+      },
+      "orientationAngle" : 123.45
+    },
+    "type" : "OBJECT",
+    "integrationLevel" : "TO_BE_NOTICED",
+    "layout" : {
+      "layerId" : 23
+    },
+    "createdTime" : "2025-07-22T12:03:00Z",
+    "retiredTime" : "2025-07-22T13:03:00Z"
+  },
+  "previousObjectState" : {
+    "name" : "entity-1",
+    "properties" : {
+      "key-1" : "value-1",
+      "key-2" : "value-2"
+    },
+    "history" : {
+      "entries" : [ {
+        "timestamp" : "2025-07-22T12:03:00Z",
+        "eventCode" : "event-code-1",
+        "supplements" : [ "supplement-1", "supplement-2" ]
+      } ]
+    },
+    "envelope" : {
+      "vertices" : [ {
+        "x" : 1,
+        "y" : 2
+      }, {
+        "x" : 3,
+        "y" : 4
+      }, {
+        "x" : 5,
+        "y" : 6
+      }, {
+        "x" : 1,
+        "y" : 2
+      } ]
+    },
+    "pose" : {
+      "position" : {
+        "x" : 1,
+        "y" : 2,
+        "z" : 0
+      },
+      "orientationAngle" : 123.45
+    },
+    "type" : "OBJECT",
+    "integrationLevel" : "TO_BE_NOTICED",
+    "layout" : {
+      "layerId" : 23
+    },
+    "createdTime" : "2025-07-22T12:03:00Z",
+    "retiredTime" : "2025-07-22T13:03:00Z"
+  }
+}

@@ -16,7 +16,7 @@ paths:
                 title: ArrayOfEnvironmentalEntityStates
                 type: array
                 items:
-                  $ref: "#/components/schemas/EnvironmentalEntityState"
+                  $ref: '../schemas/objects-states/environmental-entity.yaml#/components/schemas/EnvironmentalEntityState'
   /environmentalEntities/{NAME}:
     get:
       tags:
@@ -35,7 +35,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EnvironmentalEntityState"
+                $ref: '../schemas/objects-states/environmental-entity.yaml#/components/schemas/EnvironmentalEntityState'
     post:
       tags:
         - Environmental entities
@@ -60,7 +60,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EnvironmentalEntityState"
+                $ref: '../schemas/objects-states/environmental-entity.yaml#/components/schemas/EnvironmentalEntityState'
         "400":
           description: The submitted environmental entity is invalid.
           content:
@@ -272,74 +272,8 @@ components:
               type: integer
               example: 3
       required:
-        - name
         - envelope
         - pose
-    EnvironmentalEntityState:
-      title: Environmental entity state
-      type: object
-      properties:
-        name:
-          type: string
-          description: The entity's name.
-          example: Some Entity 01
-        properties:
-          type: object
-          additionalProperties:
-            type: string
-          description: The entity's properties.
-        history:
-          $ref: "../schemas/common.yaml#/components/schemas/ObjectHistory"
-        envelope:
-          $ref: "#/components/schemas/EnvironmentalEntityEnvelope"
-        pose:
-          $ref: "#/components/schemas/EnvironmentalEntityPose"
-        type:
-          type: string
-          description: This entity's type.
-          enum:
-            - OBJECT
-            - ZONE
-        integrationLevel:
-          type: string
-          enum:
-            - TO_BE_IGNORED
-            - TO_BE_NOTICED
-            - TO_BE_RESPECTED
-          description: The entity's integration level.
-        layout:
-          type: object
-          description: The information regarding the graphical representation of this entity.
-          properties:
-            layerId:
-              type: integer
-              example: 3
-        retired:
-          type: boolean
-          description: Whether this entity is retired.
-          example: false
-        createdTime:
-          type: string
-          format: date-time
-          description: The point of time at which this entity was created (expressed according to ISO 8601).
-          example: "2022-01-01T12:00:00Z"
-        retiredTime:
-          type: string
-          format: date-time
-          description: The point of time at which this entity was retired (expressed according to ISO 8601).
-          example: "2022-01-01T12:00:00Z"
-      required:
-        - name
-        - properties
-        - history
-        - envelope
-        - pose
-        - type
-        - integrationLevel
-        - layout
-        - retired
-        - createdTime
-        - retiredTime
     EnvironmentalEntityEnvelope:
       title: Envelope
       type: object
@@ -348,7 +282,7 @@ components:
           type: array
           description: The sequence of vertices this envelope consists of.
           items:
-            $ref: "../schemas/common.yaml#/components/schemas/Couple"
+            $ref: "../schemas/objects-states/common.yaml#/components/schemas/Couple"
           example:
             - x: 1500
               y: 1750
@@ -364,7 +298,7 @@ components:
         position:
           nullable: false
           allOf:
-            - $ref: "../schemas/common.yaml#/components/schemas/Triple"
+            - $ref: "../schemas/objects-states/common.yaml#/components/schemas/Triple"
         orientationAngle:
           nullable: false
           type: number
