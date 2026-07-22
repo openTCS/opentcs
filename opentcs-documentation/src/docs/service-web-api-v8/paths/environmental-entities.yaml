@@ -5,7 +5,7 @@ paths:
   /environmentalEntities:
     get:
       tags:
-        - Environmental entities
+        - Environmental Entities
       summary: Retrieves a set of environmental entities.
       responses:
         "200":
@@ -20,7 +20,7 @@ paths:
   /environmentalEntities/{NAME}:
     get:
       tags:
-        - Environmental entities
+        - Environmental Entities
       summary: Retrieves the named environmental entity.
       parameters:
         - name: NAME
@@ -38,7 +38,7 @@ paths:
                 $ref: '../schemas/objects-states/environmental-entity.yaml#/components/schemas/EnvironmentalEntityState'
     post:
       tags:
-        - Environmental entities
+        - Environmental Entities
       summary: Creates a new environmental entity with the given name.
       parameters:
         - name: NAME
@@ -74,7 +74,7 @@ paths:
   /environmentalEntities/{NAME}/envelope:
     put:
       tags:
-        - Environmental entities
+        - Environmental Entities
       summary: Updates the envelope of the named environmental entity.
       parameters:
         - name: NAME
@@ -116,7 +116,7 @@ paths:
   /environmentalEntities/{NAME}/pose:
     put:
       tags:
-        - Environmental entities
+        - Environmental Entities
       summary: Updates the pose of the named environmental entity.
       parameters:
         - name: NAME
@@ -158,7 +158,7 @@ paths:
   /environmentalEntities/{NAME}/integrationLevel:
     put:
       tags:
-        - Environmental entities
+        - Environmental Entities
       summary: Updates the integration level of the named environmental entity.
       parameters:
         - name: NAME
@@ -204,7 +204,7 @@ paths:
   /environmentalEntities/{NAME}/retired:
     put:
       tags:
-        - Environmental entities
+        - Environmental Entities
       summary: Marks the named environmental entity as retired.
       parameters:
         - name: NAME

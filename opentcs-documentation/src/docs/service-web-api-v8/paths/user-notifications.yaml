@@ -5,7 +5,7 @@ paths:
   /userNotifications:
     get:
       tags:
-        - User notifications
+        - User Notifications
       summary: Returns user notifications issued by the kernel.
       parameters:
         - name: since

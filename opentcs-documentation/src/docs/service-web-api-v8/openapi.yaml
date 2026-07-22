@@ -27,21 +27,21 @@ servers:
 tags:
   - name: Authentication
     description: Authenticating with the web API
-  - name: Transport orders
+  - name: Transport Orders
     description: Working with transport orders
   - name: Order Sequences
     description: Working with order sequences
   - name: Vehicles
     description: Working with vehicles
-  - name: Peripheral jobs
+  - name: Peripheral Jobs
     description: Working with peripheral jobs
   - name: Peripherals
     description: Working with peripherals
-  - name: Plant models
+  - name: Plant Models
     description: Working with plant models
-  - name: Environmental entities
+  - name: Environmental Entities
     description: Working with environmental entities
-  - name: User notifications
+  - name: User Notifications
     description: Retrieving user notifications
   - name: Server-Sent Events - Connection
     description: Receiving status updates
@@ -56,7 +56,7 @@ tags:
 
       To avoid redundant documentation, descriptions for the properties in the response body schemas are omitted.
       Instead, refer to the API documentation of the corresponding Java classes for detailed information on the semantics of the properties.
-  - name: Kernel administration
+  - name: Kernel Administration
     description: Kernel administration
 security:
   - cookieAuth: []

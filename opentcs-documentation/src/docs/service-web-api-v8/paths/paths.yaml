@@ -5,7 +5,7 @@ paths:
   /paths:
     get:
       tags:
-        - Plant models
+        - Plant Models
       summary: Retrieves a set of paths.
       parameters:
         - name: names
@@ -34,7 +34,7 @@ paths:
   "/paths/{NAME}":
     get:
       tags:
-        - Plant models
+        - Plant Models
       summary: Retrieves the path with the given name.
       parameters:
         - name: NAME
@@ -63,7 +63,7 @@ paths:
   /paths/{NAME}/locked:
     put:
       tags:
-        - Plant models
+        - Plant Models
       summary: Sets the locked state for the named path.
       parameters:
         - name: NAME

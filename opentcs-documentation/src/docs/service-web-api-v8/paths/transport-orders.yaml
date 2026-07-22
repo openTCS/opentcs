@@ -5,7 +5,7 @@ paths:
   /transportOrders:
     get:
       tags:
-        - Transport orders
+        - Transport Orders
       summary: Retrieves a set of transport orders.
       description: ""
       parameters:
@@ -40,7 +40,7 @@ paths:
   "/transportOrders/{NAME}":
     get:
       tags:
-        - Transport orders
+        - Transport Orders
       summary: Retrieves a single named transport order.
       description: ""
       parameters:
@@ -69,7 +69,7 @@ paths:
                   example: Could not find transport order 'TOrder-01'.
     post:
       tags:
-        - Transport orders
+        - Transport Orders
       summary: Creates a new transport order with the given name.
       description: ""
       responses:
@@ -127,7 +127,7 @@ paths:
   "/transportOrders/{NAME}/immediateAssignment":
     post:
       tags:
-        - Transport orders
+        - Transport Orders
       summary: Immediately assigns the transport order to its intended vehicle.
       parameters:
         - name: NAME
@@ -162,7 +162,7 @@ paths:
   "/transportOrders/{NAME}/withdrawal":
     post:
       tags:
-        - Transport orders
+        - Transport Orders
       summary: Withdraws the transport order with the given name.
       description: ""
       parameters:
@@ -200,7 +200,7 @@ paths:
   "/transportOrders/{NAME}/intendedVehicle":
     put:
       tags:
-        - Transport orders
+        - Transport Orders
       summary: Updates the transport order's intended vehicle.
       description: ""
       parameters:
@@ -232,7 +232,7 @@ paths:
   /transportOrders/dispatcher/trigger:
     post:
       tags:
-        - Transport orders
+        - Transport Orders
       summary: Explicitly triggers dispatching of vehicles / transport orders.
       description: >-
         Triggers the kernel's dispatcher to assign vehicles to transport orders.

@@ -5,7 +5,7 @@ paths:
   /kernel:
     delete:
       tags:
-        - Kernel administration
+        - Kernel Administration
       summary: Shuts down the kernel
       description: >-
         Shuts down the kernel.
@@ -17,7 +17,7 @@ paths:
   /kernel/version:
     get:
       tags:
-        - Kernel administration
+        - Kernel Administration
       summary: Returns the current kernel version
       description: >-
         Returns the current kernel version

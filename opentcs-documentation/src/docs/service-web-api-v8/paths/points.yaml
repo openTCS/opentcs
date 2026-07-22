@@ -5,7 +5,7 @@ paths:
   /points:
     get:
       tags:
-        - Plant models
+        - Plant Models
       summary: Retrieves a set of points.
       parameters:
         - name: names
@@ -34,7 +34,7 @@ paths:
   "/points/{NAME}":
     get:
       tags:
-        - Plant models
+        - Plant Models
       summary: Retrieves the point with the given name.
       parameters:
         - name: NAME

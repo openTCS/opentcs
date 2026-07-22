@@ -5,7 +5,7 @@ paths:
   /visualLayout:
     get:
       tags:
-        - Plant models
+        - Plant Models
       summary: Retrieves the visual layout.
       responses:
         "200":

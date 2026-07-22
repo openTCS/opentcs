@@ -5,7 +5,7 @@ paths:
   /peripheralJobs:
     get:
       tags:
-        - Peripheral jobs
+        - Peripheral Jobs
       summary: Retrieves a set of peripheral jobs.
       description: ""
       parameters:
@@ -48,7 +48,7 @@ paths:
   "/peripheralJobs/{NAME}":
     get:
       tags:
-        - Peripheral jobs
+        - Peripheral Jobs
       summary: Retrieves a single named peripheral job.
       description: ""
       parameters:
@@ -77,7 +77,7 @@ paths:
                   example: Could not find peripheral job 'PJob-01'.
     post:
       tags:
-        - Peripheral jobs
+        - Peripheral Jobs
       summary: Creates a new peripheral job with the given name.
       description: ""
       parameters:
@@ -136,7 +136,7 @@ paths:
   "/peripheralJobs/{NAME}/withdrawal":
     post:
       tags:
-        - Peripheral jobs
+        - Peripheral Jobs
       summary: Withdraws the peripheral job with the given name.
       description: ""
       parameters:
@@ -162,7 +162,7 @@ paths:
   /peripheralJobs/dispatcher/trigger:
     post:
       tags:
-        - Peripheral jobs
+        - Peripheral Jobs
       summary: Explicitly triggers dispatching of peripheral jobs.
       description: >-
         Triggers the kernel's dispatcher to assign peripheral jobs to peripheral devices.

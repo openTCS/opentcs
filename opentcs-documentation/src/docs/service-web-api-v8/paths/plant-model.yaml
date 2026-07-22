@@ -5,7 +5,7 @@ paths:
   /plantModel:
     get:
       tags:
-        - Plant models
+        - Plant Models
       summary: Retrieves the currently loaded plant model.
       responses:
         "200":
@@ -19,7 +19,7 @@ paths:
                   $ref: '../examples/response-examples.yaml#/components/examples/plantModelExample'
     put:
       tags:
-        - Plant models
+        - Plant Models
       summary: Uploads a new plant model with the given information.
       requestBody:
         required: true
@@ -44,7 +44,7 @@ paths:
   /plantModel/topologyUpdateRequest:
     post:
       tags:
-        - Plant models
+        - Plant Models
       summary: Triggers an update of the routing topology.
       description: ""
       requestBody:

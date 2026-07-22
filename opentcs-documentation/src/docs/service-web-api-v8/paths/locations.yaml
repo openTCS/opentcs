@@ -5,7 +5,7 @@ paths:
   /locations:
     get:
       tags:
-        - Plant models
+        - Plant Models
       summary: Retrieves a set of locations.
       parameters:
         - name: names
@@ -34,7 +34,7 @@ paths:
   "/locations/{NAME}":
     get:
       tags:
-        - Plant models
+        - Plant Models
       summary: Retrieves the location with the given name.
       parameters:
         - name: NAME
@@ -63,7 +63,7 @@ paths:
   /locations/{NAME}/locked:
     put:
       tags:
-        - Plant models
+        - Plant Models
       summary: Sets the locked state for the named location.
       parameters:
         - name: NAME
