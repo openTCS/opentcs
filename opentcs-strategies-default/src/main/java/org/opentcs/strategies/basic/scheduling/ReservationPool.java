@@ -224,7 +224,7 @@ public class ReservationPool {
     requireNonNull(client, "client");
     requireNonNull(resources, "resources");
 
-    LOG.debug("{}: Releasing resources: {}", client.getId(), resources);
+    LOG.trace("{}: Releasing resources: {}", client.getId(), resources);
     for (TCSResource<?> curResource : getFreeableResources(resources, client)) {
       getReservationEntry(curResource).free();
     }

@@ -79,7 +79,7 @@ class AllocatorTask
 
   @Override
   public void run() {
-    LOG.debug("Processing AllocatorCommand: {}", command);
+    LOG.trace("Processing AllocatorCommand: {}", command);
 
     if (command instanceof AllocatorCommand.Allocate) {
       processAllocate((AllocatorCommand.Allocate) command);
@@ -165,28 +165,28 @@ class AllocatorTask
         return false;
       }
 
-      LOG.debug("{}: Checking resource availability: {}...", client.getId(), resources);
+      LOG.trace("{}: Checking resource availability: {}...", client.getId(), resources);
       if (!reservationPool.resourcesAvailableForUser(resources, client)) {
         LOG.debug("{}: Resources unavailable.", client.getId());
         return false;
       }
 
-      LOG.debug("{}: Checking if resources may be allocated...", client.getId());
+      LOG.trace("{}: Checking if resources may be allocated...", client.getId());
       if (!allocationAdvisor.mayAllocate(client, resources)) {
         LOG.debug("{}: Resources may not be allocated.", client.getId());
         return false;
       }
 
-      LOG.debug("{}: Preparing resources for allocation...", client.getId());
+      LOG.trace("{}: Preparing resources for allocation...", client.getId());
       allocationAdvisor.prepareAllocation(client, resources);
 
-      LOG.debug("{}: All resources available, allocating...", client.getId());
+      LOG.trace("{}: All resources available, allocating...", client.getId());
       // Allocate resources.
       for (TCSResource<?> curRes : command.getResources()) {
         reservationPool.getReservationEntry(curRes).allocate(client);
       }
 
-      LOG.debug("{}: Removing resources claim: {}...", client.getId(), resources);
+      LOG.trace("{}: Removing resources claim: {}...", client.getId(), resources);
       reservationPool.unclaim(client, resources);
 
       return true;
@@ -203,7 +203,7 @@ class AllocatorTask
    * Note that this does <em>not</em> return any previously claimed resources to the client!
    * </p>
    *
-   * @param command Describes the allocated resources.
+   * @param resources Describes the allocated resources.
    */
   private void undoAllocate(Client client, Set<TCSResource<?>> resources) {
     synchronized (globalSyncObject) {

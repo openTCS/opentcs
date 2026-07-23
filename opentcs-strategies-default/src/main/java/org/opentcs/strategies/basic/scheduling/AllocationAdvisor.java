@@ -47,7 +47,6 @@ public class AllocationAdvisor
   @Override
   public void initialize() {
     if (isInitialized()) {
-      LOG.debug("Already initialized, doing nothing.");
       return;
     }
 
@@ -61,7 +60,6 @@ public class AllocationAdvisor
   @Override
   public void terminate() {
     if (!isInitialized()) {
-      LOG.debug("Not initialized, doing nothing.");
       return;
     }
 
@@ -99,7 +97,16 @@ public class AllocationAdvisor
   public boolean mayAllocate(Scheduler.Client client, Set<TCSResource<?>> resources) {
     boolean result = true;
     for (Scheduler.Module module : modules) {
-      result = result && module.mayAllocate(client, resources);
+      boolean mayAllocate = module.mayAllocate(client, resources);
+      if (!mayAllocate) {
+        LOG.debug(
+            "Module {}: Denying allocation for resources {} for client {}.",
+            module,
+            resources,
+            client
+        );
+      }
+      result = result && mayAllocate;
     }
     return result;
   }
@@ -113,7 +120,7 @@ public class AllocationAdvisor
     requireNonNull(resources, "resources");
 
     for (Scheduler.Module module : modules) {
-      LOG.debug(
+      LOG.trace(
           "Module {}: Preparing allocation for resources {} for client {}.",
           module,
           resources,
@@ -140,7 +147,7 @@ public class AllocationAdvisor
     requireNonNull(resources, "resources");
 
     for (Scheduler.Module module : modules) {
-      LOG.debug(
+      LOG.trace(
           "Module {}: Allocation released for resources {} for client {}.",
           module,
           resources,
