@@ -1014,7 +1014,15 @@ public class DefaultVehicleController
     synchronized (commAdapter) {
       // If the current drive order is null, just set the vehicle's position.
       if (currentDriveOrder == null) {
-        LOG.debug(
+        notificationService.publishUserNotification(
+            new UserNotification(
+                vehicle.getName(),
+                "Vehicle reported new position (%s) but it does not have a drive order."
+                    .formatted(point == null ? "null" : point.getName()),
+                UserNotification.Level.IMPORTANT
+            )
+        );
+        LOG.warn(
             "{}: Reported new position {} and we do not have a drive order.",
             vehicle.getName(),
             point
