@@ -134,6 +134,20 @@ public class TransportOrderPoolManager
         .withDependencies(getDependencies(to))
         .withProperties(to.getProperties());
 
+    OrderSequence wrappingSequence = null;
+    if (newOrder.getWrappingSequence() != null) {
+      wrappingSequence = getObjectRepo().getObject(
+          OrderSequence.class,
+          newOrder.getWrappingSequence()
+      );
+
+      checkArgument(
+          !wrappingSequence.isFinished(),
+          "Cannot modify finished order sequence '%s'",
+          wrappingSequence.getName()
+      );
+    }
+
     LOG.info(
         "Transport order is being created: {} -- details: {}",
         newOrder.getName(),
@@ -143,15 +157,11 @@ public class TransportOrderPoolManager
     getObjectRepo().addObject(newOrder);
     emitObjectEvent(newOrder, null, TCSObjectEvent.Type.OBJECT_CREATED);
 
-    if (newOrder.getWrappingSequence() != null) {
-      OrderSequence sequence = getObjectRepo().getObject(
-          OrderSequence.class,
-          newOrder.getWrappingSequence()
-      );
-      OrderSequence prevSeq = sequence;
-      sequence = sequence.withOrder(newOrder.getReference());
-      getObjectRepo().replaceObject(sequence);
-      emitObjectEvent(sequence, prevSeq, TCSObjectEvent.Type.OBJECT_MODIFIED);
+    if (wrappingSequence != null) {
+      OrderSequence prevSeq = wrappingSequence;
+      wrappingSequence = wrappingSequence.withOrder(newOrder.getReference());
+      getObjectRepo().replaceObject(wrappingSequence);
+      emitObjectEvent(wrappingSequence, prevSeq, TCSObjectEvent.Type.OBJECT_MODIFIED);
     }
 
     // Return the newly created transport order.
@@ -176,10 +186,9 @@ public class TransportOrderPoolManager
 
     checkArgument(
         !previousState.getState().isFinalState(),
-        "Transport order %s already in a final state, not changing %s -> %s.",
-        ref.getName(),
-        previousState.getState(),
-        newState
+        "Cannot modify transport order '%s' in final state '%s'",
+        previousState.getName(),
+        previousState.getState().name()
     );
 
     LOG.info(
@@ -221,6 +230,13 @@ public class TransportOrderPoolManager
       throws ObjectUnknownException,
         IllegalArgumentException {
     TransportOrder order = getObjectRepo().getObject(TransportOrder.class, orderRef);
+
+    checkArgument(
+        !order.getState().isFinalState(),
+        "Cannot modify transport order '%s' in final state '%s'",
+        order.getName(),
+        order.getState().name()
+    );
 
     LOG.info(
         "Transport order's processing vehicle changes: {} -- {} -> {}",
@@ -275,6 +291,13 @@ public class TransportOrderPoolManager
         IllegalArgumentException {
     TransportOrder previousState = getObjectRepo().getObject(TransportOrder.class, orderRef);
 
+    checkArgument(
+        !previousState.getState().isFinalState(),
+        "Cannot modify transport order '%s' in final state '%s'",
+        previousState.getName(),
+        previousState.getState().name()
+    );
+
     LOG.debug(
         "Transport order's drive orders change: {} -- {} -> {}",
         previousState.getName(),
@@ -308,6 +331,14 @@ public class TransportOrderPoolManager
   public TransportOrder setTransportOrderNextDriveOrder(TCSObjectReference<TransportOrder> ref)
       throws ObjectUnknownException {
     TransportOrder previousState = getObjectRepo().getObject(TransportOrder.class, ref);
+
+    checkArgument(
+        !previousState.getState().isFinalState(),
+        "Cannot modify transport order '%s' in final state '%s'",
+        previousState.getName(),
+        previousState.getState().name()
+    );
+
     TransportOrder order = previousState;
     // First, mark the current drive order as FINISHED and send an event.
     // Then, shift drive orders and send a second event.
@@ -374,6 +405,13 @@ public class TransportOrderPoolManager
       throws ObjectUnknownException {
     TransportOrder previousState = getObjectRepo().getObject(TransportOrder.class, ref);
 
+    checkArgument(
+        !previousState.getState().isFinalState(),
+        "Cannot modify transport order '%s' in final state '%s'",
+        previousState.getName(),
+        previousState.getState().name()
+    );
+
     LOG.debug(
         "Transport order's route step index changes: {} -- {} -> {}",
         previousState.getName(),
@@ -408,6 +446,13 @@ public class TransportOrderPoolManager
       throws ObjectUnknownException,
         IllegalArgumentException {
     TransportOrder order = getObjectRepo().getObject(TransportOrder.class, orderRef);
+
+    checkArgument(
+        !order.getState().isFinalState(),
+        "Cannot modify transport order '%s' in final state '%s'",
+        order.getName(),
+        order.getState().name()
+    );
 
     if (!canSetIntendedVehicle(order)) {
       throw new IllegalArgumentException(
@@ -527,6 +572,12 @@ public class TransportOrderPoolManager
       throws ObjectUnknownException {
     OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
 
+    checkArgument(
+        !previousState.isFinished(),
+        "Cannot modify finished order sequence '%s'",
+        previousState.getName()
+    );
+
     LOG.debug(
         "Order sequence's finished index changes: {} -- {} -> {}",
         previousState.getName(),
@@ -556,6 +607,12 @@ public class TransportOrderPoolManager
       throws ObjectUnknownException {
     OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
 
+    checkArgument(
+        !previousState.isFinished(),
+        "Cannot modify finished order sequence '%s'",
+        previousState.getName()
+    );
+
     LOG.info("Order sequence being marked as complete: {}", previousState.getName());
 
     OrderSequence sequence = previousState.withComplete(true);
@@ -579,6 +636,12 @@ public class TransportOrderPoolManager
   public OrderSequence setOrderSequenceFinished(TCSObjectReference<OrderSequence> seqRef)
       throws ObjectUnknownException {
     OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
+
+    checkArgument(
+        !previousState.isFinished(),
+        "Cannot modify finished order sequence '%s'",
+        previousState.getName()
+    );
 
     LOG.info("Order sequence being marked as finished: {}", previousState.getName());
 
@@ -607,6 +670,12 @@ public class TransportOrderPoolManager
   )
       throws ObjectUnknownException {
     OrderSequence previousState = getObjectRepo().getObject(OrderSequence.class, seqRef);
+
+    checkArgument(
+        !previousState.isFinished(),
+        "Cannot modify finished order sequence '%s'",
+        previousState.getName()
+    );
 
     if (Objects.equals(vehicleRef, previousState.getProcessingVehicle())) {
       return previousState;

@@ -10,11 +10,11 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -186,7 +186,7 @@ class TransportOrderPoolManagerTest {
     );
     orderPoolManager.setTransportOrderState(order.getReference(), state);
 
-    Assertions.assertThrows(
+    assertThrows(
         IllegalArgumentException.class,
         () -> {
           orderPoolManager.setTransportOrderIntendedVehicle(
@@ -194,6 +194,72 @@ class TransportOrderPoolManagerTest {
               vehicle.getReference()
           );
         }
+    );
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = TransportOrder.State.class,
+      names = {"FINISHED", "FAILED", "UNROUTABLE"}
+  )
+  void disallowModifyingTransportOrderInFinalState(TransportOrder.State state) {
+    plantModelManager.createPlantModelObjects(
+        new PlantModelCreationTO("some-model")
+            .withPoint(new PointCreationTO("some-point"))
+            .withLocationType(
+                new LocationTypeCreationTO("some-location-type")
+                    .withAllowedOperations(List.of("NOP"))
+            )
+            .withLocation(
+                new LocationCreationTO(
+                    "some-location", "some-location-type", new TripleCreationTO(1, 2, 3)
+                )
+                    .withLink("some-point", Set.of("NOP"))
+            )
+            .withVehicle(new VehicleCreationTO("some-vehicle"))
+    );
+
+    TransportOrder order = orderPoolManager.createTransportOrder(
+        new TransportOrderCreationTO(
+            "some-order",
+            List.of(new DestinationCreationTO("some-location", "NOP"))
+        )
+    );
+    orderPoolManager.setTransportOrderState(order.getReference(), state);
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> orderPoolManager.setTransportOrderState(
+            order.getReference(),
+            TransportOrder.State.FINISHED
+        )
+    );
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> orderPoolManager.setTransportOrderIntendedVehicle(
+            order.getReference(),
+            objectRepo.getObject(Vehicle.class, "some-vehicle").getReference()
+        )
+    );
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> orderPoolManager.setTransportOrderProcessingVehicle(
+            order.getReference(),
+            objectRepo.getObject(Vehicle.class, "some-vehicle").getReference(),
+            List.of()
+        )
+    );
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> orderPoolManager.setTransportOrderDriveOrders(order.getReference(), List.of())
+    );
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> orderPoolManager.setTransportOrderNextDriveOrder(order.getReference())
+    );
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> orderPoolManager.setTransportOrderCurrentRouteStepIndex(order.getReference(), 0)
     );
   }
 
@@ -327,9 +393,64 @@ class TransportOrderPoolManagerTest {
         .withWrappingSequence(sequence.getName());
 
     assertThat(objectRepo.getObjects(OrderSequence.class), is(not(empty())));
-    Assertions.assertThrows(
+    assertThrows(
         IllegalArgumentException.class,
         () -> orderPoolManager.createTransportOrder(creationTO)
+    );
+  }
+
+  @Test
+  void disallowModifyingFinishedOrderSequence() {
+    plantModelManager.createPlantModelObjects(
+        new PlantModelCreationTO("some-model")
+            .withPoint(new PointCreationTO("some-point"))
+            .withLocationType(
+                new LocationTypeCreationTO("some-location-type")
+                    .withAllowedOperations(List.of("NOP"))
+            )
+            .withLocation(
+                new LocationCreationTO(
+                    "some-location", "some-location-type", new TripleCreationTO(1, 2, 3)
+                )
+                    .withLink("some-point", Set.of("NOP"))
+            )
+            .withVehicle(new VehicleCreationTO("some-vehicle"))
+    );
+
+    OrderSequence sequence = orderPoolManager.createOrderSequence(
+        new OrderSequenceCreationTO("some-sequence")
+            .withOrderTypes(Set.of(OrderConstants.TYPE_ANY))
+    );
+    orderPoolManager.setOrderSequenceFinished(sequence.getReference());
+
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> orderPoolManager.setOrderSequenceFinishedIndex(sequence.getReference(), 1)
+    );
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> orderPoolManager.setOrderSequenceComplete(sequence.getReference())
+    );
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> orderPoolManager.setOrderSequenceFinished(sequence.getReference())
+    );
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> orderPoolManager.setOrderSequenceProcessingVehicle(
+            sequence.getReference(),
+            objectRepo.getObject(Vehicle.class, "some-vehicle").getReference()
+        )
+    );
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> orderPoolManager.createTransportOrder(
+            new TransportOrderCreationTO(
+                "some-order",
+                List.of(new DestinationCreationTO("some-location", "NOP"))
+            )
+                .withWrappingSequence(sequence.getName())
+        )
     );
   }
 

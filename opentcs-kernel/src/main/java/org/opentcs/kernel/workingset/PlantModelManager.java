@@ -3,6 +3,7 @@
 package org.opentcs.kernel.workingset;
 
 import static java.util.Objects.requireNonNull;
+import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkState;
 
 import jakarta.annotation.Nonnull;
@@ -1110,6 +1111,12 @@ public class PlantModelManager
       throws ObjectUnknownException {
     EnvironmentalEntity previousState = getObjectRepo().getObject(EnvironmentalEntity.class, ref);
 
+    checkArgument(
+        !previousState.isRetired(),
+        "Cannot modify retired environmental entity '%s'",
+        previousState.getName()
+    );
+
     LOG.debug(
         "Environmental entity's envelope changes: {} -- {} -> {}",
         previousState.getName(),
@@ -1141,6 +1148,12 @@ public class PlantModelManager
   )
       throws ObjectUnknownException {
     EnvironmentalEntity previousState = getObjectRepo().getObject(EnvironmentalEntity.class, ref);
+
+    checkArgument(
+        !previousState.isRetired(),
+        "Cannot modify retired environmental entity '%s'",
+        previousState.getName()
+    );
 
     LOG.debug(
         "Environmental entity's pose changes: {} -- {} -> {}",
@@ -1174,6 +1187,12 @@ public class PlantModelManager
       throws ObjectUnknownException {
     EnvironmentalEntity previousState = getObjectRepo().getObject(EnvironmentalEntity.class, ref);
 
+    checkArgument(
+        !previousState.isRetired(),
+        "Cannot modify retired environmental entity '%s'",
+        previousState.getName()
+    );
+
     LOG.info(
         "Environmental entity's integration level changes: {} -- {} -> {}",
         previousState.getName(),
@@ -1203,6 +1222,12 @@ public class PlantModelManager
   )
       throws ObjectUnknownException {
     EnvironmentalEntity previousState = getObjectRepo().getObject(EnvironmentalEntity.class, ref);
+
+    checkArgument(
+        !previousState.isRetired(),
+        "Cannot modify retired environmental entity '%s'",
+        previousState.getName()
+    );
 
     LOG.info("Environmental entity being marked as retired: {}", previousState.getName());
 

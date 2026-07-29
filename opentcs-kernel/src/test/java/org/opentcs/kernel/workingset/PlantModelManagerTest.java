@@ -249,6 +249,40 @@ class PlantModelManagerTest {
             .isAfter(Instant.now())
     );
 
+    // An environmental entity may not be modified after it has been retired.
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> plantModelManager.setEnvironmentalEntityEnvelope(
+            createdEntity.getReference(),
+            new Envelope(
+                List.of(
+                    new Couple(13, 14),
+                    new Couple(15, 16),
+                    new Couple(17, 18),
+                    new Couple(13, 14)
+                )
+            )
+        )
+    );
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> plantModelManager.setEnvironmentalEntityPose(
+            createdEntity.getReference(),
+            new Pose(new Triple(4, 5, 6), 234.56)
+        )
+    );
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> plantModelManager.setEnvironmentalEntityIntegrationLevel(
+            createdEntity.getReference(),
+            EnvironmentalEntity.IntegrationLevel.TO_BE_RESPECTED
+        )
+    );
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> plantModelManager.setEnvironmentalEntityRetired(createdEntity.getReference())
+    );
+
     plantModelManager.clear();
 
     assertThat(objectRepo.getObjects(EnvironmentalEntity.class), is(empty()));
