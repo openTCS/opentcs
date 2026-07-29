@@ -79,9 +79,6 @@ public class TCSObjectReference<E extends TCSObject<E>>
 
   @Override
   public String toString() {
-    return "TCSObjectReference{"
-        + "referentClass=" + referentClass
-        + ", name=" + name
-        + '}';
+    return "TCSOR<" + referentClass.getSimpleName() + ">{" + name + "}";
   }
 }

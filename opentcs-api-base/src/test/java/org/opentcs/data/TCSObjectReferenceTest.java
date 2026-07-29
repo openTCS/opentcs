@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentcs.data.model.Point;
 
 /**
  * Unit tests for {@link TCSObjectReference}.
@@ -41,6 +42,16 @@ class TCSObjectReferenceTest {
     assertThat(new TestType1("some-name").getReference())
         .hasSameHashCodeAs(new TestType1("some-name").getReference())
         .doesNotHaveSameHashCodeAs(new TestType1("some-other-name").getReference());
+  }
+
+  @Test
+  void checkToString() {
+    assertThat(new TestType1("some-name").getReference().toString())
+        .isEqualTo("TCSOR<TestType1>{some-name}");
+    assertThat(new TestType2("some-other-name").getReference().toString())
+        .isEqualTo("TCSOR<TestType2>{some-other-name}");
+    assertThat(new Point("some-point-name").getReference().toString())
+        .isEqualTo("TCSOR<Point>{some-point-name}");
   }
 
   private static class TestType1
