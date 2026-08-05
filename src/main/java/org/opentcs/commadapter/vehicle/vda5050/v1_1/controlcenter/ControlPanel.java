@@ -15,8 +15,10 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.CommAdapterMessages;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.ProcessModelImpl;
+import org.opentcs.commadapter.vehicle.vda5050.v1_1.action.InitPosition;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.controlcenter.action.ActionConfigurationPanel;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.Action;
+import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.ActionParameter;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.instantactions.InstantActions;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.order.Node;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.order.Order;
@@ -689,37 +691,52 @@ public class ControlPanel
         path.getName()
     );
 
-    newOrderActionConfigurationPanel.getAction().ifPresent(action -> {
-      messageParameters.put(
-          CommAdapterMessages.SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_TYPE,
-          action.getActionType()
-      );
-      messageParameters.put(
-          CommAdapterMessages.SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_ID,
-          action.getActionId()
-      );
-      messageParameters.put(
-          CommAdapterMessages.SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_BLOCKING_TYPE,
-          action.getBlockingType().name()
-      );
-      messageParameters.put(
-          CommAdapterMessages.SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_DESCRIPTION,
-          action.getActionDescription()
-      );
+    try {
+      Optional<Action> maybeAction = newOrderActionConfigurationPanel.getAction();
+      if (maybeAction.isPresent()) {
+        Action action = maybeAction.get();
+
+        validateParameters(action);
+
+        messageParameters.put(
+            CommAdapterMessages.SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_TYPE,
+            action.getActionType()
+        );
+        messageParameters.put(
+            CommAdapterMessages.SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_ID,
+            action.getActionId()
+        );
+        messageParameters.put(
+            CommAdapterMessages.SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_BLOCKING_TYPE,
+            action.getBlockingType().name()
+        );
+        messageParameters.put(
+            CommAdapterMessages.SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_DESCRIPTION,
+            action.getActionDescription()
+        );
 
 
-      action.getActionParameters().forEach(
-          actionParameter -> messageParameters.put(
-              CommAdapterMessages.SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_PARAMETER_PREFIX
-                  + actionParameter.getKey(),
-              actionParameter.getValue().toString()
-          )
-      );
-    });
+        action.getActionParameters().forEach(
+            actionParameter -> messageParameters.put(
+                CommAdapterMessages.SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_PARAMETER_PREFIX
+                    + actionParameter.getKey(),
+                actionParameter.getValue().toString()
+            )
+        );
+      }
 
-    sendAdapterMessage(
-        new VehicleCommAdapterMessage(CommAdapterMessages.SEND_ORDER_TYPE, messageParameters)
-    );
+      sendAdapterMessage(
+          new VehicleCommAdapterMessage(CommAdapterMessages.SEND_ORDER_TYPE, messageParameters)
+      );
+    }
+    catch (InvalidActionParameterException ex) {
+      JOptionPane.showMessageDialog(
+          this,
+          ex.getMessage(),
+          "Invalid parameter",
+          JOptionPane.ERROR_MESSAGE
+      );
+    }
   }//GEN-LAST:event_sendOrderButtonActionPerformed
 
   private void enableAdapterCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableAdapterCheckBoxActionPerformed
@@ -727,41 +744,56 @@ public class ControlPanel
   }//GEN-LAST:event_enableAdapterCheckBoxActionPerformed
 
   private void sendInstantActionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendInstantActionButtonActionPerformed
-    instantActionConfigurationPanel.getAction().ifPresent(action -> {
-      Map<String, String> messageParameters = new HashMap<>();
+    try {
+      Optional<Action> maybeInstant = instantActionConfigurationPanel.getAction();
+      if (maybeInstant.isPresent()) {
+        Action action = maybeInstant.get();
 
-      messageParameters.put(
-          CommAdapterMessages.SEND_INSTANT_ACTION_PARAM_ACTION_TYPE,
-          action.getActionType()
-      );
-      messageParameters.put(
-          CommAdapterMessages.SEND_INSTANT_ACTION_PARAM_ACTION_ID,
-          action.getActionId()
-      );
-      messageParameters.put(
-          CommAdapterMessages.SEND_INSTANT_ACTION_PARAM_BLOCKING_TYPE,
-          action.getBlockingType().name()
-      );
-      messageParameters.put(
-          CommAdapterMessages.SEND_INSTANT_ACTION_PARAM_ACTION_DESCRIPTION,
-          action.getActionDescription()
-      );
+        validateParameters(action);
 
-      action.getActionParameters()
-          .forEach(
-              actionParameter -> messageParameters.put(
-                  CommAdapterMessages.SEND_INSTANT_ACTION_PARAM_PARAMETER_PREFIX
-                      + actionParameter.getKey(),
-                  actionParameter.getValue().toString()
-              )
-          );
+        Map<String, String> messageParameters = new HashMap<>();
 
-      sendAdapterMessage(
-          new VehicleCommAdapterMessage(
-              CommAdapterMessages.SEND_INSTANT_ACTION_TYPE, messageParameters
-          )
+        messageParameters.put(
+            CommAdapterMessages.SEND_INSTANT_ACTION_PARAM_ACTION_TYPE,
+            action.getActionType()
+        );
+        messageParameters.put(
+            CommAdapterMessages.SEND_INSTANT_ACTION_PARAM_ACTION_ID,
+            action.getActionId()
+        );
+        messageParameters.put(
+            CommAdapterMessages.SEND_INSTANT_ACTION_PARAM_BLOCKING_TYPE,
+            action.getBlockingType().name()
+        );
+        messageParameters.put(
+            CommAdapterMessages.SEND_INSTANT_ACTION_PARAM_ACTION_DESCRIPTION,
+            action.getActionDescription()
+        );
+
+        action.getActionParameters()
+            .forEach(
+                actionParameter -> messageParameters.put(
+                    CommAdapterMessages.SEND_INSTANT_ACTION_PARAM_PARAMETER_PREFIX
+                        + actionParameter.getKey(),
+                    actionParameter.getValue().toString()
+                )
+            );
+
+        sendAdapterMessage(
+            new VehicleCommAdapterMessage(
+                CommAdapterMessages.SEND_INSTANT_ACTION_TYPE, messageParameters
+            )
+        );
+      }
+    }
+    catch (InvalidActionParameterException ex) {
+      JOptionPane.showMessageDialog(
+          this,
+          ex.getMessage(),
+          "Invalid action parameter",
+          JOptionPane.ERROR_MESSAGE
       );
-    });
+    }
   }//GEN-LAST:event_sendInstantActionButtonActionPerformed
 
   private void applyLastOrderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyLastOrderButtonActionPerformed
@@ -827,6 +859,71 @@ public class ControlPanel
       return Optional.empty();
     }
     return Optional.of(lastNode.getActions().get(0));
+  }
+
+  /**
+   * Validates the parameters of the given action.
+   *
+   * @param action The action
+   * @throws InvalidActionParameterException If any parameters of the given action are not valid.
+   */
+  private void validateParameters(Action action)
+      throws InvalidActionParameterException {
+    if (Objects.equals(action.getActionType(), InitPosition.ACTION_TYPE)) {
+      validateInitPositionNumericParams(action);
+    }
+  }
+
+  /**
+   * Validates that x, y, and theta parameters of an initPosition action are valid finite numbers.
+   *
+   * @param action The action.
+   * @throws InvalidActionParameterException If any parameter is not a valid finite number.
+   */
+  private void validateInitPositionNumericParams(Action action)
+      throws InvalidActionParameterException {
+    if (!Objects.equals(action.getActionType(), InitPosition.ACTION_TYPE)) {
+      return;
+    }
+
+    Optional<ActionParameter> mistypedParameter = action.getActionParameters().stream()
+        .filter(
+            parameter -> Objects.equals(parameter.getKey(), InitPosition.PARAMKEY_X)
+                || Objects.equals(parameter.getKey(), InitPosition.PARAMKEY_Y)
+                || Objects.equals(parameter.getKey(), InitPosition.PARAMKEY_THETA)
+        )
+        .filter(parameter -> parameter.getValue() instanceof String)
+        .filter(parameter -> {
+          try {
+            return !Double.isFinite(Double.parseDouble((String) parameter.getValue()));
+          }
+          catch (NumberFormatException e) {
+            return true;
+          }
+        })
+        .findAny();
+
+    if (mistypedParameter.isPresent()) {
+      ActionParameter parameter = mistypedParameter.get();
+      throw new InvalidActionParameterException(
+          "Parameter '%s': value '%s' is not a floating-point number"
+              .formatted(
+                  parameter.getKey(),
+                  parameter.getValue()
+              )
+      );
+    }
+  }
+
+  /**
+   * Indicates an invalid action parameter.
+   */
+  private static class InvalidActionParameterException
+      extends
+        RuntimeException {
+    InvalidActionParameterException(String message) {
+      super(message);
+    }
   }
 
   // FORMATTER:OFF

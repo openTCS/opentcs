@@ -17,12 +17,14 @@ import static org.opentcs.commadapter.vehicle.vda5050.v1_1.CommAdapterMessages.S
 
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentcs.commadapter.vehicle.vda5050.v1_1.action.InitPosition;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.Action;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.ActionParameter;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.BlockingType;
@@ -109,16 +111,22 @@ public class CommAdapterMessageMapper {
         destinationNodeName.get(),
         1
     );
-    toAction(
+    boolean actionRequested = mapValueExtractor.extractString(
+        SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_TYPE,
+        message.getParameters()
+    ).isPresent();
+    Optional<Action> action = toAction(
         message.getParameters(),
         SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_TYPE,
         SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_ID,
         SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_DESCRIPTION,
         SEND_ORDER_PARAM_DESTINATION_NODE_ACTION_BLOCKING_TYPE,
         SEND_ORDER_PARAM_PARAMETER_PATTERN
-    ).ifPresent(action -> {
-      destinationNode.setActions(List.of(action));
-    });
+    );
+    if (actionRequested && action.isEmpty()) {
+      return Optional.empty();
+    }
+    action.ifPresent(a -> destinationNode.setActions(List.of(a)));
 
     Edge edge = createEdge(
         edgeName.get(),
@@ -195,24 +203,24 @@ public class CommAdapterMessageMapper {
     );
 
     actionDescription.ifPresent(action::setActionDescription);
-    record ParameterMatcher(Map.Entry<String, String> parameter, Matcher matcher) {}
-    action.setActionParameters(
-        messageParameters.entrySet().stream()
-            .map(
-                entry -> new ParameterMatcher(
-                    entry,
-                    actionParameterPattern.matcher(entry.getKey())
-                )
-            )
-            .filter(parameterMatcher -> parameterMatcher.matcher.matches())
-            .map(
-                parameterMatcher -> new ActionParameter(
-                    parameterMatcher.matcher.group(1),
-                    parameterMatcher.parameter.getValue()
-                )
-            )
-            .toList()
-    );
+
+    List<ActionParameter> actionParameters = new ArrayList<>();
+    for (Map.Entry<String, String> entry : messageParameters.entrySet()) {
+      Matcher matcher = actionParameterPattern.matcher(entry.getKey());
+      if (!matcher.matches()) {
+        continue;
+      }
+
+      String paramKey = matcher.group(1);
+      Optional<Object> parsedValue = parseParameterValue(
+          action.getActionType(), paramKey, entry.getValue()
+      );
+      if (parsedValue.isEmpty()) {
+        return Optional.empty();
+      }
+      actionParameters.add(new ActionParameter(paramKey, parsedValue.get()));
+    }
+    action.setActionParameters(actionParameters);
 
     return Optional.of(action);
   }
@@ -241,5 +249,27 @@ public class CommAdapterMessageMapper {
         endNodeId,
         List.of()
     );
+  }
+
+  private Optional<Object> parseParameterValue(String actionType, String paramKey, String value) {
+    // Only parse numeric parameters for well-known action types/keys. Prevent accidental
+    // conversion of string fields that just look like numbers (e.g., mapId = "1.0").
+    if (Objects.equals(actionType, InitPosition.ACTION_TYPE)
+        && (Objects.equals(paramKey, InitPosition.PARAMKEY_X)
+            || Objects.equals(paramKey, InitPosition.PARAMKEY_Y)
+            || Objects.equals(paramKey, InitPosition.PARAMKEY_THETA))) {
+      try {
+        double parsed = Double.parseDouble(value);
+        if (!Double.isFinite(parsed)) {
+          return Optional.empty();
+        }
+        return Optional.of(parsed);
+      }
+      catch (NumberFormatException e) {
+        return Optional.empty();
+      }
+    }
+
+    return Optional.of(value);
   }
 }
