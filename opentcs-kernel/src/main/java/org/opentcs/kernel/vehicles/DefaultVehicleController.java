@@ -963,7 +963,10 @@ public class DefaultVehicleController
     setVehiclePosition(
         vehiclePositionResolver.resolveVehiclePosition(
             incomingPoseTransformer.apply(pose),
-            (vehicle.getCurrentPosition() != null) ? vehicle.getCurrentPosition().getName() : null
+            vehicleService.fetch(Vehicle.class, vehicle.getReference())
+                .map(Vehicle::getCurrentPosition)
+                .map(TCSObjectReference::getName)
+                .orElse(null)
         ).orElse(null)
     );
   }
