@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter;
 
-import static java.util.Objects.requireNonNull;
-
 import jakarta.inject.Inject;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.LayerCreationTO;
 import org.opentcs.access.to.model.LayerGroupCreationTO;
@@ -19,16 +19,13 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.Visua
  */
 public class VisualLayoutConverter {
 
-  private final PropertyConverter pConverter;
-
   @Inject
-  public VisualLayoutConverter(PropertyConverter pConverter) {
-    this.pConverter = requireNonNull(pConverter, "pConverter");
+  public VisualLayoutConverter() {
   }
 
   public VisualLayoutCreationTO toVisualLayoutCreationTO(VisualLayoutTO vLayout) {
     return new VisualLayoutCreationTO(vLayout.getName())
-        .withProperties(pConverter.toPropertyMap(vLayout.getProperties()))
+        .withProperties(Optional.ofNullable(vLayout.getProperties()).orElse(Map.of()))
         .withScaleX(vLayout.getScaleX())
         .withScaleY(vLayout.getScaleY())
         .withLayers(convertLayers(vLayout.getLayers()))

@@ -6,8 +6,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
@@ -20,8 +18,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.Vehic
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.AcceptableOrderTypeTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.CoupleTO;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.Property;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PropertyTO;
 import org.opentcs.util.Colors;
 
 /**
@@ -30,25 +26,17 @@ import org.opentcs.util.Colors;
 class VehicleConverterTest {
 
   private VehicleConverter vehicleConverter;
-
   private Map<String, String> propertyMap;
-  private List<PropertyTO> propertyTOList;
-  private List<Property> propertyList;
 
   @BeforeEach
   void setUp() {
-    PropertyConverter propertyConverter = mock();
-    vehicleConverter = new VehicleConverter(propertyConverter);
+    vehicleConverter = new VehicleConverter();
 
     propertyMap = Map.of("some-key", "some-value");
-    propertyTOList = List.of(new PropertyTO("some-key", "some-value"));
-    propertyList = List.of(new Property("some-key", "some-value"));
     Set<AcceptableOrderType> acceptableOrderTypes = Set.of(new AcceptableOrderType("order-1", 0));
     List<AcceptableOrderTypeTO> acceptableOrderTypeList = List.of(
         new AcceptableOrderTypeTO("order-1", 0)
     );
-    when(propertyConverter.toProperties(propertyMap)).thenReturn(propertyList);
-    when(propertyConverter.toPropertyMap(propertyTOList)).thenReturn(propertyMap);
   }
 
   @Test
@@ -62,7 +50,7 @@ class VehicleConverterTest {
         .setMaxVelocity(1000)
         .setMaxReverseVelocity(1000)
         .setLayout(new VehicleTO.Layout())
-        .setProperties(propertyTOList);
+        .setProperties(propertyMap);
 
     List<VehicleCreationTO> result = vehicleConverter.toVehicleCreationTOs(List.of(vehicleTo));
 

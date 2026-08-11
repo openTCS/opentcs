@@ -3,7 +3,7 @@
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import java.util.List;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +11,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PeripheralOperationDescription;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.Property;
 
 // CHECKSTYLE:OFF
 @NoArgsConstructor
@@ -28,6 +27,7 @@ public class PostPeripheralJobRequestTO {
   private String relatedVehicle;
   private String relatedTransportOrder;
   private PeripheralOperationDescription peripheralOperation;
-  private List<Property> properties;
+  @JsonPropertyOrder(alphabetic = true)
+  private Map<String, String> properties;
 }
 // CHECKSTYLE:ON

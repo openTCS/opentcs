@@ -1,10 +1,7 @@
 {
-  "parameters" : [ {
-    "key" : "key1",
-    "value" : "value1"
-  }, {
-    "key" : "key2",
-    "value" : "value2"
-  } ],
+  "parameters" : {
+    "key1" : "value1",
+    "key2" : "value2"
+  },
   "type" : "some-type"
 }

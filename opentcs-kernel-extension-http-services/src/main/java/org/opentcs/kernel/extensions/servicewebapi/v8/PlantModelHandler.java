@@ -22,7 +22,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.LocationTypeConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.PathConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.PointConverter;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.PropertyConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.VehicleConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.VisualLayoutConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.GetPlantModelResponseTO;
@@ -50,7 +49,6 @@ public class PlantModelHandler {
   private final BlockConverter blockConverter;
   private final VehicleConverter vehicleConverter;
   private final VisualLayoutConverter visualLayoutConverter;
-  private final PropertyConverter propertyConverter;
   private final RouterService routerService;
 
   /**
@@ -66,7 +64,6 @@ public class PlantModelHandler {
    * @param blockConverter Converts block instances.
    * @param vehicleConverter Converts vehicle instances.
    * @param visualLayoutConverter Converts visual layout instances.
-   * @param propertyConverter Converts property instances.
    * @param routerService Provides methods concerning the router.
    */
   @Inject
@@ -81,7 +78,6 @@ public class PlantModelHandler {
       BlockConverter blockConverter,
       VehicleConverter vehicleConverter,
       VisualLayoutConverter visualLayoutConverter,
-      PropertyConverter propertyConverter,
       RouterService routerService
   ) {
     this.plantModelService = requireNonNull(plantModelService, "plantModelService");
@@ -94,7 +90,6 @@ public class PlantModelHandler {
     this.blockConverter = requireNonNull(blockConverter, "blockConverter");
     this.vehicleConverter = requireNonNull(vehicleConverter, "vehicleConverter");
     this.visualLayoutConverter = requireNonNull(visualLayoutConverter, "visualLayoutConverter");
-    this.propertyConverter = requireNonNull(propertyConverter, "propertyConverter");
     this.routerService = requireNonNull(routerService, "routerService");
   }
 
@@ -116,7 +111,7 @@ public class PlantModelHandler {
         .withVisualLayout(
             visualLayoutConverter.toVisualLayoutCreationTO(putPlantModel.getVisualLayout())
         )
-        .withProperties(propertyConverter.toPropertyMap(putPlantModel.getProperties()));
+        .withProperties(putPlantModel.getProperties());
 
     executorWrapper.callAndWait(() -> plantModelService.createPlantModel(plantModelCreationTO));
   }

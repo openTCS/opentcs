@@ -439,10 +439,13 @@ components:
               type: integer
               example: 3
         properties:
-          type: array
-          description: This point's properties.
-          items:
-            $ref: "../schemas/common.yaml#/components/schemas/Property"
+          type: object
+          additionalProperties:
+            type: string
+          description: The object's additional properties.
+          example:
+            key1: value1
+            key2: value2
       required:
         - name
     PlantModelPath:
@@ -529,8 +532,13 @@ components:
               type: integer
               example: 3
         properties:
-          items:
-            $ref: "../schemas/common.yaml#/components/schemas/Property"
+          type: object
+          additionalProperties:
+            type: string
+          description: The object's additional properties.
+          example:
+            key1: value1
+            key2: value2
       required:
         - name
         - srcPointName
@@ -578,9 +586,12 @@ components:
                 - RECHARGE_ALT_2
         properties:
           type: object
-          description: This location type's properties.
-          items:
-            $ref: "../schemas/common.yaml#/components/schemas/Property"
+          additionalProperties:
+            type: string
+          description: The object's additional properties.
+          example:
+            key1: value1
+            key2: value2
       required:
         - name
     PlantModelLocation:
@@ -645,10 +656,13 @@ components:
               type: integer
               example: 3
         properties:
-          type: array
-          description: This location's properties.
-          items:
-            $ref: "../schemas/common.yaml#/components/schemas/Property"
+          type: object
+          additionalProperties:
+            type: string
+          description: The object's additional properties.
+          example:
+            key1: value1
+            key2: value2
       required:
         - name
         - typeName
@@ -682,10 +696,13 @@ components:
               pattern: ^#([A-Fa-f0-9]{6})$
               example: "#FF0000"
         properties:
-          type: array
-          description: This block's properties.
-          items:
-            $ref: "../schemas/common.yaml#/components/schemas/Property"
+          type: object
+          additionalProperties:
+            type: string
+          description: The object's additional properties.
+          example:
+            key1: value1
+            key2: value2
       required:
         - name
     PlantModelVehicle:
@@ -731,10 +748,13 @@ components:
               pattern: ^#([A-Fa-f0-9]{6})$
               example: "#00FF00"
         properties:
-          type: array
-          description: This vehicle's properties.
-          items:
-            $ref: "../schemas/common.yaml#/components/schemas/Property"
+          type: object
+          additionalProperties:
+            type: string
+          description: The object's additional properties.
+          example:
+            key1: value1
+            key2: value2
       required:
         - name
     PlantModelVisualLayout:
@@ -764,12 +784,13 @@ components:
           items:
             $ref: "#/components/schemas/PlantModelLayerGroup"
         properties:
-          type: array
-          description: This visual layout's properties.
-          items:
-            example:
-              name: "visualLayoutProperty"
-              value: "value"
+          type: object
+          additionalProperties:
+            type: string
+          description: The object's additional properties.
+          example:
+            key1: value1
+            key2: value2
       required:
         - name
     PlantModelTriple:

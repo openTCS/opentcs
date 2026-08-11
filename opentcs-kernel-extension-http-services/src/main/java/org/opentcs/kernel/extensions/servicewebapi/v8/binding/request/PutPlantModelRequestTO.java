@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import java.util.List;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.PathT
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.PointTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.VehicleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.VisualLayoutTO;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PropertyTO;
 
 // CHECKSTYLE:OFF
 @RequiredArgsConstructor
@@ -41,6 +41,7 @@ public class PutPlantModelRequestTO {
   private List<BlockTO> blocks = List.of();
   private List<VehicleTO> vehicles = List.of();
   private VisualLayoutTO visualLayout = new VisualLayoutTO("unnamed");
-  private List<PropertyTO> properties = List.of();
+  @JsonPropertyOrder(alphabetic = true)
+  private Map<String, String> properties;
 }
 // CHECKSTYLE:ON

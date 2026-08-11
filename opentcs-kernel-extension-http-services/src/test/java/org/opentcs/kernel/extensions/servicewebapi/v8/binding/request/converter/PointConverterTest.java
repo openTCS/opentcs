@@ -23,7 +23,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.Point
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.EnvelopeTO;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PropertyTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.TripleTO;
 
 /**
@@ -32,23 +31,18 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.share
 class PointConverterTest {
 
   private PointConverter pointConverter;
-  private PropertyConverter propertyConverter;
   private EnvelopeConverter envelopeConverter;
 
   private Map<String, String> propertyMap;
-  private List<PropertyTO> propertyList;
   private Map<String, EnvelopeCreationTO> envelopeCreationTOMap;
   private List<EnvelopeTO> envelopeList;
 
   @BeforeEach
   void setUp() {
-    propertyConverter = mock();
     envelopeConverter = mock();
-    pointConverter = new PointConverter(propertyConverter, envelopeConverter);
+    pointConverter = new PointConverter(envelopeConverter);
 
     propertyMap = Map.of("some-key", "some-value");
-    propertyList = List.of(new PropertyTO("some-key", "some-value"));
-    when(propertyConverter.toPropertyMap(propertyList)).thenReturn(propertyMap);
 
     envelopeCreationTOMap = Map.of(
         "some-envelope-key", new EnvelopeCreationTO(List.of(new CoupleCreationTO(2, 2)))
@@ -73,7 +67,7 @@ class PointConverterTest {
                 .setLabelOffset(new CoupleTO(4, 4))
                 .setLayerId(9)
         )
-        .setProperties(propertyList);
+        .setProperties(propertyMap);
 
     List<PointCreationTO> result = pointConverter.toPointCreationTOs(List.of(point1));
 

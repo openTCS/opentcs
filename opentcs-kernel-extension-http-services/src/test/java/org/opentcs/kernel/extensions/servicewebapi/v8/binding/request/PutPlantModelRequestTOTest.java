@@ -3,7 +3,9 @@
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +24,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.Visua
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.EnvelopeTO;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PropertyTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.TripleTO;
 
 /**
@@ -42,7 +43,7 @@ class PutPlantModelRequestTOTest {
         .setPoints(
             List.of(
                 new PointTO("some-point")
-                    .setProperties(List.of(new PropertyTO("point-prop", "point-value")))
+                    .setProperties(Map.of("point-prop", "point-value"))
                     .setPosition(new TripleTO(25000, -15000, 0))
                     .setVehicleOrientationAngle(73.3)
                     .setType(PointTO.Type.PARK_POSITION)
@@ -69,7 +70,7 @@ class PutPlantModelRequestTOTest {
                             .setLayerId(0)
                     ),
                 new PointTO("some-point2")
-                    .setProperties(List.of(new PropertyTO("point-prop", "point-value")))
+                    .setProperties(Map.of("point-prop", "point-value"))
                     .setPosition(new TripleTO(18000, -15000, 0))
                     .setMaxVehicleBoundingBox(
                         new BoundingBoxTO(1500, 2000, 3000, new CoupleTO(10, 20))
@@ -81,7 +82,7 @@ class PutPlantModelRequestTOTest {
                             .setLayerId(0)
                     ),
                 new PointTO("some-point3")
-                    .setProperties(List.of(new PropertyTO("point-prop", "point-value")))
+                    .setProperties(Map.of("point-prop", "point-value"))
                     .setPosition(new TripleTO(25000, -9000, 0))
                     .setMaxVehicleBoundingBox(
                         new BoundingBoxTO(1500, 2000, 3000, new CoupleTO(10, 20))
@@ -97,7 +98,7 @@ class PutPlantModelRequestTOTest {
         .setPaths(
             List.of(
                 new PathTO("some-path", "some-point", "some-point2")
-                    .setProperties(List.of(new PropertyTO("path-prop", "path-value")))
+                    .setProperties(Map.of("path-prop", "path-value"))
                     .setLength(3)
                     .setMaxVelocity(13)
                     .setMaxReverseVelocity(3)
@@ -145,7 +146,7 @@ class PutPlantModelRequestTOTest {
         .setLocationTypes(
             List.of(
                 new LocationTypeTO("some-locationType")
-                    .setProperties(List.of(new PropertyTO("locType-prop", "locType-value")))
+                    .setProperties(Map.of("locType-prop", "locType-value"))
                     .setAllowedOperations(
                         List.of("some-operation", "another-operation", "operation3")
                     )
@@ -165,6 +166,7 @@ class PutPlantModelRequestTOTest {
                     "some-locationType",
                     new TripleTO(30000, -15000, 0)
                 )
+                    .setProperties(Map.of("location-prop", "location-value"))
                     .setLocked(true)
                     .setLayout(
                         new LocationTO.Layout()
@@ -179,7 +181,7 @@ class PutPlantModelRequestTOTest {
         .setBlocks(
             List.of(
                 new BlockTO("some-block")
-                    .setProperties(List.of(new PropertyTO("block-prop", "block-value")))
+                    .setProperties(Map.of("block-prop", "block-value"))
                     .setType(BlockTO.Type.SAME_DIRECTION_ONLY)
                     .setMemberNames(Set.of("some-point2"))
                     .setLayout(new BlockTO.Layout())
@@ -188,7 +190,7 @@ class PutPlantModelRequestTOTest {
         .setVehicles(
             List.of(
                 new VehicleTO("some-vehicle")
-                    .setProperties(List.of(new PropertyTO("vehicle-prop", "vehicle-value")))
+                    .setProperties(Map.of("vehicle-prop", "vehicle-value"))
                     .setBoundingBox(new BoundingBoxTO(150, 200, 300, new CoupleTO(10, 20)))
                     .setEnergyLevelCritical(10)
                     .setEnergyLevelGood(30)
@@ -200,13 +202,13 @@ class PutPlantModelRequestTOTest {
         )
         .setVisualLayout(
             new VisualLayoutTO("some-visualLayout")
-                .setProperties(List.of(new PropertyTO("vLayout-prop", "vLayout-value")))
+                .setProperties(Map.of("vLayout-prop", "vLayout-value"))
                 .setScaleX(65)
                 .setScaleY(65)
                 .setLayers(List.of(new LayerTO(0, 0, true, "layer0", 0)))
                 .setLayerGroups(List.of(new LayerGroupTO(0, "layerGroup0", true)))
         )
-        .setProperties(List.of(new PropertyTO("plantModel-prop", "value")));
+        .setProperties(new TreeMap<>(Map.of("plantModel-prop", "value")));
 
     Approvals.verify(jsonBinder.toJson(to));
   }

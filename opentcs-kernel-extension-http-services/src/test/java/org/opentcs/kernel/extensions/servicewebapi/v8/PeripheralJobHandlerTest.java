@@ -14,6 +14,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
@@ -34,7 +35,6 @@ import org.opentcs.kernel.extensions.servicewebapi.common.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PostPeripheralJobRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.PeripheralOperationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PeripheralOperationDescription;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.Property;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.converter.PeripheralJobConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.PeripheralJobTO;
 
@@ -107,7 +107,7 @@ class PeripheralJobHandlerTest {
             )
             .setRelatedVehicle("some-vehicle")
             .setRelatedTransportOrder("some-order")
-            .setProperties(List.of(new Property("some-prop-key", "some-prop-value")))
+            .setProperties(Map.of("some-prop-key", "some-prop-value"))
     );
 
     // Assert

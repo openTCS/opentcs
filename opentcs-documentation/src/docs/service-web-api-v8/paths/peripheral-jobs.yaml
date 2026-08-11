@@ -207,12 +207,13 @@ components:
         peripheralOperation:
           $ref: "../schemas/common.yaml#/components/schemas/PeripheralOperation"
         properties:
-          type: array
-          minItems: 0
-          maxItems: 2147483647
-          items:
-            $ref: "../schemas/common.yaml#/components/schemas/Property"
-          description: The peripheral jobs's properties.
+          type: object
+          additionalProperties:
+            type: string
+          description: The object's additional properties.
+          example:
+            key1: value1
+            key2: value2
       required:
         - reservationToken
         - peripheralOperation

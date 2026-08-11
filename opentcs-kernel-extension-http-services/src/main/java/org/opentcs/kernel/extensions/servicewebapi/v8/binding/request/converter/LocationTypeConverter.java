@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter;
 
-import static java.util.Objects.requireNonNull;
-
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.LocationRepresentationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
@@ -17,11 +17,8 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.Locat
  */
 public class LocationTypeConverter {
 
-  private final PropertyConverter pConverter;
-
   @Inject
-  public LocationTypeConverter(PropertyConverter pConverter) {
-    this.pConverter = requireNonNull(pConverter, "pConverter");
+  public LocationTypeConverter() {
   }
 
   public List<LocationTypeCreationTO> toLocationTypeCreationTOs(List<LocationTypeTO> locTypes) {
@@ -32,7 +29,7 @@ public class LocationTypeConverter {
                 .withAllowedPeripheralOperations(
                     locationType.getAllowedPeripheralOperations()
                 )
-                .withProperties(pConverter.toPropertyMap(locationType.getProperties()))
+                .withProperties(Optional.ofNullable(locationType.getProperties()).orElse(Map.of()))
                 .withLayout(
                     new LocationTypeCreationTO.Layout(
                         convertToLocationRepresentation(

@@ -6,13 +6,10 @@
     "completionRequired" : true,
     "executionTrigger" : "AFTER_ALLOCATION"
   },
-  "properties" : [ {
-    "key" : "some-key",
-    "value" : "some-value"
-  }, {
-    "key" : "some-other-key",
-    "value" : "some-other-value"
-  } ],
+  "properties" : {
+    "some-key" : "some-value",
+    "some-other-key" : "some-other-value"
+  },
   "relatedTransportOrder" : "some-order",
   "relatedVehicle" : "some-vehicle",
   "reservationToken" : "some-token"

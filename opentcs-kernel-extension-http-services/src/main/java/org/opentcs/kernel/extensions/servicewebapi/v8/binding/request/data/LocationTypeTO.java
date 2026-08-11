@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import java.util.List;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PropertyTO;
 
 // CHECKSTYLE:OFF
 @RequiredArgsConstructor
@@ -31,7 +31,8 @@ public class LocationTypeTO {
   private List<String> allowedOperations = List.of();
   private List<String> allowedPeripheralOperations = List.of();
   private Layout layout = new Layout();
-  private List<PropertyTO> properties = List.of();
+  @JsonPropertyOrder(alphabetic = true)
+  private Map<String, String> properties = Map.of();
 
   // CHECKSTYLE:OFF
   @NoArgsConstructor

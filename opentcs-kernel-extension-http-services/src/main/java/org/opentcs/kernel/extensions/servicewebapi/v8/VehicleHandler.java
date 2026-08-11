@@ -7,10 +7,8 @@ import static java.util.Objects.requireNonNull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,7 +31,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PostVehicl
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PostVehicleRouteComputationQueryRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PutVehicleAcceptableOrderTypesTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PutVehicleEnergyLevelThresholdSetTO;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.Property;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.PostVehicleRouteComputationQueryResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.converter.RouteConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.converter.VehicleConverter;
@@ -231,7 +228,7 @@ public class VehicleHandler {
           vehicle.getReference(),
           new VehicleCommAdapterMessage(
               request.getType(),
-              toParameterMap(request.getParameters())
+              request.getParameters()
           )
       );
     });
@@ -366,15 +363,5 @@ public class VehicleHandler {
           )
       );
     });
-  }
-
-  private Map<String, String> toParameterMap(List<Property> parameters) {
-    Map<String, String> result = new HashMap<>();
-    if (parameters != null) {
-      for (Property param : parameters) {
-        result.put(param.getKey(), param.getValue());
-      }
-    }
-    return result;
   }
 }

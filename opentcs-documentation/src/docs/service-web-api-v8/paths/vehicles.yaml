@@ -743,13 +743,12 @@ components:
           description: The message's type
           example: "tcs:virtualVehicle:setPosition"
         parameters:
-          type: array
+          type: object
+          additionalProperties:
+            type: string
           description: The message's parameters.
-          items:
-            $ref: "../schemas/common.yaml#/components/schemas/Property"
           example:
-            - key: "position"
-              value: "Point-0001"
+            position: Point-0001
       required:
         - type
         - parameters

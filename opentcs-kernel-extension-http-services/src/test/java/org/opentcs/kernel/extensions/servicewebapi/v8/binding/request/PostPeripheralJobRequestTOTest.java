@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request;
 
-import java.util.List;
+import java.util.Map;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.kernel.extensions.servicewebapi.common.JsonBinder;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.PeripheralOperationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PeripheralOperationDescription;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.Property;
 
 /**
  * Unit tests for {@link PostPeripheralJobRequestTO}.
@@ -37,9 +36,9 @@ class PostPeripheralJobRequestTOTest {
                     .setCompletionRequired(true)
             )
             .setProperties(
-                List.of(
-                    new Property("some-key", "some-value"),
-                    new Property("some-other-key", "some-other-value")
+                Map.of(
+                    "some-key", "some-value",
+                    "some-other-key", "some-other-value"
                 )
             );
 

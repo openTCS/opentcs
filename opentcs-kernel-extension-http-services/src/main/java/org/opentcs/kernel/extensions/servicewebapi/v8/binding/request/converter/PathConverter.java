@@ -7,6 +7,8 @@ import static java.util.Objects.requireNonNull;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.CoupleCreationTO;
 import org.opentcs.access.to.model.PathCreationTO;
@@ -20,16 +22,14 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.share
  */
 public class PathConverter {
 
-  private final PropertyConverter pConverter;
   private final PeripheralOperationConverter pOConverter;
   private final EnvelopeConverter envelopeConverter;
 
   @Inject
   public PathConverter(
-      PropertyConverter pConverter, PeripheralOperationConverter pOConverter,
+      PeripheralOperationConverter pOConverter,
       EnvelopeConverter envelopeConverter
   ) {
-    this.pConverter = requireNonNull(pConverter, "pConverter");
     this.pOConverter = requireNonNull(pOConverter, "pOConverter");
     this.envelopeConverter = requireNonNull(envelopeConverter, "envelopeConverter");
   }
@@ -43,7 +43,7 @@ public class PathConverter {
                 path.getDestPointName()
             )
                 .withName(path.getName())
-                .withProperties(pConverter.toPropertyMap(path.getProperties()))
+                .withProperties(Optional.ofNullable(path.getProperties()).orElse(Map.of()))
                 .withLength(path.getLength())
                 .withMaxVelocity(path.getMaxVelocity())
                 .withMaxReverseVelocity(path.getMaxReverseVelocity())

@@ -7,6 +7,8 @@ import static java.util.Objects.requireNonNull;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.BoundingBoxCreationTO;
 import org.opentcs.access.to.model.CoupleCreationTO;
@@ -20,12 +22,10 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.Point
  */
 public class PointConverter {
 
-  private final PropertyConverter pConverter;
   private final EnvelopeConverter envelopeConverter;
 
   @Inject
-  public PointConverter(PropertyConverter pConverter, EnvelopeConverter envelopeConverter) {
-    this.pConverter = requireNonNull(pConverter, "pConverter");
+  public PointConverter(EnvelopeConverter envelopeConverter) {
     this.envelopeConverter = requireNonNull(envelopeConverter, "envelopeConverter");
   }
 
@@ -33,7 +33,7 @@ public class PointConverter {
     return points.stream()
         .map(
             point -> new PointCreationTO(point.getName())
-                .withProperties(pConverter.toPropertyMap(point.getProperties()))
+                .withProperties(Optional.ofNullable(point.getProperties()).orElse(Map.of()))
                 .withPose(
                     new PoseCreationTO(
                         new TripleCreationTO(

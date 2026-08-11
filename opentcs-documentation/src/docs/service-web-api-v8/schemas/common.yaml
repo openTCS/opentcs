@@ -3,21 +3,6 @@
 
 components:
   schemas:
-    Property:
-      type: object
-      additionalProperties: false
-      properties:
-        key:
-          type: string
-          description: The property's key
-          example: key1
-        value:
-          type: string
-          description: The property's value
-          example: value1
-      required:
-        - key
-        - value
     BoundingBox:
       type: object
       additionalProperties: false

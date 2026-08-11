@@ -9,7 +9,6 @@ import jakarta.inject.Inject;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.extensions.servicewebapi.common.KernelExecutorWrapper;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PostOrderSequenceRequestTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.PostTransportOrderRequestTO;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.Property;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.converter.OrderSequenceConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.converter.TransportOrderConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.data.OrderSequenceTO;
@@ -257,15 +255,5 @@ public class TransportOrderHandler {
 
   private Instant deadline(PostTransportOrderRequestTO order) {
     return order.getDeadline() == null ? Instant.MAX : order.getDeadline();
-  }
-
-  private Map<String, String> properties(List<Property> properties) {
-    Map<String, String> result = new HashMap<>();
-    if (properties != null) {
-      for (Property prop : properties) {
-        result.put(prop.getKey(), prop.getValue());
-      }
-    }
-    return result;
   }
 }

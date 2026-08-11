@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter;
 
-import static java.util.Objects.requireNonNull;
-
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.CoupleCreationTO;
@@ -22,11 +21,8 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.share
  */
 public class LocationConverter {
 
-  private final PropertyConverter pConverter;
-
   @Inject
-  public LocationConverter(PropertyConverter pConverter) {
-    this.pConverter = requireNonNull(pConverter, "pConverter");
+  public LocationConverter() {
   }
 
   public List<LocationCreationTO> toLocationCreationTOs(List<LocationTO> locations) {
@@ -41,7 +37,7 @@ public class LocationConverter {
                     location.getPosition().getZ()
                 )
             )
-                .withProperties(pConverter.toPropertyMap(location.getProperties()))
+                .withProperties(Optional.ofNullable(location.getProperties()).orElse(Map.of()))
                 .withLinks(toLinkMap(location.getLinks()))
                 .withLocked(location.isLocked())
                 .withLayout(

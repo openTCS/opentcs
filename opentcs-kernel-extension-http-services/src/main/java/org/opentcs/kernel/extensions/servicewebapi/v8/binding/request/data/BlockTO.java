@@ -5,7 +5,7 @@ package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PropertyTO;
 
 // CHECKSTYLE:OFF
 @RequiredArgsConstructor
@@ -32,7 +31,8 @@ public class BlockTO {
   private Type type = Type.SINGLE_VEHICLE_ONLY;
   private Layout layout = new Layout();
   private Set<String> memberNames = Set.of();
-  private List<PropertyTO> properties = List.of();
+  @JsonPropertyOrder(alphabetic = true)
+  private Map<String, String> properties = Map.of();
 
   public enum Type {
     SINGLE_VEHICLE_ONLY,

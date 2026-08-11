@@ -96,15 +96,7 @@ public class PeripheralJobHandler {
       )
           .withIncompleteName(job.isIncompleteName());
       if (job.getProperties() != null) {
-        jobCreationTO = jobCreationTO.withProperties(
-            job.getProperties().stream()
-                .collect(
-                    Collectors.toMap(
-                        property -> property.getKey(),
-                        property -> property.getValue()
-                    )
-                )
-        );
+        jobCreationTO = jobCreationTO.withProperties(job.getProperties());
       }
       if (job.getRelatedTransportOrder() != null) {
         jobCreationTO = jobCreationTO.withRelatedTransportOrderName(job.getRelatedTransportOrder());

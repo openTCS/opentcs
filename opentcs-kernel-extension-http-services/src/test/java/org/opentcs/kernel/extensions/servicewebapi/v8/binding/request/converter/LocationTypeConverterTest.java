@@ -7,8 +7,6 @@ import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.LocationRepresentationTO.RECHARGE_ALT_1;
 
 import java.util.List;
@@ -18,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.LocationRepresentationTO;
 import org.opentcs.access.to.model.LocationTypeCreationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.LocationTypeTO;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PropertyTO;
 
 /**
  * Tests for {@link LocationTypeConverter}.
@@ -26,19 +23,14 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.share
 class LocationTypeConverterTest {
 
   private LocationTypeConverter locationTypeConverter;
-  private PropertyConverter propertyConverter;
 
   private Map<String, String> propertyMap;
-  private List<PropertyTO> propertyList;
 
   @BeforeEach
   void setUp() {
-    propertyConverter = mock();
-    locationTypeConverter = new LocationTypeConverter(propertyConverter);
+    locationTypeConverter = new LocationTypeConverter();
 
     propertyMap = Map.of("some-key", "some-value");
-    propertyList = List.of(new PropertyTO("some-key", "some-value"));
-    when(propertyConverter.toPropertyMap(propertyList)).thenReturn(propertyMap);
   }
 
   @Test
@@ -50,7 +42,7 @@ class LocationTypeConverterTest {
             new LocationTypeTO.Layout()
                 .setLocationRepresentation(RECHARGE_ALT_1)
         )
-        .setProperties(propertyList);
+        .setProperties(propertyMap);
 
     List<LocationTypeCreationTO> result
         = locationTypeConverter.toLocationTypeCreationTOs(List.of(locTypeTo));

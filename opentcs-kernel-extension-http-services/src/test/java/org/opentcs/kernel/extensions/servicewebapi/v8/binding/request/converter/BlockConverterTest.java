@@ -7,8 +7,6 @@ import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentcs.access.to.model.BlockCreationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.BlockTO;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PropertyTO;
 import org.opentcs.util.Colors;
 
 /**
@@ -26,19 +23,14 @@ import org.opentcs.util.Colors;
 class BlockConverterTest {
 
   private BlockConverter blockConverter;
-  private PropertyConverter propertyConverter;
 
   private Map<String, String> propertyMap;
-  private List<PropertyTO> propertyList;
 
   @BeforeEach
   void setUp() {
-    propertyConverter = mock();
-    blockConverter = new BlockConverter(propertyConverter);
+    blockConverter = new BlockConverter();
 
     propertyMap = Map.of("some-key", "some-value");
-    propertyList = List.of(new PropertyTO("some-key", "some-value"));
-    when(propertyConverter.toPropertyMap(propertyList)).thenReturn(propertyMap);
   }
 
   @Test
@@ -47,7 +39,7 @@ class BlockConverterTest {
         .setType(BlockTO.Type.SINGLE_VEHICLE_ONLY)
         .setMemberNames(Set.of("member1"))
         .setLayout(new BlockTO.Layout())
-        .setProperties(propertyList);
+        .setProperties(propertyMap);
 
     List<BlockCreationTO> result = blockConverter.toBlockCreationTOs(List.of(blockTO));
 

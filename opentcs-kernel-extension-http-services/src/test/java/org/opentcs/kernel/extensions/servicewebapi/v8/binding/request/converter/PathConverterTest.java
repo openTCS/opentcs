@@ -24,7 +24,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.PathT
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.PeripheralOperationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.EnvelopeTO;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PropertyTO;
 
 /**
  * Tests for {@link PathConverter}.
@@ -32,12 +31,10 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.share
 class PathConverterTest {
 
   private PathConverter pathConverter;
-  private PropertyConverter propertyConverter;
   private PeripheralOperationConverter peripheralOpConverter;
   private EnvelopeConverter envelopeConverter;
 
   private Map<String, String> propertyMap;
-  private List<PropertyTO> propertyList;
   private Map<String, EnvelopeCreationTO> envelopeCreationTOMap;
   private List<EnvelopeTO> envelopeList;
   private PeripheralOperationTO peripheralOperationTO;
@@ -46,14 +43,11 @@ class PathConverterTest {
 
   @BeforeEach
   void setUp() {
-    propertyConverter = mock();
     peripheralOpConverter = mock();
     envelopeConverter = mock();
-    pathConverter = new PathConverter(propertyConverter, peripheralOpConverter, envelopeConverter);
+    pathConverter = new PathConverter(peripheralOpConverter, envelopeConverter);
 
     propertyMap = Map.of("some-key", "some-value");
-    propertyList = List.of(new PropertyTO("some-key", "some-value"));
-    when(propertyConverter.toPropertyMap(propertyList)).thenReturn(propertyMap);
 
     envelopeCreationTOMap = Map.of(
         "some-envelope-key", new EnvelopeCreationTO(List.of(new CoupleCreationTO(2, 2)))
@@ -88,7 +82,7 @@ class PathConverterTest {
                 .setControlPoints(List.of(new CoupleTO(1, 1)))
                 .setLayerId(4)
         )
-        .setProperties(propertyList);
+        .setProperties(propertyMap);
 
     List<PathCreationTO> result = pathConverter.toPathCreationTOs(List.of(path1));
 

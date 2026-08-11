@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter;
 
-import static java.util.Objects.requireNonNull;
-
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentcs.access.to.model.BoundingBoxCreationTO;
 import org.opentcs.access.to.model.CoupleCreationTO;
@@ -19,18 +19,15 @@ import org.opentcs.util.Colors;
  */
 public class VehicleConverter {
 
-  private final PropertyConverter pConverter;
-
   @Inject
-  public VehicleConverter(PropertyConverter pConverter) {
-    this.pConverter = requireNonNull(pConverter, "pConverter");
+  public VehicleConverter() {
   }
 
   public List<VehicleCreationTO> toVehicleCreationTOs(List<VehicleTO> vehicles) {
     return vehicles.stream()
         .map(
             vehicle -> new VehicleCreationTO(vehicle.getName())
-                .withProperties(pConverter.toPropertyMap(vehicle.getProperties()))
+                .withProperties(Optional.ofNullable(vehicle.getProperties()).orElse(Map.of()))
                 .withBoundingBox(
                     new BoundingBoxCreationTO(
                         vehicle.getBoundingBox().getLength(),

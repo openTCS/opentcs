@@ -36,7 +36,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.PathConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.PeripheralOperationConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.PointConverter;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.PropertyConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.VehicleConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.converter.VisualLayoutConverter;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.BlockTO;
@@ -46,7 +45,6 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.PathT
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.PointTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.VehicleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.VisualLayoutTO;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PropertyTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.TripleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.GetPlantModelResponseTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.converter.PlantModelConverter;
@@ -68,7 +66,6 @@ class PlantModelHandlerTest {
     orderService = mock();
     executorWrapper = new KernelExecutorWrapper(Executors.newSingleThreadExecutor());
     EnvelopeConverter envelopeConverter = new EnvelopeConverter();
-    PropertyConverter propertyConverter = new PropertyConverter();
     routerService = mock();
 
     handler = new PlantModelHandler(
@@ -83,18 +80,16 @@ class PlantModelHandlerTest {
             new org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.converter.VehicleConverter(),
             new org.opentcs.kernel.extensions.servicewebapi.v8.binding.response.converter.VisualLayoutConverter()
         ),
-        new PointConverter(propertyConverter, envelopeConverter),
+        new PointConverter(envelopeConverter),
         new PathConverter(
-            propertyConverter,
             new PeripheralOperationConverter(),
             envelopeConverter
         ),
-        new LocationTypeConverter(propertyConverter),
-        new LocationConverter(propertyConverter),
-        new BlockConverter(propertyConverter),
-        new VehicleConverter(propertyConverter),
-        new VisualLayoutConverter(propertyConverter),
-        propertyConverter,
+        new LocationTypeConverter(),
+        new LocationConverter(),
+        new BlockConverter(),
+        new VehicleConverter(),
+        new VisualLayoutConverter(),
         routerService
     );
   }
@@ -147,11 +142,7 @@ class PlantModelHandlerTest {
                 )
             )
             .setVisualLayout(new VisualLayoutTO("some-layout"))
-            .setProperties(
-                List.of(
-                    new PropertyTO("some-key", "some-value")
-                )
-            )
+            .setProperties(Map.of("some-key", "some-value"))
     );
 
     // Assert

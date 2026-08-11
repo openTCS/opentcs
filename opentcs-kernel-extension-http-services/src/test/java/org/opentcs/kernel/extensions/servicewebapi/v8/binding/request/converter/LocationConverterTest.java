@@ -8,8 +8,6 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.LocationRepresentationTO.LOAD_TRANSFER_GENERIC;
 
 import java.util.List;
@@ -25,7 +23,6 @@ import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.LocationTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.LinkTO;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PropertyTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.TripleTO;
 
 /**
@@ -34,19 +31,14 @@ import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.share
 class LocationConverterTest {
 
   private LocationConverter locationConverter;
-  private PropertyConverter propertyConverter;
 
   private Map<String, String> propertyMap;
-  private List<PropertyTO> propertyList;
 
   @BeforeEach
   void setUp() {
-    propertyConverter = mock();
-    locationConverter = new LocationConverter(propertyConverter);
+    locationConverter = new LocationConverter();
 
     propertyMap = Map.of("some-key", "some-value");
-    propertyList = List.of(new PropertyTO("some-key", "some-value"));
-    when(propertyConverter.toPropertyMap(propertyList)).thenReturn(propertyMap);
   }
 
   @Test
@@ -69,7 +61,7 @@ class LocationConverterTest {
                 .setLayerId(4)
                 .setLocationRepresentation(LOAD_TRANSFER_GENERIC)
         )
-        .setProperties(propertyList);
+        .setProperties(propertyMap);
 
     List<LocationCreationTO> result = locationConverter.toLocationCreationTOs(List.of(locationTo));
 

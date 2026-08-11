@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.annotation.Nonnull;
 import java.util.List;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,6 @@ import lombok.experimental.Accessors;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.BoundingBoxTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.CoupleTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.EnvelopeTO;
-import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.PropertyTO;
 import org.opentcs.kernel.extensions.servicewebapi.v8.binding.request.data.shared.TripleTO;
 
 // CHECKSTYLE:OFF
@@ -39,7 +39,8 @@ public class PointTO {
   private List<EnvelopeTO> vehicleEnvelopes = List.of();
   private BoundingBoxTO maxVehicleBoundingBox
       = new BoundingBoxTO(1000, 1000, 1000, new CoupleTO(0, 0));
-  private List<PropertyTO> properties = List.of();
+  @JsonPropertyOrder(alphabetic = true)
+  private Map<String, String> properties = Map.of();
 
   public enum Type {
 
