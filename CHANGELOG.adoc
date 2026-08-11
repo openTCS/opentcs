@@ -18,7 +18,7 @@ toc::[]
 
 = Changelog
 
-== Unreleased
+== Version 0.34 (2026-08-11)
 
 * New features and enhancements:
 ** Do not resend a `cancelOrder` instant action once the vehicle reflects it in its `actionStates` (with any `actionStatus`).
