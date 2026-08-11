@@ -139,42 +139,81 @@ public class MessageResponseMatcher {
       return;
     }
 
+    boolean rejected = updateRejectionState(state);
+    boolean accepted = !rejected && requestAccepted(currentRequest, state);
+    boolean complete = accepted && requestComplete(currentRequest, state);
+
+    if (rejected) {
+      // Don't do anything - the vehicle cannot continue processing the drive order. We will wait
+      // for this to be resolved via order withdrawal and a new initial order message.
+      LOG.debug(
+          "{}: Vehicle rejected request. Waiting for resolution: {}",
+          commAdapterName,
+          currentRequest
+      );
+    }
+    else if (complete) {
+      requests.poll();
+      if (currentRequest instanceof OrderAssociation orderAssociation) {
+        LOG.debug("{}: Vehicle acknowledged order: {}", commAdapterName, orderAssociation);
+        orderAcceptedCallback.accept(orderAssociation);
+      }
+      else if (currentRequest instanceof InstantActions actions) {
+        LOG.debug("{}: Vehicle acknowledged instant actions: {}", commAdapterName, actions);
+      }
+      // Send the next order, if any.
+      sendNextOrder();
+    }
+    else if (accepted) {
+      // The vehicle reflects the request in its state but has not completed it yet (e.g. a
+      // cancelOrder that is still being processed). We do not resend the request, but keep it at
+      // the head of the queue so that subsequent requests remain blocked until it completes.
+      LOG.debug(
+          "{}: Request accepted but not yet completed. Waiting without resending: {}",
+          commAdapterName,
+          currentRequest
+      );
+    }
+    else {
+      // The vehicle neither rejected nor accepted the current request - resend it.
+      sendNextOrder();
+    }
+  }
+
+  private boolean updateRejectionState(State state) {
     if (StateMappings.vehicleRejectsOrder(state)) {
       consecutiveRejectionsCount++;
     }
     else {
       consecutiveRejectionsCount = 0;
     }
-    if (consecutiveRejectionsCount > maxIgnoredRejectionsCount) {
-      // Don't do anything - the vehicle cannot continue processing the drive order. We will wait
-      // for this to be resolved via order withdrawal and a new initial order message.
-      return;
-    }
 
-    if (requestAcknowledged(currentRequest, state)) {
-      requests.poll();
-      if (currentRequest instanceof OrderAssociation) {
-        OrderAssociation order = (OrderAssociation) currentRequest;
-        LOG.debug("{}: Vehicle acknowledged order: {}", commAdapterName, order);
-        orderAcceptedCallback.accept(order);
-      }
-      else if (currentRequest instanceof InstantActions) {
-        InstantActions actions = (InstantActions) currentRequest;
-        LOG.debug("{}: Vehicle acknowledged instant actions: {}", commAdapterName, actions);
-      }
-      sendNextOrder();
+    return consecutiveRejectionsCount > maxIgnoredRejectionsCount;
+  }
+
+  private boolean requestAccepted(Object request, State state) {
+    if (request instanceof OrderAssociation orderAssociation) {
+      return orderAccepted(orderAssociation.getOrder(), state);
+    }
+    else if (request instanceof InstantActions actions) {
+      return instantActionsAccepted(actions, state);
     }
     else {
-      sendNextOrder();
+      LOG.warn(
+          "{}: Unrecognized request of type {}.",
+          commAdapterName,
+          request.getClass().getName()
+      );
+      return false;
     }
   }
 
-  private boolean requestAcknowledged(Object request, State state) {
-    if (request instanceof OrderAssociation) {
-      return orderAccepted(((OrderAssociation) request).getOrder(), state);
+  private boolean requestComplete(Object request, State state) {
+    if (request instanceof OrderAssociation orderAssociation) {
+      return orderAccepted(orderAssociation.getOrder(), state);
     }
-    else if (request instanceof InstantActions) {
-      return instantActionsAcknowledged((InstantActions) request, state);
+    else if (request instanceof InstantActions actions) {
+      return instantActionsCompleted(actions, state);
     }
     else {
       LOG.warn(
@@ -222,7 +261,7 @@ public class MessageResponseMatcher {
         && Objects.equals(state.getOrderUpdateId(), order.getOrderUpdateId());
   }
 
-  private boolean instantActionsAcknowledged(InstantActions instantAction, State state) {
+  private boolean instantActionsCompleted(InstantActions instantAction, State state) {
     return instantAction.getActions().stream()
         .allMatch(action -> {
           // In case of a cancelOrder action, we actually wait for the vehicle to accept AND
@@ -236,6 +275,19 @@ public class MessageResponseMatcher {
             return actionAccepted(action, state);
           }
         });
+  }
+
+  /**
+   * Checks whether the vehicle reflects all actions of the given instant actions message in its
+   * state, regardless of their (possibly non-terminal) action status.
+   *
+   * @param instantAction The instant actions message.
+   * @param state The vehicle's state.
+   * @return {@code true} if every action is present in the vehicle's {@code actionStates}.
+   */
+  private boolean instantActionsAccepted(InstantActions instantAction, State state) {
+    return instantAction.getActions().stream()
+        .allMatch(action -> actionAccepted(action, state));
   }
 
   private boolean actionAccepted(Action action, State state) {

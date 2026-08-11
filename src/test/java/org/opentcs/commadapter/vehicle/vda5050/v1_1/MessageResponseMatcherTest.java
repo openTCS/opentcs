@@ -291,22 +291,67 @@ public class MessageResponseMatcherTest {
 
     messageResponseMatcher.onStateMessage(stateAcceptingInstantAction(action1));
 
-    // The cancelOrder is repeated if the vehicle has accepted but not completed it yet.
-    verify(sendInstantActionsCallback, times(3)).accept(action1);
+    // The cancelOrder is not repeated once the vehicle reflects it in its state, even though it
+    // has not completed it yet. The next request stays blocked until the cancelOrder completes.
+    verify(sendInstantActionsCallback, times(2)).accept(action1);
     verify(sendInstantActionsCallback, never()).accept(action2);
     verify(sendInstantActionsCallback, never()).accept(action3);
 
     messageResponseMatcher.onStateMessage(stateCompletingInstantAction(action1));
 
-    verify(sendInstantActionsCallback, times(3)).accept(action1);
+    verify(sendInstantActionsCallback, times(2)).accept(action1);
     verify(sendInstantActionsCallback, times(1)).accept(action2);
     verify(sendInstantActionsCallback, never()).accept(action3);
 
     messageResponseMatcher.onStateMessage(stateCompletingInstantAction(action2));
 
-    verify(sendInstantActionsCallback, times(3)).accept(action1);
+    verify(sendInstantActionsCallback, times(2)).accept(action1);
     verify(sendInstantActionsCallback, times(1)).accept(action2);
     verify(sendInstantActionsCallback, times(1)).accept(action3);
+  }
+
+  @Test
+  public void stopResendingCancelOrderWhenVehicleReportsItRunning() {
+    InstantActions cancelAction = new InstantActions();
+    cancelAction.setHeaderId(1L);
+    cancelAction.setInstantActions(
+        List.of(new Action(CancelOrder.ACTION_TYPE, "cancel1", BlockingType.HARD))
+    );
+    InstantActions nextAction = new InstantActions();
+    nextAction.setHeaderId(2L);
+    nextAction.setInstantActions(
+        List.of(new Action(CancelOrder.ACTION_TYPE, "cancel2", BlockingType.HARD))
+    );
+
+    messageResponseMatcher.enqueueAction(cancelAction);
+    messageResponseMatcher.enqueueAction(nextAction);
+
+    verify(sendInstantActionsCallback, times(1)).accept(cancelAction);
+    verify(sendInstantActionsCallback, never()).accept(nextAction);
+
+    // While the vehicle has not yet reflected the cancelOrder, it is resent.
+    messageResponseMatcher.onStateMessage(newState());
+    verify(sendInstantActionsCallback, times(2)).accept(cancelAction);
+
+    // Once the vehicle reports the cancelOrder as RUNNING, it must not be resent anymore, and the
+    // next request stays blocked.
+    messageResponseMatcher.onStateMessage(
+        stateWithActionStatus(cancelAction, ActionStatus.RUNNING)
+    );
+    verify(sendInstantActionsCallback, times(2)).accept(cancelAction);
+    verify(sendInstantActionsCallback, never()).accept(nextAction);
+
+    // Further RUNNING reports still do not trigger a resend.
+    messageResponseMatcher.onStateMessage(
+        stateWithActionStatus(cancelAction, ActionStatus.RUNNING)
+    );
+    verify(sendInstantActionsCallback, times(2)).accept(cancelAction);
+    verify(sendInstantActionsCallback, never()).accept(nextAction);
+
+    // Only when the cancelOrder completes does the matcher advance to the next request.
+    messageResponseMatcher.onStateMessage(stateCompletingInstantAction(cancelAction));
+    verify(sendInstantActionsCallback, times(2)).accept(cancelAction);
+    verify(sendInstantActionsCallback, times(1)).accept(nextAction);
   }
 
   @ParameterizedTest
@@ -358,24 +403,22 @@ public class MessageResponseMatcherTest {
   }
 
   private State stateAcceptingInstantAction(InstantActions actions) {
-    State state = newState();
-    state.getActionStates().addAll(
-        actions.getInstantActions().stream()
-            .map(
-                action -> new ActionState(action.getActionId(), ActionStatus.WAITING)
-                    .setActionType(action.getActionType())
-            )
-            .toList()
-    );
-    return state;
+    return stateWithActionStatus(actions, ActionStatus.WAITING);
   }
 
   private State stateCompletingInstantAction(InstantActions actions) {
+    return stateWithActionStatus(actions, ActionStatus.FINISHED);
+  }
+
+  private State stateWithActionStatus(
+      InstantActions actions,
+      ActionStatus status
+  ) {
     State state = newState();
     state.getActionStates().addAll(
         actions.getInstantActions().stream()
             .map(
-                action -> new ActionState(action.getActionId(), ActionStatus.FINISHED)
+                action -> new ActionState(action.getActionId(), status)
                     .setActionType(action.getActionType())
             )
             .toList()

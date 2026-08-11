@@ -368,6 +368,10 @@ An instant action of type `cancelOrder` is automatically sent in the following c
 
 The instant action's blocking type is set to `NONE`.
 
+The vehicle driver transmits the `cancelOrder` instant action until the vehicle reflects it in its `actionStates` array.
+Once the vehicle reflects the action (with any `actionStatus`, including a non-terminal one such as `RUNNING`), the driver stops resending it.
+The driver still waits for the action's `actionStatus` to become `FINISHED` or `FAILED` before sending any further messages to the vehicle, so that a new order is never sent while the vehicle is still processing the cancellation.
+
 === `startPause`/`stopPause`
 
 An instant action of type `startPause`/`stopPause` is sent when the vehicle is paused/unpaused in openTCS.
