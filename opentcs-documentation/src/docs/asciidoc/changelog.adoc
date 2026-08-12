@@ -20,7 +20,9 @@ This change log lists the most relevant changes for past releases in reverse chr
 
 == Unreleased
 
-...
+* New features and enhancements:
+** Let scheduler modules know when resources are being allocated forcefully (for a vehicle that has unexpectedly appeared at a position).
+   Although scheduler modules cannot prevent this, the information at least gives them a chance to consider these resource allocations.
 
 == Version 7.4.0 (2026-08-12)
 

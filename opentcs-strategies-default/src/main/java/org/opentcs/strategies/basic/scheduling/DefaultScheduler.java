@@ -209,10 +209,26 @@ public class DefaultScheduler
 
     synchronized (globalSyncObject) {
       if (mayAllocateNow(client, resources)) {
-        LOG.debug("{}: Allocating immediately: {}", client.getId(), resources);
+        if (allocationAdvisor.mayAllocate(client, resources)) {
+          LOG.debug("{}: Allocating immediately: {}", client.getId(), resources);
+        }
+        else {
+          LOG.warn(
+              "{}: Allocating immediately although resulting system state is unsafe: {}",
+              client.getId(),
+              resources
+          );
+        }
+
         for (TCSResource<?> curResource : resources) {
           reservationPool.getReservationEntry(curResource).allocate(client);
         }
+
+        allocationAdvisor.setAllocationState(
+            client,
+            reservationPool.allocatedResources(client),
+            reservationPool.getClaim(client)
+        );
       }
       else {
         throw new ResourceAllocationException(
