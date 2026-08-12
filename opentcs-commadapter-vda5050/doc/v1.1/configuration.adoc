@@ -1,0 +1,131 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: CC-BY-4.0
+
+:doctype: book
+:toc: macro
+:toclevels: 6
+:sectnums: all
+:sectnumlevels: 6
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+toc::[]
+
+= VDA5050 1.1 driver configuration
+
+The driver reads configuration data from properties of the vehicle element in the plant model.
+It reads the properties with the following keys:
+
+`vda5050:version` (required)::
+Must be set to `1.1`.
+`vda5050:topicPrefix` (required, if `vda5050:interfaceName` is not set)::
+The property value contains a string to be used as the prefix for all MQTT topics, e.g. `myprefix`.
+If this is not set, the topic prefix is derived from the `vda5050:interfaceName`, `vda5050:manufacturer`, and `vda5050:serialNumber` properties as follows: `<interfaceName>/v1/<manufacturer>/<serialNumber>`.
+`vda5050:interfaceName` (required, if `vda5050:topicPrefix` is not set)::
+The property value contains the interface name to be used as part of the MQTT topic, e.g. `uagv`.
+`vda5050:manufacturer` (required)::
+The property value contains the manufacturer string to be included in message headers, e.g. `Some_Company`.
+`vda5050:serialNumber` (required)::
+The property value contains the vehicle's serial number to be included in message headers, e.g. `AGV-XY-1234`.
+`vda5050:topicConnectionName` (optional)::
+The property value contains the name of the topic to subscribe to for receiving connection messages from the vehicle.
+The value is appended to the vehicle's topic prefix.
+(Default value: `connection`.)
+`vda5050:topicConnectionQos` (optional)::
+The property value contains the QoS level to be used for subscribing to the connection topic.
+Possible values are `at_most_once`, `at_least_once` and `exactly_once`; the values `0`, `1`, and `2` are also accepted.
+(Default value: `at_most_once`.)
+`vda5050:topicStateName` (optional)::
+The property value contains the name of the topic to subscribe to for receiving state messages from the vehicle.
+The value is appended to the vehicle's topic prefix.
+(Default value: `state`.)
+`vda5050:topicStateQos` (optional)::
+The property value contains the QoS level to be used for subscribing to the state topic.
+Possible values are `at_most_once`, `at_least_once` and `exactly_once`; the values `0`, `1`, and `2` are also accepted.
+(Default value: `at_most_once`.)
+`vda5050:topicVisualizationName` (optional)::
+The property value contains the name of the topic to subscribe to for receiving visualization messages from the vehicle.
+The value is appended to the vehicle's topic prefix.
+(Default value: `visualization`.)
+`vda5050:topicVisualizationQos` (optional)::
+The property value contains the QoS level to be used for subscribing to the visualization topic.
+Possible values are `at_most_once`, `at_least_once` and `exactly_once`; the values `0`, `1`, and `2` are also accepted.
+(Default value: `at_most_once`.)
+`vda5050:topicOrderName` (optional)::
+The property value contains the name of the topic to publish order messages to.
+The value is appended to the vehicle's topic prefix.
+(Default value: `order`.)
+`vda5050:topicOrderQos` (optional)::
+The property value contains the QoS level to be used for publishing order messages.
+Possible values are `at_most_once`, `at_least_once` and `exactly_once`; the values `0`, `1`, and `2` are also accepted.
+(Default value: `at_most_once`.)
+`vda5050:topicInstantActionsName` (optional)::
+The property value contains the name of the topic to publish instant action messages to.
+The value is appended to the vehicle's topic prefix.
+(Default value: `instantActions`.)
+`vda5050:topicInstantActionsQos` (optional)::
+The property value contains the QoS level to be used for publishing instant action messages.
+Possible values are `at_most_once`, `at_least_once` and `exactly_once`; the values `0`, `1`, and `2` are also accepted.
+(Default value: `at_most_once`.)
+`vda5050:validateIncomingMessages` (optional)::
+The property value contains a boolean value that indicates whether incoming messages should be validated against the VDA5050 JSON schemas.
+Setting this to `false` helps with integrating vehicles that include additional fields in their messages, but also means that the driver may not be able to detect malformed messages.
+(Default value: `true`.)
+`vda5050:rechargeOperation` (optional)::
+The property value contains a string that should be used as the vehicle's recharge operation in the plant model, e.g. `Recharge`.
+(Default value: `Charge`.)
+`vda5050:maxStepsBase` (optional)::
+The property value contains the decimal representation of the vehicle's base capacity, i.e. the maximum number of unfinished route steps in the VDA5050 order base that the vehicle can take, e.g. `10`.
+(Default value: `2`.)
+`vda5050:maxDistanceBase` (optional)::
+The property value contains the maximum distance in mm that may be covered by currently queued movement commands.
+Once the sum of all currently queued movement commands for a vehicle reaches the defined value, no additional commands are accepted.
+(Default value: `Long.MAX_VALUE` (approximately one light year))
+`vda5050:maxStepsHorizon` (optional)::
+The property value contains the decimal representation of the vehicle's horizon capacity, i.e. the maximum number of route steps in the VDA5050 order horizon that the vehicle can take, e.g. `10`.
+(Default: unlimited, i.e. all horizon steps on the prospective route.)
+`vda5050:minVisualizationInterval` (optional)::
+The property value contains the decimal representation of the minimum time in milliseconds between visualization updates forwarded to the kernel, e.g. `1000`.
+(Default value: `500`.)
+`vda5050:vehicleLengthLoaded` (optional)::
+The property value contains the decimal representation of the vehicle length in mm to be set when the vehicle reports at least one load.
+(Default value: The vehicle length configured in the plant model.)
+`vda5050:vehicleLengthUnloaded` (optional)::
+The property value contains the decimal representation of the vehicle length in mm to be set when the vehicle reports no loads.
+(Default value: The vehicle length configured in the plant model.)
+`vda5050:movementCommandCompletedCondition` (optional)::
+The property value contains a string that describes the condition under which a movement command is considered completed.
+Valid values are `EDGE` and `EDGE_AND_NODE`.
+For details regarding the functionality behind this property, see the 'Movement command completion' section in xref:runtime-behaviour.adoc#movement-command-completion[].
+(Default value: `EDGE_AND_NODE`)
+`vda5050:deviationExtensionTrigger` (optional)::
+The property value contains a string that describes the condition under which the deviation range of the very first node in an order is extended to include the vehicle's position.
+Valid values are:
+* `always` - The deviation range is always extended.
+* `never` - The deviation range is never extended.
+* `auto` - The deviation range is extended once after a `cancelOrder` instant action has been sent to the vehicle.
+(See the section on the `cancelOrder` instant action in xref:runtime-behaviour.adoc#instantaction-cancelorder[].)
+* `manually` - The deviation range is extended once after a request for it has been issued manually.
+(See the section on supported communication adapter messages in xref:runtime-behaviour.adoc#supported-communication-adapter-messages[].)
+* `auto+manually` - This is a combination of the `auto` and `manually` options.
+`vda5050:extendedDeviationRangePadding` (optional)::
+The property value contains a padding distance in m, which is added when a node's deviation range is extended to include the vehicle position.
+If the value is negative, it is instead replaced with zero.
+(Default value: `0.01`.)
+`vda5050:optionalParams.order` (prefix, optional)::
+Property keys that start with this prefix should be extended by the path to the optional field in the order message separated by dots.
+The property value contains the support status for the optional field, which can be `REQUIRED`, `SUPPORTED`, or `NOT_SUPPORTED`.
+(Default value: `SUPPORTED`)
+`vda5050:maxIgnoredRejections` (optional)::
+The property value contains the maximum number of consecutive state messages indicating an order rejection before the driver considers the rejection to be permanent and stop retrying.
+(Default value: `0`.)
+`vda5050:lastNodeIdRequiredForMovementCompletion` (optional)::
+The property value contains a boolean value that indicates whether the driver should not only consider `edgeStates` and `nodeStates` for deciding whether a vehicle has completed a movement to a node on its route, but also require the vehicle's reported `lastNodeId` to reflect that node or one beyond it.
+(Default value: `false`.)
+
+NOTE: If any of the required properties are not set or contain unusable data, the driver may fail to be instantiated for / attached to the vehicle.

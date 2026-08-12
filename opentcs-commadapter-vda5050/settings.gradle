@@ -1,0 +1,4 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
+
+rootProject.name = 'openTCS-CommAdapter-VDA5050'

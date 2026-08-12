@@ -1,0 +1,104 @@
+{
+  "headerId" : 0,
+  "timestamp" : "1970-01-01T00:00:00Z",
+  "version" : "version",
+  "manufacturer" : "manufacture",
+  "serialNumber" : "serial-number",
+  "orderId" : "some-order-id",
+  "orderUpdateId" : 0,
+  "nodes" : [ {
+    "nodeId" : "source-node",
+    "sequenceId" : 0,
+    "released" : true,
+    "actions" : [ {
+      "actionType" : "some-action-type",
+      "actionId" : "some-action-id",
+      "blockingType" : "NONE",
+      "actionDescription" : "some-action-description",
+      "actionParameters" : [ {
+        "key" : "some-key",
+        "value" : "some-value"
+      }, {
+        "key" : "some-other-key",
+        "value" : "some-other-value"
+      } ]
+    } ],
+    "nodeDescription" : "some-node-description",
+    "nodePosition" : {
+      "x" : 1.2,
+      "y" : 3.4,
+      "mapId" : "some-map-id",
+      "theta" : 1.3,
+      "allowedDeviationXY" : 0.1,
+      "allowedDeviationTheta" : 0.1,
+      "mapDescription" : "some-map-description"
+    }
+  }, {
+    "nodeId" : "destination-node",
+    "sequenceId" : 0,
+    "released" : true,
+    "actions" : [ {
+      "actionType" : "some-action-type",
+      "actionId" : "some-action-id",
+      "blockingType" : "NONE",
+      "actionDescription" : "some-action-description",
+      "actionParameters" : [ {
+        "key" : "some-key",
+        "value" : "some-value"
+      }, {
+        "key" : "some-other-key",
+        "value" : "some-other-value"
+      } ]
+    } ],
+    "nodeDescription" : "some-node-description",
+    "nodePosition" : {
+      "x" : 5.6,
+      "y" : 7.8,
+      "mapId" : "some-map-id",
+      "theta" : 0.0,
+      "allowedDeviationXY" : 0.2,
+      "allowedDeviationTheta" : 0.3,
+      "mapDescription" : "some-map-description"
+    }
+  } ],
+  "edges" : [ {
+    "edgeId" : "some-edge-id",
+    "sequenceId" : 0,
+    "released" : true,
+    "startNodeId" : "source-node",
+    "endNodeId" : "destination-node",
+    "actions" : [ {
+      "actionType" : "some-action-type",
+      "actionId" : "some-action-id",
+      "blockingType" : "NONE",
+      "actionDescription" : "some-action-description",
+      "actionParameters" : [ {
+        "key" : "some-key",
+        "value" : "some-value"
+      }, {
+        "key" : "some-other-key",
+        "value" : "some-other-value"
+      } ]
+    } ],
+    "edgeDescription" : "some-edge-description",
+    "maxSpeed" : 123.0,
+    "maxHeight" : 3.0,
+    "minHeight" : 1.0,
+    "orientation" : 0.0,
+    "direction" : "some-direction",
+    "rotationAllowed" : true,
+    "maxRotationSpeed" : 44.0,
+    "length" : 123.0,
+    "trajectory" : {
+      "degree" : 1.0,
+      "knotVector" : [ 0.1, 0.2, 0.3 ],
+      "controlPoints" : [ {
+        "x" : 1.2,
+        "y" : 2.3,
+        "weight" : 1.0,
+        "orientation" : 3.14
+      } ]
+    }
+  } ],
+  "zoneSetId" : "some-zone-set-id"
+}

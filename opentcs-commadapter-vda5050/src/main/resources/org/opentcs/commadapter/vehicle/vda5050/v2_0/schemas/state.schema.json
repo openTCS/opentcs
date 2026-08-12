@@ -1,0 +1,641 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "state",
+    "documentVersion": "5.0.0",
+    "subtopic": "/state",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "headerId": {
+            "type": "integer"
+        },
+        "timestamp": {
+            "type": "string",
+            "examples": [
+                "1991-03-11T11:40:03.12Z"
+            ]
+        },
+        "version": {
+            "type": "string",
+            "examples": [
+                "1.3.2"
+            ]
+        },
+        "manufacturer": {
+            "type": "string"
+        },
+        "serialNumber": {
+            "type": "string"
+        },
+        "orderId": {
+            "type": "string"
+        },
+        "orderUpdateId": {
+            "type": "integer"
+        },
+        "zoneSetId": {
+            "type": [
+              "string",
+              "null"
+            ]
+        },
+        "lastNodeId": {
+            "type": "string"
+        },
+        "lastNodeSequenceId": {
+            "type": "integer"
+        },
+        "driving": {
+            "type": "boolean"
+        },
+        "paused": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+        },
+        "newBaseRequest": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+        },
+        "distanceSinceLastNode": {
+            "type": [
+              "number",
+              "null"
+            ]
+        },
+        "operatingMode": {
+            "type": "string",
+            "enum": [
+                "AUTOMATIC",
+                "SEMIAUTOMATIC",
+                "MANUAL",
+                "SERVICE",
+                "TEACHIN"
+            ]
+        },
+        "nodeStates": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "title": "nodeState",
+                "properties": {
+                    "nodeId": {
+                        "type": "string"
+                    },
+                    "sequenceId": {
+                        "type": "integer"
+                    },
+                    "nodeDescription": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                    },
+                    "nodePosition": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "title": "nodePosition",
+                        "properties": {
+                            "x": {
+                                "type": "number"
+                            },
+                            "y": {
+                                "type": "number"
+                            },
+                            "theta": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "minimum": -3.14159265359,
+                                "maximum": 3.14159265359
+                            },
+                            "allowedDeviationXY": {
+                                "title": "allowedDeviationXY",
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "minimum": 0
+                            },
+                            "allowedDeviationTheta": {
+                                "title": "allowedDeviationTheta",
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "minimum": 0,
+                                "maximum": 3.141592654
+                            },
+                            "mapId": {
+                                "type": "string"
+                            },
+                            "mapDescription": {
+                                "title": "mapDescription",
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "x",
+                            "y",
+                            "mapId"
+                        ]
+                    },
+                    "released": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "nodeId",
+                    "released",
+                    "sequenceId"
+                ]
+            }
+        },
+        "edgeStates": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "title": "edgeState",
+                "properties": {
+                    "edgeId": {
+                        "type": "string"
+                    },
+                    "sequenceId": {
+                        "type": "integer"
+                    },
+                    "edgeDescription": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                    },
+                    "released": {
+                        "type": "boolean"
+                    },
+                    "trajectory": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "properties": {
+                            "degree": {
+                                "type": "number"
+                            },
+                            "knotVector": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number",
+                                    "maximum": 1.0,
+                                    "minimum": 0.0
+                                }
+                            },
+                            "controlPoints": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "title": "controlPoint",
+                                    "properties": {
+                                        "x": {
+                                            "type": "number"
+                                        },
+                                        "y": {
+                                            "type": "number"
+                                        },
+                                        "weight": {
+                                            "type": [
+                                              "number",
+                                              "null"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "x",
+                                        "y"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "degree",
+                            "knotVector",
+                            "controlPoints"
+                        ]
+                    }
+                },
+                "required": [
+                    "edgeId",
+                    "sequenceId",
+                    "released"
+                ]
+            }
+        },
+        "agvPosition": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "title": "agvPosition",
+            "properties": {
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                },
+                "theta": {
+                    "type": "number"
+                },
+                "mapId": {
+                    "type": "string"
+                },
+                "mapDescription": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                },
+                "positionInitialized": {
+                    "type": "boolean"
+                },
+                "localizationScore": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0.0,
+                    "maximum": 1.0
+                },
+                "deviationRange": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                }
+            },
+            "required": [
+                "x",
+                "y",
+                "theta",
+                "mapId",
+                "positionInitialized"
+            ]
+        },
+        "velocity": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "title": "velocity",
+            "properties": {
+                "vx": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                },
+                "vy": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                },
+                "omega": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                }
+            }
+        },
+        "loads": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+                "type": "object",
+                "title": "load",
+                "properties": {
+                    "loadId": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                    },
+                    "loadType": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                    },
+                    "loadPosition": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                    },
+                    "boundingBoxReference": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "properties": {
+                            "x": {
+                                "type": "number"
+                            },
+                            "y": {
+                                "type": "number"
+                            },
+                            "z": {
+                                "type": "number"
+                            },
+                            "theta": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "x",
+                            "y",
+                            "z"
+                        ]
+                    },
+                    "loadDimensions": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "title": "loadDimensions",
+                        "properties": {
+                            "length": {
+                                "type": "number"
+                            },
+                            "width": {
+                                "type": "number"
+                            },
+                            "height": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "length",
+                            "width"
+                        ]
+                    },
+                    "weight": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                    }
+                }
+            }
+        },
+        "actionStates": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "title": "actionState",
+                "properties": {
+                    "actionId": {
+                        "type": "string",
+                        "examples": [
+                            "blink_123jdaimoim234"
+                        ]
+                    },
+                    "actionType": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                    },
+                    "actionDescription": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                    },
+                    "actionStatus": {
+                        "type": "string",
+                        "enum": [
+                            "WAITING",
+                            "INITIALIZING",
+                            "RUNNING",
+                            "PAUSED",
+                            "FINISHED",
+                            "FAILED"
+                        ]
+                    },
+                    "resultDescription": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                    }
+                },
+                "required": [
+                    "actionId",
+                    "actionStatus"
+                ]
+            }
+        },
+        "batteryState": {
+            "type": "object",
+            "title": "batteryState",
+            "properties": {
+                "batteryCharge": {
+                    "type": "number"
+                },
+                "batteryVoltage": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                },
+                "batteryHealth": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                },
+                "charging": {
+                    "type": "boolean"
+                },
+                "reach": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                }
+            },
+            "required": [
+                "batteryCharge",
+                "charging"
+            ]
+        },
+        "errors": {
+            "type": "array",
+            "title": "Errors",
+            "items": {
+                "type": "object",
+                "title": "Error",
+                "properties": {
+                    "errorType": {
+                        "type": "string"
+                    },
+                    "errorReferences": {
+                        "type": [
+                          "array",
+                          "null"
+                        ],
+                        "title": "errorReferences",
+                        "items": {
+                            "type": "object",
+                            "title": "errorReference",
+                            "properties": {
+                                "referenceKey": {
+                                    "type": "string"
+                                },
+                                "referenceValue": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "referenceKey",
+                                "referenceValue"
+                            ]
+                        }
+                    },
+                    "errorDescription": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                    },
+                    "errorLevel": {
+                        "type": "string",
+                        "enum": [
+                            "WARNING",
+                            "FATAL"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "errorType",
+                "errorLevel"
+            ]
+        },
+        "information": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "title": "Information",
+            "items": {
+                "type": "object",
+                "title": "info",
+                "properties": {
+                    "infoType": {
+                        "type": "string"
+                    },
+                    "infoReferences": {
+                        "type": [
+                          "array",
+                          "null"
+                        ],
+                        "title": "infoReferences",
+                        "items": {
+                            "type": "object",
+                            "title": "infoReference",
+                            "properties": {
+                                "referenceKey": {
+                                    "type": "string"
+                                },
+                                "referenceValue": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "referenceKey",
+                                "referenceValue"
+                            ]
+                        }
+                    },
+                    "infoDescription": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                    },
+                    "infoLevel": {
+                        "type": "string",
+                        "enum": [
+                            "INFO",
+                            "DEBUG"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "infoType",
+                "infoLevel"
+            ]
+        },
+        "safetyState": {
+            "type": "object",
+            "title": "safetyStatus",
+            "properties": {
+                "eStop": {
+                    "type": "string",
+                    "enum": [
+                        "AUTOACK",
+                        "MANUAL",
+                        "REMOTE",
+                        "NONE"
+                    ]
+                },
+                "fieldViolation": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "eStop",
+                "fieldViolation"
+            ]
+        }
+    },
+    "required": [
+        "headerId",
+        "timestamp",
+        "version",
+        "manufacturer",
+        "serialNumber",
+        "orderId",
+        "orderUpdateId",
+        "lastNodeId",
+        "lastNodeSequenceId",
+        "nodeStates",
+        "edgeStates",
+        "driving",
+        "actionStates",
+        "batteryState",
+        "operatingMode",
+        "errors",
+        "safetyState"
+    ]
+}

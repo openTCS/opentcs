@@ -1,0 +1,90 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: CC-BY-4.0
+
+:doctype: book
+:toc: macro
+:toclevels: 6
+:sectnums: all
+:sectnumlevels: 6
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+toc::[]
+
+= Driver usage and configuration
+
+To make use of the driver, some configuration data needs to be made available to it as part of the kernel's configuration files or as plant model elements or transport orders.
+
+== Configuration file entries
+
+All of the following entries need to be set to valid values in the kernel application's configuration files for the vehicle driver to function correctly:
+
+`commadapter.vehicle.vda5050.enabledVersions`::
+Set to a list of VDA5050 specification versions for which to enable the vehicle driver; set to an empty string to disable it.
+When disabled, the kernel will not use the driver at all, even if vehicles are configured for it.
+Valid versions to be used here are: `1.1`, `2.0`.
+`commadapter.vehicle.vda5050.onOpModeChangeDoUpdateIntegrationLevel`::
+Set to a map of VDA5050 operating mode names to openTCS integration level names.
+Whenever the vehicle's reported operating mode changes to a value given in the map, the vehicle's integration level in openTCS will be changed to the one given for that operating mode.
+Valid values for operating mode names are `TEACHIN`, `SERVICE`, `MANUAL`, `SEMIAUTOMATIC` and `AUTOMATIC`.
+Valid values for integration level names are `TO_BE_UTILIZED`, `TO_BE_RESPECTED`, `TO_BE_NOTICED`, `TO_BE_IGNORED`; the value `LEAVE_UNCHANGED`, which is the default for every operating mode, can be used to explicitly state that the integration level should not be changed. +
++
+Note that for setting a vehicle's integration level to `TO_BE_NOTICED` or `TO_BE_IGNORED`, openTCS requires the vehicle to not be processing any transport order, so it usually makes sense to also configure the driver to explicitly withdraw any transport order in these cases.
+(See below.)
+`commadapter.vehicle.vda5050.onOpModeChangeDoWithdrawOrder`::
+Set to a map of VDA5050 operating mode names to boolean values.
+Whenever the vehicle's reported operating mode changes to a value given in the map, the vehicle's transport order may be withdrawn; if it is withdrawn, this happens forcibly.
+Valid values for operating mode names are `TEACHIN`, `SERVICE`, `MANUAL`, `SEMIAUTOMATIC` and `AUTOMATIC`.
+Valid assignment values are `true` (do withdraw the transport order forcibly) and `false` (do not withdraw the transport order), with `false` being the default for every operating mode.
+Note that it is recommended to always set `MANUAL=true`.
+While setting it to `false` is generally possible, a vehicle that adheres to the VDA5050 specification will clear its order buffer and thus stop processing the current order when switching to/from manual mode; withdrawing the order ensures that the vehicle's state in openTCS reflects this, too.
+`commadapter.vehicle.vda5050.onOpModeChangeDoResetPosition`::
+Set to a map of VDA5050 operating mode names to boolean values.
+Whenever the vehicle's reported operating mode changes to a value given in the map, the vehicle's last known position may be reset.
+Valid values for operating mode names are `TEACHIN`, `SERVICE`, `MANUAL`, `SEMIAUTOMATIC` and `AUTOMATIC`.
+Valid assignment values are 'true' (do reset the last known position) and 'false' (do not reset the last known position), with 'false' being the default for every operating mode.
+`commadapter.vehicle.vda5050.mqtt.brokerHost`::
+The IP address or host name of the MQTT broker to be used.
+`commadapter.vehicle.vda5050.mqtt.brokerPort`::
+The port number of the MQTT broker to be used.
+`commadapter.vehicle.vda5050.mqtt.connectionEncrypted`::
+Whether to use SSL/TLS encryption for the connection to the MQTT broker.
+Valid values are `true` and `false`.
+Note that, for an encrypted connection, the server's certificate must be signed by a CA certificate trusted by the system the driver is running on.
+`commadapter.vehicle.vda5050.mqtt.username`::
+The user name to be used for authenticating with the MQTT broker.
+May be set to an arbitrary value in case no authentication is required with the broker.
+`commadapter.vehicle.vda5050.mqtt.password`::
+The password to be used for authenticating with the MQTT broker.
+May be set to an arbitrary value in case no authentication is required with the broker.
+`commadapter.vehicle.vda5050.mqtt.clientId`::
+The client ID to use for the connection to the MQTT broker.
+This should be unique among all clients connecting to the broker.
+`commadapter.vehicle.vda5050.mqtt.keepAliveInterval`::
+The keep-alive interval (in ms) for the connection to the MQTT broker.
+Can be set to zero to disable the keep-alive mechanism.
+Will be rounded down to seconds if non-zero.
+`commadapter.vehicle.vda5050.mqtt.reconnectInterval`::
+The interval (in ms) for trying to reconnect to the MQTT broker.
+
+The following example configuration can be used as a template to be pasted into the kernel configuration file and adjusted for the respective plant:
+
+----
+commadapter.vehicle.vda5050.enabledVersions = 1.1, 2.0
+commadapter.vehicle.vda5050.onOpModeChangeDoUpdateIntegrationLevel = AUTOMATIC=LEAVE_UNCHANGED, SEMIAUTOMATIC=LEAVE_UNCHANGED, SERVICE=LEAVE_UNCHANGED, MANUAL=LEAVE_UNCHANGED, TEACHIN=LEAVE_UNCHANGED
+commadapter.vehicle.vda5050.onOpModeChangeDoWithdrawOrder = AUTOMATIC=false, SEMIAUTOMATIC=false, SERVICE=false, MANUAL=true, TEACHIN=false
+commadapter.vehicle.vda5050.onOpModeChangeDoResetPosition = AUTOMATIC=false, SEMIAUTOMATIC=false, SERVICE=false, MANUAL=false, TEACHIN=false
+commadapter.vehicle.vda5050.mqtt.brokerHost = broker.example.com
+commadapter.vehicle.vda5050.mqtt.brokerPort = 1883
+commadapter.vehicle.vda5050.mqtt.connectionEncrypted = false
+commadapter.vehicle.vda5050.mqtt.username = some-user
+commadapter.vehicle.vda5050.mqtt.password = secret
+commadapter.vehicle.vda5050.mqtt.clientId = opentcs-vda5050-driver
+commadapter.vehicle.vda5050.mqtt.keepAliveInterval = 10000
+commadapter.vehicle.vda5050.mqtt.reconnectInterval = 10000
+----

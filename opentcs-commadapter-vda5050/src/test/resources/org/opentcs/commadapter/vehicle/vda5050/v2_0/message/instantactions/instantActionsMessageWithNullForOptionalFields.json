@@ -1,0 +1,23 @@
+{
+  "headerId" : 0,
+  "timestamp" : "1970-01-01T00:00:00Z",
+  "version" : "version",
+  "manufacturer" : "manufacturer",
+  "serialNumber" : "serial-number",
+  "actions" : [ {
+    "actionType" : "some-action-type",
+    "actionId" : "action1",
+    "blockingType" : "NONE",
+    "actionDescription" : null,
+    "actionParameters" : [ {
+      "key" : "some-key",
+      "value" : "some-value"
+    }]
+  }, {
+    "actionType" : "some-other-action-type",
+    "actionId" : "action2",
+    "blockingType" : "SOFT",
+    "actionDescription" : null,
+    "actionParameters" : null
+  } ]
+}

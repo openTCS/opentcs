@@ -1,0 +1,28 @@
+{
+  "orderId" : "some-order",
+  "orderUpdateId" : 1,
+  "nodes" : [ {
+    "nodeId" : "node1",
+    "released" : true,
+    "nodePosition" : {
+      "x" : 11,
+      "y" : 22,
+      "mapId" : "map"
+    }
+  }, {
+    "nodeId" : "node2",
+    "released" : true,
+    "nodePosition" : {
+      "x" : 33,
+      "y" : 44,
+      "mapId" : "map"
+    }
+  } ],
+  "edges" : [ {
+    "edgeId" : "edge1",
+    "sequenceId" : 12,
+    "released" : true,
+    "sourceNode" : "node1",
+    "destinationNode" : "node2"
+  } ]
+}

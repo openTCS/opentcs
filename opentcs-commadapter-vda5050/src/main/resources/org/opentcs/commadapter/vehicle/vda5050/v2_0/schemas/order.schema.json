@@ -1,0 +1,493 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Order Message",
+    "subtopic": "/order",
+    "documentVersion": "5.0.0",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "headerId": {
+            "type": "integer"
+        },
+        "timestamp": {
+            "type": "string",
+            "examples": [
+                "1991-03-11T11:40:03.12Z"
+            ]
+        },
+        "version": {
+            "type": "string",
+            "examples": [
+                "1.3.2"
+            ]
+        },
+        "manufacturer": {
+            "type": "string"
+        },
+        "serialNumber": {
+            "type": "string"
+        },
+        "orderId": {
+            "title": "orderId",
+            "type": "string"
+        },
+        "orderUpdateId": {
+            "title": "orderUpdateId",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967296
+        },
+        "zoneSetId": {
+            "title": "zoneSetId",
+            "type": [
+              "string",
+              "null"
+            ]
+        },
+        "nodes": {
+            "title": "List of Nodes",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "title": "node",
+                "required": [
+                    "nodeId",
+                    "sequenceId",
+                    "released",
+                    "actions"
+                ],
+                "properties": {
+                    "nodeId": {
+                        "title": "nodeId",
+                        "type": "string",
+                        "examples": [
+                            "pumpenhaus_1",
+                            "MONTAGE"
+                        ]
+                    },
+                    "sequenceId": {
+                        "title": "sequenceId",
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 4294967296
+                    },
+                    "nodeDescription": {
+                        "title": "nodeDescription",
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                    },
+                    "released": {
+                        "type": "boolean",
+                        "title": "released"
+                    },
+                    "nodePosition": {
+                        "title": "nodePosition",
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "required": [
+                            "x",
+                            "y",
+                            "mapId"
+                        ],
+                        "properties": {
+                            "x": {
+                                "title": "x",
+                                "type": "number"
+                            },
+                            "y": {
+                                "title": "y",
+                                "type": "number"
+                            },
+                            "theta": {
+                                "title": "Theta",
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "minimum": -3.14159265359,
+                                "maximum": 3.14159265359
+                            },
+                            "allowedDeviationXY": {
+                                "title": "allowedDeviationXY",
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "minimum": 0
+                            },
+                            "allowedDeviationTheta": {
+                                "title": "allowedDeviationTheta",
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "minimum": 0,
+                                "maximum": 3.141592654
+                            },
+                            "mapId": {
+                                "title": "mapId",
+                                "type": "string"
+                            },
+                            "mapDescription": {
+                                "title": "mapDescription",
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                            }
+                        }
+                    },
+                    "actions": {
+                        "title": "actions",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "$id": "#action",
+                            "title": "action",
+                            "required": [
+                                "actionType",
+                                "actionId",
+                                "blockingType"
+                            ],
+                            "properties": {
+                                "actionType": {
+                                    "type": "string",
+                                    "title": "actionType"
+                                },
+                                "actionId": {
+                                    "type": "string",
+                                    "title": "actionId"
+                                },
+                                "actionDescription": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ]
+                                },
+                                "blockingType": {
+                                    "type": "string",
+                                    "title": "blockingType",
+                                    "enum": [
+                                        "NONE",
+                                        "SOFT",
+                                        "HARD"
+                                    ]
+                                },
+                                "actionParameters": {
+                                    "type": [
+                                      "array",
+                                      "null"
+                                    ],
+                                    "items": {
+                                        "title": "actionParameter",
+                                        "type": "object",
+                                        "required": [
+                                            "key",
+                                            "value"
+                                        ],
+                                        "properties": {
+                                            "key": {
+                                                "type": "string",
+                                                "examples": [
+                                                    "duration",
+                                                    "direction",
+                                                    "signal"
+                                                ]
+                                            },
+                                            "value": {
+                                                "type": [
+                                                    "array",
+                                                    "boolean",
+                                                    "number",
+                                                    "string"
+                                                ],
+                                                "examples": [
+                                                    103.2,
+                                                    "left",
+                                                    true,
+                                                    [
+                                                        "arrays",
+                                                        "are",
+                                                        "also",
+                                                        "valid"
+                                                    ]
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "edges": {
+            "type": "array",
+            "title": "edges",
+            "items": {
+                "type": "object",
+                "title": "edge",
+                "required": [
+                    "edgeId",
+                    "sequenceId",
+                    "released",
+                    "startNodeId",
+                    "endNodeId",
+                    "actions"
+                ],
+                "properties": {
+                    "edgeId": {
+                        "type": "string",
+                        "title": "edgeId"
+                    },
+                    "sequenceId": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 4294967296,
+                        "title": "sequenceId"
+                    },
+                    "edgeDescription": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "title": "edgeDescription"
+                    },
+                    "released": {
+                        "type": "boolean",
+                        "title": "released"
+                    },
+                    "startNodeId": {
+                        "type": "string",
+                        "title": "startNodeId"
+                    },
+                    "endNodeId": {
+                        "type": "string",
+                        "title": "endNodeId"
+                    },
+                    "maxSpeed": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "title": "maxSpeed"
+                    },
+                    "maxHeight": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "title": "maxHeight"
+                    },
+                    "minHeight": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "title": "minHeight"
+                    },
+                    "orientation": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "title": "orientation",
+                        "minimum": -3.14159265359,
+                        "maximum": 3.14159265359
+                    },
+                    "orientationType": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "title": "orientationType",
+                        "enum": [
+                            "GLOBAL",
+                            "TANGENTIAL"
+                        ]
+                    },
+                    "direction": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "title": "direction",
+                        "examples": [
+                            "left",
+                            "right",
+                            "straight",
+                            "433MHz"
+                        ]
+                    },
+                    "rotationAllowed": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ],
+                        "title": "rotationAllowed"
+                    },
+                    "maxRotationSpeed": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "title": "maxRotationSpeed"
+                    },
+                    "length": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "title": "length"
+                    },
+                    "trajectory": {
+                        "type": [
+                          "object",
+                          "null"
+                        ],
+                        "properties": {
+                            "degree": {
+                                "type": "number"
+                            },
+                            "knotVector": {
+                                "type": "array",
+                                "items": {
+                                    "type": "number",
+                                    "maximum": 1,
+                                    "minimum": 0
+                                }
+                            },
+                            "controlPoints": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "title": "controlPoint",
+                                    "properties": {
+                                        "x": {
+                                            "type": "number"
+                                        },
+                                        "y": {
+                                            "type": "number"
+                                        },
+                                        "weight": {
+                                            "type": [
+                                              "number",
+                                              "null"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "x",
+                                        "y"
+                                    ]
+                                }
+                            }
+                        },
+                        "required": [
+                            "knotVector",
+                            "controlPoints"
+                        ]
+                    },
+                    "actions": {
+                        "title": "actions",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "$id": "#action",
+                            "title": "action",
+                            "required": [
+                                "actionType",
+                                "actionId",
+                                "blockingType"
+                            ],
+                            "properties": {
+                                "actionType": {
+                                    "type": "string",
+                                    "title": "actionType"
+                                },
+                                "actionId": {
+                                    "type": "string",
+                                    "title": "actionId"
+                                },
+                                "actionDescription": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ]
+                                },
+                                "blockingType": {
+                                    "type": "string",
+                                    "title": "blockingType",
+                                    "enum": [
+                                        "NONE",
+                                        "SOFT",
+                                        "HARD"
+                                    ]
+                                },
+                                "actionParameters": {
+                                    "type": [
+                                      "array",
+                                      "null"
+                                    ],
+                                    "items": {
+                                        "title": "actionParameter",
+                                        "type": "object",
+                                        "required": [
+                                            "key",
+                                            "value"
+                                        ],
+                                        "properties": {
+                                            "key": {
+                                                "type": "string",
+                                                "examples": [
+                                                    "duration",
+                                                    "direction",
+                                                    "signal"
+                                                ]
+                                            },
+                                            "value": {
+                                                "type": [
+                                                    "array",
+                                                    "boolean",
+                                                    "number",
+                                                    "string"
+                                                ],
+                                                "examples": [
+                                                    103.2,
+                                                    "left",
+                                                    true,
+                                                    [
+                                                        "arrays",
+                                                        "are",
+                                                        "also",
+                                                        "valid"
+                                                    ]
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "required": [
+        "headerId",
+        "timestamp",
+        "version",
+        "manufacturer",
+        "serialNumber",
+        "orderId",
+        "orderUpdateId",
+        "nodes",
+        "edges"
+    ]
+}

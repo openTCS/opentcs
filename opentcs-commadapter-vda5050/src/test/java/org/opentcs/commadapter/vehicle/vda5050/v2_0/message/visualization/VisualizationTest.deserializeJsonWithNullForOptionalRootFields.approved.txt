@@ -1,0 +1,7 @@
+{
+  "headerId" : 0,
+  "timestamp" : "1970-01-01T00:00:00Z",
+  "version" : "version",
+  "manufacturer" : "manufacturer",
+  "serialNumber" : "serial-number"
+}

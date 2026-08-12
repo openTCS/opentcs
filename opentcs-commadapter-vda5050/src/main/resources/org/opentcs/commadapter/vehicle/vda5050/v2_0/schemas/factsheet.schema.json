@@ -1,0 +1,630 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "AGV Factsheet",
+    "required": [
+        "headerId",
+        "timestamp",
+        "version",
+        "manufacturer",
+        "serialNumber",
+        "typeSpecification",
+        "physicalParameters",
+        "protocolLimits",
+        "protocolFeatures",
+        "agvGeometry",
+        "loadSpecification"
+    ],
+    "subtopic": "/factsheet",
+    "type": "object",
+    "additionalProperties": true,
+    "properties": {
+        "headerId": {
+            "type": "integer"
+        },
+        "timestamp": {
+            "type": "string",
+            "examples": [
+                "1991-03-11T11:40:03.12Z"
+            ]
+        },
+        "version": {
+            "type": "string",
+            "examples": [
+                "1.3.2"
+            ]
+        },
+        "manufacturer": {
+            "type": "string"
+        },
+        "serialNumber": {
+            "type": "string"
+        },
+        "typeSpecification": {
+            "type": "object",
+            "required": [
+                "seriesName",
+                "agvKinematic",
+                "agvClass",
+                "maxLoadMass",
+                "localizationTypes",
+                "navigationTypes"
+            ],
+            "properties": {
+                "seriesName": {
+                    "type": "string"
+                },
+                "seriesDescription": {
+                    "type": "string"
+                },
+                "agvKinematic": {
+                    "type": "string",
+                    "enum": [
+                        "DIFF",
+                        "OMNI",
+                        "THREEWHEEL"
+                    ]
+                },
+                "agvClass": {
+                    "type": "string",
+                    "enum": [
+                        "FORKLIFT",
+                        "CONVEYOR",
+                        "TUGGER",
+                        "CARRIER"
+                    ]
+                },
+                "maxLoadMass": {
+                    "type": "number",
+                    "unit": "kg",
+                    "minimum": 0
+                },
+                "localizationTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "NATURAL",
+                            "REFLECTOR",
+                            "RFID",
+                            "DMC",
+                            "SPOT",
+                            "GRID"
+                        ]
+                    }
+                },
+                "navigationTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "PHYSICAL_LINDE_GUIDED",
+                            "VIRTUAL_LINE_GUIDED",
+                            "AUTONOMOUS"
+                        ]
+                    }
+                }
+            }
+        },
+        "physicalParameters": {
+            "type": "object",
+            "required": [
+                "speedMin",
+                "speedMax",
+                "accelerationMax",
+                "decelerationMax",
+                "heightMin",
+                "heightMax",
+                "width",
+                "length"
+            ],
+            "properties": {
+                "speedMin": {
+                    "type": "number",
+                    "unit": "m/s"
+                },
+                "speedMax": {
+                    "type": "number",
+                    "unit": "m/s"
+                },
+                "accelerationMax": {
+                    "type": "number",
+                    "unit": "m/s^2"
+                },
+                "decelerationMax": {
+                    "type": "number",
+                    "unit": "m/s^2"
+                },
+                "heightMin": {
+                    "type": "number",
+                    "unit": "m"
+                },
+                "heightMax": {
+                    "type": "number",
+                    "unit": "m"
+                },
+                "width": {
+                    "type": "number",
+                    "unit": "m"
+                },
+                "length": {
+                    "type": "number",
+                    "unit": "m"
+                }
+            }
+        },
+        "protocolLimits": {
+            "type": "object",
+            "required": [
+                "maxStringLens",
+                "maxArrayLens",
+                "timing"
+            ],
+            "properties": {
+                "maxStringLens": {
+                    "type": "object",
+                    "properties": {
+                        "msgLen": {
+                            "type": "integer"
+                        },
+                        "topicSerialLen": {
+                            "type": "integer"
+                        },
+                        "topicElemLen": {
+                            "type": "integer"
+                        },
+                        "idLen": {
+                            "type": "integer"
+                        },
+                        "idNumericalOnly": {
+                            "type": "boolean"
+                        },
+                        "enumLen": {
+                            "type": "integer"
+                        },
+                        "loadIdLen": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "maxArrayLens": {
+                    "type": "object",
+                    "order.nodes": {
+                        "type": "integer"
+                    },
+                    "order.edges": {
+                        "type": "integer"
+                    },
+                    "node.actions": {
+                        "type": "integer"
+                    },
+                    "edge.actions": {
+                        "type": "integer"
+                    },
+                    "actions.actionsParameters": {
+                        "type": "integer"
+                    },
+                    "instantActions": {
+                        "type": "integer"
+                    },
+                    "trajectory.knotVector": {
+                        "type": "integer"
+                    },
+                    "trajectory.controlPoints": {
+                        "type": "integer"
+                    },
+                    "state.nodeStates": {
+                        "type": "integer"
+                    },
+                    "state.edgeStates": {
+                        "type": "integer"
+                    },
+                    "state.loads": {
+                        "type": "integer"
+                    },
+                    "state.actionStates": {
+                        "type": "integer"
+                    },
+                    "state.errors": {
+                        "type": "integer"
+                    },
+                    "state.information": {
+                        "type": "integer"
+                    },
+                    "error.errorReferences": {
+                        "type": "integer"
+                    },
+                    "information.infoReferences": {
+                        "type": "integer"
+                    }
+                },
+                "timing": {
+                    "type": "object",
+                    "required": [
+                        "minOrderInterval",
+                        "minStateInterval"
+                    ],
+                    "properties": {
+                        "minOrderInterval": {
+                            "type": "number",
+                            "unit": "s"
+                        },
+                        "minStateInterval": {
+                            "type": "number",
+                            "unit": "s"
+                        },
+                        "defaultStateInterval": {
+                            "type": "number",
+                            "unit": "s"
+                        },
+                        "visualizationInterval": {
+                            "type": "number",
+                            "unit": "s"
+                        }
+                    }
+                }
+            }
+        },
+        "protocolFeatures": {
+            "type": "object",
+            "required": [
+                "optionalParameters",
+                "agvActions"
+            ],
+            "properties": {
+                "optionalParameters": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "parameter",
+                            "support"
+                        ],
+                        "properties": {
+                            "parameter": {
+                                "type": "string"
+                            },
+                            "support": {
+                                "type": "string",
+                                "enum": [
+                                    "SUPPORTED",
+                                    "REQUIRED"
+                                ]
+                            },
+                            "description": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "agvActions": {
+                    "type": "array",
+                    "items": {
+                        "required": [
+                            "actionType",
+                            "actionScopes"
+                        ],
+                        "type": "object",
+                        "properties": {
+                            "actionType": {
+                                "type": "string"
+                            },
+                            "actionDescription": {
+                                "type": "string"
+                            },
+                            "actionScopes": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "INSTANT",
+                                        "NODE",
+                                        "EDGE"
+                                    ]
+                                }
+                            },
+                            "actionParameters": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "required": [
+                                        "key",
+                                        "valueDataType"
+                                    ],
+                                    "properties": {
+                                        "key": {
+                                            "type": "string"
+                                        },
+                                        "valueDataType": {
+                                            "type": "string",
+                                            "enum": [
+                                                "BOOL",
+                                                "NUMBER",
+                                                "INTEGER",
+                                                "FLOAT",
+                                                "STRING",
+                                                "OBJECT",
+                                                "ARRAY"
+                                            ]
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "isOptional": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            },
+                            "resultDescription": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "agvGeometry": {
+            "type": "object",
+            "properties": {
+                "wheelDefinitions": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "type",
+                            "isActiveDriven",
+                            "isActiveSteered",
+                            "position",
+                            "diameter",
+                            "width"
+                        ],
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "DRIVE",
+                                    "CASTER",
+                                    "FIXED",
+                                    "MECANUM"
+                                ]
+                            },
+                            "isActiveDriven": {
+                                "type": "boolean"
+                            },
+                            "isActiveSteered": {
+                                "type": "boolean"
+                            },
+                            "position": {
+                                "type": "object",
+                                "required": [
+                                    "x",
+                                    "y"
+                                ],
+                                "properties": {
+                                    "x": {
+                                        "type": "number",
+                                        "unit": "m"
+                                    },
+                                    "y": {
+                                        "type": "number",
+                                        "unit": "m"
+                                    },
+                                    "theta": {
+                                        "type": "number",
+                                        "unit": "rad"
+                                    }
+                                }
+                            },
+                            "diameter": {
+                                "type": "number",
+                                "unit": "m"
+                            },
+                            "width": {
+                                "type": "number",
+                                "unit": "m"
+                            },
+                            "centerDisplacement": {
+                                "type": "number",
+                                "unit": "m"
+                            },
+                            "constraints": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "envelopes2d": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "set",
+                            "polygonPoints"
+                        ],
+                        "properties": {
+                            "set": {
+                                "type": "string"
+                            },
+                            "polygonPoints": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "required": [
+                                        "x",
+                                        "y"
+                                    ],
+                                    "properties": {
+                                        "x": {
+                                            "type": "number",
+                                            "unit": "m"
+                                        },
+                                        "y": {
+                                            "type": "number",
+                                            "unit": "m"
+                                        }
+                                    }
+                                }
+                            },
+                            "description": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "envelopes3d": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "set",
+                            "format"
+                        ],
+                        "properties": {
+                            "set": {
+                                "type": "string"
+                            },
+                            "format": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object"
+                            },
+                            "url": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "loadSpecification": {
+            "type": "object",
+            "properties": {
+                "loadPositions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "loadSets": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "setName",
+                            "loadType"
+                        ],
+                        "properties": {
+                            "setName": {
+                                "type": "string"
+                            },
+                            "loadType": {
+                                "type": "string"
+                            },
+                            "loadPositions": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "boundingBoxReference": {
+                                "type": "object",
+                                "required": [
+                                    "x",
+                                    "y",
+                                    "z"
+                                ],
+                                "properties": {
+                                    "x": {
+                                        "type": "number"
+                                    },
+                                    "y": {
+                                        "type": "number"
+                                    },
+                                    "z": {
+                                        "type": "number"
+                                    },
+                                    "theta": {
+                                        "type": "integer"
+                                    }
+                                }
+                            },
+                            "loadDimensions": {
+                                "type": "object",
+                                "required": [
+                                    "length",
+                                    "width"
+                                ],
+                                "properties": {
+                                    "length": {
+                                        "type": "number"
+                                    },
+                                    "width": {
+                                        "type": "number"
+                                    },
+                                    "height": {
+                                        "type": "number"
+                                    }
+                                }
+                            },
+                            "maxWeight": {
+                                "type": "number",
+                                "unit": "kg"
+                            },
+                            "minLoadhandlingHeight": {
+                                "type": "number",
+                                "unit": "m"
+                            },
+                            "maxLoadhandlingHeight": {
+                                "type": "number",
+                                "unit": "m"
+                            },
+                            "minLoadhandlingDepth": {
+                                "type": "number",
+                                "unit": "m"
+                            },
+                            "maxLoadhandlingDepth": {
+                                "type": "number",
+                                "unit": "m"
+                            },
+                            "minLoadhandlingTilt": {
+                                "type": "number",
+                                "unit": "rad"
+                            },
+                            "maxLoadhandlingTilt": {
+                                "type": "number",
+                                "unit": "rad"
+                            },
+                            "agvSpeedLimit": {
+                                "type": "number",
+                                "unit": "m/s^2"
+                            },
+                            "agvAccelerationLimit": {
+                                "type": "number",
+                                "unit": "m/s^2"
+                            },
+                            "agvDecelerationLimit": {
+                                "type": "number",
+                                "unit": "m/s^2"
+                            },
+                            "pickTime": {
+                                "type": "number",
+                                "unit": "s"
+                            },
+                            "dropTime": {
+                                "type": "number",
+                                "unit": "s"
+                            },
+                            "description": {
+                                "type": "number"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

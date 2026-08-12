@@ -1,0 +1,16 @@
+{
+  "headerId" : 0,
+  "timestamp" : "1970-01-01T00:00:00Z",
+  "version" : "version",
+  "manufacturer" : "manufacture",
+  "serialNumber" : "serial-number",
+  "orderId" : "some-order-id",
+  "orderUpdateId" : 0,
+  "nodes" : [ {
+    "nodeId" : "source-node",
+    "sequenceId" : 0,
+    "released" : true,
+    "actions" : [ ]
+  } ],
+  "edges" : [ ]
+}

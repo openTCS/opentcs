@@ -1,0 +1,36 @@
+{
+  "headerId": 0,
+  "timestamp": "1970-01-01T00:00:00Z",
+  "version": "version",
+  "manufacturer": "manufacturer",
+  "serialNumber": "serial-number",
+  "orderId": "some-order",
+  "orderUpdateId": 0,
+  "lastNodeId": "some-node",
+  "lastNodeSequenceId": 0,
+  "nodeStates": [],
+  "edgeStates": [],
+  "driving": true,
+  "actionStates": [],
+  "batteryState": {
+    "batteryCharge": 50.0,
+    "charging": false,
+    "batteryVoltage": null,
+    "batteryHealth": null,
+    "reach": null
+  },
+  "operatingMode": "SEMIAUTOMATIC",
+  "errors": [],
+  "information": null,
+  "safetyState": {
+    "eStop": "AUTOACK",
+    "fieldViolation": false
+  },
+  "zoneSetId": null,
+  "agvPosition": null,
+  "velocity": null,
+  "loads": null,
+  "paused": null,
+  "newBaseRequest": null,
+  "distanceSinceLastNode": null
+}

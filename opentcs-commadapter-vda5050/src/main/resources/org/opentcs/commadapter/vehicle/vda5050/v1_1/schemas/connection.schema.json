@@ -1,0 +1,50 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "connection",
+    "subtopic": "/connection",
+    "documentVersion": "5.0.0",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "headerId": {
+            "title": "headerId",
+            "type": "integer"
+        },
+        "timestamp": {
+            "title": "timestamp",
+            "type": "string",
+            "examples": [
+                "1991-03-11T11:40:03.12Z"
+            ]
+        },
+        "version": {
+            "title": "Version",
+            "type": "string",
+            "examples": [
+                "1.3.2"
+            ]
+        },
+        "manufacturer": {
+            "type": "string"
+        },
+        "serialNumber": {
+            "type": "string"
+        },
+        "connectionState": {
+            "type": "string",
+            "enum": [
+                "ONLINE",
+                "OFFLINE",
+                "CONNECTIONBROKEN"
+            ]
+        }
+    },
+    "required": [
+        "headerId",
+        "timestamp",
+        "version",
+        "manufacturer",
+        "serialNumber",
+        "connectionState"
+    ]
+}

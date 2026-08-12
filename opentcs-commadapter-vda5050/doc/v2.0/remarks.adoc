@@ -1,0 +1,30 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: CC-BY-4.0
+
+:doctype: book
+:toc: macro
+:toclevels: 6
+:sectnums: all
+:sectnumlevels: 6
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+toc::[]
+
+= General implementation remarks
+
+* The openTCS driver is implemented based on the VDA5050 2.0 PDF document as the definitive specification, not the documents that can be found at https://github.com/vda5050.
+* A message from the vehicle may be ignored in the following cases:
+** If the vehicle's `connection` topic indicates that the vehicle is offline.
+** If the message is considered outdated, i.e. it contains a timestamp that is older than the last accepted message on the same topic.
+* In case the vehicle rejects an order, the openTCS driver does not send further messages to it.
+  Before any new messages can be sent to the vehicle, it is necessary to (forcibly) withdraw the vehicle's current transport order in openTCS.
+  For details regarding order rejection, see the 'order' topic reference in xref:runtime-behaviour.adoc#topic-order[].
+* The vehicle is expected to reflect every instant action in its `actionStates` list.
+  Not doing so effectively leads to the driver repeating the instant action message infinitely, blocking all other order or instant action messages.
+  For details regarding instant actions, see the 'instantActions' topic reference in xref:runtime-behaviour.adoc#topic-instantactions[].

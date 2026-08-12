@@ -1,0 +1,70 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: CC-BY-4.0
+
+:doctype: book
+:toc: macro
+:toclevels: 6
+:sectnums: all
+:sectnumlevels: 6
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+toc::[]
+
+= VDA5050 communication adapter for openTCS
+
+This https://www.opentcs.org/[openTCS] vehicle communication adapter implements the VDA5050 protocol specification versions 1.1 and 2.0, using JSON messages via MQTT.
+(_openTCS vehicle communication adapter_ means it implements the interface on the openTCS side.
+If you are looking for an open-source library that helps you use VDA5050 on the vehicle side, check e.g. https://git.openlogisticsfoundation.org/silicon-economy/libraries/vda5050/libvda5050pp[libVDA5050++], instead.)
+
+== How to use this driver
+
+To be able to use this driver, its JAR file needs to be on the Java classpath of both the openTCS Kernel application as well as the Kernel Control Center application.
+Optionally you can also add it to the classpath of the Model Editor application for property key/value suggestions.
+
+The artifact is published via Maven Central.
+In your openTCS integration project, add the following dependency to the `build.gradle` file with the respective application's subproject, replacing `<VERSION>` with the appropriate driver version number:
+
+[source,groovy]
+----
+implementation 'org.opentcs.commadapter.vehicle.vda5050:opentcs-commadapter-vda5050:<VERSION>'
+----
+
+=== Configuration
+
+To make use of the driver, some configuration data needs to be made available to it as part of the kernel's configuration files or as plant model elements or transport orders.
+Common configuration required for all VDA5050 specification versions is described in the following documents:
+
+* link:./doc/configuration.adoc[Common configuration]
+
+To use the driver with specific versions of the VDA5050 specification, the following documentation applies:
+
+* VDA5050 1.1:
+** link:./doc/v1.1/configuration.adoc[Configuration]
+** link:./doc/v1.1/runtime-behaviour.adoc[Runtime behaviour]
+** link:./doc/v1.1/remarks.adoc[General implementation remarks]
+* VDA5050 2.0:
+** link:./doc/v2.0/configuration.adoc[Configuration]
+** link:./doc/v2.0/runtime-behaviour.adoc[Runtime behaviour]
+** link:./doc/v2.0/remarks.adoc[General implementation remarks]
+
+== Licensing
+
+=== Code
+
+Unless stated otherwise, all of this software project's source code, including scripts and configuration files, is distributed under the link:LICENSE.txt[MIT License].
+
+=== Assets
+
+Unless stated otherwise, all of this software project's documentation, resource bundles and media files are distributed under the link:LICENSE.assets.txt[Creative Commons Attribution 4.0 International (CC BY 4.0)] license.
+
+== Contributing
+
+This project is being maintained by the openTCS team at the https://www.iml.fraunhofer.de/[Fraunhofer Institute for Material Flow and Logistics].
+You are very welcome to contribute to this project.
+Please see link:./CONTRIBUTING.adoc[CONTRIBUTING.adoc] for a few guidelines related to this.

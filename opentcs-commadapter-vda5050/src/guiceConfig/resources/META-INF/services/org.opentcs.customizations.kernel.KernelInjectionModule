@@ -1,0 +1,4 @@
+# SPDX-FileCopyrightText: The openTCS Authors
+# SPDX-License-Identifier: MIT
+
+org.opentcs.commadapter.vehicle.vda5050.KernelInjectionModuleImpl

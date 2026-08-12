@@ -1,0 +1,83 @@
+{
+  "headerId" : 0,
+  "timestamp" : "1970-01-01T00:00:00Z",
+  "version" : "version",
+  "manufacturer" : "manufacturer",
+  "serialNumber" : "serial-number",
+  "orderId" : "some-order",
+  "orderUpdateId" : 0,
+  "lastNodeId" : "some-node",
+  "lastNodeSequenceId" : 0,
+  "nodeStates" : [ {
+    "nodeId" : "node-with-node-position",
+    "sequenceId" : 0,
+    "released" : true,
+    "nodePosition" : {
+      "x" : 1.2,
+      "y" : 3.4,
+      "mapId" : "some-map-id"
+    }
+  }, {
+    "nodeId" : "node-without-node-position",
+    "sequenceId" : 0,
+    "released" : true
+  } ],
+  "edgeStates" : [ {
+    "edgeId" : "edge-with-trajectory",
+    "sequenceId" : 0,
+    "released" : true,
+    "trajectory" : {
+      "degree" : 1.0,
+      "knotVector" : [ 0.0 ],
+      "controlPoints" : [ {
+        "x" : 9.8,
+        "y" : 7.6
+      } ]
+    }
+  }, {
+    "edgeId" : "edge-without-trajectory",
+    "sequenceId" : 0,
+    "released" : true
+  } ],
+  "driving" : true,
+  "actionStates" : [ {
+    "actionId" : "some-action-id",
+    "actionStatus" : "FAILED"
+  } ],
+  "batteryState" : {
+    "batteryCharge" : 50.0,
+    "charging" : false
+  },
+  "operatingMode" : "SEMIAUTOMATIC",
+  "errors" : [ {
+    "errorType" : "some-error",
+    "errorLevel" : "FATAL"
+  } ],
+  "safetyState" : {
+    "eStop" : "AUTOACK",
+    "fieldViolation" : false
+  },
+  "agvPosition" : {
+    "x" : 2.1,
+    "y" : 5.4,
+    "theta" : 0.3,
+    "mapId" : "some-map-id",
+    "positionInitialized" : true
+  },
+  "velocity" : { },
+  "loads" : [ {
+    "boundingBoxReference" : {
+      "x" : 0.0,
+      "y" : 0.0,
+      "z" : 0.0
+    },
+    "loadDimensions" : {
+      "length" : 0.0,
+      "width" : 0.0
+    }
+  }, { } ],
+  "information" : [ {
+    "infoType" : "some-info",
+    "infoLevel" : "DEBUG"
+  } ]
+}

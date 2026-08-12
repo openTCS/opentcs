@@ -1,0 +1,37 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: CC-BY-4.0
+
+:doctype: book
+:toc: macro
+:toclevels: 6
+:sectnums: all
+:sectnumlevels: 6
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+toc::[]
+
+= General implementation remarks
+
+* Unfortunately, the VDA5050 1.1 specification documents that can be found at https://github.com/vda5050 (both the specification itself as well as the JSON schemas) deviate from the official specification PDF document in some places.
+  The openTCS driver is implemented based on the VDA5050 1.1 PDF document as the definitive specification.
+* Section 6.1.3 of the VDA5050 1.1 specification states that enumeration elements are to be written in uppercase.
+  On the other hand, the specification lists camel-cased enumeration elements in some places (e.g. `autoAck` instead of `AUTOACK`).
+  The openTCS driver sticks to the rule of all enumeration elements being kept in uppercase.
+* Section 6.2 of the VDA5050 1.1 specification states that a Quality-of-Service (QoS) level of 0 (_at most once_) is to be used for all communication.
+  For the `connection` topic, this makes communication of critical information unreliable, and with VDA5050 2.0, a QoS level of 1 (_at least once_) is specified for this topic.
+  For this reason, the openTCS driver subscribes to the `connection` topic with a QoS level of 1, and vehicles are expected to publish to it with a QoS level of 1, too.
+* A message from the vehicle may be ignored in the following cases:
+** If the vehicle's `connection` topic indicates that the vehicle is offline.
+** If the message is considered outdated, i.e. it contains a timestamp that is older than the last accepted message on the same topic.
+* In case the vehicle rejects an order, the openTCS driver does not send further messages to it.
+  Before any new messages can be sent to the vehicle, it is necessary to (forcibly) withdraw the vehicle's current transport order in openTCS.
+  For details regarding order rejection, see the 'order' topic reference in xref:runtime-behaviour.adoc#topic-order[].
+* The vehicle is expected to reflect every instant action in its `actionStates` list.
+  Not doing so effectively leads to the driver repeating the instant action message infinitely, blocking all other order or instant action messages.
+  For details regarding instant actions, see the 'instantActions' topic reference in xref:runtime-behaviour.adoc#topic-instantactions[].

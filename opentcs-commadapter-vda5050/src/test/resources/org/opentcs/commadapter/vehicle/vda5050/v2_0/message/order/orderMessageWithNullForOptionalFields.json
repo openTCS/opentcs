@@ -1,0 +1,57 @@
+{
+  "headerId" : 0,
+  "timestamp" : "1970-01-01T00:00:00Z",
+  "version" : "version",
+  "manufacturer" : "manufacture",
+  "serialNumber" : "serial-number",
+  "orderId" : "some-order-id",
+  "orderUpdateId" : 0,
+  "nodes" : [ {
+    "nodeId" : "node-with-node-position-and-action",
+    "sequenceId" : 0,
+    "released" : true,
+    "actions" : [ {
+      "actionType" : "some-action-type",
+      "actionId" : "some-action-id",
+      "blockingType" : "NONE",
+      "actionDescription" : null,
+      "actionParameters" : [ ]
+    }],
+    "nodeDescription" : null,
+    "nodePosition" : {
+      "x" : 1.2,
+      "y" : 3.4,
+      "mapId" : "some-map-id",
+      "theta" : null,
+      "allowedDeviationXY" : null,
+      "allowedDeviationTheta" : null,
+      "mapDescription" : null
+    }
+  }, {
+    "nodeId" : "node-without-node-position",
+    "sequenceId" : 0,
+    "released" : true,
+    "actions" : [],
+    "nodeDescription" : null,
+    "nodePosition" : null
+  } ],
+  "edges" : [ {
+    "edgeId" : "some-edge-id",
+    "sequenceId" : 0,
+    "released" : true,
+    "startNodeId" : "source-node",
+    "endNodeId" : "destination-node",
+    "actions" : [ ],
+    "edgeDescription" : null,
+    "maxSpeed" : null,
+    "maxHeight" : null,
+    "minHeight" : null,
+    "orientation" : null,
+    "direction" : null,
+    "rotationAllowed" : null,
+    "maxRotationSpeed" : null,
+    "length" : null,
+    "trajectory" : null
+  } ],
+  "zoneSetId" : null
+}

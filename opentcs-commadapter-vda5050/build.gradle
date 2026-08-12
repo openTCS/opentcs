@@ -1,0 +1,100 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
+
+buildscript {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+}
+
+plugins {
+  id 'maven-publish'
+  id 'signing'
+  alias(libs.plugins.spotless)
+  alias(libs.plugins.gradle.nexus.publish.plugin)
+  alias(libs.plugins.jacocolog)
+}
+
+apply from: "${rootDir}/gradle/common.gradle"
+apply from: "${rootDir}/gradle/java-project.gradle"
+apply from: "${rootDir}/gradle/java-codequality.gradle"
+apply from: "${rootDir}/gradle/guice-library.gradle"
+apply from: "${rootDir}/gradle/publishing-gitlab.gradle"
+apply from: "${rootDir}/gradle/publishing-ossrh.gradle"
+apply from: "${rootDir}/gradle/publishing-java.gradle"
+
+apply plugin: 'base'
+apply plugin: 'distribution'
+apply plugin: 'org.barfuin.gradle.jacocolog'
+
+dependencies {
+  implementation libs.opentcs.api.injection
+  implementation libs.opentcs.common
+
+  implementation libs.jackson.databind
+  implementation libs.jackson.datatype.jsr310
+
+  implementation libs.everit.json.schema
+
+  implementation libs.eclipse.paho.client.mqttv3
+
+  runtimeOnly libs.slf4j.jdk14
+
+  testImplementation libs.assertj
+}
+
+// Attributes for the AsciiDoc documentation to include code from source files
+ext.javaSrcDir = sourceSets.main.java.srcDirs[0]
+ext.collectableDistDir = new File(layout.buildDirectory.asFile.get(), 'install')
+
+distributions {
+  main {
+    contents.from(jar)
+    contents.from(sourcesJar)
+    contents.from(javadoc){
+      into('api')
+    }
+  }
+}
+
+distZip {
+  dependsOn javadoc
+  archiveClassifier = 'bin'
+}
+
+distTar {
+  enabled = false
+  dependsOn javadoc
+  archiveClassifier = 'bin'
+}
+
+build {
+  dependsOn installDist
+}
+
+tasks.register('distSrcZip', Zip) {
+  archiveClassifier = 'src'
+  from "${rootDir}"
+
+  includes << 'config/**'
+  includes << 'gradle/**'
+  includes << 'src/**'
+  includes << '.nb-gradle-properties'
+  includes << '*.gradle'
+  includes << 'gradlew'
+  includes << 'gradlew.bat'
+
+  excludes << '.gitlab'
+  excludes << '.gradle'
+  excludes << 'build'
+}
+
+artifacts {
+  archives distZip
+  archives distSrcZip
+  archives sourcesJar
+}

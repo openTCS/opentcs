@@ -1,0 +1,18 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: MIT
+
+apply plugin: 'checkstyle'
+
+checkstyle {
+  toolVersion = libs.versions.checkstyle.get()
+  configFile = rootProject.file("config/checkstyle/checkstyle.xml")
+  showViolations = false
+}
+
+project.afterEvaluate { project ->
+  project.tasks.withType(Checkstyle) {
+    reports {
+      html.stylesheet resources.text.fromFile(rootProject.file("config/checkstyle/checkstyle-noframes-severity-sorted.xsl"))
+    }
+  }
+}

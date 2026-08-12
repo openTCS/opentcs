@@ -1,0 +1,117 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "#visualization",
+    "title": "visualization",
+    "documentVersion": "5.0.0",
+    "subtopic": "/visualization",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "headerId": {
+            "type": "integer"
+        },
+        "timestamp": {
+            "type": "string",
+            "examples": [
+                "1991-03-11T11:40:03.12Z"
+            ]
+        },
+        "version": {
+            "type": "string",
+            "examples": [
+                "1.3.2"
+            ]
+        },
+        "manufacturer": {
+            "type": "string"
+        },
+        "serialNumber": {
+            "type": "string"
+        },
+        "agvPosition": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "title": "agvPosition",
+            "properties": {
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                },
+                "theta": {
+                    "type": "number"
+                },
+                "mapId": {
+                    "type": "string"
+                },
+                "mapDescription": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                },
+                "positionInitialized": {
+                    "type": "boolean"
+                },
+                "localizationScore": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0.0,
+                    "maximum": 1.0
+                },
+                "deviationRange": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                }
+            },
+            "required": [
+                "x",
+                "y",
+                "theta",
+                "mapId",
+                "positionInitialized"
+            ]
+        },
+        "velocity": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "title": "velocity",
+            "properties": {
+                "vx": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                },
+                "vy": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                },
+                "omega": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                }
+            }
+        }
+    },
+    "required": [
+        "headerId",
+        "timestamp",
+        "version",
+        "manufacturer",
+        "serialNumber"
+    ]
+}

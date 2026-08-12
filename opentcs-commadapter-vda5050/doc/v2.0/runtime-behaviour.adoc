@@ -1,0 +1,411 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: CC-BY-4.0
+
+:doctype: book
+:toc: macro
+:toclevels: 6
+:sectnums: all
+:sectnumlevels: 6
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+toc::[]
+
+= VDA5050 2.0 driver runtime behaviour
+
+== Topics
+
+The driver will use the following topic prefix as suggested by VDA5050, based on the values of the configuration properties read from the vehicle element in the plant model:
+
+----
+<interfaceName>/<majorVersion>/<manufacturer>/<serialNumber>
+----
+
+Since this driver implements version 2.0 of the VDA5050 specification, `<majorVersion>` is always `v2`.
+So, with the vehicle property values being set as
+
+* `vda5050:interfaceName`: `uagv`
+* `vda5050:manufacturer`: `Some_Company`
+* `vda5050:serialNumber`: `AGV-XY-1234`
+
+the driver would publish or subscribe to the following topics:
+
+* `uagv/v2/Some_Company/AGV-XY-1234/order` (published to)
+* `uagv/v2/Some_Company/AGV-XY-1234/instantActions` (published to)
+* `uagv/v2/Some_Company/AGV-XY-1234/state` (subscribed to)
+* `uagv/v2/Some_Company/AGV-XY-1234/visualization` (subscribed to)
+* `uagv/v2/Some_Company/AGV-XY-1234/connection` (subscribed to)
+
+NOTE: It is not recommended to use non-ASCII characters (e.g. German umlauts), spaces etc. in MQTT topic names, as they may make it more difficult to investigate in case of problems.
+Since the topic names used are derived from the property values listed above, it is also not recommended to use such characters in these property values.
+
+== Topic `connection`
+
+* When receiving a connection state of `OFFLINE` or `CONNECTIONBROKEN`, the vehicle driver will report the vehicle's state as `UNKNOWN` to the kernel.
+  This results in the vehicle being unavailable for processing transport orders.
+* Upon receiving a connection state of `ONLINE`, the driver will report the vehicle's state as `IDLE` to the kernel.
+
+Any other vehicle states in openTCS are derived from `state` messages.
+
+NOTE: The openTCS driver expects vehicles to set a _last will_ with the MQTT broker (with the _retained_ flag set) to ensure a connection state of `CONNECTIONBROKEN` is published as soon as possible when the broker's connection to the vehicle is lost.
+
+NOTE: Although the VDA5050 1.1 specification states to use a Quality-of-Service (QoS) level of 0 (_at most once_) for this topic, the openTCS driver subscribes with a QoS level of 1 (_at least once_) and expects vehicles to publish to this topic with a QoS level of 1, too.
+
+== Topic `state`
+
+Upon receiving a message on the `state` topic, the vehicle driver will...
+
+. check for an update of `lastNodeId`, and if it has changed, report the vehicle's current point to the kernel accordingly (see <<Processing logical positions>> below).
+. update the vehicle's pose with the kernel in case the vehicle has reported an `agvPosition`.
+. update the list of load handling devices with the kernel (see <<Mapping of load handling devices>> below).
+. update the energy level with the kernel.
+. update state information mapped to vehicle properties with the kernel (see <<Mapping of state information to vehicle properties>> below).
+. update the vehicle's state with the kernel (see <<Mapping of vehicle state>> below).
+. check (`nodeStates` and) `edgeStates` to see whether a step on the route has been completed, and if yes, report the respective movement command (and all previous movement commands) as finished to the kernel (see <<Movement command completion>> below).
+  (With the final step of a drive order's route, the `actionStates` are also checked to see whether the actions for that step (and especially the drive order's destination operation) have been completed.)
+
+[#movement-command-completion]
+=== Movement command completion
+
+The vehicle driver considers a step on the vehicle's route and the respective movement command as completed, when the vehicle no longer reports the associated node state and/or edge state in its state.
+The exact behavior can be configured by setting the (optional) `vda5050:movementCommandCompletedCondition` property on a vehicle element in the plant model to one of the following values:
+
+* `EDGE`: A step / movement command is considered completed when its associated edge state has disappeared from the vehicle state.
+* `EDGE_AND_NODE`: A step / movement command is considered completed when its associated edge state _and_ node state have _both_ disappeared from the vehicle state.
+
+If the aforementioned property is not set, the vehicle driver's default behaviour corresponds to the value `EDGE_AND_NODE`.
+
+For the _final_ movement of an order to be considered completed, it is _always_ required that the associated edge state _and_ node state have _both_ disappeared from the vehicle state -- regardless of the value of the `vda5050:movementCommandCompletedCondition` property.
+
+=== Processing logical positions
+
+The vehicle driver generally expects the vehicle to report its logical position by setting `lastNodeId` properly.
+
+There are cases in which a vehicle may not be able to report a logical position but would still be able to report its pose -- i.e. `lastNodeId` is an empty string, but `agvPosition` is contains usable data.
+(For instance, a vehicle may be able to determine its pose after being switched on, but may not know anything about logical positions in the driving course.)
+In such cases, the vehicle driver will try to derive the logical position from the vehicle's pose by matching it with the points in the driving course, taking into account the respective allowed deviations for coordinates and orientation angles set for them.
+
+NOTE: This fallback mechanism is intended for edge cases only, and relying heavily on it -- e.g. by never reporting a logical position at all -- may slow down the openTCS kernel, especially with plant models that contain a large number of vehicles and/or points.
+Therefore, vehicles should always report their logical positions when they can, which should be the case for every vehicle after executing its first order.
+(Every order contains the logical destination position, after all.)
+
+=== Mapping of load handling devices
+
+The vehicle driver will set the list of load handling devices according to the `loads` reported by the vehicle.
+If a `load` contains a `loadPosition`, the vehicle driver will set the respective load handling device's label to that value.
+If `loadPosition` is not given or is an empty string, the vehicle driver will set the label according to the pattern `LHD-<index>`.
+
+NOTE: According to VDA5050 2.0, vehicles report loads, not load handling devices.
+As a result, there is no specified way for vehicles to report empty load handling devices.
+Since load handling devices in openTCS are derived from the reported loads, all respective load handling devices will have their `full` flag set to `true`.
+When a vehicle does not report any loads, the list of load handling devices will be empty.
+
+=== Mapping of state information to vehicle properties
+
+The vehicle driver will set the following properties on the kernel's vehicle element, containing information reported by the vehicle:
+
+* The property with the key `vda5050:errors.fatal` will contain a concatenated list of ``errorType``s of all ``error``s with an `errorLevel` of `FATAL`.
+* The property with the key `vda5050:errors.warning` will contain a concatenated list of ``errorType``s of all ``error``s with an `errorLevel` of `WARNING`.
+* The property with the key `vda5050:information.debug` will contain a concatenated list of ``infoType``s of all `info` elements with an `infoLevel` of `DEBUG`.
+* The property with the key `vda5050:information.info` will contain a concatenated list of ``infoType``s of all `info` elements with an `infoLevel` of `INFO`.
+* The property with the key `vda5050:paused` will contain the vehicle's paused state (`true` or `false`), or it will be `null` / not set, if the vehicle has not reported a paused state.
+
+=== Mapping of vehicle state
+
+With every `state` message received, the vehicle driver will report one of the following states to the kernel (with precedence in the given order):
+
+. `ERROR`: Set if the vehicle reports at least one `error` with an `errorLevel` of `FATAL`.
+. `UNAVAILABLE`: Set if the vehicle reports an `operatingMode` other than `AUTOMATIC` or `SEMIAUTOMATIC`.
+. `CHARGING`: Set if the vehicle reports `charging = true`.
+. `EXECUTING`: Set if the vehicle reports `driving = true`, or if it reports at least one `nodeState` or `edgeState`, or if it reports at least one `actionState` with an `actionStatus` that is neither `FINISHED` nor `FAILED`.
+. `IDLE`: In all other cases.
+
+== Topic `visualization`
+
+Upon receiving a message on the `visualization` topic, the vehicle driver will update the vehicle's precise position and orientation angle in openTCS with the data in the `agvPosition` structure.
+Velocity data is not forwarded to openTCS.
+
+[#topic-order]
+== Topic `order`
+
+The general behaviour with sending order messages is the following:
+
+* The vehicle driver subsequently sends one VDA5050 order message per step on the vehicle's route.
+  This means that a vehicle that is currently at point _A_ and is supposed to move via points _B_ and _C_ to point _D_ will always receive three VDA5050 order messages.
+* The order messages sent by this vehicle driver contain both the _base_ and the _horizon_ of the vehicle's route.
+  How many steps of the route are sent as _base_ and _horizon_ can be configured using the vehicle properties `vda5050:maxStepsBase` and `vda5050:maxStepsHorizon` -- see xref:configuration.adoc[].
+* VDA5050 order messages have fields that are optional, and order messages sent to a vehicle should not contain any optional fields that are not supported by that vehicle.
+  The support status for optional fields can be set via vehicle properties by using the prefix `vda5050:optionalParams.order` followed by the path to the optional field in the order message separated by dots.
+  The possible values are `REQUIRED`, `SUPPORTED` and `NOT_SUPPORTED`, with all optional fields being considered to be `SUPPORTED` by default.
+  For example, setting the optional field `allowedDeviationTheta` in `order/nodes/nodePosition` as not supported would require you to set the vehicle property `vda5050:optionalParams.order.nodes.nodePosition.allowedDeviationTheta` to the value `NOT_SUPPORTED`.
+* The vehicle driver sends the next order message (for the next step on the vehicle's route) only after a state message from the vehicle indicates that it has received the previous order message (by reflecting the order message's `orderId` and `orderUpdateId`.)
+** In case the vehicle driver has sent an order message and receives a state message from the vehicle _not_ indicating that the vehicle has received the order message, the vehicle driver repeats the order message.
+** In case the vehicle driver receives a state message from the vehicle indicating that the vehicle rejects an order, it does not repeat the order message or send further ones.
+   Before any new messages can be sent to the vehicle, it is necessary to (forcibly) withdraw the vehicle's current transport order in openTCS.
+   An order rejection is indicated by an error with `errorType` being one of the following:
+*** `validationError`
+*** `noRouteError`
+*** `orderError`
+*** `orderUpdateError`
+
+=== Actions at locations / transport order destinations
+
+The following vehicle operations are understood by the vehicle driver and may be used with location type elements in the plant model as well as transport order destinations.
+
+NOTE: With actions at transport order destinations, the destination's operation also has to be used with the corresponding location's location type element in the plant model.
+If the destination's operation is not supported by the location's location type (i.e. it is not contained in the location type's "Supported vehicle operations" attribute in the plant model), the transport order will be marked as `UNROUTABLE` and won't be assigned to any vehicle.
+
+==== `NOP` / no action
+
+As usual, a destination operation of `NOP` given in a transport order is mapped to an order without any action, i.e. the vehicle is merely ordered to move to the respective position.
+
+==== `startCharging`
+
+The destination operation that is mapped to the `startCharging` action as predefined in VDA5050, can be configured individually for every vehicle element in the openTCS plant model.
+For this, the corresponding destination operation needs to be defined using a property with the key `vda5050:rechargeOperation`.
+The property value contains the destination operation as a character string.
+
+If this property is not set, the vehicle driver will fall back to a default destination operation of `Charge`.
+
+Regardless of the destination operation, the mapped `startCharging` action's `blockingType` is set to `SOFT` and its action parameters are not set.
+
+Note that the driver sends `startCharging` actions as part of charging orders, but it does not send `stopCharging` actions by itself.
+If a `stopCharging` action is required by the vehicle, it needs to be configured as a regular arbitrary action for a node by setting the respective properties on a point in the plant model (see <<actions-at-points-paths-locations,Actions at points, paths and locations>>.)
+
+==== Arbitrary actions
+
+In addition to the aforementioned specific destination operations that are understood by the vehicle driver and mapped to corresponding VDA5050 actions, the vehicle driver also supports arbitrary (user- or project-specific) actions.
+
+When creating transport orders, you can set the following properties at location types and/or locations, substituting `ACTIONTYPE` with the respective destination operation:
+
+`vda5050:destinationAction.<ACTIONTYPE>.blockingType`::
+Set to the blocking type of the action to be executed at the destination.
+(Example: `vda5050:destinationAction.pick.blockingType = SOFT`)
+`vda5050:destinationAction.<ACTIONTYPE>.parameter.<PARAMETER>`::
+Substitute `<PARAMETER>` with the name of the action parameter to be set, and set the property's value to the parameter value.
+(Example: `vda5050:destinationAction.pick.parameter.x = 234`.
+Also see <<Action parameters>>.)
+
+You also can set the following properties for any drive order destination in a transport order:
+
+`vda5050:destinationAction.blockingType`::
+Set to the blocking type of the action to be executed at the destination.
+(Example: `vda5050:destinationAction.blockingType = SOFT`)
+`vda5050:destinationAction.parameter.<PARAMETER>`::
+Substitute `<PARAMETER>` with the name of the action parameter to be set, and set the property's value to the parameter value.
+(Example: `vda5050:destinationAction.parameter.x = 234`.
+Also see <<Action parameters>>.)
+
+The properties read from location types are overridden by any read from locations, which are themselves overridden by any read from drive order destinations.
+If none of these properties are set or they are set incorrectly, default values (a blocking type of `NONE` and no action parameters) are used for the respective action.
+
+[#actions-at-points-paths-locations]
+=== Actions at points, paths and locations
+
+You can set the following properties at points, paths and locations, which are mapped to actions at nodes (for points and locations) and edges (for paths):
+
+`vda5050:action.<INDEX>`::
+Set to the action type of the action to be executed at the edge or node.
+(Example: `vda5050:action.01 = beep`)
+`vda5050:action.<INDEX>.blockingType`::
+Set to the blocking type of the action to be executed at the edge or node.
+(Example: `vda5050:action.01.blockingType = SOFT`)
+`vda5050:action.<INDEX>.parameter.<PARAMETER>`::
+Substitute `<PARAMETER>` with the name of the action parameter to be set, and set the property's value to the parameter value.
+(Example: `vda5050:action.pick.parameter.x = 234`.
+Also see <<Action parameters>>.)
+`vda5050:action.<INDEX>.when`::
+Set to the situations/triggers in which the action should be executed on a node.
+The property value contains a list of values, separated by `|`.
+Possible values are `PASSING`, `ORDER_START` and `ORDER_END`.
+If this property is not set, the default value of `PASSING | ORDER_START | ORDER_END` is used.
+(Example: `vda5050.action.01.when = PASSING | ORDER_START`)
+`vda5050:action.<INDEX>.tags`::
+Set to tags for the action.
+The property value contains a list of tags, separated by `|`.
+If this property is not set, the default value of `default` is used.
+(Example: `vda5050.action.01.tags = resupply line 1 | resupply line 2`)
+
+The `<INDEX>` can be anything, but it is recommended to stick to decimal digits.
+(The order of actions added to nodes and edges is determined by sorting the properties at points and paths lexicographically.)
+
+NOTE: If the properties for the blocking type or action parameters are missing or set incorrectly, default values (a blocking type of `NONE` and no action parameters) are used for the respective action.
+
+[NOTE]
+====
+For destination nodes, properties are read from openTCS elements and added to the VDA5050 `order` message in the following order:
+
+1. From the destination point of a movement
+2. From the destination location of a movement (if any)
+3. From the transport order's destination
+====
+
+==== Action parameters
+
+By default, parameter values are set as strings in the order message.
+To parse and use them as floating point numbers, integers or booleans, prefix the value with `float:`, `integer:` or `boolean:`.
+To force a parameter to be used as a string even though it starts with e.g. `integer:`, prefix it with `string:`.
+Examples:
+
+* `vda5050:action.pick.parameter.x = 234` (used as a string)
+* `vda5050:action.pick.parameter.x = float:3.14` (parsed and used as a floating point number)
+* `vda5050:action.pick.parameter.x = integer:234` (parsed and used as an integer)
+* `vda5050:action.pick.parameter.x = boolean:true` (parsed and used as a boolean)
+* `vda5050:action.pick.parameter.x = string:integer:234` (forces the string value `integer:234`)
+
+==== Action whitelists at vehicles, transport order destinations and paths
+
+It is possible to filter actions sent to a vehicle using properties at
+
+* vehicle elements in the plant model,
+* path elements in the plant model and
+* transport order destinations.
+
+To do this, a property with the key `vda5050:actionTags` can be set on either of these elements.
+The property value needs to be a list of action tags separated by `|` and works as a whitelist, i.e only actions with the given tags are sent to the respective vehicle.
+A value of `*` (the default) allows all actions to be sent; setting the value to an empty string disallows all actions.
+
+For instance, to only ever allow actions tagged with `resupply line 1` and `resupply line 2` to be sent to a vehicle, set
+
+----
+vda5050:actionTags = resupply line 1 | resupply line 2
+----
+
+on the vehicle element in the plant model.
+
+To restrict sending actions to the vehicle for a specific edge/node, set the property on the respective path in the plant model.
+To restrict sending actions to the vehicle for a specific process, set the property for that transport order destination, instead.
+
+Actions are sent only if they pass all whitelists for the respective vehicle, path and transport order destination.
+
+==== Overriding actions' blocking types per vehicle
+
+Since VDA5050 2.0 does not explicitly state specific blocking types for predefined actions, different vehicle types may expect different blocking types for these actions.
+To handle vehicles' different expectations/behaviours, it is possible to override action's blocking types for each vehicle.
+To make use of this, you can set a property with a key following the pattern `vda5050:action.<ACTIONTYPE>.blockingType` on the vehicle element in the plant model and set its value to `HARD`, `SOFT` or `NONE`.
+The vehicle driver will then always use that blocking type given in the vehicle element for actions of that type, overriding whatever is specified at a point, path or location element.
+
+For example, you could set `vda5050:action.beep.blockingType = SOFT` on a vehicle element in the plant model.
+Whenever an action of type `beep` is sent to the vehicle, it will always have `SOFT` as its blocking type.
+
+=== Actions at transport order destinations
+
+Similar to how you can set actions at points, paths and locations, it is also possible to set actions on transport order destinations.
+The actions set this way are independent of the plant model, i.e. they do not need to be defined at location types.
+
+The properties available for setting actions on a transport order destination are:
+
+* `vda5050:action.<INDEX>`
+* `vda5050:action.<INDEX>.blockingType`
+* `vda5050:action.<INDEX>.parameter.<PARAMETER>`
+
+See <<actions-at-points-paths-locations,Actions at points, paths and locations>> for explanation of these properties.
+
+=== Node position properties in order messages
+
+* `nodePosition.x` and `nodePosition.y`:
+  The coordinates of the respective point in the plant model are used.
+* `nodePosition.theta`:
+  The orientation angle of the respective point in the plant model is used if it is set.
+  If it is not set, `theta` will be left unset.
+* `nodePosition.allowedDeviationXY`:
+  The value of the property `vda5050:deviationXY`, set on the respective point or on the vehicle in the plant model, is used, with the property on the point having precedence.
+  If neither is set, `allowedDeviationXY` will be left unset.
+* `nodePosition.allowedDeviationTheta`:
+  The value of the property `vda5050:deviationTheta`, set on the respective point or on the vehicle in the plant model, is used, with the property on the point having precedence.
+  If neither is set, `allowedDeviationTheta` will be left unset.
+  If set, the angle must be within the range of 0 and 180 degrees.
+* `nodePosition.mapId`:
+  The value of the property `vda5050:mapId`, set on the respective point or on the vehicle in the plant model, is used, with the property on the point having precedence.
+  If neither is set, `mapId` is set to the empty string.
+
+NOTE: Angles in the plant model are expected to be in degrees, with an angle of 0 degrees being at the 3 o'clock position and a positive value indicating a counter-clockwise rotation.
+
+==== Deviation extension for initial order messages
+
+In the first order message sent for a new VDA5050 order, the vehicle driver will always extend the deviation range (`allowedDeviationXY` and `allowedDeviationTheta`) of the first node to include the vehicle's current position and orientation.
+An optional padding value is read from the vehicle property `vda5050:extendedDeviationRangePadding` and is added to the extended `allowedDeviationXY`.
+
+=== Edge properties in order messages
+
+* `edge.maxSpeed`:
+  Depending on whether the movement is forward or reverse, the forward or reverse maximum speed value set on the respective path in the plant model is used.
+* `edge.orientation`:
+  Depending on whether the movement is forward or reverse, the value of either the property `vda5050:orientation.forward` or the property `vda5050:orientation.reverse`, set on the respective path in the plant model, is used.
+  If the respective property is not set, `edge.orientation` will be left unset.
+* `edge.rotationAllowed`:
+  Depending on whether the movement is forward or reverse, the value of either the property `vda5050:rotationAllowed.forward` or the property `vda5050:rotationAllowed.reverse`, set on the respective path in the plant model, is used.
+  If the respective property is not set, `edge.rotationAllowed` will be left unset.
+
+NOTE: Angles in the plant model are expected to be in degrees, with an angle of 0 degrees being at the 3 o'clock position and a positive value indicating a counter-clockwise rotation.
+
+[#topic-instantactions]
+== Topic `instantActions`
+
+The vehicle driver sends only a few types of instant actions in specific situations described in the following sections.
+
+The vehicle is expected to confirm that it has received an instant action by listing it in the `actionStates` array of its state message.
+In case the vehicle rejects an instant action, it must still reflect that instant action in its `actionStates` array, with its `actionStatus` set to `FAILED`.
+
+NOTE: It is important for the vehicle to confirm that it has received an instant action even for those it rejects.
+Not doing so results in the vehicle driver resending the `instantActions` message, which effectively leads to an endless cycle of such messages being sent, implicitly also blocking any further `order` message from being sent.
+
+[#instantaction-cancelorder]
+=== `cancelOrder`
+
+An instant action of type `cancelOrder` is automatically sent in the following cases:
+
+* When a transport order is _forcibly_ withdrawn from the vehicle in openTCS.
+* When the first order message belonging to a drive order in openTCS is about to be sent and the `nodeStates` and `edgeStates` arrays reported by the vehicle are not empty.
+
+The instant action's blocking type is set to `NONE`.
+
+The vehicle driver transmits the `cancelOrder` instant action until the vehicle reflects it in its `actionStates` array.
+Once the vehicle reflects the action (with any `actionStatus`, including a non-terminal one such as `RUNNING`), the driver stops resending it.
+The driver still waits for the action's `actionStatus` to become `FINISHED` or `FAILED` before sending any further messages to the vehicle, so that a new order is never sent while the vehicle is still processing the cancellation.
+
+=== `startPause`/`stopPause`
+
+An instant action of type `startPause`/`stopPause` is sent when the vehicle is paused/unpaused in openTCS.
+The instant action's blocking type is set to `NONE`.
+
+=== Sending arbitrary instant actions via the openTCS kernel API
+
+It is possible to have the vehicle driver send instant actions of any type using the openTCS kernel API.
+This can be done by invoking `VehicleService.sendCommAdapterCommand()` with an appropriately prepared instance of `org.opentcs.commadapter.vehicle.vda5050.v2_0.commands.SendInstantActions`.
+
+== Topic `factsheet`
+
+Factsheet messages are currently not processed by the driver.
+
+[#supported-communication-adapter-messages]
+== Supported communication adapter messages
+
+This section describes the communication adapter messages that can be sent to the vehicle driver, e.g. via the openTCS web API (see the openTCS web API specification).
+
+=== Extend deviation once
+
+* Type: `vda5050:extendDeviationOnce`
+* Parameters:None
+
+Sending the _extend deviation once_ message to the vehicle driver results in the vehicle driver to extend the (node) deviation range in the next order message that is sent to the vehicle.
+The deviation range is extended...
+
+* only for the very first node in an order
+* and only if the vehicle's current position is outside that node's allowed deviation range.
+
+Otherwise, this message is ignored.
+
+[source,json]
+.Example: Extend deviation once message
+----
+{
+  "type": "vda5050:extendDeviationOnce",
+  "parameters": []
+}
+----
