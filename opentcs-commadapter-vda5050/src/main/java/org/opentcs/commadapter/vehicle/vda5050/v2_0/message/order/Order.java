@@ -9,9 +9,9 @@ import static org.opentcs.util.Assertions.checkInRange;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nonnull;
 import java.time.Instant;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.v2_0.message.Header;
 
 /**

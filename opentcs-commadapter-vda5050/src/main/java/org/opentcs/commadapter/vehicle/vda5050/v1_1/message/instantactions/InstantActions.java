@@ -7,10 +7,10 @@ import static java.util.Objects.requireNonNull;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nonnull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.Header;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.Action;
 

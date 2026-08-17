@@ -5,11 +5,11 @@ package org.opentcs.commadapter.vehicle.vda5050.v2_0.ordermapping;
 import static java.util.Objects.requireNonNull;
 import static org.opentcs.commadapter.vehicle.vda5050.v2_0.ObjectProperties.PROPKEY_VEHICLE_OPTIONAL_ORDER_PARAMETER_PREFIX;
 
+import jakarta.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.common.OptionalParameterSupport;
 import org.opentcs.data.model.Vehicle;
 import org.slf4j.Logger;

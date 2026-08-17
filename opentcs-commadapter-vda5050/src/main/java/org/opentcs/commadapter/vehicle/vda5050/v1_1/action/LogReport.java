@@ -4,9 +4,9 @@ package org.opentcs.commadapter.vehicle.vda5050.v1_1.action;
 
 import static java.util.Objects.requireNonNull;
 
+import jakarta.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.Action;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.ActionParameter;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.BlockingType;

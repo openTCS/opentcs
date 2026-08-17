@@ -136,6 +136,8 @@ asciidoctor {
     include 'developers-guide.adoc'
     include 'index.adoc'
     include 'users-guide.adoc'
+    include 'vda5050-1.1.adoc'
+    include 'vda5050-2.0.adoc'
   }
   outputOptions{
     // Whether to put backends' outputs into separate subdirectories
@@ -221,6 +223,12 @@ abstract class GenerateConfigDocTask extends DefaultTask {
 
         "org.opentcs.virtualvehicle.VirtualVehicleConfiguration",
         "${out}/VirtualVehicleConfigurationEntries.adoc",
+
+        "org.opentcs.commadapter.vehicle.vda5050.CommAdapterConfiguration",
+        "${out}/Vda5050ConfigurationEntries.adoc",
+
+        "org.opentcs.commadapter.vehicle.vda5050.common.mqtt.MqttConfiguration",
+        "${out}/Vda5050MqttConfigurationEntries.adoc",
 
         "org.opentcs.commadapter.peripheral.loopback.VirtualPeripheralConfiguration",
         "${out}/VirtualPeripheralConfigurationEntries.adoc",

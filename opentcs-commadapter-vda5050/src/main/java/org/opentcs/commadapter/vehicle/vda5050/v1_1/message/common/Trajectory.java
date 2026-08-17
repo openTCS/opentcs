@@ -8,9 +8,9 @@ import static org.opentcs.commadapter.vehicle.vda5050.common.Assertions.checkInR
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.util.List;
-import javax.annotation.Nonnull;
 
 /**
  * The trajectory of an AGV described as NURBS.

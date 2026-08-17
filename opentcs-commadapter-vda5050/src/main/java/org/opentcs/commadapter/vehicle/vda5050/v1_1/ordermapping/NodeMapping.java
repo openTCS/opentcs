@@ -12,10 +12,10 @@ import static org.opentcs.commadapter.vehicle.vda5050.v1_1.ObjectProperties.PROP
 import static org.opentcs.commadapter.vehicle.vda5050.v1_1.ObjectProperties.PROPKEY_VEHICLE_EXTENDED_DEVIATION_RANGE_PADDING;
 import static org.opentcs.commadapter.vehicle.vda5050.v1_1.ObjectProperties.PROPKEY_VEHICLE_MAP_ID;
 
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.common.PropertyExtractions;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.Action;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.NodePosition;

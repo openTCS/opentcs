@@ -4,8 +4,8 @@ package org.opentcs.commadapter.vehicle.vda5050.v2_0.message.visualization;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nonnull;
 import java.time.Instant;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.v2_0.message.Header;
 import org.opentcs.commadapter.vehicle.vda5050.v2_0.message.common.AgvPosition;
 import org.opentcs.commadapter.vehicle.vda5050.v2_0.message.common.Velocity;

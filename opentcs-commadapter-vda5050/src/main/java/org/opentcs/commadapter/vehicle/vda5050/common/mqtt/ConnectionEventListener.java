@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.commadapter.vehicle.vda5050.common.mqtt;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * A listener for events concerning an established connection.

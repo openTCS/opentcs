@@ -15,6 +15,7 @@ ext.collectableDistDir = new File(layout.buildDirectory.asFile.get(), 'install')
 
 dependencies {
   api project(':opentcs-commadapter-loopback')
+  api project(':opentcs-commadapter-vda5050')
   api project(':opentcs-common')
   api project(':opentcs-impl-configuration-gestalt')
   api project(':opentcs-plantoverview-common')

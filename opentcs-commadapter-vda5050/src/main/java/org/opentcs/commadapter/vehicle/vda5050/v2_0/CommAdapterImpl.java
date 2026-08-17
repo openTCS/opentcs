@@ -26,6 +26,7 @@ import static org.opentcs.commadapter.vehicle.vda5050.v2_0.StateMappings.toVehic
 import static org.opentcs.commadapter.vehicle.vda5050.v2_0.StateMappings.toVehicleState;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.beans.PropertyChangeEvent;
 import java.time.Instant;
@@ -37,7 +38,6 @@ import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.CommAdapterConfiguration;
 import org.opentcs.commadapter.vehicle.vda5050.CommAdapterConfiguration.ConfigIntegrationLevel;
 import org.opentcs.commadapter.vehicle.vda5050.CommAdapterConfiguration.ConfigOperatingMode;

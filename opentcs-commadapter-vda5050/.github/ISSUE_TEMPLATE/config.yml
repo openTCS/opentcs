@@ -1,9 +1,0 @@
-# SPDX-FileCopyrightText: The openTCS Authors
-# SPDX-License-Identifier: MIT
-
----
-blank_issues_enabled: false
-contact_links:
-  - name: Ask a question or get support
-    url: https://github.com/opentcs/opentcs/discussions
-    about: Ask a question or request support for using openTCS

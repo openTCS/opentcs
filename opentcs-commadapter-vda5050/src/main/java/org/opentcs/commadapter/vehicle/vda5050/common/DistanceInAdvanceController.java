@@ -7,8 +7,8 @@ import static org.opentcs.util.Assertions.checkInRange;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.annotation.Nonnull;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.opentcs.drivers.vehicle.MovementCommand;
 
 /**

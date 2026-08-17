@@ -7,7 +7,7 @@ import static org.opentcs.commadapter.vehicle.vda5050.common.PropertyExtractions
 import static org.opentcs.commadapter.vehicle.vda5050.v2_0.ObjectProperties.PROPKEY_VEHICLE_DEVIATION_THETA;
 import static org.opentcs.commadapter.vehicle.vda5050.v2_0.ObjectProperties.PROPKEY_VEHICLE_DEVIATION_XY;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import org.opentcs.components.kernel.PositionDeviationPolicy;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;

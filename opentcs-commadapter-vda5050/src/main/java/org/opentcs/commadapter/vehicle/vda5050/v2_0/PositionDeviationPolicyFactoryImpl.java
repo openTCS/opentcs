@@ -4,9 +4,9 @@ package org.opentcs.commadapter.vehicle.vda5050.v2_0;
 
 import static java.util.Objects.requireNonNull;
 
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import org.opentcs.components.kernel.PositionDeviationPolicy;
 import org.opentcs.components.kernel.PositionDeviationPolicyFactory;
 import org.opentcs.data.model.Vehicle;

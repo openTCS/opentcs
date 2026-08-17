@@ -8,12 +8,12 @@ import static org.opentcs.commadapter.vehicle.vda5050.v2_0.ErrorTypes.ORDER_ERRO
 import static org.opentcs.commadapter.vehicle.vda5050.v2_0.ErrorTypes.ORDER_UPDATE_ERROR;
 import static org.opentcs.commadapter.vehicle.vda5050.v2_0.ErrorTypes.VALIDATION_ERROR;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentcs.commadapter.vehicle.vda5050.v2_0.message.state.ActionStatus;
 import org.opentcs.commadapter.vehicle.vda5050.v2_0.message.state.ErrorEntry;
 import org.opentcs.commadapter.vehicle.vda5050.v2_0.message.state.ErrorLevel;

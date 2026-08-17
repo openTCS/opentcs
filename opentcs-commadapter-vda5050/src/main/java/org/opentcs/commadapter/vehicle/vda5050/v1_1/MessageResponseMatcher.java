@@ -4,11 +4,11 @@ package org.opentcs.commadapter.vehicle.vda5050.v1_1;
 
 import static java.util.Objects.requireNonNull;
 
+import jakarta.annotation.Nonnull;
 import java.util.ArrayDeque;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.function.Consumer;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.action.CancelOrder;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.Action;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.instantactions.InstantActions;

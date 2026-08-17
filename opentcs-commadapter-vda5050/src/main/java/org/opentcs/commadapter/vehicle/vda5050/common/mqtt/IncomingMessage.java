@@ -4,7 +4,7 @@ package org.opentcs.commadapter.vehicle.vda5050.common.mqtt;
 
 import static java.util.Objects.requireNonNull;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 /**
  * A message received via a topic.

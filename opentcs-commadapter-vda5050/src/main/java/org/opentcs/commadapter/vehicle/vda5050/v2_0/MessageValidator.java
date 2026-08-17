@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.commadapter.vehicle.vda5050.v2_0;
 
+import jakarta.annotation.Nonnull;
 import java.io.InputStreamReader;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.common.JsonValidator;
 import org.opentcs.commadapter.vehicle.vda5050.v2_0.message.connection.Connection;
 import org.opentcs.commadapter.vehicle.vda5050.v2_0.message.instantactions.InstantActions;

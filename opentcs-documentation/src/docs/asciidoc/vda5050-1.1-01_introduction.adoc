@@ -1,0 +1,14 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: CC-BY-4.0
+
+== Introduction
+
+=== Purpose of the software
+
+The VDA5050 vehicle communication adapter implements the VDA5050 protocol specification versions 1.1, using JSON messages via MQTT.
+(_openTCS vehicle communication adapter_ means it implements the interface on the openTCS side.
+If you are looking for an open-source library that helps you use VDA5050 on the vehicle side, check e.g. https://git.openlogisticsfoundation.org/silicon-economy/libraries/vda5050/libvda5050pp[libVDA5050++], instead.)
+
+=== Kernel configuration entries
+
+The kernel configuration entries influencing the VDA5050-related behavior are documented in the reference section of the link:./users-guide.html[openTCS User's Guide].

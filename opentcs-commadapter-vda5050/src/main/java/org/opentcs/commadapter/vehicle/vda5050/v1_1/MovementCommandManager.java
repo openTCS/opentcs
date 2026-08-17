@@ -7,6 +7,7 @@ import static org.opentcs.commadapter.vehicle.vda5050.v1_1.ObjectProperties.PROP
 import static org.opentcs.commadapter.vehicle.vda5050.v1_1.ObjectProperties.PROPKEY_VEHICLE_MOVEMENT_COMMAND_COMPLETED_CONDITION;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.ArrayDeque;
 import java.util.Iterator;
@@ -15,7 +16,6 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.common.MovementCommandCompletedCondition;
 import org.opentcs.commadapter.vehicle.vda5050.common.PropertyExtractions;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.Action;

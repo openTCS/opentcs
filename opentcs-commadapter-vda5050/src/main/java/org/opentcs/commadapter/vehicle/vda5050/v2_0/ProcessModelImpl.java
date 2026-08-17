@@ -4,10 +4,10 @@ package org.opentcs.commadapter.vehicle.vda5050.v2_0;
 
 import static java.util.Objects.requireNonNull;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import java.time.Instant;
 import java.util.ArrayList;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentcs.commadapter.vehicle.vda5050.v2_0.message.connection.Connection;
 import org.opentcs.commadapter.vehicle.vda5050.v2_0.message.connection.ConnectionState;
 import org.opentcs.commadapter.vehicle.vda5050.v2_0.message.instantactions.InstantActions;

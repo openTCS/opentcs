@@ -734,10 +734,16 @@
     <path name="Point-0061 --- Point-0021" sourcePoint="Point-0061" destinationPoint="Point-0021" length="8000" maxVelocity="1000" maxReverseVelocity="0" locked="false">
         <pathLayout connectionType="DIRECT" layerId="0"/>
     </path>
-    <vehicle name="Vehicle-01" energyLevelCritical="30" energyLevelGood="90" energyLevelFullyRecharged="95" energyLevelSufficientlyRecharged="45" maxVelocity="1000" maxReverseVelocity="1000" envelopeKey="envelope-a">
+    <vehicle name="Vehicle-01-VDA5050-2.0" energyLevelCritical="30" energyLevelGood="90" energyLevelFullyRecharged="95" energyLevelSufficientlyRecharged="45" maxVelocity="1000" maxReverseVelocity="1000" envelopeKey="envelope-a">
         <boundingBox length="1000" width="1000" height="1000" referenceOffsetX="0" referenceOffsetY="0"/>
-        <property name="loopback:loadOperation" value="Load cargo"/>
-        <property name="loopback:unloadOperation" value="Unload cargo"/>
+        <property name="vda5050:deviationTheta" value="10"/>
+        <property name="vda5050:deviationXY" value="0.5"/>
+        <property name="vda5050:interfaceName" value="uagv"/>
+        <property name="vda5050:manufacturer" value="acme"/>
+        <property name="vda5050:mapId" value="map"/>
+        <property name="vda5050:maxStepsBase " value="2"/>
+        <property name="vda5050:serialNumber" value="1"/>
+        <property name="vda5050:version" value="2.0"/>
         <vehicleLayout color="#FF0000"/>
     </vehicle>
     <vehicle name="Vehicle-02" energyLevelCritical="30" energyLevelGood="90" energyLevelFullyRecharged="95" energyLevelSufficientlyRecharged="45" maxVelocity="1000" maxReverseVelocity="1000" envelopeKey="envelope-a">

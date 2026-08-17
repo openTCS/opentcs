@@ -6,8 +6,8 @@ import static java.util.Objects.requireNonNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
-import javax.annotation.Nonnull;
 
 /**
  * Describes a reference to an error.

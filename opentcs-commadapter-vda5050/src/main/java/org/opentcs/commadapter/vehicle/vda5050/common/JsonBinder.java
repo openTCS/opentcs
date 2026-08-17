@@ -10,9 +10,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.annotation.Nonnull;
 import java.io.IOException;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
 
 /**
  * Binds JSON strings to objects and vice versa.

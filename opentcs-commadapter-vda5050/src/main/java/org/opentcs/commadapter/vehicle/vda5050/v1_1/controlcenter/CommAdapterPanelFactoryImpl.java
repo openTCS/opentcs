@@ -4,10 +4,10 @@ package org.opentcs.commadapter.vehicle.vda5050.v1_1.controlcenter;
 
 import static java.util.Objects.requireNonNull;
 
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.commadapter.vehicle.vda5050.CommAdapterDescriptionImpl;
 import org.opentcs.data.TCSObjectReference;

@@ -797,6 +797,14 @@ The virtual vehicle (loopback communication adapter) can be configured using the
 
 include::{configdoc}/VirtualVehicleConfigurationEntries.adoc[]
 
+===== VDA5050 configuration entries
+
+include::{configdoc}/Vda5050ConfigurationEntries.adoc[]
+
+===== VDA5050 MQTT configuration entries
+
+include::{configdoc}/Vda5050MqttConfigurationEntries.adoc[]
+
 ===== Virtual peripheral configuration entries
 
 The virtual peripheral (peripheral loopback communication adapter) can be configured using the following configuration entries:

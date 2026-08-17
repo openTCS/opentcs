@@ -4,8 +4,8 @@ package org.opentcs.commadapter.vehicle.vda5050.v1_1.controlcenter;
 
 import static java.util.Objects.requireNonNull;
 
+import jakarta.annotation.Nonnull;
 import java.awt.Component;
-import javax.annotation.Nonnull;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import org.opentcs.commadapter.vehicle.vda5050.common.JsonBinder;

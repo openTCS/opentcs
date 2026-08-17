@@ -17,8 +17,8 @@ import static org.opentcs.commadapter.vehicle.vda5050.v1_1.ObjectProperties.PROP
 import static org.opentcs.commadapter.vehicle.vda5050.v1_1.ObjectProperties.PROPKEY_VEHICLE_TOPIC_VISU_NAME;
 import static org.opentcs.commadapter.vehicle.vda5050.v1_1.ObjectProperties.PROPKEY_VEHICLE_TOPIC_VISU_QOS;
 
+import jakarta.annotation.Nonnull;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.common.mqtt.QualityOfService;
 import org.opentcs.data.model.Vehicle;
 import org.slf4j.Logger;

@@ -5,11 +5,11 @@ package org.opentcs.commadapter.vehicle.vda5050.common;
 import static java.util.Objects.requireNonNull;
 import static org.opentcs.util.Assertions.checkState;
 
+import jakarta.annotation.Nonnull;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import org.everit.json.schema.Schema;
 import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;

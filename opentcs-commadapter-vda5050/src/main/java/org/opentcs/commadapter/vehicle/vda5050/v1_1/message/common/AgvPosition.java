@@ -8,8 +8,8 @@ import static org.opentcs.commadapter.vehicle.vda5050.common.Assertions.checkInR
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
-import javax.annotation.Nonnull;
 
 /**
  * Defines the position on a map in world coordinates. Each floor has its own map.

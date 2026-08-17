@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 package org.opentcs.commadapter.vehicle.vda5050.v1_1;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.order.Order;
 import org.opentcs.drivers.vehicle.MovementCommand;
 

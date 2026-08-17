@@ -1,22 +1,7 @@
 // SPDX-FileCopyrightText: The openTCS Authors
 // SPDX-License-Identifier: CC-BY-4.0
 
-:doctype: book
-:toc: macro
-:toclevels: 6
-:sectnums: all
-:sectnumlevels: 6
-ifdef::env-github[]
-:tip-caption: :bulb:
-:note-caption: :information_source:
-:important-caption: :heavy_exclamation_mark:
-:caution-caption: :fire:
-:warning-caption: :warning:
-endif::[]
-
-toc::[]
-
-= VDA5050 1.1 driver configuration
+== Driver configuration
 
 The driver reads configuration data from properties of the vehicle element in the plant model.
 It reads the properties with the following keys:
@@ -101,7 +86,7 @@ The property value contains the decimal representation of the vehicle length in 
 `vda5050:movementCommandCompletedCondition` (optional)::
 The property value contains a string that describes the condition under which a movement command is considered completed.
 Valid values are `EDGE` and `EDGE_AND_NODE`.
-For details regarding the functionality behind this property, see the 'Movement command completion' section in xref:runtime-behaviour.adoc#movement-command-completion[].
+For details regarding the functionality behind this property, see the <<movement-command-completion,Movement command completion>> section.
 (Default value: `EDGE_AND_NODE`)
 `vda5050:deviationExtensionTrigger` (optional)::
 The property value contains a string that describes the condition under which the deviation range of the very first node in an order is extended to include the vehicle's position.
@@ -109,9 +94,9 @@ Valid values are:
 * `always` - The deviation range is always extended.
 * `never` - The deviation range is never extended.
 * `auto` - The deviation range is extended once after a `cancelOrder` instant action has been sent to the vehicle.
-(See the section on the `cancelOrder` instant action in xref:runtime-behaviour.adoc#instantaction-cancelorder[].)
+(See <<instantaction-cancelorder,`cancelOrder`>>.)
 * `manually` - The deviation range is extended once after a request for it has been issued manually.
-(See the section on supported communication adapter messages in xref:runtime-behaviour.adoc#supported-communication-adapter-messages[].)
+(See <<supported-communication-adapter-messages,Supported communication adapter messages>>.)
 * `auto+manually` - This is a combination of the `auto` and `manually` options.
 `vda5050:extendedDeviationRangePadding` (optional)::
 The property value contains a padding distance in m, which is added when a node's deviation range is extended to include the vehicle position.

@@ -7,6 +7,7 @@ import static org.opentcs.commadapter.vehicle.vda5050.common.PropertyExtractions
 import static org.opentcs.util.Assertions.checkArgument;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -15,7 +16,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.DeviationExtensionTrigger;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.ObjectProperties;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.Action;

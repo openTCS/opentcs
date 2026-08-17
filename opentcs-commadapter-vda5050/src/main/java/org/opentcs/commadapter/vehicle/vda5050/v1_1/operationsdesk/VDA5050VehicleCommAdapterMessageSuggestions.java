@@ -4,13 +4,13 @@ package org.opentcs.commadapter.vehicle.vda5050.v1_1.operationsdesk;
 
 import static java.util.Objects.requireNonNull;
 
+import jakarta.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.CommAdapterMessages;
 import org.opentcs.commadapter.vehicle.vda5050.v1_1.message.common.BlockingType;
 import org.opentcs.components.plantoverview.VehicleCommAdapterMessageSuggestions;

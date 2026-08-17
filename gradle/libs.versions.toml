@@ -4,6 +4,8 @@
 [versions]
 # Other dependency versions
 dockingframes = "1.1.2p11"
+eclipse-paho = "1.2.5"
+everit-json-schema = "1.14.6"
 gestalt = "0.37.0"
 guice = "7.0.0"
 huxhorn-sulky-ulid = "8.3.0"
@@ -45,6 +47,8 @@ swagger-generator = "2.19.2"
 # Other dependencies
 dockingframes-common = { group = "org.opentcs.thirdparty.dockingframes", name = "docking-frames-common", version.ref = "dockingframes" }
 dockingframes-core = { group = "org.opentcs.thirdparty.dockingframes", name = "docking-frames-core", version.ref = "dockingframes" }
+eclipse-paho-client-mqttv3 = { group = "org.eclipse.paho", name = "org.eclipse.paho.client.mqttv3", version.ref = "eclipse-paho" }
+everit-json-schema = { group = "com.github.erosb", name = "everit-json-schema", version.ref = "everit-json-schema" }
 gestalt-core = {group = "com.github.gestalt-config", name = "gestalt-core", version.ref = "gestalt" }
 guice = { group = "com.google.inject", name = "guice", version.ref = "guice" }
 guice-assistedinject = { group = "com.google.inject.extensions", name = "guice-assistedinject", version.ref = "guice" }

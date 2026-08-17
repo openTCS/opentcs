@@ -1,0 +1,28 @@
+// SPDX-FileCopyrightText: The openTCS Authors
+// SPDX-License-Identifier: CC-BY-4.0
+
+= openTCS: VDA5050 2.0 Integration Guide
+The openTCS developers
+:doctype: book
+:toc: left
+:toclevels: 3
+:sectnums: all
+:sectnumlevels: 6
+:docinfo: shared
+:imagesdir: _images
+:stylesdir: _assets/css
+:icons: font
+:source-highlighter: coderay
+:coderay-linenums-mode: table
+:last-update-label!:
+:experimental:
+
+// TIP: Always have the comprehensive http://asciidoctor.org/docs/asciidoc-syntax-quick-reference[QuickReference] handy.
+
+include::vda5050-2.0-01_introduction.adoc[]
+
+include::vda5050-2.0-02_configuration.adoc[]
+
+include::vda5050-2.0-03_runtime-behavior.adoc[]
+
+include::vda5050-2.0-04_remarks.adoc[]

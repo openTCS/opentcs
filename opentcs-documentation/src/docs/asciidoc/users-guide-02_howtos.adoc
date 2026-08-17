@@ -182,3 +182,17 @@ NOTE: For your project-specific key-value pairs, you may specify arbitrary keys.
 openTCS itself will not make any use of this data; it will merely store it and provide it for custom vehicle drivers and/or other extensions.
 You should, however, not use any keys starting with `"tcs:"` for storing project-specific data.
 Any keys with this prefix are reserved for official openTCS features, and using them could lead to collisions.
+
+=== Integrating a vehicle that supports VDA5050
+
+openTCS comes with a VDA5050 driver that can be used to integrate vehicles supporting the VDA5050 protocol.
+To do this, you need to configure the driver and the vehicle in the plant model accordingly:
+
+. In the kernel configuration, ensure that the VDA5050 version you intend to use is enabled, and that the connection details for your MQTT broker are correct.
+  (See <<VDA5050 configuration entries>> and <<VDA5050 MQTT configuration entries>> for details.)
+. In the plant model, create a vehicle and set the required properties for the VDA5050 driver to be able to connect to the vehicle.
+  (Depending on which version of VDA5050 you want to work with, see link:./vda5050-1.1.html[the VDA5050 1.1 Integration Guide] or link:./vda5050-2.0.html[the VDA5050 2.0 Integration Guide] for details.)
+. Start the kernel with the plant model and enable the VDA5050 driver via the Kernel Control Center.
+  The driver will then connect to the MQTT broker.
+  Assuming the vehicle publishes state updates and both the VDA5050 driver and the vehicle are configured for the same topics, openTCS will receive and process these state updates.
+  In case the vehicle is in a state that allows it to accept orders, you can create a suitable transport order and have it assigned to the vehicle, which should then process it.

@@ -8,9 +8,9 @@ import static org.opentcs.util.Assertions.checkInRange;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nonnull;
 import java.io.Serializable;
 import java.time.Instant;
-import javax.annotation.Nonnull;
 
 /**
  * Defines basic information contained in all VDA5050 messages.

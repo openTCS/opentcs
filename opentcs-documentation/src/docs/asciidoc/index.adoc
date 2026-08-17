@@ -22,6 +22,10 @@ The openTCS developers
 * User Resources:
 ** User's Guide:
    link:./users-guide.html[HTML]
+** VDA5050 1.1 Integration Guide:
+   link:./vda5050-1.1.html[HTML]
+** VDA5050 2.0 Integration Guide:
+   link:./vda5050-2.0.html[HTML]
 * Developer Resources:
 ** Developer's Guide:
    link:./developers-guide.html[HTML]
