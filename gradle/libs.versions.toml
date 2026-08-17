@@ -32,6 +32,7 @@ junit-platform-launcher = "6.0.3"
 mockito = "5.23.0"
 # Plugin versions
 asciidoctor = "4.0.5"
+checkstyle = "10.25.0"
 dependency-license-report = "3.0.1"
 freefair-lombok = "9.1.0"
 jacocolog = "3.1.0"
