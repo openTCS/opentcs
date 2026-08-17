@@ -26,7 +26,7 @@ shiro = "2.1.0"
 slf4j = "2.0.18"
 swagger-ui = "5.32.0"
 # Test dependency versions
-approvaltests = "29.0.0"
+approvaltests = "31.0.0"
 assertj = "3.27.7"
 hamcrest = "3.0"
 junit = "6.1.3"
