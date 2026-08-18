@@ -34,8 +34,6 @@ import org.opentcs.guing.common.exchange.AllocationHistory;
 import org.opentcs.guing.common.exchange.adapter.VehicleAdapter;
 import org.opentcs.guing.common.model.SystemModel;
 import org.opentcs.operationsdesk.transport.orders.TransportOrdersContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An adapter for vehicles specific to the Operations Desk application.
@@ -44,10 +42,6 @@ public class OpsDeskVehicleAdapter
     extends
       VehicleAdapter {
 
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(OpsDeskVehicleAdapter.class);
   /**
    * Keeps track of the resources claimed and allocated by vehicles.
    */

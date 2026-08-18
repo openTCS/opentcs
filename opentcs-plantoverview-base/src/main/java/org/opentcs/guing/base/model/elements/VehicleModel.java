@@ -138,10 +138,6 @@ public class VehicleModel
    */
   private TransportOrder.State fDriveOrderState;
   /**
-   * Flag whether the drive order will be displayed.
-   */
-  private boolean fDisplayDriveOrders;
-  /**
    * Flag whether the view follows this vehicle as it drives.
    */
   private boolean fViewFollows;
@@ -245,24 +241,6 @@ public class VehicleModel
    */
   public void setDriveOrderState(TransportOrder.State driveOrderState) {
     fDriveOrderState = driveOrderState;
-  }
-
-  /**
-   * Sets whether the drive order shall be displayed or not.
-   *
-   * @param state <code>true</code> to display the drive order.
-   */
-  public void setDisplayDriveOrders(boolean state) {
-    fDisplayDriveOrders = state;
-  }
-
-  /**
-   * Returns whether the drive order is displayed.
-   *
-   * @return <code>true</code>, if it displayed.
-   */
-  public boolean getDisplayDriveOrders() {
-    return fDisplayDriveOrders;
   }
 
   /**

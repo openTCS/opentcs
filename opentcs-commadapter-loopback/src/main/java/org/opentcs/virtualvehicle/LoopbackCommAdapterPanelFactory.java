@@ -15,8 +15,6 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 import org.opentcs.drivers.vehicle.management.VehicleCommAdapterPanel;
 import org.opentcs.drivers.vehicle.management.VehicleCommAdapterPanelFactory;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A factory for creating {@link LoopbackCommAdapterPanel} instances.
@@ -25,10 +23,6 @@ public class LoopbackCommAdapterPanelFactory
     implements
       VehicleCommAdapterPanelFactory {
 
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(LoopbackCommAdapterPanelFactory.class);
   /**
    * The service portal.
    */

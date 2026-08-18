@@ -65,14 +65,6 @@ public interface OpenTCSDrawingView
   void setBlocks(ModelComponent blocks);
 
   /**
-   * Shows or hides the current route of a vehicle.
-   *
-   * @param vehicle The vehicle
-   * @param visible <code>true</code> to set it to visible, <code>false</code> otherwise.
-   */
-  void displayDriveOrders(VehicleModel vehicle, boolean visible);
-
-  /**
    * Updates the figures of a block.
    *
    * @param block The block.

@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.routing.GroupMapper;
@@ -60,10 +59,6 @@ public class DefaultRouter
    */
   private final GroupMapper routingGroupMapper;
   /**
-   * The routes selected for each vehicle.
-   */
-  private final Map<Vehicle, List<DriveOrder>> routesByVehicle = new ConcurrentHashMap<>();
-  /**
    * Indicates whether this component is enabled.
    */
   private boolean initialized;
@@ -96,7 +91,6 @@ public class DefaultRouter
     }
 
     synchronized (this) {
-      routesByVehicle.clear();
       pointRouterProvider.invalidate();
       initialized = true;
     }
@@ -114,7 +108,6 @@ public class DefaultRouter
     }
 
     synchronized (this) {
-      routesByVehicle.clear();
       pointRouterProvider.invalidate();
       initialized = false;
     }

@@ -17,8 +17,6 @@ import org.opentcs.components.kernel.services.TransportOrderService;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.guing.plugins.panels.loadgenerator.DriveOrderStructure;
 import org.opentcs.guing.plugins.panels.loadgenerator.TransportOrderData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A batch generator for creating explicit transport orders.
@@ -27,10 +25,6 @@ public class ExplicitOrderBatchGenerator
     implements
       OrderBatchCreator {
 
-  /**
-   * This class's Logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(ExplicitOrderBatchGenerator.class);
   /**
    * The transport order service we talk to.
    */

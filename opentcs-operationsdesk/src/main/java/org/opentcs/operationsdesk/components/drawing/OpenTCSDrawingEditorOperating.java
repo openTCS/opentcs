@@ -11,7 +11,6 @@ import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.event.NullAttributesChangeListener;
 import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.components.drawing.OpenTCSDrawingEditor;
-import org.opentcs.guing.common.components.drawing.OpenTCSDrawingView;
 import org.opentcs.guing.common.event.SystemModelTransitionEvent;
 import org.opentcs.guing.common.persistence.ModelManager;
 import org.opentcs.operationsdesk.components.drawing.figures.NamedVehicleFigure;
@@ -98,10 +97,6 @@ public class OpenTCSDrawingEditorOperating
     vehicleModel.addAttributesChangeListener(vehicleFigure);
     modelManager.getModel().registerFigure(vehicleModel, vehicleFigure);
 
-    vehicleModel.setDisplayDriveOrders(true);
-    for (OpenTCSDrawingView view : getAllViews()) {
-      view.displayDriveOrders(vehicleModel, true);
-    }
     vehicleFigure.propertiesChanged(
         new AttributesChangeEvent(new NullAttributesChangeListener(), vehicleModel)
     );

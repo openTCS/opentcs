@@ -17,8 +17,6 @@ import org.opentcs.components.kernel.services.NotificationService;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.notification.UserNotification;
 import org.opentcs.kernel.extensions.watchdog.StrandedVehicles.VehicleSnapshot;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Checks for vehicles that are stranded for too long.
@@ -39,10 +37,6 @@ public class StrandedVehicleCheck
       Runnable,
       Lifecycle {
 
-  /**
-   * This class's Logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(StrandedVehicleCheck.class);
   /**
    * Source for notifications.
    */

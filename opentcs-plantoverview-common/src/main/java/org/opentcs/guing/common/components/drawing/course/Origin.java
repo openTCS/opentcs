@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.Set;
 import org.opentcs.guing.base.components.properties.type.LengthProperty;
 import org.opentcs.guing.common.components.drawing.figures.OriginFigure;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The origin of the coordinate system. Represents the current scale, coordinate system and
@@ -22,10 +20,6 @@ public final class Origin {
    * Scale (in mm per pixel) of the layout.
    */
   public static final double DEFAULT_SCALE = 50.0;
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(Origin.class);
   /**
    * Amount of mm to equal one pixel on screen in horizontal direction.
    */

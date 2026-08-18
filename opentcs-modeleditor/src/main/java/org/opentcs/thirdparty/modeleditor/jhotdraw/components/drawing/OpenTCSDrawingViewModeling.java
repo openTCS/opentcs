@@ -135,11 +135,6 @@ public class OpenTCSDrawingViewModeling
   }
 
   @Override
-  public void displayDriveOrders(VehicleModel vehicle, boolean visible) {
-    // Displaying drive orders is specific to operating mode
-  }
-
-  @Override
   public void followVehicle(
       @Nonnull
       final VehicleModel model

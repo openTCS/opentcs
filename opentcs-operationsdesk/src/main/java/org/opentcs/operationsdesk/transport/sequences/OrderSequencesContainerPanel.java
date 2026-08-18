@@ -32,8 +32,6 @@ import org.opentcs.operationsdesk.transport.OrdersTable;
 import org.opentcs.operationsdesk.transport.orders.TransportViewFactory;
 import org.opentcs.operationsdesk.util.I18nPlantOverviewOperating;
 import org.opentcs.thirdparty.guing.common.jhotdraw.util.ResourceBundleUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Shows a table of the kernel's order sequences.
@@ -46,10 +44,6 @@ public class OrderSequencesContainerPanel
    * The path to the icons.
    */
   private static final String ICON_PATH = "/org/opentcs/guing/res/symbols/panel/";
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(OrderSequencesContainerPanel.class);
   /**
    * A factory for order sequence views.
    */

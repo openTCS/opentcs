@@ -29,18 +29,11 @@ import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.MovementCommand;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Maps {@link MovementCommand}s from openTCS to an {@link Order} message understood by the vehicle.
  */
 public class OrderMapper {
-
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(OrderMapper.class);
 
   /**
    * A reference to the attached vehicle.

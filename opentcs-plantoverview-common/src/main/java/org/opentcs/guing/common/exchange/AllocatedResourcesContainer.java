@@ -6,17 +6,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentcs.guing.base.model.FigureDecorationDetails;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Maintains a set of all currently allocated resources.
  */
 public class AllocatedResourcesContainer {
-  /**
-   * This class's logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(AllocatedResourcesContainer.class);
   /**
    * Maps model components names to allocated components of instance FigureDecorationDetails.
    */

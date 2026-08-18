@@ -15,8 +15,6 @@ import java.awt.RadialGradientPaint;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import org.jhotdraw.draw.DefaultDrawingView;
 import org.jhotdraw.draw.Figure;
@@ -36,10 +34,6 @@ public class OpenTCSDrawingViewOperating
       AbstractOpenTCSDrawingView {
 
   /**
-   * Contains the vehicle on the drawing, for which transport order shall be drawn.
-   */
-  private final List<VehicleModel> fVehicles = new ArrayList<>();
-  /**
    * The vehicle the view should highlight and follow.
    */
   private VehicleModel fFocusVehicle;
@@ -53,12 +47,6 @@ public class OpenTCSDrawingViewOperating
   @Inject
   public OpenTCSDrawingViewOperating(ApplicationState appState, ModelManager modelManager) {
     super(appState, modelManager);
-  }
-
-  @Override
-  public void removeAll() {
-    fVehicles.clear();
-    super.removeAll();
   }
 
   @Override
@@ -88,20 +76,6 @@ public class OpenTCSDrawingViewOperating
 
   @Override
   public void duplicate() {
-  }
-
-  @Override
-  public void displayDriveOrders(VehicleModel vehicle, boolean visible) {
-    requireNonNull(vehicle, "vehicle");
-
-    if (visible) {
-      if (!fVehicles.contains(vehicle)) {
-        fVehicles.add(vehicle);
-      }
-    }
-    else {
-      fVehicles.remove(vehicle);
-    }
   }
 
   @Override

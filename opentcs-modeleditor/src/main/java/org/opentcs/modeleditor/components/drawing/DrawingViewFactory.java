@@ -8,7 +8,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import javax.swing.JToggleButton;
 import org.jhotdraw.gui.JPopupButton;
-import org.opentcs.guing.base.model.elements.VehicleModel;
 import org.opentcs.guing.common.application.StatusPanel;
 import org.opentcs.guing.common.components.drawing.DrawingOptions;
 import org.opentcs.guing.common.components.drawing.DrawingViewPlacardPanel;
@@ -84,9 +83,6 @@ public class DrawingViewFactory {
     OpenTCSDrawingView drawingView = drawingViewProvider.get();
     drawingEditor.add(drawingView);
     drawingEditor.setActiveView(drawingView);
-    for (VehicleModel vehicle : systemModel.getVehicleModels()) {
-      drawingView.displayDriveOrders(vehicle, vehicle.getDisplayDriveOrders());
-    }
     drawingView.setBlocks(systemModel.getMainFolder(SystemModel.FolderKey.BLOCKS));
 
     DrawingViewPlacardPanel placardPanel = new DrawingViewPlacardPanel(drawingView, drawingOptions);
