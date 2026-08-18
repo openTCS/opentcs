@@ -189,7 +189,7 @@ lint-hyperlinks:
   stage: test
   interruptible: true
   image:
-    name: ghcr.io/untitaker/hyperlink:0.2.0
+    name: ghcr.io/untitaker/hyperlink:0.3.2
     entrypoint: [""]
   dependencies:
     - build
