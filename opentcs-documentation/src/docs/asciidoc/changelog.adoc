@@ -21,6 +21,7 @@ This change log lists the most relevant changes for past releases in reverse chr
 == Unreleased
 
 * Changes affecting developers:
+** Update Gradle wrapper to 9.7.0.
 ** Update JUnit to 6.1.3.
 ** Update ApprovalTests to 31.0.0.
 ** Update Javalin to 7.2.3.
