@@ -3,6 +3,9 @@
   "extends": [
     "config:recommended"
   ],
+  "minimumReleaseAge": "7 days",
+  "osvVulnerabilityAlerts": true,
+  "dependencyDashboardOSVVulnerabilitySummary": true,
   "assigneesFromCodeOwners": true,
   "assigneesSampleSize": 1,
   "dependencyDashboardApproval": true
