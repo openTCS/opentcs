@@ -1016,7 +1016,7 @@ public class RequestHandler
   }
 
   private Instant since(Context ctx) {
-    String param = ctx.queryParamAsClass("since", String.class).getOrDefault(null);
+    String param = ctx.queryParam("since");
     if (param != null) {
       try {
         return Instant.parse(param);
