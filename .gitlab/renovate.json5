@@ -5,7 +5,7 @@
   ],
   "minimumReleaseAge": "7 days",
   "osvVulnerabilityAlerts": true,
-  "dependencyDashboardOSVVulnerabilitySummary": true,
+  "dependencyDashboardOSVVulnerabilitySummary": "all",
   "assigneesFromCodeOwners": true,
   "assigneesSampleSize": 1,
   "dependencyDashboardApproval": true
