@@ -172,6 +172,10 @@ public class V1RequestHandler
           );
           put("/vehicles/{NAME}/commAdapter/enabled", this::handlePutVehicleCommAdapterEnabled);
           post("/vehicles/{NAME}/commAdapter/message", this::handlePostVehicleCommAdapterMessage);
+          post(
+              "/vehicles/{NAME}/commAdapter/position",
+              this::handlePostVehicleCommAdapterPosition
+          );
           put("/vehicles/{NAME}/paused", this::handlePutVehiclePaused);
           put("/vehicles/{NAME}/integrationLevel", this::handlePutVehicleIntegrationLevel);
           post("/vehicles/{NAME}/withdrawal", this::handlePostWithdrawalByVehicle);
@@ -280,6 +284,16 @@ public class V1RequestHandler
     vehicleHandler.postVehicleCommAdapterMessage(
         ctx.pathParam("NAME"),
         jsonBinder.fromJson(ctx.body(), PostVehicleCommAdapterMessageRequestTO.class)
+    );
+    ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    ctx.result("");
+  }
+
+  private void handlePostVehicleCommAdapterPosition(Context ctx)
+      throws ObjectUnknownException {
+    vehicleHandler.postVehicleCommAdapterPosition(
+        ctx.pathParam("NAME"),
+        ctx.queryParam("newValue")
     );
     ctx.contentType(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     ctx.result("");
